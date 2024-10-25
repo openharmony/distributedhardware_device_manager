@@ -27,13 +27,15 @@ ohos_benchmarktest("DeviceManagerTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+  deps = [ 
+    "${innerkits_path}/native_cpp:devicemanagersdk" 
+    "//third_party/benchmark:benchmark",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "benchmark:benchmark",
     "bounds_checking_function:libsec_shared",
     "dsoftbus:softbus_client",
   ]

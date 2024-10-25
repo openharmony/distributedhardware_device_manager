@@ -79,7 +79,7 @@ if (defined(ohos_lite)) {
         "LITE_DEVICE",
         "HI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerservice\"",
-        "LOG_DOMAIN=0xD004110",
+        "LOG_DOMAIN=0xD004113",
       ]
 
       deps = [
@@ -181,7 +181,7 @@ if (defined(ohos_lite)) {
     defines = [
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerservice\"",
-      "LOG_DOMAIN=0xD004110",
+      "LOG_DOMAIN=0xD004113",
     ]
 
     deps = [

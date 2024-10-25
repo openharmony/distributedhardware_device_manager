@@ -47,6 +47,10 @@ std::shared_ptr<SoftbusConnector> softbusConnector_ = std::make_shared<SoftbusCo
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<DmPublishManager> publishMgr_ = std::make_shared<DmPublishManager>(softbusConnector_, listener_);
 
+bool CheckSoftbusRes(int32_t ret) 
+{
+    return ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR || ret == SOFTBUS_IPC_ERR;
+}
 /**
  * @tc.name: DmPublishManager_001
  * @tc.desc: Test whether the DmPublishManager function can generate a new pointer

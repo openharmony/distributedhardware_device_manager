@@ -73,7 +73,7 @@ bool SoftbusListener::isRadarSoLoad_ = false;
 IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
 void* SoftbusListener::radarHandle_ = nullptr;
 std::string SoftbusListener::hostName_ = "";
-int32_t g_onlinDeviceNum = 0;
+int32_t g_onlineDeviceNum = 0;
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -198,7 +198,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().SaveLocalDeviceInfo();
     {
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
-        g_onlinDeviceNum++;
+        g_onlineDeviceNum++;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ThreadManager::GetInstance().Submit(DEVICE_ONLINE, [=]() { DeviceOnLine(dmDeviceInfo); });
@@ -264,8 +264,8 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmDeviceInfo.networkId);
     {
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
-        g_onlinDeviceNum--;
-        if (g_onlinDeviceNum == 0) {
+        g_onlineDeviceNum--;
+        if (g_onlineDeviceNum == 0) {
             SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
         }
     }

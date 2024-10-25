@@ -96,6 +96,7 @@ public:
     static void SetHostPkgName(const std::string hostName);
     static std::string GetHostPkgName();
     static int32_t GetNetworkIdByUdid(const std::string &udid, std::string &networkId);
+
     int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
 private:
     int32_t InitSoftPublishLNN();

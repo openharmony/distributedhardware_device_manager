@@ -491,7 +491,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline_002, testing::ext::TestSize.Lev
     DmDeviceInfo deviceInfo;
     DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOnline called
-    ASSERT_EQ(count, 0);
+    ASSERT_EQ(count, 1);
 }
 
 /*

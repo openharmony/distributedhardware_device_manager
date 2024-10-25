@@ -2110,6 +2110,54 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string networkId;
+    int32_t screenStatus = 1;
+    DeletePermission();
+    int ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string networkId;
+    int32_t screenStatus = 1;
+    int ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgname";
+    std::string networkId = "networkId_003";
+    int32_t screenStatus = 1;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    int ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
+    EXPECT_NE(ret, DM_OK);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgname";
+    std::string networkId = "networkId_003";
+    int32_t screenStatus = 1;
+    int ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceManagerServiceTest, HandleDeviceScreenStatusChange_001, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo deviceInfo;
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    DeviceManagerService::GetInstance().IsDMServiceImplReady();
+    DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
+    EXPECT_NE(DeviceManagerService::GetInstance().dmServiceImpl_, nullptr);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

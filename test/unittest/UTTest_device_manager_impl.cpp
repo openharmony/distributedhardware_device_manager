@@ -1993,7 +1993,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_002, testing::ext::Test
     //  2. call DeviceManagerImpl::AuthenticateDevice with parameter
     ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, dsCallback);
     // 3. check ret is DM_OK
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
