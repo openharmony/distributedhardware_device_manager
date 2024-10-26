@@ -310,7 +310,12 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
             return DM_OK;
         }
     }
-    return GetDevLevelFromBus(networkId, securityLevel);
+    int32_t ret = GetDevLevelFromBus(networkId, securityLevel);
+    if (ret == DM_OK) {
+        LOGI("Get dev level from softbus success.");
+        return DM_OK;
+    }
+    return ret;
 }
 
 int32_t SoftbusCache::GetDevLevelFromBus(const char *networkId, int32_t &securityLevel)
@@ -370,22 +375,6 @@ int32_t SoftbusCache::GetDevInfoFromBus(const std::string &networkId, DmDeviceIn
     LOGI("GetDeviceInfo complete, deviceName : %{public}s, deviceTypeId : %{public}d.",
         GetAnonyString(devInfo.deviceName).c_str(), devInfo.deviceTypeId);
     return ret;
-}
-
-int32_t SoftbusCache::GetUdidByUdidHash(const std::string &udidHash, std::string &udid)
-{
-    LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
-    {
-        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-        for (const auto &item : deviceInfo_) {
-            if (std::string(item.second.second.deviceId) == udidHash) {
-                udid = item.first;
-                LOGI("GetUdidByUdidHash success udid %{public}s.", GetAnonyString(udid).c_str());
-                return DM_OK;
-            }
-        }
-    }
-    return ERR_DM_FAILED;
 }
 
 int32_t SoftbusCache::GetNetworkIdFromCache(const std::string &udid, std::string &networkId)

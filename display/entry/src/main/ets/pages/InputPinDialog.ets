@@ -316,7 +316,10 @@ struct InputCustomDialog {
         .constraintSize({ maxHeight: `${this.heightNum}`})
         .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
         .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
+        .margin({
+          left: $r('sys.float.ohos_id_dialog_margin_bottom'),
+          right: $r('sys.float.ohos_id_dialog_margin_bottom')
+        })
       }
     }.margin({top: 8, bottom: 20})
   }
@@ -335,7 +338,7 @@ struct dialogPlusPage {
   });
 
   aboutToAppear() {
-    console.log(TAG + 'aboutToAppear aboutToAppear')
+    console.log(TAG + 'aboutToAppear aboutToAppear');
   }
 
   aboutToDisappear() {

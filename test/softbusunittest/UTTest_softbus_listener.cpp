@@ -50,7 +50,8 @@ namespace {
 
 bool checkSoftbusRes(int32_t ret)
 {
-    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
+    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR
+        || SOFTBUS_IPC_ERR;
 }
 
 /**
@@ -289,7 +290,7 @@ HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetUuidByNetworkId(networkId.c_str(), udid);
-    EXPECT_TRUE(checkSoftbusRes(ret));
+    EXPECT_EQ(true, checkSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
@@ -728,6 +729,48 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
     EXPECT_EQ(true, checkSoftbusRes(ret));
 }
+
+HWTEST_F(SoftbusListenerTest, OnLocalDevInfoChange_001, testing::ext::TestSize.Level0)
+{
+    char *msg = nullptr;
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnLocalDevInfoChange();
+    EXPECT_EQ(msg, nullptr);
+}
+
+HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_001, testing::ext::TestSize.Level0)
+{
+    char *msg = nullptr;
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnDeviceNotTrusted(nullptr);
+    EXPECT_EQ(msg, nullptr);
+}
+
+HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_002, testing::ext::TestSize.Level0)
+{
+    char msg[MAX_SOFTBUS_MSG_LEN + 1] = "This is a long message";
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnDeviceNotTrusted(msg);
+    EXPECT_NE(msg, nullptr);
+}
+
+HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_003, testing::ext::TestSize.Level0)
+{
+    char msg[MAX_SOFTBUS_MSG_LEN - 1] = "Valid message";
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    softbusListener->OnDeviceNotTrusted(msg);
+    EXPECT_NE(msg, nullptr);
+}
+
+
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

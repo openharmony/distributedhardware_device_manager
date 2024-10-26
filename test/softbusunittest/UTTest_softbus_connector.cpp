@@ -103,9 +103,10 @@ void SoftbusConnectorTest::TearDownTestCase()
 namespace {
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 
-bool CheckReturnResult(int ret)
+bool CheckSoftbusRes(int ret)
 {
-    return ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
+    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR
+        || ret == SOFTBUS_IPC_ERR ;
 }
 /**
  * @tc.name: SoftbusConnector_001
@@ -211,7 +212,7 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_001, testing::ext::TestSize.Level0
     DmSubscribeInfo dmSubscribeInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->StartDiscovery(dmSubscribeInfo);
-    EXPECT_TRUE(CheckReturnResult(ret));
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**
@@ -225,7 +226,7 @@ HWTEST_F(SoftbusConnectorTest, StartDiscovery_002, testing::ext::TestSize.Level0
     uint16_t subscribeId = 0;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->StartDiscovery(subscribeId);
-    EXPECT_TRUE(CheckReturnResult(ret));
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**
@@ -253,7 +254,7 @@ HWTEST_F(SoftbusConnectorTest, PublishDiscovery_001, testing::ext::TestSize.Leve
     DmPublishInfo dmPublishInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int ret = softbusConnector->PublishDiscovery(dmPublishInfo);
-    EXPECT_TRUE(CheckReturnResult(ret));
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**

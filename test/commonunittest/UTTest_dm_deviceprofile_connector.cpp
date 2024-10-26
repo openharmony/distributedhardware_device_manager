@@ -719,7 +719,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_003, testing::ext::TestSi
 
 HWTEST_F(DeviceProfileConnectorTest, CheckPkgnameInAcl_004, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "bundleName2";
+    std::string pkgName = "bundleName";
     std::string localDeviceId = "deviceId";
     std::string remoteDeviceId = "deviceId";
     bool ret = DeviceProfileConnector::GetInstance().CheckPkgnameInAcl(pkgName, localDeviceId, remoteDeviceId);
