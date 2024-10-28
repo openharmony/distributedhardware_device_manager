@@ -106,7 +106,7 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("PkgName %{public}s.", pkgName.c_str());
+    LOGD("PkgName %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> lock(appIdMapLock_);
     if (appIdMap_.find(pkgName) == appIdMap_.end()) {
         LOGE("AppIdMap not find pkgName.");

@@ -437,7 +437,7 @@ void DeviceManagerServiceListener::OnPinHolderEvent(const std::string &pkgName, 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo)
 {
-    LOGI("pkgName %{public}s.", pkgName.c_str());
+    LOGD("pkgName %{public}s.", pkgName.c_str());
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
         LOGD("GetAppIdByPkgName failed");

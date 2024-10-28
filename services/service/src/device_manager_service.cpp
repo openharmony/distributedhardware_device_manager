@@ -326,7 +326,7 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
-    LOGI("Begin.");
+    LOGD("Begin.");
     bool isOnlyShowNetworkId = false;
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
