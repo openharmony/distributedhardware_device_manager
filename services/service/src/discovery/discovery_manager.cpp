@@ -509,7 +509,7 @@ void UpdateInfoFreq(const std::map<std::string, std::string> &discoverParam, DmS
     if (auto it = discoverParam.find(PARAM_KEY_DISC_FREQ); it != discoverParam.end()) {
         int32_t freq = StringToInt(it->second, DECIMALISM);
         if (freq < DmExchangeFreq::DM_LOW || freq > DmExchangeFreq::DM_FREQ_BUTT) {
-            LOGE("Invalid freq value.")
+            LOGE("Invalid freq value.");
             return;
         }
         dmSubInfo.freq = static_cast<DmExchangeFreq>(freq);

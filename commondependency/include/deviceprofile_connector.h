@@ -154,7 +154,7 @@ public:
     void DeleteAccessControlList(const std::string &udid);
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfileByUserId(int32_t userId);
     void DeleteAclForAccountLogOut(const std::string &localUdid, int32_t userId, const std::string &remoteUdid);
-    std::map<std::string, int32_t> GetDeviceAndBindType(int32_t userId, const std::string &accountId,
+    std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId,
         const std::string &localUdid);
 
 private:

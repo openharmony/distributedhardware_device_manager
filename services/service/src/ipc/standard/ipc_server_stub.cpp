@@ -64,15 +64,6 @@ void IpcServerStub::OnStart()
 #endif
     AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
     AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
-
-    {
-        std::lock_guard<std::mutex> lock(dependsSASetLock_);
-        dependsSASet_.emplace(SOFTBUS_SERVER_SA_ID);
-#ifdef SUPPORT_POWER_MANAGER
-        dependsSASet_.emplace(POWER_MANAGER_SERVICE_ID);  // power
-#endif // SUPPORT_POWER_MANAGER
-    }
-
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
     LOGI("called:AddAbilityListener end!");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
