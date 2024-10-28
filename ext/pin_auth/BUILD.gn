@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -68,7 +68,6 @@ ohos_shared_library("devicemanagerext_pin_auth") {
   ]
 
   external_deps = [
-    "ability_base:session_info",
     "ability_base:want",
     "ability_runtime:ability_manager",
     "bundle_framework:appexecfwk_base",
@@ -77,15 +76,12 @@ ohos_shared_library("devicemanagerext_pin_auth") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "json:nlohmann_json_static",
     "resource_management:resmgr_napi_core",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
 
   defines = [

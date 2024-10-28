@@ -20,6 +20,7 @@
 #include "device_manager_impl.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "dm_servcie_load.h"
 #include "ipc_client_server_proxy.h"
 #include "ipc_client_stub.h"
 #include "ipc_register_listener_req.h"
@@ -54,6 +55,7 @@ int32_t IpcClientManager::ClientInit()
     auto object = samgr->CheckSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     if (object == nullptr) {
         LOGE("Get DeviceManager SystemAbility Failed");
+        DmServiceLoad::GetInstance().LoadDMService();
         return ERR_DM_INIT_FAILED;
     }
 
@@ -145,9 +147,8 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
     if (req == nullptr || rsp == nullptr) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("IpcClientManager::SendRequest in");
     if (dmInterface_ != nullptr) {
-        LOGI("IpcClientManager::SendRequest cmdCode: %{public}d", cmdCode);
+        LOGD("IpcClientManager::SendRequest cmdCode: %{public}d", cmdCode);
         return dmInterface_->SendCmd(cmdCode, req, rsp);
     } else {
         LOGE("dmInterface_ is not init.");
@@ -214,8 +215,8 @@ void IpcClientManager::SystemAbilityListener::OnAddSystemAbility(int32_t systemA
 {
     LOGI("sa %{public}d is added.", systemAbilityId);
     if (systemAbilityId == DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) {
-        std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback
-        = DeviceManagerNotify::GetInstance().GetDmInitCallback();
+        std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback =
+            DeviceManagerNotify::GetInstance().GetDmInitCallback();
         if (dmInitCallback.size() == 0) {
             LOGI("dmInitCallback is empty when ReInit");
             return;

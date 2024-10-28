@@ -66,7 +66,6 @@
 #endif
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t SLEEP_TIME_MS = 50000; // 50ms
 
 constexpr const char* DM_INIT_DEVICE_MANAGER_SUCCESS = "DM_INIT_DEVICE_MANAGER_SUCCESS";
 constexpr const char* DM_INIT_DEVICE_MANAGER_FAILED = "DM_INIT_DEVICE_MANAGER_FAILED";
@@ -128,10 +127,10 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     int32_t retryNum = 0;
     while (retryNum < SERVICE_INIT_TRY_MAX_NUM) {
         ret = ipcClientProxy_->Init(pkgName);
-        if (ret != ERR_DM_NOT_INIT) {
+        if (ret == DM_OK) {
             break;
         }
-        usleep(SLEEP_TIME_MS);
+        usleep(USLEEP_TIME_MS);
         retryNum++;
         if (retryNum == SERVICE_INIT_TRY_MAX_NUM) {
             LOGE("InitDeviceManager error, wait for device manager service starting timeout.");

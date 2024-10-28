@@ -1457,6 +1457,25 @@ ON_IPC_CMD(SET_DN_POLICY, MessageParcel &data, MessageParcel &reply)
     }
     return DM_OK;
 }
+
+ON_IPC_CMD(GET_NETWORKID_BY_UDID, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string udid = data.ReadString();
+    std::string netWorkId;
+    int32_t result = DeviceManagerService::GetInstance().GetNetworkIdByUdid(pkgName, udid, netWorkId);
+
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteString(netWorkId)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(STOP_AUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
@@ -1508,24 +1527,6 @@ ON_IPC_CMD(GET_DEVICE_SCREEN_STATUS, MessageParcel &data, MessageParcel &reply)
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!reply.WriteInt32(screenStatus)) {
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(GET_NETWORKID_BY_UDID, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    std::string udid = data.ReadString();
-    std::string netWorkId;
-    int32_t result = DeviceManagerService::GetInstance().GetNetworkIdByUdid(pkgName, udid, netWorkId);
-
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!reply.WriteString(netWorkId)) {
-        LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

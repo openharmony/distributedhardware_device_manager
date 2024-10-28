@@ -139,28 +139,24 @@ DmConfigManager::~DmConfigManager()
 {
     void *so_handle = nullptr;
     for (auto iter = soAdapterLoadInfo_.begin(); iter != soAdapterLoadInfo_.end(); iter++) {
-        char path[PATH_MAX + 1] = {0x00};
-        std::string soPathName = (iter->second).soPath + (iter->second).soName;
-        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
-            (realpath(soPathName.c_str(), path) == nullptr)) {
+        std::string soPathName = (iter->second).soName;
+        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX)) {
             LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
             continue;
         }
-        so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
         if (so_handle != nullptr) {
             LOGI("DmConfigManager so_handle is not nullptr first.");
             dlclose(so_handle);
         }
     }
     for (auto iter = soAuthLoadInfo_.begin(); iter != soAuthLoadInfo_.end(); iter++) {
-        char path[PATH_MAX + 1] = {0x00};
-        std::string soPathName = (iter->second).soPath + (iter->second).soName;
-        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
-            (realpath(soPathName.c_str(), path) == nullptr)) {
+        std::string soPathName = (iter->second).soName;
+        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX)) {
             LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
             continue;
         }
-        so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
         if (so_handle != nullptr) {
             LOGI("DmConfigManager so_handle is not nullptr second.");
             dlclose(so_handle);
@@ -189,16 +185,14 @@ std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::str
     }
 
     void *so_handle = nullptr;
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soPathName = (soInfoIter->second).soPath + (soInfoIter->second).soName;
-    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
-        (realpath(soPathName.c_str(), path) == nullptr)) {
+    std::string soPathName = (soInfoIter->second).soName;
+    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX)) {
         LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
         return nullptr;
     }
-    so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
+    so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        LOGE("load crypto so %{public}s failed", soName.c_str());
+        LOGE("load crypto so failed.");
         return nullptr;
     }
 
@@ -224,14 +218,12 @@ void DmConfigManager::GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthenti
         }
 
         void *so_handle = nullptr;
-        char path[PATH_MAX + 1] = {0x00};
-        std::string soPathName = (iter->second).soPath + (iter->second).soName;
-        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
-            (realpath(soPathName.c_str(), path) == nullptr)) {
+        std::string soPathName = (iter->second).soName;
+        if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX)) {
             LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
             continue;
         }
-        so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
+        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NODELETE);
         if (so_handle == nullptr) {
             LOGE("load auth so %{public}s failed", (iter->second).soName.c_str());
             continue;

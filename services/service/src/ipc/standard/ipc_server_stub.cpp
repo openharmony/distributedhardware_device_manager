@@ -27,8 +27,10 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "kv_adapter_manager.h"
 #endif
+#ifdef SUPPORT_MEMMGR
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
+#endif //SUPPORT_MEMMGR
 #include "string_ex.h"
 #include "system_ability_definition.h"
 
@@ -57,7 +59,9 @@ void IpcServerStub::OnStart()
 
     LOGI("called:AddAbilityListener begin!");
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
+#ifdef SUPPORT_MEMMGR
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
+#endif
     AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
     AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
 
@@ -70,43 +74,45 @@ void IpcServerStub::OnStart()
     }
 
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
-#ifdef SUPPORT_POWER_MANAGER
-    AddSystemAbilityListener(POWER_MANAGER_SERVICE_ID);  // power
-#endif // SUPPORT_POWER_MANAGER
+    LOGI("called:AddAbilityListener end!");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
 #endif
     DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
-    LOGI("called:AddAbilityListener end!");
 }
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
-    {
-        std::lock_guard<std::mutex> lock(dependsSASetLock_);
-        if (dependsSASet_.find(systemAbilityId) != dependsSASet_.end()) {
-            dependsSASet_.erase(systemAbilityId);
-            if (dependsSASet_.empty()) {
-                DeviceManagerService::GetInstance().InitSoftbusListener();
-                if (!Init()) {
-                    LOGE("failed to init IpcServerStub");
-                    state_ = ServiceRunningState::STATE_NOT_START;
-                    return;
-                }
-                state_ = ServiceRunningState::STATE_RUNNING;
-            }
+    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+        DeviceManagerService::GetInstance().InitSoftbusListener();
+        if (!Init()) {
+            LOGE("failed to init IpcServerStub");
+            state_ = ServiceRunningState::STATE_NOT_START;
+            return;
         }
+        state_ = ServiceRunningState::STATE_RUNNING;
+        return;
     }
 
+#ifdef SUPPORT_MEMMGR
     if (systemAbilityId == MEMORY_MANAGER_SA_ID) {
         int pid = getpid();
         Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-    } else if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
-        DeviceManagerService::GetInstance().InitAccountInfo();
-    } else if (systemAbilityId == SCREENLOCK_SERVICE_ID) {
-        DeviceManagerService::GetInstance().InitScreenLockEvent();
+        return;
     }
+#endif //SUPPORT_MEMMGR
+
+    if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        DeviceManagerService::GetInstance().InitAccountInfo();
+        return;
+    }
+
+    if (systemAbilityId == SCREENLOCK_SERVICE_ID) {
+        DeviceManagerService::GetInstance().InitScreenLockEvent();
+        return;
+    }
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         KVAdapterManager::GetInstance().ReInit();
@@ -147,8 +153,10 @@ void IpcServerStub::OnStop()
     DeviceManagerService::GetInstance().UninitDMServiceListener();
     state_ = ServiceRunningState::STATE_NOT_START;
     registerToService_ = false;
+#ifdef SUPPORT_MEMMGR
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+#endif // SUPPORT_MEMMGR
     LOGI("IpcServerStub::OnStop end.");
 }
 

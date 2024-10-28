@@ -30,6 +30,7 @@ const int32_t DISCOVERY_TIMEOUT = 120;
 const uint16_t DM_INVALID_FLAG_ID = 0;
 constexpr const char* LNN_DISC_CAPABILITY = "capability";
 const std::string TYPE_MINE = "findDeviceMode";
+const int32_t DECIMALISM = 10;
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 static std::mutex comDependencyLoadLock;
@@ -72,7 +73,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         LOGE("capability copy err.");
         return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
     }
-
+    UpdateInfoFreq(discoverParam, dmSubInfo);
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
         std::string metaType = discoverParam.find(PARAM_KEY_META_TYPE)->second;
         LOGI("EnableDiscoveryListener, input MetaType = %{public}s in discoverParam map.", metaType.c_str());
@@ -503,6 +504,18 @@ void DiscoveryManager::HandleDiscoveryTimeout(const std::string &pkgName)
     StopDiscovering(pkgName, subscribeId);
 }
 
+void UpdateInfoFreq(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo)
+{
+    if (auto it = discoverParam.find(PARAM_KEY_DISC_FREQ); it != discoverParam.end()) {
+        int32_t freq = StringToInt(it->second, DECIMALISM);
+        if (freq < DmExchangeFreq::DM_LOW || freq > DmExchangeFreq::DM_FREQ_BUTT) {
+            LOGE("Invalid freq value.")
+            return;
+        }
+        dmSubInfo.freq = static_cast<DmExchangeFreq>(freq);
+    }
+}
+
 int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::string deviceId,
     bool &isOnline, int32_t &authForm)
 {
@@ -536,15 +549,9 @@ bool DiscoveryManager::IsCommonDependencyReady()
     if (isSoLoaded_ && dpConnector_ != nullptr && dpConnectorHandle_ != nullptr) {
         return true;
     }
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_DM_COMDENPENDENCY_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    dpConnectorHandle_ = dlopen(path, RTLD_NOW | RTLD_NODELETE);
+    dpConnectorHandle_ = dlopen(LIB_DM_COMDENPENDENCY_NAME, RTLD_NOW | RTLD_NODELETE);
     if (dpConnectorHandle_ == nullptr) {
-        LOGE("load libdevicemanagerdependency so %{public}s failed, errMsg: %{public}s.", soName.c_str(), dlerror());
+        LOGE("load libdevicemanagerdependency so failed, errMsg: %{public}s.", dlerror());
         return false;
     }
     dlerror();

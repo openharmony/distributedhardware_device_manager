@@ -201,6 +201,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     param["deviceType"] = DmDialogManager::GetDeviceType();
     param[TAG_TARGET_DEVICE_NAME] = DmDialogManager::GetTargetDeviceName();
     param[TAG_HOST_PKGLABEL] = DmDialogManager::GetHostPkgLabel();
+    param["disableUpGesture"] = 1;
     std::string paramStr = param.dump();
     data.WriteString16(Str8ToStr16(paramStr));
     LOGI("show dm dialog is begin");

@@ -22,9 +22,9 @@
 #include "dm_crypto.h"
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
-#include "dm_radar_helper.h"
 #include "multiple_user_connector.h"
 #include "app_manager.h"
+#include "dm_radar_helper.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
 #include "parameter.h"
@@ -198,7 +198,7 @@ int32_t DeviceManagerServiceImpl::BindDevice(const std::string &pkgName, int32_t
 int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
 {
     if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %{public}s, udid is %{public}s",
+        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %{public}s, udidHash is %{public}s",
             pkgName.c_str(), GetAnonyString(udidHash).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -753,6 +753,35 @@ void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
     }
     CHECK_NULL_VOID(authMgr_);
     authMgr_->HandleDeviceNotTrust(udid);
+}
+void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &udid, int32_t userId,
+    const std::string &accountId)
+{
+    LOGI("Udid %{punlic}s, userId %{public}d, accountId %{public}s.", GetAnonyString(udid).c_str(),
+        userId, GetAnonyString(accountId).c_str());
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, userId, udid);
+    CHECK_NULL_VOID(hiChainConnector_);
+    authMgr_->DeleteGroup(DM_PKG_NAME, udid);
+}
+
+void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
+{
+    LOGI("PreUserId %{public}d.", preUserId);
+    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(preUserId);
+    CHECK_NULL_VOID(hiChainConnector_);
+    hiChainConnector_->DeleteAllGroup(preUserId);
+}
+
+std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindType(int32_t userId,
+    const std::string &accountId)
+{
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    return DeviceProfileConnector::GetInstance().GetDeviceAndBindType(userId, accountId, localUdid);
 }
 
 void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)

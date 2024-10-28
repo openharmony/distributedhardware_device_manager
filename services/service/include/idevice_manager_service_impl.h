@@ -282,6 +282,9 @@ public:
     virtual int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
+    virtual HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId) = 0;
+    virtual HandleUserRemoved(int32_t preUserId) = 0;
+    virtual std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
 };

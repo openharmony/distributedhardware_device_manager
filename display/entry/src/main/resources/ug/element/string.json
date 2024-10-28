@@ -55,6 +55,14 @@
         {
             "name":"dm_bluetooth_dialog_content",
             "value":"ئۈسكۈنە ئۇلاش ئۈچۈن كۆكچىشنى ئېچىش كېرەك، ئېچىپ قايتا سىناڭ."
+        },
+        {
+            "name":"dm_password_error",
+            "value":"مەخپىي نومۇر خاتا، ئۇلانمىدى."
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"ئۇلاش كودى كىرگۈزۈڭ"
         }
     ]
 }
