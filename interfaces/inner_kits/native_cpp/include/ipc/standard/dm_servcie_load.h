@@ -29,7 +29,7 @@ public:
 };
 
 class DmServiceLoad {
-    DECLARE_SINGLE_INSTANCE(DmServiceLoad);
+    DM_DECLARE_SINGLE_INSTANCE(DmServiceLoad);
 public:
     int32_t LoadDMService(void);
     void SetLoadFinish(void);
