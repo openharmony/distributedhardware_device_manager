@@ -164,7 +164,7 @@ void DeviceManagerService::QueryDependsSwitchState()
 #ifdef SUPPORT_POWER_MANAGER
     if (samgr->CheckSystemAbility(POWER_MANAGER_SERVICE_ID) == nullptr) {
         publishSubScriber->SetScreenState(DM_SCREEN_OFF);
-    }else {
+    } else {
         if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
         publishSubScriber->SetScreenState(DM_SCREEN_ON);
         } else {
@@ -1603,15 +1603,15 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::strin
         if (IsDMServiceAdapterLoad()) {
             dmServiceImplExt_->AccountUserSwitched(userId, MultipleUserConnector::GetOhosAccountId());
         }
-    }else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
         MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
         MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
-    }else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
         HandleAccountLogout(MultipleUserConnector::GetCurrentAccountUserID(),
             MultipleUserConnector::GetSwitchOldAccountId());
-    }else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(userId);
-    }else {
+    } else {
         LOGE("Invalid account common event.");
     }
     return;

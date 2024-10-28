@@ -40,7 +40,7 @@ int32_t DmServiceLoad::LoadDMService(void)
         return ERR_DM_POINT_NULL;
     }
     sptr<DMLoadCallback> dmLoadCallback_(new DMLoadCallback());
-    int32_t ret = samgr->LoadSystemAbility(DISTRIBUTE_HARDWARE_DEVICEMANAGER_SA_ID, dmLoadCallback_);
+    int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, dmLoadCallback_);
     if (ret != DM_OK) {
         isDMServiceLoading_ = false;
         LOGI("Failed to Load DM service, ret code:%{public}d", ret);
@@ -54,7 +54,7 @@ void DmServiceLoad::SetLoadFinish(void)
     isDMServiceLoading_ = false;
 }
 
-void DmServiceLoad::OnLoadSystemAbilitySuccess(int32_t systemAbility, const sptr<IRemoteObject> &remoteObject)
+void DMLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
 {
     LOGI("Load DM service success remoteObject result:%{public}s", (remoteObject != nullptr) ? "true" : "false");
     DmServiceLoad::GetInstance().SetLoadFinish();
@@ -64,7 +64,7 @@ void DmServiceLoad::OnLoadSystemAbilitySuccess(int32_t systemAbility, const sptr
     }
 }
 
-void DmServiceLoad::OnLoadSystemAbilityFail(int32_t systemAbilityId)
+void DMLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
     LOGE("Load Dm service failed.");
     DmServiceLoad::GetInstance().SetLoadFinish();

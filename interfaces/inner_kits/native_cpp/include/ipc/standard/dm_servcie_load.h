@@ -24,12 +24,12 @@ namespace OHOS {
 namespace DistributedHardware {
 class DMLoadCallback : public SystemAbilityLoadCallbackStub {
 public:
-    void OnLoadSystemAbilitySuccess(int32_t systemAbility, const sptr<IRemoteObject> &remoteObject) override;
+    void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject) override;
     void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
 };
 
 class DmServiceLoad {
-    DM_DECLARE_SINGLE_INSTANCE(DmServiceLoad);
+    DECLARE_SINGLE_INSTANCE(DmServiceLoad);
 public:
     int32_t LoadDMService(void);
     void SetLoadFinish(void);

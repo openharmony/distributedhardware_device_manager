@@ -229,7 +229,6 @@ int32_t StringToInt(const std::string &str, int32_t base)
         return 0;
     }
     return static_cast<int32_t>(result);
-    
 }
 } // namespace DistributedHardware
 } // namespace OHOS

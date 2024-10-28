@@ -95,8 +95,6 @@ enum DMIpcCmdInterfaceCode {
     GET_NETWORKID_BY_UDID,
     SERVER_DEVICE_SCREEN_STATE_NOTIFY,
     GET_DEVICE_SCREEN_STATUS,
-    GET_NETWORKID_BY_UDID,
-    // Add ipc msg here
     IPC_MSG_BUTT
 };
 } // namespace DistributedHardware

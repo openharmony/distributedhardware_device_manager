@@ -486,7 +486,7 @@ void DeviceProfileConnector::DeleteAccessControlList(const std::string &udid)
     }
 }
 
-void DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localUdid, int32_t userId, 
+void DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localUdid, int32_t userId,
         const std::string &remoteUdid)
 {
     LOGI("localUdid %{public}s, userId %{public}d, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(), userId,

@@ -27,9 +27,9 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string ERR_MESSAGE_NO_PERMISSION = 
+const std::string ERR_MESSAGE_NO_PERMISSION =
     "Permission verification failed. The application does not have the permission required to call the API.";
-const std::string ERR_MESSAGE_NOT_SYSTEM_APP = 
+const std::string ERR_MESSAGE_NOT_SYSTEM_APP =
     "Permission verification failed. A nos-system application call a system API.";
 const std::string ERR_MESSAGE_INVALID_PARAMS = "Parameter error.";
 const std::string ERR_MESSAGE_FAILED = "Failed to execute the function.";

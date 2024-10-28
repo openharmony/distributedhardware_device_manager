@@ -808,7 +808,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
     authResponseContext_->targetDeviceName = softbusConnector_->GetLocalDeviceName();
     remoteVersion_ = ConvertSrcVersion(authResponseContext_->dmVersion, authResponseContext_->edition);
     NegotiateRespMsg(remoteVersion_);
-    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) && 
+    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
         (static_cast<uint32_t>(authResponseContext_->bindLevel) >= DEVICE &&
         static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
         ProcRespNegotiateExt(sessionId);
