@@ -509,8 +509,6 @@ void DmAuthManager::ProcessSinkMsg()
                     timer_->DeleteTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK));
                 }
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
-            } else {
-                LOGE("Device manager auth state error");
             }
             break;
         case MSG_TYPE_REQ_AUTH:
@@ -519,8 +517,6 @@ void DmAuthManager::ProcessSinkMsg()
                     timer_->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
                 }
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseConfirmState>());
-            } else {
-                LOGE("Device manager auth state error");
             }
             break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
@@ -2147,6 +2143,7 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK));
     }
+
     if (errorCode != DM_OK || requestId != authResponseContext_->requestId) {
         if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
             authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
