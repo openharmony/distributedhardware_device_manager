@@ -781,7 +781,7 @@ std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindType(
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
-    return DeviceProfileConnector::GetInstance().GetDeviceAndBindType(userId, accountId, localUdid);
+    return DeviceProfileConnector::GetInstance().GetDeviceIdAndBindType(userId, accountId, localUdid);
 }
 
 void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
