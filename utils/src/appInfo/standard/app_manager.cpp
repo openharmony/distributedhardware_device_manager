@@ -37,7 +37,7 @@ const std::string AppManager::GetAppId()
     std::string appId = "";
     AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
     if (AccessTokenKit::GetTokenTypeFlag(tokenId) != TOKEN_HAP) {
-        LOGI("The caller is not token_hap.");
+        LOGD("The caller is not token_hap.");
         return appId;
     }
     sptr<AppExecFwk::IBundleMgr> bundleManager = nullptr;
