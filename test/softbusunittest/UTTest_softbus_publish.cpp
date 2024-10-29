@@ -40,7 +40,7 @@ namespace {
 HWTEST_F(SoftbusPublishTest, OnSoftbusPublishResult_001, testing::ext::TestSize.Level0)
 {
     int publishId = 1;
-    SoftbusPublish::OnSoftbusPublishResult(publishId, PUBLISG_LNN_SUCCESS);
+    SoftbusPublish::OnSoftbusPublishResult(publishId, PUBLISH_LNN_SUCCESS);
     EXPECT_EQ(publishId, 1);
 }
 
