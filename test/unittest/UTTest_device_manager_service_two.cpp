@@ -51,7 +51,7 @@ void DeletePermission()
 }
 
 /**
- * @tc.name: RegisterDeviceManagerListener_001
+ * @tc.name: RegisterCallerAppId_201
  * @tc.type: FUNC
  */
 HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_201, testing::ext::TestSize.Level0)

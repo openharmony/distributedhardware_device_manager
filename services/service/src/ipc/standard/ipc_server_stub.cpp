@@ -30,7 +30,7 @@
 #ifdef SUPPORT_MEMMGR
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
-#endif //SUPPORT_MEMMGR
+#endif // SUPPORT_MEMMGR
 #include "string_ex.h"
 #include "system_ability_definition.h"
 

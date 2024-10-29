@@ -156,7 +156,7 @@ if (defined(ohos_lite)) {
       "src/device_manager.cpp",
       "src/device_manager_impl.cpp",
       "src/ipc/ipc_client_proxy.cpp",
-      "src/ipc/standard/dm_servcie_load.cpp",
+      "src/ipc/standard/dm_service_load.cpp",
       "src/ipc/standard/ipc_client_manager.cpp",
       "src/ipc/standard/ipc_client_server_proxy.cpp",
       "src/ipc/standard/ipc_client_stub.cpp",
