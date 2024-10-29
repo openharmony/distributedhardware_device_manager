@@ -137,6 +137,7 @@ public:
     void HandleDeviceNotTrust(const std::string &udid);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
+    void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode);
 
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);

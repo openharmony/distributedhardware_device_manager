@@ -1839,5 +1839,13 @@ void DeviceManagerService::SubscribePackageCommonEvent()
     }
 #endif
 }
+
+void DeviceManagerService::HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
+                                                      int32_t errcode)
+{
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1554,6 +1554,15 @@ HWTEST_F(DeviceManagerServiceImplTest, LoadHardwareFwkService_001, testing::ext:
     deviceManagerServiceImpl_->LoadHardwareFwkService();
     EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
 }
+
+HWTEST_F(DeviceManagerServiceImplTest, CredentialAuthStatus_101, testing::ext::TestSize.Level0)
+{
+    std::string proofInfo;
+    uint16_t deviceTypeId = 0x00;
+    int32_t errcode = -1;
+    deviceManagerServiceImpl_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
+    EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

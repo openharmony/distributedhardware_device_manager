@@ -23,6 +23,7 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #include "ipc_create_pin_holder_req.h"
+#include "ipc_credential_auth_status_req.h"
 #include "ipc_destroy_pin_holder_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
@@ -508,6 +509,28 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const std::string &
             SetDeviceScreenInfo(pReq, it, devInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_SCREEN_STATE_NOTIFY, pReq, pRsp);
         }
+    }
+}
+
+void DeviceManagerServiceListener::OnCredentialAuthStatus(const std::string &pkgName,
+    const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode)
+{
+    LOGI("In, pkgName = %{public}s", pkgName.c_str());
+    std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq =
+        std::make_shared<IpcNotifyCredentialAuthStatusReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetProofInfo(proofInfo);
+    pReq->SetDeviceTypeId(deviceTypeId);
+    pReq->SetErrCode(errcode);
+    if (pkgName == std::string(DM_PKG_NAME)) {
+        std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
+        for (const auto &it : PkgNameVec) {
+            pReq->SetPkgName(it);
+            ipcServerListener_.SendRequest(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, pReq, pRsp);
+        }
+    } else {
+        pReq->SetPkgName(pkgName);
+        ipcServerListener_.SendRequest(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, pReq, pRsp);
     }
 }
 } // namespace DistributedHardware

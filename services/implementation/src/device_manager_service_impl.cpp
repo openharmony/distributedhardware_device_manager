@@ -793,6 +793,13 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     deviceStateMgr_->HandleDeviceScreenStatusChange(devInfo);
 }
 
+void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
+                                                          int32_t errcode)
+{
+    CHECK_NULL_VOID(deviceStateMgr_);
+    deviceStateMgr_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
