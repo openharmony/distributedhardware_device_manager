@@ -383,7 +383,7 @@ void to_json(nlohmann::json &jsonObject, const CredentialDataInfo &credentialDat
 
 int32_t DmCredentialManager::GetAddDeviceList(const nlohmann::json &jsonObject, nlohmann::json &jsonDeviceList)
 {
-    if (!jsonObject.contains(FIELD_CREDENTIAL_DATA) || !jsonObject[FIELD_CREDENTIAL_DATA].is_object() ||
+    if (!jsonObject.contains(FIELD_CREDENTIAL_DATA) || !jsonObject[FIELD_CREDENTIAL_DATA].is_array() ||
         !IsInt32(jsonObject, FIELD_AUTH_TYPE)) {
         LOGE("credentaildata or authType string key not exist!");
         return ERR_DM_FAILED;
