@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "dm_servcie_load.h"
+#include "dm_service_load.h"
 
 #include "dm_constants.h"
 #include "dm_log.h"
