@@ -32,7 +32,6 @@ constexpr int32_t ERR_DM_POINT_NULL = 96929748;
 
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    int32_t ret = DM_OK;
     if (pBaseReq == nullptr) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -55,8 +54,7 @@ int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBas
             return ERR_DM_POINT_NULL;
         }
     }
-    ret = (ptr)(pBaseReq, data);
-    return ret;
+    return (ptr)(pBaseReq, data);
 }
 
 int32_t IpcCmdRegister::ReadResponse(int32_t cmdCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
