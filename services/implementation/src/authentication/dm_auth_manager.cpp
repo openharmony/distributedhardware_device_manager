@@ -486,7 +486,9 @@ void DmAuthManager::ProcessSourceMsg()
             break;
         case MSG_TYPE_REQ_SYNC_DELETE_DONE:
             if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_SYNCDELETE) {
-                timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
+                if (timer_ != nullptr) {
+                    timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
+                }
                 isFinishOfLocal_ = false;
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestSyncDeleteAclNone>());
             }
@@ -537,7 +539,9 @@ void DmAuthManager::ProcessSinkMsg()
             break;
         case MSG_TYPE_REQ_SYNC_DELETE_DONE:
             if (authResponseState_->GetStateType() == AuthState::AUTH_REQUEST_SYNCDELETE) {
-                timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
+                if (timer_ != nullptr) {
+                    timer_->DeleteTimer(std::string(SYNC_DELETE_TIMEOUT_TASK));
+                }
                 isFinishOfLocal_ = false;
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseSyncDeleteAclNone>());
             }
@@ -628,6 +632,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
             HandleMemberJoinImportAuthCode(requestId, status);
             return;
         }
+        CHECK_NULL_VOID(timer_);
         if (status != DM_OK || authResponseContext_->requestId != requestId) {
             if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
                 authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
@@ -838,6 +843,7 @@ void DmAuthManager::NegotiateRespMsg(const std::string &version)
 
 void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
 {
+    LOGI("DmAuthManager::SendAuthRequest sessionId %{public}d.", sessionId);
     if (authResponseContext_ == nullptr) {
         LOGE("failed to SendAuthRequest because authResponseContext_ is nullptr");
         return;
@@ -1453,7 +1459,8 @@ void DmAuthManager::ShowStartAuthDialog()
             return;
         }
         if (CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
-            (authResponseContext_->bindLevel >= DEVICE && authResponseContext_->bindLevel <= APP)) {
+            (static_cast<uint32_t>(authResponseContext_->bindLevel) >= DEVICE &&
+            static_cast<uint32_t>(authResponseContext_->bindLevel)  <= APP)) {
             AuthDevice(pinCode);
         } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
             authResponseContext_->bindLevel == INVALIED_TYPE) {
@@ -1888,6 +1895,7 @@ void DmAuthManager::RequestCredentialDone()
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
     }
+
     softbusConnector_->JoinLnn(authRequestContext_->ip);
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
@@ -2116,6 +2124,7 @@ void DmAuthManager::AuthDeviceFinish(int64_t requestId)
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK));
     }
+
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         PutAccessControlList();
         SrcAuthDeviceFinish();

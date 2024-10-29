@@ -15,6 +15,7 @@
 
 #include "device_manager_notify.h"
 #include <thread>
+
 #include "device_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -409,7 +410,7 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
     std::thread deviceOffline([=]() { DeviceBasicInfoOffline(deviceBasicInfo, tempCbk); });
     int32_t ret = pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE);
     if (ret != DM_OK) {
-        LOGE("DeviceManagerNotify deviceOffline set name failed.");
+        LOGE("DeviceManagerNotify deviceOffline setname failed.");
     }
     deviceOffline.detach();
 #endif
@@ -444,7 +445,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
     std::thread deviceChanged([=]() { DeviceInfoChanged(deviceInfo, tempCbk); });
     int32_t ret = pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE);
     if (ret != DM_OK) {
-        LOGE("DeviceManagerNotify deviceChanged set name failed.");
+        LOGE("DeviceManagerNotify deviceChanged setname failed.");
     }
     deviceChanged.detach();
 #endif
@@ -479,7 +480,7 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
     std::thread deviceChanged([=]() { DeviceBasicInfoChanged(deviceBasicInfo, tempCbk); });
     int32_t ret = pthread_setname_np(deviceChanged.native_handle(), DEVICEINFO_CHANGE);
     if (ret != DM_OK) {
-        LOGE("DeviceManagerNotify deviceChanged set name failed.");
+        LOGE("DeviceManagerNotify deviceChanged setname failed.");
     }
     deviceChanged.detach();
 #endif
@@ -514,7 +515,7 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
     std::thread deviceReady([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
     int32_t ret = pthread_setname_np(deviceReady.native_handle(), DEVICE_READY);
     if (ret != DM_OK) {
-        LOGE("DeviceManagerNotify deviceReady set name failed.");
+        LOGE("DeviceManagerNotify deviceReady setname failed.");
     }
     deviceReady.detach();
 #endif
@@ -549,7 +550,7 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
     std::thread deviceReady([=]() { DeviceBasicInfoReady(deviceBasicInfo, tempCbk); });
     int32_t ret = pthread_setname_np(deviceReady.native_handle(), DEVICE_READY);
     if (ret != DM_OK) {
-        LOGE("DeviceManagerNotify deviceReady set name failed.");
+        LOGE("DeviceManagerNotify deviceReady setname failed.");
     }
     deviceReady.detach();
 #endif

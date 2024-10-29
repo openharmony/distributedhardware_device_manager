@@ -16,7 +16,6 @@
 #define OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #include <string>
 #include <algorithm>
-#include <vector>
 #include "access_control_profile.h"
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
@@ -156,7 +155,6 @@ public:
     void DeleteAclForAccountLogOut(const std::string &localUdid, int32_t userId, const std::string &remoteUdid);
     std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId,
         const std::string &localUdid);
-
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string pkgName,

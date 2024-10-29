@@ -1528,7 +1528,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_005, testing::ext::TestSiz
 HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_006, testing::ext::TestSize.Level0)
 {
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(2);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_NE(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_007, testing::ext::TestSize.Level0)

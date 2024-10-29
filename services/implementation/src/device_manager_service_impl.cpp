@@ -754,10 +754,11 @@ void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
     CHECK_NULL_VOID(authMgr_);
     authMgr_->HandleDeviceNotTrust(udid);
 }
+
 void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &udid, int32_t userId,
     const std::string &accountId)
 {
-    LOGI("Udid %{punlic}s, userId %{public}d, accountId %{public}s.", GetAnonyString(udid).c_str(),
+    LOGI("Udid %{public}s, userId %{public}d, accountId %{public}s.", GetAnonyString(udid).c_str(),
         userId, GetAnonyString(accountId).c_str());
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);

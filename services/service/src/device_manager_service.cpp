@@ -166,9 +166,9 @@ void DeviceManagerService::QueryDependsSwitchState()
         publishSubScriber->SetScreenState(DM_SCREEN_OFF);
     } else {
         if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
-        publishSubScriber->SetScreenState(DM_SCREEN_ON);
+            publishSubScriber->SetScreenState(DM_SCREEN_ON);
         } else {
-        publishSubScriber->SetScreenState(DM_SCREEN_OFF);
+            publishSubScriber->SetScreenState(DM_SCREEN_OFF);
         }
     }
 #else
@@ -1130,7 +1130,7 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
         return true;
     }
 
-    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
         LOGE("load dm service adapter so failed.");
         return false;
@@ -1165,7 +1165,7 @@ void DeviceManagerService::UnloadDMServiceAdapter()
     }
     dmServiceImplExt_ = nullptr;
 
-    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NOLOAD);
+    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         LOGI("dm service adapter so_handle is not nullptr.");
         dlclose(so_handle);
@@ -1600,6 +1600,7 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::strin
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         MultipleUserConnector::SetSwitchOldUserId(userId);
         MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
+        MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
         if (IsDMServiceAdapterLoad()) {
             dmServiceImplExt_->AccountUserSwitched(userId, MultipleUserConnector::GetOhosAccountId());
         }
@@ -1612,7 +1613,7 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::strin
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(userId);
     } else {
-        LOGE("Invalid account common event.");
+        LOGE("Invalied account common event.");
     }
     return;
 }

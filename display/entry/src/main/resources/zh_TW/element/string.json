@@ -61,7 +61,7 @@
             "value":"密碼錯誤，連接失敗。"
         },
         {
-            "name":"dm_enter_connect_code",
+            "name":"dm_enter_peer_connect_code",
             "value":"輸入對端連接碼"
         }
     ]

@@ -377,7 +377,7 @@ struct dialogPlusPage {
       } catch (error) {
         console.log('dmClass release failed')
       }
-      dmClass = null;
+      dmClass = null
     }
   }
 

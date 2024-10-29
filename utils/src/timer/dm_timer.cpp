@@ -20,9 +20,9 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-    const int32_t MIN_TIME_OUT = 0;
-    const int32_t MAX_TIME_OUT = 300;
-    const int32_t MILLISECOND_TO_SECOND = 1000;
+const int32_t MIN_TIME_OUT = 0;
+const int32_t MAX_TIME_OUT = 300;
+const int32_t MILLISECOND_TO_SECOND = 1000;
 }
 
 CommonEventHandler::CommonEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
@@ -79,7 +79,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
     }
     LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
-    if (!timerVec_.empty() || timerVec_.find(timerName) == timerVec_.end()) {
+    if (timerVec_.empty() || timerVec_.find(timerName) == timerVec_.end()) {
         LOGI("DmTimer DeleteTimer is not exist.");
         return ERR_DM_FAILED;
     }
@@ -95,7 +95,7 @@ int32_t DmTimer::DeleteAll()
     LOGI("DmTimer DeleteAll start");
     std::lock_guard<std::mutex> locker(timerMutex_);
     if (eventHandler_ ==  nullptr) {
-        LOGE("DmTimer eventHandle_ is null");
+        LOGE("DmTimer eventHandler_ is null");
         timerVec_.clear();
         return ERR_DM_FAILED;
     }

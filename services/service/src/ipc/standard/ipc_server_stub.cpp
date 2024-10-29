@@ -61,7 +61,7 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(DISTRIBUTED_HARDWARE_SA_ID);
 #ifdef SUPPORT_MEMMGR
     AddSystemAbilityListener(MEMORY_MANAGER_SA_ID);
-#endif
+#endif // SUPPORT_MEMMGR
     AddSystemAbilityListener(SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN);
     AddSystemAbilityListener(SCREENLOCK_SERVICE_ID);
     AddSystemAbilityListener(SOFTBUS_SERVER_SA_ID);
@@ -92,7 +92,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
         Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 1, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         return;
     }
-#endif //SUPPORT_MEMMGR
+#endif // SUPPORT_MEMMGR
 
     if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
         DeviceManagerService::GetInstance().InitAccountInfo();

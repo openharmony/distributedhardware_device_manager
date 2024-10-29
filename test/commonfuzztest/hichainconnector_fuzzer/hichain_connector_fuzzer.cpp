@@ -110,7 +110,7 @@ void HiChainConnectorSecondFuzzTest(const uint8_t* data, size_t size)
     std::vector<GroupInfo> groupList;
     nlohmann::json jsonDeviceList;
     GroupInfo groupInfo;
-    std::vector<std::string>syncGroupList;
+    std::vector<std::string> syncGroupList;
     hichainConnector->GetSyncGroupList(groupList, syncGroupList);
     hichainConnector->IsGroupInfoInvalid(groupInfo);
     hichainConnector->UnRegisterHiChainGroupCallback();

@@ -20,9 +20,6 @@
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "distributed_device_profile_client.h"
-#include <map>
-#include <string>
-#include <vector>
 
 using namespace OHOS::DistributedDeviceProfile;
 
@@ -498,6 +495,7 @@ void DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localU
         }
     }
 }
+
 void DeviceProfileConnector::DeleteAclForUserRemoved(int32_t userId)
 {
     LOGI("DeleteAclForUserRemoved userId %{public}d.", userId);

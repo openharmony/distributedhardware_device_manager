@@ -109,7 +109,7 @@ struct InputCustomDialog {
       this.errorTips = $r('app.string.dm_password_error');
     } else {
       this.isTimes--;
-      this.errorTips = $r('app.string.dm_incorrect_code', this.isTimes, this.isTimes);
+      this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
     }
     this.password = '';
     this.errorTipsVisible = Visibility.Visible;
@@ -366,7 +366,7 @@ struct dialogPlusPage {
       } catch (error) {
         console.log('dmClass release failed');
       }
-      dmClass = null;
+      dmClass = null
     }
   }
 
