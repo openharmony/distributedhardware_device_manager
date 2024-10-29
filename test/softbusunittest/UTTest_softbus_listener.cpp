@@ -727,7 +727,7 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     NodeBasicInfo *info = nullptr;
     softbusListener->OnSoftbusDeviceOffline(info);
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
-    const uint32_t msgLen = 20;
+    const uint32_t msgLen = 100;
     char proofInfo[msgLen] = {0};
     uint16_t deviceTypeId = 0;
     int32_t errcode = -1;

@@ -1549,7 +1549,7 @@ ON_IPC_SET_REQUEST(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, std::shared_ptr<IpcReq
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteString(proofInfo)) {
-        LOGE("write deviceList failed");
+        LOGE("write proofInfo failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     if (!data.WriteUint16(deviceTypeId)) {

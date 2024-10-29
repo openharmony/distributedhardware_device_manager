@@ -169,7 +169,7 @@ void SoftbusListener::OnCredentialAuthStatus(const char *proofInfo, uint32_t pro
 {
     LOGI("received credential auth status callback from softbus.");
     if (proofLen > MAX_SOFTBUS_MSG_LEN) {
-        LOGE("[SOFTBUS]received invaild deviceList value.");
+        LOGE("[SOFTBUS]received invaild proofInfo value.");
         return;
     }
     std::string proofInfoStr;
