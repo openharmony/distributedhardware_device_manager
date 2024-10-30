@@ -758,6 +758,7 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
     devInfo.extraData = to_string(extraJson);
+    LOGI("OsType %{public}d.", nodeInfo.osType);
     return DM_OK;
 }
 

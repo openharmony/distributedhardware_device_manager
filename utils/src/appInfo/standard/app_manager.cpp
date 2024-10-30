@@ -109,7 +109,7 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
     LOGD("PkgName %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> lock(appIdMapLock_);
     if (appIdMap_.find(pkgName) == appIdMap_.end()) {
-        LOGE("AppIdMap not find pkgName.");
+        LOGD("AppIdMap not find pkgName.");
         return ERR_DM_FAILED;
     }
     appId = appIdMap_[pkgName];
