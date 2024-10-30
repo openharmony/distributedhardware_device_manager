@@ -45,7 +45,7 @@ namespace OHOS {
 namespace DistributedHardware {
 std::mutex DeviceManagerServiceListener::alreadyOnlineSetLock_;
 std::unordered_set<std::string> DeviceManagerServiceListener::alreadyOnlineSet_ = {};
-const int32_t LAST_APP_ONLINE_NUMS = 7;
+const int32_t LAST_APP_ONLINE_NUMS = 8;
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -480,7 +480,6 @@ void DeviceManagerServiceListener::SetDeviceScreenInfo(std::shared_ptr<IpcNotify
         return;
     }
     DmDeviceInfo dmDeviceInfo = deviceInfo;
-
     ConvertUdidHashToAnoyAndSave(pkgName, dmDeviceInfo);
     pReq->SetDeviceInfo(dmDeviceInfo);
     return;

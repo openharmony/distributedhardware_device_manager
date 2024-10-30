@@ -88,6 +88,7 @@ private:
     bool CompareCapability(uint32_t capabilityType, const std::string &capabilityStr);
     void OnDeviceFound(const std::string &pkgName, const uint32_t capabilityType,
         const DmDeviceInfo &info, const DeviceFilterPara &filterPara);
+    void UpdateInfoFreq(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo);
 
 private:
     std::mutex locks_;

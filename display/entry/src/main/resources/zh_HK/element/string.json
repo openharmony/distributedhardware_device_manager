@@ -34,7 +34,7 @@
         },
         {
             "name":"dm_is_trust_device",
-            "value":"%s 信任此裝置？"
+            "value":"%s信任此裝置？"
         },
         {
             "name":"dm_confirm_title_hap",
@@ -55,6 +55,14 @@
         {
             "name":"dm_bluetooth_dialog_content",
             "value":"裝置連接需要啟用藍牙。請先啟用，然後重試。"
+        },
+        {
+            "name":"dm_password_error",
+            "value":"密碼錯誤，連接失敗。"
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"輸入對端連接碼"
         }
     ]
 }

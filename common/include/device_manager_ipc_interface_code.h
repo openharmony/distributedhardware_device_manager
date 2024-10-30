@@ -92,10 +92,9 @@ enum DMIpcCmdInterfaceCode {
     CHECK_SAME_ACCOUNT,
     SHIFT_LNN_GEAR,
     SET_DN_POLICY,
+    GET_NETWORKID_BY_UDID,
     SERVER_DEVICE_SCREEN_STATE_NOTIFY,
     GET_DEVICE_SCREEN_STATUS,
-    GET_NETWORKID_BY_UDID,
-    // Add ipc msg here
     IPC_MSG_BUTT
 };
 } // namespace DistributedHardware

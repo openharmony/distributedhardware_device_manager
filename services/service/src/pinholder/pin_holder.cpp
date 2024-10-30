@@ -162,6 +162,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     if (timer_ != nullptr) {
         timer_->DeleteTimer(PINHOLDER_CREATE_TIMEOUT_TASK);
     }
+
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER;
     jsonObj[TAG_PIN_TYPE] = pinType;
@@ -173,7 +174,8 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     ret = session_->SendData(sessionId_, message);
     int32_t stageRes =
         ret == DM_OK ? static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL);
-    DmRadarHelper::GetInstance().ReportDestroyPinHolder(registerPkgName_, targetId.deviceId, ret, stageRes);
+    DmRadarHelper::GetInstance().ReportDestroyPinHolder(registerPkgName_,
+        targetId.deviceId, ret, stageRes);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
         listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
@@ -194,7 +196,7 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
         timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
             [this] (std::string name) {
                 PinHolder::CloseSession(name);
-        });
+            });
     }
     nlohmann::json jsonObj;
     jsonObj[TAG_PIN_TYPE] = pinType_;
@@ -572,7 +574,7 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
         timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
             [this] (std::string name) {
                 PinHolder::CloseSession(name);
-        });
+            });
     }
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].get<int32_t>());
     nlohmann::json jsonObj;
@@ -622,7 +624,7 @@ void PinHolder::ProcessChangeMsg(const std::string &message)
             timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
                 [this] (std::string name) {
                     PinHolder::CloseSession(name);
-            });
+                });
         }
     }
 

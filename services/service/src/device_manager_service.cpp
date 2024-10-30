@@ -130,15 +130,9 @@ void DeviceManagerService::QueryDependsSwitchState()
 {
     LOGI("DeviceManagerService::QueryDependsSwitchState start.");
     std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = publshCommonEventManager_->GetSubscriber();
-    if (publishSubScriber == nullptr) {
-        LOGE("publishSubScriber is nullptr.");
-        return;
-    }
+    CHECK_NULL_VOID(publishSubScriber);
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        LOGE("Get SystemAbilityManager Failed");
-        return;
-    }
+    CHECK_NULL_VOID(samgr);
 #ifdef SUPPORT_BLUETOOTH
     if (samgr->CheckSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID) == nullptr) {
         publishSubScriber->SetBluetoothState(static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_OFF));
@@ -168,10 +162,14 @@ void DeviceManagerService::QueryDependsSwitchState()
 #endif // SUPPORT_WIFI
 
 #ifdef SUPPORT_POWER_MANAGER
-    if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
-        publishSubScriber->SetScreenState(DM_SCREEN_ON);
-    } else {
+    if (samgr->CheckSystemAbility(POWER_MANAGER_SERVICE_ID) == nullptr) {
         publishSubScriber->SetScreenState(DM_SCREEN_OFF);
+    } else {
+        if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
+            publishSubScriber->SetScreenState(DM_SCREEN_ON);
+        } else {
+            publishSubScriber->SetScreenState(DM_SCREEN_OFF);
+        }
     }
 #else
     publishSubScriber->SetScreenState(DM_SCREEN_ON);
@@ -885,15 +883,9 @@ bool DeviceManagerService::IsDMServiceImplReady()
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
     }
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        LOGE("load libdevicemanagerserviceimpl so %{public}s failed, errMsg: %{public}s.", soName.c_str(), dlerror());
+        LOGE("load libdevicemanagerserviceimpl so failed, errMsg: %{public}s.", dlerror());
         return false;
     }
     dlerror();
@@ -1119,14 +1111,7 @@ void DeviceManagerService::UnloadDMServiceImplSo()
     if (dmServiceImpl_ != nullptr) {
         dmServiceImpl_->Release();
     }
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soPathName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_IMPL_NAME);
-    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
-        (realpath(soPathName.c_str(), path) == nullptr)) {
-        LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
-        return;
-    }
-    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         LOGI("DeviceManagerService so_handle is not nullptr.");
         dlclose(so_handle);
@@ -1145,15 +1130,9 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
         return true;
     }
 
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_DM_ADAPTER_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE);
     if (so_handle == nullptr) {
-        LOGE("load dm service adapter so %{public}s failed.", soName.c_str());
+        LOGE("load dm service adapter so failed.");
         return false;
     }
     dlerror();
@@ -1186,14 +1165,7 @@ void DeviceManagerService::UnloadDMServiceAdapter()
     }
     dmServiceImplExt_ = nullptr;
 
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soPathName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_DM_ADAPTER_NAME);
-    if ((soPathName.length() == 0) || (soPathName.length() > PATH_MAX) ||
-        (realpath(soPathName.c_str(), path) == nullptr)) {
-        LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
-        return;
-    }
-    void *so_handle = dlopen(path, RTLD_NOW | RTLD_NOLOAD);
+    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         LOGI("dm service adapter so_handle is not nullptr.");
         dlclose(so_handle);
@@ -1624,34 +1596,52 @@ void DeviceManagerService::SubscribeScreenLockEvent()
 
 void DeviceManagerService::AccountCommonEventCallback(int32_t userId, std::string commonEventType)
 {
-    LOGI("Start, commonEventType: %{public}s", commonEventType.c_str());
-    if ((commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED ||
-        commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN)) {
-        std::string accountId = MultipleUserConnector::GetOhosAccountId();
-        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-        LOGI("accountId: %{public}s, userId: %{public}s", GetAnonyString(accountId).c_str(),
-            GetAnonyInt32(userId).c_str());
-        if (userId > 0) {
-            MultipleUserConnector::SetSwitchOldUserId(userId);
-            MultipleUserConnector::SetSwitchOldAccountId(accountId);
+    LOGI("CommonEventType: %{public}s", commonEventType.c_str());
+    if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        MultipleUserConnector::SetSwitchOldUserId(userId);
+        MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
+        MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
+        if (IsDMServiceAdapterLoad()) {
+            dmServiceImplExt_->AccountUserSwitched(userId, MultipleUserConnector::GetOhosAccountId());
         }
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
+        MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
+        MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+        HandleAccountLogout(MultipleUserConnector::GetCurrentAccountUserID(),
+            MultipleUserConnector::GetSwitchOldAccountId());
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
+        HandleUserRemoved(userId);
+    } else {
+        LOGE("Invalied account common event.");
+    }
+    return;
+}
+
+void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string &accountId)
+{
+    LOGI("UserId %{public}d, accountId %{public}s.", userId, GetAnonyString(accountId).c_str());
+    if (IsDMServiceAdapterLoad()) {
+        dmServiceImplExt_->AccountIdLogout(userId, accountId);
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("Init impl failed.");
         return;
     }
+    std::map<std::string, int32_t> deviceMap;
+    deviceMap = dmServiceImpl_->GetDeviceIdAndBindType(userId, accountId);
+    for (const auto &item : deviceMap) {
+        if (item.second == DM_IDENTICAL_ACCOUNT) {
+            dmServiceImpl_->HandleIdentAccountLogout(item.first, userId, accountId);
+        }
+    }
+}
 
-    if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
-        std::vector<DmDeviceInfo> onlineDeviceList;
-        CHECK_NULL_VOID(softbusListener_);
-        int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
-        if (ret != DM_OK) {
-            LOGE("GetTrustedDeviceList failed, ret: %{public}d", ret);
-            return;
-        }
-        if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
-            if (IsDMServiceAdapterLoad()) {
-                dmServiceImplExt_->AccountIdLogout(userId, MultipleUserConnector::GetSwitchOldAccountId());
-            }
-            dmServiceImpl_->AccountCommonEventCallback(userId, commonEventType);
-        }
+void DeviceManagerService::HandleUserRemoved(int32_t preUserId)
+{
+    LOGI("PreUserId %{public}d.", preUserId);
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleUserRemoved(preUserId);
     }
 }
 
@@ -1777,36 +1767,6 @@ int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(const std::string &anoyD
 }
 #endif
 
-
-void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)
-{
-    if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleDeviceScreenStatusChange(deviceInfo);
-    }
-}
-
-int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
-    int32_t &screenStatus)
-{
-    LOGI("Begin pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(), GetAnonyString(networkId).c_str());
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call GetDeviceScreenStatus.", pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (pkgName.empty() || networkId.empty()) {
-        LOGE("Invalid parameter, pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(),
-            GetAnonyString(networkId).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
-    int32_t ret = softbusListener_->GetDeviceScreenStatus(networkId.c_str(), screenStatus);
-    if (ret != DM_OK) {
-        LOGE("GetDeviceScreenStatus failed, ret = %{public}d", ret);
-        return ret;
-    }
-    return DM_OK;
-}
-
 int32_t DeviceManagerService::GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
                                                  std::string &networkId)
 {
@@ -1838,6 +1798,35 @@ void DeviceManagerService::SubscribePackageCommonEvent()
         LOGI("Success");
     }
 #endif
+}
+
+void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)
+{
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleDeviceScreenStatusChange(deviceInfo);
+    }
+}
+
+int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
+    int32_t &screenStatus)
+{
+    LOGI("Begin pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(), GetAnonyString(networkId).c_str());
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call GetDeviceScreenStatus.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter, pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(),
+            GetAnonyString(networkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    int32_t ret = softbusListener_->GetDeviceScreenStatus(networkId.c_str(), screenStatus);
+    if (ret != DM_OK) {
+        LOGE("GetDeviceScreenStatus failed, ret = %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

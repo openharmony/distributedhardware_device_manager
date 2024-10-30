@@ -14,4 +14,4 @@
  */
 
  # any change to common/include/device_manager_ipc_interface_code.h needs to be reviewed by @leonchan5
-common/utils/include/dhardware_ipc_interface_code.h @leonchan5 @hwzhangchuang @renguang1116
+common/include/device_manager_ipc_interface_code.h @leonchan5

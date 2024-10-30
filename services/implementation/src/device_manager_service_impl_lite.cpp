@@ -487,6 +487,27 @@ void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
     return;
 }
 
+void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &udid, int32_t userId,
+    const std::string &accountId)
+{
+    (void)udid;
+    (void)userId;
+    (void)accountId;
+}
+
+void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
+{
+    (void)preUserId;
+}
+
+std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindType(int32_t userId,
+    const std::string &accountId)
+{
+    (void)userId;
+    (void)accountId;
+    return std::map<std::string, int32_t> {};
+}
+
 int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgName)
 {
     (void)pkgName;

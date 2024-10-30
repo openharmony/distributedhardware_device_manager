@@ -1887,7 +1887,7 @@ napi_value DeviceManagerNapi::ReleaseDeviceManager(napi_env env, napi_callback_i
 
 napi_value DeviceManagerNapi::CreateDeviceManager(napi_env env, napi_callback_info info)
 {
-    LOGI("CreateDeviceManager in");
+    LOGI("In");
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     if (!CheckArgsCount(env, argc == DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;

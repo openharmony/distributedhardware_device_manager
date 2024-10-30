@@ -136,6 +136,8 @@ public:
     int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void HandleDeviceNotTrust(const std::string &udid);
+    void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId);
+    void HandleUserRemoved(int32_t preUserId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
 private:
@@ -144,6 +146,7 @@ private:
     void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId);
+    std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId);
 
 private:
     std::shared_ptr<DmAuthManager> authMgr_;

@@ -109,7 +109,6 @@ public:
     }
     void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) override {}
 };
-
 } // namespace DistributedHardware
 } // namespace OHOS
 
