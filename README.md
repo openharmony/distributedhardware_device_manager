@@ -24,6 +24,7 @@ foundation/distributedhardware/device_manager
 │               └── resources     # Resource configuration files for PIN display ServiceExtensionAbility
 ├── figures
 ├── interfaces
+|   ├── cj                        # Cangjie FFI interfaces and their implementation
 │   ├── inner_kits                # Internal interfaces and their implementation
 │   │   └── native_cpp            # Internal native interfaces and their implementation
 │   │       ├── include

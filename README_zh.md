@@ -38,6 +38,7 @@ foundation/distributedhardware/distributedhardware_device_manager
 │               └── resources     # DM PIN码显示ServiceExtensionAbility相关资源配置文件目录
 ├── figures
 ├── interfaces
+|   ├── cj                        # 仓颉接口ffi层实现存放目录
 │   ├── inner_kits                # 内部接口及实现存放目录
 │   │   └── native_cpp            # 内部native接口及实现存放目录
 │   │       ├── include
