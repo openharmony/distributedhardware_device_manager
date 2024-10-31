@@ -1250,6 +1250,7 @@ void DmAuthManager::AuthenticateFinish()
     LOGI("DmAuthManager::AuthenticateFinish start");
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
+    isAuthDevice_ = false;
     if (authResponseContext_->isFinish) {
         CompatiblePutAcl();
     }
