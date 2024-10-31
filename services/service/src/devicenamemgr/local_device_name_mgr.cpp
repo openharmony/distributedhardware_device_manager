@@ -276,5 +276,9 @@ void LocalDeviceNameMgr::RegisterDisplayNameChangeCb()
     LOGI("register display device name change cb success");
 }
 
+std::string LocalDeviceNameMgr::GetLocalDisplayName() const
+{
+    return localDisplayName_;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -690,7 +690,7 @@ int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string
 
 int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName)
 {
-    LOGI("Start");
+    LOGI("SoftbusListener Start SetLocalDeviceName!");
     if (localDeviceName.empty()) {
         LOGE("Invalid parameter, callerId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;

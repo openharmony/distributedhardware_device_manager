@@ -158,5 +158,10 @@ void AccountBootListener::DataShareCallback()
         this->RegisterAccountBootCb();
     }
 }
+
+std::shared_ptr<LocalDeviceNameMgr> AccountBootListener::GetLocalDeviceMgr() const
+{
+    return localDeviceMgr_;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

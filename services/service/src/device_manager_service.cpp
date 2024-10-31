@@ -2010,7 +2010,7 @@ void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceL
 
 int32_t DeviceManagerService::SetLocalDeviceName(const std::string &localDeviceName)
 {
-    LOGI("Start");
+    LOGI("DeviceManagerService Start SetLocalDeviceName!");
     if (localDeviceName.empty()) {
         LOGE("Invalid parameter, parameter is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
