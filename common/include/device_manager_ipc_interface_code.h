@@ -96,7 +96,6 @@ enum DMIpcCmdInterfaceCode {
     SERVER_DEVICE_SCREEN_STATE_NOTIFY,
     GET_DEVICE_SCREEN_STATUS,
     SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY,
-    // Add ipc msg here
     IPC_MSG_BUTT
 };
 } // namespace DistributedHardware
