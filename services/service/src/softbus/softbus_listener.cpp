@@ -711,7 +711,6 @@ int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId
 int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
     DmDeviceInfo &devInfo)
 {
-    LOGI("Begin, osType : %{public}d", nodeInfo.osType);
     if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice memset failed.");
         return ERR_DM_FAILED;

@@ -790,7 +790,6 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
 
 void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo)
 {
-    LOGI("Begin, osType : %{public}d", nodeBasicInfo.osType);
     if (memset_s(&dmDeviceInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
         return;

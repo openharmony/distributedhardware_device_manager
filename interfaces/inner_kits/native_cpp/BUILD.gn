@@ -94,7 +94,6 @@ if (defined(ohos_lite)) {
         "${common_path}/src/dfx/lite/dm_hisysevent.cpp",
         "${common_path}/src/dfx/lite/dm_hitrace.cpp",
         "${common_path}/src/dm_anonymous.cpp",
-        "${devicemanager_path}/radar/src/lite/dm_radar_helper.cpp",
         "src/device_manager.cpp",
         "src/device_manager_impl.cpp",
         "src/ipc/ipc_client_proxy.cpp",
