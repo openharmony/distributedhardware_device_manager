@@ -1732,14 +1732,6 @@ ON_IPC_SET_REQUEST(GET_NETWORKID_BY_UDID, std::shared_ptr<IpcReq> pBaseReq, Mess
     return DM_OK;
 }
 
-ON_IPC_READ_RESPONSE(GET_NETWORKID_BY_UDID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    std::shared_ptr<IpcGetInfoByNetWorkRsp> pRsp = std::static_pointer_cast<IpcGetInfoByNetWorkRsp>(pBaseRsp);
-    pRsp->SetErrCode(reply.ReadInt32());
-    pRsp->SetNetWorkId(reply.ReadString());
-    return DM_OK;
-}
-
 ON_IPC_CMD(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
