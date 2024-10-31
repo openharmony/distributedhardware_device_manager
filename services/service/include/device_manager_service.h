@@ -204,8 +204,6 @@ public:
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus);
-    void SubscribePackageCommonEvent();
-    int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
     void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode);
 private:
     bool IsDMServiceImplReady();
