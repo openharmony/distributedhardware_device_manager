@@ -711,6 +711,7 @@ int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId
 int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
     DmDeviceInfo &devInfo)
 {
+    LOGI("Begin, osType : %{public}d", nodeInfo.osType);
     if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice memset failed.");
         return ERR_DM_FAILED;
@@ -737,6 +738,7 @@ int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &node
 
 int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
 {
+    LOGI("Begin, osType : %{public}d", nodeInfo.osType);
     if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
         return ERR_DM_FAILED;
@@ -758,7 +760,6 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
     devInfo.extraData = to_string(extraJson);
-    LOGI("OsType %{public}d.", nodeInfo.osType);
     return DM_OK;
 }
 

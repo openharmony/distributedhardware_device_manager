@@ -255,6 +255,7 @@ int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
 
 int32_t SoftbusCache::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
 {
+    LOGI("Begin, osType : %{public}d", nodeInfo.osType);
     if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
         return ERR_DM_FAILED;
