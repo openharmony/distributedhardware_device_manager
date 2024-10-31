@@ -79,6 +79,10 @@
         {
             "name":"dm_enter_peer_connect_code",
             "value":"输入对端连接码"
+        },
+        {
+            "name":"dm_password_error",
+            "value":"密码错误， 连接失败。"
         }
     ]
 }

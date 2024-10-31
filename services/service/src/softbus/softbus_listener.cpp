@@ -261,28 +261,6 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
 }
 
-int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
-    DmDeviceInfo &devInfo)
-{
-    (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
-    if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
-        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
-    }
-
-    if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
-        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
-    }
-    devInfo.deviceTypeId = nodeInfo.deviceTypeId;
-    nlohmann::json extraJson;
-    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
-    extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
-    extraJson[DEVICE_SCREEN_STATUS] = devScreenStatus;
-    devInfo.extraData = to_string(extraJson);
-    return DM_OK;
-}
-
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
 {
     LOGI("received device offline callback from softbus.");
@@ -721,6 +699,28 @@ int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId
     return DM_OK;
 }
 
+int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
+    DmDeviceInfo &devInfo)
+{
+    (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
+        std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+    }
+
+    if (memcpy_s(devInfo.deviceName, sizeof(devInfo.deviceName), nodeInfo.deviceName,
+        std::min(sizeof(devInfo.deviceName), sizeof(nodeInfo.deviceName))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceName data failed.");
+    }
+    devInfo.deviceTypeId = nodeInfo.deviceTypeId;
+    nlohmann::json extraJson;
+    extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
+    extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
+    extraJson[DEVICE_SCREEN_STATUS] = devScreenStatus;
+    devInfo.extraData = to_string(extraJson);
+    return DM_OK;
+}
+
 int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
 {
     (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
@@ -738,20 +738,6 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
     devInfo.extraData = to_string(extraJson);
-    return DM_OK;
-}
-
-int32_t SoftbusListener::GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus)
-{
-    int32_t devScreenStatus = -1;
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SCREEN_STATUS,
-        reinterpret_cast<uint8_t *>(&devScreenStatus), LNN_COMMON_LEN);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo screenStatus failed.");
-        return ret;
-    }
-    screenStatus = devScreenStatus;
-    LOGI("GetDeviceScreenStatus screenStatus: %{public}d.", devScreenStatus);
     return DM_OK;
 }
 
@@ -931,18 +917,12 @@ bool SoftbusListener::IsDmRadarHelperReady()
 {
     std::lock_guard<std::mutex> lock(g_radarLoadLock);
     if (isRadarSoLoad_ && (dmRadarHelper_ != nullptr) && (radarHandle_ != nullptr)) {
-        LOGI("IsDmRadarHelperReady alReady.");
+        LOGD("IsDmRadarHelperReady alReady.");
         return true;
     }
-    char path[PATH_MAX + 1] = {0x00};
-    std::string soName = std::string(DM_LIB_LOAD_PATH) + std::string(LIB_RADAR_NAME);
-    if ((soName.length() == 0) || (soName.length() > PATH_MAX) || (realpath(soName.c_str(), path) == nullptr)) {
-        LOGE("File %{public}s canonicalization failed.", soName.c_str());
-        return false;
-    }
-    radarHandle_ = dlopen(path, RTLD_NOW);
+    radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW);
     if (radarHandle_ == nullptr) {
-        LOGE("load libdevicemanagerradar so %{public}s failed.", soName.c_str());
+        LOGE("load libdevicemanagerradar so failed.");
         return false;
     }
     dlerror();
@@ -1060,6 +1040,20 @@ std::string SoftbusListener::GetHostPkgName()
 IRefreshCallback &SoftbusListener::GetSoftbusRefreshCb()
 {
     return softbusRefreshCallback_;
+}
+
+int32_t SoftbusListener::GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus)
+{
+    int32_t devScreenStatus = -1;
+    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SCREEN_STATUS,
+        reinterpret_cast<uint8_t *>(&devScreenStatus), LNN_COMMON_LEN);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo screenStatus failed.");
+        return ret;
+    }
+    screenStatus = devScreenStatus;
+    LOGI("GetDeviceScreenStatus screenStatus: %{public}d.", devScreenStatus);
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

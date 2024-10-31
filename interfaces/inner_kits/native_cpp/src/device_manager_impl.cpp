@@ -66,7 +66,6 @@
 #endif
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t SLEEP_TIME_MS = 50000; // 50ms
 
 constexpr const char* DM_INIT_DEVICE_MANAGER_SUCCESS = "DM_INIT_DEVICE_MANAGER_SUCCESS";
 constexpr const char* DM_INIT_DEVICE_MANAGER_FAILED = "DM_INIT_DEVICE_MANAGER_FAILED";
@@ -128,10 +127,10 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     int32_t retryNum = 0;
     while (retryNum < SERVICE_INIT_TRY_MAX_NUM) {
         ret = ipcClientProxy_->Init(pkgName);
-        if (ret != ERR_DM_NOT_INIT) {
+        if (ret == DM_OK) {
             break;
         }
-        usleep(SLEEP_TIME_MS);
+        usleep(USLEEP_TIME_MS);
         retryNum++;
         if (retryNum == SERVICE_INIT_TRY_MAX_NUM) {
             LOGE("InitDeviceManager error, wait for device manager service starting timeout.");
@@ -1589,7 +1588,6 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-
     uint16_t subscribeId = DM_INVALID_FLAG_ID;
     {
         std::lock_guard<std::mutex> autoLock(subMapLock);
@@ -2201,6 +2199,36 @@ int32_t DeviceManagerImpl::SetDnPolicy(const std::string &pkgName, std::map<std:
         return ret;
     }
     LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
+                                              std::string &networkId)
+{
+    if (pkgName.empty() || udid.empty()) {
+        LOGE("DeviceManagerImpl::GetNetworkIdByUdid error: Invalid para, pkgName: %{public}s, udid: %{public}s",
+            pkgName.c_str(), GetAnonyString(udid).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGD("Start, pkgName: %{public}s", GetAnonyString(pkgName).c_str());
+
+    std::shared_ptr<IpcGetInfoByNetWorkReq> req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    req->SetPkgName(pkgName);
+    req->SetUdid(udid);
+
+    int32_t ret = ipcClientProxy_->SendRequest(GET_NETWORKID_BY_UDID, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("GetNetworkIdByUdid Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetNetworkIdByUdid Failed with ret %{public}d", ret);
+        return ret;
+    }
+    networkId = rsp->GetNetWorkId();
     return DM_OK;
 }
 

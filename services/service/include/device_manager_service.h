@@ -198,6 +198,9 @@ public:
     void HandleDeviceNotTrust(const std::string &msg);
 
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
+
+    void SubscribePackageCommonEvent();
+    int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus);
@@ -218,6 +221,8 @@ private:
     void ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInfo);
     int32_t ConvertUdidHashToAnoyDeviceId(const std::string &udidHash, std::string &anoyDeviceId);
     int32_t GetUdidHashByAnoyDeviceId(const std::string &anoyDeviceId, std::string &udidHash);
+    void HandleAccountLogout(int32_t userId, const std::string &accountId);
+    void HandleUserRemoved(int32_t preUserId);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

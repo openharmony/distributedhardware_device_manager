@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "device_manager_ipc_interface_code.h"
+#include "device_manager_notify.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "ipc_client_manager.h"
@@ -35,11 +36,9 @@
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_dmfa_result_req.h"
+#include "ipc_notify_event_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
-#include "device_manager_notify.h"
-#include "ipc_notify_dmfa_result_req.h"
-#include "ipc_notify_event_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_req.h"

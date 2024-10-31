@@ -528,6 +528,7 @@ public:
     void BindSocketFail();
     void OnScreenLocked();
     void HandleDeviceNotTrust(const std::string &udid);
+    int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
@@ -542,7 +543,6 @@ private:
     int32_t AddMember(int32_t pinCode);
     int32_t AuthDevice(int32_t pinCode);
     void SyncDeleteAcl(const std::string &pkgName, const std::string &deviceId);
-    int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     void PutAccessControlList();
     void SinkAuthenticateFinish();
     void SrcAuthenticateFinish();
@@ -551,10 +551,10 @@ private:
     std::string ConvertSrcVersion(const std::string &version, const std::string &edition);
     std::string ConvertSinkVersion(const std::string &version);
     void NegotiateRespMsg(const std::string &version);
-    void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
-    void DeleteOffLineTimer(int32_t sessionId);
     void SetAuthType(int32_t authType);
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
+    void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
+    void DeleteOffLineTimer(int32_t sessionId);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -588,8 +588,8 @@ private:
     bool isAuthenticateDevice_ = false;
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
     std::string remoteVersion_ = "";
-    std::string remoteUdidHash_ = "";
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
+    std::string remoteUdidHash_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

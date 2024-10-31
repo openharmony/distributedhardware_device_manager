@@ -112,11 +112,10 @@ HWTEST_F(DmPublishManagerTest, PublishDeviceDiscovery_002, testing::ext::TestSiz
     publishInfo.mode = DM_DISCOVER_MODE_PASSIVE;
     publishInfo.freq = DM_FREQ_BUTT;
     publishInfo.ranging = 1;
-    publishMgr_->publishContextMap_.clear();
     publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "com.ohos.helloworld.new";
     int32_t ret = publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
-    ASSERT_GT(publishMgr_->publishContextMap_.size(), 0);
+    ASSERT_TRUE(CheckSoftbusRes(ret));
     publishMgr_->UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
 }
 

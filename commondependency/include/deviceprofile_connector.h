@@ -133,6 +133,7 @@ public:
     int32_t DeleteAccessControlList(int32_t userId, std::string &accountId);
     DmOfflineParam DeleteAccessControlList(std::string pkgName, std::string localDeviceId,
         std::string remoteDeviceId);
+    void DeleteAclForUserRemoved(int32_t userId);
     std::vector<std::string> GetPkgNameFromAcl(std::string &localDeviceId, std::string &targetDeviceId);
     bool CheckIdenticalAccount(int32_t userId, const std::string &accountId);
     int32_t DeleteP2PAccessControlList(int32_t userId, std::string &accountId);
@@ -150,9 +151,10 @@ public:
     int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void DeleteAccessControlList(const std::string &udid);
-    int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
-        const std::string &udid, uint64_t &tokenId);
-
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfileByUserId(int32_t userId);
+    void DeleteAclForAccountLogOut(const std::string &localUdid, int32_t userId, const std::string &remoteUdid);
+    std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId,
+        const std::string &localUdid);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string pkgName,
@@ -165,6 +167,7 @@ private:
         DmDiscoveryInfo discoveryInfo);
     bool SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const DmAccessCallee &callee);
+    void UpdateBindType(const std::string &udid, int32_t bindType, std::map<std::string, int32_t> &deviceMap);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

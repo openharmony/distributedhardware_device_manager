@@ -398,6 +398,7 @@ public:
     virtual int32_t RegisterCredentialAuthStatusCallback(const std::string &pkgName,
         std::shared_ptr<CredentialAuthStatusCallback> callback) override;
     virtual int32_t UnRegisterCredentialAuthStatusCallback(const std::string &pkgName) override;
+
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

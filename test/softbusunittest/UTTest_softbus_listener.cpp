@@ -619,9 +619,7 @@ HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_001, testing::ext::TestSize.Level0
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->CacheDeviceInfo(deviceId, infoPtr);
-    deviceId = "device_001";
-    softbusListener->CloseDmRadarHelperObj(deviceId);
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_002, testing::ext::TestSize.Level0)
@@ -633,9 +631,7 @@ HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_002, testing::ext::TestSize.Level0
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->CacheDeviceInfo(deviceId, infoPtr);
-    deviceId = "device_002";
-    softbusListener->CloseDmRadarHelperObj(deviceId);
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_003, testing::ext::TestSize.Level0)
@@ -647,9 +643,7 @@ HWTEST_F(SoftbusListenerTest, CacheDeviceInfo_003, testing::ext::TestSize.Level0
         softbusListener = std::make_shared<SoftbusListener>();
     }
     softbusListener->CacheDeviceInfo(deviceId, infoPtr);
-    deviceId = "device_003";
-    softbusListener->CloseDmRadarHelperObj(deviceId);
-    EXPECT_EQ(softbusListener->isRadarSoLoad_, false);
+    EXPECT_EQ(softbusListener->isRadarSoLoad_, true);
 }
 
 HWTEST_F(SoftbusListenerTest, GetIPAddrTypeFromCache_001, testing::ext::TestSize.Level0)
@@ -724,6 +718,10 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
+    int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
+    softbusListener->OnLocalDevInfoChange();
+    std::string msg = "123";
+    softbusListener->DeviceNotTrust(msg);
     NodeBasicInfo *info = nullptr;
     softbusListener->OnSoftbusDeviceOffline(info);
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);

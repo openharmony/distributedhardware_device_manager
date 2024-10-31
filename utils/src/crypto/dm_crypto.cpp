@@ -209,6 +209,7 @@ std::string Crypto::GetHashWithSalt(const std::string &text, const std::string &
     return Crypto::Sha256(rawText);
 }
 
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId, const std::string &udidHash,
     DmKVValue &kvValue)

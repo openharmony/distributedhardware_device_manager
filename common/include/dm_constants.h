@@ -132,6 +132,7 @@ constexpr const char* DM_PIN_HOLDER_SESSION_NAME = "ohos.distributedhardware.dev
 constexpr const char* DM_UNBIND_SESSION_NAME = "ohos.distributedhardware.devicemanager.unbind";
 constexpr const char* DM_CAPABILITY_OSD = "osdCapability";
 constexpr const char* DM_CAPABILITY_APPROACH = "approach";
+constexpr const char* DM_CAPABILITY_TOUCH = "touch";
 constexpr const char* DM_CAPABILITY_CASTPLUS = "castPlus";
 constexpr const char* DM_CAPABILITY_VIRTUAL_LINK = "virtualLink";
 constexpr const char* DM_CAPABILITY_SHARE = "share";

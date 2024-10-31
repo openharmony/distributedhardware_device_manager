@@ -160,8 +160,6 @@ private:
     mutable std::mutex listenerLock_;
     std::map<std::string, sptr<AppDeathRecipient>> appRecipient_;
     std::map<std::string, sptr<IpcRemoteBroker>> dmListener_;
-    std::mutex dependsSASetLock_;
-    std::unordered_set<int32_t> dependsSASet_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
