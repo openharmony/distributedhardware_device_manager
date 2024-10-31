@@ -1800,13 +1800,6 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 #endif
 }
 
-void DeviceManagerService::HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
-                                                      int32_t errcode)
-{
-    if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
-    }
-}
 void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)
 {
     if (IsDMServiceImplReady()) {
@@ -1834,6 +1827,14 @@ int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, 
         return ret;
     }
     return DM_OK;
+}
+
+void DeviceManagerService::HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
+                                                      int32_t errcode)
+{
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS
