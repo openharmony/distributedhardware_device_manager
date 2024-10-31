@@ -82,7 +82,7 @@
         },
         {
             "name":"dm_password_error",
-            "value":"密码错误， 连接失败。"
+            "value":"密码错误，连接失败。"
         }
     ]
 }
