@@ -36,14 +36,14 @@ int32_t DmServiceLoad::LoadDMService(void)
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         isDMServiceLoading_ = false;
-        LOGI("failed to get system ability mgr.");
+        LOGE("failed to get system ability mgr.");
         return ERR_DM_POINT_NULL;
     }
     sptr<DMLoadCallback> dmLoadCallback_(new DMLoadCallback());
     int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, dmLoadCallback_);
     if (ret != DM_OK) {
         isDMServiceLoading_ = false;
-        LOGI("Failed to Load DM service, ret code:%{public}d", ret);
+        LOGE("Failed to Load DM service, ret code:%{public}d", ret);
         return ret;
     }
     return DM_OK;
@@ -66,7 +66,7 @@ void DMLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const s
 
 void DMLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    LOGE("Load Dm service failed.");
+    LOGE("Load DM service failed.");
     DmServiceLoad::GetInstance().SetLoadFinish();
 }
 } // namespace DistributedHardware
