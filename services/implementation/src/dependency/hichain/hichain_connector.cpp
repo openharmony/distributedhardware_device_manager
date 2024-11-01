@@ -481,7 +481,7 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
     } else {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_ACCEPTED;
-        jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode).c_str();
+        jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode);
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);

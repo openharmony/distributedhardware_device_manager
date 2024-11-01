@@ -106,10 +106,10 @@ char *HiChainAuthConnector::onRequest(int64_t requestId, int operationCode, cons
         jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_REJECTED;
     } else {
         jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
+        jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode);
     }
     std::string deviceId = "";
     dmDeviceAuthCallback_->GetRemoteDeviceId(deviceId);
-    jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode);
     jsonObj[FIELD_PEER_CONN_DEVICE_ID] = deviceId;
     std::string jsonStr = jsonObj.dump();
     char *buffer = strdup(jsonStr.c_str());
