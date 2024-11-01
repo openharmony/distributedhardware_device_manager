@@ -232,7 +232,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
     }
     dmListener_[pkgName] = listener;
     appRecipient_[pkgName] = appRecipient;
-    LOGI("Register listener complete.");
+    LOGD("Register listener complete.");
     return DM_OK;
 }
 

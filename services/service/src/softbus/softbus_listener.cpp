@@ -737,6 +737,7 @@ int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &node
 
 int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
 {
+    LOGI("Begin, osType : %{public}d", nodeInfo.osType);
     if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
         return ERR_DM_FAILED;

@@ -37,7 +37,7 @@ const std::string AppManager::GetAppId()
     std::string appId = "";
     AccessTokenID tokenId = IPCSkeleton::GetCallingTokenID();
     if (AccessTokenKit::GetTokenTypeFlag(tokenId) != TOKEN_HAP) {
-        LOGI("The caller is not token_hap.");
+        LOGD("The caller is not token_hap.");
         return appId;
     }
     sptr<AppExecFwk::IBundleMgr> bundleManager = nullptr;
@@ -106,10 +106,10 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("PkgName %{public}s.", pkgName.c_str());
+    LOGD("PkgName %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> lock(appIdMapLock_);
     if (appIdMap_.find(pkgName) == appIdMap_.end()) {
-        LOGE("AppIdMap not find pkgName.");
+        LOGD("AppIdMap not find pkgName.");
         return ERR_DM_FAILED;
     }
     appId = appIdMap_[pkgName];
