@@ -159,9 +159,9 @@ void AccountBootListener::DataShareCallback()
     }
 }
 
-std::shared_ptr<LocalDeviceNameMgr> AccountBootListener::GetLocalDeviceMgr() const
+std::string AccountBootListener::GetLocalDisplayName() const
 {
-    return localDeviceMgr_;
+    return localDeviceMgr_->GetLocalDisplayName();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

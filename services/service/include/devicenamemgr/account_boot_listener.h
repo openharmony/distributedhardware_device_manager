@@ -35,7 +35,7 @@ public:
     void SetSaTriggerFlag(SaTriggerFlag triggerFlag);
     void InitDataShareEvent();
     void DataShareCallback();
-    std::shared_ptr<LocalDeviceNameMgr> GetLocalDeviceMgr() const;
+    std::string GetLocalDisplayName() const;
     
 private:
     /**
