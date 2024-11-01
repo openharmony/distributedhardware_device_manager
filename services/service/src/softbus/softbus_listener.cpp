@@ -688,6 +688,21 @@ int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string
     return SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
 }
 
+int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName)
+{
+    LOGI("SoftbusListener Start SetLocalDeviceName!");
+    if (localDeviceName.empty()) {
+        LOGE("Invalid parameter, callerId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t ret = ::SetLocalDeviceName(DM_PKG_NAME, localDeviceName.c_str());
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]SetLocalDeviceName error, failed ret: %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
 int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId)
 {
     if (callerId.empty()) {

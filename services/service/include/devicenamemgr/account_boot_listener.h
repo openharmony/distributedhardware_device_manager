@@ -35,6 +35,8 @@ public:
     void SetSaTriggerFlag(SaTriggerFlag triggerFlag);
     void InitDataShareEvent();
     void DataShareCallback();
+    std::string GetLocalDisplayName() const;
+    
 private:
     /**
      * @brief flag for is registered callback for account boot event
