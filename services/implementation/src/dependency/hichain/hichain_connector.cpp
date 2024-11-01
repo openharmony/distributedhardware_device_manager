@@ -476,13 +476,13 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
         return nullptr;
     }
     nlohmann::json jsonObj;
-    int32_t pinCode = 0;
-    if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED) {
+    int32_t pinCode = -1;
+    if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == -1) {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
     } else {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_ACCEPTED;
+        jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode).c_str();
     }
-    jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode).c_str();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;

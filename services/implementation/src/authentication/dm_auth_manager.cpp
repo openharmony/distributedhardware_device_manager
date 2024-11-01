@@ -1354,7 +1354,6 @@ int32_t DmAuthManager::GetPinCode(int32_t &code)
 {
     if (authResponseContext_ == nullptr) {
         LOGE("failed to GetPinCode because authResponseContext_ is nullptr");
-        code = ERR_DM_AUTH_NOT_START;
         return ERR_DM_FAILED;
     }
     LOGI("ShowConfigDialog start add member pin code.");
