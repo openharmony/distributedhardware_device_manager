@@ -400,6 +400,9 @@ public:
     virtual int32_t RegisterCredentialAuthStatusCallback(const std::string &pkgName,
         std::shared_ptr<CredentialAuthStatusCallback> callback) override;
     virtual int32_t UnRegisterCredentialAuthStatusCallback(const std::string &pkgName) override;
+    virtual int32_t RegisterSinkBindCallback(const std::string &pkgName,
+        std::shared_ptr<BindTargetCallback> callback) override;
+    virtual int32_t UnRegisterSinkBindCallback(const std::string &pkgName) override;
 
 private:
     DeviceManagerImpl() = default;

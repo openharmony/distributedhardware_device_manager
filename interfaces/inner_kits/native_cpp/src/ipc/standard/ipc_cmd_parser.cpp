@@ -1744,5 +1744,19 @@ ON_IPC_CMD(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, MessageParcel &data, MessagePa
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }
+
+ON_IPC_CMD(SINK_BIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    PeerTargetId targetId;
+    DecodePeerTargetId(data, targetId);
+    int32_t result = data.ReadInt32();
+    int32_t status = data.ReadInt32();
+    std::string content = data.ReadString();
+
+    DeviceManagerNotify::GetInstance().OnSinkBindResult(pkgName, targetId, result, status, content);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

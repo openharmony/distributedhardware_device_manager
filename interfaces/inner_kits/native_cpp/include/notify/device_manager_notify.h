@@ -73,6 +73,8 @@ public:
     void RegisterCredentialAuthStatusCallback(const std::string &pkgName,
         std::shared_ptr<CredentialAuthStatusCallback> callback);
     void UnRegisterCredentialAuthStatusCallback(const std::string &pkgName);
+    void RegisterSinkBindCallback(const std::string &pkgName, std::shared_ptr<BindTargetCallback> callback);
+    void UnRegisterSinkBindCallback(const std::string &pkgName);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -121,6 +123,8 @@ public:
     void OnDeviceScreenStatus(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
     void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList,
                                 uint16_t deviceTypeId, int32_t errcode);
+    void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
+        std::string content);
 
 private:
 #if !defined(__LITEOS_M__)
@@ -140,6 +144,7 @@ private:
     std::map<std::string, std::shared_ptr<DevTrustChangeCallback>> devTrustChangeCallback_;
     std::map<std::string, std::shared_ptr<DeviceScreenStatusCallback>> deviceScreenStatusCallback_;
     std::map<std::string, std::shared_ptr<CredentialAuthStatusCallback>> credentialAuthStatusCallback_;
+    std::map<std::string, std::shared_ptr<BindTargetCallback>> sinkBindTargetCallback_;
     std::mutex bindLock_;
 };
 } // namespace DistributedHardware

@@ -1192,5 +1192,50 @@ void DeviceManagerNotify::OnCredentialAuthStatus(const std::string &pkgName, con
     }
     tempCbk->OnCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
+
+void DeviceManagerNotify::RegisterSinkBindCallback(const std::string &pkgName,
+    std::shared_ptr<BindTargetCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty or callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    sinkBindTargetCallback_[pkgName] = callback;
+}
+
+void DeviceManagerNotify::UnRegisterSinkBindCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    sinkBindTargetCallback_.erase(pkgName);
+}
+
+void DeviceManagerNotify::OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId,
+    int32_t result, int32_t status, std::string content)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
+        return;
+    }
+    LOGI("DeviceManagerNotify::OnSinkBindResult in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
+    std::shared_ptr<BindTargetCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (sinkBindTargetCallback_.find(pkgName) == sinkBindTargetCallback_.end()) {
+            LOGE("error, sink bind callback not register.");
+            return;
+        }
+        tempCbk = sinkBindTargetCallback_[pkgName];
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered sink bind callback is nullptr.");
+        return;
+    }
+    tempCbk->OnBindResult(targetId, result, status, content);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

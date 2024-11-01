@@ -2465,5 +2465,28 @@ int32_t DeviceManagerImpl::UnRegisterCredentialAuthStatusCallback(const std::str
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
+
+int32_t DeviceManagerImpl::RegisterSinkBindCallback(const std::string &pkgName,
+    std::shared_ptr<BindTargetCallback> callback)
+{
+    if (pkgName.empty()) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegisterSinkBindCallback(pkgName, callback);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterSinkBindCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterSinkBindCallback(pkgName);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

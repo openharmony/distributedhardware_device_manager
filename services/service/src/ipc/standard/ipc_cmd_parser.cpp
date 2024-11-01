@@ -1102,6 +1102,51 @@ ON_IPC_READ_RESPONSE(BIND_TARGET_RESULT, MessageParcel &reply, std::shared_ptr<I
     return DM_OK;
 }
 
+ON_IPC_SET_REQUEST(SINK_BIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyBindResultReq> pReq = std::static_pointer_cast<IpcNotifyBindResultReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    PeerTargetId targetId = pReq->GetPeerTargetId();
+    int32_t result = pReq->GetResult();
+    int32_t status = pReq->GetStatus();
+    std::string content = pReq->GetContent();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write bind pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!EncodePeerTargetId(targetId, data)) {
+        LOGE("write bind peer target id failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(result)) {
+        LOGE("write bind result code failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(status)) {
+        LOGE("write bind result status failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(content)) {
+        LOGE("write bind result content failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SINK_BIND_TARGET_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(UNBIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
