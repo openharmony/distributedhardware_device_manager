@@ -55,7 +55,6 @@ const int32_t WAIT_REQUEST_TIMEOUT = 10;
 const int32_t CLONE_AUTHENTICATE_TIMEOUT = 10;
 const int32_t CLONE_CONFIRM_TIMEOUT = 5;
 const int32_t CLONE_NEGOTIATE_TIMEOUT = 5;
-const int32_t CLONE_INPUT_TIMEOUT = 5;
 const int32_t CLONE_ADD_TIMEOUT = 5;
 const int32_t CLONE_WAIT_NEGOTIATE_TIMEOUT = 5;
 const int32_t CLONE_WAIT_REQUEST_TIMEOUT = 5;
@@ -81,7 +80,6 @@ const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
     { std::string(AUTHENTICATE_TIMEOUT_TASK), CLONE_AUTHENTICATE_TIMEOUT },
     { std::string(NEGOTIATE_TIMEOUT_TASK), CLONE_NEGOTIATE_TIMEOUT },
     { std::string(CONFIRM_TIMEOUT_TASK), CLONE_CONFIRM_TIMEOUT },
-    { std::string(INPUT_TIMEOUT_TASK), CLONE_INPUT_TIMEOUT },
     { std::string(ADD_TIMEOUT_TASK), CLONE_ADD_TIMEOUT },
     { std::string(WAIT_NEGOTIATE_TIMEOUT_TASK), CLONE_WAIT_NEGOTIATE_TIMEOUT },
     { std::string(WAIT_REQUEST_TIMEOUT_TASK), CLONE_WAIT_REQUEST_TIMEOUT },
@@ -1230,6 +1228,7 @@ void DmAuthManager::AuthenticateFinish()
     LOGI("DmAuthManager::AuthenticateFinish start");
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
+    isAuthDevice_ = false;
     if (authResponseContext_->isFinish) {
         CompatiblePutAcl();
     }
@@ -1487,10 +1486,13 @@ int32_t DmAuthManager::AuthDevice(int32_t pinCode)
     }
     isAuthDevice_ = true;
     int32_t osAccountId = MultipleUserConnector::GetCurrentAccountUserID();
-    timer_->StartTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK), AUTH_DEVICE_TIMEOUT,
-        [this] (std::string name) {
-            DmAuthManager::HandleAuthenticateTimeout(name);
-        });
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(INPUT_TIMEOUT_TASK));
+        timer_->StartTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK), AUTH_DEVICE_TIMEOUT,
+            [this] (std::string name) {
+                DmAuthManager::HandleAuthenticateTimeout(name);
+            });
+    }
     if (hiChainAuthConnector_->AuthDevice(pinCode, osAccountId, remoteDeviceId_,
         authResponseContext_->requestId) != DM_OK) {
         LOGE("DmAuthManager::AuthDevice failed.");
