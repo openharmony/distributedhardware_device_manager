@@ -1015,9 +1015,9 @@ int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int3
 
 void DeviceManagerService::LoadHardwareFwkService()
 {
-    std::string extra;
     std::vector<DmDeviceInfo> deviceList;
-    int32_t ret = GetTrustedDeviceList(DM_PKG_NAME, extra, deviceList);
+    CHECK_NULL_VOID(softbusListener_);
+    int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
     if (ret != DM_OK) {
         LOGE("LoadHardwareFwkService failed, get trusted devicelist failed.");
         return;
