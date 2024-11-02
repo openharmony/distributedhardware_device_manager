@@ -147,6 +147,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
     if (req == nullptr || rsp == nullptr) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::lock_guard<std::mutex> autoLock(lock_);
     if (dmInterface_ != nullptr) {
         LOGD("IpcClientManager::SendRequest cmdCode: %{public}d", cmdCode);
         return dmInterface_->SendCmd(cmdCode, req, rsp);
