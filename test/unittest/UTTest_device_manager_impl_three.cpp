@@ -1096,8 +1096,31 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback002, testing::ext::T
     DeviceManagerImpl::GetInstance().ipcClientProxy_->ipcClientManager_ = std::make_shared<IpcClientManager>();
 }
 
+void SetSetDnPolicyPermission()
+{
+    const int32_t permsNum = 1;
+    const int32_t indexZero = 0;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission.ACCESS_SERVICE_DM";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "collaboration_service",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy001, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
@@ -1115,6 +1138,7 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy001, testing::ext::TestSize.Level0)
 
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy002, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
@@ -1127,6 +1151,7 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy002, testing::ext::TestSize.Level0)
 
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy003, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
@@ -1138,6 +1163,7 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy003, testing::ext::TestSize.Level0)
 
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy004, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName;
     std::map<std::string, std::string> policy;
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
@@ -1149,6 +1175,7 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy004, testing::ext::TestSize.Level0)
 
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy005, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName;
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
@@ -1162,6 +1189,7 @@ HWTEST_F(DeviceManagerImplTest, SetDnPolicy005, testing::ext::TestSize.Level0)
 
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy006, testing::ext::TestSize.Level0)
 {
+    SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
