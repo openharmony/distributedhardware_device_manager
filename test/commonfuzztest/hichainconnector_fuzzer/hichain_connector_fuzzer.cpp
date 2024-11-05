@@ -234,14 +234,14 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->DeleteRedundanceGroup(userId);
     hichainConnector->DealRedundanceGroup(userId, authType);
     hichainConnector->DeleteGroupByACL(delACLInfoVec, userIdVec);
-    hichainConnector->IsNeedDelete(groupName, userId, delACLInfoVec);
+    hichainConnector->IsNeedDelete(groupName, authType, delACLInfoVec);
     hichainConnector->onFinish(requestId, operationCode, returnData.c_str());
     hichainConnector->onError(requestId, operationCode, errCode, returnData.c_str());
     hichainConnector->onRequest(requestId, operationCode, returnData.c_str());
     operationCode = GroupOperationCode::GROUP_CREATE;
     hichainConnector->onFinish(requestId, operationCode, returnData.c_str());
     hichainConnector->onError(requestId, operationCode, errCode, returnData.c_str());
-    operationCode == GroupOperationCode::MEMBER_DELETE
+    operationCode == GroupOperationCode::MEMBER_DELETE;
     hichainConnector->onFinish(requestId, operationCode, returnData.c_str());
     hichainConnector->onError(requestId, operationCode, errCode, returnData.c_str());
     operationCode == GroupOperationCode::GROUP_DISBAND;

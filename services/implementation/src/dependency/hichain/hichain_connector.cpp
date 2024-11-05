@@ -15,7 +15,6 @@
 
 #include "hichain_connector.h"
 
-#include <atomic>
 #include <cstdlib>
 #include <ctime>
 #include <functional>
