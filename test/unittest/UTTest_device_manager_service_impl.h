@@ -38,7 +38,6 @@ public:
     std::shared_ptr<DeviceManagerServiceImpl> deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ =
         std::make_shared<DeviceProfileConnectorMock>();
-
 };
 } // namespace DistributedHardware
 } // namespace OHOS

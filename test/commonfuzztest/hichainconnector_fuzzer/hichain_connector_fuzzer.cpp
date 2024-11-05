@@ -153,7 +153,7 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
     int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
-    std::string groupName(reinterpret_cast<const char*>(data), size);
+    std::string groupName = "groupName";
     GroupInfo groupInfo;
     std::string userId(reinterpret_cast<const char*>(data), size);
     int32_t usersId = *(reinterpret_cast<const int32_t*>(data));
@@ -187,7 +187,7 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
         hichainConnector->deviceGroupManager_ = GetGmInstance();
     }
     hichainConnector->CreateGroup(requestId, groupName);
-    hichainConnector->CreateGroup(requestId, authType, userId, jsonOutObj);
+    hichainConnector->CreateGroup(requestId, groupName, userId, jsonOutObj);
     hichainConnector->IsGroupCreated(groupName, groupInfo);
     hichainConnector->GetGroupInfoExt(usersId, queryParams, groupList);
     hichainConnector->GetGroupInfoCommon(usersId, queryParams, pkgName.c_str(), groupList);

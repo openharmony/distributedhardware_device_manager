@@ -44,6 +44,7 @@ void DeviceManagerServiceImplTest::SetUpTestCase()
 
 void DeviceManagerServiceImplTest::TearDownTestCase()
 {
+    deviceProfileConnectorMock_ = nullptr;
 }
 
 namespace {
