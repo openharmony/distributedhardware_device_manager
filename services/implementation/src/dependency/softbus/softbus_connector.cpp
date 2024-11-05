@@ -42,6 +42,7 @@ constexpr const char* BLE_MAC = "BLE_MAC";
 constexpr const char* ETH_IP = "ETH_IP";
 constexpr const char* ETH_PORT = "ETH_PORT";
 
+std::string SoftbusConnector::remoteUdidHash_ = "";
 SoftbusConnector::PulishStatus SoftbusConnector::publishStatus = SoftbusConnector::STATUS_UNKNOWN;
 std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDeviceInfoMap_ = {};
 std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnector::discoveryCallbackMap_ = {};
@@ -263,6 +264,10 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
     if (addrInfo == nullptr) {
         LOGE("addrInfo is nullptr.");
         return;
+    }
+    if (memcpy_s(addrInfo->info.ble.udidHash, UDID_HASH_LEN,
+        remoteUdidHash_.c_str(), remoteUdidHash_.length()) != 0) {
+        LOGE("memcpy remoteUdid hash failed, remoteUdidHash_: %{public}s.", GetAnonyString(remoteUdidHash_).c_str());
     }
     int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo, OnSoftbusJoinLNNResult);
     if (ret != DM_OK) {
@@ -715,6 +720,7 @@ void SoftbusConnector::HandleDeviceOffline(std::string deviceId)
 void SoftbusConnector::DeleteOffLineTimer(std::string &udidHash)
 {
     LOGI("SoftbusConnector::DeleteOffLineTimer");
+    remoteUdidHash_ = udidHash;
     if (deviceStateManagerCallback_ != nullptr) {
         deviceStateManagerCallback_->DeleteOffLineTimer(udidHash);
     }
