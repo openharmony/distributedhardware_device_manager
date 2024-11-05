@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "device_manager_service_impl.h"
+#include "device_manager_service_impl_mock.h"
 
 #include "gtest/gtest.h"
 

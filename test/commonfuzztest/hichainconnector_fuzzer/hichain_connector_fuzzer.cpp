@@ -156,7 +156,6 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     std::string groupName = "groupName";
     GroupInfo groupInfo;
     std::string userId(reinterpret_cast<const char*>(data), size);
-    int32_t usersId = *(reinterpret_cast<const int32_t*>(data));
     int32_t authType = *(reinterpret_cast<const int32_t*>(data));
     std::vector<GroupInfo> groupList;
     std::string queryParams(reinterpret_cast<const char*>(data), size);
@@ -178,7 +177,7 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->getRegisterInfo(queryParams, jsonStr);
     hichainConnector->addMultiMembers(groupType, userId, jsonOutObj);
     hichainConnector->deleteMultiMembers(groupType, userId, jsonOutObj);
-    hichainConnector->GetGroupInfoCommon(usersId, queryParams, pkgName.c_str(), groupList);
+    hichainConnector->GetGroupInfoCommon(authType, queryParams, pkgName.c_str(), groupList);
     hichainConnector->hiChainResCallback_ = nullptr;
     hichainConnector->GetConnectPara(deviceId, reqDeviceId);
     hichainConnector->onRequest(requestId, operationCode, reqParams.c_str());
@@ -187,10 +186,10 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
         hichainConnector->deviceGroupManager_ = GetGmInstance();
     }
     hichainConnector->CreateGroup(requestId, groupName);
-    hichainConnector->CreateGroup(requestId, groupName, userId, jsonOutObj);
+    hichainConnector->CreateGroup(requestId, authType, userId, jsonOutObj);
     hichainConnector->IsGroupCreated(groupName, groupInfo);
-    hichainConnector->GetGroupInfoExt(usersId, queryParams, groupList);
-    hichainConnector->GetGroupInfoCommon(usersId, queryParams, pkgName.c_str(), groupList);
+    hichainConnector->GetGroupInfoExt(authType, queryParams, groupList);
+    hichainConnector->GetGroupInfoCommon(authType, queryParams, pkgName.c_str(), groupList);
     hichainConnector->RegisterHiChainGroupCallback(callback);
     hichainConnector->GetJsonInt(jsonOutObj, "key");
     hichainConnector->deleteMultiMembers(groupType, userId, jsonOutObj);

@@ -24,5 +24,10 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
 {
     return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnPinHolder(processName);
 }
+
+bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
+{
+    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnAuthCode(processName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -154,14 +154,6 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
         LOGE("get current process account user id failed");
         return ERR_DM_FAILED;
     }
-
-    try {
-        jsonObj.dump();
-    }
-    catch(nlohmann::json_abi_v3_11_2::detail::exception& e) {
-        LOGE("HiChainConnector::CreateGroup json throw an error:%s, try to fix", e.what());
-        return ERR_DM_FAILED;
-    }
     int32_t ret = deviceGroupManager_->createGroup(userId, requestId, DM_PKG_NAME, jsonObj.dump().c_str());
     struct RadarInfo info = {
         .funcName = "CreateGroup",

@@ -45,7 +45,6 @@ public:
         std::make_shared<PermissionManagerMock>();
     static inline  std::shared_ptr<SoftbusListenerMock> softbusListenerMock_ =
         std::make_shared<SoftbusListenerMock>();
-        std::make_shared<DeviceManagerServiceMock>();
     static inline  std::shared_ptr<AppManagerMock> appManagerMock_ =
         std::make_shared<AppManagerMock>();
     static inline  std::shared_ptr<KVAdapterManagerMock> kVAdapterManagerMock_ =
