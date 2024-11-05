@@ -20,8 +20,8 @@
 
 #include "kv_adapter_manager.h"
 
-namespace OHOS{
-namespace DistributedHardware{
+namespace OHOS {
+namespace DistributedHardware {
 class DmKVAdapterManager {
 public:
     virtual ~DmKVAdapterManager() = default;

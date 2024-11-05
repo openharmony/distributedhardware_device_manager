@@ -159,8 +159,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
     {
         jsonObj.dump();
     }
-    catch(nlohmann::json::type_error& e)
-    {
+    catch(nlohmann::json_abi_v3_11_2::detail::type_error& e){
         LOGE("HiChainConnector::CreateGroup json throw an error:%s, try to fix", e.what());
         return ERR_DM_FAILED;
     }
@@ -815,8 +814,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
     {
         jsonObj.dump();
     }
-    catch(nlohmann::json::type_error& e)
-    {
+    catch(nlohmann::json_abi_v3_11_2::detail::type_error& e){
         LOGE("HiChainConnector::CreateGroup json throw an error:%s, try to fix", e.what());
         return ERR_DM_FAILED;
     }

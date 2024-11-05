@@ -121,7 +121,7 @@ HWTEST_F(DmPublishManagerTest, PublishDeviceDiscovery_002, testing::ext::TestSiz
 
 /**
  * @tc.name: OnPublishResult_001
- * 
+ *
  * @tc.desc: The OnPublishFailed function takes the wrong case and emptying pkgName
  * @tc.type: FUNC
  * @tc.require: I5N1K3

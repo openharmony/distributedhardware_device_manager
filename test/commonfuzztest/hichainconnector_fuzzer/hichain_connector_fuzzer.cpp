@@ -66,17 +66,20 @@ void AddGroupInfo(std::vector<GroupInfo> &groupList)
     groupList.push_back(groupInfo2);
 }
 
-void AddAclInfo(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec)
+void AddAclInfo(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec)
 {
     int32_t key = 12;
     std::string value = "acl_info1";
     delACLInfoVec.push_back(std::make_pair(key, value));
-    key = 23;
+    userIdVec.push_back(key);
+    int32_t key1 = 23;
     value = "acl_info2";
-    delACLInfoVec.push_back(std::make_pair(key, value));
-    key = 25;
+    delACLInfoVec.push_back(std::make_pair(key1, value));
+    userIdVec.push_back(key);
+    int32_t key2 = 25;
     value = "acl_info3";
-    delACLInfoVec.push_back(std::make_pair(key, value));
+    delACLInfoVec.push_back(std::make_pair(key2, value));
+    userIdVec.push_back(key);
 }
 
 void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
@@ -165,9 +168,7 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     nlohmann::json jsonOutObj;
     std::shared_ptr<IDmGroupResCallback> callback;
     std::string jsonStr(reinterpret_cast<const char*>(data), size);
-    nlohmann::json jsonDeviceList;
     int32_t groupType = *(reinterpret_cast<const int32_t*>(data));
-    std::string udid(reinterpret_cast<const char*>(data), size);
     int32_t switchUserId = *(reinterpret_cast<const int32_t*>(data));
     std::string reqParams(reinterpret_cast<const char*>(data), size);
     int operationCode = GroupOperationCode::MEMBER_JOIN;
@@ -176,8 +177,8 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->CreateGroup(requestId, groupName);
     hichainConnector->CreateGroup(requestId, authType, userId, jsonOutObj);
     hichainConnector->getRegisterInfo(queryParams, jsonStr);
-    hichainConnector->addMultiMembers(groupType, userId, jsonDeviceList);
-    hichainConnector->deleteMultiMembers(groupType, userId, jsonDeviceList);
+    hichainConnector->addMultiMembers(groupType, userId, jsonOutObj);
+    hichainConnector->deleteMultiMembers(groupType, userId, jsonOutObj);
     hichainConnector->GetGroupInfoCommon(usersId, queryParams, pkgName.c_str(), groupList);
     hichainConnector->hiChainResCallback_ = nullptr;
     hichainConnector->GetConnectPara(deviceId, reqDeviceId);
@@ -188,13 +189,13 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     }
     hichainConnector->CreateGroup(requestId, groupName);
     hichainConnector->CreateGroup(requestId, authType, userId, jsonOutObj);
-    hichainConnector->IsGroupCreated(groupName ,groupInfo);
+    hichainConnector->IsGroupCreated(groupName, groupInfo);
     hichainConnector->GetGroupInfoExt(usersId, queryParams, groupList);
     hichainConnector->GetGroupInfoCommon(usersId, queryParams, pkgName.c_str(), groupList);
     hichainConnector->RegisterHiChainGroupCallback(callback);
-    hichainConnector->GetJsonInt(jsonDeviceList, "key");
-    hichainConnector->deleteMultiMembers(groupType, userId, jsonDeviceList);
-    hichainConnector->DeleteAllGroupByUdid(udid);
+    hichainConnector->GetJsonInt(jsonOutObj, "key");
+    hichainConnector->deleteMultiMembers(groupType, userId, jsonOutObj);
+    hichainConnector->DeleteAllGroupByUdid(reqParams);
     hichainConnector->DeleteP2PGroup(switchUserId);
 }
 
@@ -219,13 +220,10 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
     std::vector<std::string> syncGroupList;
     std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
     std::vector<int32_t> userIdVec;
-    AddAclInfo(delACLInfoVec);
     hichainConnector->DeleteGroupByACL(delACLInfoVec, userIdVec);
-    userIdVec.push_back(key);
-    key = 32;
-    userIdVec.push_back(key);
     std::vector<GroupInfo> groupList;
     AddGroupInfo(groupList);
+    AddAclInfo(delACLInfoVec, userIdVec);
     hichainConnector->DeleteGroup(groupId);
     hichainConnector->DeleteGroupExt(groupId);
     hichainConnector->DeleteGroup(authType, groupId);

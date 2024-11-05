@@ -20,8 +20,8 @@
 
 #include "softbus_listener.h"
 
-namespace OHOS{
-namespace DistributedHardware{
+namespace OHOS {
+namespace DistributedHardware {
 class DmSoftbusListener {
 public:
     virtual ~DmSoftbusListener() = default;

@@ -20,8 +20,8 @@
 
 #include "device_manager_service_impl.h"
 
-namespace OHOS{
-namespace DistributedHardware{
+namespace OHOS {
+namespace DistributedHardware {
 class DmDeviceManagerServiceImpl {
 public:
     virtual ~DmDeviceManagerServiceImpl() = default;

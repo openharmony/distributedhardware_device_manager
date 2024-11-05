@@ -20,8 +20,8 @@
 
 #include "app_manager.h"
 
-namespace OHOS{
-namespace DistributedHardware{
+namespace OHOS {
+namespace DistributedHardware {
 class DmAppManager {
 public:
     virtual ~DmAppManager() = default;

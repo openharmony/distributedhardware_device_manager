@@ -20,8 +20,8 @@
 
 #include "permission_manager.h"
 
-namespace OHOS{
-namespace DistributedHardware{
+namespace OHOS {
+namespace DistributedHardware {
 class DmPermissionManager {
 public:
     virtual ~DmPermissionManager() = default;

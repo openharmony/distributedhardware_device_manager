@@ -20,8 +20,8 @@
 
 #include "deviceprofile_connector.h"
 
-namespace OHOS{
-namespace DistributedHardware{
+namespace OHOS {
+namespace DistributedHardware {
 class DmDeviceProfileConnector {
 public:
     virtual ~DmDeviceProfileConnector() = default;
