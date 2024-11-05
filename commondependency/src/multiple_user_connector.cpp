@@ -32,7 +32,6 @@ int32_t MultipleUserConnector::oldUserId_ = -1;
 std::string MultipleUserConnector::accountId_ = "";
 std::string MultipleUserConnector::accountName_ = "";
 std::mutex MultipleUserConnector::lock_;
-
 #ifndef OS_ACCOUNT_PART_EXISTS
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
 #endif // OS_ACCOUNT_PART_EXISTS

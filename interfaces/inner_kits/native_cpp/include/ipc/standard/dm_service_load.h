@@ -38,4 +38,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_CLIENT_MANAGER_H
+#endif // OHOS_DM_SA_LOAD_H

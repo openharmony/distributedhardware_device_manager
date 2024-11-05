@@ -147,7 +147,6 @@ private:
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId);
     std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId);
-
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
