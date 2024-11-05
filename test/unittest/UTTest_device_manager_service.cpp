@@ -550,7 +550,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_007, testing::ext::TestSize.Leve
     std::string callerId = "ShiftLNNGear_007";
     bool isRefresh = true;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, ShiftLNNGear(_,_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusListenerMock_, ShiftLNNGear(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int ret = DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, callerId, isRefresh, false);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -2178,7 +2178,7 @@ HWTEST_F(DeviceManagerServiceTest, IsSameAccount_001, testing::ext::TestSize.Lev
 HWTEST_F(DeviceManagerServiceTest, IsSameAccount_002, testing::ext::TestSize.Level0)
 {
     std::string udid = "udidTest";
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_,_)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
     int32_t ret = DeviceManagerService::GetInstance().IsSameAccount(udid);
     EXPECT_NE(ret, DM_OK);
 }

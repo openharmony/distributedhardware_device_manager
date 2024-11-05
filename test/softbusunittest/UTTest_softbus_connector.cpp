@@ -100,8 +100,6 @@ void SoftbusConnectorTest::TearDownTestCase()
 {
 }
 
-
-
 namespace {
 std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
 

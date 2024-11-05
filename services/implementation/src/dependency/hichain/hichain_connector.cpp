@@ -155,15 +155,13 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
         return ERR_DM_FAILED;
     }
 
-    try
-    {
+    try{
         jsonObj.dump();
     }
-    catch(nlohmann::json_abi_v3_11_2::detail::type_error& e){
+    catch(nlohmann::json_abi_v3_11_2::detail::exception& e) {
         LOGE("HiChainConnector::CreateGroup json throw an error:%s, try to fix", e.what());
         return ERR_DM_FAILED;
     }
-
     int32_t ret = deviceGroupManager_->createGroup(userId, requestId, DM_PKG_NAME, jsonObj.dump().c_str());
     struct RadarInfo info = {
         .funcName = "CreateGroup",
@@ -810,15 +808,13 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
         return ERR_DM_FAILED;
     }
 
-    try
-    {
+    try{
         jsonObj.dump();
     }
-    catch(nlohmann::json_abi_v3_11_2::detail::type_error& e){
+    catch(nlohmann::json_abi_v3_11_2::detail::exception& e) {
         LOGE("HiChainConnector::CreateGroup json throw an error:%s, try to fix", e.what());
         return ERR_DM_FAILED;
     }
-
     int32_t ret = deviceGroupManager_->createGroup(osAccountUserId, requestId, DM_PKG_NAME, jsonObj.dump().c_str());
     if (ret != DM_OK) {
         LOGE("[HICHAIN]fail to create group with ret:%{public}d, requestId:%{public}" PRId64, ret, requestId);

@@ -152,7 +152,6 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     }
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-
     int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
     std::string groupName(reinterpret_cast<const char*>(data), size);
     GroupInfo groupInfo;
