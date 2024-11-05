@@ -944,7 +944,7 @@ ohos_unittest("UTTest_device_manager_service_impl") {
     "UTTest_device_manager_service_impl.cpp",
   ]
 
-  deps = [ 
+  deps = [
     ":device_manager_test_common",
     "//third_party/googletest:gmock_main",
    ]
