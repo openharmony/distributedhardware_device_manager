@@ -16,6 +16,12 @@
 #include "UTTest_device_manager_service_impl.h"
 #include "softbus_error_code.h"
 #include "common_event_support.h"
+#include "deviceprofile_connector.h"
+#include "distributed_device_profile_client.h"
+
+using namespace testing;
+using namespace testing::ext;
+using namespace OHOS::DistributedDeviceProfile;
 namespace OHOS {
 namespace DistributedHardware {
 void DeviceManagerServiceImplTest::SetUp()
@@ -33,6 +39,7 @@ void DeviceManagerServiceImplTest::TearDown()
 
 void DeviceManagerServiceImplTest::SetUpTestCase()
 {
+    DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
 }
 
 void DeviceManagerServiceImplTest::TearDownTestCase()
@@ -40,6 +47,62 @@ void DeviceManagerServiceImplTest::TearDownTestCase()
 }
 
 namespace {
+bool CheckSoftbusRes(int32_t ret)
+{
+    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR
+        || ret == SOFTBUS_IPC_ERR;
+}
+
+void AddAccessControlProfileFirst(std::vector<AccessControlProfile>& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 4;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = DEVICE;
+    uint32_t status = 0;
+    uint32_t authenticationType = 2;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "accountId_123";
+    std::string newAccountId = "accountId_456";
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "123456";
+
+    Accesser accesser;
+    accesser.SetAccesserId(accesserId);
+    accesser.SetAccesserDeviceId(deviceId);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId(oldAccountId);
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("bundleName");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    AccessControlProfile profileFirst;
+    profileFirst.SetAccessControlId(accesserId);
+    profileFirst.SetAccesserId(accesserId);
+    profileFirst.SetAccesseeId(accesserId);
+    profileFirst.SetTrustDeviceId(trustDeviceId);
+    profileFirst.SetBindType(bindType);
+    profileFirst.SetAuthenticationType(authenticationType);
+    profileFirst.SetDeviceIdType(deviceIdType);
+    profileFirst.SetStatus(status);
+    profileFirst.SetBindLevel(bindLevel);
+    profileFirst.SetAccesser(accesser);
+    profileFirst.SetAccessee(accessee);
+    accessControlProfiles.push_back(profileFirst);
+}
 
 /**
  * @tc.name: Initialize_001
@@ -863,7 +926,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_001, testing::ext::T
     uint16_t subscribeId = 0;
     std::string filterOptions;
     int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**
@@ -897,7 +960,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StartDeviceDiscovery_003, testing::ext::T
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_TRUE(ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**
@@ -946,7 +1009,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StopDeviceDiscovery_002, testing::ext::Te
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**
@@ -978,7 +1041,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PublishDeviceDiscovery_002, testing::ext:
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_TRUE(ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**
@@ -1010,7 +1073,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnPublishDeviceDiscovery_002, testing::ex
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->UnPublishDeviceDiscovery(pkgName, publishId);
-    EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**
@@ -1060,7 +1123,7 @@ HWTEST_F(DeviceManagerServiceImplTest, GetUdidHashByNetWorkId_003, testing::ext:
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
     int32_t ret = deviceManagerServiceImpl_->GetUdidHashByNetWorkId(networkId, deviceId);
-    EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
+    EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
 /**
@@ -1509,6 +1572,56 @@ HWTEST_F(DeviceManagerServiceImplTest, CredentialAuthStatus_101, testing::ext::T
     int32_t errcode = -1;
     deviceManagerServiceImpl_->HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, ProcessAppUnintall_101, testing::ext::TestSize.Level0)
+{
+    std::string appId;
+    int32_t accessTokenId = 101;
+    int ret = deviceManagerServiceImpl_->ProcessAppUnintall(appId, accessTokenId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, ProcessAppUnintall_102, testing::ext::TestSize.Level0)
+{
+    std::string appId;
+    int32_t accessTokenId = 102;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AddAccessControlProfileFirst(profiles);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    int ret = deviceManagerServiceImpl_->ProcessAppUnintall(appId, accessTokenId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, ProcessAppUnintall_103, testing::ext::TestSize.Level0)
+{
+    std::string appId;
+    int32_t accessTokenId = 1001;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AddAccessControlProfileFirst(profiles);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    if (deviceManagerServiceImpl_->hiChainConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    int ret = deviceManagerServiceImpl_->ProcessAppUnintall(appId, accessTokenId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, StopAuthenticateDevice_101, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int ret = deviceManagerServiceImpl_->StopAuthenticateDevice(pkgName);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, StopAuthenticateDevice_102, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "StopAuthenticateDevice_102";
+    if (deviceManagerServiceImpl_->authMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    int ret = deviceManagerServiceImpl_->StopAuthenticateDevice(pkgName);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -47,6 +47,10 @@ std::shared_ptr<SoftbusConnector> softbusConnector_ = std::make_shared<SoftbusCo
 std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
 std::shared_ptr<DmPublishManager> publishMgr_ = std::make_shared<DmPublishManager>(softbusConnector_, listener_);
 
+bool CheckSoftbusRes(int32_t ret)
+{
+    return ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR || ret == SOFTBUS_IPC_ERR;
+}
 /**
  * @tc.name: DmPublishManager_001
  * @tc.desc: Test whether the DmPublishManager function can generate a new pointer
@@ -111,12 +115,13 @@ HWTEST_F(DmPublishManagerTest, PublishDeviceDiscovery_002, testing::ext::TestSiz
     publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "com.ohos.helloworld.new";
     int32_t ret = publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
-    ASSERT_TRUE(ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR);
+    ASSERT_TRUE(CheckSoftbusRes(ret));
     publishMgr_->UnPublishDeviceDiscovery(pkgName, publishInfo.publishId);
 }
 
 /**
  * @tc.name: OnPublishResult_001
+ * 
  * @tc.desc: The OnPublishFailed function takes the wrong case and emptying pkgName
  * @tc.type: FUNC
  * @tc.require: I5N1K3

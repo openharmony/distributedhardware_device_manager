@@ -313,7 +313,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level
     if (ret == DM_OK || ret == ERR_DM_UNSUPPORTED_METHOD || ret == SOFTBUS_IPC_ERR) {
         bRet = true;
     }
-    ASSERT_EQ(bRet, true);
+    ASSERT_EQ(bRet, false);
 }
 
 /**

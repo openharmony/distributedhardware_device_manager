@@ -15,6 +15,7 @@
 
 #include "hichain_connector.h"
 
+#include <atomic>
 #include <cstdlib>
 #include <ctime>
 #include <functional>
@@ -152,6 +153,16 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId < 0) {
         LOGE("get current process account user id failed");
+        return ERR_DM_FAILED;
+    }
+
+    try
+    {
+        jsonObj.dump();
+    }
+    catch(nlohmann::json::type_error& e)
+    {
+        LOGE("HiChainConnector::CreateGroup json throw an error:%s, try to fix", e.what());
         return ERR_DM_FAILED;
     }
 
@@ -798,6 +809,16 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (osAccountUserId < 0) {
         LOGE("get current process account user id failed");
+        return ERR_DM_FAILED;
+    }
+
+    try
+    {
+        jsonObj.dump();
+    }
+    catch(nlohmann::json::type_error& e)
+    {
+        LOGE("HiChainConnector::CreateGroup json throw an error:%s, try to fix", e.what());
         return ERR_DM_FAILED;
     }
 
