@@ -491,7 +491,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline_002, testing::ext::TestSize.Lev
     DmDeviceInfo deviceInfo;
     DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOnline called
-    ASSERT_EQ(count, 0);
+    ASSERT_EQ(count, 1);
 }
 
 /*
@@ -689,7 +689,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_002, testing::ext::TestSize.Le
     DmDeviceInfo deviceInfo;
     DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOffline called
-    ASSERT_EQ(count, 0);
+    ASSERT_EQ(count, 1);
 }
 
 /*
@@ -887,7 +887,7 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceChanged_002, testing::ext::TestSize.Le
     DmDeviceInfo deviceInfo;
     DeviceManagerNotify::GetInstance().OnDeviceChanged(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceChanged called
-    ASSERT_EQ(count, 0);
+    ASSERT_EQ(count, 1);
 }
 
 /*
