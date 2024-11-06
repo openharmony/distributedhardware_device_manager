@@ -25,6 +25,8 @@
 #include "softbus_error_code.h"
 
 using namespace OHOS::Security::AccessToken;
+using namespace testing;
+using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
