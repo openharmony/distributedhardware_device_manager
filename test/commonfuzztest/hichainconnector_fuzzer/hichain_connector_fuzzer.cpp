@@ -172,8 +172,6 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     int operationCode = GroupOperationCode::MEMBER_JOIN;
     hichainConnector->deviceGroupManager_ = nullptr;
     hichainConnector->AddMember(deviceId, queryParams);
-    hichainConnector->CreateGroup(requestId, groupName);
-    hichainConnector->CreateGroup(requestId, authType, userId, jsonOutObj);
     hichainConnector->getRegisterInfo(queryParams, jsonStr);
     hichainConnector->addMultiMembers(groupType, userId, jsonOutObj);
     hichainConnector->deleteMultiMembers(groupType, userId, jsonOutObj);
@@ -185,8 +183,6 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     if (hichainConnector->deviceGroupManager_ == nullptr) {
         hichainConnector->deviceGroupManager_ = GetGmInstance();
     }
-    hichainConnector->CreateGroup(requestId, groupName);
-    hichainConnector->CreateGroup(requestId, authType, userId, jsonOutObj);
     hichainConnector->IsGroupCreated(groupName, groupInfo);
     hichainConnector->GetGroupInfoExt(authType, queryParams, groupList);
     hichainConnector->GetGroupInfoCommon(authType, queryParams, pkgName.c_str(), groupList);
@@ -208,8 +204,8 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
 
     int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
     std::string groupName(reinterpret_cast<const char*>(data), size);
-    std::string groupId(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    std::string groupId = "groupId_forth";
+    std::string deviceId = "deviceId_forth";
     std::string returnData(reinterpret_cast<const char*>(data), size);
     std::string userId(reinterpret_cast<const char*>(data), size);
     int32_t authType = *(reinterpret_cast<const int32_t*>(data));
@@ -249,6 +245,29 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->GetSyncGroupList(groupList, syncGroupList);
     hichainConnector->GetGroupId(userId, authType, userId);
 }
+
+void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
+
+    int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
+    std::string groupName = "groupName_fifth";
+    int32_t authType = *(reinterpret_cast<const int32_t*>(data));
+    nlohmann::json jsonDeviceList;
+    hichainConnector->deviceGroupManager_ = nullptr;
+    hichainConnector->CreateGroup(requestId, groupName);
+    hichainConnector->CreateGroup(requestId, authType, groupName, jsonDeviceList);
+    if (hichainConnector->deviceGroupManager_ == nullptr) {
+        hichainConnector->deviceGroupManager_ = GetGmInstance();
+    }
+    hichainConnector->CreateGroup(requestId, groupName);
+    hichainConnector->CreateGroup(requestId, authType, groupName, jsonDeviceList);
+}
 }
 }
 
@@ -260,5 +279,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::HiChainConnectorSecondFuzzTest(data, size);
     OHOS::DistributedHardware::HiChainConnectorThirdFuzzTest(data, size);
     OHOS::DistributedHardware::HiChainConnectorForthFuzzTest(data, size);
+    OHOS::DistributedHardware::HiChainConnectorFifthFuzzTest(data, size);
     return 0;
 }

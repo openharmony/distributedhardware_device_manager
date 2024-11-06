@@ -2563,7 +2563,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_003, testing::ext::TestSize.Le
 {
     std::string pkgName = "pkgName";
     std::string authCode;
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -2572,17 +2572,16 @@ HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_004, testing::ext::TestSize.Le
 {
     std::string pkgName = "pkgName";
     std::string authCode = "authCode";
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_003, testing::ext::TestSize.Level0)
 {
     std::string authCode = "authCode";
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().ExportAuthCode(authCode);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceTest, IsSameAccount_004, testing::ext::TestSize.Level0)
@@ -2596,7 +2595,7 @@ HWTEST_F(DeviceManagerServiceTest, IsSameAccount_004, testing::ext::TestSize.Lev
 HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_006, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test";
-    std::string invalidNetworkId;
+    std::string invalidNetworkId = "networkId";
     int32_t securityLevel = 0;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*softbusListenerMock_, GetDeviceSecurityLevel(_, _)).WillOnce(Return(DM_OK));
