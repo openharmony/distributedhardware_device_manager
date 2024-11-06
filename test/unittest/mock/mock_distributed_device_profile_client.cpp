@@ -676,13 +676,13 @@ int32_t DistributedDeviceProfileClient::GetCharacteristicProfile(const std::stri
 }
 
 int32_t DistributedDeviceProfileClient::DeleteServiceProfile(const std::string& deviceId,
-    const std::string& serviceName)
+    const std::string& serviceName, bool isMultiUser, int32_t userId)
 {
     return 0;
 }
 
 int32_t DistributedDeviceProfileClient::DeleteCharacteristicProfile(const std::string& deviceId,
-    const std::string& serviceName, const std::string& characteristicKey)
+    const std::string& serviceName, const std::string& characteristicKey, bool isMultiUser, int32_t userId)
 {
     return 0;
 }
