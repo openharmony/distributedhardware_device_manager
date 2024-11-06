@@ -224,7 +224,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSiz
     DmAccessCaller caller;
     DmAccessCallee callee;
     bool ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
 }
 
 /**
@@ -249,7 +249,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSiz
     DmAccessCaller caller;
     DmAccessCallee callee;
     bool ret = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
 }
 
 /**

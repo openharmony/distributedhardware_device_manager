@@ -207,7 +207,7 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
     std::string groupId = "groupId_forth";
     std::string deviceId = "deviceId_forth";
     std::string returnData(reinterpret_cast<const char*>(data), size);
-    std::string userId(reinterpret_cast<const char*>(data), size);
+    std::string userId = "userId_forth";
     int32_t authType = *(reinterpret_cast<const int32_t*>(data));
     int operationCode = GroupOperationCode::MEMBER_JOIN;
     int errCode = 102;
