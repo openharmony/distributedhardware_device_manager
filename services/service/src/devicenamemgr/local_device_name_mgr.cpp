@@ -192,11 +192,25 @@ int32_t LocalDeviceNameMgr::QueryLocalDeviceName()
         localDeviceName_ = localDeviceName;
         dataShareHelper->Release();
         LOGI("get user defined deviceName=%{public}s", localDeviceName.c_str());
+        if (localDisplayName_.empty()) {
+            LOGI("displayName is null, set user define device name to softbus.");
+            DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName);
+        }
         return DM_OK;
     }
     ret = GetDefaultDeviceName(dataShareHelper, localDeviceName);
-    LOGI("get default deviceName=%{public}s", localDeviceName.c_str());
+    if (ret != DM_OK || localDeviceName.empty()) {
+        LOGE("get default deviceName failed");
+        return ERR_DM_FAILED;
+    }
+    std::lock_guard<std::mutex> lock(devNameMtx_);
+    localDeviceName_ = localDeviceName;
     dataShareHelper->Release();
+    LOGI("get default deviceName=%{public}s", localDeviceName.c_str());
+    if (localDisplayName_.empty()) {
+        LOGI("displayName is null, set default deviceName to softbus.");
+        DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName);
+    }
     return DM_OK;
 }
 

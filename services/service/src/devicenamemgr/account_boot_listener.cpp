@@ -101,8 +101,8 @@ void AccountBootListener::DoAccountBootProc()
     }
     localDeviceMgr_->RegisterDeviceNameChangeCb();
     localDeviceMgr_->RegisterDisplayNameChangeCb();
-    localDeviceMgr_->QueryLocalDeviceName();
     localDeviceMgr_->QueryLocalDisplayName();
+    localDeviceMgr_->QueryLocalDeviceName();
 }
 
 void AccountBootListener::SetSaTriggerFlag(SaTriggerFlag triggerFlag)
