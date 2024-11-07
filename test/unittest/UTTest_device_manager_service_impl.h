@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "device_manager_service_impl.h"
+#include "deviceprofile_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,6 +36,8 @@ public:
 
     std::shared_ptr<IDeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DeviceManagerServiceImpl> deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
+    static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ =
+        std::make_shared<DeviceProfileConnectorMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

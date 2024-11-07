@@ -16,6 +16,7 @@
 #define OHOS_UTTEST_DM_SERVICE_H
 
 #include <gtest/gtest.h>
+#include <memory>
 #include <refbase.h>
 
 #include <string>
@@ -26,6 +27,11 @@
 #include "device_manager_service_impl.h"
 #include "dm_single_instance.h"
 #include "common_event_support.h"
+#include "permission_manager_mock.h"
+#include "softbus_listener_mock.h"
+#include "app_manager_mock.h"
+#include "kv_adapter_manager_mock.h"
+#include "device_manager_service_impl_mock.h"
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerServiceTest : public testing::Test {
@@ -34,6 +40,17 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+    static inline std::shared_ptr<PermissionManagerMock> permissionManagerMock_ =
+        std::make_shared<PermissionManagerMock>();
+    static inline  std::shared_ptr<SoftbusListenerMock> softbusListenerMock_ =
+        std::make_shared<SoftbusListenerMock>();
+    static inline  std::shared_ptr<AppManagerMock> appManagerMock_ =
+        std::make_shared<AppManagerMock>();
+    static inline  std::shared_ptr<KVAdapterManagerMock> kVAdapterManagerMock_ =
+        std::make_shared<KVAdapterManagerMock>();
+    static inline  std::shared_ptr<DeviceManagerServiceImplMock> deviceManagerServiceImplMock_ =
+        std::make_shared<DeviceManagerServiceImplMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

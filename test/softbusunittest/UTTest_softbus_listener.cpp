@@ -50,7 +50,8 @@ namespace {
 
 bool checkSoftbusRes(int32_t ret)
 {
-    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
+    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR ||
+        ret == SOFTBUS_IPC_ERR;
 }
 
 /**

@@ -323,9 +323,17 @@ ohos_unittest("UTTest_device_manager_service") {
   sources = [
     "UTTest_device_manager_service.cpp",
     "UTTest_device_manager_service_two.cpp",
+    "mock/app_manager_mock.cpp",
+    "mock/device_manager_service_impl_mock.cpp",
+    "mock/kv_adapter_manager_mock.cpp",
+    "mock/permission_manager_mock.cpp",
+    "mock/softbus_listener_mock.cpp",
   ]
 
-  deps = [ ":device_manager_test_common" ]
+  deps = [
+    ":device_manager_test_common",
+    "//third_party/googletest:gmock_main",
+  ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -933,9 +941,13 @@ ohos_unittest("UTTest_device_manager_service_impl") {
     "${devicemanager_path}/commondependency/src/multiple_user_connector.cpp",
     "${servicesimpl_path}/src/device_manager_service_impl.cpp",
     "UTTest_device_manager_service_impl.cpp",
+    "mock/deviceprofile_connector_mock.cpp",
   ]
 
-  deps = [ ":device_manager_test_common" ]
+  deps = [
+    ":device_manager_test_common",
+    "//third_party/googletest:gmock_main",
+  ]
 
   external_deps = [
     "device_auth:deviceauth_sdk",
