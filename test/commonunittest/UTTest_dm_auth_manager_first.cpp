@@ -302,8 +302,8 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level0)
     authManager_->ShowAuthInfoDialog();
     authManager_->ShowStartAuthDialog();
     int32_t code = 0;
-    authManager_->GetPinCode(code);
-    ASSERT_EQ(code, ERR_DM_AUTH_NOT_START);
+    int32_t ret = authManager_->GetPinCode(code);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, SetPageId_001, testing::ext::TestSize.Level0)
