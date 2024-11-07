@@ -271,7 +271,6 @@ void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->CreateGroup(requestId, authType, groupName, jsonDeviceList);
     hichainConnector->ParseRemoteCredential(authType, groupName, jsonDeviceList, params, osAccountUserId);
     hichainConnector->ParseRemoteCredential(authType, "", jsonDeviceList, params, osAccountUserId);
-
 }
 }
 }
