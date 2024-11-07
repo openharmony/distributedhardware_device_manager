@@ -76,6 +76,8 @@ public:
     void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList, uint16_t deviceTypeId,
                                 int32_t errcode) override;
     void OnAppUnintall(const std::string &pkgName) override;
+    void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+        int32_t status, std::string content) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

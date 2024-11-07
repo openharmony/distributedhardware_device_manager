@@ -628,6 +628,9 @@ public:
     virtual int32_t RegisterCredentialAuthStatusCallback(const std::string &pkgName,
         std::shared_ptr<CredentialAuthStatusCallback> callback) = 0;
     virtual int32_t UnRegisterCredentialAuthStatusCallback(const std::string &pkgName) = 0;
+    virtual int32_t RegisterSinkBindCallback(const std::string &pkgName,
+        std::shared_ptr<BindTargetCallback> callback) = 0;
+    virtual int32_t UnRegisterSinkBindCallback(const std::string &pkgName) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

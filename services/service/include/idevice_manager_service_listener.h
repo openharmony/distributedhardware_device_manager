@@ -167,6 +167,8 @@ public:
     virtual void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList,
                                         uint16_t deviceTypeId, int32_t errcode) = 0;
     virtual void OnAppUnintall(const std::string &pkgName) = 0;
+    virtual void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+        int32_t status, std::string content) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

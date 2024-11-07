@@ -585,5 +585,30 @@ void DeviceManagerServiceListener::OnAppUnintall(const std::string &pkgName)
         }
     }
 }
+
+void DeviceManagerServiceListener::OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId,
+    int32_t result, int32_t status, std::string content)
+{
+    std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    if (status < STATUS_DM_AUTH_FINISH && status > STATUS_DM_AUTH_DEFAULT) {
+        status = STATUS_DM_AUTH_DEFAULT;
+    }
+    PeerTargetId returnTargetId = targetId;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string deviceIdTemp = "";
+    DmKVValue kvValue;
+    if (ConvertUdidHashToAnoyDeviceId(pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
+        KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
+        returnTargetId.deviceId = deviceIdTemp;
+    }
+#endif
+    pReq->SetPkgName(pkgName);
+    pReq->SetPeerTargetId(returnTargetId);
+    pReq->SetResult(result);
+    pReq->SetStatus(status);
+    pReq->SetContent(content);
+    ipcServerListener_.SendRequest(SINK_BIND_TARGET_RESULT, pReq, pRsp);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

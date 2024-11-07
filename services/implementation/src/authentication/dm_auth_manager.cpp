@@ -319,6 +319,7 @@ int32_t DmAuthManager::StopAuthenticateDevice(const std::string &pkgName)
         LOGI("Stop previous AuthenticateDevice.");
         authRequestContext_->reason = STOP_BIND;
         authResponseContext_->state = authRequestState_->GetStateType();
+        authResponseContext_->reply = STOP_BIND;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
     return DM_OK;
@@ -637,6 +638,7 @@ void DmAuthManager::MemberJoinAuthRequest(int64_t requestId, int32_t status)
     if (status != DM_OK || authResponseContext_->requestId != requestId) {
         if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
             authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
+            authResponseContext_->reply = ERR_DM_BIND_PIN_CODE_ERROR;
             authRequestContext_->reason = ERR_DM_BIND_PIN_CODE_ERROR;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
@@ -660,6 +662,7 @@ void DmAuthManager::HandleMemberJoinImportAuthCode(const int64_t requestId, cons
 {
     if (status != DM_OK || authResponseContext_->requestId != requestId) {
         authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
+        authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;
         authRequestContext_->reason = ERR_DM_AUTH_CODE_INCORRECT;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     } else {
@@ -676,6 +679,7 @@ void DmAuthManager::HandleAuthenticateTimeout(std::string name)
         }
         authResponseContext_->state = authRequestState_->GetStateType();
         authRequestContext_->reason = ERR_DM_TIME_OUT;
+        authResponseContext_->reply = ERR_DM_TIME_OUT;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
 
@@ -713,6 +717,7 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
             authResponseContext_ = std::make_shared<DmAuthResponseContext>();
         }
         authResponseContext_->state = AuthState::AUTH_REQUEST_NEGOTIATE;
+        authResponseContext_->reply = sessionId;
         if (authRequestContext_ == nullptr) {
             authRequestContext_ = std::make_shared<DmAuthRequestContext>();
         }
@@ -978,6 +983,7 @@ bool DmAuthManager::IsAuthFinish()
 
     if (authResponseContext_->isOnline && authResponseContext_->authed) {
         authRequestContext_->reason = DM_OK;
+        authResponseContext_->reply = DM_OK;
         authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return true;
@@ -988,6 +994,7 @@ bool DmAuthManager::IsAuthFinish()
         softbusConnector_->JoinLnn(authRequestContext_->addr);
         authRequestContext_->reason = DM_OK;
         authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+        authResponseContext_->reply = DM_OK;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return true;
     }
@@ -1110,6 +1117,7 @@ void DmAuthManager::StartRespAuthProcess()
         LOGE("do not accept");
         authResponseContext_->state = AuthState::AUTH_REQUEST_REPLY;
         authRequestContext_->reason = ERR_DM_AUTH_PEER_REJECT;
+        authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     }
 }
@@ -1195,6 +1203,7 @@ int32_t DmAuthManager::JoinNetwork()
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authResponseContext_->isFinish = true;
     authRequestContext_->reason = DM_OK;
+    authResponseContext_->reply = DM_OK;
     authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
     return DM_OK;
 }
@@ -1202,6 +1211,8 @@ int32_t DmAuthManager::JoinNetwork()
 void DmAuthManager::SinkAuthenticateFinish()
 {
     LOGI("DmAuthManager::SinkAuthenticateFinish, isFinishOfLocal: %{public}d", isFinishOfLocal_);
+    listener_->OnSinkBindResult(authResponseContext_->hostPkgName, peerTargetId_, authResponseContext_->reply,
+        authResponseContext_->state, GenerateBindResultContent());
     if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_CONFIRM_SHOW);
@@ -1894,6 +1905,7 @@ void DmAuthManager::RequestCredentialDone()
     softbusConnector_->JoinLnn(authRequestContext_->addr);
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
+    authResponseContext_->reply = DM_OK;
     authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
 }
 
@@ -1952,6 +1964,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
             softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
             timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
             authRequestContext_->reason = DM_OK;
+            authResponseContext_->reply = DM_OK;
             authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return;
@@ -1972,6 +1985,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
         softbusConnector_->JoinLnn(authRequestContext_->addr);
         timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
         authRequestContext_->reason = DM_OK;
+        authResponseContext_->reply = DM_OK;
         authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
@@ -2024,6 +2038,7 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
         authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
         authRequestContext_->reason = ERR_DM_AUTH_CODE_INCORRECT;
+        authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
@@ -2033,6 +2048,7 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
         if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
             authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
             authRequestContext_->reason = ERR_DM_INPUT_PARA_INVALID;
+            authResponseContext_->reply = ERR_DM_INPUT_PARA_INVALID;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         } else {
             timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
@@ -2331,6 +2347,7 @@ int32_t DmAuthManager::CheckTrustState()
             softbusConnector_->JoinLnn(authResponseContext_->deviceId);
             authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
             authRequestContext_->reason = DM_OK;
+            authResponseContext_->reply = DM_OK;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
             return ALREADY_BIND;
         }

@@ -206,6 +206,16 @@ public:
     {
         (void)pkgName;
     }
+
+    void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+        int32_t status, std::string content) override
+    {
+        (void)pkgName;
+        (void)targetId;
+        (void)result;
+        (void)status;
+        (void)content;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
