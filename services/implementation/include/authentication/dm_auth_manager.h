@@ -512,6 +512,7 @@ private:
     int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel);
     void ProcessAuthRequestExt(const int32_t &sessionId);
+    bool IsAuthFinish();
     void ProcessAuthRequest(const int32_t &sessionId);
     int32_t ConfirmProcess(const int32_t &action);
     int32_t ConfirmProcessExt(const int32_t &action);

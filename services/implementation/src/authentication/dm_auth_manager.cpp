@@ -930,39 +930,27 @@ void DmAuthManager::GetAuthRequestContext()
 void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
 {
     LOGI("ProcessAuthRequestExt start.");
+    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
+        !authResponseContext_->importAuthCode.empty() && !importAuthCode_.empty()) {
+        if (authResponseContext_->importAuthCode != Crypto::Sha256(importAuthCode_)) {
+            SetReasonAndFinish(ERR_DM_AUTH_CODE_INCORRECT, AuthState::AUTH_REQUEST_FINISH);
+            return;
+        }
+    }
+
     GetAuthRequestContext();
     std::vector<int32_t> bindType =
         DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !bindType.empty();
+    if (authResponseContext_->isOnline && authResponseContext_->authed &&
+        authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
+        (authResponseContext_->importAuthCode.empty() || importAuthCode_.empty())) {
+        SetReasonAndFinish(ERR_DM_AUTH_CODE_INCORRECT, AuthState::AUTH_REQUEST_FINISH);
+        return;
+    }
     authResponseContext_->bindType = bindType;
-    if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE) {
-        listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
-            authRequestContext_->token, AuthState::AUTH_REQUEST_NEGOTIATE_DONE, ERR_DM_UNSUPPORTED_AUTH_TYPE);
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-        return;
-    }
-
-    if (authResponseContext_->isOnline && authResponseContext_->authed) {
-        authRequestContext_->reason = DM_OK;
-        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-        return;
-    }
-
-    if ((authResponseContext_->isIdenticalAccount && !authResponseContext_->authed) ||
-        (authResponseContext_->authed && !authResponseContext_->isOnline)) {
-        softbusConnector_->JoinLnn(authRequestContext_->addr);
-        authRequestContext_->reason = DM_OK;
-        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-        return;
-    }
-
-    if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE ||
-        (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
-        authResponseContext_->isAuthCodeReady == false)) {
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+    if (IsAuthFinish()) {
         return;
     }
 
@@ -977,6 +965,40 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
         GetTaskTimeout(CONFIRM_TIMEOUT_TASK, CONFIRM_TIMEOUT), [this] (std::string name) {
             DmAuthManager::HandleAuthenticateTimeout(name);
         });
+}
+
+bool DmAuthManager::IsAuthFinish()
+{
+    if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE) {
+        listener_->OnAuthResult(authResponseContext_->hostPkgName, peerTargetId_.deviceId,
+            authRequestContext_->token, AuthState::AUTH_REQUEST_NEGOTIATE_DONE, ERR_DM_UNSUPPORTED_AUTH_TYPE);
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        return true;
+    }
+
+    if (authResponseContext_->isOnline && authResponseContext_->authed) {
+        authRequestContext_->reason = DM_OK;
+        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        return true;
+    }
+
+    if ((authResponseContext_->isIdenticalAccount && !authResponseContext_->authed) ||
+        (authResponseContext_->authed && !authResponseContext_->isOnline)) {
+        softbusConnector_->JoinLnn(authRequestContext_->addr);
+        authRequestContext_->reason = DM_OK;
+        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        return true;
+    }
+
+    if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE ||
+        (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
+        authResponseContext_->isAuthCodeReady == false)) {
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        return true;
+    }
+    return false;
 }
 
 int32_t DmAuthManager::ConfirmProcess(const int32_t &action)
@@ -2107,6 +2129,10 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
         DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(authResponseContext_->hostPkgName,
         authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !authResponseContext_->bindType.empty();
+    if (authResponseContext_->authed && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
+        !importAuthCode_.empty()) {
+        authResponseContext_->importAuthCode = Crypto::Sha256(importAuthCode_);
+    }
     authResponseContext_->isOnline = softbusConnector_->CheckIsOnline(remoteDeviceId_);
     authResponseContext_->haveCredential =
         hiChainAuthConnector_->QueryCredential(authResponseContext_->deviceId, authResponseContext_->localUserId);
