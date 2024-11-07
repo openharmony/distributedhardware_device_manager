@@ -2315,7 +2315,14 @@ void DmAuthManager::HandleSessionHeartbeat(std::string name)
 
 int32_t DmAuthManager::CheckTrustState()
 {
-    if (authResponseContext_->isOnline && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+    bool isSameGroup = false;
+    if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT &&
+        hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId,
+                                               authRequestContext_->localDeviceId)) {
+        isSameGroup = true;
+    }
+    if (isSameGroup && authResponseContext_->isOnline && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+        authResponseContext_->isFinish = true;
         SetReasonAndFinish(DM_OK, AuthState::AUTH_REQUEST_FINISH);
         return ALREADY_BIND;
     }
@@ -2328,18 +2335,15 @@ int32_t DmAuthManager::CheckTrustState()
             return ALREADY_BIND;
         }
     }
-    if (authResponseContext_->reply == ERR_DM_AUTH_PEER_REJECT) {
-        if (hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId,
-                                                   authRequestContext_->localDeviceId)) {
-            if (!DeviceProfileConnector::GetInstance().CheckSrcDevIdInAclForDevBind(authResponseContext_->hostPkgName,
-                authResponseContext_->localDeviceId)) {
-                CompatiblePutAcl();
-            }
-            softbusConnector_->JoinLnn(authResponseContext_->deviceId);
-            authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-            return ALREADY_BIND;
+    if (isSameGroup) {
+        if (!DeviceProfileConnector::GetInstance().CheckSrcDevIdInAclForDevBind(authResponseContext_->hostPkgName,
+            authResponseContext_->localDeviceId)) {
+            CompatiblePutAcl();
         }
+        softbusConnector_->JoinLnn(authResponseContext_->deviceId);
+        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
+        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
+        return ALREADY_BIND;
     }
     if (authResponseContext_->reply == ERR_DM_UNSUPPORTED_AUTH_TYPE ||
         (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
