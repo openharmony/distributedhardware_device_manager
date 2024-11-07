@@ -258,6 +258,8 @@ void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
     int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
     std::string groupName = "groupName_fifth";
     int32_t authType = *(reinterpret_cast<const int32_t*>(data));
+    std::string params = "params";
+    int32_t osAccountUserId = *(reinterpret_cast<const int32_t*>(data));
     nlohmann::json jsonDeviceList;
     hichainConnector->deviceGroupManager_ = nullptr;
     hichainConnector->CreateGroup(requestId, groupName);
@@ -267,6 +269,9 @@ void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
     }
     hichainConnector->CreateGroup(requestId, groupName);
     hichainConnector->CreateGroup(requestId, authType, groupName, jsonDeviceList);
+    hichainConnector->ParseRemoteCredential(authType, groupName, jsonDeviceList, params, osAccountUserId);
+    hichainConnector->ParseRemoteCredential(authType, "", jsonDeviceList, params, osAccountUserId);
+
 }
 }
 }

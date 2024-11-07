@@ -105,8 +105,8 @@ std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<Device
 
 bool CheckSoftbusRes(int32_t ret)
 {
-    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR
-        || ret == SOFTBUS_IPC_ERR;
+    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR ||
+        ret == SOFTBUS_IPC_ERR;
 }
 
 /**
