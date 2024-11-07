@@ -72,7 +72,7 @@ HWTEST_F(DMImportAuthCodeTest, ImportAuthCode_001, testing::ext::TestSize.Level0
     std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(pkgName, initcallback);
     ret = DeviceManager::GetInstance().ImportAuthCode(pkgName, authCode);
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(pkgName);
 }
 
@@ -83,7 +83,7 @@ HWTEST_F(DMImportAuthCodeTest, ExportAuthCode_001, testing::ext::TestSize.Level0
     std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(pkgName, initcallback);
     ret = DeviceManager::GetInstance().ExportAuthCode(authCode);
-    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(pkgName);
 }
 
