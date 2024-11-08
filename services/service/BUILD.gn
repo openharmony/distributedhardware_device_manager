@@ -107,6 +107,10 @@ if (defined(ohos_lite)) {
         "-Wshadow",
       ]
 
+      if (dm_common) {
+        cflags += [ "-DDEVICE_MANAGER_COMMON_SWITCH" ]
+      }
+
       cflags_cc = cflags
     }
   }
@@ -254,6 +258,10 @@ if (defined(ohos_lite)) {
     if (support_memmgr) {
       defines += [ "SUPPORT_MEMMGR" ]
       external_deps += [ "memmgr:memmgrclient" ]
+    }
+
+    if (device_manager_common) {
+      defines += [ "DDEVICE_MANAGER_COMMON_SWITCH" ]
     }
 
     public_external_deps = [ "json:nlohmann_json_static" ]

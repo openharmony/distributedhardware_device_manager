@@ -2017,15 +2017,11 @@ void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceL
     }
 }
 
-int32_t DeviceManagerService::SetLocalDeviceName(const std::string &localDeviceName)
+int32_t DeviceManagerService::SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName)
 {
     LOGI("DeviceManagerService Start SetLocalDeviceName!");
-    if (localDeviceName.empty()) {
-        LOGE("Invalid parameter, parameter is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
-    int32_t ret = softbusListener_->SetLocalDeviceName(localDeviceName);
+    int32_t ret = softbusListener_->SetLocalDeviceName(localDeviceName, localDisplayName);
     if (ret != DM_OK) {
         LOGE("SetLocalDeviceName error, failed ret: %{public}d", ret);
         return ret;

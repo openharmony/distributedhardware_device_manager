@@ -163,5 +163,10 @@ std::string AccountBootListener::GetLocalDisplayName() const
 {
     return localDeviceMgr_->GetLocalDisplayName();
 }
+
+std::string AccountBootListener::GetLocalDeviceName() const
+{
+    return localDeviceMgr_->GetLocalDeviceName();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

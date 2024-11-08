@@ -36,6 +36,7 @@ public:
     void InitDataShareEvent();
     void DataShareCallback();
     std::string GetLocalDisplayName() const;
+    std::string GetLocalDeviceName() const;
     
 private:
     /**

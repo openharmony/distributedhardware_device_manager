@@ -192,10 +192,7 @@ int32_t LocalDeviceNameMgr::QueryLocalDeviceName()
         localDeviceName_ = localDeviceName;
         dataShareHelper->Release();
         LOGI("get user defined deviceName=%{public}s", localDeviceName.c_str());
-        if (localDisplayName_.empty()) {
-            LOGI("displayName is null, set user define device name to softbus.");
-            DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName);
-        }
+        DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName_, localDisplayName_);
         return DM_OK;
     }
     ret = GetDefaultDeviceName(dataShareHelper, localDeviceName);
@@ -207,10 +204,7 @@ int32_t LocalDeviceNameMgr::QueryLocalDeviceName()
     localDeviceName_ = localDeviceName;
     dataShareHelper->Release();
     LOGI("get default deviceName=%{public}s", localDeviceName.c_str());
-    if (localDisplayName_.empty()) {
-        LOGI("displayName is null, set default deviceName to softbus.");
-        DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName);
-    }
+    DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName_, localDisplayName_);
     return DM_OK;
 }
 
@@ -261,7 +255,7 @@ int32_t LocalDeviceNameMgr::QueryLocalDisplayName()
     localDisplayName_ = localDisplayName;
     dataShareHelper->Release();
     LOGI("get display deviceName=%{public}s", localDisplayName.c_str());
-    DeviceManagerService::GetInstance().SetLocalDeviceName(localDisplayName);
+    DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName_, localDisplayName_);
     return DM_OK;
 }
 
@@ -293,6 +287,11 @@ void LocalDeviceNameMgr::RegisterDisplayNameChangeCb()
 std::string LocalDeviceNameMgr::GetLocalDisplayName() const
 {
     return localDisplayName_;
+}
+
+std::string LocalDeviceNameMgr::GetLocalDeviceName() const
+{
+    return localDeviceName_;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

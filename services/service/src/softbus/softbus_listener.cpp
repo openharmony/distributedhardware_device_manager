@@ -688,18 +688,35 @@ int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string
     return SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
 }
 
-int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName)
+int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName)
 {
     LOGI("SoftbusListener Start SetLocalDeviceName!");
-    if (localDeviceName.empty()) {
-        LOGE("Invalid parameter, callerId is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
+#ifdef DDEVICE_MANAGER_COMMON_SWITCH
+    LOGI("device_manager_common is true, Blue!");
+    int32_t ret = 1;
+    if (!localDisplayName.empty()) {
+        ret = ::SetLocalDeviceName(DM_PKG_NAME, localDisplayName.c_str());
+    } else if (!localDeviceName.empty()) {
+        ret = ::SetLocalDeviceName(DM_PKG_NAME, localDeviceName.c_str());
+    } else {
+        LOGE("localDeviceName and localDisplayName is null!");
     }
-    int32_t ret = ::SetLocalDeviceName(DM_PKG_NAME, localDeviceName.c_str());
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SetLocalDeviceName error, failed ret: %{public}d", ret);
         return ret;
     }
+#else
+    LOGI("device_manager_common is false, Yellow!");
+    if (localDisplayName.empty()) {
+        LOGE("Invalid parameter, localDisplayName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t ret = ::SetLocalDeviceName(DM_PKG_NAME, localDisplayName.c_str());
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]SetLocalDeviceName error, failed ret: %{public}d", ret);
+        return ret;
+    }
+#endif
     return DM_OK;
 }
 
