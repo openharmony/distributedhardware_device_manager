@@ -688,7 +688,8 @@ int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string
     return SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
 }
 
-int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName)
+int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName,
+                                            const std::string &localDisplayName)
 {
     LOGI("SoftbusListener Start SetLocalDeviceName!");
 #ifdef DDEVICE_MANAGER_COMMON_SWITCH

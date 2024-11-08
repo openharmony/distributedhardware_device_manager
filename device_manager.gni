@@ -79,7 +79,8 @@ declare_args() {
   }
 
   if (defined(global_parts_info) &&
-      defined(global_parts_info.distributedhardware_distributed_hardware_adapter)) {
+      defined(
+          global_parts_info.distributedhardware_distributed_hardware_adapter)) {
     device_manager_common = false
   } else {
     device_manager_common = true

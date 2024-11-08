@@ -2017,7 +2017,8 @@ void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceL
     }
 }
 
-int32_t DeviceManagerService::SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName)
+int32_t DeviceManagerService::SetLocalDeviceName(const std::string &localDeviceName,
+                                                 const std::string &localDisplayName)
 {
     LOGI("DeviceManagerService Start SetLocalDeviceName!");
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);

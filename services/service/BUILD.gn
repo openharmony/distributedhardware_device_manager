@@ -106,11 +106,7 @@ if (defined(ohos_lite)) {
         "-Wfloat-equal",
         "-Wshadow",
       ]
-
-      if (dm_common) {
-        cflags += [ "-DDEVICE_MANAGER_COMMON_SWITCH" ]
-      }
-
+      
       cflags_cc = cflags
     }
   }
