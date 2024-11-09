@@ -106,7 +106,7 @@ if (defined(ohos_lite)) {
         "-Wfloat-equal",
         "-Wshadow",
       ]
-      
+
       cflags_cc = cflags
     }
   }
