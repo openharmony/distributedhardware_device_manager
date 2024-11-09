@@ -86,8 +86,10 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
-        std::string localDeviceName = accountBootListener_->GetLocalDisplayName();
+        std::string localDeviceName = accountBootListener_->GetLocalDeviceName();
         std::string localDisplayName = accountBootListener_->GetLocalDisplayName();
+        LOGI("deviceName=%{public}s, displayName=%{public}s",
+            localDeviceName.c_str(), localDisplayName.c_str());
         int ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
         if (ret == DM_OK) {
             LOGI("Already have deviceName=%{public}s or displayName=%{public}s",
