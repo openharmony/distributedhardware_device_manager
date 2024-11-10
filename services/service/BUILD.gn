@@ -257,7 +257,7 @@ if (defined(ohos_lite)) {
     }
 
     if (device_manager_common) {
-      defines += [ "DDEVICE_MANAGER_COMMON_SWITCH" ]
+      defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
     }
 
     public_external_deps = [ "json:nlohmann_json_static" ]

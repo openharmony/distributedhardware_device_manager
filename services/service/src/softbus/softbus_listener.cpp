@@ -692,8 +692,8 @@ int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName,
                                             const std::string &localDisplayName)
 {
     LOGI("SoftbusListener Start SetLocalDeviceName!");
-#ifdef DDEVICE_MANAGER_COMMON_SWITCH
-    LOGI("device_manager_common is true, Blue!");
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("device_manager_common is true!");
     int32_t ret = 1;
     if (!localDisplayName.empty()) {
         ret = ::SetLocalDeviceName(DM_PKG_NAME, localDisplayName.c_str());
@@ -707,7 +707,7 @@ int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName,
         return ret;
     }
 #else
-    LOGI("device_manager_common is false, Yellow!");
+    LOGI("device_manager_common is false!");
     if (localDisplayName.empty()) {
         LOGE("Invalid parameter, localDisplayName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
