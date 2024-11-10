@@ -1954,7 +1954,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
     obj->bundleName_ = bundleName;
     std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
     g_deviceManagerMap[obj->bundleName_] = obj;
-    napi_wrap(
+    napi_status status = napi_wrap(
         env, thisVar, reinterpret_cast<void *>(obj),
         [](napi_env env, void *data, void *hint) {
             (void)env;
@@ -1965,6 +1965,12 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
             LOGI("delete deviceManager");
         },
         nullptr, nullptr);
+    if (status != napi_ok) {
+        delete obj;
+        obj = nullptr;
+        LOGE("failed to wrap JS object");
+        return nullptr;
+    }
     return thisVar;
 }
 
