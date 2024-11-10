@@ -101,8 +101,8 @@ void AccountBootListener::DoAccountBootProc()
     }
     localDeviceMgr_->RegisterDeviceNameChangeCb();
     localDeviceMgr_->RegisterDisplayNameChangeCb();
-    localDeviceMgr_->QueryLocalDeviceName();
     localDeviceMgr_->QueryLocalDisplayName();
+    localDeviceMgr_->QueryLocalDeviceName();
 }
 
 void AccountBootListener::SetSaTriggerFlag(SaTriggerFlag triggerFlag)
@@ -162,6 +162,11 @@ void AccountBootListener::DataShareCallback()
 std::string AccountBootListener::GetLocalDisplayName() const
 {
     return localDeviceMgr_->GetLocalDisplayName();
+}
+
+std::string AccountBootListener::GetLocalDeviceName() const
+{
+    return localDeviceMgr_->GetLocalDeviceName();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

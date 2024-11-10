@@ -33,6 +33,7 @@ public:
     int32_t QueryLocalDisplayName();
     void RegisterDisplayNameChangeCb();
     std::string GetLocalDisplayName() const;
+    std::string GetLocalDeviceName() const;
 
 private:
     std::shared_ptr<DataShare::DataShareHelper> GetDataShareHelper();

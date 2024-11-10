@@ -102,7 +102,7 @@ public:
     void SendAclChangedBroadcast(const std::string &msg);
     int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
     static int32_t GetNetworkIdByUdid(const std::string &udid, std::string &networkId);
-    int32_t SetLocalDeviceName(const std::string &localDeviceName);
+    int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName);
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     int32_t InitSoftPublishLNN();

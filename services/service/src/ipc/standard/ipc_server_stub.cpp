@@ -86,10 +86,14 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
+        std::string localDeviceName = accountBootListener_->GetLocalDeviceName();
         std::string localDisplayName = accountBootListener_->GetLocalDisplayName();
-        if (!localDisplayName.empty()) {
-            LOGI("Already have display deviceName=%{public}s", localDisplayName.c_str());
-            DeviceManagerService::GetInstance().SetLocalDeviceName(localDisplayName);
+        LOGI("deviceName=%{public}s, displayName=%{public}s",
+            localDeviceName.c_str(), localDisplayName.c_str());
+        int ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
+        if (ret == DM_OK) {
+            LOGI("Already have deviceName=%{public}s or displayName=%{public}s",
+                localDeviceName.c_str(), localDisplayName.c_str());
             return;
         }
         accountBootListener_->SetSaTriggerFlag(SaTriggerFlag::DM_SA_READY);
