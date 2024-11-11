@@ -30,7 +30,6 @@
 #include "permission_manager_mock.h"
 #include "softbus_listener_mock.h"
 #include "device_manager_service_mock.h"
-#include "dm_softbus_cache_mock.h"
 #include "device_manager_service_impl_mock.h"
 
 namespace OHOS {
@@ -48,8 +47,6 @@ public:
         std::make_shared<PermissionManagerMock>();
     static inline  std::shared_ptr<SoftbusListenerMock> softbusListenerMock_ =
         std::make_shared<SoftbusListenerMock>();
-    static inline  std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ =
-        std::make_shared<SoftbusCacheMock>();
     static inline  std::shared_ptr<DeviceManagerServiceImplMock> deviceManagerServiceImplMock_ =
         std::make_shared<DeviceManagerServiceImplMock>();
 };

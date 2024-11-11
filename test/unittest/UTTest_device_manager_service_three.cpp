@@ -67,7 +67,6 @@ void DeviceManagerServiceThreeTest::SetUpTestCase()
     DmDeviceManagerService::dmDeviceManagerService = deviceManagerServiceMock_;
     DmPermissionManager::dmPermissionManager = permissionManagerMock_;
     DmSoftbusListener::dmSoftbusListener = softbusListenerMock_;
-    DmSoftbusCache::dmSoftbusCache = softbusCacheMock_;
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = deviceManagerServiceImplMock_;
 }
 
@@ -76,7 +75,6 @@ void DeviceManagerServiceThreeTest::TearDownTestCase()
     deviceManagerServiceMock_ = nullptr;
     permissionManagerMock_ = nullptr;
     softbusListenerMock_ = nullptr;
-    softbusCacheMock_ = nullptr;
     deviceManagerServiceImplMock_ = nullptr;
 }
 
@@ -255,7 +253,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, NotifyEvent_301, testing::ext::TestSize.
     std::string event;
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().NotifyEvent(pkgName, eventId, event);
-    EXPECT_NE(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, BindTarget_301, testing::ext::TestSize.Level0)
@@ -328,52 +326,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSi
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ExportAuthCode(authCode);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, UnBindDevice_302, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string deviceId = "1234";
-    EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
-    int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, UnBindDevice_303, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string deviceId = "1234";
-    EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
-    int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(DM_OK));
-    ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, StopAuthenticateDevice_302, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName_004";
-    std::string msg =  R"(
-    {
-        "type" : 0,
-        "userId" : 123,
-        "accountId" : "28776",
-        "tokenId" : 16,
-        "peerUdid" : "104",
-        "accountName" : "account_xiao"
-    })";
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
-    EXPECT_CALL(*deviceManagerServiceImplMock_, StopAuthenticateDevice(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

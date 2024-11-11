@@ -31,6 +31,8 @@
 #include "softbus_listener_mock.h"
 #include "app_manager_mock.h"
 #include "kv_adapter_manager_mock.h"
+#include "device_manager_service_impl_mock.h"
+#include "dm_softbus_cache_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -49,6 +51,10 @@ public:
         std::make_shared<AppManagerMock>();
     static inline  std::shared_ptr<KVAdapterManagerMock> kVAdapterManagerMock_ =
         std::make_shared<KVAdapterManagerMock>();
+    static inline  std::shared_ptr<DeviceManagerServiceImplMock> deviceManagerServiceImplMock_ =
+        std::make_shared<DeviceManagerServiceImplMock>();
+    static inline  std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ =
+        std::make_shared<SoftbusCacheMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
