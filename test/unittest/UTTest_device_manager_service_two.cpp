@@ -550,6 +550,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     std::string pkgName = "com.ohos.test";
     std::string networkId = "12345";
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, networkId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
