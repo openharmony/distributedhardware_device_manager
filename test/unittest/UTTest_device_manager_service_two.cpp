@@ -487,7 +487,7 @@ HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_201, testing::ext::TestSiz
     std::string localDeviceName = "localDeviceName_201";
     std::string localDisplayName = "localDisplayName_201";
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);  
+    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
