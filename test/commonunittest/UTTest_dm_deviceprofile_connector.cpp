@@ -1210,7 +1210,8 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteServiceBindLevel_001, testing::ext::T
     std::string localUdid = "remoteDeviceId";
     std::string remoteUdid="localDeviceId";
     GetAccessControlProfiles(profiles);
-    DeviceProfileConnector::GetInstance().DeleteServiceBindLevel(offlineParam, pkgName, profiles, localUdid, remoteUdid);
+    DeviceProfileConnector::GetInstance().DeleteServiceBindLevel(offlineParam, pkgName, profiles,
+        localUdid, remoteUdid);
     EXPECT_EQ(offlineParam.bindType, SERVICE);
 
     pkgName = "bundleName2";

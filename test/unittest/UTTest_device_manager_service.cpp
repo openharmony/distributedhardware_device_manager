@@ -1302,7 +1302,8 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_003, testing::ext::TestSize.Level0
     int32_t authType = 1;
     std::string deviceId = "1234";
     std::string bindParam;
-    EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(ERR_DM_BIND_INPUT_PARA_INVALID));
+    EXPECT_CALL(*softbusListenerMock_,
+        GetTargetInfoFromCache(_, _, _)).WillOnce(Return(ERR_DM_BIND_INPUT_PARA_INVALID));
     int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
     EXPECT_EQ(ret, ERR_DM_BIND_INPUT_PARA_INVALID);
 }
@@ -2720,131 +2721,6 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidHashByAnoyDeviceId_001, testing::ext::
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 #endif
-
-/**
- * @tc.name: GetTrustedDeviceList_004
- * @tc.desc:Set the intFlag of GetTrustedDeviceList_004 to true; Return DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "ohos_test";
-    std::string extra = "jdddd";
-    std::vector<DmDeviceInfo> deviceList;
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_)).WillOnce(Return(ERR_DM_FAILED));
-    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-    DeviceManagerService::GetInstance().UninitDMServiceListener();
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
-/**
- * @tc.name: GetLocalDeviceInfo_003
- * @tc.desc: The return value is ERR_DM_FAILED
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_003, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info;
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetLocalDeviceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
-/**
- * @tc.name: GetLocalDeviceInfo_004
- * @tc.desc: The return value is ERR_DM_FAILED
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_004, testing::ext::TestSize.Level0)
-{
-    DmDeviceInfo info;
-    DeletePermission();
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetLocalDeviceInfo(_)).WillOnce(Return(DM_OK));
-    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
-    EXPECT_EQ(ret, DM_OK);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
-HWTEST_F(DeviceManagerServiceTest, BindTarget_007, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    PeerTargetId targetId;
-    targetId.wifiIp = "wifi_Ip";
-    std::map<std::string, std::string> bindParam;
-    std::string key = PARAM_KEY_TARGET_ID;
-    std::string value = "186";
-    bindParam.insert(std::make_pair(key, value));
-    int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_001, testing::ext::TestSize.Level0)
-{
-    std::string localDeviceName;
-    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-
-    localDeviceName = "localDeviceName_001";
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
-
-    std::string deviceList;
-    uint16_t deviceTypeId = 0 ;
-    int32_t errcode = 1;
-    DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName);
-    EXPECT_EQ(ret, DM_OK);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string deviceId = "1234";
-    EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
-    int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_006, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string deviceId = "1234";
-    EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
-    int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(DM_OK));
-    ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_002, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_)).WillOnce(Return(DM_OK));
-    DeviceManagerService::GetInstance().LoadHardwareFwkService();
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_)).WillOnce(Return(ERR_DM_FAILED));
-    DeviceManagerService::GetInstance().LoadHardwareFwkService();
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
