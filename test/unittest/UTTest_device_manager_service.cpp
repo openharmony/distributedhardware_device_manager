@@ -2652,50 +2652,6 @@ HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_004, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-/**
- * @tc.name: UnAuthenticateDevice_005
- * @tc.desc: Set intFlag for UnAuthenticateDevice to true and pkgName to com.ohos.test; set deviceId null ，The return
- * value is SOFTBUS_IPC_ERR
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string networkId = "12345";
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
-    int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, networkId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceTest, BindDevice_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    int32_t authType = 1;
-    std::string deviceId = "1234";
-    std::string bindParam;
-    EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(DM_OK));
-    int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: AuthenticateDevice_005
- * @tc.desc: Set intFlag for GAuthenticateDevice to True and deviceId to null; Return ERR_DM_BIND_INPUT_PARA_INVALID
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_005, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    std::string extra = "jdddd";
-    int32_t authType = 0;
-    std::string deviceId = " 2345";
-    EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(DM_OK));
-    int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoyDeviceId_001, testing::ext::TestSize.Level0)
 {
