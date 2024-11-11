@@ -348,6 +348,11 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_005, testing::ext::TestSize.L
     int32_t remoteUserId = 1;
     std::string remoteAccountHash = "45552878";
     std::string remoteUdid = "ajdakndkwj98877";
+    EXPECT_CALL(*deviceProfileConnectorMock_,
+        HandleAccountLogoutEvent(_, _, _, _)).WillOnce(Return(DM_INVALIED_BINDTYPE));
+    deviceManagerServiceImpl_->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash, remoteUdid);
+    EXPECT_CALL(*deviceProfileConnectorMock_,
+        HandleAccountLogoutEvent(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
     deviceManagerServiceImpl_->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash, remoteUdid);
     int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, DM_OK);
@@ -1523,6 +1528,9 @@ HWTEST_F(DeviceManagerServiceImplTest, GetBindLevel_101, testing::ext::TestSize.
     int32_t tokenId2 = 123;
     int32_t remoteUserId = 100;
     int32_t ret = deviceManagerServiceImpl_->GetBindLevel(pkgName, localUdid, udid, tokenId);
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(""));
+    deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, localUdid, tokenId2);
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(udid));
     deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, localUdid, tokenId2);
     EXPECT_EQ(ret, INVALIED_TYPE);
 }
@@ -1533,6 +1541,9 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndBindType_101, testing::ext:
     const std::string localUdid = "234";
     int32_t userId = 100;
     std::map<std::string, int32_t> temp = deviceManagerServiceImpl_->GetDeviceIdAndBindType(userId, accountId);
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _)).WillOnce(Return(DM_INVALIED_BINDTYPE));
+    deviceManagerServiceImpl_->HandleDevUnBindEvent(userId, localUdid);
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
     deviceManagerServiceImpl_->HandleDevUnBindEvent(userId, localUdid);
     EXPECT_EQ(temp.empty(), true);
 }
@@ -1599,6 +1610,8 @@ HWTEST_F(DeviceManagerServiceImplTest, ProcessAppUnintall_103, testing::ext::Tes
     std::string appId;
     int32_t accessTokenId = 1001;
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DmDeviceInfo devInfo;
+    deviceManagerServiceImpl_->HandleDeviceScreenStatusChange(devInfo);
     AddAccessControlProfileFirst(profiles);
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
     if (deviceManagerServiceImpl_->hiChainConnector_ == nullptr) {

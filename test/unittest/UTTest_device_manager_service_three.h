@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTEST_DM_SERVICE_H
-#define OHOS_UTTEST_DM_SERVICE_H
+#ifndef OHOS_DEVICE_MANAGER_SERVICE_THREE_H
+#define OHOS_DEVICE_MANAGER_SERVICE_THREE_H
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -29,26 +29,29 @@
 #include "common_event_support.h"
 #include "permission_manager_mock.h"
 #include "softbus_listener_mock.h"
-#include "app_manager_mock.h"
-#include "kv_adapter_manager_mock.h"
+#include "device_manager_service_mock.h"
+#include "dm_softbus_cache_mock.h"
+#include "device_manager_service_impl_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DeviceManagerServiceTest : public testing::Test {
+class DeviceManagerServiceThreeTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
 
+    static inline  std::shared_ptr<DeviceManagerServiceMock> deviceManagerServiceMock_ =
+        std::make_shared<DeviceManagerServiceMock>();
     static inline std::shared_ptr<PermissionManagerMock> permissionManagerMock_ =
         std::make_shared<PermissionManagerMock>();
     static inline  std::shared_ptr<SoftbusListenerMock> softbusListenerMock_ =
         std::make_shared<SoftbusListenerMock>();
-    static inline  std::shared_ptr<AppManagerMock> appManagerMock_ =
-        std::make_shared<AppManagerMock>();
-    static inline  std::shared_ptr<KVAdapterManagerMock> kVAdapterManagerMock_ =
-        std::make_shared<KVAdapterManagerMock>();
+    static inline  std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ =
+        std::make_shared<SoftbusCacheMock>();
+    static inline  std::shared_ptr<DeviceManagerServiceImplMock> deviceManagerServiceImplMock_ =
+        std::make_shared<DeviceManagerServiceImplMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

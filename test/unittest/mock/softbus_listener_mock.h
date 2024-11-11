@@ -31,6 +31,10 @@ public:
     virtual int32_t GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel) = 0;
     virtual int32_t GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info) = 0;
     virtual int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid) = 0;
+    virtual int32_t GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId,
+        ConnectionAddrType &addrType) = 0;
+    virtual int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
+    virtual int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusListener> dmSoftbusListener = nullptr;
 };
@@ -42,6 +46,9 @@ public:
     MOCK_METHOD(int32_t, GetDeviceSecurityLevel, (const char *, int32_t &));
     MOCK_METHOD(int32_t, GetDeviceInfo, (const std::string &, DmDeviceInfo &));
     MOCK_METHOD(int32_t, GetUuidByNetworkId, (const char *, std::string &));
+    MOCK_METHOD(int32_t, GetTargetInfoFromCache, (const std::string &, PeerTargetId &, ConnectionAddrType &addrType));
+    MOCK_METHOD(int32_t, GetTrustedDeviceList, (std::vector<DmDeviceInfo> &));
+    MOCK_METHOD(int32_t, GetLocalDeviceInfo, (DmDeviceInfo &));
 };
 }
 }

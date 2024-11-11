@@ -190,7 +190,6 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->GetJsonInt(jsonOutObj, "key");
     hichainConnector->deleteMultiMembers(groupType, userId, jsonOutObj);
     hichainConnector->DeleteAllGroupByUdid(reqParams);
-    hichainConnector->DeleteP2PGroup(switchUserId);
 }
 
 void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)

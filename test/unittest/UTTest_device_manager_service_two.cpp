@@ -223,6 +223,8 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSiz
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
+    EXPECT_CALL(*softbusListenerMock_, GetUuidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusListenerMock_, GetUuidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
     bool ret = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
     EXPECT_EQ(ret, true);
 }
