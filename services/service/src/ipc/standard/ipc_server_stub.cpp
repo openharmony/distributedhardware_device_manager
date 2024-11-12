@@ -42,6 +42,7 @@ DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(&IpcServerStub::GetInstance());
 constexpr int32_t DM_IPC_THREAD_NUM = 32;
+constexpr int32_t MAX_CALLBACK_NUM = 5000;
 
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
@@ -239,6 +240,10 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
+    }
+    if (dmListener_.size() > MAX_CALLBACK_NUM || appRecipient_.size() > MAX_CALLBACK_NUM) {
+        LOGE("dmListener_ or appRecipient_ size exceed the limit!");
+        return ERR_DM_FAILED;
     }
     dmListener_[pkgName] = listener;
     appRecipient_[pkgName] = appRecipient;
