@@ -2659,6 +2659,7 @@ HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoyDeviceId_001, testing::e
 {
     std::string udidHash;
     std::string result;
+    EXPECT_CALL(*appManagerMock_, GetAppId()).WillOnce(Return(""));
     int32_t ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udidHash, result);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
