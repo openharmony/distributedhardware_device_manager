@@ -408,6 +408,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_003, testing::ext::TestS
     std::vector<DmDeviceInfo> deviceList;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     DeviceManagerService::GetInstance().InitDMServiceListener();
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_)).WillOnce(Return(DM_OK));
     int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
@@ -2639,6 +2640,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_004, testing::ext
         DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     }
     EXPECT_CALL(*softbusListenerMock_, GetUuidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppId()).WillOnce(Return("appId"));
     int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     EXPECT_EQ(ret, DM_OK);
