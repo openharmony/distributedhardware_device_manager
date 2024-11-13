@@ -1640,8 +1640,7 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, const std:
         MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
         MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
-        HandleAccountLogout(MultipleUserConnector::GetCurrentAccountUserID(),
-            MultipleUserConnector::GetSwitchOldAccountId());
+        HandleAccountLogout(userId, MultipleUserConnector::GetSwitchOldAccountId());
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(userId);
     } else {

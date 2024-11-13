@@ -348,6 +348,7 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
+    LOGI("Completed, Offline with DmDeviceInfo, pkgName:%{public}s", pkgName.c_str());
 #else
     std::thread deviceOffline([=]() { DeviceInfoOffline(deviceInfo, tempCbk); });
     if (pthread_setname_np(deviceOffline.native_handle(), DEVICE_OFFLINE) != DM_OK) {
