@@ -43,5 +43,21 @@ int32_t SoftbusListener::GetUuidByNetworkId(const char *networkId, std::string &
 {
     return DmSoftbusListener::dmSoftbusListener->GetUuidByNetworkId(networkId, uuid);
 }
+
+int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId,
+    ConnectionAddrType &addrType)
+{
+    return DmSoftbusListener::dmSoftbusListener->GetTargetInfoFromCache(deviceId, targetId, addrType);
+}
+
+int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList)
+{
+    return DmSoftbusListener::dmSoftbusListener->GetTrustedDeviceList(deviceInfoList);
+}
+
+int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
+{
+    return DmSoftbusListener::dmSoftbusListener->GetLocalDeviceInfo(deviceInfo);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

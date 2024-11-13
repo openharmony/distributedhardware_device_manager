@@ -23,5 +23,17 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->StopAuthenticateDevice(pkgName);
 }
+
+int32_t DeviceManagerServiceImpl::GetBindLevel(const std::string &pkgName, const std::string &localUdid,
+    const std::string &udid, uint64_t &tokenId)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->GetBindLevel(pkgName, localUdid, udid, tokenId);
+}
+
+int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udid,
+    int32_t bindLevel)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->UnBindDevice(pkgName, udid, bindLevel);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

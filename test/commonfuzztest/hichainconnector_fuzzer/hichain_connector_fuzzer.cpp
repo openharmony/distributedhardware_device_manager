@@ -147,7 +147,7 @@ void HiChainConnectorSecondFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t))) {
         return;
     }
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
@@ -190,7 +190,6 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->GetJsonInt(jsonOutObj, "key");
     hichainConnector->deleteMultiMembers(groupType, userId, jsonOutObj);
     hichainConnector->DeleteAllGroupByUdid(reqParams);
-    hichainConnector->DeleteP2PGroup(switchUserId);
 }
 
 void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)

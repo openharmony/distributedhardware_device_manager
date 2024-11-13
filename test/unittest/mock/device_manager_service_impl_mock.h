@@ -27,6 +27,9 @@ public:
     virtual ~DmDeviceManagerServiceImpl() = default;
 public:
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
+    virtual int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
+        const std::string &udid, uint64_t &tokenId) = 0;
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
 };
@@ -34,6 +37,8 @@ public:
 class DeviceManagerServiceImplMock : public DmDeviceManagerServiceImpl {
 public:
     MOCK_METHOD(int32_t, StopAuthenticateDevice, (const std::string &));
+    MOCK_METHOD(int32_t, GetBindLevel, (const std::string &, const std::string &, const std::string &, uint64_t &));
+    MOCK_METHOD(int32_t, UnBindDevice, (const std::string &, const std::string &, int32_t));
 };
 }
 }

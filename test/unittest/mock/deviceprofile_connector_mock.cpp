@@ -24,5 +24,26 @@ std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnect
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAllAccessControlProfile();
 }
+
+int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    const std::string &localUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleDevUnBindEvent(remoteUserId, remoteUdid,
+        localUdid);
+}
+
+std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId, const std::string &localUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId,
+        localUdid);
+}
+
+int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
+    const std::string &remoteUdid, const std::string &localUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash,
+        remoteUdid, localUdid);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
