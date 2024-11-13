@@ -45,5 +45,21 @@ int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId, c
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash,
         remoteUdid, localUdid);
 }
+
+uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::string requestDeviceId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckBindType(trustDeviceId, requestDeviceId);
+}
+
+std::vector<std::string> DeviceProfileConnector::GetPkgNameFromAcl(std::string &localDeviceId,
+    std::string &targetDeviceId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetPkgNameFromAcl(localDeviceId, targetDeviceId);
+}
+
+DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
