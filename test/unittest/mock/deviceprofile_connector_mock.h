@@ -33,6 +33,9 @@ public:
         const std::string &localUdid) = 0;
     virtual int32_t HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid, const std::string &localUdid) = 0;
+    virtual uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId) = 0;
+    virtual std::vector<std::string> GetPkgNameFromAcl(std::string &localDeviceId, std::string &targetDeviceId) = 0;
+    virtual DmOfflineParam GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -44,6 +47,9 @@ public:
     MOCK_METHOD(std::string, HandleAppUnBindEvent, (int32_t, const std::string &, int32_t, const std::string &));
     MOCK_METHOD(int32_t, HandleAccountLogoutEvent, (int32_t, const std::string &, const std::string &,
         const std::string &));
+    MOCK_METHOD(uint32_t, CheckBindType, (std::string, std::string));
+    MOCK_METHOD(std::vector<std::string>, GetPkgNameFromAcl, (std::string &, std::string &));
+    MOCK_METHOD(DmOfflineParam, GetOfflineParamFromAcl, (std::string, std::string));
 };
 }
 }
