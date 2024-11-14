@@ -78,11 +78,14 @@ private:
     void RegisterCallbackByType(const std::string &type, void *callback);
     void Off(const std::string &type);
 
-    inline static void FreeDeviceInfo(const FfiDeviceBasicInfo &info)
+    inline static void FreeDeviceInfo(FfiDeviceBasicInfo &info)
     {
         free(info.deviceId);
+        info.deviceId = nullptr;
         free(info.deviceName);
+        info.deviceName = nullptr;
         free(info.networkId);
+        info.networkId = nullptr;
     };
 
     std::string bundleName_;

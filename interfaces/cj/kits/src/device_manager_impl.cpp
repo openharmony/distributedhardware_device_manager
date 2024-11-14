@@ -80,7 +80,7 @@ enum ErrorCode {
     DM_ERR_PUBLISH_INVALID = 11600105,
 };
 
-inline int32_t stringCheck(const std::string &str)
+inline int32_t StringCheck(const std::string &str)
 {
     if (str.size() == 0 || str.size() >= DM_FFI_BUF_LENGTH) {
         return ERR_INVALID_PARAMS;
@@ -88,7 +88,7 @@ inline int32_t stringCheck(const std::string &str)
     return ERR_OK;
 }
 
-int32_t transformErrCode(const int32_t errCode)
+int32_t TransformErrCode(const int32_t errCode)
 {
     switch (errCode) {
         case ERR_DM_NO_PERMISSION:
@@ -146,7 +146,7 @@ void InsertJsonParamesToMap(nlohmann::json &bindParamObj, std::map<std::string, 
 
 DeviceManagerFfiImpl::DeviceManagerFfiImpl(const std::string &bundleName, int32_t *errCode) : bundleName_(bundleName)
 {
-    *errCode = stringCheck(bundleName);
+    *errCode = StringCheck(bundleName);
     if (*errCode != 0) {
         LOGE("CreateDeviceManager for bundleName %{public}s failed, ret %{public}d.", bundleName_.c_str(), *errCode);
         return;
@@ -154,7 +154,7 @@ DeviceManagerFfiImpl::DeviceManagerFfiImpl(const std::string &bundleName, int32_
     std::shared_ptr<DmFfiInitCallback> initCallback = std::make_shared<DmFfiInitCallback>(bundleName_);
     *errCode = DeviceManager::GetInstance().InitDeviceManager(bundleName_, initCallback);
     if (*errCode != 0) {
-        *errCode = transformErrCode(*errCode);
+        *errCode = TransformErrCode(*errCode);
         LOGE("CreateDeviceManager for bundleName %{public}s failed, ret %{public}d.", bundleName_.c_str(), *errCode);
         return;
     }
@@ -174,7 +174,7 @@ int32_t DeviceManagerFfiImpl::ReleaseDeviceManager()
     }
     int ret = DeviceManager::GetInstance().UnInitDeviceManager(bundleName_);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("ReleaseDeviceManager for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
         return ret;
     }
@@ -186,12 +186,12 @@ int32_t DeviceManagerFfiImpl::GetAvailableDeviceList(FfiDeviceBasicInfoArray &de
 {
     int32_t ret = DeviceManager::GetInstance().CheckNewAPIAccessPermission();
     if (ret != 0) {
-        return transformErrCode(ret);
+        return TransformErrCode(ret);
     }
     std::vector<DmDeviceBasicInfo> result;
     ret = DeviceManager::GetInstance().GetAvailableDeviceList(bundleName_, result);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("GetTrustedDeviceList for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
         return ret;
     }
@@ -251,7 +251,7 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceNetworkId(const char *&networkId)
     std::string result;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceNetWorkId(bundleName_, result);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("GetLocalDeviceNetworkId for failed, ret %{public}d", ret);
         return ret;
     }
@@ -273,7 +273,7 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceName(const char *&deviceName)
     std::string result;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceName(bundleName_, result);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("GetLocalDeviceName for failed, ret %{public}d", ret);
         return ret;
     }
@@ -294,7 +294,7 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceType(int32_t &deviceType)
 
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceType(bundleName_, deviceType);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("GetLocalDeviceType for failed, ret %{public}d", ret);
         return ret;
     }
@@ -311,7 +311,7 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceId(const char *&deviceId)
     std::string result;
     int32_t ret = DeviceManager::GetInstance().GetLocalDeviceId(bundleName_, result);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("GetLocalDeviceId for failed, ret %{public}d", ret);
         return ret;
     }
@@ -326,7 +326,7 @@ int32_t DeviceManagerFfiImpl::GetLocalDeviceId(const char *&deviceId)
 
 int32_t DeviceManagerFfiImpl::GetDeviceName(const std::string &networkId, const char *&deviceName)
 {
-    int32_t ret = stringCheck(networkId);
+    int32_t ret = StringCheck(networkId);
     if (ret != 0) {
         return ret;
     }
@@ -334,7 +334,7 @@ int32_t DeviceManagerFfiImpl::GetDeviceName(const std::string &networkId, const 
     ret = DeviceManager::GetInstance().GetDeviceName(bundleName_, networkId, result);
     LOGI("DeviceManager::GetDeviceName getinstance return.");
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("GetDeviceName for failed, ret %{public}d", ret);
         return ret;
     }
@@ -349,13 +349,13 @@ int32_t DeviceManagerFfiImpl::GetDeviceName(const std::string &networkId, const 
 
 int32_t DeviceManagerFfiImpl::GetDeviceType(const std::string &networkId, int32_t &deviceType)
 {
-    int32_t ret = stringCheck(networkId);
+    int32_t ret = StringCheck(networkId);
     if (ret != 0) {
         return ret;
     }
     ret = DeviceManager::GetInstance().GetDeviceType(bundleName_, networkId, deviceType);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("GetDeviceType for failed, ret %{public}d", ret);
         return ret;
     }
@@ -382,7 +382,7 @@ int32_t DeviceManagerFfiImpl::StartDiscovering(const std::string &extra)
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
     int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName_, tokenId, extra, discoveryCallback);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("Discovery failed, bundleName %{public}s, ret %{public}d", bundleName_.c_str(), ret);
         discoveryCallback->OnDiscoveryFailed(static_cast<uint16_t>(0), ret);
         return ret;
@@ -398,7 +398,7 @@ int32_t DeviceManagerFfiImpl::StopDiscovering()
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
     int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(tokenId, bundleName_);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("StopDeviceDiscovery for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
         return ret;
     }
@@ -411,7 +411,7 @@ int32_t DeviceManagerFfiImpl::BindTarget(const std::string &deviceId,
     if (DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         return ERR_NO_PERMISSION;
     }
-    int32_t ret = stringCheck(deviceId);
+    int32_t ret = StringCheck(deviceId);
     if (ret != 0) {
         return ret;
     }
@@ -431,7 +431,7 @@ int32_t DeviceManagerFfiImpl::BindTarget(const std::string &deviceId,
         }
         int32_t ret = BindTargetWarpper(deviceId, bindParam, bindTargetCallback);
         if (ret != 0) {
-            ret = transformErrCode(ret);
+            ret = TransformErrCode(ret);
             LOGE("BindTarget for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
             return ret;
         }
@@ -452,7 +452,7 @@ int32_t DeviceManagerFfiImpl::BindTarget(const std::string &deviceId,
     constexpr int32_t bindType = 1;
     ret = DeviceManager::GetInstance().BindDevice(bundleName_, bindType, deviceId, bindParam, bindDeviceCallback);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("BindDevice for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
         return ret;
     }
@@ -472,14 +472,14 @@ int32_t DeviceManagerFfiImpl::UnbindTarget(const std::string &deviceId)
     if (DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         return ERR_NO_PERMISSION;
     }
-    int32_t ret = stringCheck(deviceId);
+    int32_t ret = StringCheck(deviceId);
     if (ret != 0) {
         return ret;
     }
     LOGI("UnBindDevice deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     ret = DeviceManager::GetInstance().UnBindDevice(bundleName_, deviceId);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("UnBindDevice for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
         return ret;
     }
@@ -490,7 +490,7 @@ int32_t DeviceManagerFfiImpl::EventOn(const std::string &type, void *callback)
 {
     int32_t ret = DeviceManager::GetInstance().CheckNewAPIAccessPermission();
     if (ret != 0) {
-        return transformErrCode(ret);
+        return TransformErrCode(ret);
     }
 
     LOGI("EventOn for bundleName %{public}s, eventType %{public}s ", bundleName_.c_str(), type.c_str());
@@ -710,7 +710,7 @@ int32_t DeviceManagerFfiImpl::RegisterDevStatusCallback()
     auto callback = std::make_shared<DmFfiDeviceStatusCallback>(bundleName_);
     int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName_, "", callback);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("RegisterDevStatusCallback failed for bundleName %{public}s", bundleName_.c_str());
         return ret;
     }
@@ -748,7 +748,7 @@ int32_t DeviceManagerFfiImpl::RegisterReplyCallback()
     auto dmUiCallback = std::make_shared<DmFfiDeviceManagerUiCallback>(bundleName_);
     int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(bundleName_, dmUiCallback);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("RegisterDeviceManagerFaCallback failed for bundleName %{public}s", bundleName_.c_str());
         return ret;
     }
@@ -771,7 +771,7 @@ int32_t DeviceManagerFfiImpl::ReleaseDevStatusCallback()
     }
     int32_t ret = DeviceManager::GetInstance().UnRegisterDevStatusCallback(bundleName_);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("UnRegisterDevStatusCallback failed for bundleName %{public}s", bundleName_.c_str());
         return ret;
     }
@@ -834,7 +834,7 @@ int32_t DeviceManagerFfiImpl::ReleaseReplyCallback()
     }
     int32_t ret = DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(bundleName_);
     if (ret != 0) {
-        ret = transformErrCode(ret);
+        ret = TransformErrCode(ret);
         LOGE("UnRegisterDeviceManagerFaCallback failed for bundleName %{public}s", bundleName_.c_str());
         return ret;
     }
