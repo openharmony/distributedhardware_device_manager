@@ -17,10 +17,15 @@
 #define OHOS_DM_MULTIPLE_USER_CONNECTOR_H
 
 #include <cstdint>
+#include <map>
 #include <mutex>
 #include <string>
 namespace OHOS {
 namespace DistributedHardware {
+typedef struct DMAccountInfo {
+    std::string accountId;
+    std::string accountName;
+} DMAccountInfo;
 class MultipleUserConnector {
 public:
     /**
@@ -85,11 +90,17 @@ public:
      * @tc.type: FUNC
      */
     static std::string GetSwitchOldAccountName(void);
+
+    static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
+    static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
+    static void DeleteAccountInfoByUserId(int32_t userId);
 private:
     static int32_t oldUserId_;
     static std::string accountId_;
     static std::string accountName_;
     static std::mutex lock_;
+    static std::map<int32_t, DMAccountInfo> dmAccountInfoMap_;
+    static std::mutex dmAccountInfoMaplock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

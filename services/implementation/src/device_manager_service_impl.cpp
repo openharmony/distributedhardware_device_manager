@@ -681,7 +681,7 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &udid,
     std::string localUdid = std::string(localUdidTemp);
     DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, userId, udid);
     CHECK_NULL_VOID(hiChainConnector_);
-    authMgr_->DeleteGroup(DM_PKG_NAME, udid);
+    authMgr_->DeleteGroup(DM_PKG_NAME, userId, udid);
 }
 
 void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
@@ -690,14 +690,6 @@ void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
     DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(preUserId);
     CHECK_NULL_VOID(hiChainConnector_);
     hiChainConnector_->DeleteAllGroup(preUserId);
-}
-
-void DeviceManagerServiceImpl::HandleUserSwitched(int32_t switchUserId)
-{
-    LOGI("switchUserId: %{public}d.", switchUserId);
-    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(switchUserId);
-    CHECK_NULL_VOID(hiChainConnector_);
-    hiChainConnector_->DeleteP2PGroup(switchUserId);
 }
 
 void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)

@@ -198,10 +198,9 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->deviceId = deviceId;
     authRequestContext_->addr = deviceId;
     authRequestContext_->dmVersion = DM_VERSION_5_0_2;
-    authRequestContext_->localAccountId = MultipleUserConnector::GetOhosAccountId();
-    MultipleUserConnector::SetSwitchOldAccountId(authRequestContext_->localAccountId);
     authRequestContext_->localUserId = MultipleUserConnector::GetCurrentAccountUserID();
-    MultipleUserConnector::SetSwitchOldUserId(authRequestContext_->localUserId);
+    authRequestContext_->localAccountId = MultipleUserConnector::GetAccountInfoByUserId(
+        authRequestContext_->localUserId).accountId;
     authRequestContext_->isOnline = false;
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
     authRequestContext_->bindLevel = INVALIED_TYPE;
@@ -2102,7 +2101,7 @@ void DmAuthManager::CompatiblePutAcl()
     accesser.requestBundleName = authResponseContext_->hostPkgName;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         accesser.requestUserId = MultipleUserConnector::GetCurrentAccountUserID();
-        accesser.requestAccountId = MultipleUserConnector::GetOhosAccountId();
+        accesser.requestAccountId = MultipleUserConnector::GetAccountInfoByUserId(accesser.requestUserId).accountId;
         accesser.requestDeviceId = localUdid;
     } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
         accesser.requestDeviceId = authResponseContext_->localDeviceId;
@@ -2115,7 +2114,7 @@ void DmAuthManager::CompatiblePutAcl()
         accessee.trustDeviceId = remoteDeviceId_;
     } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
         accessee.trustUserId = MultipleUserConnector::GetCurrentAccountUserID();
-        accessee.trustAccountId = MultipleUserConnector::GetOhosAccountId();
+        accessee.trustAccountId = MultipleUserConnector::GetAccountInfoByUserId(accessee.trustUserId).accountId;
         accessee.trustDeviceId = localUdid;
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
@@ -2125,10 +2124,8 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
 {
     LOGI("DmAuthManager::ProcRespNegotiateExt start.");
     remoteDeviceId_ = authResponseContext_->localDeviceId;
-    std::string accountId = MultipleUserConnector::GetOhosAccountId();
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    MultipleUserConnector::SetSwitchOldAccountId(accountId);
-    MultipleUserConnector::SetSwitchOldUserId(userId);
+    std::string accountId = MultipleUserConnector::GetAccountInfoByUserId(userId).accountId;
     authResponseContext_->isIdenticalAccount = false;
     if (authResponseContext_->localAccountId == accountId && accountId != "ohosAnonymousUid") {
         authResponseContext_->isIdenticalAccount = true;
@@ -2249,6 +2246,29 @@ int32_t DmAuthManager::DeleteGroup(const std::string &pkgName, const std::string
         std::string groupId = "";
         groupId = groupList.front().groupId;
         hiChainConnector_->DeleteGroup(groupId);
+    } else {
+        LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");
+        return ERR_DM_FAILED;
+    }
+    if (softbusConnector_ != nullptr) {
+        softbusConnector_->EraseUdidFromMap(deviceId);
+    }
+    return DM_OK;
+}
+
+int32_t DmAuthManager::DeleteGroup(const std::string &pkgName, int32_t userId, const std::string &deviceId)
+{
+    LOGI("DmAuthManager::DeleteGroup");
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_FAILED;
+    }
+    std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
+    hiChainConnector_->GetRelatedGroups(userId, deviceId, groupList);
+    if (groupList.size() > 0) {
+        std::string groupId = "";
+        groupId = groupList.front().groupId;
+        hiChainConnector_->DeleteGroup(userId, groupId);
     } else {
         LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");
         return ERR_DM_FAILED;

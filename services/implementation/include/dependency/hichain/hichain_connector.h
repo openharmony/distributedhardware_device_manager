@@ -232,12 +232,14 @@ public:
     int32_t addMultiMembersExt(const std::string &credentialInfo);
 
     void DeleteAllGroup(int32_t userId);
-    
+    int32_t GetRelatedGroups(int32_t userId, const std::string &deviceId, std::vector<GroupInfo> &groupList);
     int32_t GetRelatedGroupsExt(const std::string &deviceId, std::vector<GroupInfo> &groupList);
 
     int32_t DeleteGroupExt(std::string &groupId);
 
     int32_t GetRelatedGroupsCommon(const std::string &deviceId, const char* pkgName,
+        std::vector<GroupInfo> &groupList);
+    int32_t GetRelatedGroupsCommon(int32_t userId, const std::string &deviceId, const char* pkgName,
         std::vector<GroupInfo> &groupList);
     void DeleteAllGroupByUdid(const std::string &udid);
     void DeleteP2PGroup(int32_t switchUserId);

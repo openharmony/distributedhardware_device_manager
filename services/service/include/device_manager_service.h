@@ -225,9 +225,8 @@ private:
     void ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInfo);
     int32_t ConvertUdidHashToAnoyDeviceId(const std::string &udidHash, std::string &anoyDeviceId);
     int32_t GetUdidHashByAnoyDeviceId(const std::string &anoyDeviceId, std::string &udidHash);
-    void HandleAccountLogout(int32_t userId, const std::string &accountId);
+    void HandleAccountLogout(int32_t userId, const std::string &accountId, const std::string &accountName);
     void HandleUserRemoved(int32_t preUserId);
-    void HandleUserSwitched(int32_t switchUserId);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
