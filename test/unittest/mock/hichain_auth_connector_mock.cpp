@@ -13,21 +13,15 @@
  * limitations under the License.
  */
 
-#include "app_manager_mock.h"
+#include "hichain_auth_connector_mock.h"
 
 #include "gtest/gtest.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
-const std::string AppManager::GetAppId()
+bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAccountId)
 {
-    return DmAppManager::dmAppManager->GetAppId();
-}
-
-bool AppManager::IsSystemSA()
-{
-    return DmAppManager::dmAppManager->IsSystemSA();
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredential(localUdid, osAccountId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

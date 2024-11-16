@@ -28,6 +28,10 @@
 static bool g_reportAuthOpenSessionReturnBoolValue = false;
 static bool g_reportAuthConfirmBoxReturnBoolValue = false;
 
+constexpr const char* DM_VERSION_4_1_5_1 = "4.1.5.1";
+constexpr const char* DM_VERSION_5_0_1 = "5.0.1";
+constexpr const char* DM_VERSION_5_0_2 = "5.0.2";
+
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t CLONE_AUTHENTICATE_TIMEOUT = 10;
@@ -66,8 +70,19 @@ void DmAuthManagerTest::SetUp()
     authManager_->timer_ = std::make_shared<DmTimer>();
 }
 void DmAuthManagerTest::TearDown() {}
-void DmAuthManagerTest::SetUpTestCase() {}
-void DmAuthManagerTest::TearDownTestCase() {}
+void DmAuthManagerTest::SetUpTestCase()
+{
+    DmSoftbusSession::dmSoftbusSession = softbusSessionMock_;
+    DmAppManager::dmAppManager = appManagerMock_;
+    DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+
+}
+void DmAuthManagerTest::TearDownTestCase()
+{
+    softbusSessionMock_ = nullptr;
+    appManagerMock_ = nullptr;
+    multipleUserConnectorMock_ = nullptr;
+}
 
 namespace {
 const int32_t MIN_PIN_CODE = 100000;
@@ -1123,6 +1138,11 @@ HWTEST_F(DmAuthManagerTest, PutAccessControlList001, testing::ext::TestSize.Leve
     authManager_->authResponseContext_->isIdenticalAccount = true;
     authManager_->PutAccessControlList();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
+    authManager_->authResponseContext_->isIdenticalAccount = false;
+    authManager_->authResponseContext_->localAccountId = "ohosAnonymousUid";
+    authManager_->authResponseContext_->confirmOperation = USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    authManager_->PutAccessControlList();
+    ASSERT_EQ(authManager_->isIdenticalAccount, false);
 }
 
 HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_001, testing::ext::TestSize.Level0)
@@ -1302,6 +1322,172 @@ HWTEST_F(DmAuthManagerTest, GetTaskTimeout_001, testing::ext::TestSize.Level0)
 
     authManager_->SetAuthType(AUTH_TYPE_IMPORT_AUTH_CODE);
     EXPECT_EQ(authManager_->GetTaskTimeout(AUTHENTICATE_TIMEOUT_TASK, taskTimeOut), CLONE_AUTHENTICATE_TIMEOUT);
+}
+
+HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize.Level0)
+{
+    std::string extra = R"({"extra": {"bindLevel": 1}})";
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
+    int32_t ret = authManager_->CheckAuthParamVaildExtra(extra);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    ret = authManager_->CheckAuthParamVaildExtra(extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    extra = R"({"extra": {"bindLevel": 789}})";
+    ret = authManager_->CheckAuthParamVaildExtra(extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    extra = R"({"extra": {"bindLevel": 789})";
+    ret = authManager_->CheckAuthParamVaildExtra(extra);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level0)
+{
+    int32_t authType = 0;
+    std::string extra = R"({"extra": {"bindLevel": 789}})";
+    std::string pkgName = "ohos_test_004";
+    std::string deviceId = "512156";
+    authManager_->importPkgName_ = "ohos_test_004";
+    authManager_->importAuthCode_ = "156161";
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseState_ = nullptr;
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
+    authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
+    int32_t ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t ret = authManager_->StopAuthenticateDevice(pkgName);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    pkgName = "pkgName_001";
+    int64_t requestId = 12;
+    int32_t status = 0;
+    int32_t sessionId = 1;
+    std::string peerUdidHash;
+    if (authManager_->timer_ == nullptr) {
+        authManager_->timer_ = std::make_shared<DmTimer>();
+    }
+    authManager_->authRequestState_ = std::make_shared<AuthRequestInitState>();
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager_->authRequestContext_->hostPkgName = pkgName;
+    authManager_->authResponseContext_->hostPkgName = pkgName;
+    authManager_->isAuthenticateDevice_ = true;
+
+    authManager_->authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->MemberJoinAuthRequest(requestId, status);
+    authManager_->authResponseContext_->authType == AUTH_TYPE_NFC;
+    authManager_->authResponseContext_->requestId = requestId;
+    status = 1;
+    authManager_->authTimes_ = MAX_AUTH_TIMES;
+    authManager_->MemberJoinAuthRequest(requestId, status);
+    status = 0;
+    authManager_->authTimes_ = 2;
+    authManager_->MemberJoinAuthRequest(requestId, status);
+    status = 0;
+    authManager_->HandleMemberJoinImportAuthCode(requestId, status);
+    authManager_->NegotiateRespMsg(DM_VERSION_5_0_1);
+    authManager_->NegotiateRespMsg(DM_VERSION_4_1_5_1);
+    authManager_->NegotiateRespMsg(DM_VERSION_5_0_2);
+    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
+    authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
+    ret = authManager_->StopAuthenticateDevice(pkgName, authType, deviceId, extra);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, GetBindLevel_001, testing::ext::TestSize.Level0)
+{
+    int32_t bindLevel = INVALIED_TYPE;
+    std::string udid;
+    authManager_->HandleDeviceNotTrust(udid);
+    udid = "988989";
+    int32_t sessionId = 32166;
+    authManager_->ProcIncompatible(sessionId);
+    
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
+    int32_t ret = authManager_->GetBindLevel(bindLevel);
+    ASSERT_EQ(ret, DEVICE);
+
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    ret = authManager_->GetBindLevel(bindLevel);
+    ASSERT_EQ(ret, APP);
+
+    int32_t sessionId = 123;
+    authManager_->authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->authResponseContext_->importAuthCode = "importAuthCode";
+    authManager_->importAuthCode_ = "importAuthCode";
+    authManager_->ProcessAuthRequest(sessionId);
+
+    authManager_->authResponseContext_->authType == AUTH_TYPE_NFC;
+    authManager_->authResponseContext_->isOnline = false;
+    authManager_->authResponseContext_->reply = 0;
+    authManager_->authResponseContext_->isIdenticalAccount = false;
+    authManager_->authResponseContext_->isAuthCodeReady = true;
+    authManager_->ProcessAuthRequest(sessionId);
+
+    authManager_->authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->authResponseContext_->isAuthCodeReady == false;
+    authManager_->ProcessAuthRequest(sessionId);
+
+    bindLevel = SERVICE;
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    ret = authManager_->GetBindLevel(bindLevel);
+    ASSERT_EQ(ret, SERVICE);
+}
+
+HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
+    bool ret = authManager_->IsAuthFinish();
+    EXPECT_TRUE(ret);
+
+    authManager_->authResponseContext_->reply = ERR_DM_AUTH_BUSINESS_BUSY;
+    authManager_->authResponseContext_->isOnline = true;
+    authManager_->authResponseContext_->authed = true;
+    ret = authManager_->IsAuthFinish();
+    EXPECT_TRUE(ret);
+
+    authManager_->authResponseContext_->isOnline = false;
+    authManager_->authResponseContext_->isIdenticalAccount = true;
+    authManager_->authResponseContext_->authed = false;
+    ret = authManager_->IsAuthFinish();
+    EXPECT_TRUE(ret);
+
+    authManager_->authResponseContext_->isIdenticalAccount = false;
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->authResponseContext_->isAuthCodeReady == false;
+    ret = authManager_->IsAuthFinish();
+    EXPECT_TRUE(ret);
+
+    authManager_->authResponseContext_->isAuthCodeReady == true;
+    ret = authManager_->IsAuthFinish();
+    EXPECT_FALSE(ret);
+
+    int32_t sessionId = 1;
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->authResponseContext_->importAuthCode = "importAuthCode";
+    authManager_->importAuthCode_= "importAuthCode";
+    authManager_->ProcessAuthRequestExt(sessionId);
+
+    authManager_->authResponseContext_->isOnline = true;
+    authManager_->authResponseContext_->authed = true;
+    authManager_->authResponseContext_->importAuthCode = "";
+    authManager_->ProcessAuthRequestExt(sessionId);
+    authManager_->authResponseContext_->reply = ERR_DM_AUTH_BUSINESS_BUSY;
+    authManager_->authResponseContext_->isOnline = false;
+    authManager_->authResponseContext_->importAuthCode = "importAuthCode";
+    authManager_->authResponseContext_->isIdenticalAccount = false;
+    authResponseContext_->isAuthCodeReady = true;
+    authManager_->ProcessAuthRequestExt(sessionId);
 }
 } // namespace
 } // namespace DistributedHardware

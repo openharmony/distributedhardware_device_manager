@@ -12,30 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SOFTBUS_CONNECTOR_MOCK_H
-#define OHOS_SOFTBUS_CONNECTOR_MOCK_H
+#ifndef OHOS_SOFTBUS_SESSION_MOCK_H
+#define OHOS_SOFTBUS_SESSION_MOCK_H
 
 #include <string>
 #include <gmock/gmock.h>
 
-#include "softbus_connector.h"
+#include "softbus_session.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmSoftbusConnector {
+class DmSoftbusSession {
 public:
-    virtual ~DmSoftbusConnector() = default;
+    virtual ~DmSoftbusSession() = default;
 public:
-    virtual int32_t GetUdidByNetworkId(const char *networkId, std::string &udid) = 0;
-    virtual bool CheckIsOnline(const std::string &targetDeviceId) = 0;
+    virtual int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId) = 0;
 public:
-    static inline std::shared_ptr<DmSoftbusConnector> dmSoftbusConnector = nullptr;
+    static inline std::shared_ptr<DmSoftbusSession> dmSoftbusSession = nullptr;
 };
 
-class SoftbusConnectorMock : public DmSoftbusConnector {
+class SoftbusSessionMock : public DmSoftbusSession {
 public:
-    MOCK_METHOD(int32_t, GetUdidByNetworkId, (const char *, std::string &));
-    MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
+    MOCK_METHOD(int32_t, GetPeerDeviceId, (int32_t, std::string &));
 };
 }
 }

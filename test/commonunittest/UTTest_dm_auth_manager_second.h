@@ -33,6 +33,10 @@
 #include "hichain_connector.h"
 #include "softbus_connector.h"
 #include "softbus_session.h"
+#include "hichain_connector_mock.h"
+#include "multiple_user_connector_mock.h"
+#include "softbus_connector_mock.h"
+#include "hichain_auth_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -44,6 +48,14 @@ public:
     void TearDown();
 
     std::shared_ptr<DmAuthManager> authManager_;
+    static inline std::shared_ptr<HiChainConnectorMock> hiChainConnectorMock_ =
+        std::make_shared<HiChainConnectorMock>();
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
+        std::make_shared<MultipleUserConnectorMock>();
+    static inline std::shared_ptr<SoftbusConnectorMock> softbusConnectorMock_ =
+        std::make_shared<SoftbusConnectorMock>();
+    static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock_ =
+        std::make_shared<HiChainAuthConnectorMock>();
 };
 
 class AuthResponseInitStateMock : public AuthResponseInitState {

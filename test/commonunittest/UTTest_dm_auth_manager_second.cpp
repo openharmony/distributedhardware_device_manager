@@ -50,8 +50,20 @@ void DmAuthManagerTest::TearDown()
 {
     authManager_ = nullptr;
 }
-void DmAuthManagerTest::SetUpTestCase() {}
-void DmAuthManagerTest::TearDownTestCase() {}
+void DmAuthManagerTest::SetUpTestCase()
+{
+    DmHiChainConnector::dmHiChainConnector = hiChainConnectorMock_;
+    DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock_;
+    DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock_;
+}
+void DmAuthManagerTest::TearDownTestCase()
+{
+    hiChainConnectorMock_ = nullptr;
+    multipleUserConnectorMock_ = nullptr;
+    softbusConnectorMock_ = nullptr;
+    hiChainAuthConnectorMock_ = nullptr;
+}
 
 namespace {
 HWTEST_F(DmAuthManagerTest, OnDataReceived_001, testing::ext::TestSize.Level0)
@@ -1440,6 +1452,79 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_002, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->importAuthCode = "test";
     int32_t ret = authManager_->CheckTrustState();
     ASSERT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level0)
+{
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(-1));
+    bool ret = authManager_->IsIdenticalAccount();
+    ASSERT_FALSE(ret);
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(false));
+    ret = authManager_->IsIdenticalAccount();
+    ASSERT_FALSE(ret);
+
+    authManager_->authRequestContext_ = nullptr;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
+    ret = authManager_->IsIdenticalAccount();
+    ASSERT_FALSE(ret);
+
+    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager_->authResponseContext_->accountGroupIdHash == OLD_VERSION_ACCOUNT;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
+    ret = authManager_->IsIdenticalAccount();
+    ASSERT_TRUE(ret);
+
+    EXPECT_CALL(*hiChainConnectorMock_, IsDevicesInP2PGroup(_, _)).WillOnce(Return(true));
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->importAuthCode_= "importAuthCode";
+    authManager_->importPkgName_ = "importPkgName";
+    authResponseContext_->hostPkgName = "importPkgName";
+    authManager_->AbilityNegotiate();
+
+    EXPECT_CALL(*hiChainConnectorMock_, IsDevicesInP2PGroup(_, _)).WillOnce(Return(true));
+    authManager_->importAuthCode_= "";
+    authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
+    authManager_->AbilityNegotiate();
+
+    authManager_->authResponseContext_->isOnline = true;
+    EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).WillOnce(Return(true));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _)).WillOnce(Return(true));
+    authManager_->GetAuthRequestContext();
+
+    nlohmann::json jsonPeerGroupIdObj;
+    jsonPeerGroupIdObj["groupId"] = "123456";
+    authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
+    ret = authManager_->IsIdenticalAccount();
+    ASSERT_FALSE(ret);
+}
+
+HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Level0)
+{
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(-1));
+    auto ret = authManager_->GetAccountGroupIdHash();
+    ASSERT_TRUE(ret.empty());
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
+    auto ret = authManager_->GetAccountGroupIdHash();
+    ASSERT_FALSE(ret.empty());
+}
+
+HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
+{
+    authResponseContext_->reply == ERR_DM_AUTH_BUSINESS_BUSY;
+    authManager_->authResponseContext_->isIdenticalAccount = true;
+    authManager_->authResponseContext_->accountGroupIdHash == OLD_VERSION_ACCOUNT;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
+    int32_t ret = authManager_->CheckTrustState();
+    ASSERT_EQ(ret, 1);
 }
 } // namespace
 } // namespace DistributedHardware

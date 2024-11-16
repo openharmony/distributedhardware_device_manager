@@ -13,21 +13,17 @@
  * limitations under the License.
  */
 
-#include "app_manager_mock.h"
+#include "softbus_session_mock.h"
 
 #include "gtest/gtest.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
-const std::string AppManager::GetAppId()
+
+int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevId)
 {
-    return DmAppManager::dmAppManager->GetAppId();
+    return DmSoftbusSession::dmSoftbusSession->GetPeerDeviceId(sessionId, peerDevId);
 }
 
-bool AppManager::IsSystemSA()
-{
-    return DmAppManager::dmAppManager->IsSystemSA();
-}
 } // namespace DistributedHardware
 } // namespace OHOS

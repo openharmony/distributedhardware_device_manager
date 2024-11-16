@@ -15,6 +15,7 @@
 
 #include "dm_auth_manager.h"
 
+#include <algorithm>
 #include <mutex>
 #include <string>
 #include <unistd.h>
@@ -166,18 +167,19 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
-    if (!jsonObject.is_discarded()) {
-        if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
-            int32_t bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
-            if (bindLevel > APP || bindLevel < INVALID_TYPE) {
-                LOGE("bindlevel error %{public}d.", bindLevel);
-                return ERR_DM_INPUT_PARA_INVALID;
-            }
-            if (bindLevel == DEVICE && !IsAllowDeviceBind()) {
-                LOGE("not allowd device level bind bindlevel: %{public}d.", bindLevel);
-                return ERR_DM_INPUT_PARA_INVALID;
-            }
-        }
+    if (jsonObject.is_discarded() || jsonObject.find(TAG_BIND_LEVEL) == jsonObject.end() ||
+        !IsInt32(jsonObject, TAG_BIND_LEVEL)) {
+        return DM_OK;
+    }
+    int32_t bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
+    if (static_cast<uint32_t>(bindLevel) > APP || static_cast<uint32_t>(bindLevel) < INVALID_TYPE) {
+        LOGE("bindlevel error %{public}d.", bindLevel);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    if (static_cast<uint32_t>(bindLevel) == DEVICE && !IsAllowDeviceBind()) {
+        LOGE("not allowd device level bind bindlevel: %{public}d.", bindLevel);
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
 }
@@ -2516,12 +2518,14 @@ bool DmAuthManager::IsAllowDeviceBind()
 int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
 {
     if (IsAllowDeviceBind()) {
-        if (bindLevel == INVALIED_TYPE || bindLevel > APP || bindLevel < DEVICE) {
+        if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || static_cast<uint32_t>(bindLevel) > APP ||
+            static_cast<uint32_t>(bindLevel) < DEVICE) {
             return DEVICE;
         }
         return bindLevel;
     }
-    if (bindLevel == INVALIED_TYPE || (bindLevel != APP && bindLevel != SERVICE)) {
+    if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || (static_cast<uint32_t>(bindLevel) != APP &&
+        static_cast<uint32_t>(bindLevel) != SERVICE)) {
         return APP;
     }
     return bindLevel;
