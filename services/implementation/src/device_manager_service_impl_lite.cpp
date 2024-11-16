@@ -512,12 +512,6 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     return;
 }
 
-void DeviceManagerServiceImpl::HandleUserSwitched(int32_t switchUserId)
-{
-    (void)switchUserId;
-    return;
-}
-
 int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgName)
 {
     (void)pkgName;

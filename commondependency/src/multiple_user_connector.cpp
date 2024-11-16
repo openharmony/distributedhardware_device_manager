@@ -32,6 +32,8 @@ int32_t MultipleUserConnector::oldUserId_ = -1;
 std::string MultipleUserConnector::accountId_ = "";
 std::string MultipleUserConnector::accountName_ = "";
 std::mutex MultipleUserConnector::lock_;
+std::map<int32_t, DMAccountInfo> MultipleUserConnector::dmAccountInfoMap_ = {};
+std::mutex MultipleUserConnector::dmAccountInfoMaplock_;
 #ifndef OS_ACCOUNT_PART_EXISTS
 const int32_t DEFAULT_OS_ACCOUNT_ID = 0; // 0 is the default id when there is no os_account part
 #endif // OS_ACCOUNT_PART_EXISTS
@@ -124,6 +126,35 @@ std::string MultipleUserConnector::GetSwitchOldAccountName(void)
 {
     std::lock_guard<std::mutex> lock(lock_);
     return accountName_;
+}
+
+void MultipleUserConnector::SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo)
+{
+    std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
+    dmAccountInfoMap_[userId] = dmAccountInfo;
+}
+
+DMAccountInfo MultipleUserConnector::GetAccountInfoByUserId(int32_t userId)
+{
+    DMAccountInfo dmAccountInfo;
+    {
+        std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
+        if (dmAccountInfoMap_.find(userId) != dmAccountInfoMap_.end()) {
+            dmAccountInfo = dmAccountInfoMap_[userId];
+            return dmAccountInfo;
+        }
+    }
+    LOGE("userId is not exist.");
+    return dmAccountInfo;
+}
+
+void MultipleUserConnector::DeleteAccountInfoByUserId(int32_t userId)
+{
+    std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
+    LOGI("userId: %{public}d", userId);
+    if (dmAccountInfoMap_.find(userId) != dmAccountInfoMap_.end()) {
+        dmAccountInfoMap_.erase(userId);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1626,32 +1626,36 @@ void DeviceManagerService::AccountCommonEventCallback(int32_t userId, const std:
 {
     LOGI("CommonEventType: %{public}s, userId: %{public}d", commonEventType.c_str(), userId);
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-        if (MultipleUserConnector::GetSwitchOldUserId() > 0 &&
-            (userId != MultipleUserConnector::GetSwitchOldUserId())) {
-            HandleUserSwitched(MultipleUserConnector::GetSwitchOldUserId());
-        }
-        MultipleUserConnector::SetSwitchOldUserId(userId);
-        MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
-        MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
+        DMAccountInfo dmAccountInfo;
+        dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
+        dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
+        MultipleUserConnector::SetAccountInfo(userId, dmAccountInfo);
         if (IsDMServiceAdapterLoad()) {
             dmServiceImplExt_->AccountUserSwitched(userId, MultipleUserConnector::GetOhosAccountId());
         }
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
-        MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
-        MultipleUserConnector::SetSwitchOldAccountName(MultipleUserConnector::GetOhosAccountName());
+        DMAccountInfo dmAccountInfo;
+        dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
+        dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
+        MultipleUserConnector::SetAccountInfo(userId, dmAccountInfo);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
-        HandleAccountLogout(userId, MultipleUserConnector::GetSwitchOldAccountId());
+        DMAccountInfo dmAccountInfo = MultipleUserConnector::GetAccountInfoByUserId(userId);
+        HandleAccountLogout(userId, dmAccountInfo.accountId, dmAccountInfo.accountName);
+        MultipleUserConnector::DeleteAccountInfoByUserId(userId);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(userId);
+        MultipleUserConnector::DeleteAccountInfoByUserId(userId);
     } else {
         LOGE("Invalied account common event.");
     }
     return;
 }
 
-void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string &accountId)
+void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string &accountId,
+    const std::string &accountName)
 {
-    LOGI("UserId %{public}d, accountId %{public}s.", userId, GetAnonyString(accountId).c_str());
+    LOGI("UserId: %{public}d, accountId: %{public}s, accountName: %{public}s", userId, GetAnonyString(accountId).c_str(),
+        GetAnonyString(accountName).c_str());
     if (IsDMServiceAdapterLoad()) {
         dmServiceImplExt_->AccountIdLogout(userId, accountId);
     }
@@ -1674,16 +1678,7 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
             LOGE("GetAccountHash failed.");
             return;
         }
-        std::string accountName = MultipleUserConnector::GetSwitchOldAccountName();
         SendAccountLogoutBroadCast(peerUdids, std::string(accountIdHash), accountName, userId);
-    }
-}
-
-void DeviceManagerService::HandleUserSwitched(int32_t switchUserId)
-{
-    LOGI("switchUserId: %{public}d.", switchUserId);
-    if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleUserSwitched(switchUserId);
     }
 }
 

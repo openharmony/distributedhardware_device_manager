@@ -135,7 +135,6 @@ public:
     void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId);
     void HandleUserRemoved(int32_t preUserId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
-    void HandleUserSwitched(int32_t switchUserId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);

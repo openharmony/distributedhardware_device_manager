@@ -354,7 +354,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
     DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
-    DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId);
+    DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
     DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     DeviceManagerService::GetInstance().SendAccountLogoutBroadCast(peerUdids, accountId, accountName, userId);

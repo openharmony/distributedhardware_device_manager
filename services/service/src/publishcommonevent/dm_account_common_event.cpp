@@ -181,13 +181,15 @@ void DmAccountCommonEventManager::SystemAbilityStatusChangeListener::OnAddSystem
     if (!CommonEventManager::SubscribeCommonEvent(changeSubscriber_)) {
         LOGE("failed to subscribe account commom event: %{public}zu", eventNameVec.size());
     }
+    DMAccountInfo dmAccountInfo;
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    std::string accountId = MultipleUserConnector::GetOhosAccountId();
-    LOGI("after subscribe account event accountId: %{public}s, userId: %{public}s",
-        GetAnonyString(accountId).c_str(), GetAnonyInt32(userId).c_str());
+    dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
+    dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
+    LOGI("after subscribe account event accountId: %{public}s, userId: %{public}s, accountName: %{public}s",
+        GetAnonyString(dmAccountInfo.accountId).c_str(), GetAnonyInt32(userId).c_str(),
+        GetAnonyString(dmAccountInfo.accountName).c_str());
     if (userId > 0) {
-        MultipleUserConnector::SetSwitchOldUserId(userId);
-        MultipleUserConnector::SetSwitchOldAccountId(accountId);
+        MultipleUserConnector::SetAccountInfo(userId, dmAccountInfo);
     }
 }
 

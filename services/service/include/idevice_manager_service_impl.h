@@ -271,7 +271,6 @@ public:
     virtual void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId) = 0;
     virtual void HandleUserRemoved(int32_t preUserId) = 0;
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
-    virtual void HandleUserSwitched(int32_t switchUserId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
                                             int32_t errcode) = 0;
