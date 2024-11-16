@@ -34,6 +34,7 @@ constexpr int32_t MSG_TYPE_DESTROY_PIN_HOLDER = 650;
 constexpr int32_t MSG_TYPE_DESTROY_PIN_HOLDER_RESP = 651;
 constexpr int32_t MSG_TYPE_PIN_HOLDER_CHANGE = 700;
 constexpr int32_t MSG_TYPE_PIN_HOLDER_CHANGE_RESP = 701;
+constexpr int32_t MSG_TYPE_PIN_CLOSE_SESSION = 800;
 
 constexpr const char* PINHOLDER_CREATE_TIMEOUT_TASK = "deviceManagerTimer:pinholdercreate";
 constexpr int32_t PIN_HOLDER_SESSION_CREATE_TIMEOUT = 60;
@@ -46,6 +47,7 @@ constexpr const char* TAG_REMOTE_DEVICE_ID = "REMOTE_DEVICE_ID";
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = 96929744;
 constexpr int32_t ERR_DM_TIME_OUT = 96929745;
+constexpr int32_t ERR_DM_CREATE_PIN_HOLDER_BUSY = 96929821;
 constexpr const char* TAG_MSG_TYPE = "MSG_TYPE";
 constexpr const char* TAG_DM_VERSION = "DM_VERSION";
 constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
@@ -234,6 +236,20 @@ int32_t PinHolder::ParseMsgType(const std::string &message)
     return msgType;
 }
 
+void PinHolder::ProcessCloseSessionMsg(const std::string &message)
+{
+    if (listener_ == nullptr || session_ == nullptr) {
+        LOGE("ProcessCloseSessionMsg listener or session is nullptr.");
+        return;
+    }
+    LOGI("CloseSessionMsg, message type is: %{public}d.", MSG_TYPE_PIN_CLOSE_SESSION);
+    session_->CloseSessionServer(sessionId_);
+    sessionId_ = SESSION_ID_INVALID;
+    sourceState_ = SOURCE_INIT;
+    sinkState_ = SINK_INIT;
+    listener_->OnCreateResult(registerPkgName_, ERR_DM_CREATE_PIN_HOLDER_BUSY);
+}
+
 void PinHolder::ProcessCreateMsg(const std::string &message)
 {
     if (listener_ == nullptr || session_ == nullptr) {
@@ -310,6 +326,8 @@ void PinHolder::ProcessCreateRespMsg(const std::string &message)
         session_->CloseSessionServer(sessionId_);
         sessionId_ = SESSION_ID_INVALID;
         destroyState_ = STATE_REMOTE_WRONG;
+        sourceState_ = SOURCE_INIT;
+        sinkState_ = SINK_INIT;
     }
 }
 
@@ -419,6 +437,8 @@ void PinHolder::ProcessDestroyResMsg(const std::string &message)
         LOGE("ProcessDestroyResMsg remote state is wrong.");
         listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
         listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY_RESULT, ERR_DM_FAILED, "");
+        sinkState_ = SINK_INIT;
+        sourceState_ = SOURCE_INIT;
     }
     session_->CloseSessionServer(sessionId_);
     sessionId_ = SESSION_ID_INVALID;
@@ -429,8 +449,23 @@ void PinHolder::OnDataReceived(int32_t sessionId, std::string message)
 {
     int32_t msgType = ParseMsgType(message);
     LOGI("OnDataReceived, msgType: %{public}d.", msgType);
-
+    int32_t sessionSide = GetSessionSide(sessionId);
+    if (sessionSide == SESSION_SIDE_SERVER && sessionId != sessionId_) {
+        LOGE("another session opened, close this sessionId: %{public}d.", sessionId);
+        nlohmann::json jsonObj;
+        jsonObj[TAG_MSG_TYPE] = MSG_TYPE_PIN_CLOSE_SESSION;
+        std::string msg = jsonObj.dump();
+        int32_t ret = session_->SendData(sessionId, msg);
+        if (ret != DM_OK) {
+            LOGE("[SOFTBUS] SendBytes failed. ret: %{public}d.", ret);
+            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
+        }
+        return;
+    }
     switch (msgType) {
+        case MSG_TYPE_PIN_CLOSE_SESSION:
+            ProcessCloseSessionMsg(message);
+            break;
         case MSG_TYPE_CREATE_PIN_HOLDER:
             ProcessCreateMsg(message);
             break;
@@ -485,12 +520,15 @@ void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t 
     }
     DmRadarHelper::GetInstance().ReportSendOrReceiveHolderMsg(static_cast<int32_t>(PinHolderStage::SESSION_OPENED),
         std::string("OnSessionOpened"), std::string(peerDeviceId));
-    sessionId_ = sessionId;
     if (sessionSide == SESSION_SIDE_SERVER) {
         LOGI("[SOFTBUS]onSesssionOpened success, side is sink. sessionId: %{public}d.", sessionId);
         GetPeerDeviceId(sessionId, remoteDeviceId_);
+        if (sessionId_ == SESSION_ID_INVALID) {
+            sessionId_ = sessionId;
+        }
         return;
     }
+    sessionId_ = sessionId;
     if (result == DM_OK) {
         CreateGeneratePinHolderMsg();
         return;
@@ -506,6 +544,9 @@ void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t 
 
 void PinHolder::OnSessionClosed(int32_t sessionId)
 {
+    if (sessionId != sessionId_) {
+        return;
+    }
     LOGI("[SOFTBUS]OnSessionClosed sessionId: %{public}d.", sessionId);
     sessionId_ = SESSION_ID_INVALID;
     sinkState_ = SINK_INIT;

@@ -61,6 +61,7 @@ public:
 private:
     int32_t CreateGeneratePinHolderMsg();
     int32_t ParseMsgType(const std::string &message);
+    void ProcessCloseSessionMsg(const std::string &message);
     void ProcessCreateMsg(const std::string &message);
     void ProcessCreateRespMsg(const std::string &message);
     void ProcessDestroyMsg(const std::string &message);
