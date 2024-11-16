@@ -163,6 +163,7 @@ private:
         ALLOW_BE_DISCOVERY = 1,
         NOT_ALLOW_BE_DISCOVERY = 2,
     };
+    static std::string remoteUdidHash_;
     static PulishStatus publishStatus;
     static IRefreshCallback softbusDiscoveryCallback_;
     static IRefreshCallback softbusDiscoveryByIdCallback_;
