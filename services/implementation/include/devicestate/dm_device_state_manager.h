@@ -96,7 +96,6 @@ public:
     bool CheckIsOnline(const std::string &udid);
     void DeleteOffLineTimer(std::string udidHash);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
-    void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
 private:
     void StartEventThread();
     void StopEventThread();

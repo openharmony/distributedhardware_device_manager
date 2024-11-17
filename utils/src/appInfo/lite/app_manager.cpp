@@ -46,5 +46,27 @@ bool AppManager::IsSystemSA()
 {
     return true;
 }
+
+int32_t AppManager::GetCallerName(bool isSystemSA, std::string &callerName)
+{
+    (void)isSystemSA;
+    (void)callerName;
+    return DM_OK;
+}
+int32_t AppManager::GetNativeTokenIdByName(std::string &processName, int64_t &tokenId)
+{
+    (void)processName;
+    (void)tokenId;
+    return DM_OK;
+}
+
+int32_t AppManager::GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex, int64_t &tokenId)
+{
+    (void)userId;
+    (void)bundleName;
+    (void)instIndex;
+    (void)tokenId;
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

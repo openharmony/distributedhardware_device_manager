@@ -43,9 +43,12 @@
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_server_client_proxy.h"
 #include "ipc_server_stub.h"
-
+#include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
-
+#include "parameter.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "multiple_user_connector.h"
+#endif
 namespace OHOS {
 namespace DistributedHardware {
 const unsigned int XCOLLIE_TIMEOUT_S = 5;
@@ -419,8 +422,11 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
         OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
         return ERR_DM_POINT_NULL;
     }
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
     DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
-    int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, callback);
+    int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, callback);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
@@ -433,8 +439,11 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
 ON_IPC_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
     DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
-    int32_t result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    int32_t result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -442,48 +451,6 @@ ON_IPC_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParce
     return DM_OK;
 }
 
-ON_IPC_CMD(START_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    std::string extra = data.ReadString();
-    DmSubscribeInfo *subscribeInfo =
-        static_cast<DmSubscribeInfo *>(const_cast<void *>(data.ReadRawData(sizeof(DmSubscribeInfo))));
-    int32_t result = ERR_DM_POINT_NULL;
-
-    if (subscribeInfo != nullptr) {
-        result = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, *subscribeInfo, extra);
-    }
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(START_DEVICE_DISCOVERY, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    std::string filterOption = data.ReadString();
-    uint16_t subscribeId = data.ReadUint16();
-    int32_t result = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOption);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_CMD(STOP_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
-{
-    std::string pkgName = data.ReadString();
-    uint16_t subscribeId = data.ReadUint16();
-    int32_t result = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
 
 ON_IPC_CMD(PUBLISH_DEVICE_DISCOVER, MessageParcel &data, MessageParcel &reply)
 {

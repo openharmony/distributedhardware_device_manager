@@ -28,8 +28,6 @@
 #include "ipc_def.h"
 #include "ipc_types.h"
 #include "ipc_set_useroperation_req.h"
-#include "ipc_stop_discovery_req.h"
-#include "ipc_start_discovery_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -45,6 +45,7 @@ constexpr uint32_t ACTIVE = 1;
 typedef struct DmDiscoveryInfo {
     std::string pkgname;
     std::string localDeviceId;
+    int32_t userId;
     std::string remoteDeviceIdHash;
 } DmDiscoveryInfo;
 
@@ -78,7 +79,7 @@ typedef struct DmAccessee {
 
 typedef struct DmOfflineParam {
     uint32_t bindType;
-    std::vector<std::string> pkgNameVec;
+    std::vector<OHOS::DistributedHardware::ProcessInfo> processVec;
     int32_t leftAclNumber;
 } DmOfflineParam;
 
@@ -95,22 +96,25 @@ class DeviceProfileConnector : public IDeviceProfileConnector {
 public:
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfile();
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfileByUserId(int32_t userId);
-    uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
+        const std::string &deviceId, int32_t userId);
+    uint32_t CheckBindType(std::string peerUdid, std::string localUdid);
     int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee);
     int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId);
     std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName,
         const std::string &deviceId);
-    DmOfflineParam GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId);
     std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
         std::string trustUdid);
     std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
         std::string localDeviceId, std::string targetDeviceId);
     int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm);
-    void DeleteAclForAccountLogOut(const std::string &localUdid, int32_t userId, const std::string &remoteUdid);
-    void DeleteAclForUserRemoved(int32_t userId);
+    bool DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
+        const std::string &peerUdid, int32_t peerUserId);
+    void DeleteAclForUserRemoved(std::string localUdid, int32_t userId);
     DmOfflineParam DeleteAccessControlList(const std::string &pkgName, const std::string &localDeviceId,
         const std::string &remoteDeviceId, int32_t bindLevel);
-    std::vector<std::string> GetPkgNameFromAcl(std::string &localDeviceId, std::string &targetDeviceId);
+    std::vector<OHOS::DistributedHardware::ProcessInfo> GetProcessInfoFromAclByUserId(const std::string &localDeviceId,
+        const std::string &targetDeviceId, int32_t userId);
     bool CheckIdenticalAccount(int32_t userId, const std::string &accountId);
     bool CheckSrcDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
     bool CheckSinkDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
@@ -127,15 +131,30 @@ public:
     void DeleteAccessControlList(const std::string &udid);
     int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId);
-    std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId,
+    std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds, const std::string &localUdid);
+    std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId,
         const std::string &localUdid);
     int32_t HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid, const std::string &localUdid);
     int32_t HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, const std::string &localUdid);
-    std::string HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId,
-        const std::string &localUdid);
+    OHOS::DistributedHardware::ProcessInfo HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+        int32_t tokenId, const std::string &localUdid);
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAccessControlProfile();
     void DeleteAccessControlById(int64_t accessControlId);
+    int32_t HandleUserSwitched(const std::string &localUdid, int32_t currentUserId, int32_t beforeUserId);
+    void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
+        const std::vector<int32_t> &localUserIds, std::string &localUdid);
+    std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
+        const std::string &remoteUdid, const std::vector<int32_t> &remoteUserIds);
+    std::map<int32_t, int32_t> GetUserIdAndBindLevel(const std::string &localUdid, const std::string &peerUdid);
+    void UpdateACL(std::string &localUdid, const std::vector<int32_t> &localUserIds,
+        const std::string &remoteUdid, const std::vector<int32_t> &remoteFrontUserIds,
+        const std::vector<int32_t> &remoteBackUserIds);
+    std::multimap<std::string, int32_t> GetDevIdAndUserIdByActHash(const std::string &localUdid,
+        const std::string &peerUdid, int32_t peerUserId, const std::string &peerAccountHash);
+    std::multimap<std::string, int32_t> GetDeviceIdAndUserId(const std::string &localUdid, int32_t localUserId);
+    void HandleSyncBackgroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
+        const std::vector<int32_t> &localUserIds, std::string &localUdid);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
@@ -158,7 +177,14 @@ private:
     void DeleteServiceBindLevel(DmOfflineParam &offlineParam, const std::string &pkgName,
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid,
         const std::string &remoteUdid);
-    void UpdateBindType(const std::string &udid, int32_t bindType, std::map<std::string, int32_t> &deviceMap);
+    void UpdateBindType(const std::string &udid, int32_t compareParam, std::map<std::string, int32_t> &deviceMap);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByUserId(const std::string &localUdid,
+        int32_t userId, const std::string &remoteUdid);
+    void DeleteSigTrustACL(DistributedDeviceProfile::AccessControlProfile profile, const std::string &remoteUdid,
+        const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds);
+    void UpdatePeerUserId(DistributedDeviceProfile::AccessControlProfile profile, std::string &localUdid,
+        const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
+        const std::vector<int32_t> &remoteFrontUserIds);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

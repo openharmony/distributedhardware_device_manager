@@ -42,7 +42,7 @@ public:
     void UnRegisterUiStateCallback(const std::string pkgName);
     void UpdateUiState(const DmUiStateMsg msg);
 private:
-    std::set<std::string> pkgSet_;
+    std::set<ProcessInfo> pkgSet_;
     std::mutex pkgSetMutex_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
 };

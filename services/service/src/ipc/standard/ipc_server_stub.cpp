@@ -33,8 +33,10 @@
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"
+#include "permission_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -213,31 +215,30 @@ ServiceRunningState IpcServerStub::QueryServiceState() const
     return state_;
 }
 
-int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<IpcRemoteBroker> listener)
+int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener)
 {
-    if (pkgName.empty() || listener == nullptr) {
+    if (processInfo.pkgName.empty() || listener == nullptr) {
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
         return ERR_DM_POINT_NULL;
     }
 
-    LOGI("Register device manager listener for package name: %{public}s", pkgName.c_str());
+    LOGI("Register device manager listener for package name: %{public}s", processInfo.pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
-    auto iter = dmListener_.find(pkgName);
+    auto iter = dmListener_.find(processInfo);
     if (iter != dmListener_.end()) {
         LOGI("Listener already exists");
-        auto recipientIter = appRecipient_.find(pkgName);
+        auto recipientIter = appRecipient_.find(processInfo);
         if (recipientIter == appRecipient_.end()) {
             LOGI("AppRecipient not exists");
-            dmListener_.erase(pkgName);
+            dmListener_.erase(processInfo);
         } else {
             auto listener = iter->second;
             auto appRecipient = recipientIter->second;
             listener->AsObject()->RemoveDeathRecipient(appRecipient);
-            appRecipient_.erase(pkgName);
-            dmListener_.erase(pkgName);
+            appRecipient_.erase(processInfo);
+            dmListener_.erase(processInfo);
         }
     }
-
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
@@ -246,90 +247,77 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(std::string &pkgName, sptr<
         LOGE("dmListener_ or appRecipient_ size exceed the limit!");
         return ERR_DM_FAILED;
     }
-    dmListener_[pkgName] = listener;
-    appRecipient_[pkgName] = appRecipient;
-    LOGD("Register listener complete.");
+    dmListener_[processInfo] = listener;
+    appRecipient_[processInfo] = appRecipient;
+    AddSystemSA(processInfo.pkgName);
+    LOGI("Register listener complete.");
     return DM_OK;
 }
 
-int32_t IpcServerStub::UnRegisterDeviceManagerListener(std::string &pkgName)
+int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &processInfo)
 {
-    if (pkgName.empty()) {
+    if (processInfo.pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("IpcServerStub::UnRegisterDeviceManagerListener In, pkgName: %{public}s", pkgName.c_str());
+    LOGI("IpcServerStub::UnRegisterDeviceManagerListener In, pkgName: %{public}s", processInfo.pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
-    auto listenerIter = dmListener_.find(pkgName);
+    auto listenerIter = dmListener_.find(processInfo);
     if (listenerIter == dmListener_.end()) {
         LOGI("Listener not exists");
         return DM_OK;
     }
-    auto recipientIter = appRecipient_.find(pkgName);
+    auto recipientIter = appRecipient_.find(processInfo);
     if (recipientIter == appRecipient_.end()) {
         LOGI("AppRecipient not exists");
-        dmListener_.erase(pkgName);
+        dmListener_.erase(processInfo);
         return DM_OK;
     }
     auto listener = listenerIter->second;
     auto appRecipient = recipientIter->second;
     listener->AsObject()->RemoveDeathRecipient(appRecipient);
-    appRecipient_.erase(pkgName);
-    dmListener_.erase(pkgName);
+    appRecipient_.erase(processInfo);
+    dmListener_.erase(processInfo);
+    RemoveSystemSA(processInfo.pkgName);
+    DeviceManagerService::GetInstance().RemoveNotifyRecord(processInfo);
     return DM_OK;
 }
 
-int32_t IpcServerStub::SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
+std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
 {
+    std::vector<ProcessInfo> processInfoVec;
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     for (const auto &iter : dmListener_) {
-        auto pkgName = iter.first;
-        auto listener = iter.second;
-        req->SetPkgName(pkgName);
-        if (listener == nullptr) {
-            LOGE("IpcServerStub::SendALL, listener is nullptr, pkgName : %{public}s.", pkgName.c_str());
-            continue;
-        }
-        listener->SendCmd(cmdCode, req, rsp);
+        processInfoVec.push_back(iter.first);
     }
-    return DM_OK;
+    return processInfoVec;
 }
 
-std::vector<std::string> IpcServerStub::GetAllPkgName()
+const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo) const
 {
-    std::vector<std::string> PkgNameVec;
-    std::lock_guard<std::mutex> autoLock(listenerLock_);
-    for (const auto &iter : dmListener_) {
-        PkgNameVec.push_back(iter.first);
-    }
-    return PkgNameVec;
-}
-
-const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(std::string pkgName) const
-{
-    if (pkgName.empty()) {
+    if (processInfo.pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return nullptr;
     }
     std::lock_guard<std::mutex> autoLock(listenerLock_);
-    auto iter = dmListener_.find(pkgName);
+    auto iter = dmListener_.find(processInfo);
     if (iter == dmListener_.end()) {
         return nullptr;
     }
     return iter->second;
 }
 
-const std::string IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const
+const ProcessInfo IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const
 {
-    std::string pkgName = "";
+    ProcessInfo processInfo;
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     for (const auto &iter : dmListener_) {
         if ((iter.second)->AsObject() == remote.promote()) {
-            pkgName = iter.first;
+            processInfo = iter.first;
             break;
         }
     }
-    return pkgName;
+    return processInfo;
 }
 
 int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
@@ -356,10 +344,34 @@ int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 
 void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    std::string pkgName = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
-    LOGI("AppDeathRecipient: OnRemoteDied for %{public}s", pkgName.c_str());
-    IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
-    DeviceManagerService::GetInstance().ClearDiscoveryCache(pkgName);
+    ProcessInfo processInfo = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
+    LOGI("AppDeathRecipient: OnRemoteDied for %{public}s", processInfo.pkgName.c_str());
+    IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
+    DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
+}
+
+void IpcServerStub::AddSystemSA(const std::string &pkgName)
+{
+    if (PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
+        systemSA_.insert(pkgName);
+    }
+}
+
+void IpcServerStub::RemoveSystemSA(const std::string &pkgName)
+{
+    if (PermissionManager::GetInstance().CheckSystemSA(pkgName) || systemSA_.find(pkgName) != systemSA_.end()) {
+        systemSA_.erase(pkgName);
+    }
+}
+
+std::set<std::string> IpcServerStub::GetSystemSA()
+{
+    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    std::set<std::string> systemSA;
+    for (const auto &item : systemSA_) {
+        systemSA.insert(item);
+    }
+    return systemSA;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

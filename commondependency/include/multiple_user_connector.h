@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <vector>
 namespace OHOS {
 namespace DistributedHardware {
 typedef struct DMAccountInfo {
@@ -51,11 +52,19 @@ public:
 
     /**
      * @tc.name: MultipleUserConnector::GetOhosAccountId
-     * @tc.desc: Get Current AccountId of the Multiple User Connector
+     * @tc.desc: Get Current AccountId of current user
      * @tc.type: FUNC
      */
     static std::string GetOhosAccountId(void);
- 
+
+    /**
+     * @brief Get the Ohos Account Id By Userid
+     *
+     * @param userId the user id in which account login
+     * @return std::string the account id
+     */
+    static std::string GetOhosAccountIdByUserId(int32_t userId);
+
     /**
      * @tc.name: MultipleUserConnector::SetSwitchOldAccountId
      * @tc.desc: Set Switch Old UserId of the Multiple User Connector
@@ -94,6 +103,13 @@ public:
     static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
     static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
     static void DeleteAccountInfoByUserId(int32_t userId);
+    static void GetTokenIdAndForegroundUserId(uint32_t &tokenId, int32_t &userId);
+    static void GetCallerUserId(int32_t &userId);
+    static int32_t GetForegroundUserIds(std::vector<int32_t> &userVec);
+    static int32_t GetFirstForegroundUserId(void);
+    static int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec);
+    static int32_t GetAllUserIds(std::vector<int32_t> &userIdVec);
+
 private:
     static int32_t oldUserId_;
     static std::string accountId_;

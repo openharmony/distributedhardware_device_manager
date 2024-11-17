@@ -49,11 +49,11 @@ std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> SoftbusConnect
 std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> SoftbusConnector::publishCallbackMap_ = {};
 std::queue<std::string> SoftbusConnector::discoveryDeviceIdQueue_ = {};
 std::unordered_map<std::string, std::string> SoftbusConnector::deviceUdidMap_ = {};
-std::vector<std::string> SoftbusConnector::pkgNameVec_ = {};
+std::vector<ProcessInfo> SoftbusConnector::processInfoVec_ = {};
 std::mutex SoftbusConnector::discoveryCallbackMutex_;
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
 std::mutex SoftbusConnector::deviceUdidLocks_;
-std::mutex SoftbusConnector::pkgNameVecMutex_;
+std::mutex SoftbusConnector::processInfoVecMutex_;
 
 IPublishCb SoftbusConnector::softbusPublishCallback_ = {
     .OnPublishResult = SoftbusConnector::OnSoftbusPublishResult,
@@ -675,32 +675,32 @@ std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId
     return "";
 }
 
-void SoftbusConnector::SetPkgName(std::string pkgName)
+void SoftbusConnector::SetProcessInfo(ProcessInfo processInfo)
 {
-    LOGI("SoftbusConnector::SetPkgName");
-    std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
-    pkgNameVec_.push_back(pkgName);
+    LOGI("SoftbusConnector::SetProcessInfo");
+    std::lock_guard<std::mutex> lock(processInfoVecMutex_);
+    processInfoVec_.push_back(processInfo);
 }
 
-void SoftbusConnector::SetPkgNameVec(std::vector<std::string> pkgNameVec)
+void SoftbusConnector::SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec)
 {
-    LOGI("SoftbusConnector::SetPkgNameVec");
-    std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
-    pkgNameVec_ = pkgNameVec;
+    LOGI("SoftbusConnector::SetProcessInfoVec");
+    std::lock_guard<std::mutex> lock(processInfoVecMutex_);
+    processInfoVec_ = processInfoVec;
 }
 
-std::vector<std::string> SoftbusConnector::GetPkgName()
+std::vector<ProcessInfo> SoftbusConnector::GetProcessInfo()
 {
     LOGI("In");
-    std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
-    return pkgNameVec_;
+    std::lock_guard<std::mutex> lock(processInfoVecMutex_);
+    return processInfoVec_;
 }
 
-void SoftbusConnector::ClearPkgName()
+void SoftbusConnector::ClearProcessInfo()
 {
     LOGI("In");
-    std::lock_guard<std::mutex> lock(pkgNameVecMutex_);
-    pkgNameVec_.clear();
+    std::lock_guard<std::mutex> lock(processInfoVecMutex_);
+    processInfoVec_.clear();
 }
 
 void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm)

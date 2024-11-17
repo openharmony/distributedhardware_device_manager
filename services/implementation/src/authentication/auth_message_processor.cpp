@@ -42,7 +42,7 @@ AuthMessageProcessor::~AuthMessageProcessor()
 
 void AuthMessageProcessor::GetJsonObj(nlohmann::json &jsonObj)
 {
-    if (authResponseContext_->bindType.size() > MAX_BINDTYPE_SIZE) {
+    if (authResponseContext_ == nullptr || authResponseContext_->bindType.size() > MAX_BINDTYPE_SIZE) {
         LOGE("GetJsonObj invalid bindType size.");
         return;
     }
@@ -176,6 +176,7 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_AUTHED] = authResponseContext_->authed;
     json[TAG_DMVERSION] = authResponseContext_->dmVersion;
     json[TAG_HOST] = authResponseContext_->hostPkgName;
+    json[TAG_BUNDLE_NAME] = authResponseContext_->bundleName;
     json[TAG_TOKENID] = authResponseContext_->tokenId;
     json[TAG_IDENTICAL_ACCOUNT] = authResponseContext_->isIdenticalAccount;
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
@@ -201,6 +202,7 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
 
     json[TAG_LOCAL_ACCOUNTID] = authResponseContext_->localAccountId;
     json[TAG_LOCAL_USERID] = authResponseContext_->localUserId;
+    json[TAG_TOKENID] = authResponseContext_->tokenId;
     json[TAG_ISONLINE] = authResponseContext_->isOnline;
     json[TAG_AUTHED] = authResponseContext_->authed;
     json[TAG_DMVERSION] = authResponseContext_->dmVersion;
@@ -462,7 +464,7 @@ void AuthMessageProcessor::ParsePkgNegotiateMessage(const nlohmann::json &json)
         authResponseContext_->authed = json[TAG_AUTHED].get<bool>();
     }
     if (IsInt64(json, TAG_TOKENID)) {
-        authResponseContext_->tokenId = json[TAG_TOKENID].get<int64_t>();
+        authResponseContext_->remoteTokenId = json[TAG_TOKENID].get<int64_t>();
     }
     if (IsString(json, TAG_DMVERSION)) {
         authResponseContext_->dmVersion = json[TAG_DMVERSION].get<std::string>();
@@ -524,6 +526,9 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
     }
     if (IsString(json, TAG_EDITION)) {
         authResponseContext_->edition = json[TAG_EDITION].get<std::string>();
+    }
+    if (IsString(json, TAG_BUNDLE_NAME)) {
+        authResponseContext_->bundleName = json[TAG_BUNDLE_NAME].get<std::string>();
     }
     ParsePkgNegotiateMessage(json);
 }

@@ -49,12 +49,44 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfil
     return profiles;
 }
 
+std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(const std::string &deviceId,
+    int32_t userId)
+{
+    std::vector<AccessControlProfile> profiles;
+    std::vector<AccessControlProfile> aclProfileVec;
+    std::map<std::string, std::string> queryParams;
+    queryParams[USERID] = std::to_string(userId);
+    if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
+        LOGE("DP GetAccessControlProfile failed.");
+        return profiles;
+    }
+    for (auto &item : profiles) {
+        if ((item.GetAccesser().GetAccesserDeviceId() == deviceId &&
+             item.GetAccesser().GetAccesserUserId() == userId) ||
+            (item.GetAccessee().GetAccesseeDeviceId() == deviceId &&
+             item.GetAccessee().GetAccesseeUserId() == userId)) {
+            aclProfileVec.push_back(item);
+        }
+    }
+    return aclProfileVec;
+}
+
 std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
     const std::string &deviceId)
 {
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    std::unordered_map<std::string, DmAuthForm> deviceIdMap;
+    int32_t userId = MultipleUserConnector::GetFirstForegroundUserId();
+    std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(deviceId, userId);
+    std::vector<AccessControlProfile> profilesFilter = {};
     for (auto &item : profiles) {
+        if ((item.GetAccesser().GetAccesserUserId() == userId &&
+             item.GetAccesser().GetAccesserDeviceId() == deviceId) ||
+            (item.GetAccessee().GetAccesseeUserId() == userId &&
+             item.GetAccessee().GetAccesseeDeviceId() == deviceId)) {
+            profilesFilter.push_back(item);
+        }
+    }
+    std::unordered_map<std::string, DmAuthForm> deviceIdMap;
+    for (auto &item : profilesFilter) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         if (trustDeviceId == deviceId || item.GetStatus() != ACTIVE) {
             continue;
@@ -87,18 +119,19 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustD
 
 int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm)
 {
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    if (profiles.size() == 0) {
-        return DM_OK;
-    }
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(discoveryInfo.userId);
     std::vector<int32_t> bindTypes;
     for (auto &item : profiles) {
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         if (Crypto::GetUdidHash(item.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(deviceIdHash)) != DM_OK) {
             LOGE("get deviceIdHash by deviceId: %{public}s failed.", GetAnonyString(deviceIdHash).c_str());
-            return ERR_DM_FAILED;
+            continue;
         }
-        if (static_cast<std::string>(deviceIdHash) != discoveryInfo.remoteDeviceIdHash || item.GetStatus() != ACTIVE) {
+        if (static_cast<std::string>(deviceIdHash) != discoveryInfo.remoteDeviceIdHash ||
+            (discoveryInfo.localDeviceId == item.GetAccesser().GetAccesserDeviceId() &&
+            discoveryInfo.userId != item.GetAccesser().GetAccesserUserId()) ||
+            (discoveryInfo.localDeviceId == item.GetAccessee().GetAccesseeDeviceId() &&
+            discoveryInfo.userId != item.GetAccessee().GetAccesseeUserId())) {
             continue;
         }
         int32_t bindType = HandleDmAuthForm(item, discoveryInfo);
@@ -162,17 +195,17 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
     return DmAuthForm::INVALID_TYPE;
 }
 
-uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::string requestDeviceId)
+uint32_t DeviceProfileConnector::CheckBindType(std::string peerUdid, std::string localUdid)
 {
-    LOGI("Start.");
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
+    std::vector<AccessControlProfile> filterProfiles = GetAclProfileByUserId(localUdid,
+        MultipleUserConnector::GetFirstForegroundUserId(), peerUdid);
+    LOGI("filterProfiles size is %{public}zu", filterProfiles.size());
     uint32_t highestPriority = INVALIED_TYPE;
-    for (auto &item : profiles) {
-        if (trustDeviceId != item.GetTrustDeviceId() || item.GetStatus() != ACTIVE) {
+    for (auto &item : filterProfiles) {
+        if (peerUdid != item.GetTrustDeviceId()) {
             continue;
         }
-        uint32_t priority = static_cast<uint32_t>(GetAuthForm(item, trustDeviceId, requestDeviceId));
+        uint32_t priority = static_cast<uint32_t>(GetAuthForm(item, peerUdid, localUdid));
         if (priority > highestPriority) {
             highestPriority = priority;
         }
@@ -194,22 +227,16 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
         case DM_POINT_TO_POINT:
             if (profiles.GetBindLevel() == DEVICE) {
                 priority = DEVICE_PEER_TO_PEER_TYPE;
-            } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
-                profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
+            } else if (profiles.GetBindLevel() == APP) {
                 priority = APP_PEER_TO_PEER_TYPE;
-            } else if (profiles.GetBindLevel() == APP && profiles.GetAccessee().GetAccesseeDeviceId() == reqDev &&
-                profiles.GetAccesser().GetAccesserDeviceId() == trustDev) {
+            } else if (profiles.GetBindLevel() == APP) {
                 priority = APP_PEER_TO_PEER_TYPE;
             }
             break;
         case DM_ACROSS_ACCOUNT:
             if (profiles.GetBindLevel() == DEVICE) {
                 priority = DEVICE_ACROSS_ACCOUNT_TYPE;
-            } else if (profiles.GetBindLevel() == APP && profiles.GetAccesser().GetAccesserDeviceId() == reqDev &&
-                profiles.GetAccessee().GetAccesseeDeviceId() == trustDev) {
-                priority = APP_ACROSS_ACCOUNT_TYPE;
-            } else if (profiles.GetBindLevel() == APP && profiles.GetAccessee().GetAccesseeDeviceId() == reqDev &&
-                profiles.GetAccesser().GetAccesserDeviceId() == trustDev) {
+            } else if (profiles.GetBindLevel() == APP) {
                 priority = APP_ACROSS_ACCOUNT_TYPE;
             }
             break;
@@ -224,7 +251,8 @@ std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pk
     std::string trustUdid)
 {
     LOGI("Start.");
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    std::vector<AccessControlProfile> profiles =
+        GetAccessControlProfileByUserId(MultipleUserConnector::GetFirstForegroundUserId());
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     std::vector<int32_t> bindTypeVec;
     for (auto &item : profiles) {
@@ -339,7 +367,8 @@ void DeviceProfileConnector::ProcessBindType(AccessControlProfile profiles, DmDi
 std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
     std::string localDeviceId, std::string targetDeviceId)
 {
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    std::vector<AccessControlProfile> profiles =
+        GetAccessControlProfileByUserId(MultipleUserConnector::GetFirstForegroundUserId());
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     std::vector<int32_t> sinkBindType;
     std::vector<int32_t> bindType;
@@ -361,61 +390,34 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
     return bindType;
 }
 
-std::vector<std::string> DeviceProfileConnector::GetPkgNameFromAcl(std::string &localDeviceId,
-    std::string &targetDeviceId)
+std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConnector::GetProcessInfoFromAclByUserId(
+    const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId)
 {
-    LOGI("Start.");
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
-    std::vector<std::string> pkgNameVec;
-    for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() != targetDeviceId || item.GetStatus() != ACTIVE) {
+    std::vector<AccessControlProfile> filterProfiles = GetAclProfileByUserId(localDeviceId,
+        userId, targetDeviceId);
+    LOGI("filterProfiles size is %{public}zu", filterProfiles.size());
+    std::vector<OHOS::DistributedHardware::ProcessInfo> processInfoVec;
+    for (auto &item : filterProfiles) {
+        if (item.GetTrustDeviceId() != targetDeviceId) {
             continue;
         }
-        if ((item.GetAccesser().GetAccesserDeviceId() == localDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId() == targetDeviceId) ||
-            (item.GetAccesser().GetAccesserDeviceId() == targetDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId() == localDeviceId)) {
-            pkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
-        }
-    }
-    return pkgNameVec;
-}
-
-DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId)
-{
-    LOGI("TrustDeviceId = %{public}s and requestDeviceId = %{public}s",
-         GetAnonyString(trustDeviceId).c_str(), GetAnonyString(requestDeviceId).c_str());
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    LOGI("AccessControlProfile size is %{public}zu", profiles.size());
-    DmOfflineParam offlineParam;
-    offlineParam.leftAclNumber = 0;
-    offlineParam.bindType = INVALIED_TYPE;
-    for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() != trustDeviceId || item.GetStatus() != ACTIVE) {
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        OHOS::DistributedHardware::ProcessInfo processInfo;
+        if (accesserUdid == localDeviceId) {
+            processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
+            processInfo.userId = item.GetAccesser().GetAccesserUserId();
+            processInfoVec.push_back(processInfo);
             continue;
         }
-        offlineParam.leftAclNumber++;
-        uint32_t priority = INVALIED_TYPE;
-        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-            priority = IDENTICAL_ACCOUNT_TYPE;
-        } else if (item.GetBindLevel() == DEVICE && item.GetAuthenticationType() == ALLOW_AUTH_ALWAYS) {
-            priority = DEVICE_PEER_TO_PEER_TYPE;
-        } else if (item.GetBindLevel() == DEVICE && item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
-            priority = DEVICE_PEER_TO_PEER_TYPE;
-            offlineParam.pkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
-        } else if ((item.GetAccesser().GetAccesserDeviceId() == requestDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId() == trustDeviceId) ||
-            (item.GetAccesser().GetAccesserDeviceId() == trustDeviceId &&
-            item.GetAccessee().GetAccesseeDeviceId() == requestDeviceId)) {
-            priority = APP_PEER_TO_PEER_TYPE;
-            offlineParam.pkgNameVec.push_back(item.GetAccesser().GetAccesserBundleName());
-        }
-        if (priority > offlineParam.bindType) {
-            offlineParam.bindType = priority;
-        }
+        if (accesseeUdid == localDeviceId) {
+            processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
+            processInfo.userId = item.GetAccessee().GetAccesseeUserId();
+            processInfoVec.push_back(processInfo);
+            continue;
+        }        
     }
-    return offlineParam;
+    return processInfoVec;
 }
 
 int32_t DeviceProfileConnector::PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee)
@@ -450,25 +452,62 @@ int32_t DeviceProfileConnector::PutAccessControlList(DmAclInfo aclInfo, DmAccess
     return ret;
 }
 
-void DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localUdid, int32_t userId,
-    const std::string &remoteUdid)
+bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
+    const std::string &peerUdid, int32_t peerUserId)
 {
-    LOGI("localUdid %{public}s, userId %{public}d, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(), userId,
-        GetAnonyString(remoteUdid).c_str());
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
+    LOGI("localUdid %{public}s, localUserId %{public}d, peerUdid %{public}s, peerUserId %{public}d.",
+        GetAnonyString(localUdid).c_str(), localUserId, GetAnonyString(peerUdid).c_str(), peerUserId);
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<AccessControlProfile> deleteProfiles;
+    bool notifyOffline = false;
+    bool isDelete = false;
     for (const auto &item : profiles) {
-        if (item.GetTrustDeviceId() == remoteUdid) {
-            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+        if (item.GetTrustDeviceId() != peerUdid) {
+            continue;
+        }
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
+        if (accesserUdid == localUdid && accesserUserId == localUserId &&
+            accesseeUdid == peerUdid && accesseeUserId == peerUserId) {
+            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+                isDelete = true;
+            }
+            deleteProfiles.push_back(item);
+            notifyOffline = (item.GetStatus() == ACTIVE);
+            continue;
+        }
+        if (accesserUdid == peerUdid && accesserUserId == peerUserId &&
+            accesseeUdid == localUdid && accesseeUserId == localUserId) {
+            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+                isDelete = true;
+            }
+            deleteProfiles.push_back(item);
+            notifyOffline = (item.GetStatus() == ACTIVE);
+            continue;
         }
     }
+    if (!isDelete) {
+        return false;
+    }
+    for (const auto &item : deleteProfiles) {
+        DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+    }
+    return notifyOffline;
 }
 
-void DeviceProfileConnector::DeleteAclForUserRemoved(int32_t userId)
+void DeviceProfileConnector::DeleteAclForUserRemoved(std::string localUdid, int32_t userId)
 {
-    LOGI("DeleteAclForUserRemoved userId %{public}d.", userId);
+    LOGI("localUdid %{public}s, userId %{public}d.", GetAnonyString(localUdid).c_str(), userId);
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
     for (const auto &item : profiles) {
-        if (item.GetAccesser().GetAccesserUserId() == userId || item.GetAccessee().GetAccesseeUserId() == userId) {
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
+        if ((accesserUdid == localUdid && accesserUserId == userId) ||
+            (accesseeUdid == localUdid && accesseeUserId == userId)) {
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         }
     }
@@ -539,6 +578,10 @@ void DeviceProfileConnector::DeleteAppBindLevel(DmOfflineParam &offlineParam, co
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
             deleteNums++;
             offlineParam.bindType = APP;
+            ProcessInfo processInfo;
+            processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
+            processInfo.userId = item.GetAccesser().GetAccesserUserId();
+            offlineParam.processVec.push_back(processInfo);
             LOGI("Src delete acl pkgName %{public}s, bindType %{public}d, localUdid %{public}s, remoteUdid %{public}s",
                 pkgName.c_str(), item.GetBindType(), GetAnonyString(localUdid).c_str(),
                 GetAnonyString(remoteUdid).c_str());
@@ -550,6 +593,10 @@ void DeviceProfileConnector::DeleteAppBindLevel(DmOfflineParam &offlineParam, co
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
             deleteNums++;
             offlineParam.bindType = APP;
+            ProcessInfo processInfo;
+            processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
+            processInfo.userId = item.GetAccessee().GetAccesseeUserId();
+            offlineParam.processVec.push_back(processInfo);
             LOGI("Sink delete acl pkgName %{public}s, bindType %{public}d, localUdid %{public}s, remoteUdid %{public}s",
                 pkgName.c_str(), item.GetBindType(), GetAnonyString(localUdid).c_str(),
                 GetAnonyString(remoteUdid).c_str());
@@ -653,24 +700,6 @@ int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::str
     return DM_OK;
 }
 
-bool DeviceProfileConnector::CheckIdenticalAccount(int32_t userId, const std::string &accountId)
-{
-    LOGI("Start");
-    std::vector<AccessControlProfile> profiles;
-    std::map<std::string, std::string> queryParams;
-    queryParams[USERID] = std::to_string(userId);
-    queryParams[ACCOUNTID] = accountId;
-    if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
-        LOGE("DP GetAccessControlProfile failed.");
-    }
-    for (auto &item : profiles) {
-        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT && item.GetStatus() == ACTIVE) {
-            return true;
-        }
-    }
-    return false;
-}
-
 bool DeviceProfileConnector::CheckSrcDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId)
 {
     LOGI("Start");
@@ -756,13 +785,48 @@ int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
     return ERR_DM_FAILED;
 }
 
+std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessControlProfile> profiles,
+    const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    std::vector<AccessControlProfile> profilesFilter;
+    for (auto &item : profiles) {
+        if (item.GetAccesser().GetAccesserUserId() == caller.userId &&
+            item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
+            item.GetAccessee().GetAccesseeDeviceId() == sinkUdid) {
+            profilesFilter.push_back(item);
+            continue;
+        }
+        if (item.GetAccesser().GetAccesserUserId() == callee.userId &&
+            item.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
+            item.GetAccessee().GetAccesseeDeviceId() == srcUdid) {
+            profilesFilter.push_back(item);
+            continue;
+        }
+        if (item.GetAccessee().GetAccesseeUserId() == caller.userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
+            item.GetAccesser().GetAccesserDeviceId() == sinkUdid) {
+            profilesFilter.push_back(item);
+            continue;
+        }
+        if (item.GetAccessee().GetAccesseeUserId() == callee.userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
+            item.GetAccesser().GetAccesserDeviceId() == srcUdid) {
+            profilesFilter.push_back(item);
+            continue;
+        }
+    }
+    return profilesFilter;
+}
+
 int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     LOGI("PkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
         caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    for (auto &item : profiles) {
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<AccessControlProfile> profilesFilter =
+        GetACLByDeviceIdAndUserId(profiles, caller, srcUdid, callee, sinkUdid);
+    for (auto &item : profilesFilter) {
         if (item.GetStatus() != ACTIVE || (item.GetTrustDeviceId() != sinkUdid &&
             item.GetTrustDeviceId() != srcUdid)) {
             continue;
@@ -772,6 +836,24 @@ int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller,
         }
     }
     return ERR_DM_FAILED;
+}
+
+bool DeviceProfileConnector::CheckIdenticalAccount(int32_t userId, const std::string &accountId)
+{
+    LOGI("Start");
+    std::vector<AccessControlProfile> profiles;
+    std::map<std::string, std::string> queryParams;
+    queryParams[USERID] = std::to_string(userId);
+    queryParams[ACCOUNTID] = accountId;
+    if (DistributedDeviceProfileClient::GetInstance().GetAccessControlProfile(queryParams, profiles) != DM_OK) {
+        LOGE("DP GetAccessControlProfile failed.");
+    }
+    for (auto &item : profiles) {
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT && item.GetStatus() == ACTIVE) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile,
@@ -813,8 +895,10 @@ int32_t DeviceProfileConnector::CheckIsSameAccount(const DmAccessCaller &caller,
 {
     LOGI("DeviceProfileConnector::CheckIsSameAccount pkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
         caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    for (auto &item : profiles) {
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<AccessControlProfile> profilesFilter
+        = GetACLByDeviceIdAndUserId(profiles, caller, srcUdid, callee, sinkUdid);
+    for (auto &item : profilesFilter) {
         if (item.GetStatus() != ACTIVE || (item.GetTrustDeviceId() != sinkUdid &&
             item.GetTrustDeviceId() != srcUdid)) {
             continue;
@@ -858,56 +942,93 @@ int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgName, const s
     return bindLevel;
 }
 
-std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindType(int32_t userId,
-    const std::string &accountId, const std::string &localUdid)
+std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
+    const std::string &localUdid)
 {
-    LOGI("userId %{public}d, accountId %{public}s.", userId, GetAnonyString(accountId).c_str());
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::map<std::string, int32_t> deviceIdMap;
     for (const auto &item : profiles) {
-        if (item.GetAccesser().GetAccesserUserId() == userId &&
-            item.GetAccesser().GetAccesserAccountId() == accountId &&
+        if (find(userIds.begin(), userIds.end(), item.GetAccesser().GetAccesserUserId()) != userIds.end() &&
             item.GetAccesser().GetAccesserDeviceId() == localUdid) {
-            LOGI("Account logout localUdid %{public}s is src.", GetAnonyString(localUdid).c_str());
-            UpdateBindType(item.GetTrustDeviceId(), item.GetBindType(), deviceIdMap);
+            LOGI("Get Device Bind type localUdid %{public}s is src.", GetAnonyString(localUdid).c_str());
+            UpdateBindType(item.GetTrustDeviceId(), item.GetBindLevel(), deviceIdMap);
             continue;
         }
-        if (item.GetAccessee().GetAccesseeUserId() == userId &&
-            item.GetAccessee().GetAccesseeAccountId() == accountId &&
+        if (find(userIds.begin(), userIds.end(), item.GetAccessee().GetAccesseeUserId()) != userIds.end() &&
             item.GetAccessee().GetAccesseeDeviceId() == localUdid) {
-            LOGI("Account logout localUdid %{public}s is sink.", GetAnonyString(localUdid).c_str());
-            UpdateBindType(item.GetTrustDeviceId(), item.GetBindType(), deviceIdMap);
+            LOGI("Get Device Bind type localUdid %{public}s is sink.", GetAnonyString(localUdid).c_str());
+            UpdateBindType(item.GetTrustDeviceId(), item.GetBindLevel(), deviceIdMap);
             continue;
         }
     }
     return deviceIdMap;
 }
 
-void DeviceProfileConnector::UpdateBindType(const std::string &udid, int32_t bindType,
+std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(int32_t userId,
+    const std::string &accountId, const std::string &localUdid)
+{
+    LOGI("localUdid %{public}s, userId %{public}d, accountId %{public}s.", GetAnonyString(localUdid).c_str(),
+        userId, GetAnonyString(accountId).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::multimap<std::string, int32_t> deviceIdMap;
+    for (const auto &item : profiles) {
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
+        if (accesserUdid == localUdid && accesserUserId == userId && item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            LOGI("Account logout trust udid %{public}s userid %{public}d is src.",
+                GetAnonyString(accesseeUdid).c_str(), accesseeUserId);
+            deviceIdMap.insert(std::pair<std::string, int32_t>(accesseeUdid, accesseeUserId));
+            continue;
+        }
+        if (accesseeUdid == localUdid && accesseeUserId == userId && item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            LOGI("Account logout trust udid %{public}s userid %{public}d is sink.",
+                GetAnonyString(accesserUdid).c_str(), accesserUserId);
+            deviceIdMap.insert(std::pair<std::string, int32_t>(accesserUdid, accesserUserId));
+            continue;
+        }
+    }
+    return deviceIdMap;
+}
+
+void DeviceProfileConnector::UpdateBindType(const std::string &udid, int32_t compareParam,
     std::map<std::string, int32_t> &deviceMap)
 {
-    LOGI("BindType %{public}d.", bindType);
+    LOGI("BindType %{public}d.", compareParam);
     if (deviceMap.find(udid) == deviceMap.end()) {
-        deviceMap[udid] = bindType;
+        deviceMap[udid] = compareParam;
     } else {
-        deviceMap[udid] = std::min(deviceMap[udid], bindType);
+        deviceMap[udid] = std::min(deviceMap[udid], compareParam);
     }
 }
 
-int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
-    const std::string &remoteUdid, const std::string &localUdid)
+int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId,
+    const std::string &remoteAccountHash, const std::string &remoteUdid, const std::string &localUdid)
 {
     LOGI("RemoteUserId %{public}d, remoteAccountHash %{public}s, remoteUdid %{public}s, localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteAccountHash).c_str(), GetAnonyString(remoteUdid).c_str(),
         GetAnonyString(localUdid).c_str());
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(remoteUserId);
     int32_t bindType = DM_INVALIED_BINDTYPE;
     for (const auto &item : profiles) {
         if (item.GetTrustDeviceId() != remoteUdid) {
             continue;
         }
-        DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
-        bindType = DM_IDENTICAL_ACCOUNT;
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
+        if (accesserUdid == localUdid && accesseeUdid == remoteUdid && accesseeUserId == remoteUserId) {
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+            bindType = DM_IDENTICAL_ACCOUNT;
+            continue;
+        }
+        if (accesseeUdid == localUdid && accesserUdid == remoteUdid && accesserUserId == remoteUserId) {
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+            bindType = DM_IDENTICAL_ACCOUNT;
+            continue;
+        }
     }
     return bindType;
 }
@@ -945,13 +1066,13 @@ int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const
     return bindType;
 }
 
-std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-    int32_t tokenId, const std::string &localUdid)
+OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
+    const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
 {
     LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}d, localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteUdid).c_str(), tokenId, GetAnonyString(localUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    std::string pkgName = "";
+    ProcessInfo processInfo;
     for (const auto &item : profiles) {
         if (item.GetTrustDeviceId() != remoteUdid || item.GetBindType() == DM_IDENTICAL_ACCOUNT ||
             item.GetBindLevel() != APP) {
@@ -963,7 +1084,8 @@ std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, c
             item.GetAccessee().GetAccesseeDeviceId() == localUdid) {
             LOGI("Src device unbind.");
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
-            pkgName = item.GetAccesser().GetAccesserBundleName();
+            processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
+            processInfo.userId = item.GetAccessee().GetAccesseeUserId();
             continue;
         }
         if (item.GetAccessee().GetAccesseeUserId() == remoteUserId &&
@@ -972,11 +1094,12 @@ std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, c
             item.GetAccesser().GetAccesserDeviceId() == localUdid) {
             LOGI("Sink device unbind.");
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
-            pkgName = item.GetAccessee().GetAccesseeBundleName();
+            processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
+            processInfo.userId = item.GetAccesser().GetAccesserUserId();
             continue;
         }
     }
-    return pkgName;
+    return processInfo;
 }
 
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
@@ -991,6 +1114,305 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlPro
 void DeviceProfileConnector::DeleteAccessControlById(int64_t accessControlId)
 {
     DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(accessControlId);
+}
+
+int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid, int32_t currentUserId,
+    int32_t beforeUserId)
+{
+    LOGI("Start.");
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    for (auto &item : profiles) {
+        if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == beforeUserId && item.GetStatus() == ACTIVE) ||
+            (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == beforeUserId && item.GetStatus() == ACTIVE)) {
+            item.SetStatus(INACTIVE);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+            continue;
+        }
+        if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == currentUserId && item.GetStatus() == INACTIVE) || (
+            item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == currentUserId && item.GetStatus() == INACTIVE)) {
+            item.SetStatus(ACTIVE);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+            continue;
+        }
+    }
+    return DM_OK;
+}
+
+std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByUserId(const std::string &localUdid,
+    int32_t userId, const std::string &remoteUdid)
+{
+    LOGI("localUdid %{public}s, localUserId %{public}d, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(),
+        userId, GetAnonyString(remoteUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<AccessControlProfile> profilesTemp;
+    for (const auto &item : profiles) {
+        if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == remoteUdid) {
+            profilesTemp.push_back(item);
+        } else if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == userId &&
+            item.GetAccesser().GetAccesserDeviceId() == remoteUdid) {
+            profilesTemp.push_back(item);
+        }
+    }
+    return profilesTemp;
+}
+
+void DeviceProfileConnector::HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
+    const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid)
+{
+    LOGI("localUdid %{public}s, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(),
+        GetAnonyString(remoteUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    for (auto &item : profiles) {
+        if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeDeviceId() == remoteUdid &&
+            find(localUserIds.begin(), localUserIds.end(),
+                item.GetAccesser().GetAccesserUserId()) != localUserIds.end() &&
+            find(remoteUserIds.begin(), remoteUserIds.end(),
+                item.GetAccessee().GetAccesseeUserId()) != remoteUserIds.end() && item.GetStatus() == INACTIVE) {
+            item.SetStatus(ACTIVE);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        } else if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
+            find(localUserIds.begin(), localUserIds.end(),
+                item.GetAccessee().GetAccesseeUserId()) != localUserIds.end() &&
+            find(remoteUserIds.begin(), remoteUserIds.end(),
+                item.GetAccesser().GetAccesserUserId()) != remoteUserIds.end() && item.GetStatus() == INACTIVE) {
+            item.SetStatus(ACTIVE);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        }
+    }
+}
+
+std::vector<ProcessInfo> DeviceProfileConnector::GetOfflineProcessInfo(std::string &localUdid,
+    const std::vector<int32_t> &localUserIds, const std::string &remoteUdid, const std::vector<int32_t> &remoteUserIds)
+{
+    LOGI("localUdid %{public}s, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(),
+        GetAnonyString(remoteUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<ProcessInfo> processInfos;
+    int32_t bindLevel = 100;
+    for (const auto &item : profiles) {
+        ProcessInfo processInfo;
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
+        if (accesserUdid == localUdid && accesseeUdid == remoteUdid &&
+            find(localUserIds.begin(), localUserIds.end(), accesserUserId) != localUserIds.end() &&
+            find(remoteUserIds.begin(), remoteUserIds.end(), accesseeUserId) != remoteUserIds.end() &&
+            item.GetStatus() == ACTIVE) {
+            processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
+            processInfo.userId = item.GetAccesser().GetAccesserUserId();
+            bindLevel = std::min(bindLevel, static_cast<int32_t>(item.GetBindLevel()));
+            processInfos.push_back(processInfo);
+        } else if (accesseeUdid == localUdid && accesserUdid == remoteUdid &&
+            find(localUserIds.begin(), localUserIds.end(), accesseeUserId) != localUserIds.end() &&
+            find(remoteUserIds.begin(), remoteUserIds.end(), accesserUserId) != remoteUserIds.end() &&
+            item.GetStatus() == ACTIVE) {
+            processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
+            processInfo.userId = item.GetAccessee().GetAccesseeUserId();
+            bindLevel = std::min(bindLevel, static_cast<int32_t>(item.GetBindLevel()));
+            processInfos.push_back(processInfo);
+        }
+    }
+    if (bindLevel == INVALIED_TYPE || bindLevel == DEVICE) {
+        processInfos.clear();
+        for (const auto &item : localUserIds) {
+            ProcessInfo processInfo;
+            processInfo.pkgName = std::string(DM_PKG_NAME);
+            processInfo.userId = item;
+            processInfos.push_back(processInfo);
+        }
+    }
+    return processInfos;
+}
+
+std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const std::string &localUdid,
+    const std::string &peerUdid)
+{
+    LOGI("localUdid %{public}s, peerUdid %{public}s.", GetAnonyString(localUdid).c_str(),
+        GetAnonyString(peerUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::map<int32_t, int32_t> userIdAndBindLevel;
+    for (const auto &item : profiles) {
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserid = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserid = item.GetAccessee().GetAccesseeUserId();
+        if (accesserUdid == localUdid && accesseeUdid == peerUdid) {
+            if (userIdAndBindLevel.find(accesserUserid) == userIdAndBindLevel.end()) {
+                userIdAndBindLevel[accesserUserid] = item.GetBindLevel();
+            } else {
+                userIdAndBindLevel[accesserUserid] =
+                    std::min(static_cast<int32_t>(item.GetBindLevel()), userIdAndBindLevel[accesserUserid]);
+            }
+        } else if (accesseeUdid == localUdid && accesserUdid == peerUdid) {
+            if (userIdAndBindLevel.find(accesseeUserid) == userIdAndBindLevel.end()) {
+                userIdAndBindLevel[accesseeUserid] = item.GetBindLevel();
+            } else {
+                userIdAndBindLevel[accesseeUserid] =
+                    std::min(static_cast<int32_t>(item.GetBindLevel()), userIdAndBindLevel[accesseeUserid]);
+            }
+        }
+    }
+    return userIdAndBindLevel;
+}
+
+void DeviceProfileConnector::UpdateACL(std::string &localUdid, const std::vector<int32_t> &localUserIds,
+    const std::string &remoteUdid, const std::vector<int32_t> &remoteFrontUserIds,
+    const std::vector<int32_t> &remoteBackUserIds)
+{
+    LOGI("localUdid %{public}s, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(),
+        GetAnonyString(remoteUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    for (auto item : profiles) {
+        // deleta signal trust acl.
+        DeleteSigTrustACL(item, remoteUdid, remoteFrontUserIds, remoteBackUserIds);
+        // update identical account userId.
+        UpdatePeerUserId(item, localUdid, localUserIds, remoteUdid, remoteFrontUserIds);
+    }
+}
+
+void DeviceProfileConnector::DeleteSigTrustACL(AccessControlProfile profile, const std::string &remoteUdid,
+    const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds)
+{
+    LOGI("start.");
+    std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+    std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+    int32_t accesserUserid = profile.GetAccesser().GetAccesserUserId();
+    int32_t accesseeUserid = profile.GetAccessee().GetAccesseeUserId();
+    if (accesserUdid == remoteUdid && accesserUserid != 0 && accesserUserid != -1 &&
+        find(remoteFrontUserIds.begin(), remoteFrontUserIds.end(), accesserUserid) == remoteFrontUserIds.end() &&
+        find(remoteBackUserIds.begin(), remoteBackUserIds.end(), accesserUserid) == remoteBackUserIds.end()) {
+        DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(profile.GetAccessControlId());
+        return;
+    }
+    if (accesseeUdid == remoteUdid && accesseeUserid != 0 && accesseeUserid != -1 &&
+        find(remoteFrontUserIds.begin(), remoteFrontUserIds.end(), accesseeUserid) == remoteFrontUserIds.end() &&
+        find(remoteBackUserIds.begin(), remoteBackUserIds.end(), accesseeUserid) == remoteBackUserIds.end()) {
+        DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(profile.GetAccessControlId());
+        return;
+    }
+}
+
+void DeviceProfileConnector::UpdatePeerUserId(AccessControlProfile profile, std::string &localUdid,
+    const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
+    const std::vector<int32_t> &remoteFrontUserIds)
+{
+    LOGI("start.");
+    std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+    std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+    int32_t accesserUserid = profile.GetAccesser().GetAccesserUserId();
+    int32_t accesseeUserid = profile.GetAccessee().GetAccesseeUserId();
+    int32_t bindType = profile.GetBindType();
+    if (accesserUdid == localUdid && accesseeUdid == remoteUdid && bindType == DM_IDENTICAL_ACCOUNT &&
+        find(localUserIds.begin(), localUserIds.end(), accesserUserid) != localUserIds.end() &&
+        (accesseeUserid == 0 || accesseeUserid == -1)) {
+        Accessee accessee = profile.GetAccessee();
+        accessee.SetAccesseeUserId(remoteFrontUserIds[0]);
+        profile.SetAccessee(accessee);
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+        return;
+    }
+}
+
+std::multimap<std::string, int32_t> DeviceProfileConnector::GetDevIdAndUserIdByActHash(const std::string &localUdid,
+    const std::string &peerUdid, int32_t peerUserId, const std::string &peerAccountHash)
+{
+    LOGI("localUdid %{public}s, peerUdid %{public}s, peerUserId %{public}d, peerAccountHash %{public}s.",
+        GetAnonyString(localUdid).c_str(), GetAnonyString(peerUdid).c_str(), peerUserId, peerAccountHash.c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::multimap<std::string, int32_t> deviceIdMap;
+    for (const auto &item : profiles) {
+        std::string accesserAccountId = item.GetAccesser().GetAccesserAccountId();
+        std::string accesseeAccountId = item.GetAccessee().GetAccesseeAccountId();
+        char accesserAccountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetAccountIdHash(accesserAccountId, reinterpret_cast<uint8_t *>(accesserAccountIdHash)) != DM_OK) {
+            LOGE("GetAccountHash failed.");
+            return deviceIdMap;
+        }
+        char accesseeAccountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetAccountIdHash(accesseeAccountId, reinterpret_cast<uint8_t *>(accesseeAccountIdHash)) != DM_OK) {
+            LOGE("GetAccountHash failed.");
+            return deviceIdMap;
+        }
+        LOGI("accesserAccountIdHash %{public}s, accesseeAccountIdHash %{public}s", accesserAccountIdHash,
+            accesseeAccountIdHash);
+        if (std::string(accesserAccountIdHash) != peerAccountHash ||
+            std::string(accesseeAccountIdHash) != peerAccountHash) {
+            continue;
+        }
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserid = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserid = item.GetAccessee().GetAccesseeUserId();
+        if (accesserUdid == localUdid && accesseeUdid == peerUdid && accesseeUserid == peerUserId) {
+            deviceIdMap.insert(std::pair<std::string, int32_t>(accesserUdid, accesserUserid));
+            continue;
+        }
+        if (accesseeUdid == localUdid && accesserUdid == peerUdid && accesserUserid == peerUserId) {
+            deviceIdMap.insert(std::pair<std::string, int32_t>(accesseeUdid, accesseeUserid));
+            continue;
+        }
+    }
+    return deviceIdMap;
+}
+
+std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(const std::string &localUdid,
+    int32_t localUserId)
+{
+    LOGI("localUdid %{public}s, userId %{public}d.", GetAnonyString(localUdid).c_str(), localUserId);
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::multimap<std::string, int32_t> deviceIdMap;
+    for (const auto &item : profiles) {
+        std::string accesserDeviceId = item.GetAccesser().GetAccesserDeviceId();
+        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
+        std::string accesseeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
+        if (accesserDeviceId == localUdid && accesserUserId == localUserId) {
+            if (!IsValueExist(deviceIdMap, accesseeDeviceId, accesseeUserId)) {
+                deviceIdMap.insert(std::pair<std::string, int32_t>(accesseeDeviceId, accesseeUserId));
+            }
+            continue;
+        }
+        if (accesseeDeviceId == localUdid && accesseeUserId == localUserId) {
+            if (!IsValueExist(deviceIdMap, accesserDeviceId, accesserUserId)) {
+                deviceIdMap.insert(std::pair<std::string, int32_t>(accesserDeviceId, accesserUserId));
+            }
+            continue;
+        }
+    }
+    return deviceIdMap;
+}
+
+void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
+    const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid)
+{
+    LOGI("localUdid %{public}s, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(),
+        GetAnonyString(remoteUdid).c_str());
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    for (auto &item : profiles) {
+        std::string accesserDeviceId = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
+        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
+        if (accesserDeviceId == localUdid && accesseeDeviceId == remoteUdid && item.GetStatus() == ACTIVE &&
+            find(remoteUserIds.begin(), remoteUserIds.end(), accesseeUserId) != remoteUserIds.end()) {
+            item.SetStatus(INACTIVE);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        } else if ((accesseeDeviceId == localUdid && accesserDeviceId == remoteUdid) && item.GetStatus() == ACTIVE &&
+            find(remoteUserIds.begin(), remoteUserIds.end(), accesserUserId) != remoteUserIds.end()) {
+            item.SetStatus(INACTIVE);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        }
+    }
 }
 
 IDeviceProfileConnector *CreateDpConnectorInstance()

@@ -30,6 +30,9 @@ public:
     void UnRegisterCallerAppId(const std::string &pkgName);
     int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
     bool IsSystemSA();
+    int32_t GetCallerName(bool isSystemSA, std::string &callerName);
+    int32_t GetNativeTokenIdByName(std::string &processName, int64_t &tokenId);
+    int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex, int64_t &tokenId);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

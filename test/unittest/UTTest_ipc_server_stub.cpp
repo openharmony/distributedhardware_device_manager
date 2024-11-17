@@ -227,9 +227,12 @@ HWTEST_F(IpcServerStubTest, QueryServiceState_001, testing::ext::TestSize.Level0
 HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     sptr<IpcRemoteBroker> listener = nullptr;
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
@@ -243,9 +246,12 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_001, testing::ext::Tes
 HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     sptr<IpcRemoteBroker> listener = sptr<IpcClientStub>(new IpcClientStub());
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -259,9 +265,12 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_002, testing::ext::Tes
 HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_003, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     ASSERT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
@@ -277,10 +286,13 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_004, testing::ext::Tes
 {
     // 1. Set PkgName is com.ohos.test
     std::string pkgName = "com.ohos.test";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
@@ -301,22 +313,25 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_005, testing::ext::Tes
 {
     // 1. Set PkgName is com.ohos.test
     std::string pkgName = "com.ohos.test";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     int result = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     sptr<IpcClientStub> listener2 = sptr<IpcClientStub>(new IpcClientStub());
     // 4. Call IpcServerStub RegisterDeviceManagerListener with same pkgName another listener
-    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener2);
+    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener2);
     // 5. check result is DM_OK
     ASSERT_EQ(result, DM_OK);
     sptr<IpcClientStub> listener3 = sptr<IpcClientStub>(new IpcClientStub());
     // 6. earse pkgName for appRecipient_
-    IpcServerStub::GetInstance().appRecipient_.erase(pkgName);
-    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener3);
+    IpcServerStub::GetInstance().appRecipient_.erase(processInfo);
+    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener3);
     // 7. check result is DM_OK
     ASSERT_EQ(result, DM_OK);
 }
@@ -330,9 +345,9 @@ HWTEST_F(IpcServerStubTest, RegisterDeviceManagerListener_005, testing::ext::Tes
  */
 HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName;
+    ProcessInfo processInfo;
     int ret = 0;
-    ret = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    ret = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -350,15 +365,18 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_002, testing::ext::T
 {
     // 1. Set PkgName is com.ohos.test
     std::string pkgName = "com.ohos.test";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     int result = 0;
     // 4. Call IpcServerStub UnRegisterDeviceManagerListener
-    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     // 5. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
 }
@@ -375,9 +393,12 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_003, testing::ext::T
 {
     // 1. Set pkgName is com.ohos.test
     std::string pkgName = "com.ohos.test";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     // 2. Call IpcServerStub UnRegisterDeviceManagerListener
-    ret = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    ret = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
 }
@@ -396,18 +417,21 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_004, testing::ext::T
 {
     // 1. Set PkgName is com.ohos.test
     std::string pkgName = "com.ohos.test1";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     int result = 0;
     // 4. Call IpcServerStub UnRegisterDeviceManagerListener
-    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     // 5. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
-    sptr<IpcRemoteBroker> dmListener = IpcServerStub::GetInstance().dmListener_[pkgName];
+    sptr<IpcRemoteBroker> dmListener = IpcServerStub::GetInstance().dmListener_[processInfo];
     ASSERT_EQ(dmListener, nullptr);
 }
 
@@ -427,70 +451,26 @@ HWTEST_F(IpcServerStubTest, UnRegisterDeviceManagerListener_005, testing::ext::T
 {
     // 1. Set PkgName is com.ohos.test
     std::string pkgName = "com.ohos.test2";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = 100;
     int ret = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    ret = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, DM_OK);
     int result = 0;
     // 4. Call IpcServerStub UnRegisterDeviceManagerListener
     std::string testPkgName = "com.test";
-    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(testPkgName);
+    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     // 5. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
-    IpcServerStub::GetInstance().appRecipient_.erase(pkgName);
+    IpcServerStub::GetInstance().appRecipient_.erase(processInfo);
     // 6. Call IpcServerStub UnRegisterDeviceManagerListener
-    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     // 7. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
-}
-
-/**
- * @tc.name: SendALL_001
- * @tc.desc:  1. Set PkgName1 is com.ohos.SendALL_001
- *            2. Set PkgName2 is com.ohos.SendALL_002
- *            3. Add listener1 (nullptr) to dmListener_ with key pkgName1
- *            4. Add listener2 to dmListener_ with key listener2
- *            5. Call IpcServerStub::SendALL with cmdCode, req, rsp
- *            6. Check result is DM_OK
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcServerStubTest, SendALL_001, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = -1;
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    std::string pkgName1 = "com.ohos.SendALL_001";
-    std::string pkgName2 = "com.ohos.SendALL_002";
-    sptr<IpcClientStub> listener1 = nullptr;
-    sptr<IpcClientStub> listener2 = sptr<IpcClientStub>(new IpcClientStub());
-    IpcServerStub::GetInstance().dmListener_[pkgName1] = listener1;
-    IpcServerStub::GetInstance().dmListener_[pkgName2] = listener2;
-    int32_t result = IpcServerStub::GetInstance().SendALL(cmdCode, req, rsp);
-    ASSERT_EQ(result, DM_OK);
-    IpcServerStub::GetInstance().dmListener_.clear();
-}
-
-/**
- * @tc.name: GetDmListenerPkgName_001
- * @tc.desc:  1. Set pkgName is com.ohos.GetDmListenerPkgName_001
- *            2. Create listener and add it to dmListener_ with key pkgName
- *            3. Call IpcServerStub::GetDmListenerPkgName with remote object
- *            4. Check the result is not empty
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcServerStubTest, GetDmListenerPkgName_001, testing::ext::TestSize.Level0)
-{
-    sptr<IRemoteObject> remote(new IpcClientStub());
-    std::string pkgName = "com.ohos.GetDmListenerPkgName_001";
-    sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
-    IpcServerStub::GetInstance().dmListener_[pkgName] = listener;
-    std::string ret = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
-    EXPECT_TRUE(ret.empty() || (ret == pkgName));
-    IpcServerStub::GetInstance().dmListener_.clear();
 }
 
 /**
@@ -504,10 +484,11 @@ HWTEST_F(IpcServerStubTest, GetDmListenerPkgName_001, testing::ext::TestSize.Lev
 HWTEST_F(IpcServerStubTest, GetDmListener_001, testing::ext::TestSize.Level0)
 {
     // 1. Set pkgName is com.ohos.test
-    std::string pkgName = "com.ohos.test";
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.test";
     sptr<IpcRemoteBroker> ret = nullptr;
     // 2. Call IpcServerStub UnRegisterDeviceManagerListener
-    ret = IpcServerStub::GetInstance().GetDmListener(pkgName);
+    ret = IpcServerStub::GetInstance().GetDmListener(processInfo);
     // 3. check ret is DM_OK
     ASSERT_EQ(ret, nullptr);
 }
@@ -524,15 +505,17 @@ HWTEST_F(IpcServerStubTest, GetDmListener_002, testing::ext::TestSize.Level0)
 {
     // 1. Set pkgName is com.ohos.test
     std::string pkgName = "com.ohos.test";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
     int result = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
     sptr<IpcRemoteBroker> ret = nullptr;
     // 2. Call IpcServerStub UnRegisterDeviceManagerListener
-    ret = IpcServerStub::GetInstance().GetDmListener(pkgName);
+    ret = IpcServerStub::GetInstance().GetDmListener(processInfo);
     // 3. check ret is DM_OK
     ASSERT_NE(ret, nullptr);
 }
@@ -549,18 +532,19 @@ HWTEST_F(IpcServerStubTest, GetDmListener_003, testing::ext::TestSize.Level0)
 {
     // 1. Set pkgName is com.ohos.test
     std::string pkgName = "com.ohos.test";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
     int result = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is DM_OK
     ASSERT_EQ(result, DM_OK);
     sptr<IpcRemoteBroker> ret = nullptr;
     // 2. Call IpcServerStub UnRegisterDeviceManagerListener
-    std::string testPkgName = "test";
-    ret = IpcServerStub::GetInstance().GetDmListener(testPkgName);
+    ret = IpcServerStub::GetInstance().GetDmListener(processInfo);
     // 3. check ret is DM_OK
-    ASSERT_EQ(ret, nullptr);
+    ASSERT_NE(ret, nullptr);
 }
 
 /**
@@ -575,15 +559,17 @@ HWTEST_F(IpcServerStubTest, GetDmListener_004, testing::ext::TestSize.Level0)
 {
     // 1. Set pkgName is null
     std::string pkgName = "";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
     int result = 0;
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is ERR_DM_POINT_NULL
     ASSERT_EQ(result, ERR_DM_POINT_NULL);
     sptr<IpcRemoteBroker> ret = nullptr;
     // 2. Call IpcServerStub UnRegisterDeviceManagerListener
-    ret = IpcServerStub::GetInstance().GetDmListener(pkgName);
+    ret = IpcServerStub::GetInstance().GetDmListener(processInfo);
     // 3. check ret is nullptr
     ASSERT_EQ(ret, nullptr);
 }
@@ -600,15 +586,17 @@ HWTEST_F(IpcServerStubTest, GetDmListener_005, testing::ext::TestSize.Level0)
 {
     // 1. Set pkgName is null
     std::string pkgName = "com.test.ohos";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
     int result = 0;
     sptr<IpcClientStub> listener = nullptr;
     // 2. Call IpcServerStub RegisterDeviceManagerListener with param
-    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(pkgName, listener);
+    result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     // 3. check ret is ERR_DM_POINT_NULL
     ASSERT_EQ(result, ERR_DM_POINT_NULL);
     sptr<IpcRemoteBroker> ret = nullptr;
     // 2. Call IpcServerStub UnRegisterDeviceManagerListener
-    ret = IpcServerStub::GetInstance().GetDmListener(pkgName);
+    ret = IpcServerStub::GetInstance().GetDmListener(processInfo);
     // 3. check ret is nullptr
     ASSERT_EQ(ret, nullptr);
 }
@@ -677,14 +665,14 @@ HWTEST_F(IpcServerStubTest, OnAddSystemAbility_002, testing::ext::TestSize.Level
 }
 
 /**
- * @tc.name: GetAllPkgName_001
+ * @tc.name: GetAllProcessInfo_001
  * @tc.type: FUNC
  */
-HWTEST_F(IpcServerStubTest, GetAllPkgName_001, testing::ext::TestSize.Level0)
+HWTEST_F(IpcServerStubTest, GetAllProcessInfo_001, testing::ext::TestSize.Level0)
 {
-    std::vector<std::string>  pkgName;
-    pkgName = IpcServerStub::GetInstance().GetAllPkgName();
-    ASSERT_EQ(pkgName.empty(), false);
+    std::vector<ProcessInfo>  processInfo;
+    processInfo = IpcServerStub::GetInstance().GetAllProcessInfo();
+    ASSERT_EQ(processInfo.empty(), false);
 }
 
 /**

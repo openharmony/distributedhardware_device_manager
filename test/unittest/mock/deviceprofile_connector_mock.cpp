@@ -32,13 +32,6 @@ int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const
         localUdid);
 }
 
-std::string DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-    int32_t tokenId, const std::string &localUdid)
-{
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId,
-        localUdid);
-}
-
 int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
     const std::string &remoteUdid, const std::string &localUdid)
 {
@@ -49,17 +42,6 @@ int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId, c
 uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::string requestDeviceId)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckBindType(trustDeviceId, requestDeviceId);
-}
-
-std::vector<std::string> DeviceProfileConnector::GetPkgNameFromAcl(std::string &localDeviceId,
-    std::string &targetDeviceId)
-{
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetPkgNameFromAcl(localDeviceId, targetDeviceId);
-}
-
-DmOfflineParam DeviceProfileConnector::GetOfflineParamFromAcl(std::string trustDeviceId, std::string requestDeviceId)
-{
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

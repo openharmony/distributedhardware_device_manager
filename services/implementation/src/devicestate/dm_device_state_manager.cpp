@@ -21,6 +21,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
+#include "dm_device_info.h"
 #include "dm_distributed_hardware_load.h"
 #include "dm_log.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -110,7 +111,7 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
         }
     }
     ProcessDeviceStateChange(DEVICE_STATE_ONLINE, devInfo);
-    softbusConnector_->ClearPkgName();
+    softbusConnector_->ClearProcessInfo();
 }
 
 void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
@@ -126,7 +127,7 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
         devInfo = stateDeviceInfos_[deviceId];
     }
     ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo);
-    softbusConnector_->ClearPkgName();
+    softbusConnector_->ClearProcessInfo();
 }
 
 void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
@@ -139,7 +140,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
             SaveOnlineDeviceInfo(devInfo);
             DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
             ProcessDeviceStateChange(devState, devInfo);
-            softbusConnector_->ClearPkgName();
+            softbusConnector_->ClearProcessInfo();
             break;
         case DEVICE_STATE_OFFLINE:
             StartOffLineTimer(devInfo);
@@ -150,12 +151,12 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
                 softbusConnector_->EraseUdidFromMap(udid);
             }
             ProcessDeviceStateChange(devState, devInfo);
-            softbusConnector_->ClearPkgName();
+            softbusConnector_->ClearProcessInfo();
             break;
         case DEVICE_INFO_CHANGED:
             ChangeDeviceInfo(devInfo);
             ProcessDeviceStateChange(devState, devInfo);
-            softbusConnector_->ClearPkgName();
+            softbusConnector_->ClearProcessInfo();
             break;
         default:
             LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
@@ -165,15 +166,11 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
 
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo)
 {
-    if (softbusConnector_ == nullptr || listener_ == nullptr) {
-        LOGE("ProcessDeviceStateChange failed, callback_ptr is null.");
-        return;
-    }
-    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-    if (pkgName.size() == 0) {
-        listener_->OnDeviceStateChange(std::string(DM_PKG_NAME), devState, devInfo);
-    } else {
-        for (auto item : pkgName) {
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(listener_);
+    std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
+    for (const auto &item : processInfoVec) {
+        if (!item.pkgName.empty()) {
             listener_->OnDeviceStateChange(item, devState, devInfo);
         }
     }
@@ -201,7 +198,10 @@ void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::stri
     }
     if (listener_ != nullptr) {
         DmDeviceState state = DEVICE_INFO_READY;
-        listener_->OnDeviceStateChange(pkgName, state, saveInfo);
+        ProcessInfo processInfo;
+        processInfo.pkgName = pkgName;
+        processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
+        listener_->OnDeviceStateChange(processInfo, state, saveInfo);
     }
 }
 
@@ -511,30 +511,14 @@ bool DmDeviceStateManager::CheckIsOnline(const std::string &udid)
 
 void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
 {
-    if (softbusConnector_ == nullptr || listener_ == nullptr) {
-        LOGE("failed, ptr is null.");
-        return;
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(listener_);
+    std::vector<ProcessInfo> processInfos = softbusConnector_->GetProcessInfo();
+    softbusConnector_->ClearProcessInfo();
+    LOGI("pkgName size: %{public}zu", processInfos.size());
+    for (const auto &item : processInfos) {
+        listener_->OnDeviceScreenStateChange(item, devInfo);
     }
-    std::vector<std::string> pkgName = softbusConnector_->GetPkgName();
-    LOGI("pkgName size: %{public}zu", pkgName.size());
-    if (pkgName.size() == 0) {
-        listener_->OnDeviceScreenStateChange(std::string(DM_PKG_NAME), devInfo);
-    } else {
-        for (auto item : pkgName) {
-            listener_->OnDeviceScreenStateChange(item, devInfo);
-        }
-    }
-    softbusConnector_->ClearPkgName();
-}
-
-void DmDeviceStateManager::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
-                                                      int32_t errcode)
-{
-    if (listener_ == nullptr) {
-        LOGE("Failed, listener_ is null.");
-        return;
-    }
-    listener_->OnCredentialAuthStatus(std::string(DM_PKG_NAME), deviceList, deviceTypeId, errcode);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

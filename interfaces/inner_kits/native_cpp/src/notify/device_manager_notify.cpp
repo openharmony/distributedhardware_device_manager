@@ -31,7 +31,7 @@ constexpr const char* DEVICEINFO_CHANGE = "deviceInfoChange";
 constexpr const char* DEVICE_READY = "deviceReady";
 constexpr const char* DEVICE_TRUST_CHANGE = "deviceTrustChange";
 #endif
-
+const uint16_t DM_INVALID_FLAG_ID = 0;
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
                                                          std::shared_ptr<DmInitCallback> dmInitCallback)
 {
@@ -521,68 +521,34 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
 void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
                                         const DmDeviceInfo &deviceInfo)
 {
+    LOGD("pkgName:%{public}s, subscribeId:%{public}d.",
+         GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-
-    std::shared_ptr<DiscoveryCallback> tempCbk;
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
-            LOGE("DeviceManagerNotify::OnDeviceFound error, device discovery callback not register for"
-                "pkgName %{public}s.", pkgName.c_str());
-            return;
-        }
-        std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
-        auto iter = discoverCallMap.find(subscribeId);
-        if (iter == discoverCallMap.end()) {
-            LOGE("OnDeviceFound error, no register deviceDiscoveryCallback for subscribeId %{public}d.",
-                (int32_t)subscribeId);
-            return;
-        }
-        tempCbk = iter->second;
-    }
+    std::shared_ptr<DiscoveryCallback> tempCbk = GetDiscoveryCallback(pkgName, subscribeId);
     if (tempCbk == nullptr) {
         LOGE("OnDeviceFound error, registered device discovery callback is nullptr.");
         return;
     }
-    LOGD("Complete with devInfo, pkgName:%{public}s, subscribeId:%{public}d.",
-         GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     tempCbk->OnDeviceFound(subscribeId, deviceInfo);
 }
 
 void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
                                         const DmDeviceBasicInfo &deviceBasicInfo)
 {
+    LOGD("pkgName:%{public}s, subscribeId:%{public}d.",
+         GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-
-    std::shared_ptr<DiscoveryCallback> tempCbk;
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
-            LOGE("DeviceManagerNotify::OnDeviceFound error, device discovery callback not register for"
-                "pkgName %{public}s.", pkgName.c_str());
-            return;
-        }
-        std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
-        auto iter = discoverCallMap.find(subscribeId);
-        if (iter == discoverCallMap.end()) {
-            LOGE("OnDeviceFound error, no register deviceDiscoveryCallback for subscribeId %{public}d.",
-                (int32_t)subscribeId);
-            return;
-        }
-        tempCbk = iter->second;
-    }
+    std::shared_ptr<DiscoveryCallback> tempCbk = GetDiscoveryCallback(pkgName, subscribeId);
     if (tempCbk == nullptr) {
         LOGE("OnDeviceFound error, registered device discovery callback is nullptr.");
         return;
     }
-    LOGD("Complete with DmDeviceBasicInfo, pkgName:%{public}s, subscribeId:%{public}d.",
-         GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     tempCbk->OnDeviceFound(subscribeId, deviceBasicInfo);
 }
 
@@ -594,23 +560,7 @@ void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t
     }
     LOGI("DeviceManagerNotify::OnDiscoveryFailed in, pkgName:%{public}s, subscribeId %{public}d, failed"
         "reason %{public}d", pkgName.c_str(), (int32_t)subscribeId, failedReason);
-    std::shared_ptr<DiscoveryCallback> tempCbk;
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
-            LOGE("DeviceManagerNotify::OnDiscoveryFailed error, device discovery callback not register for"
-                "pkgName %{public}s.", pkgName.c_str());
-            return;
-        }
-        std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
-        auto iter = discoverCallMap.find(subscribeId);
-        if (iter == discoverCallMap.end()) {
-            LOGE("OnDiscoveryFailed error, device discovery callback not register for subscribeId %{public}d.",
-                subscribeId);
-            return;
-        }
-        tempCbk = iter->second;
-    }
+    std::shared_ptr<DiscoveryCallback> tempCbk = GetDiscoveryCallback(pkgName, subscribeId);
     if (tempCbk == nullptr) {
         LOGE("OnDiscoveryFailed error, registered device discovery callback is nullptr.");
         return;
@@ -625,23 +575,7 @@ void DeviceManagerNotify::OnDiscoverySuccess(const std::string &pkgName, uint16_
         return;
     }
     LOGI("PkgName:%{public}s, subscribeId:%{public}d.", GetAnonyString(pkgName).c_str(), subscribeId);
-    std::shared_ptr<DiscoveryCallback> tempCbk;
-    {
-        std::lock_guard<std::mutex> autoLock(lock_);
-        if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
-            LOGE("OnDiscoverySuccess error, device discovery callback not register for pkgName %{public}s.",
-                pkgName.c_str());
-            return;
-        }
-        std::map<uint16_t, std::shared_ptr<DiscoveryCallback>> &discoverCallMap = deviceDiscoveryCallbacks_[pkgName];
-        auto iter = discoverCallMap.find(subscribeId);
-        if (iter == discoverCallMap.end()) {
-            LOGE("OnDiscoverySuccess error, device discovery callback not register for subscribeId %{public}d.",
-                (int32_t)subscribeId);
-            return;
-        }
-        tempCbk = iter->second;
-    }
+    std::shared_ptr<DiscoveryCallback> tempCbk = GetDiscoveryCallback(pkgName, subscribeId);
     if (tempCbk == nullptr) {
         LOGE("OnDiscoverySuccess error, registered device discovery callback is nullptr.");
         return;
@@ -1237,6 +1171,30 @@ void DeviceManagerNotify::OnSinkBindResult(const std::string &pkgName, const Pee
         return;
     }
     tempCbk->OnBindResult(targetId, result, status, content);
+}
+
+std::shared_ptr<DiscoveryCallback> DeviceManagerNotify::GetDiscoveryCallback(const std::string &pkgName,
+    uint16_t subscribeId)
+{
+    std::string discWithSubscribeId = ComposeStr(pkgName, subscribeId);
+    std::lock_guard<std::mutex> autoLock(lock_);
+    auto iter = deviceDiscoveryCallbacks_.find(discWithSubscribeId);
+    if (iter != deviceDiscoveryCallbacks_.end()) {
+        auto subIter = iter->second.find(subscribeId);
+        if (subIter != iter->second.end()) {
+            return subIter->second;
+        }
+        return nullptr;
+    }
+    std::string discNoSubscribeId = ComposeStr(pkgName, DM_INVALID_FLAG_ID);
+    iter = deviceDiscoveryCallbacks_.find(discNoSubscribeId);
+    if (iter != deviceDiscoveryCallbacks_.end()) {
+        auto subIter = iter->second.find(DM_INVALID_FLAG_ID);
+        if (subIter != iter->second.end()) {
+            return subIter->second;
+        }
+    }
+    return nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

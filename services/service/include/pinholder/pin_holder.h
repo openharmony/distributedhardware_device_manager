@@ -76,7 +76,6 @@ private:
     std::shared_ptr<PinHolderSession> session_ = nullptr;
     std::shared_ptr<DmTimer> timer_ = nullptr;
 
-    std::string registerPkgName_ = "";
     std::string remoteDeviceId_ = "";
     std::string payload_ = "";
     DmPinType pinType_ = NUMBER_PIN_CODE;
@@ -86,6 +85,7 @@ private:
     bool isRemoteSupported_ = false;
     std::atomic<bool> isDestroy_ {false};
     DestroyState destroyState_ = STATE_UNKNOW;
+    ProcessInfo processInfo_;
 };
 }
 }

@@ -20,6 +20,9 @@
 #include "dm_log.h"
 #include "dm_radar_helper.h"
 #include "nlohmann/json.hpp"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "multiple_user_connector.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -84,7 +87,12 @@ int32_t PinHolder::RegisterPinHolderCallback(const std::string &pkgName)
         LOGE("RegisterPinHolderCallback session is nullptr.");
         return ERR_DM_FAILED;
     }
-    registerPkgName_ = pkgName;
+    int32_t userId = -1;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MultipleUserConnector::GetCallerUserId(userId);
+#endif
+    processInfo_.userId = userId;
+    processInfo_.pkgName = pkgName;
     session_->RegisterSessionCallback(shared_from_this());
     return DM_OK;
 }
@@ -93,7 +101,7 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
     const PeerTargetId &targetId, DmPinType pinType, const std::string &payload)
 {
     LOGI("CreatePinHolder.");
-    if (registerPkgName_.empty() || registerPkgName_ != pkgName) {
+    if (processInfo_.pkgName.empty() || processInfo_.pkgName != pkgName) {
         LOGE("CreatePinHolder pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
@@ -120,11 +128,11 @@ int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
     int32_t stageRes =
         sessionId_ > 0 ? static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL);
     DmRadarHelper::GetInstance().ReportCreatePinHolder(
-        registerPkgName_, sessionId_, targetId.deviceId, sessionId_, stageRes);
+        processInfo_.pkgName, sessionId_, targetId.deviceId, sessionId_, stageRes);
     if (sessionId_ < 0) {
         LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId_);
-        listener_->OnCreateResult(registerPkgName_, sessionId_);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT,
+        listener_->OnCreateResult(processInfo_, sessionId_);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE_RESULT,
             sessionId_, "");
         sessionId_ = SESSION_ID_INVALID;
         return sessionId_;
@@ -142,7 +150,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
         LOGE("DestroyPinHolder listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
-    if (registerPkgName_.empty() || pkgName != registerPkgName_) {
+    if (processInfo_.pkgName.empty() || pkgName != processInfo_.pkgName) {
         LOGE("DestroyPinHolder pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
@@ -153,8 +161,8 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     }
     if (sessionId_ == SESSION_ID_INVALID) {
         LOGI("DestroyPinHolder session already destroy.");
-        listener_->OnDestroyResult(registerPkgName_, ret);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY_RESULT, ret, "");
+        listener_->OnDestroyResult(processInfo_, ret);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY_RESULT, ret, "");
         return ret;
     }
     if (sourceState_ != SOURCE_CREATE) {
@@ -175,11 +183,11 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     ret = session_->SendData(sessionId_, message);
     int32_t stageRes =
         ret == DM_OK ? static_cast<int32_t>(StageRes::STAGE_SUCC) : static_cast<int32_t>(StageRes::STAGE_FAIL);
-    DmRadarHelper::GetInstance().ReportDestroyPinHolder(registerPkgName_, targetId.deviceId, ret, stageRes);
+    DmRadarHelper::GetInstance().ReportDestroyPinHolder(processInfo_.pkgName, targetId.deviceId, ret, stageRes);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
-        listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY_RESULT, ERR_DM_FAILED, "");
+        listener_->OnDestroyResult(processInfo_, ERR_DM_FAILED);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY_RESULT, ERR_DM_FAILED, "");
         return ret;
     }
     return ret;
@@ -211,8 +219,8 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
         std::string("CreateGeneratePinHolderMsg"), "");
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
-        listener_->OnCreateResult(registerPkgName_, ret);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ret, "");
+        listener_->OnCreateResult(processInfo_, ret);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE_RESULT, ret, "");
         return ret;
     }
     return ret;
@@ -244,7 +252,7 @@ void PinHolder::ProcessCloseSessionMsg(const std::string &message)
     sessionId_ = SESSION_ID_INVALID;
     sourceState_ = SOURCE_INIT;
     sinkState_ = SINK_INIT;
-    listener_->OnCreateResult(registerPkgName_, ERR_DM_CREATE_PIN_HOLDER_BUSY);
+    listener_->OnCreateResult(processInfo_, ERR_DM_CREATE_PIN_HOLDER_BUSY);
 }
 
 void PinHolder::ProcessCreateMsg(const std::string &message)
@@ -275,13 +283,13 @@ void PinHolder::ProcessCreateMsg(const std::string &message)
         jsonObj[TAG_REPLY] = REPLY_SUCCESS;
         sinkState_ = SINK_CREATE;
         sourceState_ = SOURCE_CREATE;
-        listener_->OnPinHolderCreate(registerPkgName_, remoteDeviceId_, pinType, payload);
+        listener_->OnPinHolderCreate(processInfo_, remoteDeviceId_, pinType, payload);
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType;
         jsonContent[TAG_PAYLOAD] = payload;
         jsonContent[TAG_REMOTE_DEVICE_ID] = remoteDeviceId_;
         std::string content = jsonContent.dump();
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE, DM_OK, content);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE, DM_OK, content);
     }
     jsonObj[TAG_DM_VERSION] = "";
 
@@ -312,14 +320,14 @@ void PinHolder::ProcessCreateRespMsg(const std::string &message)
         return;
     }
     if (reply == REPLY_SUCCESS) {
-        listener_->OnCreateResult(registerPkgName_, DM_OK);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, DM_OK, "");
+        listener_->OnCreateResult(processInfo_, DM_OK);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE_RESULT, DM_OK, "");
         sourceState_ = SOURCE_CREATE;
         sinkState_ = SINK_CREATE;
     } else {
         LOGE("ProcessCreateRespMsg remote state is wrong.");
-        listener_->OnCreateResult(registerPkgName_, ERR_DM_FAILED);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
+        listener_->OnCreateResult(processInfo_, ERR_DM_FAILED);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
         session_->CloseSessionServer(sessionId_);
         sessionId_ = SESSION_ID_INVALID;
         destroyState_ = STATE_REMOTE_WRONG;
@@ -356,12 +364,12 @@ void PinHolder::ProcessDestroyMsg(const std::string &message)
         sinkState_ = SINK_INIT;
         sourceState_ = SOURCE_INIT;
         if (!isDestroy_.load()) {
-            listener_->OnPinHolderDestroy(registerPkgName_, pinType, payload);
+            listener_->OnPinHolderDestroy(processInfo_, pinType, payload);
             nlohmann::json jsonContent;
             jsonContent[TAG_PIN_TYPE] = pinType;
             jsonContent[TAG_PAYLOAD] = payload;
             std::string content = jsonContent.dump();
-            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, DM_OK, content);
+            listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY, DM_OK, content);
             isDestroy_.store(true);
         }
     }
@@ -386,12 +394,12 @@ void PinHolder::CloseSession(const std::string &name)
     jsonObj[DM_CONNECTION_DISCONNECTED] = true;
     std::string payload = jsonObj.dump();
     if (listener_ != nullptr && !isDestroy_.load()) {
-        listener_->OnPinHolderDestroy(registerPkgName_, pinType_, payload);
+        listener_->OnPinHolderDestroy(processInfo_, pinType_, payload);
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType_;
         jsonContent[TAG_PAYLOAD] = payload;
         std::string content = jsonContent.dump();
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
         isDestroy_.store(true);
     }
     session_->CloseSessionServer(sessionId_);
@@ -421,15 +429,15 @@ void PinHolder::ProcessDestroyResMsg(const std::string &message)
         return;
     }
     if (reply == REPLY_SUCCESS) {
-        listener_->OnDestroyResult(registerPkgName_, DM_OK);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY_RESULT, DM_OK, "");
+        listener_->OnDestroyResult(processInfo_, DM_OK);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY_RESULT, DM_OK, "");
         sourceState_ = SOURCE_INIT;
         sinkState_ = SINK_INIT;
         timer_->DeleteAll();
     } else {
         LOGE("ProcessDestroyResMsg remote state is wrong.");
-        listener_->OnDestroyResult(registerPkgName_, ERR_DM_FAILED);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY_RESULT, ERR_DM_FAILED, "");
+        listener_->OnDestroyResult(processInfo_, ERR_DM_FAILED);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY_RESULT, ERR_DM_FAILED, "");
         sinkState_ = SINK_INIT;
         sourceState_ = SOURCE_INIT;
     }
@@ -451,7 +459,7 @@ void PinHolder::OnDataReceived(int32_t sessionId, std::string message)
         int32_t ret = session_->SendData(sessionId, msg);
         if (ret != DM_OK) {
             LOGE("[SOFTBUS] SendBytes failed. ret: %{public}d.", ret);
-            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
+            listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE_RESULT, ERR_DM_FAILED, "");
         }
         return;
     }
@@ -530,8 +538,8 @@ void PinHolder::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t 
     LOGE("[SOFTBUS]onSesssionOpened failed. sessionId: %{public}d.", sessionId);
     sessionId_ = SESSION_ID_INVALID;
     if (listener_ != nullptr) {
-        listener_->OnCreateResult(registerPkgName_, result);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::CREATE_RESULT, result, "");
+        listener_->OnCreateResult(processInfo_, result);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE_RESULT, result, "");
     }
     return;
 }
@@ -551,17 +559,17 @@ void PinHolder::OnSessionClosed(int32_t sessionId)
     jsonObj[DM_CONNECTION_DISCONNECTED] = true;
     std::string payload = jsonObj.dump();
     if (listener_ != nullptr && !isDestroy_.load()) {
-        listener_->OnPinHolderDestroy(registerPkgName_, pinType_, payload);
+        listener_->OnPinHolderDestroy(processInfo_, pinType_, payload);
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType_;
         jsonContent[TAG_PAYLOAD] = payload;
         std::string content = jsonContent.dump();
         if (destroyState_ == STATE_UNKNOW) {
-            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, sessionId, content);
+            listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY, sessionId, content);
         } else if (destroyState_ == STATE_REMOTE_WRONG) {
-            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, ERR_DM_FAILED, content);
+            listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY, ERR_DM_FAILED, content);
         } else if (destroyState_ == STATE_TIME_OUT) {
-            listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
+            listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
         }
         isDestroy_.store(true);
     }
@@ -587,7 +595,7 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
         LOGE("NotifyPinHolderEvent listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
-    if (registerPkgName_.empty() || pkgName != registerPkgName_ || event.empty()) {
+    if (processInfo_.pkgName.empty() || pkgName != processInfo_.pkgName || event.empty()) {
         LOGE("NotifyPinHolderEvent pkgName: %{public}s is not register callback.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
@@ -619,7 +627,7 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
     int32_t ret = session_->SendData(sessionId_, message);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed, ret: %{public}d.", ret);
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::PIN_TYPE_CHANGE_RESULT, ERR_DM_FAILED, "");
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::PIN_TYPE_CHANGE_RESULT, ERR_DM_FAILED, "");
         return ERR_DM_FAILED;
     }
     return ret;
@@ -651,7 +659,7 @@ void PinHolder::ProcessChangeMsg(const std::string &message)
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType;
         std::string content = jsonContent.dump();
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::PIN_TYPE_CHANGE, DM_OK, content);
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::PIN_TYPE_CHANGE, DM_OK, content);
         timer_->DeleteAll();
         timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
             [this] (std::string name) {
@@ -685,10 +693,10 @@ void PinHolder::ProcessChangeRespMsg(const std::string &message)
         return;
     }
     if (reply == REPLY_SUCCESS) {
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::PIN_TYPE_CHANGE_RESULT, DM_OK, "");
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::PIN_TYPE_CHANGE_RESULT, DM_OK, "");
     } else {
         LOGE("ProcessChangeRespMsg remote state is wrong.");
-        listener_->OnPinHolderEvent(registerPkgName_, DmPinHolderEvent::PIN_TYPE_CHANGE_RESULT, ERR_DM_FAILED, "");
+        listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::PIN_TYPE_CHANGE_RESULT, ERR_DM_FAILED, "");
     }
 }
 } // namespace DistributedHardware

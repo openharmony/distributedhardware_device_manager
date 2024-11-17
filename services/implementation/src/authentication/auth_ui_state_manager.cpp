@@ -16,7 +16,9 @@
 #include "auth_ui_state_manager.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "multiple_user_connector.h"
+#endif
 namespace OHOS {
 namespace DistributedHardware {
 constexpr const char* UI_STATE_MSG = "uiStateMsg";
@@ -27,18 +29,28 @@ AuthUiStateManager::AuthUiStateManager(std::shared_ptr<IDeviceManagerServiceList
 
 void AuthUiStateManager::RegisterUiStateCallback(const std::string pkgName)
 {
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+    ProcessInfo processInfo;
+    processInfo.userId = userId;
+    processInfo.pkgName = pkgName;
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
-    pkgSet_.emplace(pkgName);
+    pkgSet_.emplace(processInfo);
 }
 
 void AuthUiStateManager::UnRegisterUiStateCallback(const std::string pkgName)
 {
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+    ProcessInfo processInfo;
+    processInfo.userId = userId;
+    processInfo.pkgName = pkgName;
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
-    if (pkgSet_.find(pkgName) == pkgSet_.end()) {
-        LOGE("AuthUiStateManager UnRegisterUiStateCallback pkgName is not exist.");
+    if (pkgSet_.find(processInfo) == pkgSet_.end()) {
+        LOGE("AuthUiStateManager UnRegisterUiStateCallback processInfo is not exist.");
         return;
     }
-    pkgSet_.erase(pkgName);
+    pkgSet_.erase(processInfo);
 }
 
 void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
@@ -51,8 +63,8 @@ void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
     jsonObj[UI_STATE_MSG] = msg;
     std::string paramJson = jsonObj.dump();
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
-    for (auto pkgName : pkgSet_) {
-        listener_->OnUiCall(pkgName, paramJson);
+    for (auto item : pkgSet_) {
+        listener_->OnUiCall(item, paramJson);
     }
     LOGI("AuthUiStateManager::UpdateUiState complete.");
 }

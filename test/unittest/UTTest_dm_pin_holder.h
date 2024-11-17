@@ -23,6 +23,7 @@
 #include <cstdint>
 #include "mock/mock_ipc_client_proxy.h"
 #include "device_manager.h"
+#include "dm_device_info.h"
 #include "dm_single_instance.h"
 #include "idevice_manager_service_listener.h"
 
@@ -60,37 +61,31 @@ public:
     {
     }
 
-    void OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state, const DmDeviceInfo &info) override
+    void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
+        const DmDeviceInfo &info) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)state;
         (void)info;
     }
 
-    void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &info) override
+    void OnDeviceFound(const ProcessInfo &processInfo, uint16_t subscribeId, const DmDeviceInfo &info) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)subscribeId;
         (void)info;
     }
 
-    void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, DmDeviceBasicInfo &info) override
+    void OnDiscoveryFailed(const ProcessInfo &processInfo, uint16_t subscribeId, int32_t failedReason) override
     {
-        (void)pkgName;
-        (void)subscribeId;
-        (void)info;
-    }
-
-    void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason) override
-    {
-        (void)pkgName;
+        (void)processInfo;
         (void)subscribeId;
         (void)failedReason;
     }
 
-    void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId) override
+    void OnDiscoverySuccess(const ProcessInfo &processInfo, int32_t subscribeId) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)subscribeId;
     }
 
@@ -101,80 +96,80 @@ public:
         (void)publishResult;
     }
 
-    void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token, int32_t status,
-        int32_t reason) override
+    void OnAuthResult(const ProcessInfo &processInfo, const std::string &deviceId, const std::string &token,
+        int32_t status, int32_t reason) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)deviceId;
         (void)token;
         (void)status;
         (void)reason;
     }
 
-    void OnUiCall(std::string &pkgName, std::string &paramJson) override
+    void OnUiCall(const ProcessInfo &processInfo, std::string &paramJson) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)paramJson;
     }
 
-    void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo) override
+    void OnCredentialResult(const ProcessInfo &processInfo, int32_t action, const std::string &resultInfo) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)action;
         (void)resultInfo;
     }
 
-    void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
+    void OnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result, int32_t status,
         std::string content) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)targetId;
         (void)result;
         (void)status;
         (void)content;
     }
 
-    void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+    void OnUnbindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
         std::string content) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)targetId;
         (void)result;
         (void)content;
     }
 
-    void OnPinHolderCreate(const std::string &pkgName, const std::string &deviceId, DmPinType pinType,
+    void OnPinHolderCreate(const ProcessInfo &processInfo, const std::string &deviceId, DmPinType pinType,
         const std::string &payload) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)deviceId;
         (void)pinType;
         (void)payload;
     }
 
-    void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload) override
+    void OnPinHolderDestroy(const ProcessInfo &processInfo, DmPinType pinType, const std::string &payload) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)pinType;
         (void)payload;
     }
 
-    void OnCreateResult(const std::string &pkgName, int32_t result) override
+    void OnCreateResult(const ProcessInfo &processInfo, int32_t result) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)result;
     }
 
-    void OnDestroyResult(const std::string &pkgName, int32_t result) override
+    void OnDestroyResult(const ProcessInfo &processInfo, int32_t result) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)result;
     }
 
-    void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
+    void OnPinHolderEvent(const ProcessInfo &processInfo, DmPinHolderEvent event, int32_t result,
         const std::string &content) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)event;
         (void)result;
         (void)content;
@@ -187,16 +182,16 @@ public:
         (void)authForm;
     }
 
-    void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) override
+    void OnDeviceScreenStateChange(const ProcessInfo &processInfo, DmDeviceInfo &devInfo) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)devInfo;
     }
 
-    void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList, uint16_t deviceTypeId,
+    void OnCredentialAuthStatus(const ProcessInfo &processInfo, const std::string &deviceList, uint16_t deviceTypeId,
                                 int32_t errcode) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)deviceList;
         (void)deviceTypeId;
         (void)errcode;
@@ -207,14 +202,18 @@ public:
         (void)pkgName;
     }
 
-    void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+    void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
         int32_t status, std::string content) override
     {
-        (void)pkgName;
+        (void)processInfo;
         (void)targetId;
         (void)result;
         (void)status;
         (void)content;
+    }
+    void OnProcessRemove(const ProcessInfo &processInfo) override
+    {
+        (void)processInfo;
     }
 };
 } // namespace DistributedHardware

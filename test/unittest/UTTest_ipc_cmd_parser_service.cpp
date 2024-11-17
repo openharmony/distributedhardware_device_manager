@@ -45,8 +45,6 @@
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
-#include "ipc_start_discovery_req.h"
-#include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_unpublish_req.h"
 #include "nlohmann/json.hpp"
@@ -905,62 +903,6 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_026, testing::ext::TestSize.Level
     MessageParcel reply;
     std::string pkgName = "ohos.dm.test";
     data.WriteString(pkgName);
-    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_027, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = START_DEVICE_DISCOVER;
-    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    MessageParcel data;
-    MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
-    std::string extra = "";
-    DmSubscribeInfo dmSubscribeInfo;
-    dmSubscribeInfo.subscribeId = 100;
-    data.WriteString(pkgName);
-    data.WriteString(extra);
-    data.WriteRawData(&dmSubscribeInfo, sizeof(DmSubscribeInfo));
-    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_028, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = START_DEVICE_DISCOVERY;
-    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    MessageParcel data;
-    MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
-    std::string extra = "";
-    uint16_t subscribeId = 100;
-    data.WriteString(pkgName);
-    data.WriteString(extra);
-    data.WriteUint16(subscribeId);
-    OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
-    if (ptr) {
-        ret = ptr(data, reply);
-    }
-    ASSERT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_029, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = STOP_DEVICE_DISCOVER;
-    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    MessageParcel data;
-    MessageParcel reply;
-    std::string pkgName = "ohos.dm.test";
-    uint16_t subscribeId = 100;
-    data.WriteString(pkgName);
-    data.WriteUint16(subscribeId);
     OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
     if (ptr) {
         ret = ptr(data, reply);

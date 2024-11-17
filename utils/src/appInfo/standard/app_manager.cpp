@@ -151,5 +151,59 @@ bool AppManager::IsSystemSA()
     }
     return false;
 }
+
+int32_t AppManager::GetCallerName(bool isSystemSA, std::string &callerName)
+{
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("GetCallingTokenID error.");
+        return ERR_DM_FAILED;
+    }
+    LOGI("tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
+        isSystemSA = false;
+        HapTokenInfo tokenInfo;
+        if (AccessTokenKit::GetHapTokenInfo(tokenCaller, tokenInfo) != EOK) {
+            LOGE("GetHapTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        callerName = std::move(tokenInfo.bundleName);
+    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        isSystemSA = true;
+        NativeTokenInfo tokenInfo;
+        if (AccessTokenKit::GetNativeTokenInfo(tokenCaller, tokenInfo) != EOK) {
+            LOGE("GetNativeTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        callerName = std::move(tokenInfo.processName);
+    } else {
+        LOGE("failed, unsupported process.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t AppManager::GetNativeTokenIdByName(std::string &processName, int64_t &tokenId)
+{
+    AccessTokenID nativeTokenId = AccessTokenKit::GetNativeTokenId(processName);
+    if (nativeTokenId == INVALID_TOKENID) {
+        LOGE("GetNativeTokenId failed.");
+        return ERR_DM_FAILED;
+    }
+    tokenId = static_cast<int64_t>(nativeTokenId);
+    return DM_OK;
+}
+
+int32_t AppManager::GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex, int64_t &tokenId)
+{
+    auto hapTokenId = AccessTokenKit::GetHapTokenID(userId, bundleName, instIndex);
+    if (hapTokenId == 0) {
+        LOGE("GetHapTokenId failed.");
+        return ERR_DM_FAILED;
+    }
+    tokenId = static_cast<int64_t>(hapTokenId);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

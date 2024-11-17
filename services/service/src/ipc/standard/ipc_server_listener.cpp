@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,36 +31,27 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
         LOGE("IpcServerListener::SendRequest cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
     }
-    std::string pkgName = req->GetPkgName();
-    if (pkgName.empty()) {
+    ProcessInfo processInfo = req->GetProcessInfo();
+    if (processInfo.pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(pkgName);
+    sptr<IpcRemoteBroker> listener = IpcServerStub::GetInstance().GetDmListener(processInfo);
     if (listener == nullptr) {
-        LOGI("cannot get listener for package:%{public}s.", pkgName.c_str());
+        LOGI("cannot get listener for package:%{public}s.", processInfo.pkgName.c_str());
         return ERR_DM_POINT_NULL;
     }
     return listener->SendCmd(cmdCode, req, rsp);
 }
 
-std::vector<std::string> IpcServerListener::GetAllPkgName()
+std::vector<ProcessInfo> IpcServerListener::GetAllProcessInfo()
 {
-    return IpcServerStub::GetInstance().GetAllPkgName();
+    return IpcServerStub::GetInstance().GetAllProcessInfo();
 }
 
-int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
+std::set<std::string> IpcServerListener::GetSystemSA()
 {
-    if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
-        LOGE("IpcServerListener::SendAll cmdCode param invalid!");
-        return ERR_DM_UNSUPPORTED_IPC_COMMAND;
-    }
-    int32_t ret = IpcServerStub::GetInstance().SendALL(cmdCode, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("IpcServerListener::SendAll failed!");
-        return ret;
-    }
-    return DM_OK;
+    return IpcServerStub::GetInstance().GetSystemSA();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -320,7 +320,7 @@ void AuthenticateDeviceFourthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().UnbindTarget(str, targetId, discoverParam, nullptr);
     DeviceManagerImpl::GetInstance().GetTrustedDeviceList(str, discoverParam, false, g_deviceList);
     DeviceManagerImpl::GetInstance().RegisterDevStateCallback(str, discoverParam, nullptr);
-    DeviceManagerImpl::GetInstance().AddDiscoveryCallback("test", nullptr);
+    DeviceManagerImpl::GetInstance().AddDiscoveryCallback("test", discoverParam, nullptr);
     DeviceManagerImpl::GetInstance().RemoveDiscoveryCallback("test");
     DeviceManagerImpl::GetInstance().AddPublishCallback("test");
     DeviceManagerImpl::GetInstance().RemovePublishCallback("test");

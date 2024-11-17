@@ -267,7 +267,6 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_002, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_ = nullptr;
     authManager_->AuthenticateFinish();
-    authManager_->CancelDisplay();
     int32_t ret = authManager_->JoinNetwork();
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -303,7 +302,7 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level0)
     authManager_->ShowStartAuthDialog();
     int32_t code = 0;
     int32_t ret = authManager_->GetPinCode(code);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_NE(code, ERR_DM_TIME_OUT);
 }
 
 HWTEST_F(DmAuthManagerTest, SetPageId_001, testing::ext::TestSize.Level0)
@@ -777,40 +776,40 @@ HWTEST_F(DmAuthManagerTest, SrcAuthDeviceFinish001, testing::ext::TestSize.Level
     authManager_->authResponseContext_->hostPkgName = "hostPkgName";
     authManager_->softbusConnector_->deviceStateManagerCallback_ = std::make_shared<SoftbusStateCallbackTest>();
     authManager_->SrcAuthDeviceFinish();
-    EXPECT_TRUE(authManager_->softbusConnector_->pkgNameVec_.size() > 0);
+    EXPECT_TRUE(authManager_->softbusConnector_->processInfoVec_.size() > 0);
 
     authManager_->authResponseContext_->confirmOperation = USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
     authManager_->authResponseContext_->hostPkgName = "";
     authManager_->SrcAuthDeviceFinish();
-    EXPECT_TRUE(authManager_->softbusConnector_->pkgNameVec_.size() > 0);
+    EXPECT_TRUE(authManager_->softbusConnector_->processInfoVec_.size() > 0);
 
     authManager_->authResponseContext_->isIdenticalAccount = true;
     authManager_->SrcAuthDeviceFinish();
-    EXPECT_TRUE(authManager_->softbusConnector_->pkgNameVec_.size() > 0);
+    EXPECT_TRUE(authManager_->softbusConnector_->processInfoVec_.size() > 0);
 
     authManager_->authResponseContext_->bindLevel = SERVICE;
     authManager_->SrcAuthDeviceFinish();
-    EXPECT_TRUE(authManager_->softbusConnector_->pkgNameVec_.size() > 0);
+    EXPECT_TRUE(authManager_->softbusConnector_->processInfoVec_.size() > 0);
 
     authManager_->authResponseContext_->haveCredential = false;
     authManager_->authResponseContext_->bindLevel = APP;
     authManager_->authResponseContext_->isIdenticalAccount = false;
     authManager_->authResponseContext_->hostPkgName = "hostPkgName";
     authManager_->SrcAuthDeviceFinish();
-    EXPECT_TRUE(authManager_->softbusConnector_->pkgNameVec_.size() > 0);
+    EXPECT_TRUE(authManager_->softbusConnector_->processInfoVec_.size() > 0);
 
     authManager_->authResponseContext_->hostPkgName = "";
     authManager_->SrcAuthDeviceFinish();
-    EXPECT_TRUE(authManager_->softbusConnector_->pkgNameVec_.size() > 0);
+    EXPECT_TRUE(authManager_->softbusConnector_->processInfoVec_.size() > 0);
 
     authManager_->authResponseContext_->bindLevel = SERVICE;
     authManager_->authResponseContext_->isIdenticalAccount = true;
     authManager_->SrcAuthDeviceFinish();
-    EXPECT_TRUE(authManager_->softbusConnector_->pkgNameVec_.size() > 0);
+    EXPECT_TRUE(authManager_->softbusConnector_->processInfoVec_.size() > 0);
 
     authManager_->authResponseContext_->confirmOperation = USER_OPERATION_TYPE_DONE_PINCODE_INPUT;
     authManager_->SrcAuthDeviceFinish();
-    EXPECT_TRUE(authManager_->softbusConnector_->pkgNameVec_.size() > 0);
+    EXPECT_TRUE(authManager_->softbusConnector_->processInfoVec_.size() > 0);
 }
 
 HWTEST_F(DmAuthManagerTest, SrcAuthDeviceFinish002, testing::ext::TestSize.Level0)

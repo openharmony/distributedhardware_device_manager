@@ -36,6 +36,11 @@ typedef struct DiscoveryContext {
     std::vector<DeviceFilters> filters;
 } DiscoveryContext;
 
+typedef struct MultiUserDiscovery {
+    std::string pkgName;
+    int32_t userId;
+} MultiUserDiscovery;
+
 typedef enum {
     PROXY_TRANSMISION = 0,
     PROXY_HEARTBEAT = 1,
@@ -84,12 +89,16 @@ private:
         const std::string &searchJson);
     int32_t HandleDiscoveryQueue(const std::string &pkgName, uint16_t subscribeId,
         const std::map<std::string, std::string> &filterOps);
-    int32_t GetDeviceAclParam(const std::string &pkgName, std::string deviceId, bool &isOnline, int32_t &authForm);
+    int32_t GetDeviceAclParam(const std::string &pkgName, int32_t userId, std::string deviceId, bool &isOnline,
+        int32_t &authForm);
     void ConfigDiscParam(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo *dmSubInfo);
     bool CompareCapability(uint32_t capabilityType, const std::string &capabilityStr);
     void OnDeviceFound(const std::string &pkgName, const uint32_t capabilityType,
         const DmDeviceInfo &info, const DeviceFilterPara &filterPara);
     void UpdateInfoFreq(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo);
+    std::string AddMultiUserIdentify(const std::string &pkgName);
+    std::string RemoveMultiUserIdentify(const std::string &pkgName);
+    void GetPkgNameAndUserId(const std::string &pkgName, std::string &callerPkgName, int32_t &userId);
 
 private:
     std::mutex locks_;
@@ -104,6 +113,8 @@ private:
     std::set<std::string> pkgNameSet_;
     std::map<std::string, std::string> capabilityMap_;
     std::mutex capabilityMapLocks_;
+    std::mutex multiUserDiscLocks_;
+    std::map<std::string, MultiUserDiscovery> multiUserDiscMap_;
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     static bool isSoLoaded_;

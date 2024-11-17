@@ -22,6 +22,7 @@
 #include "dm_single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
+const uint32_t MAX_USER_ID_NUM = 5;
 enum class RelationShipChangeType : uint32_t {
     ACCOUNT_LOGOUT = 0,
     DEVICE_UNBIND = 1,
@@ -29,7 +30,18 @@ enum class RelationShipChangeType : uint32_t {
     SERVICE_UNBIND = 3,
     DEL_USER = 4,
     APP_UNINSTALL = 5,
-    TYPE_MAX = 6
+    SYNC_USERID = 6,
+    TYPE_MAX = 7
+};
+
+struct UserIdInfo {
+    /**
+     * @brief true for foreground userid, false for background
+     */
+    bool isForeground;
+    std::uint16_t userId;
+    UserIdInfo(bool isForeground, std::uint16_t userId) : isForeground(isForeground), userId(userId) {}
+    const std::string ToString() const;
 };
 
 struct RelationShipChangeMsg {
@@ -37,9 +49,15 @@ struct RelationShipChangeMsg {
     uint32_t userId;
     std::string accountId;
     uint64_t tokenId;
+    // The broadcast need send to these devices with the udids
     std::vector<std::string> peerUdids;
+    // The broadcast from which device with the udid.
     std::string peerUdid;
     std::string accountName;
+    // true: request, false: response
+    bool syncUserIdFlag;
+    // The foreground and background user id infos
+    std::vector<UserIdInfo> userIdInfos;
 
     explicit RelationShipChangeMsg();
     bool ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) const;
@@ -50,14 +68,20 @@ struct RelationShipChangeMsg {
     void ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDeviceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
-    cJSON *ToArrayJson() const;
+    bool ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32_t &len) const;
+    void ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const;
+    cJSON *ToPayLoadJson() const;
 
     bool FromAccountLogoutPayLoad(const cJSON *payloadJson);
     bool FromDeviceUnbindPayLoad(const cJSON *payloadJson);
     bool FromAppUnbindPayLoad(const cJSON *payloadJson);
+    bool FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloadJson);
+    bool FromDelUserPayLoad(const cJSON *payloadJson);
 
     std::string ToJson() const;
     bool FromJson(const std::string &msgJson);
+
+    const std::string ToString() const;
 };
 
 class ReleationShipSyncMgr {
@@ -67,6 +91,9 @@ public:
     RelationShipChangeMsg ParseTrustRelationShipChange(const std::string &msgJson);
 };
 
+const std::string GetUserIdInfoList(const std::vector<UserIdInfo> &list);
+void GetFrontAndBackUserIdInfos(const std::vector<UserIdInfo> &remoteUserIdInfos,
+    std::vector<UserIdInfo> &foregroundUserIdInfos, std::vector<UserIdInfo> &backgroundUserIdInfos);
 } // DistributedHardware
 } // OHOS
 #endif // OHOS_RELATIONSHIP_SYNC_MGR_H

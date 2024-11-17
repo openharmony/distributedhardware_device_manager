@@ -133,6 +133,7 @@ constexpr const char* DM_ITF_VER = "1.1";
 constexpr const char* DM_PKG_NAME = "ohos.distributedhardware.devicemanager";
 constexpr const char* DM_SESSION_NAME = "ohos.distributedhardware.devicemanager.resident";
 constexpr const char* DM_PIN_HOLDER_SESSION_NAME = "ohos.distributedhardware.devicemanager.pinholder";
+constexpr const char* DM_SYNC_USERID_SESSION_NAME = "ohos.distributedhardware.devicemanager.syncuserid";
 constexpr const char* DM_CAPABILITY_OSD = "osdCapability";
 constexpr const char* DM_CAPABILITY_APPROACH = "approach";
 constexpr const char* DM_CAPABILITY_TOUCH = "touch";

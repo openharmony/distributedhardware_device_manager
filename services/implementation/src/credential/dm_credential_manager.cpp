@@ -20,7 +20,9 @@
 #include "dm_log.h"
 #include "dm_random.h"
 #include "parameter.h"
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "multiple_user_connector.h"
+#endif
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t LOCAL_CREDENTIAL_DEAL_TYPE = 1;
@@ -123,7 +125,6 @@ int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const 
         LOGE("credentialInfo not found by pkgName %{public}s", GetAnonyString(pkgName).c_str());
         return ERR_DM_FAILED;
     }
-    pkgName_ = pkgName;
     nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("credentialInfo string not a json type.");
@@ -213,7 +214,12 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
         LOGE("credentialInfo not found by pkgName %{public}s", GetAnonyString(pkgName).c_str());
         return ERR_DM_FAILED;
     }
-    pkgName_ = pkgName;
+    int32_t callerUserId = -1;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MultipleUserConnector::GetCallerUserId(callerUserId);
+#endif
+    processInfo_.pkgName = pkgName;
+    processInfo_.userId = callerUserId;
     nlohmann::json jsonObject = nlohmann::json::parse(deleteInfo, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("deleteInfo string not a json type.");
@@ -247,7 +253,8 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
 void DmCredentialManager::OnGroupResultExt(int32_t action, const std::string &resultInfo)
 {
     LOGI("DmCredentialManager::OnGroupResultExt action %{public}d, resultInfo %{public}s.", action, resultInfo.c_str());
-    listener_->OnCredentialResult(pkgName_, action, resultInfo);
+    CHECK_NULL_VOID(listener_);
+    listener_->OnCredentialResult(processInfo_, action, resultInfo);
 }
 
 void DmCredentialManager::OnGroupResult(int64_t requestId, int32_t action,
@@ -257,7 +264,8 @@ void DmCredentialManager::OnGroupResult(int64_t requestId, int32_t action,
     if (requestId_ != requestId) {
         return;
     }
-    listener_->OnCredentialResult(pkgName_, action, resultInfo);
+    CHECK_NULL_VOID(listener_);
+    listener_->OnCredentialResult(processInfo_, action, resultInfo);
 }
 
 int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgName)
@@ -266,9 +274,15 @@ int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgNa
         LOGE("DmCredentialManager::RegisterCredentialCallback input param is empty");
         return ERR_DM_FAILED;
     }
+    int32_t userId = -1;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MultipleUserConnector::GetCallerUserId(userId);
+#endif
     LOGI("DmCredentialManager::RegisterCredentialCallback pkgName = %{public}s", GetAnonyString(pkgName).c_str());
     {
         std::lock_guard<std::mutex> autoLock(locks_);
+        processInfo_.pkgName = pkgName;
+        processInfo_.userId = userId;
         credentialVec_.push_back(pkgName);
     }
     return hiChainConnector_->RegisterHiChainGroupCallback(std::shared_ptr<IDmGroupResCallback>(shared_from_this()));
@@ -518,6 +532,13 @@ int32_t DmCredentialManager::DeleteRemoteCredential(const std::string &deleteInf
         return ERR_DM_FAILED;
     }
     return DM_OK;
+}
+
+void DmCredentialManager::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
+    int32_t errcode)
+{
+    CHECK_NULL_VOID(listener_);
+    listener_->OnCredentialAuthStatus(processInfo_, deviceList, deviceTypeId, errcode);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

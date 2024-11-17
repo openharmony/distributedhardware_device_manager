@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <string>
 
 #include "ipc_def.h"
+#include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,8 +37,18 @@ public:
         pkgName_ = pkgName;
     }
 
+    const ProcessInfo GetProcessInfo() const
+    {
+        return processInfo_;
+    }
+
+    void SetProcessInfo(const ProcessInfo &processInfo)
+    {
+        processInfo_ = processInfo;
+    }
 private:
     std::string pkgName_;
+    ProcessInfo processInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

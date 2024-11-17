@@ -361,6 +361,45 @@ typedef struct DmAccessCallee {
     int32_t userId;
     std::string extra;
 } DmAccessCallee;
+
+typedef struct ProcessInfo {
+    int32_t userId;
+    std::string pkgName;
+
+    bool operator==(const ProcessInfo &other) const
+    {
+        return (userId == other.userId) && (pkgName == other.pkgName);
+    }
+
+    bool operator<(const ProcessInfo &other) const
+    {
+        return (userId < other.userId) ||
+            (userId == other.userId && pkgName < other.pkgName);
+    }
+} ProcessInfo;
+
+typedef struct DmNotifyKey {
+    int32_t processUserId;
+    std::string processPkgName;
+    int32_t notifyUserId;
+    std::string udid;
+
+    bool operator==(const DmNotifyKey &other) const
+    {
+        return (processUserId == other.processUserId) && (processPkgName == other.processPkgName) &&
+            (notifyUserId == other.notifyUserId) && (udid == other.udid);
+    }
+
+    bool operator<(const DmNotifyKey &other) const
+    {
+        return (processUserId < other.processUserId) ||
+        (processUserId == other.processUserId && processPkgName < other.processPkgName) ||
+        (processUserId == other.processUserId && processPkgName == other.processPkgName &&
+            notifyUserId < other.notifyUserId) ||
+        (processUserId == other.processUserId && processPkgName == other.processPkgName &&
+            notifyUserId == other.notifyUserId && udid < other.udid);
+    }
+} DmNotifyKey;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

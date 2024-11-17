@@ -56,6 +56,7 @@ public:
     static void OnDeviceTrustedChange(TrustChangeType type, const char *msg, uint32_t msgLen);
     static void DeviceNotTrust(const std::string &msg);
     static void DeviceTrustedChange(const std::string &msg);
+    static void DeviceUserIdCheckSumChange(const std::string &msg);
     static void OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status);
     static void DeviceScreenStatusChange(DmDeviceInfo deviceInfo);
     static void OnCredentialAuthStatus(const char *deviceList, uint32_t deviceListLen, uint16_t deviceTypeId,
@@ -103,6 +104,7 @@ public:
     int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
     static int32_t GetNetworkIdByUdid(const std::string &udid, std::string &networkId);
     int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName);
+    int32_t SetForegroundUserIdsToDSoftBus(const std::string &remoteUserId, const std::vector<uint32_t> &userIds);
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     int32_t InitSoftPublishLNN();

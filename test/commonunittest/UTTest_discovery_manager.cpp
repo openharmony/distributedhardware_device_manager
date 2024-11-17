@@ -254,7 +254,7 @@ HWTEST_F(DiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level0)
     DmDeviceInfo info;
     bool isOnline = false;
     manager->OnDeviceFound(pkgName, info, isOnline);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, OnDeviceFound_002, testing::ext::TestSize.Level0)
@@ -263,7 +263,7 @@ HWTEST_F(DiscoveryManagerTest, OnDeviceFound_002, testing::ext::TestSize.Level0)
     DmDeviceInfo info;
     bool isOnline = true;
     manager->OnDeviceFound(pkgName, info, isOnline);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_001, testing::ext::TestSize.Level0)
@@ -272,7 +272,7 @@ HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_001, testing::ext::TestSize.L
     int32_t subscribeId = 1;
     int32_t result = 0;
     manager->OnDiscoveringResult(pkgName, subscribeId, result);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_002, testing::ext::TestSize.Level0)
@@ -282,7 +282,7 @@ HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_002, testing::ext::TestSize.L
     int32_t result = 0;
     manager->listener_ = nullptr;
     manager->OnDiscoveringResult(pkgName, subscribeId, result);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_003, testing::ext::TestSize.Level0)
@@ -352,7 +352,7 @@ HWTEST_F(DiscoveryManagerTest, HandleDiscoveryTimeout_003, testing::ext::TestSiz
     DiscoveryContext context;
     manager->discoveryContextMap_.emplace(name, context);
     manager->HandleDiscoveryTimeout(name);
-    EXPECT_NE(manager->pkgNameSet_.empty(), false);
+    EXPECT_EQ(manager->pkgNameSet_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, GetDeviceAclParam_001, testing::ext::TestSize.Level0)
@@ -361,7 +361,7 @@ HWTEST_F(DiscoveryManagerTest, GetDeviceAclParam_001, testing::ext::TestSize.Lev
     std::string deviceId;
     bool isonline = true;
     int32_t authForm = 0;
-    int32_t ret = manager->GetDeviceAclParam(pkgName, deviceId, isonline, authForm);
+    int32_t ret = manager->GetDeviceAclParam(pkgName, 100, deviceId, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
 }
 

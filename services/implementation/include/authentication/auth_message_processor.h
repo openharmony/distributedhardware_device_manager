@@ -72,6 +72,7 @@ constexpr const char* TAG_DATA_LEN = "dataLen";
 constexpr const char* TAG_IMPORT_AUTH_CODE = "IMPORT_AUTH_CODE";
 constexpr const char* TAG_HOST_PKGLABEL = "hostPkgLabel";
 constexpr const char* TAG_EDITION = "edition";
+constexpr const char* TAG_BUNDLE_NAME = "bundleName";
 
 class DmAuthManager;
 struct DmAuthRequestContext;

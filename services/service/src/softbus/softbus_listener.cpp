@@ -30,6 +30,7 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "dm_transport_msg.h"
 #include "ffrt.h"
 #endif
 #include "parameter.h"
@@ -62,6 +63,7 @@ static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
 static std::mutex g_onlineDeviceNumLock;
 static std::mutex g_lockDeviceTrustedChange;
+static std::mutex g_lockUserIdCheckSumChange;
 static std::mutex g_lockDeviceOnLine;
 static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
@@ -155,8 +157,22 @@ void SoftbusListener::DeviceNotTrust(const std::string &msg)
 
 void SoftbusListener::DeviceTrustedChange(const std::string &msg)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::lock_guard<std::mutex> lock(g_lockDeviceTrustedChange);
     DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
+#else
+    (void)msg;
+#endif
+}
+
+void SoftbusListener::DeviceUserIdCheckSumChange(const std::string &msg)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(g_lockUserIdCheckSumChange);
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+#else
+    (void)msg;
+#endif
 }
 
 void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
@@ -358,16 +374,18 @@ void SoftbusListener::OnLocalDevInfoChange()
 void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *msg, uint32_t msgLen)
 {
     LOGI("OnDeviceTrustedChange.");
-    if (msg == nullptr || msgLen > MAX_SOFTBUS_MSG_LEN) {
+    if (msg == nullptr || msgLen > MAX_SOFTBUS_MSG_LEN || strlen(msg) != msgLen) {
         LOGE("OnDeviceTrustedChange msg invalied.");
         return;
     }
-    std::string softbusMsg = std::string(msg);
+    std::string softbusMsg = std::string(msg, msgLen);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (type == TrustChangeType::DEVICE_NOT_TRUSTED) {
         ffrt::submit([=]() { DeviceNotTrust(softbusMsg); });
     } else if (type == TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE) {
         ffrt::submit([=]() { DeviceTrustedChange(softbusMsg); });
+    } else if (type == TrustChangeType::DEVICE_FOREGROUND_USERID_CHANGE) {
+        ffrt::submit([=]() { DeviceUserIdCheckSumChange(softbusMsg); });
     } else {
         LOGE("Invalied trust change type.");
     }
@@ -386,6 +404,13 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
             LOGE("deviceTrustedChange setname failed.");
         }
         deviceTrustedChange.detach();
+    } else if (type == TrustChangeType::DEVICE_FOREGROUND_USERID_CHANGE) {
+        std::thread deviceUserIdCheckSumChange([=]() { DeviceUserIdCheckSumChange(softbusMsg); });
+        int32_t ret = pthread_setname_np(deviceUserIdCheckSumChange.native_handle(), DEVICE_NOT_TRUST);
+        if (ret != DM_OK) {
+            LOGE("deviceUserIdCheckSumChange setname failed.");
+        }
+        deviceUserIdCheckSumChange.detach();
     } else {
         LOGE("Invalied trust change type.");
     }
@@ -1137,6 +1162,21 @@ int32_t SoftbusListener::GetDeviceScreenStatus(const char *networkId, int32_t &s
     }
     screenStatus = devScreenStatus;
     LOGI("GetDeviceScreenStatus screenStatus: %{public}d.", devScreenStatus);
+    return DM_OK;
+}
+
+int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remoteUdid,
+    const std::vector<uint32_t> &userIds)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    NotifyUserIds notifyUserIds(remoteUdid, userIds);
+    std::string msg = notifyUserIds.ToString();
+    LOGI("Notify remote userid to dsoftbus, msg: %{public}s", GetAnonyString(msg).c_str());
+    return DM_OK;
+#else
+    (void)remoteUdid;
+    (void)userIds;
+#endif
     return DM_OK;
 }
 } // namespace DistributedHardware

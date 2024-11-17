@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -143,11 +143,11 @@ public:
     std::string GetNetworkIdByDeviceId(const std::string &deviceId);
     void HandleDeviceOnline(std::string deviceId, int32_t authForm);
     void HandleDeviceOffline(std::string deviceId);
-    void SetPkgName(std::string pkgName);
+    void SetProcessInfo(ProcessInfo processInfo);
     bool CheckIsOnline(const std::string &targetDeviceId);
-    void SetPkgNameVec(std::vector<std::string> pkgNameVec);
-    std::vector<std::string> GetPkgName();
-    void ClearPkgName();
+    void SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec);
+    std::vector<ProcessInfo> GetProcessInfo();
+    void ClearProcessInfo();
     DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
     void DeleteOffLineTimer(std::string &udidHash);
 
@@ -177,11 +177,11 @@ private:
     std::shared_ptr<ISoftbusStateCallback> deviceStateManagerCallback_;
     static std::queue<std::string> discoveryDeviceIdQueue_;
     static std::unordered_map<std::string, std::string> deviceUdidMap_;
-    static std::vector<std::string> pkgNameVec_;
+    static std::vector<ProcessInfo> processInfoVec_;
     static std::mutex discoveryCallbackMutex_;
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex deviceUdidLocks_;
-    static std::mutex pkgNameVecMutex_;
+    static std::mutex processInfoVecMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
