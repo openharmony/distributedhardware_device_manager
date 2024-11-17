@@ -1252,7 +1252,7 @@ std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const s
     return userIdAndBindLevel;
 }
 
-void DeviceProfileConnector::UpdatePeerUserId(std::string &localUdid, const std::vector<int32_t> &localUserIds,
+void DeviceProfileConnector::UpdateACL(std::string &localUdid, const std::vector<int32_t> &localUserIds,
     const std::string &remoteUdid, const std::vector<int32_t> &remoteFrontUserIds,
     const std::vector<int32_t> &remoteBackUserIds)
 {
@@ -1260,43 +1260,53 @@ void DeviceProfileConnector::UpdatePeerUserId(std::string &localUdid, const std:
         GetAnonyString(remoteUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     for (auto item : profiles) {
-        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
-        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
-        int32_t accesserUserid = item.GetAccesser().GetAccesserUserId();
-        int32_t accesseeUserid = item.GetAccessee().GetAccesseeUserId();
-        int32_t bindType = item.GetBindType();
         // deleta signal trust acl.
-        if (accesserUdid == remoteUdid && accesserUserid != 0 && accesserUserid != -1 &&
-            find(remoteFrontUserIds.begin(), remoteFrontUserIds.end(), accesserUserid) == remoteFrontUserIds.end() &&
-            find(remoteBackUserIds.begin(), remoteBackUserIds.end(), accesserUserid) == remoteBackUserIds.end()) {
-            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
-            continue;
-        }
-        if (accesseeUdid == remoteUdid && accesseeUserid != 0 && accesseeUserid != -1 &&
-            find(remoteFrontUserIds.begin(), remoteFrontUserIds.end(), accesseeUserid) == remoteFrontUserIds.end() &&
-            find(remoteBackUserIds.begin(), remoteBackUserIds.end(), accesseeUserid) == remoteBackUserIds.end()) {
-            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
-            continue;
-        }
+        DeleteSigTrustACL(item, remoteUdid, remoteFrontUserIds, remoteBackUserIds);
         // update identical account userId.
-        if (accesserUdid == localUdid && accesseeUdid == remoteUdid && bindType == DM_IDENTICAL_ACCOUNT &&
-            find(localUserIds.begin(), localUserIds.end(), accesserUserid) != localUserIds.end() &&
-            (accesseeUserid == 0 || accesseeUserid == -1)) {
-            Accessee accessee = item.GetAccessee();
-            accessee.SetAccesseeUserId(remoteFrontUserIds[0]);
-            item.SetAccessee(accessee);
-            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
-            continue;
-        }
-        if (accesserUdid == remoteUdid && accesseeUdid == localUdid && bindType == DM_IDENTICAL_ACCOUNT &&
-            find(localUserIds.begin(), localUserIds.end(), accesseeUserid) != localUserIds.end() &&
-            (accesserUserid == 0 || accesserUserid == -1)) {
-            Accesser accesser = item.GetAccesser();
-            accesser.SetAccesserUserId(remoteFrontUserIds[0]);
-            item.SetAccesser(accesser);
-            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
-            continue;
-        }
+        UpdatePeerUserId(item, localUdid, localUserIds, remoteUdid, remoteFrontUserIds);
+    }
+}
+
+void DeviceProfileConnector::DeleteSigTrustACL(AccessControlProfile profile, const std::string &remoteUdid,
+    const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds)
+{
+    LOGI("start.");
+    std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+    std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+    int32_t accesserUserid = profile.GetAccesser().GetAccesserUserId();
+    int32_t accesseeUserid = profile.GetAccessee().GetAccesseeUserId();
+    if (accesserUdid == remoteUdid && accesserUserid != 0 && accesserUserid != -1 &&
+        find(remoteFrontUserIds.begin(), remoteFrontUserIds.end(), accesserUserid) == remoteFrontUserIds.end() &&
+        find(remoteBackUserIds.begin(), remoteBackUserIds.end(), accesserUserid) == remoteBackUserIds.end()) {
+        DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(profile.GetAccessControlId());
+        return;
+    }
+    if (accesseeUdid == remoteUdid && accesseeUserid != 0 && accesseeUserid != -1 &&
+        find(remoteFrontUserIds.begin(), remoteFrontUserIds.end(), accesseeUserid) == remoteFrontUserIds.end() &&
+        find(remoteBackUserIds.begin(), remoteBackUserIds.end(), accesseeUserid) == remoteBackUserIds.end()) {
+        DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(profile.GetAccessControlId());
+        return;
+    }
+}
+
+void DeviceProfileConnector::UpdatePeerUserId(AccessControlProfile profile, std::string &localUdid,
+    const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
+    const std::vector<int32_t> &remoteFrontUserIds)
+{
+    LOGI("start.");
+    std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
+    std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
+    int32_t accesserUserid = profile.GetAccesser().GetAccesserUserId();
+    int32_t accesseeUserid = profile.GetAccessee().GetAccesseeUserId();
+    int32_t bindType = profile.GetBindType();
+    if (accesserUdid == localUdid && accesseeUdid == remoteUdid && bindType == DM_IDENTICAL_ACCOUNT &&
+        find(localUserIds.begin(), localUserIds.end(), accesserUserid) != localUserIds.end() &&
+        (accesseeUserid == 0 || accesseeUserid == -1)) {
+        Accessee accessee = profile.GetAccessee();
+        accessee.SetAccesseeUserId(remoteFrontUserIds[0]);
+        profile.SetAccessee(accessee);
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+        return;
     }
 }
 
