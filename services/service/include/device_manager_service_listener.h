@@ -109,12 +109,11 @@ private:
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessAppOffline(const std::vector<ProcessInfo> procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    void RemoveNotExistProcess(const std::vector<ProcessInfo> &procInfoVec);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;
     static std::mutex alreadyNotifyPkgNameLock_;
-    static std::map<DmNotifyKey, DmDeviceInfo> alreadyOnlinePkgName_;
+    static std::map<std::string, DmDeviceInfo> alreadyOnlinePkgName_;
 #endif
 };
 } // namespace DistributedHardware

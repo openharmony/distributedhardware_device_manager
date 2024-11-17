@@ -170,7 +170,9 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
     CHECK_NULL_VOID(listener_);
     std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
     for (const auto &item : processInfoVec) {
-        listener_->OnDeviceStateChange(item, devState, devInfo);
+        if (!item.pkgName.empty()) {
+            listener_->OnDeviceStateChange(item, devState, devInfo);
+        }
     }
 }
 

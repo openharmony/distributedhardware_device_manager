@@ -19,7 +19,6 @@
 #include <map>
 #include <string>
 #include "nlohmann/json.hpp"
-#include <unordered_map>
 #include "dm_device_info.h"
 
 namespace OHOS {

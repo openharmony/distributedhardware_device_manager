@@ -235,8 +235,8 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
                     item.first);
             softbusConnector_->SetProcessInfoVec(processInfoVec);
         }
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
     }
-    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
 }
 
 void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo)
@@ -731,20 +731,6 @@ void DeviceManagerServiceImpl::HandleUserSwitched(const std::map<std::string, in
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    ProcessInfo processInfo;
-    processInfo.pkgName = std::string(DM_PKG_NAME);
-    processInfo.userId = beforeUserId;
-    for (const auto &item : deviceMap) {
-        if (item.second == INVALIED_TYPE || item.second == DEVICE) {
-            softbusConnector_->SetProcessInfo(processInfo);
-        } else {
-            std::vector<ProcessInfo> processInfoVec =
-                DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localUdid,
-                    item.first, beforeUserId);
-            softbusConnector_->SetProcessInfoVec(processInfoVec);
-        }
-        softbusConnector_->HandleDeviceOffline(item.first);
-    }
     DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, currentUserId, beforeUserId);
 }
 
@@ -897,14 +883,6 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     }
     DeviceProfileConnector::GetInstance().UpdatePeerUserId(localUdid, localUserIds, remoteUdid,
         rmtFrontUserIdsTemp, rmtBackUserIdsTemp);
-    std::vector<ProcessInfo> offlineProcInfo =
-        DeviceProfileConnector::GetInstance().GetOfflineProcessInfo(localUdid, localUserIds,
-            remoteUdid, rmtBackUserIdsTemp);
-    if (!offlineProcInfo.empty()) {
-        CHECK_NULL_VOID(softbusConnector_);
-        softbusConnector_->SetProcessInfoVec(offlineProcInfo);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
-    }
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
         localUserIds, localUdid);
     DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(rmtBackUserIdsTemp, remoteUdid,
