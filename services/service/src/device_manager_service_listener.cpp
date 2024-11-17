@@ -49,7 +49,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 std::mutex DeviceManagerServiceListener::alreadyNotifyPkgNameLock_;
-std::map<DmNotifyKey, DmDeviceInfo> DeviceManagerServiceListener::alreadyOnlinePkgName_ = {};
+std::map<std::string, DmDeviceInfo> DeviceManagerServiceListener::alreadyOnlinePkgName_ = {};
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -557,7 +557,7 @@ void DeviceManagerServiceListener::OnAppUnintall(const std::string &pkgName)
 {
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
     for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
-        if (it->first.processPkgName == pkgName) {
+        if (it->first.find(pkgName) != std::string::npos) {
             it = alreadyOnlinePkgName_.erase(it);
         } else {
             ++it;
@@ -651,18 +651,14 @@ void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<Process
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     for (const auto &it : procInfoVec) {
-        DmNotifyKey notifyKey;
-        notifyKey.processPkgName = it.pkgName;
-        notifyKey.processUserId = it.userId;
-        notifyKey.notifyUserId = processInfo.userId;
-        notifyKey.udid = info.deviceId;
+        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
         DmDeviceState notifyState = state;
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-            if (alreadyOnlinePkgName_.find(notifyKey) != alreadyOnlinePkgName_.end()) {
+            if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
                 notifyState = DmDeviceState::DEVICE_INFO_CHANGED;
             } else {
-                alreadyOnlinePkgName_[notifyKey] = info;
+                alreadyOnlinePkgName_[notifyPkgName] = info;
             }
         }
         SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
@@ -678,20 +674,14 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
         GetAnonyString(info.deviceId).c_str());
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    RemoveNotExistProcess(procInfoVec);
-    if (!SoftbusCache::GetInstance().CheckIsOnline(std::string(info.deviceId))) {
-        RemoveOnlinePkgName(info);
-    }
     for (const auto &it : procInfoVec) {
-        DmNotifyKey notifyKey;
-        notifyKey.processPkgName = it.pkgName;
-        notifyKey.processUserId = it.userId;
-        notifyKey.notifyUserId = processInfo.userId;
-        notifyKey.udid = info.deviceId;
+        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-            if (alreadyOnlinePkgName_.find(notifyKey) != alreadyOnlinePkgName_.end()) {
+            if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
                 alreadyOnlinePkgName_.erase(notifyKey);
+            } else {
+                continue;
             }
         }
         SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
@@ -722,18 +712,14 @@ void DeviceManagerServiceListener::ProcessAppOnline(const std::vector<ProcessInf
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     for (const auto &it : procInfoVec) {
-        DmNotifyKey notifyKey;
-        notifyKey.processPkgName = it.pkgName;
-        notifyKey.processUserId = it.userId;
-        notifyKey.notifyUserId = processInfo.userId;
-        notifyKey.udid = info.deviceId;
+        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
         DmDeviceState notifyState = state;
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-            if (alreadyOnlinePkgName_.find(notifyKey) != alreadyOnlinePkgName_.end()) {
+            if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
                 notifyState = DmDeviceState::DEVICE_INFO_CHANGED;
             } else {
-                alreadyOnlinePkgName_[notifyKey] = info;
+                alreadyOnlinePkgName_[notifyPkgName] = info;
             }
         }
         SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
@@ -750,21 +736,25 @@ void DeviceManagerServiceListener::ProcessAppOffline(const std::vector<ProcessIn
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     if (!SoftbusCache::GetInstance().CheckIsOnline(std::string(info.deviceId))) {
-        RemoveOnlinePkgName(info);
         for (const auto &it : procInfoVec) {
+            std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+            {
+                std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+                if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
+                    alreadyOnlinePkgName_.erase(notifyKey);
+                } else {
+                    continue;
+                }
+            }
             SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     } else {
-        DmNotifyKey notifyKey;
-        notifyKey.processPkgName = processInfo.pkgName;
-        notifyKey.processUserId = processInfo.userId;
-        notifyKey.notifyUserId = processInfo.userId;
-        notifyKey.udid = info.deviceId;
+        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-            if (alreadyOnlinePkgName_.find(notifyKey) != alreadyOnlinePkgName_.end()) {
-                alreadyOnlinePkgName_.erase(notifyKey);
+            if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
+                alreadyOnlinePkgName_.erase(notifyPkgName);
             }
         }
         SetDeviceInfo(pReq, processInfo, state, info, deviceBasicInfo);
@@ -772,26 +762,12 @@ void DeviceManagerServiceListener::ProcessAppOffline(const std::vector<ProcessIn
     }
 }
 
-void DeviceManagerServiceListener::RemoveNotExistProcess(const std::vector<ProcessInfo> &procInfoVec)
-{
-    std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-    for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
-        ProcessInfo processInfo;
-        processInfo.pkgName = it->first.processPkgName;
-        processInfo.userId = it->first.processUserId;
-        if (find(procInfoVec.begin(), procInfoVec.end(), processInfo) != procInfoVec.end()) {
-            it = alreadyOnlinePkgName_.erase(it);
-        } else {
-            ++it;
-        }
-    }
-}
-
 void DeviceManagerServiceListener::OnProcessRemove(const ProcessInfo &processInfo)
 {
     std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+    std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId)
     for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
-        if (processInfo.pkgName == it->first.processPkgName && processInfo.userId == it->first.processUserId) {
+        if (it->first.find(notifyPkgName) != std::string::npos) {
             it = alreadyOnlinePkgName_.erase(it);
         } else {
             ++it;
