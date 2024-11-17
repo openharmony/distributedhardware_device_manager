@@ -53,10 +53,16 @@ std::string GetAnonyString(const std::string &value)
 
 std::string GetAnonyStringList(const std::vector<std::string> &values)
 {
-    std::string temp = "";
+    std::string temp = "[ ";
+    bool flag = false;
     for (auto const &v : values) {
-        temp += GetAnonyString(v) + ", ";
+        temp += GetAnonyString(v) + PRINT_LIST_SPLIT;
+        flag = true;
     }
+    if (flag) {
+        temp.erase(temp.length() - LIST_SPLIT_LEN);
+    }
+    temp += " ]";
     return temp;
 }
 
@@ -76,10 +82,16 @@ std::string GetAnonyInt32(const int32_t value)
 
 std::string GetAnonyInt32List(const std::vector<int32_t> &values)
 {
-    std::string temp = "";
+    std::string temp = "[ ";
+    bool flag = false;
     for (auto const &v : values) {
-        temp += GetAnonyInt32(v) + ", ";
+        temp += GetAnonyInt32(v) + PRINT_LIST_SPLIT;
+        flag = true;
     }
+    if (flag) {
+        temp.erase(temp.length() - LIST_SPLIT_LEN);
+    }
+    temp += " ]";
     return temp;
 }
 
