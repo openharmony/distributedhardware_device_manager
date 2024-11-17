@@ -147,7 +147,7 @@ public:
     std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
         const std::string &remoteUdid, const std::vector<int32_t> &remoteUserIds);
     std::map<int32_t, int32_t> GetUserIdAndBindLevel(const std::string &localUdid, const std::string &peerUdid);
-    void UpdatePeerUserId(std::string &localUdid, const std::vector<int32_t> &localUserIds,
+    void UpdateACL(std::string &localUdid, const std::vector<int32_t> &localUserIds,
         const std::string &remoteUdid, const std::vector<int32_t> &remoteFrontUserIds,
         const std::vector<int32_t> &remoteBackUserIds);
     std::multimap<std::string, int32_t> GetDevIdAndUserIdByActHash(const std::string &localUdid,
@@ -180,6 +180,11 @@ private:
     void UpdateBindType(const std::string &udid, int32_t compareParam, std::map<std::string, int32_t> &deviceMap);
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByUserId(const std::string &localUdid,
         int32_t userId, const std::string &remoteUdid);
+    void DeleteSigTrustACL(DistributedDeviceProfile::AccessControlProfile profile, const std::string &remoteUdid,
+        const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds);
+    void UpdatePeerUserId(DistributedDeviceProfile::AccessControlProfile profile, std::string &localUdid,
+        const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
+        const std::vector<int32_t> &remoteFrontUserIds);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

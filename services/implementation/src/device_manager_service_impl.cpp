@@ -884,7 +884,7 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
         LOGE("Get foreground userids failed, ret: %{public}d", ret);
         return;
     }
-    DeviceProfileConnector::GetInstance().UpdatePeerUserId(localUdid, localUserIds, remoteUdid,
+    DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
         rmtFrontUserIdsTemp, rmtBackUserIdsTemp);
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
         localUserIds, localUdid);
