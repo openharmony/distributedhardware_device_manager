@@ -384,7 +384,7 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
         ffrt::submit([=]() { DeviceNotTrust(softbusMsg); });
     } else if (type == TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE) {
         ffrt::submit([=]() { DeviceTrustedChange(softbusMsg); });
-    } else if (type == TrustChangeType::DEVICE_USERIDCHECKSUM_CHANGE) {
+    } else if (type == TrustChangeType::DEVICE_FOREGROUND_USERID_CHANGE) {
         ffrt::submit([=]() { DeviceUserIdCheckSumChange(softbusMsg); });
     } else {
         LOGE("Invalied trust change type.");
@@ -404,7 +404,7 @@ void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *ms
             LOGE("deviceTrustedChange setname failed.");
         }
         deviceTrustedChange.detach();
-    } else if (type == TrustChangeType::DEVICE_USERIDCHECKSUM_CHANGE) {
+    } else if (type == TrustChangeType::DEVICE_FOREGROUND_USERID_CHANGE) {
         std::thread deviceUserIdCheckSumChange([=]() { DeviceUserIdCheckSumChange(softbusMsg); });
         int32_t ret = pthread_setname_np(deviceUserIdCheckSumChange.native_handle(), DEVICE_NOT_TRUST);
         if (ret != DM_OK) {
