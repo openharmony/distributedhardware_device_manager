@@ -2067,11 +2067,11 @@ void DeviceManagerService::ProcessCheckSumByWifi(std::string networkId, std::vec
     for (auto const &u : foregroundUserIds) {
         foregroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
     }
-    std::vector<uint32_t> backroundUserIdsUInt;
+    std::vector<uint32_t> backgroundUserIdsUInt;
     for (auto const &u : backgroundUserIds) {
-        backroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
+        backgroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
     }
-    DMCommTool::GetInstance()->SendUserIds(networkId, foregroundUserIdsUInt, backroundUserIdsUInt);
+    DMCommTool::GetInstance()->SendUserIds(networkId, foregroundUserIdsUInt, backgroundUserIdsUInt);
 }
 
 void DeviceManagerService::ProcessCheckSumByBT(std::string networkId, std::vector<int32_t> foregroundUserIds,

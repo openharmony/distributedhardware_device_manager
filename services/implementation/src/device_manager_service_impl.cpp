@@ -868,18 +868,21 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
 }
 
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-    const std::vector<uint32_t> &backroundUserIds, const std::string &remoteUdid)
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
 {
-    LOGI("remote udid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    LOGI("remote udid: %{public}s, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
+        GetAnonyString(remoteUdid).c_str(), GetIntegerList<uint32_t>(foregroundUserIds).c_str(),
+        GetIntegerList<uint32_t>(backgroundUserIds).c_str());
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
     std::vector<int32_t> rmtFrontUserIdsTemp(foregroundUserIds.begin(), foregroundUserIds.end());
-    std::vector<int32_t> rmtBackUserIdsTemp(backroundUserIds.begin(), backroundUserIds.end());
+    std::vector<int32_t> rmtBackUserIdsTemp(backgroundUserIds.begin(), backgroundUserIds.end());
     std::vector<int32_t> localUserIds;
     int32_t ret = MultipleUserConnector::GetForegroundUserIds(localUserIds);
     if (ret != DM_OK || localUserIds.empty()) {
         LOGE("Get foreground userids failed, ret: %{public}d", ret);
+        return;
     }
     DeviceProfileConnector::GetInstance().UpdatePeerUserId(localUdid, localUserIds, remoteUdid,
         rmtFrontUserIdsTemp, rmtBackUserIdsTemp);

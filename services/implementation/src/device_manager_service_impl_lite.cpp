@@ -545,10 +545,10 @@ int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, i
 }
 
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-    const std::vector<uint32_t> &backroundUserIds, const std::string &remoteUdid)
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
 {
     (void)foregroundUserIds;
-    (void)backroundUserIds;
+    (void)backgroundUserIds;
     (void)remoteUdid;
 }
 

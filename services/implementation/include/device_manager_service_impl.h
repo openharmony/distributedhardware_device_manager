@@ -135,7 +135,7 @@ public:
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backroundUserIds, const std::string &remoteUdid);
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     void HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap, int32_t currentUserId,
         int32_t beforeUserId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId);
@@ -154,7 +154,7 @@ private:
     void HandleUserRemoved(int32_t preUserId);
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
-    
+
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;

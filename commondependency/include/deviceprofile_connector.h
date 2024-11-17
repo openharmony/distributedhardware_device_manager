@@ -108,7 +108,7 @@ public:
     std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
         std::string localDeviceId, std::string targetDeviceId);
     int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm);
-    int32_t DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
+    bool DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
         const std::string &peerUdid, int32_t peerUserId);
     void DeleteAclForUserRemoved(std::string localUdid, int32_t userId);
     DmOfflineParam DeleteAccessControlList(const std::string &pkgName, const std::string &localDeviceId,

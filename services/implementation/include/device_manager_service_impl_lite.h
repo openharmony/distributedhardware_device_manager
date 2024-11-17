@@ -142,7 +142,7 @@ public:
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backroundUserIds, const std::string &remoteUdid);
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId);

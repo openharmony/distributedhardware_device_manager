@@ -99,15 +99,15 @@ private:
     std::vector<ProcessInfo> GetWhiteListSAProcessInfo();
     std::vector<ProcessInfo> GetNotifyProcessInfoByUserId(int32_t userId);
     ProcessInfo DealBindProcessInfo(const ProcessInfo &processInfo);
-    void ProcessDeviceOnline(const std::vector<ProcessInfo> procInfoVec, const ProcessInfo &processInfo,
+    void ProcessDeviceOnline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessDeviceOffline(const std::vector<ProcessInfo> procInfoVec, const ProcessInfo &processInfo,
+    void ProcessDeviceOffline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessDeviceInfoChange(const std::vector<ProcessInfo> procInfoVec, const ProcessInfo &processInfo,
+    void ProcessDeviceInfoChange(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessAppOnline(const std::vector<ProcessInfo> procInfoVec, const ProcessInfo &processInfo,
+    void ProcessAppOnline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessAppOffline(const std::vector<ProcessInfo> procInfoVec, const ProcessInfo &processInfo,
+    void ProcessAppOffline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
 private:
 #if !defined(__LITEOS_M__)

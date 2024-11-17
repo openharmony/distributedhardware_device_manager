@@ -641,7 +641,7 @@ ProcessInfo DeviceManagerServiceListener::DealBindProcessInfo(const ProcessInfo 
     return bindProcessInfo;
 }
 
-void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<ProcessInfo> procInfoVec,
+void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<ProcessInfo> &procInfoVec,
     const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -665,7 +665,7 @@ void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<Process
     }
 }
 
-void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<ProcessInfo> procInfoVec,
+void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<ProcessInfo> &procInfoVec,
     const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -688,7 +688,7 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
     }
 }
 
-void DeviceManagerServiceListener::ProcessDeviceInfoChange(const std::vector<ProcessInfo> procInfoVec,
+void DeviceManagerServiceListener::ProcessDeviceInfoChange(const std::vector<ProcessInfo> &procInfoVec,
     const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -702,7 +702,7 @@ void DeviceManagerServiceListener::ProcessDeviceInfoChange(const std::vector<Pro
     }
 }
 
-void DeviceManagerServiceListener::ProcessAppOnline(const std::vector<ProcessInfo> procInfoVec,
+void DeviceManagerServiceListener::ProcessAppOnline(const std::vector<ProcessInfo> &procInfoVec,
     const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -726,7 +726,7 @@ void DeviceManagerServiceListener::ProcessAppOnline(const std::vector<ProcessInf
     }
 }
 
-void DeviceManagerServiceListener::ProcessAppOffline(const std::vector<ProcessInfo> procInfoVec,
+void DeviceManagerServiceListener::ProcessAppOffline(const std::vector<ProcessInfo> &procInfoVec,
     const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
     const DmDeviceBasicInfo &deviceBasicInfo)
 {

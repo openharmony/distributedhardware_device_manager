@@ -2597,6 +2597,9 @@ void DmAuthManager::SetProcessInfo()
     } else if (authResponseContext_->bindLevel == DEVICE || authResponseContext_->bindLevel == INVALIED_TYPE) {
         processInfo.pkgName = std::string(DM_PKG_NAME);
         processInfo.userId = authResponseContext_->localUserId;
+    } else {
+        LOGE("bindlevel error %{public}d.", authResponseContext_->bindLevel);
+        return;
     }
     softbusConnector_->SetProcessInfo(processInfo);
 }

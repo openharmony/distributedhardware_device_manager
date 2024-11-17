@@ -695,7 +695,7 @@ void DiscoveryManager::GetPkgNameAndUserId(const std::string &pkgName, std::stri
             return;
         }
     }
-    LOGE("find failed.");
+    LOGE("find failed PkgName %{public}s.", pkgName.c_str());
 }
 } // namespace DistributedHardware
 } // namespace OHOS
