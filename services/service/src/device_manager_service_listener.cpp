@@ -678,7 +678,7 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
             if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
-                alreadyOnlinePkgName_.erase(notifyKey);
+                alreadyOnlinePkgName_.erase(notifyPkgName);
             } else {
                 continue;
             }
@@ -740,7 +740,7 @@ void DeviceManagerServiceListener::ProcessAppOffline(const std::vector<ProcessIn
             {
                 std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
                 if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
-                    alreadyOnlinePkgName_.erase(notifyKey);
+                    alreadyOnlinePkgName_.erase(notifyPkgName);
                 } else {
                     continue;
                 }
@@ -749,13 +749,14 @@ void DeviceManagerServiceListener::ProcessAppOffline(const std::vector<ProcessIn
             ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
         }
     } else {
-        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" +
+            std::string(info.deviceId);
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
             if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
                 alreadyOnlinePkgName_.erase(notifyPkgName);
             } else {
-                continue;
+                return;
             }
         }
         SetDeviceInfo(pReq, processInfo, state, info, deviceBasicInfo);
