@@ -160,9 +160,6 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName, DmDeviceInfo 
     info.authForm = DmAuthForm::INVALID_TYPE;
     GetAuthForm(localDeviceId, info.deviceId, filterPara.isTrusted, info.authForm);
     filterPara.authForm = info.authForm;
-    if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
-        listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
-    }
     return;
 }
 
@@ -223,9 +220,6 @@ void DmDiscoveryManager::OnDeviceFound(const std::string &pkgName,
     DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
     GetAuthForm(localDeviceId, info.deviceId, filterPara.isTrusted, authForm);
     filterPara.authForm = authForm;
-    if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
-        listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
-    }
     return;
 }
 
@@ -248,7 +242,6 @@ void DmDiscoveryManager::OnDiscoveryFailed(const std::string &pkgName, int32_t s
         }
     }
     softbusConnector_->StopDiscovery(subscribeId);
-    listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, failedReason);
 }
 
 void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId)
@@ -258,7 +251,6 @@ void DmDiscoveryManager::OnDiscoverySuccess(const std::string &pkgName, int32_t 
         std::lock_guard<std::mutex> autoLock(locks_);
         discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
     }
-    listener_->OnDiscoverySuccess(pkgName, subscribeId);
 }
 
 void DmDiscoveryManager::HandleDiscoveryTimeout(std::string name)

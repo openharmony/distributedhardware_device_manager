@@ -24,8 +24,6 @@
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_trustdevice_req.h"
-#include "ipc_start_discovery_req.h"
-#include "ipc_stop_discovery_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_set_useroperation_req.h"
@@ -276,44 +274,6 @@ HWTEST_F(IpcCmdRegisterTest, SetRequest_010, testing::ext::TestSize.Level0)
     std::string netWorkId = "1234";
     req->SetPkgName(pkgName);
     req->SetNetWorkId(netWorkId);
-    int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: SetRequest_011
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, SetRequest_011, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = START_DEVICE_DISCOVER;
-    MessageParcel data;
-    std::shared_ptr<IpcStartDiscoveryReq> req = std::make_shared<IpcStartDiscoveryReq>();
-    std::string pkgName = "ohos.test";
-    std::string extra = "1234";
-    DmSubscribeInfo dmSubscribeInfo;
-    req->SetPkgName(pkgName);
-    req->SetExtra(extra);
-    req->SetSubscribeInfo(dmSubscribeInfo);
-    int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: SetRequest_012
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, SetRequest_012, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = STOP_DEVICE_DISCOVER;
-    MessageParcel data;
-    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
-    std::string pkgName = "ohos.test";
-    uint16_t subscribeId = 12;
-    req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
     int ret = IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -639,34 +599,6 @@ HWTEST_F(IpcCmdRegisterTest, ReadResponse_008, testing::ext::TestSize.Level0)
     int32_t cmdCode = GET_UUID_BY_NETWORK;
     MessageParcel reply;
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
-    int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: ReadResponse_009
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, ReadResponse_009, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = START_DEVICE_DISCOVER;
-    MessageParcel reply;
-    std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
-    int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
-    ASSERT_EQ(ret, DM_OK);
-}
-
-/**
- * @tc.name: ReadResponse_010
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(IpcCmdRegisterTest, ReadResponse_010, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = STOP_DEVICE_DISCOVER;
-    MessageParcel reply;
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     int ret = IpcCmdRegister::GetInstance().ReadResponse(cmdCode, reply, rsp);
     ASSERT_EQ(ret, DM_OK);
 }

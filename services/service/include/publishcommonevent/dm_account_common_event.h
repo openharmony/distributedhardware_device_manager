@@ -33,7 +33,19 @@ namespace DistributedHardware {
 using OHOS::EventFwk::CommonEventData;
 using OHOS::EventFwk::CommonEventSubscriber;
 using OHOS::EventFwk::CommonEventSubscribeInfo;
-using AccountEventCallback = std::function<void(int32_t, std::string)>;
+/**
+ * @brief account event callback define, fun(event_type, current userid, before userid)
+ * first param, accont event
+ * second param, the current userid
+ * third param, the userid before.
+ *          first param         |       second param        |       third param
+ * ------------------------------------------
+ * COMMON_EVENT_USER_SWITCHED   |   switch target user id   |   the user id before switch
+ * COMMON_EVENT_USER_REMOVED    |           -1              |   the user id removed
+ * COMMON_EVENT_HWID_LOGOUT     |  logout in witch user id  |   logout in witch user id
+ * COMMON_EVENT_HWID_LOGIN      |  login in witch user id   |   login in witch user id
+ */
+using AccountEventCallback = std::function<void(std::string, int32_t, int32_t)>;
 
 class DmAccountEventSubscriber : public CommonEventSubscriber {
 public:

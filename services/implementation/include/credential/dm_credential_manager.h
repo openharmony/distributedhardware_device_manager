@@ -95,7 +95,7 @@ public:
     int32_t DeleteCredential(const std::string &pkgName, const std::string &deleteInfo);
 
     /**
-     * @tc.name: HiChainConnector::OnCredentialResult
+     * @tc.name: HiChainConnector::OnGroupResult
      * @tc.desc: Credential Result of the DmCredential Manager
      * @tc.type: FUNC
      */
@@ -103,6 +103,7 @@ public:
 
     int32_t ImportRemoteCredentialExt(const std::string &credentialInfo);
     void OnGroupResultExt(int32_t action, const std::string &resultInfo);
+    void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     
 private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
@@ -110,7 +111,7 @@ private:
     std::vector<std::string> credentialVec_;
     int64_t requestId_ = 0;
     std::mutex locks_;
-    std::string pkgName_;
+    ProcessInfo processInfo_;
 private:
     int32_t GetCredentialData(const std::string &credentialInfo, const CredentialData &inputCreData,
         nlohmann::json &jsonOutObj);

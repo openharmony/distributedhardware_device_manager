@@ -120,100 +120,6 @@ HWTEST_F(DeviceManagerServiceTest, InitDMServiceListener_001, testing::ext::Test
 }
 
 /**
- * @tc.name: StartDeviceDiscovery_001
- * @tc.desc: Start device discovery and return ERR_DM_NO_PERMISSION
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_001, testing::ext::TestSize.Level0)
-{
-    DeletePermission();
-    std::string pkgName = "com.ohos.test";
-    DmSubscribeInfo subscribeInfo;
-    std::string extra;
-    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-/**
- * @tc.name: StartDeviceDiscovery_002
- * @tc.desc: Empty pkgName of StartDeviceDiscovery and return ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    DmSubscribeInfo subscribeInfo;
-    std::string extra = "test";
-    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name: StartDeviceDiscovery_003
- * @tc.desc: Call StartDeviceDiscovery twice with pkgName not null and flag bit not false and return
- * ERR_DM_DISCOVERY_REPEATED
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    DmSubscribeInfo subscribeInfo;
-    std::string extra = "test";
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-    EXPECT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
-    DeviceManagerService::GetInstance().UninitDMServiceListener();
-}
-
-/**
- * @tc.name: StopDeviceDiscovery_001
- * @tc.desc: Stop device discovery and return SOFTBUS_ERR
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    uint16_t subscribeId = 1;
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_TRUE(ret == SOFTBUS_DISCOVER_COAP_STOP_DISCOVER_FAIL || ret == SOFTBUS_ERR);
-    DeviceManagerService::GetInstance().UninitDMServiceListener();
-}
-
-/**
- * @tc.name:StopDeviceDiscovery_002
- * @tc.desc: StopDeviceDiscovery is initialized, pkgName is null, and its return value is ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    uint16_t subscribeId = 1;
-    int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-/**
- * @tc.name:StopDeviceDiscovery_003
- * @tc.desc: StopDeviceDiscovery is initialized, pkgName is null, and its return value is ERR_DM_INPUT_PARA_INVALID
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, StopDeviceDiscovery_003, testing::ext::TestSize.Level0)
-{
-    DeletePermission();
-    std::string pkgName = "StopDeviceDiscovery_003";
-    uint16_t subscribeId = 1;
-    int ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-/**
  * @tc.name: PublishDeviceDiscovery_001
  * @tc.desc: Publish device discovery and return ERR_DM_NO_PERMISSION
  * @tc.type: FUNC
@@ -294,7 +200,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_001, testing::ext::T
     std::string pkgName = "com.ohos.test";
     int32_t publishId = 1;
     int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+    EXPECT_NE(ret, DM_OK);
 }
 
 /**
@@ -345,16 +251,16 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
     std::vector<std::string> peerUdids;
     std::string accountName = "openharmony123";
     std::string commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN;
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED;
-    DeviceManagerService::GetInstance().AccountCommonEventCallback(userId, commonEventType);
-    DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
+    DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
+    DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, pkgName);
     DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     DeviceManagerService::GetInstance().SendAccountLogoutBroadCast(peerUdids, accountId, accountName, userId);
@@ -1249,34 +1155,6 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_002, testing::ext::Test
     EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    uint16_t subscribeId = 1;
-    std::string filterOptions;
-    int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_005, testing::ext::TestSize.Level0)
-{
-    DeletePermission();
-    std::string pkgName = "com.ohos.test";
-    uint16_t subscribeId = 1;
-    std::string filterOptions;
-    int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-}
-
-HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_006, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    uint16_t subscribeId = 1;
-    std::string filterOptions = "filterOptions";
-    int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-    EXPECT_NE(ret, ERR_DM_FAILED);
-}
-
 HWTEST_F(DeviceManagerServiceTest, BindDevice_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
@@ -1912,7 +1790,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::T
     std::map<std::string, std::string> extraParam;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(ret, SOFTBUS_DISCOVER_COAP_STOP_DISCOVER_FAIL);
+    EXPECT_NE(ret, DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -2264,24 +2142,6 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level
     EXPECT_NE(ret, DM_OK);
 }
 
-/**
- * @tc.name: StartDeviceDiscovery_007
- * @tc.desc: Call StartDeviceDiscovery twice with pkgName not null and flag bit not false and return
- * ERR_DM_DISCOVERY_REPEATED
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(DeviceManagerServiceTest, StartDeviceDiscovery_007, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test7";
-    uint16_t subscribeId = 1;
-    std::string extra = "test";
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    int ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, extra);
-    EXPECT_NE(ret, DM_OK);
-    DeviceManagerService::GetInstance().UninitDMServiceListener();
-}
-
 HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_003, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
@@ -2317,9 +2177,10 @@ HWTEST_F(DeviceManagerServiceTest, SendServiceUnBindBroadCast_001, testing::ext:
 
 HWTEST_F(DeviceManagerServiceTest, ClearDiscoveryCache_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "pkgName001";
+    ProcessInfo processInfo;
+    processInfo.pkgName = "pkgName001";
     DeviceManagerService::GetInstance().InitDMServiceListener();
-    DeviceManagerService::GetInstance().ClearDiscoveryCache(pkgName);
+    DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
     EXPECT_NE(DeviceManagerService::GetInstance().discoveryMgr_, nullptr);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }

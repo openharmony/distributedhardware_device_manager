@@ -159,27 +159,6 @@ ON_IPC_SERVER_CMD(GET_TRUST_DEVICE_LIST, IpcIo &req, IpcIo &reply)
     }
 }
 
-ON_IPC_SERVER_CMD(START_DEVICE_DISCOVERY, IpcIo &req, IpcIo &reply)
-{
-    LOGI("StartDeviceDiscovery service listener.");
-    std::string pkgName = (const char *)ReadString(&req, nullptr);
-    std::string extra = (const char *)ReadString(&req, nullptr);
-    uint16_t subscribeId = 0;
-    ReadUint16(&req, &subscribeId);
-    int32_t ret = DeviceManagerService::GetInstance().StartDeviceDiscovery(pkgName, subscribeId, extra);
-    WriteInt32(&reply, ret);
-}
-
-ON_IPC_SERVER_CMD(STOP_DEVICE_DISCOVER, IpcIo &req, IpcIo &reply)
-{
-    LOGI("StopDeviceDiscovery service listener.");
-    std::string pkgName = (const char *)ReadString(&req, nullptr);
-    uint16_t subscribeId = 0;
-    ReadUint16(&req, &subscribeId);
-    int32_t ret = DeviceManagerService::GetInstance().StopDeviceDiscovery(pkgName, subscribeId);
-    WriteInt32(&reply, ret);
-}
-
 ON_IPC_SERVER_CMD(REQUEST_CREDENTIAL, IpcIo &req, IpcIo &reply)
 {
     LOGI("request credential service listener.");

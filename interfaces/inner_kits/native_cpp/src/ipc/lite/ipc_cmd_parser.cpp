@@ -30,8 +30,6 @@
 #include "ipc_register_listener_req.h"
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
-#include "ipc_start_discover_req.h"
-#include "ipc_stop_discovery_req.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -161,44 +159,6 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, IpcIo &reply, std::shared_ptr<IpcRsp
     }
     pRsp->SetErrCode(ret);
     return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(START_DEVICE_DISCOVERY, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::shared_ptr<IpcStartDevDiscoveryByIdReq> pReq = std::static_pointer_cast<IpcStartDevDiscoveryByIdReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string extra = pReq->GetFilterOption();
-    uint16_t subscribeId = pReq->GetSubscribeId();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    WriteString(&request, extra.c_str());
-    WriteUint16(&request, subscribeId);
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(START_DEVICE_DISCOVERY, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    return SetRspErrCode(reply, pBaseRsp);
-}
-
-ON_IPC_SET_REQUEST(STOP_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
-                   size_t buffLen)
-{
-    std::shared_ptr<IpcStopDiscoveryReq> pReq = std::static_pointer_cast<IpcStopDiscoveryReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    uint16_t subscribeId = pReq->GetSubscribeId();
-
-    IpcIoInit(&request, buffer, buffLen, 0);
-    WriteString(&request, pkgName.c_str());
-    WriteUint16(&request, subscribeId);
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(STOP_DEVICE_DISCOVER, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    return SetRspErrCode(reply, pBaseRsp);
 }
 
 ON_IPC_SET_REQUEST(REQUEST_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,

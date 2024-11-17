@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,8 @@
 #define OHOS_DM_IPC_SERVER_LISTENER_H
 
 #include <cstdint>
-
+#include <set>
+#include "dm_device_info.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 
@@ -37,18 +38,12 @@ public:
     int32_t SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
 
     /**
-     * @tc.name: IpcServerListener::SendAll
-     * @tc.desc: Send All of the Ipc Server Listener
-     * @tc.type: FUNC
-     */
-    int32_t SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
-
-    /**
-     * @tc.name: IpcServerListener::GetAllPkgName
+     * @tc.name: IpcServerListener::GetAllProcessInfo
      * @tc.desc: Get All PkgName from stub
      * @tc.type: FUNC
      */
-    std::vector<std::string> GetAllPkgName();
+    std::vector<ProcessInfo> GetAllProcessInfo();
+    std::set<std::string> GetSystemSA();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

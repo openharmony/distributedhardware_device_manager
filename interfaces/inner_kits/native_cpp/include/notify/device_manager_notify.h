@@ -125,6 +125,7 @@ public:
                                 uint16_t deviceTypeId, int32_t errcode);
     void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
         std::string content);
+    std::shared_ptr<DiscoveryCallback> GetDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
 
 private:
 #if !defined(__LITEOS_M__)

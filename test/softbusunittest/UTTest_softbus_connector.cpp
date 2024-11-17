@@ -813,14 +813,16 @@ HWTEST_F(SoftbusConnectorTest, AddMemberToDiscoverMap_002, testing::ext::TestSiz
  * @tc.name: SetPkgName_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, SetPkgName_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, SetProcessInfo_001, testing::ext::TestSize.Level0)
 {
+    ProcessInfo processInfo;
+    std::vector<ProcessInfo> processInfoVec;
     std::string pkgName = "pkgName";
     std::vector<std::string> pkgNameVec;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    softbusConnector->SetPkgNameVec(pkgNameVec);
-    softbusConnector->SetPkgName(pkgName);
-    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), false);
+    softbusConnector->SetProcessInfoVec(processInfoVec);
+    softbusConnector->SetProcessInfo(processInfo);
+    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), false);
 }
 
 /**
@@ -871,25 +873,25 @@ HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSiz
 }
 
 /**
- * @tc.name: SetPkgNameVec_001
+ * @tc.name: SetProcessInfoVec_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, SetPkgNameVec_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, SetProcessInfoVec_001, testing::ext::TestSize.Level0)
 {
-    std::vector<std::string> pkgNameVec;
+    std::vector<ProcessInfo> processInfoVec;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    softbusConnector->SetPkgNameVec(pkgNameVec);
-    EXPECT_EQ(pkgNameVec.empty(), true);
+    softbusConnector->SetProcessInfoVec(processInfoVec);
+    EXPECT_EQ(processInfoVec.empty(), true);
 }
 
 /**
  * @tc.name: GetPkgName_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, GetPkgName_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, GetProcessInfo_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    auto ret = softbusConnector->GetPkgName();
+    auto ret = softbusConnector->GetProcessInfo();
     EXPECT_EQ(ret.empty(), true);
 }
 
@@ -897,11 +899,11 @@ HWTEST_F(SoftbusConnectorTest, GetPkgName_001, testing::ext::TestSize.Level0)
  * @tc.name: ClearPkgName_001
  * @tc.type: FUNC
  */
-HWTEST_F(SoftbusConnectorTest, ClearPkgName_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusConnectorTest, ClearProcessInfo_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    softbusConnector->ClearPkgName();
-    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+    softbusConnector->ClearProcessInfo();
+    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
 }
 
 /**
@@ -915,7 +917,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOnline_001, testing::ext::TestSize.Le
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     softbusConnector->RegisterSoftbusStateCallback(callback);
     softbusConnector->HandleDeviceOnline(deviceId, DmAuthForm::ACROSS_ACCOUNT);
-    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
 }
 
 /**
@@ -929,7 +931,7 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.L
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackTest>();
     softbusConnector->RegisterSoftbusStateCallback(callback);
     softbusConnector->HandleDeviceOffline(deviceId);
-    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
 }
 
 /**
@@ -941,7 +943,7 @@ HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
     std::string targetDeviceId = "targetDeviceId";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->CheckIsOnline(targetDeviceId);
-    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
 }
 
 /**
@@ -969,7 +971,7 @@ HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext:
     DmDeviceInfo dmDeviceInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
-    EXPECT_EQ(softbusConnector->pkgNameVec_.empty(), true);
+    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -35,6 +35,7 @@
 #include "dm_account_common_event.h"
 #include "dm_package_common_event.h"
 #include "dm_screen_common_event.h"
+#include "relationship_sync_mgr.h"
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "dm_publish_common_event.h"
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
@@ -75,14 +76,6 @@ public:
     int32_t GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &udid);
 
     int32_t GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId, std::string &uuid);
-
-    int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-                                 const std::string &extra);
-
-    int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeInfo,
-                                const std::string &filterOptions);
-
-    int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId);
 
     int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo);
 
@@ -192,17 +185,22 @@ public:
     bool CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     void HandleDeviceNotTrust(const std::string &msg);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void HandleDeviceTrustedChange(const std::string &msg);
-
+    void HandleUserIdCheckSumChange(const std::string &msg);
+#endif
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
-    void ClearDiscoveryCache(const std::string &pkgName);
+    void ClearDiscoveryCache(const ProcessInfo &processInfo);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus);
     void SubscribePackageCommonEvent();
     int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
+    void ProcessSyncUserIds(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName);
+    void RemoveNotifyRecord(const ProcessInfo &processInfo);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
@@ -216,17 +214,50 @@ private:
     void SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
     void SendAccountLogoutBroadCast(const std::vector<std::string> &peerUdids, const std::string &accountId,
         const std::string &accountName, int32_t userId);
+    /**
+     * @brief send local foreground or background userids by broadcast
+     *
+     * @param peerUdids the broadcast target device udid list
+     * @param foregroundUserIds local foreground userids
+     * @param backgroundUserIds local background userids
+     */
+    void SendUserIdsBroadCast(const std::vector<std::string> &peerUdids,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+        bool isNeedResponse);
+    void SendUserRemovedBroadCast(const std::vector<std::string> &peerUdids, int32_t userId);
+    /**
+     * @brief parse dsoftbus checksum msg
+     *
+     * @param msg checksum msg
+     * @param networkId remote device networkid
+     * @param discoveryType remote device link type, wifi or ble/br
+     * @return int32_t 0 for success
+     */
+    int32_t ParseCheckSumMsg(const std::string &msg, std::string &networkId, uint32_t &discoveryType);
+    void ProcessCheckSumByWifi(std::string networkId, std::vector<int32_t> foregroundUserIds,
+        std::vector<int32_t> backgroundUserIds);
+    void ProcessCheckSumByBT(std::string networkId, std::vector<int32_t> foregroundUserIds,
+        std::vector<int32_t> backgroundUserIds);
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();
-    void AccountCommonEventCallback(int32_t userId, const std::string commonEventType);
+    void AccountCommonEventCallback(const std::string commonEventType, int32_t currentUserId, int32_t beforeUserId);
     void SubscribeScreenLockEvent();
     void ScreenCommonEventCallback(std::string commonEventType);
     void ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInfo);
     int32_t ConvertUdidHashToAnoyDeviceId(const std::string &udidHash, std::string &anoyDeviceId);
     int32_t GetUdidHashByAnoyDeviceId(const std::string &anoyDeviceId, std::string &udidHash);
     void HandleAccountLogout(int32_t userId, const std::string &accountId, const std::string &accountName);
-    void HandleUserRemoved(int32_t preUserId);
+    void HandleUserRemoved(int32_t removedUserId);
+    /**
+     * @brief process the user switch
+     *
+     * @param currentUserId the user id which switched to foreground.
+     * @param beforeUserId the user id which switched to backend.
+     */
+    void HandleUserSwitched(int32_t curUserId, int32_t preUserId);
+    void HandleUserIdsBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
+        const std::string &remoteUdid, bool isNeedResponse);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

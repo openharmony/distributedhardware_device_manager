@@ -54,15 +54,21 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
     return true;
 }
 
-bool PermissionManager::CheckSystemSA(const std::string &pkgName)
+bool PermissionManager::CheckWhiteListSystemSA(const std::string &pkgName)
 {
     (void)pkgName;
     return true;
 }
 
-std::unordered_set<std::string> PermissionManager::GetSystemSA()
+std::unordered_set<std::string> PermissionManager::GetWhiteListSystemSA()
 {
     return std::unordered_set<std::string>{};
+}
+
+bool PermissionManager::CheckSystemSA(const std::string &pkgName)
+{
+    (void)pkgName;
+    return true;
 }
 
 bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)

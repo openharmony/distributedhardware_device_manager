@@ -26,8 +26,6 @@
 #include "ipc_register_listener_req.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_trustdevice_req.h"
-#include "ipc_start_discovery_req.h"
-#include "ipc_stop_discovery_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
@@ -128,12 +126,6 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_001, testing::ext::TestSize.Le
 {
     int32_t cmdCode = REGISTER_DEVICE_MANAGER_LISTENER;
     ASSERT_EQ(ERR_DM_FAILED, TestReadResponseRspNull(cmdCode));
-}
-
-HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_003, testing::ext::TestSize.Level0)
-{
-    int32_t cmdCode = STOP_DEVICE_DISCOVER;
-    ASSERT_EQ(TestReadResponseRspNull(cmdCode), ERR_DM_FAILED);
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_004, testing::ext::TestSize.Level0)

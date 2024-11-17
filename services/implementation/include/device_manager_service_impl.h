@@ -128,26 +128,33 @@ public:
     void HandleDeviceNotTrust(const std::string &udid);
     int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId);
-    void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId);
+    void HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId, const std::string &peerUdid,
+        int32_t peerUserId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
-
+    void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backroundUserIds, const std::string &remoteUdid);
+    void HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap, int32_t currentUserId,
+        int32_t beforeUserId);
+    std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
     void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId);
-    std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId);
+    std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
+    std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid);
     void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleUserRemoved(int32_t preUserId);
+    void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
-
+    
 private:
     std::shared_ptr<DmAuthManager> authMgr_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;

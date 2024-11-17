@@ -136,27 +136,35 @@ bool DmAccountCommonEventManager::UnsubscribeAccountCommonEvent()
 void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
-    LOGI("Received account event: %{public}s", receiveEvent.c_str());
-    int32_t userId = data.GetCode();
-    bool accountValiedEvent = false;
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED ||
-        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
-        userId = data.GetCode();
-        accountValiedEvent = true;
+    int32_t currentUserId = -1;
+    int32_t beforeUserId = -1;
+    bool accountValidEvent = false;
+
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        currentUserId = data.GetCode();
+        beforeUserId = std::atoi(data.GetWant().GetStringParam("oldId").c_str());
+        accountValidEvent = true;
+    }
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
+        beforeUserId = data.GetCode();
+        accountValidEvent = true;
     }
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT ||
         receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
-        userId = data.GetWant().GetIntParam("userId", 0);
-        accountValiedEvent = true;
+        currentUserId = data.GetWant().GetIntParam("userId", 0);
+        beforeUserId = currentUserId;
+        accountValidEvent = true;
     }
-    if (userId <= 0 || !accountValiedEvent) {
+    LOGI("Received account event: %{public}s, currentUserId: %{public}d, beforeUserId: %{public}d",
+        receiveEvent.c_str(), currentUserId, beforeUserId);
+    if (!accountValidEvent) {
         LOGE("Invalied account type event.");
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { callback_(userId, receiveEvent); });
+    ffrt::submit([=]() { callback_(receiveEvent, currentUserId, beforeUserId); });
 #else
-    std::thread dealThread([=]() { callback_(userId, receiveEvent); });
+    std::thread dealThread([=]() { callback_(receiveEvent, currentUserId, beforeUserId); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
     if (ret != DM_OK) {
         LOGE("dealThread setname failed.");

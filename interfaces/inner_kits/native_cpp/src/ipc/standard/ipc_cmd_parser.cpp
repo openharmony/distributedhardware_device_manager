@@ -48,9 +48,6 @@
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
-#include "ipc_start_discovery_req.h"
-#include "ipc_start_discover_req.h"
-#include "ipc_stop_discovery_req.h"
 #include "ipc_permission_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unbind_device_req.h"
@@ -311,86 +308,6 @@ ON_IPC_READ_RESPONSE(GET_UUID_BY_NETWORK, MessageParcel &reply, std::shared_ptr<
     std::shared_ptr<IpcGetInfoByNetWorkRsp> pRsp = std::static_pointer_cast<IpcGetInfoByNetWorkRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
     pRsp->SetUuid(reply.ReadString());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(START_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcStartDiscoveryReq> pReq = std::static_pointer_cast<IpcStartDiscoveryReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string extra = pReq->GetExtra();
-    const DmSubscribeInfo dmSubscribeInfo = pReq->GetSubscribeInfo();
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteString(extra)) {
-        LOGE("write extra failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteRawData(&dmSubscribeInfo, sizeof(DmSubscribeInfo))) {
-        LOGE("write subscribe info failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(START_DEVICE_DISCOVER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(START_DEVICE_DISCOVERY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcStartDevDiscoveryByIdReq> pReq = std::static_pointer_cast<IpcStartDevDiscoveryByIdReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    std::string filterOption = pReq->GetFilterOption();
-    const uint16_t subscribeId = pReq->GetSubscribeId();
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteString(filterOption)) {
-        LOGE("write filterOption failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteUint16(subscribeId)) {
-        LOGE("write subscribe id failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(START_DEVICE_DISCOVERY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
-}
-
-ON_IPC_SET_REQUEST(STOP_DEVICE_DISCOVER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
-{
-    std::shared_ptr<IpcStopDiscoveryReq> pReq = std::static_pointer_cast<IpcStopDiscoveryReq>(pBaseReq);
-    std::string pkgName = pReq->GetPkgName();
-    uint16_t subscribeId = pReq->GetSubscribeId();
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!data.WriteInt16((int16_t)subscribeId)) {
-        LOGE("write subscribeId failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
-}
-
-ON_IPC_READ_RESPONSE(STOP_DEVICE_DISCOVER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
-{
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
-    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 

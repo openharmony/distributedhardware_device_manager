@@ -15,10 +15,11 @@
 
 #include "multiple_user_connector.h"
 
+#include "dm_constants.h"
 #include "dm_log.h"
-
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "account_info.h"
+#include "ipc_skeleton.h"
 #include "ohos_account_kits.h"
 #ifdef OS_ACCOUNT_PART_EXISTS
 #include "os_account_manager.h"
@@ -72,6 +73,25 @@ std::string MultipleUserConnector::GetOhosAccountId(void)
 #endif
 }
 
+std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t userId)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    (void)userId;
+    return "";
+#elif OS_ACCOUNT_PART_EXISTS
+    OhosAccountInfo accountInfo;
+    ErrCode ret = OhosAccountKits::GetInstance().GetOhosAccountInfoByUserId(userId, accountInfo);
+    if (ret != 0 || accountInfo.uid_ == "") {
+        LOGE("error ret: %{public}d", ret);
+        return "";
+    }
+    return accountInfo.uid_;
+#else
+    (void)userId;
+    return "";
+#endif
+}
+
 std::string MultipleUserConnector::GetOhosAccountName(void)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -89,6 +109,34 @@ std::string MultipleUserConnector::GetOhosAccountName(void)
     return accountInfo.second.name_;
 #else
     return "";
+#endif
+}
+
+void MultipleUserConnector::GetTokenIdAndForegroundUserId(uint32_t &tokenId, int32_t &userId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+#else
+    (void)tokenId;
+#endif
+    userId = GetFirstForegroundUserId();
+}
+
+void MultipleUserConnector::GetCallerUserId(int32_t &userId)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    (void)userId;
+    return;
+#elif OS_ACCOUNT_PART_EXISTS
+    int32_t uid = OHOS::IPCSkeleton::GetCallingUid();
+    ErrCode ret = OsAccountManager::GetOsAccountLocalIdFromUid(uid, userId);
+    if (ret != 0) {
+        LOGE("GetOsAccountLocalIdFromUid error ret: %{public}d", ret);
+    }
+    return;
+#else // OS_ACCOUNT_PART_EXISTS
+    (void)userId;
+    return;
 #endif
 }
 
@@ -155,6 +203,102 @@ void MultipleUserConnector::DeleteAccountInfoByUserId(int32_t userId)
     if (dmAccountInfoMap_.find(userId) != dmAccountInfoMap_.end()) {
         dmAccountInfoMap_.erase(userId);
     }
+}
+
+int32_t MultipleUserConnector::GetForegroundUserIds(std::vector<int32_t> &userVec)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    userVec.push_back(DEFAULT_OS_ACCOUNT_ID);
+    return DM_OK;
+#elif OS_ACCOUNT_PART_EXISTS
+    userVec.clear();
+    std::vector<AccountSA::ForegroundOsAccount> accounts;
+    ErrCode ret = OsAccountManager::GetForegroundOsAccounts(accounts);
+    if (ret != 0 || accounts.empty()) {
+        LOGE("error ret: %{public}d", ret);
+        return ret;
+    }
+    for (auto &account : accounts) {
+        userVec.push_back(account.localId);
+    }
+    return DM_OK;
+#else // OS_ACCOUNT_PART_EXISTS
+    userVec.push_back(DEFAULT_OS_ACCOUNT_ID);
+    return DM_OK;
+#endif
+}
+
+int32_t MultipleUserConnector::GetFirstForegroundUserId(void)
+{
+    std::vector<int32_t> userVec;
+    int32_t ret = GetForegroundUserIds(userVec);
+    if (ret != DM_OK || userVec.size() == 0) {
+        LOGE("get userid error ret: %{public}d.", ret);
+        return -1;
+    }
+    return userVec[0];
+}
+
+int32_t MultipleUserConnector::GetBackgroundUserIds(std::vector<int32_t> &userIdVec)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DM_OK;
+#elif OS_ACCOUNT_PART_EXISTS
+    userIdVec.clear();
+    std::vector<OsAccountInfo> allOsAccounts;
+    ErrCode ret = OsAccountManager::QueryAllCreatedOsAccounts(allOsAccounts);
+    if (ret != 0) {
+        LOGE("Get all created accounts error, ret: %{public}d", ret);
+        return ret;
+    }
+
+    std::vector<AccountSA::ForegroundOsAccount> foregroundAccounts;
+    ret = OsAccountManager::GetForegroundOsAccounts(foregroundAccounts);
+    if (ret != 0) {
+        LOGE("Get foreground accounts error ret: %{public}d", ret);
+        return ret;
+    }
+
+    std::vector<int32_t> allUserIds;
+    std::vector<int32_t> foregroundUserIds;
+    for (const auto &u : allOsAccounts) {
+        allUserIds.push_back(u.GetLocalId());
+    }
+    for (const auto &u : foregroundAccounts) {
+        foregroundUserIds.push_back(u.localId);
+    }
+
+    for (const auto &userId : allUserIds) {
+        if (std::find(foregroundUserIds.begin(), foregroundUserIds.end(), userId) == foregroundUserIds.end()) {
+            userIdVec.push_back(userId);
+        }
+    }
+    return DM_OK;
+#else
+    return DM_OK;
+#endif
+}
+
+int32_t MultipleUserConnector::GetAllUserIds(std::vector<int32_t> &userIdVec)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DM_OK;
+#elif OS_ACCOUNT_PART_EXISTS
+    userIdVec.clear();
+    std::vector<OsAccountInfo> allOsAccounts;
+    ErrCode ret = OsAccountManager::QueryAllCreatedOsAccounts(allOsAccounts);
+    if (ret != 0) {
+        LOGE("Get all created accounts error, ret: %{public}d", ret);
+        return ret;
+    }
+
+    for (const auto &u : allOsAccounts) {
+        userIdVec.push_back(u.GetLocalId());
+    }
+    return DM_OK;
+#else
+    return DM_OK;
+#endif
 }
 } // namespace DistributedHardware
 } // namespace OHOS

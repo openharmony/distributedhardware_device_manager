@@ -22,6 +22,7 @@ namespace {
 constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
 constexpr uint32_t MAX_MAP_LEN = 1000;
 constexpr uint32_t MAX_INT_LEN = 20;
+constexpr uint32_t MAX_ID_LEN = 256;
 }
 
 std::string GetAnonyString(const std::string &value)
@@ -50,6 +51,15 @@ std::string GetAnonyString(const std::string &value)
     return res;
 }
 
+std::string GetAnonyStringList(const std::vector<std::string> &values)
+{
+    std::string temp = "";
+    for (auto const &v : values) {
+        temp += GetAnonyString(v) + ", ";
+    }
+    return temp;
+}
+
 std::string GetAnonyInt32(const int32_t value)
 {
     std::string tempString = std::to_string(value);
@@ -62,6 +72,15 @@ std::string GetAnonyInt32(const int32_t value)
         tempString[i] = '*';
     }
     return tempString;
+}
+
+std::string GetAnonyInt32List(const std::vector<int32_t> &values)
+{
+    std::string temp = "";
+    for (auto const &v : values) {
+        temp += GetAnonyInt32(v) + ", ";
+    }
+    return temp;
 }
 
 bool IsNumberString(const std::string &inputString)
@@ -264,6 +283,67 @@ bool CompareVersion(const std::string &remoteVersion, const std::string &oldVers
     VersionSplitToInt(remoteVersion, '.', remoteVersionVec);
     VersionSplitToInt(oldVersion, '.', oldVersionVec);
     return CompareVecNum(remoteVersionVec, oldVersionVec);
+}
+
+std::string ComposeStr(const std::string &pkgName, uint16_t subscribeId)
+{
+    std::string strTemp = pkgName + "#" + std::to_string(subscribeId);
+    return strTemp;
+}
+
+std::string GetCallerPkgName(const std::string &pkgName)
+{
+    std::istringstream stream(pkgName);
+    std::string item = "";
+    getline(stream, item, '#');
+    return item;
+}
+
+uint16_t GetSubscribeId(const std::string &pkgName)
+{
+    std::vector<std::string> strVec;
+    size_t subIdIndex = 1;
+    size_t start = 0;
+    size_t end = pkgName.find("#");
+
+    while (end != std::string::npos) {
+        strVec.push_back(pkgName.substr(start, end - start));
+        start = end + 1;
+        end = pkgName.find("#", start);
+    }
+    strVec.push_back(pkgName.substr(start));
+    if (strVec.size() >= subIdIndex + 1) {
+        return std::atoi(strVec.at(subIdIndex).c_str());
+    }
+    return 0;
+}
+
+bool IsIdLengthValid(const std::string &inputID)
+{
+    if (inputID.empty() || inputID.length() > MAX_ID_LEN) {
+        LOGE("On parameter length error, maybe empty or beyond MAX_ID_LEN!");
+        return false;
+    }
+    return true;
+}
+
+bool IsMessageLengthValid(const std::string &inputMessage)
+{
+    if (inputMessage.empty() || inputMessage.length() > MAX_MESSAGE_LEN) {
+        LOGE("On parameter error, maybe empty or beyond MAX_MESSAGE_LEN!");
+        return false;
+    }
+    return true;
+}
+
+bool IsValueExist(const std::multimap<std::string, int32_t> unorderedmap, const std::string &udid, int32_t userId)
+{
+    for (const auto &item : unorderedmap) {
+        if (item.first == udid && item.second == userId) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

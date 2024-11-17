@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_log.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_device_found_req.h"
@@ -55,14 +56,16 @@ namespace {
 HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
     DmDeviceState state = DEVICE_STATE_ONLINE;
     DmDeviceInfo info = {
         .deviceId = "asdad",
         .deviceName = "asda",
         .deviceTypeId = 1,
     };
-    listener_->OnDeviceStateChange(pkgName, state, info);
+    listener_->OnDeviceStateChange(processInfo, state, info);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
@@ -76,14 +79,16 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext
 HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "ohos.distributedhardware.devicemanager";
+    ProcessInfo processInfo;
+    processInfo.pkgName = "ohos.distributedhardware.devicemanager";
+    processInfo.userId = 100;
     DmDeviceState state = DEVICE_STATE_OFFLINE;
     DmDeviceInfo info = {
         .deviceId = "asdad",
         .deviceName = "asda",
         .deviceTypeId = 1,
     };
-    listener_->OnDeviceStateChange(pkgName, state, info);
+    listener_->OnDeviceStateChange(processInfo, state, info);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -96,12 +101,14 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_002, testing::ext
 HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     std::string deviceId = "dkdkd";
     std::string token = "kdkddk";
     int32_t status = 3;
     int32_t reason = 2006;
-    listener_->OnAuthResult(pkgName, deviceId, token, status, reason);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    listener_->OnAuthResult(processInfo, deviceId, token, status, reason);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -114,12 +121,14 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     std::string deviceId = "dkdkd";
     std::string token = "kdkddk";
     int32_t status = 8;
     int32_t reason = 2006;
-    listener_->OnAuthResult(pkgName, deviceId, token, status, reason);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    listener_->OnAuthResult(processInfo, deviceId, token, status, reason);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -132,12 +141,14 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_002, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     std::string deviceId = "dkdkd";
     std::string token = "kdkddk";
     int32_t status = -1;
     int32_t reason = 2006;
-    listener_->OnAuthResult(pkgName, deviceId, token, status, reason);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    listener_->OnAuthResult(processInfo, deviceId, token, status, reason);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -152,13 +163,15 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::Test
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
     DmDeviceInfo info = {
         .deviceId = "dkdkd",
         .deviceName = "asda",
         .deviceTypeId = 1,
     };
     uint16_t subscribeId = 1;
-    listener_->OnDeviceFound(pkgName, subscribeId, info);
+    listener_->OnDeviceFound(processInfo, subscribeId, info);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -173,9 +186,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoveryFailed_001, testing::ext::
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
     std::string deviceId = "dkdkd";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
     uint16_t subscribeId = 1;
     int32_t failedReason = 1;
-    listener_->OnDiscoveryFailed(pkgName, subscribeId, failedReason);
+    listener_->OnDiscoveryFailed(processInfo, subscribeId, failedReason);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -190,7 +205,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext:
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
     uint16_t subscribeId = 1;
-    listener_->OnDiscoverySuccess(pkgName, subscribeId);
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    listener_->OnDiscoverySuccess(processInfo, subscribeId);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -236,9 +253,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::Te
 HWTEST_F(DeviceManagerServiceListenerTest, OnUiCall_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     std::string paramJson = "ahaha";
-    listener_->OnUiCall(pkgName, paramJson);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    listener_->OnUiCall(processInfo, paramJson);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -251,9 +270,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialResult_001, testing::ext:
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
     int32_t action = 1;
     std::string resultInfo = "resultInfo";
-    listener_->OnCredentialResult(pkgName, action, resultInfo);
+    listener_->OnCredentialResult(processInfo, action, resultInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -265,12 +286,14 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialResult_001, testing::ext:
 HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     PeerTargetId targetId;
     int32_t result = 0;
     int32_t status = 1;
     std::string content = "content";
-    listener_->OnBindResult(pkgName, targetId, result, status, content);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    listener_->OnBindResult(processInfo, targetId, result, status, content);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -282,12 +305,14 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_001, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     PeerTargetId targetId;
     int32_t result = 0;
     int32_t status = 8;
     std::string content = "content";
-    listener_->OnBindResult(pkgName, targetId, result, status, content);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    listener_->OnBindResult(processInfo, targetId, result, status, content);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -299,12 +324,14 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_002, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     PeerTargetId targetId;
     int32_t result = 0;
     int32_t status = -1;
     std::string content = "content";
-    listener_->OnBindResult(pkgName, targetId, result, status, content);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    listener_->OnBindResult(processInfo, targetId, result, status, content);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -316,11 +343,13 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_003, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     PeerTargetId targetId;
     int32_t result = 0;
     std::string content = "content";
-    listener_->OnUnbindResult(pkgName, targetId, result, content);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "com.ohos.helloworld";
+    processInfo.userId = 100;
+    listener_->OnUnbindResult(processInfo, targetId, result, content);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -344,21 +373,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
 }
 
 /**
- * @tc.name: OnDeviceFound_002
- * @tc.desc: OnDeviceFound, construct a dummy listener, pass in pkgName, subscribeId, DmDeviceInfo
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_002, testing::ext::TestSize.Level0)
-{
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
-    uint16_t subscribeId = 1;
-    DmDeviceBasicInfo info;
-    listener_->OnDeviceFound(pkgName, subscribeId, info);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
-}
-
-/**
  * @tc.name: OnPinHolderCreate_001
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
@@ -366,11 +380,13 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_002, testing::ext::Test
 HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderCreate_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
     std::string deviceId = "153123";
     DmPinType pinType = static_cast<DmPinType>(1);
     std::string payload = "payload";
-    listener_->OnPinHolderCreate(pkgName, deviceId, pinType, payload);
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
+    listener_->OnPinHolderCreate(processInfo, deviceId, pinType, payload);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -382,10 +398,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderCreate_001, testing::ext::
 HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderDestroy_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
     DmPinType pinType = static_cast<DmPinType>(1);
     std::string payload = "payload";
-    listener_->OnPinHolderDestroy(pkgName, pinType, payload);
+    listener_->OnPinHolderDestroy(processInfo, pinType, payload);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -397,9 +415,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderDestroy_001, testing::ext:
 HWTEST_F(DeviceManagerServiceListenerTest, OnCreateResult_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
     int32_t result = 0;
-    listener_->OnCreateResult(pkgName, result);
+    listener_->OnCreateResult(processInfo, result);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -411,9 +431,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCreateResult_001, testing::ext::Tes
 HWTEST_F(DeviceManagerServiceListenerTest, OnDestroyResult_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
     int32_t result = 0;
-    listener_->OnDestroyResult(pkgName, result);
+    listener_->OnDestroyResult(processInfo, result);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
@@ -425,11 +447,13 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDestroyResult_001, testing::ext::Te
 HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderEvent_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::string pkgName = "com.ohos.helloworld";
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
     DmPinHolderEvent event = DmPinHolderEvent::CREATE_RESULT;
     int32_t result = 0;
     std::string content = "content";
-    listener_->OnPinHolderEvent(pkgName, event, result, content);
+    listener_->OnPinHolderEvent(processInfo, event, result, content);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 } // namespace

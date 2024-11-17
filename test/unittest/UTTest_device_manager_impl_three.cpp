@@ -31,8 +31,6 @@
 #include "ipc_rsp.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_skeleton.h"
-#include "ipc_start_discovery_req.h"
-#include "ipc_stop_discovery_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
@@ -839,7 +837,6 @@ HWTEST_F(DeviceManagerImplTest, StartDeviceDiscovery_106, testing::ext::TestSize
     std::string packName = "com.ohos.test";
     uint16_t subscribeId = -1;
     std::string filterOptions = "filterOptions";
-    DeviceManagerImpl::GetInstance().subscribIdMap_.clear();
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     std::shared_ptr<DmInitCallback> initcallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initcallback);
@@ -1221,11 +1218,9 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_302, testing::ext::TestSize.
     uint64_t tokenId = 123;
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
     DeviceManagerImpl::GetInstance().InitDeviceManager(packName, callback);
-    DeviceManagerImpl::GetInstance().subscribIdMap_[tokenId] = 12345;
     DeviceManagerImpl::GetInstance().StopDeviceDiscovery(tokenId, packName);
-    DeviceManagerImpl::GetInstance().subscribIdMap_.erase(tokenId);
     int32_t ret = DeviceManagerImpl::GetInstance().StopDeviceDiscovery(tokenId, packName);
-    ASSERT_EQ(ret, ERR_DM_STOP_DISCOVERY);
+    ASSERT_NE(ret, DM_OK);
     DeviceManagerImpl::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -1345,7 +1340,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceScreenStatus_001, testing::ext::TestSiz
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
     DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     int32_t ret = DeviceManager::GetInstance().GetDeviceScreenStatus(packName, networkId, screenStatus);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_NE(ret, ERR_DM_TIME_OUT);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 

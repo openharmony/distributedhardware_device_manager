@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <tuple>
 #include <unordered_set>
 #include <vector>
@@ -30,6 +31,7 @@
 #include "system_ability.h"
 
 #include "account_boot_listener.h"
+#include "dm_device_info.h"
 #include "dm_single_instance.h"
 
 namespace OHOS {
@@ -86,14 +88,14 @@ public:
      * @tc.desc: Register DeviceManager Listener of the IpcServerStub
      * @tc.type: FUNC
      */
-    int32_t RegisterDeviceManagerListener(std::string &pkgName, sptr<IpcRemoteBroker> listener);
+    int32_t RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener);
 
     /**
      * @tc.name: IpcServerStub::UnRegisterDeviceManagerListener
      * @tc.desc: UnRegister DeviceManager Listener of the IpcServerStub
      * @tc.type: FUNC
      */
-    int32_t UnRegisterDeviceManagerListener(std::string &pkgName);
+    int32_t UnRegisterDeviceManagerListener(const ProcessInfo &processInfo);
 
     /**
      * @tc.name: IpcServerStub::QueryServiceState
@@ -103,32 +105,25 @@ public:
     ServiceRunningState QueryServiceState() const;
 
     /**
-     * @tc.name: IpcServerStub::SendALL
-     * @tc.desc: SendALL of the IpcServerStub
-     * @tc.type: FUNC
-     */
-    int32_t SendALL(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp);
-
-    /**
-     * @tc.name: IpcServerStub::GetAllPkgName
+     * @tc.name: IpcServerStub::GetAllProcessInfo
      * @tc.desc: Get All PkgName from dmListener_
      * @tc.type: FUNC
      */
-    std::vector<std::string> GetAllPkgName();
+    std::vector<ProcessInfo> GetAllProcessInfo();
 
     /**
      * @tc.name: IpcServerStub::GetDmListener
      * @tc.desc: Get DmListener of the IpcServerStub
      * @tc.type: FUNC
      */
-    const sptr<IpcRemoteBroker> GetDmListener(std::string pkgName) const;
+    const sptr<IpcRemoteBroker> GetDmListener(ProcessInfo processInfo) const;
 
     /**
      * @tc.name: IpcServerStub::GetDmListenerPkgName
      * @tc.desc: Get DmListener PkgName of the IpcServerStub
      * @tc.type: FUNC
      */
-    const std::string GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const;
+    const ProcessInfo GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const;
 
     /**
      * @tc.name: IpcServerStub::Dump
@@ -150,19 +145,23 @@ public:
      * @tc.type: FUNC
      */
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
+    std::set<std::string> GetSystemSA();
 
 private:
     IpcServerStub();
     ~IpcServerStub() override = default;
     bool Init();
+    void AddSystemSA(const std::string &pkgName);
+    void RemoveSystemSA(const std::string &pkgName);
 
 private:
     bool registerToService_;
     ServiceRunningState state_;
     mutable std::mutex listenerLock_;
-    std::map<std::string, sptr<AppDeathRecipient>> appRecipient_;
-    std::map<std::string, sptr<IpcRemoteBroker>> dmListener_;
+    std::map<ProcessInfo, sptr<AppDeathRecipient>> appRecipient_;
+    std::map<ProcessInfo, sptr<IpcRemoteBroker>> dmListener_;
     std::shared_ptr<AccountBootListener> accountBootListener_;
+    std::set<std::string> systemSA_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

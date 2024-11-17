@@ -55,9 +55,6 @@
 #include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_skeleton.h"
-#include "ipc_start_discovery_req.h"
-#include "ipc_start_discover_req.h"
-#include "ipc_stop_discovery_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
@@ -455,35 +452,14 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, cons
         LOGE("DeviceManagerImpl::StartDeviceDiscovery error: Invalid para, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
-    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeInfo.subscribeId, callback);
-
-    std::shared_ptr<IpcStartDiscoveryReq> req = std::make_shared<IpcStartDiscoveryReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetExtra(extra);
-    req->SetSubscribeInfo(subscribeInfo);
-    int32_t ret = ipcClientProxy_->SendRequest(START_DEVICE_DISCOVER, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("StartDeviceDiscovery error: Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("StartDeviceDiscovery error: Failed with ret %{public}d", ret);
-        SysEventWrite(std::string(START_DEVICE_DISCOVERY_FAILED), DM_HISYEVENT_BEHAVIOR,
-            std::string(START_DEVICE_DISCOVERY_FAILED_MSG));
-        return ret;
-    }
-
-    DmTraceEnd();
-    LOGI("Completed");
-    SysEventWrite(std::string(START_DEVICE_DISCOVERY_SUCCESS), DM_HISYEVENT_BEHAVIOR,
-        std::string(START_DEVICE_DISCOVERY_SUCCESS_MSG));
-    return DM_OK;
+    std::map<std::string, std::string> discParam;
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID,
+        std::to_string(subscribeInfo.subscribeId)));
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_DISC_MEDIUM, std::to_string(subscribeInfo.medium)));
+    std::map<std::string, std::string> filterOps;
+    filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, extra));
+    return StartDiscovering(pkgName, discParam, filterOps, callback);
 }
 
 int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint64_t tokenId,
@@ -493,35 +469,64 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint
         LOGE("DeviceManagerImpl::StartDeviceDiscovery error: Invalid para, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::map<std::string, std::string> discParam;
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID, std::to_string(tokenId)));
+    std::map<std::string, std::string> filterOps;
+    filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, filterOptions));
+    return StartDiscovering(pkgName, discParam, filterOps, callback);
+}
 
-    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    uint16_t subscribeId = 0;
-    {
-        std::lock_guard<std::mutex> autoLock(subscribIdLock);
-        if (subscribIdMap_.find(tokenId) != subscribIdMap_.end()) {
-            return ERR_DM_DISCOVERY_REPEATED;
-        }
-        subscribeId = GenRandUint(0, DM_MAX_RANDOM);
-        subscribIdMap_[tokenId] = subscribeId;
+int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerImpl::StopDeviceDiscovery Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::map<std::string, std::string> discParam;
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId)));
+    return StopDiscovering(pkgName, discParam);
+}
+
+int32_t DeviceManagerImpl::StopDeviceDiscovery(uint64_t tokenId, const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerImpl::StopDeviceDiscovery Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::map<std::string, std::string> discParam;
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID, std::to_string(tokenId)));
+    return StopDiscovering(pkgName, discParam);
+}
+
+int32_t DeviceManagerImpl::StartDiscovering(const std::string &pkgName,
+    std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
+    std::shared_ptr<DiscoveryCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("DeviceManagerImpl::StartDiscovering failed: input callback is null or pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
-    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
-    std::shared_ptr<IpcStartDevDiscoveryByIdReq> req = std::make_shared<IpcStartDevDiscoveryByIdReq>();
+
+    uint16_t subscribeId = AddDiscoveryCallback(pkgName, discoverParam, callback);
+    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    std::string discParaStr = ConvertMapToJsonString(discoverParam);
+    std::string filterOpStr = ConvertMapToJsonString(filterOptions);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetFilterOption(filterOptions);
-    req->SetSubscribeId(subscribeId);
-    int32_t ret = ipcClientProxy_->SendRequest(START_DEVICE_DISCOVERY, req, rsp);
+    req->SetPkgName(ComposeStr(pkgName, subscribeId));
+    req->SetFirstParam(discParaStr);
+    req->SetSecondParam(filterOpStr);
+    int32_t ret = ipcClientProxy_->SendRequest(START_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
-        LOGE("StartDeviceDiscovery error: Send Request failed ret: %{public}d", ret);
+        LOGE("StartDiscovering error: Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
-
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("StartDeviceDiscovery error: Failed with ret %{public}d", ret);
-        SysEventWrite(std::string(START_DEVICE_DISCOVERY_FAILED), DM_HISYEVENT_BEHAVIOR,
-            std::string(START_DEVICE_DISCOVERY_FAILED_MSG));
+        LOGE("StartDiscovering error: Failed with ret %{public}d", ret);
         return ret;
     }
 
@@ -532,67 +537,44 @@ int32_t DeviceManagerImpl::StartDeviceDiscovery(const std::string &pkgName, uint
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
+int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
+    std::map<std::string, std::string> &discoverParam)
 {
     if (pkgName.empty()) {
-        LOGE("DeviceManagerImpl::StopDeviceDiscovery Invalid parameter, pkgName is empty.");
+        LOGE("DeviceManagerImpl::StopDiscovering failed: input pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-    int32_t ret = ipcClientProxy_->SendRequest(STOP_DEVICE_DISCOVER, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("StopDeviceDiscovery error: Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    uint16_t subscribeId = DM_INVALID_FLAG_ID;
+    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
+        subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
     }
-
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("StopDeviceDiscovery error: Failed with ret %{public}d", ret);
-        return ret;
+    if (subscribeId == DM_INVALID_FLAG_ID) {
+        subscribeId = GetSubscribeIdFromMap(pkgName);
     }
-
-    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
-    LOGI("Completed");
-    return DM_OK;
-}
-
-int32_t DeviceManagerImpl::StopDeviceDiscovery(uint64_t tokenId, const std::string &pkgName)
-{
-    if (pkgName.empty()) {
-        LOGE("DeviceManagerImpl::StopDeviceDiscovery Invalid parameter, pkgName is empty.");
+    if (subscribeId == DM_INVALID_FLAG_ID) {
+        LOGE("DeviceManagerImpl::StopDiscovering failed: cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    uint16_t subscribeId = 0;
-    {
-        std::lock_guard<std::mutex> autoLock(subscribIdLock);
-        if (subscribIdMap_.find(tokenId) == subscribIdMap_.end()) {
-            return ERR_DM_STOP_DISCOVERY;
-        }
-        subscribeId = subscribIdMap_[tokenId];
-        subscribIdMap_.erase(tokenId);
-    }
-    std::shared_ptr<IpcStopDiscoveryReq> req = std::make_shared<IpcStopDiscoveryReq>();
+    std::string discoveryFlag = ComposeStr(pkgName, subscribeId);
+    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
+    std::string discParaStr = ConvertMapToJsonString(discoverParam);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetSubscribeId(subscribeId);
-    int32_t ret = ipcClientProxy_->SendRequest(STOP_DEVICE_DISCOVER, req, rsp);
+    req->SetPkgName(discoveryFlag);
+    req->SetFirstParam(discParaStr);
+    int32_t ret = ipcClientProxy_->SendRequest(STOP_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
-        LOGE("StopDeviceDiscovery error: Send Request failed ret: %{public}d", ret);
+        LOGE("StopDiscovering error: Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
-
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("StopDeviceDiscovery error: Failed with ret %{public}d", ret);
+        LOGE("StopDiscovering error: Failed with ret %{public}d", ret);
         return ret;
     }
-
-    DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(pkgName, subscribeId);
+    RemoveDiscoveryCallback(discoveryFlag);
     LOGI("Completed");
     return DM_OK;
 }
@@ -1648,86 +1630,6 @@ int32_t DeviceManagerImpl::ExportAuthCode(std::string &authCode)
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::StartDiscovering(const std::string &pkgName,
-    std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
-    std::shared_ptr<DiscoveryCallback> callback)
-{
-    if (pkgName.empty() || callback == nullptr) {
-        LOGE("DeviceManagerImpl::StartDiscovering failed: input callback is null or pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
-
-    uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
-    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
-    std::string discParaStr = ConvertMapToJsonString(discoverParam);
-    std::string filterOpStr = ConvertMapToJsonString(filterOptions);
-
-    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetFirstParam(discParaStr);
-    req->SetSecondParam(filterOpStr);
-    int32_t ret = ipcClientProxy_->SendRequest(START_DISCOVERING, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("StartDiscovering error: Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("StartDiscovering error: Failed with ret %{public}d", ret);
-        return ret;
-    }
-
-    DmTraceEnd();
-    LOGI("Completed");
-    SysEventWrite(std::string(START_DEVICE_DISCOVERY_SUCCESS), DM_HISYEVENT_BEHAVIOR,
-        std::string(START_DEVICE_DISCOVERY_SUCCESS_MSG));
-    return DM_OK;
-}
-
-int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
-    std::map<std::string, std::string> &discoverParam)
-{
-    if (pkgName.empty()) {
-        LOGE("DeviceManagerImpl::StopDiscovering failed: input pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    uint16_t subscribeId = DM_INVALID_FLAG_ID;
-    {
-        std::lock_guard<std::mutex> autoLock(subMapLock);
-        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
-            subscribeId = pkgName2SubIdMap_[pkgName];
-        }
-    }
-    if (subscribeId == DM_INVALID_FLAG_ID) {
-        LOGE("DeviceManagerImpl::StopDiscovering failed: cannot find pkgName in cache map.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
-    std::string discParaStr = ConvertMapToJsonString(discoverParam);
-
-    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    req->SetFirstParam(discParaStr);
-    int32_t ret = ipcClientProxy_->SendRequest(STOP_DISCOVERING, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("StopDiscovering error: Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("StopDiscovering error: Failed with ret %{public}d", ret);
-        return ret;
-    }
-    RemoveDiscoveryCallback(pkgName);
-    LOGI("Completed");
-    return DM_OK;
-}
-
 int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
     std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions,
     std::shared_ptr<DiscoveryCallback> callback)
@@ -1737,15 +1639,14 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-
-    uint16_t subscribeId = AddDiscoveryCallback(pkgName, callback);
+    uint16_t subscribeId = AddDiscoveryCallback(pkgName, discoverParam, callback);
     discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
     std::string discParaStr = ConvertMapToJsonString(discoverParam);
     std::string filterOpStr = ConvertMapToJsonString(filterOptions);
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
+    req->SetPkgName(ComposeStr(pkgName, subscribeId));
     req->SetFirstParam(discParaStr);
     req->SetSecondParam(filterOpStr);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_DISCOVERY_CALLBACK, req, rsp);
@@ -1771,8 +1672,8 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-
-    uint16_t subscribeId = RemoveDiscoveryCallback(pkgName);
+    std::string discoveryFlag = ComposeStr(pkgName, DM_INVALID_FLAG_ID);
+    uint16_t subscribeId = RemoveDiscoveryCallback(discoveryFlag);
     if (subscribeId == DM_INVALID_FLAG_ID) {
         DmRadarHelper::GetInstance().ReportDmBehavior(
             pkgName, "UnRegisterDiscoveryCallback", ERR_DM_INPUT_PARA_INVALID);
@@ -1785,21 +1686,21 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
+    req->SetPkgName(discoveryFlag);
     req->SetFirstParam(extraParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDiscoveryCallback", ret);
+        DmRadarHelper::GetInstance().ReportDmBehavior(discoveryFlag, "UnRegisterDiscoveryCallback", ret);
         LOGE("UnRegisterDiscoveryCallback error: Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDiscoveryCallback", ret);
+        DmRadarHelper::GetInstance().ReportDmBehavior(discoveryFlag, "UnRegisterDiscoveryCallback", ret);
         LOGE("UnRegisterDiscoveryCallback error: Failed with ret %{public}d", ret);
         return ret;
     }
-    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterDiscoveryCallback", DM_OK);
+    DmRadarHelper::GetInstance().ReportDmBehavior(discoveryFlag, "UnRegisterDiscoveryCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -1982,20 +1883,32 @@ int32_t DeviceManagerImpl::CheckAccessToTarget(uint64_t tokenId, const std::stri
 }
 
 uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
-    std::shared_ptr<DiscoveryCallback> callback)
+    std::map<std::string, std::string> &discoverParam, std::shared_ptr<DiscoveryCallback> callback)
 {
+    if (discoverParam.empty() || callback == nullptr) {
+        LOGE("input param invalid.");
+        return DM_INVALID_FLAG_ID;
+    }
     uint16_t subscribeId = DM_INVALID_FLAG_ID;
+    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
+        subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+    }
+    if (subscribeId == DM_INVALID_FLAG_ID) {
+        subscribeId = GetSubscribeIdFromMap(pkgName);
+    }
+    if (subscribeId == DM_INVALID_FLAG_ID) {
+        subscribeId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
+    }
+    std::string discoveryFlag = ComposeStr(pkgName, subscribeId);
     {
         std::lock_guard<std::mutex> autoLock(subMapLock);
-        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
-            subscribeId = pkgName2SubIdMap_[pkgName];
-        } else {
-            subscribeId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
-            pkgName2SubIdMap_[pkgName] = subscribeId;
+        auto iter = pkgName2SubIdMap_.find(discoveryFlag);
+        if (iter == pkgName2SubIdMap_.end()) {
+            pkgName2SubIdMap_[discoveryFlag] = subscribeId;
         }
     }
-    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgName, subscribeId, callback);
-    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "AddDiscoveryCallback", DM_OK);
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(discoveryFlag, subscribeId, callback);
+    DmRadarHelper::GetInstance().ReportDmBehavior(discoveryFlag, "AddDiscoveryCallback", DM_OK);
     return subscribeId;
 }
 
@@ -2487,6 +2400,19 @@ int32_t DeviceManagerImpl::UnRegisterSinkBindCallback(const std::string &pkgName
     DeviceManagerNotify::GetInstance().UnRegisterSinkBindCallback(pkgName);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
+}
+
+uint16_t DeviceManagerImpl::GetSubscribeIdFromMap(const std::string &pkgName)
+{
+    {
+        std::lock_guard<std::mutex> autoLock(subMapLock);
+        for (auto &item : pkgName2SubIdMap_) {
+            if (item.first.find(pkgName) == 0) {
+                return GetSubscribeId(item.first);
+            }
+        }
+    }
+    return DM_INVALID_FLAG_ID;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

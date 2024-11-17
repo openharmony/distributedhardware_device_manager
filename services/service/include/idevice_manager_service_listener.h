@@ -32,7 +32,7 @@ public:
      * @tc.desc: Device State Change of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnDeviceStateChange(const std::string &pkgName, const DmDeviceState &state,
+    virtual void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
         const DmDeviceInfo &info) = 0;
 
     /**
@@ -40,28 +40,21 @@ public:
      * @tc.desc: Device Found of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, const DmDeviceInfo &info) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceListener::OnDeviceFound
-     * @tc.desc: Device Found of the DeviceManager Service Listener
-     * @tc.type: FUNC
-     */
-    virtual void OnDeviceFound(const std::string &pkgName, uint16_t subscribeId, DmDeviceBasicInfo &info) = 0;
+    virtual void OnDeviceFound(const ProcessInfo &processInfo, uint16_t subscribeId, const DmDeviceInfo &info) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnDiscoveryFailed
      * @tc.desc: Discovery Failed of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnDiscoveryFailed(const std::string &pkgName, uint16_t subscribeId, int32_t failedReason) = 0;
+    virtual void OnDiscoveryFailed(const ProcessInfo &processInfo, uint16_t subscribeId, int32_t failedReason) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnDiscoverySuccess
      * @tc.desc: Discovery Success of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnDiscoverySuccess(const std::string &pkgName, int32_t subscribeId) = 0;
+    virtual void OnDiscoverySuccess(const ProcessInfo &processInfo, int32_t subscribeId) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnPublishResult
@@ -75,7 +68,7 @@ public:
      * @tc.desc: Auth Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnAuthResult(const std::string &pkgName, const std::string &deviceId, const std::string &token,
+    virtual void OnAuthResult(const ProcessInfo &processInfo, const std::string &deviceId, const std::string &token,
                               int32_t status, int32_t reason) = 0;
 
     /**
@@ -83,21 +76,21 @@ public:
      * @tc.desc: Fa Call of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnUiCall(std::string &pkgName, std::string &paramJson) = 0;
+    virtual void OnUiCall(const ProcessInfo &processInfo, std::string &paramJson) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnCredentialResult
      * @tc.desc: Credential Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo) = 0;
+    virtual void OnCredentialResult(const ProcessInfo &processInfo, int32_t action, const std::string &resultInfo) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnBindResult
      * @tc.desc: Bind target Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+    virtual void OnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
         int32_t status, std::string content) = 0;
 
     /**
@@ -105,7 +98,7 @@ public:
      * @tc.desc: Unbind target Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnUnbindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+    virtual void OnUnbindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
         std::string content) = 0;
 
     /**
@@ -113,7 +106,7 @@ public:
      * @tc.desc: Unbind target Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnPinHolderCreate(const std::string &pkgName, const std::string &deviceId, DmPinType pinType,
+    virtual void OnPinHolderCreate(const ProcessInfo &processInfo, const std::string &deviceId, DmPinType pinType,
         const std::string &payload) = 0;
 
     /**
@@ -121,28 +114,28 @@ public:
      * @tc.desc: Unbind target Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnPinHolderDestroy(const std::string &pkgName, DmPinType pinType, const std::string &payload) = 0;
+    virtual void OnPinHolderDestroy(const ProcessInfo &processInfo, DmPinType pinType, const std::string &payload) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnCreateResult
      * @tc.desc: Create Pin Holder Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnCreateResult(const std::string &pkgName, int32_t result) = 0;
+    virtual void OnCreateResult(const ProcessInfo &processInfo, int32_t result) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnDestroyResult
      * @tc.desc: Destroy Pin Holder Result of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnDestroyResult(const std::string &pkgName, int32_t result) = 0;
+    virtual void OnDestroyResult(const ProcessInfo &processInfo, int32_t result) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnPinHolderEvent
      * @tc.desc: Pin Holder Event of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnPinHolderEvent(const std::string &pkgName, DmPinHolderEvent event, int32_t result,
+    virtual void OnPinHolderEvent(const ProcessInfo &processInfo, DmPinHolderEvent event, int32_t result,
         const std::string &content) = 0;
 
     /**
@@ -157,18 +150,19 @@ public:
      * @tc.desc: Device Screen State Change of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) = 0;
+    virtual void OnDeviceScreenStateChange(const ProcessInfo &processInfo, DmDeviceInfo &devInfo) = 0;
 
     /**
      * @tc.name: IDeviceManagerServiceListener::OnCredentialAuthStatus
      * @tc.desc: Candidate Restrict Status Change of the DeviceManager Service Listener
      * @tc.type: FUNC
      */
-    virtual void OnCredentialAuthStatus(const std::string &pkgName, const std::string &deviceList,
+    virtual void OnCredentialAuthStatus(const ProcessInfo &processInfo, const std::string &deviceList,
                                         uint16_t deviceTypeId, int32_t errcode) = 0;
     virtual void OnAppUnintall(const std::string &pkgName) = 0;
-    virtual void OnSinkBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result,
+    virtual void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
         int32_t status, std::string content) = 0;
+    virtual void OnProcessRemove(const ProcessInfo &processInfo) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

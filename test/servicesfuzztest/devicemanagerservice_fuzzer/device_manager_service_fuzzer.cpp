@@ -38,12 +38,9 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     DmPublishInfo publishInfo;
     std::map<std::string, std::string> parametricMap;
 
-    DeviceManagerService::GetInstance().StartDeviceDiscovery(inputStr, subscribeInfo, inputStr);
     DeviceManagerService::GetInstance().PublishDeviceDiscovery(inputStr, publishInfo);
     DeviceManagerService::GetInstance().RequestCredential(inputStr, inputStr);
-    DeviceManagerService::GetInstance().StopDeviceDiscovery(inputStr, subscribeId);
     DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(inputStr, publishId);
-    DeviceManagerService::GetInstance().StartDeviceDiscovery(inputStr, subscribeId, inputStr);
     DeviceManagerService::GetInstance().GetDeviceInfo(inputStr, info);
     DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     DeviceManagerService::GetInstance().GetDeviceSecurityLevel(inputStr, inputStr, publishId);

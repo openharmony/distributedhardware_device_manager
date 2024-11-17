@@ -412,21 +412,20 @@ private:
     DeviceManagerImpl(DeviceManagerImpl &&) = delete;
     DeviceManagerImpl &operator=(DeviceManagerImpl &&) = delete;
 
-    uint16_t AddDiscoveryCallback(const std::string &pkgName, std::shared_ptr<DiscoveryCallback> callback);
+    uint16_t AddDiscoveryCallback(const std::string &pkgName, std::map<std::string, std::string> &discoverParam,
+        std::shared_ptr<DiscoveryCallback> callback);
     uint16_t RemoveDiscoveryCallback(const std::string &pkgName);
     int32_t AddPublishCallback(const std::string &pkgName);
     int32_t RemovePublishCallback(const std::string &pkgName);
     int32_t CheckApiPermission(int32_t permissionLevel);
     void ConvertDeviceInfoToDeviceBasicInfo(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
+    uint16_t GetSubscribeIdFromMap(const std::string &pkgName);
 
 private:
 #if !defined(__LITEOS_M__)
     std::shared_ptr<IpcClientProxy> ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
 #endif
-    std::mutex subscribIdLock;
-    std::map<uint64_t, uint16_t> subscribIdMap_;
-
     std::mutex subMapLock;
     std::map<std::string, uint16_t> pkgName2SubIdMap_;
 

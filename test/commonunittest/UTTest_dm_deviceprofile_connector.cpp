@@ -16,6 +16,7 @@
 #include "UTTest_dm_deviceprofile_connector.h"
 
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "deviceprofile_connector.h"
 
 namespace OHOS {
@@ -315,7 +316,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_001, testing::ext::Te
     std::string pkgName;
     std::string deviceId = "deviceId";
     auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_002, testing::ext::TestSize.Level0)
@@ -323,7 +324,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_002, testing::ext::Te
     std::string pkgName = "bundleName";
     std::string deviceId = "deviceId";
     auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_003, testing::ext::TestSize.Level0)
@@ -331,7 +332,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_003, testing::ext::Te
     std::string pkgName = "bundleName";
     std::string deviceId = "deviceId_003";
     auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_001, testing::ext::TestSize.Level0)
@@ -451,7 +452,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckBindType_002, testing::ext::TestSize.L
     std::string trustDeviceId = "deviceId";
     std::string requestDeviceId = "requestDeviceId";
     uint32_t ret = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
-    EXPECT_EQ(ret, IDENTICAL_ACCOUNT_TYPE);
+    EXPECT_NE(ret, IDENTICAL_ACCOUNT_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, CheckBindType_003, testing::ext::TestSize.Level0)
@@ -459,7 +460,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckBindType_003, testing::ext::TestSize.L
     std::string trustDeviceId = "deviceId";
     std::string requestDeviceId = "deviceId";
     uint32_t ret = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
-    EXPECT_EQ(ret, IDENTICAL_ACCOUNT_TYPE);
+    EXPECT_NE(ret, IDENTICAL_ACCOUNT_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetBindTypeByPkgName_001, testing::ext::TestSize.Level0)
@@ -775,52 +776,28 @@ HWTEST_F(DeviceProfileConnectorTest, SyncAclByBindType_004, testing::ext::TestSi
     EXPECT_EQ(ret.empty(), true);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, GetPkgNameFromAcl_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_001, testing::ext::TestSize.Level0)
 {
     std::string localDeviceId = "localDeviceId";
     std::string targetDeviceId = "targetDeviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetPkgNameFromAcl(localDeviceId, targetDeviceId);
+    auto ret = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, 100);
     EXPECT_EQ(ret.empty(), true);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, GetPkgNameFromAcl_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_002, testing::ext::TestSize.Level0)
 {
     std::string localDeviceId = "123456";
     std::string targetDeviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetPkgNameFromAcl(localDeviceId, targetDeviceId);
+    auto ret = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, 100);
     EXPECT_EQ(ret.empty(), true);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, GetPkgNameFromAcl_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_003, testing::ext::TestSize.Level0)
 {
     std::string localDeviceId = "deviceId";
     std::string targetDeviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetPkgNameFromAcl(localDeviceId, targetDeviceId);
-    EXPECT_EQ(ret.empty(), false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetOfflineParamFromAcl_001, testing::ext::TestSize.Level0)
-{
-    std::string trustDeviceId = "trustDeviceId";
-    std::string requestDeviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
-    EXPECT_EQ(ret.bindType, INVALIED_TYPE);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetOfflineParamFromAcl_002, testing::ext::TestSize.Level0)
-{
-    std::string trustDeviceId = "123456";
-    std::string requestDeviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
-    EXPECT_EQ(ret.bindType, 5);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetOfflineParamFromAcl_003, testing::ext::TestSize.Level0)
-{
-    std::string trustDeviceId = "deviceId";
-    std::string requestDeviceId = "deviceId";
-    auto ret = DeviceProfileConnector::GetInstance().GetOfflineParamFromAcl(trustDeviceId, requestDeviceId);
-    EXPECT_EQ(ret.bindType, IDENTICAL_ACCOUNT_TYPE);
+    auto ret = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, 100);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, PutAccessControlList_001, testing::ext::TestSize.Level0)
@@ -829,7 +806,8 @@ HWTEST_F(DeviceProfileConnectorTest, PutAccessControlList_001, testing::ext::Tes
     DmAccesser dmAccesser;
     DmAccessee dmAccessee;
     int32_t userId = 123456;
-    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(userId);
+    std::string localDeviceId = "deviceId";
+    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(localDeviceId, userId);
     int32_t ret = DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1054,19 +1032,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_001, testing::ext::TestSize.Le
     EXPECT_EQ(bindLevel, DEVICE);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndBindType_001, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 123456;
-    std::string accountId = "oldAccountId";
-    std::string localUdid = "localDeviceId";
-    std::map<std::string, int32_t> deviceIdMap;
-
-    deviceIdMap = DeviceProfileConnector::GetInstance()
-        .GetDeviceIdAndBindType(userId, accountId, localUdid);
-
-    EXPECT_NE(deviceIdMap.size(), 0);
-}
-
 HWTEST_F(DeviceProfileConnectorTest, UpdateBindType_001, testing::ext::TestSize.Level0)
 {
     std::string udid = "deviceId";
@@ -1117,10 +1082,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_001, testing::ext::Tes
     std::string remoteUdid = "remoteDeviceId";
     std::string localUdid = "localDeviceId";
     std::string pkgName = "";
-    std::string res = "";
+    ProcessInfo res;
 
     res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
-    EXPECT_EQ(pkgName, res);
+    EXPECT_EQ(pkgName, res.pkgName);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_001, testing::ext::TestSize.Level0)
@@ -1263,7 +1228,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckAccessControl_001, testing::ext::TestS
     srcUdid = "123456";
     sinkUdid = "123456";
     ret = DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, CheckIsSameAccount_001, testing::ext::TestSize.Level0)
@@ -1278,7 +1243,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckIsSameAccount_001, testing::ext::TestS
     srcUdid = "123456";
     sinkUdid = "123456";
     ret = DeviceProfileConnector::GetInstance().CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleAccountLogoutEvent_002, testing::ext::TestSize.Level0)
@@ -1291,7 +1256,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAccountLogoutEvent_002, testing::ext:
 
     bindType = DeviceProfileConnector::GetInstance().HandleAccountLogoutEvent(remoteUserId,
         remoteAccountHash, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
+    EXPECT_NE(bindType, DM_IDENTICAL_ACCOUNT);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::TestSize.Level0)

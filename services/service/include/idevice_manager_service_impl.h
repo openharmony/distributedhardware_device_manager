@@ -261,20 +261,29 @@ public:
     virtual int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
-    virtual std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId) = 0;
+    virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId,
+        const std::string &accountId) = 0;
     virtual void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid) = 0;
     virtual void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid) = 0;
     virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
     virtual int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId) = 0;
-    virtual void HandleIdentAccountLogout(const std::string &udid, int32_t userId, const std::string &accountId) = 0;
+    virtual void HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId,
+        const std::string &peerUdid, int32_t peerUserId) = 0;
     virtual void HandleUserRemoved(int32_t preUserId) = 0;
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
+    virtual void HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap, int32_t currentUserId,
+        int32_t beforeUserId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
                                             int32_t errcode) = 0;
     virtual int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId) = 0;
+    virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backroundUserIds, const std::string &remoteUdid) = 0;
+    virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid) = 0;
+    virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId) = 0;
+    virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

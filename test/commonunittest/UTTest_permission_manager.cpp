@@ -199,54 +199,54 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_004, testing::e
     ASSERT_TRUE(ret);
 }
 /**
- * @tc.name: PinAuthUi::CheckSystemSA_001
+ * @tc.name: PinAuthUi::CheckWhiteListSystemSA_001
  * @tc.desc: the return value is false
  * @tc.type：FUNC
  * @tc.require: AR000GHSJK
 */
-HWTEST_F(PermissionManagerTest, CheckSystemSA_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
-    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
     ASSERT_EQ(ret, false);
     pkgName = "pkgName";
-    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
     ASSERT_EQ(ret, false);
 }
 
 /**
- * @tc.name: PinAuthUi::CheckSystemSA_002
+ * @tc.name: PinAuthUi::CheckWhiteListSystemSA_002
  * @tc.desc: the return value is true
  * @tc.type：FUNC
  * @tc.require: AR000GHSJK
 */
-HWTEST_F(PermissionManagerTest, CheckSystemSA_002, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_002, testing::ext::TestSize.Level0)
 {
     std::string pkgName1(systemSaWhiteList[0]);
-    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName1);
+    bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName1);
     ASSERT_EQ(ret, true);
     std::string pkgName2(systemSaWhiteList[1]);
-    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName2);
+    ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName2);
     ASSERT_EQ(ret, true);
     std::string pkgName3(systemSaWhiteList[2]);
-    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName3);
+    ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName3);
     ASSERT_EQ(ret, true);
     std::string pkgName4(systemSaWhiteList[3]);
-    ret = PermissionManager::GetInstance().CheckSystemSA(pkgName4);
+    ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName4);
     ASSERT_EQ(ret, true);
 }
 
-HWTEST_F(PermissionManagerTest, CheckSystemSA_101, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_101, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
-    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
     ASSERT_FALSE(ret);
 }
 
-HWTEST_F(PermissionManagerTest, CheckSystemSA_102, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_102, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "ohos.dhardware";
-    bool ret = PermissionManager::GetInstance().CheckSystemSA(pkgName);
+    bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
     ASSERT_TRUE(ret);
 }
 }

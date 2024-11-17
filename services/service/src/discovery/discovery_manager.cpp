@@ -23,6 +23,9 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "parameter.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "multiple_user_connector.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -62,6 +65,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::string pkgNameTemp = AddMultiUserIdentify(pkgName);
     DmSubscribeInfo dmSubInfo;
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE;
@@ -82,7 +86,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         dmSubInfo.subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
         {
             std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-            pkgName2SubIdMap_[pkgName] = dmSubInfo.subscribeId;
+            pkgName2SubIdMap_[pkgNameTemp] = dmSubInfo.subscribeId;
         }
     }
     if (discoverParam.find(PARAM_KEY_DISC_CAPABILITY) != discoverParam.end()) {
@@ -95,7 +99,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     LOGI("EnableDiscoveryListener capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
-        capabilityMap_[pkgName] = std::string(dmSubInfo.capability);
+        capabilityMap_[pkgNameTemp] = std::string(dmSubInfo.capability);
     }
 
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
@@ -103,7 +107,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
         return ret;
     }
-    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
+    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgNameTemp, shared_from_this());
     return DM_OK;
 }
 
@@ -115,7 +119,7 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
+    std::string pkgNameTemp = RemoveMultiUserIdentify(pkgName);
     if (extraParam.find(PARAM_KEY_META_TYPE) != extraParam.end()) {
         LOGI("DisableDiscoveryListener, input MetaType = %{public}s",
             (extraParam.find(PARAM_KEY_META_TYPE)->second).c_str());
@@ -125,16 +129,16 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
         subscribeId = std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
         {
             std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-            pkgName2SubIdMap_.erase(pkgName);
+            pkgName2SubIdMap_.erase(pkgNameTemp);
         }
     }
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
-        if (capabilityMap_.find(pkgName) != capabilityMap_.end()) {
-            capabilityMap_.erase(pkgName);
+        if (capabilityMap_.find(pkgNameTemp) != capabilityMap_.end()) {
+            capabilityMap_.erase(pkgNameTemp);
         }
     }
-    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
+    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgNameTemp);
     return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
 }
 
@@ -146,9 +150,10 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::string pkgNameTemp = AddMultiUserIdentify(pkgName);
     DmSubscribeInfo dmSubInfo;
     ConfigDiscParam(discoverParam, &dmSubInfo);
-    if (HandleDiscoveryQueue(pkgName, dmSubInfo.subscribeId, filterOptions) != DM_OK) {
+    if (HandleDiscoveryQueue(pkgNameTemp, dmSubInfo.subscribeId, filterOptions) != DM_OK) {
         return ERR_DM_DISCOVERY_REPEATED;
     }
 
@@ -158,17 +163,17 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
         isStandardMetaNode = (metaType == MetaNodeType::PROXY_TRANSMISION);
     }
 
-    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
-    StartDiscoveryTimer(pkgName);
+    softbusListener_->RegisterSoftbusLnnOpsCbk(pkgNameTemp, shared_from_this());
+    StartDiscoveryTimer(pkgNameTemp);
 
     auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
     nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
     if (!jsonObject.is_discarded() && jsonObject.contains(TYPE_MINE)) {
-        return StartDiscovering4MineLibary(pkgName, dmSubInfo, it->second);
+        return StartDiscovering4MineLibary(pkgNameTemp, dmSubInfo, it->second);
     }
 
-    int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(pkgName, dmSubInfo, discoverParam) :
-            StartDiscovering4MetaType(pkgName, dmSubInfo, discoverParam);
+    int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(pkgNameTemp, dmSubInfo, discoverParam) :
+            StartDiscovering4MetaType(pkgNameTemp, dmSubInfo, discoverParam);
     if (ret != DM_OK) {
         LOGE("StartDiscovering for meta node process failed, ret = %{public}d", ret);
         return ret;
@@ -307,24 +312,25 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::string pkgNameTemp = RemoveMultiUserIdentify(pkgName);
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-        if (pkgNameSet_.find(pkgName) != pkgNameSet_.end()) {
-            pkgNameSet_.erase(pkgName);
+        if (pkgNameSet_.find(pkgNameTemp) != pkgNameSet_.end()) {
+            pkgNameSet_.erase(pkgNameTemp);
         }
 
-        if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
-            discoveryContextMap_.erase(pkgName);
-            timer_->DeleteTimer(pkgName);
+        if (discoveryContextMap_.find(pkgNameTemp) != discoveryContextMap_.end()) {
+            discoveryContextMap_.erase(pkgNameTemp);
+            timer_->DeleteTimer(pkgNameTemp);
         }
     }
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
-        if (capabilityMap_.find(pkgName) != capabilityMap_.end()) {
-            capabilityMap_.erase(pkgName);
+        if (capabilityMap_.find(pkgNameTemp) != capabilityMap_.end()) {
+            capabilityMap_.erase(pkgNameTemp);
         }
     }
-    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
+    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgNameTemp);
 #if (defined(MINE_HARMONY))
     return mineSoftbusListener_->StopRefreshSoftbusLNN(subscribeId);
 #else
@@ -334,12 +340,16 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
 
 void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline)
 {
+    int32_t userId = -1;
+    std::string callerPkgName = "";
+    GetPkgNameAndUserId(pkgName, callerPkgName, userId);
     DeviceFilterPara filterPara;
     filterPara.isOnline = false;
     filterPara.range = info.range;
     filterPara.deviceType = info.deviceTypeId;
     std::string deviceIdHash = static_cast<std::string>(info.deviceId);
-    if (isOnline && GetDeviceAclParam(pkgName, deviceIdHash, filterPara.isOnline, filterPara.authForm) != DM_OK) {
+    if (isOnline && GetDeviceAclParam(callerPkgName, userId, deviceIdHash, filterPara.isOnline,
+        filterPara.authForm) != DM_OK) {
         LOGE("The found device get online param failed.");
     }
     nlohmann::json jsonObject = nlohmann::json::parse(info.extraData, nullptr, false);
@@ -358,6 +368,12 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
 void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t capabilityType,
     const DmDeviceInfo &info, const DeviceFilterPara &filterPara)
 {
+    int32_t userId = -1;
+    std::string callerPkgName = "";
+    GetPkgNameAndUserId(pkgName, callerPkgName, userId);
+    ProcessInfo processInfo;
+    processInfo.userId = userId;
+    processInfo.pkgName = callerPkgName;
     bool isIndiscoveryContextMap = false;
     DiscoveryContext discoveryContext;
     {
@@ -382,7 +398,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
             subscribeId = pkgName2SubIdMap_[pkgName];
         }
         LOGD("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
-        listener_->OnDeviceFound(pkgName, subscribeId, info);
+        listener_->OnDeviceFound(processInfo, subscribeId, info);
         return;
     }
     DiscoveryFilter filter;
@@ -395,7 +411,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
             }
         }
         LOGD("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
-        listener_->OnDeviceFound(pkgName, discoveryContext.subscribeId, info);
+        listener_->OnDeviceFound(processInfo, discoveryContext.subscribeId, info);
     }
 }
 
@@ -413,6 +429,12 @@ bool DiscoveryManager::CompareCapability(uint32_t capabilityType, const std::str
 void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
 {
     LOGI("DiscoveryManager::OnDiscoveringResult, subscribeId = %{public}d, result = %{public}d.", subscribeId, result);
+    int32_t userId = -1;
+    std::string callerPkgName = "";
+    GetPkgNameAndUserId(pkgName, callerPkgName, userId);
+    ProcessInfo processInfo;
+    processInfo.userId = userId;
+    processInfo.pkgName = callerPkgName;
     if (pkgName.empty() || (listener_ == nullptr)) {
         LOGE("DiscoveryManager::OnDiscoveringResult failed, IDeviceManagerServiceListener is null.");
         return;
@@ -420,7 +442,7 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
     if (result == 0) {
         std::lock_guard<std::mutex> autoLock(locks_);
         discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
-        listener_->OnDiscoverySuccess(pkgName, subscribeId);
+        listener_->OnDiscoverySuccess(processInfo, subscribeId);
         return;
     }
     {
@@ -439,7 +461,7 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
             capabilityMap_.erase(pkgName);
         }
     }
-    listener_->OnDiscoveryFailed(pkgName, (uint32_t)subscribeId, result);
+    listener_->OnDiscoveryFailed(processInfo, (uint32_t)subscribeId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
 }
 
@@ -513,7 +535,7 @@ void DiscoveryManager::UpdateInfoFreq(
     }
 }
 
-int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::string deviceId,
+int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, int32_t userId, std::string deviceId,
     bool &isOnline, int32_t &authForm)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -524,6 +546,7 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, std::str
     discoveryInfo.pkgname = pkgName;
     discoveryInfo.localDeviceId = requestDeviceId;
     discoveryInfo.remoteDeviceIdHash = deviceId;
+    discoveryInfo.userId = userId;
     if (DiscoveryManager::IsCommonDependencyReady() && DiscoveryManager::GetCommonDependencyObj() != nullptr) {
         if (DiscoveryManager::GetCommonDependencyObj()->GetDeviceAclParam(discoveryInfo, isOnline, authForm) != DM_OK) {
             LOGE("GetDeviceAclParam failed.");
@@ -618,6 +641,61 @@ void DiscoveryManager::ClearDiscoveryCache(const std::string &pkgName)
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
     CHECK_NULL_VOID(timer_);
     timer_->DeleteTimer(pkgName);
+}
+
+std::string DiscoveryManager::AddMultiUserIdentify(const std::string &pkgName)
+{
+    int32_t userId = -1;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MultipleUserConnector::GetCallerUserId(userId);
+#endif
+    if (userId == -1) {
+        LOGE("Get caller userId failed.");
+        return pkgName;
+    }
+    MultiUserDiscovery multiUserDisc;
+    multiUserDisc.pkgName = pkgName;
+    multiUserDisc.userId = userId;
+    std::string pkgNameTemp = ComposeStr(pkgName, userId);
+    {
+        std::lock_guard<std::mutex> autoLock(multiUserDiscLocks_);
+        multiUserDiscMap_[pkgNameTemp] = multiUserDisc;
+    }
+    return pkgNameTemp;
+}
+
+std::string DiscoveryManager::RemoveMultiUserIdentify(const std::string &pkgName)
+{
+    int32_t userId = -1;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MultipleUserConnector::GetCallerUserId(userId);
+#endif
+    if (userId == -1) {
+        LOGE("Get caller userId failed.");
+        return pkgName;
+    }
+    std::string pkgNameTemp = ComposeStr(pkgName, userId);
+    {
+        std::lock_guard<std::mutex> autoLock(multiUserDiscLocks_);
+        if (multiUserDiscMap_.find(pkgNameTemp) != multiUserDiscMap_.end()) {
+            multiUserDiscMap_.erase(pkgNameTemp);
+        }
+    }
+    return pkgNameTemp;
+}
+
+void DiscoveryManager::GetPkgNameAndUserId(const std::string &pkgName, std::string &callerPkgName,
+    int32_t &userId)
+{
+    {
+        std::lock_guard<std::mutex> autoLock(multiUserDiscLocks_);
+        if (multiUserDiscMap_.find(pkgName) != multiUserDiscMap_.end()) {
+            callerPkgName = GetCallerPkgName(multiUserDiscMap_[pkgName].pkgName);
+            userId = multiUserDiscMap_[pkgName].userId;
+            return;
+        }
+    }
+    LOGE("find failed.");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

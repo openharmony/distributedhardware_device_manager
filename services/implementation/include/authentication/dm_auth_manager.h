@@ -103,6 +103,7 @@ typedef struct DmAuthRequestContext {
     std::string cryptoVer;
     std::string hostPkgName;
     std::string targetPkgName;
+    std::string bundleName;
     std::string appOperation;
     std::string appDesc;
     std::string appName;
@@ -145,6 +146,7 @@ typedef struct DmAuthResponseContext {
     std::string groupName;
     std::string hostPkgName;
     std::string targetPkgName;
+    std::string bundleName;
     std::string appOperation;
     std::string appDesc;
     std::string customDesc;
@@ -166,6 +168,7 @@ typedef struct DmAuthResponseContext {
     std::string localAccountId;
     int32_t localUserId;
     int64_t tokenId;
+    int64_t remoteTokenId;
     bool authed;
     std::string dmVersion;
     std::vector<int32_t> bindType;
@@ -369,13 +372,6 @@ public:
     void HandleAuthenticateTimeout(std::string name);
 
     /**
-     * @tc.name: DmAuthManager::CancelDisplay
-     * @tc.desc: Cancel Display of the DeviceManager Authenticate Manager
-     * @tc.type: FUNC
-     */
-    void CancelDisplay();
-
-    /**
      * @tc.name: DmAuthManager::GeneratePincode
      * @tc.desc: Generate Pincode of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
@@ -533,6 +529,9 @@ private:
     void DeleteOffLineTimer(int32_t sessionId);
     bool IsAllowDeviceBind();
     int32_t GetBindLevel(int32_t bindLevel);
+    std::string GetBundleName(nlohmann::json &jsonObject);
+    int32_t GetBinderInfo();
+    void SetProcessInfo();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -568,6 +567,7 @@ private:
     std::string remoteVersion_ = "";
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
     std::string remoteUdidHash_ = "";
+    ProcessInfo processInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

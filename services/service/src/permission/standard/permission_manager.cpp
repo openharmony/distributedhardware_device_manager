@@ -197,7 +197,7 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
     return false;
 }
 
-bool PermissionManager::CheckSystemSA(const std::string &pkgName)
+bool PermissionManager::CheckWhiteListSystemSA(const std::string &pkgName)
 {
     for (uint16_t index = 0; index < SYSTEM_SA_WHITE_LIST_NUM; ++index) {
         std::string tmp(systemSaWhiteList[index]);
@@ -208,7 +208,7 @@ bool PermissionManager::CheckSystemSA(const std::string &pkgName)
     return false;
 }
 
-std::unordered_set<std::string> PermissionManager::GetSystemSA()
+std::unordered_set<std::string> PermissionManager::GetWhiteListSystemSA()
 {
     std::unordered_set<std::string> systemSA;
     for (uint16_t index = 0; index < SYSTEM_SA_WHITE_LIST_NUM; ++index) {
@@ -216,6 +216,20 @@ std::unordered_set<std::string> PermissionManager::GetSystemSA()
         systemSA.insert(tmp);
     }
     return systemSA;
+}
+
+bool PermissionManager::CheckSystemSA(const std::string &pkgName)
+{
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("CheckMonitorPermission GetCallingTokenID error.");
+        return false;
+    }
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        return true;
+    }
+    return false;
 }
 
 bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)

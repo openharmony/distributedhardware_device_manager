@@ -458,12 +458,12 @@ int32_t DeviceManagerServiceImpl::GetBindLevel(const std::string &pkgName, const
     return DEVICE_BIUND_LEVEL;
 }
 
-std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindType(int32_t userId,
+std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUserId(int32_t userId,
     const std::string &accountId)
 {
     (void)userId;
     (void)accountId;
-    return std::map<std::string, int32_t> {};
+    return std::multimap<std::string, int32_t> {};
 }
 
 void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
@@ -491,12 +491,13 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
     return;
 }
 
-void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &udid, int32_t userId,
-    const std::string &accountId)
+void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId,
+    const std::string &peerUdid, int32_t peerUserId)
 {
-    (void)udid;
-    (void)userId;
-    (void)accountId;
+    (void)localUdid;
+    (void)localUserId;
+    (void)peerUdid;
+    (void)peerUserId;
     return;
 }
 
@@ -509,6 +510,15 @@ void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
 void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
 {
     (void)devInfo;
+    return;
+}
+
+void DeviceManagerServiceImpl::HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap,
+    int32_t currentUserId, int32_t beforeUserId)
+{
+    (void)deviceMap;
+    (void)currentUserId;
+    (void)beforeUserId;
     return;
 }
 
@@ -527,11 +537,36 @@ void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &dev
     return;
 }
 
-int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId)
+int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, int32_t accessTokenId)
 {
     (void)appId;
     (void)accessTokenId;
     return 0;
+}
+
+void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backroundUserIds, const std::string &remoteUdid)
+{
+    (void)foregroundUserIds;
+    (void)backroundUserIds;
+    (void)remoteUdid;
+}
+
+void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid)
+{
+    (void)preUserId;
+    (void)remoteUdid;
+}
+
+std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindLevel(int32_t userId)
+{
+    (void)userId;
+}
+
+std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUserId(int32_t localUserId)
+{
+    (void)localUserId;
+    return {};
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

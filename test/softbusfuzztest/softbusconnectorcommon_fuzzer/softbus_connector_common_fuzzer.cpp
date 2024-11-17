@@ -38,7 +38,6 @@ void SoftBusConnectorCommonFuzzTest(const uint8_t* data, size_t size)
     softbusConnector->GetDeviceUdidHashByUdid(str);
     softbusConnector->EraseUdidFromMap(str);
     softbusConnector->GetNetworkIdByDeviceId(str);
-    softbusConnector->SetPkgName(str);
     softbusConnector->CheckIsOnline(str);
     softbusConnector->GetDeviceInfoByDeviceId(str);
 }

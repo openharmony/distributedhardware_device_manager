@@ -31,8 +31,6 @@
 #include "ipc_rsp.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_skeleton.h"
-#include "ipc_start_discovery_req.h"
-#include "ipc_stop_discovery_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
@@ -191,7 +189,8 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_102, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = "";
+    pinHolder->processInfo_.pkgName = "";
+    pinHolder->processInfo_.userId = 100;
     int32_t ret = pinHolder->CreatePinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -204,7 +203,8 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_103, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = "dmtest";
+    pinHolder->processInfo_.pkgName = "dmtest";
+    pinHolder->processInfo_.userId = 100;
     int32_t ret = pinHolder->CreatePinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -223,7 +223,8 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_105, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = packName;
+    pinHolder->processInfo_.pkgName = packName;
+    pinHolder->processInfo_.userId = 100;
     int32_t ret = pinHolder->CreatePinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -242,7 +243,8 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_106, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = packName;
+    pinHolder->processInfo_.pkgName = packName;
+    pinHolder->processInfo_.userId = 100;
     pinHolder->listener_ = nullptr;
     int32_t ret = pinHolder->CreatePinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_FAILED);
@@ -262,7 +264,8 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_107, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = packName;
+    pinHolder->processInfo_.pkgName = packName;
+    pinHolder->processInfo_.userId = 100;
     pinHolder->session_ = nullptr;
     int32_t ret = pinHolder->CreatePinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_FAILED);
@@ -282,7 +285,8 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_108, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = packName;
+    pinHolder->processInfo_.pkgName = packName;
+    pinHolder->processInfo_.userId = 100;
     pinHolder->sourceState_ = SOURCE_CREATE;
     int32_t ret = pinHolder->CreatePinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_FAILED);
@@ -337,7 +341,8 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_103, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = "";
+    pinHolder->processInfo_.pkgName = "";
+    pinHolder->processInfo_.userId = 100;
     int32_t ret = pinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -355,7 +360,8 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_104, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = "dmtest";
+    pinHolder->processInfo_.pkgName = "dmtest";
+    pinHolder->processInfo_.userId = 100;
     int32_t ret = pinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -373,7 +379,8 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_105, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = packName;
+    pinHolder->processInfo_.pkgName = packName;
+    pinHolder->processInfo_.userId = 100;
     int32_t ret = pinHolder->DestroyPinHolder(packName, targetId, pinType, payload);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -391,7 +398,8 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_106, testing::ext::TestSize.Level0)
     std::string payload;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    pinHolder->registerPkgName_ = packName;
+    pinHolder->processInfo_.pkgName = packName;
+    pinHolder->processInfo_.userId = 100;
     pinHolder->sessionId_ = 0;
     pinHolder->sourceState_ = SOURCE_DESTROY;
     pinHolder->listener_ = std::make_shared<IDeviceManagerServiceListenerTest>();

@@ -37,7 +37,6 @@ void IpcServerListenerFuzzTest(const uint8_t* data, size_t size)
 
     std::shared_ptr<IpcServerListener> ipcServerListener = std::make_shared<IpcServerListener>();
     ipcServerListener->SendRequest(cmdCode, req, rsp);
-    ipcServerListener->SendAll(cmdCode, req, rsp);
 }
 }
 }

@@ -42,7 +42,7 @@ class MockDeviceManagerServiceListener : public DeviceManagerServiceListener {
 public:
     MockDeviceManagerServiceListener() = default;
     ~MockDeviceManagerServiceListener() = default;
-    void OnCredentialResult(const std::string &pkgName, int32_t action, const std::string &resultInfo) override {}
+    void OnCredentialResult(const ProcessInfo &processInfo, int32_t action, const std::string &resultInfo) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

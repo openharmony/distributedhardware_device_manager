@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,40 +66,21 @@ int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> 
     return DM_OK;
 }
 
-int32_t IpcServerListener::SendAll(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
+std::vector<ProcessInfo> IpcServerListener::GetAllProcessInfo()
 {
+    std::vector<ProcessInfo> processInfoVec;
     const std::map<std::string, CommonSvcId> &listenerMap = IpcServerListenermgr::GetInstance().GetAllListeners();
     for (const auto &kv : listenerMap) {
-        SvcIdentity svc;
-        IpcIo io;
-        uint8_t data[MAX_DM_IPC_LEN] = {0};
-        std::string pkgName = kv.first;
-
-        req->SetPkgName(pkgName);
-        if (IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, io, data, MAX_DM_IPC_LEN) != DM_OK) {
-            LOGE("SetRequest failed cmdCode:%{public}d", cmdCode);
-            continue;
-        }
-        CommonSvcId svcId = kv.second;
-        CommonSvcToIdentity(&svcId, &svc);
-        MessageOption option;
-        MessageOptionInit(&option);
-        option.flags = TF_OP_ASYNC;
-        if (::SendRequest(svc, cmdCode, &io, nullptr, option, nullptr) != DM_OK) {
-            LOGI("SendRequest failed cmdCode:%{public}d", cmdCode);
-        }
+        ProcessInfo processInfo;
+        processInfo.pkgName = kv.first;
+        processInfoVec.push_back(processInfo);
     }
-    return DM_OK;
+    return processInfoVec;
 }
 
-std::vector<std::string> IpcServerListener::GetAllPkgName()
+std::set<std::string> IpcServerListener::GetSystemSA()
 {
-    std::vector<std::string> pkgNameList;
-    const std::map<std::string, CommonSvcId> &listenerMap = IpcServerListenermgr::GetInstance().GetAllListeners();
-    for (const auto &kv : listenerMap) {
-        pkgNameList.push_back(kv.first);
-    }
-    return pkgNameList;
+    return {};
 }
 } // namespace DistributedHardware
 } // namespace OHOS
