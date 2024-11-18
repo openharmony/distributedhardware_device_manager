@@ -25,6 +25,8 @@
 #include "nlohmann/json.hpp"
 #include "softbus_error_code.h"
 
+using namespace testing;
+using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 void DmAuthManagerTest::SetUp()
@@ -1482,7 +1484,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->importAuthCode_= "importAuthCode";
     authManager_->importPkgName_ = "importPkgName";
-    authResponseContext_->hostPkgName = "importPkgName";
+    authManager_->authResponseContext_->hostPkgName = "importPkgName";
     authManager_->AbilityNegotiate();
 
     EXPECT_CALL(*hiChainConnectorMock_, IsDevicesInP2PGroup(_, _)).WillOnce(Return(true));
@@ -1497,7 +1499,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
 
     nlohmann::json jsonPeerGroupIdObj;
     jsonPeerGroupIdObj["groupId"] = "123456";
-    authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
+    authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();
@@ -1512,13 +1514,13 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
 
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
-    auto ret = authManager_->GetAccountGroupIdHash();
+    ret = authManager_->GetAccountGroupIdHash();
     ASSERT_FALSE(ret.empty());
 }
 
 HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
 {
-    authResponseContext_->reply == ERR_DM_AUTH_BUSINESS_BUSY;
+    authManager_->authResponseContext_->reply == ERR_DM_AUTH_BUSINESS_BUSY;
     authManager_->authResponseContext_->isIdenticalAccount = true;
     authManager_->authResponseContext_->accountGroupIdHash == OLD_VERSION_ACCOUNT;
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));

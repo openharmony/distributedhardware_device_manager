@@ -269,9 +269,8 @@ void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
     int32_t key = 12;
     std::string value = "acl_info1";
     std::string credentialInfo = R"({"content": {"deviceid": "123"}}, authId: "123456"))";
-    std::string params(reinterpret_cast<const char*>(data), size);
     std::string groupOwner(reinterpret_cast<const char*>(data), size);
-    delAclInfoVec1.push_back(std::make_pair(key1, value));
+    delAclInfoVec1.push_back(std::make_pair(key, value));
     nlohmann::json jsonObj;
     jsonObj[AUTH_TYPE] = 1;
     jsonObj[FIELD_USER_ID] = "123456";
@@ -306,6 +305,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
+    std::string groupOwner(reinterpret_cast<const char*>(data), size);
     nlohmann::json jsonObj;
     std::string deviceId = "deviceId";
     std::string key = "localDeviceId";
@@ -324,6 +324,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->AddMember(deviceId, jsonObj.dump());
 
     nlohmann::json jsonObjCre;
+    std::string params;
     jsonObjCre[AUTH_TYPE] = 1;
     jsonObjCre["userId"] = "user_001";
     jsonObjCre[FIELD_CREDENTIAL_TYPE] = 25;
@@ -333,8 +334,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     std::string credentialInfo = jsonObjCre.dump();
     hichainConnector->ParseRemoteCredentialExt(credentialInfo, params, groupOwner);
     int32_t groupType = *(reinterpret_cast<const int32_t*>(data));
-    nlohmann::json jsonDeviceList;
-    std::string params;
+    nlohmann::json jsonDeviceList; 
     int32_t osAccountUserId = 0;
     std::string userId = "user_002";
     jsonDeviceList[FIELD_DEVICE_LIST] = "deviceList";

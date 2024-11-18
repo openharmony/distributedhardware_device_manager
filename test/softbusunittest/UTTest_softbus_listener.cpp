@@ -544,25 +544,20 @@ HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_002, testing::ext::TestSize
 HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_003, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId_003";
-    DeviceInfo deviceInfo = {
-        .devId = "deviceId_003",
-        .devType = (DeviceType)1,
-        .devName = "11112",
-        .addrNum = 1,
-        .addr[0] = {
+    PeerTargetId targetId;
+    ConnectionAddrType addrType;
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    infoPtr->devType = (DeviceType)1;
+    infoPtr->addrNum = 1;
+    infoPtr->addr[0] = {
             .type = ConnectionAddrType::CONNECTION_ADDR_WLAN,
             .info {
                 .ip {
                     .ip = "172.0.0.1",
                     .port = 0,
-                }
             }
         }
     };
-    PeerTargetId targetId;
-    ConnectionAddrType addrType;
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    infoPtr = &deviceInfo;
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
     deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
     discoveredDeviceMap.insert(std::pair<std::string,
@@ -577,28 +572,22 @@ HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_003, testing::ext::TestSize
 HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_004, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId_004";
-    DeviceInfo deviceInfo = {
-        .devId = "deviceId_004",
-        .devType = (DeviceType)1,
-        .devName = "11113",
-        .addrNum = 1,
-        .addr[0] = {
+    PeerTargetId targetId;
+    ConnectionAddrType addrType = ConnectionAddrType::CONNECTION_ADDR_ETH;
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    infoPtr->devType = (DeviceType)1;
+    infoPtr->addrNum = 1;
+    infoPtr->addr[0] = {
             .type = ConnectionAddrType::CONNECTION_ADDR_ETH,
             .info {
                 .ip {
                     .ip = "172.0.0.1",
                     .port = 0,
-                }
             }
         }
     };
-    PeerTargetId targetId;
-    ConnectionAddrType addrType = ConnectionAddrType::CONNECTION_ADDR_ETH;
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    infoPtr = &deviceInfo;
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
-    deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, 
-    ));
+    deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
     discoveredDeviceMap.insert(std::pair<std::string,
         std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>>(deviceId, deviceVec));
     if (softbusListener == nullptr) {
@@ -612,25 +601,20 @@ HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_004, testing::ext::TestSize
 HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_005, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId_005";
-    DeviceInfo deviceInfo = {
-        .devId = "deviceId_005",
-        .devType = (DeviceType)1,
-        .devName = "11115",
-        .addrNum = 1,
-        .addr[0] = {
+    PeerTargetId targetId;
+    ConnectionAddrType addrType;
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    infoPtr->devType = (DeviceType)1;
+    infoPtr->addrNum = 1;
+    infoPtr->addr[0] = {
             .type = ConnectionAddrType::CONNECTION_ADDR_BR,
             .info {
                 .ip {
                     .ip = "172.0.0.1",
-                    .port = 1,
-                }
+                    .port = 0,
             }
         }
     };
-    PeerTargetId targetId;
-    ConnectionAddrType addrType;
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    infoPtr = &deviceInfo;
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
     deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
     discoveredDeviceMap.insert(std::pair<std::string,
@@ -645,25 +629,20 @@ HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_005, testing::ext::TestSize
 HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_006, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId_006";
-    DeviceInfo deviceInfo = {
-        .devId = "deviceId_006",
-        .devType = (DeviceType)1,
-        .devName = "11116",
-        .addrNum = 1,
-        .addr[0] = {
+    PeerTargetId targetId;
+    ConnectionAddrType addrType;
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    infoPtr->devType = (DeviceType)1;
+    infoPtr->addrNum = 1;
+    infoPtr->addr[0] = {
             .type = ConnectionAddrType::CONNECTION_ADDR_BLE,
             .info {
                 .ip {
                     .ip = "172.0.0.1",
-                    .port = 2,
-                }
+                    .port = 0,
             }
         }
     };
-    PeerTargetId targetId;
-    ConnectionAddrType addrType;
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    infoPtr = &deviceInfo;
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
     deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
     discoveredDeviceMap.insert(std::pair<std::string,
@@ -678,25 +657,8 @@ HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_006, testing::ext::TestSize
 HWTEST_F(SoftbusListenerTest, GetTargetInfoFromCache_007, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId_007";
-    DeviceInfo deviceInfo = {
-        .devId = "deviceId_006",
-        .devType = (DeviceType)1,
-        .devName = "11116",
-        .addrNum = 1,
-        .addr[0] = {
-            .type = ConnectionAddrType::CONNECTION_ADDR_BLE,
-            .info {
-                .ip {
-                    .ip = "172.0.0.1",
-                    .port = 2,
-                }
-            }
-        }
-    };
     PeerTargetId targetId;
     ConnectionAddrType addrType;
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    infoPtr = &deviceInfo;
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
     discoveredDeviceMap.insert(std::pair<std::string,
         std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>>(deviceId, deviceVec));
@@ -972,23 +934,18 @@ HWTEST_F(SoftbusListenerTest, GetIPAddrTypeFromCache_004, testing::ext::TestSize
     std::string deviceId = "deviceId";
     std::string ip = "172.0.0.1";
     ConnectionAddrType addrType = ConnectionAddrType::CONNECTION_ADDR_ETH;
-    DeviceInfo deviceInfo = {
-        .devId = "deviceId",
-        .devType = (DeviceType)1,
-        .devName = "11111",
-        .addrNum = 1,
-        .addr[0] = {
+    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
+    infoPtr->devType = (DeviceType)1;
+    infoPtr->addrNum = 1;
+    infoPtr->addr[0] = {
             .type = ConnectionAddrType::CONNECTION_ADDR_WLAN,
             .info {
                 .ip {
                     .ip = "172.0.0.1",
                     .port = 0,
-                }
             }
         }
     };
-    std::shared_ptr<DeviceInfo> infoPtr = std::make_shared<DeviceInfo>();
-    infoPtr = &deviceInfo;
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>> deviceVec;
     deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
     discoveredDeviceMap.insert(std::pair<std::string,

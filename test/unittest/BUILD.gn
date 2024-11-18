@@ -1142,7 +1142,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
-    "googletest::gmock_main",
+    "googletest:gmock_main",
   ]
 }
 

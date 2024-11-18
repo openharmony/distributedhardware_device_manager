@@ -32,6 +32,8 @@ constexpr const char* DM_VERSION_4_1_5_1 = "4.1.5.1";
 constexpr const char* DM_VERSION_5_0_1 = "5.0.1";
 constexpr const char* DM_VERSION_5_0_2 = "5.0.2";
 
+using namespace testing;
+using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t CLONE_AUTHENTICATE_TIMEOUT = 10;
@@ -1387,7 +1389,7 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     authManager_->authResponseContext_->authType == AUTH_TYPE_NFC;
     authManager_->authResponseContext_->requestId = requestId;
     status = 1;
-    authManager_->authTimes_ = MAX_AUTH_TIMES;
+    authManager_->authTimes_ = 3;
     authManager_->MemberJoinAuthRequest(requestId, status);
     status = 0;
     authManager_->authTimes_ = 2;
@@ -1399,7 +1401,7 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     authManager_->NegotiateRespMsg(DM_VERSION_5_0_2);
     EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
     authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
-    ret = authManager_->StopAuthenticateDevice(pkgName, authType, deviceId, extra);
+    ret = authManager_->StopAuthenticateDevice(pkgName);
     ASSERT_EQ(ret, DM_OK);
 }
 
