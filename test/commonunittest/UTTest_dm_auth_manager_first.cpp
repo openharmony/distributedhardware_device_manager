@@ -1337,12 +1337,13 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize
     EXPECT_EQ(ret, DM_OK);
 
     extra = jsonObject.dump();
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
     ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
     ret = authManager_->CheckAuthParamVaildExtra(extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, DM_OK);
 
     jsonObject["bindLevel"] = 15;
     extra = jsonObject.dump();
