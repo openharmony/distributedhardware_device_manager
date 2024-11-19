@@ -319,7 +319,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     jsonObj[TAG_DEVICE_ID] = "deviceId_001";
     jsonObj[PIN_CODE_KEY] = 1;
     jsonObj[TAG_GROUP_ID] = "groupId";
-    jsonObj[TAG_REQUEST_ID] = 3;
+    jsonObj[TAG_REQUEST_ID] = 1;
     jsonObj[TAG_GROUP_NAME] = "groupName";
     hichainConnector->AddMember(deviceId, jsonObj.dump());
 
@@ -328,7 +328,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     jsonObjCre[AUTH_TYPE] = 1;
     jsonObjCre["userId"] = "user_001";
     jsonObjCre[FIELD_CREDENTIAL_TYPE] = 1;
-    jsonObjCre[FIELD_OPERATION_CODE] = 2;
+    jsonObjCre[FIELD_OPERATION_CODE] = 1;
     jsonObjCre[FIELD_META_NODE_TYPE] = "metaNode_002";
     jsonObjCre[FIELD_DEVICE_LIST] = "deviceList";
     std::string credentialInfo = jsonObjCre.dump();
