@@ -54,16 +54,24 @@ void DmAuthManagerTest::TearDown()
 }
 void DmAuthManagerTest::SetUpTestCase()
 {
+    hiChainConnectorMock_ = std::make_shared<HiChainConnectorMock>();
     DmHiChainConnector::dmHiChainConnector = hiChainConnectorMock_;
+    multipleUserConnectorMock_ = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    softbusConnectorMock_ = std::make_shared<SoftbusConnectorMock>();
     DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock_;
+    hiChainAuthConnectorMock_ = std::make_shared<HiChainAuthConnectorMock>();
     DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock_;
 }
 void DmAuthManagerTest::TearDownTestCase()
 {
+    DmHiChainConnector::dmHiChainConnector = nullptr;
     hiChainConnectorMock_ = nullptr;
+    DmMultipleUserConnector::dmMultipleUserConnector =  = nullptr;
     multipleUserConnectorMock_ = nullptr;
+    DmSoftbusConnector::dmSoftbusConnector =  = nullptr;
     softbusConnectorMock_ = nullptr;
+    DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
     hiChainAuthConnectorMock_ = nullptr;
 }
 

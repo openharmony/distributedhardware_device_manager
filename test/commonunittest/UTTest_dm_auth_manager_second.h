@@ -48,14 +48,10 @@ public:
     void TearDown();
 
     std::shared_ptr<DmAuthManager> authManager_;
-    static inline std::shared_ptr<HiChainConnectorMock> hiChainConnectorMock_ =
-        std::make_shared<HiChainConnectorMock>();
-    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
-        std::make_shared<MultipleUserConnectorMock>();
-    static inline std::shared_ptr<SoftbusConnectorMock> softbusConnectorMock_ =
-        std::make_shared<SoftbusConnectorMock>();
-    static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock_ =
-        std::make_shared<HiChainAuthConnectorMock>();
+    static inline std::shared_ptr<HiChainConnectorMock> hiChainConnectorMock_ = nullptr;
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;
+    static inline std::shared_ptr<SoftbusConnectorMock> softbusConnectorMock_ = nullptr;
+    static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock_ = nullptr;
 };
 
 class AuthResponseInitStateMock : public AuthResponseInitState {

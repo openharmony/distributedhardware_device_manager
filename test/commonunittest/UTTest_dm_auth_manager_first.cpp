@@ -1330,15 +1330,17 @@ HWTEST_F(DmAuthManagerTest, GetTaskTimeout_001, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize.Level0)
 {
-    std::string extra = R"({"extra": {"bindLevel": 1}})";
+    std::string extra = R"({"extra": {"bindLevel": "123"}})";
     nlohmann::json jsonObject;
     jsonObject["bindLevel"] = 1;
-    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
     int32_t ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, DM_OK);
 
     extra = jsonObject.dump();
-    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
+    ret = authManager_->CheckAuthParamVaildExtra(extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
     ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
