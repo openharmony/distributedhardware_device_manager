@@ -36,6 +36,7 @@ group("unittest") {
     ":UTTest_dm_auth_manager_first",
     ":UTTest_dm_auth_manager_second",
     ":UTTest_dm_auth_manager_third",
+    ":UTTest_dm_comm_tool",
     ":UTTest_dm_common_event_manager",
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_crypto",
@@ -54,6 +55,8 @@ group("unittest") {
     ":UTTest_dm_screen_common_event",
     ":UTTest_dm_service_load",
     ":UTTest_dm_timer",
+    ":UTTest_dm_transport",
+    ":UTTest_dm_transport_msg",
     ":UTTest_hichain_auth_connector",
     ":UTTest_hichain_connector",
     ":UTTest_ipc_client_manager",
@@ -647,6 +650,35 @@ ohos_unittest("UTTest_dm_timer") {
 }
 
 ## UnitTest UTTest_dm_timer }}}
+
+## UnitTest UTTest_dm_transport {{{
+ohos_unittest("UTTest_dm_transport") {
+  module_out_path = module_out_path
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_transport.cpp" ]
+  deps = [ ":device_manager_test_common" ]
+  external_deps = [
+    "cJSON:cjson",
+    "googletest:gmock",
+  ]
+}
+
+## UnitTest UTTest_dm_transport }}}
+
+## UnitTest UTTest_dm_transport_msg {{{
+ohos_unittest("UTTest_dm_transport_msg") {
+  module_out_path = module_out_path
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+  sources =
+      [ "${devicemanager_path}/test/unittest/UTTest_dm_transport_msg.cpp" ]
+  deps = [ ":device_manager_test_common" ]
+  external_deps = [
+    "cJSON:cjson",
+    "googletest:gmock",
+  ]
+}
+
+## UnitTest UTTest_dm_transport_msg }}}
 
 ## UnitTest UTTest_dm_service_load {{{
 ohos_unittest("UTTest_dm_service_load") {
@@ -1348,6 +1380,20 @@ ohos_unittest("UTTest_dm_distributed_hardware_load") {
 }
 
 ## UnitTest UTTest_dm_distributed_hardware_load }}}
+
+## UnitTest UTTest_dm_comm_tool {{{
+ohos_unittest("UTTest_dm_comm_tool") {
+  module_out_path = module_out_path
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_comm_tool.cpp" ]
+  deps = [ ":device_manager_test_common" ]
+  external_deps = [
+    "cJSON:cjson",
+    "googletest:gmock",
+  ]
+}
+
+## UnitTest UTTest_dm_comm_tool }}}
 
 ## UnitTest UTTest_dm_crypto {{{
 ohos_unittest("UTTest_dm_crypto") {

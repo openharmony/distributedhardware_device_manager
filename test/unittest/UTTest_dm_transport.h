@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,17 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_RELEATION_SHIP_SYNC_MGR_TEST_H
-#define OHOS_RELEATION_SHIP_SYNC_MGR_TEST_H
+#ifndef OHOS_UTTEST_DM_TRANSPORT_H
+#define OHOS_UTTEST_DM_TRANSPORT_H
 
 #include <gtest/gtest.h>
-#include <refbase.h>
-
-#include "relationship_sync_mgr.h"
+#include <gmock/gmock.h>
+#include <memory>
+#include "dm_comm_tool.h"
+#include "dm_transport.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class ReleationShipSyncMgrTest : public testing::Test {
+class DMTransportTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -31,10 +32,16 @@ public:
     void TearDown();
 
 protected:
-    int32_t FRONT_OR_BACK_USER_FLAG_OFFSET = 7;
-    int32_t DEL_USER_PAYLOAD_LEN = 2;
+    std::shared_ptr<DMCommTool> dmCommTool;
+    std::shared_ptr<DMCommTool> dmCommToolPtr = std::make_shared<DMCommTool>();
+    DMTransport dmTransport = DMTransport(dmCommToolPtr);
+
+    int32_t ERR_DM_FAILED = 96929744;
+    int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
+    uint32_t MAX_SEND_MSG_LENGTH = 4 * 1024 * 1024;
+    int32_t DM_OK = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
 
-#endif // OHOS_RELEATION_SHIP_SYNC_MGR_TEST_H
+#endif // OHOS_UTTEST_DM_TRANSPORT_H

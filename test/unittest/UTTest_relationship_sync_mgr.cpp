@@ -240,6 +240,154 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_005, testing::ex
         ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
     ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
 }
+
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_ValidInput, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.userIdInfos.push_back({12345, true});
+    msg.userIdInfos.push_back({67890, false});
+    
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+
+    bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
+
+    ASSERT_TRUE(result);
+    ASSERT_EQ(len, 5);
+    ASSERT_EQ(msgPtr[0], 2);
+
+    delete[] msgPtr;
+    msg.userIdInfos.clear();
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToDelUserPayLoad_ValidInput, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.userId = 12345;
+
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+
+    msg.ToDelUserPayLoad(msgPtr, len);
+
+    ASSERT_EQ(len, DEL_USER_PAYLOAD_LEN);
+    ASSERT_EQ(msgPtr[0], 0x39);
+
+    delete[] msgPtr;
+    msg.userIdInfos.clear();
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_TooManyUserIds, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    for (int i = 0; i < MAX_USER_ID_NUM + 1; ++i) {
+        msg.userIdInfos.push_back({i, true});
+    }
+
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+
+    bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
+
+    ASSERT_FALSE(result);
+    ASSERT_EQ(msgPtr, nullptr);
+    msg.userIdInfos.clear();
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_LengthExceedsLimit, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.userIdInfos.push_back({12345, true});
+    msg.userIdInfos.push_back({67890, false});
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
+    ASSERT_TRUE(result);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNBIND;
+    msg.userId = 12345;
+    msg.accountId = "account_123";
+    msg.tokenId = 67890;
+    msg.peerUdids = {"udid1", "udid2"};
+    msg.peerUdid = "peer_udid";
+    msg.accountName = "test_account";
+    msg.syncUserIdFlag = true;
+    msg.userIdInfos = {{true, 111}, {false, 222}};
+
+    std::string expected = "{ MsgType: " + std::to_string(static_cast<uint32_t>(msg.type)) +
+                           ", userId: 12345, accountId: a******3, tokenId: 67890, " +
+                           "peerUdids: [ u******1, u******2 ], peerUdid: p******d, " +
+                           "accountName: t******t, syncUserIdFlag: 1, " +
+                           "userIds: [ { 1, userId: 111 }, { 0, userId: 222 } ] }";
+                           
+    EXPECT_EQ(msg.ToString(), expected);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData02, testing::ext::TestSize.Level0)
+{
+    bool isForeground = true;
+    std::uint16_t userId = 123;
+    UserIdInfo userIdInfo(isForeground, userId);
+    std::string expected = "{ 1, userId: 123 }";
+    EXPECT_EQ(userIdInfo.ToString(), expected);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToString_ZeroUserId, testing::ext::TestSize.Level0)
+{
+    bool isForeground = false;
+    std::uint16_t userId = 0;
+    UserIdInfo userIdInfo(isForeground, userId);
+
+    std::string expected = "{ 0, userId: 0 }";
+    EXPECT_EQ(userIdInfo.ToString(), expected);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ValidList, testing::ext::TestSize.Level0)
+{
+    std::vector<UserIdInfo> list = {{true, 1}, {false, 2}};
+    std::string expected = "[ { 1, userId: 1 }, { 0, userId: 2 } ]";
+    
+    EXPECT_EQ(GetUserIdInfoList(list), expected);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, EmptyList, testing::ext::TestSize.Level0)
+{
+    std::vector<UserIdInfo> list;
+    std::string expected = "[  ]";
+    
+    EXPECT_EQ(GetUserIdInfoList(list), expected);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ValidData, testing::ext::TestSize.Level0)
+{
+    std::vector<UserIdInfo> remoteUserIdInfos = {{true, 1}, {false, 2}, {true, 3}};
+    std::vector<UserIdInfo> foregroundUserIdInfos;
+    std::vector<UserIdInfo> backgroundUserIdInfos;
+
+    GetFrontAndBackUserIdInfos(remoteUserIdInfos, foregroundUserIdInfos, backgroundUserIdInfos);
+
+    EXPECT_EQ(foregroundUserIdInfos.size(), 2);
+    EXPECT_EQ(backgroundUserIdInfos.size(), 1);
+    EXPECT_EQ(foregroundUserIdInfos[0].userId, 1);
+    EXPECT_EQ(foregroundUserIdInfos[1].userId, 3);
+    EXPECT_EQ(backgroundUserIdInfos[0].userId, 2);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, EmptyRemoteList, testing::ext::TestSize.Level0)
+{
+    std::vector<UserIdInfo> remoteUserIdInfos;
+    std::vector<UserIdInfo> foregroundUserIdInfos;
+    std::vector<UserIdInfo> backgroundUserIdInfos;
+
+    GetFrontAndBackUserIdInfos(remoteUserIdInfos, foregroundUserIdInfos, backgroundUserIdInfos);
+
+    EXPECT_TRUE(foregroundUserIdInfos.empty());
+    EXPECT_TRUE(backgroundUserIdInfos.empty());
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
