@@ -52,9 +52,8 @@ public:
 
     std::shared_ptr<DmAuthManager> authManager_ =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    static inline std::shared_ptr<SoftbusSessionMock> softbusSessionMock_
-        = std::make_shared<SoftbusSessionMock>();
-    static inline std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
+    static inline std::shared_ptr<SoftbusSessionMock> softbusSessionMock_ = nullptr;
+    static inline std::shared_ptr<AppManagerMock> appManagerMock_ = nullptr;
 };
 
 class AuthRequestFinishStateMock : public AuthRequestFinishState {

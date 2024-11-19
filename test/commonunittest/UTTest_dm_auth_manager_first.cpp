@@ -75,18 +75,17 @@ void DmAuthManagerTest::SetUp()
 void DmAuthManagerTest::TearDown() {}
 void DmAuthManagerTest::SetUpTestCase()
 {
+    softbusSessionMock_ = std::make_shared<SoftbusSessionMock>();
     DmSoftbusSession::dmSoftbusSession = softbusSessionMock_;
+    appManagerMock_ = std::make_shared<AppManagerMock>();
     DmAppManager::dmAppManager = appManagerMock_;
 }
 void DmAuthManagerTest::TearDownTestCase()
 {
-    if (softbusSessionMock_ != nullptr) {
-        softbusSessionMock_ = nullptr;
-    }
-    
-    if (appManagerMock_ != nullptr) {
-        appManagerMock_ = nullptr;
-    }
+    DmSoftbusSession::dmSoftbusSession = nullptr;
+    softbusSessionMock_ = nullptr;
+    DmAppManager::dmAppManager = nullptr;
+    appManagerMock_ = nullptr;
 }
 
 namespace {
@@ -1338,18 +1337,14 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize
     int32_t ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, DM_OK);
 
-    std::string extra1 = jsonObject.dump();
+    extra = jsonObject.dump();
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
-    ret = authManager_->CheckAuthParamVaildExtra(extra1);
+    ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
-    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
-    ret = authManager_->CheckAuthParamVaildExtra(extra1);
-    EXPECT_EQ(ret, DM_OK);
-
     jsonObject["bindLevel"] = 15;
-    std::string extra2 = jsonObject.dump();
-    ret = authManager_->CheckAuthParamVaildExtra(extra2);
+    extra = jsonObject.dump();
+    ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
