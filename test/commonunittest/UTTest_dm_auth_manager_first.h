@@ -35,7 +35,6 @@
 #include "dm_auth_manager.h"
 #include "softbus_session_mock.h"
 #include "app_manager_mock.h"
-#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -56,8 +55,6 @@ public:
     static inline std::shared_ptr<SoftbusSessionMock> softbusSessionMock_
         = std::make_shared<SoftbusSessionMock>();
     static inline std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
-    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
-        std::make_shared<MultipleUserConnectorMock>();
 };
 
 class AuthRequestFinishStateMock : public AuthRequestFinishState {
