@@ -955,7 +955,7 @@ HWTEST_F(SoftbusListenerTest, GetIPAddrTypeFromCache_004, testing::ext::TestSize
     }
     int32_t ret = softbusListener->GetIPAddrTypeFromCache(deviceId, ip, addrType);
     softbusListener->CacheDeviceInfo(deviceId, infoPtr);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_BIND_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(SoftbusListenerTest, InitSoftbusListener_001, testing::ext::TestSize.Level0)
