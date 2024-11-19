@@ -1474,8 +1474,9 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     ASSERT_FALSE(ret);
 
     authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager_->authResponseContext_->accountGroupIdHash == OLD_VERSION_ACCOUNT;
-    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    authManager_->authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
+    EXPECT_CALL(*multipleUserConnectorMock_,
+        GetCurrentAccountUserID()).WillOnce(Return(0)).WillOnce(Return(0)).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_TRUE(ret);
@@ -1520,9 +1521,9 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
 
 HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
 {
-    authManager_->authResponseContext_->reply == ERR_DM_AUTH_BUSINESS_BUSY;
+    authManager_->authResponseContext_->reply = ERR_DM_AUTH_BUSINESS_BUSY;
     authManager_->authResponseContext_->isIdenticalAccount = true;
-    authManager_->authResponseContext_->accountGroupIdHash == OLD_VERSION_ACCOUNT;
+    authManager_->authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     int32_t ret = authManager_->CheckTrustState();

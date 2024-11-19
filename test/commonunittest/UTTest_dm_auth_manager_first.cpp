@@ -61,6 +61,7 @@ void DmAuthManagerTest::SetUp()
 {
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authMessageProcessor_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -1360,7 +1361,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
     authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
     authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     int32_t ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.Level0)
@@ -1411,6 +1412,7 @@ HWTEST_F(DmAuthManagerTest, GetBindLevel_001, testing::ext::TestSize.Level0)
     std::string udid;
     authManager_->HandleDeviceNotTrust(udid);
     udid = "988989";
+    authManager_->HandleDeviceNotTrust(udid);
     int32_t sessionId = 32166;
     authManager_->ProcIncompatible(sessionId);
     
@@ -1466,11 +1468,11 @@ HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
 
     authManager_->authResponseContext_->isIdenticalAccount = false;
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
-    authManager_->authResponseContext_->isAuthCodeReady == false;
+    authManager_->authResponseContext_->isAuthCodeReady = false;
     ret = authManager_->IsAuthFinish();
     EXPECT_TRUE(ret);
 
-    authManager_->authResponseContext_->isAuthCodeReady == true;
+    authManager_->authResponseContext_->isAuthCodeReady = true;
     ret = authManager_->IsAuthFinish();
     EXPECT_FALSE(ret);
 

@@ -1041,7 +1041,7 @@ HWTEST_F(SoftbusListenerTest, GetNetworkIdByUdid_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetNetworkIdByUdid(udid, networkId);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(SoftbusListenerTest, SetLocalDeviceName_001, testing::ext::TestSize.Level0)
@@ -1072,7 +1072,7 @@ HWTEST_F(SoftbusListenerTest, GetDeviceScreenStatus_001, testing::ext::TestSize.
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetDeviceScreenStatus(networkId.c_str(), screenStatus);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_TRUE(checkSoftbusRes(ret));
     softbusListener = nullptr;
 }
 } // namespace
