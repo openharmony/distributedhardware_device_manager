@@ -252,7 +252,7 @@ HWTEST_F(PermissionManagerTest, CheckSystemSA_102, testing::ext::TestSize.Level0
 
 HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSize.Level0)
 {
-    bool ret = PermissionManager::GetInstance().CheckMonitorPermission(pkgName);
+    bool ret = PermissionManager::GetInstance().CheckMonitorPermission();
     ASSERT_TRUE(ret);
 }
 

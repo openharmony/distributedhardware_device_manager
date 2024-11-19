@@ -28,7 +28,7 @@
 static bool g_reportAuthOpenSessionReturnBoolValue = false;
 static bool g_reportAuthConfirmBoxReturnBoolValue = false;
 
-constexpr const char* DM_VERSION_4_1_5_1 = "4.1.5.1";
+constexpr const char* DM_VERSION_4_1_5_1 = "4.1.5";
 constexpr const char* DM_VERSION_5_0_1 = "5.0.1";
 constexpr const char* DM_VERSION_5_0_2 = "5.0.2";
 
@@ -78,7 +78,6 @@ void DmAuthManagerTest::SetUpTestCase()
     DmSoftbusSession::dmSoftbusSession = softbusSessionMock_;
     DmAppManager::dmAppManager = appManagerMock_;
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
-
 }
 void DmAuthManagerTest::TearDownTestCase()
 {
@@ -1145,7 +1144,7 @@ HWTEST_F(DmAuthManagerTest, PutAccessControlList001, testing::ext::TestSize.Leve
     authManager_->authResponseContext_->localAccountId = "ohosAnonymousUid";
     authManager_->authResponseContext_->confirmOperation = USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
     authManager_->PutAccessControlList();
-    ASSERT_EQ(authManager_->isIdenticalAccount, false);
+    ASSERT_EQ(authManager_->authResponseContext_->isIdenticalAccount, false);
 }
 
 HWTEST_F(DmAuthManagerTest, ProcessSourceMsg_001, testing::ext::TestSize.Level0)
@@ -1424,7 +1423,6 @@ HWTEST_F(DmAuthManagerTest, GetBindLevel_001, testing::ext::TestSize.Level0)
     ret = authManager_->GetBindLevel(bindLevel);
     ASSERT_EQ(ret, APP);
 
-    int32_t sessionId = 123;
     authManager_->authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->authResponseContext_->importAuthCode = "importAuthCode";
     authManager_->importAuthCode_ = "importAuthCode";
@@ -1490,7 +1488,7 @@ HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->isOnline = false;
     authManager_->authResponseContext_->importAuthCode = "importAuthCode";
     authManager_->authResponseContext_->isIdenticalAccount = false;
-    authResponseContext_->isAuthCodeReady = true;
+    authManager_->authResponseContext_->isAuthCodeReady = true;
     authManager_->ProcessAuthRequestExt(sessionId);
 }
 } // namespace
