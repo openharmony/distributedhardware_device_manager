@@ -69,7 +69,7 @@ void DmAuthManagerTest::TearDownTestCase()
     hiChainConnectorMock_ = nullptr;
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
     multipleUserConnectorMock_ = nullptr;
-    DmSoftbusConnector::dmSoftbusConnector = nullptr;git
+    DmSoftbusConnector::dmSoftbusConnector = nullptr;
     softbusConnectorMock_ = nullptr;
     DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
     hiChainAuthConnectorMock_ = nullptr;
