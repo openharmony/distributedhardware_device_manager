@@ -14,7 +14,6 @@
  */
 
 #include "mine_hichain_connector_mock.h"
-#include "dm_softbus_cache_mock.h"
 
 #include "gtest/gtest.h"
 

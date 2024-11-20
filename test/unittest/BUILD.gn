@@ -1131,7 +1131,11 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
 
   include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_first.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_first.cpp",
+    "mock/app_manager_mock.cpp",
+    "mock/softbus_session_mock.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -1141,6 +1145,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 
   cflags = [
@@ -1161,7 +1166,13 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
 
   include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
-  sources = [ "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_second.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_second.cpp",
+    "mock/hichain_auth_connector_mock.cpp",
+    "mock/hichain_connector_mock.cpp",
+    "mock/multiple_user_connector_mock.cpp",
+    "mock/softbus_connector_mock.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -1172,6 +1183,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 }
 

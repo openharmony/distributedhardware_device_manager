@@ -12,30 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SOFTBUS_CONNECTOR_MOCK_H
-#define OHOS_SOFTBUS_CONNECTOR_MOCK_H
+#ifndef OHOS_HICHAIN_AUTH_CONNECTOR_MOCK_H
+#define OHOS_HICHAIN_AUTH_CONNECTOR_MOCK_H
 
 #include <string>
 #include <gmock/gmock.h>
 
-#include "softbus_connector.h"
+#include "hichain_auth_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmSoftbusConnector {
+class DmHiChainAuthConnector {
 public:
-    virtual ~DmSoftbusConnector() = default;
+    virtual ~DmHiChainAuthConnector() = default;
 public:
-    virtual int32_t GetUdidByNetworkId(const char *networkId, std::string &udid) = 0;
-    virtual bool CheckIsOnline(const std::string &targetDeviceId) = 0;
+    virtual bool QueryCredential(std::string &localUdid, int32_t osAccountId) = 0;
 public:
-    static inline std::shared_ptr<DmSoftbusConnector> dmSoftbusConnector = nullptr;
+    static inline std::shared_ptr<DmHiChainAuthConnector> dmHiChainAuthConnector = nullptr;
 };
 
-class SoftbusConnectorMock : public DmSoftbusConnector {
+class HiChainAuthConnectorMock : public DmHiChainAuthConnector {
 public:
-    MOCK_METHOD(int32_t, GetUdidByNetworkId, (const char *, std::string &));
-    MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
+    MOCK_METHOD(bool, QueryCredential, (std::string &, int32_t));
 };
 }
 }

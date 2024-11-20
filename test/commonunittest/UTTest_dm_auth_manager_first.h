@@ -33,6 +33,8 @@
 #include "auth_message_processor.h"
 #include "dm_timer.h"
 #include "dm_auth_manager.h"
+#include "softbus_session_mock.h"
+#include "app_manager_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -50,6 +52,8 @@ public:
 
     std::shared_ptr<DmAuthManager> authManager_ =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
+    static inline std::shared_ptr<SoftbusSessionMock> softbusSessionMock_ = nullptr;
+    static inline std::shared_ptr<AppManagerMock> appManagerMock_ = nullptr;
 };
 
 class AuthRequestFinishStateMock : public AuthRequestFinishState {

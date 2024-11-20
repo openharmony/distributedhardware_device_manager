@@ -27,6 +27,7 @@ public:
     virtual ~DmAppManager() = default;
 public:
     virtual std::string GetAppId() = 0;
+    virtual bool IsSystemSA() = 0;
 public:
     static inline std::shared_ptr<DmAppManager> dmAppManager = nullptr;
 };
@@ -34,6 +35,7 @@ public:
 class AppManagerMock : public DmAppManager {
 public:
     MOCK_METHOD(std::string, GetAppId, ());
+    MOCK_METHOD(bool, IsSystemSA, ());
 };
 }
 }

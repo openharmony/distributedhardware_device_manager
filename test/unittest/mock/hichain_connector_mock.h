@@ -12,30 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_SOFTBUS_CONNECTOR_MOCK_H
-#define OHOS_SOFTBUS_CONNECTOR_MOCK_H
+#ifndef OHOS_HICHAIN_CONNECTOR_MOCK_H
+#define OHOS_HICHAIN_CONNECTOR_MOCK_H
 
 #include <string>
 #include <gmock/gmock.h>
 
-#include "softbus_connector.h"
+#include "hichain_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmSoftbusConnector {
+class DmHiChainConnector {
 public:
-    virtual ~DmSoftbusConnector() = default;
+    virtual ~DmHiChainConnector() = default;
 public:
-    virtual int32_t GetUdidByNetworkId(const char *networkId, std::string &udid) = 0;
-    virtual bool CheckIsOnline(const std::string &targetDeviceId) = 0;
+    virtual bool GetGroupInfo(const int32_t userId, const std::string &queryParams,
+    std::vector<GroupInfo> &groupList) = 0;
+    virtual bool IsDevicesInP2PGroup(const std::string &hostDevice, const std::string &peerDevice) = 0;
 public:
-    static inline std::shared_ptr<DmSoftbusConnector> dmSoftbusConnector = nullptr;
+    static inline std::shared_ptr<DmHiChainConnector> dmHiChainConnector = nullptr;
 };
 
-class SoftbusConnectorMock : public DmSoftbusConnector {
+class HiChainConnectorMock : public DmHiChainConnector {
 public:
-    MOCK_METHOD(int32_t, GetUdidByNetworkId, (const char *, std::string &));
-    MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
+    MOCK_METHOD(bool, GetGroupInfo, (const int32_t, const std::string &, std::vector<GroupInfo> &));
+    MOCK_METHOD(bool, IsDevicesInP2PGroup, (const std::string &, const std::string &));
 };
 }
 }

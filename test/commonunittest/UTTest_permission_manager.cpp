@@ -249,6 +249,27 @@ HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_102, testing::ext::TestSi
     bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
     ASSERT_TRUE(ret);
 }
+
+HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSize.Level0)
+{
+    bool ret = PermissionManager::GetInstance().CheckMonitorPermission();
+    ASSERT_TRUE(ret);
+}
+
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnSetDnPolicy_001, testing::ext::TestSize.Level0)
+{
+    std::string processName = "";
+    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
+    ASSERT_FALSE(ret);
+
+    processName = "processName";
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
+    ASSERT_FALSE(ret);
+
+    processName = "collaboration_service";
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
+    ASSERT_TRUE(ret);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS

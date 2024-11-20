@@ -13,21 +13,15 @@
  * limitations under the License.
  */
 
-#include "app_manager_mock.h"
+#include "multiple_user_connector_mock.h"
 
 #include "gtest/gtest.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
-const std::string AppManager::GetAppId()
+int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
-    return DmAppManager::dmAppManager->GetAppId();
-}
-
-bool AppManager::IsSystemSA()
-{
-    return DmAppManager::dmAppManager->IsSystemSA();
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetCurrentAccountUserID();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

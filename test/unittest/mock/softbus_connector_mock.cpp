@@ -24,6 +24,10 @@ int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string 
 {
     return DmSoftbusConnector::dmSoftbusConnector->GetUdidByNetworkId(networkId, udid);
 }
+bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
+{
+    return DmSoftbusConnector::dmSoftbusConnector->CheckIsOnline(targetDeviceId);
+}
 
 } // namespace DistributedHardware
 } // namespace OHOS
