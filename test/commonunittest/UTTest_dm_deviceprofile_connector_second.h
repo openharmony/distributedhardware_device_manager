@@ -19,6 +19,7 @@
 #include <memory>
 #include <gtest/gtest.h>
 
+#include "access_control_profile.h"
 #include "deviceprofile_connector.h"
 #include "distributed_device_profile_client_mock.h"
 #include "deviceprofile_connector_mock.h"
@@ -31,6 +32,7 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    DeviceProfileConnector connector;
 
     static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
         distributedDeviceProfileClientMock_ =
