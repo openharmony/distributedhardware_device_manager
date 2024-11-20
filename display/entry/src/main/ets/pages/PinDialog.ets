@@ -95,7 +95,6 @@ struct PinCustomDialog {
                     .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                     .fontColor($r('sys.color.ohos_id_color_text_primary'))
                     .fontWeight(FontWeight.Medium)
-                    .height(26)
                 }.width('10%')
                 .height('100%')
               })
@@ -133,8 +132,8 @@ struct PinCustomDialog {
                 }
               })
           }.margin({
-            left: this.isPC ? 72 : 16,
-            right: this.isPC ? 72 : 16,
+            left: 16,
+            right: 16,
             bottom: this.isPC ? 24 : 16 })
         }
         .constraintSize({ maxHeight: `${300}` })
