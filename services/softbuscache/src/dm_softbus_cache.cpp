@@ -123,8 +123,16 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
     LOGI("SoftbusCache::SaveDeviceInfo");
     std::string udid = "";
     std::string uuid = "";
+    if (deviceInfo.networkId[0] == '\0') {
+        LOGE("networkId is empty.");
+        return;
+    }
     GetUdidByNetworkId(deviceInfo.networkId, udid);
     GetUuidByNetworkId(deviceInfo.networkId, uuid);
+    if (udid.empty()) {
+        LOGE("udid is empty.");
+        return;
+    }
     char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
     if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
         LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(udid).c_str());
