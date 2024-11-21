@@ -2231,5 +2231,58 @@ void DeviceManagerService::RemoveNotifyRecord(const ProcessInfo &processInfo)
     listener_->OnProcessRemove(processInfo);
 }
 
+int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pkgName)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
+    std::vector<DmDeviceInfo> deviceList;
+    GetTrustedDeviceList(pkgName, deviceList);
+    if (deviceList.size() == 0) {
+        return DM_OK;
+    }
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = userId;
+    listener_->OnDevStateCallbackAdd(processInfo, deviceList);
+#else
+    (void)pkgName;
+#endif
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList)
+{
+    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::vector<DmDeviceInfo> onlineDeviceList;
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
+    if (ret != DM_OK) {
+        LOGE("failed");
+        return ret;
+    }
+    if (!onlineDeviceList.empty() && IsDMServiceImplReady()) {
+        std::unordered_map<std::string, DmAuthForm> udidMap;
+        if (PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName)) {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
+        } else {
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+        }
+        for (auto item : onlineDeviceList) {
+            std::string udid = "";
+            SoftbusListener::GetUdidByNetworkId(item.networkId, udid);
+            if (udidMap.find(udid) != udidMap.end()) {
+                item.authForm = udidMap[udid];
+                deviceList.push_back(item);
+            }
+        }
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
