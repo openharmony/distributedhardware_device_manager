@@ -1348,7 +1348,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_001, testing::ext::Tes
 
 HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_001, testing::ext::TestSize.Level0)
 {
-    int32_t currentUserId;
+    int32_t currentUserId = 0;
     std::string localUdid = "deviceId";
     int32_t beforeUserId = 123456;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, currentUserId, beforeUserId);
