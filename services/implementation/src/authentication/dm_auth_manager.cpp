@@ -240,7 +240,10 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
 void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    authPtr_ = authenticationMap_[authType];
+    if (authenticationMap_.find(authType) != authenticationMap_.end()) {
+        authPtr_ = authenticationMap_[authType];
+    }
+    
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }

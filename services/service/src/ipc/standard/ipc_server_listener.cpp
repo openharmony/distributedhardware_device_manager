@@ -24,7 +24,7 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
-    if (rsp == nullptr) {
+    if (rsp == nullptr || req == nullptr) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {

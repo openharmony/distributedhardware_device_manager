@@ -44,6 +44,9 @@ const int32_t DM_NAPI_BUF_LENGTH = 256;
 void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                       char *dest, const int32_t destLen)
 {
+    if (dest == nullptr) {
+        return;
+    }
     bool hasProperty = false;
     NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
     if (hasProperty) {
@@ -449,7 +452,10 @@ bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &value
         return false;
     }
     char temp[DM_NAPI_BUF_LENGTH] = {0};
-    napi_get_value_string_utf8(env, value, temp, valueLen + 1, &valueLen);
+    napi_status status = napi_get_value_string_utf8(env, value, temp, valueLen + 1, &valueLen);
+    if (status != napi_ok) {
+        return false;
+    }
     strValue = temp;
     return true;
 }
