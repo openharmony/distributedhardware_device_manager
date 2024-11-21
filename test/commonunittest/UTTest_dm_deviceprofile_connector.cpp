@@ -1311,7 +1311,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     EXPECT_TRUE(ret);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_005, testing::ext::TestSize.Level0)
 {
     std::string localDeviceId = "deviceId";
     std::string targetDeviceId = "deviceId";
