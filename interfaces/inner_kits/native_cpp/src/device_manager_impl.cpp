@@ -2283,5 +2283,28 @@ int32_t DeviceManagerImpl::GetDeviceScreenStatus(const std::string &pkgName, con
     screenStatus = rsp->GetScreenStatus();
     return DM_OK;
 }
+
+int32_t DeviceManagerImpl::RegisterCredentialAuthStatusCallback(const std::string &pkgName,
+    std::shared_ptr<CredentialAuthStatusCallback> callback)
+{
+    if (pkgName.empty() || callback == nullptr) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegisterCredentialAuthStatusCallback(pkgName, callback);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::UnRegisterCredentialAuthStatusCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterCredentialAuthStatusCallback(pkgName);
+    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

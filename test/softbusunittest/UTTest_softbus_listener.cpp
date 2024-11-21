@@ -724,6 +724,14 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     softbusListener->DeviceNotTrust(msg);
     NodeBasicInfo *info = nullptr;
     softbusListener->OnSoftbusDeviceOffline(info);
+    const uint32_t msgLen = 100;
+    char proofInfo[msgLen] = {0};
+    uint16_t deviceTypeId = 0;
+    int32_t errcode = -1;
+    softbusListener->OnCredentialAuthStatus(proofInfo, msgLen, deviceTypeId, errcode);
+    std::string proofInfo2;
+    deviceTypeId = 0xA2F;
+    softbusListener->CredentialAuthStatusProcess(proofInfo2, deviceTypeId, errcode);
     EXPECT_EQ(true, checkSoftbusRes(ret));
 }
 

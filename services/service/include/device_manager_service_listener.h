@@ -73,6 +73,8 @@ public:
         const std::string &content) override;
 
     void OnDeviceScreenStateChange(const std::string &pkgName, DmDeviceInfo &devInfo) override;
+    void OnCredentialAuthStatus(const std::string &pkgName, const std::string &proofInfo, uint16_t deviceTypeId,
+                                int32_t errcode) override;
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);

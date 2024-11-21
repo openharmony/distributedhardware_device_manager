@@ -109,6 +109,14 @@ public:
     }
     void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) override {}
 };
+
+class CandidateRestrictStatusCallbackTest : public CredentialAuthStatusCallback {
+public:
+    virtual ~CandidateRestrictStatusCallbackTest()
+    {
+    }
+    void OnCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

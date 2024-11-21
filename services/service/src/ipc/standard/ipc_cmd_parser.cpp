@@ -29,6 +29,7 @@
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
 #include "ipc_create_pin_holder_req.h"
+#include "ipc_credential_auth_status_req.h"
 #include "ipc_destroy_pin_holder_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
@@ -1529,6 +1530,47 @@ ON_IPC_CMD(GET_DEVICE_SCREEN_STATUS, MessageParcel &data, MessageParcel &reply)
     if (!reply.WriteInt32(screenStatus)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq =
+        std::static_pointer_cast<IpcNotifyCredentialAuthStatusReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string proofInfo = pReq->GetProofInfo();
+    uint16_t deviceTypeId = pReq->GetDeviceTypeId();
+    int32_t errCode = pReq->GetErrCode();
+
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(proofInfo)) {
+        LOGE("write proofInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteUint16(deviceTypeId)) {
+        LOGE("write deviceTypeId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(errCode)) {
+        LOGE("write errCode failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

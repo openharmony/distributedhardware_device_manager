@@ -622,6 +622,9 @@ public:
     virtual int32_t UnRegisterDeviceScreenStatusCallback(const std::string &pkgName) = 0;
     virtual int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus) = 0;
+    virtual int32_t RegisterCredentialAuthStatusCallback(const std::string &pkgName,
+        std::shared_ptr<CredentialAuthStatusCallback> callback) = 0;
+    virtual int32_t UnRegisterCredentialAuthStatusCallback(const std::string &pkgName) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

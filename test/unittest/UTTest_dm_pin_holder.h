@@ -185,6 +185,15 @@ public:
         (void)pkgName;
         (void)devInfo;
     }
+
+    void OnCredentialAuthStatus(const std::string &pkgName, const std::string &proofInfo, uint16_t deviceTypeId,
+                                int32_t errcode) override
+    {
+        (void)pkgName;
+        (void)proofInfo;
+        (void)deviceTypeId;
+        (void)errcode;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

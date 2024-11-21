@@ -1249,6 +1249,46 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceScreenStatus_003, testing::ext::TestSiz
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
+
+HWTEST_F(DeviceManagerImplTest, RegisterCredentialAuthStatusCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::shared_ptr<CandidateRestrictStatusCallbackTest> callback =
+        std::make_shared<CandidateRestrictStatusCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().RegisterCredentialAuthStatusCallback(packName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterCredentialAuthStatusCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.candidateRestrict01";
+    std::shared_ptr<CandidateRestrictStatusCallbackTest> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().RegisterCredentialAuthStatusCallback(packName, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterCredentialAuthStatusCallback_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.scandidateRestrict02";
+    std::shared_ptr<CandidateRestrictStatusCallbackTest> callback =
+        std::make_shared<CandidateRestrictStatusCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().RegisterCredentialAuthStatusCallback(packName, callback);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialAuthStatusCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.candidateRestrict03";
+    int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialAuthStatusCallback(packName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialAuthStatusCallback_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialAuthStatusCallback(packName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

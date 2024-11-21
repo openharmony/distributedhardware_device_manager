@@ -140,6 +140,7 @@ public:
     std::map<std::string, int32_t> GetDeviceIdAndBindType(int32_t userId, const std::string &accountId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
+    void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode);
 
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
