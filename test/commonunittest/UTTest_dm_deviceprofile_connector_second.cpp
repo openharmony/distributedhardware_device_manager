@@ -164,7 +164,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testi
     EXPECT_TRUE(ret.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorTest, GetAclProfileByDeviceIdAndUserId_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByDeviceIdAndUserId_201, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
     int32_t userId = 123456;

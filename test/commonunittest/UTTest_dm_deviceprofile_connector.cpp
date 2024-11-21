@@ -1364,7 +1364,6 @@ HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_001, testing::ext::TestS
     std::string remoteUdid = "deviceId";
     std::vector<int32_t> localUserIds;
     localUserIds.push_back(currentUserId);
-    std::string localUdid = "deviceId";
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(remoteUserIds, remoteUdid,
         localUserIds, localUdid);
 }
