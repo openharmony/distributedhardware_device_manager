@@ -545,8 +545,8 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     std::string accountId = "accountId";
     std::string accountName = "accountName";
     std::multimap<std::string, int32_t> deviceMap;
-    deviceMap.insert(std:make_pair("accountId", userId));
-    deviceMap.insert(std:make_pair("accountName", 1));
+    deviceMap.insert(std::make_pair("accountId", userId));
+    deviceMap.insert(std::make_pair("accountName", 1));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_, _)).WillOnce(Return(deviceMap));
     EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
@@ -568,7 +568,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
 
     int32_t removeId = 123;
-    deviceMap.insert(std:make_pair("removeId", removeId));
+    deviceMap.insert(std::make_pair("removeId", removeId));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(deviceMap));
     DeviceManagerService::GetInstance().HandleUserRemoved(userId);
 }
