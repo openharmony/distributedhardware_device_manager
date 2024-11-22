@@ -63,8 +63,7 @@ void OnErrorFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
     int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
-    std::random_device rd;
-    int operationCode = static_cast<GroupOperationCode>(rd() % 6);
+    int operationCode = *(reinterpret_cast<const int32_t*>(data));
     int errorCode = *(reinterpret_cast<const int*>(data));
     std::string str(reinterpret_cast<const char*>(data), size);
     const char *returnData = str.data();
