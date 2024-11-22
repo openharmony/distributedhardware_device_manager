@@ -19,11 +19,12 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include <atomic>
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
-bool g_online = false;
-bool g_getLocalDevInfo = false;
+std::atomic<bool> g_online;
+std::atomic<bool> g_getLocalDevInfo;
 DmDeviceInfo localDeviceInfo_;
 std::mutex localDevInfoMutex_;
 void SoftbusCache::SaveLocalDeviceInfo()
