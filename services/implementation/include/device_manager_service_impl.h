@@ -28,6 +28,7 @@
 #include "dm_device_state_manager.h"
 #include "dm_discovery_manager.h"
 #include "dm_publish_manager.h"
+#include "dp_inited_callback.h"
 #include "idevice_manager_service_impl.h"
 #include "dm_single_instance.h"
 #include "softbus_connector.h"
@@ -169,6 +170,7 @@ private:
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::atomic<bool> isCredentialType_ = false;
+    sptr<DpInitedCallback> dpInitedCallback_ = nullptr;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

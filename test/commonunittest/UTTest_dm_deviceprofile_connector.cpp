@@ -18,6 +18,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "deviceprofile_connector.h"
+#include "dp_inited_callback_stub.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,6 +37,16 @@ void DeviceProfileConnectorTest::SetUpTestCase()
 void DeviceProfileConnectorTest::TearDownTestCase()
 {
 }
+
+class MockDpInitedCallback : public DistributedDeviceProfile::DpInitedCallbackStub {
+public:
+    MockDpInitedCallback() {}
+    ~MockDpInitedCallback() {}
+    int32_t OnDpInited()
+    {
+        return DM_OK;
+    }
+};
 
 void AddAccessControlProfileFirst(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
 {
@@ -1275,6 +1286,22 @@ HWTEST_F(DeviceProfileConnectorTest, GetAllAccessControlProfile_001, testing::ex
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(accessControlId);
     auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     EXPECT_TRUE(ret.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorTest, SubscribeDeviceProfileInited_001, testing::ext::TestSize.Level0)
+{
+    sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback =
+        sptr<MockDpInitedCallback>(new MockDpInitedCallback());
+    ASSERT_NE(dpInitedCallback, nullptr);
+    int32_t ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, PutAllTrustedDevices_001, testing::ext::TestSize.Level0)
+{
+    std::vector<DistributedDeviceProfile::TrustedDeviceInfo> deviceInfos;
+    int32_t ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
+    EXPECT_NE(ret, DM_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

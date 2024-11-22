@@ -17,9 +17,10 @@
 #define OHOS_DM_SERVICE_LISTENER_H
 
 #include <map>
+#include <mutex>
 #include <string>
 #include <unordered_map>
-#include <mutex>
+#include <unordered_set>
 
 #include "dm_device_info.h"
 #include "idevice_manager_service_listener.h"
@@ -85,6 +86,7 @@ private:
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
     void SetDeviceInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &deviceInfo, const DmDeviceBasicInfo &deviceBasicInfo);
+    int32_t FillUdidAndUuidToDeviceInfo(const std::string &pkgName, DmDeviceInfo &dmDeviceInfo);
     void ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
         const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessAppStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
@@ -115,6 +117,7 @@ private:
     IpcServerListener ipcServerListener_;
     static std::mutex alreadyNotifyPkgNameLock_;
     static std::map<std::string, DmDeviceInfo> alreadyOnlinePkgName_;
+    static std::unordered_set<std::string> highPriorityPkgNameSet_;
 #endif
 };
 } // namespace DistributedHardware

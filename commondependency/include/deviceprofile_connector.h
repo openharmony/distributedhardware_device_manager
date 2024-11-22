@@ -20,6 +20,8 @@
 #include "access_control_profile.h"
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
+#include "i_dp_inited_callback.h"
+#include "trusted_device_info.h"
 
 constexpr uint32_t ALLOW_AUTH_ONCE = 1;
 constexpr uint32_t ALLOW_AUTH_ALWAYS = 2;
@@ -155,6 +157,9 @@ public:
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(const std::string &localUdid, int32_t localUserId);
     void HandleSyncBackgroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
+    int32_t SubscribeDeviceProfileInited(sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback);
+    int32_t UnSubscribeDeviceProfileInited();
+    int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

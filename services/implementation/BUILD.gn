@@ -168,6 +168,7 @@ if (defined(ohos_lite)) {
       "src/config/dm_config_manager.cpp",
       "src/credential/dm_credential_manager.cpp",
       "src/dependency/commonevent/dm_common_event_manager.cpp",
+      "src/dependency/deviceprofile/dp_inited_callback.cpp",
       "src/dependency/hichain/hichain_auth_connector.cpp",
       "src/dependency/hichain/hichain_connector.cpp",
       "src/dependency/hichain/mine_hichain_connector.cpp",
