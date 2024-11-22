@@ -879,7 +879,10 @@ bool DeviceManagerService::IsDMServiceImplReady()
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
     }
-    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (so_handle == nullptr) {
+        so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
     if (so_handle == nullptr) {
         LOGE("load libdevicemanagerserviceimpl so failed, errMsg: %{public}s.", dlerror());
         return false;
@@ -897,7 +900,6 @@ bool DeviceManagerService::IsDMServiceImplReady()
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
     if (dmServiceImpl_->Initialize(listener_) != DM_OK) {
-        dlclose(so_handle);
         dmServiceImpl_ = nullptr;
         isImplsoLoaded_ = false;
         return false;
@@ -1129,7 +1131,10 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
         return true;
     }
 
-    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (so_handle == nullptr) {
+        so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
     if (so_handle == nullptr) {
         LOGE("load dm service adapter so failed.");
         return false;
@@ -1144,7 +1149,6 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
 
     dmServiceImplExt_ = std::shared_ptr<IDMServiceImplExt>(func());
     if (dmServiceImplExt_->Initialize(listener_) != DM_OK) {
-        dlclose(so_handle);
         dmServiceImplExt_ = nullptr;
         isAdapterSoLoaded_ = false;
         LOGE("dm service adapter impl ext init failed.");
