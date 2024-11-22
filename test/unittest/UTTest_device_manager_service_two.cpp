@@ -564,7 +564,8 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     preUserDeviceMap["accountId"] = userId;
     preUserDeviceMap["accountName"] = 1;
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(preUserDeviceMap));
+    EXPECT_CALL(*deviceManagerServiceImplMock_,
+        GetDeviceIdAndBindLevel(_)).WillOnce(Return(preUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
 
     int32_t removeId = 123;

@@ -994,6 +994,13 @@ int32_t DistributedDeviceProfileClient::GetAccessControlProfile(std::map<std::st
 int32_t DistributedDeviceProfileClient::GetAllAccessControlProfile(
     std::vector<AccessControlProfile>& accessControlProfiles)
 {
+    AddAccessControlProfileTwelfth(accessControlProfiles);
+    AddAccessControlprofileThirteenth(accessControlProfiles);
+    AddAccessControlprofileFourteenth(accessControlProfiles);
+    AddAccessControlprofileFifteenth(accessControlProfiles);
+    AddAccessControlprofileSixteenth(accessControlProfiles);
+    AddAccessControlprofileSeventeenth(accessControlProfiles);
+    AddAccessControlprofileEightteenth(accessControlProfiles);
     return 0;
 }
 
