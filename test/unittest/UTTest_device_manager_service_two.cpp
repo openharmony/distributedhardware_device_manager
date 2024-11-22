@@ -545,17 +545,18 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     std::string accountId = "accountId";
     std::string accountName = "accountName";
     std::multimap<std::string, int32_t> deviceMap;
-    deviceMap["accountId"] = userId;
-    deviceMap["accountName"] = 1;
+    deviceMap.insert(std:make_pair("accountId", userId));
+    deviceMap.insert(std:make_pair("accountName", 1));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_, _)).WillOnce(Return(deviceMap));
     EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
 
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_,_)).WillOnce(Return(deviceMap));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_, _)).WillOnce(Return(deviceMap));
     EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
 
-
+    int32_t curUserId = 0;
+    int32_t preUserId = 1;
     std::map<std::string, int32_t> curUserDeviceMap;
     curUserDeviceMap["curUserId"] = userId;
     curUserDeviceMap["preUserId"] = userId;
@@ -564,12 +565,10 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     preUserDeviceMap["accountName"] = 1;
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(preUserDeviceMap));
-    
-
-
+    DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
 
     int32_t removeId = 123;
-    deviceMap["removeId"] = removeId;
+    deviceMap.insert(std:make_pair("removeId", removeId));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(deviceMap));
     DeviceManagerService::GetInstance().HandleUserRemoved(userId);
 }
