@@ -25,7 +25,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "dm_thread_manager.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -142,7 +142,7 @@ void KVAdapter::OnRemoteDied()
         LOGI("ReInit, storeId:%{public}s", storeId_.storeId.c_str());
         ReInit();
     };
-    ThreadManager::GetInstance().Submit(KV_REINIT_THREAD.c_str(), reInitTask);
+    ffrt::submit(reInitTask);
 }
 
 DistributedKv::Status KVAdapter::GetLocalKvStorePtr()

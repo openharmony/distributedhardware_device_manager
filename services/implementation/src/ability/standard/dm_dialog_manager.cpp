@@ -27,7 +27,7 @@
 #include "parameter.h"
 #include "dm_single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "dm_thread_manager.h"
+#include "ffrt.h"
 #endif
 
 namespace OHOS {
@@ -115,7 +115,7 @@ void DmDialogManager::ShowPinDialog(const std::string param)
     abilityName_ = PIN_ABILITY_NAME;
     pinCode_ = param;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ThreadManager::GetInstance().Submit(CONNECT_PIN_DIALOG.c_str(), []() { ConnectExtension(); });
+    ffrt::submit([]() { ConnectExtension(); });
 #else
     std::thread pinDilog([]() { ConnectExtension(); });
     int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG.c_str());

@@ -23,7 +23,7 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "dm_thread_manager.h"
+#include "ffrt.h"
 #endif
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -32,8 +32,9 @@ namespace OHOS {
 namespace DistributedHardware {
 using OHOS::EventFwk::MatchingSkills;
 using OHOS::EventFwk::CommonEventManager;
-
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEAL_THREAD = "package_common_event";
+#endif
 const std::string APP_ID = "appId";
 constexpr int32_t MAX_TRY_TIMES = 3;
 
@@ -143,7 +144,7 @@ void DmPackageEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ThreadManager::GetInstance().Submit(DEAL_THREAD, [=]() { callback_(appId, receiveEvent); });
+    ffrt::submit([=]() { callback_(appId, receiveEvent); });
 #else
     std::thread dealThread([=]() { callback_(appId, receiveEvent); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);

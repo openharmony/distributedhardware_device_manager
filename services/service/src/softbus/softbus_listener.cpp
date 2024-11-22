@@ -30,7 +30,7 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "dm_thread_manager.h"
+#include "ffrt.h"
 #endif
 #include "parameter.h"
 #include "system_ability_definition.h"
@@ -43,13 +43,15 @@ const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t MAX_CACHED_DISCOVERED_DEVICE_SIZE = 100;
 const int32_t MAX_SOFTBUS_MSG_LEN = 2000;
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
 constexpr const char* DEVICE_NAME_CHANGE = "deviceNameChange";
-constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr const char* DEVICE_NOT_TRUST = "deviceNotTrust";
 constexpr const char* DEVICE_SCREEN_STATUS_CHANGE = "deviceScreenStatusChange";
 constexpr const char* CREDENTIAL_AUTH_STATUS = "credentialAuthStatus";
+#endif
+constexpr const char* LIB_RADAR_NAME = "libdevicemanagerradar.z.so";
 constexpr static char HEX_ARRAY[] = "0123456789ABCDEF";
 constexpr static uint8_t BYTE_MASK = 0x0F;
 constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
@@ -204,8 +206,7 @@ void SoftbusListener::OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatu
     int32_t devScreenStatus = static_cast<int32_t>(status->reserved[0]);
     ConvertScreenStatusToDmDevice(status->basicInfo, devScreenStatus, dmDeviceInfo);
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        ThreadManager::GetInstance().Submit(
-            DEVICE_SCREEN_STATUS_CHANGE, [=]() { DeviceScreenStatusChange(dmDeviceInfo); });
+        ffrt::submit([=]() { DeviceScreenStatusChange(dmDeviceInfo); });
     #else
         std::thread devScreenStatusChange([=]() { DeviceScreenStatusChange(dmDeviceInfo); });
         if (pthread_setname_np(devScreenStatusChange.native_handle(), DEVICE_SCREEN_STATUS_CHANGE) != DM_OK) {
@@ -233,7 +234,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
         g_onlineDeviceNum++;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ThreadManager::GetInstance().Submit(DEVICE_ONLINE, [=]() { DeviceOnLine(dmDeviceInfo); });
+    ffrt::submit([=]() { DeviceOnLine(dmDeviceInfo); });
 #else
     std::thread deviceOnLine([=]() { DeviceOnLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
@@ -281,7 +282,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ThreadManager::GetInstance().Submit(DEVICE_OFFLINE, [=]() { DeviceOffLine(dmDeviceInfo); });
+    ffrt::submit([=]() { DeviceOffLine(dmDeviceInfo); });
 #else
     std::thread deviceOffLine([=]() { DeviceOffLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
@@ -332,7 +333,7 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         dmDeviceInfo.networkType = networkType;
         SoftbusCache::GetInstance().ChangeDeviceInfo(dmDeviceInfo);
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        ThreadManager::GetInstance().Submit(DEVICE_NAME_CHANGE, [=]() { DeviceNameChange(dmDeviceInfo); });
+        ffrt::submit([=]() { DeviceNameChange(dmDeviceInfo); });
     #else
         std::thread deviceInfoChange([=]() { DeviceNameChange(dmDeviceInfo); });
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
@@ -359,7 +360,7 @@ void SoftbusListener::OnDeviceNotTrusted(const char *msg)
     }
     std::string softbusMsg = std::string(msg);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ThreadManager::GetInstance().Submit(DEVICE_NOT_TRUST, [=]() { DeviceNotTrust(softbusMsg); });
+    ffrt::submit([=]() { DeviceNotTrust(softbusMsg); });
 #else
     std::thread deviceNotTrust([=]() { DeviceNotTrust(softbusMsg); });
     int32_t ret = pthread_setname_np(deviceNotTrust.native_handle(), DEVICE_NOT_TRUST);

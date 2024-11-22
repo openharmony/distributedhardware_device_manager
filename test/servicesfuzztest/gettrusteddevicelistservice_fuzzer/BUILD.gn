@@ -65,6 +65,7 @@ ohos_fuzztest("GetTrustedDeviceListServiceFuzzTest") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
   ]

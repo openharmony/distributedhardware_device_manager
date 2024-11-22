@@ -74,7 +74,6 @@ if (defined(ohos_lite)) {
       "include",
       "include/crypto",
       "include/kvadapter",
-      "include/threadManager",
       "include/fwkload/standard",
       "include/appInfo/standard",
       "include/timer",
@@ -103,7 +102,6 @@ if (defined(ohos_lite)) {
       "src/kvadapter/dm_kv_info.cpp",
       "src/kvadapter/kv_adapter.cpp",
       "src/kvadapter/kv_adapter_manager.cpp",
-      "src/threadManager/dm_thread_manager.cpp",
       "src/timer/dm_timer.cpp",
     ]
 

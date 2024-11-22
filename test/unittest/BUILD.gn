@@ -91,6 +91,7 @@ ohos_unittest("UTTest_pin_auth") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -114,6 +115,7 @@ ohos_unittest("UTTest_pin_auth_ui") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -284,6 +286,7 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -307,6 +310,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -326,6 +330,7 @@ ohos_unittest("UTTest_hichain_auth_connector") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -347,6 +352,7 @@ ohos_unittest("UTTest_hichain_connector") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -394,6 +400,7 @@ ohos_unittest("UTTest_mine_softbus_listener") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "openssl:libcrypto_shared",
@@ -418,6 +425,7 @@ ohos_unittest("UTTest_softbus_adapter") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -441,6 +449,7 @@ ohos_unittest("UTTest_softbus_connector") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "os_account:libaccountkits",
@@ -521,6 +530,7 @@ ohos_unittest("UTTest_softbus_session") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -570,7 +580,10 @@ ohos_unittest("UTTest_dm_timer") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "device_auth:deviceauth_sdk" ]
+  external_deps = [ 
+    "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
+  ]
 }
 
 ## UnitTest UTTest_dm_timer }}}
@@ -632,6 +645,7 @@ ohos_unittest("UTTest_ipc_server_client_proxy") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "hicollie:libhicollie",
   ]
 }
@@ -663,6 +677,7 @@ ohos_unittest("UTTest_ipc_server_stub") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -799,6 +814,7 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]
@@ -861,6 +877,7 @@ ohos_unittest("UTTest_device_manager_service_impl") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
@@ -897,6 +914,7 @@ ohos_unittest("UTTest_auth_message_processor") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -914,6 +932,7 @@ ohos_unittest("UTTest_auth_response_state") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -931,6 +950,7 @@ ohos_unittest("UTTest_auth_request_state") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -963,6 +983,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -982,6 +1003,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -1044,6 +1066,7 @@ ohos_unittest("UTTest_discovery_manager") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "hitrace:hitrace_meter",
   ]
 }
@@ -1070,6 +1093,7 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
   external_deps = [
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
   ]
 }
 
@@ -1093,6 +1117,7 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "hitrace:hitrace_meter",
   ]
 }
