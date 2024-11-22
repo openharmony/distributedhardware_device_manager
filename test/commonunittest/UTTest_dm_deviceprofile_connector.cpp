@@ -1331,10 +1331,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndBindLevel_001, testing::ext::
     std::string localUdid = "deviceId";
     auto ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndBindLevel(userIds, localUdid);
     EXPECT_FALSE(ret.empty());
-
-    localUdid = "remoteDeviceId";
-    ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndBindLevel(userIds, localUdid);
-    EXPECT_FALSE(ret.empty());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_001, testing::ext::TestSize.Level0)

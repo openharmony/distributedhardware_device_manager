@@ -35,5 +35,20 @@ int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->UnBindDevice(pkgName, udid, bindLevel);
 }
+
+std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUserId(int32_t userId,
+    const std::string &accountId)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->GetDeviceIdAndUserId(userId, accountId);
+}
+
+std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUserId(int32_t userId)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->GetDeviceIdAndUserId(userId);
+}
+std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindLevel(int32_t localUserId)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->GetDeviceIdAndBindLevel(localUserId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

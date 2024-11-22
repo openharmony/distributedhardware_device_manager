@@ -508,7 +508,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_202, testing::ext::TestSize.Leve
 
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
     EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     EXPECT_EQ(ret, DM_OK);
@@ -540,6 +540,38 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
     int ret = DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, networkId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    int32_t userId = 123456;
+    std::string accountId = "accountId";
+    std::string accountName = "accountName";
+    std::multimap<std::string, int32_t> deviceMap;
+    deviceMap["accountId"] = userId;
+    deviceMap["accountName"] = 1;
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_, _)).WillOnce(Return(deviceMap));
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(DM_OK));
+    DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_,_)).WillOnce(Return(deviceMap));
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
+
+
+    std::map<std::string, int32_t> curUserDeviceMap;
+    curUserDeviceMap["curUserId"] = userId;
+    curUserDeviceMap["preUserId"] = userId;
+    std::map<std::string, int32_t> preUserDeviceMap;
+    preUserDeviceMap["accountId"] = userId;
+    preUserDeviceMap["accountName"] = 1;
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(preUserDeviceMap));
+    
+
+
+
+    int32_t removeId = 123;
+    deviceMap["removeId"] = removeId;
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(deviceMap));
+    DeviceManagerService::GetInstance().HandleUserRemoved(userId);
 }
 
 HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level0)

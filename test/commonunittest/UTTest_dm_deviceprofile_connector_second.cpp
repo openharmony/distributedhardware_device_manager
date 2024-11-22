@@ -39,6 +39,7 @@ void DeviceProfileConnectorSecondTest::SetUpTestCase()
 
 void DeviceProfileConnectorSecondTest::TearDownTestCase()
 {
+    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     distributedDeviceProfileClientMock_ = nullptr;
 }
 
