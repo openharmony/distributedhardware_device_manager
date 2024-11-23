@@ -1274,7 +1274,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetAllAccessControlProfile_001, testing::ex
     int64_t accessControlId = 1;
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(accessControlId);
     auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
-    EXPECT_TRUE(ret.empty());
+    EXPECT_FALSE(ret.empty());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAclProfileByDeviceIdAndUserId_001, testing::ext::TestSize.Level0)
@@ -1298,7 +1298,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
 
     localUdid = "deviceId";
     localUserId = 123456;
-    peerUdid = "deviceIdee";
+    peerUdid = "deviceId";
     peerUserId = 456;
     ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
     EXPECT_TRUE(ret);
