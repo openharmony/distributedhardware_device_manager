@@ -970,6 +970,10 @@ void DeviceManagerService::LoadHardwareFwkService()
         LOGE("LoadHardwareFwkService failed, get trusted devicelist failed.");
         return;
     }
+    if (!IsDMServiceImplReady()) {
+        LOGE("LoadHardwareFwkService failed, instance not init or init failed.");
+        return;
+    }
     if (deviceList.size() > 0) {
         dmServiceImpl_->LoadHardwareFwkService();
     }
