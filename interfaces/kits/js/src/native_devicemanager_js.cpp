@@ -620,6 +620,7 @@ void DmNapiPublishCallback::OnPublishResult(int32_t publishId, int32_t publishRe
             deviceManagerNapi->OnPublishResult(callback->publishId_, callback->reason_);
         }
         delete callback;
+        callback = nullptr;
         DeleteUvWork(work);
     }, uv_qos_user_initiated);
     if (ret != 0) {
@@ -678,6 +679,7 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
                 callback->status_, callback->reason_);
         }
         delete callback;
+        callback = nullptr;
         DeleteUvWork(work);
     }, uv_qos_user_initiated);
     if (ret != 0) {
@@ -721,6 +723,7 @@ void DmNapiCredentialCallback::OnCredentialResult(int32_t &action, const std::st
             deviceManagerNapi->OnCredentialResult(callback->action_, callback->credentialResult_);
         }
         delete callback;
+        callback = nullptr;
         delete work;
         work = nullptr;
     }, uv_qos_user_initiated);
@@ -1601,6 +1604,7 @@ void DmNapiDeviceManagerUiCallback::OnCall(const std::string &paramJson)
             deviceManagerNapi->OnDmUiCall(callback->token_);
         }
         delete callback;
+        callback = nullptr;
         DeleteUvWork(work);
     }, uv_qos_user_initiated);
     if (ret != 0) {
