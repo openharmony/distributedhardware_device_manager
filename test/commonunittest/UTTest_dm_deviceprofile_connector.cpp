@@ -1352,7 +1352,8 @@ HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_001, testing::ext::TestS
 
     beforeUserId = 1234;
     currentUserId = 123456;
-    DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, currentUserId, beforeUserId);
+    ret = DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, currentUserId, beforeUserId);
+    EXPECT_EQ(ret, DM_OK);
 
     std::vector<int32_t> remoteUserIds;
     remoteUserIds.push_back(currentUserId);
