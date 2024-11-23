@@ -392,6 +392,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ret;
     }
 #endif
+    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK);
     LOGI("Completed");
@@ -408,6 +409,7 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStatusCallback", DM_OK);
     LOGI("Completed");
@@ -549,20 +551,18 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
     if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
         subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
     }
-    if (subscribeId == DM_INVALID_FLAG_ID) {
-        subscribeId = GetSubscribeIdFromMap(pkgName);
-    }
+    std::string pkgNameTemp = ComposeStr(pkgName, subscribeId);
+    subscribeId = GetSubscribeIdFromMap(pkgNameTemp);
     if (subscribeId == DM_INVALID_FLAG_ID) {
         LOGE("DeviceManagerImpl::StopDiscovering failed: cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::string discoveryFlag = ComposeStr(pkgName, subscribeId);
     discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
     std::string discParaStr = ConvertMapToJsonString(discoverParam);
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(discoveryFlag);
+    req->SetPkgName(pkgNameTemp);
     req->SetFirstParam(discParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(STOP_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
@@ -574,7 +574,7 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
         LOGE("StopDiscovering error: Failed with ret %{public}d", ret);
         return ret;
     }
-    RemoveDiscoveryCallback(discoveryFlag);
+    RemoveDiscoveryCallback(pkgNameTemp);
     LOGI("Completed");
     return DM_OK;
 }
@@ -1672,8 +1672,8 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    std::string discoveryFlag = ComposeStr(pkgName, DM_INVALID_FLAG_ID);
-    uint16_t subscribeId = RemoveDiscoveryCallback(discoveryFlag);
+    std::string pkgNameTemp = ComposeStr(pkgName, DM_INVALID_FLAG_ID);
+    uint16_t subscribeId = GetSubscribeIdFromMap(pkgNameTemp);
     if (subscribeId == DM_INVALID_FLAG_ID) {
         DmRadarHelper::GetInstance().ReportDmBehavior(
             pkgName, "UnRegisterDiscoveryCallback", ERR_DM_INPUT_PARA_INVALID);
@@ -1686,21 +1686,22 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(discoveryFlag);
+    req->SetPkgName(pkgNameTemp);
     req->SetFirstParam(extraParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(discoveryFlag, "UnRegisterDiscoveryCallback", ret);
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgNameTemp, "UnRegisterDiscoveryCallback", ret);
         LOGE("UnRegisterDiscoveryCallback error: Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(discoveryFlag, "UnRegisterDiscoveryCallback", ret);
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgNameTemp, "UnRegisterDiscoveryCallback", ret);
         LOGE("UnRegisterDiscoveryCallback error: Failed with ret %{public}d", ret);
         return ret;
     }
-    DmRadarHelper::GetInstance().ReportDmBehavior(discoveryFlag, "UnRegisterDiscoveryCallback", DM_OK);
+    RemoveDiscoveryCallback(pkgNameTemp);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgNameTemp, "UnRegisterDiscoveryCallback", DM_OK);
     LOGI("Completed");
     return DM_OK;
 }
@@ -1868,6 +1869,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
         LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
@@ -1893,22 +1895,23 @@ uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
     if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
         subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
     }
-    if (subscribeId == DM_INVALID_FLAG_ID) {
-        subscribeId = GetSubscribeIdFromMap(pkgName);
-    }
-    if (subscribeId == DM_INVALID_FLAG_ID) {
-        subscribeId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
-    }
-    std::string discoveryFlag = ComposeStr(pkgName, subscribeId);
+    std::string pkgNameTemp = ComposeStr(pkgName, subscribeId);
     {
         std::lock_guard<std::mutex> autoLock(subMapLock);
-        auto iter = pkgName2SubIdMap_.find(discoveryFlag);
-        if (iter == pkgName2SubIdMap_.end()) {
-            pkgName2SubIdMap_[discoveryFlag] = subscribeId;
+        auto item = pkgName2SubIdMap_.find(pkgNameTemp);
+        if (item == pkgName2SubIdMap_.end() && subscribeId == DM_INVALID_FLAG_ID) {
+            subscribeId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
+            pkgName2SubIdMap_[pkgNameTemp] = subscribeId;
+        } else if (item == pkgName2SubIdMap_.end() && subscribeId != DM_INVALID_FLAG_ID) {
+            pkgName2SubIdMap_[pkgNameTemp] = subscribeId;
+        } else if (item != pkgName2SubIdMap_.end()) {
+            subscribeId = pkgName2SubIdMap_[pkgNameTemp];
+        } else {
+            LOGE("subscribeId is unreasonable");
         }
     }
-    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(discoveryFlag, subscribeId, callback);
-    DmRadarHelper::GetInstance().ReportDmBehavior(discoveryFlag, "AddDiscoveryCallback", DM_OK);
+    DeviceManagerNotify::GetInstance().RegisterDiscoveryCallback(pkgNameTemp, subscribeId, callback);
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgNameTemp, "AddDiscoveryCallback", DM_OK);
     return subscribeId;
 }
 
@@ -2406,13 +2409,32 @@ uint16_t DeviceManagerImpl::GetSubscribeIdFromMap(const std::string &pkgName)
 {
     {
         std::lock_guard<std::mutex> autoLock(subMapLock);
-        for (auto &item : pkgName2SubIdMap_) {
-            if (item.first.find(pkgName) == 0) {
-                return GetSubscribeId(item.first);
-            }
+        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
+            return pkgName2SubIdMap_[pkgName];
         }
     }
     return DM_INVALID_FLAG_ID;
+}
+
+void DeviceManagerImpl::RegDevStateCallbackToService(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(REGISTER_DEV_STATE_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("Send Request failed ret: %{public}d", ret);
+        return;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return;
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

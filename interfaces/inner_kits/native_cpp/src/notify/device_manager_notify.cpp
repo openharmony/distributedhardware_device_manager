@@ -194,10 +194,16 @@ void DeviceManagerNotify::UnRegisterPackageCallback(const std::string &pkgName)
     std::lock_guard<std::mutex> autoLock(lock_);
     deviceStateCallback_.erase(pkgName);
     deviceStatusCallback_.erase(pkgName);
-    deviceDiscoveryCallbacks_.erase(pkgName);
     devicePublishCallbacks_.erase(pkgName);
     authenticateCallback_.erase(pkgName);
     dmInitCallback_.erase(pkgName);
+    for (auto it = deviceDiscoveryCallbacks_.begin(); it != deviceDiscoveryCallbacks_.end();) {
+        if (it->first.find(pkgName) != std::string::npos) {
+            it = deviceDiscoveryCallbacks_.erase(it);
+        } else {
+            ++it;
+        }
+    }
 }
 
 void DeviceManagerNotify::RegisterDeviceManagerFaCallback(const std::string &pkgName,
@@ -1189,7 +1195,7 @@ std::shared_ptr<DiscoveryCallback> DeviceManagerNotify::GetDiscoveryCallback(con
     std::string discNoSubscribeId = ComposeStr(pkgName, DM_INVALID_FLAG_ID);
     iter = deviceDiscoveryCallbacks_.find(discNoSubscribeId);
     if (iter != deviceDiscoveryCallbacks_.end()) {
-        auto subIter = iter->second.find(DM_INVALID_FLAG_ID);
+        auto subIter = iter->second.find(subscribeId);
         if (subIter != iter->second.end()) {
             return subIter->second;
         }
