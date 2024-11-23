@@ -201,6 +201,8 @@ public:
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName);
     void RemoveNotifyRecord(const ProcessInfo &processInfo);
+    int32_t RegDevStateCallbackToService(const std::string &pkgName);
+    int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
