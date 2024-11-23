@@ -52,6 +52,7 @@ int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
     }
     std::shared_ptr<DmAuthRequestContext> contextTemp = GetAuthContext();
     state->SetAuthManager(stateAuthManager);
+    std::shared_ptr<AuthRequestState> selfTemp = shared_from_this();
     stateAuthManager->SetAuthRequestState(state);
     state->SetAuthContext(contextTemp);
     this->Leave();
