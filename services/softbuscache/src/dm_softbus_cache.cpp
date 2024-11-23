@@ -23,8 +23,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(SoftbusCache);
-std::atomic<bool> g_online;
-std::atomic<bool> g_getLocalDevInfo;
+std::atomic<bool> g_online{false};
+std::atomic<bool> g_getLocalDevInfo{false};
 DmDeviceInfo localDeviceInfo_;
 std::mutex localDevInfoMutex_;
 void SoftbusCache::SaveLocalDeviceInfo()
