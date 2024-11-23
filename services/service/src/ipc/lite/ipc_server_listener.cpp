@@ -43,6 +43,10 @@ int32_t IpcServerListener::GetIdentityByPkgName(std::string &name, SvcIdentity *
 
 int32_t IpcServerListener::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> req, std::shared_ptr<IpcRsp> rsp)
 {
+    if (req == nullptr || rsp == nullptr) {
+        LOGE("SendRequest req or rsp is nullptr.");
+        return ERR_DM_POINT_NULL;
+    }
     std::string pkgName = req->GetPkgName();
     SvcIdentity svc;
     if (GetIdentityByPkgName(pkgName, &svc) != DM_OK) {

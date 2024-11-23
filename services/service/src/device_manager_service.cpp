@@ -264,6 +264,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
             DmDeviceInfo tempInfo;
             if (memcpy_s(tempInfo.networkId, DM_MAX_DEVICE_ID_LEN, item.networkId, sizeof(item.networkId)) != 0) {
                 LOGE("get networkId: %{public}s failed", GetAnonyString(item.networkId).c_str());
+                continue;
             }
             deviceList.push_back(tempInfo);
         }
@@ -353,6 +354,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         DmDeviceInfo tempInfo;
         if (memcpy_s(tempInfo.networkId, DM_MAX_DEVICE_ID_LEN, info.networkId, sizeof(info.networkId)) != 0) {
             LOGE("get networkId: %{public}s failed", GetAnonyString(info.networkId).c_str());
+            return ERR_DM_FAILED;
         }
         info = tempInfo;
         return DM_OK;
@@ -381,6 +383,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 #endif
     if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, localDeviceId_.c_str(), localDeviceId_.length()) != 0) {
         LOGE("get deviceId: %{public}s failed", GetAnonyString(localDeviceId_).c_str());
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -1910,6 +1913,7 @@ void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInf
         }
         if (memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
             LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHashTemp).c_str());
+            return;
         }
     }
 }

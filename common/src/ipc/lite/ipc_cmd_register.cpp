@@ -26,6 +26,10 @@ DM_IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
 int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                                    size_t buffLen)
 {
+    if (pBaseReq == nullptr) {
+        LOGE("IpcCmdRegister::SetRequest pBaseReq is nullptr!");
+        return ERR_DM_POINT_NULL;
+    }
     if (cmdCode < 0 || cmdCode >= IPC_MSG_BUTT) {
         LOGE("IpcCmdRegister::SetRequest cmdCode param invalid!");
         return ERR_DM_UNSUPPORTED_IPC_COMMAND;
