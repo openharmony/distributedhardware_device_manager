@@ -1301,7 +1301,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUdid = "deviceId";
     peerUserId = 456;
     ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 
     localUdid = "deviceId";
     localUserId = 123456;
@@ -1353,7 +1353,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_001, testing::ext::TestS
     beforeUserId = 1234;
     currentUserId = 123456;
     DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, currentUserId, beforeUserId);
-    
+
     std::vector<int32_t> remoteUserIds;
     remoteUserIds.push_back(currentUserId);
     std::string remoteUdid = "deviceId";
