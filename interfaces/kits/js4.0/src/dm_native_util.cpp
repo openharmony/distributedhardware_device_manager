@@ -444,7 +444,10 @@ bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &value
         return false;
     }
     size_t valueLen = 0;
-    napi_get_value_string_utf8(env, value, nullptr, 0, &valueLen);
+    napi_status stat = napi_get_value_string_utf8(env, value, nullptr, 0, &valueLen);
+    if (status != napi_ok) {
+        return false;
+    }
     if (!CheckArgsVal(env, valueLen > 0, valueName, "len == 0")) {
         return false;
     }
