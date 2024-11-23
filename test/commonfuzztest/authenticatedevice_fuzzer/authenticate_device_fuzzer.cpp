@@ -216,9 +216,10 @@ void AuthenticateDeviceFirstFuzzTest(const uint8_t* data, size_t size)
     std::string emptyStr = "";
     DeviceManager::GetInstance().AuthenticateDevice(str, g_authType, g_deviceInfo, emptyStr, g_callbackk);
     DeviceManager::GetInstance().UnAuthenticateDevice(str, g_deviceInfo);
-    DeviceManager::GetInstance().StartDeviceDiscovery(str, g_subscribeInfo, str, g_discoveryCallback);
+    std::string pkgName = "pkgName";
+    DeviceManager::GetInstance().StartDeviceDiscovery(pkgName, g_subscribeInfo, pkgName, g_discoveryCallback);
     DeviceManager::GetInstance().StopDeviceDiscovery(str, g_subscribeInfo.subscribeId);
-    DeviceManager::GetInstance().StartDeviceDiscovery(str, g_tokenId, str, g_discoveryCallback);
+    DeviceManager::GetInstance().StartDeviceDiscovery(pkgName, g_tokenId, pkgName, g_discoveryCallback);
     DeviceManager::GetInstance().StopDeviceDiscovery(g_tokenId, str);
     DeviceManager::GetInstance().PublishDeviceDiscovery(str, g_publishInfo, g_publishCallback);
     DeviceManager::GetInstance().UnPublishDeviceDiscovery(str, g_publishInfo.publishId);
