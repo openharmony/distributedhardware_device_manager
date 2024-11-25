@@ -2609,10 +2609,5 @@ void DmAuthManager::SetProcessInfo()
     }
     softbusConnector_->SetProcessInfo(processInfo);
 }
-
-void DmAuthManager::Leave()
-{
-    authRequestStateTemp_ = nullptr;
-}
 } // namespace DistributedHardware
 } // namespace OHOS
