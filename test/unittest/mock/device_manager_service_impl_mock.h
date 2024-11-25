@@ -30,6 +30,9 @@ public:
     virtual int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId) = 0;
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
+    virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId) = 0;
+    virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId) = 0;
+    virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
 };
@@ -39,6 +42,9 @@ public:
     MOCK_METHOD(int32_t, StopAuthenticateDevice, (const std::string &));
     MOCK_METHOD(int32_t, GetBindLevel, (const std::string &, const std::string &, const std::string &, uint64_t &));
     MOCK_METHOD(int32_t, UnBindDevice, (const std::string &, const std::string &, int32_t));
+    MOCK_METHOD((std::multimap<std::string, int32_t>), GetDeviceIdAndUserId, (int32_t, const std::string &));
+    MOCK_METHOD((std::multimap<std::string, int32_t>), GetDeviceIdAndUserId, (int32_t));
+    MOCK_METHOD((std::map<std::string, int32_t>), GetDeviceIdAndBindLevel, (int32_t));
 };
 }
 }

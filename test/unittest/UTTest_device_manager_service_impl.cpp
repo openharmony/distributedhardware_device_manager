@@ -1724,6 +1724,14 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_003, testing::ext::TestSize.
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(DEVICE_ACROSS_ACCOUNT_TYPE));
     deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP_PEER_TO_PEER_TYPE));
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP_ACROSS_ACCOUNT_TYPE));
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
     EXPECT_NE(deviceManagerServiceImpl_->softbusConnector_, nullptr);
 }
 
@@ -1739,22 +1747,13 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_003, testing::ext::TestSize
     EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return(""));
     deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
 
-    DmOfflineParam offlineParam;
-    offlineParam.leftAclNumber = 0;
-    offlineParam.bindType = INVALID_TYPE;
+    std::map<int32_t, int32_t> userIdAndBindLevel;
+    userIdAndBindLevel[1] = INVALIED_TYPE;
+    userIdAndBindLevel[2] = DEVICE;
+    userIdAndBindLevel[3] = SERVICE;
+    userIdAndBindLevel[4] = APP;
     EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
-
-    offlineParam.bindType = IDENTICAL_ACCOUNT_TYPE;
-    EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
-
-    offlineParam.bindType = DEVICE_PEER_TO_PEER_TYPE;
-    EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
-    deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
-
-    offlineParam.bindType = APP_PEER_TO_PEER_TYPE;
-    EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetUserIdAndBindLevel(_, _)).WillOnce(Return(userIdAndBindLevel));
     deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }

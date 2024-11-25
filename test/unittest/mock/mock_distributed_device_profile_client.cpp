@@ -790,6 +790,162 @@ void AddAccessControlprofileFifteenth(std::vector<AccessControlProfile>& accessC
     accessControlProfiles.push_back(profileFourth);
 }
 
+void AddAccessControlprofileSixteenth(std::vector<AccessControlProfile>& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 1;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = 1;
+    uint32_t status = 1;
+    uint32_t authenticationType = 1;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "accountId";
+    std::string newAccountId = "accountId";
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "deviceId";
+
+    std::string deviceIdee = "deviceIdee";
+    int32_t userIdee = 456;
+
+    Accesser accesser;
+    accesser.SetAccesserId(0);
+    accesser.SetAccesserDeviceId(deviceId);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId("");
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceIdee);
+    accessee.SetAccesseeUserId(userIdee);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    AccessControlProfile profileFourth;
+    profileFourth.SetAccessControlId(accesserId);
+    profileFourth.SetAccesserId(accesserId);
+    profileFourth.SetAccesseeId(accesserId);
+    profileFourth.SetTrustDeviceId(trustDeviceId);
+    profileFourth.SetBindType(bindType);
+    profileFourth.SetAuthenticationType(authenticationType);
+    profileFourth.SetDeviceIdType(deviceIdType);
+    profileFourth.SetStatus(status);
+    profileFourth.SetBindLevel(bindLevel);
+    profileFourth.SetAccesser(accesser);
+    profileFourth.SetAccessee(accessee);
+    accessControlProfiles.push_back(profileFourth);
+}
+
+void AddAccessControlprofileSeventeenth(std::vector<AccessControlProfile>& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 1;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = 1;
+    uint32_t status = 0;
+    uint32_t authenticationType = 1;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "accountId";
+    std::string newAccountId = "accountId";
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "deviceIdee";
+
+    Accesser accesser;
+    accesser.SetAccesserId(0);
+    accesser.SetAccesserDeviceId(deviceId);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId("");
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    AccessControlProfile profileFourth;
+    profileFourth.SetAccessControlId(accesserId);
+    profileFourth.SetAccesserId(accesserId);
+    profileFourth.SetAccesseeId(accesserId);
+    profileFourth.SetTrustDeviceId(trustDeviceId);
+    profileFourth.SetBindType(bindType);
+    profileFourth.SetAuthenticationType(authenticationType);
+    profileFourth.SetDeviceIdType(deviceIdType);
+    profileFourth.SetStatus(status);
+    profileFourth.SetBindLevel(bindLevel);
+    profileFourth.SetAccesser(accesser);
+    profileFourth.SetAccessee(accessee);
+    accessControlProfiles.push_back(profileFourth);
+}
+
+void AddAccessControlprofileEightteenth(std::vector<AccessControlProfile>& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 1;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = 1;
+    uint32_t status = 1;
+    uint32_t authenticationType = 1;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "accountId";
+    std::string newAccountId = "accountId";
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "deviceId";
+
+    Accesser accesser;
+    accesser.SetAccesserId(0);
+    accesser.SetAccesserDeviceId(deviceId);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId("");
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    AccessControlProfile profileFourth;
+    profileFourth.SetAccessControlId(accesserId);
+    profileFourth.SetAccesserId(accesserId);
+    profileFourth.SetAccesseeId(accesserId);
+    profileFourth.SetTrustDeviceId(trustDeviceId);
+    profileFourth.SetBindType(bindType);
+    profileFourth.SetAuthenticationType(authenticationType);
+    profileFourth.SetDeviceIdType(deviceIdType);
+    profileFourth.SetStatus(status);
+    profileFourth.SetBindLevel(bindLevel);
+    profileFourth.SetAccesser(accesser);
+    profileFourth.SetAccessee(accessee);
+    accessControlProfiles.push_back(profileFourth);
+}
+
 int32_t DistributedDeviceProfileClient::PutAccessControlProfile(const AccessControlProfile& accessControlProfile)
 {
     return 0;
@@ -829,12 +985,22 @@ int32_t DistributedDeviceProfileClient::GetAccessControlProfile(std::map<std::st
     AddAccessControlprofileThirteenth(accessControlProfiles);
     AddAccessControlprofileFourteenth(accessControlProfiles);
     AddAccessControlprofileFifteenth(accessControlProfiles);
+    AddAccessControlprofileSixteenth(accessControlProfiles);
+    AddAccessControlprofileSeventeenth(accessControlProfiles);
+    AddAccessControlprofileEightteenth(accessControlProfiles);
     return 0;
 }
 
 int32_t DistributedDeviceProfileClient::GetAllAccessControlProfile(
     std::vector<AccessControlProfile>& accessControlProfiles)
 {
+    AddAccessControlProfileTwelfth(accessControlProfiles);
+    AddAccessControlprofileThirteenth(accessControlProfiles);
+    AddAccessControlprofileFourteenth(accessControlProfiles);
+    AddAccessControlprofileFifteenth(accessControlProfiles);
+    AddAccessControlprofileSixteenth(accessControlProfiles);
+    AddAccessControlprofileSeventeenth(accessControlProfiles);
+    AddAccessControlprofileEightteenth(accessControlProfiles);
     return 0;
 }
 

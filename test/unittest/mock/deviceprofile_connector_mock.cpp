@@ -43,5 +43,11 @@ uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::s
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckBindType(trustDeviceId, requestDeviceId);
 }
+
+std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const std::string &localUdid,
+    const std::string &peerUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetUserIdAndBindLevel(localUdid, peerUdid);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
