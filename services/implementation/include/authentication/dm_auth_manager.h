@@ -502,6 +502,7 @@ public:
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     int32_t DeleteGroup(const std::string &pkgName, int32_t userId, const std::string &deviceId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
+    void Leave();
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,

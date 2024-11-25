@@ -22,6 +22,12 @@ namespace OHOS {
 namespace DistributedHardware {
 int32_t AuthRequestState::Leave()
 {
+    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
+    if (stateAuthManager == nullptr) {
+        LOGE("AuthRequestState::authManager_ null");
+        return ERR_DM_FAILED;
+    }
+    stateAuthManager->Leave();
     return DM_OK;
 }
 
