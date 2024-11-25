@@ -20,7 +20,6 @@ namespace DistributedHardware {
 void DMCommToolTest::SetUp()
 {
     dmCommTool = DMCommTool::GetInstance();
-    dmCommTool->Init();
 }
 void DMCommToolTest::TearDown()
 {
@@ -30,6 +29,15 @@ void DMCommToolTest::SetUpTestCase()
 }
 void DMCommToolTest::TearDownTestCase()
 {
+}
+
+/**
+ * @tc.name: Init_Success
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMCommToolTest, Init_Success, testing::ext::TestSize.Level0)
+{
+    EXPECT_NO_THROW(dmCommTool->Init());
 }
 
 /**

@@ -392,7 +392,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ret;
     }
 #endif
-    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK);
     LOGI("Completed");
@@ -409,7 +408,6 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStatusCallback", DM_OK);
     LOGI("Completed");
@@ -1869,7 +1867,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
         LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
@@ -2414,27 +2411,6 @@ uint16_t DeviceManagerImpl::GetSubscribeIdFromMap(const std::string &pkgName)
         }
     }
     return DM_INVALID_FLAG_ID;
-}
-
-void DeviceManagerImpl::RegDevStateCallbackToService(const std::string &pkgName)
-{
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return;
-    }
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgName);
-    int32_t ret = ipcClientProxy_->SendRequest(REGISTER_DEV_STATE_CALLBACK, req, rsp);
-    if (ret != DM_OK) {
-        LOGI("Send Request failed ret: %{public}d", ret);
-        return;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("Failed with ret %{public}d", ret);
-        return;
-    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

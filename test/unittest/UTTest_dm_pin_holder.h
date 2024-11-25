@@ -215,13 +215,6 @@ public:
     {
         (void)processInfo;
     }
-
-    virtual void OnDevStateCallbackAdd(const ProcessInfo &processInfo,
-        const std::vector<DmDeviceInfo> &deviceList) override
-    {
-        (void)processInfo;
-        (void)deviceList;
-    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

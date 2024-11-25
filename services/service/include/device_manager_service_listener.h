@@ -78,7 +78,6 @@ public:
     void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
         int32_t status, std::string content) override;
     void OnProcessRemove(const ProcessInfo &processInfo) override;
-    void OnDevStateCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

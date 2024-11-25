@@ -776,27 +776,5 @@ void DeviceManagerServiceListener::OnProcessRemove(const ProcessInfo &processInf
         }
     }
 }
-
-void DeviceManagerServiceListener::OnDevStateCallbackAdd(const ProcessInfo &processInfo,
-    const std::vector<DmDeviceInfo> &deviceList)
-{
-    for (auto item : deviceList) {
-        std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId) + "#" +
-            std::string(item.deviceId);
-        {
-            std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
-            if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
-                continue;
-            }
-            alreadyOnlinePkgName_[notifyPkgName] = item;
-        }
-        DmDeviceBasicInfo deviceBasicInfo;
-        std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
-        std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-        ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, item, deviceBasicInfo);
-        SetDeviceInfo(pReq, processInfo, DmDeviceState::DEVICE_STATE_ONLINE, item, deviceBasicInfo);
-        ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
-    }
-}
 } // namespace DistributedHardware
 } // namespace OHOS
