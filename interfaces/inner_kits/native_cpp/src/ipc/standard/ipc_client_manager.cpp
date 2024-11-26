@@ -36,6 +36,7 @@ void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     LOGW("DmDeathRecipient : OnRemoteDied");
     (void)remote;
+    DeviceManagerNotify::GetInstance().OnRemoteDied();
 }
 
 int32_t IpcClientManager::ClientInit()
