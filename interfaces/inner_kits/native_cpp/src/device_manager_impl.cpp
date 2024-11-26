@@ -392,7 +392,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ret;
     }
 #endif
-    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK);
     LOGI("Completed");
@@ -409,7 +408,6 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStatusCallback", DM_OK);
     LOGI("Completed");
@@ -1869,7 +1867,6 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
         LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    RegDevStateCallbackToService(pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
