@@ -420,7 +420,6 @@ private:
     int32_t CheckApiPermission(int32_t permissionLevel);
     void ConvertDeviceInfoToDeviceBasicInfo(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
     uint16_t GetSubscribeIdFromMap(const std::string &pkgName);
-    void RegDevStateCallbackToService(const std::string &pkgName);
 
 private:
 #if !defined(__LITEOS_M__)

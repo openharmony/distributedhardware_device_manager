@@ -163,8 +163,6 @@ public:
     virtual void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
         int32_t status, std::string content) = 0;
     virtual void OnProcessRemove(const ProcessInfo &processInfo) = 0;
-    virtual void OnDevStateCallbackAdd(const ProcessInfo &processInfo,
-        const std::vector<DmDeviceInfo> &deviceList) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
