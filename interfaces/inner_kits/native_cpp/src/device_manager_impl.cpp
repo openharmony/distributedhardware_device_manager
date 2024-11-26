@@ -1686,7 +1686,7 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgNameTemp);
+    req->SetPkgName(ComposeStr(pkgName, subscribeId));
     req->SetFirstParam(extraParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
