@@ -401,13 +401,13 @@ int32_t MineSoftbusListener::ParseScopeDeviceJsonArray(const vector<ScopeOptionI
             output[(*outLen)++] = sha256Out[j];
         }
         retValue = sprintf_s(&output[*outLen], DM_DEVICE_NUMBER_LEN, "%010d", optionInfo[i].startNumber);
-        if (retValue == EOK) {
+        if (retValue <= 0) {
             LOGE("fail to add device number to data buffer");
             return ERR_DM_FAILED;
         }
         *outLen = *outLen + DM_DEVICE_NUMBER_LEN;
         retValue = sprintf_s(&output[*outLen], DM_DEVICE_NUMBER_LEN, "%010d", optionInfo[i].endNumber);
-        if (retValue == EOK) {
+        if (retValue <= 0) {
             LOGE("fail to add device number to data buffer");
             return ERR_DM_FAILED;
         }
