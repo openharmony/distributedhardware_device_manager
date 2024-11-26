@@ -23,6 +23,7 @@
 #endif
 #include <map>
 #include <mutex>
+#include <set>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -403,6 +404,7 @@ public:
     virtual int32_t RegisterSinkBindCallback(const std::string &pkgName,
         std::shared_ptr<BindTargetCallback> callback) override;
     virtual int32_t UnRegisterSinkBindCallback(const std::string &pkgName) override;
+    void SyncCallbacksToService(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
 
 private:
     DeviceManagerImpl() = default;
@@ -420,7 +422,7 @@ private:
     int32_t CheckApiPermission(int32_t permissionLevel);
     void ConvertDeviceInfoToDeviceBasicInfo(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
     uint16_t GetSubscribeIdFromMap(const std::string &pkgName);
-    void RegDevStateCallbackToService(const std::string &pkgName);
+    void SyncCallbackToService(DmCommonNotifyEvent dmCommonNotifyEvent, const std::string &pkgName);
 
 private:
 #if !defined(__LITEOS_M__)

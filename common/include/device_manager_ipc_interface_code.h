@@ -95,6 +95,7 @@ enum DMIpcCmdInterfaceCode {
     GET_NETWORKID_BY_UDID,
     SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY,
     SINK_BIND_TARGET_RESULT,
+    SYNC_CALLBACK,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

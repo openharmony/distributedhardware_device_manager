@@ -146,6 +146,7 @@ public:
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId);
+    int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 
