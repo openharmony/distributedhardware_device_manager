@@ -1411,6 +1411,33 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_002, testing::ext::Tes
     localUserIds.push_back(localUserId);
     DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(remoteUserIds, remoteUdid, localUserIds,
         localUdid);
+
+    ProcessInfo process;
+    process.userId = 1;
+    process.pkgName = "pkgName";
+    ProcessInfo process1;
+    process1.userId = 1;
+    process1.pkgName = "pkgName";
+    EXPECT_TRUE(process == process1);
+
+    process.userId = 0;
+    EXPECT_TRUE(process < process1);
+
+    DmNotifyKey dmNotifyKey;
+    dmNotifyKey.processUserId = 1;
+    dmNotifyKey.processPkgName = "proName";
+    dmNotifyKey.notifyUserId = 0;
+    dmNotifyKey.udid = "udid";
+
+    DmNotifyKey dmNotifyKey1;
+    dmNotifyKey1.processUserId = 1;
+    dmNotifyKey1.processPkgName = "proName";
+    dmNotifyKey1.notifyUserId = 0;
+    dmNotifyKey1.udid = "udid";
+    EXPECT_TRUE(dmNotifyKey == dmNotifyKey1);
+
+    dmNotifyKey1.processUserId = 2;
+    EXPECT_TRUE(dmNotifyKey < dmNotifyKey1);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
