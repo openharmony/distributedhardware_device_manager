@@ -1144,7 +1144,7 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
     LOGI("Notify remote userid to dsoftbus, msg: %{public}s", GetAnonyString(msg).c_str());
     return DM_OK;
 #else
-    (void)remoteUdid;    
+    (void)remoteUdid;
     (void)userIds;
 #endif
     return DM_OK;

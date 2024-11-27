@@ -328,7 +328,7 @@ int32_t SoftbusCache::GetSecurityDeviceLevel(const char *networkId, int32_t &sec
     }
     int32_t ret = GetDevLevelFromBus(networkId, securityLevel);
     if (ret == DM_OK) {
-        LOGI("Get dev level from softbus success.")
+        LOGI("Get dev level from softbus success.");
         return DM_OK;
     }
     return ret;
