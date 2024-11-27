@@ -35,6 +35,8 @@ public:
         ConnectionAddrType &addrType) = 0;
     virtual int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
     virtual int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo) = 0;
+    virtual int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName) = 0;
+    virtual int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusListener> dmSoftbusListener = nullptr;
 };
@@ -49,6 +51,7 @@ public:
     MOCK_METHOD(int32_t, GetTargetInfoFromCache, (const std::string &, PeerTargetId &, ConnectionAddrType &addrType));
     MOCK_METHOD(int32_t, GetTrustedDeviceList, (std::vector<DmDeviceInfo> &));
     MOCK_METHOD(int32_t, GetLocalDeviceInfo, (DmDeviceInfo &));
+    MOCK_METHOD(int32_t, SetLocalDeviceName, (const std::string &, const std::string &));
 };
 }
 }

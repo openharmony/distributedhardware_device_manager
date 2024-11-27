@@ -402,6 +402,13 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_202, testing::ext::Test
     int32_t screenStatus = -1;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    pkgName = "pkgName";
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusListenerMock_, GetDeviceScreenStatus(_, _)).WillOnce(Return(DM_OK));
+    ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
 /**
@@ -479,8 +486,13 @@ HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_201, testing::ext::TestSiz
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusListenerMock_, SetLocalDeviceName(_, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
     EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*softbusListenerMock_, SetLocalDeviceName(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
@@ -626,6 +638,52 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ex
     std::string pkgName = "pkgName";
     int32_t ret = DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
     EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_205, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::vector<DmDeviceInfo> deviceList;
+    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, deviceList);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    pkgName = "jjdjk_pkgName";
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, deviceList);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, deviceList);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    std::vector<DmDeviceInfo> onlineDeviceList;
+    DmDeviceInfo dmDeviceInfo;
+    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+    dmDeviceInfo.networkType = 1;
+    onlineDeviceList.push_back(dmDeviceInfo);
+    std::unordered_map<std::string, DmAuthForm> udidMap;
+    udidMap.insert(std::make_pair("udid01", DmAuthForm::IDENTICAL_ACCOUNT));
+    udidMap.insert(std::make_pair("udid02", DmAuthForm::ACROSS_ACCOUNT));
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
+        .WillOnce(DoAll(SetArgReferee<0>(onlineDeviceList), Return(DM_OK)));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetAppTrustDeviceIdList(_)).WillOnce(Return(udidMap));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
+    ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, deviceList);
+    EXPECT_EQ(ret, DM_OK);
+
+    pkgName = "ohos.deviceprofile";
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
+        .WillOnce(DoAll(SetArgReferee<0>(onlineDeviceList), Return(DM_OK)));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetAppTrustDeviceIdList(_)).WillOnce(Return(udidMap));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("udid02"), Return(DM_OK)));
+    ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, deviceList);
+    EXPECT_EQ(ret, DM_OK);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 } // namespace
 } // namespace DistributedHardware
