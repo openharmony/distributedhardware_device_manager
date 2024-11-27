@@ -59,6 +59,7 @@ using namespace OHOS::EventFwk;
 constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.so";
 #endif
 constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
+constexpr const char* LIB_DM_RESIDENT_NAME = "libdevicemanagerresident.z.so";
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -80,6 +81,7 @@ DeviceManagerService::~DeviceManagerService()
     LOGI("DeviceManagerService destructor");
     UnloadDMServiceImplSo();
     UnloadDMServiceAdapter();
+    UnloadDMServiceAdapterResident();
 }
 
 int32_t DeviceManagerService::Init()
@@ -103,6 +105,9 @@ int32_t DeviceManagerService::InitSoftbusListener()
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
 #endif
     LOGI("SoftbusListener init success.");
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("load dm service resident failed.");
+    }
     return DM_OK;
 }
 
@@ -1174,6 +1179,59 @@ void DeviceManagerService::UnloadDMServiceAdapter()
     void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         LOGI("dm service adapter so_handle is not nullptr.");
+        dlclose(so_handle);
+    }
+}
+
+bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
+{
+    LOGI("Start.");
+    if (listener_ == nullptr) {
+        listener_ = std::make_shared<DeviceManagerServiceListener>();
+    }
+    std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
+    if (isAdapterResidentSoLoaded_ && (dmServiceImplExtResident_ != nullptr)) {
+        return true;
+    }
+
+    void *so_handle = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE);
+    if (so_handle == nullptr) {
+        LOGE("load dm service resident so failed.");
+        return false;
+    }
+    dlerror();
+    auto func = (CreateDMServiceExtResidentFuncPtr)dlsym(so_handle, "CreateDMServiceExtResidentObject");
+    if (dlerror() != nullptr || func == nullptr) {
+        dlclose(so_handle);
+        LOGE("Create object function is not exist.");
+        return false;
+    }
+
+    dmServiceImplExtResident_ = std::shared_ptr<IDMServiceImplExtResident>(func());
+    if (dmServiceImplExtResident_->Initialize(listener_) != DM_OK) {
+        dlclose(so_handle);
+        dmServiceImplExtResident_ = nullptr;
+        isAdapterResidentSoLoaded_ = false;
+        LOGE("dm service impl ext resident init failed.");
+        return false;
+    }
+    isAdapterResidentSoLoaded_ = true;
+    LOGI("Success.");
+    return true;
+}
+
+void DeviceManagerService::UnloadDMServiceAdapterResident()
+{
+    LOGI("Start.");
+    std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
+    if (dmServiceImplExtResident_ != nullptr) {
+        dmServiceImplExtResident_->Release();
+    }
+    dmServiceImplExtResident_ = nullptr;
+
+    void *so_handle = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NOLOAD);
+    if (so_handle != nullptr) {
+        LOGI("dm service resident so_handle is not nullptr.");
         dlclose(so_handle);
     }
 }
