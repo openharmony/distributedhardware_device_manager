@@ -89,17 +89,6 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
-        std::string localDeviceName = accountBootListener_->GetLocalDeviceName();
-        std::string localDisplayName = accountBootListener_->GetLocalDisplayName();
-        LOGI("deviceName=%{public}s, displayName=%{public}s",
-            localDeviceName.c_str(), localDisplayName.c_str());
-        int ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
-        if (ret == DM_OK) {
-            LOGI("Already have deviceName=%{public}s or displayName=%{public}s",
-                localDeviceName.c_str(), localDisplayName.c_str());
-            return;
-        }
-        accountBootListener_->SetSaTriggerFlag(SaTriggerFlag::DM_SA_READY);
         return;
     }
 
@@ -128,7 +117,6 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         KVAdapterManager::GetInstance().ReInit();
-        accountBootListener_->SetSaTriggerFlag(SaTriggerFlag::DATA_SHARE_SA_REDDY);
         return;
     }
 #endif
