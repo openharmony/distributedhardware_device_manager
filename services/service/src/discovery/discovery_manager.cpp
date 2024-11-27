@@ -321,7 +321,9 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
 
         if (discoveryContextMap_.find(pkgNameTemp) != discoveryContextMap_.end()) {
             discoveryContextMap_.erase(pkgNameTemp);
-            timer_->DeleteTimer(pkgNameTemp);
+            if (timer_ != nullptr) {
+                timer_->DeleteTimer(pkgNameTemp);
+            }
         }
     }
     {
@@ -452,7 +454,9 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
         }
         if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
             discoveryContextMap_.erase(pkgName);
-            timer_->DeleteTimer(pkgName);
+            if (timer_ != nullptr) {
+                timer_->DeleteTimer(pkgName);
+            }
         }
     }
     {
@@ -619,7 +623,7 @@ void DiscoveryManager::ClearDiscoveryCache(const std::string &pkgName)
             pkgNameSet_.erase(pkgName);
         }
         if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
-            LOGI("Erase pkgname %{public}s from pkgNameSet.", pkgName.c_str());
+            LOGI("Erase pkgname %{public}s from discoveryContextMap.", pkgName.c_str());
             subscribeId = discoveryContextMap_[pkgName].subscribeId;
             discoveryContextMap_.erase(pkgName);
         }
