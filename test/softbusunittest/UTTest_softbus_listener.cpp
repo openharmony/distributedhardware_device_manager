@@ -1075,6 +1075,18 @@ HWTEST_F(SoftbusListenerTest, GetDeviceScreenStatus_001, testing::ext::TestSize.
     EXPECT_TRUE(checkSoftbusRes(ret));
     softbusListener = nullptr;
 }
+
+HWTEST_F(SoftbusListenerTest, SetForegroundUserIdsToDSoftBus_001, testing::ext::TestSize.Level0)
+{
+    std::string remoteUdid = "remoteUdid";
+    std::vector<uint32_t> userIds;
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    int32_t ret = softbusListener->SetForegroundUserIdsToDSoftBus(remoteUdid, userIds);
+    EXPECT_EQ(ret, DM_OK);
+    softbusListener = nullptr;
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

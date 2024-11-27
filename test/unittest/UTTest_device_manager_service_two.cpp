@@ -584,6 +584,23 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level0
     EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    ProcessInfo processInfo;
+    processInfo.pkgName = "pkgName";
+    if (DeviceManagerService::GetInstance().discoveryMgr_ == nullptr){
+        DeviceManagerService::GetInstance().InitDMServiceListener();
+    }
+    DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
+    DeviceManagerService::GetInstance().RemoveNotifyRecord(processInfo);
+
+    std::vector<uint32_t> foregroundUserIds;
+    std::vector<uint32_t> backgroundUserIds;
+    std::string remoteUdid = "remoteUdid";
+    if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
+        DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    }
+    DeviceManagerService::GetInstance().ProcessSyncUserIds(foregroundUserIds, backgroundUserIds, remoteUdid);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
 /**
@@ -602,6 +619,13 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    int32_t ret = DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

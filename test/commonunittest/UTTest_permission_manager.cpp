@@ -270,6 +270,17 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnSetDnPolicy_001, testing:
     ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
     ASSERT_TRUE(ret);
 }
+
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA();
+    ASSERT_FALSE(ret);
+
+    pkgName = "ohos.deviceprofile";
+    ret = PermissionManager::GetInstance().CheckWhiteListSystemSA();
+    ASSERT_TRUE(ret);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS

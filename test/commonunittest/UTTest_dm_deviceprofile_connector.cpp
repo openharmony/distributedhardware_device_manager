@@ -31,10 +31,14 @@ void DeviceProfileConnectorTest::TearDown()
 
 void DeviceProfileConnectorTest::SetUpTestCase()
 {
+    cryptoMock_ = std::make_shared<CryptoMock>();
+    DmCrypto::dmCrypto = cryptoMock_;
 }
 
 void DeviceProfileConnectorTest::TearDownTestCase()
 {
+    DmCrypto::dmCrypto = nullptr;
+    cryptoMock_ = nullptr;
 }
 
 void AddAccessControlProfileFirst(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
@@ -1411,6 +1415,31 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_002, testing::ext::Tes
     localUserIds.push_back(localUserId);
     DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(remoteUserIds, remoteUdid, localUserIds,
         localUdid);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level0)
+{
+    std::string localUdid = "";
+    std::string peerUdid = "";
+    int32_t peerUserId = 123456;
+    std::string peerAccountHash = "";
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    auto ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
+        peerUserId, peerAccountHash);
+    EXPECT_TRUE(ret.empty());
+
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
+        peerUserId, peerAccountHash);
+    EXPECT_TRUE(ret.empty());
+
+    localUdid = "deviceId";
+    peerUdid = "deviceId";
+    peerAccountHash = "peerAccountHash";
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
+        peerUserId, peerAccountHash);
+    EXPECT_TRUE(ret.empty());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -16,6 +16,7 @@
 #include "UTTest_device_manager_impl.h"
 #include "dm_device_info.h"
 
+#include <memory>
 #include <unistd.h>
 #include "accesstoken_kit.h"
 #include "device_manager_notify.h"
@@ -1406,6 +1407,42 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialAuthStatusCallback_002, test
     std::string packName = "";
     int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialAuthStatusCallback(packName);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, AddDiscoveryCallback_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> discoverParam;
+    std::shared_ptr<DiscoveryCallback> callback = nullptr;
+    uint16_t ret = DeviceManager::GetInstance().AddDiscoveryCallback(pkgName, discoverParam, callback);
+    ASSERT_EQ(ret, 0);
+
+    discoverParam.insert(std::make_pair(PARAM_KEY_SUBSCRIBE_ID, "0"));
+    callback = std::make_shared<DeviceDiscoveryCallbackTest>();
+    ret = DeviceManager::GetInstance().AddDiscoveryCallback(pkgName, discoverParam, callback);
+    ASSERT_EQ(ret, 0);
+
+    discoverParam[PARAM_KEY_SUBSCRIBE_ID] = "12";
+    ret = DeviceManager::GetInstance().AddDiscoveryCallback(pkgName, discoverParam, callback);
+    ASSERT_EQ(ret, 12);
+
+    pkgName = "SUBSCRIBE_ID";
+    std::string key = "SUBSCRIBE_ID#12";
+    DeviceManager::GetInstance().pkgName2SubIdMap_[key] = 1;
+    ret = DeviceManager::GetInstance().AddDiscoveryCallback(pkgName, discoverParam, callback);
+    ASSERT_EQ(ret, 1);
+}
+
+HWTEST_F(DeviceManagerImplTest, GetSubscribeIdFromMap_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DeviceManager::GetInstance().pkgName2SubIdMap_[pkgName] = 6;
+    uint16_t ret = DeviceManager::GetInstance().GetSubscribeIdFromMap(pkgName);
+    ASSERT_EQ(ret, 6);
+
+    pkgName = "pkgName_301";
+    ret = DeviceManager::GetInstance().GetSubscribeIdFromMap(pkgName);
+    ASSERT_EQ(ret, 0);
 }
 } // namespace
 } // namespace DistributedHardware
