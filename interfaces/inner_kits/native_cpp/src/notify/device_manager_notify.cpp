@@ -258,8 +258,8 @@ void DeviceManagerNotify::RegisterPinHolderCallback(const std::string &pkgName,
 void DeviceManagerNotify::OnRemoteDied()
 {
     LOGW("DeviceManagerNotify::OnRemoteDied");
-    std::lock_guard<std::mutex> autoLock(lock_);
-    for (auto iter : dmInitCallback_) {
+    std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback = GetDmInitCallback();
+    for (auto iter : dmInitCallback) {
         LOGI("DeviceManagerNotify::OnRemoteDied, pkgName:%{public}s", iter.first.c_str());
         if (iter.second != nullptr) {
             iter.second->OnRemoteDied();
