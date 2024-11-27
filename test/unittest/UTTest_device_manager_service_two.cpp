@@ -638,6 +638,46 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ex
     std::string pkgName = "pkgName";
     int32_t ret = DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
     EXPECT_EQ(ret, DM_OK);
+
+    std::string msg;
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+    msg = R"(
+    {
+        "processType" : 1,
+        "g_authType" : 1,
+        "userId" : "123"
+    }))";
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    msg = R"(
+    {
+        "processType" : 1,
+        "g_authType" : 1,
+        "userId" : "123"
+    })";
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    msg = R"(
+    {
+        "networkId" : "networkId_001",
+        "g_authType" : 1,
+        "userId" : "123"
+    })";
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    nlohmann::json msgJsonObj;
+    msgJsonObj["networkId"] = "networkId_001";
+    msgJsonObj["discoverType"] = 0;
+    msg = msgJsonObj.dump();
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    msgJsonObj["discoverType"] = 1;
+    msg = msgJsonObj.dump();
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_205, testing::ext::TestSize.Level0)
