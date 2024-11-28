@@ -47,9 +47,13 @@ void DeviceManagerServiceImplTest::SetUpTestCase()
 
 void DeviceManagerServiceImplTest::TearDownTestCase()
 {
+    DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     deviceProfileConnectorMock_ = nullptr;
+    DmSoftbusConnector::dmSoftbusConnector = nullptr;
     softbusConnectorMock_ = nullptr;
+    DmDmDeviceStateManager::dmDeviceStateManager = nullptr;
     dmDeviceStateManagerMock_ = nullptr;
+    DmMineHiChainConnector::dmMineHiChainConnector = nullptr;
     mineHiChainConnectorMock_ = nullptr;
 }
 
