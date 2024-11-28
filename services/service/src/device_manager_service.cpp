@@ -1193,8 +1193,10 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
     if (isAdapterResidentSoLoaded_ && (dmServiceImplExtResident_ != nullptr)) {
         return true;
     }
-
-    void *so_handle = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (so_handle == nullptr) {
+        so_handle = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
     if (so_handle == nullptr) {
         LOGE("load dm service resident so failed.");
         return false;
@@ -1209,7 +1211,6 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
 
     dmServiceImplExtResident_ = std::shared_ptr<IDMServiceImplExtResident>(func());
     if (dmServiceImplExtResident_->Initialize(listener_) != DM_OK) {
-        dlclose(so_handle);
         dmServiceImplExtResident_ = nullptr;
         isAdapterResidentSoLoaded_ = false;
         LOGE("dm service impl ext resident init failed.");
