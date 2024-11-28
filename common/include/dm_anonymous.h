@@ -100,6 +100,7 @@ std::string GetIntegerList(const std::vector<T> &values)
 bool IsIdLengthValid(const std::string &inputID);
 bool IsMessageLengthValid(const std::string &inputMessage);
 bool IsValueExist(const std::multimap<std::string, int32_t> unorderedmap, const std::string &udid, int32_t userId);
+bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

@@ -74,6 +74,7 @@ namespace {
     const std::string USERID_CHECKSUM_NETWORKID_KEY = "networkId";
     const std::string USERID_CHECKSUM_DISCOVER_TYPE_KEY = "discoverType";
     constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
+    const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
 }
 DeviceManagerService::~DeviceManagerService()
 {
@@ -96,6 +97,11 @@ int32_t DeviceManagerService::InitSoftbusListener()
         softbusListener_ = std::make_shared<SoftbusListener>();
     }
     SoftbusCache::GetInstance().UpdateDeviceInfoCache();
+    std::vector<DmDeviceInfo> onlineDeviceList;
+    SoftbusCache::GetInstance().GetDeviceInfoFromCache(onlineDeviceList);
+    if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
+        dmServiceImpl_->SaveOnlineDeviceInfo(onlineDeviceList);
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     SubscribePublishCommonEvent();
@@ -965,18 +971,20 @@ void DeviceManagerService::LoadHardwareFwkService()
 {
     std::vector<DmDeviceInfo> deviceList;
     CHECK_NULL_VOID(softbusListener_);
-    int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
+    int32_t ret = GetTrustedDeviceList(DHARD_WARE_PKG_NAME, deviceList);
     if (ret != DM_OK) {
         LOGE("LoadHardwareFwkService failed, get trusted devicelist failed.");
+        return;
+    }
+    if (deviceList.empty()) {
+        LOGI("no trusted device.");
         return;
     }
     if (!IsDMServiceImplReady()) {
         LOGE("LoadHardwareFwkService failed, instance not init or init failed.");
         return;
     }
-    if (deviceList.size() > 0) {
-        dmServiceImpl_->LoadHardwareFwkService();
-    }
+    dmServiceImpl_->LoadHardwareFwkService();
 }
 
 int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
@@ -1667,6 +1675,7 @@ void DeviceManagerService::HandleUserSwitched(int32_t curUserId, int32_t preUser
             peerUdids.push_back(item.first);
         }
     }
+    dmServiceImpl_->HandleUserSwitched(preUserDeviceMap, curUserId, preUserId);
     if (!peerUdids.empty()) {
         std::vector<int32_t> foregroundUserVec;
         int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
@@ -1680,7 +1689,6 @@ void DeviceManagerService::HandleUserSwitched(int32_t curUserId, int32_t preUser
             SendUserIdsBroadCast(peerUdids, foregroundUserVec, backgroundUserVec, true);
         }
     }
-    dmServiceImpl_->HandleUserSwitched(preUserDeviceMap, curUserId, preUserId);
 }
 
 void DeviceManagerService::HandleUserRemoved(int32_t removedUserId)
