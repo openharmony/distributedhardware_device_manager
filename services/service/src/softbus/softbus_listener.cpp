@@ -995,7 +995,10 @@ bool SoftbusListener::IsDmRadarHelperReady()
         LOGD("IsDmRadarHelperReady alReady.");
         return true;
     }
-    radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW);
+    radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW | RTLD_NOLOAD);
+    if (radarHandle_ == nullptr) {
+        radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW);
+    }
     if (radarHandle_ == nullptr) {
         LOGE("load libdevicemanagerradar so failed.");
         return false;
