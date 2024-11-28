@@ -287,6 +287,7 @@ private:
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
+    std::string localNetWorkId_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

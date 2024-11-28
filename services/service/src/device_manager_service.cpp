@@ -2069,6 +2069,15 @@ int32_t DeviceManagerService::ParseCheckSumMsg(const std::string &msg, std::stri
 void DeviceManagerService::ProcessCheckSumByWifi(std::string networkId, std::vector<int32_t> foregroundUserIds,
     std::vector<int32_t> backgroundUserIds)
 {
+    if (localNetWorkId_ == "") {
+        DmDeviceInfo deviceInfo;
+        SoftbusCache::GetInstance().GetLocalDeviceInfo(deviceInfo);
+        localNetWorkId_ = std::string(deviceInfo.networkId);
+    }
+    if (localNetWorkId_ >= networkId) {
+        LOGI("Local networkid big than remote, no need begin req");
+        return;
+    }
     // use connection to exchange foreground/background userid
     LOGI("Try open softbus session to exchange foreground/background userid");
     std::vector<uint32_t> foregroundUserIdsUInt;
