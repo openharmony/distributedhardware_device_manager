@@ -202,5 +202,26 @@ HWTEST_F(DMTransportTest, Send_SessionNotOpened_Failure, testing::ext::TestSize.
     int32_t result = dmTransport.Send(notOpenedId, payload);
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
+
+HWTEST_F(DMTransportTest, OnSocketOpened_001, testing::ext::TestSize.Level0)
+{
+    int32_t socketId = 1;
+    PeerSocketInfo info;
+    int32_t ret = dmTransport.OnSocketOpened(socketId, info);
+    EXPECT_EQ(ret, DM_OK);
+
+    ShutdownReason reason;
+    dmTransport.remoteDevSocketIds_["socketId"] = socketId;
+    dmTransport.OnSocketClosed(socketId, reason);
+
+    int32_t value = 1;
+    void *data = &value;
+    uint32_t dataLen = 1;
+    socketId = -1;
+    dmTransport.OnBytesReceived(socketId, data, dataLen);
+
+    socketId = 1;
+    dmTransport.OnBytesReceived(socketId, data, dataLen);
+}
 } // DistributedHardware
 } // OHOS

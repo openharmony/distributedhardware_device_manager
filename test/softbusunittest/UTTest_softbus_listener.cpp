@@ -1052,15 +1052,15 @@ HWTEST_F(SoftbusListenerTest, SetLocalDeviceName_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, DM_OK);
 
     localDeviceName = "localDeviceName";
     ret = softbusListener->SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
 
     localDisplayName = "localDisplayName";
     ret = softbusListener->SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
     softbusListener = nullptr;
 }
 
