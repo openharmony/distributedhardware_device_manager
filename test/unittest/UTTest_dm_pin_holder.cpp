@@ -797,6 +797,38 @@ HWTEST_F(DmPinHolderTest, SendData_103, testing::ext::TestSize.Level0)
     )";
     int32_t ret = pinHolderSession->SendData(sessionId, message);
     EXPECT_NE(ret, DM_OK);
+
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
+    pinHolder->session_ = nullptr;
+    std::string message;
+    pinHolder->ProcessChangeMsg(message);
+
+    message = R"(
+    {
+        "MSG_TYPE" : 100
+    }}
+    )";
+    pinHolder->session_ = std::make_shared<PinHolderSession>();
+    pinHolder->ProcessChangeMsg(message);
+
+    message = R"(
+    {
+        "MSG_TYPE" : 100
+    }
+    )";
+    pinHolder->ProcessChangeMsg(message);
+
+    message = R"(
+    {
+        "PIN_TYPE" : 12
+    }
+    )";
+    pinHolder->sinkState_ = PinHolderState::SINK_INIT;
+    pinHolder->ProcessChangeMsg(message);
+
+    pinHolder->sinkState_ = PinHolderState::SINK_CREATE;
+    pinHolder->ProcessChangeMsg(message);
 }
 
 HWTEST_F(DmPinHolderTest, GetAddrByTargetId_101, testing::ext::TestSize.Level0)
@@ -812,6 +844,84 @@ HWTEST_F(DmPinHolderTest, GetAddrByTargetId_101, testing::ext::TestSize.Level0)
     ConnectionAddr addr;
     int32_t ret = pinHolderSession->GetAddrByTargetId(targetId, addr);
     EXPECT_EQ(ret, DM_OK);
+
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
+    std::string message = R"(
+    {
+        "MSG_TYPE" : 100
+    }}
+    )";
+    pinHolder->ProcessChangeRespMsg(message);
+
+    message = R"(
+    {
+        "MSG_TYPE" : 100
+    }
+    )";
+    pinHolder->ProcessChangeRespMsg(message);
+
+    message = R"(
+    {
+        "REPLY" : 10
+    }
+    )";
+    pinHolder->session_ = nullptr;
+    pinHolder->ProcessChangeRespMsg(message);
+
+    pinHolder->session_ = std::make_shared<PinHolderSession>();
+    pinHolder->ProcessChangeRespMsg(message);
+
+    message = R"(
+    {
+        "REPLY" : 0
+    }
+    )";
+    pinHolder->ProcessChangeRespMsg(message);
+}
+
+HWTEST_F(DmPinHolderTest, NotifyPinHolderEvent_102, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
+    std::string pkgName = "com.ohos.dmtest";
+    std::string event = "event";
+    pinHolder->session_ = nullptr;
+    int32_t ret = pinHolder->NotifyPinHolderEvent(pkgName, event);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    pinHolder->session_ = std::make_shared<PinHolderSession>();
+    pinHolder->processInfo_.pkgName = "";
+    ret = pinHolder->NotifyPinHolderEvent(pkgName, event);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    pinHolder->processInfo_.pkgName = "pkgName";
+    pkgName = "pkgName";
+    pinHolder->sessionId_ = -1;
+    ret = pinHolder->NotifyPinHolderEvent(pkgName, event);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    pinHolder->sessionId_ = 0;
+    pinHolder->isRemoteSupported_ = false;
+    ret = pinHolder->NotifyPinHolderEvent(pkgName, event);
+    ASSERT_EQ(ret, ERR_DM_BIND_PEER_UNSUPPORTED);
+
+    pinHolder->isRemoteSupported_ = true;
+    ret = pinHolder->NotifyPinHolderEvent(pkgName, event);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    if (pinHolder->timer_ == nullptr) {
+        pinHolder->timer_ = std::make_shared<DmTimer>();
+    }
+    nlohmann::json jsonObj;
+    jsonObj[TAG_MSG_TYPE] = 1;
+    jsonObj[TAG_PIN_TYPE] = DmPinType::SUPER_SONIC;
+    event = jsonObj.dump();
+    if (pinHolder->session_ == nullptr) {
+        pinHolder->session_ = std::make_shared<PinHolderSession>();
+    }
+    ret = pinHolder->NotifyPinHolderEvent(pkgName, event);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware
