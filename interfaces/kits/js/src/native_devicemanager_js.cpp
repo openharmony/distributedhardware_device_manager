@@ -3214,17 +3214,17 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    char pkgName[DM_NAPI_BUF_LENGTH] = {0};
+    char bundleName[DM_NAPI_BUF_LENGTH] = {0};
     size_t typeLen = 0;
-    napi_get_value_string_utf8(env, argv[0], pkgName, sizeof(pkgName), &typeLen);
+    napi_get_value_string_utf8(env, argv[0], bundleName, sizeof(bundleName), &typeLen);
 
-    LOGI("create DeviceManagerNapi for packageName:%{public}s", pkgName);
+    LOGI("create DeviceManagerNapi for packageName:%{public}s", GetAnonyString(bundleName).c_str());
     DeviceManagerNapi *obj = new DeviceManagerNapi(env, thisVar);
     if (obj == nullptr) {
         return nullptr;
     }
 
-    obj->bundleName_ = std::string(pkgName);
+    obj->bundleName_ = std::string(bundleName);
     std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
     g_deviceManagerMap[obj->bundleName_] = obj;
     napi_status status = napi_wrap(
