@@ -3218,7 +3218,7 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
     size_t typeLen = 0;
     napi_get_value_string_utf8(env, argv[0], bundleName, sizeof(bundleName), &typeLen);
 
-    LOGI("create DeviceManagerNapi for packageName:%{public}s", bundleName);
+    LOGI("create DeviceManagerNapi for packageName:%{public}s", GetAnonyString(bundleName).c_str());
     DeviceManagerNapi *obj = new DeviceManagerNapi(env, thisVar);
     if (obj == nullptr) {
         return nullptr;
