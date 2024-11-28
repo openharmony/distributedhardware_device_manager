@@ -210,7 +210,7 @@ HWTEST_F(DMTransportTest, OnSocketOpened_001, testing::ext::TestSize.Level0)
     int32_t ret = dmTransport.OnSocketOpened(socketId, info);
     EXPECT_EQ(ret, DM_OK);
 
-    ShutdownReason reason;
+    ShutdownReason reason = ShutdownReason::SHUTDOWN_REASON_UNKNOWN;
     dmTransport.remoteDevSocketIds_["socketId"] = socketId;
     dmTransport.OnSocketClosed(socketId, reason);
 

@@ -801,7 +801,6 @@ HWTEST_F(DmPinHolderTest, SendData_103, testing::ext::TestSize.Level0)
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     pinHolder->session_ = nullptr;
-    std::string message;
     pinHolder->ProcessChangeMsg(message);
 
     message = R"(

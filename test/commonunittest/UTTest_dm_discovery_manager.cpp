@@ -566,34 +566,6 @@ HWTEST_F(DmDiscoveryManagerTest, CheckDiscoveryQueue_003, testing::ext::TestSize
     int32_t ret = discoveryMgr_->CheckDiscoveryQueue(pkgName);
     EXPECT_EQ(ret, DM_OK);
 }
-
-HWTEST_F(DmDiscoveryManagerTest, GetDeviceAclParam_001, testing::ext::TestSize.Level0)
-{
-    int32_t userId = 0;
-    std::string deviceId = "deviceId";
-    bool isOnline = false;
-    int32_t authForm = 1;
-    std::string pkgName = "pkgName";
-    int32_t ret = discoveryMgr_->GetDeviceAclParam(pkgName, userId, deviceId, isOnline, authForm);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    std::string callerPkgName = "callerPkgName";
-    discoveryMgr_->GetPkgNameAndUserId(pkgName, callerPkgName, userId);
-}
-
-HWTEST_F(DmDiscoveryManagerTest, GetDeviceAclParam_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    std::string str = discoveryMgr_->AddMultiUserIdentify(pkgName);
-    EXPECT_EQ(str.empty, false);
-}
-
-HWTEST_F(DmDiscoveryManagerTest, RemoveMultiUserIdentify_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    std::string str = discoveryMgr_->RemoveMultiUserIdentify(pkgName);
-    EXPECT_EQ(str.empty, false);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -19,6 +19,8 @@
 #include "dm_device_info.h"
 #include "deviceprofile_connector.h"
 
+using namespace testing;
+using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 void DeviceProfileConnectorTest::SetUp()

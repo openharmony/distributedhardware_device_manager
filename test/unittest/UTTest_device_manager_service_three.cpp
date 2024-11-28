@@ -72,9 +72,13 @@ void DeviceManagerServiceThreeTest::SetUpTestCase()
 
 void DeviceManagerServiceThreeTest::TearDownTestCase()
 {
+    DmDeviceManagerService::dmDeviceManagerService = nullptr;
     deviceManagerServiceMock_ = nullptr;
+    DmPermissionManager::dmPermissionManager = nullptr;
     permissionManagerMock_ = nullptr;
+    DmSoftbusListener::dmSoftbusListener = nullptr;
     softbusListenerMock_ = nullptr;
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = nullptr;
     deviceManagerServiceImplMock_ = nullptr;
 }
 

@@ -599,7 +599,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level0
 
     ProcessInfo processInfo;
     processInfo.pkgName = "pkgName";
-    if (DeviceManagerService::GetInstance().discoveryMgr_ == nullptr){
+    if (DeviceManagerService::GetInstance().discoveryMgr_ == nullptr) {
         DeviceManagerService::GetInstance().InitDMServiceListener();
     }
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);

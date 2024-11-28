@@ -52,6 +52,7 @@ public:
     MOCK_METHOD(int32_t, GetTrustedDeviceList, (std::vector<DmDeviceInfo> &));
     MOCK_METHOD(int32_t, GetLocalDeviceInfo, (DmDeviceInfo &));
     MOCK_METHOD(int32_t, SetLocalDeviceName, (const std::string &, const std::string &));
+    MOCK_METHOD(int32_t, GetDeviceScreenStatus, (const char *, int32_t));
 };
 }
 }

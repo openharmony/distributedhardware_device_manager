@@ -1836,7 +1836,7 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     deviceManagerServiceImpl_->HandleIdentAccountLogout(localUdid, localUserId, peerUdid, peerUserId);
 
     std::vector<uint32_t> foregroundUserIds;
-    std::vector<uint32_t> &backgroundUserIds;
+    std::vector<uint32_t> backgroundUserIds;
     std::string remoteUdid = "deviceId";
     deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
 
