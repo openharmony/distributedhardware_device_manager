@@ -770,7 +770,10 @@ int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &node
 int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo)
 {
     LOGI("Begin, osType : %{public}d", nodeInfo.osType);
-    (void)memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo));
+    if (memset_s(&devInfo, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != EOK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
+        return ERR_DM_FAILED;
+    }
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
         std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
