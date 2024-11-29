@@ -611,39 +611,73 @@ bool DiscoveryManager::CloseCommonDependencyObj()
 }
 #endif
 
-void DiscoveryManager::ClearDiscoveryCache(const std::string &pkgName)
+void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
 {
-    LOGI("PkgName %{public}s.", pkgName.c_str());
-    uint16_t subscribeId = 0;
+    LOGI("PkgName: %{public}s, userId: %{public}d", processInfo.pkgName.c_str(), processInfo.userId);
+    std::string pkgName = processInfo.pkgName + "#";
+    std::set<uint16_t> subscribeIdSet = ClearDiscoveryPkgName(pkgName);
+
+    CHECK_NULL_VOID(softbusListener_);
+    for (auto it : subscribeIdSet) {
+        std::string pkgNameTemp = (ComposeStr(ComposeStr(processInfo.pkgName, it), processInfo.userId));
+        softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgNameTemp);
+        softbusListener_->StopRefreshSoftbusLNN(it);
+    }
+
+    CHECK_NULL_VOID(timer_);
+    for (auto it : subscribeIdSet) {
+        std::string pkgNameTemp = (ComposeStr(ComposeStr(processInfo.pkgName, it), processInfo.userId));
+        timer_->DeleteTimer(pkgNameTemp);
+    }
+}
+
+std::set<uint16_t> DiscoveryManager::ClearDiscoveryPkgName(const std::string &pkgName)
+{
+    std::set<uint16_t> subscribeIdSet;
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-        if (pkgNameSet_.find(pkgName) != pkgNameSet_.end()) {
-            LOGI("Erase pkgname %{public}s from pkgNameSet.", pkgName.c_str());
-            pkgNameSet_.erase(pkgName);
+        for (auto it = pkgNameSet_.begin(); it != pkgNameSet_.end();) {
+            if ((*it).find(pkgName) != std::string::npos) {
+                LOGI("Erase pkgname %{public}s from pkgNameSet.", (*it).c_str());
+                it = pkgNameSet_.erase(it);
+            } else {
+                ++it;
+            }
         }
-        if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
-            LOGI("Erase pkgname %{public}s from pkgNameSet.", pkgName.c_str());
-            subscribeId = discoveryContextMap_[pkgName].subscribeId;
-            discoveryContextMap_.erase(pkgName);
+        for (auto it = discoveryContextMap_.begin(); it != discoveryContextMap_.end();) {
+            if (it->first.find(pkgName) != std::string::npos) {
+                LOGI("Erase pkgname %{public}s from discoveryContextMap_.", it->first.c_str());
+                subscribeIdSet.insert(it->second.subscribeId);
+                it = discoveryContextMap_.erase(it);
+            } else {
+                ++it;
+            }
         }
     }
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
-        if (capabilityMap_.find(pkgName) != capabilityMap_.end()) {
-            capabilityMap_.erase(pkgName);
+        for (auto it = capabilityMap_.begin(); it != capabilityMap_.end();) {
+            if (it->first.find(pkgName) != std::string::npos) {
+                LOGI("Erase pkgname %{public}s from capabilityMap_.", it->first.c_str());
+                it = capabilityMap_.erase(it);
+            } else {
+                ++it;
+            }
         }
     }
     {
         std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-        if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
-            pkgName2SubIdMap_.erase(pkgName);
+        for (auto it = pkgName2SubIdMap_.begin(); it != pkgName2SubIdMap_.end();) {
+            if (it->first.find(pkgName) != std::string::npos) {
+                LOGI("Erase pkgname %{public}s from pkgName2SubIdMap_.", it->first.c_str());
+                subscribeIdSet.insert(it->second);
+                it = pkgName2SubIdMap_.erase(it);
+            } else {
+                ++it;
+            }
         }
     }
-    CHECK_NULL_VOID(softbusListener_);
-    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
-    softbusListener_->StopRefreshSoftbusLNN(subscribeId);
-    CHECK_NULL_VOID(timer_);
-    timer_->DeleteTimer(pkgName);
+    return subscribeIdSet;
 }
 
 std::string DiscoveryManager::AddMultiUserIdentify(const std::string &pkgName)
