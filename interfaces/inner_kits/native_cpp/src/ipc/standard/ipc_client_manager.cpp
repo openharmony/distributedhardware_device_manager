@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <set>
+
 #include "ipc_client_manager.h"
 
 #include "device_manager_ipc_interface_code.h"
@@ -36,6 +38,7 @@ void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     LOGW("DmDeathRecipient : OnRemoteDied");
     (void)remote;
+    DeviceManagerNotify::GetInstance().OnRemoteDied();
 }
 
 int32_t IpcClientManager::ClientInit()
@@ -225,6 +228,13 @@ void IpcClientManager::SystemAbilityListener::OnAddSystemAbility(int32_t systemA
         for (auto iter : dmInitCallback) {
             DeviceManagerImpl::GetInstance().InitDeviceManager(iter.first, iter.second);
         }
+        std::map<DmCommonNotifyEvent, std::set<std::string>> callbackMap;
+        DeviceManagerNotify::GetInstance().GetCallBack(callbackMap);
+        if (callbackMap.size() == 0) {
+            LOGE("callbackMap is empty when ReInit");
+            return;
+        }
+        DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
     }
 }
 } // namespace DistributedHardware

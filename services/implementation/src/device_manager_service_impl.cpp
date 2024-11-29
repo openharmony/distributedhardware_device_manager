@@ -223,6 +223,9 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
     ProcessInfo processInfo;
     processInfo.pkgName = std::string(DM_PKG_NAME);
     processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
+    if (userIdAndBindLevel.empty() || userIdAndBindLevel.find(processInfo.userId) == userIdAndBindLevel.end()) {
+        userIdAndBindLevel[processInfo.userId] = INVALIED_TYPE;
+    }
     for (const auto &item : userIdAndBindLevel) {
         if (item.second == INVALIED_TYPE) {
             LOGI("The offline device is identical account bind type.");
@@ -986,6 +989,15 @@ std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUser
     GetDevUdid(localdeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localdeviceId);
     return DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(localUdid, localUserId);
+}
+
+int32_t DeviceManagerServiceImpl::SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList)
+{
+    CHECK_NULL_RETURN(deviceStateMgr_, ERR_DM_POINT_NULL);
+    for (auto item : deviceList) {
+        deviceStateMgr_->SaveOnlineDeviceInfo(item);
+    }
+    return DM_OK;
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

@@ -284,6 +284,7 @@ public:
     virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId) = 0;
     virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId) = 0;
+    virtual int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

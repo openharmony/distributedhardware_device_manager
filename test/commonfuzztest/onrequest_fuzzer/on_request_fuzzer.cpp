@@ -59,8 +59,7 @@ void OnRequestFuzzTest(const uint8_t* data, size_t size)
     }
 
     int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
-    std::random_device rd;
-    int operationCode = static_cast<GroupOperationCode>(rd() % 6);
+    int operationCode = *(reinterpret_cast<const int32_t*>(data));
     const char *reqParams = reinterpret_cast<const char*>(data);
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();

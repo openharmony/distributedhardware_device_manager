@@ -326,6 +326,20 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSi
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ExportAuthCode(authCode);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+
+    int32_t userId = 0;
+    std::string accountId;
+    std::string accountName;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
+
+    int32_t curUserId = 0;
+    int32_t preUserId = 1;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
+
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
 }
 } // namespace
 } // namespace DistributedHardware

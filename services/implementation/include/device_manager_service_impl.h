@@ -140,6 +140,7 @@ public:
     void HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap, int32_t currentUserId,
         int32_t beforeUserId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId);
+    int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

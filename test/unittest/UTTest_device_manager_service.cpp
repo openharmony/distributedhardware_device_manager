@@ -71,16 +71,25 @@ void DeviceManagerServiceTest::SetUpTestCase()
     DmAppManager::dmAppManager = appManagerMock_;
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = deviceManagerServiceImplMock_;
     DmSoftbusCache::dmSoftbusCache = softbusCacheMock_;
+    DmCrypto::dmCrypto = cryptoMock_;
 }
 
 void DeviceManagerServiceTest::TearDownTestCase()
 {
+    DmPermissionManager::dmPermissionManager = nullptr;
     permissionManagerMock_ = nullptr;
+    DmSoftbusListener::dmSoftbusListener = nullptr;
     softbusListenerMock_ = nullptr;
+    DmKVAdapterManager::dmKVAdapterManager = nullptr;
     kVAdapterManagerMock_ = nullptr;
+    DmAppManager::dmAppManager = nullptr;
     appManagerMock_ = nullptr;
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = nullptr;
     deviceManagerServiceImplMock_ = nullptr;
+    DmSoftbusCache::dmSoftbusCache = nullptr;
     softbusCacheMock_ = nullptr;
+    DmCrypto::dmCrypto = nullptr;
+    cryptoMock_ = nullptr;
 }
 
 namespace {

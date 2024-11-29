@@ -569,6 +569,12 @@ std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUser
     return {};
 }
 
+int32_t DeviceManagerServiceImpl::SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList)
+{
+    (void)deviceList;
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

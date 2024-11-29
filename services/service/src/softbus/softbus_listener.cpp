@@ -717,32 +717,6 @@ int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName,
                                             const std::string &localDisplayName)
 {
     LOGI("SoftbusListener Start SetLocalDeviceName!");
-#ifdef DEVICE_MANAGER_COMMON_FLAG
-    LOGI("device_manager_common is true!");
-    int32_t ret = 1;
-    if (!localDisplayName.empty()) {
-        ret = ::SetLocalDeviceName(DM_PKG_NAME, localDisplayName.c_str());
-    } else if (!localDeviceName.empty()) {
-        ret = ::SetLocalDeviceName(DM_PKG_NAME, localDeviceName.c_str());
-    } else {
-        LOGE("localDeviceName and localDisplayName is null!");
-    }
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SetLocalDeviceName error, failed ret: %{public}d", ret);
-        return ret;
-    }
-#else
-    LOGI("device_manager_common is false!");
-    if (localDisplayName.empty()) {
-        LOGE("Invalid parameter, localDisplayName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    int32_t ret = ::SetLocalDeviceName(DM_PKG_NAME, localDisplayName.c_str());
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]SetLocalDeviceName error, failed ret: %{public}d", ret);
-        return ret;
-    }
-#endif
     return DM_OK;
 }
 
@@ -1021,7 +995,10 @@ bool SoftbusListener::IsDmRadarHelperReady()
         LOGD("IsDmRadarHelperReady alReady.");
         return true;
     }
-    radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW);
+    radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW | RTLD_NOLOAD);
+    if (radarHandle_ == nullptr) {
+        radarHandle_ = dlopen(LIB_RADAR_NAME, RTLD_NOW);
+    }
     if (radarHandle_ == nullptr) {
         LOGE("load libdevicemanagerradar so failed.");
         return false;

@@ -39,6 +39,7 @@ void DeviceProfileConnectorSecondTest::SetUpTestCase()
 
 void DeviceProfileConnectorSecondTest::TearDownTestCase()
 {
+    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     distributedDeviceProfileClientMock_ = nullptr;
 }
 
@@ -161,6 +162,15 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testi
 {
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
     auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    EXPECT_TRUE(ret.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByDeviceIdAndUserId_201, testing::ext::TestSize.Level0)
+{
+    std::string deviceId = "deviceId";
+    int32_t userId = 123456;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    auto ret = DeviceProfileConnector::GetInstance().GetAclProfileByDeviceIdAndUserId(deviceId, userId);
     EXPECT_TRUE(ret.empty());
 }
 

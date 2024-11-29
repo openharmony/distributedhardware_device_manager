@@ -357,5 +357,13 @@ bool IsValueExist(const std::multimap<std::string, int32_t> unorderedmap, const 
     }
     return false;
 }
+
+bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent)
+{
+    if (dmCommonNotifyEvent > DmCommonNotifyEvent::MIN && dmCommonNotifyEvent < DmCommonNotifyEvent::MAX) {
+        return true;
+    }
+    return false;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

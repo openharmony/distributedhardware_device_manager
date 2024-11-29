@@ -99,8 +99,8 @@ private:
     int32_t ConvertUdidHashToAnoyDeviceId(const std::string &pkgName, const std::string &udidHash,
         std::string &anoyDeviceId);
 #endif
-    std::vector<ProcessInfo> GetWhiteListSAProcessInfo();
-    std::vector<ProcessInfo> GetNotifyProcessInfoByUserId(int32_t userId);
+    std::vector<ProcessInfo> GetWhiteListSAProcessInfo(DmCommonNotifyEvent dmCommonNotifyEvent);
+    std::vector<ProcessInfo> GetNotifyProcessInfoByUserId(int32_t userId, DmCommonNotifyEvent dmCommonNotifyEvent);
     ProcessInfo DealBindProcessInfo(const ProcessInfo &processInfo);
     void ProcessDeviceOnline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);

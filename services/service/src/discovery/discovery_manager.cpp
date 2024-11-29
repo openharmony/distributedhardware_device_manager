@@ -569,7 +569,10 @@ bool DiscoveryManager::IsCommonDependencyReady()
     if (isSoLoaded_ && dpConnector_ != nullptr && dpConnectorHandle_ != nullptr) {
         return true;
     }
-    dpConnectorHandle_ = dlopen(LIB_DM_COMDENPENDENCY_NAME, RTLD_NOW | RTLD_NODELETE);
+    dpConnectorHandle_ = dlopen(LIB_DM_COMDENPENDENCY_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (dpConnectorHandle_ == nullptr) {
+        dpConnectorHandle_ = dlopen(LIB_DM_COMDENPENDENCY_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
     if (dpConnectorHandle_ == nullptr) {
         LOGE("load libdevicemanagerdependency so failed, errMsg: %{public}s.", dlerror());
         return false;

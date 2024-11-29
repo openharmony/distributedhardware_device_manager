@@ -18,6 +18,7 @@
 #include "device_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_log.h"
 
 namespace OHOS {
@@ -258,8 +259,8 @@ void DeviceManagerNotify::RegisterPinHolderCallback(const std::string &pkgName,
 void DeviceManagerNotify::OnRemoteDied()
 {
     LOGW("DeviceManagerNotify::OnRemoteDied");
-    std::lock_guard<std::mutex> autoLock(lock_);
-    for (auto iter : dmInitCallback_) {
+    std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback = GetDmInitCallback();
+    for (auto iter : dmInitCallback) {
         LOGI("DeviceManagerNotify::OnRemoteDied, pkgName:%{public}s", iter.first.c_str());
         if (iter.second != nullptr) {
             iter.second->OnRemoteDied();
@@ -1201,6 +1202,45 @@ std::shared_ptr<DiscoveryCallback> DeviceManagerNotify::GetDiscoveryCallback(con
         }
     }
     return nullptr;
+}
+
+void DeviceManagerNotify::GetCallBack(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap)
+{
+    std::lock_guard<std::mutex> autoLock(lock_);
+    std::set<std::string> statePkgnameSet;
+    for (auto it : deviceStateCallback_) {
+        statePkgnameSet.insert(it.first);
+    }
+    for (auto it : deviceStatusCallback_) {
+        statePkgnameSet.insert(it.first);
+    }
+    if (statePkgnameSet.size() > 0) {
+        callbackMap[DmCommonNotifyEvent::REG_DEVICE_STATE] = statePkgnameSet;
+    }
+
+    std::set<std::string> trustChangePkgnameSet;
+    for (auto it : devTrustChangeCallback_) {
+        trustChangePkgnameSet.insert(it.first);
+    }
+    if (trustChangePkgnameSet.size() > 0) {
+        callbackMap[DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE] = trustChangePkgnameSet;
+    }
+
+    std::set<std::string> screenStatusPkgnameSet;
+    for (auto it : deviceScreenStatusCallback_) {
+        screenStatusPkgnameSet.insert(it.first);
+    }
+    if (screenStatusPkgnameSet.size() > 0) {
+        callbackMap[DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE] = screenStatusPkgnameSet;
+    }
+
+    std::set<std::string> authStatusPkgnameSet;
+    for (auto it : credentialAuthStatusCallback_) {
+        authStatusPkgnameSet.insert(it.first);
+    }
+    if (authStatusPkgnameSet.size() > 0) {
+        callbackMap[DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY] = authStatusPkgnameSet;
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

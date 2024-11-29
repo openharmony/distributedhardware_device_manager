@@ -74,6 +74,7 @@ namespace {
     const std::string USERID_CHECKSUM_NETWORKID_KEY = "networkId";
     const std::string USERID_CHECKSUM_DISCOVER_TYPE_KEY = "discoverType";
     constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
+    const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
 }
 DeviceManagerService::~DeviceManagerService()
 {
@@ -96,6 +97,11 @@ int32_t DeviceManagerService::InitSoftbusListener()
         softbusListener_ = std::make_shared<SoftbusListener>();
     }
     SoftbusCache::GetInstance().UpdateDeviceInfoCache();
+    std::vector<DmDeviceInfo> onlineDeviceList;
+    SoftbusCache::GetInstance().GetDeviceInfoFromCache(onlineDeviceList);
+    if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
+        dmServiceImpl_->SaveOnlineDeviceInfo(onlineDeviceList);
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     SubscribePublishCommonEvent();
@@ -264,6 +270,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
             DmDeviceInfo tempInfo;
             if (memcpy_s(tempInfo.networkId, DM_MAX_DEVICE_ID_LEN, item.networkId, sizeof(item.networkId)) != 0) {
                 LOGE("get networkId: %{public}s failed", GetAnonyString(item.networkId).c_str());
+                continue;
             }
             deviceList.push_back(tempInfo);
         }
@@ -353,6 +360,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         DmDeviceInfo tempInfo;
         if (memcpy_s(tempInfo.networkId, DM_MAX_DEVICE_ID_LEN, info.networkId, sizeof(info.networkId)) != 0) {
             LOGE("get networkId: %{public}s failed", GetAnonyString(info.networkId).c_str());
+            return ERR_DM_FAILED;
         }
         info = tempInfo;
         return DM_OK;
@@ -381,6 +389,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 #endif
     if (memcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, localDeviceId_.c_str(), localDeviceId_.length()) != 0) {
         LOGE("get deviceId: %{public}s failed", GetAnonyString(localDeviceId_).c_str());
+        return ERR_DM_FAILED;
     }
     return DM_OK;
 }
@@ -879,7 +888,10 @@ bool DeviceManagerService::IsDMServiceImplReady()
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
     }
-    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (so_handle == nullptr) {
+        so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
     if (so_handle == nullptr) {
         LOGE("load libdevicemanagerserviceimpl so failed, errMsg: %{public}s.", dlerror());
         return false;
@@ -897,7 +909,6 @@ bool DeviceManagerService::IsDMServiceImplReady()
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
     if (dmServiceImpl_->Initialize(listener_) != DM_OK) {
-        dlclose(so_handle);
         dmServiceImpl_ = nullptr;
         isImplsoLoaded_ = false;
         return false;
@@ -962,14 +973,20 @@ void DeviceManagerService::LoadHardwareFwkService()
 {
     std::vector<DmDeviceInfo> deviceList;
     CHECK_NULL_VOID(softbusListener_);
-    int32_t ret = softbusListener_->GetTrustedDeviceList(deviceList);
+    int32_t ret = GetTrustedDeviceList(DHARD_WARE_PKG_NAME, deviceList);
     if (ret != DM_OK) {
         LOGE("LoadHardwareFwkService failed, get trusted devicelist failed.");
         return;
     }
-    if (deviceList.size() > 0) {
-        dmServiceImpl_->LoadHardwareFwkService();
+    if (deviceList.empty()) {
+        LOGI("no trusted device.");
+        return;
     }
+    if (!IsDMServiceImplReady()) {
+        LOGE("LoadHardwareFwkService failed, instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->LoadHardwareFwkService();
 }
 
 int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
@@ -1129,7 +1146,10 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
         return true;
     }
 
-    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE);
+    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (so_handle == nullptr) {
+        so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
     if (so_handle == nullptr) {
         LOGE("load dm service adapter so failed.");
         return false;
@@ -1144,7 +1164,6 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
 
     dmServiceImplExt_ = std::shared_ptr<IDMServiceImplExt>(func());
     if (dmServiceImplExt_->Initialize(listener_) != DM_OK) {
-        dlclose(so_handle);
         dmServiceImplExt_ = nullptr;
         isAdapterSoLoaded_ = false;
         LOGE("dm service adapter impl ext init failed.");
@@ -1660,6 +1679,7 @@ void DeviceManagerService::HandleUserSwitched(int32_t curUserId, int32_t preUser
             peerUdids.push_back(item.first);
         }
     }
+    dmServiceImpl_->HandleUserSwitched(preUserDeviceMap, curUserId, preUserId);
     if (!peerUdids.empty()) {
         std::vector<int32_t> foregroundUserVec;
         int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
@@ -1673,7 +1693,6 @@ void DeviceManagerService::HandleUserSwitched(int32_t curUserId, int32_t preUser
             SendUserIdsBroadCast(peerUdids, foregroundUserVec, backgroundUserVec, true);
         }
     }
-    dmServiceImpl_->HandleUserSwitched(preUserDeviceMap, curUserId, preUserId);
 }
 
 void DeviceManagerService::HandleUserRemoved(int32_t removedUserId)
@@ -1910,6 +1929,7 @@ void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInf
         }
         if (memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udidHashTemp.c_str(), udidHashTemp.length()) != 0) {
             LOGE("get deviceId: %{public}s failed", GetAnonyString(udidHashTemp).c_str());
+            return;
         }
     }
 }
@@ -2061,6 +2081,15 @@ int32_t DeviceManagerService::ParseCheckSumMsg(const std::string &msg, std::stri
 void DeviceManagerService::ProcessCheckSumByWifi(std::string networkId, std::vector<int32_t> foregroundUserIds,
     std::vector<int32_t> backgroundUserIds)
 {
+    if (localNetWorkId_ == "") {
+        DmDeviceInfo deviceInfo;
+        SoftbusCache::GetInstance().GetLocalDeviceInfo(deviceInfo);
+        localNetWorkId_ = std::string(deviceInfo.networkId);
+    }
+    if (localNetWorkId_ >= networkId) {
+        LOGI("Local networkid big than remote, no need begin req");
+        return;
+    }
     // use connection to exchange foreground/background userid
     LOGI("Try open softbus session to exchange foreground/background userid");
     std::vector<uint32_t> foregroundUserIdsUInt;

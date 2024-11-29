@@ -55,7 +55,7 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     if (strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, "111", DM_MAX_DEVICE_CAPABILITY_LEN) != 0) {
         return;
     }
-    std::string extra(reinterpret_cast<const char*>(data), size);
+    std::string extra = "extraInfo";
 
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
     bundleName = "111";
