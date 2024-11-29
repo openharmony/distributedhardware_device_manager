@@ -177,7 +177,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     jsonObj[TAG_PIN_TYPE] = pinType;
     jsonObj[TAG_PAYLOAD] = payload;
     pinType_ = pinType;
-    std::string message = jsonObj.dump();
+    std::string message = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     LOGI("DestroyPinHolder, message type is: %{public}d, pin type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER,
         pinType);
     ret = session_->SendData(sessionId_, message);
@@ -210,7 +210,7 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
     jsonObj[TAG_PAYLOAD] = payload_;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER;
     jsonObj[TAG_DM_VERSION] = "";
-    std::string message = jsonObj.dump();
+    std::string message = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     LOGI("CreateGeneratePinHolderMsg, message type is: %{public}d, pin type is: %{public}d.",
         MSG_TYPE_CREATE_PIN_HOLDER, pinType_);
     int32_t ret = session_->SendData(sessionId_, message);
@@ -288,12 +288,12 @@ void PinHolder::ProcessCreateMsg(const std::string &message)
         jsonContent[TAG_PIN_TYPE] = pinType;
         jsonContent[TAG_PAYLOAD] = payload;
         jsonContent[TAG_REMOTE_DEVICE_ID] = remoteDeviceId_;
-        std::string content = jsonContent.dump();
+        std::string content = jsonContent.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::CREATE, DM_OK, content);
     }
     jsonObj[TAG_DM_VERSION] = "";
 
-    std::string msg = jsonObj.dump();
+    std::string msg = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     LOGI("ProcessCreateMsg, message type is: %{public}d.", MSG_TYPE_CREATE_PIN_HOLDER_RESP);
     int32_t ret = session_->SendData(sessionId_, msg);
     if (ret != DM_OK) {
@@ -368,13 +368,13 @@ void PinHolder::ProcessDestroyMsg(const std::string &message)
             nlohmann::json jsonContent;
             jsonContent[TAG_PIN_TYPE] = pinType;
             jsonContent[TAG_PAYLOAD] = payload;
-            std::string content = jsonContent.dump();
+            std::string content = jsonContent.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
             listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY, DM_OK, content);
             isDestroy_.store(true);
         }
     }
 
-    std::string msg = jsonObj.dump();
+    std::string msg = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     LOGI("ProcessDestroyMsg, message type is: %{public}d.", MSG_TYPE_DESTROY_PIN_HOLDER_RESP);
     int32_t ret = session_->SendData(sessionId_, msg);
     if (ret != DM_OK) {
@@ -392,13 +392,13 @@ void PinHolder::CloseSession(const std::string &name)
     }
     nlohmann::json jsonObj;
     jsonObj[DM_CONNECTION_DISCONNECTED] = true;
-    std::string payload = jsonObj.dump();
+    std::string payload = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     if (listener_ != nullptr && !isDestroy_.load()) {
         listener_->OnPinHolderDestroy(processInfo_, pinType_, payload);
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType_;
         jsonContent[TAG_PAYLOAD] = payload;
-        std::string content = jsonContent.dump();
+        std::string content = jsonContent.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY, ERR_DM_TIME_OUT, content);
         isDestroy_.store(true);
     }
@@ -455,7 +455,7 @@ void PinHolder::OnDataReceived(int32_t sessionId, std::string message)
         LOGE("another session opened, close this sessionId: %{public}d.", sessionId);
         nlohmann::json jsonObj;
         jsonObj[TAG_MSG_TYPE] = MSG_TYPE_PIN_CLOSE_SESSION;
-        std::string msg = jsonObj.dump();
+        std::string msg = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
         int32_t ret = session_->SendData(sessionId, msg);
         if (ret != DM_OK) {
             LOGE("[SOFTBUS] SendBytes failed. ret: %{public}d.", ret);
@@ -557,13 +557,13 @@ void PinHolder::OnSessionClosed(int32_t sessionId)
     isRemoteSupported_ = false;
     nlohmann::json jsonObj;
     jsonObj[DM_CONNECTION_DISCONNECTED] = true;
-    std::string payload = jsonObj.dump();
+    std::string payload = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     if (listener_ != nullptr && !isDestroy_.load()) {
         listener_->OnPinHolderDestroy(processInfo_, pinType_, payload);
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType_;
         jsonContent[TAG_PAYLOAD] = payload;
-        std::string content = jsonContent.dump();
+        std::string content = jsonContent.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
         if (destroyState_ == STATE_UNKNOW) {
             listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY, sessionId, content);
         } else if (destroyState_ == STATE_REMOTE_WRONG) {
@@ -621,7 +621,7 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE;
     jsonObj[TAG_PIN_TYPE] = pinType;
-    std::string message = jsonObj.dump();
+    std::string message = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     LOGI("NotifyPinHolderEvent, message type is: %{public}d, pin type is: %{public}d.",
         MSG_TYPE_PIN_HOLDER_CHANGE, pinType);
     int32_t ret = session_->SendData(sessionId_, message);
@@ -658,7 +658,7 @@ void PinHolder::ProcessChangeMsg(const std::string &message)
         jsonObj[TAG_REPLY] = REPLY_SUCCESS;
         nlohmann::json jsonContent;
         jsonContent[TAG_PIN_TYPE] = pinType;
-        std::string content = jsonContent.dump();
+        std::string content = jsonContent.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::PIN_TYPE_CHANGE, DM_OK, content);
         timer_->DeleteAll();
         timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
@@ -667,7 +667,7 @@ void PinHolder::ProcessChangeMsg(const std::string &message)
             });
     }
 
-    std::string msg = jsonObj.dump();
+    std::string msg = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     LOGI("ProcessChangeMsg, message type is: %{public}d.", MSG_TYPE_PIN_HOLDER_CHANGE_RESP);
     int32_t ret = session_->SendData(sessionId_, msg);
     if (ret != DM_OK) {

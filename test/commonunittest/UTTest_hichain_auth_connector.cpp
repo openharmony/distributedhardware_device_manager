@@ -314,7 +314,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_002, testing::ext::TestSize.L
     nlohmann::json jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
-    std::string localUdid = jsonObject.dump();
+    std::string localUdid = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t osAccountId = 1245;
     bool ret = hiChain_->QueryCredential(localUdid, osAccountId);
     EXPECT_EQ(ret, false);
@@ -325,7 +325,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_003, testing::ext::TestSize.L
     nlohmann::json jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
-    std::string localUdid = jsonObject.dump();
+    std::string localUdid = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     g_processCredentialResultCode = HC_SUCCESS;
     g_processCredentialReturnDataStr = "{invalid_json}";
     int32_t osAccountId = 1245;
@@ -338,7 +338,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_004, testing::ext::TestSize.L
     nlohmann::json jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
-    std::string localUdid = jsonObject.dump();
+    std::string localUdid = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     g_processCredentialResultCode = HC_SUCCESS;
     g_processCredentialReturnDataStr = R"({"result": "not_an_int", "publicKey": "key"})";
     int32_t osAccountId = 1245;
@@ -351,7 +351,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_005, testing::ext::TestSize.L
     nlohmann::json jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
-    std::string localUdid = jsonObject.dump();
+    std::string localUdid = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     g_processCredentialResultCode = HC_SUCCESS;
     g_processCredentialReturnDataStr = R"({"result": -1, "publicKey": "key"})";
     int32_t osAccountId = 1245;
@@ -364,7 +364,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_006, testing::ext::TestSize.L
     nlohmann::json jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
-    std::string localUdid = jsonObject.dump();
+    std::string localUdid = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     g_processCredentialResultCode = HC_SUCCESS;
     g_processCredentialReturnDataStr = R"({"result": 1, "publicKey": 0})";
     int32_t osAccountId = 1245;
@@ -377,7 +377,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_007, testing::ext::TestSize.L
     nlohmann::json jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
-    std::string localUdid = jsonObject.dump();
+    std::string localUdid = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     g_processCredentialResultCode = HC_SUCCESS;
     g_processCredentialReturnDataStr = R"({"result": 1, "publicKey": "string"})";
     int32_t osAccountId = 1245;
@@ -390,7 +390,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_008, testing::ext::TestSize.L
     nlohmann::json jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
-    std::string localUdid = jsonObject.dump();
+    std::string localUdid = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     g_processCredentialResultCode = HC_SUCCESS;
     g_processCredentialReturnDataStr = R"({"result": 2, "publicKey": "string"})";
     int32_t osAccountId = 1245;

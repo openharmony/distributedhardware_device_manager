@@ -184,7 +184,7 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
         for (const auto &it : paramMap) {
             jsonObj[it.first] = it.second;
         }
-        jsonStr = jsonObj.dump();
+        jsonStr = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     }
     return jsonStr;
 }

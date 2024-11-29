@@ -108,7 +108,7 @@ HWTEST_F(DmAuthManagerTest, OnDataReceived_007, testing::ext::TestSize.Level0)
     int32_t sessionId = 0;
     nlohmann::json jsonObject;
     jsonObject[TAG_MSG_TYPE] = 200;
-    std::string message = jsonObject.dump();
+    std::string message = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     authManager_->OnDataReceived(sessionId, message);
     authManager_->authRequestState_ = nullptr;
     authManager_->authResponseState_ = nullptr;
@@ -1322,7 +1322,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_002, testing::ext::TestSize.Level0)
 {
     nlohmann::json jsonObject;
     jsonObject["targetPkgName"] = 1234;
-    std::string extra = jsonObject.dump();
+    std::string extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1335,7 +1335,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_003, testing::ext::TestSize.Level0)
     nlohmann::json jsonObject;
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = 1234;
-    std::string extra = jsonObject.dump();
+    std::string extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1349,7 +1349,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_004, testing::ext::TestSize.Level0)
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = 1234;
-    std::string extra = jsonObject.dump();
+    std::string extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1364,7 +1364,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_005, testing::ext::TestSize.Level0)
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = "1234";
     jsonObject["appThumbnail"] = 1234;
-    std::string extra = jsonObject.dump();
+    std::string extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1380,7 +1380,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_006, testing::ext::TestSize.Level0)
     jsonObject["customDescription"] = "1234";
     jsonObject["appThumbnail"] = "1234";
     jsonObject["tokenId"] = "1234";
-    std::string extra = jsonObject.dump();
+    std::string extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1397,7 +1397,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_007, testing::ext::TestSize.Level0)
     jsonObject["appThumbnail"] = "1234";
     jsonObject["tokenId"] = 1234;
     jsonObject["bindLevel"] = "1234";
-    std::string extra = jsonObject.dump();
+    std::string extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1414,7 +1414,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_008, testing::ext::TestSize.Level0)
     jsonObject["appThumbnail"] = "1234";
     jsonObject["tokenId"] = 1234;
     jsonObject["bindLevel"] = 1234;
-    std::string extra = jsonObject.dump();
+    std::string extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1508,7 +1508,8 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
 
     nlohmann::json jsonPeerGroupIdObj;
     jsonPeerGroupIdObj["groupId"] = "123456";
-    authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
+    authManager_->authResponseContext_->accountGroupIdHash =
+        jsonPeerGroupIdObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();

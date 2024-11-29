@@ -112,7 +112,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_002, testing::ext::TestSize.L
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     nlohmann::json jsonObject;
     jsonObject["userId"] = 123456789;
-    std::string reqJsonStr = jsonObject.dump();
+    std::string reqJsonStr = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t ret = minHiChain->CreateGroup(reqJsonStr);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -122,7 +122,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_003, testing::ext::TestSize.L
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     nlohmann::json jsonObject;
     jsonObject["userId"] = "123456789";
-    std::string reqJsonStr = jsonObject.dump();
+    std::string reqJsonStr = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t ret = minHiChain->CreateGroup(reqJsonStr);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -132,7 +132,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, RequestCredential_001, testing::ext::Test
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     nlohmann::json jsonObject;
     jsonObject["userId"] = "123456789";
-    std::string returnJsonStr = jsonObject.dump();
+    std::string returnJsonStr = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t ret = minHiChain->RequestCredential(returnJsonStr);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -169,7 +169,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestS
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     nlohmann::json jsonObject;
     jsonObject["userId"] = 123456789;
-    std::string reqJsonStr = jsonObject.dump();
+    std::string reqJsonStr = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     std::string returnJsonStr;
     int32_t ret = minHiChain->ImportCredential(reqJsonStr, returnJsonStr);
     EXPECT_EQ(ret, ERR_DM_HICHAIN_REGISTER_CALLBACK);

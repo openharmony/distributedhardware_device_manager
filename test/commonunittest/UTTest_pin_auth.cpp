@@ -73,7 +73,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_002, testing::ext::TestSize.Level0)
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
     nlohmann::json jsonObject;
     jsonObject[PIN_TOKEN] = 123456;
-    std::string authToken = jsonObject.dump();
+    std::string authToken = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t ret = pinAuth->ShowAuthInfo(authToken, authManager);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -89,7 +89,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_003, testing::ext::TestSize.Level0)
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
     nlohmann::json jsonObject;
     jsonObject[PIN_CODE_KEY] = 123456;
-    std::string authToken = jsonObject.dump();
+    std::string authToken = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t ret = pinAuth->ShowAuthInfo(authToken, nullptr);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -105,7 +105,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_004, testing::ext::TestSize.Level0)
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
     nlohmann::json jsonObject;
     jsonObject[PIN_CODE_KEY] = 123456;
-    std::string authToken = jsonObject.dump();
+    std::string authToken = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     int32_t ret = pinAuth->ShowAuthInfo(authToken, authManager);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }

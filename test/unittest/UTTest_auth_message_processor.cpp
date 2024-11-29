@@ -132,7 +132,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->cryptoAdapter_ = nullptr;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
-    std::string str1 = jsonObj.dump();
+    std::string str1 = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
 
@@ -145,7 +145,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     jsonObject[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
     jsonObject[TAG_LOCAL_DEVICE_ID] = authMessageProcessor->authResponseContext_->localDeviceId;
     jsonObject[TAG_HOST] = "";
-    std::string str2 = jsonObject.dump();
+    std::string str2 = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     ASSERT_NE(str1, str2);
 }
 
@@ -171,8 +171,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateSyncGroupMessage_001, testing::ext::Tes
     jsona[TAG_DEVICE_ID] = authMessageProcessor->authRequestContext_->deviceId;
     jsona[TAG_GROUPIDS] = authMessageProcessor->authRequestContext_->syncGroupList;
     authMessageProcessor->CreateSyncGroupMessage(jsonObj);
-    std::string str1 = jsona.dump();
-    std::string str2 = jsonObj.dump();
+    std::string str1 = jsona.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str2 = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     ASSERT_EQ(str1, str2);
 }
 
@@ -196,7 +196,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
     authMessageProcessor->authResponseContext_->token = "11";
     nlohmann::json jsonb;
     jsonb[TAG_GROUP_ID] = "123456";
-    authMessageProcessor->authResponseContext_->groupId = jsonb.dump();
+    authMessageProcessor->authResponseContext_->groupId =
+        jsonb.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     authMessageProcessor->authResponseContext_->authToken = "123456";
     authMessageProcessor->authResponseContext_->networkId = "11112222";
     authMessageProcessor->authResponseContext_->requestId = 222222;
@@ -210,8 +211,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
     jsona[TAG_GROUP_ID] = "123456";
     jsona[TAG_GROUP_NAME] = authMessageProcessor->authResponseContext_->groupName;
     authMessageProcessor->CreateResponseAuthMessage(jsonObj);
-    std::string str1 = jsona.dump();
-    std::string str2 = jsonObj.dump();
+    std::string str1 = jsona.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str2 = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     ASSERT_EQ(str1, str2);
 }
 
@@ -234,8 +235,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseFinishMessage_001, testing::ext
     jsona[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
     jsona[TAG_AUTH_FINISH] = authMessageProcessor->authResponseContext_->isFinish;
     authMessageProcessor->CreateResponseFinishMessage(jsonObj);
-    std::string str1 = jsona.dump();
-    std::string str2 = jsonObj.dump();
+    std::string str1 = jsona.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str2 = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     ASSERT_EQ(str1, str2);
 }
 

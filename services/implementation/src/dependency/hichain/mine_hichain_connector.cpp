@@ -135,7 +135,7 @@ int32_t MineHiChainConnector::DeleteCredentialAndGroup(void)
 {
     nlohmann::json jsonObj;
     jsonObj[FIELD_IS_DELETE_ALL] = true;
-    std::string params = jsonObj.dump();
+    std::string params = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
 #if (defined(MINE_HARMONY))
     char *returnInfo = nullptr;
     int32_t retValue = g_deviceGroupManager->processCredential(DELETE_SELF_CREDENTIAL, params.c_str(), &returnInfo);
@@ -173,7 +173,7 @@ int32_t MineHiChainConnector::CreateGroup(const std::string &reqJsonStr)
     jsonObj[FIELD_GROUP_NAME] = DEVICE_MANAGER_GROUPNAME;
     jsonObj[FIELD_DEVICE_ID] = std::string(deviceUdid);
     jsonObj[FIELD_GROUP_TYPE] = IDENTICAL_ACCOUNT_GROUP;
-    std::string createParams = jsonObj.dump();
+    std::string createParams = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
     retValue = g_deviceGroupManager->createGroup(DEFAULT_OS_ACCOUNT, requestId, DM_PKG_NAME, createParams.c_str());
     if (retValue != HC_SUCCESS) {
         LOGE("failed to create group with ret:%{public}d.", retValue);
