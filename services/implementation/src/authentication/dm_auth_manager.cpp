@@ -2165,11 +2165,6 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
     GetBinderInfo();
-    authResponseContext_->isIdenticalAccount = false;
-    if (authResponseContext_->localAccountId == authResponseContext_->remoteAccountId &&
-        authResponseContext_->localAccountId != "ohosAnonymousUid") {
-        authResponseContext_->isIdenticalAccount = true;
-    }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->deviceId = authResponseContext_->localDeviceId;
@@ -2182,6 +2177,13 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
         !importAuthCode_.empty()) {
         authResponseContext_->importAuthCode = Crypto::Sha256(importAuthCode_);
     }
+
+    authResponseContext_->isIdenticalAccount = false;
+    if (authResponseContext_->localAccountId == authResponseContext_->remoteAccountId &&
+        authResponseContext_->localAccountId != "ohosAnonymousUid" && authResponseContext_->authed) {
+        authResponseContext_->isIdenticalAccount = true;
+    }
+
     authResponseContext_->isOnline = softbusConnector_->CheckIsOnline(remoteDeviceId_);
     authResponseContext_->haveCredential =
         hiChainAuthConnector_->QueryCredential(authResponseContext_->deviceId, authResponseContext_->localUserId);
