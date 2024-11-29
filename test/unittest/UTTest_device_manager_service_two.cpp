@@ -672,7 +672,8 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ex
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
-    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)))
+        .WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
     msgJsonObj["discoverType"] = 1;
