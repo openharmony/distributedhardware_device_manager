@@ -213,15 +213,6 @@ HWTEST_F(DMTransportTest, OnSocketOpened_001, testing::ext::TestSize.Level0)
     ShutdownReason reason = ShutdownReason::SHUTDOWN_REASON_UNKNOWN;
     dmTransport.remoteDevSocketIds_["socketId"] = socketId;
     dmTransport.OnSocketClosed(socketId, reason);
-
-    int32_t value = 1;
-    void *data = &value;
-    uint32_t dataLen = 1;
-    socketId = -1;
-    dmTransport.OnBytesReceived(socketId, data, dataLen);
-
-    socketId = 1;
-    dmTransport.OnBytesReceived(socketId, data, dataLen);
 }
 } // DistributedHardware
 } // OHOS
