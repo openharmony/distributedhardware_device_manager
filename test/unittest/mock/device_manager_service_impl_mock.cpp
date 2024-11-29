@@ -53,7 +53,7 @@ std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindLevel
 
 std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(std::string pkgname)
 {
-    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->GetAppTrustDeviceIdList(pkgname);
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->GetAppTrustDeviceIdList(pkgname);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
