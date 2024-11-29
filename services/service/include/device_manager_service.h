@@ -203,6 +203,7 @@ public:
     void RemoveNotifyRecord(const ProcessInfo &processInfo);
     int32_t RegDevStateCallbackToService(const std::string &pkgName);
     int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
+
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
@@ -287,6 +288,7 @@ private:
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
+    std::string localNetWorkId_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

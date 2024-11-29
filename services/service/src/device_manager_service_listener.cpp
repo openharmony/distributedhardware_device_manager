@@ -19,6 +19,7 @@
 
 #include "app_manager.h"
 #include "device_manager_ipc_interface_code.h"
+#include "device_manager_service_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
@@ -118,7 +119,8 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &p
     const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo)
 {
     LOGI("In");
-    std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId);
+    std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId,
+        DmCommonNotifyEvent::REG_DEVICE_STATE);
     switch (static_cast<int32_t>(state)) {
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_ONLINE):
             ProcessDeviceOnline(processInfoVec, processInfo, state, info, deviceBasicInfo);
@@ -139,7 +141,7 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
     const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo)
 {
     LOGI("In");
-    std::vector<ProcessInfo> processInfoVec = GetWhiteListSAProcessInfo();
+    std::vector<ProcessInfo> processInfoVec = GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_STATE);
     ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
     processInfoVec.push_back(bindProcessInfo);
     switch (static_cast<int32_t>(state)) {
@@ -452,7 +454,8 @@ void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &udid, 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     userId = MultipleUserConnector::GetFirstForegroundUserId();
 #endif
-    std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(userId);
+    std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(userId,
+        DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE);
     for (const auto &item : processInfoVec) {
         pReq->SetPkgName(item.pkgName);
         pReq->SetUdid(udid);
@@ -494,7 +497,7 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const ProcessInfo &
         userId = MultipleUserConnector::GetFirstForegroundUserId();
 #endif
         std::vector<ProcessInfo> processInfoVec =
-            GetNotifyProcessInfoByUserId(userId);
+            GetNotifyProcessInfoByUserId(userId, DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE);
         for (const auto &item : processInfoVec) {
             SetDeviceScreenInfo(pReq, item, devInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_SCREEN_STATE_NOTIFY, pReq, pRsp);
@@ -502,16 +505,13 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const ProcessInfo &
     } else {
         std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-        std::unordered_set<std::string> notifyPkgnames = PermissionManager::GetInstance().GetWhiteListSystemSA();
-        for (const auto &item : notifyPkgnames) {
-            ProcessInfo processInfo;
-            processInfo.pkgName = item;
-            processInfo.userId = 0;
-            SetDeviceScreenInfo(pReq, processInfo, devInfo);
+        std::vector<ProcessInfo> processInfoVec =
+            GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE);
+        processInfoVec.push_back(processInfo);
+        for (const auto &item : processInfoVec) {
+            SetDeviceScreenInfo(pReq, item, devInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_SCREEN_STATE_NOTIFY, pReq, pRsp);
         }
-        SetDeviceScreenInfo(pReq, processInfo, devInfo);
-        ipcServerListener_.SendRequest(SERVER_DEVICE_SCREEN_STATE_NOTIFY, pReq, pRsp);
     }
 }
 
@@ -539,7 +539,7 @@ void DeviceManagerServiceListener::OnCredentialAuthStatus(const ProcessInfo &pro
     userId = MultipleUserConnector::GetFirstForegroundUserId();
 #endif
     std::vector<ProcessInfo> processInfoVec =
-        GetNotifyProcessInfoByUserId(userId);
+        GetNotifyProcessInfoByUserId(userId, DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY);
     for (const auto &item : processInfoVec) {
         std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq = std::make_shared<IpcNotifyCredentialAuthStatusReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
@@ -601,29 +601,60 @@ void DeviceManagerServiceListener::OnSinkBindResult(const ProcessInfo &processIn
     ipcServerListener_.SendRequest(SINK_BIND_TARGET_RESULT, pReq, pRsp);
 }
 
-std::vector<ProcessInfo> DeviceManagerServiceListener::GetWhiteListSAProcessInfo()
+std::vector<ProcessInfo> DeviceManagerServiceListener::GetWhiteListSAProcessInfo(
+    DmCommonNotifyEvent dmCommonNotifyEvent)
 {
+    if (!IsDmCommonNotifyEventValid(dmCommonNotifyEvent)) {
+        LOGE("Invalid dmCommonNotifyEvent: %{public}d.", dmCommonNotifyEvent);
+        return {};
+    }
+    std::set<ProcessInfo> notifyProcessInfos;
+    DeviceManagerServiceNotify::GetInstance().GetCallBack(dmCommonNotifyEvent, notifyProcessInfos);
+    if (notifyProcessInfos.size() == 0) {
+        LOGE("callback not exist dmCommonNotifyEvent: %{public}d", dmCommonNotifyEvent);
+        return {};
+    }
     std::unordered_set<std::string> notifyPkgnames = PermissionManager::GetInstance().GetWhiteListSystemSA();
     std::vector<ProcessInfo> processInfos;
     for (const auto &it : notifyPkgnames) {
         ProcessInfo processInfo;
         processInfo.pkgName = it;
         processInfo.userId = 0;
+        if (notifyProcessInfos.find(processInfo) == notifyProcessInfos.end()) {
+            continue;
+        }
         processInfos.push_back(processInfo);
     }
     return processInfos;
 }
 
-std::vector<ProcessInfo> DeviceManagerServiceListener::GetNotifyProcessInfoByUserId(int32_t userId)
+std::vector<ProcessInfo> DeviceManagerServiceListener::GetNotifyProcessInfoByUserId(int32_t userId,
+    DmCommonNotifyEvent dmCommonNotifyEvent)
 {
+    if (!IsDmCommonNotifyEventValid(dmCommonNotifyEvent)) {
+        LOGE("Invalid dmCommonNotifyEvent: %{public}d.", dmCommonNotifyEvent);
+        return {};
+    }
+    std::set<ProcessInfo> notifyProcessInfos;
+    DeviceManagerServiceNotify::GetInstance().GetCallBack(dmCommonNotifyEvent, notifyProcessInfos);
+    if (notifyProcessInfos.size() == 0) {
+        LOGE("callback not exist dmCommonNotifyEvent: %{public}d", dmCommonNotifyEvent);
+        return {};
+    }
     std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
     std::set<std::string> systemSA = ipcServerListener_.GetSystemSA();
     std::vector<ProcessInfo> processInfosTemp;
     for (auto item : processInfos) {
         if (systemSA.find(item.pkgName) != systemSA.end()) {
             item.userId = 0;
+            if (notifyProcessInfos.find(item) == notifyProcessInfos.end()) {
+                continue;
+            }
             processInfosTemp.push_back(item);
         } else if (item.userId == userId) {
+            if (notifyProcessInfos.find(item) == notifyProcessInfos.end()) {
+                continue;
+            }
             processInfosTemp.push_back(item);
         }
     }

@@ -32,6 +32,7 @@
 #include "system_ability_definition.h"
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
+#include "device_manager_service_notify.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
@@ -336,6 +337,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     LOGI("AppDeathRecipient: OnRemoteDied for %{public}s", processInfo.pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
+    DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(processInfo);
 }
 
 void IpcServerStub::AddSystemSA(const std::string &pkgName)

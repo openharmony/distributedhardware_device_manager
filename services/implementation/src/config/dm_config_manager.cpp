@@ -190,7 +190,10 @@ std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::str
         LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
         return nullptr;
     }
-    so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NODELETE);
+    so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (so_handle == nullptr) {
+        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NODELETE);
+    }
     if (so_handle == nullptr) {
         LOGE("load crypto so failed.");
         return nullptr;
@@ -223,7 +226,10 @@ void DmConfigManager::GetAuthAdapter(std::map<int32_t, std::shared_ptr<IAuthenti
             LOGE("File %{public}s canonicalization failed.", soPathName.c_str());
             continue;
         }
-        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NODELETE);
+        so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+        if (so_handle == nullptr) {
+            so_handle = dlopen(soPathName.c_str(), RTLD_NOW | RTLD_NODELETE);
+        }
         if (so_handle == nullptr) {
             LOGE("load auth so %{public}s failed", (iter->second).soName.c_str());
             continue;

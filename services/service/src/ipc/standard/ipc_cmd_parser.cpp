@@ -19,6 +19,7 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
+#include "device_manager_service_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -1626,10 +1627,17 @@ ON_IPC_READ_RESPONSE(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, MessageParcel &reply
     return DM_OK;
 }
 
-ON_IPC_CMD(REGISTER_DEV_STATE_CALLBACK, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(SYNC_CALLBACK, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
-    int32_t result = DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
+    int32_t dmCommonNotifyEvent = data.ReadInt32();
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    int32_t result = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
+    if (dmCommonNotifyEvent == static_cast<int32_t>(DmCommonNotifyEvent::REG_DEVICE_STATE)) {
+        DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
+    }
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
