@@ -514,7 +514,6 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_202, testing::ext::TestSize.Leve
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(0));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
@@ -575,9 +574,8 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     std::map<std::string, int32_t> preUserDeviceMap;
     preUserDeviceMap["accountId"] = userId;
     preUserDeviceMap["accountName"] = 1;
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap));
     EXPECT_CALL(*deviceManagerServiceImplMock_,
-        GetDeviceIdAndBindLevel(_)).WillOnce(Return(preUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
+        GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
 
     int32_t removeId = 123;

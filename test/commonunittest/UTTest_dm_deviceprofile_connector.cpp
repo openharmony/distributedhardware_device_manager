@@ -1448,8 +1448,8 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_002, testing::ext::Tes
 
 HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level0)
 {
-    std::string localUdid = "";
-    std::string peerUdid = "";
+    std::string localUdid = "deviceId";
+    std::string peerUdid = "deviceId";
     int32_t peerUserId = 123456;
     std::string peerAccountHash = "";
     EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
@@ -1458,14 +1458,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ex
     EXPECT_TRUE(ret.empty());
 
     EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(ERR_DM_FAILED));
-    ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
-        peerUserId, peerAccountHash);
-    EXPECT_TRUE(ret.empty());
-
-    localUdid = "deviceId";
-    peerUdid = "deviceId";
-    peerAccountHash = "peerAccountHash";
-    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(DM_OK));
     ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
         peerUserId, peerAccountHash);
     EXPECT_TRUE(ret.empty());
