@@ -1304,8 +1304,8 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_deviceprofile_connector.cpp",
-    "${devicemanager_path}/test/unittest/mock/mock_distributed_device_profile_client.cpp",
     "${devicemanager_path}/test/unittest/mock/dm_crypto_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/mock_distributed_device_profile_client.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]

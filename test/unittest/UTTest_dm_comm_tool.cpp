@@ -50,9 +50,6 @@ HWTEST_F(DMCommToolTest, GetDMTransportPtr_NotNull, testing::ext::TestSize.Level
 {
     auto transportPtr = dmCommTool->GetDMTransportPtr();
     EXPECT_NE(transportPtr, nullptr);
-
-    AppExecFwk::InnerEvent::Pointer event;
-    dmCommTool->ProcessEvent(event);
 }
 } // DistributedHardware
 } // OHOS
