@@ -1299,6 +1299,7 @@ void DmAuthManager::AuthenticateFinish()
     authResponseContext_ = nullptr;
     authMessageProcessor_ = nullptr;
     authPtr_ = nullptr;
+    authRequestStateTemp_ = nullptr;
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
