@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include "deviceprofile_connector.h"
+#include "dm_crypto_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -29,6 +30,7 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static inline std::shared_ptr<CryptoMock> cryptoMock_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

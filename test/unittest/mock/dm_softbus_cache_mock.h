@@ -27,6 +27,7 @@ public:
     virtual ~DmSoftbusCache() = default;
 public:
     virtual int32_t GetUdidByUdidHash(const std::string &udidHash, std::string &udid) = 0;
+    virtual int32_t GetUdidFromCache(const char *networkId, std::string &udid) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusCache> dmSoftbusCache = nullptr;
 };
@@ -34,6 +35,7 @@ public:
 class SoftbusCacheMock : public DmSoftbusCache {
 public:
     MOCK_METHOD(int32_t, GetUdidByUdidHash, (const std::string &, std::string &));
+    MOCK_METHOD(int32_t, GetUdidFromCache, (const char *, std::string &));
 };
 }
 }

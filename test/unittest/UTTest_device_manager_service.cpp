@@ -2219,8 +2219,9 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_003, testing::ext::Test
     std::string networkId = "networkId_003";
     int32_t screenStatus = 1;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusListenerMock_, GetDeviceScreenStatus(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int ret = DeviceManagerService::GetInstance().GetDeviceScreenStatus(pkgName, networkId, screenStatus);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
@@ -2534,8 +2535,14 @@ HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoyDeviceId_001, testing::e
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
     EXPECT_CALL(*appManagerMock_, GetAppId()).WillOnce(Return("appId"));
+    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udidHash, result);
     EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*appManagerMock_, GetAppId()).WillOnce(Return("appId"));
+    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceManagerService::GetInstance().ConvertUdidHashToAnoyDeviceId(udidHash, result);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetUdidHashByAnoyDeviceId_001, testing::ext::TestSize.Level0)

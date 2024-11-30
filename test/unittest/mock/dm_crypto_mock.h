@@ -27,6 +27,8 @@ public:
     virtual ~DmCrypto() = default;
 public:
     virtual int32_t GetAccountIdHash(const std::string &accountId, unsigned char *accountIdHash) = 0;
+    virtual int32_t ConvertUdidHashToAnoyAndSave(const std::string &appId, const std::string &udidHash,
+        DmKVValue &kvValue) = 0;
 public:
     static inline std::shared_ptr<DmCrypto> dmCrypto = nullptr;
 };
@@ -34,6 +36,7 @@ public:
 class CryptoMock : public DmCrypto {
 public:
     MOCK_METHOD(int32_t, GetAccountIdHash, (const std::string &, unsigned char *));
+    MOCK_METHOD(int32_t, ConvertUdidHashToAnoyAndSave, (const std::string &, const std::string &, DmKVValue &));
 };
 }
 }
