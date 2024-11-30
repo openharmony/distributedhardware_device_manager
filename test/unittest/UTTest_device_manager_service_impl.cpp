@@ -47,9 +47,13 @@ void DeviceManagerServiceImplTest::SetUpTestCase()
 
 void DeviceManagerServiceImplTest::TearDownTestCase()
 {
+    DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     deviceProfileConnectorMock_ = nullptr;
+    DmSoftbusConnector::dmSoftbusConnector = nullptr;
     softbusConnectorMock_ = nullptr;
+    DmDmDeviceStateManager::dmDeviceStateManager = nullptr;
     dmDeviceStateManagerMock_ = nullptr;
+    DmMineHiChainConnector::dmMineHiChainConnector = nullptr;
     mineHiChainConnectorMock_ = nullptr;
 }
 
@@ -1808,6 +1812,38 @@ HWTEST_F(DeviceManagerServiceImplTest, GetGroupType_004, testing::ext::TestSize.
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(DM_OK));
     int32_t ret = deviceManagerServiceImpl_->GetGroupType(deviceList);
     EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::TestSize.Level0)
+{
+    int32_t userId = 1;
+    std::string accountId = "accountId";
+    auto ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(userId, accountId);
+    EXPECT_TRUE(ret.empty());
+
+    std::string localUdid = "deviceId";
+    int32_t localUserId = 123456;
+    std::string peerUdid = "remoteUdid";
+    int32_t peerUserId = 1;
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _)).WillOnce(Return(true));
+    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+
+    if (deviceManagerServiceImpl_->deviceStateMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    deviceManagerServiceImpl_->HandleIdentAccountLogout(localUdid, localUserId, peerUdid, peerUserId);
+
+    std::vector<uint32_t> foregroundUserIds;
+    std::vector<uint32_t> backgroundUserIds;
+    std::string remoteUdid = "deviceId";
+    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
+
+    std::map<std::string, int32_t> deviceMap;
+    int32_t currentUserId = 1;
+    int32_t beforeUserId = 0;
+    deviceManagerServiceImpl_->HandleUserSwitched(deviceMap, currentUserId, beforeUserId);
 }
 } // namespace
 } // namespace DistributedHardware

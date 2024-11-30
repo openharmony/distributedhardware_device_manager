@@ -78,7 +78,7 @@ bool SoftbusListener::isRadarSoLoad_ = false;
 IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
 void* SoftbusListener::radarHandle_ = nullptr;
 std::string SoftbusListener::hostName_ = "";
-int32_t g_onlinDeviceNum = 0;
+int32_t g_onlineDeviceNum = 0;
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -252,7 +252,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().SaveLocalDeviceInfo();
     {
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
-        g_onlinDeviceNum++;
+        g_onlineDeviceNum++;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceOnLine(dmDeviceInfo); });
@@ -296,8 +296,8 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmDeviceInfo.networkId);
     {
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
-        g_onlinDeviceNum--;
-        if (g_onlinDeviceNum == 0) {
+        g_onlineDeviceNum--;
+        if (g_onlineDeviceNum == 0) {
             SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
         }
     }
@@ -774,7 +774,6 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
         LOGE("ConvertNodeBasicInfoToDmDevice memset_s failed.");
         return ERR_DM_FAILED;
     }
-    
     if (memcpy_s(devInfo.networkId, sizeof(devInfo.networkId), nodeInfo.networkId,
         std::min(sizeof(devInfo.networkId), sizeof(nodeInfo.networkId))) != EOK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");

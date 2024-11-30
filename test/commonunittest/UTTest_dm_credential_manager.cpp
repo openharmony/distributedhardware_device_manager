@@ -1688,6 +1688,12 @@ HWTEST_F(DmCredentialManagerTest, from_json_002, testing::ext::TestSize.Level0)
     jsonObject[FIELD_PEER_USER_ID] = "peerDeviceId";
     from_json(jsonObject, peerCredentialInfo);
     EXPECT_EQ(peerCredentialInfo.peerDeviceId, "peerDeviceId");
+
+    std::string deviceList = "deviceList";
+    uint16_t deviceTypeId = 0;
+    int32_t errcode = 0;
+    std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    dmCreMgr->HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 
 /**

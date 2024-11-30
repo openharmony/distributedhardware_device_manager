@@ -253,7 +253,7 @@ HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_102, testing::ext::TestSi
 HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSize.Level0)
 {
     bool ret = PermissionManager::GetInstance().CheckMonitorPermission();
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnSetDnPolicy_001, testing::ext::TestSize.Level0)

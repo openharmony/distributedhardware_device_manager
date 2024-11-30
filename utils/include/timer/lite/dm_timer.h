@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,6 @@ constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitReques
 constexpr const char* STATE_TIMER_PREFIX = "deviceManagerTimer:stateTimer_";
 constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_";
 constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
-
 
 constexpr int32_t DELAY_TICK_MILLSECONDS = 1000;
 typedef std::chrono::steady_clock::time_point timerPoint;

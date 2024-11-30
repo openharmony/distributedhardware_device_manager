@@ -172,6 +172,7 @@ int32_t PinHolder::DestroyPinHolder(const std::string &pkgName, const PeerTarget
     if (timer_ != nullptr) {
         timer_->DeleteTimer(PINHOLDER_CREATE_TIMEOUT_TASK);
     }
+
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER;
     jsonObj[TAG_PIN_TYPE] = pinType;
@@ -199,12 +200,13 @@ int32_t PinHolder::CreateGeneratePinHolderMsg()
         LOGE("CreateGeneratePinHolderMsg listener or session is nullptr.");
         return ERR_DM_FAILED;
     }
-
-    timer_->DeleteAll();
-    timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
-        [this] (std::string name) {
-            PinHolder::CloseSession(name);
-        });
+    if (timer_ != nullptr) {
+        timer_->DeleteAll();
+        timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
+            [this] (std::string name) {
+                PinHolder::CloseSession(name);
+            });
+    }
     nlohmann::json jsonObj;
     jsonObj[TAG_PIN_TYPE] = pinType_;
     jsonObj[TAG_PAYLOAD] = payload_;
@@ -403,7 +405,9 @@ void PinHolder::CloseSession(const std::string &name)
         isDestroy_.store(true);
     }
     session_->CloseSessionServer(sessionId_);
-    timer_->DeleteAll();
+    if (timer_ != nullptr) {
+        timer_->DeleteAll();
+    }
     destroyState_ = STATE_TIME_OUT;
     sessionId_ = SESSION_ID_INVALID;
     sinkState_ = SINK_INIT;
@@ -433,7 +437,9 @@ void PinHolder::ProcessDestroyResMsg(const std::string &message)
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::DESTROY_RESULT, DM_OK, "");
         sourceState_ = SOURCE_INIT;
         sinkState_ = SINK_INIT;
-        timer_->DeleteAll();
+        if (timer_ != nullptr) {
+            timer_->DeleteAll();
+        }
     } else {
         LOGE("ProcessDestroyResMsg remote state is wrong.");
         listener_->OnDestroyResult(processInfo_, ERR_DM_FAILED);
@@ -612,11 +618,13 @@ int32_t PinHolder::NotifyPinHolderEvent(const std::string &pkgName, const std::s
         LOGE("ProcessChangeMsg DecodeRequest jsonStr error.");
         return ERR_DM_FAILED;
     }
-    timer_->DeleteAll();
-    timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
-        [this] (std::string name) {
-            PinHolder::CloseSession(name);
-        });
+    if (timer_ != nullptr) {
+        timer_->DeleteAll();
+        timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
+            [this] (std::string name) {
+                PinHolder::CloseSession(name);
+            });
+    }
     DmPinType pinType = static_cast<DmPinType>(jsonObject[TAG_PIN_TYPE].get<int32_t>());
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE;
@@ -660,11 +668,13 @@ void PinHolder::ProcessChangeMsg(const std::string &message)
         jsonContent[TAG_PIN_TYPE] = pinType;
         std::string content = jsonContent.dump();
         listener_->OnPinHolderEvent(processInfo_, DmPinHolderEvent::PIN_TYPE_CHANGE, DM_OK, content);
-        timer_->DeleteAll();
-        timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
-            [this] (std::string name) {
-                PinHolder::CloseSession(name);
-            });
+        if (timer_ != nullptr) {
+            timer_->DeleteAll();
+            timer_->StartTimer(std::string(PINHOLDER_CREATE_TIMEOUT_TASK), PIN_HOLDER_SESSION_CREATE_TIMEOUT,
+                [this] (std::string name) {
+                    PinHolder::CloseSession(name);
+                });
+        }
     }
 
     std::string msg = jsonObj.dump();

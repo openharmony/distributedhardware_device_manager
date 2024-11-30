@@ -49,5 +49,12 @@ std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const s
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetUserIdAndBindLevel(localUdid, peerUdid);
 }
+
+bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
+    const std::string &peerUdid, int32_t peerUserId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForAccountLogOut(localUdid, localUserId,
+        peerUdid, peerUserId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

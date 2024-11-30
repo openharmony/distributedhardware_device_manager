@@ -16,6 +16,7 @@
 #include "UTTest_device_manager_impl.h"
 #include "dm_device_info.h"
 
+#include <memory>
 #include <unistd.h>
 #include "accesstoken_kit.h"
 #include "device_manager_notify.h"
