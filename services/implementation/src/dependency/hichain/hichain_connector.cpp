@@ -1180,6 +1180,7 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(int32_t userId, const std::stri
         deviceGroupManager_->getRelatedGroups(userId, pkgName, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("[HICHAIN] fail to get related groups with ret:%{public}d.", ret);
+        delete[] returnGroups;
         returnGroups = nullptr;
         return ERR_DM_FAILED;
     }
@@ -1189,10 +1190,12 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(int32_t userId, const std::stri
     }
     if (groupNum == 0) {
         LOGE("[HICHAIN]return related goups number is zero.");
+        delete[] returnGroups;
         returnGroups = nullptr;
         return ERR_DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
+    delete[] returnGroups;
     returnGroups = nullptr;
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
     if (jsonObject.is_discarded()) {
@@ -1227,37 +1230,6 @@ void HiChainConnector::DeleteAllGroupByUdid(const std::string &udid)
     for (auto &iter : groupListExt) {
         if (DeleteGroupExt(iter.groupId) != DM_OK) {
             LOGE("DeleteGroupExt groupId %{public}s failed.", GetAnonyString(iter.groupId).c_str());
-        }
-    }
-}
-
-void HiChainConnector::DeleteP2PGroup(int32_t switchUserId)
-{
-    LOGI("switchuserId: %{public}d", switchUserId);
-    nlohmann::json jsonObj;
-    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
-    std::string queryParams = jsonObj.dump();
-    std::vector<GroupInfo> groupList;
-
-    if (!GetGroupInfo(switchUserId, queryParams, groupList)) {
-        LOGE("failed to get the switch user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        if (DeleteGroup(switchUserId, iter->groupId) != DM_OK) {
-            LOGE("failed to delete the old user id group %{public}s", GetAnonyString(iter->groupId).c_str());
-        }
-    }
-
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    LOGI("userId: %{public}d", userId);
-    if (!GetGroupInfo(userId, queryParams, groupList)) {
-        LOGE("failed to get the user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        if (DeleteGroup(userId, iter->groupId) != DM_OK) {
-            LOGE("failed to delete the user id group %{public}s", GetAnonyString(iter->groupId).c_str());
         }
     }
 }

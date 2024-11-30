@@ -76,6 +76,7 @@ namespace {
     constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
 }
+
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");

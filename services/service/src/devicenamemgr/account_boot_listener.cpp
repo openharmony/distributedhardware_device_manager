@@ -161,11 +161,19 @@ void AccountBootListener::DataShareCallback()
 
 std::string AccountBootListener::GetLocalDisplayName() const
 {
+    if (localDeviceMgr_ == nullptr) {
+        LOGE("logcalDeviceMgr_ is null");
+        return "";
+    }
     return localDeviceMgr_->GetLocalDisplayName();
 }
 
 std::string AccountBootListener::GetLocalDeviceName() const
 {
+    if (localDeviceMgr_ == nullptr) {
+        LOGE("logcalDeviceMgr_ is null");
+        return "";
+    }
     return localDeviceMgr_->GetLocalDeviceName();
 }
 } // namespace DistributedHardware

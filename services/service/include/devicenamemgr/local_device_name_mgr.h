@@ -47,7 +47,7 @@ private:
         std::string &deviceName);
     int32_t GetActiveOsAccountIds();
 private:
-    std::mutex devNameMtx_;
+    static std::mutex devNameMtx_;
     std::string localDeviceName_;
     std::string localDisplayName_;
 };
