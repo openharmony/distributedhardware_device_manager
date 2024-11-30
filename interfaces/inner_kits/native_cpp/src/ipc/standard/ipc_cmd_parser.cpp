@@ -1589,8 +1589,8 @@ ON_IPC_CMD(REMOTE_DEVICE_TRUST_CHANGE, MessageParcel &data, MessageParcel &reply
 {
     std::string pkgName = data.ReadString();
     std::string udid = data.ReadString();
-    std::string uuid = data.ReadString();
     int32_t authForm = data.ReadInt32();
+    std::string uuid = data.ReadString();
     DeviceManagerNotify::GetInstance().OnDeviceTrustChange(pkgName, udid, uuid, authForm);
     reply.WriteInt32(DM_OK);
     return DM_OK;

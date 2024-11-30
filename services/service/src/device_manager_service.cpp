@@ -2162,9 +2162,9 @@ void DeviceManagerService::HandleUserIdCheckSumChange(const std::string &msg)
 
 void DeviceManagerService::ClearDiscoveryCache(const ProcessInfo &processInfo)
 {
-    LOGI("PkgName %{public}s.", processInfo.pkgName.c_str());
+    LOGI("PkgName: %{public}s, userId: %{public}d", processInfo.pkgName.c_str(), processInfo.userId);
     CHECK_NULL_VOID(discoveryMgr_);
-    discoveryMgr_->ClearDiscoveryCache(processInfo.pkgName);
+    discoveryMgr_->ClearDiscoveryCache(processInfo);
 }
 
 void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)

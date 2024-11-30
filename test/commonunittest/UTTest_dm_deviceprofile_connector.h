@@ -21,6 +21,7 @@
 
 #include "deviceprofile_connector.h"
 #include "multiple_user_connector_mock.h"
+#include "dm_crypto_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -30,8 +31,8 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
-        std::make_shared<MultipleUserConnectorMock>();
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;
+    static inline std::shared_ptr<CryptoMock> cryptoMock_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

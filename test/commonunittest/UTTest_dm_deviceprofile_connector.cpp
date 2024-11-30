@@ -19,6 +19,8 @@
 #include "dm_device_info.h"
 #include "deviceprofile_connector.h"
 
+using namespace testing;
+using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 void DeviceProfileConnectorTest::SetUp()
@@ -31,13 +33,18 @@ void DeviceProfileConnectorTest::TearDown()
 
 void DeviceProfileConnectorTest::SetUpTestCase()
 {
+    multipleUserConnectorMock_ = std::make_shared<MultipleUserConnectorMock>();
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    cryptoMock_ = std::make_shared<CryptoMock>();
+    DmCrypto::dmCrypto = cryptoMock_;
 }
 
 void DeviceProfileConnectorTest::TearDownTestCase()
 {
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
     multipleUserConnectorMock_ = nullptr;
+    DmCrypto::dmCrypto = nullptr;
+    cryptoMock_ = nullptr;
 }
 
 void AddAccessControlProfileFirst(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
@@ -1542,6 +1549,21 @@ HWTEST_F(DeviceProfileConnectorTest, GetACLByDeviceIdAndUserId_001, testing::ext
     ret = DeviceProfileConnector::GetInstance().GetACLByDeviceIdAndUserId(profiles, caller, srcUdid,
         callee, srcUdid);
     EXPECT_EQ(ret.empty(), false);
+HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level0)
+{
+    std::string localUdid = "deviceId";
+    std::string peerUdid = "deviceId";
+    int32_t peerUserId = 123456;
+    std::string peerAccountHash = "";
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    auto ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
+        peerUserId, peerAccountHash);
+    EXPECT_TRUE(ret.empty());
+
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
+        peerUserId, peerAccountHash);
+    EXPECT_TRUE(ret.empty());
 }
 } // namespace DistributedHardware
 } // namespace OHOS
