@@ -156,6 +156,47 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::e
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
     bool ret = DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
     EXPECT_FALSE(ret);
+
+    userId = 1;
+    int32_t bindType = 1;
+    std::string deviceIdEr = "deviceId";
+    std::string deviceIdEe = "deviceIdEe";
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(deviceIdEr);
+    accesser.SetAccesserUserId(userId);
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeDeviceId(deviceIdEe);
+    accessee.SetAccesseeUserId(userId);
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetAccessControlId(accesserId);
+    profile.SetBindType(bindType);
+    profile.SetAccesser(accesser);
+    profile.SetAccessee(accessee);
+    
+    int userIds = 12356;
+    std::string remoteUdid = "deviceId";
+    std::vector<int32_t> remoteFrontUserIds;
+    remoteFrontUserIds.push_back(userIds);
+    std::vector<int32_t> remoteBackUserIds;
+    remoteBackUserIds.push_back(userIds);
+    DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profile, remoteUdid, remoteFrontUserIds, remoteBackUserIds);
+
+    remoteUdid = "deviceIdEe";
+    DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profile, remoteUdid, remoteFrontUserIds, remoteBackUserIds);
+
+    int32_t userIdee = 0;
+    accessee.SetAccesseeUserId(userIdee);
+    DistributedDeviceProfile::AccessControlProfile profilesecond;
+    profilesecond.SetAccessControlId(accesserId);
+    profilesecond.SetBindType(bindType);
+    profilesecond.SetAccesser(accesser);
+    profilesecond.SetAccessee(accessee);
+    std::string localUdid = "deviceId";
+    std::vector<int32_t> localUserIds;
+    int32_t localUserId = 1;
+    localUserIds.push_back(localUserId);
+    DeviceProfileConnector::GetInstance().UpdatePeerUserId(profilesecond, localUdid, localUserIds,
+        remoteUdid, remoteFrontUserIds);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level0)

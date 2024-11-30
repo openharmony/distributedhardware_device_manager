@@ -23,5 +23,10 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 {
     return DmMultipleUserConnector::dmMultipleUserConnector->GetCurrentAccountUserID();
 }
+
+int32_t MultipleUserConnector::GetFirstForegroundUserId(void)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetFirstForegroundUserId();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

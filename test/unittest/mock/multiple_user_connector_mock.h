@@ -27,6 +27,7 @@ public:
     virtual ~DmMultipleUserConnector() = default;
 public:
     virtual int32_t GetCurrentAccountUserID(void) = 0;
+    virtual int32_t GetFirstForegroundUserId(void) = 0;
 public:
     static inline std::shared_ptr<DmMultipleUserConnector> dmMultipleUserConnector = nullptr;
 };
@@ -34,6 +35,7 @@ public:
 class MultipleUserConnectorMock : public DmMultipleUserConnector {
 public:
     MOCK_METHOD(int32_t, GetCurrentAccountUserID, ());
+    MOCK_METHOD(int32_t, GetFirstForegroundUserId, ());
 };
 }
 }

@@ -1303,6 +1303,7 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_deviceprofile_connector.cpp",
+    "${devicemanager_path}/test/unittest/mock/multiple_user_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/mock_distributed_device_profile_client.cpp",
   ]
 
@@ -1313,6 +1314,7 @@ ohos_unittest("UTTest_dm_deviceprofile_connector") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 }
 
