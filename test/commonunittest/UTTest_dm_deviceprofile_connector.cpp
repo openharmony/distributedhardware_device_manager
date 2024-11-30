@@ -402,6 +402,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_001, testing::ext::TestSi
     DmDiscoveryInfo discoveryInfo;
     bool isonline = true;
     int32_t authForm = 0;
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1371,6 +1372,13 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUserId = 123456;
     ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
     EXPECT_TRUE(ret);
+
+    localUdid = "localDeviceId";
+    localUserId = 123456;
+    peerUdid = "remoteDeviceId";
+    peerUserId = 123456;
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_005, testing::ext::TestSize.Level0)
@@ -1379,6 +1387,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_005, testing:
     std::string targetDeviceId = "deviceId";
     int32_t userId = 123456;
     auto ret = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId,
+        targetDeviceId, userId);
+    EXPECT_FALSE(ret.empty());
+
+    localDeviceId = "remoteDeviceId";
+    ret = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId,
         targetDeviceId, userId);
     EXPECT_FALSE(ret.empty());
 }
@@ -1515,6 +1528,12 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
     auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_EQ(ret.empty(), false);
+
+    std::string udid;
+    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
+
+    udid = "deviceId";
+    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetACLByDeviceIdAndUserId_001, testing::ext::TestSize.Level0)
@@ -1545,10 +1564,12 @@ HWTEST_F(DeviceProfileConnectorTest, GetACLByDeviceIdAndUserId_001, testing::ext
         callee, srcUdid);
     EXPECT_EQ(ret.empty(), false);
 
-    callee.userId == 0 
+    callee.userId == 0 ;
     ret = DeviceProfileConnector::GetInstance().GetACLByDeviceIdAndUserId(profiles, caller, srcUdid,
         callee, srcUdid);
     EXPECT_EQ(ret.empty(), false);
+}
+
 HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level0)
 {
     std::string localUdid = "deviceId";
@@ -1564,6 +1585,55 @@ HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ex
     ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
         peerUserId, peerAccountHash);
     EXPECT_TRUE(ret.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_002, testing::ext::TestSize.Level0)
+{
+    DmDiscoveryInfo discoveryInfo;
+    discoveryInfo.remoteDeviceIdHash = "";
+    discoveryInfo.localDeviceId = "deviceId";
+    discoveryInfo.userId = 123456;
+    discoveryInfo.pkgname = "";
+    bool isonline = true;
+    int32_t authForm = 0;
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
+    EXPECT_EQ(ret, DM_OK);
+
+    discoveryInfo.pkgname = "bundleName";
+    discoveryInfo.localDeviceId = "deviceId";
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string deviceId = "123456";
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string deviceId = "123456";
+    bool ret = DeviceProfileConnector::GetInstance().CheckSrcDevIdInAclForDevBind(pkgName, deviceId);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckAccessControl_002, testing::ext::TestSize.Level0)
+{
+    int32_t userId = 123456;
+    DmAccessCaller caller;
+    caller.userId = userId;
+    std::string srcUdid = "deviceId";
+    DmAccessCallee callee;
+    callee.userId = userId;
+    std::string sinkUdid = "deviceId";
+    int32_t ret = DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

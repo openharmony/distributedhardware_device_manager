@@ -29,5 +29,10 @@ int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId, const std
 {
     return DmCrypto::dmCrypto->ConvertUdidHashToAnoyAndSave(appId, udidHash, kvValue);
 }
+
+int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
+{
+    return DmCrypto::dmCrypto->GetUdidHash(udid, udidHash);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
