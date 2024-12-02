@@ -112,6 +112,16 @@ int32_t DeviceManagerService::InitSoftbusListener()
     return DM_OK;
 }
 
+void DeviceManagerService::InitHichainListener()
+{
+    LOGI("DeviceManagerService::InitHichainListener Start.");
+    if (hichainListener_ == nullptr) {
+        hichainListener_ = std::make_shared<HichainListener>();
+    }
+    //注册回调
+    hichainListener_->RegisterDataChangeCb();
+}
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 void DeviceManagerService::SubscribePublishCommonEvent()
@@ -2312,6 +2322,19 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
         }
     }
     return DM_OK;
+}
+
+void DeviceManagerService::HandleDataChange(const char *peerUdid, const char *groupInfo)
+{
+    LOGI("DeviceManagerService::HandleDataChange start!");
+    LOGI("peerUdid = %{public}s.", peerUdid);
+    std::vector<AccessControlProfile> profiles = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    LOGI("profiles size = %{public}lu", profiles.size());
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == peerUdid) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+        }
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

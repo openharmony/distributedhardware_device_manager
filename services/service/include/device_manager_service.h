@@ -29,6 +29,7 @@
 #include "pin_holder.h"
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
+#include "hichain_listener.h"
 #include "i_dm_service_impl_ext.h"
 #include "dm_single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -53,6 +54,8 @@ public:
     int32_t Init();
 
     int32_t InitSoftbusListener();
+
+    void InitHichainListener();
 
     void RegisterCallerAppId(const std::string &pkgName);
 
@@ -203,6 +206,7 @@ public:
     void RemoveNotifyRecord(const ProcessInfo &processInfo);
     int32_t RegDevStateCallbackToService(const std::string &pkgName);
     int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
+    void HandleDataChange(const char *peerUdid, const char *groupInfo);
 
 private:
     bool IsDMServiceImplReady();
@@ -275,6 +279,7 @@ private:
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;
+    std::shared_ptr<HichainListener> hichainListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
     std::shared_ptr<IDMServiceImplExt> dmServiceImplExt_;
