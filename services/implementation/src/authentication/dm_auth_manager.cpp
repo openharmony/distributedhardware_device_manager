@@ -1316,6 +1316,7 @@ void DmAuthManager::AuthenticateFinish()
     authResponseContext_ = nullptr;
     authMessageProcessor_ = nullptr;
     authPtr_ = nullptr;
+    authRequestStateTemp_ = nullptr;
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
@@ -1392,6 +1393,8 @@ int32_t DmAuthManager::SetAuthRequestState(std::shared_ptr<AuthRequestState> aut
         LOGE("authRequestState is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    // Keep current state, avoid deconstructed during state transitions
+    authRequestStateTemp_ = authRequestState_;
     authRequestState_ = authRequestState;
     return DM_OK;
 }
