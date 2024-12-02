@@ -93,7 +93,9 @@ int32_t DmPublishManager::UnPublishDeviceDiscovery(const std::string &pkgName, i
     if (!publishContextMap_.empty()) {
         publishContextMap_.erase(pkgName);
         softbusConnector_->UnRegisterSoftbusPublishCallback(pkgName);
-        timer_->DeleteTimer(std::string(PUBLISH_DISCOVERY_TIMEOUT_TASK));
+        if (timer_ != nullptr) {
+            timer_->DeleteTimer(std::string(PUBLISH_DISCOVERY_TIMEOUT_TASK));
+        }
     }
     return softbusConnector_->UnPublishDiscovery(publishId);
 }

@@ -45,6 +45,8 @@ namespace {
     constexpr const char *DISPLAY_DEVICE_NAME_STRING = "settings.general.display_device_name";
 }
 
+std::mutex LocalDeviceNameMgr::devNameMtx_;
+
 LocalDeviceNameMgr::LocalDeviceNameMgr() : localDeviceName_(""), localDisplayName_("")
 {
     LOGI("Ctor LocalDeviceNameMgr");
@@ -286,11 +288,13 @@ void LocalDeviceNameMgr::RegisterDisplayNameChangeCb()
 
 std::string LocalDeviceNameMgr::GetLocalDisplayName() const
 {
+    std::lock_guard<std::mutex> lock(devNameMtx_);
     return localDisplayName_;
 }
 
 std::string LocalDeviceNameMgr::GetLocalDeviceName() const
 {
+    std::lock_guard<std::mutex> lock(devNameMtx_);
     return localDeviceName_;
 }
 } // namespace DistributedHardware

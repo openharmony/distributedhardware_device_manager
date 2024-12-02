@@ -446,8 +446,8 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyDeviceId(const std::s
 void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &udid, const std::string &uuid,
     DmAuthForm authForm)
 {
-    LOGI("udid %{public}s, uuid %{public}s, authForm %{public}d.", GetAnonyString(udid).c_str(),
-        GetAnonyString(uuid).c_str(), authForm);
+    LOGI("udid %{public}s, authForm %{public}d, uuid %{public}s.", GetAnonyString(udid).c_str(),
+        authForm, GetAnonyString(uuid).c_str());
     std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::make_shared<IpcNotifyDevTrustChangeReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     int32_t userId = -1;
