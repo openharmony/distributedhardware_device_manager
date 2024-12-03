@@ -15,11 +15,14 @@
 
 #include "hichain_listener.h"
 
+#include "device_manager_service.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+
+const int32_t MAX_DATA_LEN = 65536;
 
 static DataChangeListener dataChangeListener_ = {
     .onDeviceUnBound = HichainListener::onHichainDeviceUnBound,
@@ -27,29 +30,47 @@ static DataChangeListener dataChangeListener_ = {
 
 HichainListener::HichainListener()
 {
-    LOGI("HichainListener constructor.");
+    LOGI("HichainListener constructor start.");
+    InitDeviceAuthService();
+    deviceGroupManager_ = GetGmInstance();
+    if (deviceGroupManager_ == nullptr) {
+        LOGE("[HICHAIN]failed to init group manager.");
+        return;
+    }
+    LOGI("HichainListener::constructor success.");
 }
 
 HichainListener::~HichainListener()
 {
-    
+    LOGI("HichainListener::destructor.");
 }
 
-HichainListener::RegisterDataChangeCb()
+void HichainListener::RegisterDataChangeCb()
 {
     LOGI("HichainListener::RegisterDataChangeCb start");
-    int32_t ret = regDataChangeListener(DM_PKG_NAME, &dataChangeListener_);
+    if (deviceGroupManager_ == nullptr) {
+        LOGE("deviceGroupManager_ is null!");
+        return;
+    }
+    int32_t ret = deviceGroupManager_->regDataChangeListener(DM_PKG_NAME, &dataChangeListener_);
     if (ret != DM_OK) {
-        LOGE("[HICHAIN]RegNodeDeviceStateCb failed with ret: %{public}d, retryTimes: %{public}u.", ret, retryTimes);
+        LOGE("[HICHAIN]regDataChangeListener failed with ret: %{public}d.", ret);
         return;
     }
     LOGI("RegisterDataChangeCb success!");
 }
 
-HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *groupInfo) 
+void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *groupInfo) 
 {
-    // hichain回调
     LOGI("HichainListener::onDeviceUnBound start");
+    if (peerUdid == nullptr || groupInfo == nullptr) {
+        LOGE("peerUdid or groupInfo is null!");
+        return;
+    }
+    if (strlen(peerUdid) > MAX_DATA_LEN || strlen(groupInfo) > MAX_DATA_LEN) {
+        LOGE("peerUdid or groupInfo is invalid");
+        return;
+    }
     LOGI("peerUdid = %{public}s, groupInfo = %{public}s", peerUdid, groupInfo);
     // 起线程异步调用
     DeviceManagerService::GetInstance().HandleDataChange(peerUdid, groupInfo);

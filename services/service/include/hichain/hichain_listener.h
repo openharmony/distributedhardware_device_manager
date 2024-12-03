@@ -25,8 +25,11 @@ class HichainListener {
 public:
     HichainListener();
     ~HichainListener();
-    RegisterDataChangeCb();
+    void RegisterDataChangeCb();
     static void onHichainDeviceUnBound(const char *peerUdid, const char *groupInfo);
+
+private:
+    const DeviceGroupManager *deviceGroupManager_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

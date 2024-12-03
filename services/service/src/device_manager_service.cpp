@@ -20,6 +20,7 @@
 
 #include "app_manager.h"
 #include "nlohmann/json.hpp"
+#include "deviceprofile_connector.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
@@ -2326,9 +2327,9 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
 
 void DeviceManagerService::HandleDataChange(const char *peerUdid, const char *groupInfo)
 {
-    LOGI("DeviceManagerService::HandleDataChange start!");
-    LOGI("peerUdid = %{public}s.", peerUdid);
-    std::vector<AccessControlProfile> profiles = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    LOGI("DeviceManagerService::HandleDataChange start, peerUdid = %{public}s.", peerUdid);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles 
+        = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     LOGI("profiles size = %{public}lu", profiles.size());
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() == peerUdid) {
