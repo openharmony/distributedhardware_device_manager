@@ -1236,37 +1236,6 @@ void HiChainConnector::DeleteAllGroupByUdid(const std::string &udid)
     }
 }
 
-void HiChainConnector::DeleteP2PGroup(int32_t switchUserId)
-{
-    LOGI("switchuserId: %{public}d", switchUserId);
-    nlohmann::json jsonObj;
-    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
-    std::string queryParams = jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
-    std::vector<GroupInfo> groupList;
-
-    if (!GetGroupInfo(switchUserId, queryParams, groupList)) {
-        LOGE("failed to get the switch user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        if (DeleteGroup(switchUserId, iter->groupId) != DM_OK) {
-            LOGE("failed to delete the old user id group %{public}s", GetAnonyString(iter->groupId).c_str());
-        }
-    }
-
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    LOGI("userId: %{public}d", userId);
-    if (!GetGroupInfo(userId, queryParams, groupList)) {
-        LOGE("failed to get the user id groups");
-        return;
-    }
-    for (auto iter = groupList.begin(); iter != groupList.end(); iter++) {
-        if (DeleteGroup(userId, iter->groupId) != DM_OK) {
-            LOGE("failed to delete the user id group %{public}s", GetAnonyString(iter->groupId).c_str());
-        }
-    }
-}
-
 int32_t HiChainConnector::DeleteGroupByACL(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec,
     std::vector<int32_t> &userIdVec)
 {
