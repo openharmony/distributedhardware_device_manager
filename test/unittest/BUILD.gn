@@ -333,6 +333,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "mock/app_manager_mock.cpp",
     "mock/device_manager_service_impl_mock.cpp",
     "mock/dm_crypto_mock.cpp",
+    "mock/dm_hidumper_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
     "mock/kv_adapter_manager_mock.cpp",
     "mock/permission_manager_mock.cpp",
@@ -729,13 +730,17 @@ ohos_unittest("UTTest_ipc_client_proxy") {
 ohos_unittest("UTTest_ipc_client_stub") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_ipc_client_stub.cpp" ]
+  sources = [
+    "UTTest_ipc_client_stub.cpp",
+    "mock/ipc_cmd_register_mock.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
     "device_auth:deviceauth_sdk",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 }
 

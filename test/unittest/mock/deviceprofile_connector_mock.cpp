@@ -56,5 +56,12 @@ bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localU
     return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForAccountLogOut(localUdid, localUserId,
         peerUdid, peerUserId);
 }
+
+OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
+    const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid,
+        tokenId, localUdid);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

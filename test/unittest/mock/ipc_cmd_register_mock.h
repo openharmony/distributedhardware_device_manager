@@ -12,32 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_MULTIPLE_USER_CONNECTOR_MOCK_H
-#define OHOS_MULTIPLE_USER_CONNECTOR_MOCK_H
+#ifndef OHOS_IPC_CMD_REGISTER_MOCK_H
+#define OHOS_IPC_CMD_REGISTER_MOCK_H
 
 #include <string>
 #include <gmock/gmock.h>
 
-#include "multiple_user_connector.h"
+#include "ipc_cmd_register.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DmMultipleUserConnector {
+class DmIpcCmdRegister {
 public:
-    virtual ~DmMultipleUserConnector() = default;
+    virtual ~DmIpcCmdRegister() = default;
 public:
-    virtual int32_t GetCurrentAccountUserID(void) = 0;
-    virtual int32_t GetFirstForegroundUserId(void) = 0;
-    virtual int32_t GetFirstForegroundUserId(void) = 0;
+    virtual int32_t SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data) = 0;
+    virtual int32_t OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply) = 0;
 public:
-    static inline std::shared_ptr<DmMultipleUserConnector> dmMultipleUserConnector = nullptr;
+    static inline std::shared_ptr<DmIpcCmdRegister> dmIpcCmdRegister = nullptr;
 };
 
-class MultipleUserConnectorMock : public DmMultipleUserConnector {
+class IpcCmdRegisterMock : public DmIpcCmdRegister {
 public:
-    MOCK_METHOD(int32_t, GetCurrentAccountUserID, ());
-    MOCK_METHOD(int32_t, GetFirstForegroundUserId, ());
-    MOCK_METHOD(int32_t, GetFirstForegroundUserId, ());
+    MOCK_METHOD(int32_t, SetRequest, (int32_t, std::shared_ptr<IpcReq>, MessageParcel &));
+    MOCK_METHOD(int32_t, OnIpcCmd, (int32_t, MessageParcel &, MessageParcel &));
 };
 }
 }

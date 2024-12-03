@@ -34,6 +34,7 @@
 #include "device_manager_service_impl_mock.h"
 #include "dm_softbus_cache_mock.h"
 #include "dm_crypto_mock.h"
+#include "dm_hidumper_mock.cpp"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -57,6 +58,7 @@ public:
     static inline  std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ =
         std::make_shared<SoftbusCacheMock>();
     static inline  std::shared_ptr<CryptoMock> cryptoMock_ = std::make_shared<CryptoMock>();
+    static inline  std::shared_ptr<HiDumpHelperMock> hiDumpHelperMock_ = std::make_shared<HiDumpHelperMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

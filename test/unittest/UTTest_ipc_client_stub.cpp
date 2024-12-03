@@ -15,6 +15,7 @@
 
 #include "UTTest_ipc_client_stub.h"
 
+#include <memory>
 #include <unistd.h>
 
 #include "device_manager.h"
@@ -35,6 +36,9 @@
 #include "ipc_rsp.h"
 #include "ipc_def.h"
 
+using namespace testing;
+using namespace testing::ext;
+
 namespace OHOS {
 namespace DistributedHardware {
 void IpcClientStubTest::SetUp()
@@ -47,10 +51,14 @@ void IpcClientStubTest::TearDown()
 
 void IpcClientStubTest::SetUpTestCase()
 {
+    ipcCmdRegisterMock_ = std::make_shared<IpcCmdRegisterMock>();
+    DmIpcCmdRegister::dmIpcCmdRegister = ipcCmdRegisterMock_;
 }
 
 void IpcClientStubTest::TearDownTestCase()
 {
+    DmIpcCmdRegister::dmIpcCmdRegister = nullptr;
+    ipcCmdRegisterMock_ = nullptr;
 }
 
 namespace {
@@ -203,6 +211,25 @@ HWTEST_F(IpcClientStubTest, SendCmd_004, testing::ext::TestSize.Level0)
     sptr<IpcClientStub> instance = sptr<IpcClientStub>(new IpcClientStub());
     int ret = instance->SendCmd(cmdCode, req, rsp);
     ASSERT_EQ(ret, result);
+}
+
+HWTEST_F(IpcClientStubTest, SendCmd_005, testing::ext::TestSize.Level0)
+{
+    int cmdCode = 1;
+    std::shared_ptr<IpcReq> req = nullptr;
+    std::shared_ptr<IpcRsp> rsp = nullptr;
+    sptr<IpcClientStub> instance = sptr<IpcClientStub>(new IpcClientStub());
+    EXPECT_CALL(*ipcCmdRegisterMock_, SetRequest(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*ipcCmdRegisterMock_, OnIpcCmd(_, _, _)).WillOnce(Return(DM_OK));
+    int ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, DM_OK);
+
+    req = std::make_shared<IpcReq>();
+    rsp = std::make_shared<IpcRsp>();
+    EXPECT_CALL(*ipcCmdRegisterMock_, SetRequest(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*ipcCmdRegisterMock_, OnIpcCmd(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = instance->SendCmd(cmdCode, req, rsp);
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

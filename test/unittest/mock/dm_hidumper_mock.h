@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,28 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_DM_HIDUMPER_MOCK_H
+#define OHOS_DM_HIDUMPER_MOCK_H
 
-#ifndef OHOS_IPC_CLIENT_STUB_TEST_H
-#define OHOS_IPC_CLIENT_STUB_TEST_H
+#include <string>
+#include <gmock/gmock.h>
 
-#include <gtest/gtest.h>
-#include <memory>
-#include <refbase.h>
-
-#include "ipc_client_stub.h"
-#include "ipc_cmd_register_mock.h"
+#include "dm_hidumper.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcClientStubTest : public testing::Test {
+class DmHiDumpHelper {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
-    static inline std::shared_ptr<IpcCmdRegisterMock> ipcCmdRegisterMock_ = nullptr;
+    virtual ~DmHiDumpHelper() = default;
+public:
+    virtual int32_t GetArgsType(const std::vector<std::string>& args, std::vector<HidumperFlag> &Flag) = 0;
+public:
+    static inline std::shared_ptr<DmHiDumpHelper> dmHiDumpHelper = nullptr;
 };
-} // namespace DistributedHardware
-} // namespace OHOS
 
-#endif //  OHOS_IPC_CLIENT_STUB_TEST_H
+class HiDumpHelperMock : public DmHiDumpHelper {
+public:
+    MOCK_METHOD(int32_t, GetArgsType, (const std::vector<std::string>&, std::vector<HidumperFlag> &));
+};
+}
+}
+#endif

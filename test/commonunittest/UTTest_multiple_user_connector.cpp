@@ -82,6 +82,41 @@ HWTEST_F(MultipleUserConnectorTest, GetSwitchOldUserId_001, testing::ext::TestSi
     userIdOut = MultipleUserConnector::GetSwitchOldUserId();
     ASSERT_EQ(userIdIn, userIdOut);
 }
+
+HWTEST_F(MultipleUserConnectorTest, GetSwitchOldAccountId_001, testing::ext::TestSize.Level0)
+{
+    std::string accountId = "accountId";
+    MultipleUserConnector::SetSwitchOldAccountId(accountId);
+    std::string accountIdOut = MultipleUserConnector::GetSwitchOldAccountId();
+    ASSERT_EQ(accountId, accountIdOut);
+}
+
+HWTEST_F(MultipleUserConnectorTest, GetSwitchOldAccountName_001, testing::ext::TestSize.Level0)
+{
+    std::string accountName = "accountName";
+    MultipleUserConnector::SetSwitchOldAccountName(accountName);
+    std::string accountNameOut = MultipleUserConnector::GetSwitchOldAccountName();
+    ASSERT_EQ(accountName, accountNameOut);
+}
+
+HWTEST_F(MultipleUserConnectorTest, GetAllUserIds_001, testing::ext::TestSize.Level0)
+{
+    std::vector<int32_t> userIdVec;
+    int32_t ret = MultipleUserConnector::GetAllUserIds(userIdVec);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(MultipleUserConnectorTest, GetAccountInfoByUserId_001, testing::ext::TestSize.Level0)
+{
+    int32_t userId = 123;
+    DMAccountInfo dmAccountInfo;
+    dmAccountInfo.accountId = "12456";
+    MultipleUserConnector::dmAccountInfoMap_[userId] = dmAccountInfo;
+    auto ret = MultipleUserConnector::GetAccountInfoByUserId(userId);
+    ASSERT_FALSE(ret.accountId.empty());
+
+    MultipleUserConnector::DeleteAccountInfoByUserId(userId);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
