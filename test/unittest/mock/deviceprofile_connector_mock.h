@@ -35,6 +35,8 @@ public:
     virtual uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId) = 0;
     virtual std::map<int32_t, int32_t> GetUserIdAndBindLevel(const std::string &localUdid,
         const std::string &peerUdid) = 0;
+    virtual bool DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
+        const std::string &peerUdid, int32_t peerUserId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -47,6 +49,7 @@ public:
         const std::string &));
     MOCK_METHOD(uint32_t, CheckBindType, (std::string, std::string));
     MOCK_METHOD((std::map<int32_t, int32_t>), GetUserIdAndBindLevel, (const std::string &, const std::string &));
+    MOCK_METHOD(bool, DeleteAclForAccountLogOut, (const std::string &, int32_t, const std::string &, int32_t));
 };
 }
 }

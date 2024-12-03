@@ -243,6 +243,7 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     if (authenticationMap_.find(authType) != authenticationMap_.end()) {
         authPtr_ = authenticationMap_[authType];
     }
+
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
@@ -527,8 +528,6 @@ void DmAuthManager::ProcessSinkMsg()
                     timer_->DeleteTimer(std::string(WAIT_NEGOTIATE_TIMEOUT_TASK));
                 }
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseNegotiateState>());
-            } else {
-                LOGE("Device manager auth state error");
             }
             break;
         case MSG_TYPE_REQ_AUTH:
@@ -537,8 +536,6 @@ void DmAuthManager::ProcessSinkMsg()
                     timer_->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
                 }
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseConfirmState>());
-            } else {
-                LOGE("Device manager auth state error");
             }
             break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
@@ -1319,6 +1316,7 @@ void DmAuthManager::AuthenticateFinish()
     authResponseContext_ = nullptr;
     authMessageProcessor_ = nullptr;
     authPtr_ = nullptr;
+    authRequestStateTemp_ = nullptr;
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
@@ -1395,6 +1393,8 @@ int32_t DmAuthManager::SetAuthRequestState(std::shared_ptr<AuthRequestState> aut
         LOGE("authRequestState is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    // Keep current state, avoid deconstructed during state transitions
+    authRequestStateTemp_ = authRequestState_;
     authRequestState_ = authRequestState;
     return DM_OK;
 }
@@ -2051,6 +2051,7 @@ void DmAuthManager::AuthDeviceFinish(int64_t requestId)
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK));
     }
+
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         PutAccessControlList();
         SrcAuthDeviceFinish();
@@ -2079,6 +2080,7 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK));
     }
+
     if (errorCode != DM_OK || requestId != authResponseContext_->requestId) {
         if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
             authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
@@ -2277,17 +2279,11 @@ int32_t DmAuthManager::DeleteGroup(const std::string &pkgName, const std::string
         return ERR_DM_FAILED;
     }
     std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
+    CHECK_NULL_RETURN(hiChainConnector_, ERR_DM_POINT_NULL);
     hiChainConnector_->GetRelatedGroups(deviceId, groupList);
-    if (groupList.size() > 0) {
-        std::string groupId = "";
-        groupId = groupList.front().groupId;
+    for (const auto &item : groupList) {
+        std::string groupId = item.groupId;
         hiChainConnector_->DeleteGroup(groupId);
-    } else {
-        LOGE("DmAuthManager::UnAuthenticateDevice groupList.size = 0");
-        return ERR_DM_FAILED;
-    }
-    if (softbusConnector_ != nullptr) {
-        softbusConnector_->EraseUdidFromMap(deviceId);
     }
     return DM_OK;
 }

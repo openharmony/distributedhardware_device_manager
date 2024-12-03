@@ -1182,6 +1182,7 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(int32_t userId, const std::stri
         deviceGroupManager_->getRelatedGroups(userId, pkgName, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("[HICHAIN] fail to get related groups with ret:%{public}d.", ret);
+        delete[] returnGroups;
         returnGroups = nullptr;
         return ERR_DM_FAILED;
     }
@@ -1191,10 +1192,12 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(int32_t userId, const std::stri
     }
     if (groupNum == 0) {
         LOGE("[HICHAIN]return related goups number is zero.");
+        delete[] returnGroups;
         returnGroups = nullptr;
         return ERR_DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
+    delete[] returnGroups;
     returnGroups = nullptr;
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
     if (jsonObject.is_discarded()) {

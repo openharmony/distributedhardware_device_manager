@@ -80,7 +80,7 @@ std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t userId)
     return "";
 #elif OS_ACCOUNT_PART_EXISTS
     OhosAccountInfo accountInfo;
-    ErrCode ret = OhosAccountKits::GetInstance().GetOhosAccountInfoByUserId(userId, accountInfo);
+    ErrCode ret = OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, accountInfo);
     if (ret != 0 || accountInfo.uid_ == "") {
         LOGE("error ret: %{public}d", ret);
         return "";

@@ -19,10 +19,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
 int32_t Crypto::GetAccountIdHash(const std::string &accountId, unsigned char *accountIdHash)
 {
     return DmCrypto::dmCrypto->GetAccountIdHash(accountId, accountIdHash);
+}
+
+int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId, const std::string &udidHash,
+    DmKVValue &kvValue)
+{
+    return DmCrypto::dmCrypto->ConvertUdidHashToAnoyAndSave(appId, udidHash, kvValue);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

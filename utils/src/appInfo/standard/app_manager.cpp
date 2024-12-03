@@ -49,16 +49,15 @@ const std::string AppManager::GetAppId()
         LOGE("bundleManager is nullptr.");
         return appId;
     }
-    int userId;
-    ErrCode result = AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
-    if (result != ERR_OK) {
+    int32_t userId = -1;
+    if (AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId) != ERR_OK) {
         LOGE("GetAppIdByCallingUid QueryActiveOsAccountIds failed.");
         return appId;
     }
-    std::string BundleName;
+    std::string BundleName = "";
     bundleManager->GetNameForUid(IPCSkeleton::GetCallingUid(), BundleName);
     AppExecFwk::BundleInfo bundleInfo;
-    int ret = bundleManager->GetBundleInfoV9(
+    int32_t ret = bundleManager->GetBundleInfoV9(
         BundleName, static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO),
         bundleInfo, userId);
     if (ret != 0) {

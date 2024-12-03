@@ -541,6 +541,7 @@ private:
     std::shared_ptr<DmAdapterManager> adapterMgr_;
     std::map<int32_t, std::shared_ptr<IAuthentication>> authenticationMap_;
     std::shared_ptr<AuthRequestState> authRequestState_ = nullptr;
+    std::shared_ptr<AuthRequestState> authRequestStateTemp_ = nullptr;
     std::shared_ptr<AuthResponseState> authResponseState_ = nullptr;
     std::shared_ptr<DmAuthRequestContext> authRequestContext_;
     std::shared_ptr<DmAuthResponseContext> authResponseContext_;

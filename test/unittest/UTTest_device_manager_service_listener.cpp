@@ -456,6 +456,62 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderEvent_001, testing::ext::T
     listener_->OnPinHolderEvent(processInfo, event, result, content);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
+
+HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
+    DmDeviceInfo devInfo;
+    listener_->OnDeviceScreenStateChange(processInfo, devInfo);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+
+    processInfo.pkgName = "ohos.distributedhardware.devicemanager";
+    listener_->OnDeviceScreenStateChange(processInfo, devInfo);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+}
+
+HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
+    std::string deviceList = "deviceList";
+    uint16_t deviceTypeId = 1;
+    int32_t errcode = 0;
+    listener_->OnCredentialAuthStatus(processInfo, deviceList, deviceTypeId, errcode);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+}
+
+HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
+    PeerTargetId targetId;
+    int32_t result = 1;
+    int32_t status = 0;
+    std::string content = "content";
+    listener_->OnSinkBindResult(processInfo, targetId, result, status, content);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+}
+
+HWTEST_F(DeviceManagerServiceListenerTest, OnProcessRemove_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    ProcessInfo processInfo;
+    processInfo.userId = 100;
+    processInfo.pkgName = "com.ohos.helloworld";
+    DmDeviceInfo dmDeviceInfo;
+    listener_->alreadyOnlinePkgName_["com.ohos.helloworld#100"] = dmDeviceInfo;
+    DmDeviceInfo dmDeviceInfo1;
+    listener_->alreadyOnlinePkgName_["com.ohos.network"] = dmDeviceInfo;
+    listener_->OnProcessRemove(processInfo);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

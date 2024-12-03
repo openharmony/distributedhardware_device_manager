@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,10 +21,11 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
+namespace {
 constexpr const char* TIMER_RUNNING = "TimerRunning";
 constexpr int32_t ERR_DM_INPUT_PARA_INVALID = -20006;
 constexpr int32_t DM_OK = 0;
+}
 
 Timer::Timer(std::string name, int32_t time, TimerCallback callback)
     : timerName_(name), expire_(steadyClock::now()), state_(true), timeOut_(time), callback_(callback) {};

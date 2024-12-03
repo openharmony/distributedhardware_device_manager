@@ -76,6 +76,7 @@ namespace {
     constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
 }
+
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -2162,9 +2163,9 @@ void DeviceManagerService::HandleUserIdCheckSumChange(const std::string &msg)
 
 void DeviceManagerService::ClearDiscoveryCache(const ProcessInfo &processInfo)
 {
-    LOGI("PkgName %{public}s.", processInfo.pkgName.c_str());
+    LOGI("PkgName: %{public}s, userId: %{public}d", processInfo.pkgName.c_str(), processInfo.userId);
     CHECK_NULL_VOID(discoveryMgr_);
-    discoveryMgr_->ClearDiscoveryCache(processInfo.pkgName);
+    discoveryMgr_->ClearDiscoveryCache(processInfo);
 }
 
 void DeviceManagerService::HandleDeviceScreenStatusChange(DmDeviceInfo &deviceInfo)

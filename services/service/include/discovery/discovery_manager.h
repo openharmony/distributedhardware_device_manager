@@ -76,7 +76,8 @@ public:
     static bool IsCommonDependencyReady();
     static bool CloseCommonDependencyObj();
 #endif
-    void ClearDiscoveryCache(const std::string &pkgName);
+    void ClearDiscoveryCache(const ProcessInfo &processInfo);
+    std::set<uint16_t> ClearDiscoveryPkgName(const std::string &pkgName);
 
 private:
     void StartDiscoveryTimer(const std::string &pkgName);
