@@ -268,6 +268,12 @@ HWTEST_F(DeviceManagerServiceThreeTest, BindTarget_301, testing::ext::TestSize.L
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+
+    bindParam.insert(std::make_pair(PARAM_KEY_META_TYPE, pkgName));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterLoad()).WillOnce(Return(false));
+    ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, DpAclAdd_301, testing::ext::TestSize.Level0)
@@ -321,6 +327,15 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+
+    std::vector<DmDeviceInfo> deviceList;
+    DmDeviceInfo dmDeviceInfo;
+    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+    deviceList.push_back(dmDeviceInfo);
+    EXPECT_CALL(*deviceManagerServiceMock_, GetTrustedDeviceList(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(deviceList),Return(DM_OK)));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().LoadHardwareFwkService();
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSize.Level0)
@@ -344,6 +359,16 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSi
 
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, UnbindTarget_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    PeerTargetId targetId;
+    std::map<std::string, std::string> unbindParam;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, unbindParam);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 } // namespace
 } // namespace DistributedHardware

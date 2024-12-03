@@ -27,6 +27,7 @@
 #include "device_manager_service_impl.h"
 #include "dm_single_instance.h"
 #include "common_event_support.h"
+#include "mock/multiple_user_connector_mock.h"
 #include "permission_manager_mock.h"
 #include "softbus_listener_mock.h"
 #include "app_manager_mock.h"
@@ -35,6 +36,7 @@
 #include "dm_softbus_cache_mock.h"
 #include "dm_crypto_mock.h"
 #include "dm_hidumper_mock.cpp"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -59,6 +61,8 @@ public:
         std::make_shared<SoftbusCacheMock>();
     static inline  std::shared_ptr<CryptoMock> cryptoMock_ = std::make_shared<CryptoMock>();
     static inline  std::shared_ptr<HiDumpHelperMock> hiDumpHelperMock_ = std::make_shared<HiDumpHelperMock>();
+    static inline  std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
+        std::make_shared<MultipleUserConnectorMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

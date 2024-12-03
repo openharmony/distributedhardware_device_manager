@@ -37,6 +37,8 @@ public:
     virtual int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo) = 0;
     virtual int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName) = 0;
     virtual int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus) = 0;
+    virtual int32_t GetIPAddrTypeFromCache(const std::string &deviceId, const std::string &ip,
+        ConnectionAddrType &addrType) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusListener> dmSoftbusListener = nullptr;
 };
@@ -53,6 +55,7 @@ public:
     MOCK_METHOD(int32_t, GetLocalDeviceInfo, (DmDeviceInfo &));
     MOCK_METHOD(int32_t, SetLocalDeviceName, (const std::string &, const std::string &));
     MOCK_METHOD(int32_t, GetDeviceScreenStatus, (const char *, int32_t &));
+    MOCK_METHOD(int32_t, GetIPAddrTypeFromCache, (const std::string &, const std::string &, ConnectionAddrType &));
 };
 }
 }

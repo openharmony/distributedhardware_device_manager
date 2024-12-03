@@ -69,5 +69,11 @@ int32_t SoftbusListener::GetDeviceScreenStatus(const char *networkId, int32_t &s
 {
     return DmSoftbusListener::dmSoftbusListener->GetDeviceScreenStatus(networkId, screenStatus);
 }
+
+int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, const std::string &ip,
+    ConnectionAddrType &addrType)
+{
+    return DmSoftbusListener::dmSoftbusListener->GetIPAddrTypeFromCache(deviceId, ip, addrType);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
