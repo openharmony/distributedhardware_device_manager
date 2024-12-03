@@ -889,9 +889,9 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     }
     DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
         rmtFrontUserIdsTemp, rmtBackUserIdsTemp);
-    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
-        localUserIds, localUdid);
     DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(rmtBackUserIdsTemp, remoteUdid,
+        localUserIds, localUdid);
+    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
         localUserIds, localUdid);
 }
 
