@@ -830,6 +830,15 @@ void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &pro
     deviceStateMgr_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
 }
 
+int32_t DeviceManagerServiceImpl::SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList)
+{
+    CHECK_NULL_RETURN(deviceStateMgr_, ERR_DM_POINT_NULL);
+    for (auto item : deviceList) {
+        deviceStateMgr_->SaveOnlineDeviceInfo(item);
+    }
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

@@ -17,6 +17,7 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
+#include "device_manager_service_notify.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "if_system_ability_manager.h"
@@ -335,6 +336,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     std::string pkgName = IpcServerStub::GetInstance().GetDmListenerPkgName(remote);
     LOGI("AppDeathRecipient: OnRemoteDied for %{public}s", pkgName.c_str());
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(pkgName);
+    DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(pkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -15,8 +15,10 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
+#include "device_manager_service_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_log.h"
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
@@ -257,6 +259,16 @@ ON_IPC_SERVER_CMD(DELETE_CREDENTIAL, IpcIo &req, IpcIo &reply)
     if (ret == DM_OK) {
         WriteString(&reply, outParamStr.c_str());
     }
+}
+
+ON_IPC_SERVER_CMD(SYNC_CALLBACK, IpcIo &req, IpcIo &reply)
+{
+    LOGI("start.");
+    std::string pkgName = (const char*)ReadString(&req, nullptr);
+    int32_t dmCommonNotifyEvent = 0;
+    ReadInt32(&req, &dmCommonNotifyEvent);
+    int32_t ret = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, pkgName);
+    WriteInt32(&reply, ret);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -56,6 +56,7 @@
 #include "ipc_start_discovery_req.h"
 #include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
+#include "ipc_sync_callback_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_unbind_device_req.h"
 #include "ipc_unpublish_req.h"
@@ -356,6 +357,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ret;
     }
 #endif
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     LOGI("Completed");
     return DM_OK;
@@ -369,6 +371,7 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
     LOGI("Completed");
     return DM_OK;
@@ -381,6 +384,7 @@ int32_t DeviceManagerImpl::UnRegisterDevStateCallback(const std::string &pkgName
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    SyncCallbackToService(DmCommonNotifyEvent::UN_REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
     LOGI("Completed");
     return DM_OK;
@@ -393,6 +397,7 @@ int32_t DeviceManagerImpl::UnRegisterDevStatusCallback(const std::string &pkgNam
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    SyncCallbackToService(DmCommonNotifyEvent::UN_REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStatusCallback(pkgName);
     LOGI("Completed");
     return DM_OK;
@@ -1849,6 +1854,7 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
         LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
@@ -2239,6 +2245,7 @@ int32_t DeviceManagerImpl::RegisterDeviceScreenStatusCallback(const std::string 
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceScreenStatusCallback(pkgName, callback);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
@@ -2250,6 +2257,7 @@ int32_t DeviceManagerImpl::UnRegisterDeviceScreenStatusCallback(const std::strin
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    SyncCallbackToService(DmCommonNotifyEvent::UN_REG_DEVICE_SCREEN_STATE, pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceScreenStatusCallback(pkgName);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
@@ -2291,6 +2299,7 @@ int32_t DeviceManagerImpl::RegisterCredentialAuthStatusCallback(const std::strin
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    SyncCallbackToService(DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY, pkgName);
     DeviceManagerNotify::GetInstance().RegisterCredentialAuthStatusCallback(pkgName, callback);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
@@ -2302,9 +2311,52 @@ int32_t DeviceManagerImpl::UnRegisterCredentialAuthStatusCallback(const std::str
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    SyncCallbackToService(DmCommonNotifyEvent::UN_REG_CREDENTIAL_AUTH_STATUS_NOTIFY, pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterCredentialAuthStatusCallback(pkgName);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
+}
+
+void DeviceManagerImpl::SyncCallbackToService(DmCommonNotifyEvent dmCommonNotifyEvent, const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    if (!IsDmCommonNotifyEventValid(dmCommonNotifyEvent)) {
+        LOGE("Invalid dmCommonNotifyEvent: %{public}d.", dmCommonNotifyEvent);
+        return;
+    }
+    std::shared_ptr<IpcSyncCallbackReq> req = std::make_shared<IpcSyncCallbackReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDmCommonNotifyEvent(static_cast<int32_t>(dmCommonNotifyEvent));
+    int32_t ret = ipcClientProxy_->SendRequest(SYNC_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("Send Request failed ret: %{public}d", ret);
+        return;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return;
+    }
+}
+
+void DeviceManagerImpl::SyncCallbacksToService(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap)
+{
+    if (callbackMap.size() == 0) {
+        LOGI("callbackMap is empty.");
+        return;
+    }
+    for (auto iter : callbackMap) {
+        if (iter.second.size() == 0) {
+            continue;
+        }
+        for (auto item : iter.second) {
+            SyncCallbackToService(iter.first, item);
+        }
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

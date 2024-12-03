@@ -142,6 +142,7 @@ public:
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode);
 
+    int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

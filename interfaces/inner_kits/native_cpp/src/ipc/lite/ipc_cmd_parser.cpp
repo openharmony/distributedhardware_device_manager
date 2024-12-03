@@ -32,6 +32,7 @@
 #include "ipc_set_credential_rsp.h"
 #include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
+#include "ipc_sync_callback_req.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -369,6 +370,24 @@ ON_IPC_CMD(SERVER_DISCOVER_FINISH, IpcIo &reply)
     } else {
         DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, subscribeId, failedReason);
     }
+}
+
+ON_IPC_SET_REQUEST(SYNC_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
+                   size_t buffLen)
+{
+    std::shared_ptr<IpcSyncCallbackReq> pReq = std::static_pointer_cast<IpcSyncCallbackReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    int32_t dmCommonNotifyEvent = pReq->GetDmCommonNotifyEvent();
+
+    IpcIoInit(&request, buffer, buffLen, 0);
+    WriteString(&request, pkgName.c_str());
+    WriteInt32(&request, dmCommonNotifyEvent);
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SYNC_CALLBACK, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    return SetRspErrCode(reply, pBaseRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

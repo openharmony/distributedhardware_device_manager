@@ -92,6 +92,8 @@ private:
     int32_t ConvertUdidHashToAnoyDeviceId(const std::string &pkgName, const std::string &udidHash,
         std::string &anoyDeviceId);
 #endif
+    std::unordered_set<std::string> GetWhiteListSAPkgName(DmCommonNotifyEvent dmCommonNotifyEvent);
+    std::vector<std::string> GetNotifyPkgName(DmCommonNotifyEvent dmCommonNotifyEvent);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

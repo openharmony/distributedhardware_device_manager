@@ -85,6 +85,11 @@ int32_t DeviceManagerService::InitSoftbusListener()
         softbusListener_ = std::make_shared<SoftbusListener>();
     }
     SoftbusCache::GetInstance().UpdateDeviceInfoCache();
+    std::vector<DmDeviceInfo> onlineDeviceList;
+    SoftbusCache::GetInstance().GetDeviceInfoFromCache(onlineDeviceList);
+    if (onlineDeviceList.size() > 0 && IsDMServiceImplReady()) {
+        dmServiceImpl_->SaveOnlineDeviceInfo(onlineDeviceList);
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     SubscribePublishCommonEvent();
@@ -897,6 +902,9 @@ bool DeviceManagerService::IsDMServiceImplReady()
     }
 
     dmServiceImpl_ = std::shared_ptr<IDeviceManagerServiceImpl>(func());
+    if (listener_ == nullptr) {
+        listener_ = std::make_shared<DeviceManagerServiceListener>();
+    }
     if (dmServiceImpl_->Initialize(listener_) != DM_OK) {
         dlclose(so_handle);
         dmServiceImpl_ = nullptr;

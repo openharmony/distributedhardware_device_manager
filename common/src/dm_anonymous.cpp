@@ -230,5 +230,13 @@ int32_t StringToInt(const std::string &str, int32_t base)
     }
     return static_cast<int32_t>(result);
 }
+
+bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent)
+{
+    if (dmCommonNotifyEvent > DmCommonNotifyEvent::MIN && dmCommonNotifyEvent < DmCommonNotifyEvent::MAX) {
+        return true;
+    }
+    return false;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
