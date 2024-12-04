@@ -236,7 +236,7 @@ private:
      * @param discoveryType remote device link type, wifi or ble/br
      * @return int32_t 0 for success
      */
-    int32_t ParseCheckSumMsg(const std::string &msg, std::string &networkId, uint32_t &discoveryType);
+    int32_t ParseCheckSumMsg(const std::string &msg, std::string &networkId, uint32_t &discoveryType, bool &isChange);
     void ProcessCheckSumByWifi(std::string networkId, std::vector<int32_t> foregroundUserIds,
         std::vector<int32_t> backgroundUserIds);
     void ProcessCheckSumByBT(std::string networkId, std::vector<int32_t> foregroundUserIds,
