@@ -29,5 +29,10 @@ bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &proce
 {
     return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnAuthCode(processName);
 }
+
+int32_t PermissionManager::GetCallerProcessName(std::string &processName)
+{
+    return DmPermissionManager::dmPermissionManager->GetCallerProcessName(processName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

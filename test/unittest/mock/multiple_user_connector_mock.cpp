@@ -38,5 +38,10 @@ int32_t MultipleUserConnector::GetBackgroundUserIds(std::vector<int32_t> &userId
 {
     return DmMultipleUserConnector::dmMultipleUserConnector->GetBackgroundUserIds(userIdVec);
 }
+
+int32_t MultipleUserConnector::GetForegroundUserIds(std::vector<int32_t> &userVec)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetForegroundUserIds(userVec);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

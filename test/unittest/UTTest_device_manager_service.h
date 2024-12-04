@@ -27,7 +27,6 @@
 #include "device_manager_service_impl.h"
 #include "dm_single_instance.h"
 #include "common_event_support.h"
-#include "mock/multiple_user_connector_mock.h"
 #include "permission_manager_mock.h"
 #include "softbus_listener_mock.h"
 #include "app_manager_mock.h"

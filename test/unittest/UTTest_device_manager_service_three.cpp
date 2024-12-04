@@ -84,6 +84,28 @@ void DeviceManagerServiceThreeTest::TearDownTestCase()
 
 namespace {
 
+void SetSetDnPolicyPermission()
+{
+    const int32_t permsNum = 1;
+    const int32_t indexZero = 0;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission.ACCESS_SERVICE_DM";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "collaboration_service",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
+
 /**
  * @tc.name: AuthenticateDevice_301
  * @tc.desc: Set unsupport authType = 0 and return ERR_DM_NOT_INIT
@@ -369,6 +391,19 @@ HWTEST_F(DeviceManagerServiceThreeTest, UnbindTarget_301, testing::ext::TestSize
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, unbindParam);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level0)
+{
+    SetSetDnPolicyPermission();
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 } // namespace
 } // namespace DistributedHardware
