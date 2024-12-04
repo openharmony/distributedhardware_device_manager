@@ -333,7 +333,6 @@ ohos_unittest("UTTest_device_manager_service") {
     "mock/app_manager_mock.cpp",
     "mock/device_manager_service_impl_mock.cpp",
     "mock/dm_crypto_mock.cpp",
-    "mock/dm_hidumper_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
     "mock/kv_adapter_manager_mock.cpp",
     "mock/permission_manager_mock.cpp",

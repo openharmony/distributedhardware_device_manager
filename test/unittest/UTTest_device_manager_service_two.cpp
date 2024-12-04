@@ -807,24 +807,19 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_205, testing::ext::TestS
 HWTEST_F(DeviceManagerServiceTest, DmHiDumper_201, testing::ext::TestSize.Level0)
 {
     std::vector<std::string> args;
+    args.push_back(std::string(HIDUMPER_GET_TRUSTED_LIST_INFO));
     std::string result;
-    std::vector<HidumperFlag> dumpflag;
-    dumpflag.push_back(HidumperFlag::HIDUMPER_GET_DEVICE_STATE);
-    dumpflag.push_back(HidumperFlag::HIDUMPER_GET_HELP);
-    dumpflag.push_back(HidumperFlag::HIDUMPER_GET_TRUSTED_LIST);
     std::vector<DmDeviceInfo> deviceList;
     DmDeviceInfo dmDeviceInfo;
     dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
     dmDeviceInfo.deviceTypeId = 0;
     deviceList.push_back(dmDeviceInfo);
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*hiDumpHelperMock_, GetArgsType(_, _)).WillOnce(DoAll(SetArgReferee<1>(dumpflag), Return(DM_OK)));
     EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
         .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
     int ret = DeviceManagerService::GetInstance().DmHiDumper(args, result);
     EXPECT_EQ(ret, DM_OK);
 
-    EXPECT_CALL(*hiDumpHelperMock_, GetArgsType(_, _)).WillOnce(DoAll(SetArgReferee<1>(dumpflag), Return(DM_OK)));
     EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
         .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(ERR_DM_FAILED)));
     ret = DeviceManagerService::GetInstance().DmHiDumper(args, result);
