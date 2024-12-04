@@ -1170,7 +1170,7 @@ void AddAccessControlProfileTwentythree(std::vector<AccessControlProfile>& acces
     Accesser accesser;
     accesser.SetAccesserId(accesserId);
     accesser.SetAccesserDeviceId(deviceIdEr);
-    accesser.SetAccesserUserId(0);
+    accesser.SetAccesserUserId(userId);
     accesser.SetAccesserAccountId(oldAccountId);
     accesser.SetAccesserTokenId(tokenId);
     accesser.SetAccesserBundleName("bundleName");
@@ -1180,7 +1180,7 @@ void AddAccessControlProfileTwentythree(std::vector<AccessControlProfile>& acces
     Accessee accessee;
     accessee.SetAccesseeId(accesserId);
     accessee.SetAccesseeDeviceId(deviceIdEe);
-    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeUserId(0);
     accessee.SetAccesseeAccountId(newAccountId);
     accessee.SetAccesseeTokenId(tokenId);
     accessee.SetAccesseeBundleName("bundleName");

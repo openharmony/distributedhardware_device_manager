@@ -345,6 +345,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
 {
     std::string pkgName = "pkgName";
     std::string authCode = "authCode";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
@@ -363,6 +364,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSize.Level0)
 {
     std::string authCode = "authCode";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ExportAuthCode(authCode);
@@ -389,7 +391,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, UnbindTarget_301, testing::ext::TestSize
     PeerTargetId targetId;
     std::map<std::string, std::string> unbindParam;
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterLoad()).WillOnce(Return(false));
-    int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, unbindParam);
+    int32_t ret = DeviceManagerService::GetInstance().UnbindTarget(pkgName, targetId, unbindParam);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
@@ -400,7 +402,9 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetDnPolicy_301, testing::ext::TestSize.
     std::map<std::string, std::string> policy;
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
+    std::string processName = "collaboration_service";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
