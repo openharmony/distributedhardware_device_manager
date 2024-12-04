@@ -16,10 +16,29 @@
 #ifndef OHOS_DM_HICHAIN_LISTENER_H
 #define OHOS_DM_HICHAIN_LISTENER_H
 
+#include <string>
+
 #include "device_auth.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {
+
+struct GroupInfo {
+    std::string groupName;
+    std::string groupId;
+    std::string groupOwner;
+    int32_t groupType;
+    int32_t groupVisibility;
+    int32_t userId;
+    std::string osAccountId;
+
+    GroupInfo() : groupName(""), groupId(""), groupOwner(""), groupType(0),
+        groupVisibility(0), userId(0), osAccountId("") {
+    }
+};
+
+void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo);
 
 class HichainListener {
 public:

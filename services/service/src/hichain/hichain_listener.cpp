@@ -22,11 +22,29 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-const int32_t MAX_DATA_LEN = 65536;
+namespace {
+    constexpr uint32_t MAX_DATA_LEN = 65536;
+    constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
+}
 
 static DataChangeListener dataChangeListener_ = {
     .onDeviceUnBound = HichainListener::onHichainDeviceUnBound,
 };
+
+void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
+{
+    if (jsonObject.find(FIELD_GROUP_TYPE) != jsonObject.end() && jsonObject.at(FIELD_GROUP_TYPE).is_number_integer()) {
+        groupInfo.groupType = jsonObject.at(FIELD_GROUP_TYPE).get<int32_t>();
+    }
+    // FIELD_USER_ID是osAccountId
+    if (jsonObject.find(FIELD_USER_ID) != jsonObject.end() && jsonObject.at(FIELD_USER_ID).is_string()) {
+        groupInfo.osAccountId = jsonObject.at(FIELD_USER_ID).get<std::string>();
+    }
+    // FIELD_OS_ACCOUNT_ID是userId
+    if (jsonObject.find(FIELD_OS_ACCOUNT_ID) != jsonObject.end() && jsonObject.at(FIELD_OS_ACCOUNT_ID).is_string()) {
+        groupInfo.userId = jsonObject.at(FIELD_OS_ACCOUNT_ID).get<int32_t>();
+    }
+}
 
 HichainListener::HichainListener()
 {
@@ -72,8 +90,14 @@ void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *g
         return;
     }
     LOGI("peerUdid = %{public}s, groupInfo = %{public}s", peerUdid, groupInfo);
-    // 起线程异步调用
-    DeviceManagerService::GetInstance().HandleDataChange(peerUdid, groupInfo);
+    nlohmann::json groupInfoJsonObj = nlohmann::json::parse(string(groupInfo), nullptr, false);
+    GroupInfo hichainGroupInfo;
+    from_json(groupInfoJsonObj, hichainGroupInfo);
+    if (hichainGroupInfo.groupType != DM_IDENTICAL_ACCOUNT) {
+        LOGI("groupType is %{public}d, not idential account.", hichainGroupInfo.groupType);
+        return;
+    }
+    DeviceManagerService::GetInstance().HandleDataChange(peerUdid, hichainGroupInfo);
 }
 
 } // namespace DistributedHardware
