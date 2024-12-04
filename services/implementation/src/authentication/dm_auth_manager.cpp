@@ -2070,6 +2070,10 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
         return;
     }
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
+        if (requestId != authResponseContext_->requestId) {
+            LOGE("DmAuthManager::AuthDeviceError requestId %{public}" PRId64 "is error.", requestId);
+            return;
+        }
         authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
         authRequestContext_->reason = ERR_DM_AUTH_CODE_INCORRECT;
         authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;
@@ -2254,6 +2258,10 @@ void DmAuthManager::ProcIncompatible(const int32_t &sessionId)
 
 void DmAuthManager::OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message)
 {
+    if (authResponseContext_ == nullptr || authMessageProcessor_ == nullptr || hiChainAuthConnector_ == nullptr) {
+        LOGE("OnAuthDeviceDataReceived param is invalid");
+        return;
+    }
     authResponseContext_->sessionId = sessionId;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
