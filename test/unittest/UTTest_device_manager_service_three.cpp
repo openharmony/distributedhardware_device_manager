@@ -355,7 +355,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
     dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
     deviceList.push_back(dmDeviceInfo);
     EXPECT_CALL(*deviceManagerServiceMock_, GetTrustedDeviceList(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(deviceList),Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<1>(deviceList), Return(DM_OK)));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     DeviceManagerService::GetInstance().LoadHardwareFwkService();
 }
@@ -393,7 +393,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, UnbindTarget_301, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceThreeTest, SetDnPolicy_301, testing::ext::TestSize.Level0)
 {
     SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";

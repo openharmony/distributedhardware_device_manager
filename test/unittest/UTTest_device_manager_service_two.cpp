@@ -267,11 +267,11 @@ HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.L
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
     commonEventType = "common.event.HWID_LOGIN";
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
-    commonEventType = CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
+    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
     int32_t currentUserId = -1;
     int32_t beforeUserId = 0;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, currentUserId, beforeUserId);
-    commonEventType = CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
+    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
     currentUserId = 1;
     beforeUserId = 1;
     DMAccountInfo dmAccountInfo;
@@ -680,7 +680,6 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     }
     DeviceManagerService::GetInstance().SendUserRemovedBroadCast(peerUdids, userId);
 
-    std::vector<std::string> peerUdids;
     std::vector<int32_t> foregroundUserIds;
     std::vector<int32_t> backgroundUserIds;
     bool isNeedResponse = false;
@@ -692,14 +691,16 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
         backgroundUserIds, isNeedResponse);
 
     std::vector<UserIdInfo> remoteUserIdInfos;
-    UserIdInfo userIdInfo;
-    userIdInfo.isForeground = true;
-    userIdInfo.userId = 1;
+    UserIdInfo userIdInfo = {
+        .isForeground = true,
+        .userId = 1
+    };
     remoteUserIdInfos.push_back(userIdInfo);
-    UserIdInfo userIdInfo1;
-    userIdInfo1.isForeground = true;
-    userIdInfo1.userId = 101;
-    remoteUserIdInfos.push_back(userIdInfo);
+    UserIdInfo userIdInfo1 = {
+        .isForeground = true,
+        .userId = 101
+    };
+    remoteUserIdInfos.push_back(userIdInfo1);
     std::string remoteUdid = "remoteDeviceId";
     isNeedResponse = true;
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));

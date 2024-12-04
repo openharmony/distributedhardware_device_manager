@@ -161,6 +161,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::e
     int32_t bindType = 1;
     std::string deviceIdEr = "deviceId";
     std::string deviceIdEe = "deviceIdEe";
+    uint32_t accesserId = 1;
     DistributedDeviceProfile::Accesser accesser;
     accesser.SetAccesserDeviceId(deviceIdEr);
     accesser.SetAccesserUserId(userId);
