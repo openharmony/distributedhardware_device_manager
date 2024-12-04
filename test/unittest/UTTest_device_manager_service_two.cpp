@@ -691,15 +691,9 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
         backgroundUserIds, isNeedResponse);
 
     std::vector<UserIdInfo> remoteUserIdInfos;
-    UserIdInfo userIdInfo = {
-        .isForeground = true,
-        .userId = 1
-    };
+    UserIdInfo userIdInfo(true, 1);
     remoteUserIdInfos.push_back(userIdInfo);
-    UserIdInfo userIdInfo1 = {
-        .isForeground = true,
-        .userId = 101
-    };
+    UserIdInfo userIdInfo1(true, 102);
     remoteUserIdInfos.push_back(userIdInfo1);
     std::string remoteUdid = "remoteDeviceId";
     isNeedResponse = true;

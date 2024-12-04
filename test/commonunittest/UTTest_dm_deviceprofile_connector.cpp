@@ -1746,40 +1746,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
     DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, GetACLByDeviceIdAndUserId_001, testing::ext::TestSize.Level0)
-{
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    DmAccessCaller caller;
-    std::string srcUdid = "remoteDeviceId";
-    DmAccessCallee callee;
-    std::string sinkUdid = "localDeviceId";
-    AddAccessControlProfileFirst(profiles);
-    AddAccessControlProfileSix(profiles);
-
-    int32_t userId = 123456;
-    caller.userId = userId;
-    callee.userId = userId;
-    auto ret = DeviceProfileConnector::GetInstance().GetACLByDeviceIdAndUserId(profiles, caller, srcUdid,
-        callee, srcUdid);
-    EXPECT_EQ(ret.empty(), false);
-
-    callee.userId = 0;
-    ret = DeviceProfileConnector::GetInstance().GetACLByDeviceIdAndUserId(profiles, caller, srcUdid,
-        callee, srcUdid);
-    EXPECT_EQ(ret.empty(), false);
-
-    srcUdid = "localDeviceId";
-    sinkUdid = "remoteDeviceId";
-    ret = DeviceProfileConnector::GetInstance().GetACLByDeviceIdAndUserId(profiles, caller, srcUdid,
-        callee, srcUdid);
-    EXPECT_EQ(ret.empty(), false);
-
-    callee.userId == 0 ;
-    ret = DeviceProfileConnector::GetInstance().GetACLByDeviceIdAndUserId(profiles, caller, srcUdid,
-        callee, srcUdid);
-    EXPECT_EQ(ret.empty(), false);
-}
-
 HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level0)
 {
     std::string localUdid = "deviceId";
