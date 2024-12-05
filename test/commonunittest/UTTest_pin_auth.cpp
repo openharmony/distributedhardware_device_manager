@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <memory>
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"

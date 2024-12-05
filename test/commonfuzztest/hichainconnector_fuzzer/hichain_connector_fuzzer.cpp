@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "device_manager_service_listener.h"
+#include "dm_anonymous.h"
 #include "dm_auth_manager.h"
 #include "hichain_connector.h"
 

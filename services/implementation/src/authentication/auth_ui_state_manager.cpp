@@ -14,6 +14,7 @@
  */
 
 #include "auth_ui_state_manager.h"
+#include "dm_anonymous.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
