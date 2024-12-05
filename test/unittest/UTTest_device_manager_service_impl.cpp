@@ -1876,6 +1876,7 @@ HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_001, testing::ext::T
     if (deviceManagerServiceImpl_->deviceStateMgr_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
     int32_t ret = deviceManagerServiceImpl_->SaveOnlineDeviceInfo(deviceList);
     EXPECT_EQ(ret, DM_OK);
 

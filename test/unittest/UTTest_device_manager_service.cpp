@@ -2103,6 +2103,7 @@ HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::T
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(devState, devInfo);
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
@@ -2256,6 +2257,7 @@ HWTEST_F(DeviceManagerServiceTest, HandleDeviceScreenStatusChange_001, testing::
     DmDeviceInfo deviceInfo;
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     DeviceManagerService::GetInstance().IsDMServiceImplReady();
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
     EXPECT_NE(DeviceManagerService::GetInstance().dmServiceImpl_, nullptr);
 }

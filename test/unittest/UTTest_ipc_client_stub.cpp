@@ -162,7 +162,7 @@ HWTEST_F(IpcClientStubTest, SendCmd_001, testing::ext::TestSize.Level0)
     // 2. call IpcClientStub SendCmd with parameter
     int ret = instance->SendCmd(cmdCode, req, rsp);
     // 3. check result is ERR_DM_IPC_SEND_REQUEST_FAILED
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**

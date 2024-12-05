@@ -168,6 +168,7 @@ HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_201, testing::ext::TestSize.
 HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "CollaborationFwk";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().RegisterPinHolderCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
@@ -183,6 +184,7 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.L
     PeerTargetId targetId;
     DmPinType pinType = NUMBER_PIN_CODE;
     std::string payload;
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).Times(::testing::AtLeast(1)).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().CreatePinHolder(pkgName, targetId, pinType, payload);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);

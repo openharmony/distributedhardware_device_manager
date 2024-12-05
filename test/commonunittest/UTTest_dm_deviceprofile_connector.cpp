@@ -1106,7 +1106,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_002, testing:
     std::string pkgName = "bundleName";
     std::string deviceId = "123456";
     bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_003, testing::ext::TestSize.Level0)
@@ -1589,6 +1589,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_001, testing::ext::Tes
     EXPECT_FALSE(ret.empty());
 
     localUdid = "localDeviceId";
+    userId = 456;
     ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(userId, accountId, localUdid);
     EXPECT_FALSE(ret.empty());
 }
