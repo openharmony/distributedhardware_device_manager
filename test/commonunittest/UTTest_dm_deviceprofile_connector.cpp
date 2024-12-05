@@ -18,6 +18,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "deviceprofile_connector.h"
+#include "dp_inited_callback_stub.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -46,6 +47,16 @@ void DeviceProfileConnectorTest::TearDownTestCase()
     DmCrypto::dmCrypto = nullptr;
     cryptoMock_ = nullptr;
 }
+
+class MockDpInitedCallback : public DistributedDeviceProfile::DpInitedCallbackStub {
+public:
+    MockDpInitedCallback() {}
+    ~MockDpInitedCallback() {}
+    int32_t OnDpInited()
+    {
+        return DM_OK;
+    }
+};
 
 void AddAccessControlProfileFirst(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
 {
@@ -1909,6 +1920,13 @@ HWTEST_F(DeviceProfileConnectorTest, GetAclProfileByUserId_001, testing::ext::Te
     userId = 456;
     ret = DeviceProfileConnector::GetInstance().GetAclProfileByUserId(localUdid, userId, remoteUdid);
     EXPECT_FALSE(ret.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorTest, PutAllTrustedDevices_001, testing::ext::TestSize.Level0)
+{
+    std::vector<DistributedDeviceProfile::TrustedDeviceInfo> deviceInfos;
+    int32_t ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
+    EXPECT_NE(ret, DM_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
