@@ -2333,7 +2333,7 @@ void DeviceManagerService::HandleDataChange(const char *peerUdid, const GroupInf
     LOGI("profiles size = %{public}lu", profiles.size());
     for (auto &item : profiles) {
         if (item.GetBindType() == groupInfo.groupType &&
-            item.GetTrustDeviceId() == peerUdid &&
+            item.GetTrustDeviceId() == std::string(peerUdid) &&
             item.GetAccesser().GetAccesserUserId() == groupInfo.userId &&
             item.GetAccesser().GetAccesserAccountId() == groupInfo.osAccountId) {
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());

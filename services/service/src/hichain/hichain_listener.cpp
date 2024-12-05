@@ -90,7 +90,7 @@ void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *g
         return;
     }
     LOGI("peerUdid = %{public}s, groupInfo = %{public}s", peerUdid, groupInfo);
-    nlohmann::json groupInfoJsonObj = nlohmann::json::parse(string(groupInfo), nullptr, false);
+    nlohmann::json groupInfoJsonObj = nlohmann::json::parse(std::string(groupInfo), nullptr, false);
     GroupInfo hichainGroupInfo;
     from_json(groupInfoJsonObj, hichainGroupInfo);
     if (hichainGroupInfo.groupType != DM_IDENTICAL_ACCOUNT) {
