@@ -1787,13 +1787,13 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_002, testing::ext::TestSi
     discoveryInfo.pkgname = "";
     bool isonline = true;
     int32_t authForm = 0;
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30))WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
 
     discoveryInfo.pkgname = "bundleName";
     discoveryInfo.localDeviceId = "deviceId";
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30))WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30)).WillOnce(Return(DM_OK));
     ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
 }
