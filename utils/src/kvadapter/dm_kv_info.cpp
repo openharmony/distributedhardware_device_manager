@@ -28,7 +28,7 @@ void ConvertDmKVValueToJson(const DmKVValue &kvValue, std::string &result)
     jsonObj[ANOY_DEVICE_ID_KEY] = kvValue.anoyDeviceId;
     jsonObj[SALT_KEY] = kvValue.salt;
     jsonObj[LAST_MODIFY_TIME_KEY] = kvValue.lastModifyTime;
-    result = SafeDump(jsonObj);
+    result = SafeyDump(jsonObj);
 }
 
 void ConvertJsonToDmKVValue(const std::string &result, DmKVValue &kvValue)

@@ -316,13 +316,13 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     jsonObj[key] = 1;
     jsonObj["deviceName"] = "devieName1";
     hichainConnector->GetJsonInt(jsonObj, "devieName");
-    hichainConnector->AddMember(deviceId, SafeDump(jsonObj));
+    hichainConnector->AddMember(deviceId, SafeyDump(jsonObj));
     jsonObj[TAG_DEVICE_ID] = "deviceId_001";
     jsonObj[PIN_CODE_KEY] = 1;
     jsonObj[TAG_GROUP_ID] = "groupId";
     jsonObj[TAG_REQUEST_ID] = 1;
     jsonObj[TAG_GROUP_NAME] = "groupName";
-    hichainConnector->AddMember(deviceId, SafeDump(jsonObj));
+    hichainConnector->AddMember(deviceId, SafeyDump(jsonObj));
 
     nlohmann::json jsonObjCre;
     std::string params;
@@ -332,7 +332,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     jsonObjCre[FIELD_OPERATION_CODE] = 1;
     jsonObjCre[FIELD_META_NODE_TYPE] = "metaNode_002";
     jsonObjCre[FIELD_DEVICE_LIST] = "deviceList";
-    std::string credentialInfo = SafeDump(jsonObjCre);
+    std::string credentialInfo = SafeyDump(jsonObjCre);
     hichainConnector->ParseRemoteCredentialExt(credentialInfo, params, groupOwner);
     int32_t groupType = *(reinterpret_cast<const int32_t*>(data));
     nlohmann::json jsonDeviceList;

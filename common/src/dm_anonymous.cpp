@@ -184,7 +184,7 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
         for (const auto &it : paramMap) {
             jsonObj[it.first] = it.second;
         }
-        jsonStr = SafeDump(jsonObj);
+        jsonStr = SafeyDump(jsonObj);
     }
     return jsonStr;
 }
@@ -366,7 +366,7 @@ bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent)
     return false;
 }
 
-std::string SafeDump(const nlohmann::json &jsonObj)
+std::string SafeyDump(const nlohmann::json &jsonObj)
 {
     int indent = -1;
     return jsonObj.dump(indent, ' ', false, nlohmann::detail::error_handler_t::ignore);
