@@ -13,27 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_UTTEST_DM_DEVICEPROFILE_CONNECTOR_H
-#define OHOS_UTTEST_DM_DEVICEPROFILE_CONNECTOR_H
+#include "ipc_cmd_register_mock.h"
 
-#include <memory>
-#include <gtest/gtest.h>
-
-#include "deviceprofile_connector.h"
-#include "multiple_user_connector_mock.h"
-#include "dm_crypto_mock.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DeviceProfileConnectorTest : public testing::Test {
-public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
-    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;
-    static inline std::shared_ptr<CryptoMock> cryptoMock_ = nullptr;
-};
+DM_IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
+int32_t IpcCmdRegister::SetRequest(int32_t cmdCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    return DmIpcCmdRegister::dmIpcCmdRegister->SetRequest(cmdCode, pBaseReq, data);
+}
+
+int32_t IpcCmdRegister::OnIpcCmd(int32_t cmdCode, MessageParcel &data, MessageParcel &reply)
+{
+    return DmIpcCmdRegister::dmIpcCmdRegister->OnIpcCmd(cmdCode, data, reply);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_UTTEST_DM_DEVICEPROFILE_CONNECTOR_H

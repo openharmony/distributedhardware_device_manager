@@ -1647,6 +1647,8 @@ HWTEST_F(DeviceManagerServiceImplTest, CheckIsSameAccount_001, testing::ext::Tes
     if (deviceManagerServiceImpl_->authMgr_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
     int ret = deviceManagerServiceImpl_->CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -1660,6 +1662,8 @@ HWTEST_F(DeviceManagerServiceImplTest, CheckAccessControl_001, testing::ext::Tes
     if (deviceManagerServiceImpl_->authMgr_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
     int ret = deviceManagerServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -1679,6 +1683,12 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceScreenStatusChange_001, testi
 
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(IDENTICAL_ACCOUNT_TYPE));
+    deviceManagerServiceImpl_->HandleDeviceScreenStatusChange(devInfo);
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP_PEER_TO_PEER_TYPE));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
     deviceManagerServiceImpl_->HandleDeviceScreenStatusChange(devInfo);
     EXPECT_NE(deviceManagerServiceImpl_->softbusConnector_, nullptr);
 }
@@ -1729,12 +1739,15 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_003, testing::ext::TestSize.
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(DEVICE_ACROSS_ACCOUNT_TYPE));
     deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
 
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP_PEER_TO_PEER_TYPE));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
     deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
 
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP_ACROSS_ACCOUNT_TYPE));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
     deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
     EXPECT_NE(deviceManagerServiceImpl_->softbusConnector_, nullptr);
 }
@@ -1756,8 +1769,11 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_003, testing::ext::TestSize
     userIdAndBindLevel[2] = DEVICE;
     userIdAndBindLevel[3] = SERVICE;
     userIdAndBindLevel[4] = APP;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
     EXPECT_CALL(*deviceProfileConnectorMock_, GetUserIdAndBindLevel(_, _)).WillOnce(Return(userIdAndBindLevel));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile())
+        .WillOnce(Return(profiles)).WillOnce(Return(profiles));
     deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }
@@ -1821,6 +1837,9 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     auto ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(userId, accountId);
     EXPECT_TRUE(ret.empty());
 
+    ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(userId);
+    EXPECT_TRUE(ret.empty());
+
     std::string localUdid = "deviceId";
     int32_t localUserId = 123456;
     std::string peerUdid = "remoteUdid";
@@ -1844,6 +1863,45 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     int32_t currentUserId = 1;
     int32_t beforeUserId = 0;
     deviceManagerServiceImpl_->HandleUserSwitched(deviceMap, currentUserId, beforeUserId);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    std::vector<DmDeviceInfo> deviceList;
+    DmDeviceInfo dmDeviceInfo;
+    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+    dmDeviceInfo.networkType = 1;
+    deviceList.push_back(dmDeviceInfo);
+
+    if (deviceManagerServiceImpl_->deviceStateMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->SaveOnlineDeviceInfo(deviceList);
+    EXPECT_EQ(ret, DM_OK);
+
+    int32_t remoteUserId = 1;
+    std::string remoteUdid = "remoteDeviceId";
+    int32_t tokenId = 0;
+    ProcessInfo processInfo;
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(processInfo));
+    deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId);
+
+    processInfo.pkgName = "pkgName";
+    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(processInfo));
+    deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _)).WillOnce(Return(DM_INVALIED_BINDTYPE));
+    deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
+    if (deviceManagerServiceImpl_->authMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid);
 }
 } // namespace
 } // namespace DistributedHardware

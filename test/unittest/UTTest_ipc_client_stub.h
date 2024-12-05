@@ -17,9 +17,11 @@
 #define OHOS_IPC_CLIENT_STUB_TEST_H
 
 #include <gtest/gtest.h>
+#include <memory>
 #include <refbase.h>
 
 #include "ipc_client_stub.h"
+#include "ipc_cmd_register_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -29,6 +31,7 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static inline std::shared_ptr<IpcCmdRegisterMock> ipcCmdRegisterMock_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

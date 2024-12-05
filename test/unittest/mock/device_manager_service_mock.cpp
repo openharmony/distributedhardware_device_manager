@@ -24,5 +24,15 @@ bool DeviceManagerService::IsDMServiceImplReady()
 {
     return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceImplReady();
 }
+
+int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList)
+{
+    return DmDeviceManagerService::dmDeviceManagerService->GetTrustedDeviceList(pkgName, deviceList);
+}
+
+bool DeviceManagerService::IsDMServiceAdapterLoad()
+{
+    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterLoad();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

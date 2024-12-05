@@ -55,5 +55,11 @@ std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrus
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->GetAppTrustDeviceIdList(pkgname);
 }
+
+int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid,
+    int32_t bindLevel)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->UnAuthenticateDevice(pkgName, udid, bindLevel);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

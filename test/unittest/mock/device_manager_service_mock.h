@@ -27,6 +27,8 @@ public:
     virtual ~DmDeviceManagerService() = default;
 public:
     virtual bool IsDMServiceImplReady() = 0;
+    virtual int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList) = 0;
+    virtual bool IsDMServiceAdapterLoad() = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerService> dmDeviceManagerService = nullptr;
 };
@@ -34,6 +36,8 @@ public:
 class DeviceManagerServiceMock : public DmDeviceManagerService {
 public:
     MOCK_METHOD(bool, IsDMServiceImplReady, ());
+    MOCK_METHOD(int32_t, GetTrustedDeviceList, (const std::string &, std::vector<DmDeviceInfo> &));
+    MOCK_METHOD(bool, IsDMServiceAdapterLoad, ());
 };
 }
 }
