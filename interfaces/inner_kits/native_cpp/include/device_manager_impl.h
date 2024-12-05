@@ -23,6 +23,7 @@
 #endif
 #include <map>
 #include <mutex>
+#include <set>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -398,6 +399,7 @@ public:
     virtual int32_t RegisterCredentialAuthStatusCallback(const std::string &pkgName,
         std::shared_ptr<CredentialAuthStatusCallback> callback) override;
     virtual int32_t UnRegisterCredentialAuthStatusCallback(const std::string &pkgName) override;
+    void SyncCallbacksToService(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
 
 private:
     DeviceManagerImpl() = default;
@@ -413,6 +415,7 @@ private:
     int32_t RemovePublishCallback(const std::string &pkgName);
     int32_t CheckApiPermission(int32_t permissionLevel);
     void ConvertDeviceInfoToDeviceBasicInfo(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
+    void SyncCallbackToService(DmCommonNotifyEvent dmCommonNotifyEvent, const std::string &pkgName);
 
 private:
 #if !defined(__LITEOS_M__)

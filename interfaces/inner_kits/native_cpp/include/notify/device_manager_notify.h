@@ -21,6 +21,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -116,6 +117,7 @@ public:
     void OnDeviceScreenStatus(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
     void OnCredentialAuthStatus(const std::string &pkgName, const std::string &proofInfo,
                                 uint16_t deviceTypeId, int32_t errcode);
+    void GetCallBack(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
 
 private:
 #if !defined(__LITEOS_M__)

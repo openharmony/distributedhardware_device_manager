@@ -51,6 +51,7 @@
 #include "ipc_start_discovery_req.h"
 #include "ipc_start_discover_req.h"
 #include "ipc_stop_discovery_req.h"
+#include "ipc_sync_callback_req.h"
 #include "ipc_permission_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unbind_device_req.h"
@@ -1727,6 +1728,27 @@ ON_IPC_CMD(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, MessageParcel &data, MessagePa
     DeviceManagerNotify::GetInstance().OnCredentialAuthStatus(pkgName, proofInfo, deviceTypeId, errCode);
 
     reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SYNC_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    std::shared_ptr<IpcSyncCallbackReq> pReq = std::static_pointer_cast<IpcSyncCallbackReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(pReq->GetDmCommonNotifyEvent())) {
+        LOGE("write notify event failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SYNC_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

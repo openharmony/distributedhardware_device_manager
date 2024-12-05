@@ -17,6 +17,7 @@
 
 #include "app_manager.h"
 #include "device_manager_ipc_interface_code.h"
+#include "device_manager_service_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
@@ -108,7 +109,7 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const DmDeviceState 
     LOGI("In");
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
+    std::vector<std::string> PkgNameVec = GetNotifyPkgName(DmCommonNotifyEvent::REG_DEVICE_STATE);
     if (state == DEVICE_STATE_OFFLINE) {
         for (const auto &it : PkgNameVec) {
             std::string notifyKey = ComposeOnlineKey(it, std::string(info.deviceId));
@@ -150,7 +151,7 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const std::string &pkgN
     LOGI("In");
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-    std::unordered_set<std::string> notifyPkgnames = PermissionManager::GetInstance().GetSystemSA();
+    std::unordered_set<std::string> notifyPkgnames = GetWhiteListSAPkgName(DmCommonNotifyEvent::REG_DEVICE_STATE);
     notifyPkgnames.insert(pkgName);
     if (state == DEVICE_STATE_ONLINE) {
         for (const auto &it : notifyPkgnames) {
@@ -494,7 +495,7 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const std::string &
     if (pkgName == std::string(DM_PKG_NAME)) {
         std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-        std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
+        std::vector<std::string> PkgNameVec = GetNotifyPkgName(DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE);
         for (const auto &it : PkgNameVec) {
             SetDeviceScreenInfo(pReq, it, devInfo);
             ipcServerListener_.SendRequest(SERVER_DEVICE_SCREEN_STATE_NOTIFY, pReq, pRsp);
@@ -502,7 +503,8 @@ void DeviceManagerServiceListener::OnDeviceScreenStateChange(const std::string &
     } else {
         std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
         std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
-        std::unordered_set<std::string> notifyPkgnames = PermissionManager::GetInstance().GetSystemSA();
+        std::unordered_set<std::string> notifyPkgnames =
+            GetWhiteListSAPkgName(DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE);
         notifyPkgnames.insert(pkgName);
         for (const auto &it : notifyPkgnames) {
             SetDeviceScreenInfo(pReq, it, devInfo);
@@ -521,16 +523,59 @@ void DeviceManagerServiceListener::OnCredentialAuthStatus(const std::string &pkg
     pReq->SetProofInfo(proofInfo);
     pReq->SetDeviceTypeId(deviceTypeId);
     pReq->SetErrCode(errcode);
-    if (pkgName == std::string(DM_PKG_NAME)) {
-        std::vector<std::string> PkgNameVec = ipcServerListener_.GetAllPkgName();
-        for (const auto &it : PkgNameVec) {
-            pReq->SetPkgName(it);
-            ipcServerListener_.SendRequest(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, pReq, pRsp);
-        }
-    } else {
-        pReq->SetPkgName(pkgName);
+    std::vector<std::string> PkgNameVec = GetNotifyPkgName(DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY);
+    for (const auto &it : PkgNameVec) {
+        pReq->SetPkgName(it);
         ipcServerListener_.SendRequest(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, pReq, pRsp);
     }
+}
+
+std::unordered_set<std::string> DeviceManagerServiceListener::GetWhiteListSAPkgName(
+    DmCommonNotifyEvent dmCommonNotifyEvent)
+{
+    if (!IsDmCommonNotifyEventValid(dmCommonNotifyEvent)) {
+        LOGE("Invalid dmCommonNotifyEvent: %{public}d.", dmCommonNotifyEvent);
+        return {};
+    }
+    std::set<std::string> notifyPkgNames;
+    DeviceManagerServiceNotify::GetInstance().GetCallBack(dmCommonNotifyEvent, notifyPkgNames);
+    if (notifyPkgNames.size() == 0) {
+        LOGE("callback not exist dmCommonNotifyEvent: %{public}d", dmCommonNotifyEvent);
+        return {};
+    }
+    std::unordered_set<std::string> whiteListPkgnames = PermissionManager::GetInstance().GetSystemSA();
+    std::unordered_set<std::string> pkgNames;
+    for (const auto &it : whiteListPkgnames) {
+        if (notifyPkgNames.find(it) == notifyPkgNames.end()) {
+            continue;
+        }
+        pkgNames.insert(it);
+    }
+    return pkgNames;
+}
+
+std::vector<std::string> DeviceManagerServiceListener::GetNotifyPkgName(
+    DmCommonNotifyEvent dmCommonNotifyEvent)
+{
+    if (!IsDmCommonNotifyEventValid(dmCommonNotifyEvent)) {
+        LOGE("Invalid dmCommonNotifyEvent: %{public}d.", dmCommonNotifyEvent);
+        return {};
+    }
+    std::set<std::string> notifyPkgNames;
+    DeviceManagerServiceNotify::GetInstance().GetCallBack(dmCommonNotifyEvent, notifyPkgNames);
+    if (notifyPkgNames.size() == 0) {
+        LOGE("callback not exist dmCommonNotifyEvent: %{public}d", dmCommonNotifyEvent);
+        return {};
+    }
+    std::vector<std::string> pkgNames = ipcServerListener_.GetAllPkgName();
+    std::vector<std::string> pkgNamesTemp;
+    for (auto item : pkgNames) {
+        if (notifyPkgNames.find(item) == notifyPkgNames.end()) {
+            continue;
+        }
+        pkgNamesTemp.push_back(item);
+    }
+    return pkgNamesTemp;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
