@@ -1508,8 +1508,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
 
     nlohmann::json jsonPeerGroupIdObj;
     jsonPeerGroupIdObj["groupId"] = "123456";
-    authManager_->authResponseContext_->accountGroupIdHash =
-        SafeDump(jsonPeerGroupIdObj);
+    authManager_->authResponseContext_->accountGroupIdHash = SafeDump(jsonPeerGroupIdObj);
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();

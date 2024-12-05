@@ -73,8 +73,7 @@ int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string aut
     nlohmann::json jsonAuthParam;
     jsonAuthParam["osAccountId"] = osAccountId;
     jsonAuthParam["data"] = authData;
-    int32_t ret = ProcessAuthDevice(requestId,
-        SafeDump(jsonAuthParam).c_str(), &deviceAuthCallback_);
+    int32_t ret = ProcessAuthDevice(requestId, SafeDump(jsonAuthParam).c_str(), &deviceAuthCallback_);
     if (ret != HC_SUCCESS) {
         LOGE("Hichain processData failed ret %{public}d.", ret);
         return ERR_DM_FAILED;

@@ -154,8 +154,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
         LOGE("get current process account user id failed");
         return ERR_DM_FAILED;
     }
-    int32_t ret = deviceGroupManager_->createGroup(userId, requestId,
-        DM_PKG_NAME, SafeDump(jsonObj).c_str());
+    int32_t ret = deviceGroupManager_->createGroup(userId, requestId, DM_PKG_NAME, SafeDump(jsonObj).c_str());
     struct RadarInfo info = {
         .funcName = "CreateGroup",
         .toCallPkg = HICHAINNAME,
