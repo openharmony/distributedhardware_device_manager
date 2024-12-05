@@ -1075,7 +1075,7 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived002, testing::ext::TestSize.
     int32_t sessionId = 0;
     nlohmann::json jsonObject;
     jsonObject[TAG_DATA] = 123;
-    std::string message = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string message = SafeDump(jsonObject);
     authManager_->OnAuthDeviceDataReceived(sessionId, message);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
@@ -1086,7 +1086,7 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived003, testing::ext::TestSize.
     nlohmann::json jsonObject;
     jsonObject[TAG_DATA] = "123";
     jsonObject[TAG_DATA_LEN] = "123";
-    std::string message = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string message = SafeDump(jsonObject);
     authManager_->OnAuthDeviceDataReceived(sessionId, message);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
@@ -1098,7 +1098,7 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived004, testing::ext::TestSize.
     jsonObject[TAG_DATA] = "123";
     jsonObject[TAG_DATA_LEN] = 123;
     jsonObject[TAG_MSG_TYPE] = "123";
-    std::string message = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string message = SafeDump(jsonObject);
     authManager_->OnAuthDeviceDataReceived(sessionId, message);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
@@ -1110,7 +1110,7 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived005, testing::ext::TestSize.
     jsonObject[TAG_DATA] = "123";
     jsonObject[TAG_DATA_LEN] = 123;
     jsonObject[TAG_MSG_TYPE] = 123;
-    std::string message = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string message = SafeDump(jsonObject);
     authManager_->OnAuthDeviceDataReceived(sessionId, message);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
@@ -1335,7 +1335,7 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize
     int32_t ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, DM_OK);
 
-    extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    extra = SafeDump(jsonObject);
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
     ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
@@ -1345,7 +1345,7 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize
     EXPECT_EQ(ret, DM_OK);
 
     jsonObject["bindLevel"] = 15;
-    extra = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    extra = SafeDump(jsonObject);
     ret = authManager_->CheckAuthParamVaildExtra(extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }

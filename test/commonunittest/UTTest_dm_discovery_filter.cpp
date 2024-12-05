@@ -58,7 +58,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_002, testing::ext::TestSize.Leve
 {
     DmDeviceFilterOption filterOption;
     nlohmann::json jsonObject;
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -74,7 +74,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_003, testing::ext::TestSize.Leve
     DmDeviceFilterOption filterOption;
     nlohmann::json jsonObject;
     jsonObject[FILTERS_KEY] = "filters";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -91,7 +91,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_004, testing::ext::TestSize.Leve
     nlohmann::json jsonObject;
     std::vector<int> myArray;
     jsonObject[FILTERS_KEY] = myArray;
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -108,7 +108,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_005, testing::ext::TestSize.Leve
     nlohmann::json jsonObject;
     int myArray[5] = {1, 2, 3, 4, 5};
     jsonObject[FILTERS_KEY] = myArray;
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -126,7 +126,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_006, testing::ext::TestSize.Leve
     int myArray[5] = {1, 2, 3, 4, 5};
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = 12345;
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -144,7 +144,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_007, testing::ext::TestSize.Leve
     int myArray[5] = {1, 2, 3, 4, 5};
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = "filter_op";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -165,7 +165,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_008, testing::ext::TestSize.Leve
     myArray.push_back(object);
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = "filter_op";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -187,7 +187,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_009, testing::ext::TestSize.Leve
     myArray.push_back(object);
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = "filter_op";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -209,7 +209,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterJson_0010, testing::ext::TestSize.Lev
     myArray.push_back(object);
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = "filter_op";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -238,7 +238,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterOptionJson_002, testing::ext::TestSiz
 {
     DmDeviceFilterOption filterOption;
     nlohmann::json jsonObject;
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     filterOption.ParseFilterOptionJson(str);
     EXPECT_EQ(filterOption.filterOp_ == "AND", true);
 }
@@ -254,7 +254,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterOptionJson_003, testing::ext::TestSiz
     DmDeviceFilterOption filterOption;
     nlohmann::json jsonObject;
     jsonObject["credible"] = "123";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     filterOption.ParseFilterOptionJson(str);
     EXPECT_EQ(filterOption.filterOp_ == "AND", true);
 }
@@ -271,7 +271,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterOptionJson_004, testing::ext::TestSiz
     nlohmann::json jsonObject;
     jsonObject["credible"] = 1;
     jsonObject["isTrusted"] = "123";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     filterOption.ParseFilterOptionJson(str);
     EXPECT_EQ(filterOption.filterOp_ == "AND", true);
 }
@@ -289,7 +289,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterOptionJson_005, testing::ext::TestSiz
     jsonObject["credible"] = 1;
     jsonObject["isTrusted"] = 2;
     jsonObject["authForm"] = "3";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     filterOption.ParseFilterOptionJson(str);
     EXPECT_EQ(filterOption.filterOp_ == "AND", true);
 }
@@ -308,7 +308,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterOptionJson_006, testing::ext::TestSiz
     jsonObject["isTrusted"] = 2;
     jsonObject["authForm"] = 3;
     jsonObject["deviceType"] = "4";
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     filterOption.ParseFilterOptionJson(str);
     EXPECT_EQ(filterOption.filterOp_ == "AND", true);
 }
@@ -327,7 +327,7 @@ HWTEST_F(DmDiscoveryFilterTest, ParseFilterOptionJson_007, testing::ext::TestSiz
     jsonObject["isTrusted"] = 2;
     jsonObject["authForm"] = 3;
     jsonObject["deviceType"] = 4;
-    std::string str = jsonObject.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    std::string str = SafeDump(jsonObject);
     filterOption.ParseFilterOptionJson(str);
     EXPECT_EQ(filterOption.filterOp_ == "AND", true);
 }

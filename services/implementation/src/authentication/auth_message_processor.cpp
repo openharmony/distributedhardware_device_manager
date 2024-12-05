@@ -87,7 +87,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
     jsonObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
     GetJsonObj(jsonObj);
-    jsonStrVec.push_back(jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore));
+    jsonStrVec.push_back(SafeDump(jsonObj));
     for (int32_t idx = 0; idx < thumbnailSlice; idx++) {
         nlohmann::json jsonThumbnailObj;
         jsonThumbnailObj[TAG_VER] = DM_ITF_VER;
@@ -101,7 +101,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
         LOGI("TAG_APP_THUMBNAIL encode, idx %{public}d, sliceLen %{public}d, thumbnailSize %{public}d", idx,
             (uint32_t)sliceLen, thumbnailSize);
         jsonObj[TAG_APP_THUMBNAIL] = authRequestContext_->appThumbnail.substr(idx * MSG_MAX_SIZE, sliceLen);
-        jsonStrVec.push_back(jsonThumbnailObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore));
+        jsonStrVec.push_back(SafeDump(jsonThumbnailObj));
     }
     return jsonStrVec;
 }
@@ -138,7 +138,7 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
         default:
             break;
     }
-    return jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    return SafeDump(jsonObj);
 }
 
 void AuthMessageProcessor::CreatePublicKeyMessageExt(nlohmann::json &json)
@@ -593,7 +593,7 @@ std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const
     std::string authDataStr = std::string(reinterpret_cast<const char *>(data), dataLen);
     jsonObj[TAG_DATA] = authDataStr;
     jsonObj[TAG_DATA_LEN] = dataLen;
-    return jsonObj.dump(-1, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    return SafeDump(jsonObj);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
