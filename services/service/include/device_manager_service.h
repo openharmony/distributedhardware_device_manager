@@ -206,7 +206,7 @@ public:
     void RemoveNotifyRecord(const ProcessInfo &processInfo);
     int32_t RegDevStateCallbackToService(const std::string &pkgName);
     int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
-    void HandleDataChange(const char *peerUdid, const GroupInfo &groupInfo);
+    void HandleDeviceUnBound(const char *peerUdid, const GroupInfo &groupInfo);
 
 private:
     bool IsDMServiceImplReady();

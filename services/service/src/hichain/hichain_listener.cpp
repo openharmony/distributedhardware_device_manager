@@ -41,7 +41,8 @@ void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
         groupInfo.osAccountId = jsonObject.at(FIELD_USER_ID).get<std::string>();
     }
     // FIELD_OS_ACCOUNT_ID是userId
-    if (jsonObject.find(FIELD_OS_ACCOUNT_ID) != jsonObject.end() && jsonObject.at(FIELD_OS_ACCOUNT_ID).is_string()) {
+    if (jsonObject.find(FIELD_OS_ACCOUNT_ID) != jsonObject.end() &&
+        jsonObject.at(FIELD_OS_ACCOUNT_ID).is_number_integer()) {
         groupInfo.userId = jsonObject.at(FIELD_OS_ACCOUNT_ID).get<int32_t>();
     }
 }
@@ -78,7 +79,7 @@ void HichainListener::RegisterDataChangeCb()
     LOGI("RegisterDataChangeCb success!");
 }
 
-void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *groupInfo) 
+void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *groupInfo)
 {
     LOGI("HichainListener::onDeviceUnBound start");
     if (peerUdid == nullptr || groupInfo == nullptr) {
@@ -97,8 +98,7 @@ void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *g
         LOGI("groupType is %{public}d, not idential account.", hichainGroupInfo.groupType);
         return;
     }
-    DeviceManagerService::GetInstance().HandleDataChange(peerUdid, hichainGroupInfo);
+    DeviceManagerService::GetInstance().HandleDeviceUnBound(peerUdid, hichainGroupInfo);
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS

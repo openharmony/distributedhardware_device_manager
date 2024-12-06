@@ -155,6 +155,8 @@ public:
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(const std::string &localUdid, int32_t localUserId);
     void HandleSyncBackgroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
+    void HandleDeviceUnBound(int32_t bindType, const std::string &peerUdid,
+        const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

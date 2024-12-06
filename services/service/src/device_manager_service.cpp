@@ -2325,20 +2325,15 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
     return DM_OK;
 }
 
-void DeviceManagerService::HandleDataChange(const char *peerUdid, const GroupInfo &groupInfo)
+void DeviceManagerService::HandleDeviceUnBound(const char *peerUdid, const GroupInfo &groupInfo)
 {
-    LOGI("DeviceManagerService::HandleDataChange start, peerUdid = %{public}s.", peerUdid);
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles
-        = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
-    LOGI("profiles size = %{public}lu", profiles.size());
-    for (auto &item : profiles) {
-        if (item.GetBindType() == groupInfo.groupType &&
-            item.GetTrustDeviceId() == std::string(peerUdid) &&
-            item.GetAccesser().GetAccesserUserId() == groupInfo.userId &&
-            item.GetAccesser().GetAccesserAccountId() == groupInfo.osAccountId) {
-            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
-        }
-    }
+    LOGI("DeviceManagerService::HandleDeviceUnBound start, peerUdid = %{public}s.", peerUdid);
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    LOGI("DeviceManagerService::HandleDeviceUnBound localUdid = %{public}s.", localUdid.c_str());
+    DeviceProfileConnector::GetInstance().HandleDeviceUnBound(groupInfo.groupType, std::string(peerUdid),
+        localUdid, groupInfo.userId, groupInfo.osAccountId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
