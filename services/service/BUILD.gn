@@ -96,7 +96,7 @@ if (defined(ohos_lite)) {
         "//commonlibrary/utils_lite:utils",
         "//foundation/communication/dsoftbus:dsoftbus",
         "//foundation/deviceprofile/device_info_manager:distributed_device_profile_common",
-        "//foundation/deviceprofile/device_info_manager:distributed_device_profile_sdk"
+        "//foundation/deviceprofile/device_info_manager:distributed_device_profile_sdk",
         "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
