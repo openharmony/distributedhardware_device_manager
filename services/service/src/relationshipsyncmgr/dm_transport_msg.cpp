@@ -37,7 +37,7 @@ void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
     cJSON *numberObj = nullptr;
     for (auto const &userId : userIdsMsg.foregroundUserIds) {
         numberObj = cJSON_CreateNumber(userId);
-        if (numberObj != nullptr || !cJSON_AddItemToArray(foregroundUserIdArr, numberObj)) {
+        if (numberObj == nullptr || !cJSON_AddItemToArray(foregroundUserIdArr, numberObj)) {
             cJSON_Delete(numberObj);
             cJSON_Delete(foregroundUserIdArr);
             return;
