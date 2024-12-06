@@ -265,9 +265,10 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
         LOGE("addrInfo is nullptr.");
         return;
     }
-    if (memcpy_s(addrInfo->info.ble.udidHash, UDID_HASH_LEN,
-        remoteUdidHash_.c_str(), remoteUdidHash_.length()) != 0) {
-        LOGE("memcpy remoteUdid hash failed, remoteUdidHash_: %{public}s.", GetAnonyString(remoteUdidHash_).c_str());
+    if (Crypto::ConvertHexStringToBytes(addrInfo->info.ble.udidHash, UDID_HASH_LEN,
+        remoteUdidHash_.c_str(), remoteUdidHash_.length()) != DM_OK) {
+        LOGE("convert remoteUdid hash failed, remoteUdidHash_: %{public}s.", GetAnonyString(remoteUdidHash_).c_str());
+        return;
     }
     int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo, OnSoftbusJoinLNNResult);
     if (ret != DM_OK) {

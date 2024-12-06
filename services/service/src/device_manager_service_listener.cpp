@@ -51,6 +51,8 @@ namespace OHOS {
 namespace DistributedHardware {
 std::mutex DeviceManagerServiceListener::alreadyNotifyPkgNameLock_;
 std::map<std::string, DmDeviceInfo> DeviceManagerServiceListener::alreadyOnlinePkgName_ = {};
+std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNameSet_ = { "ohos.deviceprofile",
+    "ohos.distributeddata.service" };
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
     const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
@@ -88,14 +90,15 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetProcessInfo(processInfo);
     pReq->SetDeviceState(state);
+    DmDeviceInfo dmDeviceInfo = deviceInfo;
+    FillUdidAndUuidToDeviceInfo(processInfo.pkgName, dmDeviceInfo);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(processInfo.pkgName, appId) != DM_OK) {
-        pReq->SetDeviceInfo(deviceInfo);
+        pReq->SetDeviceInfo(dmDeviceInfo);
         pReq->SetDeviceBasicInfo(deviceBasicInfo);
         return;
     }
-    DmDeviceInfo dmDeviceInfo = deviceInfo;
     ConvertUdidHashToAnoyAndSave(processInfo.pkgName, dmDeviceInfo);
     DmDeviceBasicInfo dmDeviceBasicInfo = deviceBasicInfo;
     if (memset_s(dmDeviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN) != DM_OK) {
@@ -111,8 +114,37 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     pReq->SetDeviceBasicInfo(dmDeviceBasicInfo);
     return;
 #endif
-    pReq->SetDeviceInfo(deviceInfo);
+    pReq->SetDeviceInfo(dmDeviceInfo);
     pReq->SetDeviceBasicInfo(deviceBasicInfo);
+}
+
+int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::string &pkgName,
+    DmDeviceInfo &dmDeviceInfo)
+{
+    if (highPriorityPkgNameSet_.find(pkgName) == highPriorityPkgNameSet_.end()) {
+        return DM_OK;
+    }
+    std::string extraData = dmDeviceInfo.extraData;
+    std::string udid = "";
+    std::string uuid = "";
+    if (SoftbusCache::GetInstance().GetUdidFromCache(dmDeviceInfo.networkId, udid) != DM_OK) {
+        LOGE("GetUdidFromCache fail, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
+        return ERR_DM_FAILED;
+    }
+    if (SoftbusCache::GetInstance().GetUuidFromCache(dmDeviceInfo.networkId, uuid) != DM_OK) {
+        LOGE("GetUuidFromCache fail, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
+        return ERR_DM_FAILED;
+    }
+    nlohmann::json extraJson;
+    if (!extraData.empty()) {
+        extraJson = nlohmann::json::parse(extraData, nullptr, false);
+    }
+    if (!extraJson.is_discarded()) {
+        extraJson[PARAM_KEY_UDID] = udid;
+        extraJson[PARAM_KEY_UUID] = uuid;
+        dmDeviceInfo.extraData = to_string(extraJson);
+    }
+    return DM_OK;
 }
 
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
@@ -121,16 +153,29 @@ void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &p
     LOGI("In");
     std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId,
         DmCommonNotifyEvent::REG_DEVICE_STATE);
+    std::vector<ProcessInfo> hpProcessInfoVec;
+    std::vector<ProcessInfo> lpProcessInfoVec;
+    for (const auto &it : processInfoVec) {
+        if (highPriorityPkgNameSet_.find(it.pkgName) != highPriorityPkgNameSet_.end()) {
+            hpProcessInfoVec.push_back(it);
+        } else {
+            lpProcessInfoVec.push_back(it);
+        }
+    }
+
     switch (static_cast<int32_t>(state)) {
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_ONLINE):
-            ProcessDeviceOnline(processInfoVec, processInfo, state, info, deviceBasicInfo);
+            ProcessDeviceOnline(hpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
+            ProcessDeviceOnline(lpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
             break;
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_OFFLINE):
-            ProcessDeviceOffline(processInfoVec, processInfo, state, info, deviceBasicInfo);
+            ProcessDeviceOffline(lpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
+            ProcessDeviceOffline(hpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
             break;
         case static_cast<int32_t>(DmDeviceState::DEVICE_INFO_READY):
         case static_cast<int32_t>(DmDeviceState::DEVICE_INFO_CHANGED):
-            ProcessDeviceInfoChange(processInfoVec, processInfo, state, info, deviceBasicInfo);
+            ProcessDeviceInfoChange(hpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
+            ProcessDeviceInfoChange(lpProcessInfoVec, processInfo, state, info, deviceBasicInfo);
             break;
         default:
             break;
@@ -446,8 +491,8 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyDeviceId(const std::s
 void DeviceManagerServiceListener::OnDeviceTrustChange(const std::string &udid, const std::string &uuid,
     DmAuthForm authForm)
 {
-    LOGI("udid %{public}s, uuid %{public}s, authForm %{public}d.", GetAnonyString(udid).c_str(),
-        GetAnonyString(uuid).c_str(), authForm);
+    LOGI("udid %{public}s, authForm %{public}d, uuid %{public}s.", GetAnonyString(udid).c_str(),
+        authForm, GetAnonyString(uuid).c_str());
     std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::make_shared<IpcNotifyDevTrustChangeReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     int32_t userId = -1;

@@ -20,6 +20,8 @@
 #include "access_control_profile.h"
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
+#include "i_dp_inited_callback.h"
+#include "trusted_device_info.h"
 
 constexpr uint32_t ALLOW_AUTH_ONCE = 1;
 constexpr uint32_t ALLOW_AUTH_ALWAYS = 2;
@@ -157,6 +159,9 @@ public:
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
     void HandleDeviceUnBound(int32_t bindType, const std::string &peerUdid,
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
+    int32_t SubscribeDeviceProfileInited(sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback);
+    int32_t UnSubscribeDeviceProfileInited();
+    int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

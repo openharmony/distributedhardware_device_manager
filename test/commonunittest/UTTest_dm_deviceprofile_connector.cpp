@@ -18,6 +18,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "deviceprofile_connector.h"
+#include "dp_inited_callback_stub.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -33,15 +34,29 @@ void DeviceProfileConnectorTest::TearDown()
 
 void DeviceProfileConnectorTest::SetUpTestCase()
 {
+    multipleUserConnectorMock_ = std::make_shared<MultipleUserConnectorMock>();
+    DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
     cryptoMock_ = std::make_shared<CryptoMock>();
     DmCrypto::dmCrypto = cryptoMock_;
 }
 
 void DeviceProfileConnectorTest::TearDownTestCase()
 {
+    DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
+    multipleUserConnectorMock_ = nullptr;
     DmCrypto::dmCrypto = nullptr;
     cryptoMock_ = nullptr;
 }
+
+class MockDpInitedCallback : public DistributedDeviceProfile::DpInitedCallbackStub {
+public:
+    MockDpInitedCallback() {}
+    ~MockDpInitedCallback() {}
+    int32_t OnDpInited()
+    {
+        return DM_OK;
+    }
+};
 
 void AddAccessControlProfileFirst(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
 {
@@ -93,6 +108,56 @@ void AddAccessControlProfileFirst(std::vector<DistributedDeviceProfile::AccessCo
     profileFifth.SetAccesser(accesser);
     profileFifth.SetAccessee(accessee);
     accessControlProfiles.push_back(profileFifth);
+}
+
+void AddAccessControlProfileFirst(DistributedDeviceProfile::AccessControlProfile& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 256;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = 1;
+    uint32_t status = 1;
+    uint32_t authenticationType = 2;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "oldAccountId";
+    std::string newAccountId = "newAccountId";
+    std::string deviceIdEr = "remoteDeviceId";
+    std::string deviceIdEe = "localDeviceId";
+    std::string trustDeviceId = "123456";
+
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserId(accesserId);
+    accesser.SetAccesserDeviceId(deviceIdEr);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId(oldAccountId);
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceIdEe);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("bundleName");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    accessControlProfiles.SetAccessControlId(accesserId);
+    accessControlProfiles.SetAccesserId(accesserId);
+    accessControlProfiles.SetAccesseeId(accesserId);
+    accessControlProfiles.SetTrustDeviceId(trustDeviceId);
+    accessControlProfiles.SetBindType(bindType);
+    accessControlProfiles.SetAuthenticationType(authenticationType);
+    accessControlProfiles.SetDeviceIdType(deviceIdType);
+    accessControlProfiles.SetStatus(status);
+    accessControlProfiles.SetBindLevel(bindLevel);
+    accessControlProfiles.SetAccesser(accesser);
+    accessControlProfiles.SetAccessee(accessee);
 }
 
 void AddAccessControlProfileSecond(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
@@ -303,6 +368,158 @@ void AddAccessControlProfileFifth(std::vector<DistributedDeviceProfile::AccessCo
     accessControlProfiles.push_back(profileFifth);
 }
 
+void AddAccessControlProfileSix(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 256;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = 2;
+    uint32_t status = 1;
+    uint32_t authenticationType = 2;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "oldAccountId";
+    std::string newAccountId = "newAccountId";
+    std::string deviceIdEr = "remoteDeviceId";
+    std::string deviceIdEe = "localDeviceId";
+    std::string trustDeviceId = "remoteDeviceId";
+
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserId(accesserId);
+    accesser.SetAccesserDeviceId(deviceIdEr);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId(oldAccountId);
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName1");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceIdEe);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("bundleName2");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    DistributedDeviceProfile::AccessControlProfile profileFifth;
+    profileFifth.SetAccessControlId(accesserId);
+    profileFifth.SetAccesserId(accesserId);
+    profileFifth.SetAccesseeId(accesserId);
+    profileFifth.SetTrustDeviceId(trustDeviceId);
+    profileFifth.SetBindType(bindType);
+    profileFifth.SetAuthenticationType(authenticationType);
+    profileFifth.SetDeviceIdType(deviceIdType);
+    profileFifth.SetStatus(status);
+    profileFifth.SetBindLevel(bindLevel);
+    profileFifth.SetAccesser(accesser);
+    profileFifth.SetAccessee(accessee);
+    accessControlProfiles.push_back(profileFifth);
+}
+
+void AddAccessControlProfileSeven(DistributedDeviceProfile::AccessControlProfile& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 256;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = 2;
+    uint32_t status = 1;
+    uint32_t authenticationType = 2;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "oldAccountId";
+    std::string newAccountId = "newAccountId";
+    std::string deviceIdEr = "localDeviceId";
+    std::string deviceIdEe = "remoteDeviceId";
+    std::string trustDeviceId = "remoteDeviceId";
+
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserId(accesserId);
+    accesser.SetAccesserDeviceId(deviceIdEr);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId(oldAccountId);
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName1");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceIdEe);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("bundleName2");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    accessControlProfiles.SetAccessControlId(accesserId);
+    accessControlProfiles.SetAccesserId(accesserId);
+    accessControlProfiles.SetAccesseeId(accesserId);
+    accessControlProfiles.SetTrustDeviceId(trustDeviceId);
+    accessControlProfiles.SetBindType(bindType);
+    accessControlProfiles.SetAuthenticationType(authenticationType);
+    accessControlProfiles.SetDeviceIdType(deviceIdType);
+    accessControlProfiles.SetStatus(status);
+    accessControlProfiles.SetBindLevel(bindLevel);
+    accessControlProfiles.SetAccesser(accesser);
+    accessControlProfiles.SetAccessee(accessee);
+}
+
+void AddAccessControlProfileEight(DistributedDeviceProfile::AccessControlProfile& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 1;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = 2;
+    uint32_t status = 1;
+    uint32_t authenticationType = 2;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "oldAccountId";
+    std::string newAccountId = "newAccountId";
+    std::string deviceIdEr = "localDeviceId";
+    std::string deviceIdEe = "remoteDeviceId";
+    std::string trustDeviceId = "remoteDeviceId";
+
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserId(accesserId);
+    accesser.SetAccesserDeviceId(deviceIdEr);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId(oldAccountId);
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName1");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceIdEe);
+    accessee.SetAccesseeUserId(0);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("bundleName2");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    accessControlProfiles.SetAccessControlId(accesserId);
+    accessControlProfiles.SetAccesserId(accesserId);
+    accessControlProfiles.SetAccesseeId(accesserId);
+    accessControlProfiles.SetTrustDeviceId(trustDeviceId);
+    accessControlProfiles.SetBindType(bindType);
+    accessControlProfiles.SetAuthenticationType(authenticationType);
+    accessControlProfiles.SetDeviceIdType(deviceIdType);
+    accessControlProfiles.SetStatus(status);
+    accessControlProfiles.SetBindLevel(bindLevel);
+    accessControlProfiles.SetAccesser(accesser);
+    accessControlProfiles.SetAccessee(accessee);
+}
+
 void GetAccessControlProfiles(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
 {
     AddAccessControlProfileFirst(accessControlProfiles);
@@ -346,6 +563,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_001, testing::ext::TestSi
     DmDiscoveryInfo discoveryInfo;
     bool isonline = true;
     int32_t authForm = 0;
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1263,6 +1481,18 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAccountLogoutEvent_002, testing::ext:
     bindType = DeviceProfileConnector::GetInstance().HandleAccountLogoutEvent(remoteUserId,
         remoteAccountHash, remoteUdid, localUdid);
     EXPECT_NE(bindType, DM_IDENTICAL_ACCOUNT);
+
+    localUdid = "remoteDeviceId";
+    remoteUdid = "localDeviceId";
+    bindType = DeviceProfileConnector::GetInstance().HandleAccountLogoutEvent(remoteUserId,
+        remoteAccountHash, remoteUdid, localUdid);
+    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
+
+    int32_t remoteId = 456;
+    remoteUserId = remoteId;
+    bindType = DeviceProfileConnector::GetInstance().HandleAccountLogoutEvent(remoteUserId,
+        remoteAccountHash, remoteUdid, localUdid);
+    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::TestSize.Level0)
@@ -1273,6 +1503,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::Tes
     int32_t bindType = DM_INVALIED_BINDTYPE;
     bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
     EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
+
+    remoteUdid = "123456";
+    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
+    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAllAccessControlProfile_001, testing::ext::TestSize.Level0)
@@ -1315,6 +1549,13 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUserId = 123456;
     ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
     EXPECT_TRUE(ret);
+
+    localUdid = "localDeviceId";
+    localUserId = 123456;
+    peerUdid = "remoteDeviceId";
+    peerUserId = 123456;
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_005, testing::ext::TestSize.Level0)
@@ -1325,17 +1566,28 @@ HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_005, testing:
     auto ret = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId,
         targetDeviceId, userId);
     EXPECT_FALSE(ret.empty());
+
+    localDeviceId = "remoteDeviceId";
+    targetDeviceId = "localDeviceId";
+    userId = 456;
+    ret = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId,
+        targetDeviceId, userId);
+    EXPECT_FALSE(ret.empty());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndBindLevel_001, testing::ext::TestSize.Level0)
 {
     std::vector<int32_t> userIds;
     int32_t userId = 123456;
+    int32_t localId = 456;
     userIds.push_back(userId);
-    userIds.push_back(userId);
-    userIds.push_back(userId);
+    userIds.push_back(localId);
     std::string localUdid = "deviceId";
     auto ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndBindLevel(userIds, localUdid);
+    EXPECT_FALSE(ret.empty());
+
+    localUdid = "localDeviceId";
+    ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndBindLevel(userIds, localUdid);
     EXPECT_FALSE(ret.empty());
 }
 
@@ -1345,6 +1597,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_001, testing::ext::Tes
     std::string accountId;
     std::string localUdid = "deviceId";
     auto ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(userId, accountId, localUdid);
+    EXPECT_FALSE(ret.empty());
+
+    localUdid = "localDeviceId";
+    userId = 456;
+    ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(userId, accountId, localUdid);
     EXPECT_FALSE(ret.empty());
 }
 
@@ -1368,6 +1625,14 @@ HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_001, testing::ext::TestS
     localUserIds.push_back(currentUserId);
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(remoteUserIds, remoteUdid,
         localUserIds, localUdid);
+
+    localUdid = "remoteDeviceId";
+    remoteUdid = "localDeviceId";
+    int32_t localdeviceId = 456;
+    remoteUserIds.push_back(localdeviceId);
+    localUserIds.push_back(localdeviceId);
+    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(remoteUserIds, remoteUdid,
+        localUserIds, localUdid);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetOfflineProcessInfo_001, testing::ext::TestSize.Level0)
@@ -1382,6 +1647,15 @@ HWTEST_F(DeviceProfileConnectorTest, GetOfflineProcessInfo_001, testing::ext::Te
     auto ret = DeviceProfileConnector::GetInstance().GetOfflineProcessInfo(localUdid, localUserIds, remoteUdid,
         remoteUserIds);
     EXPECT_FALSE(ret.empty());
+
+    localUdid = "remoteDeviceId";
+    remoteUdid = "localDeviceId";
+    int32_t localdeviceId = 456;
+    remoteUserIds.push_back(localdeviceId);
+    localUserIds.push_back(localdeviceId);
+    ret = DeviceProfileConnector::GetInstance().GetOfflineProcessInfo(localUdid, localUserIds, remoteUdid,
+        remoteUserIds);
+    EXPECT_FALSE(ret.empty());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetUserIdAndBindLevel_001, testing::ext::TestSize.Level0)
@@ -1389,6 +1663,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetUserIdAndBindLevel_001, testing::ext::Te
     std::string localUdid = "deviceId";
     std::string peerUdid = "deviceId";
     auto ret = DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(localUdid, peerUdid);
+    EXPECT_FALSE(ret.empty());
+
+    localUdid = "remoteDeviceId";
+    peerUdid = "localDeviceId";
+    ret = DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(localUdid, peerUdid);
     EXPECT_FALSE(ret.empty());
 
     int32_t userId = 123456;
@@ -1401,6 +1680,15 @@ HWTEST_F(DeviceProfileConnectorTest, GetUserIdAndBindLevel_001, testing::ext::Te
     remoteBackUserIds.push_back(userId);
     DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid, remoteFrontUserIds,
         remoteBackUserIds);
+
+    localUdid = "remoteDeviceId";
+    remoteUdid = "localDeviceId";
+    userId = 456;
+    std::vector<int32_t> remoteUserIds;
+    remoteUserIds.push_back(userId);
+    localUserIds.push_back(userId);
+    DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(remoteUserIds, remoteUdid, localUserIds,
+        localUdid);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_002, testing::ext::TestSize.Level0)
@@ -1408,6 +1696,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_002, testing::ext::Tes
     std::string localUdid = "deviceId";
     int32_t localUserId = 123456;
     auto ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(localUdid, localUserId);
+    EXPECT_FALSE(ret.empty());
+
+    localUdid = "localDeviceId";
+    localUserId = 456;
+    ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(localUdid, localUserId);
     EXPECT_FALSE(ret.empty());
 
     std::vector<int32_t> remoteUserIds;
@@ -1446,6 +1739,27 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_002, testing::ext::Tes
     EXPECT_TRUE(dmNotifyKey < dmNotifyKey1);
 }
 
+HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string deviceId = "deviceId";
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
+    auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
+    EXPECT_EQ(ret.empty(), false);
+
+    deviceId = "deviceIder001";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
+    ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
+    EXPECT_EQ(ret.empty(), true);
+
+    std::string udid;
+    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
+
+    udid = "deviceId";
+    DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
+}
+
 HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level0)
 {
     std::string localUdid = "deviceId";
@@ -1461,6 +1775,158 @@ HWTEST_F(DeviceProfileConnectorTest, GetDevIdAndUserIdByActHash_001, testing::ex
     ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
         peerUserId, peerAccountHash);
     EXPECT_TRUE(ret.empty());
+
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).Times(::testing::AtLeast(40)).WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
+        peerUserId, peerAccountHash);
+    EXPECT_FALSE(ret.empty());
+
+    localUdid = "remoteDeviceId";
+    peerUdid = "localDeviceId";
+    peerUserId = 456;
+    EXPECT_CALL(*cryptoMock_, GetAccountIdHash(_, _)).Times(::testing::AtLeast(40)).WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().GetDevIdAndUserIdByActHash(localUdid, peerUdid,
+        peerUserId, peerAccountHash);
+    EXPECT_FALSE(ret.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_002, testing::ext::TestSize.Level0)
+{
+    DmDiscoveryInfo discoveryInfo;
+    discoveryInfo.remoteDeviceIdHash = "";
+    discoveryInfo.localDeviceId = "deviceId";
+    discoveryInfo.userId = 123456;
+    discoveryInfo.pkgname = "";
+    bool isonline = true;
+    int32_t authForm = 0;
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
+    EXPECT_EQ(ret, DM_OK);
+
+    discoveryInfo.pkgname = "bundleName";
+    discoveryInfo.localDeviceId = "deviceId";
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30)).WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string deviceId = "123456";
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_005, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string deviceId = "123456";
+    bool ret = DeviceProfileConnector::GetInstance().CheckSrcDevIdInAclForDevBind(pkgName, deviceId);
+    EXPECT_FALSE(ret);
+
+    DistributedDeviceProfile::AccessControlProfile profiles;
+    std::string remoteUdid = "remoteDeviceId";
+    std::vector<int32_t> remoteFrontUserIds;
+    std::vector<int32_t> remoteBackUserIds;
+    AddAccessControlProfileFirst(profiles);
+    DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profiles, remoteUdid,
+        remoteFrontUserIds, remoteBackUserIds);
+
+    remoteUdid = "localDeviceId";
+    AddAccessControlProfileSeven(profiles);
+    DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profiles, remoteUdid,
+        remoteFrontUserIds, remoteBackUserIds);
+
+    AddAccessControlProfileEight(profiles);
+    std::string localUdid = "localDeviceId";
+    std::vector<int32_t> localUserIds;
+    int32_t userId = 123456;
+    localUserIds.push_back(userId);
+    remoteUdid =  "remoteDeviceId";
+    remoteFrontUserIds.push_back(0);
+    remoteFrontUserIds.push_back(userId);
+    DeviceProfileConnector::GetInstance().UpdatePeerUserId(profiles, localUdid, localUserIds, remoteUdid,
+        remoteFrontUserIds);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckAccessControl_002, testing::ext::TestSize.Level0)
+{
+    int32_t userId = 123456;
+    DmAccessCaller caller;
+    caller.userId = userId;
+    std::string srcUdid = "deviceId";
+    DmAccessCallee callee;
+    callee.userId = userId;
+    std::string sinkUdid = "deviceId";
+    int32_t ret = DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    EXPECT_EQ(ret, DM_OK);
+
+    srcUdid = "remoteDeviceId";
+    sinkUdid = "localDeviceId";
+    caller.userId = 456;
+    callee.userId = 456;
+    ret = DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    EXPECT_EQ(ret, DM_OK);
+
+    callee.userId = 0;
+    ret = DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckIsSameAccount_002, testing::ext::TestSize.Level0)
+{
+    int32_t userId = 456;
+    DmAccessCaller caller;
+    caller.userId = userId;
+    std::string srcUdid = "localDeviceId";
+    DmAccessCallee callee;
+    callee.userId = userId;
+    std::string sinkUdid = "remoteDeviceId";
+    int32_t ret = DeviceProfileConnector::GetInstance().CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
+    EXPECT_EQ(ret, DM_OK);
+
+    callee.userId = 0;
+    ret = DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_002, testing::ext::TestSize.Level0)
+{
+    int32_t remoteUserId = 456;
+    int32_t tokenId = 1001;
+    std::string remoteUdid = "localDeviceId";
+    std::string localUdid = "remoteDeviceId";
+    std::string pkgName = "";
+    ProcessInfo res;
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
+    EXPECT_EQ("bundleName", res.pkgName);
+
+    tokenId = 1002;
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
+    EXPECT_EQ("bundleName", res.pkgName);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, GetAclProfileByUserId_001, testing::ext::TestSize.Level0)
+{
+    std::string localUdid = "deviceId";
+    int32_t userId = 123456;
+    std::string remoteUdid  = "deviceId";
+    auto ret = DeviceProfileConnector::GetInstance().GetAclProfileByUserId(localUdid, userId, remoteUdid);
+    EXPECT_FALSE(ret.empty());
+
+    localUdid = "remoteDeviceId";
+    remoteUdid = "localDeviceId";
+    userId = 456;
+    ret = DeviceProfileConnector::GetInstance().GetAclProfileByUserId(localUdid, userId, remoteUdid);
+    EXPECT_FALSE(ret.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorTest, PutAllTrustedDevices_001, testing::ext::TestSize.Level0)
+{
+    std::vector<DistributedDeviceProfile::TrustedDeviceInfo> deviceInfos;
+    int32_t ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
+    EXPECT_NE(ret, DM_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

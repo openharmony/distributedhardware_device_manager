@@ -242,7 +242,6 @@ public:
     int32_t GetRelatedGroupsCommon(int32_t userId, const std::string &deviceId, const char* pkgName,
         std::vector<GroupInfo> &groupList);
     void DeleteAllGroupByUdid(const std::string &udid);
-    void DeleteP2PGroup(int32_t switchUserId);
     int32_t DeleteGroupByACL(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec,
         std::vector<int32_t> &userIdVec);
     bool IsNeedDelete(std::string &groupName, int32_t userId,

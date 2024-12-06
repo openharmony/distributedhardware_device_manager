@@ -76,7 +76,9 @@ namespace {
     const std::string USERID_CHECKSUM_DISCOVER_TYPE_KEY = "discoverType";
     constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
+    const std::string USERID_CHECKSUM_ISCHANGE_KEY = "ischange";
 }
+
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -2069,7 +2071,8 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
     return;
 }
 
-int32_t DeviceManagerService::ParseCheckSumMsg(const std::string &msg, std::string &networkId, uint32_t &discoveryType)
+int32_t DeviceManagerService::ParseCheckSumMsg(const std::string &msg, std::string &networkId, uint32_t &discoveryType,
+    bool &isChange)
 {
     nlohmann::json msgJsonObj = nlohmann::json::parse(msg, nullptr, false);
     if (msgJsonObj.is_discarded()) {
@@ -2084,8 +2087,13 @@ int32_t DeviceManagerService::ParseCheckSumMsg(const std::string &msg, std::stri
         LOGE("msg not contain discoveryType.");
         return ERR_DM_FAILED;
     }
+    if (!IsBool(msgJsonObj, USERID_CHECKSUM_ISCHANGE_KEY)) {
+        LOGE("msg not contain ischange.");
+        return ERR_DM_FAILED;
+    }
     networkId = msgJsonObj[USERID_CHECKSUM_NETWORKID_KEY].get<std::string>();
     discoveryType = msgJsonObj[USERID_CHECKSUM_DISCOVER_TYPE_KEY].get<uint32_t>();
+    isChange = msgJsonObj[USERID_CHECKSUM_ISCHANGE_KEY].get<bool>();
     return DM_OK;
 }
 
@@ -2143,12 +2151,16 @@ void DeviceManagerService::HandleUserIdCheckSumChange(const std::string &msg)
     LOGI("handle user trust change, msg: %{public}s", GetAnonyString(msg).c_str());
     std::string remoteNetworkId = "";
     uint32_t discoveryType = 0;
-    int32_t ret = ParseCheckSumMsg(msg, remoteNetworkId, discoveryType);
+    bool isPeerUserIdChanged = true;
+    int32_t ret = ParseCheckSumMsg(msg, remoteNetworkId, discoveryType, isPeerUserIdChanged);
     if (ret != DM_OK) {
         LOGE("Parse checksum msg error");
         return;
     }
-
+    if (!isPeerUserIdChanged) {
+        LOGI("Peer foreground userId not change.");
+        return;
+    }
     std::vector<int32_t> foregroundUserIds;
     ret = MultipleUserConnector::GetForegroundUserIds(foregroundUserIds);
     if (ret != DM_OK || foregroundUserIds.empty()) {

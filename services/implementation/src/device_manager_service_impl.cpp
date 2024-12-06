@@ -81,6 +81,10 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (credentialMgr_ == nullptr) {
         credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener);
     }
+    if (dpInitedCallback_ == nullptr) {
+        dpInitedCallback_ = sptr<DpInitedCallback>(new DpInitedCallback());
+        DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback_);
+    }
     listener_ = listener;
     LOGI("Init success, singleton initialized");
     return DM_OK;
@@ -101,6 +105,8 @@ void DeviceManagerServiceImpl::Release()
     softbusConnector_ = nullptr;
     abilityMgr_ = nullptr;
     hiChainConnector_ = nullptr;
+    DeviceProfileConnector::GetInstance().UnSubscribeDeviceProfileInited();
+    dpInitedCallback_ = nullptr;
 }
 
 int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
@@ -889,9 +895,9 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     }
     DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
         rmtFrontUserIdsTemp, rmtBackUserIdsTemp);
-    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
-        localUserIds, localUdid);
     DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(rmtBackUserIdsTemp, remoteUdid,
+        localUserIds, localUdid);
+    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
         localUserIds, localUdid);
 }
 

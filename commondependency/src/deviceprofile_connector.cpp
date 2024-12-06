@@ -20,6 +20,7 @@
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "distributed_device_profile_client.h"
+#include "system_ability_definition.h"
 
 using namespace OHOS::DistributedDeviceProfile;
 
@@ -1431,6 +1432,47 @@ void DeviceProfileConnector::HandleDeviceUnBound(int32_t bindType, const std::st
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
+}
+
+int32_t DeviceProfileConnector::SubscribeDeviceProfileInited(
+    sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback)
+{
+    LOGI("In");
+    if (dpInitedCallback == nullptr) {
+        LOGE("dpInitedCallback is nullptr");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().SubscribeDeviceProfileInited(
+        DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, dpInitedCallback);
+    if (ret != DM_OK) {
+        LOGE("failed: %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceProfileConnector::UnSubscribeDeviceProfileInited()
+{
+    LOGI("In");
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().UnSubscribeDeviceProfileInited(
+        DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    if (ret != DM_OK) {
+        LOGE("failed: %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceProfileConnector::PutAllTrustedDevices(
+    const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos)
+{
+    LOGI("In deviceInfos.size:%{public}zu", deviceInfos.size());
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().PutAllTrustedDevices(deviceInfos);
+    if (ret != DM_OK) {
+        LOGE("failed: %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
 }
 
 IDeviceProfileConnector *CreateDpConnectorInstance()

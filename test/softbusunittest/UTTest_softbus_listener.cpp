@@ -1085,6 +1085,12 @@ HWTEST_F(SoftbusListenerTest, SetForegroundUserIdsToDSoftBus_001, testing::ext::
     }
     int32_t ret = softbusListener->SetForegroundUserIdsToDSoftBus(remoteUdid, userIds);
     EXPECT_EQ(ret, DM_OK);
+    
+    const uint32_t deviceListLen = 2001;
+    char devicelist[deviceListLen] = {0};
+    uint16_t deviceTypeId = 0;
+    int32_t errcode = -1;
+    softbusListener->OnCredentialAuthStatus(devicelist, deviceListLen, deviceTypeId, errcode);
     softbusListener = nullptr;
 }
 } // namespace

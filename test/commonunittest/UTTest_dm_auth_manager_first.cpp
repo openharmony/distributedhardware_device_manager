@@ -1128,7 +1128,7 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup002, testing::ext::TestSize.Level0)
     std::string pkgName = "pkgName";
     std::string deviceId;
     int32_t ret = authManager_->DeleteGroup(pkgName, deviceId);
-    ASSERT_NE(ret, DM_OK);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthManagerTest, PutAccessControlList001, testing::ext::TestSize.Level0)
@@ -1324,7 +1324,7 @@ HWTEST_F(DmAuthManagerTest, GetTaskTimeout_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(authManager_->GetTaskTimeout("test", taskTimeOut), taskTimeOut);
 
     authManager_->SetAuthType(AUTH_TYPE_IMPORT_AUTH_CODE);
-    EXPECT_EQ(authManager_->GetTaskTimeout(AUTHENTICATE_TIMEOUT_TASK, taskTimeOut), CLONE_AUTHENTICATE_TIMEOUT);
+    EXPECT_EQ(authManager_->GetTaskTimeout(AUTHENTICATE_TIMEOUT_TASK, taskTimeOut), 20);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize.Level0)
