@@ -124,7 +124,6 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
     if (highPriorityPkgNameSet_.find(pkgName) == highPriorityPkgNameSet_.end()) {
         return DM_OK;
     }
-    std::string extraData = dmDeviceInfo.extraData;
     std::string udid = "";
     std::string uuid = "";
     if (SoftbusCache::GetInstance().GetUdidFromCache(dmDeviceInfo.networkId, udid) != DM_OK) {
@@ -135,15 +134,19 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
         LOGE("GetUuidFromCache fail, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
         return ERR_DM_FAILED;
     }
-    nlohmann::json extraJson;
-    if (!extraData.empty()) {
-        extraJson = nlohmann::json::parse(extraData, nullptr, false);
+    std::string extraData = dmDeviceInfo.extraData;
+    if (extraData.empty()) {
+        LOGE("extraData is empty, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
+        return ERR_DM_FAILED;
     }
-    if (!extraJson.is_discarded()) {
-        extraJson[PARAM_KEY_UDID] = udid;
-        extraJson[PARAM_KEY_UUID] = uuid;
-        dmDeviceInfo.extraData = to_string(extraJson);
+    nlohmann::json extraJson = nlohmann::json::parse(extraData, nullptr, false);
+    if (extraJson.is_discarded()) {
+        LOGE("parse extraData fail, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
+        return ERR_DM_FAILED;
     }
+    extraJson[PARAM_KEY_UDID] = udid;
+    extraJson[PARAM_KEY_UUID] = uuid;
+    dmDeviceInfo.extraData = to_string(extraJson);
     return DM_OK;
 }
 
