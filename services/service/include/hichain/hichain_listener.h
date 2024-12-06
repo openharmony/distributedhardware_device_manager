@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-struct GroupInfo {
+struct GroupInformation {
     std::string groupName;
     std::string groupId;
     std::string groupOwner;
@@ -33,12 +33,12 @@ struct GroupInfo {
     int32_t userId;
     std::string osAccountId;
 
-    GroupInfo() : groupName(""), groupId(""), groupOwner(""), groupType(0),
+    GroupInformation() : groupName(""), groupId(""), groupOwner(""), groupType(0),
         groupVisibility(0), userId(0), osAccountId("") {
     }
 };
 
-void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo);
+void from_json(const nlohmann::json &jsonObject, GroupInformation &groupInfo);
 
 class HichainListener {
 public:

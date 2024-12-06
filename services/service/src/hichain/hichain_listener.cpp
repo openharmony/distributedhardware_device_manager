@@ -31,7 +31,7 @@ static DataChangeListener dataChangeListener_ = {
     .onDeviceUnBound = HichainListener::onHichainDeviceUnBound,
 };
 
-void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
+void from_json(const nlohmann::json &jsonObject, GroupInformation &groupInfo)
 {
     if (jsonObject.find(FIELD_GROUP_TYPE) != jsonObject.end() && jsonObject.at(FIELD_GROUP_TYPE).is_number_integer()) {
         groupInfo.groupType = jsonObject.at(FIELD_GROUP_TYPE).get<int32_t>();
@@ -92,7 +92,7 @@ void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *g
     }
     LOGI("peerUdid = %{public}s, groupInfo = %{public}s", peerUdid, groupInfo);
     nlohmann::json groupInfoJsonObj = nlohmann::json::parse(std::string(groupInfo), nullptr, false);
-    GroupInfo hichainGroupInfo;
+    GroupInformation hichainGroupInfo;
     from_json(groupInfoJsonObj, hichainGroupInfo);
     if (hichainGroupInfo.groupType != DM_IDENTICAL_ACCOUNT) {
         LOGI("groupType is %{public}d, not idential account.", hichainGroupInfo.groupType);

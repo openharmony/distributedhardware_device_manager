@@ -2337,7 +2337,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
     return DM_OK;
 }
 
-void DeviceManagerService::HandleDeviceUnBound(const char *peerUdid, const GroupInfo &groupInfo)
+void DeviceManagerService::HandleDeviceUnBound(const char *peerUdid, const GroupInformation &groupInfo)
 {
     LOGI("DeviceManagerService::HandleDeviceUnBound start, peerUdid = %{public}s.", peerUdid);
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
