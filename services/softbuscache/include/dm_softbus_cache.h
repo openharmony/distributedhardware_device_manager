@@ -32,6 +32,7 @@ class SoftbusCache {
 public:
     void SaveDeviceInfo(DmDeviceInfo deviceInfo);
     void DeleteDeviceInfo(const DmDeviceInfo &nodeInfo);
+    void DeleteDeviceInfo();
     void ChangeDeviceInfo(const DmDeviceInfo deviceInfo);
     void SaveDeviceSecurityLevel(const char *networkId);
     void DeleteDeviceSecurityLevel(const char *networkId);
