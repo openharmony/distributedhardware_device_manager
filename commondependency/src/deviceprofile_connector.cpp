@@ -1422,7 +1422,7 @@ void DeviceProfileConnector::HandleDeviceUnBound(int32_t bindType, const std::st
         LOGI("profiles is empty");
         return;
     }
-    LOGI("profiles size = %{public}lu", profiles.size());
+    LOGI("profiles size = %{public}zu", profiles.size());
     for (auto &item : profiles) {
         if (item.GetBindType() == bindType &&
             item.GetTrustDeviceId() == peerUdid &&
