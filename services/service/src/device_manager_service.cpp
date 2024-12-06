@@ -1195,7 +1195,8 @@ void DeviceManagerService::UnloadDMServiceAdapter()
 int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckNewPermission() &&
+        !PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1214,7 +1215,8 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
 int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckNewPermission() &&
+        !PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
