@@ -70,5 +70,12 @@ std::multimap<std::string, int32_t> DeviceProfileConnector::GetDevIdAndUserIdByA
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetDevIdAndUserIdByActHash(localUdid, peerUdid,
         peerUserId, peerAccountHash);
 }
+
+std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
+    std::string localDeviceId, std::string targetDeviceId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->SyncAclByBindType(pkgName, bindTypeVec,
+        localDeviceId, targetDeviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

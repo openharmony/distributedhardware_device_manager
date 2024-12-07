@@ -62,6 +62,8 @@ void DmAuthManagerTest::SetUpTestCase()
     DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock_;
     hiChainAuthConnectorMock_ = std::make_shared<HiChainAuthConnectorMock>();
     DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock_;
+    deviceProfileConnectorMock_ = std::make_shared<DeviceProfileConnectorMock>();
+    DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
 }
 void DmAuthManagerTest::TearDownTestCase()
 {
@@ -73,6 +75,8 @@ void DmAuthManagerTest::TearDownTestCase()
     softbusConnectorMock_ = nullptr;
     DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
     hiChainAuthConnectorMock_ = nullptr;
+    DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
+    deviceProfileConnectorMock_ = nullptr;
 }
 
 namespace {
@@ -1536,6 +1540,24 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     int32_t ret = authManager_->CheckTrustState();
     ASSERT_EQ(ret, 1);
+
+    int32_t sessionId = 1;
+    authResponseContext_->authType = AUTH_TYPE_PIN;
+    authResponseContext_->isOnline = true;
+    EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).WillOnce(Return(true));
+    authManager_->ProcessAuthRequest(sessionId);
+
+    authManager_->authResponseContext_->haveCredential = true;
+    EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _)).WillOnce(Return(true));
+    authManager_->GetAuthRequestContext();
+
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->authResponseContext_->importAuthCode = "";
+    std::vector<int32_t> bindType;
+    bindType.push_back(101);
+    bindType.push_back(102);
+    EXPECT_CALL(*deviceProfileConnectorMock_, SyncAclByBindType(_, _, _, _)).WillOnce(Return(bindType));
+    authManager_->ProcessAuthRequestExt(sessionId);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -79,6 +79,8 @@ void DmAuthManagerTest::SetUpTestCase()
     DmSoftbusSession::dmSoftbusSession = softbusSessionMock_;
     appManagerMock_ = std::make_shared<AppManagerMock>();
     DmAppManager::dmAppManager = appManagerMock_;
+    cryptoMock_ = std::make_shared<CryptoMock>();
+    DmCrypto::dmCrypto = cryptoMock_;
 }
 void DmAuthManagerTest::TearDownTestCase()
 {
@@ -86,6 +88,8 @@ void DmAuthManagerTest::TearDownTestCase()
     softbusSessionMock_ = nullptr;
     DmAppManager::dmAppManager = nullptr;
     appManagerMock_ = nullptr;
+    DmCrypto::dmCrypto = nullptr;
+    cryptoMock_ = nullptr;
 }
 
 namespace {
@@ -261,6 +265,9 @@ HWTEST_F(DmAuthManagerTest, AddMember_002, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_ = nullptr;
     int32_t ret = authManager_->AddMember(pinCode);
     ASSERT_EQ(ret, ERR_DM_FAILED);
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
     authManager_->isAddingMember_ = true;
     ret = authManager_->AddMember(pinCode);
     ASSERT_EQ(ret, ERR_DM_FAILED);
@@ -340,10 +347,13 @@ HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
     const std::string message = "messageTest";
     int64_t requestId = 555;
     int32_t status = 2;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = MSG_TYPE_AUTH_BY_PIN;
     authManager_->OnMemberJoin(requestId, status);
     authManager_->OnDataReceived(sessionId, message);
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    message = jsonObject.dump();
     authManager_->authResponseState_ = nullptr;
     authManager_->OnDataReceived(sessionId, message);
     authManager_->authRequestState_ = nullptr;
@@ -480,6 +490,13 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_001, testing::ext::TestSize.Level
     std::string extra = "extraTest";
     int32_t ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, ERR_DM_AUTH_FAILED);
+
+    authType = 0;
+    nlohmann::json jsonObject;
+    jsonObject["bindLevel"] = 5;
+    extra = jsonObject.dump();
+    ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_002, testing::ext::TestSize.Level0)
@@ -1404,6 +1421,11 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     authManager_->NegotiateRespMsg(DM_VERSION_4_1_5_1);
     authManager_->NegotiateRespMsg(DM_VERSION_5_0_2);
     EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
+    authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
+
+    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
     authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
     ret = authManager_->StopAuthenticateDevice(pkgName);
     ASSERT_EQ(ret, DM_OK);
@@ -1494,6 +1516,31 @@ HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->isIdenticalAccount = false;
     authManager_->authResponseContext_->isAuthCodeReady = true;
     authManager_->ProcessAuthRequestExt(sessionId);
+}
+
+HWTEST_F(DmAuthManagerTest, RespNegotiate_101, testing::ext::TestSize.Level0)
+{
+    int64_t requestId = 1;
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->dmVersion = "5.0.2";
+    authManager_->authResponseContext_->bindLevel = 1;
+    authManager_->RespNegotiate(requestId);
+    authManager_->authResponseContext_->dmVersion = "5.0.1";
+    authManager_->authResponseContext_->bindLevel = 0;
+    authManager_->RespNegotiate(requestId);
+    ASSERT_NE(authManager_->authResponseContext_, nullptr);
+}
+
+HWTEST_F(DmAuthManagerTest, SendAuthRequest_101, testing::ext::TestSize.Level0)
+{
+    int64_t sessionId = 1;
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_ = ERR_DM_VERSION_INCOMPATIBLE;
+    authManager_->SendAuthRequest(sessionId);
+
+    authManager_->authResponseContext_ = ERR_DM_AUTH_CODE_INCORRECT;
+    authResponseContext_->bindLevel = 5;
+    ASSERT_NE(authManager_->authResponseContext_, nullptr);
 }
 } // namespace
 } // namespace DistributedHardware
