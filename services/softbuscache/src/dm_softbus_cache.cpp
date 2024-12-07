@@ -164,6 +164,12 @@ void SoftbusCache::DeleteDeviceInfo(const DmDeviceInfo &nodeInfo)
     }
 }
 
+void SoftbusCache::DeleteDeviceInfo()
+{
+    std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+    deviceInfo_.clear();
+}
+
 void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
 {
     LOGI("SoftbusCache::ChangeDeviceInfo");

@@ -1155,5 +1155,21 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
 #endif
     return DM_OK;
 }
+
+void SoftbusListener::DeleteCacheDeviceInfo()
+{
+    LOGI("DeleteCacheDeviceInfo start.");
+    std::vector<DmDeviceInfo> onlineDevInfoVec;
+    SoftbusCache::GetInstance().GetDeviceInfoFromCache(onlineDevInfoVec);
+    if (onlineDevInfoVec.empty()) {
+        LOGE("onlineDevInfoVec is empty");
+        return;
+    }
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+    for (auto it : onlineDevInfoVec) {
+        LOGI("networkId: %{public}s", GetAnonyString(it.networkId).c_str());
+        DeviceOffLine(it);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS

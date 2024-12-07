@@ -201,6 +201,8 @@ void DeviceManagerService::QueryDependsSwitchState()
 
 void DeviceManagerService::UninitSoftbusListener()
 {
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->DeleteCacheDeviceInfo();
     softbusListener_ = nullptr;
     LOGI("SoftbusListener uninit.");
 }

@@ -565,7 +565,7 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgNameTemp);
+    req->SetPkgName(ComposeStr(pkgName, subscribeId));
     req->SetFirstParam(discParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(STOP_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
