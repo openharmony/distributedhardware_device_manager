@@ -27,6 +27,7 @@
 #include "softbus_connector_mock.h"
 #include "dm_device_state_manager_mock.h"
 #include "mine_hichain_connector_mock.h"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -47,6 +48,8 @@ public:
         std::make_shared<DmDeviceStateManagerMock>();
     static inline std::shared_ptr<MineHiChainConnectorMock> mineHiChainConnectorMock_ =
         std::make_shared<MineHiChainConnectorMock>();
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
+        std::make_shared<MultipleUserConnectorMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

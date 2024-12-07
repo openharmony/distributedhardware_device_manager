@@ -1188,6 +1188,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetAuthForm_001, testing::ext::TestSize.Lev
     profile.SetBindType(INVALIED_TYPE);
     ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
     EXPECT_EQ(ret, INVALIED_TYPE);
+
+    profile.SetBindType(DM_POINT_TO_POINT);
+    profile.SetBindLevel(APP);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, APP_PEER_TO_PEER_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::TestSize.Level0)
@@ -1927,6 +1932,15 @@ HWTEST_F(DeviceProfileConnectorTest, PutAllTrustedDevices_001, testing::ext::Tes
     std::vector<DistributedDeviceProfile::TrustedDeviceInfo> deviceInfos;
     int32_t ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
     EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckBindType_004, testing::ext::TestSize.Level0)
+{
+    std::string peerUdid = "remoteDeviceId";
+    std::string localUdid = "localDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
+    uint32_t ret = DeviceProfileConnector::GetInstance().CheckBindType(peerUdid, localUdid);
+    EXPECT_EQ(ret, DEVICE_ACROSS_ACCOUNT_TYPE);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
