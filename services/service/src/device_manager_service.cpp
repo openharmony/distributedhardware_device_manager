@@ -20,7 +20,6 @@
 
 #include "app_manager.h"
 #include "nlohmann/json.hpp"
-#include "deviceprofile_connector.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
@@ -2344,8 +2343,11 @@ void DeviceManagerService::HandleDeviceUnBound(const char *peerUdid, const Group
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
     LOGI("DeviceManagerService::HandleDeviceUnBound localUdid = %{public}s.", localUdid.c_str());
-    DeviceProfileConnector::GetInstance().HandleDeviceUnBound(groupInfo.groupType, std::string(peerUdid),
-        localUdid, groupInfo.userId, groupInfo.osAccountId);
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleDeviceUnBound(groupInfo.groupType, std::string(peerUdid),
+            localUdid, groupInfo.userId, groupInfo.osAccountId);
+    }
+    return;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
