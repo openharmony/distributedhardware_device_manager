@@ -323,9 +323,9 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
 
 int32_t DmAuthManager::StopAuthenticateDevice(const std::string &pkgName)
 {
-    if (pkgName.empty()) {
+    if (pkgName.empty() || authRequestContext_ == nullptr || authResponseContext_ == nullptr) {
         LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_FAILED;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (((authRequestState_!= nullptr && authRequestContext_->hostPkgName == pkgName) ||
         (authResponseContext_ != nullptr && authResponseContext_->hostPkgName == pkgName)) &&

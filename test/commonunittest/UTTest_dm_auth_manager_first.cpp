@@ -1371,7 +1371,7 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
 {
     std::string pkgName;
     int32_t ret = authManager_->StopAuthenticateDevice(pkgName);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     pkgName = "pkgName_001";
     int64_t requestId = 12;
