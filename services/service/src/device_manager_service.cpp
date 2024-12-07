@@ -120,7 +120,6 @@ void DeviceManagerService::InitHichainListener()
     if (hichainListener_ == nullptr) {
         hichainListener_ = std::make_shared<HichainListener>();
     }
-    //注册回调
     hichainListener_->RegisterDataChangeCb();
 }
 
@@ -2338,11 +2337,10 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
 
 void DeviceManagerService::HandleDeviceUnBound(const char *peerUdid, const GroupInformation &groupInfo)
 {
-    LOGI("DeviceManagerService::HandleDeviceUnBound start, peerUdid = %{public}s.", peerUdid);
+    LOGI("DeviceManagerService::HandleDeviceUnBound start.");
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
-    LOGI("DeviceManagerService::HandleDeviceUnBound localUdid = %{public}s.", localUdid.c_str());
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceUnBound(groupInfo.groupType, std::string(peerUdid),
             localUdid, groupInfo.userId, groupInfo.osAccountId);

@@ -90,7 +90,6 @@ void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *g
         LOGE("peerUdid or groupInfo is invalid");
         return;
     }
-    LOGI("peerUdid = %{public}s, groupInfo = %{public}s", peerUdid, groupInfo);
     nlohmann::json groupInfoJsonObj = nlohmann::json::parse(std::string(groupInfo), nullptr, false);
     GroupInformation hichainGroupInfo;
     from_json(groupInfoJsonObj, hichainGroupInfo);
