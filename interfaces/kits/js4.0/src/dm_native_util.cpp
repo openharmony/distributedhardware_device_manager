@@ -40,11 +40,12 @@ const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
 const int32_t DM_NAPI_DESCRIPTION_BUF_LENGTH = 16384;
 const int32_t DM_NAPI_BUF_LENGTH = 256;
+const int32_t MAX_OBJECT_LEN = 4096;
 
 void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                       char *dest, const int32_t destLen)
 {
-    if (dest == nullptr) {
+    if (dest == nullptr || destLen < 0 || destLen > MAX_OBJECT_LEN) {
         return;
     }
     bool hasProperty = false;
