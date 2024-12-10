@@ -38,7 +38,6 @@ void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
     for (auto const &userId : userIdsMsg.foregroundUserIds) {
         numberObj = cJSON_CreateNumber(userId);
         if (numberObj == nullptr || !cJSON_AddItemToArray(foregroundUserIdArr, numberObj)) {
-            cJSON_Delete(numberObj);
             cJSON_Delete(foregroundUserIdArr);
             return;
         }
@@ -53,7 +52,6 @@ void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
     for (auto const &userId : userIdsMsg.backgroundUserIds) {
         backgroundNumberObj = cJSON_CreateNumber(userId);
         if (backgroundNumberObj == nullptr || !cJSON_AddItemToArray(backgroundUserIdArr, backgroundNumberObj)) {
-            cJSON_Delete(backgroundNumberObj);
             cJSON_Delete(backgroundUserIdArr);
             return;
         }
@@ -165,7 +163,6 @@ void ToJson(cJSON *jsonObject, const NotifyUserIds &notifyUserIds)
     for (auto const &userId : notifyUserIds.userIds) {
         userIdNumberObj = cJSON_CreateNumber(userId);
         if (userIdNumberObj == nullptr || !cJSON_AddItemToArray(userIdArr, userIdNumberObj)) {
-            cJSON_Delete(userIdNumberObj);
             cJSON_Delete(userIdArr);
             return;
         }

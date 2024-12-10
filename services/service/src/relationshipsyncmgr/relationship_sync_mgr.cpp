@@ -473,7 +473,6 @@ cJSON *RelationShipChangeMsg::ToPayLoadJson() const
     for (uint32_t index = 0; index < len; index++) {
         numberObj = cJSON_CreateNumber(payload[index]);
         if (numberObj == nullptr || !cJSON_AddItemToArray(arrayObj, numberObj)) {
-            cJSON_Delete(numberObj);
             cJSON_Delete(arrayObj);
             return nullptr;
         }
@@ -510,7 +509,6 @@ std::string RelationShipChangeMsg::ToJson() const
     for (uint32_t index = 0; index < peerUdids.size(); index++) {
         udidStringObj = cJSON_CreateString(peerUdids[index].c_str());
         if (udidStringObj == nullptr || !cJSON_AddItemToArray(udidArrayObj, udidStringObj)) {
-            cJSON_Delete(udidStringObj);
             cJSON_Delete(udidArrayObj);
             cJSON_Delete(msg);
             return "";
