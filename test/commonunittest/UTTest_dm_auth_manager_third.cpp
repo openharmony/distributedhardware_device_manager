@@ -142,13 +142,13 @@ void DmAuthManagerTest::TearDownTestCase() {}
 HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
 {
     nlohmann::json jsonObject;
-    g_createSimpleMessageReturnDataStr = SafeyDump(jsonObject);
+    g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     int32_t sessionId = 0;
     authManager_->remoteDeviceId_ = "ProcRespNegotiate001";
     authManager_->ProcRespNegotiate(sessionId);
 
     jsonObject[TAG_CRYPTO_SUPPORT] = false;
-    g_createSimpleMessageReturnDataStr = SafeyDump(jsonObject);
+    g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     g_isIdenticalAccountReturnBoolValue = true;
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseContext_->authType = AUTH_TYPE_CRE;
@@ -157,7 +157,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseState_->context_ = std::make_shared<DmAuthResponseContext>();
     jsonObject[TAG_CRYPTO_SUPPORT] = true;
-    g_createSimpleMessageReturnDataStr = SafeyDump(jsonObject);
+    g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     g_isIdenticalAccountReturnBoolValue = true;
     authManager_->importAuthCode_ = "";
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
@@ -165,7 +165,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
     authManager_->ProcRespNegotiate(sessionId);
 
     authManager_->authResponseState_->context_ = std::make_shared<DmAuthResponseContext>();
-    g_createSimpleMessageReturnDataStr = SafeyDump(jsonObject);
+    g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     g_isIdenticalAccountReturnBoolValue = true;
     authManager_->importAuthCode_ = "test";
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -175,7 +175,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
 
     authManager_->authResponseState_->context_ = std::make_shared<DmAuthResponseContext>();
     jsonObject[TAG_CRYPTO_NAME] = "test";
-    g_createSimpleMessageReturnDataStr = SafeyDump(jsonObject);
+    g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     g_isIdenticalAccountReturnBoolValue = true;
     authManager_->importAuthCode_ = "test";
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -188,13 +188,13 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level0)
 {
     nlohmann::json jsonObject;
-    g_createSimpleMessageReturnDataStr = SafeyDump(jsonObject);
+    g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     int32_t sessionId = 0;
     authManager_->authResponseState_->context_ = std::make_shared<DmAuthResponseContext>();
     jsonObject[TAG_CRYPTO_SUPPORT] = true;
     jsonObject[TAG_CRYPTO_NAME] = "test";
     jsonObject[TAG_CRYPTO_VERSION] = "test";
-    g_createSimpleMessageReturnDataStr = SafeyDump(jsonObject);
+    g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     g_isIdenticalAccountReturnBoolValue = false;
     authManager_->remoteDeviceId_ = "ProcRespNegotiate002";
     authManager_->importAuthCode_ = "test";
@@ -208,7 +208,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level0)
     jsonObject[TAG_CRYPTO_SUPPORT] = true;
     jsonObject[TAG_CRYPTO_NAME] = "test";
     jsonObject[TAG_CRYPTO_VERSION] = "test";
-    g_createSimpleMessageReturnDataStr = SafeyDump(jsonObject);
+    g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     g_isIdenticalAccountReturnBoolValue = false;
     authManager_->importAuthCode_ = "test";
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();

@@ -62,7 +62,7 @@ void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
     }
     nlohmann::json jsonObj;
     jsonObj[UI_STATE_MSG] = msg;
-    std::string paramJson = SafeyDump(jsonObj);
+    std::string paramJson = SafetyDump(jsonObj);
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
     for (auto item : pkgSet_) {
         listener_->OnUiCall(item, paramJson);

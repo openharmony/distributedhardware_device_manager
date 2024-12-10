@@ -1250,7 +1250,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_053, testing::ext::TestSize.Level
     nlohmann::json jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
     jsonObject[DM_CREDENTIAL_REQJSONSTR] = "";
-    std::string credentialInfo = SafeyDump(jsonObject);
+    std::string credentialInfo = SafetyDump(jsonObject);
     data.WriteString(pkgName);
     data.WriteString(credentialInfo);
     OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
@@ -1288,7 +1288,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_054, testing::ext::TestSize.Level
     nlohmann::json jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
     jsonObject[DM_CREDENTIAL_REQJSONSTR] = "";
-    std::string credentialInfo = SafeyDump(jsonObject);
+    std::string credentialInfo = SafetyDump(jsonObject);
     data.WriteString(pkgName);
     data.WriteString(credentialInfo);
     OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
