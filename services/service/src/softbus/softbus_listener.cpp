@@ -868,7 +868,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     const ConnectionAddr *addrInfo = &(device.addr)[0];
     if (addrInfo == nullptr) {
         LOGE("ConvertDeviceInfoToDmDevice: addrInfo is nullptr.");
-        dmDevice.extraData = jsonObj.dump();
+        dmDevice.extraData = SafetyDump(jsonObj);
         return;
     }
     jsonObj[PARAM_KEY_DISC_CAPABILITY] = device.capabilityBitmap[0];
@@ -896,7 +896,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     } else {
         LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }
-    dmDevice.extraData = jsonObj.dump();
+    dmDevice.extraData = SafetyDump(jsonObj);
 }
 
 int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)

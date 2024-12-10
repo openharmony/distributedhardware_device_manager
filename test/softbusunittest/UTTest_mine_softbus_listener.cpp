@@ -67,7 +67,7 @@ HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_002, testing::ext::TestSize.
     nlohmann::json jsonObj;
     jsonObj["findDeviceMode"] = 4;
     string pkgName;
-    string searchJson = jsonObj.dump();
+    string searchJson = SafetyDump(jsonObj);
     DmSubscribeInfo dmSubscribeInfo;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->RefreshSoftbusLNN(pkgName, searchJson, dmSubscribeInfo);
@@ -145,7 +145,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_002, testing::ext::TestSize.Le
     nlohmann::json jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(1);
     string pkgName;
-    string searchJson = jsonObj.dump();
+    string searchJson = SafetyDump(jsonObj);
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->ParseSearchJson(pkgName, searchJson, output, &outLen);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -158,7 +158,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_003, testing::ext::TestSize.Le
     nlohmann::json jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     string pkgName;
-    string searchJson = jsonObj.dump();
+    string searchJson = SafetyDump(jsonObj);
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->ParseSearchJson(pkgName, searchJson, output, &outLen);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -171,7 +171,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_004, testing::ext::TestSize.Le
     nlohmann::json jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(3);
     string pkgName;
-    string searchJson = jsonObj.dump();
+    string searchJson = SafetyDump(jsonObj);
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->ParseSearchJson(pkgName, searchJson, output, &outLen);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -184,7 +184,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_005, testing::ext::TestSize.Le
     nlohmann::json jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(4);
     string pkgName;
-    string searchJson = jsonObj.dump();
+    string searchJson = SafetyDump(jsonObj);
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->ParseSearchJson(pkgName, searchJson, output, &outLen);
     EXPECT_EQ(ret, DM_OK);

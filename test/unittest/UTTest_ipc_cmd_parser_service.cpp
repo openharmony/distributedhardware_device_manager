@@ -19,6 +19,7 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "ipc_client_manager.h"
@@ -1249,7 +1250,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_053, testing::ext::TestSize.Level
     nlohmann::json jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
     jsonObject[DM_CREDENTIAL_REQJSONSTR] = "";
-    std::string credentialInfo = jsonObject.dump();
+    std::string credentialInfo = SafetyDump(jsonObject);
     data.WriteString(pkgName);
     data.WriteString(credentialInfo);
     OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
@@ -1287,7 +1288,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_054, testing::ext::TestSize.Level
     nlohmann::json jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
     jsonObject[DM_CREDENTIAL_REQJSONSTR] = "";
-    std::string credentialInfo = jsonObject.dump();
+    std::string credentialInfo = SafetyDump(jsonObject);
     data.WriteString(pkgName);
     data.WriteString(credentialInfo);
     OnIpcCmdFunc ptr = GetIpcCmdFunc(cmdCode);
