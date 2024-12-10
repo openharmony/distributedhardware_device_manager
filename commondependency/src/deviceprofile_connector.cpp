@@ -1119,13 +1119,15 @@ int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
 {
     LOGI("Start.");
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<AccessControlProfile> activeProfiles;
+    std::vector<AccessControlProfile> inActiveProfiles;
     for (auto &item : profiles) {
         if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == beforeUserId && item.GetStatus() == ACTIVE) ||
             (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == beforeUserId && item.GetStatus() == ACTIVE)) {
             item.SetStatus(INACTIVE);
-            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+            inActiveProfiles.push_back(item);
             continue;
         }
         if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
@@ -1133,9 +1135,15 @@ int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
             item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == currentUserId && item.GetStatus() == INACTIVE)) {
             item.SetStatus(ACTIVE);
-            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+            activeProfiles.push_back(item);
             continue;
         }
+    }
+    for (auto &item : inActiveProfiles) {
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+    }
+    for (auto &item : activeProfiles) {
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
     }
     return DM_OK;
 }
