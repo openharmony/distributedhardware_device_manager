@@ -893,6 +893,11 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
         std::string udidHash(ConvertBytesToUpperCaseHexString((addrInfo->info).ble.udidHash,
             sizeof((addrInfo->info).ble.udidHash) / sizeof(*((addrInfo->info).ble.udidHash))));
         jsonObj[PARAM_KEY_BLE_UDID_HASH] = udidHash;
+    } else if (addrInfo->type == CONNECTION_ADDR_USB) {
+        std::string usbIp((addrInfo->info).ip.ip);
+        jsonObj[PARAM_KEY_USB_IP] = usbIp;
+        jsonObj[PARAM_KEY_USB_PORT] = (addrInfo->info).ip.port;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_USB;
     } else {
         LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }

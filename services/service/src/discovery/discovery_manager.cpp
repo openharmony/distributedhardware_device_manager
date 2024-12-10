@@ -101,7 +101,10 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
         capabilityMap_[pkgNameTemp] = std::string(dmSubInfo.capability);
     }
-
+    if (discoverParam.find(PARAM_KEY_DISC_MEDIUM) != discoverParam.end()) {
+        int32_t medium = std::atoi((discoverParam.find(PARAM_KEY_DISC_MEDIUM)->second).c_str());
+        dmSubInfo.medium = static_cast<DmExchangeMedium>(medium);
+    }
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
