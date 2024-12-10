@@ -15,7 +15,7 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   if (ohos_kernel_type == "liteos_m") {
     lite_component("device_manager_hap") {
-      features = []
+      deps = []
     }
     lite_component("device_manager") {
       features = [ "interfaces/inner_kits/native_cpp:devicemanagersdk" ]
@@ -29,7 +29,7 @@ if (defined(ohos_lite)) {
     }
   } else {
     lite_component("device_manager_hap") {
-      features = []
+      deps = []
     }
     lite_component("device_manager") {
       features = [
