@@ -14,9 +14,6 @@
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   if (ohos_kernel_type == "liteos_m") {
-    lite_component("device_manager_hap") {
-      deps = []
-    }
     lite_component("device_manager") {
       features = [ "interfaces/inner_kits/native_cpp:devicemanagersdk" ]
     }
@@ -28,9 +25,6 @@ if (defined(ohos_lite)) {
       deps = []
     }
   } else {
-    lite_component("device_manager_hap") {
-      deps = []
-    }
     lite_component("device_manager") {
       features = [
         "utils:devicemanagerutils",
@@ -53,11 +47,6 @@ if (defined(ohos_lite)) {
   if (defined(harmony_industry_project) &&
       harmony_industry_project == "MINE_HARMONY") {
   }
-  group("device_manager_hap") {
-    if (product_name != "qemu-arm-linux-min") {
-      deps = [ "display/entry:DeviceManager_UI" ]
-    }
-  }
   group("device_manager") {
     deps = [
       "ext:ext_modules",
@@ -66,6 +55,7 @@ if (defined(ohos_lite)) {
       "services/implementation:devicemanagerserviceimpl",
       "services/service:devicemanagerservice",
       "services/softbuscache:dmdevicecache",
+      "display/entry:DeviceManager_UI",
     ]
   }
   group("device_manager_fwk") {
