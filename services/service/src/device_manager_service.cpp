@@ -2335,14 +2335,14 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
     return DM_OK;
 }
 
-void DeviceManagerService::HandleDeviceUnBound(const char *peerUdid, const GroupInformation &groupInfo)
+void DeviceManagerService::HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo)
 {
-    LOGI("DeviceManagerService::HandleDeviceUnBound start.");
+    LOGI("DeviceManagerService::HandleDeviceUnBind start.");
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
     if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleDeviceUnBound(groupInfo.groupType, std::string(peerUdid),
+        dmServiceImpl_->HandleDeviceUnBind(groupInfo.groupType, std::string(peerUdid),
             localUdid, groupInfo.userId, groupInfo.osAccountId);
     }
     return;

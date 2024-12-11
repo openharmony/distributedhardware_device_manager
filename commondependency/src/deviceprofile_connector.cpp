@@ -1413,11 +1413,11 @@ void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(const std::vector<i
     }
 }
 
-void DeviceProfileConnector::HandleDeviceUnBound(int32_t bindType, const std::string &peerUdid,
+void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
     const std::string &localUdid, int32_t localUserId, const std::string &localAccountId)
 {
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles
-        = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     if (profiles.empty()) {
         LOGI("profiles is empty");
         return;

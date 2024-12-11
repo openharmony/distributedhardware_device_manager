@@ -28,7 +28,7 @@ namespace {
 }
 
 static DataChangeListener dataChangeListener_ = {
-    .onDeviceUnBound = HichainListener::onHichainDeviceUnBound,
+    .onDeviceUnBound = HichainListener::OnHichainDeviceUnBound,
 };
 
 void from_json(const nlohmann::json &jsonObject, GroupInformation &groupInfo)
@@ -36,11 +36,11 @@ void from_json(const nlohmann::json &jsonObject, GroupInformation &groupInfo)
     if (jsonObject.find(FIELD_GROUP_TYPE) != jsonObject.end() && jsonObject.at(FIELD_GROUP_TYPE).is_number_integer()) {
         groupInfo.groupType = jsonObject.at(FIELD_GROUP_TYPE).get<int32_t>();
     }
-    // FIELD_USER_ID是osAccountId
+    // FIELD_USER_ID is osAccountId
     if (jsonObject.find(FIELD_USER_ID) != jsonObject.end() && jsonObject.at(FIELD_USER_ID).is_string()) {
         groupInfo.osAccountId = jsonObject.at(FIELD_USER_ID).get<std::string>();
     }
-    // FIELD_OS_ACCOUNT_ID是userId
+    // FIELD_OS_ACCOUNT_ID is userId
     if (jsonObject.find(FIELD_OS_ACCOUNT_ID) != jsonObject.end() &&
         jsonObject.at(FIELD_OS_ACCOUNT_ID).is_number_integer()) {
         groupInfo.userId = jsonObject.at(FIELD_OS_ACCOUNT_ID).get<int32_t>();
@@ -79,7 +79,7 @@ void HichainListener::RegisterDataChangeCb()
     LOGI("RegisterDataChangeCb success!");
 }
 
-void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *groupInfo)
+void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *groupInfo)
 {
     LOGI("HichainListener::onDeviceUnBound start");
     if (peerUdid == nullptr || groupInfo == nullptr) {
@@ -97,7 +97,7 @@ void HichainListener::onHichainDeviceUnBound(const char *peerUdid, const char *g
         LOGI("groupType is %{public}d, not idential account.", hichainGroupInfo.groupType);
         return;
     }
-    DeviceManagerService::GetInstance().HandleDeviceUnBound(peerUdid, hichainGroupInfo);
+    DeviceManagerService::GetInstance().HandleDeviceUnBind(peerUdid, hichainGroupInfo);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

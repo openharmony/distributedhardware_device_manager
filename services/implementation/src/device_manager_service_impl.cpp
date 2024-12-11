@@ -1000,10 +1000,10 @@ int32_t DeviceManagerServiceImpl::SaveOnlineDeviceInfo(const std::vector<DmDevic
     return DM_OK;
 }
 
-void DeviceManagerServiceImpl::HandleDeviceUnBound(int32_t bindType, const std::string &peerUdid,
+void DeviceManagerServiceImpl::HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
     const std::string &localUdid, int32_t localUserId, const std::string &localAccountId)
 {
-    return DeviceProfileConnector::GetInstance().HandleDeviceUnBound(bindType, peerUdid,
+    return DeviceProfileConnector::GetInstance().HandleDeviceUnBind(bindType, peerUdid,
         localUdid, localUserId, localAccountId);
 }
 

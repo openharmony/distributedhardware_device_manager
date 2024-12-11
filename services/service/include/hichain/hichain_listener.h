@@ -45,7 +45,7 @@ public:
     HichainListener();
     ~HichainListener();
     void RegisterDataChangeCb();
-    static void onHichainDeviceUnBound(const char *peerUdid, const char *groupInfo);
+    static void OnHichainDeviceUnBound(const char *peerUdid, const char *groupInfo);
 
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
