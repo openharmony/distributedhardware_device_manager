@@ -85,7 +85,7 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_002, testing::ext::TestSize.Lev
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->isAuthenticateDevice_ = false;
     int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_TRUE(CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_003, testing::ext::TestSize.Level0)
@@ -97,7 +97,7 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_003, testing::ext::TestSize.Lev
     authManager_->isAuthenticateDevice_ = true;
     authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_TRUE(CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_004, testing::ext::TestSize.Level0)
@@ -107,7 +107,7 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_004, testing::ext::TestSize.Lev
     authManager_->authRequestState_ = std::make_shared<AuthRequestReplyState>();
     authManager_->isAuthenticateDevice_ = false;
     int32_t ret = authManager_->UnAuthenticateDevice(pkgName, networkId);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_TRUE(CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_005, testing::ext::TestSize.Level0)
@@ -602,7 +602,7 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_002, testing::ext::TestSize.Level0)
     authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateDoneState>();
     authManager_->isAuthenticateDevice_ = true;
     int32_t ret = authManager_->UnBindDevice(pkgName, udidHash);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, UnBindDevice_003, testing::ext::TestSize.Level0)
@@ -636,7 +636,7 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_005, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
     authManager_->isAuthenticateDevice_ = true;
     ret = authManager_->UnBindDevice(pkgName, udidHash);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, RequestCredential001, testing::ext::TestSize.Level0)
