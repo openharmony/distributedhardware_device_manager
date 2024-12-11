@@ -37,12 +37,13 @@ constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permiss
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = 96929744;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
-constexpr int32_t AUTH_CODE_WHITE_LIST_NUM = 4;
+constexpr int32_t AUTH_CODE_WHITE_LIST_NUM = 5;
 constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "com.huawei.msdp.hmringgenerator",
     "com.huawei.msdp.hmringdiscriminator",
     "CollaborationFwk",
     "wear_link_service",
+    "watch_system_service",
 };
 
 constexpr int32_t PIN_HOLDER_WHITE_LIST_NUM = 1;
