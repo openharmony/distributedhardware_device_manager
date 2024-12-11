@@ -852,6 +852,25 @@ int32_t SoftbusListener::FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &
 
 void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj)
 {
+    if (FillDeviceInfo(device, dmDevice) != DM_OK) {
+        LOGE("FillDeviceInfo failed.");
+        return;
+    }
+
+    dmDevice.deviceTypeId = device.devType;
+    dmDevice.range = device.range;
+
+    nlohmann::json jsonObj;
+    std::string customData = ConvertCharArray2String(device.custData, DISC_MAX_CUST_DATA_LEN);
+    jsonObj[PARAM_KEY_CUSTOM_DATA] = customData;
+
+    const ConnectionAddr *addrInfo = &(device.addr)[0];
+    if (addrInfo == nullptr) {
+        LOGE("ConvertDeviceInfoToDmDevice: addrInfo is nullptr.");
+        dmDevice.extraData = SafetyDump(jsonObj);
+        return;
+    }
+    jsonObj[PARAM_KEY_DISC_CAPABILITY] = device.capabilityBitmap[0];
     if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
         std::string wifiIp((addrInfo->info).ip.ip);
         jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;
@@ -881,32 +900,7 @@ void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann
     } else {
         LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }
-}
-
-void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDeviceInfo &dmDevice)
-{
-    if (FillDeviceInfo(device, dmDevice) != DM_OK) {
-        LOGE("FillDeviceInfo failed.");
-        return;
-    }
-
-    dmDevice.deviceTypeId = device.devType;
-    dmDevice.range = device.range;
-
-    nlohmann::json jsonObj;
-    std::string customData = ConvertCharArray2String(device.custData, DISC_MAX_CUST_DATA_LEN);
-    jsonObj[PARAM_KEY_CUSTOM_DATA] = customData;
-
-    const ConnectionAddr *addrInfo = &(device.addr)[0];
-    if (addrInfo == nullptr) {
-        LOGE("ConvertDeviceInfoToDmDevice: addrInfo is nullptr.");
-        dmDevice.extraData = jsonObj.dump();
-        return;
-    }
-    jsonObj[PARAM_KEY_DISC_CAPABILITY] = device.capabilityBitmap[0];
-
-    ParseConnAddrInfo(addrInfo, jsonObj);
-    dmDevice.extraData = jsonObj.dump();
+    dmDevice.extraData = SafetyDump(jsonObj);
 }
 
 int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)

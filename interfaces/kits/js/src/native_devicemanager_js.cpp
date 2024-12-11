@@ -1203,7 +1203,7 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
     jsonObj[CUSTOM_DESCRIPTION] = customDescriptionStr;
     jsonObj[BIND_LEVEL] = bindLevel;
     JsToJsonObject(env, object, "extraInfo", jsonObj);
-    extra = jsonObj.dump();
+    extra = SafetyDump(jsonObj);
     LOGI("appOperationLen %{public}zu, customDescriptionLen %{public}zu", appOperationStr.size(),
         customDescriptionStr.size());
 }
@@ -1274,7 +1274,7 @@ void DeviceManagerNapi::JsToDmAuthInfo(const napi_env &env, const napi_value &ob
     jsonObj[AUTH_TYPE] = authType;
     jsonObj[PIN_TOKEN] = token;
     JsToJsonObject(env, object, "extraInfo", jsonObj);
-    extra = jsonObj.dump();
+    extra = SafetyDump(jsonObj);
 }
 
 void DeviceManagerNapi::JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)

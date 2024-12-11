@@ -342,7 +342,7 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
         LOGI("[SOFTBUS]get ETH ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
         jsonPara[ETH_IP] = addr->info.ip.ip;
         jsonPara[ETH_PORT] = addr->info.ip.port;
-        connectAddr = jsonPara.dump();
+        connectAddr = SafetyDump(jsonPara);
         return addr;
     }
     addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_WLAN);
@@ -350,20 +350,20 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
         jsonPara[WIFI_IP] = addr->info.ip.ip;
         jsonPara[WIFI_PORT] = addr->info.ip.port;
         LOGI("[SOFTBUS]get WLAN ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
-        connectAddr = jsonPara.dump();
+        connectAddr = SafetyDump(jsonPara);
         return addr;
     }
     addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_BR);
     if (addr != nullptr) {
         jsonPara[BR_MAC] = addr->info.br.brMac;
         LOGI("[SOFTBUS]get BR ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
-        connectAddr = jsonPara.dump();
+        connectAddr = SafetyDump(jsonPara);
         return addr;
     }
     addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_BLE);
     if (addr != nullptr) {
         jsonPara[BLE_MAC] = addr->info.ble.bleMac;
-        connectAddr = jsonPara.dump();
+        connectAddr = SafetyDump(jsonPara);
         return addr;
     }
     LOGE("[SOFTBUS]failed to get ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
