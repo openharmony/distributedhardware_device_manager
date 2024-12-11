@@ -56,5 +56,16 @@ bool HiChainConnector::IsDevicesInP2PGroup(const std::string &hostDevice, const 
 {
     return DmHiChainConnector::dmHiChainConnector->IsDevicesInP2PGroup(hostDevice, peerDevice);
 }
+
+int32_t HiChainConnector::GetRelatedGroups(const std::string &deviceId, std::vector<GroupInfo> &groupList)
+{
+    return DmHiChainConnector::dmHiChainConnector->GetRelatedGroups(deviceId, groupList);
+}
+
+int32_t HiChainConnector::GetRelatedGroups(int32_t userId, const std::string &deviceId,
+    std::vector<GroupInfo> &groupList)
+{
+    return DmHiChainConnector::dmHiChainConnector->GetRelatedGroups(userId, deviceId, groupList);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

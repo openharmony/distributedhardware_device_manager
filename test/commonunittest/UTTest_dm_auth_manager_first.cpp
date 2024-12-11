@@ -1542,6 +1542,28 @@ HWTEST_F(DmAuthManagerTest, SendAuthRequest_101, testing::ext::TestSize.Level0)
     authResponseContext_->bindLevel = 5;
     ASSERT_NE(authManager_->authResponseContext_, nullptr);
 }
+
+HWTEST_F(DmAuthManagerTest, AuthDeviceError_007, testing::ext::TestSize.Level0)
+{
+    authManager_->authRequestState_ = std::make_shared<AuthRequestNegotiateState>();
+    authManager_->authResponseState_ = nullptr;
+    authManager_->authResponseContext_->requestId = 3;
+    authManager_->authTimes_ = 0;
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    int64_t requestId = authManager_->authResponseContext_->requestId;
+    int32_t errorCode = DM_OK;
+    authManager_->AuthDeviceError(requestId, errorCode);
+    ASSERT_NE(authManager_->authRequestState_, nullptr);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteGroup_003, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    int32_t userId = 0;
+    std::string deviceId;
+    int32_t ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

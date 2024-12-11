@@ -38,6 +38,7 @@
 #include "softbus_connector_mock.h"
 #include "hichain_auth_connector_mock.h"
 #include "deviceprofile_connector_mock.h"
+#include "dm_crypto_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -54,6 +55,7 @@ public:
     static inline std::shared_ptr<SoftbusConnectorMock> softbusConnectorMock_ = nullptr;
     static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock_ = nullptr;
     static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ = nullptr;
+    static inline std::shared_ptr<CryptoMock> cryptoMock_ = nullptr;
 };
 
 class AuthResponseInitStateMock : public AuthResponseInitState {

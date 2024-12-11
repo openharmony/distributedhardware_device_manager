@@ -64,6 +64,8 @@ void DmAuthManagerTest::SetUpTestCase()
     DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock_;
     deviceProfileConnectorMock_ = std::make_shared<DeviceProfileConnectorMock>();
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
+    cryptoMock_ = std::make_shared<CryptoMock>();
+    DmCrypto::dmCrypto = cryptoMock_;
 }
 void DmAuthManagerTest::TearDownTestCase()
 {
@@ -77,6 +79,8 @@ void DmAuthManagerTest::TearDownTestCase()
     hiChainAuthConnectorMock_ = nullptr;
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     deviceProfileConnectorMock_ = nullptr;
+    DmCrypto::dmCrypto = nullptr;
+    cryptoMock_ = nullptr;
 }
 
 namespace {
@@ -1479,13 +1483,13 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     ret = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(ret);
 
-    authManager_->authRequestContext_ = nullptr;
+    authManager_->authResponseContext_ = nullptr;
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(ret);
 
-    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
     EXPECT_CALL(*multipleUserConnectorMock_,
         GetCurrentAccountUserID()).WillOnce(Return(0)).WillOnce(Return(0)).WillOnce(Return(0));
@@ -1515,6 +1519,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
+    EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123"));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(ret);
 }
@@ -1529,6 +1534,23 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->GetAccountGroupIdHash();
     ASSERT_FALSE(ret.empty());
+
+    std::vector<GroupInfo> groupList;
+    GroupInfo groupInfo;
+    groupInfo.groupId = "123456";
+    groupInfo.groupName = "group101";
+    groupInfo.groupType = 1;
+    groupList.push_back(groupInfo);
+    nlohmann::json jsonPeerGroupIdObj;
+    jsonPeerGroupIdObj["groupId"] = "123456";
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(groupList),Return(true)));
+    EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123456"));
+    ret = authManager_->IsIdenticalAccount();
+    ASSERT_TRUE(ret);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
@@ -1558,6 +1580,41 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
     bindType.push_back(102);
     EXPECT_CALL(*deviceProfileConnectorMock_, SyncAclByBindType(_, _, _, _)).WillOnce(Return(bindType));
     authManager_->ProcessAuthRequestExt(sessionId);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteGroup_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string deviceId;
+    std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
+    GroupInfo groupInfo;
+    groupInfo.groupId = "123456";
+    groupList.push_back(groupInfo);
+    EXPECT_CALL(*hiChainConnectorMock_, GetRelatedGroups(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(groupList),Return(DM_OK)));
+    int32_t ret = authManager_->DeleteGroup(pkgName, deviceId);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteGroup_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t userId = 0;
+    std::string deviceId;
+    int32_t ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+    
+    std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
+    GroupInfo groupInfo;
+    groupInfo.groupId = "123456";
+    groupList.push_back(groupInfo);
+    GroupInfo groupInfo1;
+    groupInfo1.groupId = "12345";
+    groupList.push_back(groupInfo1);
+    EXPECT_CALL(*hiChainConnectorMock_, GetRelatedGroups(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(groupList),Return(DM_OK)));
+    ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

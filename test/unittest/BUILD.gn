@@ -335,6 +335,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "mock/dm_crypto_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
     "mock/kv_adapter_manager_mock.cpp",
+    "mock/multiple_user_connector_mock.cpp",
     "mock/permission_manager_mock.cpp",
     "mock/softbus_listener_mock.cpp",
   ]
