@@ -34,6 +34,7 @@
 #include "inner_session.h"
 #include "session.h"
 #include "socket.h"
+#include "dm_anonymous.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -108,6 +109,7 @@ public:
     void DeleteCacheDeviceInfo();
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
+    static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj);
     int32_t InitSoftPublishLNN();
 
 private:
