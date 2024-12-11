@@ -850,39 +850,6 @@ int32_t SoftbusListener::FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &
     return DM_OK;
 }
 
-void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj)
-{
-    if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
-        std::string wifiIp((addrInfo->info).ip.ip);
-        jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;
-        jsonObj[PARAM_KEY_WIFI_PORT] = (addrInfo->info).ip.port;
-        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_ETH_IP;
-    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN) {
-        std::string wifiIp((addrInfo->info).ip.ip);
-        jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;
-        jsonObj[PARAM_KEY_WIFI_PORT] = (addrInfo->info).ip.port;
-        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_WLAN_IP;
-    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_BR) {
-        std::string brMac((addrInfo->info).br.brMac);
-        jsonObj[PARAM_KEY_BR_MAC] = brMac;
-        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_BR;
-    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_BLE) {
-        std::string bleMac((addrInfo->info).ble.bleMac);
-        jsonObj[PARAM_KEY_BLE_MAC] = bleMac;
-        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_BLE;
-        std::string udidHash(ConvertBytesToUpperCaseHexString((addrInfo->info).ble.udidHash,
-            sizeof((addrInfo->info).ble.udidHash) / sizeof(*((addrInfo->info).ble.udidHash))));
-        jsonObj[PARAM_KEY_BLE_UDID_HASH] = udidHash;
-    } else if (addrInfo->type == CONNECTION_ADDR_USB) {
-        std::string usbIp((addrInfo->info).ip.ip);
-        jsonObj[PARAM_KEY_USB_IP] = usbIp;
-        jsonObj[PARAM_KEY_USB_PORT] = (addrInfo->info).ip.port;
-        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_USB;
-    } else {
-        LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
-    }
-}
-
 void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDeviceInfo &dmDevice)
 {
     if (FillDeviceInfo(device, dmDevice) != DM_OK) {
@@ -925,6 +892,39 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
 int32_t SoftbusListener::GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel)
 {
     return SoftbusCache::GetInstance().GetSecurityDeviceLevel(networkId, securityLevel);
+}
+
+void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj)
+{
+    if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
+        std::string wifiIp((addrInfo->info).ip.ip);
+        jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;
+        jsonObj[PARAM_KEY_WIFI_PORT] = (addrInfo->info).ip.port;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_ETH_IP;
+    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN) {
+        std::string wifiIp((addrInfo->info).ip.ip);
+        jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;
+        jsonObj[PARAM_KEY_WIFI_PORT] = (addrInfo->info).ip.port;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_WLAN_IP;
+    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_BR) {
+        std::string brMac((addrInfo->info).br.brMac);
+        jsonObj[PARAM_KEY_BR_MAC] = brMac;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_BR;
+    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_BLE) {
+        std::string bleMac((addrInfo->info).ble.bleMac);
+        jsonObj[PARAM_KEY_BLE_MAC] = bleMac;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_BLE;
+        std::string udidHash(ConvertBytesToUpperCaseHexString((addrInfo->info).ble.udidHash,
+            sizeof((addrInfo->info).ble.udidHash) / sizeof(*((addrInfo->info).ble.udidHash))));
+        jsonObj[PARAM_KEY_BLE_UDID_HASH] = udidHash;
+    } else if (addrInfo->type == CONNECTION_ADDR_USB) {
+        std::string usbIp((addrInfo->info).ip.ip);
+        jsonObj[PARAM_KEY_USB_IP] = usbIp;
+        jsonObj[PARAM_KEY_USB_PORT] = (addrInfo->info).ip.port;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_USB;
+    } else {
+        LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
+    }
 }
 
 void SoftbusListener::CacheDiscoveredDevice(const DeviceInfo *device)
