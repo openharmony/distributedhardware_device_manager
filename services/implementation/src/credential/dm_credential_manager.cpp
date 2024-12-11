@@ -113,7 +113,7 @@ int32_t DmCredentialManager::RequestCredential(const std::string &reqJsonStr, st
     jsonObj[FIELD_CREDENTIAL_VERSION] = credentialVersion;
     jsonObj[FIELD_USER_ID] = userId;
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
-    std::string tmpStr = jsonObj.dump();
+    std::string tmpStr = SafetyDump(jsonObj);
     return hiChainConnector_->getRegisterInfo(tmpStr.c_str(), returnJsonStr);
 }
 
@@ -364,7 +364,7 @@ void from_json(const nlohmann::json &jsonObject, CredentialDataInfo &credentialD
         }
         if (IsString(jsonObject, FIELD_PKINFO)) {
             nlohmann::json jsonPkInfo = jsonObject[FIELD_PKINFO];
-            credentialDataInfo.pkInfo = jsonPkInfo.dump();
+            credentialDataInfo.pkInfo = SafetyDump(jsonPkInfo);
         }
     } else if (credentialDataInfo.credentialType == SYMMETRY_CREDENTIAL_TYPE) {
         if (IsString(jsonObject, FIELD_AUTH_CODE)) {
