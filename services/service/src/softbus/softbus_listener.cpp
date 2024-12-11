@@ -875,25 +875,6 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     dmDevice.extraData = SafetyDump(jsonObj);
 }
 
-int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
-{
-    int32_t tempNetworkType = -1;
-    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
-        reinterpret_cast<uint8_t *>(&tempNetworkType), LNN_COMMON_LEN);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
-        return ret;
-    }
-    networkType = tempNetworkType;
-    LOGI("GetNetworkTypeByNetworkId networkType %{public}d.", tempNetworkType);
-    return DM_OK;
-}
-
-int32_t SoftbusListener::GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel)
-{
-    return SoftbusCache::GetInstance().GetSecurityDeviceLevel(networkId, securityLevel);
-}
-
 void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj)
 {
     if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
@@ -925,6 +906,25 @@ void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann
     } else {
         LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }
+}
+
+int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
+{
+    int32_t tempNetworkType = -1;
+    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
+        reinterpret_cast<uint8_t *>(&tempNetworkType), LNN_COMMON_LEN);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
+        return ret;
+    }
+    networkType = tempNetworkType;
+    LOGI("GetNetworkTypeByNetworkId networkType %{public}d.", tempNetworkType);
+    return DM_OK;
+}
+
+int32_t SoftbusListener::GetDeviceSecurityLevel(const char *networkId, int32_t &securityLevel)
+{
+    return SoftbusCache::GetInstance().GetSecurityDeviceLevel(networkId, securityLevel);
 }
 
 void SoftbusListener::CacheDiscoveredDevice(const DeviceInfo *device)
