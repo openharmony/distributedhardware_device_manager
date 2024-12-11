@@ -1421,6 +1421,26 @@ void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(const std::vector<i
     }
 }
 
+void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+    const std::string &localUdid, int32_t localUserId, const std::string &localAccountId)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    if (profiles.empty()) {
+        LOGI("profiles is empty");
+        return;
+    }
+    for (auto &item : profiles) {
+        if (item.GetBindType() == bindType &&
+            item.GetTrustDeviceId() == peerUdid &&
+            item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == localUserId &&
+            item.GetAccesser().GetAccesserAccountId() == localAccountId) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+        }
+    }
+}
+
 int32_t DeviceProfileConnector::SubscribeDeviceProfileInited(
     sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback)
 {

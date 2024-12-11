@@ -141,6 +141,8 @@ public:
         int32_t beforeUserId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId);
     int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList);
+    void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+        const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

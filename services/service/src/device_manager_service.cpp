@@ -114,6 +114,15 @@ int32_t DeviceManagerService::InitSoftbusListener()
     return DM_OK;
 }
 
+void DeviceManagerService::InitHichainListener()
+{
+    LOGI("DeviceManagerService::InitHichainListener Start.");
+    if (hichainListener_ == nullptr) {
+        hichainListener_ = std::make_shared<HichainListener>();
+    }
+    hichainListener_->RegisterDataChangeCb();
+}
+
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 void DeviceManagerService::SubscribePublishCommonEvent()
@@ -2328,6 +2337,19 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
         }
     }
     return DM_OK;
+}
+
+void DeviceManagerService::HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo)
+{
+    LOGI("DeviceManagerService::HandleDeviceUnBind start.");
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleDeviceUnBind(groupInfo.groupType, std::string(peerUdid),
+            localUdid, groupInfo.userId, groupInfo.osAccountId);
+    }
+    return;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
