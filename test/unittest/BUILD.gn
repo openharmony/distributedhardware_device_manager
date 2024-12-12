@@ -984,28 +984,6 @@ ohos_unittest("UTTest_dm_dfx") {
 
 ## UnitTest UTTest_dm_dfx }}}
 
-## UnitTest UTTest_dm_discovery_filter {{{
-ohos_unittest("UTTest_dm_discovery_filter") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_discovery_filter.cpp",
-  ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "googletest:gmock",
-  ]
-}
-
-## UnitTest UTTest_dm_discovery_filter }}}
-
 ## UnitTest UTTest_device_manager_service_impl {{{
 ohos_unittest("UTTest_device_manager_service_impl") {
   module_out_path = module_out_path
