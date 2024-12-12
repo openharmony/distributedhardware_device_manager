@@ -537,35 +537,6 @@ ohos_unittest("UTTest_softbus_listener") {
 
 ## UnitTest UTTest_softbus_listener }}}
 
-## UnitTest UTTest_softbus_publish {{{
-ohos_unittest("UTTest_softbus_publish") {
-  module_out_path = module_out_path
-
-  include_dirs = [
-    "${devicemanager_path}/test/softbusunittest",
-    "${services_path}/src/softbus",
-  ]
-
-  sources = [
-    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_publish.cpp",
-    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
-  ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
-  ]
-}
-
-## UnitTest UTTest_softbus_publish }}}
-
 ## UnitTest UTTest_softbus_session {{{
 ohos_unittest("UTTest_softbus_session") {
   module_out_path = module_out_path
@@ -1452,45 +1423,6 @@ ohos_unittest("UTTest_relationship_sync_mgr") {
 }
 
 ## UnitTest UTTest_relationship_sync_mgr }}}
-
-## UnitTest UTTest_dm_publish_manager {{{
-ohos_unittest("UTTest_dm_publish_manager") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_publish_manager.cpp",
-    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
-    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
-    "${services_path}/src/device_manager_service.cpp",
-    "${services_path}/src/device_manager_service_listener.cpp",
-    "${services_path}/src/softbus/softbus_listener.cpp",
-    "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
-    "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
-    "${softbuscache_parh}/src/dm_softbus_cache.cpp",
-  ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "cJSON:cjson",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hitrace:hitrace_meter",
-  ]
-
-  if (support_power_manager) {
-    external_deps += [ "power_manager:powermgr_client" ]
-  }
-}
-
-## UnitTest UTTest_dm_publish_manager }}}
 
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {
