@@ -26,14 +26,10 @@
 #include "device_manager_service_listener.h"
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
-#include "dm_discovery_manager.h"
-#include "dm_publish_manager.h"
 #include "dm_subscribe_info.h"
 #include "softbus_bus_center.h"
 #include "softbus_connector.h"
 #include "softbus_listener.h"
-#include "softbus_discovery_callback.h"
-#include "softbus_publish_callback.h"
 #include "softbus_session.h"
 
 namespace OHOS {

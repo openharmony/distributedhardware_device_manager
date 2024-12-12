@@ -76,7 +76,6 @@ group("unittest") {
     ":UTTest_relationship_sync_mgr",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_listener",
-    ":UTTest_softbus_publish",
     ":UTTest_softbus_session",
   ]
 }

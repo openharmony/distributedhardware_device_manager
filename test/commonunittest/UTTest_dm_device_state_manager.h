@@ -22,7 +22,6 @@
 #include "dm_adapter_manager.h"
 #include "device_manager_service_listener.h"
 #include "softbus_session_callback.h"
-#include "dm_discovery_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
