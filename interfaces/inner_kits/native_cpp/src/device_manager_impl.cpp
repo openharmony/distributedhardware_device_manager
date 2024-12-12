@@ -100,6 +100,7 @@ const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
 const int32_t USLEEP_TIME_US_100000 = 100000; // 100ms
+constexpr int32_t SERVICE_INIT_MAX_NUM = 50;
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
     std::random_device randDevice;
@@ -126,14 +127,14 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
 
     int32_t ret = DM_OK;
     int32_t retryNum = 0;
-    while (retryNum < SERVICE_INIT_TRY_MAX_NUM) {
+    while (retryNum < SERVICE_INIT_MAX_NUM) {
         ret = ipcClientProxy_->Init(pkgName);
         if (ret == DM_OK) {
             break;
         }
         usleep(USLEEP_TIME_US_100000);
         retryNum++;
-        if (retryNum == SERVICE_INIT_TRY_MAX_NUM) {
+        if (retryNum == SERVICE_INIT_MAX_NUM) {
             DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "InitDeviceManager", ERR_DM_NOT_INIT);
             LOGE("InitDeviceManager error, wait for device manager service starting timeout.");
             return ERR_DM_NOT_INIT;
