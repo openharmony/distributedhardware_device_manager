@@ -193,6 +193,12 @@ public:
     int32_t GetStateType() override;
     int32_t Enter() override;
 };
+
+class AuthRequestAuthFinish : public AuthRequestState {
+public:
+    int32_t GetStateType() override;
+    int32_t Enter() override;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_AUTH_REQUEST_STATE_H
