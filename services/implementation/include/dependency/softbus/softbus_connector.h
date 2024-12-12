@@ -44,13 +44,6 @@ public:
     static void OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *networkId, int32_t result);
 
     /**
-     * @tc.name: SoftbusConnector::OnParameterChgCallback
-     * @tc.desc: OnParameter Chg Callback of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static void OnParameterChgCallback(const char *key, const char *value, void *context);
-
-    /**
      * @tc.name: SoftbusConnector::GetConnectAddr
      * @tc.desc: Get Connect Addr of the SoftbusConnector
      * @tc.type: FUNC
@@ -117,13 +110,7 @@ private:
     static void ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
 
 private:
-    enum PulishStatus {
-        STATUS_UNKNOWN = 0,
-        ALLOW_BE_DISCOVERY = 1,
-        NOT_ALLOW_BE_DISCOVERY = 2,
-    };
     static std::string remoteUdidHash_;
-    static PulishStatus publishStatus;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> softbusSession_;
 #endif

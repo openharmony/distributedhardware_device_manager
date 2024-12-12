@@ -43,7 +43,6 @@ constexpr const char* ETH_IP = "ETH_IP";
 constexpr const char* ETH_PORT = "ETH_PORT";
 
 std::string SoftbusConnector::remoteUdidHash_ = "";
-SoftbusConnector::PulishStatus SoftbusConnector::publishStatus = SoftbusConnector::STATUS_UNKNOWN;
 std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDeviceInfoMap_ = {};
 std::unordered_map<std::string, std::string> SoftbusConnector::deviceUdidMap_ = {};
 std::vector<ProcessInfo> SoftbusConnector::processInfoVec_ = {};
