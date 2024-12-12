@@ -1616,6 +1616,34 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup_202, testing::ext::TestSize.Level0)
     ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
     ASSERT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(DmAuthManagerTest, ParseConnectAddr_201, testing::ext::TestSize.Level0)
+{
+    PeerTargetId targetId;
+    targetId.wifiIp = "12131415";
+    targetId.brMac = "D4G4E5G2B4G";
+    targetId.bleMac = "1463158131321";
+    std::string deviceId;
+    std::string addrType;
+    int32_t ret = authManager_->ParseConnectAddr(targetId, deviceId, addrType);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, ParseConnectAddr_202, testing::ext::TestSize.Level0)
+{
+    PeerTargetId targetId;
+    targetId.wifiIp;
+    targetId.brMac = "D4G4E5G2B4G";
+    targetId.bleMac = "1463158131321";
+    std::string deviceId;
+    std::string addrType;
+    int32_t ret = authManager_->ParseConnectAddr(targetId, deviceId, addrType);
+    ASSERT_EQ(ret, DM_OK);
+
+    targetId.brMac = "";
+    ret = authManager_->ParseConnectAddr(targetId, deviceId, addrType);
+    ASSERT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
