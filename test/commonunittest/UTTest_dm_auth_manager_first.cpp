@@ -24,6 +24,7 @@
 #include "dm_radar_helper.h"
 #include "nlohmann/json.hpp"
 #include "softbus_error_code.h"
+#include <memory>
 
 static bool g_reportAuthOpenSessionReturnBoolValue = false;
 static bool g_reportAuthConfirmBoxReturnBoolValue = false;
@@ -1470,6 +1471,10 @@ HWTEST_F(DmAuthManagerTest, GetBindLevel_001, testing::ext::TestSize.Level0)
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
     ret = authManager_->GetBindLevel(bindLevel);
     ASSERT_EQ(ret, SERVICE);
+
+    EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
+    ret = authManager_->GetBindLevel(bindLevel);
+    ASSERT_EQ(ret, SERVICE);
 }
 
 HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
@@ -1563,6 +1568,64 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup_003, testing::ext::TestSize.Level0)
     std::string deviceId;
     int32_t ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
     ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DmAuthManagerTest, CompatiblePutAcl_004, testing::ext::TestSize.Level0)
+{
+    authManager_->action_ = USER_OPERATION_TYPE_ALLOW_AUTH;
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
+    authManager_->CompatiblePutAcl();
+    ASSERT_EQ(authManager_->authRequestState_, nullptr);
+}
+
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt002, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    authManager_->authResponseContext_->authed = true;
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->importAuthCode_ = "importAuthCode_";
+    authManager_->ProcRespNegotiateExt(sessionId);
+    ASSERT_EQ(authManager_->isAuthDevice_, false);
+}
+
+HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived006, testing::ext::TestSize.Level0)
+{
+    int32_t sessionId = 0;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_DATA] = "123";
+    jsonObject[TAG_DATA_LEN] = 123;
+    jsonObject[TAG_MSG_TYPE] = 123;
+    std::string message = jsonObject.dump();
+    authManager_->authResponseContext_ = nullptr;
+    authManager_->OnAuthDeviceDataReceived(sessionId, message);
+    ASSERT_EQ(authManager_->isAuthDevice_, false);
+}
+
+HWTEST_F(DmAuthManagerTest, GetBinderInfo_001, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->bundleName = "bundleName";
+    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
+    int32_t ret = authManager_->GetBinderInfo();
+    ASSERT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*appManagerMock_, GetHapTokenIdByName(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = authManager_->GetBinderInfo();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*appManagerMock_, GetHapTokenIdByName(_, _, _, _)).WillOnce(Return(DM_OK));
+    ret = authManager_->GetBinderInfo();
+    ASSERT_EQ(ret, DM_OK);
+
+    authManager_->authResponseContext_->bindLevel = DEVICE;
+    authManager_->SetProcessInfo();
+
+    authManager_->authResponseContext_->bindLevel = SERVICE;
+    authManager_->SetProcessInfo();
+}
 }
 } // namespace
 } // namespace DistributedHardware

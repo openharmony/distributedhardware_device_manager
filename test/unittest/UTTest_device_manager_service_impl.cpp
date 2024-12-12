@@ -1647,7 +1647,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StopAuthenticateDevice_102, testing::ext:
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     int ret = deviceManagerServiceImpl_->StopAuthenticateDevice(pkgName);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, CheckIsSameAccount_001, testing::ext::TestSize.Level0)

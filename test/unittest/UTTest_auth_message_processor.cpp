@@ -22,6 +22,7 @@
 #include "softbus_session.h"
 #include "dm_auth_manager.h"
 #include "device_manager_service_listener.h"
+#include "auth_ui_state_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -1643,6 +1644,19 @@ HWTEST_F(AuthMessageProcessorTest, CreateDeviceAuthMessage_001, testing::ext::Te
     std::string str = "1324213";
     std::string ret = authMessageProcessor->CreateDeviceAuthMessage(msgType, &param, dataLen);
     ASSERT_EQ(ret.empty(), false);
+
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = nullptr;
+    std::shared_ptr<AuthUiStateManager> authUiStateManager = std::make_shared<AuthUiStateManager>(listener_);
+    DmUiStateMsg msg = DmUiStateMsg::MSG_PIN_CODE_SUCCESS;
+    authUiStateManager->UpdateUiState(msg);
+
+    listener_ = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<AuthUiStateManager> authUiStateManager_ = std::make_shared<AuthUiStateManager>(listener_);
+    ProcessInfo processInfo;
+    processInfo.pkgName = "pkgName";
+    processInfo.userId = 123456;
+    authUiStateManager_->pkgSet_.insert(processInfo);
+    authUiStateManager_->UpdateUiState(msg);
 }
 } // namespace
 } // namespace DistributedHardware
