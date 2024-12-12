@@ -476,7 +476,7 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
     }
     nlohmann::json jsonObj;
     int32_t pinCode = -1;
-    if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == -1) {
+    if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == -1 || pinCode == 0) {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
     } else {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_ACCEPTED;
