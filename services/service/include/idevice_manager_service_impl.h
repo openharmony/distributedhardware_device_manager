@@ -47,43 +47,6 @@ public:
     virtual void Release() = 0;
 
     /**
-     * @tc.name: IDeviceManagerServiceImpl::StartDeviceDiscovery
-     * @tc.desc: Start Device Discovery of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-                                         const std::string &extra) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::StartDeviceDiscovery
-     * @tc.desc: Start Device Discovery of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
-                                 const std::string &filterOptions) = 0;
-
-   /**
-     * @tc.name: IDeviceManagerServiceImpl::StopDeviceDiscovery
-     * @tc.desc: Stop Device Discovery of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId) = 0;
-
-   /**
-     * @tc.name: IDeviceManagerServiceImpl::PublishDeviceDiscovery
-     * @tc.desc: Publish Device Discovery of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo) = 0;
-
-    /**
-     * @tc.name: IDeviceManagerServiceImpl::UnPublishDeviceDiscovery
-     * @tc.desc: UnPublish Device Discovery of the device manager service impl
-     * @tc.type: FUNC
-     */
-    virtual int32_t UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId) = 0;
-
-    /**
      * @tc.name: IDeviceManagerServiceImpl::UnAuthenticateDevice
      * @tc.desc: UnAuthenticate Device of the device manager service impl
      * @tc.type: FUNC

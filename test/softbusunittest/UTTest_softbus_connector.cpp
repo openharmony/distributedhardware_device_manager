@@ -315,37 +315,6 @@ HWTEST_F(SoftbusConnectorTest, GetSoftbusSession_001, testing::ext::TestSize.Lev
 }
 
 /**
- * @tc.name: GetSoftbusSession_001
- * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_001, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "12345678";
-    SoftbusConnector::discoveryDeviceInfoMap_[deviceId];
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    bool ret = softbusConnector->HaveDeviceInMap(deviceId);
-    EXPECT_EQ(ret, true);
-    SoftbusConnector::discoveryDeviceInfoMap_.clear();
-}
-
-/**
- * @tc.name: GetSoftbusSession_001
- * @tc.desc: set SoftbusConnector to new a pointer, and the pointer nou equal nullptr, and delete it
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(SoftbusConnectorTest, HaveDeviceInMap_002, testing::ext::TestSize.Level0)
-{
-    std::string deviceId = "12345678";
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    bool ret = softbusConnector->HaveDeviceInMap(deviceId);
-    EXPECT_EQ(ret, false);
-    SoftbusConnector::discoveryDeviceInfoMap_.clear();
-}
-
-/**
  * @tc.name: GetConnectAddrByType_001
  * @tc.desc: set deviceInfo'pointer null, go to first branch, and return nullptr
  * @tc.require: AR000GHSJK

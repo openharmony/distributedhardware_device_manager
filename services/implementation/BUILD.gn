@@ -114,8 +114,6 @@ if (defined(ohos_lite)) {
       "include/ability",
       "include/credential",
       "include/devicestate",
-      "include/discovery",
-      "include/publish",
       "include/dependency/commonevent",
       "include/dependency/deviceprofile",
       "include/dependency/multipleuser",
@@ -176,9 +174,6 @@ if (defined(ohos_lite)) {
       "src/dependency/softbus/softbus_session.cpp",
       "src/device_manager_service_impl.cpp",
       "src/devicestate/dm_device_state_manager.cpp",
-      "src/discovery/dm_discovery_filter.cpp",
-      "src/discovery/dm_discovery_manager.cpp",
-      "src/publish/dm_publish_manager.cpp",
     ]
 
     public_configs = [ ":devicemanagerserviceimpl_config" ]

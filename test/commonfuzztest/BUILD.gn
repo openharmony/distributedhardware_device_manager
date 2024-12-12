@@ -21,7 +21,6 @@ group("fuzztest") {
     "dmauthmanager_fuzzer:fuzztest",
     "dmcommoneventmanager_fuzzer:fuzztest",
     "dmcredentialimpl_fuzzer:fuzztest",
-    "dmdiscoverymanager_fuzzer:fuzztest",
     "generateencrypteduuid_fuzzer:fuzztest",
     "getdeviceinfo_fuzzer:fuzztest",
     "hichainconnector_fuzzer:fuzztest",
