@@ -158,7 +158,7 @@ typedef struct DmAuthResponseContext {
     std::string authToken;
     int32_t pageId;
     int64_t requestId;
-    int32_t code;
+    int32_t code = -1;
     int32_t state;
     std::vector<std::string> syncGroupList;
     std::string accountGroupIdHash;
