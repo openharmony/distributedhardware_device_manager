@@ -137,7 +137,7 @@ void DmDialogManager::ShowInputDialog(const std::string param)
 void DmDialogManager::ConnectExtension()
 {
     LOGI("DmDialogManager::ConnectExtension start.");
-    if (isConnectSystemUI_.load() && dialogConnectionCallback_ != nullptr) {
+    if (isConnectSystemUI_.load() && dialogConnectionCallback_ != nullptr && g_remoteObject != nullptr) {
         AppExecFwk::ElementName element;
         dialogConnectionCallback_->OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
         LOGI("DmDialogManager::ConnectExtension dialog has been show.");
@@ -220,6 +220,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityDisconnectDone(
 {
     LOGI("OnAbilityDisconnectDone");
     std::lock_guard<std::mutex> lock(mutex_);
+    g_remoteObject = nullptr;
     isConnectSystemUI_.store(false);
 }
 }
