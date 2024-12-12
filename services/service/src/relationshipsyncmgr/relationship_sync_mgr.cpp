@@ -469,8 +469,14 @@ cJSON *RelationShipChangeMsg::ToPayLoadJson() const
         }
         return nullptr;
     }
+    cJSON *numberObj = nullptr;
     for (uint32_t index = 0; index < len; index++) {
-        cJSON_AddItemToArray(arrayObj, cJSON_CreateNumber(payload[index]));
+        numberObj = cJSON_CreateNumber(payload[index]);
+        if (numberObj == nullptr || !cJSON_AddItemToArray(arrayObj, numberObj)) {
+            cJSON_Delete(numberObj);
+            cJSON_Delete(arrayObj);
+            return nullptr;
+        }
     }
     if (payload != nullptr) {
         delete[] payload;
@@ -500,8 +506,15 @@ std::string RelationShipChangeMsg::ToJson() const
         cJSON_Delete(msg);
         return "";
     }
+    cJSON *udidStringObj = nullptr;
     for (uint32_t index = 0; index < peerUdids.size(); index++) {
-        cJSON_AddItemToArray(udidArrayObj, cJSON_CreateString(peerUdids[index].c_str()));
+        udidStringObj = cJSON_CreateString(peerUdids[index].c_str());
+        if (udidStringObj == nullptr || !cJSON_AddItemToArray(udidArrayObj, udidStringObj)) {
+            cJSON_Delete(udidStringObj);
+            cJSON_Delete(udidArrayObj);
+            cJSON_Delete(msg);
+            return "";
+        }
     }
     cJSON_AddItemToObject(msg, MSG_PEER_UDID, udidArrayObj);
     cJSON_AddStringToObject(msg, MSG_ACCOUNTID, accountName.c_str());
