@@ -166,7 +166,7 @@ constexpr int32_t CHECK_AUTH_ALWAYS_POS = 0;
 constexpr const char AUTH_ALWAYS = '1';
 constexpr const char AUTH_ONCE = '0';
 constexpr const char* TAG_TARGET_DEVICE_NAME = "targetDeviceName";
-constexpr int32_t INVALIED_PINCODE = -1;
+constexpr int32_t INVALID_PINCODE = -1;
 
 // HiChain
 constexpr int32_t SERVICE_INIT_TRY_MAX_NUM = 200;

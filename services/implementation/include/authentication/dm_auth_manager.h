@@ -158,7 +158,7 @@ typedef struct DmAuthResponseContext {
     std::string authToken;
     int32_t pageId;
     int64_t requestId;
-    int32_t code = INVALIED_PINCODE;
+    int32_t code = INVALID_PINCODE;
     int32_t state;
     std::vector<std::string> syncGroupList;
     std::string accountGroupIdHash;

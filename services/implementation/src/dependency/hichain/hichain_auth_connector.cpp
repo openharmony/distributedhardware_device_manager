@@ -101,8 +101,8 @@ char *HiChainAuthConnector::onRequest(int64_t requestId, int operationCode, cons
         return nullptr;
     }
     nlohmann::json jsonObj;
-    int32_t pinCode = INVALIED_PINCODE;
-    if (dmDeviceAuthCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == INVALIED_PINCODE) {
+    int32_t pinCode = INVALID_PINCODE;
+    if (dmDeviceAuthCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == INVALID_PINCODE) {
         jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_REJECTED;
     } else {
         jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
