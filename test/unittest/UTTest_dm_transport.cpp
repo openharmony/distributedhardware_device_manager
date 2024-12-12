@@ -65,12 +65,11 @@ HWTEST_F(DMTransportTest, Init_AlreadyInitialized, testing::ext::TestSize.Level0
  */
 HWTEST_F(DMTransportTest, UnInit_ShouldShutdownAllSockets, testing::ext::TestSize.Level0)
 {
-    dmTransport.StartSocket("device1");
-    dmTransport.StartSocket("device2");
+    int32_t socketId;
+    dmTransport.StartSocket("device1", socketId);
+    dmTransport.StartSocket("device2", socketId);
 
     EXPECT_EQ(dmTransport.UnInit(), DM_OK);
-
-    int32_t socketId;
     EXPECT_FALSE(dmTransport.IsDeviceSessionOpened("device1", socketId));
     EXPECT_FALSE(dmTransport.IsDeviceSessionOpened("device2", socketId));
 }
@@ -109,9 +108,9 @@ HWTEST_F(DMTransportTest, GetRemoteNetworkIdBySocketIdReturnEmptyString, testing
  */
 HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldRemoveSocket, testing::ext::TestSize.Level0)
 {
-    dmTransport.StartSocket("device1");
-    dmTransport.ClearDeviceSocketOpened("device1");
-    int32_t socketId;
+    int32_t socketId = 1;
+    dmTransport.StartSocket("device1", socketId);
+    dmTransport.ClearDeviceSocketOpened("device1", socketId);
     EXPECT_FALSE(dmTransport.IsDeviceSessionOpened("device1", socketId));
 }
 
@@ -121,9 +120,9 @@ HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldRemoveSocket, testing::e
  */
 HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldDoNothingForInvalidId, testing::ext::TestSize.Level0)
 {
-    dmTransport.StartSocket("device1");
-    dmTransport.ClearDeviceSocketOpened("invalid_device");
-    int32_t socketId;
+    int32_t socketId = 1;
+    dmTransport.StartSocket("device1", socketId);
+    dmTransport.ClearDeviceSocketOpened("invalid_device", socketId);
     EXPECT_FALSE(dmTransport.IsDeviceSessionOpened("device1", socketId));
 }
 
@@ -133,8 +132,8 @@ HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldDoNothingForInvalidId, t
  */
 HWTEST_F(DMTransportTest, StartSocket_ShouldCreateSocket, testing::ext::TestSize.Level0)
 {
-    EXPECT_EQ(dmTransport.StartSocket("device1"), ERR_DM_FAILED);
     int32_t socketId;
+    EXPECT_EQ(dmTransport.StartSocket("device1", socketId), ERR_DM_FAILED);
     EXPECT_FALSE(dmTransport.IsDeviceSessionOpened("device1", socketId));
 }
 
@@ -144,7 +143,8 @@ HWTEST_F(DMTransportTest, StartSocket_ShouldCreateSocket, testing::ext::TestSize
  */
 HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorForInvalidId, testing::ext::TestSize.Level0)
 {
-    EXPECT_EQ(dmTransport.StartSocket(""), ERR_DM_INPUT_PARA_INVALID);
+    int32_t socketId;
+    EXPECT_EQ(dmTransport.StartSocket("", socketId), ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**
@@ -153,8 +153,9 @@ HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorForInvalidId, testing::ex
  */
 HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorIfAlreadyOpened, testing::ext::TestSize.Level0)
 {
-    dmTransport.StartSocket("device1");
-    EXPECT_EQ(dmTransport.StartSocket("device1"), ERR_DM_FAILED);
+    int32_t socketId;
+    dmTransport.StartSocket("device1", socketId);
+    EXPECT_EQ(dmTransport.StartSocket("device1", socketId), ERR_DM_FAILED);
 }
 
 /**
@@ -187,7 +188,7 @@ HWTEST_F(DMTransportTest, Send_InvalidId_Failure, testing::ext::TestSize.Level0)
 {
     std::string invalidId = "invalidId";
     std::string payload = "Hello, World!";
-    int32_t result = dmTransport.Send(invalidId, payload);
+    int32_t result = dmTransport.Send(invalidId, payload, 0);
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
@@ -199,7 +200,7 @@ HWTEST_F(DMTransportTest, Send_SessionNotOpened_Failure, testing::ext::TestSize.
 {
     std::string notOpenedId = "notOpenedId";
     std::string payload = "Hello, World!";
-    int32_t result = dmTransport.Send(notOpenedId, payload);
+    int32_t result = dmTransport.Send(notOpenedId, payload, 0);
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
 } // DistributedHardware

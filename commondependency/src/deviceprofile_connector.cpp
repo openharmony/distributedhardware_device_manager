@@ -1114,14 +1114,21 @@ void DeviceProfileConnector::DeleteAccessControlById(int64_t accessControlId)
     DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(accessControlId);
 }
 
-int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid, int32_t currentUserId,
-    int32_t beforeUserId)
+int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
+    const std::vector<std::string> &deviceVec, int32_t currentUserId, int32_t beforeUserId)
 {
     LOGI("Start.");
+    if (deviceVec.empty()) {
+        LOGI("no remote device.");
+        return DM_OK;
+    }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> activeProfiles;
     std::vector<AccessControlProfile> inActiveProfiles;
     for (auto &item : profiles) {
+        if (std::find(deviceVec.begin(), deviceVec.end(), item.GetTrustDeviceId()) == deviceVec.end()) {
+            continue;
+        }
         if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == beforeUserId && item.GetStatus() == ACTIVE) ||
             (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
@@ -1410,11 +1417,13 @@ void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(const std::vector<i
         int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
         int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
         if (accesserDeviceId == localUdid && accesseeDeviceId == remoteUdid && item.GetStatus() == ACTIVE &&
-            find(remoteUserIds.begin(), remoteUserIds.end(), accesseeUserId) != remoteUserIds.end()) {
+            (find(remoteUserIds.begin(), remoteUserIds.end(), accesseeUserId) != remoteUserIds.end() ||
+            find(localUserIds.begin(), localUserIds.end(), accesserUserId) == localUserIds.end())) {
             item.SetStatus(INACTIVE);
             DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
         } else if ((accesseeDeviceId == localUdid && accesserDeviceId == remoteUdid) && item.GetStatus() == ACTIVE &&
-            find(remoteUserIds.begin(), remoteUserIds.end(), accesserUserId) != remoteUserIds.end()) {
+            (find(remoteUserIds.begin(), remoteUserIds.end(), accesserUserId) != remoteUserIds.end() ||
+            find(localUserIds.begin(), localUserIds.end(), accesseeUserId) == localUserIds.end())) {
             item.SetStatus(INACTIVE);
             DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
         }

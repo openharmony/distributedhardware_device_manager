@@ -273,7 +273,7 @@ public:
         const std::string &peerUdid, int32_t peerUserId) = 0;
     virtual void HandleUserRemoved(int32_t preUserId) = 0;
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
-    virtual void HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap, int32_t currentUserId,
+    virtual void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
