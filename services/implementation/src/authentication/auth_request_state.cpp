@@ -204,5 +204,15 @@ int32_t AuthRequestCredentialDone::Enter()
     stateAuthManager->RequestCredentialDone();
     return DM_OK;
 }
+
+int32_t AuthRequestAuthFinish::GetStateType()
+{
+    return AuthState::AUTH_REQUEST_AUTH_FINISH;
+}
+
+int32_t AuthRequestAuthFinish::Enter()
+{
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
