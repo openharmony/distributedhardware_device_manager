@@ -475,8 +475,8 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
         return nullptr;
     }
     nlohmann::json jsonObj;
-    int32_t pinCode = -1;
-    if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == -1) {
+    int32_t pinCode = INVALID_PINCODE;
+    if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == INVALID_PINCODE) {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
     } else {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_ACCEPTED;

@@ -545,7 +545,7 @@ void DmAuthManager::ProcessSinkMsg()
             }
             break;
         case MSG_TYPE_REQ_PUBLICKEY:
-            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
+            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_AUTH_FINISH) {
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseCredential>());
             }
             break;
@@ -1984,6 +1984,8 @@ bool DmAuthManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, u
 
 void DmAuthManager::SrcAuthDeviceFinish()
 {
+    CHECK_NULL_VOID(authRequestState_);
+    authRequestState_->TransitionTo(std::make_shared<AuthRequestAuthFinish>());
     if (authResponseContext_->isOnline) {
         if (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
             (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
@@ -2030,6 +2032,8 @@ void DmAuthManager::SrcAuthDeviceFinish()
 
 void DmAuthManager::SinkAuthDeviceFinish()
 {
+    CHECK_NULL_VOID(authResponseState_);
+    authResponseState_->TransitionTo(std::make_shared<AuthResponseAuthFinish>());
     if (!authResponseContext_->haveCredential) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
     }

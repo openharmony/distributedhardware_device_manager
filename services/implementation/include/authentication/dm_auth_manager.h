@@ -47,6 +47,7 @@ typedef enum AuthState {
     AUTH_REQUEST_FINISH,
     AUTH_REQUEST_CREDENTIAL,
     AUTH_REQUEST_CREDENTIAL_DONE,
+    AUTH_REQUEST_AUTH_FINISH,
 
     AUTH_RESPONSE_INIT = 20,
     AUTH_RESPONSE_NEGOTIATE,
@@ -55,6 +56,7 @@ typedef enum AuthState {
     AUTH_RESPONSE_SHOW,
     AUTH_RESPONSE_FINISH,
     AUTH_RESPONSE_CREDENTIAL,
+    AUTH_RESPONSE_AUTH_FINISH,
 } AuthState;
 
 enum DmMsgType : int32_t {
@@ -156,7 +158,7 @@ typedef struct DmAuthResponseContext {
     std::string authToken;
     int32_t pageId;
     int64_t requestId;
-    int32_t code;
+    int32_t code = INVALID_PINCODE;
     int32_t state;
     std::vector<std::string> syncGroupList;
     std::string accountGroupIdHash;
