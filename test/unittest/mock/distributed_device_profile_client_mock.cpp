@@ -52,7 +52,7 @@ int32_t DistributedDeviceProfileClient::UnSubscribeDeviceProfileInited(int32_t s
 }
 
 int32_t DistributedDeviceProfileClient::PutAllTrustedDevices(
-        const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos)
+    const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos)
 {
     return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->PutAllTrustedDevices(deviceInfos);
 }

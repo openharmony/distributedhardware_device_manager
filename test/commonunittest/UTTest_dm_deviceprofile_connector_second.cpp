@@ -410,7 +410,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, SubscribeDeviceProfileInited_201, tes
     int32_t ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
-    dpInitedCallback = sptr<IDpInitedCallback>(new DpInitedCallback());
+    dpInitedCallback = sptr<DistributedDeviceProfile::IDpInitedCallback>(new DpInitedCallback());
     EXPECT_CALL(*distributedDeviceProfileClientMock_, SubscribeDeviceProfileInited(_, _))
         .WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);

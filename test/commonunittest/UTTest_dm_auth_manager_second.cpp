@@ -1547,7 +1547,7 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
     authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(groupList),Return(true)));
+        .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(true)));
     EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123456"));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_TRUE(ret);
@@ -1591,7 +1591,7 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup_201, testing::ext::TestSize.Level0)
     groupInfo.groupId = "123456";
     groupList.push_back(groupInfo);
     EXPECT_CALL(*hiChainConnectorMock_, GetRelatedGroups(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(groupList),Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<1>(groupList), Return(DM_OK)));
     int32_t ret = authManager_->DeleteGroup(pkgName, deviceId);
     ASSERT_EQ(ret, DM_OK);
 }

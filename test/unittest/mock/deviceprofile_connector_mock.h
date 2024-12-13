@@ -58,8 +58,8 @@ public:
     MOCK_METHOD(bool, DeleteAclForAccountLogOut, (const std::string &, int32_t, const std::string &, int32_t));
     MOCK_METHOD((OHOS::DistributedHardware::ProcessInfo), HandleAppUnBindEvent, (int32_t, const std::string &,
         int32_t, const std::string &));
-    MOCK_METHOD((std::multimap<std::string, int32_t>), GetDevIdAndUserIdByActHash, (std::string &, std::string &,
-        int32_t, std::string &));
+    MOCK_METHOD((std::multimap<std::string, int32_t>), GetDevIdAndUserIdByActHash, (const std::string &,
+        const std::string &, int32_t, const std::string &));
     MOCK_METHOD((std::vector<int32_t>), SyncAclByBindType, (std::string, std::vector<int32_t>, std::string,
         std::string));
 };

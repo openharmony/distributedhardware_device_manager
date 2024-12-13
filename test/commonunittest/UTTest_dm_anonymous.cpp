@@ -505,12 +505,12 @@ HWTEST_F(DmAnonymousTest, GetAnonyStringList_001, testing::ext::TestSize.Level0)
     std::string value = "valueTest";
     std::vector<std::string> valueVec;
     valueVec.push_back(value);
-    std::string str = GetAnonyStringList(value);
+    std::string str = GetAnonyStringList(valueVec);
     auto ret = str.size();
     EXPECT_GE(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt64_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt64_002, testing::ext::TestSize.Level0)
 {
     std::string str = "12345";
     int32_t base = 10;

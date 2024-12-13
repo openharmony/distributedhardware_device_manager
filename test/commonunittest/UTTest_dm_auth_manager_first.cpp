@@ -345,7 +345,7 @@ HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_ = nullptr;
     authManager_->authMessageProcessor_ = nullptr;
     const int32_t sessionId = 65;
-    const std::string message = "messageTest";
+    std::string message = "messageTest";
     int64_t requestId = 555;
     int32_t status = 2;
     nlohmann::json jsonObject;
@@ -1540,11 +1540,11 @@ HWTEST_F(DmAuthManagerTest, SendAuthRequest_101, testing::ext::TestSize.Level0)
 {
     int64_t sessionId = 1;
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->authResponseContext_ = ERR_DM_VERSION_INCOMPATIBLE;
+    authManager_->authResponseContext_->reply = ERR_DM_VERSION_INCOMPATIBLE;
     authManager_->SendAuthRequest(sessionId);
 
-    authManager_->authResponseContext_ = ERR_DM_AUTH_CODE_INCORRECT;
-    authResponseContext_->bindLevel = 5;
+    authManager_->authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;
+    authManager_->authResponseContext_->bindLevel = 5;
     ASSERT_NE(authManager_->authResponseContext_, nullptr);
 }
 
