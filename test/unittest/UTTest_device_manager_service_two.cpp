@@ -937,10 +937,6 @@ HWTEST_F(DeviceManagerServiceTest, ParseCheckSumMsg_201, testing::ext::TestSize.
     msg = msgJsonObj.dump();
     int ret = DeviceManagerService::GetInstance().ParseCheckSumMsg(msg, networkId, discoveryType, isChange);
     EXPECT_EQ(ret, DM_OK);
-
-    std::string networkId = "networkId001";
-    std::vector<int32_t> foregroundUserIds;
-    std::vector<int32_t> backgroundUserIds;
 }
 
 } // namespace

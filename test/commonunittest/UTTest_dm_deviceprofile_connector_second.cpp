@@ -18,6 +18,7 @@
 #include "dm_constants.h"
 #include "deviceprofile_connector.h"
 #include <iterator>
+#include "dp_inited_callback_stub.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -42,6 +43,20 @@ void DeviceProfileConnectorSecondTest::TearDownTestCase()
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     distributedDeviceProfileClientMock_ = nullptr;
 }
+
+class DpInitedCallback : public DpInitedCallbackStub {
+public:
+    DpInitedCallback()
+    {
+    }
+    ~DpInitedCallback()
+    {
+    }
+    int32_t OnDpInited()
+    {
+        return 0;
+    }
+};
 
 void AddAccessControlProfile(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
 {

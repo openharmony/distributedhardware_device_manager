@@ -1549,8 +1549,8 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(true)));
     EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123456"));
-    ret = authManager_->IsIdenticalAccount();
-    ASSERT_TRUE(ret);
+    bool rets = authManager_->IsIdenticalAccount();
+    ASSERT_TRUE(rets);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
@@ -1564,8 +1564,8 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, 1);
 
     int32_t sessionId = 1;
-    authResponseContext_->authType = AUTH_TYPE_PIN;
-    authResponseContext_->isOnline = true;
+    authManager_->authResponseContext_->authType = AUTH_TYPE_PIN;
+    authManager_->authResponseContext_->isOnline = true;
     EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).WillOnce(Return(true));
     authManager_->ProcessAuthRequest(sessionId);
 
@@ -1612,7 +1612,7 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup_202, testing::ext::TestSize.Level0)
     groupInfo1.groupId = "12345";
     groupList.push_back(groupInfo1);
     EXPECT_CALL(*hiChainConnectorMock_, GetRelatedGroups(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<1>(groupList),Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<1>(groupList), Return(DM_OK)));
     ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
     ASSERT_EQ(ret, DM_OK);
 }

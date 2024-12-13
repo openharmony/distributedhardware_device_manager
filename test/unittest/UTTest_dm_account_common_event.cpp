@@ -40,11 +40,8 @@ void DmAccountCommonEventManagerTest::TearDownTestCase()
 
 void AccountCommonEventCallbacks(const std::string commonEventType, int32_t currentUserId, int32_t beforeUserId)
 {
-
 }
-
 namespace {
-
 HWTEST_F(DmAccountCommonEventManagerTest, SubscribeAccountCommonEvent_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager

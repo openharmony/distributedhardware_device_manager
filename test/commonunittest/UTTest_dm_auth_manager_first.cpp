@@ -1626,7 +1626,6 @@ HWTEST_F(DmAuthManagerTest, GetBinderInfo_001, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->bindLevel = SERVICE;
     authManager_->SetProcessInfo();
 }
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
