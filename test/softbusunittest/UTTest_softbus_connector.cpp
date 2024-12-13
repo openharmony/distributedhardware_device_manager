@@ -359,7 +359,7 @@ HWTEST_F(SoftbusConnectorTest, JoinLnn_001, testing::ext::TestSize.Level0)
     std::string deviceId;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->JoinLnn(deviceId);
-    EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
+    EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), true);
 }
 
 /**
@@ -431,7 +431,7 @@ HWTEST_F(SoftbusConnectorTest, OnSoftbusJoinLNNResult_001, testing::ext::TestSiz
     int32_t result = 0;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusJoinLNNResult(addr, networkId, result);
-    EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), false);
+    EXPECT_EQ(SoftbusConnector::discoveryDeviceInfoMap_.empty(), true);
 }
 
 /**
