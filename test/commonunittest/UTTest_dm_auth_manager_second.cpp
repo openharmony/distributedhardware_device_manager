@@ -1586,7 +1586,7 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
     std::string deviceId;
-    std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
+    std::vector<GroupInfo> groupList;
     GroupInfo groupInfo;
     groupInfo.groupId = "123456";
     groupList.push_back(groupInfo);
@@ -1604,7 +1604,7 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup_202, testing::ext::TestSize.Level0)
     int32_t ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
     ASSERT_EQ(ret, ERR_DM_FAILED);
     
-    std::vector<OHOS::DistributedHardware::GroupInfo> groupList;
+    std::vector<GroupInfo> groupList;
     GroupInfo groupInfo;
     groupInfo.groupId = "123456";
     groupList.push_back(groupInfo);
