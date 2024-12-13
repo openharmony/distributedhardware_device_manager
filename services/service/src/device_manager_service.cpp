@@ -1230,7 +1230,6 @@ void DeviceManagerService::UnloadDMServiceAdapterResident()
         dmServiceImplExtResident_->Release();
     }
     dmServiceImplExtResident_ = nullptr;
-
     if (residentSoHandle != nullptr) {
         LOGI("dm service resident residentSoHandle is not nullptr.");
         dlclose(residentSoHandle);
