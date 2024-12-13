@@ -41,10 +41,10 @@ public:
     void Init();
     void UnInit();
 
-    void SendUserIds(const std::string rmtNetworkId, const std::vector<uint32_t> &foregroundUserIds,
+    int32_t SendUserIds(const std::string rmtNetworkId, const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds);
     void RspLocalFrontOrBackUserIds(const std::string rmtNetworkId, const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backgroundUserIds);
+        const std::vector<uint32_t> &backgroundUserIds, int32_t socketId);
 
     class DMCommToolEventHandler : public AppExecFwk::EventHandler {
     public:

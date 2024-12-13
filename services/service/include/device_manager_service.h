@@ -32,6 +32,7 @@
 #include "hichain_listener.h"
 #include "i_dm_service_impl_ext.h"
 #include "dm_single_instance.h"
+#include "dm_timer.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
 #include "dm_package_common_event.h"
@@ -265,6 +266,14 @@ private:
     void HandleUserSwitched(int32_t curUserId, int32_t preUserId);
     void HandleUserIdsBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
         const std::string &remoteUdid, bool isNeedResponse);
+    void NotifyRemoteLocalUserSwitch(int32_t curUserId, int32_t preUserId, const std::vector<std::string> &peerUdids,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void NotifyRemoteLocalUserSwitchByWifi(int32_t curUserId, int32_t preUserId,
+        const std::map<std::string, std::string> &wifiDevices, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds);
+    int32_t SendUserIdsByWifi(const std::string &networkId, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds);
+    void HandleUserSwitchTimeout(int32_t curUserId, int32_t preUserId, const std::string &udid);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
@@ -294,6 +303,7 @@ private:
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
     std::string localNetWorkId_ = "";
+    std::shared_ptr<DmTimer> timer_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

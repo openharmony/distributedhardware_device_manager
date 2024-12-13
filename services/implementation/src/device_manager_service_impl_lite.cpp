@@ -513,10 +513,10 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     return;
 }
 
-void DeviceManagerServiceImpl::HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap,
+void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string> &deviceVec,
     int32_t currentUserId, int32_t beforeUserId)
 {
-    (void)deviceMap;
+    (void)deviceVec;
     (void)currentUserId;
     (void)beforeUserId;
     return;

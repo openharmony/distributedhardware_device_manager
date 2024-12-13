@@ -56,8 +56,9 @@ std::string GetCommMsgString(const CommMsg &commMsg);
 struct InnerCommMsg {
     std::string remoteNetworkId;
     std::shared_ptr<CommMsg> commMsg;
-    InnerCommMsg(std::string remoteNetworkId, std::shared_ptr<CommMsg> commMsg)
-        : remoteNetworkId(remoteNetworkId), commMsg(commMsg) {}
+    int32_t socketId = 0;
+    InnerCommMsg(std::string remoteNetworkId, std::shared_ptr<CommMsg> commMsg, int32_t socketId)
+        : remoteNetworkId(remoteNetworkId), commMsg(commMsg), socketId(socketId) {}
 };
 
 struct NotifyUserIds {

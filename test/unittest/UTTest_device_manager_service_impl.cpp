@@ -1859,10 +1859,10 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     std::string remoteUdid = "deviceId";
     deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
 
-    std::map<std::string, int32_t> deviceMap;
+    std::vector<std::string> deviceVec;
     int32_t currentUserId = 1;
     int32_t beforeUserId = 0;
-    deviceManagerServiceImpl_->HandleUserSwitched(deviceMap, currentUserId, beforeUserId);
+    deviceManagerServiceImpl_->HandleUserSwitched(deviceVec, currentUserId, beforeUserId);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_001, testing::ext::TestSize.Level0)

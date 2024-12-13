@@ -136,7 +136,7 @@ public:
         int32_t peerUserId);
     void HandleUserRemoved(int32_t preUserId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
-    void HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap, int32_t currentUserId,
+    void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);

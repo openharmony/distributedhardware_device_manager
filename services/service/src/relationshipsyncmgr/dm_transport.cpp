@@ -54,7 +54,13 @@ int32_t DMTransport::OnSocketOpened(int32_t socketId, const PeerSocketInfo &info
     LOGI("OnSocketOpened, socket: %{public}d, peerSocketName: %{public}s, peerNetworkId: %{public}s, "
         "peerPkgName: %{public}s", socketId, info.name, GetAnonyString(info.networkId).c_str(), info.pkgName);
     std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
-    remoteDevSocketIds_[info.networkId] = socketId;
+    if (remoteDevSocketIds_.find(info.networkId) == remoteDevSocketIds_.end()) {
+        std::set<int32_t> socketSet;
+        socketSet.insert(socketId);
+        remoteDevSocketIds_[info.networkId] = socketSet;
+        return DM_OK;
+    }
+    remoteDevSocketIds_.at(info.networkId).insert(socketId);
     return DM_OK;
 }
 
@@ -62,12 +68,15 @@ void DMTransport::OnSocketClosed(int32_t socketId, ShutdownReason reason)
 {
     LOGI("OnSocketClosed, socket: %{public}d, reason: %{public}d", socketId, (int32_t)reason);
     std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
-    for (auto iter = remoteDevSocketIds_.begin(); iter != remoteDevSocketIds_.end(); ++iter) {
-        if (iter->second == socketId) {
-            remoteDevSocketIds_.erase(iter);
-            break;
+    for (auto iter = remoteDevSocketIds_.begin(); iter != remoteDevSocketIds_.end();) {
+        iter->second.erase(socketId);
+        if (iter->second.empty()) {
+            iter = remoteDevSocketIds_.erase(iter);
+        } else {
+            ++iter;
         }
     }
+    sourceSocketIds_.erase(socketId);
 }
 
 void DMTransport::OnBytesReceived(int32_t socketId, const void *data, uint32_t dataLen)
@@ -123,7 +132,7 @@ void DMTransport::HandleReceiveMessage(const int32_t socketId, const std::string
     FromJson(root, *commMsg);
     cJSON_Delete(root);
 
-    std::shared_ptr<InnerCommMsg> innerMsg = std::make_shared<InnerCommMsg>(rmtNetworkId, commMsg);
+    std::shared_ptr<InnerCommMsg> innerMsg = std::make_shared<InnerCommMsg>(rmtNetworkId, commMsg, socketId);
 
     LOGI("Receive DM msg, code: %{public}d, msg: %{public}s", commMsg->code, GetAnonyString(commMsg->msg).c_str());
     AppExecFwk::InnerEvent::Pointer msgEvent = AppExecFwk::InnerEvent::Get(commMsg->code, innerMsg);
@@ -298,11 +307,14 @@ int32_t DMTransport::UnInit()
     {
         std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
         for (auto iter = remoteDevSocketIds_.begin(); iter != remoteDevSocketIds_.end(); ++iter) {
-            LOGI("Shutdown client socket: %{public}d to remote dev: %{public}s", iter->second,
-                GetAnonyString(iter->first).c_str());
-            Shutdown(iter->second);
+            for (auto iter1 = iter->second.begin(); iter1 != iter->second.end(); ++iter1) {
+                LOGI("Shutdown client socket: %{public}d to remote dev: %{public}s", *iter1,
+                    GetAnonyString(iter->first).c_str());
+                Shutdown(*iter1);
+            }
         }
         remoteDevSocketIds_.clear();
+        sourceSocketIds_.clear();
     }
 
     if (!isSocketSvrCreateFlag_.load()) {
@@ -322,13 +334,17 @@ bool DMTransport::IsDeviceSessionOpened(const std::string &rmtNetworkId, int32_t
         return false;
     }
     std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
-    if (remoteDevSocketIds_.find(rmtNetworkId) == remoteDevSocketIds_.end()) {
+    auto iter = remoteDevSocketIds_.find(rmtNetworkId);
+    if (iter == remoteDevSocketIds_.end()) {
         return false;
     }
-    socketId = remoteDevSocketIds_.at(rmtNetworkId);
-    LOGI("DeviceSession has opened, rmtNetworkId: %{public}s, socketId: %{public}d",
-        GetAnonyString(rmtNetworkId).c_str(), socketId);
-    return true;
+    for (auto iter1 = iter->second.begin(); iter1 != iter->second.end(); ++iter1) {
+        if (sourceSocketIds_.find(*iter1) != sourceSocketIds_.end()) {
+            socketId = *iter1;
+            return true;
+        }
+    }
+    return false;
 }
 
 std::string DMTransport::GetRemoteNetworkIdBySocketId(int32_t socketId)
@@ -336,7 +352,7 @@ std::string DMTransport::GetRemoteNetworkIdBySocketId(int32_t socketId)
     std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
     std::string networkId = "";
     for (auto const &item : remoteDevSocketIds_) {
-        if (item.second == socketId) {
+        if (item.second.find(socketId) != item.second.end()) {
             networkId = item.first;
             break;
         }
@@ -344,21 +360,28 @@ std::string DMTransport::GetRemoteNetworkIdBySocketId(int32_t socketId)
     return networkId;
 }
 
-void DMTransport::ClearDeviceSocketOpened(const std::string &remoteDevId)
+void DMTransport::ClearDeviceSocketOpened(const std::string &remoteDevId, int32_t socketId)
 {
     if (!IsIdLengthValid(remoteDevId)) {
         return;
     }
     std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
-    remoteDevSocketIds_.erase(remoteDevId);
+    auto iter = remoteDevSocketIds_.find(remoteDevId);
+    if (iter == remoteDevSocketIds_.end()) {
+        return;
+    }
+    iter->second.erase(socketId);
+    if (iter->second.empty()) {
+        remoteDevSocketIds_.erase(iter);
+    }
+    sourceSocketIds_.erase(socketId);
 }
 
-int32_t DMTransport::StartSocket(const std::string &rmtNetworkId)
+int32_t DMTransport::StartSocket(const std::string &rmtNetworkId, int32_t &socketId)
 {
     if (!IsIdLengthValid(rmtNetworkId)) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t socketId = -1;
     if (IsDeviceSessionOpened(rmtNetworkId, socketId)) {
         LOGE("Softbus session has already opened, deviceId: %{public}s", GetAnonyString(rmtNetworkId).c_str());
         return DM_OK;
@@ -389,6 +412,8 @@ int32_t DMTransport::StartSocket(const std::string &rmtNetworkId)
         .dataType = DATA_TYPE_BYTES
     };
     OnSocketOpened(socket, peerSocketInfo);
+    sourceSocketIds_.insert(socket);
+    socketId = socket;
     return DM_OK;
 }
 
@@ -406,17 +431,16 @@ int32_t DMTransport::StopSocket(const std::string &rmtNetworkId)
     LOGI("StopSocket rmtNetworkId: %{public}s, socketId: %{public}d",
         GetAnonyString(rmtNetworkId).c_str(), socketId);
     Shutdown(socketId);
-    ClearDeviceSocketOpened(rmtNetworkId);
+    ClearDeviceSocketOpened(rmtNetworkId, socketId);
     return DM_OK;
 }
 
-int32_t DMTransport::Send(const std::string &rmtNetworkId, const std::string &payload)
+int32_t DMTransport::Send(const std::string &rmtNetworkId, const std::string &payload, int32_t socketId)
 {
     if (!IsIdLengthValid(rmtNetworkId) || !IsMessageLengthValid(payload)) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t socketId = -1;
-    if (!IsDeviceSessionOpened(rmtNetworkId, socketId)) {
+    if (socketId <= 0) {
         LOGI("The session is not open, target networkId: %{public}s", GetAnonyString(rmtNetworkId).c_str());
         return ERR_DM_FAILED;
     }

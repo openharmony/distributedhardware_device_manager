@@ -74,8 +74,11 @@ namespace {
     const std::string USERID_CHECKSUM_NETWORKID_KEY = "networkId";
     const std::string USERID_CHECKSUM_DISCOVER_TYPE_KEY = "discoverType";
     constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
+    constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BLE_MASK = 0b0100;
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
     const std::string USERID_CHECKSUM_ISCHANGE_KEY = "ischange";
+    constexpr const char* USER_SWITCH_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userSwitchByWifi";
+    const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
 }
 
 DeviceManagerService::~DeviceManagerService()
@@ -1694,20 +1697,19 @@ void DeviceManagerService::HandleUserSwitched(int32_t curUserId, int32_t preUser
             peerUdids.push_back(item.first);
         }
     }
-    dmServiceImpl_->HandleUserSwitched(preUserDeviceMap, curUserId, preUserId);
-    if (!peerUdids.empty()) {
-        std::vector<int32_t> foregroundUserVec;
-        int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
-        std::vector<int32_t> backgroundUserVec;
-        int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
-        if (retFront != DM_OK || retBack != DM_OK || foregroundUserVec.empty()) {
-            LOGE("Get userids failed, retFront: %{public}d, retBack: %{public}d, foreground user num: %{public}d",
-                retFront, retBack, static_cast<int32_t>(foregroundUserVec.size()));
-        } else {
-            LOGE("Send local foreground and background userids");
-            SendUserIdsBroadCast(peerUdids, foregroundUserVec, backgroundUserVec, true);
-        }
+    if (peerUdids.empty()) {
+        return;
     }
+    std::vector<int32_t> foregroundUserVec;
+    int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
+    std::vector<int32_t> backgroundUserVec;
+    int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
+    if (retFront != DM_OK || retBack != DM_OK || foregroundUserVec.empty()) {
+        LOGE("Get userids failed, retFront: %{public}d, retBack: %{public}d, foreground user num: %{public}d",
+            retFront, retBack, static_cast<int32_t>(foregroundUserVec.size()));
+        return;
+    }
+    NotifyRemoteLocalUserSwitch(curUserId, preUserId, peerUdids, foregroundUserVec, backgroundUserVec);
 }
 
 void DeviceManagerService::HandleUserRemoved(int32_t removedUserId)
@@ -1839,7 +1841,9 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
     if (softbusListener_ != nullptr) {
         softbusListener_->SetForegroundUserIdsToDSoftBus(remoteUdid, foregroundUserIds);
     }
-
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(USER_SWITCH_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
     }
@@ -2351,5 +2355,99 @@ void DeviceManagerService::HandleDeviceUnBind(const char *peerUdid, const GroupI
     }
     return;
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void DeviceManagerService::NotifyRemoteLocalUserSwitch(int32_t curUserId, int32_t preUserId,
+    const std::vector<std::string> &peerUdids, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    LOGI("Send local foreground and background userids");
+    if (peerUdids.empty()) {
+        return;
+    }
+    if (softbusListener_ == nullptr) {
+        dmServiceImpl_->HandleUserSwitched(peerUdids, curUserId, preUserId);
+        LOGE("softbusListener_ is null");
+        return;
+    }
+    std::vector<std::string> bleUdids;
+    std::map<std::string, std::string> wifiDevices;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+    if (!bleUdids.empty()) {
+        dmServiceImpl_->HandleUserSwitched(bleUdids, curUserId, preUserId);
+        SendUserIdsBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, true);
+    }
+    if (!wifiDevices.empty()) {
+        NotifyRemoteLocalUserSwitchByWifi(curUserId, preUserId, wifiDevices, foregroundUserIds, backgroundUserIds);
+    }
+}
+
+void DeviceManagerService::NotifyRemoteLocalUserSwitchByWifi(int32_t curUserId, int32_t preUserId,
+    const std::map<std::string, std::string> &wifiDevices, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    for (const auto &it : wifiDevices) {
+        int32_t result = SendUserIdsByWifi(it.second, foregroundUserIds, backgroundUserIds);
+        if (result != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            std::vector<std::string> updateUdids;
+            updateUdids.push_back(it.first);
+            dmServiceImpl_->HandleUserSwitched(updateUdids, curUserId, preUserId);
+            continue;
+        }
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        timer_->StartTimer(std::string(USER_SWITCH_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S, [this, curUserId, preUserId, udid] (std::string name) {
+                DeviceManagerService::HandleUserSwitchTimeout(curUserId, preUserId, udid);
+            });
+    }
+}
+
+int32_t DeviceManagerService::SendUserIdsByWifi(const std::string &networkId,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
+{
+    LOGI("Try open softbus session to exchange foreground/background userid");
+    std::vector<uint32_t> foregroundUserIdsUInt;
+    for (auto const &u : foregroundUserIds) {
+        foregroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
+    }
+    std::vector<uint32_t> backgroundUserIdsUInt;
+    for (auto const &u : backgroundUserIds) {
+        backgroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
+    }
+    return DMCommTool::GetInstance()->SendUserIds(networkId, foregroundUserIdsUInt, backgroundUserIdsUInt);
+}
+
+void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t preUserId, const std::string &udid)
+{
+    LOGI("start udid: %{public}s", GetAnonyString(udid).c_str());
+    std::vector<std::string> updateUdids;
+    updateUdids.push_back(udid);
+    dmServiceImpl_->HandleUserSwitched(updateUdids, curUserId, preUserId);
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
