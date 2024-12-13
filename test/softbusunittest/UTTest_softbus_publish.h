@@ -12,25 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef OHOS_UTTEST_DM_SOFTBUS_PUBLISH_H
+#define OHOS_UTTEST_DM_SOFTBUS_PUBLISH_H
 
-#ifndef OHOS_DM_SOFTBUS_PUBLISH_H
-#define OHOS_DM_SOFTBUS_PUBLISH_H
+#include <gtest/gtest.h>
+#include <refbase.h>
 
-#include "softbus_bus_center.h"
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "auth_response_state.h"
+#include "device_manager_service_listener.h"
+#include "dm_auth_manager.h"
+#include "dm_device_state_manager.h"
+#include "inner_session.h"
+#include "softbus_publish.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32_t screenState);
-class SoftbusPublish {
+class SoftbusPublishTest : public testing::Test {
 public:
-    SoftbusPublish();
-    ~SoftbusPublish();
-
-    static void OnSoftbusPublishResult(int publishId, PublishResult result);
-
-    int32_t PublishSoftbusLNN();
-    int32_t StopPublishSoftbusLNN(int32_t publishId);
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp() override;
+    void TearDown() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_SOFTBUS_PUBLISH_H
+#endif
