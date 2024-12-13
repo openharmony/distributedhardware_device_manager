@@ -22,8 +22,8 @@ ohos_hap("DeviceManager_UI") {
   publicity_file = "../publicity.xml"
   certificate_profile = "../signature/DeviceManager_UI.p7b"
   hap_name = "DeviceManager_UI"
-  part_name = "prebuilt_hap"
-  subsystem_name = "applications"
+  part_name = "device_manager"
+  subsystem_name = "distributedhardware"
   js_build_mode = "release"
   module_install_dir = "app/com.ohos.devicemanagerui"
   if (defined(sign_hap_py_path)) {
