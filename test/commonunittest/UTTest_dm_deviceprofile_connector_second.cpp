@@ -44,7 +44,7 @@ void DeviceProfileConnectorSecondTest::TearDownTestCase()
     distributedDeviceProfileClientMock_ = nullptr;
 }
 
-class DpInitedCallback : public DpInitedCallbackStub {
+class DpInitedCallback : public DistributedDeviceProfile::DpInitedCallbackStub {
 public:
     DpInitedCallback()
     {

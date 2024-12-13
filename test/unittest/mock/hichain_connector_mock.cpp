@@ -22,33 +22,6 @@ namespace DistributedHardware {
 bool HiChainConnector::GetGroupInfo(const int32_t userId, const std::string &queryParams,
     std::vector<GroupInfo> &groupList)
 {
-    GroupInfo groupInfo;
-    groupInfo.groupName = "group1";
-    groupInfo.groupId = "123456";
-    groupInfo.groupOwner = "sdsd";
-    groupInfo.groupType = 1;
-    groupInfo.groupVisibility = 0;
-    groupInfo.userId = "82898";
-
-    GroupInfo groupInfo2;
-    groupInfo2.groupName = "group2";
-    groupInfo2.groupId = "123456";
-    groupInfo2.groupOwner = "sdsd";
-    groupInfo2.groupType = 1;
-    groupInfo2.groupVisibility = 0;
-    groupInfo2.userId = "82898";
-
-    GroupInfo groupInfo3;
-    groupInfo3.groupName = "group3";
-    groupInfo3.groupId = "123456";
-    groupInfo3.groupOwner = "sdsd";
-    groupInfo3.groupType = 1;
-    groupInfo3.groupVisibility = 0;
-    groupInfo3.userId = "82898";
-
-    groupList.push_back(groupInfo);
-    groupList.push_back(groupInfo2);
-    groupList.push_back(groupInfo3);
     return DmHiChainConnector::dmHiChainConnector->GetGroupInfo(userId, queryParams, groupList);
 }
 
