@@ -62,9 +62,10 @@ constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME
     "ohos.security.distributed_access_token",
 };
 
-constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = 1;
+constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = 2;
 constexpr const static char g_setDnPolicyWhiteList[SETDNPOLICY_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "collaboration_service",
+    "watch_system_service",
 };
 }
 
