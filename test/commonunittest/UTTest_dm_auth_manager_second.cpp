@@ -1612,7 +1612,7 @@ HWTEST_F(DmAuthManagerTest, DeleteGroup_202, testing::ext::TestSize.Level0)
     groupInfo1.groupId = "12345";
     groupList.push_back(groupInfo1);
     EXPECT_CALL(*hiChainConnectorMock_, GetRelatedGroups(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<1>(groupList), Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(DM_OK)));
     ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
     ASSERT_EQ(ret, DM_OK);
 }
