@@ -53,6 +53,7 @@ ohos_fuzztest("SoftbusConnectorRegisterFuzzTest") {
   external_deps = [
     "ffrt:libffrt",
     "safwk:system_ability_fwk",
+    "dsoftbus:softbus_client",
   ]
 
   defines = [

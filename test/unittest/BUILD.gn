@@ -106,6 +106,7 @@ ohos_unittest("UTTest_pin_auth") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -131,6 +132,7 @@ ohos_unittest("UTTest_pin_auth_ui") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -191,6 +193,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_service") {
     "ffrt:libffrt",
     "googletest:gmock",
     "hicollie:libhicollie",
+    "dsoftbus:softbus_client",
   ]
 
   cflags = [
@@ -240,6 +243,7 @@ ohos_unittest("UTTest_dm_pin_holder") {
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -318,6 +322,7 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -352,6 +357,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -382,6 +388,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -426,6 +433,7 @@ ohos_unittest("UTTest_hichain_connector") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -446,6 +454,7 @@ ohos_unittest("UTTest_mine_hichain_connector") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -479,6 +488,7 @@ ohos_unittest("UTTest_mine_softbus_listener") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "openssl:libcrypto_shared",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -506,6 +516,7 @@ ohos_unittest("UTTest_softbus_connector") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "os_account:libaccountkits",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -536,6 +547,7 @@ ohos_unittest("UTTest_softbus_listener") {
     "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -565,6 +577,7 @@ ohos_unittest("UTTest_softbus_publish") {
     "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -590,6 +603,7 @@ ohos_unittest("UTTest_softbus_session") {
     "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -661,6 +675,7 @@ ohos_unittest("UTTest_dm_transport") {
   external_deps = [
     "cJSON:cjson",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -766,6 +781,7 @@ ohos_unittest("UTTest_ipc_server_client_proxy") {
     "ffrt:libffrt",
     "googletest:gmock",
     "hicollie:libhicollie",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -807,6 +823,7 @@ ohos_unittest("UTTest_ipc_server_stub") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -831,6 +848,7 @@ ohos_unittest("UTTest_device_manager_impl") {
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 
   cflags = [
@@ -963,6 +981,7 @@ ohos_unittest("UTTest_dm_device_state_manager") {
     "googletest:gmock",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1034,6 +1053,7 @@ ohos_unittest("UTTest_device_manager_service_impl") {
     "googletest:gmock_main",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1052,6 +1072,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1071,6 +1092,7 @@ ohos_unittest("UTTest_auth_message_processor") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1090,6 +1112,7 @@ ohos_unittest("UTTest_auth_response_state") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1109,6 +1132,7 @@ ohos_unittest("UTTest_auth_request_state") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1151,6 +1175,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
+    "dsoftbus:softbus_client",
   ]
 
   cflags = [
@@ -1189,6 +1214,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
     "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1211,6 +1237,7 @@ ohos_unittest("UTTest_dm_auth_manager_third") {
     "device_info_manager:distributed_device_profile_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 
   cflags = [
@@ -1291,6 +1318,7 @@ ohos_unittest("UTTest_discovery_manager") {
     "ffrt:libffrt",
     "googletest:gmock",
     "hitrace:hitrace_meter",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1375,6 +1403,7 @@ ohos_unittest("UTTest_dm_discovery_manager") {
     "ffrt:libffrt",
     "googletest:gmock",
     "hitrace:hitrace_meter",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1410,6 +1439,7 @@ ohos_unittest("UTTest_dm_comm_tool") {
   external_deps = [
     "cJSON:cjson",
     "googletest:gmock",
+    "dsoftbus:softbus_client",
   ]
 }
 
@@ -1534,6 +1564,7 @@ ohos_unittest("UTTest_dm_publish_manager") {
     "ffrt:libffrt",
     "googletest:gmock",
     "hitrace:hitrace_meter",
+    "dsoftbus:softbus_client",
   ]
 
   if (support_power_manager) {

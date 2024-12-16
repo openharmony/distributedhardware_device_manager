@@ -87,6 +87,7 @@ ohos_fuzztest("PinAuthFuzzTest") {
     "ipc:ipc_single",
     "resource_management:resmgr_napi_core",
     "safwk:system_ability_fwk",
+    "dsoftbus:softbus_client",
   ]
 }
 

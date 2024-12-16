@@ -76,6 +76,7 @@ ohos_fuzztest("DeviceManagerServiceFuzzTest") {
     "ffrt:libffrt",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
+    "dsoftbus:softbus_client",
   ]
 }
 

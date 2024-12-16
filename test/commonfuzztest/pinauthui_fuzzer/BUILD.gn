@@ -87,6 +87,7 @@ ohos_fuzztest("PinAuthUiFuzzTest") {
     "init:libbegetutil",
     "resource_management:resmgr_napi_core",
     "safwk:system_ability_fwk",
+    "dsoftbus:softbus_client",
   ]
 }
 

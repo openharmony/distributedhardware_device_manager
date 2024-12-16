@@ -48,6 +48,7 @@ ohos_fuzztest("OnSoftbusListenerDeviceFoundFuzzTest") {
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "safwk:system_ability_fwk",
+    "dsoftbus:softbus_client",
   ]
 
   defines = [
