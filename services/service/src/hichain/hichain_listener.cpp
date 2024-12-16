@@ -16,8 +16,10 @@
 #include "hichain_listener.h"
 
 #include "device_manager_service.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "multiple_user_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -97,7 +99,12 @@ void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *g
         LOGI("groupType is %{public}d, not idential account.", hichainGroupInfo.groupType);
         return;
     }
-    DeviceManagerService::GetInstance().HandleDeviceUnBind(peerUdid, hichainGroupInfo);
+    string accountId = MultipleUserConnector::GetOhosAccountId();
+    if (accountId == hichainGroupInfo.osAccountId && accountId != "ohosAnonymousUid") {
+        LOGI("accountId = %{public}s.", GetAnonyString(accountId).c_str());
+        DeviceManagerService::GetInstance().HandleDeviceUnBind(peerUdid, hichainGroupInfo);
+        return;
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

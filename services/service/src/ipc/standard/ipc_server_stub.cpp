@@ -77,6 +77,7 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
 #endif
     AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);
+    AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
     DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
 }
 
@@ -123,6 +124,10 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     }
 #endif
     if (systemAbilityId == DEVICE_AUTH_SERVICE_ID) {
+        DeviceManagerService::GetInstance().InitHichainListener();
+        return;
+    }
+    if (systemAbilityId == ACCESS_TOKEN_MANAGER_SERVICE_ID) {
         DeviceManagerService::GetInstance().InitHichainListener();
         return;
     }
