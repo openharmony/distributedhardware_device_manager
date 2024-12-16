@@ -273,7 +273,7 @@ public:
         const std::string &peerUdid, int32_t peerUserId) = 0;
     virtual void HandleUserRemoved(int32_t preUserId) = 0;
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
-    virtual void HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap, int32_t currentUserId,
+    virtual void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
@@ -285,6 +285,8 @@ public:
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId) = 0;
     virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId) = 0;
     virtual int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList) = 0;
+    virtual void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+        const std::string &localUdid, int32_t localUserId, const std::string &localAccountId) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

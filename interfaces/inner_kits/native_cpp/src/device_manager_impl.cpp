@@ -565,7 +565,7 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
 
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetPkgName(pkgNameTemp);
+    req->SetPkgName(ComposeStr(pkgName, subscribeId));
     req->SetFirstParam(discParaStr);
     int32_t ret = ipcClientProxy_->SendRequest(STOP_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
@@ -674,7 +674,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
     std::shared_ptr<IpcAuthenticateDeviceReq> req = std::make_shared<IpcAuthenticateDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetExtra(extraJson.dump());
+    req->SetExtra(SafetyDump(extraJson));
     req->SetAuthType(authType);
     req->SetDeviceInfo(deviceInfo);
     int32_t ret = ipcClientProxy_->SendRequest(AUTHENTICATE_DEVICE, req, rsp);
@@ -1493,7 +1493,7 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
     std::shared_ptr<IpcBindDeviceReq> req = std::make_shared<IpcBindDeviceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-    req->SetBindParam(paramJson.dump());
+    req->SetBindParam(SafetyDump(paramJson));
     req->SetBindType(bindType);
     req->SetDeviceId(deviceId);
     int32_t ret = ipcClientProxy_->SendRequest(BIND_DEVICE, req, rsp);

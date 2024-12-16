@@ -23,7 +23,6 @@
 #include <unistd.h>
 
 #include "device_manager_service.h"
-#include "dm_anonymous.h"
 #include "dm_crypto.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -868,10 +867,16 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     const ConnectionAddr *addrInfo = &(device.addr)[0];
     if (addrInfo == nullptr) {
         LOGE("ConvertDeviceInfoToDmDevice: addrInfo is nullptr.");
-        dmDevice.extraData = jsonObj.dump();
+        dmDevice.extraData = SafetyDump(jsonObj);
         return;
     }
     jsonObj[PARAM_KEY_DISC_CAPABILITY] = device.capabilityBitmap[0];
+    ParseConnAddrInfo(addrInfo, jsonObj);
+    dmDevice.extraData = SafetyDump(jsonObj);
+}
+
+void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj)
+{
     if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
         std::string wifiIp((addrInfo->info).ip.ip);
         jsonObj[PARAM_KEY_WIFI_IP] = wifiIp;
@@ -893,10 +898,14 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
         std::string udidHash(ConvertBytesToUpperCaseHexString((addrInfo->info).ble.udidHash,
             sizeof((addrInfo->info).ble.udidHash) / sizeof(*((addrInfo->info).ble.udidHash))));
         jsonObj[PARAM_KEY_BLE_UDID_HASH] = udidHash;
+    } else if (addrInfo->type == CONNECTION_ADDR_USB) {
+        std::string usbIp((addrInfo->info).ip.ip);
+        jsonObj[PARAM_KEY_USB_IP] = usbIp;
+        jsonObj[PARAM_KEY_USB_PORT] = (addrInfo->info).ip.port;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_USB;
     } else {
         LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }
-    dmDevice.extraData = jsonObj.dump();
 }
 
 int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
@@ -1154,6 +1163,22 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
     (void)userIds;
 #endif
     return DM_OK;
+}
+
+void SoftbusListener::DeleteCacheDeviceInfo()
+{
+    LOGI("DeleteCacheDeviceInfo start.");
+    std::vector<DmDeviceInfo> onlineDevInfoVec;
+    SoftbusCache::GetInstance().GetDeviceInfoFromCache(onlineDevInfoVec);
+    if (onlineDevInfoVec.empty()) {
+        LOGE("onlineDevInfoVec is empty");
+        return;
+    }
+    SoftbusCache::GetInstance().DeleteDeviceInfo();
+    for (auto it : onlineDevInfoVec) {
+        LOGI("networkId: %{public}s", GetAnonyString(it.networkId).c_str());
+        DeviceOffLine(it);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

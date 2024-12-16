@@ -137,10 +137,12 @@ public:
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
-    void HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap, int32_t currentUserId,
+    void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId);
     int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList);
+    void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+        const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

@@ -58,47 +58,48 @@ std::shared_ptr<DMCommTool> DMCommTool::GetInstance()
     return instance;
 }
 
-void DMCommTool::SendUserIds(const std::string rmtNetworkId,
+int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds)
 {
     if (!IsIdLengthValid(rmtNetworkId) || foregroundUserIds.empty() || dmTransportPtr_ == nullptr) {
         LOGE("param invalid, networkId: %{public}s, foreground userids size: %{public}d",
             GetAnonyString(rmtNetworkId).c_str(), static_cast<int32_t>(foregroundUserIds.size()));
-        return;
+        return ERR_DM_INPUT_PARA_INVALID;
     }
-
-    if (dmTransportPtr_->StartSocket(rmtNetworkId) != DM_OK) {
+    int32_t socketId;
+    if (dmTransportPtr_->StartSocket(rmtNetworkId, socketId) != DM_OK || socketId <= 0) {
         LOGE("Start socket error");
-        return;
+        return ERR_DM_FAILED;
     }
 
     UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds);
     cJSON *root = cJSON_CreateObject();
     if (root == nullptr) {
         LOGE("Create cJSON object failed.");
-        return;
+        return ERR_DM_FAILED;
     }
     ToJson(root, userIdsMsg);
     char *msg = cJSON_PrintUnformatted(root);
     if (msg == nullptr) {
         cJSON_Delete(root);
-        return;
+        return ERR_DM_FAILED;
     }
     std::string msgStr(msg);
     cJSON_Delete(root);
     CommMsg commMsg(DM_COMM_SEND_LOCAL_USERIDS, msgStr);
     std::string payload = GetCommMsgString(commMsg);
 
-    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload);
+    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
     if (ret != DM_OK) {
         LOGE("Send local foreground userids failed, ret: %{public}d", ret);
-        return;
+        return ERR_DM_FAILED;
     }
     LOGI("Send local foreground userids success");
+    return DM_OK;
 }
 
 void DMCommTool::RspLocalFrontOrBackUserIds(const std::string rmtNetworkId,
-    const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds)
+    const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds, int32_t socketId)
 {
     UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds);
     cJSON *root = cJSON_CreateObject();
@@ -117,7 +118,7 @@ void DMCommTool::RspLocalFrontOrBackUserIds(const std::string rmtNetworkId,
     CommMsg commMsg(DM_COMM_RSP_LOCAL_USERIDS, msgStr);
     std::string payload = GetCommMsgString(commMsg);
 
-    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload);
+    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
     if (ret != DM_OK) {
         LOGE("Response local foreground userids failed, ret: %{public}d", ret);
         return;
@@ -208,7 +209,8 @@ void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> 
     for (auto const &u : backgroundUserIds) {
         backgroundUserIdsU32.push_back(static_cast<uint32_t>(u));
     }
-    RspLocalFrontOrBackUserIds(commMsg->remoteNetworkId, foregroundUserIdsU32, backgroundUserIdsU32);
+    RspLocalFrontOrBackUserIds(commMsg->remoteNetworkId, foregroundUserIdsU32, backgroundUserIdsU32,
+        commMsg->socketId);
 }
 
 void DMCommTool::ProcessResponseUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg)

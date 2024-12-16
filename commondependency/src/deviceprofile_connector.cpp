@@ -1114,18 +1114,27 @@ void DeviceProfileConnector::DeleteAccessControlById(int64_t accessControlId)
     DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(accessControlId);
 }
 
-int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid, int32_t currentUserId,
-    int32_t beforeUserId)
+int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
+    const std::vector<std::string> &deviceVec, int32_t currentUserId, int32_t beforeUserId)
 {
     LOGI("Start.");
+    if (deviceVec.empty()) {
+        LOGI("no remote device.");
+        return DM_OK;
+    }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<AccessControlProfile> activeProfiles;
+    std::vector<AccessControlProfile> inActiveProfiles;
     for (auto &item : profiles) {
+        if (std::find(deviceVec.begin(), deviceVec.end(), item.GetTrustDeviceId()) == deviceVec.end()) {
+            continue;
+        }
         if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == beforeUserId && item.GetStatus() == ACTIVE) ||
             (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == beforeUserId && item.GetStatus() == ACTIVE)) {
             item.SetStatus(INACTIVE);
-            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+            inActiveProfiles.push_back(item);
             continue;
         }
         if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
@@ -1133,9 +1142,15 @@ int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
             item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == currentUserId && item.GetStatus() == INACTIVE)) {
             item.SetStatus(ACTIVE);
-            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+            activeProfiles.push_back(item);
             continue;
         }
+    }
+    for (auto &item : inActiveProfiles) {
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+    }
+    for (auto &item : activeProfiles) {
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
     }
     return DM_OK;
 }
@@ -1402,13 +1417,35 @@ void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(const std::vector<i
         int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
         int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
         if (accesserDeviceId == localUdid && accesseeDeviceId == remoteUdid && item.GetStatus() == ACTIVE &&
-            find(remoteUserIds.begin(), remoteUserIds.end(), accesseeUserId) != remoteUserIds.end()) {
+            (find(remoteUserIds.begin(), remoteUserIds.end(), accesseeUserId) != remoteUserIds.end() ||
+            find(localUserIds.begin(), localUserIds.end(), accesserUserId) == localUserIds.end())) {
             item.SetStatus(INACTIVE);
             DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
         } else if ((accesseeDeviceId == localUdid && accesserDeviceId == remoteUdid) && item.GetStatus() == ACTIVE &&
-            find(remoteUserIds.begin(), remoteUserIds.end(), accesserUserId) != remoteUserIds.end()) {
+            (find(remoteUserIds.begin(), remoteUserIds.end(), accesserUserId) != remoteUserIds.end() ||
+            find(localUserIds.begin(), localUserIds.end(), accesseeUserId) == localUserIds.end())) {
             item.SetStatus(INACTIVE);
             DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        }
+    }
+}
+
+void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+    const std::string &localUdid, int32_t localUserId, const std::string &localAccountId)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    if (profiles.empty()) {
+        LOGI("profiles is empty");
+        return;
+    }
+    for (auto &item : profiles) {
+        if (item.GetBindType() == bindType &&
+            item.GetTrustDeviceId() == peerUdid &&
+            item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == localUserId &&
+            item.GetAccesser().GetAccesserAccountId() == localAccountId) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
 }

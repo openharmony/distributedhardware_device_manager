@@ -76,6 +76,8 @@ void IpcServerStub::OnStart()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     AddSystemAbilityListener(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
 #endif
+    AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);
+    AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
     DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
 }
 
@@ -121,6 +123,14 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
         return;
     }
 #endif
+    if (systemAbilityId == DEVICE_AUTH_SERVICE_ID) {
+        DeviceManagerService::GetInstance().InitHichainListener();
+        return;
+    }
+    if (systemAbilityId == ACCESS_TOKEN_MANAGER_SERVICE_ID) {
+        DeviceManagerService::GetInstance().InitHichainListener();
+        return;
+    }
 }
 
 void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId)

@@ -513,10 +513,10 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     return;
 }
 
-void DeviceManagerServiceImpl::HandleUserSwitched(const std::map<std::string, int32_t> &deviceMap,
+void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string> &deviceVec,
     int32_t currentUserId, int32_t beforeUserId)
 {
-    (void)deviceMap;
+    (void)deviceVec;
     (void)currentUserId;
     (void)beforeUserId;
     return;
@@ -573,6 +573,17 @@ int32_t DeviceManagerServiceImpl::SaveOnlineDeviceInfo(const std::vector<DmDevic
 {
     (void)deviceList;
     return DM_OK;
+}
+
+void DeviceManagerServiceImpl::HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+    const std::string &localUdid, int32_t localUserId, const std::string &localAccountId)
+{
+    (void)bindType;
+    (void)peerUdid;
+    (void)localUdid;
+    (void)localUserId;
+    (void)localAccountId;
+    return;
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

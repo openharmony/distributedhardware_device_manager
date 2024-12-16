@@ -166,6 +166,7 @@ constexpr int32_t CHECK_AUTH_ALWAYS_POS = 0;
 constexpr const char AUTH_ALWAYS = '1';
 constexpr const char AUTH_ONCE = '0';
 constexpr const char* TAG_TARGET_DEVICE_NAME = "targetDeviceName";
+constexpr int32_t INVALID_PINCODE = -1;
 
 // HiChain
 constexpr int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
@@ -199,8 +200,12 @@ constexpr const char* FILTER_PARA_INCLUDE_TRUST = "FILTER_INCLUDE_TRUST";
 constexpr const char* CONN_ADDR_TYPE_ID = "ID_TYPE";
 constexpr const char* CONN_ADDR_TYPE_BR = "BR_TYPE";
 constexpr const char* CONN_ADDR_TYPE_BLE = "BLE_TYPE";
+constexpr const char* CONN_ADDR_TYPE_USB = "USB_TYPE";
 constexpr const char* CONN_ADDR_TYPE_WLAN_IP = "WLAN_IP_TYPE";
 constexpr const char* CONN_ADDR_TYPE_ETH_IP = "ETH_IP_TYPE";
+
+// Softbus connection address type int
+constexpr int32_t CONNECTION_ADDR_USB = 5;
 
 // Parameter Key
 constexpr const char* PARAM_KEY_META_TYPE = "META_TYPE";
@@ -209,6 +214,8 @@ constexpr const char* PARAM_KEY_BR_MAC = "BR_MAC";
 constexpr const char* PARAM_KEY_BLE_MAC = "BLE_MAC";
 constexpr const char* PARAM_KEY_WIFI_IP = "WIFI_IP";
 constexpr const char* PARAM_KEY_WIFI_PORT = "WIFI_PORT";
+constexpr const char* PARAM_KEY_USB_IP = "USB_IP";
+constexpr const char* PARAM_KEY_USB_PORT = "USB_PORT";
 constexpr const char* PARAM_KEY_AUTH_TOKEN = "AUTH_TOKEN";
 constexpr const char* PARAM_KEY_AUTH_TYPE = "AUTH_TYPE";
 constexpr const char* PARAM_KEY_PIN_CODE = "PIN_CODE";

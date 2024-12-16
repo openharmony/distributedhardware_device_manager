@@ -34,6 +34,7 @@
 #include "inner_session.h"
 #include "session.h"
 #include "socket.h"
+#include "dm_anonymous.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -105,8 +106,10 @@ public:
     static int32_t GetNetworkIdByUdid(const std::string &udid, std::string &networkId);
     int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName);
     int32_t SetForegroundUserIdsToDSoftBus(const std::string &remoteUserId, const std::vector<uint32_t> &userIds);
+    void DeleteCacheDeviceInfo();
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
+    static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj);
     int32_t InitSoftPublishLNN();
 
 private:

@@ -143,7 +143,8 @@ public:
         int32_t tokenId, const std::string &localUdid);
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAccessControlProfile();
     void DeleteAccessControlById(int64_t accessControlId);
-    int32_t HandleUserSwitched(const std::string &localUdid, int32_t currentUserId, int32_t beforeUserId);
+    int32_t HandleUserSwitched(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        int32_t currentUserId, int32_t beforeUserId);
     void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
     std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
@@ -157,6 +158,8 @@ public:
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(const std::string &localUdid, int32_t localUserId);
     void HandleSyncBackgroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
+    void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
+        const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
     int32_t SubscribeDeviceProfileInited(sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback);
     int32_t UnSubscribeDeviceProfileInited();
     int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos);

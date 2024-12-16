@@ -34,8 +34,14 @@ void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
     if (foregroundUserIdArr == nullptr) {
         return;
     }
+    cJSON *numberObj = nullptr;
     for (auto const &userId : userIdsMsg.foregroundUserIds) {
-        cJSON_AddItemToArray(foregroundUserIdArr, cJSON_CreateNumber(userId));
+        numberObj = cJSON_CreateNumber(userId);
+        if (numberObj == nullptr || !cJSON_AddItemToArray(foregroundUserIdArr, numberObj)) {
+            cJSON_Delete(numberObj);
+            cJSON_Delete(foregroundUserIdArr);
+            return;
+        }
     }
     cJSON_AddItemToObject(jsonObject, FOREGROUND_USERIDS_MSG_USERIDS_KEY, foregroundUserIdArr);
 
@@ -43,8 +49,14 @@ void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
     if (backgroundUserIdArr == nullptr) {
         return;
     }
+    cJSON *backgroundNumberObj = nullptr;
     for (auto const &userId : userIdsMsg.backgroundUserIds) {
-        cJSON_AddItemToArray(backgroundUserIdArr, cJSON_CreateNumber(userId));
+        backgroundNumberObj = cJSON_CreateNumber(userId);
+        if (backgroundNumberObj == nullptr || !cJSON_AddItemToArray(backgroundUserIdArr, backgroundNumberObj)) {
+            cJSON_Delete(backgroundNumberObj);
+            cJSON_Delete(backgroundUserIdArr);
+            return;
+        }
     }
     cJSON_AddItemToObject(jsonObject, BACKGROUND_USERIDS_MSG_USERIDS_KEY, backgroundUserIdArr);
 }
@@ -149,8 +161,14 @@ void ToJson(cJSON *jsonObject, const NotifyUserIds &notifyUserIds)
     if (userIdArr == nullptr) {
         return;
     }
+    cJSON *userIdNumberObj = nullptr;
     for (auto const &userId : notifyUserIds.userIds) {
-        cJSON_AddItemToArray(userIdArr, cJSON_CreateNumber(userId));
+        userIdNumberObj = cJSON_CreateNumber(userId);
+        if (userIdNumberObj == nullptr || !cJSON_AddItemToArray(userIdArr, userIdNumberObj)) {
+            cJSON_Delete(userIdNumberObj);
+            cJSON_Delete(userIdArr);
+            return;
+        }
     }
     cJSON_AddItemToObject(jsonObject, DSOFTBUS_NOTIFY_USERIDS_USERIDKEY, userIdArr);
 }
