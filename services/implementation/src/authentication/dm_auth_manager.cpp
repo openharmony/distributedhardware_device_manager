@@ -237,8 +237,8 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         if (IsInt32(jsonObject, PARAM_CLOSE_SESSION_TIMEOUT)) {
             authRequestContext_->isDelayCloseSession = true;
             authRequestContext_->closeSessionDelayTimes = jsonObject[PARAM_CLOSE_SESSION_TIMEOUT].get<int32_t>();
-            if (authRequestContext_->closeSessionDelayTimes > CLOSE_SESSION_DELAY_TYPE_MAX) {
-                authRequestContext_->closeSessionDelayTimes = CLOSE_SESSION_DELAY_TYPE_MAX;
+            if (authRequestContext_->closeSessionDelayTimes > CLOSE_SESSION_DELAY_TIME_MAX) {
+                authRequestContext_->closeSessionDelayTimes = CLOSE_SESSION_DELAY_TIME_MAX;
             }
         }
         authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
@@ -1294,7 +1294,7 @@ void DmAuthManager::SrcAuthenticateFinish()
         closeSessionId_ = authRequestContext_->sessionId;
         closeSessionTimer_->StartTimer(std::string(CLOSE_SESSION_DELAY_TASK),
             authRequestContext_->closeSessionDelayTimes, [=](std::string name) {
-                DmAuthManager::HandleSessionClosed(sessionId);
+                DmAuthManager::HandleSessionClosed(name);
             });
     } else {
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
