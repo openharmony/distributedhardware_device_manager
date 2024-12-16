@@ -78,6 +78,7 @@ const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
+const int32_t CLOSE_SESSION_DELAY_TIME_MAX = 10;
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -119,6 +120,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
 DmAuthManager::~DmAuthManager()
 {
     LOGI("DmAuthManager destructor");
+    closeSessionTimer_->DeleteAll();
 }
 
 int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
@@ -230,6 +232,14 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         }
         if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
             authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
+        }
+        authRequestContext_->isDelayCloseSession = false;
+        if (IsInt32(jsonObject, PARAM_CLOSE_SESSION_TIMEOUT)) {
+            authRequestContext_->isDelayCloseSession = true;
+            authRequestContext_->closeSessionDelayTimes = jsonObject[PARAM_CLOSE_SESSION_TIMEOUT].get<int32_t>();
+            if (authRequestContext_->closeSessionDelayTimes > CLOSE_SESSION_DELAY_TYPE_MAX) {
+                authRequestContext_->closeSessionDelayTimes = CLOSE_SESSION_DELAY_TYPE_MAX;
+            }
         }
         authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
     }
@@ -1276,10 +1286,34 @@ void DmAuthManager::SrcAuthenticateFinish()
         authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
-    softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
+
+    if (authRequestContext_->isDelayCloseSession) {
+        if (closeSessionTimer_ == nullptr) {
+            closeSessionTimer_ = std::make_shared<DmTimer>();
+        }
+        closeSessionId_ = authRequestContext_->sessionId;
+        closeSessionTimer_->StartTimer(std::string(CLOSE_SESSION_DELAY_TASK),
+            authRequestContext_->closeSessionDelayTimes, [=](std::string name) {
+                DmAuthManager::HandleSessionClosed(sessionId);
+            });
+    } else {
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
+    }
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
     authTimes_ = 0;
+}
+
+void DmAuthManager::HandleSessionClosed(std::string name)
+{
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+    if (closeSessionId_ < 0) {
+        LOGE("invaild sessionId");
+        return;
+    }
+    LOGI("close authSession start");
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(closeSessionId_);
 }
 
 void DmAuthManager::AuthenticateFinish()

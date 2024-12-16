@@ -141,6 +141,7 @@ void InsertJsonParamesToMap(nlohmann::json &bindParamObj, std::map<std::string, 
     InsertStringItem(bindParamObj, bindParamMap, PARAM_KEY_PIN_CODE, PARAM_KEY_PIN_CODE);
     InsertStringItem(bindParamObj, bindParamMap, PARAM_KEY_AUTH_TOKEN, PARAM_KEY_AUTH_TOKEN);
     InsertIntItem(bindParamObj, bindParamMap, BIND_LEVEL, BIND_LEVEL);
+    InsertIntItem(bindParamObj, bindParamMap, PARAM_CLOSE_SESSION_TIMEOUT, PARAM_CLOSE_SESSION_TIMEOUT);
 }
 } // namespace
 
