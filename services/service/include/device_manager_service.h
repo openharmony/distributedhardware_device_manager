@@ -273,7 +273,7 @@ private:
     bool isImplsoLoaded_ = false;
     bool isAdapterSoLoaded_ = false;
     bool isAdapterResidentSoLoaded_ = false;
-    void *residentSoHandle = nullptr;
+    void *residentSoHandle_ = nullptr;
     std::mutex isImplLoadLock_;
     std::mutex isAdapterLoadLock_;
     std::mutex isAdapterResidentLoadLock_;

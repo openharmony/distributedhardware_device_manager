@@ -1193,25 +1193,27 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
     if (isAdapterResidentSoLoaded_ && (dmServiceImplExtResident_ != nullptr)) {
         return true;
     }
-    residentSoHandle = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
-    if (residentSoHandle == nullptr) {
-        residentSoHandle = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE);
+    residentSoHandle_ = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (residentSoHandle_ == nullptr) {
+        residentSoHandle_ = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE);
     }
-    if (residentSoHandle == nullptr) {
+    if (residentSoHandle_ == nullptr) {
         LOGE("load dm service resident so failed.");
         return false;
     }
     dlerror();
-    auto func = (CreateDMServiceExtResidentFuncPtr)dlsym(residentSoHandle, "CreateDMServiceExtResidentObject");
+    auto func = (CreateDMServiceExtResidentFuncPtr)dlsym(residentSoHandle_, "CreateDMServiceExtResidentObject");
     if (dlerror() != nullptr || func == nullptr) {
-        dlclose(residentSoHandle);
+        dlclose(residentSoHandle_);
+        residentSoHandle_ = nullptr;
         LOGE("Create object function is not exist.");
         return false;
     }
 
     dmServiceImplExtResident_ = std::shared_ptr<IDMServiceImplExtResident>(func());
     if (dmServiceImplExtResident_->Initialize(listener_) != DM_OK) {
-        dlclose(residentSoHandle);
+        dlclose(residentSoHandle_);
+        residentSoHandle_ = nullptr;
         dmServiceImplExtResident_ = nullptr;
         isAdapterResidentSoLoaded_ = false;
         LOGE("dm service impl ext resident init failed.");
@@ -1230,10 +1232,10 @@ void DeviceManagerService::UnloadDMServiceAdapterResident()
         dmServiceImplExtResident_->Release();
     }
     dmServiceImplExtResident_ = nullptr;
-    if (residentSoHandle != nullptr) {
-        LOGI("dm service resident residentSoHandle is not nullptr.");
-        dlclose(residentSoHandle);
-        residentSoHandle = nullptr;
+    if (residentSoHandle_ != nullptr) {
+        LOGI("dm service resident residentSoHandle_ is not nullptr.");
+        dlclose(residentSoHandle_);
+        residentSoHandle_ = nullptr;
     }
 }
 
