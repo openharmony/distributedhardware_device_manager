@@ -43,7 +43,6 @@ void DeviceManagerServiceImplTest::SetUpTestCase()
     DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock_;
     DmDmDeviceStateManager::dmDeviceStateManager = dmDeviceStateManagerMock_;
     DmMineHiChainConnector::dmMineHiChainConnector = mineHiChainConnectorMock_;
-    DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
 }
 
 void DeviceManagerServiceImplTest::TearDownTestCase()
@@ -56,8 +55,6 @@ void DeviceManagerServiceImplTest::TearDownTestCase()
     dmDeviceStateManagerMock_ = nullptr;
     DmMineHiChainConnector::dmMineHiChainConnector = nullptr;
     mineHiChainConnectorMock_ = nullptr;
-    DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
-    multipleUserConnectorMock_ = nullptr;
 }
 
 namespace {
@@ -1865,19 +1862,6 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     deviceManagerServiceImpl_->HandleIdentAccountLogout(localUdid, localUserId, peerUdid, peerUserId);
-
-    std::vector<uint32_t> foregroundUserIds;
-    std::vector<uint32_t> backgroundUserIds;
-    std::string remoteUdid = "deviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
-    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
-
-    std::vector<int32_t> localUserIds;
-    localUserIds.push_back(101);
-    localUserIds.push_back(102);
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(localUserIds), Return(DM_OK)));
-    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
 
     std::map<std::string, int32_t> deviceMap;
     int32_t currentUserId = 1;
