@@ -60,8 +60,8 @@ ohos_fuzztest("OnBytesReceivedFuzzTest") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
-    "safwk:system_ability_fwk",
     "dsoftbus:softbus_client",
+    "safwk:system_ability_fwk",
   ]
 
   defines = [

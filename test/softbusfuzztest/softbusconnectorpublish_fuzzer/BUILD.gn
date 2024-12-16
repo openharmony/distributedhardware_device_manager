@@ -49,8 +49,8 @@ ohos_fuzztest("SoftbusConnectorPublishFuzzTest") {
   ]
 
   external_deps = [
-    "safwk:system_ability_fwk",
     "dsoftbus:softbus_client",
+    "safwk:system_ability_fwk",
   ]
 
   defines = [

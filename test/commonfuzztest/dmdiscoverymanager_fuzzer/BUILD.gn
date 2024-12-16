@@ -57,9 +57,9 @@ ohos_fuzztest("DmDiscoveryManagerFuzzTest") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "safwk:system_ability_fwk",
-    "dsoftbus:softbus_client",
   ]
 }
 
