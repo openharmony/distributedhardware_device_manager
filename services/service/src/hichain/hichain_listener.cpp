@@ -101,11 +101,10 @@ void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *g
     }
     string accountId = MultipleUserConnector::GetOhosAccountId();
     if (accountId == hichainGroupInfo.osAccountId && accountId != "ohosAnonymousUid") {
-        LOGI("accountId = %{public}d.", GetAnonyString(accountId).c_str());
+        LOGI("accountId = %{public}s.", GetAnonyString(accountId).c_str());
         DeviceManagerService::GetInstance().HandleDeviceUnBind(peerUdid, hichainGroupInfo);
         return;
     }
-
 }
 } // namespace DistributedHardware
 } // namespace OHOS
