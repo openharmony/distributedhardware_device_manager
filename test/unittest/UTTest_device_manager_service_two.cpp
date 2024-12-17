@@ -630,8 +630,8 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     std::map<std::string, int32_t> preUserDeviceMap;
     preUserDeviceMap["accountId"] = userId;
     preUserDeviceMap["accountName"] = 1;
-    EXPECT_CALL(*deviceManagerServiceImplMock_,
-        GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
+        EXPECT_CALL(*deviceManagerServiceImplMock_,
+            GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
@@ -667,6 +667,8 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level0
     if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
         DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     }
+    
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().ProcessSyncUserIds(foregroundUserIds, backgroundUserIds, remoteUdid);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
@@ -716,7 +718,8 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     remoteUserIdInfos.push_back(userIdInfo3);
     std::string remoteUdid = "remoteDeviceId";
     isNeedResponse = true;
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(Return(ERR_DM_FAILED)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserIdsBroadCast(remoteUserIdInfos, remoteUdid, isNeedResponse);
 
@@ -724,7 +727,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     foregroundUserVec.push_back(1);
     foregroundUserVec.push_back(102);
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK))).WillOnce(Return(DM_OK));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleUserIdsBroadCast(remoteUserIdInfos, remoteUdid, isNeedResponse);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
@@ -854,6 +857,7 @@ HWTEST_F(DeviceManagerServiceTest, DmHiDumper_201, testing::ext::TestSize.Level0
     if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
         DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     }
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().ProcessSyncUserIds(foregroundUserIds, backgroundUserIds, remoteUdid);
 }
 

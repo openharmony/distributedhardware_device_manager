@@ -2179,6 +2179,7 @@ int32_t DistributedDeviceProfileClient::GetAllAccessControlProfile(
     AddAccessControlProfilethirtyfifth(accessControlProfiles);
     AddAccessControlProfilethirtysix(accessControlProfiles);
     AddAccessControlProfilethirtySeven(accessControlProfiles);
+    AddAccessControlProfileFortieth(accessControlProfiles);
     return 0;
 }
 

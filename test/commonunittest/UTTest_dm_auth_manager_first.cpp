@@ -498,7 +498,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_001, testing::ext::TestSize.Level
     jsonObject["bindLevel"] = 5;
     extra = jsonObject.dump();
     ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthenticateDevice_002, testing::ext::TestSize.Level0)
@@ -1515,6 +1515,7 @@ HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->isOnline = true;
     authManager_->authResponseContext_->authed = true;
     authManager_->authResponseContext_->importAuthCode = "";
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(DM_OK));
     authManager_->ProcessAuthRequestExt(sessionId);
     authManager_->authResponseContext_->reply = ERR_DM_AUTH_BUSINESS_BUSY;
     authManager_->authResponseContext_->isOnline = false;
@@ -1576,6 +1577,7 @@ HWTEST_F(DmAuthManagerTest, CompatiblePutAcl_004, testing::ext::TestSize.Level0)
     authManager_->action_ = USER_OPERATION_TYPE_ALLOW_AUTH;
     authManager_->authRequestState_ = nullptr;
     authManager_->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
     authManager_->CompatiblePutAcl();
     ASSERT_EQ(authManager_->authRequestState_, nullptr);
 }

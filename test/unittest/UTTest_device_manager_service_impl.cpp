@@ -363,7 +363,8 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_005, testing::ext::TestSize.L
     devIdAndUserMap.insert(std::make_pair("devId02", 102));
     devIdAndUserMap.insert(std::make_pair("devId03", 103));
     EXPECT_CALL(*deviceProfileConnectorMock_, GetDevIdAndUserIdByActHash(_, _, _, _)).WillOnce(Return(devIdAndUserMap));
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _)).WillOnce(Return(true));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _))
+        .Times(::testing::AtLeast(3)).WillOnce(Return(true));
     deviceManagerServiceImpl_->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash, remoteUdid);
 
     std::string localUdid = "localUdid";
@@ -1541,6 +1542,8 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_104, testing::ext::TestSize.
     int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
     int32_t userId = 100;
     std::string accountId = "60008";
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _))
+        .Times(::testing::AtLeast(1)).WillOnce(Return(true));
     deviceManagerServiceImpl_->HandleIdentAccountLogout(udid, userId, udid, userId);
     deviceManagerServiceImpl_->HandleUserRemoved(userId);
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);

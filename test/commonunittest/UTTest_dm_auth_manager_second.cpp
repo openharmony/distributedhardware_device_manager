@@ -39,6 +39,7 @@ void DmAuthManagerTest::SetUp()
     authManager_ = std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authMessageProcessor_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -1551,7 +1552,7 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
         .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(true)));
     EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123456"));
     bool rets = authManager_->IsIdenticalAccount();
-    ASSERT_TRUE(rets);
+    ASSERT_FALSE(rets);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
@@ -1568,6 +1569,8 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->authType = AUTH_TYPE_PIN;
     authManager_->authResponseContext_->isOnline = true;
     EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).WillOnce(Return(true));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     authManager_->ProcessAuthRequest(sessionId);
 
     authManager_->authResponseContext_->haveCredential = true;

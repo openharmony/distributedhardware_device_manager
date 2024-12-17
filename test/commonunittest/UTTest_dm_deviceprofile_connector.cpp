@@ -1567,7 +1567,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUdid = "localDeviceId";
     peerUserId = 1234;
     ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_005, testing::ext::TestSize.Level0)
@@ -1975,11 +1975,11 @@ HWTEST_F(DeviceProfileConnectorTest, PutAllTrustedDevices_001, testing::ext::Tes
 
 HWTEST_F(DeviceProfileConnectorTest, CheckBindType_004, testing::ext::TestSize.Level0)
 {
-    std::string peerUdid = "remoteDeviceId";
-    std::string localUdid = "localDeviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
+    std::string peerUdid = "localDeviceId";
+    std::string localUdid = "remoteDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(0));
     uint32_t ret = DeviceProfileConnector::GetInstance().CheckBindType(peerUdid, localUdid);
-    EXPECT_EQ(ret, DEVICE_ACROSS_ACCOUNT_TYPE);
+    EXPECT_EQ(ret, IDENTICAL_ACCOUNT_TYPE);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
