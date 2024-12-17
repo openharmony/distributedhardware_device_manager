@@ -234,17 +234,30 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
             authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
         }
         authRequestContext_->isDelayCloseSession = false;
-        if (IsInt32(jsonObject, PARAM_CLOSE_SESSION_TIMEOUT)) {
-            authRequestContext_->isDelayCloseSession = true;
-            authRequestContext_->closeSessionDelayTimes = jsonObject[PARAM_CLOSE_SESSION_TIMEOUT].get<int32_t>();
-            if (authRequestContext_->closeSessionDelayTimes > CLOSE_SESSION_DELAY_TIME_MAX) {
-                authRequestContext_->closeSessionDelayTimes = CLOSE_SESSION_DELAY_TIME_MAX;
+        if (IsString(jsonObject, PARAM_CLOSE_SESSION_TIMEOUT)) {
+            std::string delayTimeStr = jsonObject[PARAM_CLOSE_SESSION_TIMEOUT].get<string>();
+            int32_t delayTime = GetCloseSessionDelayTime(delayTimeStr);
+            if (delayTime != -1) {
+                authRequestContext_->closeSessionDelayTimes = delayTime;
+                authRequestContext_->isDelayCloseSession = true;
             }
         }
         authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
     }
     authRequestContext_->bundleName = GetBundleName(jsonObject);
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
+}
+
+int32_t DmAuthManager::GetCloseSessionDelayTime(std::string &delayTimeStr)
+{
+    int32_t delayTime = -1;
+    if (IsNumberString(delayTimeStr)) {
+        delayTime = std::atoi(delayTimeStr.c_str());
+        if (delayTime > CLOSE_SESSION_DELAY_TIME_MAX) {
+            delayTime = CLOSE_SESSION_DELAY_TIME_MAX;
+        }
+    }
+    return delayTime;
 }
 
 void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,

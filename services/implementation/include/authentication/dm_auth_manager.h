@@ -535,6 +535,7 @@ private:
     int32_t GetBinderInfo();
     void SetProcessInfo();
     void HandleSessionClosed(std::string name);
+    int32_t GetCloseSessionDelayTime(std::string &delayTimeStr);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
