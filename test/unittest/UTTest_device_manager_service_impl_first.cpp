@@ -87,11 +87,6 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdAndUserId_101, testing::e
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(localUserIds), Return(DM_OK)));
     deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
-
-    std::map<std::string, int32_t> deviceMap;
-    int32_t currentUserId = 1;
-    int32_t beforeUserId = 0;
-    deviceManagerServiceImpl_->HandleUserSwitched(deviceMap, currentUserId, beforeUserId);
 }
 } // namespace
 } // namespace DistributedHardware
