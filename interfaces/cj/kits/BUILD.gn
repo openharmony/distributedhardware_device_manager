@@ -1,0 +1,74 @@
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+ohos_shared_library("cj_distributed_device_manager_ffi") {
+  branch_protector_ret = "pac_ret"
+
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
+
+  cflags = [
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fvisibility=hidden",
+  ]
+
+  include_dirs = [
+    "include",
+    "${common_path}/include",
+    "${common_path}/include/ipc",
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include/ipc",
+    "${innerkits_path}/native_cpp/include/ipc/standard",
+  ]
+
+  sources = [
+    "${common_path}/src/dm_anonymous.cpp",
+    "${common_path}/src/dm_error_message.cpp",
+    "src/device_manager_ffi.cpp",
+    "src/device_manager_impl.cpp",
+    "src/device_manager_utils.cpp",
+  ]
+
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"cj_distrubuted_devicemanager\"",
+    "LOG_DOMAIN=0xD004111",
+  ]
+
+  external_deps = [
+    "access_token:libtokenid_sdk",
+    "bounds_checking_function:libsec_shared",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "json:nlohmann_json_static",
+    "napi:cj_bind_ffi",
+    "napi:cj_bind_native",
+  ]
+
+  innerapi_tags = [ "platformsdk" ]
+  subsystem_name = "distributedhardware"
+  part_name = "device_manager"
+}

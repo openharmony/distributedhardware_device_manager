@@ -218,7 +218,7 @@ char *MallocCStr(const char *in)
         LOGE("Malloc failed.");
         return nullptr;
     }
-    std::char_traits<char>::copy(result, in, len+1);
+    std::char_traits<char>::copy(result, in, len + 1);
     return result;
 }
 } // OHOS::DistributedHardware
