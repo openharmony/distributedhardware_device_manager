@@ -49,7 +49,10 @@ ohos_fuzztest("SoftbusSessionFuzzTest") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 
-  external_deps = [ "safwk:system_ability_fwk" ]
+  external_deps = [
+    "dsoftbus:softbus_client",
+    "safwk:system_ability_fwk",
+  ]
 
   defines = [
     "HI_LOG_ENABLE",

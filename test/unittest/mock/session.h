@@ -44,6 +44,7 @@
 #define SESSION_H
 
 #include <stdint.h>
+#include "trans_type.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -103,16 +104,6 @@ typedef struct {
 } SessionAttribute;
 
 typedef struct {
-    char *buf;
-    int bufLen;
-} StreamData;
-
-typedef struct {
-    int type;
-    int64_t value;
-} TV;
-
-typedef struct {
     int frameType;
     int64_t timeStamp;
     int seqNum;
@@ -156,8 +147,6 @@ void CloseSession(int sessionId);
 int SendBytes(int sessionId, const void *data, unsigned int len);
 
 int SendMessage(int sessionId, const void *data, unsigned int len);
-
-int SendStream(int sessionId, const StreamData *data, const StreamData *ext, const FrameInfo *param);
 
 int GetMySessionName(int sessionId, char *sessionName, unsigned int len);
 
