@@ -17,7 +17,6 @@ group("fuzztest") {
   deps = [
     "onbytesreceived_fuzzer:fuzztest",
     "onsessionopened_fuzzer:fuzztest",
-    "onsoftbusdevicefound_fuzzer:fuzztest",
     "onsoftbusdeviceinfochanged_fuzzer:fuzztest",
     "onsoftbusdeviceoffline_fuzzer:fuzztest",
     "onsoftbusdeviceonline_fuzzer:fuzztest",
@@ -27,7 +26,6 @@ group("fuzztest") {
     "softbusconnector_fuzzer:fuzztest",
     "softbusconnectorcommon_fuzzer:fuzztest",
     "softbusconnectorpublish_fuzzer:fuzztest",
-    "softbusconnectorregister_fuzzer:fuzztest",
     "softbusconnectorstate_fuzzer:fuzztest",
     "softbusconnectorstatic_fuzzer:fuzztest",
     "softbuslistenergetlocaldeviceinfo_fuzzer:fuzztest",

@@ -26,7 +26,6 @@
 
 #include "device_manager_service_listener.h"
 #include "dm_device_state_manager.h"
-#include "dm_discovery_manager.h"
 #include "inner_session.h"
 #include "session.h"
 #include "softbus_session.h"

@@ -28,7 +28,6 @@
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
 #include "dm_device_state_manager.h"
-#include "dm_discovery_manager.h"
 #include "inner_session.h"
 #include "softbus_publish.h"
 

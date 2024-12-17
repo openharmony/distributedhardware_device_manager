@@ -26,7 +26,6 @@ public:
     SoftbusPublish();
     ~SoftbusPublish();
 
-    static void OnParameterChgCallback(const char *key, const char *value, void *context);
     static void OnSoftbusPublishResult(int publishId, PublishResult result);
 
     int32_t PublishSoftbusLNN();

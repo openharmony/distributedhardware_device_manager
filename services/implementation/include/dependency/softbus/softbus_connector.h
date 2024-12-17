@@ -27,8 +27,6 @@
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
-#include "softbus_discovery_callback.h"
-#include "softbus_publish_callback.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "softbus_session.h"
 #endif
@@ -39,46 +37,11 @@ namespace DistributedHardware {
 class SoftbusConnector {
 public:
     /**
-     * @tc.name: SoftbusConnector::OnSoftbusPublishResult
-     * @tc.desc: OnSoftbusPublishResult of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static void OnSoftbusPublishResult(int32_t publishId, PublishResult result);
-
-    /**
-     * @tc.name: SoftbusConnector::OnSoftbusDeviceFound
-     * @tc.desc: OnSoftbus DeviceFound of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static void OnSoftbusDeviceFound(const DeviceInfo *device);
-
-    /**
-     * @tc.name: SoftbusConnector::OnSoftbusDeviceDiscovery
-     * @tc.desc: OnSoftbus DeviceDiscovery of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static void OnSoftbusDeviceDiscovery(const DeviceInfo *device);
-
-    /**
-     * @tc.name: SoftbusConnector::OnSoftbusDiscoveryResult
-     * @tc.desc: OnSoftbus Discovery Result of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static void OnSoftbusDiscoveryResult(int subscribeId, RefreshResult result);
-
-    /**
      * @tc.name: SoftbusConnector::OnSoftbusJoinLNNResult
      * @tc.desc: OnSoftbus JoinLNN Result of the SoftbusConnector
      * @tc.type: FUNC
      */
     static void OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *networkId, int32_t result);
-
-    /**
-     * @tc.name: SoftbusConnector::OnParameterChgCallback
-     * @tc.desc: OnParameter Chg Callback of the SoftbusConnector
-     * @tc.type: FUNC
-     */
-    static void OnParameterChgCallback(const char *key, const char *value, void *context);
 
     /**
      * @tc.name: SoftbusConnector::GetConnectAddr
@@ -117,19 +80,8 @@ public:
 public:
     SoftbusConnector();
     ~SoftbusConnector();
-    int32_t RegisterSoftbusDiscoveryCallback(const std::string &pkgName,
-                                             const std::shared_ptr<ISoftbusDiscoveryCallback> callback);
-    int32_t UnRegisterSoftbusDiscoveryCallback(const std::string &pkgName);
-    int32_t RegisterSoftbusPublishCallback(const std::string &pkgName,
-                                           const std::shared_ptr<ISoftbusPublishCallback> callback);
-    int32_t UnRegisterSoftbusPublishCallback(const std::string &pkgName);
     int32_t RegisterSoftbusStateCallback(const std::shared_ptr<ISoftbusStateCallback> callback);
     int32_t UnRegisterSoftbusStateCallback();
-    int32_t PublishDiscovery(const DmPublishInfo &dmPublishInfo);
-    int32_t UnPublishDiscovery(int32_t publishId);
-    int32_t StartDiscovery(const DmSubscribeInfo &dmSubscribeInfo);
-    int32_t StartDiscovery(const uint16_t subscribeId);
-    int32_t StopDiscovery(uint16_t subscribeId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
 #endif
@@ -158,27 +110,14 @@ private:
     static void ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
 
 private:
-    enum PulishStatus {
-        STATUS_UNKNOWN = 0,
-        ALLOW_BE_DISCOVERY = 1,
-        NOT_ALLOW_BE_DISCOVERY = 2,
-    };
     static std::string remoteUdidHash_;
-    static PulishStatus publishStatus;
-    static IRefreshCallback softbusDiscoveryCallback_;
-    static IRefreshCallback softbusDiscoveryByIdCallback_;
-    static IPublishCb softbusPublishCallback_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> softbusSession_;
 #endif
     static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveryDeviceInfoMap_;
-    static std::map<std::string, std::shared_ptr<ISoftbusDiscoveryCallback>> discoveryCallbackMap_;
-    static std::map<std::string, std::shared_ptr<ISoftbusPublishCallback>> publishCallbackMap_;
     std::shared_ptr<ISoftbusStateCallback> deviceStateManagerCallback_;
-    static std::queue<std::string> discoveryDeviceIdQueue_;
     static std::unordered_map<std::string, std::string> deviceUdidMap_;
     static std::vector<ProcessInfo> processInfoVec_;
-    static std::mutex discoveryCallbackMutex_;
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex deviceUdidLocks_;
     static std::mutex processInfoVecMutex_;

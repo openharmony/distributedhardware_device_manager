@@ -18,8 +18,6 @@
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
-#include "softbus_discovery_callback.h"
-#include "softbus_publish_callback.h"
 #include "softbus_session.h"
 #include "softbus_state_callback.h"
 #include "softbus_connector_state_fuzzer.h"
