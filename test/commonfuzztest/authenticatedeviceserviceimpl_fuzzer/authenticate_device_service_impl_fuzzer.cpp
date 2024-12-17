@@ -133,12 +133,6 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->Initialize(listener);
     deviceManagerServiceImpl->RegisterUiStateCallback(str);
     deviceManagerServiceImpl->RegisterCredentialCallback(str);
-    deviceManagerServiceImpl->StartDeviceDiscovery(str, subscribeInfo, str);
-    deviceManagerServiceImpl->StopDeviceDiscovery(str, subscribeInfo.subscribeId);
-    deviceManagerServiceImpl->StartDeviceDiscovery(str, g_subscribeId, str);
-    deviceManagerServiceImpl->StopDeviceDiscovery(str, g_subscribeId);
-    deviceManagerServiceImpl->PublishDeviceDiscovery(str, publishInfo);
-    deviceManagerServiceImpl->UnPublishDeviceDiscovery(str, publishInfo.publishId);
     deviceManagerServiceImpl->UnAuthenticateDevice(str, str, bindLevel);
     deviceManagerServiceImpl->UnBindDevice(str, str, bindLevel);
     deviceManagerServiceImpl->SetUserOperation(str, g_action, str);

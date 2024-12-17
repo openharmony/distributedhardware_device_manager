@@ -18,8 +18,6 @@
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
-#include "softbus_discovery_callback.h"
-#include "softbus_publish_callback.h"
 #include "softbus_session.h"
 #include "softbus_connector_fuzzer.h"
 
@@ -32,23 +30,10 @@ void SoftBusConnectorFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    int32_t subscribeId = *(reinterpret_cast<const int32_t*>(data));
-    int publishId = *(reinterpret_cast<const int*>(data));
-    PublishResult pResult = (PublishResult)1;
-    RefreshResult rResult = (RefreshResult)1;
     ConnectionAddr *addr = nullptr;
     const char *networkId = reinterpret_cast<const char*>(data);
     int32_t result = *(reinterpret_cast<const int32_t*>(data));
-    DeviceInfo device = {
-        .devId = "123456",
-        .devType = (DeviceType)1,
-        .devName = "com.ohos.helloworld"
-    };
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    softbusConnector->OnSoftbusPublishResult(publishId, pResult);
-    softbusConnector->OnSoftbusDeviceFound(&device);
-    softbusConnector->OnSoftbusDiscoveryResult(subscribeId, rResult);
-    softbusConnector->OnSoftbusDeviceDiscovery(&device);
     softbusConnector->OnSoftbusJoinLNNResult(addr, networkId, result);
 }
 }

@@ -57,12 +57,6 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (mineHiChainConnector_ == nullptr) {
         mineHiChainConnector_ = std::make_shared<MineHiChainConnector>();
     }
-    if (discoveryMgr_ == nullptr) {
-        discoveryMgr_ = std::make_shared<DmDiscoveryManager>(softbusConnector_, listener, hiChainConnector_);
-    }
-    if (publishMgr_ == nullptr) {
-        publishMgr_ = std::make_shared<DmPublishManager>(softbusConnector_, listener);
-    }
     if (hiChainAuthConnector_ == nullptr) {
         hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
     }
@@ -100,60 +94,11 @@ void DeviceManagerServiceImpl::Release()
     hiChainConnector_->UnRegisterHiChainCallback();
     authMgr_ = nullptr;
     deviceStateMgr_ = nullptr;
-    discoveryMgr_ = nullptr;
-    publishMgr_ = nullptr;
     softbusConnector_ = nullptr;
     abilityMgr_ = nullptr;
     hiChainConnector_ = nullptr;
     DeviceProfileConnector::GetInstance().UnSubscribeDeviceProfileInited();
     dpInitedCallback_ = nullptr;
-}
-
-int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-    const std::string &extra)
-{
-    if (pkgName.empty()) {
-        LOGE("StartDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    return discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeInfo, extra);
-}
-
-int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
-    const std::string &filterOptions)
-{
-    if (pkgName.empty()) {
-        LOGE("StartDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    return discoveryMgr_->StartDeviceDiscovery(pkgName, subscribeId, filterOptions);
-}
-
-int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
-{
-    if (pkgName.empty()) {
-        LOGE("StopDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    return discoveryMgr_->StopDeviceDiscovery(pkgName, subscribeId);
-}
-
-int32_t DeviceManagerServiceImpl::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
-{
-    if (pkgName.empty()) {
-        LOGE("PublishDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    return publishMgr_->PublishDeviceDiscovery(pkgName, publishInfo);
-}
-
-int32_t DeviceManagerServiceImpl::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
-{
-    if (pkgName.empty()) {
-        LOGE("UnPublishDeviceDiscovery failed, pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    return publishMgr_->UnPublishDeviceDiscovery(pkgName, publishId);
 }
 
 int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid,

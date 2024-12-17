@@ -44,13 +44,10 @@ group("unittest") {
     ":UTTest_dm_deviceprofile_connector",
     ":UTTest_dm_deviceprofile_connector_second",
     ":UTTest_dm_dfx",
-    ":UTTest_dm_discovery_filter",
-    ":UTTest_dm_discovery_manager",
     ":UTTest_dm_distributed_hardware_load",
     ":UTTest_dm_import_auth_code",
     ":UTTest_dm_pin_holder",
     ":UTTest_dm_publish_common_event",
-    ":UTTest_dm_publish_manager",
     ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_screen_common_event",
     ":UTTest_dm_service_load",
@@ -1006,28 +1003,6 @@ ohos_unittest("UTTest_dm_dfx") {
 
 ## UnitTest UTTest_dm_dfx }}}
 
-## UnitTest UTTest_dm_discovery_filter {{{
-ohos_unittest("UTTest_dm_discovery_filter") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_discovery_filter.cpp",
-  ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "googletest:gmock",
-  ]
-}
-
-## UnitTest UTTest_dm_discovery_filter }}}
-
 ## UnitTest UTTest_device_manager_service_impl {{{
 ohos_unittest("UTTest_device_manager_service_impl") {
   module_out_path = module_out_path
@@ -1384,31 +1359,6 @@ ohos_unittest("UTTest_dm_deviceprofile_connector_second") {
 
 #############################
 
-## UnitTest UTTest_dm_discovery_manager {{{
-ohos_unittest("UTTest_dm_discovery_manager") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_discovery_manager.cpp",
-  ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hitrace:hitrace_meter",
-  ]
-}
-
-## UnitTest UTTest_dm_discovery_manager }}}
-
 ## UnitTest UTTest_dm_distributed_hardware_load {{{
 ohos_unittest("UTTest_dm_distributed_hardware_load") {
   module_out_path = module_out_path
@@ -1532,47 +1482,6 @@ ohos_unittest("UTTest_relationship_sync_mgr") {
 }
 
 ## UnitTest UTTest_relationship_sync_mgr }}}
-
-## UnitTest UTTest_dm_publish_manager {{{
-ohos_unittest("UTTest_dm_publish_manager") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
-
-  sources = [
-    "${devicemanager_path}/test/commonunittest/UTTest_dm_publish_manager.cpp",
-    "${devicemanager_path}/test/unittest/mock/ipc_server_listener.cpp",
-    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
-    "${services_path}/src/device_manager_service.cpp",
-    "${services_path}/src/device_manager_service_listener.cpp",
-    "${services_path}/src/softbus/softbus_listener.cpp",
-    "${servicesimpl_path}/src/dependency/softbus/softbus_connector.cpp",
-    "${servicesimpl_path}/src/dependency/softbus/softbus_session.cpp",
-    "${servicesimpl_path}/src/publish/dm_publish_manager.cpp",
-    "${softbuscache_parh}/src/dm_softbus_cache.cpp",
-  ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "cJSON:cjson",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hitrace:hitrace_meter",
-  ]
-
-  if (support_power_manager) {
-    external_deps += [ "power_manager:powermgr_client" ]
-  }
-}
-
-## UnitTest UTTest_dm_publish_manager }}}
 
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {

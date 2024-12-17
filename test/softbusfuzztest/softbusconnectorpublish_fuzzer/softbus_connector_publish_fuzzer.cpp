@@ -19,8 +19,6 @@
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
-#include "softbus_discovery_callback.h"
-#include "softbus_publish_callback.h"
 #include "softbus_session.h"
 #include "softbus_connector_publish_fuzzer.h"
 
@@ -33,19 +31,8 @@ void SoftBusConnectorPublishFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::string deviceId(reinterpret_cast<const char*>(data), size);
-    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
-    uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    DmPublishInfo dmPublishInfo;
-    dmPublishInfo.publishId = publishId;
-    DmSubscribeInfo subscribeInfo;
-    subscribeInfo.subscribeId = subscribeId;
 
-    softbusConnector->PublishDiscovery(dmPublishInfo);
-    softbusConnector->UnPublishDiscovery(publishId);
-    softbusConnector->StartDiscovery(subscribeInfo);
-    softbusConnector->StopDiscovery(subscribeId);
-    softbusConnector->StartDiscovery(subscribeId);
     softbusConnector->HaveDeviceInMap(deviceId);
 }
 }

@@ -23,6 +23,7 @@
 #include <vector>
 
 #include "device_manager_service_impl.h"
+#include "device_manager_service_listener.h"
 #include "deviceprofile_connector_mock.h"
 #include "softbus_connector_mock.h"
 #include "dm_device_state_manager_mock.h"

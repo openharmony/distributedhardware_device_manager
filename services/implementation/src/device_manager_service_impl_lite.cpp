@@ -71,45 +71,6 @@ void DeviceManagerServiceImpl::Release()
     mineHiChainConnector_ = nullptr;
 }
 
-int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const DmSubscribeInfo &subscribeInfo,
-    const std::string &extra)
-{
-    (void)pkgName;
-    (void)subscribeInfo;
-    (void)extra;
-    return DM_OK;
-}
-
-int32_t DeviceManagerServiceImpl::StartDeviceDiscovery(const std::string &pkgName, const uint16_t subscribeId,
-    const std::string &filterOptions)
-{
-    (void)pkgName;
-    (void)subscribeId;
-    (void)filterOptions;
-    return DM_OK;
-}
-
-int32_t DeviceManagerServiceImpl::StopDeviceDiscovery(const std::string &pkgName, uint16_t subscribeId)
-{
-    (void)pkgName;
-    (void)subscribeId;
-    return DM_OK;
-}
-
-int32_t DeviceManagerServiceImpl::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
-{
-    (void)pkgName;
-    (void)publishInfo;
-    return DM_OK;
-}
-
-int32_t DeviceManagerServiceImpl::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
-{
-    (void)pkgName;
-    (void)publishId;
-    return DM_OK;
-}
-
 int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid,
     int32_t bindLevel)
 {
