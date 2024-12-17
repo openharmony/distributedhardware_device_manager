@@ -266,6 +266,9 @@ HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.L
 {
     int32_t userId = 100;
     std::string commonEventType = "usual.event.USER_SWITCHED";
+    std::map<std::string, int32_t> curUserDeviceMap;
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_))
+        .WillOnce(Return(curUserDeviceMap)).WillOnce(Return(curUserDeviceMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
     commonEventType = "common.event.HWID_LOGIN";
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
@@ -630,8 +633,8 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     std::map<std::string, int32_t> preUserDeviceMap;
     preUserDeviceMap["accountId"] = userId;
     preUserDeviceMap["accountName"] = 1;
-        EXPECT_CALL(*deviceManagerServiceImplMock_,
-            GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
+    EXPECT_CALL(*deviceManagerServiceImplMock_,
+        GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);

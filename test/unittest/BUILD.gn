@@ -1047,6 +1047,7 @@ ohos_unittest("UTTest_device_manager_service_impl_first") {
 
   sources = [
     "${servicesimpl_path}/src/device_manager_service_impl.cpp",
+    "UTTest_device_manager_service_impl_first",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/multiple_user_connector_mock.cpp",
   ]
