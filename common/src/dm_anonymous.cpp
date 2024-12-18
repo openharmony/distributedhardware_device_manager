@@ -371,5 +371,28 @@ std::string SafetyDump(const nlohmann::json &jsonObj)
     int indent = -1;
     return jsonObj.dump(indent, ' ', false, nlohmann::detail::error_handler_t::ignore);
 }
+
+std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index)
+{
+    if (rawStr.empty() || separator.empty() || index < 0) {
+        LOGE("param invalid");
+        return "";
+    }
+    std::vector<std::string> strVec;
+    size_t start = 0;
+    size_t end = rawStr.find(separator);
+
+    while (end != std::string::npos) {
+        strVec.push_back(rawStr.substr(start, end - start));
+        start = end + 1;
+        end = rawStr.find(separator, start);
+    }
+    strVec.push_back(rawStr.substr(start));
+    if (strVec.size() >= index + 1) {
+        return strVec.at(index);
+    }
+    LOGE("get failed");
+    return "";
+}
 } // namespace DistributedHardware
 } // namespace OHOS
