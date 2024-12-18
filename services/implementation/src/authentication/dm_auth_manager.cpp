@@ -1303,6 +1303,7 @@ void DmAuthManager::SrcAuthenticateFinish()
         if (closeSessionTimer_ == nullptr) {
             closeSessionTimer_ = std::make_shared<DmTimer>();
         }
+        closeSessionTimer_->DeleteAll();
         closeSessionId_ = authRequestContext_->sessionId;
         closeSessionTimer_->StartTimer(std::string(CLOSE_SESSION_DELAY_TASK),
             authRequestContext_->closeSessionDelayTime, [=](std::string name) {
