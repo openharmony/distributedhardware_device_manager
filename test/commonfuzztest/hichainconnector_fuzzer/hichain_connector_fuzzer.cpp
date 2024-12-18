@@ -56,15 +56,6 @@ public:
     }
 };
 
-template<class T>
-T TypeCast(const uint8_t *data, int *pos = nullptr)
-{
-    if (pos) {
-        *pos += sizeof(T);
-    }
-    return *(reinterpret_cast<const T*>(data));
-}
-
 void AddGroupInfo(std::vector<GroupInfo> &groupList)
 {
     GroupInfo groupInfo1;
