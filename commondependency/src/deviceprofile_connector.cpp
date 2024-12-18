@@ -1448,7 +1448,6 @@ void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType, const std::str
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
-
 }
 
 int32_t DeviceProfileConnector::SubscribeDeviceProfileInited(
