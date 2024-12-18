@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "pinholder_fuzzer.h"
 
 #include "device_manager.h"
@@ -44,6 +45,7 @@ void PinHolderFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
+    FuzzedDataProvider fdp(data, size);
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string payload(reinterpret_cast<const char*>(data), size);
     PeerTargetId peerTargetId;
@@ -51,8 +53,8 @@ void PinHolderFuzzTest(const uint8_t* data, size_t size)
     peerTargetId.brMac = pkgName;
     peerTargetId.bleMac = pkgName;
     peerTargetId.wifiIp = pkgName;
-    peerTargetId.wifiPort = *(reinterpret_cast<const uint16_t*>(data));
-    uint16_t tmp = *(reinterpret_cast<const uint16_t*>(data));
+    peerTargetId.wifiPort = fdp.ConsumeIntegral<uint16_t>();
+    uint16_t tmp = fdp.ConsumeIntegral<uint16_t>();
     DmPinType pinType = static_cast<DmPinType>(tmp);
 
     std::shared_ptr<PinHolderCallback> pinHolderCallback = std::make_shared<PinHolderCallbackFuzzTest>();

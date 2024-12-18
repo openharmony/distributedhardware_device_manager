@@ -20,6 +20,7 @@
 #include "dm_subscribe_info.h"
 #include "softbus_session.h"
 #include "softbus_session_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -60,8 +61,9 @@ void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    int result = *(reinterpret_cast<const int*>(data));
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int result = fdp.ConsumeIntegral<int>();
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
     std::string str(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
 

@@ -16,6 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "dm_constants.h"
 #include "device_manager_impl.h"
@@ -43,9 +44,10 @@ void UnAuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
     if (memcpy_s(deviceInfo.networkId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
         return;
     }
-    deviceInfo.deviceTypeId = *(reinterpret_cast<const uint16_t *>(data));
-    deviceInfo.range = *(reinterpret_cast<const int32_t *>(data));
-    deviceInfo.networkType = *(reinterpret_cast<const int32_t *>(data));
+    FuzzedDataProvider fdp(data, size);
+    deviceInfo.deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
+    deviceInfo.range = fdp.ConsumeIntegral<int32_t>();
+    deviceInfo.networkType = fdp.ConsumeIntegral<int32_t>();
     std::string extraData(reinterpret_cast<const char*>(data), size);
     deviceInfo.extraData = extraData;
     deviceInfo.authForm = *(reinterpret_cast<const DmAuthForm*>(data));

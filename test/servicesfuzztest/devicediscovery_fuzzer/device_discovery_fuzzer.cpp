@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <string>
 #include <unistd.h>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "device_manager_impl.h"
 #include "device_manager.h"
@@ -46,8 +47,9 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     std::string bundleName(reinterpret_cast<const char*>(data), size);
     uint16_t subscriptionId = 22;
 
+    FuzzedDataProvider fdp(data, size);
     DmSubscribeInfo subInfo;
-    subInfo.subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    subInfo.subscribeId = fdp.ConsumeIntegral<uint16_t>();
     subInfo.mode = DM_DISCOVER_MODE_ACTIVE;
     subInfo.medium = DM_USB;
     subInfo.isSameAccount = true;
@@ -64,7 +66,7 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     usleep(SLEEP_TIME_US);
     DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subInfo.subscribeId);
     usleep(SLEEP_TIME_US);
-    uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    uint16_t subscribeId = fdp.ConsumeIntegral<uint16_t>();
     DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, subscribeId, extra, callback);
     usleep(SLEEP_TIME_US);
     DeviceManager::GetInstance().StopDeviceDiscovery(bundleName, subscribeId);
