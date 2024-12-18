@@ -1299,14 +1299,14 @@ void DmAuthManager::SrcAuthenticateFinish()
     listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
 
-    if (authRequestContext_->isDelayCloseSession > 0) {
+    if (authRequestContext_->closeSessionDelayTime > 0) {
         if (closeSessionTimer_ == nullptr) {
             closeSessionTimer_ = std::make_shared<DmTimer>();
         }
         closeSessionTimer_->DeleteAll();
         closeSessionId_ = authRequestContext_->sessionId;
         closeSessionTimer_->StartTimer(std::string(CLOSE_SESSION_DELAY_TASK),
-            authRequestContext_->closeSessionDelayTime, [=](std::string name) {
+            authRequestContext_->closeSessionDelayTime, [this](std::string name) {
                 DmAuthManager::HandleSessionClosed(name);
             });
         authRequestContext_->closeSessionDelayTime = 0;
