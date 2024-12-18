@@ -1440,7 +1440,7 @@ void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType, const std::str
         return;
     }
     for (auto &item : profiles) {
-        if (item.GetBindType() == bindType &&
+        if ((item.GetBindType() == static_cast<uint32_t>(bindType)) &&
             item.GetTrustDeviceId() == peerUdid &&
             item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == localUserId &&
@@ -1448,6 +1448,7 @@ void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType, const std::str
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
+
 }
 
 int32_t DeviceProfileConnector::SubscribeDeviceProfileInited(
