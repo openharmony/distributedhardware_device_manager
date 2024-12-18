@@ -120,7 +120,9 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
 DmAuthManager::~DmAuthManager()
 {
     LOGI("DmAuthManager destructor");
-    closeSessionTimer_->DeleteAll();
+    if (closeSessionTimer_ != nullptr) {
+        closeSessionTimer_->DeleteAll();
+    }
 }
 
 int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
