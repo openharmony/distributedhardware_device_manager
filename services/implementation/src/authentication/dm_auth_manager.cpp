@@ -233,13 +233,12 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
             authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
         }
-        authRequestContext_->isDelayCloseSession = false;
-        if (IsString(jsonObject, PARAM_CLOSE_SESSION_TIMEOUT)) {
-            std::string delayTimeStr = jsonObject[PARAM_CLOSE_SESSION_TIMEOUT].get<std::string>();
+        authRequestContext_->closeSessionDelayTime = 0;
+        if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_TIME)) {
+            std::string delayTimeStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_TIME].get<std::string>();
             int32_t delayTime = GetCloseSessionDelayTime(delayTimeStr);
             if (delayTime > 0) {
-                authRequestContext_->closeSessionDelayTimes = delayTime;
-                authRequestContext_->isDelayCloseSession = true;
+                authRequestContext_->closeSessionDelayTime = delayTime;
             }
         }
         authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
@@ -1300,15 +1299,16 @@ void DmAuthManager::SrcAuthenticateFinish()
     listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
 
-    if (authRequestContext_->isDelayCloseSession) {
+    if (authRequestContext_->isDelayCloseSession > 0) {
         if (closeSessionTimer_ == nullptr) {
             closeSessionTimer_ = std::make_shared<DmTimer>();
         }
         closeSessionId_ = authRequestContext_->sessionId;
         closeSessionTimer_->StartTimer(std::string(CLOSE_SESSION_DELAY_TASK),
-            authRequestContext_->closeSessionDelayTimes, [=](std::string name) {
+            authRequestContext_->closeSessionDelayTime, [=](std::string name) {
                 DmAuthManager::HandleSessionClosed(name);
             });
+        authRequestContext_->closeSessionDelayTime = 0;
     } else {
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
     }
@@ -1321,7 +1321,7 @@ void DmAuthManager::HandleSessionClosed(std::string name)
 {
     CHECK_NULL_VOID(softbusConnector_);
     CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
-    if (closeSessionId_ < 0) {
+    if (closeSessionId_ <= 0) {
         LOGE("invaild sessionId");
         return;
     }
