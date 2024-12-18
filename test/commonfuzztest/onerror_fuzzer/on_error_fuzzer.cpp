@@ -56,7 +56,7 @@ public:
 
 void OnErrorFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int) + sizeof(int))) {
         return;
     }
 

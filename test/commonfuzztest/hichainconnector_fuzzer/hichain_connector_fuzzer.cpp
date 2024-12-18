@@ -95,7 +95,7 @@ void AddAclInfo(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std
 
 void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < (sizeof(int32_t) * 3))) {
         return;
     }
 
@@ -159,7 +159,7 @@ void HiChainConnectorSecondFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + (sizeof(int32_t) * 3))) {
         return;
     }
     FuzzedDataProvider fdp(data, size);
@@ -209,7 +209,7 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int32_t))) {
         return;
     }
 
@@ -262,18 +262,18 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + (sizeof(int32_t) * 2))) {
         return;
     }
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-    int pos = 0;
-    int64_t requestId = TypeCast<int64_t>(data, &pos);
+    FuzzedDataProvider fdp(data, size);
+    int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     std::string groupName = "groupName_fifth";
-    int32_t authType = TypeCast<int32_t>(data + pos, &pos);
+    int32_t authType = fdp.ConsumeIntegral<int32_t>();
     std::string params = "params";
-    int32_t osAccountUserId = TypeCast<int32_t>(data + pos, &pos);
+    int32_t osAccountUserId = fdp.ConsumeIntegral<int32_t>();
     nlohmann::json jsonDeviceList;
     std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
     std::vector<int32_t> userIdVec;

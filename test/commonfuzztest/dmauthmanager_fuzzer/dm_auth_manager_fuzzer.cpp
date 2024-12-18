@@ -14,7 +14,7 @@
  */
 
 #include <string>
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_service_listener.h"
 #include "auth_message_processor.h"
 #include "dm_auth_manager.h"
@@ -61,8 +61,9 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     std::string str(reinterpret_cast<const char*>(data), size);
-    int32_t bindLevel = *(reinterpret_cast<const int32_t*>(data));
+    int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
     g_authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(g_authManager);
     g_authManager->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     g_authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();

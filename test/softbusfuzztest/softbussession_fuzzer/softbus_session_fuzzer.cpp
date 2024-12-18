@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "softbus_connector.h"
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
@@ -20,7 +20,6 @@
 #include "dm_subscribe_info.h"
 #include "softbus_session.h"
 #include "softbus_session_fuzzer.h"
-#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -57,7 +56,7 @@ public:
 
 void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int) + sizeof(int32_t))) {
         return;
     }
 

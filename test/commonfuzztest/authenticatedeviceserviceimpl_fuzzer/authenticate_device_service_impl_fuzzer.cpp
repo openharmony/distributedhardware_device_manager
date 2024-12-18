@@ -15,6 +15,7 @@
 
 #include <string>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_service.h"
 #include "device_manager_service_impl.h"
 #include "authenticate_device_service_impl_fuzzer.h"
@@ -114,7 +115,8 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::string str(reinterpret_cast<const char*>(data), size);
-    int32_t bindLevel = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
     AddPermission();
     DmSubscribeInfo subscribeInfo = {
         .subscribeId = 0,

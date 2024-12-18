@@ -41,7 +41,7 @@ public:
 
 void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint16_t))) {
+    if ((data == nullptr) || (size < (sizeof(uint16_t) * 2))) {
         return;
     }
     std::string bundleName(reinterpret_cast<const char*>(data), size);

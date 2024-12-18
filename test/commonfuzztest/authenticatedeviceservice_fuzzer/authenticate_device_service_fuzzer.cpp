@@ -15,6 +15,7 @@
 
 #include <string>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_service.h"
 #include "authenticate_device_service_fuzzer.h"
 #include "accesstoken_kit.h"
@@ -65,7 +66,8 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     int32_t authType = 1;
     DmAuthParam authParam;
     std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
-    int32_t level = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t level = fdp.ConsumeIntegral<int32_t>();
     DeviceManagerService::GetInstance().Init();
     DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, extra);

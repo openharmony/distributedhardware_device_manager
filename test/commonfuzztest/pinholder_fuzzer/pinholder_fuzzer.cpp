@@ -41,7 +41,7 @@ public:
 
 void PinHolderFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint16_t))) {
+    if ((data == nullptr) || (size < sizeof(uint16_t) + sizeof(uint16_t))) {
         return;
     }
 
