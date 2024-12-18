@@ -39,6 +39,7 @@ void DmAuthManagerTest::SetUp()
     authManager_ = std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authMessageProcessor_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
@@ -63,6 +64,10 @@ void DmAuthManagerTest::SetUpTestCase()
     DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock_;
     hiChainAuthConnectorMock_ = std::make_shared<HiChainAuthConnectorMock>();
     DmHiChainAuthConnector::dmHiChainAuthConnector = hiChainAuthConnectorMock_;
+    deviceProfileConnectorMock_ = std::make_shared<DeviceProfileConnectorMock>();
+    DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
+    cryptoMock_ = std::make_shared<CryptoMock>();
+    DmCrypto::dmCrypto = cryptoMock_;
 }
 void DmAuthManagerTest::TearDownTestCase()
 {
@@ -74,6 +79,10 @@ void DmAuthManagerTest::TearDownTestCase()
     softbusConnectorMock_ = nullptr;
     DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
     hiChainAuthConnectorMock_ = nullptr;
+    DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
+    deviceProfileConnectorMock_ = nullptr;
+    DmCrypto::dmCrypto = nullptr;
+    cryptoMock_ = nullptr;
 }
 
 namespace {
@@ -1476,13 +1485,13 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     ret = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(ret);
 
-    authManager_->authRequestContext_ = nullptr;
+    authManager_->authResponseContext_ = nullptr;
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(ret);
 
-    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
     EXPECT_CALL(*multipleUserConnectorMock_,
         GetCurrentAccountUserID()).WillOnce(Return(0)).WillOnce(Return(0)).WillOnce(Return(0));
@@ -1512,6 +1521,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     authManager_->authResponseContext_->accountGroupIdHash = SafetyDump(jsonPeerGroupIdObj);
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
+    EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123"));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(ret);
 }
@@ -1526,6 +1536,23 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->GetAccountGroupIdHash();
     ASSERT_FALSE(ret.empty());
+
+    std::vector<GroupInfo> groupList;
+    GroupInfo groupInfo;
+    groupInfo.groupId = "123456";
+    groupInfo.groupName = "group101";
+    groupInfo.groupType = 1;
+    groupList.push_back(groupInfo);
+    nlohmann::json jsonPeerGroupIdObj;
+    jsonPeerGroupIdObj["groupId"] = "123456";
+    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(true)));
+    EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123456"));
+    bool rets = authManager_->IsIdenticalAccount();
+    ASSERT_FALSE(rets);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
@@ -1537,6 +1564,91 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     int32_t ret = authManager_->CheckTrustState();
     ASSERT_EQ(ret, 1);
+
+    int32_t sessionId = 1;
+    authManager_->authResponseContext_->authType = AUTH_TYPE_PIN;
+    authManager_->authResponseContext_->isOnline = true;
+    EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).Times(::testing::AtLeast(2)).WillOnce(Return(true));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
+    authManager_->ProcessAuthRequest(sessionId);
+
+    authManager_->authResponseContext_->haveCredential = true;
+    EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(true));
+    authManager_->GetAuthRequestContext();
+
+    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
+    authManager_->authResponseContext_->importAuthCode = "";
+    std::vector<int32_t> bindType;
+    bindType.push_back(101);
+    bindType.push_back(102);
+    EXPECT_CALL(*deviceProfileConnectorMock_, SyncAclByBindType(_, _, _, _)).WillOnce(Return(bindType));
+    authManager_->ProcessAuthRequestExt(sessionId);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteGroup_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string deviceId;
+    std::vector<GroupInfo> groupList;
+    GroupInfo groupInfo;
+    groupInfo.groupId = "123456";
+    groupList.push_back(groupInfo);
+    EXPECT_CALL(*hiChainConnectorMock_, GetRelatedGroups(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(groupList), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    int32_t ret = authManager_->DeleteGroup(pkgName, deviceId);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteGroup_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    int32_t userId = 0;
+    std::string deviceId;
+    int32_t ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+    
+    pkgName = "pkgName";
+    std::vector<GroupInfo> groupList;
+    GroupInfo groupInfo;
+    groupInfo.groupId = "123456";
+    groupList.push_back(groupInfo);
+    GroupInfo groupInfo1;
+    groupInfo1.groupId = "12345";
+    groupList.push_back(groupInfo1);
+    EXPECT_CALL(*hiChainConnectorMock_, GetRelatedGroups(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(DM_OK)));
+    ret = authManager_->DeleteGroup(pkgName, userId, deviceId);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, ParseConnectAddr_201, testing::ext::TestSize.Level0)
+{
+    PeerTargetId targetId;
+    targetId.wifiIp = "12131415";
+    targetId.brMac = "D4G4E5G2B4G";
+    targetId.bleMac = "1463158131321";
+    std::string deviceId;
+    std::string addrType;
+    int32_t ret = authManager_->ParseConnectAddr(targetId, deviceId, addrType);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, ParseConnectAddr_202, testing::ext::TestSize.Level0)
+{
+    PeerTargetId targetId;
+    targetId.wifiIp;
+    targetId.brMac = "D4G4E5G2B4G";
+    targetId.bleMac = "1463158131321";
+    std::string deviceId;
+    std::string addrType;
+    int32_t ret = authManager_->ParseConnectAddr(targetId, deviceId, addrType);
+    ASSERT_EQ(ret, DM_OK);
+
+    targetId.brMac = "";
+    ret = authManager_->ParseConnectAddr(targetId, deviceId, addrType);
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

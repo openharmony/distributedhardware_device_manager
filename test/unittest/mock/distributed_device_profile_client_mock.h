@@ -30,6 +30,10 @@ public:
         std::vector<AccessControlProfile>& accessControlProfiles) = 0;
     virtual int32_t PutAccessControlProfile(const AccessControlProfile& accessControlProfile) = 0;
     virtual int32_t GetAllAccessControlProfile(std::vector<AccessControlProfile>& accessControlProfiles) = 0;
+    virtual int32_t SubscribeDeviceProfileInited(int32_t saId, sptr<IDpInitedCallback> initedCb) = 0;
+    virtual int32_t UnSubscribeDeviceProfileInited(int32_t saId) = 0;
+    virtual int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos)
+        = 0;
 public:
     static inline std::shared_ptr<DpDistributedDeviceProfileClient> dpDistributedDeviceProfileClient = nullptr;
 };
@@ -40,6 +44,9 @@ public:
         std::vector<AccessControlProfile>&));
     MOCK_METHOD(int32_t, PutAccessControlProfile, (const AccessControlProfile&));
     MOCK_METHOD(int32_t, GetAllAccessControlProfile, (std::vector<AccessControlProfile>&));
+    MOCK_METHOD(int32_t, SubscribeDeviceProfileInited, (int32_t, sptr<IDpInitedCallback>));
+    MOCK_METHOD(int32_t, UnSubscribeDeviceProfileInited, (int32_t));
+    MOCK_METHOD(int32_t, PutAllTrustedDevices, (const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &));
 };
 }
 }

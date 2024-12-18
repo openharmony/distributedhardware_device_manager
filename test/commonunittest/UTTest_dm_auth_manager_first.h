@@ -35,6 +35,7 @@
 #include "dm_auth_manager.h"
 #include "softbus_session_mock.h"
 #include "app_manager_mock.h"
+#include "dm_crypto_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -54,6 +55,7 @@ public:
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
     static inline std::shared_ptr<SoftbusSessionMock> softbusSessionMock_ = nullptr;
     static inline std::shared_ptr<AppManagerMock> appManagerMock_ = nullptr;
+    static inline std::shared_ptr<CryptoMock> cryptoMock_ = nullptr;
 };
 
 class AuthRequestFinishStateMock : public AuthRequestFinishState {

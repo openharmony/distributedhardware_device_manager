@@ -563,7 +563,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_001, testing::ext::TestSi
     DmDiscoveryInfo discoveryInfo;
     bool isonline = true;
     int32_t authForm = 0;
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(38)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1188,6 +1188,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetAuthForm_001, testing::ext::TestSize.Lev
     profile.SetBindType(INVALIED_TYPE);
     ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
     EXPECT_EQ(ret, INVALIED_TYPE);
+
+    profile.SetBindType(DM_POINT_TO_POINT);
+    profile.SetBindLevel(APP);
+    ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
+    EXPECT_EQ(ret, APP_PEER_TO_PEER_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::TestSize.Level0)
@@ -1414,9 +1419,9 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteServiceBindLevel_001, testing::ext::T
 HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_004, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "bundleName";
-    std::string deviceId = "remoteDeviceId";
+    std::string deviceId = "localDeviceId";
     bool ret = DeviceProfileConnector::GetInstance().CheckSrcDevIdInAclForDevBind(pkgName, deviceId);
-    EXPECT_FALSE(ret);
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, DeleteTimeOutAcl_002, testing::ext::TestSize.Level0)
@@ -1556,6 +1561,13 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUserId = 123456;
     ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
     EXPECT_FALSE(ret);
+
+    localUdid = "remoteDeviceId";
+    localUserId = 1234;
+    peerUdid = "localDeviceId";
+    peerUserId = 1234;
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
+    EXPECT_TRUE(ret);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetProcessInfoFromAclByUserId_005, testing::ext::TestSize.Level0)
@@ -1672,6 +1684,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetUserIdAndBindLevel_001, testing::ext::Te
     ret = DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(localUdid, peerUdid);
     EXPECT_FALSE(ret.empty());
 
+    localUdid = "remoteDeviceIdee";
+    peerUdid = "localDeviceIder";
+    ret = DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(localUdid, peerUdid);
+    EXPECT_FALSE(ret.empty());
+
     int32_t userId = 123456;
     std::vector<int32_t> localUserIds;
     localUserIds.push_back(userId);
@@ -1750,10 +1767,30 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
     auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_EQ(ret.empty(), false);
 
-    deviceId = "deviceIder001";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
+    deviceId = "remoteDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), true);
+    EXPECT_EQ(ret.empty(), false);
+
+    deviceId = "remoteDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(1234));
+    ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
+    EXPECT_EQ(ret.empty(), false);
+
+    deviceId = "remoteDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(1234));
+    ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
+    EXPECT_EQ(ret.empty(), false);
+
+    deviceId = "remoteDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(12345));
+    ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
+    EXPECT_EQ(ret.empty(), false);
+
+    deviceId = "remoteDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(12345));
+    ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
+    EXPECT_EQ(ret.empty(), false);
 
     std::string udid;
     DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
@@ -1801,13 +1838,18 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_002, testing::ext::TestSi
     discoveryInfo.pkgname = "";
     bool isonline = true;
     int32_t authForm = 0;
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(38)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
 
     discoveryInfo.pkgname = "bundleName";
     discoveryInfo.localDeviceId = "deviceId";
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(30)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(38)).WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
+    EXPECT_EQ(ret, DM_OK);
+
+    discoveryInfo.localDeviceId = "trustDeviceId";
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(38)).WillOnce(Return(DM_OK));
     ret = DeviceProfileConnector::GetInstance().GetDeviceAclParam(discoveryInfo, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1815,9 +1857,9 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceAclParam_002, testing::ext::TestSi
 HWTEST_F(DeviceProfileConnectorTest, CheckSinkDevIdInAclForDevBind_004, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "bundleName";
-    std::string deviceId = "123456";
+    std::string deviceId = "localDeviceId";
     bool ret = DeviceProfileConnector::GetInstance().CheckSinkDevIdInAclForDevBind(pkgName, deviceId);
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_005, testing::ext::TestSize.Level0)
@@ -1929,6 +1971,15 @@ HWTEST_F(DeviceProfileConnectorTest, PutAllTrustedDevices_001, testing::ext::Tes
     std::vector<DistributedDeviceProfile::TrustedDeviceInfo> deviceInfos;
     int32_t ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
     EXPECT_NE(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, CheckBindType_004, testing::ext::TestSize.Level0)
+{
+    std::string peerUdid = "localDeviceId";
+    std::string localUdid = "remoteDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(0));
+    uint32_t ret = DeviceProfileConnector::GetInstance().CheckBindType(peerUdid, localUdid);
+    EXPECT_EQ(ret, IDENTICAL_ACCOUNT_TYPE);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

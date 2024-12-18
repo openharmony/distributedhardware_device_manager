@@ -409,6 +409,10 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetDnPolicy_301, testing::ext::TestSize.
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+
+    std::string msg = "msg";
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
 }
 } // namespace
 } // namespace DistributedHardware

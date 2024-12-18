@@ -262,17 +262,25 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
     int32_t preUserId = 3;
     std::vector<std::string> peerUdids;
     std::string accountName = "openharmony123";
+    std::map<std::string, int32_t> curUserDeviceMap;
+    std::map<std::string, int32_t> preUserDeviceMap;
     std::string commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
+    EXPECT_CALL(*deviceManagerServiceImplMock_,
+        GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN;
+    DMAccountInfo dmAccountInfo;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetAccountInfoByUserId(_)).WillOnce(Return(dmAccountInfo));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, pkgName);
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap));
     DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     DeviceManagerService::GetInstance().SendAccountLogoutBroadCast(peerUdids, accountId, accountName, userId);

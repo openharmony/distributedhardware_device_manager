@@ -38,8 +38,10 @@ void DmAccountCommonEventManagerTest::TearDownTestCase()
 {
 }
 
+void AccountCommonEventCallbacks(const std::string commonEventType, int32_t currentUserId, int32_t beforeUserId)
+{
+}
 namespace {
-
 HWTEST_F(DmAccountCommonEventManagerTest, SubscribeAccountCommonEvent_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager
@@ -76,7 +78,9 @@ HWTEST_F(DmAccountCommonEventManagerTest, OnReceiveEvent_001, testing::ext::Test
     std::string strEvent = "test";
     std::vector<std::string> strEventVec;
     strEventVec.push_back(strEvent);
-    AccountEventCallback callback = nullptr;
+    AccountEventCallback callback = [=](const auto &eventType, const auto &currentUserId, const auto &beforeUserId) {
+        AccountCommonEventCallbacks(eventType, currentUserId, beforeUserId);
+    };
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(strEvent);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);

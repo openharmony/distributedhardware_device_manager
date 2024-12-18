@@ -499,6 +499,52 @@ HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_003, testing::ext::TestSize.Lev
     ParseMapFromJsonString(jsonStr, paramMap);
     EXPECT_EQ(paramMap.size(), 0);
 }
+
+HWTEST_F(DmAnonymousTest, GetAnonyStringList_001, testing::ext::TestSize.Level0)
+{
+    std::string value = "valueTest";
+    std::vector<std::string> valueVec;
+    valueVec.push_back(value);
+    std::string str = GetAnonyStringList(valueVec);
+    auto ret = str.size();
+    EXPECT_GE(ret, 0);
+}
+
+HWTEST_F(DmAnonymousTest, StringToInt64_002, testing::ext::TestSize.Level0)
+{
+    std::string str = "12345";
+    int32_t base = 10;
+    int32_t ret = StringToInt64(str, base);
+    EXPECT_EQ(ret, 12345);
+}
+
+HWTEST_F(DmAnonymousTest, GetCallerPkgName_001, testing::ext::TestSize.Level0)
+{
+    std::string str = "pkgName#12345";
+    std::string ret = GetCallerPkgName(str);
+    EXPECT_FALSE(ret.empty());
+}
+
+HWTEST_F(DmAnonymousTest, IsMessageLengthValid_001, testing::ext::TestSize.Level0)
+{
+    std::string inputMessage;
+    bool ret = IsMessageLengthValid(inputMessage);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DmAnonymousTest, IsDmCommonNotifyEventValid_001, testing::ext::TestSize.Level0)
+{
+    DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::MAX;
+    bool ret = IsDmCommonNotifyEventValid(dmCommonNotifyEvent);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DmAnonymousTest, GetSubscribeId_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "12345#pkgName";
+    uint16_t ret = GetSubscribeId(pkgName);
+    EXPECT_GE(ret, 0);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
