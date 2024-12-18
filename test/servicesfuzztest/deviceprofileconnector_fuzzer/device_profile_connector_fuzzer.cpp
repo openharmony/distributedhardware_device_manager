@@ -23,9 +23,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t NUMBER = 7;
 void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(DmAccesser)) || (size < (sizeof(int32_t) * 7))) {
+    if ((data == nullptr) || (size < sizeof(DmAccesser)) || (size < (sizeof(int32_t) * NUMBER))) {
         return;
     }
 

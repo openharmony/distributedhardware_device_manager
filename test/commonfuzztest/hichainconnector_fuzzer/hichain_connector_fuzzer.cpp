@@ -86,7 +86,7 @@ void AddAclInfo(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std
 
 void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t) * 3))) {
+    if ((data == nullptr) || (size < (sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t)))) {
         return;
     }
 
@@ -150,7 +150,7 @@ void HiChainConnectorSecondFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t) + (sizeof(int32_t) * 3))) {
+    if ((data == nullptr) || (size < (sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t)))) {
         return;
     }
     FuzzedDataProvider fdp(data, size);
@@ -253,7 +253,7 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t) + (sizeof(int32_t) * 2))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t))) {
         return;
     }
 

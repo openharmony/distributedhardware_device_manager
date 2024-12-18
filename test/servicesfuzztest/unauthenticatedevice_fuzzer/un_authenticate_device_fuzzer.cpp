@@ -28,7 +28,8 @@ namespace OHOS {
 namespace DistributedHardware {
 void UnAuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size <  sizeof(uint16_t) + (sizeof(int32_t) * 2) || (size > DM_MAX_DEVICE_ID_LEN))) {
+    if ((data == nullptr) || (size <  (sizeof(uint16_t) + (sizeof(int32_t) + sizeof(int32_t))) ||
+        (size > DM_MAX_DEVICE_ID_LEN))) {
         return;
     }
 
