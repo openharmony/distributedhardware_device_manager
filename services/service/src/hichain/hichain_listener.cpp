@@ -93,6 +93,10 @@ void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *g
         return;
     }
     nlohmann::json groupInfoJsonObj = nlohmann::json::parse(std::string(groupInfo), nullptr, false);
+    if (groupInfoJsonObj.is_discarded()) {
+        LOGE("groupInfo parse error");
+        return ;
+    }
     GroupInformation hichainGroupInfo;
     from_json(groupInfoJsonObj, hichainGroupInfo);
     if (hichainGroupInfo.groupType != DM_IDENTICAL_ACCOUNT) {
