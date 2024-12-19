@@ -748,7 +748,7 @@ void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string f
 }
 
 void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
-    std::string funcName, std::vector<DmDeviceInfo> &deviceInfoList, int32_t errCode)
+    std::string funcName, std::vector<DmDeviceInfo> &deviceInfoList, int32_t errCode, std::string localUdid)
 {
     int32_t res = DM_OK;
     std::string discoverDevList = GetDeviceInfoList(deviceInfoList);
@@ -769,7 +769,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
                 "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "LOCAL_UDID", localUdid,
                 "DISCOVERY_DEVICE_LIST", discoverDevList);
         }
     } else {
@@ -785,7 +785,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
             "BIZ_STAGE", static_cast<int32_t>(GetTrustDeviceList::GET_TRUST_DEVICE_LIST),
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "LOCAL_UDID", localUdid,
             "DISCOVERY_DEVICE_LIST", discoverDevList,
             "ERROR_CODE", GetErrCode(errCode));
     }
@@ -795,7 +795,8 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
     }
 }
 
-void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName, int32_t errCode)
+void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName, int32_t errCode,
+    std::string localUdid)
 {
     int32_t res = DM_OK;
     if (errCode == DM_OK) {
@@ -811,7 +812,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
             "BIZ_STAGE", DEFAULT_STAGE,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "LOCAL_UDID", GetAnonyLocalUdid());
+            "LOCAL_UDID", localUdid);
     } else {
         res = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
@@ -825,7 +826,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
             "BIZ_STAGE", DEFAULT_STAGE,
             "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
             "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-            "LOCAL_UDID", GetAnonyLocalUdid(),
+            "LOCAL_UDID", localUdid,
             "ERROR_CODE", GetErrCode(errCode));
     }
     if (res != DM_OK) {
@@ -835,7 +836,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
 }
 
 void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
-    std::string funcName, DmDeviceInfo &info, int32_t errCode)
+    std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid)
 {
     int32_t res = DM_OK;
     static std::string localCallerName = "";
@@ -855,7 +856,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
                 "DEV_TYPE", ConvertHexToString(info.deviceTypeId),
-                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "LOCAL_UDID", localUdid,
                 "LOCAL_NET_ID", GetAnonyUdid(info.networkId));
         } else {
             res = HiSysEventWrite(
@@ -871,7 +872,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
                 "DEV_TYPE", ConvertHexToString(info.deviceTypeId),
-                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "LOCAL_UDID", localUdid,
                 "LOCAL_NET_ID", GetAnonyUdid(info.networkId),
                 "ERROR_CODE", GetErrCode(errCode));
         }
@@ -883,7 +884,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
 }
 
 void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
-    std::string funcName, DmDeviceInfo &info, int32_t errCode)
+    std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid)
 {
     int32_t res = DM_OK;
     static std::string callerName = "";
@@ -902,7 +903,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
                 "BIZ_STAGE", DEFAULT_STAGE,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_SUCC),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "LOCAL_UDID", localUdid,
                 "DEV_TYPE", ConvertHexToString(info.deviceTypeId),
                 "PEER_UDID", GetAnonyUdid(info.deviceId),
                 "PEER_NET_ID", GetAnonyUdid(info.networkId));
@@ -919,7 +920,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
                 "BIZ_STAGE", DEFAULT_STAGE,
                 "STAGE_RES", static_cast<int32_t>(StageRes::STAGE_FAIL),
                 "BIZ_STATE", static_cast<int32_t>(BizState::BIZ_STATE_END),
-                "LOCAL_UDID", GetAnonyLocalUdid(),
+                "LOCAL_UDID", localUdid,
                 "DEV_TYPE", ConvertHexToString(info.deviceTypeId),
                 "PEER_UDID", GetAnonyUdid(info.deviceId),
                 "PEER_NET_ID", GetAnonyUdid(info.networkId),

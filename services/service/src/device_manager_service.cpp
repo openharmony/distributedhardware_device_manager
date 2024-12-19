@@ -2418,8 +2418,9 @@ void DeviceManagerService::HandleDeviceUnBind(const char *peerUdid, const GroupI
     return;
 }
 
-int32_t DeviceManagerService::GetAnonyLocalUdid(std::string &anonyUdid)
+int32_t DeviceManagerService::GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid)
 {
+    (void) pkgName;
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller does not have permission to call GetAnonyLocalUdid.");
         return ERR_DM_NO_PERMISSION;

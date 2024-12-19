@@ -1588,8 +1588,9 @@ ON_IPC_CMD(GET_NETWORKID_BY_UDID, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(GET_ANONY_LOCAL_UDID, MessageParcel &data, MessageParcel &reply)
 {
-    std string anonyUdid;
-    int32_t result = DeviceManagerService::GetInstance().GetAnonyLocalUdid(anonyUdid);
+    std::string pkgName = data.ReadString();
+    std::string anonyUdid;
+    int32_t result = DeviceManagerService::GetInstance().GetAnonyLocalUdid(pkgName, anonyUdid);
     if (!reply.WriteInt32(result)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
