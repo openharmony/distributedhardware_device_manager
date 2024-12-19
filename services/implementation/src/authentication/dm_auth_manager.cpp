@@ -238,10 +238,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         authRequestContext_->closeSessionDelayTime = 0;
         if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_TIME)) {
             std::string delayTimeStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_TIME].get<std::string>();
-            int32_t delayTime = GetCloseSessionDelayTime(delayTimeStr);
-            if (delayTime > 0) {
-                authRequestContext_->closeSessionDelayTime = delayTime;
-            }
+            authRequestContext_->closeSessionDelayTime = GetCloseSessionDelayTime(delayTimeStr);
         }
         authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
     }
