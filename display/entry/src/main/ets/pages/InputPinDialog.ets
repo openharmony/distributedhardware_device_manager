@@ -18,6 +18,8 @@ import mediaquery from '@ohos.mediaquery';
 import deviceInfo from '@ohos.deviceInfo';
 import inputMethod from '@ohos.inputMethod';
 import Constant from '../common/constant';
+import accessibility from '@ohos.accessibility';
+import common from '@ohos.app.ability.common';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:InputPinDialog]==>'
@@ -95,21 +97,47 @@ struct InputCustomDialog {
           return;
         }
         if (msg === MSG_PIN_CODE_ERROR) {
-          if (this.model == MODEL_PASSWORD) {
-            this.errorTips = $r('app.string.dm_password_error');
-          } else {
-            this.isTimes--;
-            this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
-          }
-          this.password = '';
-          this.errorTipsVisible = Visibility.Visible;
-          this.passwordCircle = ['', '', '', '', '', ''];
+          this.inputCodeError();
         }
       })
     });
     this.listener.on('change', (mediaQueryResult: mediaquery.MediaQueryResult) => {
       this.onPortrait(mediaQueryResult);
     });
+  }
+
+  sendAccessibilityEvent(times: number) {
+    console.log(TAG + 'sendAccessibilityEvent in');
+    let context = getContext(this) as common.UIAbilityContext;
+    let str = context.resourceManager.getPluralStringValueSync($r('app.plural.dm_incorrect_code').id, times)
+    let eventInfo: accessibility.EventInfo = ({
+      type: 'announceForAccessibility',
+      bundleName: 'com.ohos.devicemanagerui',
+      triggerAction: 'common',
+      textAnnouncedForAccessibility: str
+    })
+
+    try {
+      accessibility.sendAccessibilityEvent(eventInfo).then(()=>{
+        console.info(`${TAG} Succeeded in send event, eventInfo is ${JSON.stringify(eventInfo)}`);
+      });
+    } catch (error) {
+      console.info(`${TAG} Failed in send event, error.message is ${error.message}`);
+    }
+  }
+
+  inputCodeError() {
+    console.log(TAG + 'inputCodeError in');
+    if (this.model == MODEL_PASSWORD) {
+      this.errorTips = $r('app.string.dm_password_error');
+    } else {
+      this.isTimes--;
+      this.errorTips = $r('app.plural.dm_incorrect_code', this.isTimes, this.isTimes);
+      this.sendAccessibilityEvent(this.isTimes);
+    }
+    this.password = '';
+    this.errorTipsVisible = Visibility.Visible;
+    this.passwordCircle = ['', '', '', '', '', ''];
   }
 
   cancel() {
