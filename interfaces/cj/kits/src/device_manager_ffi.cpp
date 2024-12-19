@@ -26,7 +26,6 @@ int64_t FfiOHOSDistributedDeviceManagerCreateDeviceManager(const char *name, int
         std::string(name), errCode);
     if (*errCode != 0) {
         LOGE("deviceManager create fail, the errcode is %{public}d", *errCode);
-        delete static_cast<OHOS::DistributedHardware::DeviceManagerFfiImpl *>(deviceManager);
         return 0;
     }
     return deviceManager->GetID();
