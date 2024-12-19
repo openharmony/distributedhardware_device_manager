@@ -124,7 +124,7 @@ typedef struct DmAuthRequestContext {
     int32_t remoteUserId;
     std::string addr;
     std::string hostPkgLabel;
-    int32_t closeSessionDelayTime;
+    int32_t closeSessionDelayTime = 0;
 } DmAuthRequestContext;
 
 typedef struct DmAuthResponseContext {
