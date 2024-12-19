@@ -1300,7 +1300,7 @@ void DmAuthManager::SrcAuthenticateFinish()
         CHECK_NULL_VOID(softbusConnector_);
         CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
-    }
+    };
     const int64_t microsecond_to_second = 1000000L;
     int32_t delayTime = authRequestContext_->closeSessionDelayTime;
     ffrt::submit(taskFunc, ffrt::task_attr().delay(delayTime * microsecond_to_second));
