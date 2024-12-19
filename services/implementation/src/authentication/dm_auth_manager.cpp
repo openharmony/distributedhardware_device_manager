@@ -120,9 +120,6 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
 DmAuthManager::~DmAuthManager()
 {
     LOGI("DmAuthManager destructor");
-    if (closeSessionTimer_ != nullptr) {
-        closeSessionTimer_->DeleteAll();
-    }
 }
 
 int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
@@ -251,8 +248,8 @@ int32_t DmAuthManager::GetCloseSessionDelayTime(std::string &delayTimeStr)
     int32_t delayTime = 0;
     if (IsNumberString(delayTimeStr)) {
         delayTime = std::atoi(delayTimeStr.c_str());
-        if (delayTime > CLOSE_SESSION_DELAY_TIME_MAX) {
-            delayTime = CLOSE_SESSION_DELAY_TIME_MAX;
+        if (delayTime < 0 || delayTime > CLOSE_SESSION_DELAY_TIME_MAX) {
+            delayTime = 0;
         }
     }
     return delayTime;
@@ -1298,20 +1295,16 @@ void DmAuthManager::SrcAuthenticateFinish()
     listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
 
-    if (authRequestContext_->closeSessionDelayTime > 0) {
-        if (closeSessionTimer_ == nullptr) {
-            closeSessionTimer_ = std::make_shared<DmTimer>();
-        }
-        closeSessionTimer_->DeleteAll();
-        closeSessionId_ = authRequestContext_->sessionId;
-        closeSessionTimer_->StartTimer(std::string(CLOSE_SESSION_DELAY_TASK),
-            authRequestContext_->closeSessionDelayTime, [this](std::string name) {
-                DmAuthManager::HandleSessionClosed(name);
-            });
-        authRequestContext_->closeSessionDelayTime = 0;
-    } else {
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
+    int32_t sessionId = authRequestContext_->sessionId;
+    auto taskFunc = [this, sessionId]() {
+        CHECK_NULL_VOID(softbusConnector_);
+        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
     }
+    const int64_t microsecond_to_second = 1000000L;
+    int32_t delayTime = authRequestContext_->closeSessionDelayTime;
+    ffrt::submit(taskFunc, ffrt::task_attr().delay(delayTime * microsecond_to_second));
+
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
     authTimes_ = 0;
@@ -1321,13 +1314,7 @@ void DmAuthManager::HandleSessionClosed(std::string name)
 {
     CHECK_NULL_VOID(softbusConnector_);
     CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
-    if (closeSessionId_ <= 0) {
-        LOGE("invaild sessionId");
-        return;
-    }
-    LOGI("close authSession start");
     softbusConnector_->GetSoftbusSession()->CloseAuthSession(closeSessionId_);
-    closeSessionId_ = 0;
 }
 
 void DmAuthManager::AuthenticateFinish()

@@ -533,7 +533,6 @@ private:
     std::string GetBundleName(nlohmann::json &jsonObject);
     int32_t GetBinderInfo();
     void SetProcessInfo();
-    void HandleSessionClosed(std::string name);
     int32_t GetCloseSessionDelayTime(std::string &delayTimeStr);
 
 private:
@@ -572,8 +571,6 @@ private:
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
     std::string remoteUdidHash_ = "";
     ProcessInfo processInfo_;
-    std::shared_ptr<DmTimer> closeSessionTimer_;
-    int32_t closeSessionId_ = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
