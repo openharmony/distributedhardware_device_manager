@@ -96,6 +96,7 @@ enum DMIpcCmdInterfaceCode {
     SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY,
     SINK_BIND_TARGET_RESULT,
     SYNC_CALLBACK,
+    GET_ANONY_LOCAL_UDID,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

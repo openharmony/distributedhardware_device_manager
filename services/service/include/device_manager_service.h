@@ -209,7 +209,7 @@ public:
     int32_t RegDevStateCallbackToService(const std::string &pkgName);
     int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
     void HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo);
-
+    int32_t GetAnonyLocalUdid(std::string &anonyUdid);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

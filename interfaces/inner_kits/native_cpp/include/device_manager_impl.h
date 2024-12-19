@@ -423,6 +423,7 @@ private:
     void ConvertDeviceInfoToDeviceBasicInfo(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
     uint16_t GetSubscribeIdFromMap(const std::string &pkgName);
     void SyncCallbackToService(DmCommonNotifyEvent dmCommonNotifyEvent, const std::string &pkgName);
+    int32_t GetAnonyLocalUdid(std::string &anonyUdid);
 
 private:
 #if !defined(__LITEOS_M__)

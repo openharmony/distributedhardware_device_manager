@@ -1586,6 +1586,19 @@ ON_IPC_CMD(GET_NETWORKID_BY_UDID, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(GET_ANONY_LOCAL_UDID, MessageParcel &data, MessageParcel &reply)
+{
+    std string anonyUdid;
+    int32_t result = DeviceManagerService::GetInstance().GetAnonyLocalUdid(anonyUdid);
+    if (!reply.WriteInt32(result)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteString(anonyUdid)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {

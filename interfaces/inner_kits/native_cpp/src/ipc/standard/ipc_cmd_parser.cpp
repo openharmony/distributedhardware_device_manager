@@ -31,6 +31,7 @@
 #include "ipc_def.h"
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
+#include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
@@ -1918,6 +1919,18 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_SCREEN_STATUS, MessageParcel &reply, std::shared
     std::shared_ptr<IpcGetDeviceScreenStatusRsp> pRsp = std::static_pointer_cast<IpcGetDeviceScreenStatusRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
     pRsp->SetScreenStatus(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_ANONY_LOCAL_UDID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetAnonyLocalUdidRsp> pRsp = std::static_pointer_cast<IpcGetAnonyLocalUdidRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetAnonyUdid(reply.ReadString());
     return DM_OK;
 }
 

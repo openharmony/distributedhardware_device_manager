@@ -2413,6 +2413,26 @@ int32_t DeviceManagerImpl::UnRegisterSinkBindCallback(const std::string &pkgName
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::GetAnonyLocalUdid(std::string &anonyUdid)
+{
+    LOGD("Start");
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetAnonyLocalUdidRsp> rsp = std::make_shared<IpcGetAnonyLocalUdidRsp>();
+    int32_t ret = ipcClientProxy_->SendRequest(GET_ANONY_LOCAL_UDID, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("GetAnonyLocalUdid Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("GetAnonyLocalUdid Failed with ret %{public}d", ret);
+        return ret;
+    }
+    anonyUdid = rsp->GetAnonyUdid();
+    return DM_OK;
+}
+
 uint16_t DeviceManagerImpl::GetSubscribeIdFromMap(const std::string &pkgName)
 {
     {

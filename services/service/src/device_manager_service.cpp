@@ -26,6 +26,7 @@
 #include "dm_hidumper.h"
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
+#include "dm_radar_helper.h"
 #include "parameter.h"
 #include "permission_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -2415,6 +2416,21 @@ void DeviceManagerService::HandleDeviceUnBind(const char *peerUdid, const GroupI
             localUdid, groupInfo.userId, groupInfo.osAccountId);
     }
     return;
+}
+
+int32_t DeviceManagerService::GetAnonyLocalUdid(std::string &anonyUdid)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call GetAnonyLocalUdid.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string udid = DmRadarHelper::GetInstance().GetAnonyLocalUdid();
+    if (udid.empty()) {
+        LOGE("Anony local udid is empty.");
+        return ERR_DM_FAILED;
+    }
+    anonyUdid = udid;
+    return DM_OK;
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

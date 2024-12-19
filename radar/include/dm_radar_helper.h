@@ -222,9 +222,9 @@ public:
     std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) override;
     std::string ConvertHexToString(uint16_t hex);
     int32_t GetErrCode(int32_t errCode);
+    std::string GetAnonyLocalUdid();
 private:
     std::string GetAnonyUdid(std::string udid);
-    std::string GetAnonyLocalUdid();
     int32_t GetApiType();
 };
 
