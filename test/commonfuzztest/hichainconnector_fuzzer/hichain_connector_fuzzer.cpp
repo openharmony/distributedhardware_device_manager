@@ -18,6 +18,7 @@
 #include <random>
 #include <utility>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "device_manager_service_listener.h"
 #include "dm_anonymous.h"
@@ -85,29 +86,30 @@ void AddAclInfo(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std
 
 void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < (sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t)))) {
         return;
     }
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
+    FuzzedDataProvider fdp(data, size);
     std::string userId(reinterpret_cast<const char*>(data), size);
-    int32_t authType = *(reinterpret_cast<const int32_t*>(data));
+    int32_t authType = fdp.ConsumeIntegral<int32_t>();
     std::vector<GroupInfo> groupList;
     std::string queryParams(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
     std::string reqDeviceId(reinterpret_cast<const char*>(data), size);
     std::string hostDevice(reinterpret_cast<const char*>(data), size);
     std::vector<std::string> remoteGroupIdList;
-    int32_t groupType = *(reinterpret_cast<const int32_t*>(data));
+    int32_t groupType = fdp.ConsumeIntegral<int32_t>();
     nlohmann::json jsonDeviceList;
     std::string groupOwner(reinterpret_cast<const char*>(data), size);
     std::string credentialInfo(reinterpret_cast<const char*>(data), size);
     std::string jsonStr(reinterpret_cast<const char*>(data), size);
     std::vector<std::string> udidList;
     std::string pkgNameStr(reinterpret_cast<const char*>(data), size);
-    int32_t delUserid = *(reinterpret_cast<const int32_t*>(data));
+    int32_t delUserid = fdp.ConsumeIntegral<int32_t>();
 
     hichainConnector->IsRedundanceGroup(userId, authType, groupList);
     hichainConnector->GetGroupInfo(queryParams, groupList);
@@ -148,16 +150,17 @@ void HiChainConnectorSecondFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if ((data == nullptr) || (size < (sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t)))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-    int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
+    int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     std::string groupName = "groupName";
     GroupInfo groupInfo;
     std::string userId(reinterpret_cast<const char*>(data), size);
-    int32_t authType = *(reinterpret_cast<const int32_t*>(data));
+    int32_t authType = fdp.ConsumeIntegral<int32_t>();
     std::vector<GroupInfo> groupList;
     std::string queryParams(reinterpret_cast<const char*>(data), size);
     std::string pkgName(reinterpret_cast<const char*>(data), size);
@@ -167,8 +170,8 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     nlohmann::json jsonOutObj;
     std::shared_ptr<IDmGroupResCallback> callback;
     std::string jsonStr(reinterpret_cast<const char*>(data), size);
-    int32_t groupType = *(reinterpret_cast<const int32_t*>(data));
-    int32_t switchUserId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t groupType = fdp.ConsumeIntegral<int32_t>();
+    int32_t switchUserId = fdp.ConsumeIntegral<int32_t>();
     std::string reqParams(reinterpret_cast<const char*>(data), size);
     std::string credentialInfo(reinterpret_cast<const char*>(data), size);
     int operationCode = GroupOperationCode::MEMBER_JOIN;
@@ -197,20 +200,20 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int32_t))) {
         return;
     }
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-
-    int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     std::string groupName(reinterpret_cast<const char*>(data), size);
     std::string groupId = "groupId_forth";
     std::string deviceId = "deviceId_forth";
     std::string returnData(reinterpret_cast<const char*>(data), size);
     std::string userId = "userId_forth";
-    int32_t authType = *(reinterpret_cast<const int32_t*>(data));
+    int32_t authType = fdp.ConsumeIntegral<int32_t>();
     int operationCode = GroupOperationCode::MEMBER_JOIN;
     int errCode = 102;
     std::vector<std::string> syncGroupList;
@@ -250,17 +253,18 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
 
 void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t))) {
         return;
     }
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-    int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     std::string groupName = "groupName_fifth";
-    int32_t authType = *(reinterpret_cast<const int32_t*>(data));
+    int32_t authType = fdp.ConsumeIntegral<int32_t>();
     std::string params = "params";
-    int32_t osAccountUserId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t osAccountUserId = fdp.ConsumeIntegral<int32_t>();
     nlohmann::json jsonDeviceList;
     std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
     std::vector<int32_t> userIdVec;

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "softbus_connector.h"
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
@@ -56,12 +56,13 @@ public:
 
 void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int) + sizeof(int32_t))) {
         return;
     }
 
-    int result = *(reinterpret_cast<const int*>(data));
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int result = fdp.ConsumeIntegral<int>();
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
     std::string str(reinterpret_cast<const char*>(data), size);
     std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
 

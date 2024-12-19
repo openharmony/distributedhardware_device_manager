@@ -19,15 +19,18 @@
 
 #include "deviceprofile_connector.h"
 #include "device_profile_connector_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t NUMBER = 7;
 void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(DmAccesser)) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(DmAccesser)) || (size < (sizeof(int32_t) * NUMBER))) {
         return;
     }
 
+    FuzzedDataProvider fdp(data, size);
     std::string trustDeviceId(reinterpret_cast<const char*>(data), size);
     std::string requestDeviceId(reinterpret_cast<const char*>(data), size);
     std::string pkgName(reinterpret_cast<const char*>(data), size);
@@ -38,22 +41,22 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     std::string deviceIdHash(reinterpret_cast<const char*>(data), size);
     std::string trustBundleName(reinterpret_cast<const char*>(data), size);
     DmAclInfo aclInfo;
-    aclInfo.bindType = *(reinterpret_cast<const int32_t*>(data));
-    aclInfo.bindLevel = *(reinterpret_cast<const int32_t*>(data));
+    aclInfo.bindType = fdp.ConsumeIntegral<int32_t>();
+    aclInfo.bindLevel = fdp.ConsumeIntegral<int32_t>();
     aclInfo.trustDeviceId = trustDeviceId;
     aclInfo.deviceIdHash = deviceIdHash;
-    aclInfo.authenticationType = *(reinterpret_cast<const int32_t*>(data));
+    aclInfo.authenticationType = fdp.ConsumeIntegral<int32_t>();
     DmAccesser dmAccesser;
     dmAccesser.requestDeviceId = requestDeviceId;
-    dmAccesser.requestUserId = *(reinterpret_cast<const int32_t*>(data));
+    dmAccesser.requestUserId = fdp.ConsumeIntegral<int32_t>();
     dmAccesser.requestAccountId = requestAccountId;
     DmAccessee dmAccessee;
     dmAccessee.trustDeviceId = trustDeviceId;
-    dmAccessee.trustUserId = *(reinterpret_cast<const int32_t*>(data));
+    dmAccessee.trustUserId = fdp.ConsumeIntegral<int32_t>();
     dmAccessee.trustBundleName = trustBundleName;
-    int32_t userId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
     std::string accountId(reinterpret_cast<const char*>(data), size);
-    int32_t bindLevel = *(reinterpret_cast<const int32_t*>(data));
+    int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
     DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(pkgName, requestDeviceId, trustUdid);
     DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, userId);

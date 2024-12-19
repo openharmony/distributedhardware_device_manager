@@ -17,6 +17,7 @@
 #include <cstdlib>
 #include <random>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
@@ -55,15 +56,16 @@ public:
 
 void OnFinishFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int32_t))) {
         return;
     }
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
-    int64_t requestId = *(reinterpret_cast<const int64_t*>(data));
-    int operationCode = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int64_t requestId = fdp.ConsumeIntegral<int64_t>();
+    int operationCode = fdp.ConsumeIntegral<int32_t>();
     std::string str(reinterpret_cast<const char*>(data), size);
     const char *returnData = str.data();
     hichainConnector->onFinish(requestId, operationCode, returnData);
