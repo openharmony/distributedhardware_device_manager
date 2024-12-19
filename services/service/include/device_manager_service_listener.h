@@ -112,6 +112,7 @@ private:
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessAppOffline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
+    void RemoveNotExistProcess();
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;
