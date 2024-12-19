@@ -78,7 +78,6 @@ const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
-const int32_t CLOSE_SESSION_DELAY_TIME_MAX = 10;
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -246,6 +245,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
 int32_t DmAuthManager::GetCloseSessionDelayTime(std::string &delayTimeStr)
 {
     int32_t delayTime = 0;
+    const int32_t CLOSE_SESSION_DELAY_TIME_MAX = 10;
     if (IsNumberString(delayTimeStr)) {
         delayTime = std::atoi(delayTimeStr.c_str());
         if (delayTime < 0 || delayTime > CLOSE_SESSION_DELAY_TIME_MAX) {
@@ -1301,9 +1301,9 @@ void DmAuthManager::SrcAuthenticateFinish()
         CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
     };
-    const int64_t microsecond_to_second = 1000000L;
+    const int64_t MICROSECOND_TO_SECOND = 1000000L;
     int32_t delayTime = authRequestContext_->closeSessionDelayTime;
-    ffrt::submit(taskFunc, ffrt::task_attr().delay(delayTime * microsecond_to_second));
+    ffrt::submit(taskFunc, ffrt::task_attr().delay(delayTime * MICROSECOND_TO_SECOND));
 
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
