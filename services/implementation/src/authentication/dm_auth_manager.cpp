@@ -1310,13 +1310,6 @@ void DmAuthManager::SrcAuthenticateFinish()
     authTimes_ = 0;
 }
 
-void DmAuthManager::HandleSessionClosed(std::string name)
-{
-    CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
-    softbusConnector_->GetSoftbusSession()->CloseAuthSession(closeSessionId_);
-}
-
 void DmAuthManager::AuthenticateFinish()
 {
     authType_ = AUTH_TYPE_UNKNOW;
