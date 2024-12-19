@@ -62,7 +62,7 @@ if (defined(ohos_lite)) {
   }
   group("device_manager_fwk") {
     deps = [
-      "interfaces/cj:cj_distributed_device_manager_ffi",
+      "interfaces/cj:cj_distributed_device_manager_ffi_group",
       "interfaces/inner_kits/native_cpp:devicemanagersdk",
       "interfaces/kits:devicemanager_native_js",
     ]

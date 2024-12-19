@@ -31,6 +31,7 @@
 #include "idevice_manager_service_impl.h"
 #include "hichain_listener.h"
 #include "i_dm_service_impl_ext.h"
+#include "i_dm_service_impl_ext_resident.h"
 #include "dm_single_instance.h"
 #include "dm_timer.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -213,8 +214,10 @@ private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
     bool IsDMImplSoLoaded();
+    bool IsDMServiceAdapterResidentLoad();
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapter();
+    void UnloadDMServiceAdapterResident();
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
         int32_t bindLevel);
     void SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId);
@@ -283,8 +286,11 @@ private:
 private:
     bool isImplsoLoaded_ = false;
     bool isAdapterSoLoaded_ = false;
+    bool isAdapterResidentSoLoaded_ = false;
+    void *residentSoHandle_ = nullptr;
     std::mutex isImplLoadLock_;
     std::mutex isAdapterLoadLock_;
+    std::mutex isAdapterResidentLoadLock_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;
@@ -292,6 +298,7 @@ private:
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
     std::shared_ptr<IDMServiceImplExt> dmServiceImplExt_;
+    std::shared_ptr<IDMServiceImplExtResident> dmServiceImplExtResident_;
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

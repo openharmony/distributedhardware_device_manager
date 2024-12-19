@@ -266,14 +266,17 @@ HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.L
 {
     int32_t userId = 100;
     std::string commonEventType = "usual.event.USER_SWITCHED";
+    std::map<std::string, int32_t> curUserDeviceMap;
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_))
+        .WillOnce(Return(curUserDeviceMap)).WillOnce(Return(curUserDeviceMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
     commonEventType = "common.event.HWID_LOGIN";
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
-    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
+    commonEventType = "usual.event.USER_SWITCHED";
     int32_t currentUserId = -1;
     int32_t beforeUserId = 0;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, currentUserId, beforeUserId);
-    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
+    commonEventType = "common.event.HWID_LOGOUT";
     currentUserId = 1;
     beforeUserId = 1;
     DMAccountInfo dmAccountInfo;
@@ -632,6 +635,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     preUserDeviceMap["accountName"] = 1;
     EXPECT_CALL(*deviceManagerServiceImplMock_,
         GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
 
@@ -666,6 +670,8 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level0
     if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
         DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     }
+    
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().ProcessSyncUserIds(foregroundUserIds, backgroundUserIds, remoteUdid);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
@@ -709,8 +715,14 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     remoteUserIdInfos.push_back(userIdInfo);
     UserIdInfo userIdInfo1(true, 102);
     remoteUserIdInfos.push_back(userIdInfo1);
+    UserIdInfo userIdInfo2(false, 103);
+    remoteUserIdInfos.push_back(userIdInfo2);
+    UserIdInfo userIdInfo3(false, 104);
+    remoteUserIdInfos.push_back(userIdInfo3);
     std::string remoteUdid = "remoteDeviceId";
     isNeedResponse = true;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(Return(ERR_DM_FAILED)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserIdsBroadCast(remoteUserIdInfos, remoteUdid, isNeedResponse);
 
@@ -718,7 +730,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     foregroundUserVec.push_back(1);
     foregroundUserVec.push_back(102);
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK))).WillOnce(Return(DM_OK));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleUserIdsBroadCast(remoteUserIdInfos, remoteUdid, isNeedResponse);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
@@ -775,6 +787,107 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ex
 HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_205, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
+    std::string extra = "extra";
+    std::vector<DmDeviceInfo> deviceList;
+    int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    pkgName = "jjdjk_pkgName";
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    std::vector<DmDeviceInfo> onlineDeviceList;
+    DmDeviceInfo dmDeviceInfo;
+    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+    dmDeviceInfo.networkType = 1;
+    onlineDeviceList.push_back(dmDeviceInfo);
+    std::unordered_map<std::string, DmAuthForm> udidMap;
+    udidMap.insert(std::make_pair("udid01", DmAuthForm::IDENTICAL_ACCOUNT));
+    udidMap.insert(std::make_pair("udid02", DmAuthForm::ACROSS_ACCOUNT));
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
+        .WillOnce(DoAll(SetArgReferee<0>(onlineDeviceList), Return(DM_OK)));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetAppTrustDeviceIdList(_)).WillOnce(Return(udidMap));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
+    ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, DM_OK);
+
+    pkgName = "ohos.deviceprofile";
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
+        .WillOnce(DoAll(SetArgReferee<0>(onlineDeviceList), Return(DM_OK)));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetAppTrustDeviceIdList(_)).WillOnce(Return(udidMap));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("udid02"), Return(DM_OK)));
+    ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, DM_OK);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceTest, DmHiDumper_201, testing::ext::TestSize.Level0)
+{
+    std::vector<std::string> args;
+    args.push_back(std::string("-getTrustlist"));
+    std::string result;
+    std::vector<DmDeviceInfo> deviceList;
+    DmDeviceInfo dmDeviceInfo;
+    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+    dmDeviceInfo.deviceTypeId = 0;
+    deviceList.push_back(dmDeviceInfo);
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
+        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
+    int ret = DeviceManagerService::GetInstance().DmHiDumper(args, result);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
+        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(ERR_DM_FAILED)));
+    ret = DeviceManagerService::GetInstance().DmHiDumper(args, result);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    std::vector<uint32_t> foregroundUserIds;
+    foregroundUserIds.push_back(1);
+    std::vector<uint32_t> backgroundUserIds;
+    backgroundUserIds.push_back(2);
+    std::string remoteUdid = "remoteUdid";
+    if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
+        DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    }
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
+    DeviceManagerService::GetInstance().ProcessSyncUserIds(foregroundUserIds, backgroundUserIds, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level0)
+{
+    SetSetDnPolicyPermission();
+    std::string packName = "com.ohos.test";
+    std::map<std::string, std::string> policy;
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100a";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
+    std::string processName = "collaboration_service";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
+    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
+    policy[PARAM_KEY_POLICY_TIME_OUT] = "10a";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
+    ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_206, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
     std::vector<DmDeviceInfo> deviceList;
     int ret = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, deviceList);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
@@ -818,55 +931,21 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_205, testing::ext::TestS
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, DmHiDumper_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ParseCheckSumMsg_201, testing::ext::TestSize.Level0)
 {
-    std::vector<std::string> args;
-    args.push_back(std::string("-getTrustlist"));
-    std::string result;
-    std::vector<DmDeviceInfo> deviceList;
-    DmDeviceInfo dmDeviceInfo;
-    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
-    dmDeviceInfo.deviceTypeId = 0;
-    deviceList.push_back(dmDeviceInfo);
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
-    int ret = DeviceManagerService::GetInstance().DmHiDumper(args, result);
+    std::string msg;
+    std::string networkId;
+    uint32_t discoveryType = 0;
+    bool isChange = false;
+    nlohmann::json msgJsonObj;
+    msgJsonObj["networkId"] = "networkId001";
+    msgJsonObj["discoverType"] = 1;
+    msgJsonObj["ischange"] = false;
+    msg = msgJsonObj.dump();
+    int ret = DeviceManagerService::GetInstance().ParseCheckSumMsg(msg, networkId, discoveryType, isChange);
     EXPECT_EQ(ret, DM_OK);
-
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(ERR_DM_FAILED)));
-    ret = DeviceManagerService::GetInstance().DmHiDumper(args, result);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    std::vector<uint32_t> foregroundUserIds;
-    foregroundUserIds.push_back(1);
-    std::vector<uint32_t> backgroundUserIds;
-    backgroundUserIds.push_back(2);
-    std::string remoteUdid = "remoteUdid";
-    if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
-        DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    }
-    DeviceManagerService::GetInstance().ProcessSyncUserIds(foregroundUserIds, backgroundUserIds, remoteUdid);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level0)
-{
-    SetSetDnPolicyPermission();
-    std::string packName = "com.ohos.test";
-    std::map<std::string, std::string> policy;
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100a";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
-    policy[PARAM_KEY_POLICY_TIME_OUT] = "10a";
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -356,12 +356,22 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_005, testing::ext::TestSize.L
     int32_t remoteUserId = 1;
     std::string remoteAccountHash = "45552878";
     std::string remoteUdid = "ajdakndkwj98877";
-    EXPECT_CALL(*deviceProfileConnectorMock_,
-        HandleAccountLogoutEvent(_, _, _, _)).WillOnce(Return(DM_INVALIED_BINDTYPE));
+    std::multimap<std::string, int32_t> devIdAndUserMap;
+    devIdAndUserMap.insert(std::make_pair("devId01", 101));
+    devIdAndUserMap.insert(std::make_pair("devId02", 102));
+    devIdAndUserMap.insert(std::make_pair("devId03", 103));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetDevIdAndUserIdByActHash(_, _, _, _)).WillOnce(Return(devIdAndUserMap));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _))
+        .Times(::testing::AtLeast(3)).WillOnce(Return(true));
     deviceManagerServiceImpl_->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash, remoteUdid);
-    EXPECT_CALL(*deviceProfileConnectorMock_,
-        HandleAccountLogoutEvent(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
-    deviceManagerServiceImpl_->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash, remoteUdid);
+
+    std::string localUdid = "localUdid";
+    int32_t localUserId = 123;
+    std::string peerUdid = "peerUdid";
+    int32_t peerUserId = 456;
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _)).WillOnce(Return(true));
+    deviceManagerServiceImpl_->HandleIdentAccountLogout(localUdid, localUserId, peerUdid, peerUserId);
+
     EXPECT_CALL(*dmDeviceStateManagerMock_, ProcNotifyEvent(_, _)).WillOnce(Return(DM_OK));
     int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
     EXPECT_EQ(ret, DM_OK);
@@ -1369,6 +1379,8 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_104, testing::ext::TestSize.
     int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
     int32_t userId = 100;
     std::string accountId = "60008";
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _))
+        .Times(::testing::AtLeast(1)).WillOnce(Return(true));
     deviceManagerServiceImpl_->HandleIdentAccountLogout(udid, userId, udid, userId);
     deviceManagerServiceImpl_->HandleUserRemoved(userId);
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
@@ -1472,7 +1484,7 @@ HWTEST_F(DeviceManagerServiceImplTest, StopAuthenticateDevice_102, testing::ext:
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     int ret = deviceManagerServiceImpl_->StopAuthenticateDevice(pkgName);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, CheckIsSameAccount_001, testing::ext::TestSize.Level0)
@@ -1739,6 +1751,31 @@ HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_001, testing::ext::T
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid);
+
+    int32_t userId = 123456;
+    remoteUdid = "remoteDeviceId";
+    if (deviceManagerServiceImpl_->hiChainConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    deviceManagerServiceImpl_->HandleRemoteUserRemoved(userId, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndBindLevel_001, testing::ext::TestSize.Level0)
+{
+    int32_t userId = 123456;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    auto ret = deviceManagerServiceImpl_->GetDeviceIdAndBindLevel(userId);
+    EXPECT_TRUE(ret.empty());
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_002, testing::ext::TestSize.Level0)
+{
+    int32_t localUserId = 123456;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    auto ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(localUserId);
+    EXPECT_TRUE(ret.empty());
 }
 } // namespace
 } // namespace DistributedHardware

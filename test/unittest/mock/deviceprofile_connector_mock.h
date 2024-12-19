@@ -39,6 +39,10 @@ public:
         const std::string &peerUdid, int32_t peerUserId) = 0;
     virtual OHOS::DistributedHardware::ProcessInfo HandleAppUnBindEvent(int32_t remoteUserId,
         const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid) = 0;
+    virtual std::multimap<std::string, int32_t> GetDevIdAndUserIdByActHash(const std::string &localUdid,
+        const std::string &peerUdid, int32_t peerUserId, const std::string &peerAccountHash) = 0;
+    virtual std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
+        std::string localDeviceId, std::string targetDeviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -54,6 +58,10 @@ public:
     MOCK_METHOD(bool, DeleteAclForAccountLogOut, (const std::string &, int32_t, const std::string &, int32_t));
     MOCK_METHOD((OHOS::DistributedHardware::ProcessInfo), HandleAppUnBindEvent, (int32_t, const std::string &,
         int32_t, const std::string &));
+    MOCK_METHOD((std::multimap<std::string, int32_t>), GetDevIdAndUserIdByActHash, (const std::string &,
+        const std::string &, int32_t, const std::string &));
+    MOCK_METHOD((std::vector<int32_t>), SyncAclByBindType, (std::string, std::vector<int32_t>, std::string,
+        std::string));
 };
 }
 }

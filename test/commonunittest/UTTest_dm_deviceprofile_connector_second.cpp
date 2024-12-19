@@ -18,6 +18,7 @@
 #include "dm_constants.h"
 #include "deviceprofile_connector.h"
 #include <iterator>
+#include "dp_inited_callback_stub.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -42,6 +43,20 @@ void DeviceProfileConnectorSecondTest::TearDownTestCase()
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     distributedDeviceProfileClientMock_ = nullptr;
 }
+
+class DpInitedCallback : public DistributedDeviceProfile::DpInitedCallbackStub {
+public:
+    DpInitedCallback()
+    {
+    }
+    ~DpInitedCallback()
+    {
+    }
+    int32_t OnDpInited()
+    {
+        return 0;
+    }
+};
 
 void AddAccessControlProfile(std::vector<DistributedDeviceProfile::AccessControlProfile>& accessControlProfiles)
 {
@@ -402,6 +417,51 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUserId_002, testing::ex
 {
     auto result = connector.GetDeviceIdAndUserId("", 0);
     EXPECT_EQ(result.size(), 0);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, SubscribeDeviceProfileInited_201, testing::ext::TestSize.Level0)
+{
+    OHOS::sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback = nullptr;
+    int32_t ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    dpInitedCallback = sptr<DistributedDeviceProfile::IDpInitedCallback>(new DpInitedCallback());
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, SubscribeDeviceProfileInited(_, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, SubscribeDeviceProfileInited(_, _))
+        .WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, UnSubscribeDeviceProfileInited_201, testing::ext::TestSize.Level0)
+{
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UnSubscribeDeviceProfileInited(_))
+        .WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = DeviceProfileConnector::GetInstance().UnSubscribeDeviceProfileInited();
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UnSubscribeDeviceProfileInited(_))
+        .WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().UnSubscribeDeviceProfileInited();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, PutAllTrustedDevices_201, testing::ext::TestSize.Level0)
+{
+    std::vector<DistributedDeviceProfile::TrustedDeviceInfo> deviceInfos;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutAllTrustedDevices(_))
+        .WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutAllTrustedDevices(_))
+        .WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
