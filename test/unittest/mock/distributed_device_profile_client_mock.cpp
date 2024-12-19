@@ -39,5 +39,22 @@ int32_t DistributedDeviceProfileClient::GetAllAccessControlProfile(
     return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->GetAllAccessControlProfile(
         accessControlProfiles);
 }
+
+int32_t DistributedDeviceProfileClient::SubscribeDeviceProfileInited(int32_t saId, sptr<IDpInitedCallback> initedCb)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->SubscribeDeviceProfileInited(saId,
+        initedCb);
+}
+
+int32_t DistributedDeviceProfileClient::UnSubscribeDeviceProfileInited(int32_t saId)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->UnSubscribeDeviceProfileInited(saId);
+}
+
+int32_t DistributedDeviceProfileClient::PutAllTrustedDevices(
+    const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->PutAllTrustedDevices(deviceInfos);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

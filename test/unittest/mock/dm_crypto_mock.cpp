@@ -34,5 +34,10 @@ int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
 {
     return DmCrypto::dmCrypto->GetUdidHash(udid, udidHash);
 }
+
+std::string Crypto::GetGroupIdHash(const std::string &groupId)
+{
+    return DmCrypto::dmCrypto->GetGroupIdHash(groupId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -29,6 +29,9 @@ public:
     virtual bool GetGroupInfo(const int32_t userId, const std::string &queryParams,
     std::vector<GroupInfo> &groupList) = 0;
     virtual bool IsDevicesInP2PGroup(const std::string &hostDevice, const std::string &peerDevice) = 0;
+    virtual int32_t GetRelatedGroups(const std::string &deviceId, std::vector<GroupInfo> &groupList) = 0;
+    virtual int32_t GetRelatedGroups(int32_t userId, const std::string &deviceId,
+        std::vector<GroupInfo> &groupList) = 0;
 public:
     static inline std::shared_ptr<DmHiChainConnector> dmHiChainConnector = nullptr;
 };
@@ -37,6 +40,8 @@ class HiChainConnectorMock : public DmHiChainConnector {
 public:
     MOCK_METHOD(bool, GetGroupInfo, (const int32_t, const std::string &, std::vector<GroupInfo> &));
     MOCK_METHOD(bool, IsDevicesInP2PGroup, (const std::string &, const std::string &));
+    MOCK_METHOD(int32_t, GetRelatedGroups, (const std::string &, std::vector<GroupInfo> &));
+    MOCK_METHOD(int32_t, GetRelatedGroups, (int32_t, const std::string &, std::vector<GroupInfo> &));
 };
 }
 }

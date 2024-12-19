@@ -26,6 +26,7 @@ group("unittest") {
     ":UTTest_device_manager_notify",
     ":UTTest_device_manager_service",
     ":UTTest_device_manager_service_impl",
+    ":UTTest_device_manager_service_impl_first",
     ":UTTest_device_manager_service_listener",
     ":UTTest_device_manager_service_three",
     ":UTTest_discovery_filter",
@@ -337,6 +338,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "mock/dm_crypto_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
     "mock/kv_adapter_manager_mock.cpp",
+    "mock/multiple_user_connector_mock.cpp",
     "mock/permission_manager_mock.cpp",
     "mock/softbus_listener_mock.cpp",
   ]
@@ -1034,6 +1036,33 @@ ohos_unittest("UTTest_device_manager_service_impl") {
 
 ## UnitTest UTTest_device_manager_service_impl }}}
 
+## UnitTest UTTest_device_manager_service_impl_first {{{
+ohos_unittest("UTTest_device_manager_service_impl_first") {
+  module_out_path = module_out_path
+
+  sources = [
+    "${servicesimpl_path}/src/device_manager_service_impl.cpp",
+    "UTTest_device_manager_service_impl_first.cpp",
+    "mock/deviceprofile_connector_mock.cpp",
+    "mock/multiple_user_connector_mock.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
+  ]
+}
+
+## UnitTest UTTest_device_manager_service_impl_first }}}
+
 ## UnitTest UTTest_device_manager_service_listener {{{
 ohos_unittest("UTTest_device_manager_service_listener") {
   module_out_path = module_out_path
@@ -1138,6 +1167,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_first.cpp",
     "mock/app_manager_mock.cpp",
+    "mock/dm_crypto_mock.cpp",
     "mock/softbus_session_mock.cpp",
   ]
 
@@ -1173,6 +1203,7 @@ ohos_unittest("UTTest_dm_auth_manager_second") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_second.cpp",
+    "mock/deviceprofile_connector_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
     "mock/hichain_connector_mock.cpp",
     "mock/multiple_user_connector_mock.cpp",

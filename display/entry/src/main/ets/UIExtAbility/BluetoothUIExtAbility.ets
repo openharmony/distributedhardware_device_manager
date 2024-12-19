@@ -28,6 +28,7 @@ export default class BluetoothUIExtAbility extends UIExtensionAbility {
         session.setWindowBackgroundColor('#00000000');
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(true);
+        session.setWindowPrivacyMode(true);
         AppStorage.setOrCreate('bluetoothSession', session);
     }
 

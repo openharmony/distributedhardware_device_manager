@@ -37,6 +37,7 @@ export default class InputUIExtAbility extends UIExtensionAbility {
         session.setWindowBackgroundColor('#00000000');
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(true);
+        session.setWindowPrivacyMode(true);
         AppStorage.setOrCreate('pinSession', session);
         console.log(TAG + "AppStorage.get<UIExtensionContentSession>('pinSession')" + AppStorage.get<UIExtensionContentSession>('pinSession'));
     }

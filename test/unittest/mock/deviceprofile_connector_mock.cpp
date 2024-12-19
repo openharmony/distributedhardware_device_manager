@@ -63,5 +63,19 @@ OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEv
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid,
         tokenId, localUdid);
 }
+
+std::multimap<std::string, int32_t> DeviceProfileConnector::GetDevIdAndUserIdByActHash(const std::string &localUdid,
+    const std::string &peerUdid, int32_t peerUserId, const std::string &peerAccountHash)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetDevIdAndUserIdByActHash(localUdid, peerUdid,
+        peerUserId, peerAccountHash);
+}
+
+std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
+    std::string localDeviceId, std::string targetDeviceId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->SyncAclByBindType(pkgName, bindTypeVec,
+        localDeviceId, targetDeviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

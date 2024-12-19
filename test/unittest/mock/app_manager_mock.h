@@ -28,6 +28,9 @@ public:
 public:
     virtual std::string GetAppId() = 0;
     virtual bool IsSystemSA() = 0;
+    virtual int32_t GetNativeTokenIdByName(std::string &processName, int64_t &tokenId) = 0;
+    virtual int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex,
+        int64_t &tokenId) = 0;
 public:
     static inline std::shared_ptr<DmAppManager> dmAppManager = nullptr;
 };
@@ -36,6 +39,8 @@ class AppManagerMock : public DmAppManager {
 public:
     MOCK_METHOD(std::string, GetAppId, ());
     MOCK_METHOD(bool, IsSystemSA, ());
+    MOCK_METHOD(int32_t, GetNativeTokenIdByName, (std::string &, int64_t &));
+    MOCK_METHOD(int32_t, GetHapTokenIdByName, (int32_t, std::string &, int32_t, int64_t &));
 };
 }
 }
