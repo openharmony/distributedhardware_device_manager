@@ -11,4 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-certificate_profile_path = "//vendor/tools/hap_sign_conf/distributedhardware/device_manager/DeviceManager_UI.p7b" 
+certificate_profile_path = "//vendor/tools/hap_sign_conf/distributedhardware/device_manager/DeviceManager_UI.p7b"
