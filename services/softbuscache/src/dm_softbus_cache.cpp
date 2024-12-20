@@ -391,5 +391,20 @@ int32_t SoftbusCache::GetNetworkIdFromCache(const std::string &udid, std::string
     }
     return ERR_DM_FAILED;
 }
+
+bool SoftbusCache::CheckIsOnline(const std::string &deviceId)
+{
+    LOGI("deviceId %{public}s.", GetAnonyString(deviceId).c_str());
+    {
+        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+        for (const auto &item : deviceInfo_) {
+            if (std::string(item.second.second.deviceId) == deviceId) {
+                LOGI("CheckIsOnline is true.");
+                return true;
+            }
+        }
+    }
+    return false;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
