@@ -81,7 +81,7 @@ const int32_t STRTOLL_BASE_10 = 10;
 constexpr int32_t PKGNAME_WHITE_LIST_NUM = 1;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 constexpr const static char g_pkgNameWhiteList[PKGNAME_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
-
+    "ohos.samples.etsdevicemanager",
 };
 
 // clone task timeout map
