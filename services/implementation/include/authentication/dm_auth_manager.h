@@ -463,6 +463,7 @@ private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra);
+    bool CheckPkgNameInWhiteList(const std::string &pkgName);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
     std::string GetAccountGroupIdHash();
@@ -530,7 +531,7 @@ private:
     void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
     void DeleteOffLineTimer(int32_t sessionId);
     bool IsAllowDeviceBind();
-    int32_t GetBindLevel(int32_t bindLevel);
+    int32_t GetBindLevel(int32_t bindLevel, const std::string &pkgName);
     std::string GetBundleName(nlohmann::json &jsonObject);
     int32_t GetBinderInfo();
     void SetProcessInfo();

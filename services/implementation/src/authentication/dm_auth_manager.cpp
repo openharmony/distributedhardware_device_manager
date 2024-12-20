@@ -78,6 +78,11 @@ const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
+constexpr int32_t PKGNAME_WHITE_LIST_NUM = 1;
+constexpr int32_t PKG_NAME_SIZE_MAX = 256;
+constexpr const static char g_pkgNameWhiteList[PKGNAME_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+
+};
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -188,6 +193,25 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra)
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
+}
+
+bool DmAuthManager::CheckPkgNameInWhiteList(const std::string &pkgName)
+{
+    LOGI("DmAuthManager::CheckPkgNameInWhiteList start");
+    if (pkgName.empty()) {
+        LOGE("pkgName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < PKGNAME_WHITE_LIST_NUM; ++index) {
+        std::string whitePkgName(g_pkgNameWhiteList[index]);
+        if (pkgName == whitePkgName) {
+            LOGI("pkgName = %{public}s in whiteList.", pkgName.c_str());
+            return true;
+        }
+    }
+    LOGI("CheckPkgNameInWhiteList: %{public}s invalid.", pkgName.c_str());
+    return false;
 }
 
 void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
@@ -2582,7 +2606,7 @@ bool DmAuthManager::IsAllowDeviceBind()
     return false;
 }
 
-int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
+int32_t DmAuthManager::GetBindLevel(int32_t bindLevel, const std::string &pkgName)
 {
     if (IsAllowDeviceBind()) {
         if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || static_cast<uint32_t>(bindLevel) > APP ||
@@ -2590,6 +2614,9 @@ int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
             return DEVICE;
         }
         return bindLevel;
+    }
+    if (CheckPkgNameInWhiteList(pkgName)) {
+        return DEVICE;
     }
     if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || (static_cast<uint32_t>(bindLevel) != APP &&
         static_cast<uint32_t>(bindLevel) != SERVICE)) {
