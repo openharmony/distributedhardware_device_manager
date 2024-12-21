@@ -80,7 +80,7 @@ const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
 constexpr int32_t PROCESS_NAME_WHITE_LIST_NUM = 1;
 constexpr int32_t PROCESS_NAME_SIZE_MAX = 256;
-constexpr const static char g_pkgNameWhiteList[PROCESS_NAME_WHITE_LIST_NUM][PROCESS_NAME_SIZE_MAX] = {
+constexpr const static char PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM][PROCESS_NAME_SIZE_MAX] = {
     "ohos.samples.etsdevicemanager",
 };
 
@@ -204,8 +204,8 @@ bool DmAuthManager::CheckProcessNameInWhiteList(const std::string &processName)
     }
     uint16_t index = 0;
     for (; index < PROCESS_NAME_WHITE_LIST_NUM; ++index) {
-        std::string whitePkgName(g_pkgNameWhiteList[index]);
-        if (pkgName == whitePkgName) {
+        std::string whitePkgName(PROCESS_NAME_WHITE_LIST[index]);
+        if (processName == whitePkgName) {
             LOGI("processName = %{public}s in whiteList.", processName.c_str());
             return true;
         }
@@ -255,7 +255,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
             authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
         }
-        string processName = "";
+        std::string processName = "";
         if (IsString(jsonObject, PROCESS_NAME)) {
             processName = jsonObject[PROCESS_NAME].get<std::string>();
         }

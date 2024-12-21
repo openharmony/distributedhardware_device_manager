@@ -463,7 +463,7 @@ private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra);
-    bool CheckPkgNameInWhiteList(const std::string &pkgName);
+    bool CheckProcessNameInWhiteList(const std::string &processName);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
     std::string GetAccountGroupIdHash();
