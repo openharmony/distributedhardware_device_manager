@@ -232,8 +232,8 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
             authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
         }
         authRequestContext_->closeSessionDelayTime = 0;
-        if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_TIME)) {
-            std::string delayTimeStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_TIME].get<std::string>();
+        if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
+            std::string delayTimeStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].get<std::string>();
             authRequestContext_->closeSessionDelayTime = GetCloseSessionDelayTime(delayTimeStr);
         }
         authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
@@ -244,13 +244,15 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
 
 int32_t DmAuthManager::GetCloseSessionDelayTime(std::string &delayTimeStr)
 {
-    int32_t delayTime = 0;
-    const int32_t CLOSE_SESSION_DELAY_TIME_MAX = 10;
-    if (IsNumberString(delayTimeStr)) {
-        delayTime = std::atoi(delayTimeStr.c_str());
-        if (delayTime < 0 || delayTime > CLOSE_SESSION_DELAY_TIME_MAX) {
-            delayTime = 0;
-        }
+    if (!IsNumberString(delayTimeStr)) {
+        LOGE("Invalid parameter, param is not number.");
+        return 0;
+    }
+    const int32_t CLOSE_SESSION_DELAY_SECONDS_MAX = 10;
+    int32_t delayTime = std::atoi(delayTimeStr.c_str());
+    if (delayTime < 0 || delayTime > CLOSE_SESSION_DELAY_SECONDS_MAX) {
+        LOGE("param is invaild");
+        return 0;
     }
     return delayTime;
 }
@@ -1301,9 +1303,9 @@ void DmAuthManager::SrcAuthenticateFinish()
         CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
     };
-    const int64_t MICROSECOND_TO_SECOND = 1000000L;
+    const int64_t MICROSECOND_PER_SECOND = 1000000L;
     int32_t delayTime = authRequestContext_->closeSessionDelayTime;
-    ffrt::submit(taskFunc, ffrt::task_attr().delay(delayTime * MICROSECOND_TO_SECOND));
+    ffrt::submit(taskFunc, ffrt::task_attr().delay(delayTime * MICROSECOND_PER_SECOND));
 
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
