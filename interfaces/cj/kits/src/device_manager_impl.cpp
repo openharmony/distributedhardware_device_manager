@@ -205,7 +205,7 @@ int32_t DeviceManagerFfiImpl::GetAvailableDeviceList(FfiDeviceBasicInfoArray &de
         LOGE("Malloc failed");
         return DM_ERR_FAILED;
     }
-    deviceInfoList.size = static_cast<int32_t>(result.size());
+    deviceInfoList.size = result.size();
     for (decltype(result.size()) i = 0; i < result.size(); ++i) {
         ret = Transform2FfiDeviceBasicInfo(result[i], deviceInfoList.head[i]);
         if (ret != 0) {
@@ -538,8 +538,6 @@ void DeviceManagerFfiImpl::OnDeviceStatusChange(int32_t action, const DmDeviceBa
         int32_t ret = Transform2FfiDeviceBasicInfo(deviceBasicInfo, *ptr);
         if (ret != 0) {
             LOGE("OnDeviceStatusChange failed to transform DmDeviceBasicInfo.");
-            FreeDeviceInfo(*ptr);
-            free(ptr);
             return;
         }
         deviceStateChangedCallback(action, ptr);
@@ -574,8 +572,6 @@ void DeviceManagerFfiImpl::OnDeviceFound(uint16_t subscribeId, const DmDeviceBas
         int32_t ret = Transform2FfiDeviceBasicInfo(deviceBasicInfo, *ptr);
         if (ret != 0) {
             LOGE("OnDeviceStatusChange failed to transform DmDeviceBasicInfo.");
-            FreeDeviceInfo(*ptr);
-            free(ptr);
             return;
         }
         discoverSuccessCallback(ptr);
