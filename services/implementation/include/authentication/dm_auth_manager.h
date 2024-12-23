@@ -544,7 +544,7 @@ private:
     int32_t GetBinderInfo();
     void SetProcessInfo();
     int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
-	void ConverToFinish();
+    void ConverToFinish();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
