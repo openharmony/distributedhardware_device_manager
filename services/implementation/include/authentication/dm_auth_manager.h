@@ -126,6 +126,7 @@ typedef struct DmAuthRequestContext {
     int32_t remoteUserId;
     std::string addr;
     std::string hostPkgLabel;
+    int32_t closeSessionDelaySeconds = 0;
 } DmAuthRequestContext;
 
 typedef struct DmAuthResponseContext {
@@ -534,6 +535,7 @@ private:
     std::string GetBundleName(nlohmann::json &jsonObject);
     int32_t GetBinderInfo();
     void SetProcessInfo();
+    int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
