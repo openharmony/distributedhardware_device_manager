@@ -41,6 +41,7 @@ AuthMessageProcessor::~AuthMessageProcessor()
     authMgr_.reset();
     if (cryptoMgr_ != nullptr) {
         cryptoMgr_->ClearSessionKey();
+        cryptoMgr_ = nullptr;
     }
 }
 
