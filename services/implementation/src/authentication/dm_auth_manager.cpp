@@ -81,7 +81,7 @@ const int32_t STRTOLL_BASE_10 = 10;
 constexpr int32_t PROCESS_NAME_WHITE_LIST_NUM = 1;
 constexpr int32_t PROCESS_NAME_SIZE_MAX = 256;
 constexpr const static char PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM][PROCESS_NAME_SIZE_MAX] = {
-    "ohos.samples.etsdevicemanager",
+    "com.example.myapplication",
 };
 
 // clone task timeout map
