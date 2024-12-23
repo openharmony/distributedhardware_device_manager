@@ -251,7 +251,7 @@ int32_t DmAuthManager::GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
     const int32_t CLOSE_SESSION_DELAY_SECONDS_MAX = 10;
     int32_t delaySeconds = std::atoi(delaySecondsStr.c_str());
     if (delaySeconds < 0 || delaySeconds > CLOSE_SESSION_DELAY_SECONDS_MAX) {
-        LOGE("param is invaild");
+        LOGE("Invalid parameter, param out of range.");
         return 0;
     }
     return delaySeconds;
