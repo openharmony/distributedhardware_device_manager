@@ -2384,7 +2384,6 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("processName = %{public}s.", processName.c_str());
     std::vector<DmDeviceInfo> onlineDeviceList;
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
