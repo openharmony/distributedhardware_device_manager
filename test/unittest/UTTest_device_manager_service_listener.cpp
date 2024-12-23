@@ -89,7 +89,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_002, testing::ext
         .deviceTypeId = 1,
     };
     listener_->OnDeviceStateChange(processInfo, state, info);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -109,7 +109,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestS
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
     listener_->OnAuthResult(processInfo, deviceId, token, status, reason);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -129,7 +129,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_002, testing::ext::TestS
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
     listener_->OnAuthResult(processInfo, deviceId, token, status, reason);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -149,7 +149,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_003, testing::ext::TestS
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
     listener_->OnAuthResult(processInfo, deviceId, token, status, reason);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -172,7 +172,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::Test
     };
     uint16_t subscribeId = 1;
     listener_->OnDeviceFound(processInfo, subscribeId, info);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -191,7 +191,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoveryFailed_001, testing::ext::
     uint16_t subscribeId = 1;
     int32_t failedReason = 1;
     listener_->OnDiscoveryFailed(processInfo, subscribeId, failedReason);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -208,7 +208,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext:
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     listener_->OnDiscoverySuccess(processInfo, subscribeId);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -225,7 +225,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_001, testing::ext::Te
     int32_t publishId = 1;
     int32_t failedReason = 1;
     listener_->OnPublishResult(pkgName, publishId, failedReason);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -241,7 +241,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::Te
     int32_t publishId = 1;
     int32_t failedReason = 0;
     listener_->OnPublishResult(pkgName, publishId, failedReason);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -258,7 +258,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUiCall_001, testing::ext::TestSize.
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
     listener_->OnUiCall(processInfo, paramJson);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -275,7 +275,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialResult_001, testing::ext:
     int32_t action = 1;
     std::string resultInfo = "resultInfo";
     listener_->OnCredentialResult(processInfo, action, resultInfo);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -294,7 +294,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_001, testing::ext::TestS
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
     listener_->OnBindResult(processInfo, targetId, result, status, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -313,7 +313,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_002, testing::ext::TestS
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
     listener_->OnBindResult(processInfo, targetId, result, status, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -332,7 +332,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_003, testing::ext::TestS
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
     listener_->OnBindResult(processInfo, targetId, result, status, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -350,7 +350,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_001, testing::ext::Tes
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
     listener_->OnUnbindResult(processInfo, targetId, result, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -387,7 +387,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderCreate_001, testing::ext::
     processInfo.userId = 100;
     processInfo.pkgName = "com.ohos.helloworld";
     listener_->OnPinHolderCreate(processInfo, deviceId, pinType, payload);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -404,7 +404,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderDestroy_001, testing::ext:
     DmPinType pinType = static_cast<DmPinType>(1);
     std::string payload = "payload";
     listener_->OnPinHolderDestroy(processInfo, pinType, payload);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -420,7 +420,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCreateResult_001, testing::ext::Tes
     processInfo.pkgName = "com.ohos.helloworld";
     int32_t result = 0;
     listener_->OnCreateResult(processInfo, result);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -436,7 +436,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDestroyResult_001, testing::ext::Te
     processInfo.pkgName = "com.ohos.helloworld";
     int32_t result = 0;
     listener_->OnDestroyResult(processInfo, result);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
@@ -454,7 +454,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderEvent_001, testing::ext::T
     int32_t result = 0;
     std::string content = "content";
     listener_->OnPinHolderEvent(processInfo, event, result, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testing::ext::TestSize.Level0)
@@ -465,11 +465,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testin
     processInfo.pkgName = "com.ohos.helloworld";
     DmDeviceInfo devInfo;
     listener_->OnDeviceScreenStateChange(processInfo, devInfo);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 
     processInfo.pkgName = "ohos.distributedhardware.devicemanager";
     listener_->OnDeviceScreenStateChange(processInfo, devInfo);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::ext::TestSize.Level0)
@@ -482,7 +482,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::
     uint16_t deviceTypeId = 1;
     int32_t errcode = 0;
     listener_->OnCredentialAuthStatus(processInfo, deviceList, deviceTypeId, errcode);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_001, testing::ext::TestSize.Level0)
@@ -496,7 +496,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_001, testing::ext::T
     int32_t status = 0;
     std::string content = "content";
     listener_->OnSinkBindResult(processInfo, targetId, result, status, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnProcessRemove_001, testing::ext::TestSize.Level0)
