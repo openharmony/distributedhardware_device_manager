@@ -48,6 +48,8 @@ typedef enum AuthState {
     AUTH_REQUEST_CREDENTIAL,
     AUTH_REQUEST_CREDENTIAL_DONE,
     AUTH_REQUEST_AUTH_FINISH,
+    AUTH_REQUEST_VERSION,
+    AUTH_REQUEST_VERSION_DONE,
 
     AUTH_RESPONSE_INIT = 20,
     AUTH_RESPONSE_NEGOTIATE,
@@ -57,6 +59,7 @@ typedef enum AuthState {
     AUTH_RESPONSE_FINISH,
     AUTH_RESPONSE_CREDENTIAL,
     AUTH_RESPONSE_AUTH_FINISH,
+    AUTH_RESPONSE_VERSION,
 } AuthState;
 
 enum DmMsgType : int32_t {
@@ -76,6 +79,8 @@ enum DmMsgType : int32_t {
     MSG_TYPE_RESP_AUTH_EXT,
     MSG_TYPE_REQ_PUBLICKEY,
     MSG_TYPE_RESP_PUBLICKEY,
+    MSG_TYPE_REQ_VERSION,
+    MSG_TYPE_RESP_VERSION,
     MSG_TYPE_REQ_AUTH_DEVICE_NEGOTIATE = 600,
     MSG_TYPE_RESP_AUTH_DEVICE_NEGOTIATE = 700,
 };
@@ -505,6 +510,9 @@ public:
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     int32_t DeleteGroup(const std::string &pkgName, int32_t userId, const std::string &deviceId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
+    void RequestVersion();
+    void ResponseVersion();
+    void RequestVersionDone();
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
@@ -536,6 +544,7 @@ private:
     int32_t GetBinderInfo();
     void SetProcessInfo();
     int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
+	void ConverToFinish();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -562,8 +571,6 @@ private:
     std::string importPkgName_ = "";
     std::string importAuthCode_ = "";
     PeerTargetId peerTargetId_;
-    const uint8_t *sessionKey_ = nullptr;
-    uint32_t sessionKeyLen_ = 0;
     std::string remoteDeviceId_ = "";
     std::string dmVersion_ = "";
     bool isAuthDevice_ = false;

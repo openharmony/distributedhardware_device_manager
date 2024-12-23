@@ -63,7 +63,7 @@ void DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf,
     SHA256_Final(&outBuf[startIndex], &ctx);
 }
 
-int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen, const unsigned char *inBuf,
+int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen, const unsigned char *inBuf,
     uint32_t inLen)
 {
     if ((outBuf == nullptr) || (inBuf == nullptr) || (outBufLen < HexifyLen(inLen))) {
