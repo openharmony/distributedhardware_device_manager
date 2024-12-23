@@ -246,6 +246,7 @@ constexpr const char* PARAM_KEY_POLICY_STRATEGY_FOR_BLE = "DM_POLICY_STRATEGY_FO
 constexpr const char* PARAM_KEY_POLICY_TIME_OUT = "DM_POLICY_TIMEOUT";
 constexpr const char* DEVICE_SCREEN_STATUS = "DEVICE_SCREEN_STATUS";
 constexpr const char* PROCESS_NAME = "PROCESS_NAME";
+constexpr const char* PARAM_CLOSE_SESSION_DELAY_SECONDS = "DM_CLOSE_SESSION_DELAY_SECONDS";
 
 // screen state
 constexpr int32_t DM_SCREEN_UNKNOWN = -1;
