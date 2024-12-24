@@ -1444,11 +1444,11 @@ HWTEST_F(DmAuthManagerTest, GetBindLevel_001, testing::ext::TestSize.Level0)
     authManager_->ProcIncompatible(sessionId);
     
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
-    int32_t ret = authManager_->GetBindLevel(bindLevel);
+    int32_t ret = authManager_->GetBindLevel(bindLevel, "");
     ASSERT_EQ(ret, DEVICE);
 
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
-    ret = authManager_->GetBindLevel(bindLevel);
+    ret = authManager_->GetBindLevel(bindLevel, "");
     ASSERT_EQ(ret, APP);
 
     authManager_->authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE;
@@ -1470,11 +1470,11 @@ HWTEST_F(DmAuthManagerTest, GetBindLevel_001, testing::ext::TestSize.Level0)
 
     bindLevel = SERVICE;
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
-    ret = authManager_->GetBindLevel(bindLevel);
+    ret = authManager_->GetBindLevel(bindLevel, "");
     ASSERT_EQ(ret, SERVICE);
 
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
-    ret = authManager_->GetBindLevel(bindLevel);
+    ret = authManager_->GetBindLevel(bindLevel, "");
     ASSERT_EQ(ret, SERVICE);
 }
 
