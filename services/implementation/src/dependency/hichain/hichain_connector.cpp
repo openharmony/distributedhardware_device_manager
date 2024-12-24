@@ -351,7 +351,6 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
     jsonObj[FIELD_GROUP_NAME] = jsonObject[TAG_GROUP_NAME].get<std::string>();
     jsonObj[FIELD_CONNECT_PARAMS] = connectInfomation.c_str();
-    delete[] localDeviceId;
     std::string tmpStr = SafetyDump(jsonObj);
     int64_t requestId = jsonObject[TAG_REQUEST_ID].get<int64_t>();
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -494,7 +493,6 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
-    delete[] localDeviceId;
     std::string jsonStr = SafetyDump(jsonObj);
     char *buffer = strdup(jsonStr.c_str());
     return buffer;
@@ -795,7 +793,6 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
     jsonObj[FIELD_GROUP_VISIBILITY] = GROUP_VISIBILITY_PUBLIC;
     jsonObj[FIELD_EXPIRE_TIME] = FIELD_EXPIRE_TIME_VALUE;
     g_createGroupFlag = false;
-    delete[] localDeviceId;
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (osAccountUserId < 0) {
         LOGE("get current process account user id failed");
@@ -1101,7 +1098,6 @@ void HiChainConnector::DeleteAllGroup(int32_t userId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    delete[] localDeviceId;
     std::vector<GroupInfo> groupList;
     GetRelatedGroups(localUdid, groupList);
     for (auto &iter : groupList) {
