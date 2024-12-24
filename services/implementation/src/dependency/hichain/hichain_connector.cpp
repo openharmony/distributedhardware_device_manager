@@ -493,8 +493,8 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
-    std::string jsonStr = SafetyDump(jsonObj);
 
+    std::string jsonStr = SafetyDump(jsonObj);
     char *buffer = strdup(jsonStr.c_str());
     return buffer;
 }
