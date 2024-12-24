@@ -238,11 +238,15 @@ bool HiChainConnector::GetGroupInfoCommon(const int32_t userId, const std::strin
     uint32_t num = 0;
     if (deviceGroupManager_ == nullptr) {
         LOGE("deviceGroupManager_ is null");
+        delete[] groupVec;
+        groupVec = nullptr;
         return false;
     }
     int32_t ret = deviceGroupManager_->getGroupInfo(userId, pkgName, queryParams.c_str(), &groupVec, &num);
     if (ret != 0) {
         LOGE("[HICHAIN]fail to get group info with ret:%{public}d.", ret);
+        delete[] groupVec;
+        groupVec = nullptr;
         return false;
     }
     if (groupVec == nullptr) {
@@ -251,11 +255,15 @@ bool HiChainConnector::GetGroupInfoCommon(const int32_t userId, const std::strin
     }
     if (num == 0) {
         LOGE("[HICHAIN]return groups info number is zero.");
+        delete[] groupVec;
+        groupVec = nullptr;
         return false;
     }
     LOGI("HiChainConnector::GetGroupInfo groupNum(%{public}u)", num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
+    delete[] groupVec;
+    groupVec = nullptr;
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("returnGroups parse error");
@@ -343,6 +351,7 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
     jsonObj[FIELD_GROUP_NAME] = jsonObject[TAG_GROUP_NAME].get<std::string>();
     jsonObj[FIELD_CONNECT_PARAMS] = connectInfomation.c_str();
+    delete[] localDeviceId;
     std::string tmpStr = SafetyDump(jsonObj);
     int64_t requestId = jsonObject[TAG_REQUEST_ID].get<int64_t>();
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -485,7 +494,7 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
-
+    delete[] localDeviceId;
     std::string jsonStr = SafetyDump(jsonObj);
     char *buffer = strdup(jsonStr.c_str());
     return buffer;
@@ -786,6 +795,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
     jsonObj[FIELD_GROUP_VISIBILITY] = GROUP_VISIBILITY_PUBLIC;
     jsonObj[FIELD_EXPIRE_TIME] = FIELD_EXPIRE_TIME_VALUE;
     g_createGroupFlag = false;
+    delete[] localDeviceId;
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (osAccountUserId < 0) {
         LOGE("get current process account user id failed");
@@ -834,6 +844,8 @@ int32_t HiChainConnector::getRegisterInfo(const std::string &queryParams, std::s
 
     returnJsonStr = credentialInfo;
     deviceGroupManager_->destroyInfo(&credentialInfo);
+    delete[] credentialInfo;
+    credentialInfo = nullptr;
     LOGI("request hichain device registerinfo successfully.");
     return DM_OK;
 }
@@ -1089,6 +1101,7 @@ void HiChainConnector::DeleteAllGroup(int32_t userId)
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
+    delete[] localDeviceId;
     std::vector<GroupInfo> groupList;
     GetRelatedGroups(localUdid, groupList);
     for (auto &iter : groupList) {
@@ -1114,12 +1127,16 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, co
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId < 0) {
         LOGE("get current process account user id failed");
+        delete[] returnGroups;
+        returnGroups = nullptr;
         return ERR_DM_FAILED;
     }
     int32_t ret =
         deviceGroupManager_->getRelatedGroups(userId, pkgName, deviceId.c_str(), &returnGroups, &groupNum);
     if (ret != 0) {
         LOGE("[HICHAIN] fail to get related groups with ret:%{public}d.", ret);
+        delete[] returnGroups;
+        returnGroups = nullptr;
         return ERR_DM_FAILED;
     }
     if (returnGroups == nullptr) {
@@ -1128,9 +1145,13 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, co
     }
     if (groupNum == 0) {
         LOGE("[HICHAIN]return related goups number is zero.");
+        delete[] returnGroups;
+        returnGroups = nullptr;
         return ERR_DM_FAILED;
     }
     std::string relatedGroups = std::string(returnGroups);
+    delete[] returnGroups;
+    returnGroups = nullptr;
     nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("returnGroups parse error");

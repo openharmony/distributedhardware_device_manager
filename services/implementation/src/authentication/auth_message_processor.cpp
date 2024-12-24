@@ -25,6 +25,7 @@ namespace DistributedHardware {
 const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
 const int32_t MAX_BINDTYPE_SIZE = 1000;
+const int32_t AUTH_TRANSMIT_LEN = 65535;
 constexpr const char* TAG_HOST = "HOST";
 constexpr const char* TAG_VISIBILITY = "VISIBILITY";
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
@@ -647,11 +648,19 @@ std::shared_ptr<DmAuthRequestContext> AuthMessageProcessor::GetRequestContext()
 std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen)
 {
     LOGI("CreateDeviceAuthMessage start, msgType %{public}d.", msgType);
+    uint8_t *dataTmp = nullptr;
+    dataTmp = new uint8_t[AUTH_TRANSMIT_LEN];
+    if (memcpy_s(dataTmp, AUTH_TRANSMIT_LEN, data, dataLen) != DM_OK) {
+        LOGE("CreateDeviceAuthMessage start memcpy_s dataTmp error.");
+        delete[] dataTmp;
+        return "";
+    }
     nlohmann::json jsonObj;
     jsonObj[TAG_MSG_TYPE] = msgType;
-    std::string authDataStr = std::string(reinterpret_cast<const char *>(data), dataLen);
+    std::string authDataStr = std::string(reinterpret_cast<const char *>(dataTmp), dataLen);
     jsonObj[TAG_DATA] = authDataStr;
     jsonObj[TAG_DATA_LEN] = dataLen;
+    delete[] dataTmp;
     return SafetyDump(jsonObj);
 }
 
