@@ -661,6 +661,7 @@ std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const
     jsonObj[TAG_DATA] = authDataStr;
     jsonObj[TAG_DATA_LEN] = dataLen;
     delete[] dataTmp;
+    dataTmp = nullptr;
     return SafetyDump(jsonObj);
 }
 
