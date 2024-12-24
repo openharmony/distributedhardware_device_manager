@@ -68,15 +68,18 @@ void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
     std::string deviceIdStr = parcel.ReadString();
     if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceId failed!");
+        return;
     }
     std::string deviceNameStr = parcel.ReadString();
     if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceName failed!");
+        return;
     }
     devInfo.deviceTypeId = parcel.ReadUint16();
     std::string networkIdStr = parcel.ReadString();
     if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s networkId failed!");
+        return;
     }
     devInfo.range = parcel.ReadInt32();
     devInfo.networkType = parcel.ReadInt32();
@@ -89,15 +92,18 @@ void DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
     std::string deviceIdStr = parcel.ReadString();
     if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceId failed!");
+        return;
     }
     std::string deviceNameStr = parcel.ReadString();
     if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceName failed!");
+        return;
     }
     devInfo.deviceTypeId = parcel.ReadUint16();
     std::string networkIdStr = parcel.ReadString();
     if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s networkId failed!");
+        return;
     }
 }
 

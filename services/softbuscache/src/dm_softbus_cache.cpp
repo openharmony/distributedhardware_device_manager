@@ -180,10 +180,12 @@ void SoftbusCache::ChangeDeviceInfo(const DmDeviceInfo deviceInfo)
         if (memcpy_s(deviceInfo_[udid].second.deviceName, sizeof(deviceInfo_[udid].second.deviceName),
             deviceInfo.deviceName, sizeof(deviceInfo.deviceName)) != DM_OK) {
             LOGE("ChangeDeviceInfo deviceInfo copy deviceName failed");
+            return;
         }
         if (memcpy_s(deviceInfo_[udid].second.networkId, sizeof(deviceInfo_[udid].second.networkId),
             deviceInfo.networkId, sizeof(deviceInfo.networkId)) != DM_OK) {
             LOGE("ChangeDeviceInfo deviceInfo copy networkId failed");
+            return;
         }
         deviceInfo_[udid].second.deviceTypeId = deviceInfo.deviceTypeId;
         std::string uuid = "";
