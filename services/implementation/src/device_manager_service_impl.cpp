@@ -29,6 +29,7 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
 #include "parameter.h"
+#include "permission_manager.h"
 #include "common_event_support.h"
 using namespace OHOS::EventFwk;
 #endif

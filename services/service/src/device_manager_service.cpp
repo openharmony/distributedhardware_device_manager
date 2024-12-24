@@ -507,16 +507,10 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
         LOGE("AuthenticateDevice failed, cannot get target info from cached discovered device map.");
         return ERR_DM_BIND_INPUT_PARA_INVALID;
     }
-    std::string processName = "";
-    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
-        return ERR_DM_FAILED;
-    }
     std::map<std::string, std::string> bindParam;
     bindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
     bindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_BIND_EXTRA_DATA, extra));
     bindParam.insert(std::pair<std::string, std::string>(PARAM_KEY_CONN_ADDR_TYPE, std::to_string(addrType)));
-    bindParam.insert(std::pair<std::string, std::string>(PROCESS_NAME, processName));
     return dmServiceImpl_->BindTarget(pkgName, targetId, bindParam);
 }
 

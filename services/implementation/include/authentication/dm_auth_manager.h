@@ -533,7 +533,7 @@ private:
     void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
     void DeleteOffLineTimer(int32_t sessionId);
     bool IsAllowDeviceBind();
-    int32_t GetBindLevel(int32_t bindLevel, const std::string &pkgName);
+    int32_t GetBindLevel(int32_t bindLevel);
     std::string GetBundleName(nlohmann::json &jsonObject);
     int32_t GetBinderInfo();
     void SetProcessInfo();

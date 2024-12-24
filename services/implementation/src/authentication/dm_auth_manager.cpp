@@ -244,6 +244,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
 
 void DmAuthManager::parseBindParam(const std::string &extra)
 {
+    LOGI("DmAuthManager::parseBindParam start extra %{public}s.", extra.c_str());
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
@@ -266,11 +267,7 @@ void DmAuthManager::parseBindParam(const std::string &extra)
             std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].get<std::string>();
             authRequestContext_->closeSessionDelaySeconds = GetCloseSessionDelaySeconds(delaySecondsStr);
         }
-        std::string processName = "";
-        if (IsString(jsonObject, PROCESS_NAME)) {
-            processName = jsonObject[PROCESS_NAME].get<std::string>();
-        }
-        authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel, processName);
+        authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
     }
     authRequestContext_->bundleName = GetBundleName(jsonObject);
 }
@@ -2645,7 +2642,7 @@ bool DmAuthManager::IsAllowDeviceBind()
     return false;
 }
 
-int32_t DmAuthManager::GetBindLevel(int32_t bindLevel, const std::string &processName)
+int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
 {
     if (IsAllowDeviceBind()) {
         if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || static_cast<uint32_t>(bindLevel) > APP ||
@@ -2654,7 +2651,9 @@ int32_t DmAuthManager::GetBindLevel(int32_t bindLevel, const std::string &proces
         }
         return bindLevel;
     }
-    if (CheckProcessNameInWhiteList(processName)) {
+    string processName = "";
+    int32_t ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
+    if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
         return DEVICE;
     }
     if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || (static_cast<uint32_t>(bindLevel) != APP &&
