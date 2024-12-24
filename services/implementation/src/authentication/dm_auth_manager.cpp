@@ -243,7 +243,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     parseBindParam(extra);
 }
 
-void parseBindParam(const std::string &extra)
+void DmAuthManager::parseBindParam(const std::string &extra)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     if (!jsonObject.is_discarded()) {

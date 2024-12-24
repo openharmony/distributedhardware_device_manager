@@ -510,6 +510,7 @@ private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
+    void parseBindParam(const std::string &extra);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel);
     void ProcessAuthRequestExt(const int32_t &sessionId);
