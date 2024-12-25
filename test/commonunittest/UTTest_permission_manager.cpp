@@ -44,11 +44,13 @@ void PermissionManagerTest::SetUp()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 constexpr int32_t PAKAGE_NAME_SIZE_MAX = 256;
-#define AUTH_CODE_WHITE_LIST_NUM (3)
+#define AUTH_CODE_WHITE_LIST_NUM (5)
 constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
     "com.huawei.msdp.hmringgenerator",
     "com.huawei.msdp.hmringdiscriminator",
     "CollaborationFwk",
+    "wear_link_service",
+    "watch_system_service",
 };
 
 #define PIN_HOLDER_WHITE_LIST_NUM (1)
@@ -144,6 +146,12 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_003, testing::ex
     ASSERT_EQ(ret, true);
     std::string processName3(g_authCodeWhiteList[2]);
     ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName3);
+    ASSERT_EQ(ret, true);
+    std::string processName4(g_authCodeWhiteList[3]);
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName4);
+    ASSERT_EQ(ret, true);
+    std::string processName5(g_authCodeWhiteList[4]);
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName5);
     ASSERT_EQ(ret, true);
 }
 
@@ -267,6 +275,10 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnSetDnPolicy_001, testing:
     ASSERT_FALSE(ret);
 
     processName = "collaboration_service";
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
+    ASSERT_TRUE(ret);
+
+    processName = "watch_system_service";
     ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
     ASSERT_TRUE(ret);
 }
