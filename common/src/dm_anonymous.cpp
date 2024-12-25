@@ -395,7 +395,7 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
     return "";
 }
 
-void delete_ptr(const char* ptr)
+void DeletePtr(const char* ptr)
 {
     if (ptr != nullptr) {
         delete[] ptr;
