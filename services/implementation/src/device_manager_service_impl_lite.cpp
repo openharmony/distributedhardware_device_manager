@@ -513,7 +513,7 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     (void)remoteUdid;
 }
 
-void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid)
+void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid)
 {
     (void)preUserId;
     (void)remoteUdid;
