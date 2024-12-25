@@ -25,7 +25,6 @@ namespace DistributedHardware {
 const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
 const int32_t MAX_BINDTYPE_SIZE = 1000;
-const int32_t AUTH_TRANSMIT_LEN = 65535;
 constexpr const char* TAG_HOST = "HOST";
 constexpr const char* TAG_VISIBILITY = "VISIBILITY";
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
