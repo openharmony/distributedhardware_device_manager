@@ -42,18 +42,6 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
     return DM_OK;
 }
 
-bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
-bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
-{
-    (void)processName;
-    return true;
-}
-
 bool PermissionManager::CheckWhiteListSystemSA(const std::string &pkgName)
 {
     (void)pkgName;
@@ -71,9 +59,19 @@ bool PermissionManager::CheckSystemSA(const std::string &pkgName)
     return true;
 }
 
-bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
+int32_t PermissionManager::Init()
 {
-    (void)processName;
+    return DM_OK;
+}
+
+int32_t PermissionManager::UnInit()
+{
+    return DM_OK;
+}
+
+bool PermissionManager::CheckInterfacePermission(const std::string &interfaceName)
+{
+    (void)interfaceName;
     return true;
 }
 } // namespace DistributedHardware
