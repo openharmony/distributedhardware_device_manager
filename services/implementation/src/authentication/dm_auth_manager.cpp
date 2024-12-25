@@ -2653,7 +2653,7 @@ int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
         return bindLevel;
     }
     string processName = "";
-    int32_t ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
+    int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
     if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
         return DEVICE;
     }
