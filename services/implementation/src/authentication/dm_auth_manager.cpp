@@ -42,7 +42,6 @@
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
-#include "permission_manager.h"
 #include "show_confirm.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
@@ -2652,7 +2651,7 @@ int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
         }
         return bindLevel;
     }
-    string processName = "";
+    std::string processName = "";
     int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
     if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
         return DEVICE;
