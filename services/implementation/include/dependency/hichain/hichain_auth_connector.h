@@ -62,7 +62,7 @@ public:
 private:
     DeviceAuthCallback deviceAuthCallback_;
     static std::shared_ptr<IDmDeviceAuthCallback> dmDeviceAuthCallback_;
-    std::mutex dmDeviceAuthCallbackMutex_;
+    static std::mutex dmDeviceAuthCallbackMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
