@@ -102,6 +102,7 @@ bool IsMessageLengthValid(const std::string &inputMessage);
 bool IsValueExist(const std::multimap<std::string, int32_t> unorderedmap, const std::string &udid, int32_t userId);
 bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent);
 std::string SafetyDump(const nlohmann::json &jsonObj);
+std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

@@ -750,6 +750,7 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
 {
     LOGI("userId %{public}d, state %{public}d, udidhash %{public}s.", processInfo.userId, static_cast<int32_t>(state),
         GetAnonyString(info.deviceId).c_str());
+    RemoveNotExistProcess();
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     for (const auto &it : procInfoVec) {
@@ -811,6 +812,7 @@ void DeviceManagerServiceListener::ProcessAppOffline(const std::vector<ProcessIn
 {
     LOGI("userId %{public}d, state %{public}d, udidhash %{public}s.", processInfo.userId, static_cast<int32_t>(state),
         GetAnonyString(info.deviceId).c_str());
+    RemoveNotExistProcess();
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     if (!SoftbusCache::GetInstance().CheckIsOnline(std::string(info.deviceId))) {
@@ -875,6 +877,27 @@ void DeviceManagerServiceListener::OnDevStateCallbackAdd(const ProcessInfo &proc
         ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, item, deviceBasicInfo);
         SetDeviceInfo(pReq, processInfo, DmDeviceState::DEVICE_STATE_ONLINE, item, deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    }
+}
+
+void DeviceManagerServiceListener::RemoveNotExistProcess()
+{
+    std::set<ProcessInfo> notifyProcessInfos;
+    std::set<std::string> notifyPkgNames;
+    DeviceManagerServiceNotify::GetInstance().GetCallBack(DmCommonNotifyEvent::REG_DEVICE_STATE, notifyProcessInfos);
+    int32_t pkgNameIndex = 0;
+    for (ProcessInfo processInfo : notifyProcessInfos) {
+        notifyPkgNames.insert(processInfo.pkgName);
+    }
+    std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+    for (auto it = alreadyOnlinePkgName_.begin(); it != alreadyOnlinePkgName_.end();) {
+        std::string pkgName = GetSubStr(it->first, "#", pkgNameIndex);
+        if (find(notifyPkgNames.begin(), notifyPkgNames.end(), pkgName) == notifyPkgNames.end()) {
+            it = alreadyOnlinePkgName_.erase(it);
+            LOGI("pkgName %{public}s.", pkgName.c_str());
+        } else {
+            ++it;
+        }
     }
 }
 } // namespace DistributedHardware

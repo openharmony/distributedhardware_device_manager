@@ -493,5 +493,40 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_007, testing::ext::TestSize.Level0)
     int32_t ret = authManager_->CheckTrustState();
     ASSERT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_001, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("123jlk");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_002, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("123");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_003, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("5");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 5);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_004, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("10");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 10);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_005, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("0");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 0);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

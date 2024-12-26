@@ -14,7 +14,7 @@
  */
 
 #include <string>
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
 #include "hichain_connector.h"
@@ -34,7 +34,8 @@ void OnDataReceivedFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
-    int32_t sessionId = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
     std::string message(reinterpret_cast<const char*>(data), size);
     authManager->OnDataReceived(sessionId, message);
     authManager->OnSessionClosed(sessionId);

@@ -178,5 +178,21 @@ int32_t AuthResponseAuthFinish::Enter()
 {
     return DM_OK;
 }
+
+int32_t AuthResponseVersion::GetStateType()
+{
+    return AuthState::AUTH_RESPONSE_VERSION;
+}
+
+int32_t AuthResponseVersion::Enter()
+{
+    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
+    if (stateAuthManager == nullptr) {
+        LOGE("AuthResponseCredential authManager_ is null");
+        return ERR_DM_FAILED;
+    }
+    stateAuthManager->ResponseVersion();
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

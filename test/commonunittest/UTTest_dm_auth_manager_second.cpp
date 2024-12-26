@@ -1432,6 +1432,30 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_008, testing::ext::TestSize.Level0)
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
+HWTEST_F(DmAuthManagerTest, GetAuthParam_009, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject["DM_CLOSE_SESSION_DELAY_SECONDS"] = 1234;
+    std::string extra = SafetyDump(jsonObject);
+    int32_t authType = 5;
+    std::string pkgName = "ohos_test";
+    std::string deviceId = "512156";
+    authManager_->GetAuthParam(pkgName, authType, deviceId, extra);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
+HWTEST_F(DmAuthManagerTest, GetAuthParam_010, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject["DM_CLOSE_SESSION_DELAY_SECONDS"] = "1234";
+    std::string extra = SafetyDump(jsonObject);
+    int32_t authType = 5;
+    std::string pkgName = "ohos_test";
+    std::string deviceId = "512156";
+    authManager_->GetAuthParam(pkgName, authType, deviceId, extra);
+    ASSERT_EQ(authManager_->isFinishOfLocal_, true);
+}
+
 HWTEST_F(DmAuthManagerTest, InitAuthState_001, testing::ext::TestSize.Level0)
 {
     std::string extra;

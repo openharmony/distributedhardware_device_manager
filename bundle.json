@@ -58,7 +58,8 @@
                 "samgr",
                 "resource_management",
                 "wifi",
-                "screenlock_mgr"
+                "screenlock_mgr",
+                "mbedtls"
             ],
             "third_party": []
         },

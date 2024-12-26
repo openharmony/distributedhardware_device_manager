@@ -98,7 +98,9 @@ struct PinCustomDialog {
                 }.width('10%')
                 .height('100%')
               })
-            }.height(48)
+            }
+            .height(48)
+            .accessibilityText('[n1]'+this.pinCode+'[n0]')
           }
           .margin({ bottom: this.isPC ? 16 : 8 })
 
