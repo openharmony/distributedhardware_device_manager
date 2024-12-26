@@ -250,6 +250,8 @@ void DmAuthManager::parseJsonObject(nlohmann::json jsonObject)
                 authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
             }
             LOGI("parseJsonObject peerBundleName = %{public}s", authRequestContext_->peerBundleName.c_str());
+        } else {
+            authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
         }
     }
     authRequestContext_->bundleName = GetBundleName(jsonObject);
@@ -2691,8 +2693,6 @@ int32_t DmAuthManager::GetBinderInfo()
     }
     ret = AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
         authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId);
-    LOGI("GetBinderInfo sink peerBundleName = %{public}s.", authResponseContext_->peerBundleName.c_str());
-    LOGI("GetBinderInfo sink tokenId = %{public}llu", authResponseContext_->tokenId);
     if (ret != DM_OK) {
         LOGI("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
         authResponseContext_->tokenId = authResponseContext_->remoteTokenId;
@@ -2707,7 +2707,7 @@ void DmAuthManager::SetProcessInfo()
     if (authResponseContext_->bindLevel == APP) {
         if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
             processInfo.pkgName = authResponseContext_->hostPkgName;
-            processInfo.userId = authResponseContext_->localUserId;
+            processInfo.userId = authRequestContext_->localUserId;
         } else if ((authRequestState_ == nullptr) && (authResponseState_ != nullptr)) {
             processInfo.pkgName = authResponseContext_->peerBundleName;
             processInfo.userId = authResponseContext_->localUserId;

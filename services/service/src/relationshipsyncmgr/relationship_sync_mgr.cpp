@@ -381,6 +381,7 @@ bool RelationShipChangeMsg::FromAppUnbindPayLoad(const cJSON *payloadJson)
     peerTokenId = 0;
     for (uint32_t j = TOKENID_PAYLOAD_LEN; j < APP_UNBIND_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             peerTokenId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE);
