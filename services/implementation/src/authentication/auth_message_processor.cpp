@@ -207,6 +207,7 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_DMVERSION] = authResponseContext_->dmVersion;
     json[TAG_HOST] = authResponseContext_->hostPkgName;
     json[TAG_BUNDLE_NAME] = authResponseContext_->bundleName;
+    json[TAG_PEER_BUNDLE_NAME] = authResponseContext_->peerBundleName;
     json[TAG_TOKENID] = authResponseContext_->tokenId;
     json[TAG_IDENTICAL_ACCOUNT] = authResponseContext_->isIdenticalAccount;
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
@@ -588,6 +589,11 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
     }
     if (IsString(json, TAG_BUNDLE_NAME)) {
         authResponseContext_->bundleName = json[TAG_BUNDLE_NAME].get<std::string>();
+    }
+    if (IsString(json, TAG_PEER_BUNDLE_NAME)) {
+        authResponseContext_->peerBundleName = json[TAG_PEER_BUNDLE_NAME].get<std::string>();
+    } else {
+        authResponseContext_->peerBundleName = authResponseContext_->hostPkgName;
     }
     ParsePkgNegotiateMessage(json);
 }

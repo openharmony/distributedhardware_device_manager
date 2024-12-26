@@ -230,6 +230,7 @@ constexpr const char* PARAM_KEY_CONN_ADDR_TYPE = "CONN_ADDR_TYPE";
 constexpr const char* PARAM_KEY_PUBLISH_ID = "PUBLISH_ID";
 constexpr const char* PARAM_KEY_SUBSCRIBE_ID = "SUBSCRIBE_ID";
 constexpr const char* PARAM_KEY_TARGET_PKG_NAME = "TARGET_PKG_NAME";
+constexpr const char* PARAM_KEY_PEER_BUNDLE_NAME = "PEER_BUNDLE_NAME";
 constexpr const char* PARAM_KEY_DISC_FREQ = "DISC_FREQ";
 constexpr const char* PARAM_KEY_DISC_MEDIUM = "DISC_MEDIUM";
 constexpr const char* PARAM_KEY_DISC_CAPABILITY = "DISC_CAPABILITY";

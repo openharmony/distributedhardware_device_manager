@@ -216,6 +216,12 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
     authRequestContext_->bindLevel = INVALIED_TYPE;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
+    parseJsonObject(jsonObject);
+    authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
+}
+
+void DmAuthManager::parseJsonObject(nlohmann::json jsonObject)
+{
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
             authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY].get<std::string>();
@@ -238,9 +244,13 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
             authRequestContext_->closeSessionDelaySeconds = GetCloseSessionDelaySeconds(delaySecondsStr);
         }
         authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
+        if (IsString(jsonObject, TAG_PEER_BUNDLE_NAME)) {
+            authRequestContext_->peerBundleName = jsonObject[TAG_PEER_BUNDLE_NAME].get<std::string>();
+        } else {
+            authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
+        }
     }
     authRequestContext_->bundleName = GetBundleName(jsonObject);
-    authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
 }
 
 int32_t DmAuthManager::GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
@@ -339,7 +349,8 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     if (bindLevel == DEVICE) {
         DeleteGroup(pkgName, udid);
     }
-    return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel);
+    std::string extra = "";
+    return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel, extra);
 }
 
 int32_t DmAuthManager::StopAuthenticateDevice(const std::string &pkgName)
@@ -361,12 +372,12 @@ int32_t DmAuthManager::StopAuthenticateDevice(const std::string &pkgName)
 }
 
 int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &localUdid,
-    const std::string &remoteUdid, int32_t bindLevel)
+    const std::string &remoteUdid, int32_t bindLevel, const std::string &extra)
 {
     LOGI("DeleteAcl pkgName %{public}s, localUdid %{public}s, remoteUdid %{public}s, bindLevel %{public}d.",
         pkgName.c_str(), GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), bindLevel);
     DmOfflineParam offlineParam =
-        DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localUdid, remoteUdid, bindLevel);
+        DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localUdid, remoteUdid, bindLevel, extra);
     if (offlineParam.bindType == INVALIED_TYPE) {
         LOGE("Acl not contain the pkgname bind data.");
         return ERR_DM_FAILED;
@@ -400,7 +411,8 @@ int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &
     return ERR_DM_FAILED;
 }
 
-int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel)
+int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::string &udid,
+    int32_t bindLevel, const std::string &extra)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -411,7 +423,7 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
     if (bindLevel == DEVICE) {
         DeleteGroup(pkgName, udid);
     }
-    return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel);
+    return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel, extra);
 }
 
 void DmAuthManager::GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash)
@@ -794,6 +806,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->accountGroupIdHash = GetAccountGroupIdHash();
     authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
     authResponseContext_->bundleName = authRequestContext_->bundleName;
+    authResponseContext_->peerBundleName = authRequestContext_->peerBundleName;
     authResponseContext_->hostPkgLabel = authRequestContext_->hostPkgLabel;
     authResponseContext_->tokenId = authRequestContext_->tokenId;
     authResponseContext_->bindLevel = authRequestContext_->bindLevel;
@@ -1037,14 +1050,6 @@ bool DmAuthManager::IsAuthFinish()
         return true;
     }
 
-    if (authResponseContext_->isOnline && authResponseContext_->authed) {
-        authRequestContext_->reason = DM_OK;
-        authResponseContext_->reply = DM_OK;
-        authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
-        authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
-        return true;
-    }
-
     if ((authResponseContext_->isIdenticalAccount && !authResponseContext_->authed) ||
         (authResponseContext_->authed && !authResponseContext_->isOnline)) {
         softbusConnector_->JoinLnn(authRequestContext_->addr);
@@ -1274,7 +1279,7 @@ int32_t DmAuthManager::JoinNetwork()
 void DmAuthManager::SinkAuthenticateFinish()
 {
     LOGI("DmAuthManager::SinkAuthenticateFinish, isFinishOfLocal: %{public}d", isFinishOfLocal_);
-    processInfo_.pkgName = authResponseContext_->hostPkgName;
+    processInfo_.pkgName = authResponseContext_->peerBundleName;
     listener_->OnSinkBindResult(processInfo_, peerTargetId_, authResponseContext_->reply,
         authResponseContext_->state, GenerateBindResultContent());
     if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
@@ -1487,7 +1492,7 @@ void DmAuthManager::ShowConfigDialog()
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
+    DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->peerBundleName,
         authResponseContext_->bindType, localUdid, remoteDeviceId_);
     DmDialogManager::GetInstance().ShowConfirmDialog(params);
     struct RadarInfo info = {
@@ -2407,7 +2412,7 @@ void DmAuthManager::PutAccessControlList()
     DmAccesser accesser;
     accesser.requestBundleName = authResponseContext_->hostPkgName;
     DmAccessee accessee;
-    accessee.trustBundleName = authResponseContext_->hostPkgName;
+    accessee.trustBundleName = authResponseContext_->peerBundleName;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
         accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
         accesser.requestUserId = authRequestContext_->localUserId;
@@ -2683,7 +2688,8 @@ int32_t DmAuthManager::GetBinderInfo()
         return DM_OK;
     }
     ret = AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
-        authResponseContext_->bundleName, 0, authResponseContext_->tokenId);
+        authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId);
+    LOGI("GetBinderInfo sink tokenId = %{public}llu", authResponseContext_->tokenId);
     if (ret != DM_OK) {
         LOGI("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
         authResponseContext_->tokenId = authResponseContext_->remoteTokenId;
@@ -2696,8 +2702,15 @@ void DmAuthManager::SetProcessInfo()
     CHECK_NULL_VOID(authResponseContext_);
     ProcessInfo processInfo;
     if (authResponseContext_->bindLevel == APP) {
-        processInfo.pkgName = authResponseContext_->hostPkgName;
-        processInfo.userId = authResponseContext_->localUserId;
+        if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
+            processInfo.pkgName = authResponseContext_->hostPkgName;
+            processInfo.userId = authResponseContext_->localUserId;
+        } else if ((authRequestState_ == nullptr) && (authResponseState_ != nullptr)) {
+            processInfo.pkgName = authResponseContext_->peerBundleName;
+            processInfo.userId = authResponseContext_->localUserId;
+        } else {
+            LOGE("DMAuthManager::SetProcessInfo failed, state is invalid.");
+        }
     } else if (authResponseContext_->bindLevel == DEVICE || authResponseContext_->bindLevel == INVALIED_TYPE) {
         processInfo.pkgName = std::string(DM_PKG_NAME);
         processInfo.userId = authResponseContext_->localUserId;

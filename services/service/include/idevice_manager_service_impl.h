@@ -59,6 +59,9 @@ public:
      */
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
 
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &udid,
+        int32_t bindLevel, const std::string &extra) = 0;
+
     /**
      * @tc.name: IDeviceManagerServiceImpl::SetUserOperation
      * @tc.desc: Se tUser Operation of device manager service impl
@@ -218,6 +221,7 @@ public:
     virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
     virtual int32_t IsSameAccount(const std::string &udid) = 0;
+    virtual uint64_t GetTokenIdByNameAndDeviceId(std::string pkgName, std::string requestDeviceId) = 0;
     virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
     virtual int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
@@ -230,6 +234,8 @@ public:
         const std::string &remoteUdid) = 0;
     virtual void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid) = 0;
     virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
+    virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+        int32_t tokenId, int32_t peerTokenId) = 0;
     virtual int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId) = 0;
     virtual void HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId,

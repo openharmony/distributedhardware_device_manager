@@ -1028,6 +1028,7 @@ ON_IPC_SET_REQUEST(UNBIND_DEVICE, std::shared_ptr<IpcReq> pBaseReq, MessageParce
     std::shared_ptr<IpcUnBindDeviceReq> pReq = std::static_pointer_cast<IpcUnBindDeviceReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     std::string deviceId = pReq->GetDeviceId();
+    std::string extra = pReq->GetExtraInfo();
 
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
@@ -1036,6 +1037,9 @@ ON_IPC_SET_REQUEST(UNBIND_DEVICE, std::shared_ptr<IpcReq> pBaseReq, MessageParce
     if (!data.WriteString(deviceId)) {
         LOGE("write deviceId failed");
         return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(extra)) {
+        LOGE("write extra failed");
     }
     return DM_OK;
 }
