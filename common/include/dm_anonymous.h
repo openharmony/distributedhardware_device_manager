@@ -50,7 +50,7 @@ bool CompareVersion(const std::string &remoteVersion, const std::string &oldVers
 std::string ComposeStr(const std::string &pkgName, uint16_t subscribeId);
 std::string GetCallerPkgName(const std::string &pkgName);
 uint16_t GetSubscribeId(const std::string &pkgName);
-void DeletePtr(const char* ptr);
+void DeleteArrayPtr(const char* arrPtr);
 template <class T>
 std::string GetAnonyInteger(const T value)
 {

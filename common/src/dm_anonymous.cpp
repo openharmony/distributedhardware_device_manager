@@ -395,11 +395,11 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
     return "";
 }
 
-void DeletePtr(const char* ptr)
+void DeleteArrayPtr(const char* arrPtr)
 {
-    if (ptr != nullptr) {
-        delete[] ptr;
-        ptr = nullptr;
+    if (arrPtr != nullptr) {
+        delete[] arrPtr;
+        arrPtr = nullptr;
     }
 }
 } // namespace DistributedHardware
