@@ -14,7 +14,6 @@
  */
 
 #include "dm_radar_helper.h"
-#include <errors.h>
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
