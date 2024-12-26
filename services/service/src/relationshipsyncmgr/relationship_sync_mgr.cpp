@@ -475,6 +475,9 @@ cJSON *RelationShipChangeMsg::ToPayLoadJson() const
         if (numberObj == nullptr || !cJSON_AddItemToArray(arrayObj, numberObj)) {
             cJSON_Delete(numberObj);
             cJSON_Delete(arrayObj);
+            if (payload != nullptr) {
+                delete[] payload;
+            }
             return nullptr;
         }
     }

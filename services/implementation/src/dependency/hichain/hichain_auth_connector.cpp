@@ -23,6 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::dmDeviceAuthCallback_ = nullptr;
+std::mutex HiChainAuthConnector::dmDeviceAuthCallbackMutex_;
 
 HiChainAuthConnector::HiChainAuthConnector()
 {
@@ -45,6 +46,7 @@ HiChainAuthConnector::~HiChainAuthConnector()
 
 int32_t HiChainAuthConnector::RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback)
 {
+    std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
     dmDeviceAuthCallback_ = callback;
     return DM_OK;
 }
