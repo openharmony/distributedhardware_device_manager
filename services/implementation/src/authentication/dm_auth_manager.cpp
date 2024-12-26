@@ -246,8 +246,10 @@ void DmAuthManager::parseJsonObject(nlohmann::json jsonObject)
         authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
         if (IsString(jsonObject, TAG_PEER_BUNDLE_NAME)) {
             authRequestContext_->peerBundleName = jsonObject[TAG_PEER_BUNDLE_NAME].get<std::string>();
-        } else {
-            authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
+            if (authRequestContext_->peerBundleName == "") {
+                authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
+            }
+            LOGI("parseJsonObject peerBundleName = %{public}s", authRequestContext_->peerBundleName.c_str());
         }
     }
     authRequestContext_->bundleName = GetBundleName(jsonObject);
@@ -2689,6 +2691,7 @@ int32_t DmAuthManager::GetBinderInfo()
     }
     ret = AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
         authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId);
+    LOGI("GetBinderInfo sink peerBundleName = %{public}s.", authResponseContext_->peerBundleName.c_str());
     LOGI("GetBinderInfo sink tokenId = %{public}llu", authResponseContext_->tokenId);
     if (ret != DM_OK) {
         LOGI("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
