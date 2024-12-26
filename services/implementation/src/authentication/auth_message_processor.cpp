@@ -675,7 +675,7 @@ void AuthMessageProcessor::CreateReqEncryptMessage(nlohmann::json &jsonObj)
     jsonTemp[TAG_LOCAL_USERID] = authResponseContext_->localUserId;
     jsonTemp[TAG_LOCAL_ACCOUNTID] = authResponseContext_->localAccountId;
     jsonTemp[TAG_TOKENID] = authResponseContext_->tokenId;
-    jsonTemp[TAG_HOST_PKGNAME] = authResponseContext_->hostPkgName;
+    jsonTemp[TAG_BUNDLE_NAME] = authResponseContext_->bundleName;
     jsonTemp[TAG_BIND_LEVEL] = authResponseContext_->bindLevel;
     std::string strTemp = SafetyDump(jsonTemp);
     std::string encryptStr = "";
@@ -699,6 +699,7 @@ void AuthMessageProcessor::ParseReqEncryptMessage(nlohmann::json &json)
     authResponseContext_->localUserId = 0;
     authResponseContext_->localAccountId = "";
     authResponseContext_->tokenId = 0;
+    authResponseContext_->bundleName = "";
     authResponseContext_->localBindLevel = -1;
     CHECK_NULL_VOID(cryptoMgr_);
     if (cryptoMgr_->DecryptMessage(encryptStr, decryptStr) != DM_OK) {
@@ -725,8 +726,8 @@ void AuthMessageProcessor::ParseReqEncryptMessage(nlohmann::json &json)
     if (IsInt64(jsonObject, TAG_TOKENID)) {
         authResponseContext_->tokenId = jsonObject[TAG_TOKENID].get<int64_t>();
     }
-    if (IsString(jsonObject, TAG_HOST_PKGNAME)) {
-        authResponseContext_->bundleName = jsonObject[TAG_HOST_PKGNAME].get<std::string>();
+    if (IsString(jsonObject, TAG_BUNDLE_NAME)) {
+        authResponseContext_->bundleName = jsonObject[TAG_BUNDLE_NAME].get<std::string>();
     }
     if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
         authResponseContext_->localBindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
@@ -757,6 +758,7 @@ void AuthMessageProcessor::ParseRespEncryptMessage(nlohmann::json &json)
     authResponseContext_->localUserId = 0;
     authResponseContext_->localAccountId = "";
     authResponseContext_->tokenId = 0;
+    authResponseContext_->bundleName = "";
     authResponseContext_->localBindLevel = -1;
     CHECK_NULL_VOID(cryptoMgr_);
     if (cryptoMgr_->DecryptMessage(encryptStr, decryptStr) != DM_OK) {
@@ -783,8 +785,8 @@ void AuthMessageProcessor::ParseRespEncryptMessage(nlohmann::json &json)
     if (IsInt64(jsonObject, TAG_TOKENID)) {
         authResponseContext_->tokenId = jsonObject[TAG_TOKENID].get<int64_t>();
     }
-    if (IsString(jsonObject, TAG_HOST_PKGNAME)) {
-        authResponseContext_->bundleName = jsonObject[TAG_HOST_PKGNAME].get<std::string>();
+    if (IsString(jsonObject, TAG_BUNDLE_NAME)) {
+        authResponseContext_->bundleName = jsonObject[TAG_BUNDLE_NAME].get<std::string>();
     }
     if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
         authResponseContext_->localBindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();

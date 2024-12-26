@@ -2750,7 +2750,7 @@ void DmAuthManager::RequestEncryptMsg()
     authResponseContext_->localUserId = localUserId;
     authResponseContext_->localAccountId = localAccountId;
     authResponseContext_->tokenId = static_cast<int64_t>(tokenId);
-    authResponseContext_->hostPkgName = authRequestContext_->hostPkgName;
+    authResponseContext_->bundleName = authRequestContext_->hostPkgName;
     authResponseContext_->bindLevel = authRequestContext_->bindLevel;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_ENCRYPTMSG);
@@ -2779,10 +2779,10 @@ void DmAuthManager::ResponseEncryptMsg()
     authResponseContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authResponseContext_->localUserId);
     if (AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
-        authResponseContext_->bundleName, 0, authResponseContext_->tokenId) != DM_OK) {
+        authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId) != DM_OK) {
         LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
     }
-    authResponseContext_->hostPkgName = authResponseContext_->bundleName;
+    authResponseContext_->bundleName = authResponseContext_->peerBundleName;
     authMessageProcessor_->SetEncryptFlag(true);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_ENCRYPTMSG);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
@@ -2845,7 +2845,7 @@ bool DmAuthManager::CheckSourceMsgValidity()
         authResponseContext_->localUserId != authRequestContext_->remoteUserId ||
         authResponseContext_->localAccountId != authRequestContext_->remoteAccountId ||
         authResponseContext_->tokenId != authResponseContext_->remoteTokenId ||
-        authResponseContext_->bundleName != authResponseContext_->hostPkgName ||
+        authResponseContext_->bundleName != authResponseContext_->peerBundleName ||
         authResponseContext_->localBindLevel != authResponseContext_->bindLevel) {
         return false;
     }
