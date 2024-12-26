@@ -215,28 +215,28 @@ int32_t AuthRequestAuthFinish::Enter()
     return DM_OK;
 }
 
-int32_t AuthRequestVersion::GetStateType()
+int32_t AuthRequestEncryptMsg::GetStateType()
 {
-    return AuthState::AUTH_REQUEST_VERSION;
+    return AuthState::AUTH_REQUEST_ENCRYPTMSG;
 }
 
-int32_t AuthRequestVersion::Enter()
+int32_t AuthRequestEncryptMsg::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
-    stateAuthManager->RequestVersion();
+    stateAuthManager->RequestEncryptMsg();
     return DM_OK;
 }
 
-int32_t AuthRequestVersionDone::GetStateType()
+int32_t AuthRequestEncryptMsgDone::GetStateType()
 {
-    return AuthState::AUTH_REQUEST_VERSION_DONE;
+    return AuthState::AUTH_REQUEST_ENCRYPTMSG_DONE;
 }
 
-int32_t AuthRequestVersionDone::Enter()
+int32_t AuthRequestEncryptMsgDone::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {

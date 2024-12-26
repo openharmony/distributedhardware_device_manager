@@ -200,13 +200,13 @@ public:
     int32_t Enter() override;
 };
 
-class AuthRequestVersion : public AuthRequestState {
+class AuthRequestEncryptMsg : public AuthRequestState {
 public:
     int32_t GetStateType() override;
     int32_t Enter() override;
 };
 
-class AuthRequestVersionDone : public AuthRequestState {
+class AuthRequestEncryptMsgDone : public AuthRequestState {
 public:
     int32_t GetStateType() override;
     int32_t Enter() override;
