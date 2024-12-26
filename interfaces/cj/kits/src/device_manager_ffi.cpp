@@ -20,13 +20,12 @@
 #include "device_manager_impl.h"
 #include "dm_log.h"
 
+extern "C" {
 int64_t FfiOHOSDistributedDeviceManagerCreateDeviceManager(const char *name, int32_t *errCode)
 {
     auto deviceManager = OHOS::FFI::FFIData::Create<OHOS::DistributedHardware::DeviceManagerFfiImpl>(
         std::string(name), errCode);
-    if (*errCode != 0) {
-        LOGE("deviceManager create fail, the errcode is %{public}d", *errCode);
-        delete static_cast<OHOS::DistributedHardware::DeviceManagerFfiImpl *>(deviceManager);
+    if (deviceManager == nullptr) {
         return 0;
     }
     return deviceManager->GetID();
@@ -133,4 +132,5 @@ void FfiOHOSDistributedDeviceManagerOff(int64_t id, const char *type, int32_t *e
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
     *errCode = instance->EventOff(type);
+}
 }
