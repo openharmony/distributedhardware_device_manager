@@ -2849,6 +2849,7 @@ bool DmAuthManager::CheckSourceMsgValidity()
         authResponseContext_->localBindLevel != authResponseContext_->bindLevel) {
         return false;
     }
+    authResponseContext_->localAccountId = authRequestContext_->localAccountId;
     return true;
 }
 } // namespace DistributedHardware
