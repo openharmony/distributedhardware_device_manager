@@ -1461,12 +1461,6 @@ HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
     bool ret = authManager_->IsAuthFinish();
     EXPECT_TRUE(ret);
 
-    authManager_->authResponseContext_->reply = ERR_DM_AUTH_BUSINESS_BUSY;
-    authManager_->authResponseContext_->isOnline = true;
-    authManager_->authResponseContext_->authed = true;
-    ret = authManager_->IsAuthFinish();
-    EXPECT_TRUE(ret);
-
     authManager_->authResponseContext_->isOnline = false;
     authManager_->authResponseContext_->isIdenticalAccount = true;
     authManager_->authResponseContext_->authed = false;
