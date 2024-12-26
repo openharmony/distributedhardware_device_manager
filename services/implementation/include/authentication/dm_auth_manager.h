@@ -111,6 +111,7 @@ typedef struct DmAuthRequestContext {
     std::string hostPkgName;
     std::string targetPkgName;
     std::string bundleName;
+    std::string peerBundleName;
     std::string appOperation;
     std::string appDesc;
     std::string appName;
@@ -155,6 +156,7 @@ typedef struct DmAuthResponseContext {
     std::string hostPkgName;
     std::string targetPkgName;
     std::string bundleName;
+    std::string peerBundleName;
     std::string appOperation;
     std::string appDesc;
     std::string customDesc;
@@ -223,7 +225,8 @@ public:
      * @param deviceId device id.
      * @return Return 0 if success.
      */
-    int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udid,
+        int32_t bindLevel, const std::string &extra);
 
     /**
      * @tc.name: DmAuthManager::OnSessionOpened
@@ -517,8 +520,9 @@ private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
+    void parseJsonObject(nlohmann::json jsonObject);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
-        int32_t bindLevel);
+        int32_t bindLevel, const std::string &extra);
     void ProcessAuthRequestExt(const int32_t &sessionId);
     bool IsAuthFinish();
     void ProcessAuthRequest(const int32_t &sessionId);

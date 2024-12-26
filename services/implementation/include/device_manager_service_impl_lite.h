@@ -54,6 +54,9 @@ public:
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
  
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udid,
+        int32_t bindLevel, const std::string &extra);
+        
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
@@ -119,6 +122,7 @@ public:
 
     int32_t DpAclAdd(const std::string &udid);
     int32_t IsSameAccount(const std::string &udid);
+    uint64_t GetTokenIdByNameAndDeviceId(std::string pkgName, std::string requestDeviceId);
     void ScreenCommonEventCallback(std::string commonEventType);
     int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
@@ -132,6 +136,8 @@ public:
         const std::string &remoteUdid);
     void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
+    void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+        int32_t tokenId, int32_t peerTokenId);
     void HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId, const std::string &peerUdid,
         int32_t peerUserId);
     void HandleUserRemoved(int32_t preUserId);

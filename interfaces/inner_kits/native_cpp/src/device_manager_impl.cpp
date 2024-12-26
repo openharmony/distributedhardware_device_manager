@@ -1540,6 +1540,36 @@ int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::s
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::string &deviceId,
+    const std::string &extra)
+{
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("UnBindDevice error: Invalid para. pkgName %{public}s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, pkgName: %{public}s, deviceId: %{public}s", pkgName.c_str(),
+        GetAnonyString(std::string(deviceId)).c_str());
+    std::shared_ptr<IpcUnBindDeviceReq> req = std::make_shared<IpcUnBindDeviceReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDeviceId(deviceId);
+    req->SetExtraInfo(extra);
+    LOGI("DeviceManagerImpl::UnBindDevice extra: %{public}s.", extra.c_str());
+    int32_t ret = ipcClientProxy_->SendRequest(UNBIND_DEVICE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("UnBindDevice error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("UnBindDevice error: Failed with ret %{public}d", ret);
+        return ret;
+    }
+
+    LOGI("End");
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                      int32_t &netWorkType)
 {

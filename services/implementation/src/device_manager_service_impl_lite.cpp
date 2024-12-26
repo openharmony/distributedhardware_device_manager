@@ -69,6 +69,7 @@ void DeviceManagerServiceImpl::Release()
     softbusConnector_ = nullptr;
     hiChainConnector_ = nullptr;
     mineHiChainConnector_ = nullptr;
+    return;
 }
 
 int32_t DeviceManagerServiceImpl::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid,
@@ -86,6 +87,16 @@ int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const
     (void)pkgName;
     (void)udid;
     (void)bindLevel;
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udid,
+    int32_t bindLevel, const std::string &extra)
+{
+    (void)pkgName;
+    (void)udid;
+    (void)bindLevel;
+    (void)extra;
     return DM_OK;
 }
 
@@ -109,6 +120,7 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
         LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
     }
     deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    return;
 }
 
 std::string DeviceManagerServiceImpl::GetUdidHashByNetworkId(const std::string &networkId)
@@ -136,6 +148,7 @@ int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
 void DeviceManagerServiceImpl::OnSessionClosed(int sessionId)
 {
     (void)sessionId;
+    return;
 }
 
 void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
@@ -143,6 +156,7 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
     (void)sessionId;
     (void)data;
     (void)dataLen;
+    return;
 }
 
 int DeviceManagerServiceImpl::OnPinHolderSessionOpened(int sessionId, int result)
@@ -155,6 +169,7 @@ int DeviceManagerServiceImpl::OnPinHolderSessionOpened(int sessionId, int result
 void DeviceManagerServiceImpl::OnPinHolderSessionClosed(int sessionId)
 {
     (void)sessionId;
+    return;
 }
 
 void DeviceManagerServiceImpl::OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
@@ -162,6 +177,7 @@ void DeviceManagerServiceImpl::OnPinHolderBytesReceived(int sessionId, const voi
     (void)sessionId;
     (void)data;
     (void)dataLen;
+    return;
 }
 
 int32_t DeviceManagerServiceImpl::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
@@ -364,6 +380,7 @@ std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrus
 
 void DeviceManagerServiceImpl::LoadHardwareFwkService()
 {
+    return;
 }
 
 int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
@@ -378,9 +395,18 @@ int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
     return DM_OK;
 }
 
+uint64_t DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId(std::string pkgName,
+    std::string requestDeviceId)
+{
+    (void)pkgName;
+    (void)requestDeviceId;
+    return 0;
+}
+
 void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
 {
     (void)commonEventType;
+    return;
 }
 
 int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
@@ -452,6 +478,16 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
     return;
 }
 
+void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId, int32_t peerTokenId)
+{
+    (void)remoteUserId;
+    (void)remoteUdid;
+    (void)tokenId;
+    (void)peerTokenId;
+    return;
+}
+
 void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId,
     const std::string &peerUdid, int32_t peerUserId)
 {
@@ -511,23 +547,26 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     (void)foregroundUserIds;
     (void)backgroundUserIds;
     (void)remoteUdid;
+    return;
 }
 
 void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid)
 {
     (void)preUserId;
     (void)remoteUdid;
+    return;
 }
 
 std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindLevel(int32_t userId)
 {
     (void)userId;
+    return std::map<std::string, int32_t> {};
 }
 
 std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUserId(int32_t localUserId)
 {
     (void)localUserId;
-    return {};
+    return std::multimap<std::string, int32_t> {};
 }
 
 int32_t DeviceManagerServiceImpl::SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList)

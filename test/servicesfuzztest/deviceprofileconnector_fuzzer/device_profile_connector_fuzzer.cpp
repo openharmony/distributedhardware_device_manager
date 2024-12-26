@@ -35,11 +35,13 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     std::string requestDeviceId(reinterpret_cast<const char*>(data), size);
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string trustUdid(reinterpret_cast<const char*>(data), size);
+    std::string extra(reinterpret_cast<const char*>(data), size);
     std::string localDeviceId(reinterpret_cast<const char*>(data), size);
     std::string targetDeviceId(reinterpret_cast<const char*>(data), size);
     std::string requestAccountId(reinterpret_cast<const char*>(data), size);
     std::string deviceIdHash(reinterpret_cast<const char*>(data), size);
     std::string trustBundleName(reinterpret_cast<const char*>(data), size);
+    int32_t bindLevel = 1;
     DmAclInfo aclInfo;
     aclInfo.bindType = fdp.ConsumeIntegral<int32_t>();
     aclInfo.bindLevel = fdp.ConsumeIntegral<int32_t>();
@@ -56,12 +58,12 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     dmAccessee.trustBundleName = trustBundleName;
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     std::string accountId(reinterpret_cast<const char*>(data), size);
-    int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
     DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(pkgName, requestDeviceId, trustUdid);
     DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, userId);
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, requestDeviceId, bindLevel);
+    DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+        requestDeviceId, bindLevel, extra);
     DeviceProfileConnector::GetInstance().UpdateAccessControlList(userId, accountId, accountId);
     DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
     DeviceProfileConnector::GetInstance().CheckDevIdInAclForDevBind(pkgName, localDeviceId);

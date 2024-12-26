@@ -69,15 +69,6 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
     return g_checkIsOnlineReturnBoolValue;
 }
 
-DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string &pkgName,
-    const std::string &localDeviceId, const std::string &remoteDeviceId, int32_t bindLevel)
-{
-    DmOfflineParam offlineParam;
-    offlineParam.bindType = g_bindType;
-    offlineParam.leftAclNumber = g_leftAclNumber;
-    return offlineParam;
-}
-
 bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
 {
     return g_reportAuthConfirmBoxReturnBoolValue;
@@ -225,37 +216,38 @@ HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
     std::string pkgName = "pkgName";
     std::string localUdid = "localUdid";
     std::string remoteUdid = "remoteUdid";
+    std::string extra = "extraTest";
     int32_t sessionId = 0;
     int32_t bindLevel = APP;
     g_bindType = INVALIED_TYPE;
-    int32_t ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
+    int32_t ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
     bindLevel = APP;
     g_bindType = APP_PEER_TO_PEER_TYPE;
     g_leftAclNumber = 1;
     authManager_->softbusConnector_->deviceStateManagerCallback_ = std::make_shared<SoftbusStateCallbackMock>();
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
+    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     EXPECT_EQ(ret, DM_OK);
 
     g_leftAclNumber = 0;
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
+    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     EXPECT_EQ(ret, DM_OK);
 
     bindLevel = DEVICE;
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
+    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     EXPECT_EQ(ret, DM_OK);
 
     g_leftAclNumber = 1;
     g_peerUdidHash = "test";
     authManager_->DeleteOffLineTimer(sessionId);
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
+    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     EXPECT_EQ(ret, DM_OK);
 
     authManager_->softbusConnector_ = nullptr;
     authManager_->DeleteOffLineTimer(sessionId);
     bindLevel = 0;
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
+    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -317,6 +309,63 @@ HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog001, testing::ext::TestSize.Level
     authManager_->authResponseContext_->targetDeviceName = "test";
     authManager_->ShowStartAuthDialog();
     ASSERT_EQ(authManager_->authResponseContext_->targetDeviceName, DmDialogManager::GetInstance().targetDeviceName_);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteAccessControlList001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string localDeviceId = "localDeviceId";
+    std::string remoteDeviceId = "remoteDeviceId";
+    int32_t bindLevel = APP;
+    std::string extra = "";
+    auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+        remoteDeviceId, bindLevel, extra);
+    EXPECT_EQ(APP, ret.bindType);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteAccessControlList002, testing::ext::TestSize.Level0)
+{
+    DmOfflineParam offlineParam;
+    offlineParam.leftAclNumber = 1;
+    std::string pkgName = "pkgName";
+    std::string localDeviceId = "localDeviceId";
+    std::string remoteDeviceId = "remoteDeviceId";
+    int32_t bindLevel = APP;
+    std::string extra = "extratest";
+    auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+        remoteDeviceId, bindLevel, extra);
+    EXPECT_EQ(APP, ret.bindType);
+    EXPECT_EQ(0, ret.leftAclNumber);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteAccessControlList003, testing::ext::TestSize.Level0)
+{
+    DmOfflineParam offlineParam;
+    offlineParam.leftAclNumber = 1;
+    std::string pkgName = "pkgName";
+    std::string localDeviceId = "localDeviceId";
+    std::string remoteDeviceId = "remoteDeviceId";
+    int32_t bindLevel = SERVICE;
+    std::string extra = "extratest";
+    auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+        remoteDeviceId, bindLevel, extra);
+    EXPECT_EQ(SERVICE, ret.bindType);
+    EXPECT_EQ(0, ret.leftAclNumber);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteAccessControlList004, testing::ext::TestSize.Level0)
+{
+    DmOfflineParam offlineParam;
+    offlineParam.leftAclNumber = 1;
+    std::string pkgName = "pkgName";
+    std::string localDeviceId = "localDeviceId";
+    std::string remoteDeviceId = "remoteDeviceId";
+    int32_t bindLevel = DEVICE;
+    std::string extra = "";
+    auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+        remoteDeviceId, bindLevel, extra);
+    EXPECT_EQ(DEVICE, ret.bindType);
+    EXPECT_EQ(0, ret.leftAclNumber);
 }
 
 HWTEST_F(DmAuthManagerTest, OnUserOperation001, testing::ext::TestSize.Level0)

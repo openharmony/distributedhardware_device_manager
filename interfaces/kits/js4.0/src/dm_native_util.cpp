@@ -299,6 +299,8 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     JsObjectToString(env, object, "targetPkgName", targetPkgName, sizeof(targetPkgName));
     char metaType[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "metaType", metaType, sizeof(metaType));
+    char peerBundleName[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "peerBundleName", peerBundleName, sizeof(peerBundleName));
     std::string metaTypeStr = metaType;
     isMetaType = !metaTypeStr.empty();
 
@@ -324,6 +326,7 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     jsonObj[CUSTOM_DESCRIPTION] = std::string(customDescription);
     jsonObj[PARAM_KEY_TARGET_PKG_NAME] = std::string(targetPkgName);
     jsonObj[PARAM_KEY_META_TYPE] = metaTypeStr;
+    jsonObj[PARAM_KEY_PEER_BUNDLE_NAME] = std::string(peerBundleName);
     jsonObj[PARAM_KEY_PIN_CODE] = std::string(pinCode);
     jsonObj[PARAM_KEY_AUTH_TOKEN] = std::string(authToken);
     jsonObj[PARAM_KEY_BR_MAC] = std::string(brMac);

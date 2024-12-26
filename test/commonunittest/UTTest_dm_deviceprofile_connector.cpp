@@ -709,11 +709,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_001, testing::ext::Test
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_IDENTICAL_ACCOUNT);
-    std::string pkgName;
-    std::string requestDeviceId;
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustUdid = "trustUdid";
     std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, pkgName, requestDeviceId, bindTypeVec);
-    EXPECT_EQ(bindTypeVec.empty(), false);
+    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
+    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({IDENTICAL_ACCOUNT_TYPE}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_002, testing::ext::TestSize.Level0)
@@ -721,11 +721,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_002, testing::ext::Test
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_POINT_TO_POINT);
     profiles.SetBindLevel(DEVICE);
-    std::string pkgName;
-    std::string requestDeviceId;
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustUdid = "trustUdid";
     std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, pkgName, requestDeviceId, bindTypeVec);
-    EXPECT_EQ(bindTypeVec.empty(), false);
+    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
+    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({DEVICE_PEER_TO_PEER_TYPE}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_003, testing::ext::TestSize.Level0)
@@ -733,67 +733,39 @@ HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_003, testing::ext::Test
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_POINT_TO_POINT);
     profiles.SetBindLevel(APP);
-    profiles.accesser_.SetAccesserBundleName("pkgName");
-    profiles.accesser_.SetAccesserDeviceId("localDeviceId");
-    std::string pkgName = "pkgName";
-    std::string requestDeviceId = "localDeviceId";
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustUdid = "trustUdid";
+    profiles.GetAccesser().SetAccesserDeviceId(trustUdid);
+    profiles.GetAccessee().SetAccesseeDeviceId(requestDeviceId);
     std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, pkgName, requestDeviceId, bindTypeVec);
-    EXPECT_EQ(bindTypeVec.empty(), false);
+    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
+    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({APP_PEER_TO_PEER_TYPE}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_004, testing::ext::TestSize.Level0)
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_POINT_TO_POINT);
-    profiles.SetBindLevel(APP);
-    profiles.accessee_.SetAccesseeBundleName("pkgName");
-    profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
-    std::string pkgName = "pkgName";
-    std::string requestDeviceId = "localDeviceId";
+    profiles.SetBindType(DM_ACROSS_ACCOUNT);
+    profiles.SetBindLevel(DEVICE);
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustUdid = "trustUdid";
     std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, pkgName, requestDeviceId, bindTypeVec);
-    EXPECT_EQ(bindTypeVec.empty(), false);
+    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
+    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({DEVICE_ACROSS_ACCOUNT_TYPE}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_005, testing::ext::TestSize.Level0)
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(DEVICE);
-    std::string pkgName;
-    std::string requestDeviceId;
-    std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, pkgName, requestDeviceId, bindTypeVec);
-    EXPECT_EQ(bindTypeVec.empty(), false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_006, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_ACROSS_ACCOUNT);
     profiles.SetBindLevel(APP);
-    profiles.accesser_.SetAccesserBundleName("pkgName");
-    profiles.accesser_.SetAccesserDeviceId("localDeviceId");
-    std::string pkgName = "pkgName";
-    std::string requestDeviceId = "localDeviceId";
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustUdid = "trustUdid";
+    profiles.GetAccesser().SetAccesserDeviceId(trustUdid);
+    profiles.GetAccessee().SetAccesseeDeviceId(requestDeviceId);
     std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, pkgName, requestDeviceId, bindTypeVec);
-    EXPECT_EQ(bindTypeVec.empty(), false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_007, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(APP);
-    profiles.accessee_.SetAccesseeBundleName("pkgName");
-    profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
-    std::string pkgName = "pkgName";
-    std::string requestDeviceId = "localDeviceId";
-    std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, pkgName, requestDeviceId, bindTypeVec);
-    EXPECT_EQ(bindTypeVec.empty(), false);
+    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
+    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({APP_ACROSS_ACCOUNT_TYPE}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, CompareBindType_001, testing::ext::TestSize.Level0)
@@ -848,106 +820,45 @@ HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_001, testing::ext::TestSize
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_IDENTICAL_ACCOUNT);
-    DmDiscoveryInfo paramInfo;
-    std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
+    vector<int32_t> sinkBindType;
+    vector<int32_t> bindTypeIndex;
+    string localDeviceId = "localDeviceId";
+    string targetDeviceId = "targetDeviceId";
     uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, paramInfo, sinkBindType, bindTypeIndex, index);
-    EXPECT_EQ(sinkBindType.empty(), false);
+    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, localDeviceId,
+        sinkBindType, bindTypeIndex, index, targetDeviceId);
+    EXPECT_EQ(sinkBindType, vector<int32_t>({IDENTICAL_ACCOUNT_TYPE}));
+    EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_002, testing::ext::TestSize.Level0)
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_POINT_TO_POINT);
-    profiles.SetBindLevel(DEVICE);
-    DmDiscoveryInfo paramInfo;
-    std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
+    vector<int32_t> sinkBindType;
+    vector<int32_t> bindTypeIndex;
+    string localDeviceId = "localDeviceId";
+    string targetDeviceId = "targetDeviceId";
     uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, paramInfo, sinkBindType, bindTypeIndex, index);
-    EXPECT_EQ(sinkBindType.empty(), false);
+    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, localDeviceId,
+        sinkBindType, bindTypeIndex, index, targetDeviceId);
+    EXPECT_EQ(sinkBindType, vector<int32_t>({DEVICE_PEER_TO_PEER_TYPE}));
+    EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_003, testing::ext::TestSize.Level0)
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_POINT_TO_POINT);
-    profiles.SetBindLevel(APP);
-    profiles.accesser_.SetAccesserBundleName("pkgName");
-    profiles.accesser_.SetAccesserDeviceId("localDeviceId");
-    DmDiscoveryInfo paramInfo;
-    paramInfo.pkgname = "pkgName";
-    paramInfo.localDeviceId = "localDeviceId";
-    std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
-    uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, paramInfo, sinkBindType, bindTypeIndex, index);
-    EXPECT_EQ(sinkBindType.empty(), false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_004, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_POINT_TO_POINT);
-    profiles.SetBindLevel(APP);
-    profiles.accessee_.SetAccesseeBundleName("pkgName");
-    profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
-    DmDiscoveryInfo paramInfo;
-    paramInfo.pkgname = "pkgName";
-    paramInfo.localDeviceId = "localDeviceId";
-    std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
-    uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, paramInfo, sinkBindType, bindTypeIndex, index);
-    EXPECT_EQ(sinkBindType.empty(), false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_005, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(DEVICE);
-    DmDiscoveryInfo paramInfo;
-    std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
+    vector<int32_t> sinkBindType;
+    vector<int32_t> bindTypeIndex;
+    string localDeviceId = "localDeviceId";
+    string targetDeviceId = "targetDeviceId";
     uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, paramInfo, sinkBindType, bindTypeIndex, index);
-    EXPECT_EQ(sinkBindType.empty(), false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_006, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(APP);
-    profiles.accesser_.SetAccesserBundleName("pkgName");
-    profiles.accesser_.SetAccesserDeviceId("localDeviceId");
-    DmDiscoveryInfo paramInfo;
-    paramInfo.pkgname = "pkgName";
-    paramInfo.localDeviceId = "localDeviceId";
-    std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
-    uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, paramInfo, sinkBindType, bindTypeIndex, index);
-    EXPECT_EQ(sinkBindType.empty(), false);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_007, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(APP);
-    profiles.accessee_.SetAccesseeBundleName("pkgName");
-    profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
-    DmDiscoveryInfo paramInfo;
-    paramInfo.pkgname = "pkgName";
-    paramInfo.localDeviceId = "localDeviceId";
-    std::vector<int32_t> sinkBindType;
-    std::vector<int32_t> bindTypeIndex;
-    uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, paramInfo, sinkBindType, bindTypeIndex, index);
-    EXPECT_EQ(sinkBindType.empty(), false);
+    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, localDeviceId,
+        sinkBindType, bindTypeIndex, index, targetDeviceId);
+    EXPECT_EQ(sinkBindType, vector<int32_t>({DEVICE_ACROSS_ACCOUNT_TYPE}));
+    EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, SyncAclByBindType_001, testing::ext::TestSize.Level0)
@@ -1200,11 +1111,10 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::
     std::string pkgName = "bundleName";
     std::string localDeviceId = "localDeviceId";
     std::string remoteDeviceId = "remoteDeviceId";
+    std::string extra = "extraTest";
     int32_t bindLevel = INVALIED_TYPE;
-
     DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
-        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel);
-
+        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
 }
 
@@ -1213,11 +1123,10 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_002, testing::ext::
     std::string pkgName = "bundleName";
     std::string localDeviceId = "localDeviceId";
     std::string remoteDeviceId = "remoteDeviceId";
+    std::string extra = "extraTest";
     int32_t bindLevel = APP;
-
     DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
-        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel);
-
+        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.bindType, APP);
 }
 
@@ -1226,11 +1135,10 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_003, testing::ext::
     std::string pkgName = "bundleName";
     std::string localDeviceId = "localDeviceId";
     std::string remoteDeviceId = "remoteDeviceId";
+    std::string extra = "extraTest";
     int32_t bindLevel = SERVICE;
-
     DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
-        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel);
-
+        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.bindType, SERVICE);
 }
 
@@ -1239,11 +1147,10 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_004, testing::ext::
     std::string pkgName = "bundleName";
     std::string localDeviceId = "localDeviceId";
     std::string remoteDeviceId = "remoteDeviceId";
+    std::string extra = "extraTest";
     int32_t bindLevel = DEVICE;
-
     DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
-        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel);
-
+        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.bindType, DEVICE);
 }
 

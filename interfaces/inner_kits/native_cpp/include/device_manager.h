@@ -393,6 +393,8 @@ public:
      */
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
 
+    virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId, const std::string &extra) = 0;
+    
     virtual int32_t CheckNewAPIAccessPermission() = 0;
 
     /**

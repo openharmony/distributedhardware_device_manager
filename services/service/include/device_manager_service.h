@@ -98,6 +98,8 @@ public:
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
 
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash, const std::string &extra);
+
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
@@ -220,8 +222,12 @@ private:
     void UnloadDMServiceAdapterResident();
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
         int32_t bindLevel);
+    void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
+        int32_t bindLevel, uint64_t peerTokenId);
     void SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId);
     void SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
+    void SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+        uint64_t tokenId, uint64_t peerTokenId);
     void SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
     void SendAccountLogoutBroadCast(const std::vector<std::string> &peerUdids, const std::string &accountId,
         const std::string &accountName, int32_t userId);
