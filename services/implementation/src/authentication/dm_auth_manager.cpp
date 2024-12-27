@@ -1804,15 +1804,11 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
     ConnectionAddr addr;
     if (!targetId.wifiIp.empty() && targetId.wifiIp.length() <= IP_STR_MAX_LEN) {
         LOGI("DmAuthManager::ParseConnectAddr parse wifiIp: %{public}s.", GetAnonyString(targetId.wifiIp).c_str());
+        addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
         if (!addrType.empty()) {
             addr.type = static_cast<ConnectionAddrType>(std::atoi(addrType.c_str()));
-        } else {
-            addr.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
         }
-        if (memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length()) != DM_OK) {
-            LOGE("get ip: %{public}s failed", GetAnonyString(targetId.wifiIp).c_str());
-            return ERR_DM_SECURITY_FUNC_FAILED;
-        }
+        memcpy_s(addr.info.ip.ip, IP_STR_MAX_LEN, targetId.wifiIp.c_str(), targetId.wifiIp.length());
         addr.info.ip.port = targetId.wifiPort;
         deviceInfo->addr[index] = addr;
         deviceId = targetId.wifiIp;
@@ -1820,20 +1816,14 @@ int32_t DmAuthManager::ParseConnectAddr(const PeerTargetId &targetId, std::strin
     } else if (!targetId.brMac.empty() && targetId.brMac.length() <= BT_MAC_LEN) {
         LOGI("DmAuthManager::ParseConnectAddr parse brMac: %{public}s.", GetAnonyString(targetId.brMac).c_str());
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BR;
-        if (memcpy_s(addr.info.br.brMac, BT_MAC_LEN, targetId.brMac.c_str(), targetId.brMac.length()) != DM_OK) {
-            LOGE("get mac: %{public}s failed", GetAnonyString(targetId.brMac).c_str());
-            return ERR_DM_SECURITY_FUNC_FAILED;
-        }
+        memcpy_s(addr.info.br.brMac, BT_MAC_LEN, targetId.brMac.c_str(), targetId.brMac.length());
         deviceInfo->addr[index] = addr;
         deviceId = targetId.brMac;
         index++;
     } else if (!targetId.bleMac.empty() && targetId.bleMac.length() <= BT_MAC_LEN) {
         LOGI("DmAuthManager::ParseConnectAddr parse bleMac: %{public}s.", GetAnonyString(targetId.bleMac).c_str());
         addr.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
-        if (memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length()) != DM_OK) {
-            LOGE("get mac: %{public}s failed", GetAnonyString(targetId.bleMac).c_str());
-            return ERR_DM_SECURITY_FUNC_FAILED;
-        }
+        memcpy_s(addr.info.ble.bleMac, BT_MAC_LEN, targetId.bleMac.c_str(), targetId.bleMac.length());
         if (!targetId.deviceId.empty()) {
             Crypto::ConvertHexStringToBytes(addr.info.ble.udidHash, UDID_HASH_LEN,
                 targetId.deviceId.c_str(), targetId.deviceId.length());

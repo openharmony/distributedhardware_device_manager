@@ -67,7 +67,7 @@ int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outp
         LOGE("EncryptData fail=%{public}d", ret);
         return ERR_DM_CRYPTO_OPT_FAILED;
     }
-    if(memset_s(&cipherKey, sizeof(AesGcmCipherKey), 0, sizeof(AesGcmCipherKey)) != DM_OK) {
+    if (memset_s(&cipherKey, sizeof(AesGcmCipherKey), 0, sizeof(AesGcmCipherKey)) != DM_OK) {
         LOGE("memset_s failed.");
         return ERR_DM_CRYPTO_OPT_FAILED;
     }
