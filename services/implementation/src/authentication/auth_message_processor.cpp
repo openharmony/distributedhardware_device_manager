@@ -332,7 +332,7 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
             break;
         case MSG_TYPE_REQ_ENCRYPTMSG:
         case MSG_TYPE_RESP_ENCRYPTMSG:
-            ParseReqEncryptMessage(jsonObject);
+            ParseReqReCheckMessage(jsonObject);
             break;
         default:
             break;
@@ -685,7 +685,7 @@ void AuthMessageProcessor::CreateReqReCheckMessage(nlohmann::json &jsonObj)
     jsonObj[TAG_CRYPTIC_MSG] = encryptStr;
 }
 
-void AuthMessageProcessor::ParseReqEncryptMessage(nlohmann::json &json)
+void AuthMessageProcessor::ParseReqReCheckMessage(nlohmann::json &json)
 {
     std::string encryptStr = "";
     if (IsString(json, TAG_CRYPTIC_MSG)) {

@@ -117,7 +117,7 @@ private:
     void ParsePublicKeyMessageExt(nlohmann::json &json);
     void GetJsonObj(nlohmann::json &jsonObj);
     void CreateReqReCheckMessage(nlohmann::json &jsonObj);
-    void ParseReqEncryptMessage(nlohmann::json &json);
+    void ParseReqReCheckMessage(nlohmann::json &json);
 
 private:
     std::weak_ptr<DmAuthManager> authMgr_;
