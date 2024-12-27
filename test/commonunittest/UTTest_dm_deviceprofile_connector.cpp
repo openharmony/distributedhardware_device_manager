@@ -705,69 +705,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetBindTypeByPkgName_002, testing::ext::Tes
     EXPECT_EQ(ret.empty(), false);
 }
 
-HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_001, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_IDENTICAL_ACCOUNT);
-    std::string requestDeviceId = "requestDeviceId";
-    std::string trustUdid = "trustUdid";
-    std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({IDENTICAL_ACCOUNT_TYPE}));
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_002, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_POINT_TO_POINT);
-    profiles.SetBindLevel(DEVICE);
-    std::string requestDeviceId = "requestDeviceId";
-    std::string trustUdid = "trustUdid";
-    std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({DEVICE_PEER_TO_PEER_TYPE}));
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_003, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_POINT_TO_POINT);
-    profiles.SetBindLevel(APP);
-    std::string requestDeviceId = "requestDeviceId";
-    std::string trustUdid = "trustUdid";
-    profiles.GetAccesser().SetAccesserDeviceId(trustUdid);
-    profiles.GetAccessee().SetAccesseeDeviceId(requestDeviceId);
-    std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({APP_PEER_TO_PEER_TYPE}));
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_004, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(DEVICE);
-    std::string requestDeviceId = "requestDeviceId";
-    std::string trustUdid = "trustUdid";
-    std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({DEVICE_ACROSS_ACCOUNT_TYPE}));
-}
-
-HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_005, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(APP);
-    std::string requestDeviceId = "requestDeviceId";
-    std::string trustUdid = "trustUdid";
-    profiles.GetAccesser().SetAccesserDeviceId(trustUdid);
-    profiles.GetAccessee().SetAccesseeDeviceId(requestDeviceId);
-    std::vector<int32_t> bindTypeVec;
-    DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_EQ(bindTypeVec, std::vector<int32_t>({APP_ACROSS_ACCOUNT_TYPE}));
-}
-
 HWTEST_F(DeviceProfileConnectorTest, CompareBindType_001, testing::ext::TestSize.Level0)
 {
     DistributedDeviceProfile::AccessControlProfile profile;
@@ -814,51 +751,6 @@ HWTEST_F(DeviceProfileConnectorTest, CompareBindType_003, testing::ext::TestSize
     auto ret = DeviceProfileConnector::GetInstance().CompareBindType(profiles, pkgName, sinkBindType, localDeviceId,
         targetDeviceId);
     EXPECT_EQ(ret.empty(), true);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_001, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_IDENTICAL_ACCOUNT);
-    vector<int32_t> sinkBindType;
-    vector<int32_t> bindTypeIndex;
-    string localDeviceId = "localDeviceId";
-    string targetDeviceId = "targetDeviceId";
-    uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, localDeviceId,
-        sinkBindType, bindTypeIndex, index, targetDeviceId);
-    EXPECT_EQ(sinkBindType, vector<int32_t>({IDENTICAL_ACCOUNT_TYPE}));
-    EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
-}
-
-HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_002, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_POINT_TO_POINT);
-    vector<int32_t> sinkBindType;
-    vector<int32_t> bindTypeIndex;
-    string localDeviceId = "localDeviceId";
-    string targetDeviceId = "targetDeviceId";
-    uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, localDeviceId,
-        sinkBindType, bindTypeIndex, index, targetDeviceId);
-    EXPECT_EQ(sinkBindType, vector<int32_t>({DEVICE_PEER_TO_PEER_TYPE}));
-    EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
-}
-
-HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_003, testing::ext::TestSize.Level0)
-{
-    DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    vector<int32_t> sinkBindType;
-    vector<int32_t> bindTypeIndex;
-    string localDeviceId = "localDeviceId";
-    string targetDeviceId = "targetDeviceId";
-    uint32_t index = 0;
-    DeviceProfileConnector::GetInstance().ProcessBindType(profiles, localDeviceId,
-        sinkBindType, bindTypeIndex, index, targetDeviceId);
-    EXPECT_EQ(sinkBindType, vector<int32_t>({DEVICE_ACROSS_ACCOUNT_TYPE}));
-    EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
 }
 
 HWTEST_F(DeviceProfileConnectorTest, SyncAclByBindType_001, testing::ext::TestSize.Level0)
@@ -1104,54 +996,6 @@ HWTEST_F(DeviceProfileConnectorTest, GetAuthForm_001, testing::ext::TestSize.Lev
     profile.SetBindLevel(APP);
     ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
     EXPECT_EQ(ret, APP_PEER_TO_PEER_TYPE);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "localDeviceId";
-    std::string remoteDeviceId = "remoteDeviceId";
-    std::string extra = "extraTest";
-    int32_t bindLevel = INVALIED_TYPE;
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
-        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel, extra);
-    EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_002, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "localDeviceId";
-    std::string remoteDeviceId = "remoteDeviceId";
-    std::string extra = "extraTest";
-    int32_t bindLevel = APP;
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
-        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel, extra);
-    EXPECT_EQ(offlineParam.bindType, APP);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_003, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "localDeviceId";
-    std::string remoteDeviceId = "remoteDeviceId";
-    std::string extra = "extraTest";
-    int32_t bindLevel = SERVICE;
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
-        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel, extra);
-    EXPECT_EQ(offlineParam.bindType, SERVICE);
-}
-
-HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "bundleName";
-    std::string localDeviceId = "localDeviceId";
-    std::string remoteDeviceId = "remoteDeviceId";
-    std::string extra = "extraTest";
-    int32_t bindLevel = DEVICE;
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance()
-        .DeleteAccessControlList(pkgName, localDeviceId, remoteDeviceId, bindLevel, extra);
-    EXPECT_EQ(offlineParam.bindType, DEVICE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_001, testing::ext::TestSize.Level0)

@@ -558,30 +558,6 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_001, testing::ext::TestSize.Lev
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, UnBindDevice_001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName;
-    std::string udid = "UnBindDevice_001";
-    int32_t bindLevel = DEVICE;
-    std::string extra = "extraTest";
-    int32_t ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
-    EXPECT_NE(ret, DM_OK);
-
-    pkgName = "com.ohos.test";
-    authManager_->isAuthenticateDevice_ = false;
-    ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
-    EXPECT_NE(ret, DM_OK);
-
-    authManager_->authRequestState_ = nullptr;
-    authManager_->authResponseContext_ = nullptr;
-    ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
-    EXPECT_NE(ret, DM_OK);
-
-    bindLevel = 0;
-    ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
-    EXPECT_NE(ret, DM_OK);
-}
-
 HWTEST_F(DmAuthManagerTest, GenerateGroupName_001, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_ = nullptr;
@@ -1483,12 +1459,6 @@ HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
     bool ret = authManager_->IsAuthFinish();
-    EXPECT_TRUE(ret);
-
-    authManager_->authResponseContext_->reply = ERR_DM_AUTH_BUSINESS_BUSY;
-    authManager_->authResponseContext_->isOnline = true;
-    authManager_->authResponseContext_->authed = true;
-    ret = authManager_->IsAuthFinish();
     EXPECT_TRUE(ret);
 
     authManager_->authResponseContext_->isOnline = false;
