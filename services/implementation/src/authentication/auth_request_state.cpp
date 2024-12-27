@@ -243,7 +243,7 @@ int32_t AuthRequestEncryptMsgDone::Enter()
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
-    stateAuthManager->RequestVersionDone();
+    stateAuthManager->RequestEncryptMsgDone();
     return DM_OK;
 }
 } // namespace DistributedHardware

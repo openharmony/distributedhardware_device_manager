@@ -2806,15 +2806,15 @@ void DmAuthManager::RequestEncryptMsgDone()
 
 bool DmAuthManager::CheckSinkMsgValidity()
 {
-    LOGI("yangwei edition %{public}s, remoteVersion %{public}s, deviceId %{public}s, localDeviceId %{public}s,
-        localUserId %{public}d, remoteUserId %{public}d, localAccountId %{public}s, remoteAccountId %{public}s,
-        tokenId %{public}d, remoteTokenId %{public}d, bundleName %{public}s, hostPkgName %{public}s,
-        localBindLevel %{public}d, bindLevel %{public}d.", authResponseContext_->edition.c_str(),
+    LOGI("yangwei edition %{public}s, remoteVersion %{public}s, deviceId %{public}s, localDeviceId %{public}s,"
+        "localUserId %{public}d, remoteUserId %{public}d, localAccountId %{public}s, remoteAccountId %{public}s,"
+        "tokenId %{public}llu, remoteTokenId %{public}llu, bundleName %{public}s, hostPkgName %{public}s,"
+        "localBindLevel %{public}d, bindLevel %{public}d.", authResponseContext_->edition.c_str(),
         remoteVersion_.c_str(), authResponseContext_->deviceId.c_str(),
         authResponseContext_->localDeviceId.c_str(), authResponseContext_->localUserId,
         authResponseContext_->remoteUserId, authResponseContext_->localAccountId.c_str(),
         authResponseContext_->remoteAccountId.c_str(), authResponseContext_->tokenId,
-        authResponseContext_->remoteTokenId, authResponseContext_->bundleName, authResponseContext_->hostPkgName,
+        authResponseContext_->remoteTokenId, authResponseContext_->bundleName.c_str(), authResponseContext_->hostPkgName.c_str(),
         authResponseContext_->localBindLevel, authResponseContext_->bindLevel);
     if (authResponseContext_->edition != remoteVersion_ ||
         authResponseContext_->deviceId != authResponseContext_->localDeviceId ||
@@ -2830,15 +2830,15 @@ bool DmAuthManager::CheckSinkMsgValidity()
 
 bool DmAuthManager::CheckSourceMsgValidity()
 {
-    LOGI("yangwei edition %{public}s, remoteVersion %{public}s, deviceId %{public}s, localDeviceId %{public}s,
-        localUserId %{public}d, remoteUserId %{public}d, localAccountId %{public}s, remoteAccountId %{public}s,
-        tokenId %{public}d, remoteTokenId %{public}d, bundleName %{public}s, hostPkgName %{public}s,
-        localBindLevel %{public}d, bindLevel %{public}d.", authResponseContext_->edition.c_str(),
+    LOGI("yangwei edition %{public}s, remoteVersion %{public}s, deviceId %{public}s, localDeviceId %{public}s,"
+        "localUserId %{public}d, remoteUserId %{public}d, localAccountId %{public}s, remoteAccountId %{public}s,"
+        "tokenId %{public}llu, remoteTokenId %{public}llu, bundleName %{public}s, hostPkgName %{public}s,"
+        "localBindLevel %{public}d, bindLevel %{public}d.", authResponseContext_->edition.c_str(),
         remoteVersion_.c_str(), authResponseContext_->deviceId.c_str(),
         authResponseContext_->localDeviceId.c_str(), authResponseContext_->localUserId,
         authRequestContext_->remoteUserId, authResponseContext_->localAccountId.c_str(),
         authRequestContext_->remoteAccountId.c_str(), authResponseContext_->tokenId,
-        authResponseContext_->remoteTokenId, authResponseContext_->bundleName, authResponseContext_->hostPkgName,
+        authResponseContext_->remoteTokenId, authResponseContext_->bundleName.c_str(), authResponseContext_->hostPkgName.c_str(),
         authResponseContext_->localBindLevel, authResponseContext_->bindLevel);
     if (authResponseContext_->edition != remoteVersion_ ||
         authResponseContext_->deviceId != authResponseContext_->localDeviceId ||

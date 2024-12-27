@@ -118,6 +118,7 @@ private:
     void GetJsonObj(nlohmann::json &jsonObj);
     void CreateReqEncryptMessage(nlohmann::json &jsonObj);
     void ParseReqEncryptMessage(nlohmann::json &json);
+    void ParseRespEncryptMessage(nlohmann::json &json);
 
 private:
     std::weak_ptr<DmAuthManager> authMgr_;
