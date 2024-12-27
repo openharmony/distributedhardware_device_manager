@@ -144,7 +144,6 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     }
     int32_t msgType = jsonObject[TAG_MSG_TYPE].get<int32_t>();
     LOGI("start, msgType: %{public}d.", msgType);
-    LOGI("yangwei message %{public}s.", message.c_str());
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SendData Start encryption.");
     }
@@ -191,7 +190,6 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
         LOGI("Start decryption.");
     }
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
-    LOGI("yangwei message %{public}s.", message.c_str());
     nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");

@@ -462,8 +462,7 @@ void DmAuthManager::DeleteOffLineTimer(int32_t sessionId)
 
 void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result)
 {
-    LOGI("DmAuthManager::OnSessionOpened, sessionId = %{public}d and sessionSide = %{public}d result = %{public}d",
-         sessionId, sessionSide, result);
+    LOGI("sessionId = %{public}d and sessionSide = %{public}d result = %{public}d", sessionId, sessionSide, result);
     DeleteOffLineTimer(sessionId);
     if (sessionSide == AUTH_SESSION_SIDE_SERVER) {
         if (authResponseState_ == nullptr && authRequestState_ == nullptr) {
@@ -504,9 +503,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
             struct RadarInfo info = { .funcName = "OnSessionOpened" };
             info.channelId = sessionId;
-            if (!DmRadarHelper::GetInstance().ReportAuthSendRequest(info)) {
-                LOGE("ReportAuthSendRequest failed");
-            }
+            DmRadarHelper::GetInstance().ReportAuthSendRequest(info);
         } else {
             softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
             LOGE("DmAuthManager::OnSessionOpened but request state is wrong");
@@ -2144,7 +2141,7 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
         LOGI("AuthDeviceError sink authTimes %{public}d.", authTimes_);
         if (authTimes_ >= MAX_AUTH_TIMES) {
             authResponseContext_->isFinish = false;
-            authResponseContext_->reply = ERR_DM_BIND_PIN_CODE_ERROR;
+            authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;
             authResponseContext_->state = AuthState::AUTH_RESPONSE_SHOW;
             isFinishOfLocal_ = false;
             authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());

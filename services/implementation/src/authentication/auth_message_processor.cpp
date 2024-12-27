@@ -175,7 +175,6 @@ void AuthMessageProcessor::CreatePublicKeyMessageExt(nlohmann::json &json)
             LOGE("EncryptMessage failed.");
             return;
         }
-        LOGI("yangwei encryptStr %{public}s, strTemp %{public}s.", encryptStr.c_str(), strTemp.c_str());
         json[TAG_CRYPTIC_MSG] = encryptStr;
         return;
     }
@@ -361,7 +360,6 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(nlohmann::json &json)
             LOGE("DecryptMessage failed.");
             return;
         }
-        LOGI("yangwei encryptStr %{public}s, decryptStr %{public}s.", encryptStr.c_str(), decryptStr.c_str());
         nlohmann::json jsonObject = nlohmann::json::parse(decryptStr, nullptr, false);
         if (jsonObject.is_discarded()) {
             LOGE("DecodeRequestAuth jsonStr error");
@@ -684,7 +682,6 @@ void AuthMessageProcessor::CreateReqEncryptMessage(nlohmann::json &jsonObj)
         LOGE("EncryptMessage failed.");
         return;
     }
-    LOGI("yangwei encryptStr %{public}s, strTemp %{public}s.", encryptStr.c_str(), strTemp.c_str());
     jsonObj[TAG_CRYPTIC_MSG] = encryptStr;
 }
 
@@ -707,7 +704,6 @@ void AuthMessageProcessor::ParseReqEncryptMessage(nlohmann::json &json)
         LOGE("DecryptMessage failed.");
         return;
     }
-    LOGI("yangwei encryptStr %{public}s, decryptStr %{public}s.", encryptStr.c_str(), decryptStr.c_str());
     nlohmann::json jsonObject = nlohmann::json::parse(decryptStr, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
@@ -734,7 +730,7 @@ void AuthMessageProcessor::ParseReqEncryptMessage(nlohmann::json &json)
     if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
         authResponseContext_->localBindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
     }
- }
+}
 
 int32_t AuthMessageProcessor::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
 {
