@@ -264,6 +264,15 @@ const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
     { ERR_DM_AUTH_CODE_INCORRECT, 96929796 }, { ERR_DM_BIND_USER_CANCEL_PIN_CODE_DISPLAY, 96929799 },
     { ERR_DM_SYNC_DELETE_DEVICE_REPEATED, 96929801 }
 };
+
+/* Interface Name */
+const std::string IMPORT_AUTHCODE = "ImportAuthCode";
+const std::string EXPORT_AUTHCODE = "ExportAuthCode";
+const std::string REGISTER_PINHOLDER_CALLBACK = "RegisterPinHolderCallback";
+const std::string CREATE_PINHOLDER = "CreatePinHolder";
+const std::string DESTROY_PINHOLDER = "DestroyPinHolder";
+const std::string SET_DNPOLICY = "SetDnPolicy";
+const std::string BIND_FOR_DEVICE_LEVEL = "BindForDeviceLevel";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

@@ -79,6 +79,7 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);
     AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
     DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
+    PermissionManager::GetInstance().Init();
 }
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
@@ -169,6 +170,7 @@ void IpcServerStub::OnStop()
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 #endif // SUPPORT_MEMMGR
+    PermissionManager::GetInstance().UnInit();
     LOGI("IpcServerStub::OnStop end.");
 }
 

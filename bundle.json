@@ -72,7 +72,8 @@
                 "service_group": [
                     "//foundation/distributedhardware/device_manager:device_manager",
                     "//foundation/distributedhardware/device_manager/sa_profile:device_manager.cfg",
-                    "//foundation/distributedhardware/device_manager/sa_profile:dm_sa_profile"
+                    "//foundation/distributedhardware/device_manager/sa_profile:dm_sa_profile",
+                    "//foundation/distributedhardware/device_manager/permission:dm_permission_json"
                 ]
             },
             "inner_kits": [{

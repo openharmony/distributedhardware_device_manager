@@ -44,19 +44,6 @@ void PermissionManagerTest::SetUp()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 constexpr int32_t PAKAGE_NAME_SIZE_MAX = 256;
-#define AUTH_CODE_WHITE_LIST_NUM (5)
-constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
-    "com.huawei.msdp.hmringgenerator",
-    "com.huawei.msdp.hmringdiscriminator",
-    "CollaborationFwk",
-    "wear_link_service",
-    "watch_system_service",
-};
-
-#define PIN_HOLDER_WHITE_LIST_NUM (1)
-constexpr const static char g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
-    "CollaborationFwk",
-};
 
 #define SYSTEM_SA_WHITE_LIST_NUM (4)
 constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
@@ -65,6 +52,7 @@ constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_N
     "ohos.dslm",
     "ohos.deviceprofile",
 };
+
 void PermissionManagerTest::TearDown()
 {
 }
@@ -104,108 +92,6 @@ HWTEST_F(PermissionManagerTest, GetCallerProcessName_001, testing::ext::TestSize
     ASSERT_EQ(ret, DM_OK);
 }
 
-/**
- * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_001
- * @tc.desc: the return value is false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_001, testing::ext::TestSize.Level0)
-{
-    std::string processName;
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
-    ASSERT_EQ(ret, false);
-}
-
-/**
- * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_002
- * @tc.desc: the return value is false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_002, testing::ext::TestSize.Level0)
-{
-    std::string processName = "processName";
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
-    ASSERT_EQ(ret, false);
-}
-
-/**
- * @tc.name: PinAuthUi::CheckProcessNameValidOnAuthCode_003
- * @tc.desc: the return value is true
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_003, testing::ext::TestSize.Level0)
-{
-    std::string processName1(g_authCodeWhiteList[0]);
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName1);
-    ASSERT_EQ(ret, true);
-    std::string processName2(g_authCodeWhiteList[1]);
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName2);
-    ASSERT_EQ(ret, true);
-    std::string processName3(g_authCodeWhiteList[2]);
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName3);
-    ASSERT_EQ(ret, true);
-    std::string processName4(g_authCodeWhiteList[3]);
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName4);
-    ASSERT_EQ(ret, true);
-    std::string processName5(g_authCodeWhiteList[4]);
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName5);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnAuthCode_004, testing::ext::TestSize.Level0)
-{
-    std::string processName = "CollaborationFwk";
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName);
-    ASSERT_TRUE(ret);
-}
-/**
- * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_001
- * @tc.desc: the return value is false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_001, testing::ext::TestSize.Level0)
-{
-    std::string processName;
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
-    ASSERT_EQ(ret, false);
-}
-
-/**
- * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_002
- * @tc.desc: the return value is false
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_002, testing::ext::TestSize.Level0)
-{
-    std::string processName = "processName";
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
-    ASSERT_EQ(ret, false);
-}
-
-/**
- * @tc.name: PinAuthUi::CheckProcessNameValidOnPinHolder_003
- * @tc.desc: the return value is true
- * @tc.type: FUNC
- * @tc.require: AR000GHSJK
- */
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_003, testing::ext::TestSize.Level0)
-{
-    std::string processName1(g_pinHolderWhiteList[0]);
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName1);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnPinHolder_004, testing::ext::TestSize.Level0)
-{
-    std::string processName = "CollaborationFwk";
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName);
-    ASSERT_TRUE(ret);
-}
 /**
  * @tc.name: PinAuthUi::CheckWhiteListSystemSA_001
  * @tc.desc: the return value is false
@@ -262,25 +148,6 @@ HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSi
 {
     bool ret = PermissionManager::GetInstance().CheckMonitorPermission();
     ASSERT_FALSE(ret);
-}
-
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnSetDnPolicy_001, testing::ext::TestSize.Level0)
-{
-    std::string processName = "";
-    bool ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
-    ASSERT_FALSE(ret);
-
-    processName = "processName";
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
-    ASSERT_FALSE(ret);
-
-    processName = "collaboration_service";
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
-    ASSERT_TRUE(ret);
-
-    processName = "watch_system_service";
-    ret = PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName);
-    ASSERT_TRUE(ret);
 }
 }
 } // namespace DistributedHardware
