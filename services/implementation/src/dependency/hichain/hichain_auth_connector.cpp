@@ -165,9 +165,11 @@ int32_t HiChainAuthConnector::GenerateCredential(std::string &localUdid, int32_t
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_CREATE, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain generate credential failed.");
+        DeleteArrayPtr(returnData);
         return ERR_DM_FAILED;
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
+    DeleteArrayPtr(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("Decode generate return data jsonStr error.");
@@ -198,9 +200,11 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_QUERY, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain query credential failed.");
+        DeleteArrayPtr(returnData);
         return false;
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
+    DeleteArrayPtr(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("Decode query return data jsonStr error.");
@@ -229,9 +233,11 @@ int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAc
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_QUERY, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain query credential failed.");
+        DeleteArrayPtr(returnData);
         return ERR_DM_FAILED;
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
+    DeleteArrayPtr(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("Decode query return data jsonStr error.");
@@ -261,9 +267,11 @@ int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string 
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_IMPORT, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain query credential failed.");
+        DeleteArrayPtr(returnData);
         return ERR_DM_FAILED;
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
+    DeleteArrayPtr(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("Decode import return data jsonStr error.");
@@ -292,9 +300,11 @@ int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int3
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_DELETE, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain query credential failed.");
+        DeleteArrayPtr(returnData);
         return false;
     }
     std::string returnDataStr = static_cast<std::string>(returnData);
+    DeleteArrayPtr(returnData);
     nlohmann::json jsonObject = nlohmann::json::parse(returnDataStr, nullptr, false);
     if (jsonObject.is_discarded()) {
         LOGE("Decode import return data jsonStr error.");
