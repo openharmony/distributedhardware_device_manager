@@ -332,10 +332,8 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
             ParsePublicKeyMessageExt(jsonObject);
             break;
         case MSG_TYPE_REQ_ENCRYPTMSG:
-            ParseReqEncryptMessage(jsonObject);
-            break;
         case MSG_TYPE_RESP_ENCRYPTMSG:
-            ParseRespEncryptMessage(jsonObject);
+            ParseReqEncryptMessage(jsonObject);
             break;
         default:
             break;
@@ -698,66 +696,6 @@ void AuthMessageProcessor::ParseReqEncryptMessage(nlohmann::json &json)
     }
     std::string decryptStr = "";
     authResponseContext_->edition = "";
-    authResponseContext_->deviceId = "";
-    authResponseContext_->localUserId = 0;
-    authResponseContext_->localAccountId = "";
-    authResponseContext_->tokenId = 0;
-    authResponseContext_->bundleName = "";
-    authResponseContext_->localBindLevel = -1;
-    CHECK_NULL_VOID(cryptoMgr_);
-    if (cryptoMgr_->DecryptMessage(encryptStr, decryptStr) != DM_OK) {
-        LOGE("DecryptMessage failed.");
-        return;
-    }
-    LOGI("yangwei encryptStr %{public}s, decryptStr %{public}s.", encryptStr.c_str(), decryptStr.c_str());
-    nlohmann::json jsonObject = nlohmann::json::parse(decryptStr, nullptr, false);
-    if (jsonObject.is_discarded()) {
-        LOGE("DecodeRequestAuth jsonStr error");
-        return;
-    }
-    if (IsString(jsonObject, TAG_EDITION)) {
-        authResponseContext_->edition = jsonObject[TAG_EDITION].get<std::string>();
-    }
-    if (IsString(jsonObject, TAG_LOCAL_DEVICE_ID)) {
-        authResponseContext_->deviceId = jsonObject[TAG_LOCAL_DEVICE_ID].get<std::string>();
-    }
-    if (IsInt32(jsonObject, TAG_LOCAL_USERID)) {
-        authResponseContext_->localUserId = jsonObject[TAG_LOCAL_USERID].get<int32_t>();
-    }
-    if (IsString(jsonObject, TAG_LOCAL_ACCOUNTID)) {
-        authResponseContext_->localAccountId = jsonObject[TAG_LOCAL_ACCOUNTID].get<std::string>();
-    }
-    if (IsInt64(jsonObject, TAG_TOKENID)) {
-        authResponseContext_->tokenId = jsonObject[TAG_TOKENID].get<int64_t>();
-    }
-    if (IsString(jsonObject, TAG_BUNDLE_NAME)) {
-        authResponseContext_->bundleName = jsonObject[TAG_BUNDLE_NAME].get<std::string>();
-    }
-    if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
-        authResponseContext_->localBindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
-    }
- }
-
-int32_t AuthMessageProcessor::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
-{
-    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
-    return cryptoMgr_->SaveSessionKey(sessionKey, keyLen);
-}
-
-void AuthMessageProcessor::SetEncryptFlag(bool flag)
-{
-    std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
-    encryptFlag_ = flag;
-}
-
-void AuthMessageProcessor::ParseRespEncryptMessage(nlohmann::json &json)
-{
-    std::string encryptStr = "";
-    if (IsString(json, TAG_CRYPTIC_MSG)) {
-        encryptStr = json[TAG_CRYPTIC_MSG].get<std::string>();
-    }
-    std::string decryptStr = "";
-    authResponseContext_->edition = "";
     authResponseContext_->localDeviceId = "";
     authResponseContext_->localUserId = 0;
     authResponseContext_->localAccountId = "";
@@ -796,6 +734,18 @@ void AuthMessageProcessor::ParseRespEncryptMessage(nlohmann::json &json)
     if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
         authResponseContext_->localBindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
     }
+ }
+
+int32_t AuthMessageProcessor::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
+{
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
+    return cryptoMgr_->SaveSessionKey(sessionKey, keyLen);
+}
+
+void AuthMessageProcessor::SetEncryptFlag(bool flag)
+{
+    std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
+    encryptFlag_ = flag;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
