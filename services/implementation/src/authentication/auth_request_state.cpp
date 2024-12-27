@@ -217,7 +217,7 @@ int32_t AuthRequestAuthFinish::Enter()
 
 int32_t AuthRequestEncryptMsg::GetStateType()
 {
-    return AuthState::AUTH_REQUEST_ENCRYPTMSG;
+    return AuthState::AUTH_REQUEST_RECHECK_MSG;
 }
 
 int32_t AuthRequestEncryptMsg::Enter()

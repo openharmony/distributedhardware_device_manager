@@ -146,7 +146,7 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
             break;
         case MSG_TYPE_REQ_ENCRYPTMSG:
         case MSG_TYPE_RESP_ENCRYPTMSG:
-            CreateReqEncryptMessage(jsonObj);
+            CreateReqReCheckMessage(jsonObj);
             break;
         default:
             break;
@@ -665,7 +665,7 @@ std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const
     return SafetyDump(jsonObj);
 }
 
-void AuthMessageProcessor::CreateReqEncryptMessage(nlohmann::json &jsonObj)
+void AuthMessageProcessor::CreateReqReCheckMessage(nlohmann::json &jsonObj)
 {
     nlohmann::json jsonTemp;
     jsonTemp[TAG_EDITION] = authResponseContext_->edition;

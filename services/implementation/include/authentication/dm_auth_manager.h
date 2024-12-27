@@ -48,7 +48,7 @@ typedef enum AuthState {
     AUTH_REQUEST_CREDENTIAL,
     AUTH_REQUEST_CREDENTIAL_DONE,
     AUTH_REQUEST_AUTH_FINISH,
-    AUTH_REQUEST_ENCRYPTMSG,
+    AUTH_REQUEST_RECHECK_MSG,
     AUTH_REQUEST_ENCRYPTMSG_DONE,
 
     AUTH_RESPONSE_INIT = 20,
@@ -550,8 +550,8 @@ private:
     void SetProcessInfo();
     int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
     void ConverToFinish();
-    bool CheckSinkMsgValidity();
-    bool CheckSourceMsgValidity();
+    bool IsSinkMsgValid();
+    bool IsSourceMsgValid();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

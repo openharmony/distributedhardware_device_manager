@@ -548,7 +548,7 @@ void DmAuthManager::ProcessSourceMsg()
             }
             break;
         case MSG_TYPE_RESP_ENCRYPTMSG:
-            if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_ENCRYPTMSG) {
+            if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_RECHECK_MSG) {
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestEncryptMsgDone>());
             }
             break;
@@ -2773,7 +2773,7 @@ void DmAuthManager::ResponseEncryptMsg()
 {
     LOGI("remoteVersion %{public}s, authResponseContext_->edition %{public}s.",
         remoteVersion_.c_str(), authResponseContext_->edition.c_str());
-    if (!CheckSinkMsgValidity()) {
+    if (!IsSinkMsgValid()) {
         LOGE("peer deviceId not trust.");
         authResponseContext_->isFinish = false;
         isFinishOfLocal_ = false;
@@ -2804,7 +2804,7 @@ void DmAuthManager::RequestEncryptMsgDone()
 {
     LOGI("remoteVersion %{public}s, authResponseContext_->edition %{public}s.",
         remoteVersion_.c_str(), authResponseContext_->edition.c_str());
-    if (!CheckSourceMsgValidity()) {
+    if (!IsSourceMsgValid()) {
         LOGE("peer deviceId not trust.");
         authResponseContext_->isFinish = false;
         isFinishOfLocal_ = false;
@@ -2816,7 +2816,7 @@ void DmAuthManager::RequestEncryptMsgDone()
     authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
 }
 
-bool DmAuthManager::CheckSinkMsgValidity()
+bool DmAuthManager::IsSinkMsgValid()
 {
     if (authResponseContext_->edition != remoteVersion_ ||
         authResponseContext_->localDeviceId != remoteDeviceId_ ||
@@ -2830,7 +2830,7 @@ bool DmAuthManager::CheckSinkMsgValidity()
     return true;
 }
 
-bool DmAuthManager::CheckSourceMsgValidity()
+bool DmAuthManager::IsSourceMsgValid()
 {
     if (authResponseContext_->edition != remoteVersion_ ||
         authResponseContext_->localDeviceId != remoteDeviceId_ ||

@@ -116,7 +116,7 @@ private:
     void CreatePublicKeyMessageExt(nlohmann::json &json);
     void ParsePublicKeyMessageExt(nlohmann::json &json);
     void GetJsonObj(nlohmann::json &jsonObj);
-    void CreateReqEncryptMessage(nlohmann::json &jsonObj);
+    void CreateReqReCheckMessage(nlohmann::json &jsonObj);
     void ParseReqEncryptMessage(nlohmann::json &json);
 
 private:
