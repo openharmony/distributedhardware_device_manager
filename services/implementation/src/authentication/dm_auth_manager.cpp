@@ -1004,6 +1004,7 @@ void DmAuthManager::GetAuthRequestContext()
     } else {
         authResponseContext_->isOnline = false;
     }
+    authResponseContext_->haveCredential = false;
 }
 
 void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
