@@ -49,6 +49,7 @@ struct RelationShipChangeMsg {
     uint32_t userId;
     std::string accountId;
     uint64_t tokenId;
+    uint64_t peerTokenId = 0;
     // The broadcast need send to these devices with the udids
     std::vector<std::string> peerUdids;
     // The broadcast from which device with the udid.

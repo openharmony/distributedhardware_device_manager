@@ -106,7 +106,6 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     g_authManager->RegisterUiStateCallback(str);
     g_authManager->UnRegisterUiStateCallback(str);
     g_authManager->UnAuthenticateDevice(str, str, bindLevel);
-    g_authManager->UnBindDevice(str, str, bindLevel);
 }
 }
 }

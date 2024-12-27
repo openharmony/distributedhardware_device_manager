@@ -33,11 +33,16 @@ constexpr const char* TAG_THUMBNAIL_SIZE = "THUMSIZE";
 AuthMessageProcessor::AuthMessageProcessor(std::shared_ptr<DmAuthManager> authMgr) : authMgr_(authMgr)
 {
     LOGI("AuthMessageProcessor constructor");
+    cryptoMgr_ = std::make_shared<CryptoMgr>();
 }
 
 AuthMessageProcessor::~AuthMessageProcessor()
 {
     authMgr_.reset();
+    if (cryptoMgr_ != nullptr) {
+        cryptoMgr_->ClearSessionKey();
+        cryptoMgr_ = nullptr;
+    }
 }
 
 void AuthMessageProcessor::GetJsonObj(nlohmann::json &jsonObj)
@@ -81,6 +86,10 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 {
     LOGI("AuthMessageProcessor::CreateAuthRequestMessage start.");
     std::vector<std::string> jsonStrVec;
+    if (authRequestContext_ == nullptr) {
+        LOGE("AuthMessageProcessor::CreateAuthRequestMessage authRequestContext_ is nullptr.");
+        return jsonStrVec;
+    }
     int32_t thumbnailSize = (int32_t)(authRequestContext_->appThumbnail.size());
     int32_t thumbnailSlice = ((thumbnailSize / MSG_MAX_SIZE) + (thumbnailSize % MSG_MAX_SIZE) == 0 ? 0 : 1);
     nlohmann::json jsonObj;
@@ -135,6 +144,10 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
         case MSG_TYPE_RESP_PUBLICKEY:
             CreatePublicKeyMessageExt(jsonObj);
             break;
+        case MSG_TYPE_REQ_VERSION:
+        case MSG_TYPE_RESP_VERSION:
+            CreateReqVersionMessage(jsonObj);
+            break;
         default:
             break;
     }
@@ -143,7 +156,28 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
 
 void AuthMessageProcessor::CreatePublicKeyMessageExt(nlohmann::json &json)
 {
-    json[TAG_PUBLICKEY] = authResponseContext_->publicKey;
+    bool encryptFlag = false;
+    {
+        std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
+        encryptFlag = encryptFlag_;
+    }
+    if (!encryptFlag) {
+        LOGI("not encrypt publickey.");
+        json[TAG_PUBLICKEY] = authResponseContext_->publicKey;
+        return;
+    } else {
+        nlohmann::json jsonTemp;
+        jsonTemp[TAG_PUBLICKEY] = authResponseContext_->publicKey;
+        std::string strTemp = SafetyDump(jsonTemp);
+        std::string encryptStr = "";
+        CHECK_NULL_VOID(cryptoMgr_);
+        if (cryptoMgr_->EncryptMessage(strTemp, encryptStr) != DM_OK) {
+            LOGE("EncryptMessage failed.");
+            return;
+        }
+        json[TAG_CRYPTIC_MSG] = encryptStr;
+        return;
+    }
 }
 
 void AuthMessageProcessor::CreateResponseAuthMessageExt(nlohmann::json &json)
@@ -177,6 +211,7 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_DMVERSION] = authResponseContext_->dmVersion;
     json[TAG_HOST] = authResponseContext_->hostPkgName;
     json[TAG_BUNDLE_NAME] = authResponseContext_->bundleName;
+    json[TAG_PEER_BUNDLE_NAME] = authResponseContext_->peerBundleName;
     json[TAG_TOKENID] = authResponseContext_->tokenId;
     json[TAG_IDENTICAL_ACCOUNT] = authResponseContext_->isIdenticalAccount;
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
@@ -295,6 +330,10 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
         case MSG_TYPE_RESP_PUBLICKEY:
             ParsePublicKeyMessageExt(jsonObject);
             break;
+        case MSG_TYPE_REQ_VERSION:
+        case MSG_TYPE_RESP_VERSION:
+            ParseReqVersionMessage(jsonObject);
+            break;
         default:
             break;
     }
@@ -303,8 +342,33 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
 
 void AuthMessageProcessor::ParsePublicKeyMessageExt(nlohmann::json &json)
 {
-    if (IsString(json, TAG_PUBLICKEY)) {
+    bool encryptFlag = false;
+    {
+        std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
+        encryptFlag = encryptFlag_;
+    }
+    if (!encryptFlag && IsString(json, TAG_PUBLICKEY)) {
         authResponseContext_->publicKey = json[TAG_PUBLICKEY].get<std::string>();
+        return;
+    }
+    if (encryptFlag && IsString(json, TAG_CRYPTIC_MSG)) {
+        std::string encryptStr = json[TAG_CRYPTIC_MSG].get<std::string>();
+        std::string decryptStr = "";
+        authResponseContext_->publicKey = "";
+        CHECK_NULL_VOID(cryptoMgr_);
+        if (cryptoMgr_->DecryptMessage(encryptStr, decryptStr) != DM_OK) {
+            LOGE("DecryptMessage failed.");
+            return;
+        }
+        nlohmann::json jsonObject = nlohmann::json::parse(decryptStr, nullptr, false);
+        if (jsonObject.is_discarded()) {
+            LOGE("DecodeRequestAuth jsonStr error");
+            return;
+        }
+        if (IsString(jsonObject, TAG_PUBLICKEY)) {
+            authResponseContext_->publicKey = jsonObject[TAG_PUBLICKEY].get<std::string>();
+        }
+        return;
     }
 }
 
@@ -530,6 +594,11 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
     if (IsString(json, TAG_BUNDLE_NAME)) {
         authResponseContext_->bundleName = json[TAG_BUNDLE_NAME].get<std::string>();
     }
+    if (IsString(json, TAG_PEER_BUNDLE_NAME)) {
+        authResponseContext_->peerBundleName = json[TAG_PEER_BUNDLE_NAME].get<std::string>();
+    } else {
+        authResponseContext_->peerBundleName = authResponseContext_->hostPkgName;
+    }
     ParsePkgNegotiateMessage(json);
 }
 
@@ -594,6 +663,55 @@ std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const
     jsonObj[TAG_DATA] = authDataStr;
     jsonObj[TAG_DATA_LEN] = dataLen;
     return SafetyDump(jsonObj);
+}
+
+void AuthMessageProcessor::CreateReqVersionMessage(nlohmann::json &jsonObj)
+{
+    nlohmann::json jsonTemp;
+    jsonTemp[TAG_EDITION] = authResponseContext_->edition;
+    std::string strTemp = SafetyDump(jsonTemp);
+    std::string encryptStr = "";
+    CHECK_NULL_VOID(cryptoMgr_);
+    if (cryptoMgr_->EncryptMessage(strTemp, encryptStr) != DM_OK) {
+        LOGE("EncryptMessage failed.");
+        return;
+    }
+    jsonObj[TAG_CRYPTIC_MSG] = encryptStr;
+}
+
+void AuthMessageProcessor::ParseReqVersionMessage(nlohmann::json &json)
+{
+    std::string encryptStr = "";
+    if (IsString(json, TAG_CRYPTIC_MSG)) {
+        encryptStr = json[TAG_CRYPTIC_MSG].get<std::string>();
+    }
+    std::string decryptStr = "";
+    authResponseContext_->edition = "";
+    CHECK_NULL_VOID(cryptoMgr_);
+    if (cryptoMgr_->DecryptMessage(encryptStr, decryptStr) != DM_OK) {
+        LOGE("DecryptMessage failed.");
+        return;
+    }
+    nlohmann::json jsonObject = nlohmann::json::parse(decryptStr, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return;
+    }
+    if (IsString(jsonObject, TAG_EDITION)) {
+        authResponseContext_->edition = jsonObject[TAG_EDITION].get<std::string>();
+    }
+}
+
+int32_t AuthMessageProcessor::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
+{
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
+    return cryptoMgr_->SaveSessionKey(sessionKey, keyLen);
+}
+
+void AuthMessageProcessor::SetEncryptFlag(bool flag)
+{
+    std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
+    encryptFlag_ = flag;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

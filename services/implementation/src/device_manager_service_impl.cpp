@@ -129,7 +129,19 @@ int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const
             pkgName.c_str(), GetAnonyString(udid).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return authMgr_->UnBindDevice(pkgName, udid, bindLevel);
+    std::string extra = "";
+    return authMgr_->UnBindDevice(pkgName, udid, bindLevel, extra);
+}
+
+int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const std::string &udid,
+    int32_t bindLevel, const std::string &extra)
+{
+    if (pkgName.empty() || udid.empty()) {
+        LOGE("DeviceManagerServiceImpl::UnBindDevice failed, pkgName is %{public}s, udid is %{public}s",
+            pkgName.c_str(), GetAnonyString(udid).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return authMgr_->UnBindDevice(pkgName, udid, bindLevel, extra);
 }
 
 int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t action,
@@ -626,6 +638,22 @@ int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
     return DeviceProfileConnector::GetInstance().IsSameAccount(udid);
 }
 
+uint64_t DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId(std::string pkgName,
+    std::string requestDeviceId)
+{
+    if (pkgName.empty()) {
+        LOGE("DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId error: pkgName.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    if (requestDeviceId.empty()) {
+        LOGE("DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId error: requestDeviceId.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    return DeviceProfileConnector::GetInstance().GetTokenIdByNameAndDeviceId(pkgName, requestDeviceId);
+}
+
 std::unordered_map<std::string, DmAuthForm> DeviceManagerServiceImpl::GetAppTrustDeviceIdList(
     std::string pkgname)
 {
@@ -812,6 +840,25 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
     std::string localUdid = std::string(localUdidTemp);
     ProcessInfo processInfo =
         DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
+    if (processInfo.pkgName.empty()) {
+        LOGE("Pkgname is empty.");
+        return;
+    }
+    CHECK_NULL_VOID(softbusConnector_);
+    softbusConnector_->SetProcessInfo(processInfo);
+    softbusConnector_->HandleDeviceOffline(remoteUdid);
+}
+
+void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId, int32_t peerTokenId)
+{
+    LOGI("HandleAppUnBindEvent peerTokenId = %{public}d.", peerTokenId);
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    ProcessInfo processInfo =
+        DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid,
+        tokenId, localUdid, peerTokenId);
     if (processInfo.pkgName.empty()) {
         LOGE("Pkgname is empty.");
         return;

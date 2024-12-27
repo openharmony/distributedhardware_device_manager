@@ -69,15 +69,6 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
     return g_checkIsOnlineReturnBoolValue;
 }
 
-DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string &pkgName,
-    const std::string &localDeviceId, const std::string &remoteDeviceId, int32_t bindLevel)
-{
-    DmOfflineParam offlineParam;
-    offlineParam.bindType = g_bindType;
-    offlineParam.leftAclNumber = g_leftAclNumber;
-    return offlineParam;
-}
-
 bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
 {
     return g_reportAuthConfirmBoxReturnBoolValue;
@@ -218,45 +209,6 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level0)
     authManager_->authResponseState_->context_->cryptoVer = jsonObject[TAG_CRYPTO_VERSION];
     authManager_->ProcRespNegotiate(sessionId);
     EXPECT_FALSE(authManager_->authResponseContext_->isOnline);
-}
-
-HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    std::string localUdid = "localUdid";
-    std::string remoteUdid = "remoteUdid";
-    int32_t sessionId = 0;
-    int32_t bindLevel = APP;
-    g_bindType = INVALIED_TYPE;
-    int32_t ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    bindLevel = APP;
-    g_bindType = APP_PEER_TO_PEER_TYPE;
-    g_leftAclNumber = 1;
-    authManager_->softbusConnector_->deviceStateManagerCallback_ = std::make_shared<SoftbusStateCallbackMock>();
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
-    EXPECT_EQ(ret, DM_OK);
-
-    g_leftAclNumber = 0;
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
-    EXPECT_EQ(ret, DM_OK);
-
-    bindLevel = DEVICE;
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
-    EXPECT_EQ(ret, DM_OK);
-
-    g_leftAclNumber = 1;
-    g_peerUdidHash = "test";
-    authManager_->DeleteOffLineTimer(sessionId);
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
-    EXPECT_EQ(ret, DM_OK);
-
-    authManager_->softbusConnector_ = nullptr;
-    authManager_->DeleteOffLineTimer(sessionId);
-    bindLevel = 0;
-    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthenticateFinish001, testing::ext::TestSize.Level0)
@@ -492,6 +444,41 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_007, testing::ext::TestSize.Level0)
     g_isIdenticalAccountReturnBoolValue = false;
     int32_t ret = authManager_->CheckTrustState();
     ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_001, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("123jlk");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_002, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("123");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_003, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("5");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 5);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_004, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("10");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 10);
+}
+
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_005, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr("0");
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, 0);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -43,7 +43,7 @@ namespace {
      * |      2 bytes         |         4 bytes          |
      * | userid lower 2 bytes |  token id lower 4 bytes  |
      */
-    const int32_t APP_UNBIND_PAYLOAD_LEN = 6;
+    const int32_t APP_UNBIND_PAYLOAD_LEN = 10;
     /**
      * @brief delete user payload length 2 bytes
      * |      2 bytes         |
@@ -55,6 +55,7 @@ namespace {
      *
      */
     const int32_t USERID_PAYLOAD_LEN = 2;
+    const int32_t TOKENID_PAYLOAD_LEN = 6;
     const int32_t ACCOUNTID_PAYLOAD_LEN = 6;
     const int32_t SYNC_FRONT_OR_BACK_USERID_PAYLOAD_MAX_LEN = 11;
     const int32_t SYNC_FRONT_OR_BACK_USERID_PAYLOAD_MIN_LEN = 3;
@@ -66,6 +67,7 @@ namespace {
     const char * const MSG_VALUE = "VALUE";
     const char * const MSG_PEER_UDID = "PEER_UDID";
     const char * const MSG_ACCOUNTID = "ACCOUNTID";
+    const char * const MSG_PEER_TOKENID = "PEER_TOKENID";
 
     // The need response mask offset, the 8th bit.
     const int32_t NEED_RSP_MASK_OFFSET = 7;
@@ -242,8 +244,12 @@ void RelationShipChangeMsg::ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) con
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
     }
 
-    for (int i = USERID_PAYLOAD_LEN; i < APP_UNBIND_PAYLOAD_LEN; i++) {
+    for (int i = USERID_PAYLOAD_LEN; i < TOKENID_PAYLOAD_LEN; i++) {
         msg[i] |= (tokenId >> ((i - USERID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
+    }
+
+    for (int i = TOKENID_PAYLOAD_LEN; i < APP_UNBIND_PAYLOAD_LEN; i++) {
+        msg[i] |= (peerTokenId >> ((i - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
 
     len = APP_UNBIND_PAYLOAD_LEN;
@@ -365,11 +371,20 @@ bool RelationShipChangeMsg::FromAppUnbindPayLoad(const cJSON *payloadJson)
         }
     }
     tokenId = 0;
-    for (uint32_t j = USERID_PAYLOAD_LEN; j < APP_UNBIND_PAYLOAD_LEN; j++) {
+    for (uint32_t j = USERID_PAYLOAD_LEN; j < TOKENID_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
         CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             tokenId |= (static_cast<uint8_t>(payloadItem->valueint)) <<  ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
+        }
+    }
+    peerTokenId = 0;
+    for (uint32_t j = TOKENID_PAYLOAD_LEN; j < APP_UNBIND_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, false);
+        if (cJSON_IsNumber(payloadItem)) {
+            peerTokenId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
+                ((j - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE);
         }
     }
     return true;
@@ -475,6 +490,9 @@ cJSON *RelationShipChangeMsg::ToPayLoadJson() const
         if (numberObj == nullptr || !cJSON_AddItemToArray(arrayObj, numberObj)) {
             cJSON_Delete(numberObj);
             cJSON_Delete(arrayObj);
+            if (payload != nullptr) {
+                delete[] payload;
+            }
             return nullptr;
         }
     }

@@ -16,6 +16,7 @@
 #ifndef OHOS_HICHAIN_AUTH_CONNECTOR_H
 #define OHOS_HICHAIN_AUTH_CONNECTOR_H
 
+#include <mutex>
 #include "device_auth.h"
 #include "device_auth_defines.h"
 #include "dm_constants.h"
@@ -61,6 +62,7 @@ public:
 private:
     DeviceAuthCallback deviceAuthCallback_;
     static std::shared_ptr<IDmDeviceAuthCallback> dmDeviceAuthCallback_;
+    static std::mutex dmDeviceAuthCallbackMutex_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

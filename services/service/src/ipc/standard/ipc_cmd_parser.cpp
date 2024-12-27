@@ -829,7 +829,13 @@ ON_IPC_CMD(UNBIND_DEVICE, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     std::string deviceId = data.ReadString();
-    int32_t result = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
+    std::string extra = data.ReadString();
+    int32_t result = 0;
+    if (extra == "") {
+        result = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
+    } else {
+        result = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId, extra);
+    }
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;

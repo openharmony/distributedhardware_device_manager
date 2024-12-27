@@ -17,9 +17,11 @@
 #define OHOS_DM_AUTH_MESSAGE_PROCESSOR_H
 
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "crypto_adapter.h"
+#include "crypto_mgr.h"
 #include "dm_auth_manager.h"
 #include "nlohmann/json.hpp"
 
@@ -73,6 +75,8 @@ constexpr const char* TAG_IMPORT_AUTH_CODE = "IMPORT_AUTH_CODE";
 constexpr const char* TAG_HOST_PKGLABEL = "hostPkgLabel";
 constexpr const char* TAG_EDITION = "edition";
 constexpr const char* TAG_BUNDLE_NAME = "bundleName";
+constexpr const char* TAG_CRYPTIC_MSG = "encryptMsg";
+constexpr const char* TAG_PEER_BUNDLE_NAME = "PEER_BUNDLE_NAME";
 
 class DmAuthManager;
 struct DmAuthRequestContext;
@@ -92,6 +96,8 @@ public:
     std::string CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen);
     void CreateResponseAuthMessageExt(nlohmann::json &json);
     void ParseAuthResponseMessageExt(nlohmann::json &json);
+    void SetEncryptFlag(bool flag);
+    int32_t SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
 
 private:
     std::string CreateRequestAuthMessage(nlohmann::json &json);
@@ -110,6 +116,8 @@ private:
     void CreatePublicKeyMessageExt(nlohmann::json &json);
     void ParsePublicKeyMessageExt(nlohmann::json &json);
     void GetJsonObj(nlohmann::json &jsonObj);
+    void CreateReqVersionMessage(nlohmann::json &jsonObj);
+    void ParseReqVersionMessage(nlohmann::json &json);
 
 private:
     std::weak_ptr<DmAuthManager> authMgr_;
@@ -117,6 +125,9 @@ private:
     std::shared_ptr<DmAuthRequestContext> authRequestContext_;
     std::shared_ptr<DmAuthResponseContext> authResponseContext_;
     std::vector<nlohmann::json> authSplitJsonList_;
+    std::mutex encryptFlagMutex_;
+    bool encryptFlag_ = false;
+    std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

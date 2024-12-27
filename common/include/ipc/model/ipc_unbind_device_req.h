@@ -44,8 +44,19 @@ public:
         deviceId_ = deviceId;
     }
 
+    const std::string &GetExtraInfo() const
+    {
+        return extra_;
+    }
+
+    void SetExtraInfo(const std::string &extra)
+    {
+        extra_ = extra;
+    }
+
 private:
     std::string deviceId_;
+    std::string extra_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

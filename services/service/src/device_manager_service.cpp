@@ -664,6 +664,57 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
     return DM_OK;
 }
 
+int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash,
+    const std::string &extra)
+{
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call UnBindDevice.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Begin for pkgName = %{public}s, udidHash = %{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str());
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnBindDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    std::string realDeviceId = udidHash;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string udidHashTemp = "";
+    if (GetUdidHashByAnoyDeviceId(udidHash, udidHashTemp) == DM_OK) {
+        realDeviceId = udidHashTemp;
+    }
+#endif
+    std::string udid = "";
+    if (SoftbusCache::GetInstance().GetUdidByUdidHash(realDeviceId, udid) != DM_OK) {
+        LOGE("Get udid by udidhash failed.");
+        return ERR_DM_FAILED;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    uint64_t tokenId = 0;
+    int32_t bindLevel = dmServiceImpl_->GetBindLevel(pkgName, std::string(localUdid), udid, tokenId);
+    LOGI("UnAuthenticateDevice get bindlevel %{public}d.", bindLevel);
+    if (bindLevel == INVALIED_BIND_LEVEL) {
+        LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
+        return ERR_DM_FAILED;
+    }
+    uint64_t peerTokenId = dmServiceImpl_->GetTokenIdByNameAndDeviceId(extra, udid);
+    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra) != DM_OK) {
+        LOGE("dmServiceImpl_ UnBindDevice failed.");
+        return ERR_DM_FAILED;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::vector<std::string> peerUdids;
+    peerUdids.emplace_back(udid);
+    SendUnBindBroadCast(peerUdids, MultipleUserConnector::GetCurrentAccountUserID(), tokenId,
+        bindLevel, peerTokenId);
+#endif
+    return DM_OK;
+}
+
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
@@ -2062,6 +2113,23 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
     }
 }
 
+void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+    uint64_t tokenId, int32_t bindLevel, uint64_t peerTokenId)
+{
+    if (bindLevel == DEVICE) {
+        SendDeviceUnBindBroadCast(peerUdids, userId);
+        return;
+    }
+    if (bindLevel == APP) {
+        SendAppUnBindBroadCast(peerUdids, userId, tokenId, peerTokenId);
+        return;
+    }
+    if (bindLevel == SERVICE) {
+        SendServiceUnBindBroadCast(peerUdids, userId, tokenId);
+        return;
+    }
+}
+
 void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId)
 {
     RelationShipChangeMsg msg;
@@ -2081,6 +2149,21 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
     msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     msg.tokenId = tokenId;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+
+void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+    uint64_t tokenId, uint64_t peerTokenId)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNBIND;
+    msg.userId = static_cast<uint32_t>(userId);
+    msg.peerUdids = peerUdids;
+    msg.tokenId = tokenId;
+    msg.peerTokenId = peerTokenId;
+    LOGI("SendAppUnBindBroadCast msg.peerTokenId = %{public}llu.", msg.peerTokenId);
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
     CHECK_NULL_VOID(softbusListener_);
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
@@ -2121,8 +2204,14 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
             dmServiceImpl_->HandleDevUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid);
             break;
         case RelationShipChangeType::APP_UNBIND:
-            dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
-                static_cast<int32_t>(relationShipMsg.tokenId));
+            if (relationShipMsg.peerTokenId != 0) {
+                    dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+                        static_cast<int32_t>(relationShipMsg.tokenId),
+                        static_cast<int32_t>(relationShipMsg.peerTokenId));
+            } else {
+                dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+                    static_cast<int32_t>(relationShipMsg.tokenId));
+            }
             break;
         case RelationShipChangeType::SYNC_USERID:
             HandleUserIdsBroadCast(relationShipMsg.userIdInfos,

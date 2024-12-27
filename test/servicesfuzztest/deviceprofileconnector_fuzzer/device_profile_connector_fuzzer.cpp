@@ -56,12 +56,10 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     dmAccessee.trustBundleName = trustBundleName;
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     std::string accountId(reinterpret_cast<const char*>(data), size);
-    int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
     DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(pkgName, requestDeviceId, trustUdid);
     DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, userId);
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
-    DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId, requestDeviceId, bindLevel);
     DeviceProfileConnector::GetInstance().UpdateAccessControlList(userId, accountId, accountId);
     DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
     DeviceProfileConnector::GetInstance().CheckDevIdInAclForDevBind(pkgName, localDeviceId);

@@ -38,7 +38,6 @@ void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
     LOGW("DmDeathRecipient : OnRemoteDied");
     (void)remote;
-    DeviceManagerNotify::GetInstance().OnRemoteDied();
 }
 
 int32_t IpcClientManager::ClientInit()
@@ -211,6 +210,7 @@ void IpcClientManager::SystemAbilityListener::OnRemoveSystemAbility(int32_t syst
 {
     if (systemAbilityId == DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) {
         DeviceManagerImpl::GetInstance().OnDmServiceDied();
+        DeviceManagerNotify::GetInstance().OnRemoteDied();
     }
     LOGI("sa %{public}d is removed.", systemAbilityId);
 }

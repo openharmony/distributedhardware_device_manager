@@ -214,5 +214,37 @@ int32_t AuthRequestAuthFinish::Enter()
 {
     return DM_OK;
 }
+
+int32_t AuthRequestVersion::GetStateType()
+{
+    return AuthState::AUTH_REQUEST_VERSION;
+}
+
+int32_t AuthRequestVersion::Enter()
+{
+    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
+    if (stateAuthManager == nullptr) {
+        LOGE("AuthRequestState::authManager_ null");
+        return ERR_DM_FAILED;
+    }
+    stateAuthManager->RequestVersion();
+    return DM_OK;
+}
+
+int32_t AuthRequestVersionDone::GetStateType()
+{
+    return AuthState::AUTH_REQUEST_VERSION_DONE;
+}
+
+int32_t AuthRequestVersionDone::Enter()
+{
+    std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
+    if (stateAuthManager == nullptr) {
+        LOGE("AuthRequestState::authManager_ null");
+        return ERR_DM_FAILED;
+    }
+    stateAuthManager->RequestVersionDone();
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
