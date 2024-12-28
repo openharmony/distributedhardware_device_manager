@@ -233,7 +233,7 @@ int32_t AuthRequestReCheckMsg::Enter()
 
 int32_t AuthRequestReCheckMsgDone::GetStateType()
 {
-    return AuthState::AUTH_REQUEST_RECHECKMSG_DONE;
+    return AuthState::AUTH_REQUEST_RECHECK_MSG_DONE;
 }
 
 int32_t AuthRequestReCheckMsgDone::Enter()

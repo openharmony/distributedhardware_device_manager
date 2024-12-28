@@ -547,7 +547,7 @@ void DmAuthManager::ProcessSourceMsg()
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestCredentialDone>());
             }
             break;
-        case MSG_TYPE_RESP_RECHECKMSG:
+        case MSG_TYPE_RESP_RECHECK_MSG:
             if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_RECHECK_MSG) {
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestReCheckMsgDone>());
             }
@@ -588,11 +588,11 @@ void DmAuthManager::ProcessSinkMsg()
             break;
         case MSG_TYPE_REQ_PUBLICKEY:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_AUTH_FINISH ||
-                authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_RECHECKMSG) {
+                authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_RECHECK_MSG) {
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseCredential>());
             }
             break;
-        case MSG_TYPE_REQ_RECHECKMSG:
+        case MSG_TYPE_REQ_RECHECK_MSG:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_AUTH_FINISH) {
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseReCheckMsg>());
             }
@@ -2766,7 +2766,7 @@ void DmAuthManager::RequestReCheckMsg()
     authResponseContext_->bundleName = authRequestContext_->hostPkgName;
     authResponseContext_->bindLevel = authRequestContext_->bindLevel;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
-    std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_RECHECKMSG);
+    std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_RECHECK_MSG);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
 }
 
@@ -2797,7 +2797,7 @@ void DmAuthManager::ResponseReCheckMsg()
     }
     authResponseContext_->bundleName = authResponseContext_->peerBundleName;
     authMessageProcessor_->SetEncryptFlag(true);
-    std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_RECHECKMSG);
+    std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_RECHECK_MSG);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
 }
 

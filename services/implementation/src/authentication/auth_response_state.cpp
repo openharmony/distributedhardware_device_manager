@@ -181,7 +181,7 @@ int32_t AuthResponseAuthFinish::Enter()
 
 int32_t AuthResponseReCheckMsg::GetStateType()
 {
-    return AuthState::AUTH_RESPONSE_RECHECKMSG;
+    return AuthState::AUTH_RESPONSE_RECHECK_MSG;
 }
 
 int32_t AuthResponseReCheckMsg::Enter()

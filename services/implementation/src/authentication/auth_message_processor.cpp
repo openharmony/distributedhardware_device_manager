@@ -144,8 +144,8 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
         case MSG_TYPE_RESP_PUBLICKEY:
             CreatePublicKeyMessageExt(jsonObj);
             break;
-        case MSG_TYPE_REQ_RECHECKMSG:
-        case MSG_TYPE_RESP_RECHECKMSG:
+        case MSG_TYPE_REQ_RECHECK_MSG:
+        case MSG_TYPE_RESP_RECHECK_MSG:
             CreateReqReCheckMessage(jsonObj);
             break;
         default:
@@ -330,8 +330,8 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
         case MSG_TYPE_RESP_PUBLICKEY:
             ParsePublicKeyMessageExt(jsonObject);
             break;
-        case MSG_TYPE_REQ_RECHECKMSG:
-        case MSG_TYPE_RESP_RECHECKMSG:
+        case MSG_TYPE_REQ_RECHECK_MSG:
+        case MSG_TYPE_RESP_RECHECK_MSG:
             ParseReqReCheckMessage(jsonObject);
             break;
         default:
