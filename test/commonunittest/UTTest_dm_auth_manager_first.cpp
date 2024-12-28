@@ -1473,6 +1473,7 @@ HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level0)
     ret = authManager_->IsAuthFinish();
     EXPECT_TRUE(ret);
 
+    authManager_->authResponseContext_->reply = ERR_DM_AUTH_BUSINESS_BUSY;
     authManager_->authResponseContext_->isAuthCodeReady = true;
     ret = authManager_->IsAuthFinish();
     EXPECT_FALSE(ret);
