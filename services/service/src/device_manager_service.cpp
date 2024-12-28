@@ -2134,7 +2134,6 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
     msg.peerUdids = peerUdids;
     msg.tokenId = tokenId;
     msg.peerTokenId = peerTokenId;
-    LOGI("SendAppUnBindBroadCast msg.peerTokenId = %{public}llu.", msg.peerTokenId);
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
     CHECK_NULL_VOID(softbusListener_);
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
