@@ -191,7 +191,7 @@ int32_t AuthResponseReCheckMsg::Enter()
         LOGE("AuthResponseCredential authManager_ is null");
         return ERR_DM_FAILED;
     }
-    stateAuthManager->ResponseEncryptMsg();
+    stateAuthManager->ResponseReCheckMsg();
     return DM_OK;
 }
 } // namespace DistributedHardware

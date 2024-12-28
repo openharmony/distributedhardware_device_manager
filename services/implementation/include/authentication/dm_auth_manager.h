@@ -79,8 +79,8 @@ enum DmMsgType : int32_t {
     MSG_TYPE_RESP_AUTH_EXT,
     MSG_TYPE_REQ_PUBLICKEY,
     MSG_TYPE_RESP_PUBLICKEY,
-    MSG_TYPE_REQ_ENCRYPTMSG,
-    MSG_TYPE_RESP_ENCRYPTMSG,
+    MSG_TYPE_REQ_RECHECKMSG,
+    MSG_TYPE_RESP_RECHECKMSG,
     MSG_TYPE_REQ_AUTH_DEVICE_NEGOTIATE = 600,
     MSG_TYPE_RESP_AUTH_DEVICE_NEGOTIATE = 700,
 };
@@ -515,7 +515,7 @@ public:
     int32_t DeleteGroup(const std::string &pkgName, int32_t userId, const std::string &deviceId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void RequestReCheckMsg();
-    void ResponseEncryptMsg();
+    void ResponseReCheckMsg();
     void RequestReCheckMsgDone();
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
