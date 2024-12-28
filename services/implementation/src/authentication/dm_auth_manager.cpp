@@ -239,19 +239,12 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->isOnline = false;
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
     authRequestContext_->bindLevel = INVALIED_TYPE;
-    authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
-    parseBindParam(extra);
-}
-
-void DmAuthManager::parseBindParam(const std::string &extra)
-{
-    LOGI("DmAuthManager::parseBindParam start extra %{public}s.", extra.c_str());
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
-    parseJsonObject(jsonObject);
+    ParseJsonObject(jsonObject);
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
 }
 
-void DmAuthManager::parseJsonObject(nlohmann::json jsonObject)
+void DmAuthManager::ParseJsonObject(nlohmann::json jsonObject)
 {
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
@@ -280,7 +273,7 @@ void DmAuthManager::parseJsonObject(nlohmann::json jsonObject)
             if (authRequestContext_->peerBundleName == "") {
                 authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
             }
-            LOGI("parseJsonObject peerBundleName = %{public}s", authRequestContext_->peerBundleName.c_str());
+            LOGI("ParseJsonObject peerBundleName = %{public}s", authRequestContext_->peerBundleName.c_str());
         } else {
             authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
         }
@@ -2685,14 +2678,15 @@ int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
         }
         return bindLevel;
     }
-    std::string processName = "";
-    int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
-    if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
-        return DEVICE;
-    }
     if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || (static_cast<uint32_t>(bindLevel) != APP &&
         static_cast<uint32_t>(bindLevel) != SERVICE)) {
         return APP;
+    }
+    std::string processName = "";
+    int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
+    LOGI("GetBindLevel processName = %{public}s", GetAnonyString(processName).c_str());
+    if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
+        return DEVICE;
     }
     return bindLevel;
 }
