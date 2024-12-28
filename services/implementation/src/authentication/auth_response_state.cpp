@@ -179,12 +179,12 @@ int32_t AuthResponseAuthFinish::Enter()
     return DM_OK;
 }
 
-int32_t AuthResponseEncryptMsg::GetStateType()
+int32_t AuthResponseReCheckMsg::GetStateType()
 {
-    return AuthState::AUTH_RESPONSE_ENCRYPTMSG;
+    return AuthState::AUTH_RESPONSE_RECHECKMSG;
 }
 
-int32_t AuthResponseEncryptMsg::Enter()
+int32_t AuthResponseReCheckMsg::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {

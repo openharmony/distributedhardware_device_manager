@@ -215,35 +215,35 @@ int32_t AuthRequestAuthFinish::Enter()
     return DM_OK;
 }
 
-int32_t AuthRequestEncryptMsg::GetStateType()
+int32_t AuthRequestReCheckMsg::GetStateType()
 {
     return AuthState::AUTH_REQUEST_RECHECK_MSG;
 }
 
-int32_t AuthRequestEncryptMsg::Enter()
+int32_t AuthRequestReCheckMsg::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
-    stateAuthManager->RequestEncryptMsg();
+    stateAuthManager->RequestReCheckMsg();
     return DM_OK;
 }
 
-int32_t AuthRequestEncryptMsgDone::GetStateType()
+int32_t AuthRequestReCheckMsgDone::GetStateType()
 {
-    return AuthState::AUTH_REQUEST_ENCRYPTMSG_DONE;
+    return AuthState::AUTH_REQUEST_RECHECKMSG_DONE;
 }
 
-int32_t AuthRequestEncryptMsgDone::Enter()
+int32_t AuthRequestReCheckMsgDone::Enter()
 {
     std::shared_ptr<DmAuthManager> stateAuthManager = authManager_.lock();
     if (stateAuthManager == nullptr) {
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
-    stateAuthManager->RequestEncryptMsgDone();
+    stateAuthManager->RequestReCheckMsgDone();
     return DM_OK;
 }
 } // namespace DistributedHardware

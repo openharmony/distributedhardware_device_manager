@@ -49,7 +49,7 @@ typedef enum AuthState {
     AUTH_REQUEST_CREDENTIAL_DONE,
     AUTH_REQUEST_AUTH_FINISH,
     AUTH_REQUEST_RECHECK_MSG,
-    AUTH_REQUEST_ENCRYPTMSG_DONE,
+    AUTH_REQUEST_RECHECKMSG_DONE,
 
     AUTH_RESPONSE_INIT = 20,
     AUTH_RESPONSE_NEGOTIATE,
@@ -59,7 +59,7 @@ typedef enum AuthState {
     AUTH_RESPONSE_FINISH,
     AUTH_RESPONSE_CREDENTIAL,
     AUTH_RESPONSE_AUTH_FINISH,
-    AUTH_RESPONSE_ENCRYPTMSG,
+    AUTH_RESPONSE_RECHECKMSG,
 } AuthState;
 
 enum DmMsgType : int32_t {
@@ -514,9 +514,9 @@ public:
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     int32_t DeleteGroup(const std::string &pkgName, int32_t userId, const std::string &deviceId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
-    void RequestEncryptMsg();
+    void RequestReCheckMsg();
     void ResponseEncryptMsg();
-    void RequestEncryptMsgDone();
+    void RequestReCheckMsgDone();
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,

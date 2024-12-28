@@ -119,7 +119,7 @@ public:
     int32_t Enter() override;
 };
 
-class AuthResponseEncryptMsg : public AuthResponseState {
+class AuthResponseReCheckMsg : public AuthResponseState {
 public:
     int32_t GetStateType() override;
     int32_t Enter() override;

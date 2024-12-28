@@ -549,7 +549,7 @@ void DmAuthManager::ProcessSourceMsg()
             break;
         case MSG_TYPE_RESP_ENCRYPTMSG:
             if (authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_RECHECK_MSG) {
-                authRequestState_->TransitionTo(std::make_shared<AuthRequestEncryptMsgDone>());
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestReCheckMsgDone>());
             }
             break;
         default:
@@ -588,13 +588,13 @@ void DmAuthManager::ProcessSinkMsg()
             break;
         case MSG_TYPE_REQ_PUBLICKEY:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_AUTH_FINISH ||
-                authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_ENCRYPTMSG) {
+                authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_RECHECKMSG) {
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseCredential>());
             }
             break;
         case MSG_TYPE_REQ_ENCRYPTMSG:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_AUTH_FINISH) {
-                authResponseState_->TransitionTo(std::make_shared<AuthResponseEncryptMsg>());
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseReCheckMsg>());
             }
             break;
         default:
@@ -2071,7 +2071,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
             }
             softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
             if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_2))) {
-                authRequestState_->TransitionTo(std::make_shared<AuthRequestEncryptMsg>());
+                authRequestState_->TransitionTo(std::make_shared<AuthRequestReCheckMsg>());
             } else {
                 authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
             }
@@ -2087,7 +2087,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
     if (!authResponseContext_->isOnline && !authResponseContext_->haveCredential) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
         if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_2))) {
-            authRequestState_->TransitionTo(std::make_shared<AuthRequestEncryptMsg>());
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestReCheckMsg>());
         } else {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
         }
@@ -2749,7 +2749,7 @@ void DmAuthManager::ConverToFinish()
     authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
 }
 
-void DmAuthManager::RequestEncryptMsg()
+void DmAuthManager::RequestReCheckMsg()
 {
     LOGI("dmVersion %{public}s.", DM_VERSION_5_0_3);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
@@ -2801,7 +2801,7 @@ void DmAuthManager::ResponseEncryptMsg()
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
 }
 
-void DmAuthManager::RequestEncryptMsgDone()
+void DmAuthManager::RequestReCheckMsgDone()
 {
     LOGI("remoteVersion %{public}s, authResponseContext_->edition %{public}s.",
         remoteVersion_.c_str(), authResponseContext_->edition.c_str());
