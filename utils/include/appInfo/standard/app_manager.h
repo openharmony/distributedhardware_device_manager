@@ -39,6 +39,7 @@ public:
     int32_t GetCallerName(bool isSystemSA, std::string &callerName);
     int32_t GetNativeTokenIdByName(std::string &processName, int64_t &tokenId);
     int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex, int64_t &tokenId);
+    int32_t GetCallerProcessName(std::string &processName);
 private:
     bool GetBundleManagerProxy(sptr<AppExecFwk::IBundleMgr> &bundleManager);
     std::mutex appIdMapLock_;

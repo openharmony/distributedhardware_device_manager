@@ -78,6 +78,11 @@ const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
+constexpr int32_t PROCESS_NAME_WHITE_LIST_NUM = 1;
+constexpr int32_t PROCESS_NAME_SIZE_MAX = 256;
+constexpr const static char PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM][PROCESS_NAME_SIZE_MAX] = {
+    "com.example.myapplication",
+};
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -191,6 +196,25 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra)
     return DM_OK;
 }
 
+bool DmAuthManager::CheckProcessNameInWhiteList(const std::string &processName)
+{
+    LOGI("DmAuthManager::CheckProcessNameInWhiteList start");
+    if (processName.empty()) {
+        LOGE("processName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < PROCESS_NAME_WHITE_LIST_NUM; ++index) {
+        std::string whitePkgName(PROCESS_NAME_WHITE_LIST[index]);
+        if (processName == whitePkgName) {
+            LOGI("processName = %{public}s in whiteList.", processName.c_str());
+            return true;
+        }
+    }
+    LOGI("CheckProcessNameInWhiteList: %{public}s invalid.", processName.c_str());
+    return false;
+}
+
 void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
@@ -216,11 +240,11 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
     authRequestContext_->bindLevel = INVALIED_TYPE;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
-    parseJsonObject(jsonObject);
+    ParseJsonObject(jsonObject);
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
 }
 
-void DmAuthManager::parseJsonObject(nlohmann::json jsonObject)
+void DmAuthManager::ParseJsonObject(nlohmann::json jsonObject)
 {
     if (!jsonObject.is_discarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
@@ -249,7 +273,7 @@ void DmAuthManager::parseJsonObject(nlohmann::json jsonObject)
             if (authRequestContext_->peerBundleName == "") {
                 authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
             }
-            LOGI("parseJsonObject peerBundleName = %{public}s", authRequestContext_->peerBundleName.c_str());
+            LOGI("ParseJsonObject peerBundleName = %{public}s", authRequestContext_->peerBundleName.c_str());
         } else {
             authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
         }
@@ -2674,6 +2698,12 @@ int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
     if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || (static_cast<uint32_t>(bindLevel) != APP &&
         static_cast<uint32_t>(bindLevel) != SERVICE)) {
         return APP;
+    }
+    std::string processName = "";
+    int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
+    LOGI("GetBindLevel processName = %{public}s", GetAnonyString(processName).c_str());
+    if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
+        return DEVICE;
     }
     return bindLevel;
 }
