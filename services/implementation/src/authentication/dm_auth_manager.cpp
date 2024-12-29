@@ -2073,6 +2073,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
 {
     CHECK_NULL_VOID(authRequestState_);
     authRequestState_->TransitionTo(std::make_shared<AuthRequestAuthFinish>());
+    usleep(USLEEP_TIME_US_500000); // 500ms
     if (authResponseContext_->isOnline) {
         if (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
             (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
