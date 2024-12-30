@@ -589,9 +589,9 @@ private:
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
     std::string remoteUdidHash_ = "";
     ProcessInfo processInfo_;
-    std::mutex reqMsgLock_;
-    bool getReqMsg_ = false;
-    std::string reqMsg_ = "";
+    std::mutex srcReqMsgLock_;
+    bool isNeedProcCachedSrcReqMsg_= false;
+    std::string srcReqMsg_= "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS
