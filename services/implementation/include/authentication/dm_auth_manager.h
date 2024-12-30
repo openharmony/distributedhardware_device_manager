@@ -17,6 +17,7 @@
 #define OHOS_DM_AUTH_MANAGER_H
 
 #include <map>
+#include <mutex>
 #include <string>
 
 #include "auth_request_state.h"
@@ -588,6 +589,9 @@ private:
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
     std::string remoteUdidHash_ = "";
     ProcessInfo processInfo_;
+    std::mutex srcReqMsgLock_;
+    bool isNeedProcCachedSrcReqMsg_ = false;
+    std::string srcReqMsg_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS
