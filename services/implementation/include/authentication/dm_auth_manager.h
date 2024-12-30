@@ -590,8 +590,8 @@ private:
     std::string remoteUdidHash_ = "";
     ProcessInfo processInfo_;
     std::mutex srcReqMsgLock_;
-    bool isNeedProcCachedSrcReqMsg_= false;
-    std::string srcReqMsg_= "";
+    bool isNeedProcCachedSrcReqMsg_ = false;
+    std::string srcReqMsg_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -617,7 +617,7 @@ void DmAuthManager::ProcessSinkMsg()
             }
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
                 std::lock_guard<std::mutex> lock(srcReqMsgLock_);
-                isNeedProcCachedSrcReqMsg_= true;
+                isNeedProcCachedSrcReqMsg_ = true;
             }
             break;
         case MSG_TYPE_REQ_RECHECK_MSG:
@@ -626,7 +626,7 @@ void DmAuthManager::ProcessSinkMsg()
             }
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
                 std::lock_guard<std::mutex> lock(srcReqMsgLock_);
-                isNeedProcCachedSrcReqMsg_= true;
+                isNeedProcCachedSrcReqMsg_ = true;
             }
             break;
         default:
@@ -659,7 +659,7 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
         // sink device auth process
         {
             std::lock_guard<std::mutex> lock(srcReqMsgLock_);
-            srcReqMsg_= message;
+            srcReqMsg_ = message;
         }
         ProcessSinkMsg();
     } else {
@@ -1375,8 +1375,8 @@ void DmAuthManager::AuthenticateFinish()
 {
     {
         std::lock_guard<std::mutex> lock(srcReqMsgLock_);
-        srcReqMsg_= "";
-        isNeedProcCachedSrcReqMsg_= false;
+        srcReqMsg_ = "";
+        isNeedProcCachedSrcReqMsg_ = false;
     }
     authType_ = AUTH_TYPE_UNKNOW;
     std::lock_guard<std::mutex> autoLock(g_authFinishLock);
@@ -2154,8 +2154,8 @@ void DmAuthManager::SinkAuthDeviceFinish()
         std::lock_guard<std::mutex> lock(srcReqMsgLock_);
         reqMsg = reqMsg_;
         getReqMsg = getReqMsg_;
-        srcReqMsg_= "";
-        isNeedProcCachedSrcReqMsg_= false;
+        srcReqMsg_ = "";
+        isNeedProcCachedSrcReqMsg_ = false;
     }
     if (!getReqMsg || reqMsg.empty()) {
         LOGI("please wait client request.");
