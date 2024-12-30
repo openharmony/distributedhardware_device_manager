@@ -1371,6 +1371,11 @@ void DmAuthManager::SrcAuthenticateFinish()
 
 void DmAuthManager::AuthenticateFinish()
 {
+    {
+        std::lock_guard<std::mutex> lock(reqMsgLock_);
+        reqMsg_ = "";
+        getReqMsg_ = false;
+    }
     authType_ = AUTH_TYPE_UNKNOW;
     std::lock_guard<std::mutex> autoLock(g_authFinishLock);
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
@@ -2156,11 +2161,11 @@ void DmAuthManager::SinkAuthDeviceFinish()
         return;
     }
     authMessageProcessor_->SetResponseContext(authResponseContext_);
-    if (authMessageProcessor_->ParseMessage(message) != DM_OK) {
+    if (authMessageProcessor_->ParseMessage(reqMsg) != DM_OK) {
         LOGE("ParseMessage failed.");
         return;
     }
-    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_2))) {
+    if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_2))) {
         authResponseState_->TransitionTo(std::make_shared<AuthResponseCredential>());
     } else {
         authResponseState_->TransitionTo(std::make_shared<AuthResponseReCheckMsg>());
@@ -2845,6 +2850,7 @@ void DmAuthManager::ResponseReCheckMsg()
         authMessageProcessor_->SetEncryptFlag(false);
         int32_t sessionId = authResponseContext_->sessionId;
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
+        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
         return;
     }
