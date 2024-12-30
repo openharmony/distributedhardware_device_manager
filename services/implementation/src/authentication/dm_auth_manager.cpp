@@ -2137,7 +2137,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
 
 void DmAuthManager::SinkAuthDeviceFinish()
 {
-    LOGI("getReqMsg %{public}d.", getReqMsg_);
+    LOGI("isNeedProcCachedSrcReqMsg %{public}d.", isNeedProcCachedSrcReqMsg_);
     CHECK_NULL_VOID(authResponseState_);
     authResponseState_->TransitionTo(std::make_shared<AuthResponseAuthFinish>());
     if (!authResponseContext_->haveCredential) {
@@ -2148,21 +2148,21 @@ void DmAuthManager::SinkAuthDeviceFinish()
         SetProcessInfo();
         softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
     }
-    std::string reqMsg = "";
-    bool getReqMsg = false;
+    std::string srcReqMsg = "";
+    bool isNeedProcCachedSrcReqMsg = false;
     {
         std::lock_guard<std::mutex> lock(srcReqMsgLock_);
-        reqMsg = reqMsg_;
-        getReqMsg = getReqMsg_;
+        srcReqMsg = srcReqMsg_;
+        isNeedProcCachedSrcReqMsg = isNeedProcCachedSrcReqMsg_;
         srcReqMsg_ = "";
         isNeedProcCachedSrcReqMsg_ = false;
     }
-    if (!getReqMsg || reqMsg.empty()) {
+    if (!isNeedProcCachedSrcReqMsg || srcReqMsg.empty()) {
         LOGI("please wait client request.");
         return;
     }
     authMessageProcessor_->SetResponseContext(authResponseContext_);
-    if (authMessageProcessor_->ParseMessage(reqMsg) != DM_OK) {
+    if (authMessageProcessor_->ParseMessage(srcReqMsg) != DM_OK) {
         LOGE("ParseMessage failed.");
         return;
     }
