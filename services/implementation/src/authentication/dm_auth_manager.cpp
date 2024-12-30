@@ -2146,7 +2146,6 @@ void DmAuthManager::SinkAuthDeviceFinish()
         SetProcessInfo();
         softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
     }
-    //new-ole
     std::string reqMsg = "";
     bool getReqMsg = false;
     {
