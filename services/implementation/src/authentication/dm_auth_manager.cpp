@@ -2089,8 +2089,8 @@ void DmAuthManager::SrcAuthDeviceFinish()
 {
     CHECK_NULL_VOID(authRequestState_);
     authRequestState_->TransitionTo(std::make_shared<AuthRequestAuthFinish>());
-    if (authResponseContext_->confirmOperation != USER_OPERATION_TYPE_ALLOW_AUTH ||
-        authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
+    if (authResponseContext_->confirmOperation != USER_OPERATION_TYPE_ALLOW_AUTH &&
+        authResponseContext_->confirmOperation != USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
         LOGE("auth failed %{public}d.", authResponseContext_->confirmOperation);
         return;
     }
