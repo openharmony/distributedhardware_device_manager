@@ -225,7 +225,7 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
         LOGE("memset_s failed.");
         free(outData);
         outData = nullptr;
-        return ERR_DM_CRYPTO_OPT_FAILED;
+        return ERR_DM_SECURITY_FUNC_FAILED;
     }
     outputMsg.clear();
     outputMsg.assign(reinterpret_cast<const char*>(outData), outLen);
