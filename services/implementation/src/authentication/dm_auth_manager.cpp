@@ -2089,10 +2089,9 @@ void DmAuthManager::SrcAuthDeviceFinish()
 {
     CHECK_NULL_VOID(authRequestState_);
     authRequestState_->TransitionTo(std::make_shared<AuthRequestAuthFinish>());
-    if (authResponseContext_->isOnline) {
-        if ((authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
-            authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) &&
-            authResponseContext_->haveCredential) {
+    if (authResponseContext_->isOnline && (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
+            authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS)) {
+        if (authResponseContext_->haveCredential) {
             if (!authResponseContext_->isIdenticalAccount && !authResponseContext_->hostPkgName.empty()) {
                 SetProcessInfo();
             }
@@ -2103,9 +2102,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
             ConverToFinish();
             return;
         }
-        if ((authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
-            authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) &&
-            !authResponseContext_->haveCredential) {
+        if (!authResponseContext_->haveCredential) {
             authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
             if (!authResponseContext_->isIdenticalAccount && !authResponseContext_->hostPkgName.empty()) {
                 SetProcessInfo();
