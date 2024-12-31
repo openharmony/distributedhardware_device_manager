@@ -1743,119 +1743,13 @@ void GnssHandler::HandleSendCommands(const AppExecFwk::InnerEvent::Pointer& even
         gnssAbility->SendCommand(locationCommand);
     }
 }
-#ifdef HDF_DRIVERS_INTERFACE_AGNSS_ENABLE
+
 void GnssHandler::HandleSetSubscriberSetId(const AppExecFwk::InnerEvent::Pointer& event)
 {
     auto gnssAbility = GnssAbility::GetInstance();
     std::unique_ptr<SubscriberSetId> subscriberSetId = event->GetUniqueObject<SubscriberSetId>();
     if (subscriberSetId != nullptr) {
         gnssAbility->SetSetIdImpl(*subscriberSetId);
-    }
-}
-
-void GnssHandler::HandleSetAgnssRefInfo(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    std::unique_ptr<AgnssRefInfoMessage> agnssRefInfoMessage = event->GetUniqueObject<AgnssRefInfoMessage>();
-    if (agnssRefInfoMessage != nullptr) {
-        AGnssRefInfo refInfo = agnssRefInfoMessage->GetAgnssRefInfo();
-        gnssAbility->SetRefInfoImpl(refInfo);
-    }
-}
-#endif
-
-void GnssHandler::HandleReconnectHdi(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    gnssAbility->ReConnectHdiImpl();
-}
-
-void GnssHandler::HandleSetEnable(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    int state = event->GetParam();
-    gnssAbility->SetEnable(state != 0);
-}
-
-void GnssHandler::HandleInitHdi(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    gnssAbility->ConnectHdi();
-    gnssAbility->EnableGnss();
-#ifdef HDF_DRIVERS_INTERFACE_AGNSS_ENABLE
-    gnssAbility->SetAgnssCallback();
-#endif
-}
-
-void GnssHandler::HandleAddFence(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    std::shared_ptr<GeofenceRequest> request = event->GetSharedObject<GeofenceRequest>();
-    if (request != nullptr) {
-        gnssAbility->AddFence(request);
-    }
-}
-
-void GnssHandler::HandleRemoveFence(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    std::shared_ptr<GeofenceRequest> request = event->GetSharedObject<GeofenceRequest>();
-    if (request != nullptr) {
-        gnssAbility->RemoveFence(request);
-    }
-}
-
-void GnssHandler::HandleAddGeofence(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    std::shared_ptr<GeofenceRequest> request = event->GetSharedObject<GeofenceRequest>();
-    if (request != nullptr) {
-        gnssAbility->AddGnssGeofence(request);
-    }
-}
-
-void GnssHandler::HandleRemoveGeofence(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    std::shared_ptr<GeofenceRequest> request = event->GetSharedObject<GeofenceRequest>();
-    if (request != nullptr) {
-        gnssAbility->RemoveGnssGeofence(request);
-    }
-}
-
-void GnssHandler::HandleSendNetworkLocation(const AppExecFwk::InnerEvent::Pointer& event)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    std::unique_ptr<Location> location = event->GetUniqueObject<Location>();
-    if (location != nullptr) {
-        int64_t time = location->GetTimeStamp();
-        int64_t timeSinceBoot = location->GetTimeSinceBoot();
-        double acc = location->GetAccuracy();
-        LBSLOGI(GNSS,
-            "receive network location from locator: [ time=%{public}s timeSinceBoot=%{public}s acc=%{public}f]",
-            std::to_string(time).c_str(), std::to_string(timeSinceBoot).c_str(), acc);
-            gnssAbility->SendNetworkLocation(location);
-    }
-}
-
-LocationHdiDeathRecipient::LocationHdiDeathRecipient()
-{
-}
-
-LocationHdiDeathRecipient::~LocationHdiDeathRecipient()
-{
-}
-
-void LocationHdiDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
-{
-    auto gnssAbility = GnssAbility::GetInstance();
-    if (gnssAbility != nullptr) {
-        LBSLOGI(LOCATOR, "hdi reconnecting");
-        // wait for device unloaded
-        std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_MS));
-        gnssAbility->RestGnssWorkStatus();
-        gnssAbility->ReConnectHdi();
-        LBSLOGI(LOCATOR, "hdi connected finish");
     }
 }
 } // namespace Location
