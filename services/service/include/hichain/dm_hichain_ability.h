@@ -122,30 +122,14 @@ private:
     void HandleReportMockLocation(const AppExecFwk::InnerEvent::Pointer& event);
     void HandleSendLocationRequest(const AppExecFwk::InnerEvent::Pointer& event);
     void HandleSetMockedLocations(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleSendCommands(const AppExecFwk::InnerEvent::Pointer& event);
-#ifdef HDF_DRIVERS_INTERFACE_AGNSS_ENABLE
-    void HandleSetSubscriberSetId(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleSetAgnssRefInfo(const AppExecFwk::InnerEvent::Pointer& event);
-#endif
-    void HandleReconnectHdi(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleSetEnable(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleInitHdi(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleAddFence(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleRemoveFence(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleAddGeofence(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleRemoveGeofence(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleSendNetworkLocation(const AppExecFwk::InnerEvent::Pointer& event);
-
     using GnssEventProcessHandle = std::function<void(const AppExecFwk::InnerEvent::Pointer &)>;
     using GnssEventProcessMap = std::map<uint32_t, GnssEventProcessHandle>;
     GnssEventProcessMap gnssEventProcessMap_;
 };
 
 class GnssAbility : public SystemAbility, public GnssAbilityStub, public SubAbility {
-DECLEAR_SYSTEM_ABILITY(GnssAbility);
 
 public:
-    DISALLOW_COPY_AND_MOVE(GnssAbility);
     static GnssAbility* GetInstance();
 
     GnssAbility();
@@ -283,10 +267,6 @@ private:
 };
 
 class LocationHdiDeathRecipient : public IRemoteObject::DeathRecipient {
-public:
-    void OnRemoteDied(const wptr<IRemoteObject> &remote) override;
-    LocationHdiDeathRecipient();
-    ~LocationHdiDeathRecipient() override;
 };
 
 #ifdef HDF_DRIVERS_INTERFACE_AGNSS_ENABLE
