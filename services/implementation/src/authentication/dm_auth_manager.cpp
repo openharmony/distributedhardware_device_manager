@@ -242,6 +242,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
     ParseJsonObject(jsonObject);
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
+    authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
 }
 
 void DmAuthManager::ParseJsonObject(nlohmann::json jsonObject)
@@ -267,7 +268,6 @@ void DmAuthManager::ParseJsonObject(nlohmann::json jsonObject)
             std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].get<std::string>();
             authRequestContext_->closeSessionDelaySeconds = GetCloseSessionDelaySeconds(delaySecondsStr);
         }
-        authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
         if (IsString(jsonObject, TAG_PEER_BUNDLE_NAME)) {
             authRequestContext_->peerBundleName = jsonObject[TAG_PEER_BUNDLE_NAME].get<std::string>();
             if (authRequestContext_->peerBundleName == "") {
@@ -2728,6 +2728,15 @@ bool DmAuthManager::IsAllowDeviceBind()
 
 int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
 {
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("device_manager_common is true!");
+    std::string processName = "";
+    int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
+    LOGI("GetBindLevel processName = %{public}s", GetAnonyString(processName).c_str());
+    if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
+        return DEVICE;
+    }
+#endif
     if (IsAllowDeviceBind()) {
         if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || static_cast<uint32_t>(bindLevel) > APP ||
             static_cast<uint32_t>(bindLevel) < DEVICE) {
@@ -2738,12 +2747,6 @@ int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
     if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || (static_cast<uint32_t>(bindLevel) != APP &&
         static_cast<uint32_t>(bindLevel) != SERVICE)) {
         return APP;
-    }
-    std::string processName = "";
-    int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
-    LOGI("GetBindLevel processName = %{public}s", GetAnonyString(processName).c_str());
-    if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
-        return DEVICE;
     }
     return bindLevel;
 }

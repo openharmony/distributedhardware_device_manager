@@ -229,6 +229,10 @@ if (defined(ohos_lite)) {
       external_deps += [ "screenlock_mgr:screenlock_client" ]
     }
 
+    if (device_manager_common) {
+      defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
+    }
+
     public_external_deps = [ "json:nlohmann_json_static" ]
 
     subsystem_name = "distributedhardware"
