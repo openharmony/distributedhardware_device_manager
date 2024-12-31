@@ -2090,9 +2090,9 @@ void DmAuthManager::SrcAuthDeviceFinish()
     CHECK_NULL_VOID(authRequestState_);
     authRequestState_->TransitionTo(std::make_shared<AuthRequestAuthFinish>());
     if (authResponseContext_->isOnline) {
-        if (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
-            (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
-            authResponseContext_->haveCredential)) {
+        if ((authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
+            authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) &&
+            authResponseContext_->haveCredential) {
             if (!authResponseContext_->isIdenticalAccount && !authResponseContext_->hostPkgName.empty()) {
                 SetProcessInfo();
             }
@@ -2103,7 +2103,8 @@ void DmAuthManager::SrcAuthDeviceFinish()
             ConverToFinish();
             return;
         }
-        if (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS &&
+        if ((authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
+            authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) &&
             !authResponseContext_->haveCredential) {
             authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
             if (!authResponseContext_->isIdenticalAccount && !authResponseContext_->hostPkgName.empty()) {
@@ -2894,8 +2895,6 @@ bool DmAuthManager::IsSinkMsgValid()
     if (authResponseContext_->edition != remoteVersion_ ||
         authResponseContext_->localDeviceId != remoteDeviceId_ ||
         authResponseContext_->localUserId != authResponseContext_->remoteUserId ||
-        authResponseContext_->localAccountId != authResponseContext_->remoteAccountId ||
-        authResponseContext_->tokenId != authResponseContext_->remoteTokenId ||
         authResponseContext_->bundleName != authResponseContext_->hostPkgName ||
         authResponseContext_->localBindLevel != authResponseContext_->bindLevel) {
         return false;
@@ -2908,8 +2907,6 @@ bool DmAuthManager::IsSourceMsgValid()
     if (authResponseContext_->edition != remoteVersion_ ||
         authResponseContext_->localDeviceId != remoteDeviceId_ ||
         authResponseContext_->localUserId != authRequestContext_->remoteUserId ||
-        authResponseContext_->localAccountId != authRequestContext_->remoteAccountId ||
-        authResponseContext_->tokenId != authResponseContext_->remoteTokenId ||
         authResponseContext_->bundleName != authResponseContext_->peerBundleName ||
         authResponseContext_->localBindLevel != authResponseContext_->bindLevel) {
         return false;
