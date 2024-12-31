@@ -119,9 +119,6 @@ public:
 
 private:
     void InitGnssEventProcessMap();
-    void HandleReportMockLocation(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleSendLocationRequest(const AppExecFwk::InnerEvent::Pointer& event);
-    void HandleSetMockedLocations(const AppExecFwk::InnerEvent::Pointer& event);
     using GnssEventProcessHandle = std::function<void(const AppExecFwk::InnerEvent::Pointer &)>;
     using GnssEventProcessMap = std::map<uint32_t, GnssEventProcessHandle>;
     GnssEventProcessMap gnssEventProcessMap_;
