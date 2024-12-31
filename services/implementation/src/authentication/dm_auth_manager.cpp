@@ -2089,32 +2089,34 @@ void DmAuthManager::SrcAuthDeviceFinish()
 {
     CHECK_NULL_VOID(authRequestState_);
     authRequestState_->TransitionTo(std::make_shared<AuthRequestAuthFinish>());
-    if (authResponseContext_->isOnline && (authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH ||
-            authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS)) {
-        if (authResponseContext_->haveCredential) {
-            if (!authResponseContext_->isIdenticalAccount && !authResponseContext_->hostPkgName.empty()) {
-                SetProcessInfo();
-            }
-            softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
-            if (timer_ != nullptr) {
-                timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
-            }
-            ConverToFinish();
-            return;
+    if (authResponseContext_->confirmOperation != USER_OPERATION_TYPE_ALLOW_AUTH ||
+        authResponseContext_->confirmOperation == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
+        LOGE("auth failed %{public}d.", authResponseContext_->confirmOperation);
+        return;
+    }
+    if (authResponseContext_->isOnline && authResponseContext_->haveCredential) {
+        if (!authResponseContext_->isIdenticalAccount && !authResponseContext_->hostPkgName.empty()) {
+            SetProcessInfo();
         }
-        if (!authResponseContext_->haveCredential) {
-            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
-            if (!authResponseContext_->isIdenticalAccount && !authResponseContext_->hostPkgName.empty()) {
-                SetProcessInfo();
-            }
-            softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
-            if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_2))) {
-                authRequestState_->TransitionTo(std::make_shared<AuthRequestReCheckMsg>());
-            } else {
-                authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
-            }
-            return;
+        softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
+        if (timer_ != nullptr) {
+            timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
         }
+        ConverToFinish();
+        return;
+    }
+    if (authResponseContext_->isOnline && !authResponseContext_->haveCredential) {
+        authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
+        if (!authResponseContext_->isIdenticalAccount && !authResponseContext_->hostPkgName.empty()) {
+            SetProcessInfo();
+        }
+        softbusConnector_->HandleDeviceOnline(remoteDeviceId_, authForm_);
+        if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_2))) {
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestReCheckMsg>());
+        } else {
+            authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
+        }
+        return;
     }
     if (!authResponseContext_->isOnline && authResponseContext_->haveCredential) {
         softbusConnector_->JoinLnn(authRequestContext_->addr);
