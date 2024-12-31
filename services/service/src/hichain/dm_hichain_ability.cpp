@@ -126,7 +126,6 @@ GnssAbility::~GnssAbility()
     }
 #endif
 }
-
 bool GnssAbility::CheckIfHdiConnected()
 {
     if (!IsDeviceLoaded(GNSS_SERVICE_NAME)) {
@@ -1532,63 +1531,9 @@ void GnssAbility::SendMessage(uint32_t code, MessageParcel &data, MessageParcel 
             SendEvent(event, reply);
             break;
         }
-        case static_cast<uint32_t>(GnssInterfaceCode::SET_MOCKED_LOCATIONS): {
-            if (!IsMockEnabled()) {
-                reply.WriteInt32(ERRCODE_NOT_SUPPORTED);
-                break;
-            }
-            int timeInterval = data.ReadInt32();
-            int locationSize = data.ReadInt32();
-            timeInterval = timeInterval < 0 ? 1 : timeInterval;
-            locationSize = locationSize > INPUT_ARRAY_LEN_MAX ? INPUT_ARRAY_LEN_MAX :
-                locationSize;
-            std::shared_ptr<std::vector<std::shared_ptr<Location>>> vcLoc =
-                std::make_shared<std::vector<std::shared_ptr<Location>>>();
-            for (int i = 0; i < locationSize; i++) {
-                vcLoc->push_back(Location::UnmarshallingShared(data));
-            }
-            AppExecFwk::InnerEvent::Pointer event =
-                AppExecFwk::InnerEvent::Get(code, vcLoc, timeInterval);
-            SendEvent(event, reply);
-            break;
-        }
-        case static_cast<uint32_t>(GnssInterfaceCode::SEND_COMMANDS): {
-            std::unique_ptr<LocationCommand> locationCommand = std::make_unique<LocationCommand>();
-            locationCommand->scenario = data.ReadInt32();
-            locationCommand->command = Str16ToStr8(data.ReadString16());
-            AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(code, locationCommand);
-            SendEvent(event, reply);
-            break;
-        }
-        case static_cast<uint32_t>(GnssInterfaceCode::SET_ENABLE): {
-            AppExecFwk::InnerEvent::Pointer event =
-                AppExecFwk::InnerEvent::Get(code, static_cast<int>(data.ReadBool()));
-            SendEvent(event, reply);
-            break;
-        }
 #ifdef NOTIFICATION_ENABLE
         case static_cast<uint32_t>(GnssAbilityInterfaceCode::ADD_FENCE): {
             auto request = GeofenceRequest::Unmarshalling(data);
-            AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(code, request);
-            SendEvent(event, reply);
-            break;
-        }
-        case static_cast<uint32_t>(GnssAbilityInterfaceCode::REMOVE_FENCE): {
-            auto request = GeofenceRequest::Unmarshalling(data);
-            AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(code, request);
-            SendEvent(event, reply);
-            break;
-        }
-        case static_cast<uint32_t>(GnssAbilityInterfaceCode::ADD_GEOFENCE): {
-            auto request = GeofenceRequest::Unmarshalling(data);
-            AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(code, request);
-            SendEvent(event, reply);
-            break;
-        }
-        case static_cast<uint32_t>(GnssAbilityInterfaceCode::REMOVE_GEOFENCE): {
-            std::shared_ptr<GeofenceRequest> request = std::make_shared<GeofenceRequest>();
-            request->SetFenceId(data.ReadInt32());
-            request->SetBundleName(data.ReadString());
             AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(code, request);
             SendEvent(event, reply);
             break;

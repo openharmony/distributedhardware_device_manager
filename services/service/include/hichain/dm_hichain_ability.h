@@ -125,10 +125,8 @@ private:
 };
 
 class GnssAbility : public SystemAbility, public GnssAbilityStub, public SubAbility {
-
 public:
     static GnssAbility* GetInstance();
-
     GnssAbility();
     ~GnssAbility() override;
     void OnStart() override;
