@@ -61,21 +61,31 @@ int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outp
 
     uint32_t encDataLen = inputMsg.length() + OVERHEAD_LEN;
     unsigned char *encData = (unsigned char *)calloc(encDataLen, sizeof(unsigned char));
+    if (encData == nullptr) {
+        LOGE("calloc fail");
+        return ERR_DM_CRYPTO_OPT_FAILED;
+    }
     int32_t ret = DoEncryptData(&cipherKey, reinterpret_cast<const unsigned char*>(inputMsg.c_str()),
         static_cast<uint32_t>(inputMsg.length()), encData, &encDataLen);
     if (ret != DM_OK) {
         LOGE("EncryptData fail=%{public}d", ret);
+        free(encData);
+        encData = nullptr;
         return ERR_DM_CRYPTO_OPT_FAILED;
     }
     if (memset_s(&cipherKey, sizeof(AesGcmCipherKey), 0, sizeof(AesGcmCipherKey)) != DM_OK) {
         LOGE("memset_s failed.");
-        return ERR_DM_CRYPTO_OPT_FAILED;
+        free(encData);
+        encData = nullptr;
+        return ERR_DM_SECURITY_FUNC_FAILED;
     }
     const uint32_t hexStrLen = encDataLen * HEX_TO_UINT8 + 1;
     char hexStrTemp[hexStrLen];
     if (memset_s(hexStrTemp, hexStrLen, 0, hexStrLen) != DM_OK) {
         LOGE("memset_s failed.");
-        return ERR_DM_CRYPTO_OPT_FAILED;
+        free(encData);
+        encData = nullptr;
+        return ERR_DM_SECURITY_FUNC_FAILED;
     }
     Crypto::ConvertBytesToHexString(hexStrTemp, hexStrLen, encData, encDataLen);
     outputMsg.clear();
