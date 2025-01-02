@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include <unordered_set>
 
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "idevice_manager_service_listener.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "kv_adapter_manager.h"
@@ -80,6 +81,8 @@ public:
         int32_t status, std::string content) override;
     void OnProcessRemove(const ProcessInfo &processInfo) override;
     void OnDevStateCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
+    void OnGetDeviceProfileInfosResult(const ProcessInfo &processInfo,
+        const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_profile_infos_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
@@ -2552,6 +2553,31 @@ void DeviceManagerImpl::SyncCallbacksToService(std::map<DmCommonNotifyEvent, std
             SyncCallbackToService(iter.first, item);
         }
     }
+}
+
+int32_t DeviceManagerImpl::GetDeviceProfileInfos(const std::string &pkgName,
+    const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceProfileInfosCallback> callback)
+{
+    LOGI("In pkgName:%{public}s, isCloud:%{public}d", pkgName.c_str(), filterOptions.isCloud);
+    DeviceManagerNotify::GetInstance().RegisterGetDeviceProfileInfosCallback(pkgName, callback);
+    std::shared_ptr<IpcGetDeviceProfileInfosReq> req = std::make_shared<IpcGetDeviceProfileInfosReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFilterOptions(filterOptions);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFOS, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfosCallback(pkgName);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfosCallback(pkgName);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

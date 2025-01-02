@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 
 #include "idevice_manager_service_listener.h"
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "i_dm_bind_manager_ext_resident.h"
 
 namespace OHOS {
@@ -103,6 +104,14 @@ public:
     virtual int32_t InitResident(std::shared_ptr<IDMBindManagerExtResident> residentCallback,
         const std::shared_ptr<IDeviceManagerServiceListener> &listener) = 0;
     virtual void OnResidentBytesReceived(const int32_t sessionId, const std::string &message) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::GetDeviceProfileInfos
+     * @tc.desc: GetDeviceProfileInfos
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetDeviceProfileInfos(const std::string &pkgName,
+        const DmDeviceProfileInfoFilterOptions &filterOptions) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);

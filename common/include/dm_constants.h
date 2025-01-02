@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -273,6 +273,9 @@ const std::string CREATE_PINHOLDER = "CreatePinHolder";
 const std::string DESTROY_PINHOLDER = "DestroyPinHolder";
 const std::string SET_DNPOLICY = "SetDnPolicy";
 const std::string BIND_FOR_DEVICE_LEVEL = "BindForDeviceLevel";
+
+// wise device
+constexpr int32_t MAX_DEVICE_PROFILE_SIZE = 500;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

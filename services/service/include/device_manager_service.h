@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@
 
 #include "advertise_manager.h"
 #include "discovery_manager.h"
+#include "dm_device_profile_info.h"
 #include "pin_holder.h"
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
@@ -212,6 +213,7 @@ public:
     int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
     void HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo);
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
+    int32_t GetDeviceProfileInfos(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_get_device_profile_infos_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_server_stub.h"
@@ -899,6 +900,19 @@ void DeviceManagerServiceListener::RemoveNotExistProcess()
             ++it;
         }
     }
+}
+
+void DeviceManagerServiceListener::OnGetDeviceProfileInfosResult(const ProcessInfo &processInfo,
+    const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code)
+{
+    LOGI("pkgName %{public}s.", processInfo.pkgName.c_str());
+    std::shared_ptr<IpcNotifyGetDeviceProfileInfosReq> pReq = std::make_shared<IpcNotifyGetDeviceProfileInfosReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetPkgName(processInfo.pkgName);
+    pReq->SetDeviceProfileInfos(deviceProfileInfos);
+    pReq->SetResult(code);
+    pReq->SetProcessInfo(processInfo);
+    ipcServerListener_.SendRequest(GET_DEVICE_PROFILE_INFOS_RESULT, pReq, pRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
