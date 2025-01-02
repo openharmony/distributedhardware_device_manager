@@ -48,7 +48,7 @@ void SoftbusListenerTest::TearDownTestCase()
 namespace {
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
 
-bool checkSoftbusRes(int32_t ret)
+bool CheckSoftbusRes(int32_t ret)
 {
     return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR
         || SOFTBUS_IPC_ERR;
@@ -226,7 +226,7 @@ HWTEST_F(SoftbusListenerTest, PublishSoftbusLNN_001, testing::ext::TestSize.Leve
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->PublishSoftbusLNN(dmPubInfo, capability, customData);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.Level0)
@@ -236,7 +236,7 @@ HWTEST_F(SoftbusListenerTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->StopPublishSoftbusLNN(publishId);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, RegisterSoftbusLnnOpsCbk_001, testing::ext::TestSize.Level0)
@@ -279,7 +279,7 @@ HWTEST_F(SoftbusListenerTest, GetUdidByNetworkId_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetUdidByNetworkId(networkId.c_str(), udid);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
@@ -290,7 +290,7 @@ HWTEST_F(SoftbusListenerTest, GetUuidByNetworkId_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetUuidByNetworkId(networkId.c_str(), udid);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
@@ -548,7 +548,7 @@ HWTEST_F(SoftbusListenerTest, GetDeviceInfo_001, testing::ext::TestSize.Level0)
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetDeviceInfo(networkId, info);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
@@ -558,7 +558,7 @@ HWTEST_F(SoftbusListenerTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Lev
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->GetLocalDeviceInfo(info);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, ConvertBytesToUpperCaseHexString_001, testing::ext::TestSize.Level0)
@@ -709,7 +709,7 @@ HWTEST_F(SoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Leve
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->RefreshSoftbusLNN(pkgName.c_str(), dmSubInfo, customData);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.Level0)
@@ -732,7 +732,7 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     std::string proofInfo2;
     deviceTypeId = 0xA2F;
     softbusListener->CredentialAuthStatusProcess(proofInfo2, deviceTypeId, errcode);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(SoftbusListenerTest, OnLocalDevInfoChange_001, testing::ext::TestSize.Level0)
