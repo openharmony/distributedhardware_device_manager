@@ -700,9 +700,17 @@ void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
 void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid)
 {
     LOGI("remoteUdid %{public}s, userId %{public}d", GetAnonyString(remoteUdid).c_str(), userId);
-    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(remoteUdid, userId);
+    std::vector<int32_t> localUserIds;
+    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(remoteUdid, userId, localUserIds);
+    if (localUserIds.empty()) {
+        return;
+    }
     CHECK_NULL_VOID(hiChainConnector_);
-    hiChainConnector_->DeleteAllGroup(userId);
+    std::vector<std::pair<int32_t, std::string>> delInfoVec;
+    for (int32_t localUserId : localUserIds) {
+        delInfoVec.push_back(std::pair<int32_t, std::string>(localUserId, remoteUdid));
+    }
+    hiChainConnector_->DeleteGroupByACL(delInfoVec, localUserIds);
 }
 
 void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string> &deviceVec,
@@ -714,6 +722,8 @@ void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string>
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, deviceVec, currentUserId, beforeUserId);
+    CHECK_NULL_VOID(hiChainConnector_);
+    hiChainConnector_->DeleteAllGroup(beforeUserId);
 }
 
 void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
