@@ -59,6 +59,7 @@ SoftbusSession::SoftbusSession()
     LOGD("SoftbusSession constructor.");
     if (memset_s(&iSocketListener_, sizeof(ISocketListener), 0, sizeof(ISocketListener)) != DM_OK) {
         LOGE("SoftbusSession::SoftbusSession memset_s failed.");
+        return;
     }
 
     iSocketListener_.OnShutdown = OnShutdown;

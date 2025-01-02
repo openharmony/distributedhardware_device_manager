@@ -39,12 +39,21 @@ void DecodeDmDeviceInfo(IpcIo &reply, DmDeviceInfo &devInfo)
 {
     size_t len = 0;
     std::string deviceIdStr = (const char *)ReadString(&reply, &len);
-    strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str());
+    if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s deviceId failed!");
+        return;
+    }
     std::string deviceNameStr = (const char *)ReadString(&reply, &len);
-    strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str());
+    if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s deviceName failed!");
+        return;
+    }
     ReadUint16(&reply, &devInfo.deviceTypeId);
     std::string networkIdStr = (const char *)ReadString(&reply, &len);
-    strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str());
+    if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s networkId failed!");
+        return;
+    }
     ReadInt32(&reply, &devInfo.range);
     ReadInt32(&reply, &devInfo.networkType);
     int32_t authForm = 0;

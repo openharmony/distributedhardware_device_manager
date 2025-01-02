@@ -539,6 +539,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
         std::string deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
         if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
             LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
+            return ERR_DM_SECURITY_FUNC_FAILED;
         }
         it->authForm = hiChainConnector_->GetGroupType(udid);
     }

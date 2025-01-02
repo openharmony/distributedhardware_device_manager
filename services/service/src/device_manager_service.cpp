@@ -292,7 +292,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
             DmDeviceInfo tempInfo;
             if (memcpy_s(tempInfo.networkId, DM_MAX_DEVICE_ID_LEN, item.networkId, sizeof(item.networkId)) != 0) {
                 LOGE("get networkId: %{public}s failed", GetAnonyString(item.networkId).c_str());
-                continue;
+                return ERR_DM_SECURITY_FUNC_FAILED;
             }
             deviceList.push_back(tempInfo);
         }

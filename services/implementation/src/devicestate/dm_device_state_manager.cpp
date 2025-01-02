@@ -416,10 +416,12 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
                 sizeof(info.deviceName)) != DM_OK) {
                     LOGE("ChangeDeviceInfo remoteDeviceInfos copy deviceName failed");
+                    return;
             }
             if (memcpy_s(iter.second.networkId, sizeof(iter.second.networkId), info.networkId,
                 sizeof(info.networkId)) != DM_OK) {
                     LOGE("ChangeDeviceInfo remoteDeviceInfos copy networkId failed");
+                    return;
             }
             iter.second.deviceTypeId = info.deviceTypeId;
             LOGI("Change remoteDeviceInfos complete");
@@ -431,10 +433,12 @@ void DmDeviceStateManager::ChangeDeviceInfo(const DmDeviceInfo &info)
             if (memcpy_s(iter.second.deviceName, sizeof(iter.second.deviceName), info.deviceName,
                 sizeof(info.deviceName)) != DM_OK) {
                     LOGE("ChangeDeviceInfo stateDeviceInfos copy deviceName failed");
+                    return;
             }
             if (memcpy_s(iter.second.networkId, sizeof(iter.second.networkId), info.networkId,
                 sizeof(info.networkId)) != DM_OK) {
                     LOGE("ChangeDeviceInfo stateDeviceInfos copy networkId failed");
+                    return;
             }
             iter.second.deviceTypeId = info.deviceTypeId;
             LOGI("Change stateDeviceInfos complete");

@@ -61,18 +61,31 @@ int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outp
 
     uint32_t encDataLen = inputMsg.length() + OVERHEAD_LEN;
     unsigned char *encData = (unsigned char *)calloc(encDataLen, sizeof(unsigned char));
+    if (encData == nullptr) {
+        LOGE("calloc fail");
+        return ERR_DM_CRYPTO_OPT_FAILED;
+    }
     int32_t ret = DoEncryptData(&cipherKey, reinterpret_cast<const unsigned char*>(inputMsg.c_str()),
         static_cast<uint32_t>(inputMsg.length()), encData, &encDataLen);
-    (void)memset_s(&cipherKey, sizeof(AesGcmCipherKey), 0, sizeof(AesGcmCipherKey));
     if (ret != DM_OK) {
         LOGE("EncryptData fail=%{public}d", ret);
+        free(encData);
+        encData = nullptr;
         return ERR_DM_CRYPTO_OPT_FAILED;
+    }
+    if (memset_s(&cipherKey, sizeof(AesGcmCipherKey), 0, sizeof(AesGcmCipherKey)) != DM_OK) {
+        LOGE("memset_s failed.");
+        free(encData);
+        encData = nullptr;
+        return ERR_DM_SECURITY_FUNC_FAILED;
     }
     const uint32_t hexStrLen = encDataLen * HEX_TO_UINT8 + 1;
     char hexStrTemp[hexStrLen];
     if (memset_s(hexStrTemp, hexStrLen, 0, hexStrLen) != DM_OK) {
         LOGE("memset_s failed.");
-        return ERR_DM_CRYPTO_OPT_FAILED;
+        free(encData);
+        encData = nullptr;
+        return ERR_DM_SECURITY_FUNC_FAILED;
     }
     Crypto::ConvertBytesToHexString(hexStrTemp, hexStrLen, encData, encDataLen);
     outputMsg.clear();
@@ -195,13 +208,24 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
 
     uint32_t outLen = inputMsgBytesLen - OVERHEAD_LEN + 1; /* for '\0' */
     unsigned char *outData = (unsigned char *)calloc(outLen, sizeof(unsigned char));
+    if (outData == nullptr) {
+        LOGE("calloc fail");
+        return ERR_DM_CRYPTO_OPT_FAILED;
+    }
 
     int32_t ret = DoDecryptData(&cipherKey, inputMsgBytsTemp,
         static_cast<uint32_t>(inputMsg.length() / HEX_TO_UINT8), outData, &outLen);
-    (void)memset_s(&cipherKey, sizeof(AesGcmCipherKey), 0, sizeof(AesGcmCipherKey));
     if (ret != DM_OK) {
         LOGE("SoftBusDecryptDataWithSeq fail=%{public}d", ret);
+        free(outData);
+        outData = nullptr;
         return ERR_DM_CRYPTO_OPT_FAILED;
+    }
+    if (memset_s(&cipherKey, sizeof(AesGcmCipherKey), 0, sizeof(AesGcmCipherKey)) != DM_OK) {
+        LOGE("memset_s failed.");
+        free(outData);
+        outData = nullptr;
+        return ERR_DM_SECURITY_FUNC_FAILED;
     }
     outputMsg.clear();
     outputMsg.assign(reinterpret_cast<const char*>(outData), outLen);

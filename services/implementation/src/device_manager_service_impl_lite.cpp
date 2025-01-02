@@ -118,6 +118,7 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
     std::string deviceId = GetUdidHashByNetworkId(devInfo.networkId);
     if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
         LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
+        return;
     }
     deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
     return;
