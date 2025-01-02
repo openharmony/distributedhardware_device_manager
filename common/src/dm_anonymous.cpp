@@ -24,25 +24,25 @@ constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
 
 std::string GetAnonyString(const std::string &value)
 {
-    const int32_t INT32_SHORT_ID_LENGTH = 20;
-    const int32_t INT32_PLAINTEXT_LENGTH = 4;
-    const int32_t INT32_MIN_ID_LENGTH = 3;
+    const int32_t inT32ShortIdLength = 20;
+    const int32_t inT32PlaintextLength = 4;
+    const int32_t inT32MinIdLength = 3;
 
     std::string tmpStr("******");
     size_t strLen = value.length();
-    if (strLen < INT32_MIN_ID_LENGTH) {
+    if (strLen < inT32MinIdLength) {
         return tmpStr;
     }
 
     std::string res;
-    if (strLen <= INT32_SHORT_ID_LENGTH) {
+    if (strLen <= inT32ShortIdLength) {
         res += value[0];
         res += tmpStr;
         res += value[strLen - 1];
     } else {
-        res.append(value, 0, INT32_PLAINTEXT_LENGTH);
+        res.append(value, 0, inT32PlaintextLength);
         res += tmpStr;
-        res.append(value, strLen - INT32_PLAINTEXT_LENGTH, INT32_PLAINTEXT_LENGTH);
+        res.append(value, strLen - inT32PlaintextLength, inT32PlaintextLength);
     }
 
     return res;
@@ -69,11 +69,11 @@ bool IsNumberString(const std::string &inputString)
         LOGE("inputString is Null");
         return false;
     }
-    const int32_t MIN_ASCLL_NUM = 48;
-    const int32_t MAX_ASCLL_NUM = 57;
+    const int32_t minAscllNum = 48;
+    const int32_t maxAscllNum = 57;
     for (size_t i = 0; i < inputString.length(); i++) {
         int num = (int)inputString[i];
-        if (num >= MIN_ASCLL_NUM && num <= MAX_ASCLL_NUM) {
+        if (num >= minAscllNum && num <= maxAscllNum) {
             continue;
         } else {
             return false;
