@@ -20,29 +20,30 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
+constexpr int32_t INT32_SHORT_ID_LENGTH = 20;
+constexpr int32_t INT32_PLAINTEXT_LENGTH = 4;
+constexpr int32_t INT32_MIN_ID_LENGTH = 3;
+constexpr int32_t MIN_ASCLL_NUM = 48;
+constexpr int32_t MAX_ASCLL_NUM = 57;
 }
 
 std::string GetAnonyString(const std::string &value)
 {
-    const int32_t inT32ShortIdLength = 20;
-    const int32_t inT32PlaintextLength = 4;
-    const int32_t inT32MinIdLength = 3;
-
     std::string tmpStr("******");
     size_t strLen = value.length();
-    if (strLen < inT32MinIdLength) {
+    if (strLen < INT32_MIN_ID_LENGTH) {
         return tmpStr;
     }
 
     std::string res;
-    if (strLen <= inT32ShortIdLength) {
+    if (strLen <= INT32_SHORT_ID_LENGTH) {
         res += value[0];
         res += tmpStr;
         res += value[strLen - 1];
     } else {
-        res.append(value, 0, inT32PlaintextLength);
+        res.append(value, 0, INT32_PLAINTEXT_LENGTH);
         res += tmpStr;
-        res.append(value, strLen - inT32PlaintextLength, inT32PlaintextLength);
+        res.append(value, strLen - INT32_PLAINTEXT_LENGTH, INT32_PLAINTEXT_LENGTH);
     }
 
     return res;
@@ -69,11 +70,9 @@ bool IsNumberString(const std::string &inputString)
         LOGE("inputString is Null");
         return false;
     }
-    const int32_t minAscllNum = 48;
-    const int32_t maxAscllNum = 57;
     for (size_t i = 0; i < inputString.length(); i++) {
         int num = (int)inputString[i];
-        if (num >= minAscllNum && num <= maxAscllNum) {
+        if (num >= MIN_ASCLL_NUM && num <= MAX_ASCLL_NUM) {
             continue;
         } else {
             return false;
