@@ -636,8 +636,6 @@ void DmAuthManager::ProcessSinkMsg()
 
 void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string message)
 {
-    LOGI("sessionId %{public}d, authResponseContext_->sessionId %{public}d.", sessionId,
-        authResponseContext_->sessionId);
     if (authResponseContext_ == nullptr || authMessageProcessor_ == nullptr ||
         sessionId != authResponseContext_->sessionId) {
         LOGE("OnDataReceived failed, authResponseContext or authMessageProcessor_ is nullptr.");
@@ -2408,8 +2406,6 @@ void DmAuthManager::ProcIncompatible(const int32_t &sessionId)
 
 void DmAuthManager::OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message)
 {
-    LOGI("sessionId %{public}d, authResponseContext_->sessionId %{public}d.", sessionId,
-        authResponseContext_->sessionId);
     if (authResponseContext_ == nullptr || authMessageProcessor_ == nullptr || hiChainAuthConnector_ == nullptr ||
         authResponseContext_->sessionId != sessionId) {
         LOGE("OnAuthDeviceDataReceived param is invalid");

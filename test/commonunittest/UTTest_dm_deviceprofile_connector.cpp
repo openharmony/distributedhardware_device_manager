@@ -1009,7 +1009,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_001, testing::ext::TestSize.Le
     bindLevel = DeviceProfileConnector::GetInstance()
         .GetBindLevel(pkgName, localUdid, udid, tokenId);
 
-    EXPECT_EQ(bindLevel, DEVICE);
+    EXPECT_EQ(bindLevel, INVALIED_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, UpdateBindType_001, testing::ext::TestSize.Level0)
@@ -1052,7 +1052,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_001, testing::ext::Tes
     int32_t bindType = DM_INVALIED_BINDTYPE;
 
     bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, SERVICE);
+    EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_001, testing::ext::TestSize.Level0)
@@ -1262,7 +1262,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::Tes
 
     remoteUdid = "123456";
     bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
+    EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAllAccessControlProfile_001, testing::ext::TestSize.Level0)

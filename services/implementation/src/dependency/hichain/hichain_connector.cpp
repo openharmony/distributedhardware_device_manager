@@ -533,6 +533,12 @@ int32_t HiChainConnector::GetRelatedGroupsExt(const std::string &deviceId, std::
     return GetRelatedGroupsCommon(deviceId, DM_PKG_NAME_EXT, groupList);
 }
 
+int32_t HiChainConnector::GetRelatedGroupsExt(int32_t userId, const std::string &deviceId,
+    std::vector<GroupInfo> &groupList)
+{
+    return GetRelatedGroupsCommon(userId, deviceId, DM_PKG_NAME_EXT, groupList);
+}
+
 int32_t HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, std::vector<std::string> &syncGroupList)
 {
     if (groupList.empty()) {
@@ -651,6 +657,20 @@ int32_t HiChainConnector::DeleteGroupExt(std::string &groupId)
         return ERR_DM_FAILED;
     }
 
+    int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME_EXT, disbandParams.c_str());
+    if (ret != 0) {
+        LOGE("[HICHAIN]fail to delete group with ret:%{public}d.", ret);
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t HiChainConnector::DeleteGroupExt(int32_t userId, std::string &groupId)
+{
+    int64_t requestId = GenRequestId();
+    nlohmann::json jsonObj;
+    jsonObj[FIELD_GROUP_ID] = groupId;
+    std::string disbandParams = SafetyDump(jsonObj);
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME_EXT, disbandParams.c_str());
     if (ret != 0) {
         LOGE("[HICHAIN]fail to delete group with ret:%{public}d.", ret);
@@ -1095,16 +1115,22 @@ void HiChainConnector::DeleteAllGroup(int32_t userId)
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     std::vector<GroupInfo> groupList;
-    GetRelatedGroups(localUdid, groupList);
+    GetRelatedGroups(userId, localUdid, groupList);
     for (auto &iter : groupList) {
-        if (DeleteGroup(iter.groupId) != DM_OK) {
+        if (iter.groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+            continue;
+        }
+        if (DeleteGroup(userId, iter.groupId) != DM_OK) {
             LOGE("Delete groupId %{public}s failed.", GetAnonyString(iter.groupId).c_str());
         }
     }
     std::vector<GroupInfo> groupListExt;
-    GetRelatedGroupsExt(localUdid, groupListExt);
+    GetRelatedGroupsExt(userId, localUdid, groupListExt);
     for (auto &iter : groupListExt) {
-        if (DeleteGroupExt(iter.groupId) != DM_OK) {
+        if (iter.groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+            continue;
+        }
+        if (DeleteGroupExt(userId, iter.groupId) != DM_OK) {
             LOGE("DeleteGroupExt groupId %{public}s failed.", GetAnonyString(iter.groupId).c_str());
         }
     }

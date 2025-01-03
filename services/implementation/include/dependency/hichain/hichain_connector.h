@@ -234,8 +234,10 @@ public:
     void DeleteAllGroup(int32_t userId);
     int32_t GetRelatedGroups(int32_t userId, const std::string &deviceId, std::vector<GroupInfo> &groupList);
     int32_t GetRelatedGroupsExt(const std::string &deviceId, std::vector<GroupInfo> &groupList);
+    int32_t GetRelatedGroupsExt(int32_t userId, const std::string &deviceId, std::vector<GroupInfo> &groupList);
 
     int32_t DeleteGroupExt(std::string &groupId);
+    int32_t DeleteGroupExt(int32_t userId, std::string &groupId);
 
     int32_t GetRelatedGroupsCommon(const std::string &deviceId, const char* pkgName,
         std::vector<GroupInfo> &groupList);

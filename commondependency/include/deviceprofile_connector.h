@@ -114,6 +114,7 @@ public:
     bool DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
         const std::string &peerUdid, int32_t peerUserId);
     void DeleteAclForUserRemoved(std::string localUdid, int32_t userId);
+    void DeleteAclForRemoteUserRemoved(std::string peerUdid, int32_t peerUserId, std::vector<int32_t> &userIds);
     DmOfflineParam DeleteAccessControlList(const std::string &pkgName, const std::string &localDeviceId,
         const std::string &remoteDeviceId, int32_t bindLevel, const std::string &extra);
     std::vector<OHOS::DistributedHardware::ProcessInfo> GetProcessInfoFromAclByUserId(const std::string &localDeviceId,
