@@ -241,6 +241,7 @@ constexpr const char* PARAM_KEY_FILTER_OPTIONS = "FILTER_OPTIONS";
 constexpr const char* PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
 constexpr const char* PARAM_KEY_OS_TYPE = "OS_TYPE";
 constexpr const char* PARAM_KEY_OS_VERSION = "OS_VERSION";
+constexpr const char* PARAM_KEY_IS_SHOW_TRUST_DIALOG = "isShowTrustDialog";
 constexpr const char* PARAM_KEY_UDID = "udid";
 constexpr const char* PARAM_KEY_UUID = "uuid";
 constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
