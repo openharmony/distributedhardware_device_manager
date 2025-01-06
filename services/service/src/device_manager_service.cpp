@@ -126,6 +126,7 @@ int32_t DeviceManagerService::InitSoftbusListener()
 void DeviceManagerService::InitHichainListener()
 {
     LOGI("DeviceManagerService::InitHichainListener Start.");
+    
     if (hichainListener_ == nullptr) {
         hichainListener_ = std::make_shared<HichainListener>();
     }

@@ -297,6 +297,7 @@ private:
     std::mutex isImplLoadLock_;
     std::mutex isAdapterLoadLock_;
     std::mutex isAdapterResidentLoadLock_;
+    
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;
