@@ -126,10 +126,12 @@ int32_t DeviceManagerService::InitSoftbusListener()
 void DeviceManagerService::InitHichainListener()
 {
     LOGI("DeviceManagerService::InitHichainListener Start.");
-    std::lock_guard<std::mutex> lock(hichainListenerLock_);
-    if (hichainListener_ == nullptr) {
-        hichainListener_ = std::make_shared<HichainListener>();
-    }
+    {
+        std::lock_guard<std::mutex> lock(hichainListenerLock_);
+        if (hichainListener_ == nullptr) {
+            hichainListener_ = std::make_shared<HichainListener>();
+        }
+    }    
     hichainListener_->RegisterDataChangeCb();
 }
 
