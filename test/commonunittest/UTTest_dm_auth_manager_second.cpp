@@ -1601,8 +1601,10 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
     EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(true));
     authManager_->GetAuthRequestContext();
 
+    authManager_->authResponseContext_->isOnline = true;
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->authResponseContext_->importAuthCode = "";
+    authManager_->importAuthCode_ = "";
     std::vector<int32_t> bindType;
     bindType.push_back(101);
     bindType.push_back(102);

@@ -27,6 +27,8 @@ public:
     virtual ~DmHiChainAuthConnector() = default;
 public:
     virtual bool QueryCredential(std::string &localUdid, int32_t osAccountId) = 0;
+    virtual int32_t AuthDevice(int32_t pinCode, int32_t osAccountId,
+        std::string udid, int64_t requestId) = 0;
 public:
     static inline std::shared_ptr<DmHiChainAuthConnector> dmHiChainAuthConnector = nullptr;
 };
@@ -34,6 +36,7 @@ public:
 class HiChainAuthConnectorMock : public DmHiChainAuthConnector {
 public:
     MOCK_METHOD(bool, QueryCredential, (std::string &, int32_t));
+    MOCK_METHOD(int32_t, AuthDevice, (int32_t, int32_t, std::string, int64_t));
 };
 }
 }

@@ -77,5 +77,20 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
     return DmDeviceProfileConnector::dmDeviceProfileConnector->SyncAclByBindType(pkgName, bindTypeVec,
         localDeviceId, targetDeviceId);
 }
+
+std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
+    std::string trustUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetBindTypeByPkgName(pkgName,
+        requestDeviceId, trustUdid);
+}
+
+DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string &pkgName,
+    const std::string &localDeviceId, const std::string &remoteDeviceId,
+    int32_t bindLevel, const std::string &extra)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAccessControlList(pkgName, localDeviceId,
+        remoteDeviceId, bindLevel, extra);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
