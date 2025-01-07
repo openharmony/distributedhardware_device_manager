@@ -131,7 +131,7 @@ void DeviceManagerService::InitHichainListener()
         if (hichainListener_ == nullptr) {
             hichainListener_ = std::make_shared<HichainListener>();
         }
-    }    
+    }
     hichainListener_->RegisterDataChangeCb();
 }
 
