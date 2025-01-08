@@ -25,6 +25,7 @@
 #include "authenticate_device_fuzzer.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {

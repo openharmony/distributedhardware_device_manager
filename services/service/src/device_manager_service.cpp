@@ -2613,7 +2613,7 @@ int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgN
         LOGE("RegisterAuthenticationType failed, instance not init or init failed.");
         return ERR_DM_INIT_FAILED;
     }
-    return dmServiceImpl->RegisterAuthenticationType(authenticationType);
+    return dmServiceImpl_->RegisterAuthenticationType(authenticationType);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
