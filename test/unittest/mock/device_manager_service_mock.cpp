@@ -34,5 +34,12 @@ bool DeviceManagerService::IsDMServiceAdapterLoad()
 {
     return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterLoad();
 }
+
+int32_t DeviceManagerService::SendUserIdsByWifi(const std::string &networkId,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
+{
+    return DmDeviceManagerService::dmDeviceManagerService->SendUserIdsByWifi(networkId, foregroundUserIds,
+        backgroundUserIds);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

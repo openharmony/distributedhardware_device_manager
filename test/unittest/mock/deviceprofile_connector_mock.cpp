@@ -92,5 +92,19 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string
     return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);
 }
+
+void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(std::string peerUdid, int32_t peerUserId,
+    std::vector<int32_t> &userIds)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForRemoteUserRemoved(peerUdid, peerUserId,
+        userIds);
+}
+
+OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
+    const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid,
+        tokenId, localUdid, peerTokenId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

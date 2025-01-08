@@ -75,5 +75,10 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
 {
     return DmSoftbusListener::dmSoftbusListener->GetIPAddrTypeFromCache(deviceId, ip, addrType);
 }
+
+int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
+{
+    return DmSoftbusListener::dmSoftbusListener->GetNetworkTypeByNetworkId(networkId, networkType);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

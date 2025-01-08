@@ -185,6 +185,13 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportCredential_301, testing::ext::Test
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+
+    std::string pkgName = "";
+    std::string reqJsonStr = "";
+    std::string returnJsonStr = "";
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    ret = DeviceManagerService::GetInstance().ImportCredential(pkgName, reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 }
 
 /**
@@ -354,6 +361,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
     DmDeviceInfo dmDeviceInfo;
     dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
     deviceList.push_back(dmDeviceInfo);
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*deviceManagerServiceMock_, GetTrustedDeviceList(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(deviceList), Return(DM_OK)));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
@@ -410,6 +418,31 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetDnPolicy_301, testing::ext::TestSize.
     std::string msg = "msg";
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, UnBindDevice_302, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string deviceId = "1234";
+    std::string extra;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+}
+
+HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_301, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().timer_ = nullptr;
+    int32_t curUserId = 1;
+    int32_t preUserId = 1;
+    std::map<std::string, std::string> wifiDevices;
+    std::vector<int32_t> foregroundUserIds;
+    std::vector<int32_t> backgroundUserIds;
+    wifiDevices.insert(std::make_pair("kdmalsalskalw002", "networkId008"));
+    EXPECT_CALL(*deviceManagerServiceMock_, SendUserIdsByWifi(_, _, _)).WillOnce(Return(DM_OK));
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(curUserId, preUserId, wifiDevices,
+        foregroundUserIds, backgroundUserIds);
+    EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
 }
 } // namespace
 } // namespace DistributedHardware

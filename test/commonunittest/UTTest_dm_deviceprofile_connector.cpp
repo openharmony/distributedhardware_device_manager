@@ -1171,6 +1171,11 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_001, testing::ext::Tes
 
     res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
     EXPECT_EQ(pkgName, res.pkgName);
+
+    int32_t peerTokenId = 1;
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid,
+        peerTokenId);
+    EXPECT_EQ(pkgName, res.pkgName);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_001, testing::ext::TestSize.Level0)
@@ -1368,6 +1373,15 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::Tes
     remoteUdid = "123456";
     bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
     EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
+
+    remoteUdid = "localDeviceId";
+    remoteUserId = 1234;
+    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
+    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
+
+    remoteUserId = 456;
+    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
+    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAllAccessControlProfile_001, testing::ext::TestSize.Level0)
@@ -1802,8 +1816,18 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_002, testing::ext::Tes
     res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
     EXPECT_EQ("bundleName", res.pkgName);
 
+    int32_t peerTokenId = 1001;
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid,
+        peerTokenId);
+    EXPECT_EQ("bundleName", res.pkgName);
+
     tokenId = 1002;
+    peerTokenId = tokenId;
     res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
+    EXPECT_EQ("bundleName", res.pkgName);
+
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid,
+        peerTokenId);
     EXPECT_EQ("bundleName", res.pkgName);
 }
 
@@ -2044,6 +2068,55 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAppBindLevel_002, testing::ext::TestS
     DeviceProfileConnector::GetInstance().DeleteAppBindLevel(offlineParam, pkgName, profiles, localUdid, remoteUdid,
         extra);
     EXPECT_EQ(offlineParam.bindType, APP);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string localUdid = "remoteDeviceId";
+    std::string udid = "localDeviceId";
+    uint64_t tokenId = 0;
+    int32_t bindLevel = INVALIED_TYPE;
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(456));
+    bindLevel = DeviceProfileConnector::GetInstance().GetBindLevel(pkgName, localUdid, udid, tokenId);
+    EXPECT_EQ(bindLevel, APP);
+
+    localUdid = "deviceId";
+    udid = "deviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
+    EXPECT_EQ(bindLevel, DEVICE);
+
+    int32_t bindType = 256;
+    std::string peerUdid = "123456";
+    std::string localUdid = "localDeviceId";
+    int32_t localUserId = 1234;
+    std::string localAccountId = "";
+    DeviceProfileConnector::GetInstance().HandleDeviceUnBind(bindType, peerUdid, localUdid, localUserId,
+        localAccountId);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_002, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DmAccessCaller caller;
+    DmAccessCallee callee;
+    profile.SetBindType(DM_POINT_TO_POINT);
+    profile.SetBindLevel(APP);
+    caller.pkgName = "bundleName";
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeBundleName("bundleName");
+    profile.SetAccessee(accessee);
+    int32_t ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+    
+
+    profile.SetBindType(DM_ACROSS_ACCOUNT);
+    profile.SetBindLevel(APP);
+    accessee.SetAccesseeBundleName("bundleName");
+    profile.SetAccessee(accessee);
+    ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
