@@ -213,7 +213,7 @@ public:
     void HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo);
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
     int32_t RegisterAuthenticationType(const std::string &pkgName,
-        const std::map<std::string, std::string> &authType);
+        const std::map<std::string, std::string> &authParam);
 
 private:
     bool IsDMServiceImplReady();

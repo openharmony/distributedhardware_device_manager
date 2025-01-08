@@ -408,7 +408,7 @@ public:
     virtual int32_t UnRegisterSinkBindCallback(const std::string &pkgName) override;
     void SyncCallbacksToService(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
     virtual int32_t RegisterAuthenticationType(const std::string &pkgName,
-        const std::map<std::string, std::string> &authType) override;
+        const std::map<std::string, std::string> &authParam) override;
 
 private:
     DeviceManagerImpl() = default;

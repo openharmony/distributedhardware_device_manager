@@ -2587,7 +2587,7 @@ void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t pr
 #endif
 
 int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgName,
-    const std::map<std::string, std::string> &authType)
+    const std::map<std::string, std::string> &authParam)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
         LOGE("The caller does not have permission to call");
@@ -2598,8 +2598,8 @@ int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgN
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    auto authTypeIter = authType.find(DM_AUTHENTICATION_TYPE);
-    if (authTypeIter == authType.end()) {
+    auto authTypeIter = authParam.find(DM_AUTHENTICATION_TYPE);
+    if (authTypeIter == authParam.end()) {
         LOGE("Invalid parameter, DM_AUTHENTICATION_TYPE is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
