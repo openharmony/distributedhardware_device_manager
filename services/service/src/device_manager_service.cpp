@@ -2585,5 +2585,35 @@ void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t pr
     dmServiceImpl_->HandleUserSwitched(updateUdids, curUserId, preUserId);
 }
 #endif
+
+int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgName,
+    const std::map<std::string, std::string> &authType)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    auto authTypeIter = authType.find(DM_AUTHENTICATION_TYPE);
+    if (authTypeIter == authType.end()) {
+        LOGE("Invalid parameter, DM_AUTHENTICATION_TYPE is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsNumberString(authTypeIter->second)) {
+        LOGE("Invalid parameter, DM_AUTHENTICATION_TYPE is not number.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t authenticationType = std::atoi(authTypeIter->second.c_str());
+
+    if (!IsDMServiceImplReady()) {
+        LOGE("RegisterAuthenticationType failed, instance not init or init failed.");
+        return ERR_DM_INIT_FAILED;
+    }
+    return dmServiceImpl->RegisterAuthenticationType(authenticationType);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

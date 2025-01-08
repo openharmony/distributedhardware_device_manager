@@ -633,6 +633,8 @@ public:
     virtual int32_t RegisterSinkBindCallback(const std::string &pkgName,
         std::shared_ptr<BindTargetCallback> callback) = 0;
     virtual int32_t UnRegisterSinkBindCallback(const std::string &pkgName) = 0;
+    virtual int32_t RegisterAuthenticationType(const std::string &pkgName,
+        const std::map<std::string, std::string> &authType) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

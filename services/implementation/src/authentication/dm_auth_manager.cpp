@@ -1409,6 +1409,7 @@ void DmAuthManager::AuthenticateFinish()
     authMessageProcessor_ = nullptr;
     authPtr_ = nullptr;
     authRequestStateTemp_ = nullptr;
+    authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
@@ -1520,7 +1521,7 @@ void DmAuthManager::ShowConfigDialog()
     }
     if (!authResponseContext_->isShowDialog) {
         LOGI("start auth process");
-        StartAuthProcess(USER_OPERATION_TYPE_ALLOW_AUTH);
+        StartAuthProcess(authenticationType_);
         return;
     }
     LOGI("ShowConfigDialog start");
@@ -2911,6 +2912,17 @@ bool DmAuthManager::IsSourceMsgValid()
     }
     authResponseContext_->localAccountId = authRequestContext_->localAccountId;
     return true;
+}
+
+int32_t DmAuthManager::RegisterAuthenticationType(int32_t authenticationType)
+{
+    if (authenticationType != USER_OPERATION_TYPE_ALLOW_AUTH &&
+        authenticationType != USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    authenticationType_ = authenticationType;
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
