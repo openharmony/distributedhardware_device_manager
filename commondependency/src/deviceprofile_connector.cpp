@@ -1278,9 +1278,8 @@ int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
         }
     }
     for (auto &item : inActiveProfiles) {
-        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
-        } else {
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        if (item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
         }
     }
@@ -1554,19 +1553,17 @@ void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(const std::vector<i
         if (accesserDeviceId == localUdid && accesseeDeviceId == remoteUdid && item.GetStatus() == ACTIVE &&
             (find(remoteUserIds.begin(), remoteUserIds.end(), accesseeUserId) != remoteUserIds.end() ||
             find(localUserIds.begin(), localUserIds.end(), accesserUserId) == localUserIds.end())) {
-            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-                item.SetStatus(INACTIVE);
-                DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
-            } else {
+            item.SetStatus(INACTIVE);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+            if (item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
                 DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
             }
         } else if ((accesseeDeviceId == localUdid && accesserDeviceId == remoteUdid) && item.GetStatus() == ACTIVE &&
             (find(remoteUserIds.begin(), remoteUserIds.end(), accesserUserId) != remoteUserIds.end() ||
             find(localUserIds.begin(), localUserIds.end(), accesseeUserId) == localUserIds.end())) {
-            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-                item.SetStatus(INACTIVE);
-                DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
-            } else {
+            item.SetStatus(INACTIVE);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+            if (item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
                 DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
             }
         }
