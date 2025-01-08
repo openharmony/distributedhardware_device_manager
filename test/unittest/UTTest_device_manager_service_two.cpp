@@ -577,7 +577,7 @@ HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_201, testing::ext::Tes
     udidMap.insert(std::make_pair("udid01", DmAuthForm::IDENTICAL_ACCOUNT));
     udidMap.insert(std::make_pair("udid02", DmAuthForm::ACROSS_ACCOUNT));
     EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(deviceList),Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetAppTrustDeviceIdList(_)).WillOnce(Return(udidMap));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
