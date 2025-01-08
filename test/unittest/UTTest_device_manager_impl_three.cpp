@@ -1427,7 +1427,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterAuthenticationType_002, testing::ext::Te
 
 HWTEST_F(DeviceManagerImplTest, RegisterAuthenticationType_003, testing::ext::TestSize.Level0)
 {
-    std::string packName = "com.ohos.RegisterAuthenticationType";
+    std::string packName = "";
     std::map<std::string, std::string> authParam;
     authParam[DM_AUTHENTICATION_TYPE] = "0";
     int32_t ret = DeviceManager::GetInstance().RegisterAuthenticationType(packName, authParam);
