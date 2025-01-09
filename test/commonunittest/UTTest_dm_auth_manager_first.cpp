@@ -1663,6 +1663,8 @@ HWTEST_F(DmAuthManagerTest, ResponseReCheckMsg_001, testing::ext::TestSize.Level
     authManager_->authResponseContext_->localUserId = authManager_->authResponseContext_->remoteUserId;
     authManager_->authResponseContext_->bundleName = authManager_->authResponseContext_->hostPkgName;
     authManager_->authResponseContext_->localBindLevel = authManager_->authResponseContext_->bindLevel;
+    EXPECT_CALL(*appManagerMock_, GetHapTokenIdByName(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
     authManager_->ResponseReCheckMsg();
     ASSERT_EQ(authManager_->authResponseContext_->localBindLevel, 1);
 }
@@ -1686,6 +1688,7 @@ HWTEST_F(DmAuthManagerTest, RequestReCheckMsgDone_001, testing::ext::TestSize.Le
     authManager_->authResponseContext_->localUserId = authManager_->authRequestContext_->remoteUserId;
     authManager_->authResponseContext_->bundleName = authManager_->authResponseContext_->peerBundleName;
     authManager_->authResponseContext_->localBindLevel = authManager_->authResponseContext_->bindLevel;
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
     authManager_->RequestReCheckMsgDone();
     ASSERT_EQ(authManager_->authResponseContext_->localBindLevel, 1);
 
@@ -1725,6 +1728,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceFinish004, testing::ext::TestSize.Level0)
     int64_t requestId = 0;
     authManager_->authResponseContext_->requestId = 0;
     authManager_->remoteVersion_ = "5.0.2";
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
     authManager_->AuthDeviceFinish(requestId);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
@@ -1798,6 +1802,16 @@ HWTEST_F(DmAuthManagerTest, DeleteAcl_001, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 
     bindLevel = 2;
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlList(_, _, _, _, _)).WillOnce(Return(offlineParam));
+    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    bindLevel = 1;
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlList(_, _, _, _, _)).WillOnce(Return(offlineParam));
+    ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
+    ASSERT_EQ(ret, DM_OK);
+
+    offlineParam.leftAclNumber = 0;
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlList(_, _, _, _, _)).WillOnce(Return(offlineParam));
     ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     ASSERT_EQ(ret, DM_OK);
