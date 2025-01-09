@@ -1600,9 +1600,11 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_004, testing::ext::
     std::string netWorkId = "netWorkId";
     int32_t networkType = 0;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _)).Times(::testing::AtLeast(2))
+        .WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_001, testing::ext::TestSize.Level0)
@@ -2346,6 +2348,8 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_003, testing::ext::TestSiz
     std::string pkgName = "pkgName_003";
     std::string udid = "sewdwed98897";
     std::string networkId = "networkIdTest_003";
+    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).Times(::testing::AtLeast(2))
+        .WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkIdByUdid(pkgName, udid, networkId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }

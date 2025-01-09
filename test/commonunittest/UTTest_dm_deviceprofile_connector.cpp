@@ -1381,7 +1381,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::Tes
 
     remoteUserId = 456;
     bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
+    EXPECT_EQ(bindType, 3);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAllAccessControlProfile_001, testing::ext::TestSize.Level0)

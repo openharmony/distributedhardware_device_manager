@@ -1649,6 +1649,7 @@ HWTEST_F(DmAuthManagerTest, ResponseReCheckMsg_001, testing::ext::TestSize.Level
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
     authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseContext_->edition = "edition";
     authManager_->remoteVersion_ = "";
     authManager_->ResponseReCheckMsg();

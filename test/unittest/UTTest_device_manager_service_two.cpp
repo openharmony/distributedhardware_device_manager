@@ -987,6 +987,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_204, testing::ext::TestSize.Leve
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(1));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, udidHash, extra);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
@@ -1006,7 +1007,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Leve
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(1));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, udidHash, extra);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
@@ -1061,6 +1062,7 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_202, testing::ex
 {
     std::string pkgName = "pkgName";
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    DeviceManagerService::GetInstance().listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::vector<DmDeviceInfo> deviceList;
     DmDeviceInfo dmDeviceInfo;
     dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
