@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"رمز الاتصال",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"تطبيق %1$s على \u202a%2$s\u202c يريد الوصول إلى هذا الجهاز. هل تريد الوثوق بهذا التطبيق؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"إلغاء",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"أدخل رمز الاتصال",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"هذا الإذن مطلوب لمزامنة البيانات والمشاركة بين الأجهزة.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"الوثوق هذه المرة",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"الوثوق دائمًا",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

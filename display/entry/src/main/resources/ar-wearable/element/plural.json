@@ -1,0 +1,51 @@
+{
+    "plural":[
+        {
+            "name":"dm_incorrect_code",
+            "value":[
+                {
+                    "quantity":"one",
+                    "value":"رقم خاطئ، لا تزال لديك محاولة واحدة متبقية",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"other",
+                    "value":"رقم خاطئ، لا تزال لديك %d محاولة متبقية",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"zero",
+                    "value":"رقم خاطئ، لا تزال لديك %d محاولات متبقية",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"few",
+                    "value":"غير صحيح، لا تزال لديك %d محاولات متبقية",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"many",
+                    "value":"رقم خاطئ، لا تزال لديك %d محاولة متبقية",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"two",
+                    "value":"رقم خاطئ، لا تزال لديك محاولتين متبقيتين",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
+        }
+    ]
+}

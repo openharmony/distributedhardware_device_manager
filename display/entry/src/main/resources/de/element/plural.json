@@ -1,0 +1,42 @@
+{
+    "plural":[
+        {
+            "name":"dm_incorrect_code",
+            "value":[
+                {
+                    "quantity":"one",
+                    "value":"Falscher Code, noch %d Versuch übrig.",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"other",
+                    "value":"Falscher Code, noch %d Versuche übrig.",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
+        },
+        {
+            "name":"dm_not_allow",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"Nicht vertrauen (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"one",
+                    "value":"Nicht vertrauen (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
+        }
+    ]
+}

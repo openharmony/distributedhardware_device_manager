@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"Κωδικός σύνδεσης",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"Η εφαρμογή %1$s στη συσκευή %2$s θέλει να έχει πρόσβαση σε αυτήν τη συσκευή. Εμπιστεύεστε αυτήν την εφαρμογή;",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Ακύρωση",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Εισαγωγή κωδικού σύνδεσης",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"Αυτό απαιτείται για συγχρονισμό δεδομένων μεταξύ συσκευών και συνεργασία.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Να θεωρηθεί αξιόπιστο αυτή τη φορά",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Να θεωρείται πάντα αξιόπιστο",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}
