@@ -1034,7 +1034,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().HandleUserIdsBroadCast(remoteUserIdInfos, remoteUdid, isNeedResponse);
 
     std::vector<std::string> peerUdids;
-    int32_t userId = 123;
+    userId = 123;
     uint64_t tokenId = 1;
     int32_t bindLevel = 1;
     uint64_t peerTokenId = 1;
@@ -1070,7 +1070,7 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_202, testing::ex
     udidMap.insert(std::make_pair("udid01", DmAuthForm::IDENTICAL_ACCOUNT));
     udidMap.insert(std::make_pair("udid02", DmAuthForm::ACROSS_ACCOUNT));
     EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(deviceList),Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetAppTrustDeviceIdList(_)).WillOnce(Return(udidMap));
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
