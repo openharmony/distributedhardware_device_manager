@@ -71,7 +71,7 @@ public:
     MOCK_METHOD((std::vector<int32_t>), SyncAclByBindType, (std::string, std::vector<int32_t>, std::string,
         std::string));
     MOCK_METHOD((std::vector<int32_t>), GetBindTypeByPkgName, (std::string, std::string, std::string));
-    MOCK_METHOD(DmOfflineParam, DeleteAccessControlList, (const std::string &, const std::string &, const std::string,
+    MOCK_METHOD(DmOfflineParam, DeleteAccessControlList, (const std::string &, const std::string &, const std::string &,
         int32_t, const std::string &));
     MOCK_METHOD(void, DeleteAclForRemoteUserRemoved, (std::string, int32_t, std::vector<int32_t> &));
     MOCK_METHOD((OHOS::DistributedHardware::ProcessInfo), HandleAppUnBindEvent, (int32_t, const std::string &,
