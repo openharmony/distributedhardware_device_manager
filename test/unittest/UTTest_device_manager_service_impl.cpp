@@ -1772,7 +1772,8 @@ HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_001, testing::ext::T
     std::vector<int32_t> localUserIds;
     localUserIds.push_back(123);
     localUserIds.push_back(456);
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForRemoteUserRemoved(_, _, _)).WillOnce(Return(localUserIds));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForRemoteUserRemoved(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(localUserIds), Return()));
     deviceManagerServiceImpl_->HandleRemoteUserRemoved(userId, remoteUdid);
 }
 
@@ -1810,7 +1811,7 @@ HWTEST_F(DeviceManagerServiceImplTest, GetTokenIdByNameAndDeviceId_001, testing:
     ret = deviceManagerServiceImpl_->GetTokenIdByNameAndDeviceId(pkgName, requestDeviceId);
     EXPECT_EQ(ret, DM_OK);
 
-    nt32_t remoteUserId = 1;
+    int32_t remoteUserId = 1;
     std::string remoteUdid = "remoteDeviceId";
     int32_t tokenId = 0;
     int32_t peerTokenId = 1;

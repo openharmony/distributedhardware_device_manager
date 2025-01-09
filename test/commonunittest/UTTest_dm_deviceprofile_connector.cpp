@@ -2021,25 +2021,25 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::
     int32_t bindLevel = 3;
     std::string extra;
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(456));
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localdeviceId,
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.leftAclNumber, 0);
 
     extra = "extra";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(456));
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localdeviceId,
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.leftAclNumber, 0);
 
     bindLevel = 2;
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(456));
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localdeviceId,
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.leftAclNumber, 0);
 
     bindLevel = 1;
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(456));
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localdeviceId,
+    offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.leftAclNumber, 0);
 }

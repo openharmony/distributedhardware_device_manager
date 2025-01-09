@@ -1656,14 +1656,14 @@ HWTEST_F(DmAuthManagerTest, ResponseReCheckMsg_001, testing::ext::TestSize.Level
     authManager_->authResponseContext_->edition = "";
     authManager_->remoteDeviceId_ = "remoteDeviceId_";
     authManager_->authResponseContext_->localDeviceId = authManager_->remoteDeviceId_;
-    authManager_->authResponseContext_->remoteUserId = "remoteUserId";
+    authManager_->authResponseContext_->remoteUserId = 1;
     authManager_->authResponseContext_->hostPkgName = "hostPkgName";
     authManager_->authResponseContext_->bindLevel = 1;
     authManager_->authResponseContext_->localUserId = authManager_->authResponseContext_->remoteUserId;
     authManager_->authResponseContext_->bundleName = authManager_->authResponseContext_->hostPkgName;
-    authManager_->authResponseContext_->localBindLevel = authResponseContext_->bindLevel;
+    authManager_->authResponseContext_->localBindLevel = authManager_->authResponseContext_->bindLevel;
     authManager_->ResponseReCheckMsg();
-    ASSERT_EQ(authResponseContext_->localBindLevel, 1);
+    ASSERT_EQ(authManager_->authResponseContext_->localBindLevel, 1);
 }
 
 HWTEST_F(DmAuthManagerTest, RequestReCheckMsgDone_001, testing::ext::TestSize.Level0)
@@ -1679,14 +1679,14 @@ HWTEST_F(DmAuthManagerTest, RequestReCheckMsgDone_001, testing::ext::TestSize.Le
     authManager_->authResponseContext_->edition = "";
     authManager_->remoteDeviceId_ = "remoteDeviceId_";
     authManager_->authResponseContext_->localDeviceId = authManager_->remoteDeviceId_;
-    authManager_->authRequestContext_->remoteUserId = "remoteUserId";
+    authManager_->authRequestContext_->remoteUserId = 1;
     authManager_->authResponseContext_->peerBundleName = "peerBundleName";
     authManager_->authResponseContext_->bindLevel = 1;
     authManager_->authResponseContext_->localUserId = authManager_->authRequestContext_->remoteUserId;
     authManager_->authResponseContext_->bundleName = authManager_->authResponseContext_->peerBundleName;
     authManager_->authResponseContext_->localBindLevel = authManager_->authResponseContext_->bindLevel;
     authManager_->RequestReCheckMsgDone();
-    ASSERT_EQ(authResponseContext_->localBindLevel, 1);
+    ASSERT_EQ(authManager_->authResponseContext_->localBindLevel, 1);
 
     authManager_->ConverToFinish();
 }
