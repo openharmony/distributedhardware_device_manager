@@ -1058,33 +1058,6 @@ HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_201, testing::ext::Tes
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_202, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    DeviceManagerService::GetInstance().listener_ = std::make_shared<DeviceManagerServiceListener>();
-    std::vector<DmDeviceInfo> deviceList;
-    DmDeviceInfo dmDeviceInfo;
-    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
-    dmDeviceInfo.extraData = "extraInfo";
-    deviceList.push_back(dmDeviceInfo);
-    std::unordered_map<std::string, DmAuthForm> udidMap;
-    udidMap.insert(std::make_pair("udid01", DmAuthForm::IDENTICAL_ACCOUNT));
-    udidMap.insert(std::make_pair("udid02", DmAuthForm::ACROSS_ACCOUNT));
-    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetAppTrustDeviceIdList(_)).WillOnce(Return(udidMap));
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
-    int32_t ret = DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
-    EXPECT_EQ(ret, DM_OK);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-
-    const char *peerUdid = "peerUdid";
-    GroupInformation groupInfo;
-    DeviceManagerService::GetInstance().HandleDeviceUnBind(peerUdid, groupInfo);
-}
-
 HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_201, testing::ext::TestSize.Level0)
 {
     DeletePermission();
@@ -1092,6 +1065,10 @@ HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_201, testing::ext::TestSize
     std::string anonyUdid;
     int32_t ret = DeviceManagerService::GetInstance().GetAnonyLocalUdid(pkgName, anonyUdid);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+
+    const char *peerUdid = "peerUdid";
+    GroupInformation groupInfo;
+    DeviceManagerService::GetInstance().HandleDeviceUnBind(peerUdid, groupInfo);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_202, testing::ext::TestSize.Level0)

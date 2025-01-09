@@ -1777,6 +1777,7 @@ HWTEST_F(DmAuthManagerTest, DeleteAcl_001, testing::ext::TestSize.Level0)
     DmOfflineParam offlineParam;
     offlineParam.bindType = APP_PEER_TO_PEER_TYPE;
     offlineParam.leftAclNumber = 1;
+    authManager_->softbusConnector_->deviceStateManagerCallback_ = std::make_shared<SoftbusStateCallbackTest>();
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlList(_, _, _, _, _)).WillOnce(Return(offlineParam));
     int32_t ret = authManager_->DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     ASSERT_EQ(ret, DM_OK);
