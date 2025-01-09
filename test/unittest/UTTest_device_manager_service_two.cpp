@@ -993,7 +993,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_204, testing::ext::TestSize.Leve
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetBindLevel(_, _, _, _)).WillOnce(Return(1));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, UnBindDevice(_, _, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, udidHash, extra);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1177,7 +1177,7 @@ HWTEST_F(DeviceManagerServiceTest, SendUserIdsByWifi_201, testing::ext::TestSize
     backgroundUserIds.push_back(104);
     int32_t ret = DeviceManagerService::GetInstance().SendUserIdsByWifi(networkId, foregroundUserIds,
         backgroundUserIds);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

@@ -2027,13 +2027,13 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAccessControlList_001, testing::ext::
 
     extra = "extra";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(456));
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+    offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.leftAclNumber, 0);
 
     bindLevel = 2;
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(456));
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+    offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.leftAclNumber, 0);
 
@@ -2085,11 +2085,12 @@ HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_002, testing::ext::TestSize.Le
     localUdid = "deviceId";
     udid = "deviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
+    bindLevel = DeviceProfileConnector::GetInstance().GetBindLevel(pkgName, localUdid, udid, tokenId);
     EXPECT_EQ(bindLevel, DEVICE);
 
     int32_t bindType = 256;
     std::string peerUdid = "123456";
-    std::string localUdid = "localDeviceId";
+    localUdid = "localDeviceId";
     int32_t localUserId = 1234;
     std::string localAccountId = "";
     DeviceProfileConnector::GetInstance().HandleDeviceUnBind(bindType, peerUdid, localUdid, localUserId,
