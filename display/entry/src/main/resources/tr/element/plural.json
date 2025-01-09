@@ -1,15 +1,18 @@
 {
     "plural":[
         {
-            "name":"dm_not_allow",
+            "name":"dm_incorrect_code",
             "value":[
                 {
                     "quantity":"one",
-                    "value":"不信任( %d 秒)"
+                    "value":"Yanlış. %d deneme kaldı.",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 },
                 {
                     "quantity":"other",
-                    "value":"不信任 (%d 秒)",
+                    "value":"Yanlış. %d deneme kaldı.",
                     "attr":{
                         "priority":"translate"
                     }
@@ -17,15 +20,18 @@
             ]
         },
         {
-            "name":"dm_incorrect_code",
+            "name":"dm_not_allow",
             "value":[
                 {
-                    "quantity":"one",
-                    "value":"连接码错误，还可以尝试 %d 次"
+                    "quantity":"other",
+                    "value":"Güvenme (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 },
                 {
-                    "quantity":"other",
-                    "value":"连接码错误，还可以尝试 %d 次",
+                    "quantity":"one",
+                    "value":"Güvenme (%d)",
                     "attr":{
                         "priority":"translate"
                     }

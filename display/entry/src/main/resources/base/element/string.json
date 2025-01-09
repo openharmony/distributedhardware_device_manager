@@ -26,11 +26,17 @@
         },
         {
             "name":"dm_allow_temp",
-            "value":"Trust this time"
+            "value":"Trust this time",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_allow_always",
-            "value":"Always trust"
+            "value":"Always trust",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_connect_device",
@@ -46,7 +52,10 @@
         },
         {
             "name":"dm_cancel",
-            "value":"Cancel"
+            "value":"Cancel",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_authenticating",
@@ -54,7 +63,10 @@
         },
         {
             "name":"dm_connect_code",
-            "value":"Connection code"
+            "value":"Connection code",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_confirm_title_cast",
@@ -62,11 +74,17 @@
         },
         {
             "name":"dm_confirm_title_hap",
-            "value":"%1$s on %2$s would like to access this device. Trust this app?"
+            "value":"%1$s on %2$s would like to access this device. Trust this app?",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_confirm_intention",
-            "value":"This is required for cross-device data syncing and collaboration."
+            "value":"This is required for cross-device data syncing and collaboration.",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_bluetooth_dialog_content",
@@ -78,7 +96,10 @@
         },
         {
             "name":"dm_enter_peer_connect_code",
-            "value":"Enter connection code"
+            "value":"Enter connection code",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_password_error",
