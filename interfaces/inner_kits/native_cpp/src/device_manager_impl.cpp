@@ -2559,7 +2559,7 @@ int32_t DeviceManagerImpl::RegisterAuthenticationType(const std::string &pkgName
 {
     const size_t AUTH_TYPE_PARAM_SIZE = 1;
     if (pkgName.empty() || authParam.size() != AUTH_TYPE_PARAM_SIZE) {
-        LOGE("Para invalid: authType is less than two or pkgName is empty.");
+        LOGE("Para invalid: authParam is less than one or pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
