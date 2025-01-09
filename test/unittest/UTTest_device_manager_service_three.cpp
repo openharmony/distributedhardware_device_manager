@@ -186,7 +186,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportCredential_301, testing::ext::Test
     int32_t ret = DeviceManagerService::GetInstance().ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 
-    std::string pkgName = "";
     std::string reqJsonStr = "";
     std::string returnJsonStr = "";
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
@@ -430,7 +429,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, UnBindDevice_302, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 }
 
-HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_301, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteLocalUserSwitchByWifi_301, testing::ext::TestSize.Level0)
 {
     DeviceManagerService::GetInstance().timer_ = nullptr;
     int32_t curUserId = 1;
