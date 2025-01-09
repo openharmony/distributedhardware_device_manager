@@ -278,6 +278,9 @@ void AuthenticateDeviceThirdFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStateCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStatusCallback(str);
+    std::map<std::string, std::string> authParam;
+    authParam[DM_AUTHENTICATION_TYPE] = str;
+    DeviceManager::GetInstance().RegisterAuthenticationType(str, authParam);
 }
 
 void AuthenticateDeviceFourthFuzzTest(const uint8_t* data, size_t size)
@@ -380,9 +383,6 @@ void AuthenticateDeviceFifthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().RegisterDeviceScreenStatusCallback(emptyStr, nullptr);
     DeviceManagerImpl::GetInstance().UnRegisterDeviceScreenStatusCallback(emptyStr);
     DeviceManagerImpl::GetInstance().GetDeviceScreenStatus(emptyStr, emptyStr, indexTwo);
-    std::map<std::string, std::string> authParam;
-    authParam[DM_AUTHENTICATION_TYPE] = str;
-    DeviceManager::GetInstance().RegisterAuthenticationType(str, authParam);
 }
 }
 }
