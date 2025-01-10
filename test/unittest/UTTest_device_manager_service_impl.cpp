@@ -1348,7 +1348,11 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_101, testing::ext::TestSize.
     std::string pkgName = "pkgname";
     std::string udid;
     int32_t bindLevel = 0;
+    std::string extra;
     int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1357,7 +1361,11 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_102, testing::ext::TestSize.
     std::string pkgName;
     std::string udid = "123";
     int32_t bindLevel = 0;
+    std::string extra;
     int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1376,6 +1384,7 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_104, testing::ext::TestSize.
     std::string pkgName = "pkgname";
     std::string udid = "123";
     int32_t bindLevel = 0;
+    std::string extra;
     int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel);
     int32_t userId = 100;
     std::string accountId = "60008";
@@ -1385,6 +1394,9 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_104, testing::ext::TestSize.
     deviceManagerServiceImpl_->HandleUserRemoved(userId);
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
     EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, GetBindLevel_101, testing::ext::TestSize.Level0)
@@ -1757,6 +1769,11 @@ HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_001, testing::ext::T
     if (deviceManagerServiceImpl_->hiChainConnector_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
+    std::vector<int32_t> localUserIds;
+    localUserIds.push_back(123);
+    localUserIds.push_back(456);
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForRemoteUserRemoved(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(localUserIds), Return()));
     deviceManagerServiceImpl_->HandleRemoteUserRemoved(userId, remoteUdid);
 }
 
@@ -1776,6 +1793,45 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_002, testing::ext::T
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
     auto ret = deviceManagerServiceImpl_->GetDeviceIdAndUserId(localUserId);
     EXPECT_TRUE(ret.empty());
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, GetTokenIdByNameAndDeviceId_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string requestDeviceId = "requestDeviceId";
+    uint64_t ret = deviceManagerServiceImpl_->GetTokenIdByNameAndDeviceId(pkgName, requestDeviceId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    pkgName = "pkgName";
+    requestDeviceId = "";
+    ret = deviceManagerServiceImpl_->GetTokenIdByNameAndDeviceId(pkgName, requestDeviceId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    requestDeviceId = "requestDeviceId";
+    ret = deviceManagerServiceImpl_->GetTokenIdByNameAndDeviceId(pkgName, requestDeviceId);
+    EXPECT_EQ(ret, DM_OK);
+
+    int32_t remoteUserId = 1;
+    std::string remoteUdid = "remoteDeviceId";
+    int32_t tokenId = 0;
+    int32_t peerTokenId = 1;
+    ProcessInfo processInfo;
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(processInfo));
+    deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, peerTokenId);
+
+    processInfo.pkgName = "pkgName";
+    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(processInfo));
+    deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, peerTokenId);
+
+    int32_t bindType = 1;
+    std::string peerUdid = "peerUdid";
+    std::string localUdid = "localUdid";
+    int32_t localUserId = 1;
+    std::string localAccountId = "localAccountId";
+    deviceManagerServiceImpl_->HandleDeviceUnBind(bindType, peerUdid, localUdid, localUserId, localAccountId);
 }
 } // namespace
 } // namespace DistributedHardware
