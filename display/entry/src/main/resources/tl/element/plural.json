@@ -1,18 +1,18 @@
 {
     "plural":[
         {
-            "name":"dm_not_allow",
+            "name":"dm_incorrect_code",
             "value":[
                 {
                     "quantity":"one",
-                    "value":"Don't trust (%d)",
+                    "value":"Mali. %d pagtatangka ang natitira.",
                     "attr":{
                         "priority":"translate"
                     }
                 },
                 {
                     "quantity":"other",
-                    "value":"Don't trust (%d)",
+                    "value":"Mali. %d (na) pagtatangka ang natitira.",
                     "attr":{
                         "priority":"translate"
                     }
@@ -20,18 +20,18 @@
             ]
         },
         {
-            "name":"dm_incorrect_code",
+            "name":"dm_not_allow",
             "value":[
                 {
-                    "quantity":"one",
-                    "value":"Incorrect. %d attempt remaining.",
+                    "quantity":"other",
+                    "value":"Huwag pagkatiwalaan (%d)",
                     "attr":{
                         "priority":"translate"
                     }
                 },
                 {
-                    "quantity":"other",
-                    "value":"Incorrect. %d attempts remaining.",
+                    "quantity":"one",
+                    "value":"Huwag pagkatiwalaan (%d)",
                     "attr":{
                         "priority":"translate"
                     }

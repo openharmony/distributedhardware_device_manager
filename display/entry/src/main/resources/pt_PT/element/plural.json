@@ -1,18 +1,18 @@
 {
     "plural":[
         {
-            "name":"dm_not_allow",
+            "name":"dm_incorrect_code",
             "value":[
                 {
                     "quantity":"one",
-                    "value":"Don't trust (%d)",
+                    "value":"Incorreto. %d tentativa restante.",
                     "attr":{
                         "priority":"translate"
                     }
                 },
                 {
                     "quantity":"other",
-                    "value":"Don't trust (%d)",
+                    "value":"Incorreto. %d tentativas restantes.",
                     "attr":{
                         "priority":"translate"
                     }
@@ -20,18 +20,18 @@
             ]
         },
         {
-            "name":"dm_incorrect_code",
+            "name":"dm_not_allow",
             "value":[
                 {
-                    "quantity":"one",
-                    "value":"Incorrect. %d attempt remaining.",
+                    "quantity":"other",
+                    "value":"Não confiar (%d)",
                     "attr":{
                         "priority":"translate"
                     }
                 },
                 {
-                    "quantity":"other",
-                    "value":"Incorrect. %d attempts remaining.",
+                    "quantity":"one",
+                    "value":"Não confiar (%d)",
                     "attr":{
                         "priority":"translate"
                     }

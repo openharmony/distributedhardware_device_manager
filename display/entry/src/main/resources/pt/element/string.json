@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"Código de conexão",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%1$s em %2$s gostaria de acessar esse dispositivo. Confiar neste aplicativo?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Cancelar",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Inserir código de conexão",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"Isso é necessário para a sincronização e colaboração de dados entre dispositivos.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Confiar desta vez",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Confiar sempre",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

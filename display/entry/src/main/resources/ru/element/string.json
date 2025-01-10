@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"Код подключения",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"Приложение %1$s на устройстве %2$s хочет получить доступ к этому устройству. Доверять этому приложению?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Отмена",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Введите код подключения",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"Это необходимо для синхронизации данных и взаимодействия между устройствами.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Доверять сейчас",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Всегда доверять",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}
