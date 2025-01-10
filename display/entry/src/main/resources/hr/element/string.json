@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"Kod za povezivanje",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"Aplikacija %1$s na uređaju %2$s željela bi pristupiti ovom uređaju. Želite li ovu aplikaciju smatrati pouzdanom?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Odustani",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Unesite kod za povezivanje",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"To je potrebno za sinkronizaciju podataka na više uređaja i suradnju među uređajima.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Vjeruj ovaj put",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Uvijek smatraj pouzdanim",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

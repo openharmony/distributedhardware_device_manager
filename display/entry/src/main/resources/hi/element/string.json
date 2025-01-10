@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"कनेक्शन कोड",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%2$s पर %1$s इस डिवाइस तक पहुँच प्राप्त करना चाहता है। इस ऐप पर भरोसा करें?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"रद्द करें",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"कनेक्शन कोड दर्ज करें",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"यह क्रॉस-डिवाइस डेटा सिंकिंग और सहयोग के लिए आवश्यक है।",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"इस बार भरोसा करें",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"हमेशा भरोसा करें",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}
