@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"Yhteyskoodi",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"Sovellus %1$s laitteessa %2$s haluaa käyttää tätä laitetta. Luotetaanko tähän sovellukseen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Peruuta",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Anna yhteyskoodi",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"Tämä tarvitaan laitteiden väliseen tietojen synkronointiin ja yhteistyöhön.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Luota tällä kertaa",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Luota aina",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

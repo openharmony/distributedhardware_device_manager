@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"Kód připojení",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"Aplikace %1$s na zařízení %2$s získat přístup k tomuto zařízení. Důvěřovat této aplikaci?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Zrušit",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Zadejte kód připojení",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"To je nutné pro synchronizaci dat a spolupráci mezi zařízeními.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Tentokrát důvěřovat",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Vždy důvěřovat",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

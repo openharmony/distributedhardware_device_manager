@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"کد اتصال",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"‏%1$s در %2$s مایل به دسترسی به این دستگاه است. این برنامه مورداعتماد است؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"لغو کردن",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"کد اتصال را وارد کنید",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"این امر برای همکاری و همگام‌سازی داده‌ها بین دستگاه‌های مختلف ضروری است.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"این بار مورداعتماد است",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"همیشه مورداعتماد است",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}
