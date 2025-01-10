@@ -17,6 +17,7 @@
 #define OHOS_DM_AUTH_MANAGER_H
 
 #include <map>
+#include <mutex>
 #include <string>
 
 #include "auth_request_state.h"
@@ -469,10 +470,14 @@ public:
         const std::map<std::string, std::string> &bindParam);
 
     void HandleSessionHeartbeat(std::string name);
+
+    int32_t RegisterAuthenticationType(int32_t authenticationType);
+
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra);
+    bool CheckProcessNameInWhiteList(const std::string &processName);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
     std::string GetAccountGroupIdHash();
@@ -521,7 +526,7 @@ private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
-    void parseJsonObject(nlohmann::json jsonObject);
+    void ParseJsonObject(nlohmann::json jsonObject);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
     void ProcessAuthRequestExt(const int32_t &sessionId);
@@ -587,6 +592,10 @@ private:
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
     std::string remoteUdidHash_ = "";
     ProcessInfo processInfo_;
+    std::mutex srcReqMsgLock_;
+    bool isNeedProcCachedSrcReqMsg_ = false;
+    std::string srcReqMsg_ = "";
+    int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

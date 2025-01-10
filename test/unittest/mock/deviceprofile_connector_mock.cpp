@@ -77,5 +77,34 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
     return DmDeviceProfileConnector::dmDeviceProfileConnector->SyncAclByBindType(pkgName, bindTypeVec,
         localDeviceId, targetDeviceId);
 }
+
+std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
+    std::string trustUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetBindTypeByPkgName(pkgName,
+        requestDeviceId, trustUdid);
+}
+
+DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string &pkgName,
+    const std::string &localDeviceId, const std::string &remoteDeviceId,
+    int32_t bindLevel, const std::string &extra)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAccessControlList(pkgName, localDeviceId,
+        remoteDeviceId, bindLevel, extra);
+}
+
+void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(std::string peerUdid, int32_t peerUserId,
+    std::vector<int32_t> &userIds)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForRemoteUserRemoved(peerUdid, peerUserId,
+        userIds);
+}
+
+OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
+    const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid,
+        tokenId, localUdid, peerTokenId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

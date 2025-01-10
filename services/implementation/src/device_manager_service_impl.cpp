@@ -539,6 +539,7 @@ int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &device
         std::string deviceId = softbusConnector_->GetDeviceUdidHashByUdid(udid);
         if (memcpy_s(it->deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length()) != 0) {
             LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
+            return ERR_DM_SECURITY_FUNC_FAILED;
         }
         it->authForm = hiChainConnector_->GetGroupType(udid);
     }
@@ -700,9 +701,17 @@ void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
 void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid)
 {
     LOGI("remoteUdid %{public}s, userId %{public}d", GetAnonyString(remoteUdid).c_str(), userId);
-    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(remoteUdid, userId);
+    std::vector<int32_t> localUserIds;
+    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(remoteUdid, userId, localUserIds);
+    if (localUserIds.empty()) {
+        return;
+    }
     CHECK_NULL_VOID(hiChainConnector_);
-    hiChainConnector_->DeleteAllGroup(userId);
+    std::vector<std::pair<int32_t, std::string>> delInfoVec;
+    for (int32_t localUserId : localUserIds) {
+        delInfoVec.push_back(std::pair<int32_t, std::string>(localUserId, remoteUdid));
+    }
+    hiChainConnector_->DeleteGroupByACL(delInfoVec, localUserIds);
 }
 
 void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string> &deviceVec,
@@ -714,6 +723,8 @@ void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string>
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     DeviceProfileConnector::GetInstance().HandleUserSwitched(localUdid, deviceVec, currentUserId, beforeUserId);
+    CHECK_NULL_VOID(hiChainConnector_);
+    hiChainConnector_->DeleteAllGroup(beforeUserId);
 }
 
 void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
@@ -997,6 +1008,12 @@ void DeviceManagerServiceImpl::HandleDeviceUnBind(int32_t bindType, const std::s
 {
     return DeviceProfileConnector::GetInstance().HandleDeviceUnBind(bindType, peerUdid,
         localUdid, localUserId, localAccountId);
+}
+
+int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticationType)
+{
+    CHECK_NULL_RETURN(authMgr_, ERR_DM_POINT_NULL);
+    return authMgr_->RegisterAuthenticationType(authenticationType);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

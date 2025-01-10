@@ -1,0 +1,53 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"সংযোগ কোড",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%2$s-এর %1$s এই ডিভাইসে অ্যাক্সেস করতে চায়। অ্যাপটির উপর আস্থা রাখবেন?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"বাতিল করুন",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"সংযোগ কোড লিখুন",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"বিভিন্ন ডিভাইসের মধ্যে ডেটা সিঙ্কিং ও সমন্বয়ের জন্য এটি প্রয়োজন।",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"কেবল এবার আস্থা রাখুন",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"সবসময় আস্থা থাকবে",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

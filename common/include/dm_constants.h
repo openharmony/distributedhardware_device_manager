@@ -121,7 +121,8 @@ enum {
     ERR_DM_INPUT_TIMEOUT = 96929820,
     ERR_DM_SAVE_SESSION_KEY_FAILED = 96929821,
     ERR_DM_CRYPTO_OPT_FAILED = 96929822,
-    ERR_DM_CRYPTO_PARA_INVALID = 96929823
+    ERR_DM_CRYPTO_PARA_INVALID = 96929823,
+    ERR_DM_SECURITY_FUNC_FAILED = 96929824
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -240,6 +241,7 @@ constexpr const char* PARAM_KEY_FILTER_OPTIONS = "FILTER_OPTIONS";
 constexpr const char* PARAM_KEY_BIND_EXTRA_DATA = "BIND_EXTRA_DATA";
 constexpr const char* PARAM_KEY_OS_TYPE = "OS_TYPE";
 constexpr const char* PARAM_KEY_OS_VERSION = "OS_VERSION";
+constexpr const char* PARAM_KEY_IS_SHOW_TRUST_DIALOG = "isShowTrustDialog";
 constexpr const char* PARAM_KEY_UDID = "udid";
 constexpr const char* PARAM_KEY_UUID = "uuid";
 constexpr const char* DM_CONNECTION_DISCONNECTED = "DM_CONNECTION_DISCONNECTED";
@@ -249,7 +251,9 @@ constexpr const char* DM_BIND_RESULT_NETWORK_ID = "DM_BIND_RESULT_NETWORK_ID";
 constexpr const char* PARAM_KEY_POLICY_STRATEGY_FOR_BLE = "DM_POLICY_STRATEGY_FOR_BLE";
 constexpr const char* PARAM_KEY_POLICY_TIME_OUT = "DM_POLICY_TIMEOUT";
 constexpr const char* DEVICE_SCREEN_STATUS = "DEVICE_SCREEN_STATUS";
+constexpr const char* PROCESS_NAME = "PROCESS_NAME";
 constexpr const char* PARAM_CLOSE_SESSION_DELAY_SECONDS = "DM_CLOSE_SESSION_DELAY_SECONDS";
+constexpr const char* DM_AUTHENTICATION_TYPE = "DM_AUTHENTICATION_TYPE";
 
 // screen state
 constexpr int32_t DM_SCREEN_UNKNOWN = -1;

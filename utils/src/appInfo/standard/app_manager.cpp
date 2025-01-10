@@ -16,11 +16,13 @@
 #include "app_manager.h"
 
 #include "accesstoken_kit.h"
+#include "access_token.h"
 #include "if_system_ability_manager.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "os_account_manager.h"
 #include "system_ability_definition.h"
+#include "tokenid_kit.h"
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -202,6 +204,43 @@ int32_t AppManager::GetHapTokenIdByName(int32_t userId, std::string &bundleName,
         return ERR_DM_FAILED;
     }
     tokenId = static_cast<int64_t>(hapTokenId);
+    return DM_OK;
+}
+
+int32_t AppManager::GetCallerProcessName(std::string &processName)
+{
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("GetCallerProcessName GetCallingTokenID error.");
+        return ERR_DM_FAILED;
+    }
+    LOGI("GetCallerProcessName::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
+        HapTokenInfo tokenInfo;
+        if (AccessTokenKit::GetHapTokenInfo(tokenCaller, tokenInfo) != EOK) {
+            LOGE("GetHapTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        processName = std::move(tokenInfo.bundleName);
+        uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
+        if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId)) {
+            LOGE("GetCallerProcessName %{public}s not system hap.", processName.c_str());
+            return ERR_DM_FAILED;
+        }
+    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        NativeTokenInfo tokenInfo;
+        if (AccessTokenKit::GetNativeTokenInfo(tokenCaller, tokenInfo) != EOK) {
+            LOGE("GetNativeTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        processName = std::move(tokenInfo.processName);
+    } else {
+        LOGE("GetCallerProcessName failed, unsupported process.");
+        return ERR_DM_FAILED;
+    }
+
+    LOGI("Get process name: %{public}s success.", processName.c_str());
     return DM_OK;
 }
 } // namespace DistributedHardware

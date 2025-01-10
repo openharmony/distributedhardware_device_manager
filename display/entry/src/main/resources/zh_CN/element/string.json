@@ -26,11 +26,17 @@
         },
         {
             "name":"dm_allow_temp",
-            "value":"临时信任"
+            "value":"临时信任",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_allow_always",
-            "value":"始终信任"
+            "value":"始终信任",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_connect_device",
@@ -46,7 +52,10 @@
         },
         {
             "name":"dm_cancel",
-            "value":"取消"
+            "value":"取消",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_authenticating",
@@ -54,7 +63,10 @@
         },
         {
             "name":"dm_connect_code",
-            "value":"连接码"
+            "value":"连接码",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_confirm_title_cast",
@@ -62,11 +74,17 @@
         },
         {
             "name":"dm_confirm_title_hap",
-            "value":"%2$s的“%1$s”请求访问本机。是否信任此应用？"
+            "value":"%2$s的“%1$s”请求访问本机。是否信任此应用？",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_confirm_intention",
-            "value":"用于进行数据同步及设备间协同操作"
+            "value":"用于进行数据同步及设备间协同操作",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_bluetooth_dialog_content",
@@ -78,7 +96,10 @@
         },
         {
             "name":"dm_enter_peer_connect_code",
-            "value":"输入对端连接码"
+            "value":"输入对端连接码",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_password_error",

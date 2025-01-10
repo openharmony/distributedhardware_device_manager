@@ -2555,6 +2555,36 @@ void DeviceManagerImpl::SyncCallbacksToService(std::map<DmCommonNotifyEvent, std
     }
 }
 
+int32_t DeviceManagerImpl::RegisterAuthenticationType(const std::string &pkgName,
+    const std::map<std::string, std::string> &authParam)
+{
+    const size_t AUTH_TYPE_PARAM_SIZE = 1;
+    if (pkgName.empty() || authParam.size() != AUTH_TYPE_PARAM_SIZE) {
+        LOGE("Para invalid: authParam is less than one or pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("Start");
+    std::string authTypeStr = ConvertMapToJsonString(authParam);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFirstParam(authTypeStr);
+    int32_t ret = ipcClientProxy_->SendRequest(REG_AUTHENTICATION_TYPE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::GetDeviceProfileInfos(const std::string &pkgName,
     const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceProfileInfosCallback> callback)
 {

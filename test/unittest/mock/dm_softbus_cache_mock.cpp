@@ -29,5 +29,10 @@ int32_t SoftbusCache::GetUdidFromCache(const char *networkId, std::string &udid)
 {
     return DmSoftbusCache::dmSoftbusCache->GetUdidFromCache(networkId, udid);
 }
+
+int32_t SoftbusCache::GetNetworkIdFromCache(const std::string &udid, std::string &networkId)
+{
+    return DmSoftbusCache::dmSoftbusCache->GetNetworkIdFromCache(udid, networkId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

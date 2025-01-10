@@ -274,6 +274,10 @@ struct InputCustomDialog {
               }
               TextInput({ placeholder: '', text: this.password})
                 .defaultFocus(true)
+                .onAppear(() => {
+                  focusControl.requestFocus('inputpin')
+                })
+                .id('inputpin')
                 .type(8)
                 .height(60)
                 .opacity(0)

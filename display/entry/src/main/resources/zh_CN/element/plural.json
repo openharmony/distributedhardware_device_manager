@@ -9,7 +9,10 @@
                 },
                 {
                     "quantity":"other",
-                    "value":"不信任 (%d 秒)"
+                    "value":"不信任 (%d 秒)",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 }
             ]
         },
@@ -18,11 +21,14 @@
             "value":[
                 {
                     "quantity":"one",
-                    "value":"连接码错误，还可尝试 %d 次"
+                    "value":"连接码错误，还可以尝试 %d 次"
                 },
                 {
                     "quantity":"other",
-                    "value":"连接码错误，还可以尝试 %d 次"
+                    "value":"连接码错误，还可以尝试 %d 次",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 }
             ]
         }

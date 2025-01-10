@@ -188,15 +188,8 @@ void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> 
     cJSON_Delete(root);
     uint32_t totalUserNum = static_cast<uint32_t>(userIdsMsg.foregroundUserIds.size()) +
         static_cast<uint32_t>(userIdsMsg.backgroundUserIds.size());
-    if (userIdsMsg.foregroundUserIds.empty()) {
-        LOGE("Parse but get none remote foreground userids");
-    } else {
-        // step1: process remote foreground/background userids
-        DeviceManagerService::GetInstance().ProcessSyncUserIds(userIdsMsg.foregroundUserIds,
-            userIdsMsg.backgroundUserIds, rmtUdid);
-    }
 
-    // step2: send back local userids
+    // step1: send back local userids
     std::vector<int32_t> foregroundUserIds;
     std::vector<int32_t> backgroundUserIds;
     MultipleUserConnector::GetForegroundUserIds(foregroundUserIds);
@@ -211,6 +204,14 @@ void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> 
     }
     RspLocalFrontOrBackUserIds(commMsg->remoteNetworkId, foregroundUserIdsU32, backgroundUserIdsU32,
         commMsg->socketId);
+    
+    if (userIdsMsg.foregroundUserIds.empty()) {
+        LOGE("Parse but get none remote foreground userids");
+    } else {
+        // step2: process remote foreground/background userids
+        DeviceManagerService::GetInstance().ProcessSyncUserIds(userIdsMsg.foregroundUserIds,
+            userIdsMsg.backgroundUserIds, rmtUdid);
+    }
 }
 
 void DMCommTool::ProcessResponseUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg)

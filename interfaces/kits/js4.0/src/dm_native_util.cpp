@@ -312,6 +312,8 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     JsObjectToString(env, object, "authToken", authToken, sizeof(authToken));
     char brMac[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "brMac", brMac, sizeof(brMac));
+    char isShowTrustDialog[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "isShowTrustDialog", isShowTrustDialog, sizeof(isShowTrustDialog));
     char bleMac[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "bleMac", bleMac, sizeof(bleMac));
     char wifiIP[DM_NAPI_BUF_LENGTH] = "";
@@ -331,6 +333,7 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     jsonObj[PARAM_KEY_PEER_BUNDLE_NAME] = std::string(peerBundleName);
     jsonObj[PARAM_KEY_PIN_CODE] = std::string(pinCode);
     jsonObj[PARAM_KEY_AUTH_TOKEN] = std::string(authToken);
+    jsonObj[PARAM_KEY_IS_SHOW_TRUST_DIALOG] = std::string(isShowTrustDialog);
     jsonObj[PARAM_KEY_BR_MAC] = std::string(brMac);
     jsonObj[PARAM_KEY_BLE_MAC] = std::string(bleMac);
     jsonObj[PARAM_KEY_WIFI_IP] = std::string(wifiIP);
@@ -435,6 +438,10 @@ void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::s
     if (IsString(bindParamObj, PARAM_KEY_AUTH_TOKEN)) {
         std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TOKEN, authToken));
+    }
+    if (IsString(bindParamObj, PARAM_KEY_IS_SHOW_TRUST_DIALOG)) {
+        std::string isShowTrustDialog = bindParamObj[PARAM_KEY_IS_SHOW_TRUST_DIALOG].get<std::string>();
+        bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_IS_SHOW_TRUST_DIALOG, isShowTrustDialog));
     }
     if (IsInt32(bindParamObj, BIND_LEVEL)) {
         int32_t bindLevel = bindParamObj[BIND_LEVEL].get<std::int32_t>();

@@ -23,5 +23,10 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
 {
     return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredential(localUdid, osAccountId);
 }
+
+int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, std::string udid, int64_t requestId)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthDevice(pinCode, osAccountId, udid, requestId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

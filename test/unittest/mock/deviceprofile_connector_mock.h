@@ -43,6 +43,14 @@ public:
         const std::string &peerUdid, int32_t peerUserId, const std::string &peerAccountHash) = 0;
     virtual std::vector<int32_t> SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
         std::string localDeviceId, std::string targetDeviceId) = 0;
+    virtual std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
+        std::string trustUdid) = 0;
+    virtual DmOfflineParam DeleteAccessControlList(const std::string &pkgName, const std::string &localDeviceId,
+        const std::string &remoteDeviceId, int32_t bindLevel, const std::string &extra) = 0;
+    virtual void DeleteAclForRemoteUserRemoved(std::string peerUdid, int32_t peerUserId,
+        std::vector<int32_t> &userIds) = 0;
+    virtual OHOS::DistributedHardware::ProcessInfo HandleAppUnBindEvent(int32_t remoteUserId,
+        const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -62,6 +70,12 @@ public:
         const std::string &, int32_t, const std::string &));
     MOCK_METHOD((std::vector<int32_t>), SyncAclByBindType, (std::string, std::vector<int32_t>, std::string,
         std::string));
+    MOCK_METHOD((std::vector<int32_t>), GetBindTypeByPkgName, (std::string, std::string, std::string));
+    MOCK_METHOD(DmOfflineParam, DeleteAccessControlList, (const std::string &, const std::string &, const std::string &,
+        int32_t, const std::string &));
+    MOCK_METHOD(void, DeleteAclForRemoteUserRemoved, (std::string, int32_t, std::vector<int32_t> &));
+    MOCK_METHOD((OHOS::DistributedHardware::ProcessInfo), HandleAppUnBindEvent, (int32_t, const std::string &,
+        int32_t, const std::string &, int32_t));
 };
 }
 }

@@ -5,11 +5,17 @@
             "value":[
                 {
                     "quantity":"one",
-                    "value":"Don't trust (%d)"
+                    "value":"Don't trust (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 },
                 {
                     "quantity":"other",
-                    "value":"Don't trust (%d)"
+                    "value":"Don't trust (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 }
             ]
         },
@@ -18,11 +24,17 @@
             "value":[
                 {
                     "quantity":"one",
-                    "value":"Incorrect. %d attempt remaining."
+                    "value":"Incorrect. %d attempt remaining.",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 },
                 {
                     "quantity":"other",
-                    "value":"Incorrect. %d attempts remaining."
+                    "value":"Incorrect. %d attempts remaining.",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 }
             ]
         }

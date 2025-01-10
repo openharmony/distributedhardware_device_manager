@@ -1668,6 +1668,20 @@ ON_IPC_CMD(SYNC_CALLBACK, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(REG_AUTHENTICATION_TYPE, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string authTypeStr = data.ReadString();
+    std::map<std::string, std::string> authParam;
+    ParseMapFromJsonString(authTypeStr, authParam);
+    int32_t result = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(GET_DEVICE_PROFILE_INFOS, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();

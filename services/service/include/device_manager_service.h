@@ -213,7 +213,10 @@ public:
     int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
     void HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo);
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
+    int32_t RegisterAuthenticationType(const std::string &pkgName,
+        const std::map<std::string, std::string> &authParam);
     int32_t GetDeviceProfileInfos(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);
+
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
@@ -299,6 +302,7 @@ private:
     std::mutex isImplLoadLock_;
     std::mutex isAdapterLoadLock_;
     std::mutex isAdapterResidentLoadLock_;
+    std::mutex hichainListenerLock_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;
