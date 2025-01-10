@@ -1010,6 +1010,12 @@ void DeviceManagerServiceImpl::HandleDeviceUnBind(int32_t bindType, const std::s
         localUdid, localUserId, localAccountId);
 }
 
+int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticationType)
+{
+    CHECK_NULL_RETURN(authMgr_, ERR_DM_POINT_NULL);
+    return authMgr_->RegisterAuthenticationType(authenticationType);
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

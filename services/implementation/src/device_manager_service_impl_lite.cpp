@@ -587,6 +587,12 @@ void DeviceManagerServiceImpl::HandleDeviceUnBind(int32_t bindType, const std::s
     return;
 }
 
+int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticationType)
+{
+    (void)authenticationType;
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

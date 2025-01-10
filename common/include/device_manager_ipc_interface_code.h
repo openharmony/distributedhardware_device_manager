@@ -97,6 +97,7 @@ enum DMIpcCmdInterfaceCode {
     SINK_BIND_TARGET_RESULT,
     SYNC_CALLBACK,
     GET_ANONY_LOCAL_UDID,
+    REG_AUTHENTICATION_TYPE,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

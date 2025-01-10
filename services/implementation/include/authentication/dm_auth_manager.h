@@ -470,6 +470,9 @@ public:
         const std::map<std::string, std::string> &bindParam);
 
     void HandleSessionHeartbeat(std::string name);
+
+    int32_t RegisterAuthenticationType(int32_t authenticationType);
+
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
@@ -592,6 +595,7 @@ private:
     std::mutex srcReqMsgLock_;
     bool isNeedProcCachedSrcReqMsg_ = false;
     std::string srcReqMsg_ = "";
+    int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
