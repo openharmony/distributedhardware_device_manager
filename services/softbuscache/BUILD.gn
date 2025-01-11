@@ -50,7 +50,6 @@ if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("dmdevicecache") {
     sanitize = {
-      
       boundary_sanitize = true
       cfi = true
       cfi_cross_dso = true
@@ -58,6 +57,16 @@ if (defined(ohos_lite)) {
       integer_overflow = true
       ubsan = true
     }
+
+    cflags = [
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
 
     include_dirs = [
       "include",
