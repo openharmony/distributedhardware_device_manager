@@ -158,6 +158,16 @@ if (defined(ohos_lite)) {
       ubsan = true
     }
 
+    cflags = [
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
     sources = [
       "src/ability/standard/dm_ability_manager.cpp",
       "src/ability/standard/dm_dialog_manager.cpp",

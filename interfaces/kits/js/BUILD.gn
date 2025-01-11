@@ -26,6 +26,16 @@ ohos_shared_library("devicemanager") {
     ubsan = true
   }
 
+  cflags = [
+    "-fPIC",
+    "-fstack-protector-strong",
+  ]
+
+  ldflags = [
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
   include_dirs = [
     "include",
     "${common_path}/include",

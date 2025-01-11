@@ -27,9 +27,16 @@ ohos_shared_library("cj_distributed_device_manager_ffi") {
   }
 
   cflags = [
+    "-fPIC",
     "-fdata-sections",
     "-ffunction-sections",
+    "-fstack-protector-strong",
     "-fvisibility=hidden",
+  ]
+
+  ldflags = [
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
   ]
 
   include_dirs = [
