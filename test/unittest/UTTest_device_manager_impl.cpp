@@ -571,6 +571,24 @@ HWTEST_F(DeviceManagerImplTest, UnBindDevice_104, testing::ext::TestSize.Level0)
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
+HWTEST_F(DeviceManagerImplTest, UnBindDevice_105, testing::ext::TestSize.Level0)
+{
+    std::string packName ;
+    std::string deviceId = "deviceId";
+    std::string extra = "extra";
+    int32_t ret = DeviceManager::GetInstance().UnBindDevice(packName, deviceId, extra);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, UnBindDevice_106, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.test";
+    std::string deviceId;
+    std::string extra = "extra";
+    int32_t ret = DeviceManager::GetInstance().UnBindDevice(packName, deviceId, extra);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
 /**
  * @tc.name: BindDevice_101
  * @tc.desc: 1. set packName null
