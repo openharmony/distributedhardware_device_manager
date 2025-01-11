@@ -18,7 +18,6 @@ ohos_shared_library("distributeddevicemanager") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
-    
     boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
@@ -26,6 +25,16 @@ ohos_shared_library("distributeddevicemanager") {
     integer_overflow = true
     ubsan = true
   }
+
+  cflags = [
+    "-fPIC",
+    "-fstack-protector-strong",
+  ]
+
+  ldflags = [
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
 
   include_dirs = [
     "include",
