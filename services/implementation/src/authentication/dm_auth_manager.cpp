@@ -1349,11 +1349,6 @@ void DmAuthManager::SrcAuthenticateFinish()
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
     usleep(USLEEP_TIME_US_500000); // 500ms
-    listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, authRequestContext_->token,
-        authResponseContext_->state, authRequestContext_->reason);
-    listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason,
-        authResponseContext_->state, GenerateBindResultContent());
-
     int32_t sessionId = authRequestContext_->sessionId;
     auto taskFunc = [this, sessionId]() {
         CHECK_NULL_VOID(softbusConnector_);
@@ -1363,6 +1358,11 @@ void DmAuthManager::SrcAuthenticateFinish()
     const int64_t MICROSECOND_PER_SECOND = 1000000L;
     int32_t delaySeconds = authRequestContext_->closeSessionDelaySeconds;
     ffrt::submit(taskFunc, ffrt::task_attr().delay(delaySeconds * MICROSECOND_PER_SECOND));
+
+    listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, authRequestContext_->token,
+        authResponseContext_->state, authRequestContext_->reason);
+    listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason,
+        authResponseContext_->state, GenerateBindResultContent());
 
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
