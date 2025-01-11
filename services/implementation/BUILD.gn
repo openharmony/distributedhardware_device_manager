@@ -92,6 +92,7 @@ if (defined(ohos_lite)) {
       ]
 
       cflags = [
+        
         "-Wall",
         "-O2",
         "-Wdate-time",

@@ -18,6 +18,7 @@ ohos_shared_library("cj_distributed_device_manager_ffi") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {
+    
     boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true

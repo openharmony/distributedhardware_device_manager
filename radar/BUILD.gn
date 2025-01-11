@@ -52,6 +52,7 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include",
     ]
 
+
     sources = [ "src/dm_radar_helper.cpp" ]
 
     defines = [

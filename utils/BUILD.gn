@@ -86,6 +86,7 @@ if (defined(ohos_lite)) {
     branch_protector_ret = "pac_ret"
 
     sanitize = {
+      
       boundary_sanitize = true
       cfi = true
       cfi_cross_dso = true

@@ -50,6 +50,7 @@ if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("dmdevicecache") {
     sanitize = {
+      
       boundary_sanitize = true
       cfi = true
       cfi_cross_dso = true
