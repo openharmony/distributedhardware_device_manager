@@ -61,6 +61,7 @@ if (defined(ohos_lite)) {
       "-Wl,-z,relro",
       "-Wl,-z,now",
     ]
+
     sources = [ "src/dm_radar_helper.cpp" ]
 
     defines = [
