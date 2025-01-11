@@ -529,6 +529,45 @@ void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value 
     info.deviceIds = deviceIds;
 }
 
+void JsToDmProductInfoFilterOptions(const napi_env &env, const napi_value &object, DmProductInfoFilterOptions &info)
+{
+    napi_valuetype filterOptionsType;
+    napi_typeof(env, object, &filterOptionsType);
+    if (filterOptionsType != napi_object) {
+        LOGE("filterOptions is not object");
+        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + " tThe type of filterOptions must be object";
+        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
+        return;
+    }
+    char productId[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "productId", productId, sizeof(productId));
+    info.productId = productId;
+}
+
+void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &object, DmDeviceIconInfoFilterOptions &info)
+{
+    napi_valuetype filterOptionsType;
+    napi_typeof(env, object, &filterOptionsType);
+    if (filterOptionsType != napi_object) {
+        LOGE("filterOptions is not object");
+        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + " tThe type of filterOptions must be object";
+        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
+        return;
+    }
+    char productId[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "productId", productId, sizeof(productId));
+    info.productId = productId;
+    char subProductId[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "subProductId", subProductId, sizeof(subProductId));
+    info.subProductId = subProductId;
+    char imageType[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "imageType", imageType, sizeof(imageType));
+    info.imageType = imageType;
+    char specName[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "specName", specName, sizeof(specName));
+    info.specName = specName;
+}
+
 void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
     napi_value &arrayResult)
 {
@@ -587,6 +626,17 @@ void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &dev
     SetValueUtf8String(env, "modifyTime", devInfo.modifyTime, jsObj);
     SetValueUtf8String(env, "shareTime", devInfo.shareTime, jsObj);
     SetValueInt32(env, "isLocalDevice", devInfo.isLocalDevice ? 1 : 0, jsObj);
+}
+
+void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj)
+{
+    SetValueUtf8String(env, "productId", deviceIconInfo.productId, jsObj);
+    SetValueUtf8String(env, "subProductId", deviceIconInfo.subProductId, jsObj);
+    SetValueUtf8String(env, "imageType", deviceIconInfo.imageType, jsObj);
+    SetValueUtf8String(env, "specName", deviceIconInfo.specName, jsObj);
+    SetValueUtf8String(env, "url", deviceIconInfo.url, jsObj);
+    // need update
+    SetValueUtf8String(env, "icon", deviceIconInfo.icon, jsObj);
 }
 
 void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,

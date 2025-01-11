@@ -2631,5 +2631,35 @@ int32_t DeviceManagerService::GetDeviceProfileInfos(const std::string &pkgName,
     }
     return dmServiceImplExt_->GetDeviceProfileInfos(pkgName, filterOptions);
 }
+
+int32_t DeviceManagerService::GetProductInfo(const std::string &pkgName,
+    DmProductInfoFilterOptions &filterOptions)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterLoad()) {
+        LOGE("GetProductInfo failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExt_->GetProductInfo(pkgName, filterOptions);
+}
+
+int32_t DeviceManagerService::GetDeviceIconInfo(const std::string &pkgName,
+    DmDeviceIconInfoFilterOptions &filterOptions)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterLoad()) {
+        LOGE("GetDeviceIconInfo failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExt_->GetDeviceIconInfo(pkgName, filterOptions);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

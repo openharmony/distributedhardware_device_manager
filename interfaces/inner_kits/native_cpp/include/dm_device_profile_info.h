@@ -31,6 +31,16 @@ typedef struct DmProductInfo {
     std::string imageVersion;
 } DmProductInfo;
 
+typedef struct DmDeviceIconInfo {
+    std::string productId;
+    std::string subProductId;
+    std::string imageType;
+    std::string specName;
+    std::string url;
+    // need update
+    ArrayBuffer icon;
+} DmDeviceIconInfo;
+
 typedef struct DmServiceProfileInfo {
     std::string deviceId;
     std::string serviceId;
@@ -42,6 +52,17 @@ typedef struct DmDeviceProfileInfoFilterOptions {
     bool isCloud;
     std::vector<std::string> deviceIds;
 } DmDeviceProfileInfoFilterOptions;
+
+typedef struct DmProductInfoFilterOptions {
+    std::string productId;
+} DmProductInfoFilterOptions;
+
+typedef struct DmDeviceIconInfoFilterOptions {
+    std::string productId;
+    std::string subProductId;
+    std::string imageType;
+    std::string specName;
+} DmDeviceIconInfoFilterOptions;
 
 typedef struct DmDeviceProfileInfo {
     std::string deviceId;

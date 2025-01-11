@@ -1260,6 +1260,38 @@ int32_t DeviceManagerNotify::UnRegisterGetDeviceProfileInfosCallback(const std::
     return DM_OK;
 }
 
+int32_t DeviceManagerNotify::RegisterGetProductInfoCallback(const std::string &pkgName, std::shared_ptr<GetProductInfoCallback> callback)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    getProductInfoCallback_[pkgName] = callback;
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::UnRegisterGetProductInfoCallback(const std::string &pkgName)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    getProductInfoCallback_.erase(pkgName);
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string &pkgName, std::shared_ptr<GetDeviceIconInfoCallback> callback)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    getDeviceIconInfoCallback_[pkgName] = callback;
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::UnRegisterGetDeviceIconInfoCallback(const std::string &pkgName)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    getDeviceIconInfoCallback_.erase(pkgName);
+    return DM_OK;
+}
+
 void DeviceManagerNotify::OnGetDeviceProfileInfosResult(const std::string &pkgName,
     const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code)
 {
@@ -1283,6 +1315,54 @@ void DeviceManagerNotify::OnGetDeviceProfileInfosResult(const std::string &pkgNa
         return;
     }
     tempCbk->OnResult(deviceProfileInfos, code);
+}
+
+void DeviceManagerNotify::OnGetProductInfoResult(const std::string &pkgName, const DmProductInfo &productInfo, int32_t code)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
+        return;
+    }
+    LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
+    std::shared_ptr<GetProductInfoCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(bindLock_);
+        if (getProductInfoCallback_.count(pkgName) == 0) {
+            LOGE("error, callback not register for pkgName %{public}s.", pkgName.c_str());
+            return;
+        }
+        tempCbk = getProductInfoCallback_[pkgName];
+        getProductInfoCallback_.erase(pkgName);
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered GetDeviceProfileInfos callback is nullptr.");
+        return;
+    }
+    tempCbk->OnResult(productInfo, code);
+}
+
+void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, const DmDeviceIconInfo &deviceIconInfo, int32_t code)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
+        return;
+    }
+    LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
+    std::shared_ptr<GetDeviceIconInfoCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(bindLock_);
+        if (getDeviceIconInfoCallback_.count(pkgName) == 0) {
+            LOGE("error, callback not register for pkgName %{public}s.", pkgName.c_str());
+            return;
+        }
+        tempCbk = getDeviceIconInfoCallback_[pkgName];
+        getDeviceIconInfoCallback_.erase(pkgName);
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered GetDeviceProfileInfos callback is nullptr.");
+        return;
+    }
+    tempCbk->OnResult(deviceIconInfo, code);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

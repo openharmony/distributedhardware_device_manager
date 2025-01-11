@@ -81,8 +81,18 @@ public:
     int32_t RegisterGetDeviceProfileInfosCallback(const std::string &pkgName,
         std::shared_ptr<GetDeviceProfileInfosCallback> callback);
     int32_t UnRegisterGetDeviceProfileInfosCallback(const std::string &pkgName);
+    int32_t RegisterGetProductInfoCallback(const std::string &pkgName,
+        std::shared_ptr<GetProductInfoCallback> callback);
+    int32_t UnRegisterGetProductInfoCallback(const std::string &pkgName);
+    int32_t RegisterGetDeviceIconInfoCallback(const std::string &pkgName,
+        std::shared_ptr<GetDeviceIconInfoCallback> callback);
+    int32_t UnRegisterGetDeviceIconInfoCallback(const std::string &pkgName);
     void OnGetDeviceProfileInfosResult(const std::string &pkgName,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code);
+    void OnGetProductInfoResult(const std::string &pkgName,
+        const DmProductInfo &productInfo, int32_t code);
+    void OnGetDeviceIconInfoResult(const std::string &pkgName,
+        const DmDeviceIconInfo &deviceIconInfo, int32_t code);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -157,6 +167,8 @@ private:
     std::map<std::string, std::shared_ptr<BindTargetCallback>> sinkBindTargetCallback_;
     std::mutex bindLock_;
     std::map<std::string, std::shared_ptr<GetDeviceProfileInfosCallback>> getDeviceProfileInfoCallback_;
+    std::map<std::string, std::shared_ptr<GetProductInfoCallback>> getProductInfoCallback_;
+    std::map<std::string, std::shared_ptr<GetDeviceIconInfoCallback>> getDeviceIconInfoCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

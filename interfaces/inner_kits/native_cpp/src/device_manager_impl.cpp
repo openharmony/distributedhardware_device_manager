@@ -39,6 +39,8 @@
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_device_profile_infos_req.h"
+#include "ipc_get_product_info_req.h"
+#include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
@@ -2604,6 +2606,56 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfos(const std::string &pkgName,
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
         DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfosCallback(pkgName);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetProductInfo(const std::string &pkgName,
+    const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetProductInfoCallback> callback)
+{
+    LOGI("In pkgName:%{public}s, isCloud:%{public}d", pkgName.c_str(), filterOptions.isCloud);
+    DeviceManagerNotify::GetInstance().RegisterGetProductInfoCallback(pkgName, callback);
+    std::shared_ptr<IpcGetProductInfoReq> req = std::make_shared<IpcGetProductInfoReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFilterOptions(filterOptions);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_PRODUCT_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetProductInfoCallback(pkgName);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetProductInfoCallback(pkgName);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
+    const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceIconInfoCallback> callback)
+{
+    LOGI("In pkgName:%{public}s, isCloud:%{public}d", pkgName.c_str(), filterOptions.isCloud);
+    DeviceManagerNotify::GetInstance().RegisterGetDeviceIconInfoCallback(pkgName, callback);
+    std::shared_ptr<IpcGetDeviceIconInfoReq> req = std::make_shared<IpcGetDeviceIconInfoReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFilterOptions(filterOptions);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_ICON_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName);
         return ret;
     }
     LOGI("Completed");

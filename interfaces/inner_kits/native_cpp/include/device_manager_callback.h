@@ -122,6 +122,22 @@ public:
     virtual void OnResult(const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) = 0;
 };
 
+class GetProductInfoCallback {
+public:
+    virtual ~GetProductInfoCallback()
+    {
+    }
+    virtual void OnResult(const DmProductInfo &productInfo, int32_t code) = 0;
+};
+
+class GetDeviceIconInfoCallback {
+public:
+    virtual ~GetDeviceIconInfoCallback()
+    {
+    }
+    virtual void OnResult(const DmDeviceIconInfo &deviceIconInfo, int32_t code) = 0;
+};
+
 class CredentialCallback {
 public:
     virtual ~CredentialCallback()

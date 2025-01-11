@@ -91,6 +91,25 @@ void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
     devInfo.extraData = parcel.ReadString();
 }
 
+void DecodeDmProductInfo(MessageParcel &parcel, DmProductInfo &prodInfo)
+{
+    prodInfo.prodId = parcel.ReadString();
+    prodInfo.model = parcel.ReadString();
+    prodInfo.prodName = parcel.ReadString();
+    prodInfo.prodShortName = parcel.ReadString();
+    prodInfo.imageVersion = parcel.ReadString();
+}
+void DecodeDmDeviceIconInfo(MessageParcel &parcel, DmDeviceIconInfo &deviceIconInfo)
+{
+    deviceIconInfo.productId = parcel.ReadString();
+    deviceIconInfo.subProductId = parcel.ReadString();
+    deviceIconInfo.imageType = parcel.ReadString();
+    deviceIconInfo.specName = parcel.ReadString();
+    deviceIconInfo.url = parcel.ReadString();
+    // need update
+    deviceIconInfo.icon = parcel.ReadString();
+}
+
 void DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
 {
     std::string deviceIdStr = parcel.ReadString();
@@ -2128,7 +2147,74 @@ ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFOS, std::shared_ptr<IpcReq> pBaseReq, M
     return DM_OK;
 }
 
+ON_IPC_SET_REQUEST(GET_PRODUCT_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetProductInfoReq> pReq = std::static_pointer_cast<IpcGetProductInfoReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    DmProductInfoFilterOptions filterOptions = pReq->GetFilterOptions();
+    bool bRet = true;
+    bRet = (bRet && data.WriteString(filterOptions.productId));
+    if (!bRet) {
+        LOGE("write filterOptions failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_ICON_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetDeviceIconInfoReq> pReq = std::static_pointer_cast<IpcGetDeviceIconInfoReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    DmDeviceIconInfoFilterOptions filterOptions = pReq->GetFilterOptions();
+    bool bRet = true;
+    bRet = (bRet && data.WriteString(filterOptions.productId));
+    bRet = (bRet && data.WriteString(filterOptions.subProductId));
+    bRet = (bRet && data.WriteString(filterOptions.imageType));
+    bRet = (bRet && data.WriteString(filterOptions.specName));
+    if (!bRet) {
+        LOGE("write filterOptions failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFOS, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_PRODUCT_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_ICON_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
@@ -2153,6 +2239,32 @@ ON_IPC_CMD(GET_DEVICE_PROFILE_INFOS_RESULT, MessageParcel &data, MessageParcel &
     }
 
     DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfosResult(pkgName, deviceProfileInfos, code);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_PRODUCT_INFO_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t code = data.ReadInt32();
+    int32_t deviceNum = data.ReadInt32();
+    DmProductInfo productInfo;
+    DecodeDmProductInfo(data, productInfo);
+
+    DeviceManagerNotify::GetInstance().OnGetProductInfoResult(pkgName, productInfo, code);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_DEVICE_ICON_INFO_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t code = data.ReadInt32();
+    int32_t deviceNum = data.ReadInt32();
+    DmDeviceIconInfo deviceIconInfo;
+    DecodeDmDeviceIconInfo(data, deviceIconInfo);
+
+    DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo, code);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

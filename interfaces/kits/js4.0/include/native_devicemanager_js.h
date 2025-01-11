@@ -72,6 +72,26 @@ struct DeviceProfileInfosAsyncCallbackInfo {
     std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> deviceProfileInfos;
 };
 
+struct ProductInfoAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    std::string bundleName;
+    napi_deferred deferred = nullptr;
+    int32_t code = -1;
+    OHOS::DistributedHardware::DmProductInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmProductInfo productInfo;
+};
+
+struct DeviceIconInfoAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    std::string bundleName;
+    napi_deferred deferred = nullptr;
+    int32_t code = -1;
+    OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmDeviceIconInfo deviceIconInfo;
+};
+
 struct AuthAsyncCallbackInfo {
     napi_env env = nullptr;
 
@@ -240,6 +260,38 @@ private:
     napi_deferred deferred_ = nullptr;
 };
 
+class DmNapiGetProductInfoCallback : public OHOS::DistributedHardware::GetProductInfoCallback {
+public:
+    explicit DmNapiGetProductInfoCallback(napi_env env, const std::string &bundleName,
+        const napi_deferred &deferred) : env_(env), bundleName_(bundleName), deferred_(deferred)
+    {
+    }
+    ~DmNapiGetProductInfoCallback() override {};
+
+    void OnResult(const OHOS::DistributedHardware::DmProductInfo &productInfo, int32_t code) override;
+
+private:
+    napi_env env_;
+    std::string bundleName_;
+    napi_deferred deferred_ = nullptr;
+};
+
+class DmNapiGetDeviceIconInfoCallback : public OHOS::DistributedHardware::GetDeviceIconInfoCallback {
+public:
+    explicit DmNapiGetDeviceIconInfoCallback(napi_env env, const std::string &bundleName,
+        const napi_deferred &deferred) : env_(env), bundleName_(bundleName), deferred_(deferred)
+    {
+    }
+    ~DmNapiGetDeviceIconInfoCallback() override {};
+
+    void OnResult(const OHOS::DistributedHardware::DmDeviceIconInfo &deviceIconInfo, int32_t code) override;
+
+private:
+    napi_env env_;
+    std::string bundleName_;
+    napi_deferred deferred_ = nullptr;
+};
+
 class DeviceManagerNapi : public DmNativeEvent {
 public:
     explicit DeviceManagerNapi(napi_env env, napi_value thisVar);
@@ -268,6 +320,8 @@ public:
     static napi_value JsOn(napi_env env, napi_callback_info info);
     static napi_value JsOff(napi_env env, napi_callback_info info);
     static napi_value JsGetDeviceProfileInfos(napi_env env, napi_callback_info info);
+    static napi_value JsGetProductInfo(napi_env env, napi_callback_info info);
+    static napi_value JsGetDeviceIconInfo(napi_env env, napi_callback_info info);
     static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
@@ -280,6 +334,8 @@ public:
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason);
     void OnDmUiCall(const std::string &paramJson);
     void OnGetDeviceProfileInfosCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback);
+    void OnGetProductInfoCallbackResult(ProductInfoAsyncCallbackInfo *jsCallback);
+    void OnGetDeviceIconInfoCallbackResult(DeviceIconInfoAsyncCallbackInfo *jsCallback);
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);
@@ -303,6 +359,8 @@ private:
     static void RegisterDevStatusCallback(napi_env env, std::string &bundleName);
     static int32_t DumpDeviceInfo(DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
     static napi_value GetDeviceProfileInfosPromise(napi_env env, DeviceProfileInfosAsyncCallbackInfo *jsCallback);
+    static napi_value GetProductInfoPromise(napi_env env, ProductInfoAsyncCallbackInfo *jsCallback);
+    static napi_value GetDeviceIconInfoPromise(napi_env env, DeviceIconInfoAsyncCallbackInfo *jsCallback);
     
 private:
     napi_env env_;

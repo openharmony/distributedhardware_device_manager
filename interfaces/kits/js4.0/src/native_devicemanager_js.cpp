@@ -751,6 +751,44 @@ void DeviceManagerNapi::OnGetDeviceProfileInfosCallbackResult(DeviceProfileInfos
     napi_close_handle_scope(env_, scope);
 }
 
+void DeviceManagerNapi::OnGetProductInfoCallbackResult(ProductInfoAsyncCallbackInfo *jsCallback)
+{
+    LOGI("In");
+    napi_handle_scope scope;
+    napi_open_handle_scope(env_, &scope);
+    if (jsCallback->code != DM_OK) {
+        napi_value error = CreateBusinessError(env_, jsCallback->code, false);
+        napi_reject_deferred(env_, jsCallback->deferred, error);
+        LOGE("jsCallback->code(%{public}d) != DM_OK", jsCallback->code);
+        napi_close_handle_scope(env_, scope);
+        return;
+    }
+    napi_value productInfoJsObj;
+    napi_create_object(env_, &productInfoJsObj);
+    DmProductInfoToJs(env_, jsCallback->productInfo, productInfoJsObj);
+    napi_resolve_deferred(env_, jsCallback->deferred, productInfoJsObj);
+    napi_close_handle_scope(env_, scope);
+}
+
+void DeviceManagerNapi::OnGetDeviceIconInfoCallbackResult(DeviceIconInfoAsyncCallbackInfo *jsCallback)
+{
+    LOGI("In");
+    napi_handle_scope scope;
+    napi_open_handle_scope(env_, &scope);
+    if (jsCallback->code != DM_OK) {
+        napi_value error = CreateBusinessError(env_, jsCallback->code, false);
+        napi_reject_deferred(env_, jsCallback->deferred, error);
+        LOGE("jsCallback->code(%{public}d) != DM_OK", jsCallback->code);
+        napi_close_handle_scope(env_, scope);
+        return;
+    }
+    napi_value deviceIconInfoJsObj;
+    napi_create_object(env_, &deviceIconInfoJsObj);
+    DmDeviceIconInfoToJs(env_, jsCallback->deviceIconInfo, deviceIconInfoJsObj);
+    napi_resolve_deferred(env_, jsCallback->deferred, deviceIconInfoJsObj);
+    napi_close_handle_scope(env_, scope);
+}
+
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType)
 {
     LOGI("CreateDmCallback for bundleName %{public}s eventType %{public}s", bundleName.c_str(), eventType.c_str());
@@ -1953,6 +1991,88 @@ napi_value DeviceManagerNapi::GetDeviceProfileInfosPromise(napi_env env,
     return promise;
 }
 
+napi_value DeviceManagerNapi::GetProductInfoPromise(napi_env env, ProductInfoAsyncCallbackInfo *jsCallback)
+{
+    LOGI("In");
+    napi_value promise = 0;
+    napi_deferred deferred;
+    napi_create_promise(env, &deferred, &promise);
+    asyncCallback->deferred = deferred;
+    napi_value workName;
+    napi_create_string_latin1(env, "GetProductInfoPromise", NAPI_AUTO_LENGTH, &workName);
+    napi_create_async_work(env, nullptr, workName,
+        [](napi_env env, void *data) {
+            ProductInfoAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<ProductInfoAsyncCallbackInfo *>(data);
+            std::shared_ptr<DmNapiGetProductInfoCallback> callback =
+                std::make_shared<DmNapiGetProductInfoCallback>(jsCallback->env, jsCallback->bundleName,
+                jsCallback->deferred);
+            int32_t ret = DeviceManager::GetInstance().GetProductInfo(jsCallback->bundleName,
+                jsCallback->filterOptions, callback);
+            jsCallback->code = ret;
+            if (ret != DM_OK) {
+                LOGE("GetDeviceProfileInfos failed, bundleName:%{public}s, ret=%{public}d",
+                    jsCallback->bundleName.c_str(), ret);
+            }
+        },
+        [](napi_env env, napi_status status, void *data) {
+            (void)status;
+            ProductInfoAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<ProductInfoAsyncCallbackInfo *>(data);
+            if (jsCallback->code != DM_OK) {
+                napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                napi_reject_deferred(env, jsCallback->deferred, error);
+            }
+            napi_delete_async_work(env, jsCallback->asyncWork);
+            delete jsCallback;
+            jsCallback = nullptr;
+        },
+        (void *)asyncCallback, &asyncCallback->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallback->asyncWork, napi_qos_user_initiated);
+    return promise;
+}
+
+napi_value DeviceManagerNapi::GetDeviceIconInfoPromise(napi_env env, DeviceIconInfoAsyncCallbackInfo *jsCallback)
+{
+    LOGI("In");
+    napi_value promise = 0;
+    napi_deferred deferred;
+    napi_create_promise(env, &deferred, &promise);
+    asyncCallback->deferred = deferred;
+    napi_value workName;
+    napi_create_string_latin1(env, "GetDeviceIconInfoPromise", NAPI_AUTO_LENGTH, &workName);
+    napi_create_async_work(env, nullptr, workName,
+        [](napi_env env, void *data) {
+            DeviceIconInfoAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<DeviceIconInfoAsyncCallbackInfo *>(data);
+            std::shared_ptr<DmNapiGetDeviceIconInfoCallback> callback =
+                std::make_shared<DmNapiGetDeviceIconInfoCallback>(jsCallback->env, jsCallback->bundleName,
+                jsCallback->deferred);
+            int32_t ret = DeviceManager::GetInstance().GetDeviceIconInfo(jsCallback->bundleName,
+                jsCallback->filterOptions, callback);
+            jsCallback->code = ret;
+            if (ret != DM_OK) {
+                LOGE("GetDeviceProfileInfos failed, bundleName:%{public}s, ret=%{public}d",
+                    jsCallback->bundleName.c_str(), ret);
+            }
+        },
+        [](napi_env env, napi_status status, void *data) {
+            (void)status;
+            DeviceIconInfoAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<DeviceIconInfoAsyncCallbackInfo *>(data);
+            if (jsCallback->code != DM_OK) {
+                napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                napi_reject_deferred(env, jsCallback->deferred, error);
+            }
+            napi_delete_async_work(env, jsCallback->asyncWork);
+            delete jsCallback;
+            jsCallback = nullptr;
+        },
+        (void *)asyncCallback, &asyncCallback->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallback->asyncWork, napi_qos_user_initiated);
+    return promise;
+}
+
 napi_value DeviceManagerNapi::JsGetDeviceProfileInfos(napi_env env, napi_callback_info info)
 {
     LOGI("In");
@@ -1994,6 +2114,92 @@ napi_value DeviceManagerNapi::JsGetDeviceProfileInfos(napi_env env, napi_callbac
     jsCallback->bundleName = deviceManagerWrapper->bundleName_;
     jsCallback->filterOptions = filterOptions;
     return GetDeviceProfileInfosPromise(env, jsCallback);
+}
+
+napi_value DeviceManagerNapi::JsGetProductInfo(napi_env env, napi_callback_info info)
+{
+    LOGI("In");
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return nullptr;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
+
+    size_t argc = 0;
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
+        return nullptr;
+    }
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        LOGE("deviceManagerWrapper is NULL");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+    napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    DmProductInfoFilterOptions filterOptions;
+    JsToDmProductInfoFilterOptions(env, argv[0], filterOptions);
+    auto *jsCallback = new ProductInfoAsyncCallbackInfo();
+    if (jsCallback == nullptr) {
+        LOGE("jsCallback is nullptr");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+
+    jsCallback->env = env;
+    jsCallback->bundleName = deviceManagerWrapper->bundleName_;
+    jsCallback->filterOptions = filterOptions;
+    return GetProductInfoPromise(env, jsCallback);
+}
+
+napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_info info)
+{
+    LOGI("In");
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return nullptr;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
+
+    size_t argc = 0;
+    napi_value thisVar = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
+        return nullptr;
+    }
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        LOGE("deviceManagerWrapper is NULL");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+    napi_value argv[DM_NAPI_ARGS_ONE] = {nullptr};
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr));
+    DmDeviceIconInfoFilterOptions filterOptions;
+    JsToDmDeviceIconInfoFilterOptions(env, argv[0], filterOptions);
+    auto *jsCallback = new DeviceIconInfoAsyncCallbackInfo();
+    if (jsCallback == nullptr) {
+        LOGE("jsCallback is nullptr");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+
+    jsCallback->env = env;
+    jsCallback->bundleName = deviceManagerWrapper->bundleName_;
+    jsCallback->filterOptions = filterOptions;
+    return GetDeviceIconInfoPromise(env, jsCallback);
 }
 
 void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
@@ -2157,7 +2363,9 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("replyUiAction", SetUserOperationSync),
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
-        DECLARE_NAPI_FUNCTION("getDeviceProfileInfos", JsGetDeviceProfileInfos)};
+        DECLARE_NAPI_FUNCTION("getDeviceProfileInfos", JsGetDeviceProfileInfos),
+        DECLARE_NAPI_FUNCTION("getProductInfo", JsGetProductInfo),
+        DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo)};
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
@@ -2269,4 +2477,102 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     LOGI("RegisterModule() is called!");
     napi_module_register(&g_dmModule);
+}
+
+void DmNapiGetProductInfoCallback::OnResult(const OHOS::DistributedHardware::DmProductInfo &productInfo, int32_t code)
+{
+    LOGI("In code:%{public}d, size:%{public}zu", code, deviceProfileInfos.size());
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(env_, &loop);
+    if (loop == nullptr) {
+        LOGE("get loop fail");
+        return;
+    }
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        LOGE("OnResult, No memory");
+        return;
+    }
+    auto *jsCallback = new ProductInfoAsyncCallbackInfo();
+    if (jsCallback == nullptr) {
+        LOGE("create jsCallback fail");
+        DeleteUvWork(work);
+        return;
+    }
+    jsCallback->env = env_;
+    jsCallback->bundleName = bundleName_;
+    jsCallback->deferred = deferred_;
+    jsCallback->productInfo = productInfo;
+    jsCallback->code = code;
+    work->data = reinterpret_cast<void *>(jsCallback);
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+            LOGD("OnResult uv_queue_work_with_qos");
+    },  [] (uv_work_t *work, int status) {
+        ProductInfoAsyncCallbackInfo *callback =
+            reinterpret_cast<ProductInfoAsyncCallbackInfo *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName);
+        if (deviceManagerNapi == nullptr) {
+            LOGE("deviceManagerNapi not find for bundleName %{public}s", callback->bundleName.c_str());
+        } else {
+            deviceManagerNapi->OnGetDeviceProfileInfosCallbackResult(callback);
+        }
+        delete callback;
+        callback = nullptr;
+        DeleteUvWork(work);
+    }, uv_qos_user_initiated);
+    if (ret != 0) {
+        LOGE("Failed to execute OnBindResult work queue");
+        delete jsCallback;
+        jsCallback = nullptr;
+        DeleteUvWork(work);
+    }
+}
+
+void DmNapiGetDeviceIconInfoCallback::OnResult(const OHOS::DistributedHardware::DmDeviceIconInfo &deviceIconInfo, int32_t code)
+{
+    LOGI("In code:%{public}d", code);
+    uv_loop_s *loop = nullptr;
+    napi_get_uv_event_loop(env_, &loop);
+    if (loop == nullptr) {
+        LOGE("get loop fail");
+        return;
+    }
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        LOGE("OnResult, No memory");
+        return;
+    }
+    auto *jsCallback = new DeviceIconInfoAsyncCallbackInfo();
+    if (jsCallback == nullptr) {
+        LOGE("create jsCallback fail");
+        DeleteUvWork(work);
+        return;
+    }
+    jsCallback->env = env_;
+    jsCallback->bundleName = bundleName_;
+    jsCallback->deferred = deferred_;
+    jsCallback->deviceIconInfo = deviceIconInfo;
+    jsCallback->code = code;
+    work->data = reinterpret_cast<void *>(jsCallback);
+    int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
+            LOGD("OnResult uv_queue_work_with_qos");
+    },  [] (uv_work_t *work, int status) {
+        DeviceIconInfoAsyncCallbackInfo *callback =
+            reinterpret_cast<DeviceIconInfoAsyncCallbackInfo *>(work->data);
+        DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName);
+        if (deviceManagerNapi == nullptr) {
+            LOGE("deviceManagerNapi not find for bundleName %{public}s", callback->bundleName.c_str());
+        } else {
+            deviceManagerNapi->OnGetDeviceProfileInfosCallbackResult(callback);
+        }
+        delete callback;
+        callback = nullptr;
+        DeleteUvWork(work);
+    }, uv_qos_user_initiated);
+    if (ret != 0) {
+        LOGE("Failed to execute OnBindResult work queue");
+        delete jsCallback;
+        jsCallback = nullptr;
+        DeleteUvWork(work);
+    }
 }
