@@ -104,7 +104,6 @@ if (defined(ohos_lite)) {
       ]
 
       cflags = [
-        
         "-Wall",
         "-O2",
         "-Wdate-time",
@@ -164,6 +163,16 @@ if (defined(ohos_lite)) {
       integer_overflow = true
       ubsan = true
     }
+
+    cflags = [
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
 
     sources = [
       "${common_path}/src/dfx/standard/dm_hidumper.cpp",
