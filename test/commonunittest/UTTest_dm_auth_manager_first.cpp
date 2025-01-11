@@ -574,6 +574,30 @@ HWTEST_F(DmAuthManagerTest, GenerateGroupName_001, testing::ext::TestSize.Level0
     ASSERT_TRUE(ret.empty());
 }
 
+HWTEST_F(DmAuthManagerTest, UnBindDevice_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid = "UnBindDevice_002";
+    int32_t bindLevel = DEVICE;
+    std::string extra = "extraTest";
+    int32_t ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    EXPECT_NE(ret, DM_OK);
+
+    pkgName = "com.ohos.test";
+    authManager_->isAuthenticateDevice_ = false;
+    ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    EXPECT_NE(ret, DM_OK);
+
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseContext_ = nullptr;
+    ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    EXPECT_NE(ret, DM_OK);
+
+    bindLevel = 0;
+    ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    EXPECT_NE(ret, DM_OK);
+}
+
 HWTEST_F(DmAuthManagerTest, GenerateGroupName_002, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_->targetPkgName = "targetPkgNameTest";

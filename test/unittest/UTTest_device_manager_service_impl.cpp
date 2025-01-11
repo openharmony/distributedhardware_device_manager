@@ -1399,6 +1399,37 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_104, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
+HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_105, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgname";
+    std::string udid;
+    int32_t bindLevel = 0;
+    std::string extra = "extra";
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_106, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid = "123";
+    int32_t bindLevel = 0;
+    std::string extra = "extra";
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_107, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string udid;
+    int32_t bindLevel = 0;
+    std::string extra = "extra";
+    int32_t ret = deviceManagerServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra);
+    deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
 HWTEST_F(DeviceManagerServiceImplTest, GetBindLevel_101, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgname";
@@ -1775,6 +1806,61 @@ HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_001, testing::ext::T
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForRemoteUserRemoved(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(localUserIds), Return()));
     deviceManagerServiceImpl_->HandleRemoteUserRemoved(userId, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_002, testing::ext::TestSize.Level0)
+{
+    std::vector<DmDeviceInfo> deviceList;
+    DmDeviceInfo dmDeviceInfo;
+    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+    dmDeviceInfo.networkType = 1;
+    deviceList.push_back(dmDeviceInfo);
+
+    if (deviceManagerServiceImpl_->deviceStateMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+    int32_t ret = deviceManagerServiceImpl_->SaveOnlineDeviceInfo(deviceList);
+    EXPECT_EQ(ret, DM_OK);
+
+    int32_t remoteUserId = 1;
+    std::string remoteUdid = "remoteDeviceId";
+    int32_t tokenId = 0;
+    int32_t peerTokenId = 3;
+    ProcessInfo processInfo;
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(processInfo));
+    deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, peerTokenId);
+
+    processInfo.pkgName = "pkgName";
+    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(processInfo));
+    deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, peerTokenId);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _)).WillOnce(Return(DM_INVALIED_BINDTYPE));
+    deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
+    if (deviceManagerServiceImpl_->authMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid);
+
+    int32_t userId = 123456;
+    remoteUdid = "remoteDeviceId";
+    if (deviceManagerServiceImpl_->hiChainConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    deviceManagerServiceImpl_->HandleRemoteUserRemoved(userId, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, GetTokenIdByNameAndDeviceId_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string requestDeviceId = "";
+    auto ret = deviceManagerServiceImpl_->GetTokenIdByNameAndDeviceId(pkgName, requestDeviceId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndBindLevel_001, testing::ext::TestSize.Level0)
