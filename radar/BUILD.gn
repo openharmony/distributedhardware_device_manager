@@ -51,7 +51,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
       "${innerkits_path}/native_cpp/include",
     ]
-    
+
     cflags = [
       "-fPIC",
       "-fstack-protector-strong",
