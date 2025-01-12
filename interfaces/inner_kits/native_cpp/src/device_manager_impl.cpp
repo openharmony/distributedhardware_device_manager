@@ -2589,12 +2589,16 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfos(const std::string &pkgName,
     const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceProfileInfosCallback> callback)
 {
     LOGI("In pkgName:%{public}s, isCloud:%{public}d", pkgName.c_str(), filterOptions.isCloud);
-    DeviceManagerNotify::GetInstance().RegisterGetDeviceProfileInfosCallback(pkgName, callback);
+    int32_t ret = DeviceManagerNotify::GetInstance().RegisterGetDeviceProfileInfosCallback(pkgName, callback);
+    if (ret != DM_OK) {
+        LOGE("register callback error, ret: %{public}d", ret);
+        return ret;
+    }
     std::shared_ptr<IpcGetDeviceProfileInfosReq> req = std::make_shared<IpcGetDeviceProfileInfosReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetFilterOptions(filterOptions);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFOS, req, rsp);
+    ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFOS, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
         DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfosCallback(pkgName);

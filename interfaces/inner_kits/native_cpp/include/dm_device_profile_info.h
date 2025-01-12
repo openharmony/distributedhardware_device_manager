@@ -35,12 +35,12 @@ typedef struct DmServiceProfileInfo {
     std::string deviceId;
     std::string serviceId;
     std::string serviceType;
-    std::map<std::string, std::string> data;
+    std::map<std::string, std::string> data = {};
 } DmServiceProfileInfo;
 
 typedef struct DmDeviceProfileInfoFilterOptions {
     bool isCloud;
-    std::vector<std::string> deviceIds;
+    std::vector<std::string> deviceIds = {};
 } DmDeviceProfileInfoFilterOptions;
 
 typedef struct DmDeviceProfileInfo {
@@ -69,7 +69,7 @@ typedef struct DmDeviceProfileInfo {
     std::string modifyTime;
     std::string shareTime;
     bool isLocalDevice;
-    std::vector<DmServiceProfileInfo> services;
+    std::vector<DmServiceProfileInfo> services = {};
 } DmDeviceProfileInfo;
 
 } // namespace DistributedHardware

@@ -117,8 +117,7 @@ public:
 class GetDeviceProfileInfosCallback {
 public:
     virtual ~GetDeviceProfileInfosCallback()
-    {
-    }
+    {}
     virtual void OnResult(const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) = 0;
 };
 

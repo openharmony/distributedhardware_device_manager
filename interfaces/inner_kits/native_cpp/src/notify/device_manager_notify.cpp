@@ -1248,6 +1248,10 @@ int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfosCallback(const std::st
 {
     LOGI("In, pkgName: %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(bindLock_);
+    if (getDeviceProfileInfoCallback_.szie() > MAX_CONTAINER_SIZE) {
+        LOGI("callback map size is more than max size");
+        return ERR_DM_MAX_SIZE_FAIL;
+    }
     getDeviceProfileInfoCallback_[pkgName] = callback;
     return DM_OK;
 }

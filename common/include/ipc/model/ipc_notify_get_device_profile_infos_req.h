@@ -54,8 +54,8 @@ public:
     }
 
 private:
-    std::vector<DmDeviceProfileInfo> deviceProfileInfos_;
-    int32_t result_;
+    std::vector<DmDeviceProfileInfo> deviceProfileInfos_ = {};
+    int32_t result_ = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

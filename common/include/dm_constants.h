@@ -122,7 +122,8 @@ enum {
     ERR_DM_SAVE_SESSION_KEY_FAILED = 96929821,
     ERR_DM_CRYPTO_OPT_FAILED = 96929822,
     ERR_DM_CRYPTO_PARA_INVALID = 96929823,
-    ERR_DM_SECURITY_FUNC_FAILED = 96929824
+    ERR_DM_SECURITY_FUNC_FAILED = 96929824,
+    ERR_DM_MAX_SIZE_FAIL = 96929825
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -280,6 +281,7 @@ const std::string BIND_FOR_DEVICE_LEVEL = "BindForDeviceLevel";
 
 // wise device
 constexpr int32_t MAX_DEVICE_PROFILE_SIZE = 500;
+constexpr int32_t MAX_CONTAINER_SIZE = 500;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H
