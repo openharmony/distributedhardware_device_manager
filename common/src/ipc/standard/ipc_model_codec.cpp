@@ -19,6 +19,38 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+int32_t IpcModelCodec::DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &parcel,
+    DmDeviceProfileInfoFilterOptions &filterOptions)
+{
+    filterOptions.isCloud = parcel.ReadBool();
+    size_t size = parcel.ReadUint32();
+    if (size > MAX_DEVICE_PROFILE_SIZE) {
+        LOGE("size more than %{public}d,", MAX_DEVICE_PROFILE_SIZE);
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (size > 0) {
+        for (uint32_t i = 0; i < size; i++) {
+            std::string item = parcel.ReadString();
+            filterOptions.deviceIdList.emplace_back(item);
+        }
+    }
+    return DM_OK;
+}
+
+bool IpcModelCodec::EncodeDmDeviceProfileInfoFilterOptions(const DmDeviceProfileInfoFilterOptions &filterOptions,
+    MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteBool(filterOptions.isCloud));
+    uint32_t size = filterOptions.deviceIdList.size();
+    bRet = (bRet && parcel.WriteUint32(size));
+    if (bRet && size > 0) {
+        for (const auto& item : filterOptions.deviceIdList) {
+            bRet = (bRet && parcel.WriteString(item));
+        }
+    }
+    return bRet;
+}
 
 void IpcModelCodec::DecodeDmProductInfo(MessageParcel &parcel, DmProductInfo &prodInfo)
 {

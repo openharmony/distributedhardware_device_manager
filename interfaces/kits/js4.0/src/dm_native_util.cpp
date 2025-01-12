@@ -35,6 +35,8 @@ const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
 const std::string ERR_MESSAGE_AUTHENTICALTION_INVALID = "Authentication invalid.";
 const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
 const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
+const std::string ERR_MESSAGE_FROM_CLOUD_FAILED = "Get data from cloud failed.";
+const std::string ERR_MESSAGE_NEED_LOGIN = "A login account is required.";
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
@@ -207,6 +209,7 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             break;
         case ERR_DM_INPUT_PARA_INVALID:
         case ERR_DM_UNSUPPORTED_AUTH_TYPE:
+        case ERR_DM_MAX_SIZE_FAIL:
             error = CreateErrorForCall(env, ERR_INVALID_PARAMS, ERR_MESSAGE_INVALID_PARAMS, isAsync);
             break;
         case ERR_DM_INIT_FAILED:
@@ -214,6 +217,15 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             break;
         case ERR_NOT_SYSTEM_APP:
             error = CreateErrorForCall(env, ERR_NOT_SYSTEM_APP, ERR_MESSAGE_NOT_SYSTEM_APP, isAsync);
+            break;
+        case ERR_DM_HILINKSVC_RSP_PARSE_FAILD:
+        case ERR_DM_HILINKSVC_REPLY_FAILED:
+        case ERR_DM_HILINKSVC_ICON_URL_EMPTY:
+        case ERR_DM_HILINKSVC_DISCONNECT:
+            error = CreateErrorForCall(env, DM_ERR_FROM_CLOUD_FAILED, ERR_MESSAGE_FROM_CLOUD_FAILED, isAsync);
+            break;
+        case ERR_DM_WISE_NEED_LOGIN:
+            error = CreateErrorForCall(env, DM_ERR_NEED_LOGIN, ERR_MESSAGE_NEED_LOGIN, isAsync);
             break;
         default:
             error = CreateErrorForCall(env, DM_ERR_FAILED, ERR_MESSAGE_FAILED, isAsync);
@@ -524,9 +536,9 @@ void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value 
     bool isCloud = false;
     JsObjectToBool(env, object, "isCloud", isCloud);
     info.isCloud = isCloud;
-    std::vector<std::string> deviceIds;
-    JsObjectToStrVector(env, object, "deviceIds", deviceIds);
-    info.deviceIds = deviceIds;
+    std::vector<std::string> deviceIdList;
+    JsObjectToStrVector(env, object, "deviceIdList", deviceIdList);
+    info.deviceIdList = deviceIdList;
 }
 
 void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
@@ -557,7 +569,6 @@ void DmProductInfoToJs(const napi_env &env, const DmProductInfo &prodInfo, napi_
     SetValueUtf8String(env, "model", prodInfo.model, jsObj);
     SetValueUtf8String(env, "prodName", prodInfo.prodName, jsObj);
     SetValueUtf8String(env, "prodShortName", prodInfo.prodShortName, jsObj);
-    SetValueUtf8String(env, "imageVersion", prodInfo.imageVersion, jsObj);
 }
 
 void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &devInfo, napi_value &jsObj)
@@ -566,7 +577,6 @@ void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &dev
     SetValueUtf8String(env, "deviceSn", devInfo.deviceSn, jsObj);
     SetValueUtf8String(env, "mac", devInfo.mac, jsObj);
     SetValueUtf8String(env, "model", devInfo.model, jsObj);
-    SetValueUtf8String(env, "innerModel", devInfo.innerModel, jsObj);
     SetValueUtf8String(env, "devType", devInfo.devType, jsObj);
     SetValueUtf8String(env, "manu", devInfo.manu, jsObj);
     SetValueUtf8String(env, "deviceName", devInfo.deviceName, jsObj);

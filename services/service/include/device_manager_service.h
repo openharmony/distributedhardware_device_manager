@@ -215,7 +215,7 @@ public:
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
     int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam);
-    int32_t GetDeviceProfileInfos(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);
+    int32_t GetDeviceProfileInfoList(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);
 
 private:
     bool IsDMServiceImplReady();

@@ -38,7 +38,7 @@
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_info_rsp.h"
-#include "ipc_get_device_profile_infos_req.h"
+#include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
@@ -48,6 +48,7 @@
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
+#include "ipc_model_codec.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_permission_req.h"
 #include "ipc_publish_req.h"
@@ -2585,29 +2586,29 @@ int32_t DeviceManagerImpl::RegisterAuthenticationType(const std::string &pkgName
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::GetDeviceProfileInfos(const std::string &pkgName,
-    const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceProfileInfosCallback> callback)
+int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
+    const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
 {
     LOGI("In pkgName:%{public}s, isCloud:%{public}d", pkgName.c_str(), filterOptions.isCloud);
-    int32_t ret = DeviceManagerNotify::GetInstance().RegisterGetDeviceProfileInfosCallback(pkgName, callback);
+    int32_t ret = DeviceManagerNotify::GetInstance().RegisterGetDeviceProfileInfoListCallback(pkgName, callback);
     if (ret != DM_OK) {
         LOGE("register callback error, ret: %{public}d", ret);
         return ret;
     }
-    std::shared_ptr<IpcGetDeviceProfileInfosReq> req = std::make_shared<IpcGetDeviceProfileInfosReq>();
+    std::shared_ptr<IpcGetDeviceProfileInfoListReq> req = std::make_shared<IpcGetDeviceProfileInfoListReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetFilterOptions(filterOptions);
-    ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFOS, req, rsp);
+    ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFO_LIST, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfosCallback(pkgName);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfosCallback(pkgName);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
         return ret;
     }
     LOGI("Completed");

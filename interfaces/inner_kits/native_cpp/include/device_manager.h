@@ -643,9 +643,9 @@ public:
      * @param callback       qeury result callback.
      * @return Returns 0 if success.
      */
-    virtual int32_t GetDeviceProfileInfos(const std::string &pkgName,
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
         const DmDeviceProfileInfoFilterOptions &filterOptions,
-        std::shared_ptr<GetDeviceProfileInfosCallback> callback) = 0;
+        std::shared_ptr<GetDeviceProfileInfoListCallback> callback) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

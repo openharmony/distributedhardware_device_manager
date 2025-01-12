@@ -23,6 +23,10 @@ namespace OHOS {
 namespace DistributedHardware {
 class IpcModelCodec {
 public:
+    static int32_t DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &parcel,
+        DmDeviceProfileInfoFilterOptions &filterOptions);
+    static bool EncodeDmDeviceProfileInfoFilterOptions(const DmDeviceProfileInfoFilterOptions &filterOptions,
+        MessageParcel &parcel);
     static void DecodeDmProductInfo(MessageParcel &parcel, DmProductInfo &prodInfo);
     static void DecodeDmServiceProfileInfo(MessageParcel &parcel, DmServiceProfileInfo &svrInfo);
     static void DecodeDmServiceProfileInfos(MessageParcel &parcel, std::vector<DmServiceProfileInfo> &svrInfos);

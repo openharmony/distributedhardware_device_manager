@@ -1243,12 +1243,12 @@ void DeviceManagerNotify::GetCallBack(std::map<DmCommonNotifyEvent, std::set<std
     }
 }
 
-int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfosCallback(const std::string &pkgName,
-    std::shared_ptr<GetDeviceProfileInfosCallback> callback)
+int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
+    std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
 {
     LOGI("In, pkgName: %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(bindLock_);
-    if (getDeviceProfileInfoCallback_.szie() > MAX_CONTAINER_SIZE) {
+    if (getDeviceProfileInfoCallback_.size() > MAX_CONTAINER_SIZE) {
         LOGI("callback map size is more than max size");
         return ERR_DM_MAX_SIZE_FAIL;
     }
@@ -1256,7 +1256,7 @@ int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfosCallback(const std::st
     return DM_OK;
 }
 
-int32_t DeviceManagerNotify::UnRegisterGetDeviceProfileInfosCallback(const std::string &pkgName)
+int32_t DeviceManagerNotify::UnRegisterGetDeviceProfileInfoListCallback(const std::string &pkgName)
 {
     LOGI("In, pkgName: %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(bindLock_);
@@ -1264,7 +1264,7 @@ int32_t DeviceManagerNotify::UnRegisterGetDeviceProfileInfosCallback(const std::
     return DM_OK;
 }
 
-void DeviceManagerNotify::OnGetDeviceProfileInfosResult(const std::string &pkgName,
+void DeviceManagerNotify::OnGetDeviceProfileInfoListResult(const std::string &pkgName,
     const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code)
 {
     if (pkgName.empty()) {
@@ -1272,7 +1272,7 @@ void DeviceManagerNotify::OnGetDeviceProfileInfosResult(const std::string &pkgNa
         return;
     }
     LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
-    std::shared_ptr<GetDeviceProfileInfosCallback> tempCbk;
+    std::shared_ptr<GetDeviceProfileInfoListCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
         if (getDeviceProfileInfoCallback_.count(pkgName) == 0) {
@@ -1283,7 +1283,7 @@ void DeviceManagerNotify::OnGetDeviceProfileInfosResult(const std::string &pkgNa
         getDeviceProfileInfoCallback_.erase(pkgName);
     }
     if (tempCbk == nullptr) {
-        LOGE("error, registered GetDeviceProfileInfos callback is nullptr.");
+        LOGE("error, registered GetDeviceProfileInfoList callback is nullptr.");
         return;
     }
     tempCbk->OnResult(deviceProfileInfos, code);

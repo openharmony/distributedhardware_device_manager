@@ -223,13 +223,13 @@ private:
     std::string bundleName_;
 };
 
-class DmNapiGetDeviceProfileInfosCallback : public OHOS::DistributedHardware::GetDeviceProfileInfosCallback {
+class DmNapiGetDeviceProfileInfoListCallback : public OHOS::DistributedHardware::GetDeviceProfileInfoListCallback {
 public:
-    explicit DmNapiGetDeviceProfileInfosCallback(napi_env env, const std::string &bundleName,
+    explicit DmNapiGetDeviceProfileInfoListCallback(napi_env env, const std::string &bundleName,
         const napi_deferred &deferred) : env_(env), bundleName_(bundleName), deferred_(deferred)
     {
     }
-    ~DmNapiGetDeviceProfileInfosCallback() override {};
+    ~DmNapiGetDeviceProfileInfoListCallback() override {};
 
     void OnResult(const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfos,
         int32_t code) override;
@@ -267,7 +267,7 @@ public:
     static napi_value UnBindTarget(napi_env env, napi_callback_info info);
     static napi_value JsOn(napi_env env, napi_callback_info info);
     static napi_value JsOff(napi_env env, napi_callback_info info);
-    static napi_value JsGetDeviceProfileInfos(napi_env env, napi_callback_info info);
+    static napi_value JsGetDeviceProfileInfoList(napi_env env, napi_callback_info info);
     static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
@@ -279,7 +279,7 @@ public:
     void OnPublishResult(int32_t publishId, int32_t publishResult);
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason);
     void OnDmUiCall(const std::string &paramJson);
-    void OnGetDeviceProfileInfosCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback);
+    void OnGetDeviceProfileInfoListCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback);
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);
@@ -302,7 +302,7 @@ private:
         const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback);
     static void RegisterDevStatusCallback(napi_env env, std::string &bundleName);
     static int32_t DumpDeviceInfo(DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
-    static napi_value GetDeviceProfileInfosPromise(napi_env env, DeviceProfileInfosAsyncCallbackInfo *jsCallback);
+    static napi_value GetDeviceProfileInfoListPromise(napi_env env, DeviceProfileInfosAsyncCallbackInfo *jsCallback);
     
 private:
     napi_env env_;

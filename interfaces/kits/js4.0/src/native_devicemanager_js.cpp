@@ -541,7 +541,7 @@ void DmNapiAuthenticateCallback::OnAuthResult(const std::string &deviceId, const
     }
 }
 
-void DmNapiGetDeviceProfileInfosCallback::OnResult(const std::vector<DmDeviceProfileInfo> &deviceProfileInfos,
+void DmNapiGetDeviceProfileInfoListCallback::OnResult(const std::vector<DmDeviceProfileInfo> &deviceProfileInfos,
     int32_t code)
 {
     LOGI("In code:%{public}d, size:%{public}zu", code, deviceProfileInfos.size());
@@ -577,7 +577,7 @@ void DmNapiGetDeviceProfileInfosCallback::OnResult(const std::vector<DmDevicePro
         if (deviceManagerNapi == nullptr) {
             LOGE("deviceManagerNapi not find for bundleName %{public}s", callback->bundleName.c_str());
         } else {
-            deviceManagerNapi->OnGetDeviceProfileInfosCallbackResult(callback);
+            deviceManagerNapi->OnGetDeviceProfileInfoListCallbackResult(callback);
         }
         delete callback;
         callback = nullptr;
@@ -723,7 +723,7 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
     napi_close_handle_scope(env_, scope);
 }
 
-void DeviceManagerNapi::OnGetDeviceProfileInfosCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback)
+void DeviceManagerNapi::OnGetDeviceProfileInfoListCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback)
 {
     LOGI("In");
     napi_handle_scope scope;
@@ -1911,7 +1911,7 @@ napi_value DeviceManagerNapi::JsOff(napi_env env, napi_callback_info info)
     }
 }
 
-napi_value DeviceManagerNapi::GetDeviceProfileInfosPromise(napi_env env,
+napi_value DeviceManagerNapi::GetDeviceProfileInfoListPromise(napi_env env,
     DeviceProfileInfosAsyncCallbackInfo *asyncCallback)
 {
     LOGI("In");
@@ -1925,10 +1925,10 @@ napi_value DeviceManagerNapi::GetDeviceProfileInfosPromise(napi_env env,
         [](napi_env env, void *data) {
             DeviceProfileInfosAsyncCallbackInfo *jsCallback =
                 reinterpret_cast<DeviceProfileInfosAsyncCallbackInfo *>(data);
-            std::shared_ptr<DmNapiGetDeviceProfileInfosCallback> callback =
-                std::make_shared<DmNapiGetDeviceProfileInfosCallback>(jsCallback->env, jsCallback->bundleName,
+            std::shared_ptr<DmNapiGetDeviceProfileInfoListCallback> callback =
+                std::make_shared<DmNapiGetDeviceProfileInfoListCallback>(jsCallback->env, jsCallback->bundleName,
                 jsCallback->deferred);
-            int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfos(jsCallback->bundleName,
+            int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(jsCallback->bundleName,
                 jsCallback->filterOptions, callback);
             jsCallback->code = ret;
             if (ret != DM_OK) {
@@ -1953,7 +1953,7 @@ napi_value DeviceManagerNapi::GetDeviceProfileInfosPromise(napi_env env,
     return promise;
 }
 
-napi_value DeviceManagerNapi::JsGetDeviceProfileInfos(napi_env env, napi_callback_info info)
+napi_value DeviceManagerNapi::JsGetDeviceProfileInfoList(napi_env env, napi_callback_info info)
 {
     LOGI("In");
     if (!IsSystemApp()) {
@@ -1993,7 +1993,7 @@ napi_value DeviceManagerNapi::JsGetDeviceProfileInfos(napi_env env, napi_callbac
     jsCallback->env = env;
     jsCallback->bundleName = deviceManagerWrapper->bundleName_;
     jsCallback->filterOptions = filterOptions;
-    return GetDeviceProfileInfosPromise(env, jsCallback);
+    return GetDeviceProfileInfoListPromise(env, jsCallback);
 }
 
 void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
@@ -2157,7 +2157,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("replyUiAction", SetUserOperationSync),
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
-        DECLARE_NAPI_FUNCTION("getDeviceProfileInfos", JsGetDeviceProfileInfos)};
+        DECLARE_NAPI_FUNCTION("getDeviceProfileInfoList", JsGetDeviceProfileInfoList)};
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),

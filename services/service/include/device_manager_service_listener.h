@@ -81,7 +81,7 @@ public:
         int32_t status, std::string content) override;
     void OnProcessRemove(const ProcessInfo &processInfo) override;
     void OnDevStateCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
-    void OnGetDeviceProfileInfosResult(const ProcessInfo &processInfo,
+    void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override;
 
 private:

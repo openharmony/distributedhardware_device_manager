@@ -410,9 +410,9 @@ public:
     virtual int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam) override;
 
-    virtual int32_t GetDeviceProfileInfos(const std::string &pkgName,
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
         const DmDeviceProfileInfoFilterOptions &filterOptions,
-        std::shared_ptr<GetDeviceProfileInfosCallback> callback) override;
+        std::shared_ptr<GetDeviceProfileInfoListCallback> callback) override;
 
 private:
     DeviceManagerImpl() = default;

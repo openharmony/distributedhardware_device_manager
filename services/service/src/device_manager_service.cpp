@@ -2617,7 +2617,7 @@ int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgN
     return dmServiceImpl_->RegisterAuthenticationType(authenticationType);
 }
 
-int32_t DeviceManagerService::GetDeviceProfileInfos(const std::string &pkgName,
+int32_t DeviceManagerService::GetDeviceProfileInfoList(const std::string &pkgName,
     DmDeviceProfileInfoFilterOptions &filterOptions)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
@@ -2626,10 +2626,10 @@ int32_t DeviceManagerService::GetDeviceProfileInfos(const std::string &pkgName,
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (!IsDMServiceAdapterLoad()) {
-        LOGE("GetDeviceProfileInfos failed, adapter instance not init or init failed.");
+        LOGE("GetDeviceProfileInfoList failed, adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    return dmServiceImplExt_->GetDeviceProfileInfos(pkgName, filterOptions);
+    return dmServiceImplExt_->GetDeviceProfileInfoList(pkgName, filterOptions);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

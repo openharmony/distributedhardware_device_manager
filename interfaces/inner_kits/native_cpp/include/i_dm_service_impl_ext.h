@@ -110,7 +110,7 @@ public:
      * @tc.desc: GetDeviceProfileInfos
      * @tc.type: FUNC
      */
-    virtual int32_t GetDeviceProfileInfos(const std::string &pkgName,
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
         const DmDeviceProfileInfoFilterOptions &filterOptions) = 0;
 };
 

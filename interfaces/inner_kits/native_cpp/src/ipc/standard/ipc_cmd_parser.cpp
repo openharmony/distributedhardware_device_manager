@@ -34,7 +34,7 @@
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_info_rsp.h"
-#include "ipc_get_device_profile_infos_req.h"
+#include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
@@ -2099,36 +2099,27 @@ ON_IPC_READ_RESPONSE(REG_AUTHENTICATION_TYPE, MessageParcel &reply, std::shared_
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFOS, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFO_LIST, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
         LOGE("pBaseReq is null");
         return ERR_DM_FAILED;
     }
-    std::shared_ptr<IpcGetDeviceProfileInfosReq> pReq = std::static_pointer_cast<IpcGetDeviceProfileInfosReq>(pBaseReq);
+    std::shared_ptr<IpcGetDeviceProfileInfoListReq> pReq =
+        std::static_pointer_cast<IpcGetDeviceProfileInfoListReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    DmDeviceProfileInfoFilterOptions filterOptions = pReq->GetFilterOptions();
-    bool bRet = true;
-    bRet = (bRet && data.WriteBool(filterOptions.isCloud));
-    uint32_t size = filterOptions.deviceIds.size();
-    bRet = (bRet && data.WriteUint32(size));
-    if (bRet && size > 0) {
-        for (const auto& item : filterOptions.deviceIds) {
-            bRet = (bRet && data.WriteString(item));
-        }
-    }
-    if (!bRet) {
+    if (!IpcModelCodec::EncodeDmDeviceProfileInfoFilterOptions(pReq->GetFilterOptions(), data)) {
         LOGE("write filterOptions failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
 
-ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFOS, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFO_LIST, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");
@@ -2138,7 +2129,7 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFOS, MessageParcel &reply, std::shared
     return DM_OK;
 }
 
-ON_IPC_CMD(GET_DEVICE_PROFILE_INFOS_RESULT, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     int32_t code = data.ReadInt32();
@@ -2152,7 +2143,7 @@ ON_IPC_CMD(GET_DEVICE_PROFILE_INFOS_RESULT, MessageParcel &data, MessageParcel &
         }
     }
 
-    DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfosResult(pkgName, deviceProfileInfos, code);
+    DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfoListResult(pkgName, deviceProfileInfos, code);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

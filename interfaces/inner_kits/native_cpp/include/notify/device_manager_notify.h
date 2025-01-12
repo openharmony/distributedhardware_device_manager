@@ -78,10 +78,10 @@ public:
     void RegisterSinkBindCallback(const std::string &pkgName, std::shared_ptr<BindTargetCallback> callback);
     void UnRegisterSinkBindCallback(const std::string &pkgName);
 
-    int32_t RegisterGetDeviceProfileInfosCallback(const std::string &pkgName,
-        std::shared_ptr<GetDeviceProfileInfosCallback> callback);
-    int32_t UnRegisterGetDeviceProfileInfosCallback(const std::string &pkgName);
-    void OnGetDeviceProfileInfosResult(const std::string &pkgName,
+    int32_t RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
+        std::shared_ptr<GetDeviceProfileInfoListCallback> callback);
+    int32_t UnRegisterGetDeviceProfileInfoListCallback(const std::string &pkgName);
+    void OnGetDeviceProfileInfoListResult(const std::string &pkgName,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code);
 
 public:
@@ -156,7 +156,7 @@ private:
     std::map<std::string, std::shared_ptr<CredentialAuthStatusCallback>> credentialAuthStatusCallback_;
     std::map<std::string, std::shared_ptr<BindTargetCallback>> sinkBindTargetCallback_;
     std::mutex bindLock_;
-    std::map<std::string, std::shared_ptr<GetDeviceProfileInfosCallback>> getDeviceProfileInfoCallback_;
+    std::map<std::string, std::shared_ptr<GetDeviceProfileInfoListCallback>> getDeviceProfileInfoCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

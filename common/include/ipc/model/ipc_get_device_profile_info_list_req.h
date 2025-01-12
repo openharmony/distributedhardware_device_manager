@@ -13,50 +13,41 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_NOTIFY_GET_DEVICE_PROFILE_INFOS_REQ_H
-#define OHOS_DM_IPC_NOTIFY_GET_DEVICE_PROFILE_INFOS_REQ_H
+#ifndef OHOS_DM_IPC_GET_DEVICE_PROFILE_INFO_LIST_REQ_H
+#define OHOS_DM_IPC_GET_DEVICE_PROFILE_INFO_LIST_REQ_H
 
 #include "dm_device_profile_info.h"
 #include "ipc_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcNotifyGetDeviceProfileInfosReq : public IpcReq {
-    DECLARE_IPC_MODEL(IpcNotifyGetDeviceProfileInfosReq);
+class IpcGetDeviceProfileInfoListReq : public IpcReq {
+    DECLARE_IPC_MODEL(IpcGetDeviceProfileInfoListReq);
 
 public:
-    std::vector<DmDeviceProfileInfo> GetDeviceProfileInfos() const
+    /**
+     * @tc.name: IpcBindTargetReq::GetFirstParam
+     * @tc.desc: Ipc get first string parameter
+     * @tc.type: FUNC
+     */
+    DmDeviceProfileInfoFilterOptions GetFilterOptions() const
     {
-        return deviceProfileInfos_;
-    }
-
-    void SetDeviceProfileInfos(const std::vector<DmDeviceProfileInfo> &deviceProfileInfos)
-    {
-        deviceProfileInfos_ = deviceProfileInfos;
+        return filterOptions_;
     }
 
     /**
-     * @tc.desc: Ipc get result
+     * @tc.name: IpcBindTargetReq::SetFirstParam
+     * @tc.desc: Ipc set first string parameter
      * @tc.type: FUNC
      */
-    int32_t GetResult() const
+    void SetFilterOptions(const DmDeviceProfileInfoFilterOptions &filterOptions)
     {
-        return result_;
-    }
-
-    /**
-     * @tc.desc: Ipc set result
-     * @tc.type: FUNC
-     */
-    void SetResult(int32_t result)
-    {
-        result_ = result;
+        filterOptions_ = filterOptions;
     }
 
 private:
-    std::vector<DmDeviceProfileInfo> deviceProfileInfos_ = {};
-    int32_t result_ = 0;
+    DmDeviceProfileInfoFilterOptions filterOptions_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_NOTIFY_GET_DEVICE_PROFILE_INFOS_REQ_H
+#endif // OHOS_DM_IPC_GET_DEVICE_PROFILE_INFO_LIST_REQ_H

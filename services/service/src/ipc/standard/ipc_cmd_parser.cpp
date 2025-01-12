@@ -42,7 +42,7 @@
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
-#include "ipc_notify_get_device_profile_infos_req.h"
+#include "ipc_notify_get_device_profile_info_list_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_server_client_proxy.h"
@@ -1682,7 +1682,7 @@ ON_IPC_CMD(REG_AUTHENTICATION_TYPE, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_CMD(GET_DEVICE_PROFILE_INFOS, MessageParcel &data, MessageParcel &reply)
+ON_IPC_CMD(GET_DEVICE_PROFILE_INFO_LIST, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     DmDeviceProfileInfoFilterOptions filterOptions;
@@ -1695,10 +1695,10 @@ ON_IPC_CMD(GET_DEVICE_PROFILE_INFOS, MessageParcel &data, MessageParcel &reply)
     if (size > 0) {
         for (uint32_t i = 0; i < size; i++) {
             std::string item = data.ReadString();
-            filterOptions.deviceIds.emplace_back(item);
+            filterOptions.deviceIdList.emplace_back(item);
         }
     }
-    int32_t result = DeviceManagerService::GetInstance().GetDeviceProfileInfos(pkgName, filterOptions);
+    int32_t result = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -1706,13 +1706,13 @@ ON_IPC_CMD(GET_DEVICE_PROFILE_INFOS, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
-ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFOS_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFO_LIST_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
         return ERR_DM_FAILED;
     }
-    std::shared_ptr<IpcNotifyGetDeviceProfileInfosReq> pReq =
-        std::static_pointer_cast<IpcNotifyGetDeviceProfileInfosReq>(pBaseReq);
+    std::shared_ptr<IpcNotifyGetDeviceProfileInfoListReq> pReq =
+        std::static_pointer_cast<IpcNotifyGetDeviceProfileInfoListReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
@@ -1723,7 +1723,7 @@ ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFOS_RESULT, std::shared_ptr<IpcReq> pBas
         LOGE("write result code failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    std::vector<DmDeviceProfileInfo> deviceProfileInfos = pReq->GetDeviceProfileInfos();
+    std::vector<DmDeviceProfileInfo> deviceProfileInfos = pReq->GetDeviceProfileInfoList();
     if (!data.WriteInt32((int32_t)deviceProfileInfos.size())) {
         LOGE("write device list size failed");
         return ERR_DM_IPC_WRITE_FAILED;
@@ -1737,7 +1737,7 @@ ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFOS_RESULT, std::shared_ptr<IpcReq> pBas
     return DM_OK;
 }
 
-ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFOS_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");

@@ -114,9 +114,9 @@ public:
     virtual void OnCall(const std::string &paramJson) = 0;
 };
 
-class GetDeviceProfileInfosCallback {
+class GetDeviceProfileInfoListCallback {
 public:
-    virtual ~GetDeviceProfileInfosCallback()
+    virtual ~GetDeviceProfileInfoListCallback()
     {}
     virtual void OnResult(const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) = 0;
 };

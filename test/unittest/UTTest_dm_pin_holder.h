@@ -223,7 +223,7 @@ public:
         (void)deviceList;
     }
 
-    virtual void OnGetDeviceProfileInfosResult(const ProcessInfo &processInfo,
+    virtual void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override
     {
         (void)processInfo;

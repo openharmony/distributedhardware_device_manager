@@ -47,6 +47,10 @@ enum DMBussinessErrorCode {
     DM_ERR_DISCOVERY_INVALID = 11600104,
     // Publish invalid.
     DM_ERR_PUBLISH_INVALID = 11600105,
+    // Get data from cloud failed.
+    DM_ERR_FROM_CLOUD_FAILED = 11600106,
+    // Need Login.
+    DM_ERR_NEED_LOGIN = 11600107,
 };
 void DeviceBasicInfoToJsArray(const napi_env &env,
                               const std::vector<DmDeviceBasicInfo> &vecDevInfo,

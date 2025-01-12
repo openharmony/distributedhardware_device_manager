@@ -40,7 +40,7 @@ typedef struct DmServiceProfileInfo {
 
 typedef struct DmDeviceProfileInfoFilterOptions {
     bool isCloud;
-    std::vector<std::string> deviceIds = {};
+    std::vector<std::string> deviceIdList = {};
 } DmDeviceProfileInfoFilterOptions;
 
 typedef struct DmDeviceProfileInfo {
