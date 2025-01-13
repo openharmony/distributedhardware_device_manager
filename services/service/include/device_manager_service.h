@@ -217,11 +217,10 @@ public:
 
 private:
     bool IsDMServiceImplReady();
-    bool IsDMServiceAdapterLoad();
     bool IsDMImplSoLoaded();
+    bool IsDMServiceAdapterSoLoaded();
     bool IsDMServiceAdapterResidentLoad();
     void UnloadDMServiceImplSo();
-    void UnloadDMServiceAdapter();
     void UnloadDMServiceAdapterResident();
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
         int32_t bindLevel);
@@ -294,11 +293,9 @@ private:
 
 private:
     bool isImplsoLoaded_ = false;
-    bool isAdapterSoLoaded_ = false;
     bool isAdapterResidentSoLoaded_ = false;
     void *residentSoHandle_ = nullptr;
     std::mutex isImplLoadLock_;
-    std::mutex isAdapterLoadLock_;
     std::mutex isAdapterResidentLoadLock_;
     std::mutex hichainListenerLock_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
@@ -307,7 +304,6 @@ private:
     std::shared_ptr<HichainListener> hichainListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
-    std::shared_ptr<IDMServiceImplExt> dmServiceImplExt_;
     std::shared_ptr<IDMServiceImplExtResident> dmServiceImplExtResident_;
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;
