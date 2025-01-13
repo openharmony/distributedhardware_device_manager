@@ -611,18 +611,12 @@ void DmAuthManager::ProcessSinkMsg()
             }
             break;
         case MSG_TYPE_REQ_PUBLICKEY:
-            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_AUTH_FINISH ||
-                authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_RECHECK_MSG) {
-                authResponseState_->TransitionTo(std::make_shared<AuthResponseCredential>());
-            }
-            if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
-                std::lock_guard<std::mutex> lock(srcReqMsgLock_);
-                isNeedProcCachedSrcReqMsg_ = true;
-            }
+            ProcessReqPublicKey();
             break;
         case MSG_TYPE_REQ_RECHECK_MSG:
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_AUTH_FINISH) {
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseReCheckMsg>());
+                break;
             }
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
                 std::lock_guard<std::mutex> lock(srcReqMsgLock_);
@@ -2048,14 +2042,14 @@ void DmAuthManager::ResponseCredential()
         isFinishOfLocal_ = false;
         authMessageProcessor_->SetEncryptFlag(false);
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authResponseContext_->sessionId);
+        return;
     }
     std::string publicKey = "";
     GenerateCredential(publicKey);
     if (ImportCredential(remoteDeviceId_, authResponseContext_->publicKey) != DM_OK) {
         LOGE("ResponseCredential import credential failed.");
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(authResponseContext_->sessionId);
+        return;
     }
     authResponseContext_->publicKey = publicKey;
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_PUBLICKEY);
@@ -2851,8 +2845,6 @@ void DmAuthManager::ResponseReCheckMsg()
         authMessageProcessor_->SetEncryptFlag(false);
         int32_t sessionId = authResponseContext_->sessionId;
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
-        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
         return;
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
@@ -2923,6 +2915,19 @@ int32_t DmAuthManager::RegisterAuthenticationType(int32_t authenticationType)
     }
     authenticationType_ = authenticationType;
     return DM_OK;
+}
+
+void DmAuthManager::ProcessReqPublicKey()
+{
+    if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_AUTH_FINISH ||
+        authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_RECHECK_MSG) {
+        authResponseState_->TransitionTo(std::make_shared<AuthResponseCredential>());
+        return;
+    }
+    if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
+        std::lock_guard<std::mutex> lock(srcReqMsgLock_);
+        isNeedProcCachedSrcReqMsg_ = true;
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -557,6 +557,7 @@ private:
     void ConverToFinish();
     bool IsSinkMsgValid();
     bool IsSourceMsgValid();
+    void ProcessReqPublicKey();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
