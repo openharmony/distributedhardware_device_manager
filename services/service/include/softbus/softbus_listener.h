@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "softbus_bus_center.h"
+#include "dm_anonymous.h"
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_radar_helper.h"
@@ -102,6 +103,7 @@ public:
 
     int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
 private:
+    static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj);
     int32_t InitSoftPublishLNN();
 
 private:
