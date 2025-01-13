@@ -1158,6 +1158,14 @@ HWTEST_F(DeviceManagerServiceTest, SendUserIdsByWifi_201, testing::ext::TestSize
         backgroundUserIds);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
+
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName_004";
+    EXPECT_CALL(*deviceManagerServiceImplMock_, StopAuthenticateDevice(_)).WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
