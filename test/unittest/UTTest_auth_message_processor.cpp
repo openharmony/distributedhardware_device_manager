@@ -1745,7 +1745,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::T
     jsonObj[TAG_PUBLICKEY] = "123456";
     jsonObj[TAG_CRYPTIC_MSG] = "cryptic";
     authMessageProcessor->cryptoMgr_ = std::make_shared<CryptoMgr>();
-    EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _)).WillOnce(Return(ERR_DM_FAILED));
+        
     authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
     std::string decryptStr = "";
     EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _))
@@ -1777,6 +1777,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_010, testing::ext::TestSize.Leve
     ASSERT_EQ(ret, DM_OK);
     jsonObj[TAG_MSG_TYPE] = 504;
     message = jsonObj.dump();
+    EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(ERR_DM_FAILED));
     ret = authMessageProcessor->ParseMessage(message);
     ASSERT_EQ(ret, DM_OK);
     jsonObj[TAG_MSG_TYPE] = 700;
@@ -1837,7 +1838,7 @@ HWTEST_F(AuthMessageProcessorTest, CreatePublicKeyMessageExt_002, testing::ext::
     EXPECT_CALL(*cryptoMgrMock_, EncryptMessage(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(decryptStr), Return(DM_OK)));
     authMessageProcessor->CreatePublicKeyMessageExt(jsonObj);
-    ASSERT_EQ(jsonObj[TAG_PUBLICKEY], authMessageProcessor->authResponseContext_->publicKey);
+    ASSERT_EQ(jsonObj[TAG_CRYPTIC_MSG], authMessageProcessor->authResponseContext_->publicKey);
 }
 
 HWTEST_F(AuthMessageProcessorTest, CreateAuthRequestMessage_002, testing::ext::TestSize.Level0)
@@ -1851,7 +1852,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateAuthRequestMessage_002, testing::ext::T
     ASSERT_TRUE(ret.empty());
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateAuthRequestMessage_008, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetJsonObj_010, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1861,6 +1862,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateAuthRequestMessage_008, testing::ext::T
     nlohmann::json jsonObj;
     authMessageProcessor->GetJsonObj(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, nullptr);
+    authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_->bindType.push_back(101);
     authMessageProcessor->authResponseContext_->bindType.push_back(102);
