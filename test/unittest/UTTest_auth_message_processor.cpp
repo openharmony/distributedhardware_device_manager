@@ -31,6 +31,8 @@ namespace DistributedHardware {
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
 constexpr const char* TAG_HOST = "HOST";
 
+using namespace testing;
+using namespace testing::ext;
 class CryptoAdapterTest : public ICryptoAdapter {
 public:
     CryptoAdapterTest() {}

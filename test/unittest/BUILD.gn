@@ -1088,7 +1088,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
 ohos_unittest("UTTest_auth_message_processor") {
   module_out_path = module_out_path
 
-  sources = [ 
+  sources = [
     "UTTest_auth_message_processor.cpp",
     "mock/crypto_mgr_mock.cpp",
   ]
