@@ -1728,7 +1728,8 @@ HWTEST_F(AuthMessageProcessorTest, ParseReqReCheckMessage_001, testing::ext::Tes
     ASSERT_NE(authMessageProcessor->authResponseContext_, nullptr);
 
     decryptStr = jsonObj.dump();
-    EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _)).WillOnce(DoAll(SetArgReferee<1>(decryptStr), Return(DM_OK)));
+    EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _)).Times(::testing::AtLeast(2))
+        .WillOnce(DoAll(SetArgReferee<1>(decryptStr), Return(DM_OK)));
     authMessageProcessor->ParseReqReCheckMessage(jsonObj);
     ASSERT_NE(authMessageProcessor->authResponseContext_, nullptr);
 }
