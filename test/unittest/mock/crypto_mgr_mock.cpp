@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,26 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DEVICE_MESSAGE_TEST_H
-#define OHOS_DEVICE_MESSAGE_TEST_H
-
-#include <memory>
-#include <vector>
-#include <gtest/gtest.h>
-#include "nlohmann/json.hpp"
-#include "auth_message_processor.h"
 #include "crypto_mgr_mock.h"
+
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthMessageProcessorTest : public testing::Test {
-public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
-    static inline std::shared_ptr<CryptoMgrMock> cryptoMgrMock_ = std::make_shared<CryptoMgrMock>();
-};
+int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outputMsg)
+{
+    return DmCryptoMgr::dmCryptoMgr->EncryptMessage(inputMsg, outputMsg);
+}
+
+int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outputMsg)
+{
+    return DmCryptoMgr::dmCryptoMgr->DecryptMessage(inputMsg, outputMsg);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DEVICE_MESSAGE_TEST_H
