@@ -12,31 +12,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_DM_SOFTBUS_CACHE_TEST_H
-#define OHOS_DM_SOFTBUS_CACHE_TEST_H
+#ifndef OHOS_UTTEST_SOFTBUS_LISTENER_TWO_H
+#define OHOS_UTTEST_SOFTBUS_LISTENER_TWO_H
 
 #include <gtest/gtest.h>
-#include <memory>
 #include <refbase.h>
-
+#include <map>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
-#include "device_manager_service.h"
-#include "device_manager_service_listener.h"
-#include "device_manager_service_impl.h"
-#include "common_event_support.h"
-#include "dm_softbus_error_code.h"
+#include "softbus_bus_center.h"
+#include "softbus_listener.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DMSoftbusCacheTest : public testing::Test {
+class SoftbusListenerTwoTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
 };
+
+class ISoftbusDiscoveringCallbackTest : public ISoftbusDiscoveringCallback {
+public:
+    virtual ~ISoftbusDiscoveringCallbackTest()
+    {
+    }
+    void OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline) override
+    {
+        (void)pkgName;
+        (void)info;
+        (void)isOnline;
+    }
+    void OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result) override
+    {
+        (void)pkgName;
+        (void)subscribeId;
+        (void)result;
+    }
+};
+
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif

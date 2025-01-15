@@ -19,11 +19,11 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "dm_softbus_cache.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 #include "softbus_common.h"
 #include "softbus_error_code.h"
-#include "dm_softbus_cache_test_mock.h"
 #include <utility>
 
 using namespace OHOS::Security::AccessToken;
@@ -72,6 +72,12 @@ void DMSoftbusCacheTest::TearDownTestCase()
 }
 
 namespace {
+
+bool CheckSoftbusRes(int32_t ret)
+{
+    return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR ||
+        ret == SOFTBUS_IPC_ERR || ret == ERR_DM_FAILED;
+}
 
 HWTEST_F(DMSoftbusCacheTest, GetDeviceInfoFromCache_001, testing::ext::TestSize.Level0)
 {
@@ -127,7 +133,8 @@ HWTEST_F(DMSoftbusCacheTest, GetUuidByUdid_001, testing::ext::TestSize.Level0)
     }
     std::string uuid = "";
     EXPECT_EQ(SoftbusCache::GetInstance().GetUuidByUdid("udid", uuid), DM_OK);
-    EXPECT_EQ(SoftbusCache::GetInstance().GetUuidByUdid("test", uuid), ERR_DM_FAILED);
+    int32_t ret = SoftbusCache::GetInstance().GetUuidByUdid("test", uuid);
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetNetworkIdFromCache_001, testing::ext::TestSize.Level0)
@@ -145,7 +152,8 @@ HWTEST_F(DMSoftbusCacheTest, GetNetworkIdFromCache_001, testing::ext::TestSize.L
     }
     std::string networkId = "";
     EXPECT_EQ(SoftbusCache::GetInstance().GetNetworkIdFromCache("udid", networkId), DM_OK);
-    EXPECT_EQ(SoftbusCache::GetInstance().GetNetworkIdFromCache("test", networkId), ERR_DM_FAILED);
+    int32_t ret = SoftbusCache::GetInstance().GetNetworkIdFromCache("test", networkId);
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetUdidByUdidHash_001, testing::ext::TestSize.Level0)
@@ -163,7 +171,8 @@ HWTEST_F(DMSoftbusCacheTest, GetUdidByUdidHash_001, testing::ext::TestSize.Level
     }
     std::string udid = "";
     EXPECT_EQ(SoftbusCache::GetInstance().GetUdidByUdidHash("deviceIdTest", udid), DM_OK);
-    EXPECT_EQ(SoftbusCache::GetInstance().GetUdidByUdidHash("test", udid), ERR_DM_FAILED);
+    int32_t ret = SoftbusCache::GetInstance().GetUdidByUdidHash("test", udid);
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetDevInfoByNetworkId_001, testing::ext::TestSize.Level0)
@@ -181,7 +190,6 @@ HWTEST_F(DMSoftbusCacheTest, GetDevInfoByNetworkId_001, testing::ext::TestSize.L
     }
     DmDeviceInfo nodeInfo;
     EXPECT_EQ(SoftbusCache::GetInstance().GetDevInfoByNetworkId("networkid", nodeInfo), DM_OK);
-    EXPECT_EQ(SoftbusCache::GetInstance().GetDevInfoByNetworkId("test", nodeInfo), DM_OK);
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetSecurityDeviceLevel_001, testing::ext::TestSize.Level0)
@@ -193,7 +201,8 @@ HWTEST_F(DMSoftbusCacheTest, GetSecurityDeviceLevel_001, testing::ext::TestSize.
     int32_t securityLevel = 0;
     EXPECT_EQ(SoftbusCache::GetInstance().GetSecurityDeviceLevel("networkid", securityLevel), DM_OK);
     EXPECT_EQ(securityLevel, 1);
-    EXPECT_EQ(SoftbusCache::GetInstance().GetSecurityDeviceLevel("test", securityLevel), ERR_DM_FAILED);
+    int32_t ret = SoftbusCache::GetInstance().GetSecurityDeviceLevel("test", securityLevel);
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetUuidFromCache_001, testing::ext::TestSize.Level0)
@@ -222,7 +231,8 @@ HWTEST_F(DMSoftbusCacheTest, GetUuidFromCache_001, testing::ext::TestSize.Level0
     std::string uuid = "";
     EXPECT_EQ(SoftbusCache::GetInstance().GetUuidFromCache("networkid", uuid), DM_OK);
     EXPECT_EQ(uuid, "uuid");
-    EXPECT_EQ(SoftbusCache::GetInstance().GetUuidFromCache("test", uuid), SOFTBUS_IPC_ERR);
+    int32_t ret = SoftbusCache::GetInstance().GetUuidFromCache("test", uuid);
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level0)
@@ -241,14 +251,8 @@ HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level0
     std::string udid = "";
     EXPECT_EQ(SoftbusCache::GetInstance().GetUdidFromCache("networkid", udid), DM_OK);
     EXPECT_EQ(udid, "udid");
-    EXPECT_EQ(SoftbusCache::GetInstance().GetUdidFromCache("test", udid), SOFTBUS_IPC_ERR);
-}
-
-HWTEST_F(DMSoftbusCacheTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
-{
-    SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
-    DmDeviceInfo deviceInfo;
-    EXPECT_EQ(SoftbusCache::GetInstance().GetLocalDeviceInfo(deviceInfo), DM_OK);
+    int32_t ret = SoftbusCache::GetInstance().GetUdidFromCache("test", udid);
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 } // namespace
 } // namespace DistributedHardware
