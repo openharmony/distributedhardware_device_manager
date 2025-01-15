@@ -1088,7 +1088,10 @@ ohos_unittest("UTTest_device_manager_service_listener") {
 ohos_unittest("UTTest_auth_message_processor") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_auth_message_processor.cpp" ]
+  sources = [
+    "UTTest_auth_message_processor.cpp",
+    "mock/crypto_mgr_mock.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -1099,6 +1102,7 @@ ohos_unittest("UTTest_auth_message_processor") {
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 }
 
