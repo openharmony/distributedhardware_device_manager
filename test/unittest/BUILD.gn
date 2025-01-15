@@ -52,6 +52,7 @@ group("unittest") {
     ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_screen_common_event",
     ":UTTest_dm_service_load",
+    ":UTTest_dm_softbus_cache",
     ":UTTest_dm_timer",
     ":UTTest_dm_transport",
     ":UTTest_dm_transport_msg",
@@ -361,6 +362,34 @@ ohos_unittest("UTTest_device_manager_service") {
 }
 
 ## UnitTest UTTest_device_manager_service }}}
+
+## UnitTest UTTest_dm_softbus_cache {{{
+ohos_unittest("UTTest_dm_softbus_cache") {
+  module_out_path = module_out_path
+
+  sources = [
+    "UTTest_dm_softbus_cache.cpp",
+    "mock/dm_softbus_cache_test_mock.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+  ]
+}
+
+## UnitTest UTTest_dm_softbus_cache }}}
 
 ## UnitTest UTTest_device_manager_service_three {{{
 ohos_unittest("UTTest_device_manager_service_three") {
