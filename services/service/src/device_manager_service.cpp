@@ -741,7 +741,7 @@ void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
     }
-    if (IsDMServiceAdapterSoLoaded()) {
+    if (IsDMServiceAdapterResidentLoad()) {
         dmServiceImplExtResident_->HandleDeviceStatusChange(devState, devInfo);
     }
 }
@@ -1661,7 +1661,7 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         } else if (beforeUserId != -1 && currentUserId != -1) {
             HandleUserSwitched(currentUserId, beforeUserId);
         }
-        if (IsDMServiceAdapterSoLoaded()) {
+        if (IsDMServiceAdapterResidentLoad()) {
             dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
         }
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
@@ -1690,7 +1690,7 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
 {
     LOGI("UserId: %{public}d, accountId: %{public}s, accountName: %{public}s", userId,
         GetAnonyString(accountId).c_str(), GetAnonyString(accountName).c_str());
-    if (IsDMServiceAdapterSoLoaded()) {
+    if (IsDMServiceAdapterResidentLoad()) {
         dmServiceImplExtResident_->AccountIdLogout(userId, accountId);
     }
     if (!IsDMServiceImplReady()) {
@@ -1925,7 +1925,7 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceNotTrust(udid);
     }
-    if (IsDMServiceAdapterSoLoaded()) {
+    if (IsDMServiceAdapterResidentLoad()) {
         dmServiceImplExtResident_->HandleDeviceNotTrust(udid);
     }
     return;
