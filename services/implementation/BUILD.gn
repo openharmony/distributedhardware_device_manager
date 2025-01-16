@@ -216,6 +216,7 @@ if (defined(ohos_lite)) {
       "access_token:libaccesstoken_sdk",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "c_utils:utils",
       "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",

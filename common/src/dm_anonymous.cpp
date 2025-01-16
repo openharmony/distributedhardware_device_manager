@@ -16,6 +16,7 @@
 #include "dm_anonymous.h"
 #include "dm_log.h"
 #include <sstream>
+#include "cJSON.h"
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
@@ -398,7 +399,7 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
 void DeleteArrayPtr(const char* arrPtr)
 {
     if (arrPtr != nullptr) {
-        delete[] arrPtr;
+        cJSON_free(arrPtr);
         arrPtr = nullptr;
     }
 }
