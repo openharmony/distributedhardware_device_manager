@@ -26,7 +26,7 @@ namespace DistributedHardware {
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::dmDeviceAuthCallback_ = nullptr;
 std::mutex HiChainAuthConnector::dmDeviceAuthCallbackMutex_;
 
-static void FreeJsonString(const char *jsonStr)
+static void FreeJsonString(char *jsonStr)
 {
     if (jsonStr != nullptr) {
         cJSON_free(jsonStr);
@@ -91,7 +91,7 @@ int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string aut
     }
     return DM_OK;
 }
- 
+
 bool HiChainAuthConnector::onTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen)
 {
     LOGI("AuthDevice onTransmit, requestId %{public}" PRId64, requestId);
