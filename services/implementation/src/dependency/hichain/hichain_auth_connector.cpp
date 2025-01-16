@@ -26,7 +26,7 @@ namespace DistributedHardware {
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::dmDeviceAuthCallback_ = nullptr;
 std::mutex HiChainAuthConnector::dmDeviceAuthCallbackMutex_;
 
-static void FreeJsonString(char *jsonStr)
+void HiChainAuthConnector::FreeJsonString(char *jsonStr)
 {
     if (jsonStr != nullptr) {
         cJSON_free(jsonStr);
