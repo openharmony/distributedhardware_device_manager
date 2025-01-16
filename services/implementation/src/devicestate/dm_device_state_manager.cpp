@@ -103,6 +103,10 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
 {
     LOGI("DmDeviceStateManager::OnDeviceOnline, deviceId = %{public}s", GetAnonyString(deviceId).c_str());
     DmDeviceInfo devInfo = softbusConnector_->GetDeviceInfoByDeviceId(deviceId);
+    if (devInfo.deviceId[0] == '\0') {
+        LOGE("deviceId is empty.");
+        return;
+    }
     devInfo.authForm = static_cast<DmAuthForm>(authForm);
     {
         std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
