@@ -25,7 +25,6 @@ namespace OHOS { class MessageParcel; }
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(IpcCmdRegister);
-constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
 constexpr int32_t ERR_DM_UNSUPPORTED_IPC_COMMAND = 96929757;
 constexpr int32_t ERR_DM_POINT_NULL = 96929748;
