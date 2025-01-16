@@ -1685,27 +1685,6 @@ HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceImplSo_001, testing::ext::Test
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterLoad_001, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    DeviceManagerService::GetInstance().IsDMServiceAdapterLoad();
-    bool ret = DeviceManagerService::GetInstance().IsDMServiceImplReady();
-    EXPECT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceAdapter_001, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().UnloadDMServiceAdapter();
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceAdapter_002, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().dmServiceImplExt_ = nullptr;
-    DeviceManagerService::GetInstance().UnloadDMServiceAdapter();
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
 HWTEST_F(DeviceManagerServiceTest, StartDiscovering_001, testing::ext::TestSize.Level0)
 {
     DeletePermission();
