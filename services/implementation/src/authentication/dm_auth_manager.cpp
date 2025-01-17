@@ -1326,6 +1326,7 @@ void DmAuthManager::SinkAuthenticateFinish()
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
     }
     authResponseState_ = nullptr;
+    authTimes_ = 0;
 }
 
 void DmAuthManager::SrcAuthenticateFinish()
