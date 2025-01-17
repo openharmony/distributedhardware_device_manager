@@ -1579,6 +1579,12 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
     EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123456"));
     bool rets = authManager_->IsIdenticalAccount();
     ASSERT_FALSE(rets);
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
+    EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(true)));
+    ret = authManager_->GetAccountGroupIdHash();
+    ASSERT_FALSE(ret.empty());
 }
 
 HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
@@ -1610,6 +1616,7 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
     std::vector<int32_t> bindType;
     bindType.push_back(101);
     bindType.push_back(102);
+    EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).Times(::testing::AtLeast(1)).WillOnce(Return(true));
     EXPECT_CALL(*deviceProfileConnectorMock_, SyncAclByBindType(_, _, _, _)).WillOnce(Return(bindType));
     authManager_->ProcessAuthRequestExt(sessionId);
 }
@@ -1671,11 +1678,26 @@ HWTEST_F(DmAuthManagerTest, ParseConnectAddr_202, testing::ext::TestSize.Level0)
     targetId.bleMac = "1463158131321";
     std::string deviceId;
     std::string addrType;
+    targetId.deviceId = "dsklalsk556";
     int32_t ret = authManager_->ParseConnectAddr(targetId, deviceId, addrType);
     ASSERT_EQ(ret, DM_OK);
 
     targetId.brMac = "";
     ret = authManager_->ParseConnectAddr(targetId, deviceId, addrType);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, BindTarget_006, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    PeerTargetId targetId;
+    targetId.brMac = "D4G4E5G24D5S";
+    targetId.bleMac = "1463158131321";
+    targetId.deviceId = "";
+    std::map<std::string, std::string> bindParam;
+    bindParam.insert(std::pair<std::string, std::string>("AUTH_TYPE", "2"));
+    bindParam.insert(std::pair<std::string, std::string>("CONN_ADDR_TYPE", "3"));
+    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam);
     ASSERT_EQ(ret, DM_OK);
 }
 } // namespace

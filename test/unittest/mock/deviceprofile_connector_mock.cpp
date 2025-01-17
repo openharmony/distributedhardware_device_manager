@@ -59,6 +59,8 @@ bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localU
 
 OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
     const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
+OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
+    const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid,
         tokenId, localUdid);

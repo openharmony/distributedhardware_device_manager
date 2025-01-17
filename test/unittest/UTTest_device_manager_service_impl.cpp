@@ -1855,14 +1855,14 @@ HWTEST_F(DeviceManagerServiceImplTest, GetTokenIdByNameAndDeviceId_001, testing:
     int32_t tokenId = 0;
     int32_t peerTokenId = 1;
     ProcessInfo processInfo;
-    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(processInfo));
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _, _)).WillOnce(Return(processInfo));
     deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, peerTokenId);
 
     processInfo.pkgName = "pkgName";
     if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
-    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(processInfo));
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _, _)).WillOnce(Return(processInfo));
     deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, peerTokenId);
 
     int32_t bindType = 1;
@@ -1871,6 +1871,21 @@ HWTEST_F(DeviceManagerServiceImplTest, GetTokenIdByNameAndDeviceId_001, testing:
     int32_t localUserId = 1;
     std::string localAccountId = "localAccountId";
     deviceManagerServiceImpl_->HandleDeviceUnBind(bindType, peerUdid, localUdid, localUserId, localAccountId);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, RegisterAuthenticationType_001, testing::ext::TestSize.Level0)
+{
+    int32_t authenticationType = 1;
+    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    int32_t ret = deviceManagerServiceImpl_->RegisterAuthenticationType(authenticationType);
+    EXPECT_EQ(ret, DM_OK);
+
+    std::vector<int32_t> localUserIds;
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForRemoteUserRemoved(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(localUserIds), Return()));
+    deviceManagerServiceImpl_->HandleRemoteUserRemoved(userId, remoteUdid);
 }
 } // namespace
 } // namespace DistributedHardware

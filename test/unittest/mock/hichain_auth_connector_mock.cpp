@@ -28,5 +28,10 @@ int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, s
 {
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthDevice(pinCode, osAccountId, udid, requestId);
 }
+
+int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string deviceId, std::string publicKey)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->ImportCredential(osAccountId, deviceId, publicKey);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

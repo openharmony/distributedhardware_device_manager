@@ -770,6 +770,13 @@ HWTEST_F(DmAuthManagerTest, ResponseCredential001, testing::ext::TestSize.Level0
 {
     authManager_->ResponseCredential();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
+
+    authManager_->authResponseContext_->publicKey == "publicKey";
+    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    ASSERT_EQ(authManager_->isAuthDevice_, false);
+
+    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(DM_OK));
+    ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthDeviceTransmit001, testing::ext::TestSize.Level0)
@@ -1545,6 +1552,16 @@ HWTEST_F(DmAuthManagerTest, RespNegotiate_101, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_->bindLevel = 0;
     authManager_->RespNegotiate(requestId);
     ASSERT_NE(authManager_->authResponseContext_, nullptr);
+
+    authManager_->authResponseContext_->edition = "";
+    authManager_->authResponseContext_->bindLevel = 1;
+    authManager_->timer_ = std::make_shared<DmTimer>();
+    authManager_->RespNegotiate(requestId);
+    ASSERT_NE(authManager_->authResponseContext_, nullptr);
+
+    authManager_->authResponseContext_->bindLevel = 5;
+    authManager_->RespNegotiate(requestId);
+    ASSERT_NE(authManager_->authResponseContext_, nullptr);
 }
 
 HWTEST_F(DmAuthManagerTest, SendAuthRequest_101, testing::ext::TestSize.Level0)
@@ -1766,6 +1783,11 @@ HWTEST_F(DmAuthManagerTest, RequestCredentialDone_003, testing::ext::TestSize.Le
     authManager_->authResponseContext_->publicKey = "";
     authManager_->RequestCredentialDone();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
+
+    authManager_->authResponseContext_->publicKey = "publicKey";
+    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    authManager_->RequestCredentialDone();
+    ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthDevice_003, testing::ext::TestSize.Level0)
@@ -1853,11 +1875,33 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
     int32_t ret = authManager_->StopAuthenticateDevice(pkgName);
     ASSERT_EQ(ret, DM_OK);
 
+    authManager_->authRequestContext_->hostPkgName = "";
+    ret = authManager_->StopAuthenticateDevice(pkgName);
+    ASSERT_EQ(ret, DM_OK);
+
     nlohmann::json jsonObject;
     jsonObject["PEER_BUNDLE_NAME"] = "";
     authManager_->authRequestContext_->hostPkgName = "hostPkgName";
     authManager_->ParseJsonObject(jsonObject);
-}
+
+    int32_t sessionId = 1;
+    authManager_->remoteUdidHash_ = "remoteUdidhash";
+    authManager_->DeleteOffLineTimer(sessionId);
+
+    authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
+    authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    int32_t sessionId = 1;
+    std::string message;
+    authManager_->authResponseContext_->sessionId = sessionId;
+    nlohmann::json jsonObject;
+    jsonObject[TAG_MSG_TYPE] = 800;
+    message = jsonObject.dump();
+    authManager_->authResponseState_ = nullptr;
+    authManager_->OnDataReceived(sessionId, message);
+
+    authManager_->authRequestState_ = nullptr;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseNegotiateState>();
+    authManager_->OnDataReceived(sessionId, message);
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

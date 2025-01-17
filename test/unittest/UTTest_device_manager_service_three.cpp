@@ -443,6 +443,16 @@ HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteLocalUserSwitchByWifi_301, t
         foregroundUserIds, backgroundUserIds);
     EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
 }
+
+HWTEST_F(DeviceManagerServiceThreeTest, RegisterAuthenticationType_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> authParam;
+    authParam.insert(std::make_pair(DM_AUTHENTICATION_TYPE, "123456"));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
+    EXPECT_EQ(ret, ERR_DM_INIT_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
