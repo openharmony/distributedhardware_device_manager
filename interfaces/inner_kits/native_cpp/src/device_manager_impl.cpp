@@ -48,7 +48,6 @@
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
-#include "ipc_model_codec.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_permission_req.h"
 #include "ipc_publish_req.h"
@@ -64,6 +63,7 @@
 #include "ipc_unpublish_req.h"
 #include "securec.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ipc_model_codec.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #endif
