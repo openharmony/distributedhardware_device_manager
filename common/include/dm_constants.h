@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -122,7 +122,13 @@ enum {
     ERR_DM_SAVE_SESSION_KEY_FAILED = 96929821,
     ERR_DM_CRYPTO_OPT_FAILED = 96929822,
     ERR_DM_CRYPTO_PARA_INVALID = 96929823,
-    ERR_DM_SECURITY_FUNC_FAILED = 96929824
+    ERR_DM_SECURITY_FUNC_FAILED = 96929824,
+    ERR_DM_MAX_SIZE_FAIL = 96929825,
+    ERR_DM_HILINKSVC_RSP_PARSE_FAILD = 96929826,
+    ERR_DM_HILINKSVC_REPLY_FAILED = 96929827,
+    ERR_DM_HILINKSVC_ICON_URL_EMPTY = 96929828,
+    ERR_DM_HILINKSVC_DISCONNECT = 96929829,
+    ERR_DM_WISE_NEED_LOGIN = 96929830
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -277,6 +283,10 @@ const std::string CREATE_PINHOLDER = "CreatePinHolder";
 const std::string DESTROY_PINHOLDER = "DestroyPinHolder";
 const std::string SET_DNPOLICY = "SetDnPolicy";
 const std::string BIND_FOR_DEVICE_LEVEL = "BindForDeviceLevel";
+
+// wise device
+constexpr int32_t MAX_DEVICE_PROFILE_SIZE = 500;
+constexpr int32_t MAX_CONTAINER_SIZE = 500;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

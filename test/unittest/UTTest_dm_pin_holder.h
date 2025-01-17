@@ -222,6 +222,14 @@ public:
         (void)processInfo;
         (void)deviceList;
     }
+
+    virtual void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
+        const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override
+    {
+        (void)processInfo;
+        (void)deviceProfileInfos;
+        (void)code;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

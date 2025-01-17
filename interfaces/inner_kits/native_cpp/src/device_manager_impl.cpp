@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,7 @@
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
@@ -62,6 +63,7 @@
 #include "ipc_unpublish_req.h"
 #include "securec.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ipc_model_codec.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #endif
@@ -2578,6 +2580,35 @@ int32_t DeviceManagerImpl::RegisterAuthenticationType(const std::string &pkgName
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
+    const DmDeviceProfileInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
+{
+    LOGI("In pkgName:%{public}s, isCloud:%{public}d", pkgName.c_str(), filterOptions.isCloud);
+    int32_t ret = DeviceManagerNotify::GetInstance().RegisterGetDeviceProfileInfoListCallback(pkgName, callback);
+    if (ret != DM_OK) {
+        LOGE("register callback error, ret: %{public}d", ret);
+        return ret;
+    }
+    std::shared_ptr<IpcGetDeviceProfileInfoListReq> req = std::make_shared<IpcGetDeviceProfileInfoListReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFilterOptions(filterOptions);
+    ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFO_LIST, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
         return ret;
     }
     LOGI("Completed");

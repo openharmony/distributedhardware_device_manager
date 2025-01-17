@@ -35,6 +35,8 @@ const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
 const std::string ERR_MESSAGE_AUTHENTICALTION_INVALID = "Authentication invalid.";
 const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
 const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
+const std::string ERR_MESSAGE_FROM_CLOUD_FAILED = "Get data from cloud failed.";
+const std::string ERR_MESSAGE_NEED_LOGIN = "A login account is required.";
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
@@ -83,6 +85,8 @@ void JsObjectToBool(const napi_env &env, const napi_value &object, const std::st
         napi_get_value_bool(env, field, &fieldRef);
     } else {
         LOGE("devicemanager napi js to bool no property: %{public}s", fieldStr.c_str());
+        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + " no property " + fieldStr;
+        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
     }
 }
 
@@ -205,6 +209,7 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             break;
         case ERR_DM_INPUT_PARA_INVALID:
         case ERR_DM_UNSUPPORTED_AUTH_TYPE:
+        case ERR_DM_MAX_SIZE_FAIL:
             error = CreateErrorForCall(env, ERR_INVALID_PARAMS, ERR_MESSAGE_INVALID_PARAMS, isAsync);
             break;
         case ERR_DM_INIT_FAILED:
@@ -212,6 +217,15 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             break;
         case ERR_NOT_SYSTEM_APP:
             error = CreateErrorForCall(env, ERR_NOT_SYSTEM_APP, ERR_MESSAGE_NOT_SYSTEM_APP, isAsync);
+            break;
+        case ERR_DM_HILINKSVC_RSP_PARSE_FAILD:
+        case ERR_DM_HILINKSVC_REPLY_FAILED:
+        case ERR_DM_HILINKSVC_ICON_URL_EMPTY:
+        case ERR_DM_HILINKSVC_DISCONNECT:
+            error = CreateErrorForCall(env, DM_ERR_FROM_CLOUD_FAILED, ERR_MESSAGE_FROM_CLOUD_FAILED, isAsync);
+            break;
+        case ERR_DM_WISE_NEED_LOGIN:
+            error = CreateErrorForCall(env, DM_ERR_NEED_LOGIN, ERR_MESSAGE_NEED_LOGIN, isAsync);
             break;
         default:
             error = CreateErrorForCall(env, DM_ERR_FAILED, ERR_MESSAGE_FAILED, isAsync);
@@ -472,6 +486,142 @@ bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &value
     }
     strValue = temp;
     return true;
+}
+
+void JsObjectToStrVector(const napi_env &env, const napi_value &object, const std::string &fieldStr,
+    std::vector<std::string> &fieldRef)
+{
+    bool hasProperty = false;
+    NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
+    if (!hasProperty) {
+        LOGE("no property: %{public}s", fieldStr.c_str());
+        return;
+    }
+
+    napi_value field = nullptr;
+    napi_get_named_property(env, object, fieldStr.c_str(), &field);
+    bool isArr = false;
+    napi_is_array(env, field, &isArr);
+    if (!isArr) {
+        LOGE("property: %{public}s is not array", fieldStr.c_str());
+        return;
+    }
+    uint32_t length = 0;
+    napi_get_array_length(env, field, &length);
+    for (size_t i = 0; i < length; i++) {
+        napi_value element;
+        napi_get_element(env, field, i, &element);
+        size_t strLen = 0;
+        napi_get_value_string_utf8(env, element, nullptr, 0, &strLen);
+        if (strLen == 0) {
+            continue;
+        }
+        char buf[DEVICE_UUID_LENGTH] = {0};
+        napi_get_value_string_utf8(env, element, buf, strLen + 1, &strLen);
+        fieldRef.emplace_back(buf);
+    }
+}
+
+void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value &object,
+    DmDeviceProfileInfoFilterOptions &info)
+{
+    napi_valuetype filterOptionsType;
+    napi_typeof(env, object, &filterOptionsType);
+    if (filterOptionsType != napi_object) {
+        LOGE("filterOptions is not object");
+        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + " The type of filterOptions must be object";
+        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
+        return;
+    }
+    bool isCloud = false;
+    JsObjectToBool(env, object, "isCloud", isCloud);
+    info.isCloud = isCloud;
+    std::vector<std::string> deviceIdList;
+    JsObjectToStrVector(env, object, "deviceIdList", deviceIdList);
+    info.deviceIdList = deviceIdList;
+}
+
+void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
+    napi_value &arrayResult)
+{
+    for (unsigned int i = 0; i < svrInfos.size(); i++) {
+        napi_value item = nullptr;
+        napi_create_object(env, &item);
+        SetValueUtf8String(env, "deviceId", svrInfos[i].deviceId, item);
+        SetValueUtf8String(env, "serviceId", svrInfos[i].serviceId, item);
+        SetValueUtf8String(env, "serviceType", svrInfos[i].serviceType, item);
+        napi_value data = nullptr;
+        napi_create_object(env, &data);
+        for (const auto& [key, value] : svrInfos[i].data) {
+            SetValueUtf8String(env, key, value, data);
+        }
+        napi_set_named_property(env, item, "data", data);
+        napi_status status = napi_set_element(env, arrayResult, i, item);
+        if (status != napi_ok) {
+            LOGE("DmServiceProfileInfoToJsArray To JsArray set element error: %{public}d", status);
+        }
+    }
+}
+
+void DmProductInfoToJs(const napi_env &env, const DmProductInfo &prodInfo, napi_value &jsObj)
+{
+    SetValueUtf8String(env, "prodId", prodInfo.prodId, jsObj);
+    SetValueUtf8String(env, "model", prodInfo.model, jsObj);
+    SetValueUtf8String(env, "prodName", prodInfo.prodName, jsObj);
+    SetValueUtf8String(env, "prodShortName", prodInfo.prodShortName, jsObj);
+}
+
+void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &devInfo, napi_value &jsObj)
+{
+    SetValueUtf8String(env, "deviceId", devInfo.deviceId, jsObj);
+    SetValueUtf8String(env, "deviceSn", devInfo.deviceSn, jsObj);
+    SetValueUtf8String(env, "mac", devInfo.mac, jsObj);
+    SetValueUtf8String(env, "model", devInfo.model, jsObj);
+    SetValueUtf8String(env, "devType", devInfo.devType, jsObj);
+    SetValueUtf8String(env, "manu", devInfo.manu, jsObj);
+    SetValueUtf8String(env, "deviceName", devInfo.deviceName, jsObj);
+    SetValueUtf8String(env, "prodId", devInfo.prodId, jsObj);
+    SetValueUtf8String(env, "subProdId", devInfo.subProdId, jsObj);
+    SetValueUtf8String(env, "hiv", devInfo.hiv, jsObj);
+    SetValueUtf8String(env, "bleMac", devInfo.bleMac, jsObj);
+    SetValueUtf8String(env, "brMac", devInfo.brMac, jsObj);
+    SetValueUtf8String(env, "sleMac", devInfo.sleMac, jsObj);
+    SetValueUtf8String(env, "fwv", devInfo.fwv, jsObj);
+    SetValueUtf8String(env, "hwv", devInfo.hwv, jsObj);
+    SetValueUtf8String(env, "swv", devInfo.swv, jsObj);
+    SetValueInt32(env, "protType", devInfo.protType, jsObj);
+    SetValueInt32(env, "setupType", devInfo.setupType, jsObj);
+    SetValueUtf8String(env, "wiseDeviceId", devInfo.wiseDeviceId, jsObj);
+    SetValueUtf8String(env, "wiseUserId", devInfo.wiseUserId, jsObj);
+    SetValueUtf8String(env, "registerTime", devInfo.registerTime, jsObj);
+    SetValueUtf8String(env, "modifyTime", devInfo.modifyTime, jsObj);
+    SetValueUtf8String(env, "shareTime", devInfo.shareTime, jsObj);
+    SetValueInt32(env, "isLocalDevice", devInfo.isLocalDevice ? 1 : 0, jsObj);
+}
+
+void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,
+    napi_value &arrayResult)
+{
+    for (unsigned int i = 0; i < devInfos.size(); i++) {
+        napi_value item = nullptr;
+        napi_create_object(env, &item);
+        DmDeviceProfileInfoToJs(env, devInfos[i], item);
+        if (!devInfos[i].services.empty()) {
+            napi_value services = nullptr;
+            napi_create_array(env, &services);
+            bool isArray = false;
+            napi_is_array(env, services, &isArray);
+            if (!isArray) {
+                LOGE("napi_create_array failed");
+            }
+            DmServiceProfileInfoToJsArray(env, devInfos[i].services, services);
+            napi_set_named_property(env, item, "services", services);
+        }
+        napi_status status = napi_set_element(env, arrayResult, i, item);
+        if (status != napi_ok) {
+            LOGE("DmDeviceProfileInfo To JsArray set element error: %{public}d", status);
+        }
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

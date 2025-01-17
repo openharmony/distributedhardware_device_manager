@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1241,6 +1241,52 @@ void DeviceManagerNotify::GetCallBack(std::map<DmCommonNotifyEvent, std::set<std
     if (authStatusPkgnameSet.size() > 0) {
         callbackMap[DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY] = authStatusPkgnameSet;
     }
+}
+
+int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
+    std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    if (getDeviceProfileInfoCallback_.size() > MAX_CONTAINER_SIZE) {
+        LOGI("callback map size is more than max size");
+        return ERR_DM_MAX_SIZE_FAIL;
+    }
+    getDeviceProfileInfoCallback_[pkgName] = callback;
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::UnRegisterGetDeviceProfileInfoListCallback(const std::string &pkgName)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    getDeviceProfileInfoCallback_.erase(pkgName);
+    return DM_OK;
+}
+
+void DeviceManagerNotify::OnGetDeviceProfileInfoListResult(const std::string &pkgName,
+    const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
+        return;
+    }
+    LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
+    std::shared_ptr<GetDeviceProfileInfoListCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(bindLock_);
+        if (getDeviceProfileInfoCallback_.count(pkgName) == 0) {
+            LOGE("error, callback not register for pkgName %{public}s.", pkgName.c_str());
+            return;
+        }
+        tempCbk = getDeviceProfileInfoCallback_[pkgName];
+        getDeviceProfileInfoCallback_.erase(pkgName);
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered GetDeviceProfileInfoList callback is nullptr.");
+        return;
+    }
+    tempCbk->OnResult(deviceProfileInfos, code);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 
 #include "device_manager_callback.h"
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
 
@@ -635,6 +636,16 @@ public:
     virtual int32_t UnRegisterSinkBindCallback(const std::string &pkgName) = 0;
     virtual int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam) = 0;
+
+    /**
+     * @brief Query the device list of same account.
+     * @param filterOptions  query parameters.
+     * @param callback       qeury result callback.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
+        const DmDeviceProfileInfoFilterOptions &filterOptions,
+        std::shared_ptr<GetDeviceProfileInfoListCallback> callback) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

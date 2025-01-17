@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "dm_log.h"
 #include "dm_subscribe_info.h"
 #include "dm_publish_info.h"
@@ -32,6 +33,7 @@
 #include "ipc_create_pin_holder_req.h"
 #include "ipc_credential_auth_status_req.h"
 #include "ipc_destroy_pin_holder_req.h"
+#include "ipc_model_codec.h"
 #include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_auth_result_req.h"
 #include "ipc_notify_bind_result_req.h"
@@ -40,6 +42,7 @@
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_get_device_profile_info_list_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_server_client_proxy.h"
@@ -1676,6 +1679,71 @@ ON_IPC_CMD(REG_AUTHENTICATION_TYPE, MessageParcel &data, MessageParcel &reply)
         LOGE("write result failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_DEVICE_PROFILE_INFO_LIST, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    DmDeviceProfileInfoFilterOptions filterOptions;
+    filterOptions.isCloud = data.ReadBool();
+    size_t size = data.ReadUint32();
+    if (size > MAX_DEVICE_PROFILE_SIZE) {
+        LOGE("size more than %{public}d,", MAX_DEVICE_PROFILE_SIZE);
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (size > 0) {
+        for (uint32_t i = 0; i < size; i++) {
+            std::string item = data.ReadString();
+            filterOptions.deviceIdList.emplace_back(item);
+        }
+    }
+    int32_t result = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFO_LIST_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyGetDeviceProfileInfoListReq> pReq =
+        std::static_pointer_cast<IpcNotifyGetDeviceProfileInfoListReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    int32_t result = pReq->GetResult();
+    if (!data.WriteInt32(result)) {
+        LOGE("write result code failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    std::vector<DmDeviceProfileInfo> deviceProfileInfos = pReq->GetDeviceProfileInfoList();
+    if (!data.WriteInt32((int32_t)deviceProfileInfos.size())) {
+        LOGE("write device list size failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    for (const auto &devInfo : deviceProfileInfos) {
+        if (!IpcModelCodec::EncodeDmDeviceProfileInfo(devInfo, data)) {
+            LOGE("write dm device profile info failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

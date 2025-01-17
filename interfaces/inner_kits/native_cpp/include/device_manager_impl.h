@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -409,6 +409,10 @@ public:
     void SyncCallbacksToService(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
     virtual int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam) override;
+
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
+        const DmDeviceProfileInfoFilterOptions &filterOptions,
+        std::shared_ptr<GetDeviceProfileInfoListCallback> callback) override;
 
 private:
     DeviceManagerImpl() = default;

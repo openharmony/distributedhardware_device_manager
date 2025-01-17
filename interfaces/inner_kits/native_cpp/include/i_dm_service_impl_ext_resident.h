@@ -83,6 +83,14 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t AccountUserSwitched(int32_t userId, const std::string &accountId) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::GetDeviceProfileInfoList
+     * @tc.desc: GetDeviceProfileInfoList
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
+        const DmDeviceProfileInfoFilterOptions &filterOptions) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);
