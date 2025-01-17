@@ -1676,9 +1676,17 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         }
         HandleAccountLogout(currentUserId, dmAccountInfo.accountId, dmAccountInfo.accountName);
         MultipleUserConnector::DeleteAccountInfoByUserId(currentUserId);
+        DMAccountInfo curDmAccountInfo;
+        curDmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
+        curDmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
+        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), curDmAccountInfo);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(beforeUserId);
         MultipleUserConnector::DeleteAccountInfoByUserId(beforeUserId);
+        DMAccountInfo curDmAccountInfo;
+        curDmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
+        curDmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
+        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), curDmAccountInfo);
     } else {
         LOGE("Invalied account common event.");
     }
