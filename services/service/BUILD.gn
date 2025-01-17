@@ -164,6 +164,16 @@ if (defined(ohos_lite)) {
       ubsan = true
     }
 
+    cflags = [
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
     sources = [
       "${common_path}/src/dfx/standard/dm_hidumper.cpp",
       "${common_path}/src/dm_anonymous.cpp",

@@ -30,16 +30,14 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
     return DmDeviceManagerService::dmDeviceManagerService->GetTrustedDeviceList(pkgName, deviceList);
 }
 
-bool DeviceManagerService::IsDMServiceAdapterLoad()
+bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
 {
-    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterLoad();
+    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterResidentLoad();
 }
 
-int32_t DeviceManagerService::SendUserIdsByWifi(const std::string &networkId,
-    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
+bool DeviceManagerService::IsDMServiceAdapterSoLoaded()
 {
-    return DmDeviceManagerService::dmDeviceManagerService->SendUserIdsByWifi(networkId, foregroundUserIds,
-        backgroundUserIds);
+    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterSoLoaded();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

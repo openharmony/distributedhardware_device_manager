@@ -394,13 +394,5 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
     LOGE("get failed");
     return "";
 }
-
-void DeleteArrayPtr(const char* arrPtr)
-{
-    if (arrPtr != nullptr) {
-        delete[] arrPtr;
-        arrPtr = nullptr;
-    }
-}
 } // namespace DistributedHardware
 } // namespace OHOS

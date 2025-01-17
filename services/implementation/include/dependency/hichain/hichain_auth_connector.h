@@ -58,6 +58,8 @@ public:
     int32_t DeleteCredential(const std::string &deviceId, int32_t userId);
     int32_t RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback);
     int32_t GetCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
+private:
+    void FreeJsonString(char *jsonStr);
 
 private:
     DeviceAuthCallback deviceAuthCallback_;

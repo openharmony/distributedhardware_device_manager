@@ -94,6 +94,16 @@ if (defined(ohos_lite)) {
       ubsan = true
     }
 
+    cflags = [
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
     sources = [
       "${common_path}/src/dm_anonymous.cpp",
       "src/appInfo/standard/app_manager.cpp",
