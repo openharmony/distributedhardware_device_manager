@@ -25,6 +25,14 @@ public:
     virtual ~IDMServiceImplExtResident() = default;
     virtual int32_t Initialize(const std::shared_ptr<IDeviceManagerServiceListener> &listener) = 0;
     virtual int32_t Release() = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::GetDeviceProfileInfoList
+     * @tc.desc: GetDeviceProfileInfoList
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
+        const DmDeviceProfileInfoFilterOptions &filterOptions) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);

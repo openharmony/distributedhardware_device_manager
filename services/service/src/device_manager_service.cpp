@@ -2625,11 +2625,11 @@ int32_t DeviceManagerService::GetDeviceProfileInfoList(const std::string &pkgNam
         return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
-    if (!IsDMServiceAdapterLoad()) {
+    if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("GetDeviceProfileInfoList failed, adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    return dmServiceImplExt_->GetDeviceProfileInfoList(pkgName, filterOptions);
+    return dmServiceImplExtResident_->GetDeviceProfileInfoList(pkgName, filterOptions);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
