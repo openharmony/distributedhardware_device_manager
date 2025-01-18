@@ -660,6 +660,15 @@ HWTEST_F(AuthRequestStateTest, Enter_009, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredential>();
     int32_t ret = authRequestState->Enter();
     ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
+    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
+    authRequestState->authManager_ = authManager;
+    ret = authRequestState->Enter();
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -688,6 +697,72 @@ HWTEST_F(AuthRequestStateTest, Enter_010, testing::ext::TestSize.Level0)
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredentialDone>();
     int32_t ret = authRequestState->Enter();
     ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
+    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
+    authRequestState->authManager_ = authManager;
+    ret = authRequestState->Enter();
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(AuthRequestStateTest, GetStateType_010, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReCheckMsgDone>();
+    int32_t ret = authRequestState->GetStateType();
+    ASSERT_EQ(ret, AUTH_REQUEST_RECHECK_MSG_DONE);
+}
+
+HWTEST_F(AuthRequestStateTest, Enter_021, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReCheckMsg>();
+    int32_t ret = authRequestState->Enter();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
+    authManager->authMessageProcessor_->SetResponseContext(authManager->authResponseContext_);
+    authManager->authMessageProcessor_->SetRequestContext(authManager->authRequestContext_);
+    authRequestState->authManager_ = authManager;
+    ret = authRequestState->Enter();
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(AuthRequestStateTest, GetStateType_011, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestAuthFinish>();
+    int32_t ret = authRequestState->GetStateType();
+    ASSERT_EQ(ret, AUTH_REQUEST_AUTH_FINISH);
+}
+
+HWTEST_F(AuthRequestStateTest, Enter_020, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestAuthFinish>();
+    int32_t ret = authRequestState->Enter();
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(AuthRequestStateTest, Enter_022, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReCheckMsgDone>();
+    int32_t ret = authRequestState->Enter();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authResponseContext_->edition = "";
+    authManager->remoteVersion_ = "remoteVersion";
+    authManager->authRequestState_ = std::make_shared<AuthRequestFinishState>();
+    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
+    authRequestState->authManager_ = authManager;
+    ret = authRequestState->Enter();
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

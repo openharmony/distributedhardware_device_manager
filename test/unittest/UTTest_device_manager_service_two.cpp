@@ -1230,6 +1230,37 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
     authParam[DM_AUTHENTICATION_TYPE] = "123456";
     ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+
+    std::string msg;
+    nlohmann::json msgJsonObj;
+    msgJsonObj["networkId"] = "networkId";
+    msgJsonObj["discoverType"] = 123;
+    msgJsonObj["ischange"] = false;
+    msg = msgJsonObj.dump();
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    msgJsonObj["ischange"] = true;
+    msg = msgJsonObj.dump();
+    std::vector<int32_t> foregroundUserIds;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(ERR_DM_INPUT_PARA_INVALID)));
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    foregroundUserIds.push_back(101);
+    std::vector<int32_t> backgroundUserIds;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED))
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    backgroundUserIds.push_back(102);
+    msgJsonObj["discoverType"] = 1;
+    msg = msgJsonObj.dump();
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(backgroundUserIds), Return(DM_OK)));
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
 } // namespace
 } // namespace DistributedHardware

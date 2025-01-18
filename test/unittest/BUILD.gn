@@ -1176,6 +1176,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_crypto_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
+    "mock/multiple_user_connector_mock.cpp",
     "mock/softbus_session_mock.cpp",
   ]
 
