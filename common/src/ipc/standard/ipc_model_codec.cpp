@@ -16,6 +16,7 @@
 #include "ipc_model_codec.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -268,6 +269,30 @@ bool IpcModelCodec::EncodeDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFi
     bRet = (bRet && parcel.WriteString(filterOptions.imageType));
     bRet = (bRet && parcel.WriteString(filterOptions.specName));
     return bRet;
+}
+
+void IpcModelCodec::DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
+{
+    std::string deviceIdStr = parcel.ReadString();
+    if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s deviceId failed!");
+        return;
+    }
+    std::string deviceNameStr = parcel.ReadString();
+    if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s deviceName failed!");
+        return;
+    }
+    devInfo.deviceTypeId = parcel.ReadUint16();
+    std::string networkIdStr = parcel.ReadString();
+    if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s networkId failed!");
+        return;
+    }
+    devInfo.range = parcel.ReadInt32();
+    devInfo.networkType = parcel.ReadInt32();
+    devInfo.authForm = static_cast<DmAuthForm>(parcel.ReadInt32());
+    devInfo.extraData = parcel.ReadString();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

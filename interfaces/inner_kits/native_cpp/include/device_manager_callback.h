@@ -123,8 +123,7 @@ public:
 
 class GetDeviceIconInfoCallback {
 public:
-    virtual ~GetDeviceIconInfoCallback()
-    {}
+    virtual ~GetDeviceIconInfoCallback() {}
     virtual void OnResult(const DmDeviceIconInfo &deviceIconInfo, int32_t code) = 0;
 };
 

@@ -16,6 +16,7 @@
 #ifndef OHOS_DM_IPC_MODEL_CODEC_H
 #define OHOS_DM_IPC_MODEL_CODEC_H
 
+#include "dm_device_info.h"
 #include "dm_device_profile_info.h"
 #include "message_parcel.h"
 
@@ -43,6 +44,7 @@ public:
         DmDeviceIconInfoFilterOptions &filterOptions);
     static bool EncodeDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFilterOptions &filterOptions,
         MessageParcel &parcel);
+    static void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

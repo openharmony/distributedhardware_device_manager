@@ -2601,11 +2601,11 @@ int32_t DeviceManagerService::GetDeviceIconInfo(const std::string &pkgName,
         return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
-    if (!IsDMServiceAdapterLoad()) {
+    if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("GetDeviceIconInfo failed, adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    return dmServiceImplExt_->GetDeviceIconInfo(pkgName, filterOptions);
+    return dmServiceImplExtResident_->GetDeviceIconInfo(pkgName, filterOptions);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -68,30 +68,6 @@ namespace {
 const int32_t DM_MAX_TRUST_DEVICE_NUM = 200;
 }
 
-void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
-{
-    std::string deviceIdStr = parcel.ReadString();
-    if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s deviceId failed!");
-        return;
-    }
-    std::string deviceNameStr = parcel.ReadString();
-    if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s deviceName failed!");
-        return;
-    }
-    devInfo.deviceTypeId = parcel.ReadUint16();
-    std::string networkIdStr = parcel.ReadString();
-    if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s networkId failed!");
-        return;
-    }
-    devInfo.range = parcel.ReadInt32();
-    devInfo.networkType = parcel.ReadInt32();
-    devInfo.authForm = static_cast<DmAuthForm>(parcel.ReadInt32());
-    devInfo.extraData = parcel.ReadString();
-}
-
 void DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
 {
     std::string deviceIdStr = parcel.ReadString();
@@ -246,7 +222,7 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
         std::vector<DmDeviceInfo> deviceInfoVec;
         for (int32_t i = 0; i < deviceNum; ++i) {
             DmDeviceInfo deviceInfo;
-            DecodeDmDeviceInfo(reply, deviceInfo);
+            IpcModelCodec::DecodeDmDeviceInfo(reply, deviceInfo);
             deviceInfoVec.emplace_back(deviceInfo);
         }
         pRsp->SetDeviceVec(deviceInfoVec);
@@ -277,7 +253,7 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcR
     }
     std::shared_ptr<IpcGetDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo deviceInfo;
-    DecodeDmDeviceInfo(reply, deviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(reply, deviceInfo);
     pRsp->SetDeviceInfo(deviceInfo);
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -305,7 +281,7 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, MessageParcel &reply, std::shared_pt
     }
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo localDeviceInfo;
-    DecodeDmDeviceInfo(reply, localDeviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(reply, localDeviceInfo);
     pRsp->SetLocalDeviceInfo(localDeviceInfo);
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -546,7 +522,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
     std::string pkgName = data.ReadString();
     DmDeviceState deviceState = static_cast<DmDeviceState>(data.ReadInt32());
     DmDeviceInfo dmDeviceInfo;
-    DecodeDmDeviceInfo(data, dmDeviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
 
     DmDeviceBasicInfo dmDeviceBasicInfo;
     size_t deviceBasicSize = sizeof(DmDeviceBasicInfo);
@@ -586,7 +562,7 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
     std::string pkgName = data.ReadString();
     int16_t subscribeId = data.ReadInt16();
     DmDeviceInfo dmDeviceInfo;
-    DecodeDmDeviceInfo(data, dmDeviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
     DmDeviceBasicInfo devBasicInfo;
     DecodeDmDeviceBasicInfo(data, devBasicInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, dmDeviceInfo);
@@ -1899,7 +1875,7 @@ ON_IPC_CMD(SERVER_DEVICE_SCREEN_STATE_NOTIFY, MessageParcel &data, MessageParcel
 {
     std::string pkgName = data.ReadString();
     DmDeviceInfo dmDeviceInfo;
-    DecodeDmDeviceInfo(data, dmDeviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
     DeviceManagerNotify::GetInstance().OnDeviceScreenStatus(pkgName, dmDeviceInfo);
 
     reply.WriteInt32(DM_OK);

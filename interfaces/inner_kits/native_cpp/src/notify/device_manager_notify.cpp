@@ -20,12 +20,13 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
-#include "ipc_model_codec.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+const std::string UK_SEPARATOR = "#";
+}
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
-
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEVICE_ONLINE = "deviceOnline";
 constexpr const char* DEVICE_OFFLINE = "deviceOffline";
@@ -1293,10 +1294,10 @@ void DeviceManagerNotify::OnGetDeviceProfileInfoListResult(const std::string &pk
 int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk,
     std::shared_ptr<GetDeviceIconInfoCallback> callback)
 {
-    LOGI("In, pkgName: %{public}s. uk: %{public}s", pkgName.c_str(), uk.c_str());
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (getDeviceIconInfoCallback_.size() > MAX_CONTAINER_SIZE) {
-        LOGI("callback map size is more than max size");
+        LOGE("callback map size is more than max size");
         return ERR_DM_MAX_SIZE_FAIL;
     }
     auto iter = getDeviceIconInfoCallback_.find(pkgName);
@@ -1305,11 +1306,11 @@ int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string
         return DM_OK;
     }
     if (iter->second.size() > MAX_CONTAINER_SIZE) {
-        LOGI("callback map size is more than max size");
+        LOGE("callback map size is more than max size");
         return ERR_DM_MAX_SIZE_FAIL;
     }
     if (iter->second[uk].size() > MAX_CONTAINER_SIZE) {
-        LOGI("callback set size is more than max size");
+        LOGE("callback set size is more than max size");
         return ERR_DM_MAX_SIZE_FAIL;
     }
     iter->second[uk].insert(callback);
@@ -1318,7 +1319,7 @@ int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string
 
 int32_t DeviceManagerNotify::UnRegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk)
 {
-    LOGI("In, pkgName: %{public}s. uk: %{public}s", pkgName.c_str(), uk.c_str());
+    LOGI("In, pkgName: %{public}s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(bindLock_);
     auto iter = getDeviceIconInfoCallback_.find(pkgName);
     if (iter == getDeviceIconInfoCallback_.end()) {
@@ -1339,7 +1340,8 @@ void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, 
         return;
     }
     LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
-    std::string uk = IpcModelCodec::GetDeviceIconInfoUniqueKey(deviceIconInfo);
+    std::string uk =  deviceIconInfo.productId + UK_SEPARATOR + deviceIconInfo.subProductId + UK_SEPARATOR +
+        deviceIconInfo.imageType + UK_SEPARATOR + deviceIconInfo.specName;
     std::map<std::string, std::set<std::shared_ptr<GetDeviceIconInfoCallback>>> tempCbks;
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);

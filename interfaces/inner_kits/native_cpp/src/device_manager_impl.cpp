@@ -2619,6 +2619,7 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
 int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
     const DmDeviceIconInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceIconInfoCallback> callback)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string uk = IpcModelCodec::GetDeviceIconInfoUniqueKey(filterOptions);
     LOGI("In pkgName:%{public}s, uk:%{public}s", pkgName.c_str(), uk.c_str());
     int32_t ret = DeviceManagerNotify::GetInstance().RegisterGetDeviceIconInfoCallback(pkgName, uk, callback);
@@ -2643,6 +2644,7 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
         return ret;
     }
     LOGI("Completed");
+#endif
     return DM_OK;
 }
 } // namespace DistributedHardware
