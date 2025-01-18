@@ -544,7 +544,7 @@ void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value 
 void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
     napi_value &arrayResult)
 {
-    for (unsigned int i = 0; i < svrInfos.size(); i++) {
+    for (uint32_t i = 0; i < svrInfos.size(); i++) {
         napi_value item = nullptr;
         napi_create_object(env, &item);
         SetValueUtf8String(env, "deviceId", svrInfos[i].deviceId, item);
@@ -577,19 +577,19 @@ void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &dev
     SetValueUtf8String(env, "deviceSn", devInfo.deviceSn, jsObj);
     SetValueUtf8String(env, "mac", devInfo.mac, jsObj);
     SetValueUtf8String(env, "model", devInfo.model, jsObj);
-    SetValueUtf8String(env, "devType", devInfo.devType, jsObj);
-    SetValueUtf8String(env, "manu", devInfo.manu, jsObj);
+    SetValueUtf8String(env, "deviceType", devInfo.deviceType, jsObj);
+    SetValueUtf8String(env, "manufacturer", devInfo.manufacturer, jsObj);
     SetValueUtf8String(env, "deviceName", devInfo.deviceName, jsObj);
-    SetValueUtf8String(env, "prodId", devInfo.prodId, jsObj);
-    SetValueUtf8String(env, "subProdId", devInfo.subProdId, jsObj);
-    SetValueUtf8String(env, "hiv", devInfo.hiv, jsObj);
+    SetValueUtf8String(env, "productId", devInfo.productId, jsObj);
+    SetValueUtf8String(env, "subProductId", devInfo.subProductId, jsObj);
+    SetValueUtf8String(env, "sdkVersion", devInfo.sdkVersion, jsObj);
     SetValueUtf8String(env, "bleMac", devInfo.bleMac, jsObj);
     SetValueUtf8String(env, "brMac", devInfo.brMac, jsObj);
     SetValueUtf8String(env, "sleMac", devInfo.sleMac, jsObj);
-    SetValueUtf8String(env, "fwv", devInfo.fwv, jsObj);
-    SetValueUtf8String(env, "hwv", devInfo.hwv, jsObj);
-    SetValueUtf8String(env, "swv", devInfo.swv, jsObj);
-    SetValueInt32(env, "protType", devInfo.protType, jsObj);
+    SetValueUtf8String(env, "firmwareVersion", devInfo.firmwareVersion, jsObj);
+    SetValueUtf8String(env, "hardwareVersion", devInfo.hardwareVersion, jsObj);
+    SetValueUtf8String(env, "softwareVersion", devInfo.softwareVersion, jsObj);
+    SetValueInt32(env, "protocolType", devInfo.protocolType, jsObj);
     SetValueInt32(env, "setupType", devInfo.setupType, jsObj);
     SetValueUtf8String(env, "wiseDeviceId", devInfo.wiseDeviceId, jsObj);
     SetValueUtf8String(env, "wiseUserId", devInfo.wiseUserId, jsObj);
@@ -602,7 +602,7 @@ void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &dev
 void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,
     napi_value &arrayResult)
 {
-    for (unsigned int i = 0; i < devInfos.size(); i++) {
+    for (uint32_t i = 0; i < devInfos.size(); i++) {
         napi_value item = nullptr;
         napi_create_object(env, &item);
         DmDeviceProfileInfoToJs(env, devInfos[i], item);

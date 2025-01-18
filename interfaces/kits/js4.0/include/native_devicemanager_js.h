@@ -227,8 +227,7 @@ class DmNapiGetDeviceProfileInfoListCallback : public OHOS::DistributedHardware:
 public:
     explicit DmNapiGetDeviceProfileInfoListCallback(napi_env env, const std::string &bundleName,
         const napi_deferred &deferred) : env_(env), bundleName_(bundleName), deferred_(deferred)
-    {
-    }
+    {}
     ~DmNapiGetDeviceProfileInfoListCallback() override {};
 
     void OnResult(const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfos,
