@@ -83,6 +83,8 @@ public:
     void OnDevStateCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
     void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override;
+    void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
+        const DmDeviceIconInfo &dmDeviceIconInfo, int32_t code) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

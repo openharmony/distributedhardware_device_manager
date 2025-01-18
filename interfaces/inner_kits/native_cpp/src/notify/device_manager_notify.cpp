@@ -20,6 +20,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#include "ipc_model_codec.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -1287,6 +1288,85 @@ void DeviceManagerNotify::OnGetDeviceProfileInfoListResult(const std::string &pk
         return;
     }
     tempCbk->OnResult(deviceProfileInfos, code);
+}
+
+int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk,
+    std::shared_ptr<GetDeviceIconInfoCallback> callback)
+{
+    LOGI("In, pkgName: %{public}s. uk: %{public}s", pkgName.c_str(), uk.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    if (getDeviceIconInfoCallback_.size() > MAX_CONTAINER_SIZE) {
+        LOGI("callback map size is more than max size");
+        return ERR_DM_MAX_SIZE_FAIL;
+    }
+    auto iter = getDeviceIconInfoCallback_.find(pkgName);
+    if (iter == getDeviceIconInfoCallback_.end()) {
+        getDeviceIconInfoCallback_[pkgName][uk] = {callback};
+        return DM_OK;
+    }
+    if (iter->second.size() > MAX_CONTAINER_SIZE) {
+        LOGI("callback map size is more than max size");
+        return ERR_DM_MAX_SIZE_FAIL;
+    }
+    if (iter->second[uk].size() > MAX_CONTAINER_SIZE) {
+        LOGI("callback set size is more than max size");
+        return ERR_DM_MAX_SIZE_FAIL;
+    }
+    iter->second[uk].insert(callback);
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::UnRegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk)
+{
+    LOGI("In, pkgName: %{public}s. uk: %{public}s", pkgName.c_str(), uk.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    auto iter = getDeviceIconInfoCallback_.find(pkgName);
+    if (iter == getDeviceIconInfoCallback_.end()) {
+        return DM_OK;
+    }
+    iter->second.erase(uk);
+    if (iter->second.empty()) {
+        getDeviceIconInfoCallback_.erase(pkgName);
+    }
+    return DM_OK;
+}
+
+void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, const DmDeviceIconInfo &deviceIconInfo,
+    int32_t code)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
+        return;
+    }
+    LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
+    std::string uk = IpcModelCodec::GetDeviceIconInfoUniqueKey(deviceIconInfo);
+    std::map<std::string, std::set<std::shared_ptr<GetDeviceIconInfoCallback>>> tempCbks;
+    {
+        std::lock_guard<std::mutex> autoLock(bindLock_);
+        auto iter = getDeviceIconInfoCallback_.find(pkgName);
+        if (iter == getDeviceIconInfoCallback_.end()) {
+            LOGE("error, callback not register for pkgName %{public}s.", pkgName.c_str());
+            return;
+        }
+        if (ERR_DM_HILINKSVC_DISCONNECT == code) {
+            tempCbks = iter->second;
+            getDeviceIconInfoCallback_.erase(pkgName);
+        } else if (iter->second.count(uk) != 0) {
+            tempCbks[uk] = iter->second[uk];
+            iter->second.erase(uk);
+        }
+    }
+    if (tempCbks.empty()) {
+        LOGE("error, registered GetDeviceIconInfoResult callback is nullptr.");
+        return;
+    }
+    for (const auto &[key, callbacks] : tempCbks) {
+        for (auto callback : callbacks) {
+            if (callback != nullptr) {
+                callback->OnResult(deviceIconInfo, code);
+            }
+        }
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

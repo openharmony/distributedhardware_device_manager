@@ -286,6 +286,7 @@ const std::string BIND_FOR_DEVICE_LEVEL = "BindForDeviceLevel";
 
 // wise device
 constexpr int32_t MAX_DEVICE_PROFILE_SIZE = 500;
+constexpr int32_t MAX_ICON_SIZE = 4 * 1024 * 1024;
 constexpr int32_t MAX_CONTAINER_SIZE = 500;
 } // namespace DistributedHardware
 } // namespace OHOS

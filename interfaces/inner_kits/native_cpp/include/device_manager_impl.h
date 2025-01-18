@@ -414,6 +414,9 @@ public:
         const DmDeviceProfileInfoFilterOptions &filterOptions,
         std::shared_ptr<GetDeviceProfileInfoListCallback> callback) override;
 
+    virtual int32_t GetDeviceIconInfo(const std::string &pkgName, const DmDeviceIconInfoFilterOptions &filterOptions,
+        std::shared_ptr<GetDeviceIconInfoCallback> callback) override;
+
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

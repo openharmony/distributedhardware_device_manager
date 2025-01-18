@@ -19,6 +19,10 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+const std::string UK_SEPARATOR = "#";
+}
+
 int32_t IpcModelCodec::DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &parcel,
     DmDeviceProfileInfoFilterOptions &filterOptions)
 {
@@ -193,6 +197,76 @@ bool IpcModelCodec::EncodeDmDeviceProfileInfo(const DmDeviceProfileInfo &devInfo
     bRet = (bRet && parcel.WriteString(devInfo.shareTime));
     bRet = (bRet && parcel.WriteBool(devInfo.isLocalDevice));
     bRet = (bRet && EncodeDmServiceProfileInfos(devInfo.services, parcel));
+    return bRet;
+}
+
+std::string IpcModelCodec::GetDeviceIconInfoUniqueKey(const DmDeviceIconInfoFilterOptions &iconFiter)
+{
+    return iconFiter.productId + UK_SEPARATOR + iconFiter.subProductId + UK_SEPARATOR +
+        iconFiter.imageType + UK_SEPARATOR + iconFiter.specName;
+}
+
+std::string IpcModelCodec::GetDeviceIconInfoUniqueKey(const DmDeviceIconInfo &iconInfo)
+{
+    return iconInfo.productId + UK_SEPARATOR + iconInfo.subProductId + UK_SEPARATOR +
+        iconInfo.imageType + UK_SEPARATOR + iconInfo.specName;
+}
+
+void IpcModelCodec::DecodeDmDeviceIconInfo(MessageParcel &parcel, DmDeviceIconInfo &deviceIconInfo)
+{
+    deviceIconInfo.productId = parcel.ReadString();
+    deviceIconInfo.subProductId = parcel.ReadString();
+    deviceIconInfo.imageType = parcel.ReadString();
+    deviceIconInfo.specName = parcel.ReadString();
+    deviceIconInfo.version = parcel.ReadString();
+    deviceIconInfo.url = parcel.ReadString();
+    int32_t length = parcel.ReadInt32();
+    if (length > 0 && length <= MAX_ICON_SIZE) {
+        const unsigned char *buffer = nullptr;
+        if ((buffer = reinterpret_cast<const unsigned char *>(parcel.ReadRawData((size_t)length))) == nullptr) {
+            LOGE("read raw data failed, length = %{public}d", length);
+            return;
+        }
+        std::vector<uint8_t> icon(buffer, buffer + length);
+        deviceIconInfo.icon = icon;
+    }
+}
+
+bool IpcModelCodec::EncodeDmDeviceIconInfo(const DmDeviceIconInfo &deviceIconInfo, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(deviceIconInfo.productId));
+    bRet = (bRet && parcel.WriteString(deviceIconInfo.subProductId));
+    bRet = (bRet && parcel.WriteString(deviceIconInfo.imageType));
+    bRet = (bRet && parcel.WriteString(deviceIconInfo.specName));
+    bRet = (bRet && parcel.WriteString(deviceIconInfo.version));
+    bRet = (bRet && parcel.WriteString(deviceIconInfo.url));
+    int32_t length = static_cast<int32_t>(deviceIconInfo.icon.size());
+    bRet = (bRet && parcel.WriteInt32(length));
+    if (bRet && length > 0) {
+        const unsigned char *buffer = reinterpret_cast<const unsigned char *>(deviceIconInfo.icon.data());
+        bRet = (bRet && parcel.WriteRawData(buffer, length));
+    }
+    return bRet;
+}
+
+void IpcModelCodec::DecodeDmDeviceIconInfoFilterOptions(MessageParcel &parcel,
+    DmDeviceIconInfoFilterOptions &filterOptions)
+{
+    filterOptions.productId = parcel.ReadString();
+    filterOptions.subProductId = parcel.ReadString();
+    filterOptions.imageType = parcel.ReadString();
+    filterOptions.specName = parcel.ReadString();
+}
+
+bool IpcModelCodec::EncodeDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFilterOptions &filterOptions,
+    MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(filterOptions.productId));
+    bRet = (bRet && parcel.WriteString(filterOptions.subProductId));
+    bRet = (bRet && parcel.WriteString(filterOptions.imageType));
+    bRet = (bRet && parcel.WriteString(filterOptions.specName));
     return bRet;
 }
 } // namespace DistributedHardware

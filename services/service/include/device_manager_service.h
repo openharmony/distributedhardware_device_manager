@@ -216,6 +216,7 @@ public:
     int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam);
     int32_t GetDeviceProfileInfoList(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);
+    int32_t GetDeviceIconInfo(const std::string &pkgName, DmDeviceIconInfoFilterOptions &filterOptions);
 
 private:
     bool IsDMServiceImplReady();
