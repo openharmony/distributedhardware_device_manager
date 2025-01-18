@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -620,6 +620,52 @@ void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDevic
         napi_status status = napi_set_element(env, arrayResult, i, item);
         if (status != napi_ok) {
             LOGE("DmDeviceProfileInfo To JsArray set element error: %{public}d", status);
+        }
+    }
+}
+
+void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &object,
+    DmDeviceIconInfoFilterOptions &info)
+{
+    napi_valuetype filterOptionsType;
+    napi_typeof(env, object, &filterOptionsType);
+    if (filterOptionsType != napi_object) {
+        LOGE("filterOptions is not object");
+        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + " The type of filterOptions must be object";
+        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
+        return;
+    }
+    char productId[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "productId", productId, sizeof(productId));
+    info.productId = productId;
+    char subProductId[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "subProductId", subProductId, sizeof(subProductId));
+    info.subProductId = subProductId;
+    char imageType[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "imageType", imageType, sizeof(imageType));
+    info.imageType = imageType;
+    char specName[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "specName", specName, sizeof(specName));
+    info.specName = specName;
+}
+
+void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj)
+{
+    SetValueUtf8String(env, "productId", deviceIconInfo.productId, jsObj);
+    SetValueUtf8String(env, "subProductId", deviceIconInfo.subProductId, jsObj);
+    SetValueUtf8String(env, "imageType", deviceIconInfo.imageType, jsObj);
+    SetValueUtf8String(env, "specName", deviceIconInfo.specName, jsObj);
+    SetValueUtf8String(env, "url", deviceIconInfo.url, jsObj);
+    size_t iconLen = deviceIconInfo.icon.size();
+    if (iconLen > 0) {
+        void *icon = nullptr;
+        napi_value iconBuffer = nullptr;
+        napi_create_arraybuffer(env, iconLen, &icon, &iconBuffer);
+        if (icon != nullptr &&
+            memcpy_s(icon, iconLen, reinterpret_cast<const void *>(deviceIconInfo.icon.data()), iconLen) == 0) {
+            napi_value iconArray = nullptr;
+            napi_create_typedarray(env, napi_uint8_array, iconLen, iconBuffer, 0, &iconArray);
+            napi_set_named_property(env, jsObj, "icon", iconArray);
         }
     }
 }

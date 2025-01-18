@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,10 +77,13 @@ void JsObjectToStrVector(const napi_env &env, const napi_value &object, const st
     std::vector<std::string> &fieldRef);
 void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value &object,
     DmDeviceProfileInfoFilterOptions &info);
+void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &object,
+    DmDeviceIconInfoFilterOptions &info);
 void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
     napi_value &arrayResult);
 void DmProductInfoToJs(const napi_env &env, const DmProductInfo &prodInfos, napi_value &jsObj);
 void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &devInfo, napi_value &jsObj);
+void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj);
 void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,
     napi_value &arrayResult);
 

@@ -36,6 +36,7 @@
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_get_device_icon_info_req.h"
 #include "ipc_notify_get_device_profile_info_list_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
@@ -914,6 +915,19 @@ void DeviceManagerServiceListener::OnGetDeviceProfileInfoListResult(const Proces
     pReq->SetResult(code);
     pReq->SetProcessInfo(processInfo);
     ipcServerListener_.SendRequest(GET_DEVICE_PROFILE_INFO_LIST_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
+    const DmDeviceIconInfo &dmDeviceIconInfo, int32_t code)
+{
+    LOGI("pkgName %{public}s.", processInfo.pkgName.c_str());
+    std::shared_ptr<IpcNotifyGetDeviceIconInfoReq> pReq = std::make_shared<IpcNotifyGetDeviceIconInfoReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetPkgName(processInfo.pkgName);
+    pReq->SetDmDeviceIconInfo(dmDeviceIconInfo);
+    pReq->SetResult(code);
+    pReq->SetProcessInfo(processInfo);
+    ipcServerListener_.SendRequest(GET_DEVICE_ICON_INFO_RESULT, pReq, pRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

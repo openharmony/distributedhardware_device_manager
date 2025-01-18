@@ -646,6 +646,9 @@ public:
     virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
         const DmDeviceProfileInfoFilterOptions &filterOptions,
         std::shared_ptr<GetDeviceProfileInfoListCallback> callback) = 0;
+
+    virtual int32_t GetDeviceIconInfo(const std::string &pkgName, const DmDeviceIconInfoFilterOptions &filterOptions,
+        std::shared_ptr<GetDeviceIconInfoCallback> callback) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

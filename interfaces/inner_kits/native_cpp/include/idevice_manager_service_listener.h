@@ -168,6 +168,8 @@ public:
         const std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) = 0;
+    virtual void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
+        const DmDeviceIconInfo &dmDeviceIconInfo, int32_t code) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

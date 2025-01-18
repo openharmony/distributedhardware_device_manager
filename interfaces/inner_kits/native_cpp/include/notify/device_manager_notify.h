@@ -83,6 +83,10 @@ public:
     int32_t UnRegisterGetDeviceProfileInfoListCallback(const std::string &pkgName);
     void OnGetDeviceProfileInfoListResult(const std::string &pkgName,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code);
+    int32_t RegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk,
+        std::shared_ptr<GetDeviceIconInfoCallback> callback);
+    int32_t UnRegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk);
+    void OnGetDeviceIconInfoResult(const std::string &pkgName, const DmDeviceIconInfo &deviceIconInfo, int32_t code);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -157,6 +161,8 @@ private:
     std::map<std::string, std::shared_ptr<BindTargetCallback>> sinkBindTargetCallback_;
     std::mutex bindLock_;
     std::map<std::string, std::shared_ptr<GetDeviceProfileInfoListCallback>> getDeviceProfileInfoCallback_;
+    std::map<std::string,
+        std::map<std::string, std::set<std::shared_ptr<GetDeviceIconInfoCallback>>>> getDeviceIconInfoCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

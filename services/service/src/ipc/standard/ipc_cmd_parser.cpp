@@ -42,6 +42,7 @@
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_get_device_icon_info_req.h"
 #include "ipc_notify_get_device_profile_info_list_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
@@ -1738,6 +1739,53 @@ ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFO_LIST_RESULT, std::shared_ptr<IpcReq> 
 }
 
 ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_DEVICE_ICON_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    DmDeviceIconInfoFilterOptions filterOptions;
+    IpcModelCodec::DecodeDmDeviceIconInfoFilterOptions(data, filterOptions);
+    int32_t result = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_ICON_INFO_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyGetDeviceIconInfoReq> pReq =
+        std::static_pointer_cast<IpcNotifyGetDeviceIconInfoReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    int32_t result = pReq->GetResult();
+    if (!data.WriteInt32(result)) {
+        LOGE("write result code failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!IpcModelCodec::EncodeDmDeviceIconInfo(pReq->GetDmDeviceIconInfo(), data)) {
+        LOGE("write dm device icon info failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_ICON_INFO_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     if (pBaseRsp == nullptr) {
         LOGE("pBaseRsp is null");

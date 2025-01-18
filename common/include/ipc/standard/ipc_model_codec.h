@@ -16,6 +16,7 @@
 #ifndef OHOS_DM_IPC_MODEL_CODEC_H
 #define OHOS_DM_IPC_MODEL_CODEC_H
 
+#include "dm_device_info.h"
 #include "dm_device_profile_info.h"
 #include "message_parcel.h"
 
@@ -35,6 +36,15 @@ public:
     static bool EncodeDmServiceProfileInfo(const DmServiceProfileInfo &svrInfo, MessageParcel &parcel);
     static bool EncodeDmServiceProfileInfos(const std::vector<DmServiceProfileInfo> &svrInfos, MessageParcel &parcel);
     static bool EncodeDmDeviceProfileInfo(const DmDeviceProfileInfo &devInfo, MessageParcel &parcel);
+    static std::string GetDeviceIconInfoUniqueKey(const DmDeviceIconInfoFilterOptions &iconFiter);
+    static std::string GetDeviceIconInfoUniqueKey(const DmDeviceIconInfo &iconInfo);
+    static void DecodeDmDeviceIconInfo(MessageParcel &parcel, DmDeviceIconInfo &deviceIconInfo);
+    static bool EncodeDmDeviceIconInfo(const DmDeviceIconInfo &deviceIconInfo, MessageParcel &parcel);
+    static void DecodeDmDeviceIconInfoFilterOptions(MessageParcel &parcel,
+        DmDeviceIconInfoFilterOptions &filterOptions);
+    static bool EncodeDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFilterOptions &filterOptions,
+        MessageParcel &parcel);
+    static void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

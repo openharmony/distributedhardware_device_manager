@@ -37,6 +37,7 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_anony_local_udid_rsp.h"
+#include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
@@ -2612,6 +2613,38 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
         return ret;
     }
     LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
+    const DmDeviceIconInfoFilterOptions &filterOptions, std::shared_ptr<GetDeviceIconInfoCallback> callback)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string uk = IpcModelCodec::GetDeviceIconInfoUniqueKey(filterOptions);
+    LOGI("In pkgName:%{public}s, uk:%{public}s", pkgName.c_str(), uk.c_str());
+    int32_t ret = DeviceManagerNotify::GetInstance().RegisterGetDeviceIconInfoCallback(pkgName, uk, callback);
+    if (ret != DM_OK) {
+        LOGE("Register Callback failed ret: %{public}d", ret);
+        return ret;
+    }
+    std::shared_ptr<IpcGetDeviceIconInfoReq> req = std::make_shared<IpcGetDeviceIconInfoReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFilterOptions(filterOptions);
+    ret = ipcClientProxy_->SendRequest(GET_DEVICE_ICON_INFO, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
+        return ret;
+    }
+    LOGI("Completed");
+#endif
     return DM_OK;
 }
 } // namespace DistributedHardware
