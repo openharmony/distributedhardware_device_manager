@@ -85,6 +85,19 @@ struct Index {
     });
   }
 
+  aboutToDisappear() {
+    console.log(TAG + 'aboutToDisappear begin');
+    if (dmClass != null) {
+      try {
+        dmClass.off('uiStateChange');
+        dmClass.release();
+      } catch (error) {
+        console.log('dmClass release failed');
+      }
+      dmClass = null;
+    }
+  }
+
   showToast() {
     if (this.dialogController) {
       this.dialogController.open();
@@ -105,15 +118,6 @@ struct Index {
 
   destruction() {
     console.log(TAG + 'destruction begin');
-    if (dmClass != null) {
-      try {
-        dmClass.off('uiStateChange');
-        dmClass.release();
-      } catch (error) {
-        console.log('dmClass release failed');
-      }
-      dmClass = null;
-    }
     let session = AppStorage.get<UIExtensionContentSession>('inputSession');
     if (session) {
       session.terminateSelf();
