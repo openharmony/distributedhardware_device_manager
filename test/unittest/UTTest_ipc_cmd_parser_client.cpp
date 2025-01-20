@@ -19,12 +19,17 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "ipc_acl_profile_req.h"
+#include "ipc_bind_device_req.h"
 #include "ipc_client_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_common_param_req.h"
 #include "ipc_create_pin_holder_req.h"
 #include "ipc_register_listener_req.h"
+#include "ipc_generate_encrypted_uuid_req.h"
+#include "ipc_get_device_screen_status_req.h"
+#include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_info_by_network_req.h"
+#include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_publish_req.h"
 #include "ipc_unpublish_req.h"
@@ -32,11 +37,14 @@
 #include "ipc_unbind_device_req.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_set_credential_req.h"
+#include "ipc_set_credential_rsp.h"
 #include "ipc_notify_event_req.h"
 #include "device_manager_notify.h"
 #include "ipc_req.h"
+#include "dm_anonymous.h"
 #include "dm_device_info.h"
 #include "dm_constants.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -120,6 +128,18 @@ bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
     bRet = (bRet && parcel.WriteString(targetId.wifiIp));
     bRet = (bRet && parcel.WriteUint16(targetId.wifiPort));
     return bRet;
+}
+
+int32_t TestIpcRequestNull(int32_t cmdCode)
+{
+    MessageParcel reply;
+    std::shared_ptr<IpcReq> pBaseReq = nullptr;
+    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    auto ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(pBaseReq, reply);
+    }
+    return ret;
 }
 
 HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_001, testing::ext::TestSize.Level0)
@@ -726,6 +746,460 @@ HWTEST_F(IpcCmdParserClientTest, OnIpcCmdFunc_009, testing::ext::TestSize.Level0
         ret = ptr(data, reply);
     }
     ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, OnIpcCmdFunc_010, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcCmdFunc(SERVER_DEVICE_STATE_NOTIFY);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel reply;
+    MessageParcel data1;
+    data1.WriteString("com.ohos.test");
+    data1.WriteInt32(DEVICE_INFO_READY);
+    size_t deviceSize = sizeof(DmDeviceInfo);
+    data1.WriteRawData(nullptr, deviceSize);
+    EXPECT_EQ(ptr(data1, reply), DM_OK);
+
+    MessageParcel data2;
+    data2.WriteString("com.ohos.test");
+    data2.WriteInt32(DEVICE_STATE_UNKNOWN);
+    EXPECT_EQ(ptr(data2, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, OnIpcCmdFunc_011, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcCmdFunc(SERVER_DEVICE_SCREEN_STATE_NOTIFY);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel reply;
+    MessageParcel data;
+    EXPECT_EQ(ptr(data, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, OnIpcCmdFunc_012, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcCmdFunc(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel reply;
+    MessageParcel data;
+    EXPECT_EQ(ptr(data, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, OnIpcCmdFunc_013, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcCmdFunc(SINK_BIND_TARGET_RESULT);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel reply;
+    MessageParcel data;
+    EXPECT_EQ(ptr(data, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_016, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcRequestFunc(SERVER_GET_DMFA_INFO);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel data;
+    auto req = std::make_shared<IpcSetCredentialReq>();
+    std::string pkgName = "ohos.dm.test";
+    std::string credential = "git:https://gitee.com";
+    req->SetPkgName(pkgName);
+    req->SetCredentialParam(credential);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_017, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcRequestFunc(GENERATE_ENCRYPTED_UUID);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel data;
+    auto req = std::make_shared<IpcGenerateEncryptedUuidReq>();
+    std::string pkgName = "ohos.dm.test";
+    std::string uuid = "123456789";
+    std::string appId = "1234";
+    req->SetPkgName(pkgName);
+    req->SetUuid(uuid);
+    req->SetAppId(appId);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_018, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcRequestFunc(BIND_DEVICE);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel data;
+    auto req = std::make_shared<IpcBindDeviceReq>();
+    std::string pkgName = "ohos.dm.test";
+    int32_t bindType = 4;
+    std::string deviceId = "oh.myPhone.No1";
+    req->SetPkgName(pkgName);
+    req->SetBindType(bindType);
+    req->SetDeviceId(deviceId);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_019, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcRequestFunc(STOP_AUTHENTICATE_DEVICE);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel data;
+    auto req = std::make_shared<IpcCommonParamReq>();
+    std::string pkgName = "ohos.dm.test";
+    req->SetPkgName(pkgName);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_020, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcRequestFunc(GET_DEVICE_SCREEN_STATUS);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel data;
+    auto req = std::make_shared<IpcGetDeviceScreenStatusReq>();
+    std::string pkgName = "ohos.dm.test";
+    std::string netWorkId = "3a80******fd94";
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(netWorkId);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_021, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcRequestFunc(GET_NETWORKID_BY_UDID);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel data;
+    auto req = std::make_shared<IpcGetInfoByNetWorkReq>();
+    std::string pkgName = "ohos.dm.test";
+    std::string udid = "udid";
+    req->SetPkgName(pkgName);
+    req->SetUdid(udid);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, SetIpcRequestFunc_022, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetIpcRequestFunc(REGISTER_DEV_STATE_CALLBACK);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel data;
+    auto req = std::make_shared<IpcReq>();
+    std::string pkgName = "ohos.dm.test";
+    req->SetPkgName(pkgName);
+    auto ret = ptr(req, data);
+    ASSERT_EQ(DM_OK, ret);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_035, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(REQUEST_CREDENTIAL);
+    ASSERT_TRUE(ptr != nullptr);
+
+    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    MessageParcel data;
+    std::string credentialReasult = "The credential is created.";
+    data.WriteInt32(DM_OK);
+    data.WriteString(credentialReasult);
+    auto ipcRspInsance = std::make_shared<IpcSetCredentialRsp>();
+    ret = ptr(data, ipcRspInsance);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_036, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(SERVER_GET_DMFA_INFO);
+    ASSERT_TRUE(ptr != nullptr);
+
+    int32_t ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    MessageParcel data;
+    std::string credentialReasult = "The credential is created.";
+    data.WriteInt32(DM_OK);
+    data.WriteString(credentialReasult);
+    auto ipcRspInsance = std::make_shared<IpcSetCredentialRsp>();
+    ret = ptr(data, ipcRspInsance);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_037, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(IMPORT_CREDENTIAL);
+    ASSERT_TRUE(ptr != nullptr);
+
+    nlohmann::json jsonObject;
+    jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
+    std::string message = SafetyDump(jsonObject);
+
+    MessageParcel data;
+    data.WriteString(message);
+    data.WriteInt32(DM_OK);
+    auto ipcRspInsance = std::make_shared<IpcSetCredentialRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_038, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(IMPORT_CREDENTIAL);
+    ASSERT_TRUE(ptr != nullptr);
+
+    std::string credential = "git:https://gitee.com";
+    nlohmann::json jsonObject;
+    jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
+    jsonObject[DM_CREDENTIAL_RETURNJSONSTR] = credential;
+    std::string message = SafetyDump(jsonObject);
+
+    MessageParcel data;
+    data.WriteString(message);
+    data.WriteInt32(DM_OK);
+    auto ipcRspInsance = std::make_shared<IpcSetCredentialRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_039, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(DELETE_CREDENTIAL);
+    ASSERT_TRUE(ptr != nullptr);
+
+    nlohmann::json jsonObject;
+    jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
+    std::string message = SafetyDump(jsonObject);
+
+    MessageParcel data;
+    data.WriteString(message);
+    data.WriteInt32(DM_OK);
+    auto ipcRspInsance = std::make_shared<IpcSetCredentialRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_040, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(DELETE_CREDENTIAL);
+    ASSERT_TRUE(ptr != nullptr);
+
+    std::string credential = "git:https://gitee.com";
+    nlohmann::json jsonObject;
+    jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
+    jsonObject[DM_CREDENTIAL_RETURNJSONSTR] = credential;
+    std::string message = SafetyDump(jsonObject);
+
+    MessageParcel data;
+    data.WriteString(message);
+    data.WriteInt32(DM_OK);
+    auto ipcRspInsance = std::make_shared<IpcSetCredentialRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_041, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(GENERATE_ENCRYPTED_UUID);
+    ASSERT_TRUE(ptr != nullptr);
+
+    std::string uuid = "123456789";
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    data.WriteString(uuid);
+    auto ipcRspInsance = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_042, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(BIND_DEVICE);
+    ASSERT_TRUE(ptr != nullptr);
+
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    auto ipcRspInsance = std::make_shared<IpcRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_043, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(GET_NETWORKTYPE_BY_NETWORK);
+    ASSERT_TRUE(ptr != nullptr);
+
+    int32_t wifi = 1;
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    data.WriteInt32(wifi);
+    auto ipcRspInsance = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_044, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(STOP_AUTHENTICATE_DEVICE);
+    ASSERT_TRUE(ptr != nullptr);
+
+    int32_t wifi = 1;
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    auto ipcRspInsance = std::make_shared<IpcRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_045, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(GET_SECURITY_LEVEL);
+    ASSERT_TRUE(ptr != nullptr);
+
+    int32_t securityLevel = 1;
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    data.WriteInt32(securityLevel);
+    auto ipcRspInsance = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_046, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(GET_DEVICE_SCREEN_STATUS);
+    ASSERT_TRUE(ptr != nullptr);
+
+    int32_t screenStatus = 1;
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    data.WriteInt32(screenStatus);
+    auto ipcRspInsance = std::make_shared<IpcGetDeviceScreenStatusRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_047, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(GET_NETWORKID_BY_UDID);
+    ASSERT_TRUE(ptr != nullptr);
+
+    std::string networkId = "3a80******fd94";
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    data.WriteString(networkId);
+    auto ipcRspInsance = std::make_shared<IpcGetInfoByNetWorkRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_048, testing::ext::TestSize.Level0)
+{
+    auto ptr = GetResponseFunc(REGISTER_DEV_STATE_CALLBACK);
+    ASSERT_TRUE(ptr != nullptr);
+
+    std::string networkId = "3a80******fd94";
+    MessageParcel data;
+    data.WriteInt32(DM_OK);
+    data.WriteString(networkId);
+    auto ipcRspInsance = std::make_shared<IpcRsp>();
+    ASSERT_EQ(ptr(data, ipcRspInsance), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserClientTest, TEST_IPC_REQUEST_NULL_001, testing::ext::TestSize.Level2)
+{
+    EXPECT_EQ(TestIpcRequestNull(REGISTER_DEVICE_MANAGER_LISTENER), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNREGISTER_DEVICE_MANAGER_LISTENER), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_TRUST_DEVICE_LIST), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_DEVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_LOCAL_DEVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_UDID_BY_NETWORK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_UUID_BY_NETWORK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(PUBLISH_DEVICE_DISCOVER), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNPUBLISH_DEVICE_DISCOVER), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(AUTHENTICATE_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNAUTHENTICATE_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(SERVER_USER_AUTH_OPERATION), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(REQUEST_CREDENTIAL), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(SERVER_GET_DMFA_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(IMPORT_CREDENTIAL), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(DELETE_CREDENTIAL), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(REGISTER_CREDENTIAL_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNREGISTER_CREDENTIAL_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(NOTIFY_EVENT), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_ENCRYPTED_UUID_BY_NETWOEKID), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GENERATE_ENCRYPTED_UUID), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(BIND_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNBIND_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_NETWORKTYPE_BY_NETWORK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(REGISTER_UI_STATE_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNREGISTER_UI_STATE_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(IMPORT_AUTH_CODE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(REGISTER_DISCOVERY_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(START_DISCOVERING), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(STOP_DISCOVERING), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(BIND_TARGET), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(UNBIND_TARGET), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, TEST_IPC_REQUEST_NULL_002, testing::ext::TestSize.Level2)
+{
+    EXPECT_EQ(TestIpcRequestNull(REGISTER_PIN_HOLDER_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(CREATE_PIN_HOLDER), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(DESTROY_PIN_HOLDER), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(SET_DN_POLICY), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(STOP_AUTHENTICATE_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(DP_ACL_ADD), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_SECURITY_LEVEL), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(IS_SAME_ACCOUNT), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(CHECK_API_PERMISSION), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(CHECK_ACCESS_CONTROL), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(CHECK_SAME_ACCOUNT), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(SHIFT_LNN_GEAR), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_DEVICE_SCREEN_STATUS), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_ANONY_LOCAL_UDID), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(GET_NETWORKID_BY_UDID), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(REGISTER_DEV_STATE_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestIpcRequestNull(SYNC_CALLBACK), ERR_DM_FAILED);
+}
+
+HWTEST_F(IpcCmdParserClientTest, TEST_READ_RESPONSE_NULL_001, testing::ext::TestSize.Level2)
+{
+    EXPECT_EQ(TestReadResponseRspNull(UNREGISTER_DEVICE_MANAGER_LISTENER), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_DEVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_LOCAL_DEVICE_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_UDID_BY_NETWORK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_UUID_BY_NETWORK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(PUBLISH_DEVICE_DISCOVER), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(UNPUBLISH_DEVICE_DISCOVER), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(AUTHENTICATE_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(UNAUTHENTICATE_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(SERVER_USER_AUTH_OPERATION), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(REQUEST_CREDENTIAL), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(SERVER_GET_DMFA_INFO), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(IMPORT_CREDENTIAL), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(DELETE_CREDENTIAL), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(REGISTER_CREDENTIAL_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(UNREGISTER_CREDENTIAL_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(NOTIFY_EVENT), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_ENCRYPTED_UUID_BY_NETWOEKID), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GENERATE_ENCRYPTED_UUID), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(BIND_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(UNBIND_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_NETWORKTYPE_BY_NETWORK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(REGISTER_UI_STATE_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(UNREGISTER_UI_STATE_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(IMPORT_AUTH_CODE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(EXPORT_AUTH_CODE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(REGISTER_DISCOVERY_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(START_DISCOVERING), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(STOP_DISCOVERING), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(REGISTER_PIN_HOLDER_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(CREATE_PIN_HOLDER), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(DESTROY_PIN_HOLDER), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(STOP_AUTHENTICATE_DEVICE), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_SECURITY_LEVEL), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(CHECK_ACCESS_CONTROL), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_DEVICE_SCREEN_STATUS), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_ANONY_LOCAL_UDID), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(GET_NETWORKID_BY_UDID), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(REGISTER_DEV_STATE_CALLBACK), ERR_DM_FAILED);
+    EXPECT_EQ(TestReadResponseRspNull(SYNC_CALLBACK), ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware
