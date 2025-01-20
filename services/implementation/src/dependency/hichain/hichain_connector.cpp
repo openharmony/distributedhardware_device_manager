@@ -96,7 +96,6 @@ HiChainConnector::HiChainConnector()
                            .onFinish = HiChainConnector::onFinish,
                            .onError = HiChainConnector::onError,
                            .onRequest = HiChainConnector::onRequest};
-    InitDeviceAuthService();
     deviceGroupManager_ = GetGmInstance();
     if (deviceGroupManager_ == nullptr) {
         LOGE("[HICHAIN]failed to init group manager.");
