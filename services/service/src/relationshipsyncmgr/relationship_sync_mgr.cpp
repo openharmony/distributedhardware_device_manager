@@ -413,7 +413,7 @@ bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloa
         userIdNum = ((static_cast<uint8_t>(payloadItem->valueint)) & FOREGROUND_USERID_LEN_MASK);
     }
 
-    int32_t effectiveLen = userIdNum * USERID_BYTES + 1;
+    int32_t effectiveLen = static_cast<int32_t>(userIdNum * USERID_BYTES + 1);
     if (effectiveLen > arraySize) {
         LOGE("payload userIdNum invalid, userIdNum: %{public}u, arraySize: %{public}d", userIdNum, arraySize);
         return false;

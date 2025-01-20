@@ -240,6 +240,10 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
     authRequestContext_->bindLevel = INVALIED_TYPE;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("extra string not a json type.");
+        return;
+    }
     ParseJsonObject(jsonObject);
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
     authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
