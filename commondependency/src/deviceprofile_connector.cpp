@@ -1395,14 +1395,14 @@ std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const s
         int32_t accesseeUserid = item.GetAccessee().GetAccesseeUserId();
         if (accesserUdid == localUdid && accesseeUdid == peerUdid) {
             if (userIdAndBindLevel.find(accesserUserid) == userIdAndBindLevel.end()) {
-                userIdAndBindLevel[accesserUserid] = item.GetBindLevel();
+                userIdAndBindLevel[accesserUserid] = static_cast<int32_t>(item.GetBindLevel());
             } else {
                 userIdAndBindLevel[accesserUserid] =
                     std::min(static_cast<int32_t>(item.GetBindLevel()), userIdAndBindLevel[accesserUserid]);
             }
         } else if (accesseeUdid == localUdid && accesserUdid == peerUdid) {
             if (userIdAndBindLevel.find(accesseeUserid) == userIdAndBindLevel.end()) {
-                userIdAndBindLevel[accesseeUserid] = item.GetBindLevel();
+                userIdAndBindLevel[accesseeUserid] = static_cast<int32_t>(item.GetBindLevel());
             } else {
                 userIdAndBindLevel[accesseeUserid] =
                     std::min(static_cast<int32_t>(item.GetBindLevel()), userIdAndBindLevel[accesseeUserid]);
@@ -1458,7 +1458,7 @@ void DeviceProfileConnector::UpdatePeerUserId(AccessControlProfile profile, std:
     std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
     int32_t accesserUserid = profile.GetAccesser().GetAccesserUserId();
     int32_t accesseeUserid = profile.GetAccessee().GetAccesseeUserId();
-    int32_t bindType = profile.GetBindType();
+    uint32_t bindType = profile.GetBindType();
     if (accesserUdid == localUdid && accesseeUdid == remoteUdid && bindType == DM_IDENTICAL_ACCOUNT &&
         find(localUserIds.begin(), localUserIds.end(), accesserUserid) != localUserIds.end() &&
         (accesseeUserid == 0 || accesseeUserid == -1)) {

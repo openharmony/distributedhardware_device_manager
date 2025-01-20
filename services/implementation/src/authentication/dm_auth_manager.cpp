@@ -240,6 +240,10 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
     authRequestContext_->bindLevel = INVALIED_TYPE;
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        LOGE("extra string not a json type.");
+        return;
+    }
     ParseJsonObject(jsonObject);
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
     authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
@@ -299,8 +303,9 @@ int32_t DmAuthManager::GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
 void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    if (authenticationMap_.find(authType) != authenticationMap_.end()) {
-        authPtr_ = authenticationMap_[authType];
+    auto iter = authenticationMap_.find(authType);
+    if (iter != authenticationMap_.end()) {
+        authPtr_ = iter->second;
     }
 
     if (timer_ == nullptr) {

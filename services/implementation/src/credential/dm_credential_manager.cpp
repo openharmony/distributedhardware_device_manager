@@ -85,6 +85,7 @@ DmCredentialManager::DmCredentialManager(std::shared_ptr<HiChainConnector> hiCha
                                          std::shared_ptr<IDeviceManagerServiceListener> listener)
     : hiChainConnector_(hiChainConnector), listener_(listener)
 {
+    processInfo_.userId = 0;
     LOGI("DmCredentialManager constructor");
 }
 

@@ -1788,7 +1788,7 @@ void DeviceManagerService::SendUserRemovedBroadCast(const std::vector<std::strin
     LOGI("peerUdids: %{public}s, userId %{public}d.", GetAnonyStringList(peerUdids).c_str(), userId);
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::DEL_USER;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
     CHECK_NULL_VOID(softbusListener_);
