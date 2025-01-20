@@ -303,8 +303,9 @@ int32_t DmAuthManager::GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
 void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    if (authenticationMap_.find(authType) != authenticationMap_.end()) {
-        authPtr_ = authenticationMap_[authType];
+    auto it = authenticationMap_.find(authType);
+    if (it != authenticationMap_.end()) {
+        authPtr_ = *it;
     }
 
     if (timer_ == nullptr) {
