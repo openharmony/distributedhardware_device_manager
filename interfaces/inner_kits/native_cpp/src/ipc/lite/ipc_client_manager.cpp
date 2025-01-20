@@ -88,6 +88,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
     CHECK_NULL_RETURN(rsp, ERR_DM_POINT_NULL);
     std::string pkgName = req->GetPkgName();
     if (!IsInit(pkgName)) {
+        LOGE("dm init failed.");
         return ERR_DM_INIT_FAILED;
     }
     return serverProxy_.SendCmd(cmdCode, req, rsp);
@@ -95,7 +96,17 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 
 bool IpcClientManager::IsInit(const std::string &pkgName)
 {
-    return (packageInitSet_.count(pkgName) > 0);
+    for (auto &iter : packageInitSet_) {
+        size_t len = iter.size();
+        if (len > pkgName.size()) {
+            continue;
+        }
+        std::string tmp = pkgName.substr(0, len);
+        if (tmp == iter) {
+            return true;
+        }
+    }
+    return false;
 }
 
 int32_t IpcClientManager::OnDmServiceDied()
