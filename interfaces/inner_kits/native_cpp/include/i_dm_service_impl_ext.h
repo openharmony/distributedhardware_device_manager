@@ -112,6 +112,9 @@ public:
      */
     virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
         const DmDeviceProfileInfoFilterOptions &filterOptions) = 0;
+    virtual void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
+    virtual void OnSessionClosed(const int32_t sessionId) = 0;
+    virtual void OnBytesReceived(const int32_t sessionId, const std::string message) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);
