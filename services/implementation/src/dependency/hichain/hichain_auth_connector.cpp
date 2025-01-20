@@ -36,10 +36,6 @@ void HiChainAuthConnector::FreeJsonString(char *jsonStr)
 
 HiChainAuthConnector::HiChainAuthConnector()
 {
-    int32_t ret = InitDeviceAuthService();
-    if (ret != HC_SUCCESS) {
-        LOGE("hichain InitDeviceAuthService failed, err %{public}d.", ret);
-    }
     deviceAuthCallback_ = {.onTransmit = HiChainAuthConnector::onTransmit,
                            .onSessionKeyReturned = HiChainAuthConnector::onSessionKeyReturned,
                            .onFinish = HiChainAuthConnector::onFinish,
@@ -50,7 +46,7 @@ HiChainAuthConnector::HiChainAuthConnector()
 
 HiChainAuthConnector::~HiChainAuthConnector()
 {
-    DestroyDeviceAuthService();
+    LOGI("HiChainAuthConnector::destructor.");
 }
 
 int32_t HiChainAuthConnector::RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback)
