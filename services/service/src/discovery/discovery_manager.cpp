@@ -65,7 +65,6 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     DmSubscribeInfo dmSubInfo;
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
     dmSubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE;
-    dmSubInfo.medium = DmExchangeMedium::DM_BLE;
     dmSubInfo.freq = DmExchangeFreq::DM_LOW;
     dmSubInfo.isSameAccount = false;
     dmSubInfo.isWakeRemote = false;
@@ -98,6 +97,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         capabilityMap_[pkgName] = std::string(dmSubInfo.capability);
     }
 
+    UpdateInfoMedium(discoverParam, dmSubInfo);
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
         LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
@@ -105,6 +105,16 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     }
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgName, shared_from_this());
     return DM_OK;
+}
+
+void DiscoveryManager::UpdateInfoMedium(
+    const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo)
+{
+    dmSubInfo.medium = DmExchangeMedium::DM_BLE;
+    if (discoverParam.find(PARAM_KEY_DISC_MEDIUM) != discoverParam.end()) {
+        int32_t medium = std::atoi((discoverParam.find(PARAM_KEY_DISC_MEDIUM)->second).c_str());
+        dmSubInfo.medium = static_cast<DmExchangeMedium>(medium);
+    }
 }
 
 int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
