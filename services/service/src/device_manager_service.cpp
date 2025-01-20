@@ -88,7 +88,6 @@ DeviceManagerService::~DeviceManagerService()
     LOGI("DeviceManagerService destructor");
     UnloadDMServiceImplSo();
     UnloadDMServiceAdapterResident();
-    DestroyDeviceAuthService();
 }
 
 int32_t DeviceManagerService::Init()
