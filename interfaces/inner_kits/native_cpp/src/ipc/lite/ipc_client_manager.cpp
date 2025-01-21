@@ -88,7 +88,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
     CHECK_NULL_RETURN(rsp, ERR_DM_POINT_NULL);
     std::string pkgName = req->GetPkgName();
     if (!IsInit(pkgName)) {
-        LOGE("dm init failed.");
+        LOGE("PkgName: %s is not init.", pkgName.c_str());
         return ERR_DM_INIT_FAILED;
     }
     return serverProxy_.SendCmd(cmdCode, req, rsp);
