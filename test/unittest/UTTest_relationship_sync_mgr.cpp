@@ -163,6 +163,516 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_009, testing::ext::Test
     ASSERT_EQ(broadCastMsg, "");
 }
 
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_006, testing::ext::TestSize.Level0)
+{
+    std::string msg = R"(
+    {
+        "TYPE": 0,
+        "VALUE": [
+            { "type": 1, "userId": 1 },
+            { "type": 2, "userId": 2 }
+        ]
+    }
+    )";
+    RelationShipChangeMsg relationShipMsg =
+        ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
+    msg = R"(
+    {
+        "TYPE": 1,
+        "VALUE": [
+            { "type": 1, "userId": 1 },
+            { "type": 2, "userId": 2 }
+        ]
+    }
+    )";
+    relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
+    msg = R"(
+    {
+        "TYPE": 2,
+        "VALUE": [
+            { "type": 1, "userId": 1 },
+            { "type": 2, "userId": 2 }
+        ]
+    }
+    )";
+    relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_007, testing::ext::TestSize.Level0)
+{
+    std::string msg = R"(
+    {
+        "TYPE": 6,
+        "VALUE": [
+            { "type": 1, "userId": 1 },
+            { "type": 2, "userId": 2 }
+        ]
+    }
+    )";
+    RelationShipChangeMsg relationShipMsg =
+        ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
+    msg = R"(
+    {
+        "TYPE": 4,
+        "VALUE": [
+            { "type": 1, "userId": 1 },
+            { "type": 2, "userId": 2 }
+        ]
+    }
+    )";
+    relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    ASSERT_EQ(relationShipMsg.userId, 0);
+    msg = R"(
+    {
+        "TYPE": 7,
+        "VALUE": [
+            { "type": 1, "userId": 1 },
+            { "type": 2, "userId": 2 }
+        ]
+    }
+    )";
+    relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msgObj;
+    msgObj.type = static_cast<RelationShipChangeType>(10);
+    bool ret = msgObj.IsValid();
+    ASSERT_EQ(ret, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msgObj;
+    cJSON payloadJson;
+    RelationShipChangeType type = RelationShipChangeType::TYPE_MAX;
+    bool ret = msgObj.FromBroadcastPayLoad(&payloadJson, type);
+    ASSERT_EQ(ret, false);
+    type = RelationShipChangeType::SERVICE_UNBIND;
+    ret = msgObj.FromBroadcastPayLoad(&payloadJson, type);
+    ASSERT_EQ(ret, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.userIdInfos.push_back({1, false});
+    msg.userIdInfos.push_back({2, false});
+    msg.userIdInfos.push_back({3, false});
+    msg.userIdInfos.push_back({4, false});
+    msg.userIdInfos.push_back({5, false});
+    msg.userIdInfos.push_back({6, true});
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_002, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.userIdInfos.push_back({1, false});
+    msg.userIdInfos.push_back({2, true});
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 10;
+    msg.syncUserIdFlag = true;
+    bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
+    ASSERT_EQ(result, true);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    cJSON payloadJson;
+    bool result = msg.FromAccountLogoutPayLoad(&payloadJson);
+    ASSERT_EQ(result, false);
+    result = msg.FromAccountLogoutPayLoad(nullptr);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_002, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": 0,
+        "userId": 12345,
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromAccountLogoutPayLoad(jsonObject);
+    ASSERT_EQ(result, true);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_003, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromAccountLogoutPayLoad(jsonObject);
+    ASSERT_EQ(result, true);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_004, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "test1": 1,
+        "test2": 2,
+        "test3": 3,
+        "test4": 4,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromAccountLogoutPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    cJSON payloadJson;
+    bool result = msg.FromDeviceUnbindPayLoad(&payloadJson);
+    ASSERT_EQ(result, false);
+    result = msg.FromDeviceUnbindPayLoad(nullptr);
+    ASSERT_EQ(result, false);
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "test1": 1,
+        "test2": 2,
+        "test3": 3,
+        "test4": 4,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    result = msg.FromDeviceUnbindPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_002, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromDeviceUnbindPayLoad(jsonObject);
+    ASSERT_EQ(result, true);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_003, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": 0,
+        "userId": 12345,
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromDeviceUnbindPayLoad(jsonObject);
+    ASSERT_EQ(result, true);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    cJSON payloadJson;
+    bool result = msg.FromAppUnbindPayLoad(&payloadJson);
+    ASSERT_EQ(result, false);
+    result = msg.FromAppUnbindPayLoad(nullptr);
+    ASSERT_EQ(result, false);
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "test1": 1,
+        "test2": 2,
+        "test3": 3,
+        "test4": 4,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    result = msg.FromAppUnbindPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_002, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromAppUnbindPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_003, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": 0,
+        "userId": 12345,
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromAppUnbindPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    cJSON payloadJson;
+    bool result = msg.FromSyncFrontOrBackUserIdPayLoad(&payloadJson);
+    ASSERT_EQ(result, false);
+    result = msg.FromSyncFrontOrBackUserIdPayLoad(nullptr);
+    ASSERT_EQ(result, false);
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "test1": 1,
+        "test2": 2,
+        "test3": 3,
+        "test4": 4,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    result = msg.FromSyncFrontOrBackUserIdPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_002, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": 6,
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromSyncFrontOrBackUserIdPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_003, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": 1,
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromSyncFrontOrBackUserIdPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_004, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": "1",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromSyncFrontOrBackUserIdPayLoad(jsonObject);
+    ASSERT_EQ(result, true);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_005, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    const char* jsonString = R"({
+        "MsgType": 1,
+        "userId": 12345,
+        "accountId": 3,
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": "1",
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    bool result = msg.FromSyncFrontOrBackUserIdPayLoad(jsonObject);
+    ASSERT_EQ(result, true);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromDelUserPayLoad_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    cJSON payloadJson;
+    bool result = msg.FromDelUserPayLoad(&payloadJson);
+    ASSERT_EQ(result, false);
+    result = msg.FromDelUserPayLoad(nullptr);
+    ASSERT_EQ(result, false);
+    const char* jsonString = R"({
+        "MsgType": 0,
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    result = msg.FromDelUserPayLoad(jsonObject);
+    ASSERT_EQ(result, true);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNBIND;
+    msg.userId = 12345;
+    msg.accountId = "account_123";
+    msg.tokenId = 67890;
+    msg.peerUdids = {"udid1", "udid2"};
+    msg.peerUdid = "peer_udid";
+    msg.accountName = "test_account";
+    msg.syncUserIdFlag = true;
+
+    std::string expected = "{ MsgType: " + std::to_string(static_cast<uint32_t>(msg.type)) +
+                           ", userId: 12345, accountId: a******3, tokenId: 67890, " +
+                           "peerUdids: [ u******1, u******2 ], peerUdid: p******d, " +
+                           "accountName: t******t, syncUserIdFlag: 1, userIds: [  ] }";
+    EXPECT_EQ(msg.ToString(), expected);
+}
+
 HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_001, testing::ext::TestSize.Level0)
 {
     std::string msg = "";
@@ -270,7 +780,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToDelUserPayLoad_ValidInput, testing::ext::Te
 
     msg.ToDelUserPayLoad(msgPtr, len);
 
-    ASSERT_EQ(len, DEL_USER_PAYLOAD_LEN);
+    ASSERT_EQ(len, 2);
     ASSERT_EQ(msgPtr[0], 0x39);
 
     delete[] msgPtr;
