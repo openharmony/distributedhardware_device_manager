@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@
 
 #include "advertise_manager.h"
 #include "discovery_manager.h"
+#include "dm_device_profile_info.h"
 #include "pin_holder.h"
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
@@ -214,14 +215,15 @@ public:
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
     int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam);
+    int32_t GetDeviceProfileInfoList(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);
+    int32_t GetDeviceIconInfo(const std::string &pkgName, DmDeviceIconInfoFilterOptions &filterOptions);
 
 private:
     bool IsDMServiceImplReady();
-    bool IsDMServiceAdapterLoad();
     bool IsDMImplSoLoaded();
+    bool IsDMServiceAdapterSoLoaded();
     bool IsDMServiceAdapterResidentLoad();
     void UnloadDMServiceImplSo();
-    void UnloadDMServiceAdapter();
     void UnloadDMServiceAdapterResident();
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
         int32_t bindLevel);
@@ -294,11 +296,9 @@ private:
 
 private:
     bool isImplsoLoaded_ = false;
-    bool isAdapterSoLoaded_ = false;
     bool isAdapterResidentSoLoaded_ = false;
     void *residentSoHandle_ = nullptr;
     std::mutex isImplLoadLock_;
-    std::mutex isAdapterLoadLock_;
     std::mutex isAdapterResidentLoadLock_;
     std::mutex hichainListenerLock_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
@@ -307,7 +307,6 @@ private:
     std::shared_ptr<HichainListener> hichainListener_;
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
-    std::shared_ptr<IDMServiceImplExt> dmServiceImplExt_;
     std::shared_ptr<IDMServiceImplExtResident> dmServiceImplExtResident_;
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;

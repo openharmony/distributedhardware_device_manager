@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -87,7 +87,6 @@ DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
     UnloadDMServiceImplSo();
-    UnloadDMServiceAdapter();
     UnloadDMServiceAdapterResident();
 }
 
@@ -727,8 +726,8 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
         LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (IsDMServiceAdapterLoad()) {
-        dmServiceImplExt_->ReplyUiAction(pkgName, action, params);
+    if (IsDMServiceAdapterSoLoaded()) {
+        dmServiceImplExtResident_->ReplyUiAction(pkgName, action, params);
     }
     if (!IsDMServiceImplReady()) {
         LOGE("SetUserOperation failed, instance not init or init failed.");
@@ -742,8 +741,8 @@ void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
     }
-    if (IsDMServiceAdapterLoad()) {
-        dmServiceImplExt_->HandleDeviceStatusChange(devState, devInfo);
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->HandleDeviceStatusChange(devState, devInfo);
     }
 }
 
@@ -998,6 +997,16 @@ bool DeviceManagerService::IsDMImplSoLoaded()
     return isImplsoLoaded_;
 }
 
+bool DeviceManagerService::IsDMServiceAdapterSoLoaded()
+{
+    LOGI("In");
+    std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
+    if (!isAdapterResidentSoLoaded_ || (dmServiceImplExtResident_ == nullptr)) {
+        return false;
+    }
+    return dmServiceImplExtResident_->IsDMServiceAdapterSoLoaded();
+}
+
 int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, std::string &result)
 {
     LOGI("HiDump GetTrustedDeviceList");
@@ -1194,62 +1203,6 @@ void DeviceManagerService::UnloadDMServiceImplSo()
     void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NOLOAD);
     if (so_handle != nullptr) {
         LOGI("DeviceManagerService so_handle is not nullptr.");
-        dlclose(so_handle);
-    }
-}
-
-bool DeviceManagerService::IsDMServiceAdapterLoad()
-{
-    LOGI("Start.");
-    if (listener_ == nullptr) {
-        LOGE("Dm service is not init.");
-        return false;
-    }
-    std::lock_guard<std::mutex> lock(isAdapterLoadLock_);
-    if (isAdapterSoLoaded_ && (dmServiceImplExt_ != nullptr)) {
-        return true;
-    }
-
-    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
-    if (so_handle == nullptr) {
-        so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NODELETE);
-    }
-    if (so_handle == nullptr) {
-        LOGE("load dm service adapter so failed.");
-        return false;
-    }
-    dlerror();
-    auto func = (CreateDMServiceImplExtFuncPtr)dlsym(so_handle, "CreateDMServiceImplExtObject");
-    if (dlerror() != nullptr || func == nullptr) {
-        dlclose(so_handle);
-        LOGE("Create object function is not exist.");
-        return false;
-    }
-
-    dmServiceImplExt_ = std::shared_ptr<IDMServiceImplExt>(func());
-    if (dmServiceImplExt_->Initialize(listener_) != DM_OK) {
-        dmServiceImplExt_ = nullptr;
-        isAdapterSoLoaded_ = false;
-        LOGE("dm service adapter impl ext init failed.");
-        return false;
-    }
-    isAdapterSoLoaded_ = true;
-    LOGI("Success.");
-    return true;
-}
-
-void DeviceManagerService::UnloadDMServiceAdapter()
-{
-    LOGI("Start.");
-    std::lock_guard<std::mutex> lock(isAdapterLoadLock_);
-    if (dmServiceImplExt_ != nullptr) {
-        dmServiceImplExt_->Release();
-    }
-    dmServiceImplExt_ = nullptr;
-
-    void *so_handle = dlopen(LIB_DM_ADAPTER_NAME, RTLD_NOW | RTLD_NOLOAD);
-    if (so_handle != nullptr) {
-        LOGI("dm service adapter so_handle is not nullptr.");
         dlclose(so_handle);
     }
 }
@@ -1458,12 +1411,12 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
             const_cast<const std::map<std::string, std::string> &>(noConstBindParam);
         return dmServiceImpl_->BindTarget(pkgName, targetId, constBindParam);
     }
-    if (!IsDMServiceAdapterLoad()) {
+    if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("BindTarget failed, adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     LOGI("BindTarget unstardard begin.");
-    return dmServiceImplExt_->BindTargetExt(pkgName, targetId, bindParam);
+    return dmServiceImplExtResident_->BindTargetExt(pkgName, targetId, bindParam);
 }
 
 int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
@@ -1478,7 +1431,7 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceAdapterLoad()) {
+    if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("UnbindTarget failed, instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
@@ -1486,7 +1439,7 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         LOGE("input unbind parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return dmServiceImplExt_->UnbindTargetExt(pkgName, targetId, unbindParam);
+    return dmServiceImplExtResident_->UnbindTargetExt(pkgName, targetId, unbindParam);
 }
 
 int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgName)
@@ -1708,8 +1661,8 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         } else if (beforeUserId != -1 && currentUserId != -1) {
             HandleUserSwitched(currentUserId, beforeUserId);
         }
-        if (IsDMServiceAdapterLoad()) {
-            dmServiceImplExt_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
+        if (IsDMServiceAdapterResidentLoad()) {
+            dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
         }
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
         DMAccountInfo dmAccountInfo;
@@ -1723,9 +1676,17 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         }
         HandleAccountLogout(currentUserId, dmAccountInfo.accountId, dmAccountInfo.accountName);
         MultipleUserConnector::DeleteAccountInfoByUserId(currentUserId);
+        DMAccountInfo curDmAccountInfo;
+        curDmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
+        curDmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
+        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), curDmAccountInfo);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(beforeUserId);
         MultipleUserConnector::DeleteAccountInfoByUserId(beforeUserId);
+        DMAccountInfo curDmAccountInfo;
+        curDmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
+        curDmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
+        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), curDmAccountInfo);
     } else {
         LOGE("Invalied account common event.");
     }
@@ -1737,8 +1698,8 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
 {
     LOGI("UserId: %{public}d, accountId: %{public}s, accountName: %{public}s", userId,
         GetAnonyString(accountId).c_str(), GetAnonyString(accountName).c_str());
-    if (IsDMServiceAdapterLoad()) {
-        dmServiceImplExt_->AccountIdLogout(userId, accountId);
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->AccountIdLogout(userId, accountId);
     }
     if (!IsDMServiceImplReady()) {
         LOGE("Init impl failed.");
@@ -1827,7 +1788,7 @@ void DeviceManagerService::SendUserRemovedBroadCast(const std::vector<std::strin
     LOGI("peerUdids: %{public}s, userId %{public}d.", GetAnonyStringList(peerUdids).c_str(), userId);
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::DEL_USER;
-    msg.userId = userId;
+    msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
     CHECK_NULL_VOID(softbusListener_);
@@ -1972,8 +1933,8 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceNotTrust(udid);
     }
-    if (IsDMServiceAdapterLoad()) {
-        dmServiceImplExt_->HandleDeviceNotTrust(udid);
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->HandleDeviceNotTrust(udid);
     }
     return;
 }
@@ -2014,11 +1975,11 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
     int32_t policyStrategy = std::atoi(policyStrategyIter->second.c_str());
     int32_t timeOut = std::atoi(timeOutIter->second.c_str());
     LOGD("strategy: %{public}d, timeOut: %{public}d", policyStrategy, timeOut);
-    if (!IsDMServiceAdapterLoad()) {
+    if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("SetDnPolicy failed, instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    return dmServiceImplExt_->SetDnPolicy(policyStrategy, timeOut);
+    return dmServiceImplExtResident_->SetDnPolicy(policyStrategy, timeOut);
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -2615,6 +2576,36 @@ int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgN
         return ERR_DM_INIT_FAILED;
     }
     return dmServiceImpl_->RegisterAuthenticationType(authenticationType);
+}
+
+int32_t DeviceManagerService::GetDeviceProfileInfoList(const std::string &pkgName,
+    DmDeviceProfileInfoFilterOptions &filterOptions)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("GetDeviceProfileInfoList failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->GetDeviceProfileInfoList(pkgName, filterOptions);
+}
+
+int32_t DeviceManagerService::GetDeviceIconInfo(const std::string &pkgName,
+    DmDeviceIconInfoFilterOptions &filterOptions)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("GetDeviceIconInfo failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->GetDeviceIconInfo(pkgName, filterOptions);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

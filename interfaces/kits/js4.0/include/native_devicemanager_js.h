@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include "device_manager_callback.h"
 #include "dm_app_image_info.h"
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "dm_native_event.h"
 #include "dm_subscribe_info.h"
 #include "dm_publish_info.h"
@@ -59,6 +60,26 @@ struct DeviceBasicInfoListAsyncCallbackInfo {
     napi_deferred deferred = nullptr;
     int32_t status = -1;
     int32_t ret = 0;
+};
+
+struct DeviceProfileInfosAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    std::string bundleName;
+    napi_deferred deferred = nullptr;
+    int32_t code = -1;
+    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
+    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> deviceProfileInfos;
+};
+
+struct DeviceIconInfoAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    std::string bundleName;
+    napi_deferred deferred = nullptr;
+    int32_t code = -1;
+    OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmDeviceIconInfo deviceIconInfo;
 };
 
 struct AuthAsyncCallbackInfo {
@@ -212,6 +233,38 @@ private:
     std::string bundleName_;
 };
 
+class DmNapiGetDeviceProfileInfoListCallback : public OHOS::DistributedHardware::GetDeviceProfileInfoListCallback {
+public:
+    explicit DmNapiGetDeviceProfileInfoListCallback(napi_env env, const std::string &bundleName,
+        const napi_deferred &deferred) : env_(env), bundleName_(bundleName), deferred_(deferred)
+    {}
+    ~DmNapiGetDeviceProfileInfoListCallback() override {};
+
+    void OnResult(const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfos,
+        int32_t code) override;
+
+private:
+    napi_env env_;
+    std::string bundleName_;
+    napi_deferred deferred_ = nullptr;
+};
+
+class DmNapiGetDeviceIconInfoCallback : public OHOS::DistributedHardware::GetDeviceIconInfoCallback {
+public:
+    explicit DmNapiGetDeviceIconInfoCallback(napi_env env, const std::string &bundleName,
+        const napi_deferred &deferred) : env_(env), bundleName_(bundleName), deferred_(deferred)
+    {
+    }
+    ~DmNapiGetDeviceIconInfoCallback() override {};
+
+    void OnResult(const OHOS::DistributedHardware::DmDeviceIconInfo &deviceIconInfo, int32_t code) override;
+
+private:
+    napi_env env_;
+    std::string bundleName_;
+    napi_deferred deferred_ = nullptr;
+};
+
 class DeviceManagerNapi : public DmNativeEvent {
 public:
     explicit DeviceManagerNapi(napi_env env, napi_value thisVar);
@@ -239,6 +292,8 @@ public:
     static napi_value UnBindTarget(napi_env env, napi_callback_info info);
     static napi_value JsOn(napi_env env, napi_callback_info info);
     static napi_value JsOff(napi_env env, napi_callback_info info);
+    static napi_value JsGetDeviceProfileInfoList(napi_env env, napi_callback_info info);
+    static napi_value JsGetDeviceIconInfo(napi_env env, napi_callback_info info);
     static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
@@ -250,6 +305,8 @@ public:
     void OnPublishResult(int32_t publishId, int32_t publishResult);
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason);
     void OnDmUiCall(const std::string &paramJson);
+    void OnGetDeviceProfileInfoListCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback);
+    void OnGetDeviceIconInfoCallbackResult(DeviceIconInfoAsyncCallbackInfo *jsCallback);
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);
@@ -272,6 +329,8 @@ private:
         const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback);
     static void RegisterDevStatusCallback(napi_env env, std::string &bundleName);
     static int32_t DumpDeviceInfo(DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
+    static napi_value GetDeviceProfileInfoListPromise(napi_env env, DeviceProfileInfosAsyncCallbackInfo *jsCallback);
+    static napi_value GetDeviceIconInfoPromise(napi_env env, DeviceIconInfoAsyncCallbackInfo *jsCallback);
     
 private:
     napi_env env_;

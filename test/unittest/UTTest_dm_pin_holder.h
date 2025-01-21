@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -221,6 +221,22 @@ public:
     {
         (void)processInfo;
         (void)deviceList;
+    }
+
+    virtual void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
+        const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override
+    {
+        (void)processInfo;
+        (void)deviceProfileInfos;
+        (void)code;
+    }
+
+    virtual void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
+        const DmDeviceIconInfo &dmDeviceIconInfo, int32_t code) override
+    {
+        (void)processInfo;
+        (void)dmDeviceIconInfo;
+        (void)code;
     }
 };
 } // namespace DistributedHardware

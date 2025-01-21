@@ -540,6 +540,164 @@ HWTEST_F(DmAnonymousTest, IsDmCommonNotifyEventValid_001, testing::ext::TestSize
     EXPECT_FALSE(ret);
 }
 
+HWTEST_F(DmAnonymousTest, GetAnonyInt32List_001, testing::ext::TestSize.Level0)
+{
+    std::vector<int32_t> values = {1, 1};
+    std::string test = "[ *, * ]";
+    EXPECT_EQ(GetAnonyInt32List(values), test);
+}
+
+HWTEST_F(DmAnonymousTest, GetAnonyInt32List_002, testing::ext::TestSize.Level0)
+{
+    std::vector<int32_t> values = {};
+    std::string test = "[  ]";
+    EXPECT_EQ(GetAnonyInt32List(values), test);
+}
+
+HWTEST_F(DmAnonymousTest, GetAnonyStringList_002, testing::ext::TestSize.Level0)
+{
+    std::vector<std::string> valueVec = {};
+    std::string test = "[  ]";
+    EXPECT_EQ(GetAnonyStringList(valueVec), test);
+}
+
+HWTEST_F(DmAnonymousTest, IsNumberString_004, testing::ext::TestSize.Level0)
+{
+    const std::string inputString = "1233214569876678012312312312455644413123123";
+    bool ret = IsNumberString(inputString);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DmAnonymousTest, IsNumberString_005, testing::ext::TestSize.Level0)
+{
+    const std::string inputString = "123*+123";
+    bool ret = IsNumberString(inputString);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DmAnonymousTest, ConvertMapToJsonString_001, testing::ext::TestSize.Level0)
+{
+    std::map<std::string, std::string> paramMap;
+    for (int i = 0; i < 1001; i++) {
+        paramMap[std::to_string(i)] = "value";
+    }
+    EXPECT_EQ(ConvertMapToJsonString(paramMap), "");
+}
+
+HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_004, testing::ext::TestSize.Level0)
+{
+    std::map<std::string, std::string> paramMap;
+    for (int i = 0; i < 1001; i++) {
+        paramMap[std::to_string(i)] = "value";
+    }
+    std::string jsonStr = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
+    ParseMapFromJsonString(jsonStr, paramMap);
+    EXPECT_EQ(paramMap.size(), 1001);
+}
+
+HWTEST_F(DmAnonymousTest, CompareVersion_001, testing::ext::TestSize.Level0)
+{
+    std::string remoteVersion = "1.2.3.4";
+    std::string oldVersion = "1.2.3";
+    EXPECT_EQ(CompareVersion(remoteVersion, oldVersion), true);
+}
+
+HWTEST_F(DmAnonymousTest, StringToInt_003, testing::ext::TestSize.Level0)
+{
+    std::string str = "!++";
+    int32_t base = 10;
+    int32_t ret = StringToInt(str, base);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAnonymousTest, StringToInt_004, testing::ext::TestSize.Level0)
+{
+    std::string str = "-9223372036854775809";
+    int32_t base = 10;
+    int32_t ret = StringToInt(str, base);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAnonymousTest, StringToInt64_003, testing::ext::TestSize.Level0)
+{
+    std::string str = "!++";
+    int32_t base = 10;
+    int32_t ret = StringToInt64(str, base);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAnonymousTest, StringToInt64_004, testing::ext::TestSize.Level0)
+{
+    std::string str = "-9223372036854775809";
+    int32_t base = 10;
+    int32_t ret = StringToInt64(str, base);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAnonymousTest, GetSubscribeId_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "12345pkgName";
+    uint16_t ret = GetSubscribeId(pkgName);
+    EXPECT_EQ(ret, 0);
+}
+
+HWTEST_F(DmAnonymousTest, IsIdLengthValid_001, testing::ext::TestSize.Level0)
+{
+    std::string inputID;
+    inputID.assign(300, 'A');
+    uint16_t ret = IsIdLengthValid(inputID);
+    EXPECT_EQ(ret, false);
+    inputID = "";
+    ret = IsIdLengthValid(inputID);
+    EXPECT_EQ(ret, false);
+    inputID = "123";
+    ret = IsIdLengthValid(inputID);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DmAnonymousTest, IsMessageLengthValid_002, testing::ext::TestSize.Level0)
+{
+    std::string inputMessage;
+    inputMessage.assign(40 * 1024 * 1024 + 1, 'A');
+    bool ret = IsMessageLengthValid(inputMessage);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DmAnonymousTest, IsValueExist_001, testing::ext::TestSize.Level0)
+{
+    std::multimap<std::string, int32_t> unorderedmap = {{"1", 1}};
+    std::string udid = "1";
+    int32_t userId = 3;
+    bool ret = IsValueExist(unorderedmap, udid, userId);
+    EXPECT_FALSE(ret);
+    udid = "3";
+    ret = IsValueExist(unorderedmap, udid, 1);
+    EXPECT_FALSE(ret);
+    ret = IsValueExist(unorderedmap, udid, userId);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DmAnonymousTest, IsDmCommonNotifyEventValid_002, testing::ext::TestSize.Level0)
+{
+    DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::MIN;
+    bool ret = IsDmCommonNotifyEventValid(dmCommonNotifyEvent);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DmAnonymousTest, GetSubStr_001, testing::ext::TestSize.Level0)
+{
+    std::string rawStr = "123";
+    std::string separator = "2";
+    int32_t index = 10;
+    EXPECT_EQ(GetSubStr(rawStr, separator, index), "");
+    index = -1;
+    EXPECT_EQ(GetSubStr(rawStr, separator, index), "");
+    separator = "";
+    EXPECT_EQ(GetSubStr(rawStr, separator, index), "");
+    rawStr = "";
+    EXPECT_EQ(GetSubStr(rawStr, separator, index), "");
+}
+
 HWTEST_F(DmAnonymousTest, GetSubscribeId_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "12345#pkgName";

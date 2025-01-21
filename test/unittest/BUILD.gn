@@ -52,6 +52,7 @@ group("unittest") {
     ":UTTest_dm_radar_helper_test",
     ":UTTest_dm_screen_common_event",
     ":UTTest_dm_service_load",
+    ":UTTest_dm_softbus_cache",
     ":UTTest_dm_timer",
     ":UTTest_dm_transport",
     ":UTTest_dm_transport_msg",
@@ -77,6 +78,7 @@ group("unittest") {
     ":UTTest_relationship_sync_mgr",
     ":UTTest_softbus_connector",
     ":UTTest_softbus_listener",
+    ":UTTest_softbus_listener_two",
     ":UTTest_softbus_publish",
     ":UTTest_softbus_session",
   ]
@@ -362,6 +364,31 @@ ohos_unittest("UTTest_device_manager_service") {
 
 ## UnitTest UTTest_device_manager_service }}}
 
+## UnitTest UTTest_dm_softbus_cache {{{
+ohos_unittest("UTTest_dm_softbus_cache") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_dm_softbus_cache.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+  ]
+}
+
+## UnitTest UTTest_dm_softbus_cache }}}
+
 ## UnitTest UTTest_device_manager_service_three {{{
 ohos_unittest("UTTest_device_manager_service_three") {
   module_out_path = module_out_path
@@ -551,6 +578,37 @@ ohos_unittest("UTTest_softbus_listener") {
 }
 
 ## UnitTest UTTest_softbus_listener }}}
+
+## UnitTest UTTest_softbus_listener_two {{{
+ohos_unittest("UTTest_softbus_listener_two") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/test/softbusunittest",
+    "${services_path}/src/softbus",
+  ]
+
+  sources = [
+    "${devicemanager_path}/test/softbusunittest/UTTest_softbus_listener_two.cpp",
+    "${devicemanager_path}/test/unittest/mock/parameter.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+  ]
+}
+
+## UnitTest UTTest_softbus_listener_two }}}
 
 ## UnitTest UTTest_softbus_publish {{{
 ohos_unittest("UTTest_softbus_publish") {

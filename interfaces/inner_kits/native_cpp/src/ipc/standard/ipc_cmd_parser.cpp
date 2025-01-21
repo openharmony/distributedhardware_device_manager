@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "dm_log.h"
 #include "ipc_acl_profile_req.h"
 #include "ipc_authenticate_device_req.h"
@@ -32,7 +33,9 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_anony_local_udid_rsp.h"
+#include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
@@ -42,6 +45,7 @@
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
+#include "ipc_model_codec.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_req.h"
@@ -62,30 +66,6 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 const int32_t DM_MAX_TRUST_DEVICE_NUM = 200;
-}
-
-void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
-{
-    std::string deviceIdStr = parcel.ReadString();
-    if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s deviceId failed!");
-        return;
-    }
-    std::string deviceNameStr = parcel.ReadString();
-    if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s deviceName failed!");
-        return;
-    }
-    devInfo.deviceTypeId = parcel.ReadUint16();
-    std::string networkIdStr = parcel.ReadString();
-    if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s networkId failed!");
-        return;
-    }
-    devInfo.range = parcel.ReadInt32();
-    devInfo.networkType = parcel.ReadInt32();
-    devInfo.authForm = static_cast<DmAuthForm>(parcel.ReadInt32());
-    devInfo.extraData = parcel.ReadString();
 }
 
 void DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
@@ -242,7 +222,7 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, MessageParcel &reply, std::shared_pt
         std::vector<DmDeviceInfo> deviceInfoVec;
         for (int32_t i = 0; i < deviceNum; ++i) {
             DmDeviceInfo deviceInfo;
-            DecodeDmDeviceInfo(reply, deviceInfo);
+            IpcModelCodec::DecodeDmDeviceInfo(reply, deviceInfo);
             deviceInfoVec.emplace_back(deviceInfo);
         }
         pRsp->SetDeviceVec(deviceInfoVec);
@@ -273,7 +253,7 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcR
     }
     std::shared_ptr<IpcGetDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo deviceInfo;
-    DecodeDmDeviceInfo(reply, deviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(reply, deviceInfo);
     pRsp->SetDeviceInfo(deviceInfo);
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -301,7 +281,7 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_INFO, MessageParcel &reply, std::shared_pt
     }
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo localDeviceInfo;
-    DecodeDmDeviceInfo(reply, localDeviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(reply, localDeviceInfo);
     pRsp->SetLocalDeviceInfo(localDeviceInfo);
     pRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
@@ -542,7 +522,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
     std::string pkgName = data.ReadString();
     DmDeviceState deviceState = static_cast<DmDeviceState>(data.ReadInt32());
     DmDeviceInfo dmDeviceInfo;
-    DecodeDmDeviceInfo(data, dmDeviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
 
     DmDeviceBasicInfo dmDeviceBasicInfo;
     size_t deviceBasicSize = sizeof(DmDeviceBasicInfo);
@@ -582,7 +562,7 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
     std::string pkgName = data.ReadString();
     int16_t subscribeId = data.ReadInt16();
     DmDeviceInfo dmDeviceInfo;
-    DecodeDmDeviceInfo(data, dmDeviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
     DmDeviceBasicInfo devBasicInfo;
     DecodeDmDeviceBasicInfo(data, devBasicInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, dmDeviceInfo);
@@ -1895,7 +1875,7 @@ ON_IPC_CMD(SERVER_DEVICE_SCREEN_STATE_NOTIFY, MessageParcel &data, MessageParcel
 {
     std::string pkgName = data.ReadString();
     DmDeviceInfo dmDeviceInfo;
-    DecodeDmDeviceInfo(data, dmDeviceInfo);
+    IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
     DeviceManagerNotify::GetInstance().OnDeviceScreenStatus(pkgName, dmDeviceInfo);
 
     reply.WriteInt32(DM_OK);
@@ -2066,7 +2046,6 @@ ON_IPC_READ_RESPONSE(SYNC_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
-
 ON_IPC_SET_REQUEST(REG_AUTHENTICATION_TYPE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     if (pBaseReq == nullptr) {
@@ -2094,6 +2073,95 @@ ON_IPC_READ_RESPONSE(REG_AUTHENTICATION_TYPE, MessageParcel &reply, std::shared_
         return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFO_LIST, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetDeviceProfileInfoListReq> pReq =
+        std::static_pointer_cast<IpcGetDeviceProfileInfoListReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!IpcModelCodec::EncodeDmDeviceProfileInfoFilterOptions(pReq->GetFilterOptions(), data)) {
+        LOGE("write filterOptions failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFO_LIST, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t code = data.ReadInt32();
+    int32_t deviceNum = data.ReadInt32();
+    std::vector<DmDeviceProfileInfo> deviceProfileInfos;
+    if (deviceNum > 0 && deviceNum <= MAX_DEVICE_PROFILE_SIZE) {
+        for (int32_t i = 0; i < deviceNum; ++i) {
+            DmDeviceProfileInfo deviceInfo;
+            IpcModelCodec::DecodeDmDeviceProfileInfo(data, deviceInfo);
+            deviceProfileInfos.emplace_back(deviceInfo);
+        }
+    }
+
+    DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfoListResult(pkgName, deviceProfileInfos, code);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_ICON_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetDeviceIconInfoReq> pReq = std::static_pointer_cast<IpcGetDeviceIconInfoReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!IpcModelCodec::EncodeDmDeviceIconInfoFilterOptions(pReq->GetFilterOptions(), data)) {
+        LOGE("write filterOptions failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_ICON_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_DEVICE_ICON_INFO_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t code = data.ReadInt32();
+    DmDeviceIconInfo deviceIconInfo;
+    IpcModelCodec::DecodeDmDeviceIconInfo(data, deviceIconInfo);
+    DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo, code);
+    reply.WriteInt32(DM_OK);
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,79 @@ public:
     virtual ~IDMServiceImplExtResident() = default;
     virtual int32_t Initialize(const std::shared_ptr<IDeviceManagerServiceListener> &listener) = 0;
     virtual int32_t Release() = 0;
+    virtual bool IsDMServiceAdapterLoad() = 0;
+    virtual bool IsDMServiceAdapterSoLoaded() = 0;
+   /**
+     * @tc.name: IDMServiceImplExt::BindTargetExt
+     * @tc.desc: BindTargetExt
+     * @tc.type: FUNC
+     */
+    virtual int32_t BindTargetExt(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::UnbindTargetExt
+     * @tc.desc: UnbindTargetExt
+     * @tc.type: FUNC
+     */
+    virtual int32_t UnbindTargetExt(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &unbindParam) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::HandleDeviceStatusChange
+     * @tc.desc: HandleDeviceStatusChange
+     * @tc.type: FUNC
+     */
+    virtual int32_t HandleDeviceStatusChange(DmDeviceState devState, const DmDeviceInfo &devInfo) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::ReplyUiAction
+     * @tc.desc: ReplyUiAction
+     * @tc.type: FUNC
+     */
+    virtual int32_t ReplyUiAction(const std::string &pkgName, int32_t action, const std::string &result) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::AccountIdLogout
+     * @tc.desc: AccountIdLogout
+     * @tc.type: FUNC
+     */
+    virtual int32_t AccountIdLogout(int32_t userId, const std::string &oldAccountId) = 0;
+    /**
+     * @tc.name: IDMServiceImplExt::HandleDeviceNotTrust
+     * @tc.desc: HandleDeviceNotTrust
+     * @tc.type: FUNC
+     */
+    virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::SetDnPolicy
+     * @tc.desc: SetDnPolicy
+     * @tc.type: FUNC
+     */
+    virtual int32_t SetDnPolicy(int32_t policy, int32_t timeOut) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::AccountUserSwitched
+     * @tc.desc: AccountUserSwitched
+     * @tc.type: FUNC
+     */
+    virtual int32_t AccountUserSwitched(int32_t userId, const std::string &accountId) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::GetDeviceProfileInfoList
+     * @tc.desc: GetDeviceProfileInfoList
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
+        const DmDeviceProfileInfoFilterOptions &filterOptions) = 0;
+    /**
+     * @tc.name: IDMServiceImplExt::GetDeviceIconInfo
+     * @tc.desc: GetDeviceIconInfo
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetDeviceIconInfo(const std::string &pkgName,
+        const DmDeviceIconInfoFilterOptions &filterOptions) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);

@@ -64,6 +64,7 @@ HichainListener::HichainListener()
 HichainListener::~HichainListener()
 {
     LOGI("HichainListener::destructor.");
+    DestroyDeviceAuthService();
 }
 
 void HichainListener::RegisterDataChangeCb()

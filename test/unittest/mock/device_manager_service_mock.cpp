@@ -30,9 +30,14 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
     return DmDeviceManagerService::dmDeviceManagerService->GetTrustedDeviceList(pkgName, deviceList);
 }
 
-bool DeviceManagerService::IsDMServiceAdapterLoad()
+bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
 {
-    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterLoad();
+    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterResidentLoad();
+}
+
+bool DeviceManagerService::IsDMServiceAdapterSoLoaded()
+{
+    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterSoLoaded();
 }
 
 int32_t DeviceManagerService::SendUserIdsByWifi(const std::string &networkId,

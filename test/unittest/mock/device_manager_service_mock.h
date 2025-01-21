@@ -28,7 +28,8 @@ public:
 public:
     virtual bool IsDMServiceImplReady() = 0;
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList) = 0;
-    virtual bool IsDMServiceAdapterLoad() = 0;
+    virtual bool IsDMServiceAdapterResidentLoad() = 0;
+    virtual bool IsDMServiceAdapterSoLoaded() = 0;
     virtual int32_t SendUserIdsByWifi(const std::string &networkId,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
 public:
@@ -39,7 +40,8 @@ class DeviceManagerServiceMock : public DmDeviceManagerService {
 public:
     MOCK_METHOD(bool, IsDMServiceImplReady, ());
     MOCK_METHOD(int32_t, GetTrustedDeviceList, (const std::string &, std::vector<DmDeviceInfo> &));
-    MOCK_METHOD(bool, IsDMServiceAdapterLoad, ());
+    MOCK_METHOD(bool, IsDMServiceAdapterResidentLoad, ());
+    MOCK_METHOD(bool, IsDMServiceAdapterSoLoaded, ());
     MOCK_METHOD(int32_t, SendUserIdsByWifi, (const std::string &, const std::vector<int32_t> &,
         const std::vector<int32_t> &));
 };

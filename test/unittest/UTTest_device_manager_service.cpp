@@ -529,6 +529,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
     std::string extra = "jdddd";
     int32_t authType = 0;
     std::string deviceId = " 2345";
+    EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*softbusListenerMock_,
         GetTargetInfoFromCache(_, _, _)).WillOnce(Return(ERR_DM_BIND_INPUT_PARA_INVALID));
     int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
@@ -1201,6 +1202,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_003, testing::ext::TestSize.Level0
     int32_t authType = 1;
     std::string deviceId = "1234";
     std::string bindParam;
+    EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*softbusListenerMock_,
         GetTargetInfoFromCache(_, _, _)).WillOnce(Return(ERR_DM_BIND_INPUT_PARA_INVALID));
     int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
@@ -1222,6 +1224,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_001, testing::ext::TestSize.Leve
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "1234";
+    EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1257,6 +1260,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_005, testing::ext::TestSize.Leve
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "1234";
     std::string extra = "extra";
+    EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId, extra);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1685,27 +1689,6 @@ HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceImplSo_001, testing::ext::Test
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterLoad_001, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    DeviceManagerService::GetInstance().IsDMServiceAdapterLoad();
-    bool ret = DeviceManagerService::GetInstance().IsDMServiceImplReady();
-    EXPECT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceAdapter_001, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().UnloadDMServiceAdapter();
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
-HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceAdapter_002, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().dmServiceImplExt_ = nullptr;
-    DeviceManagerService::GetInstance().UnloadDMServiceAdapter();
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
 HWTEST_F(DeviceManagerServiceTest, StartDiscovering_001, testing::ext::TestSize.Level0)
 {
     DeletePermission();
@@ -1962,6 +1945,9 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_006, testing::ext::TestSize.Level0
     std::string pkgName = "pkgName";
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
+    targetId.wifiIp = "";
+    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
+    DeviceManagerService::GetInstance().dmServiceImpl_ = nullptr;
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -2614,6 +2600,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidHashByAnoyDeviceId_001, testing::ext::
 {
     std::string udidHash;
     std::string anoyDeviceId = "anoyDeviceId";
+    EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().GetUdidHashByAnoyDeviceId(anoyDeviceId, udidHash);
     EXPECT_EQ(ret, DM_OK);
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));

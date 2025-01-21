@@ -388,19 +388,11 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
         end = rawStr.find(separator, start);
     }
     strVec.push_back(rawStr.substr(start));
-    if (strVec.size() >= index + 1) {
+    if (strVec.size() >= static_cast<size_t>(index + 1)) {
         return strVec.at(index);
     }
     LOGE("get failed");
     return "";
-}
-
-void DeleteArrayPtr(const char* arrPtr)
-{
-    if (arrPtr != nullptr) {
-        delete[] arrPtr;
-        arrPtr = nullptr;
-    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

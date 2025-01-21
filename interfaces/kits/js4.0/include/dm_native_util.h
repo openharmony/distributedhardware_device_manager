@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include <string>
 
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "dm_publish_info.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -46,6 +47,10 @@ enum DMBussinessErrorCode {
     DM_ERR_DISCOVERY_INVALID = 11600104,
     // Publish invalid.
     DM_ERR_PUBLISH_INVALID = 11600105,
+    // Get data from cloud failed.
+    DM_ERR_FROM_CLOUD_FAILED = 11600106,
+    // Need Login.
+    DM_ERR_NEED_LOGIN = 11600107,
 };
 void DeviceBasicInfoToJsArray(const napi_env &env,
                               const std::vector<DmDeviceBasicInfo> &vecDevInfo,
@@ -67,6 +72,21 @@ bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, c
 bool IsFunctionType(napi_env env, napi_value value);
 void DmDeviceBasicToJsObject(napi_env env, const DmDeviceBasicInfo &vecDevInfo, napi_value &result);
 bool JsToStringAndCheck(napi_env env, napi_value value, const std::string &valueName, std::string &strValue);
+
+void JsObjectToStrVector(const napi_env &env, const napi_value &object, const std::string &fieldStr,
+    std::vector<std::string> &fieldRef);
+void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value &object,
+    DmDeviceProfileInfoFilterOptions &info);
+void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &object,
+    DmDeviceIconInfoFilterOptions &info);
+void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
+    napi_value &arrayResult);
+void DmProductInfoToJs(const napi_env &env, const DmProductInfo &prodInfos, napi_value &jsObj);
+void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &devInfo, napi_value &jsObj);
+void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj);
+void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,
+    napi_value &arrayResult);
+
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_NATIVE_UTIL_H
