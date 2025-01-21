@@ -1262,6 +1262,40 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
         .WillOnce(DoAll(SetArgReferee<0>(backgroundUserIds), Return(DM_OK)));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_201, testing::ext::TestSize.Level0)
+{
+    DeletePermission();
+    std::string pkgName;
+    DmDeviceProfileInfoFilterOptions filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DmDeviceProfileInfoFilterOptions filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize.Level0)
+{
+    DeletePermission();
+    std::string pkgName;
+    DmDeviceProfileInfoFilterOptions filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DmDeviceProfileInfoFilterOptions filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

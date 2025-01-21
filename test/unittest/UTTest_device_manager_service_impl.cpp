@@ -1294,6 +1294,9 @@ HWTEST_F(DeviceManagerServiceImplTest, ScreenCommonEventCallback_001, testing::e
     std::string commonEventType = "usual.event.SCREEN_LOCKED";
     deviceManagerServiceImpl_->ScreenCommonEventCallback(commonEventType);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
+    commonEventType = "commonEventType";
+    deviceManagerServiceImpl_->ScreenCommonEventCallback(commonEventType);
+    EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
 
 /**
@@ -1886,6 +1889,48 @@ HWTEST_F(DeviceManagerServiceImplTest, RegisterAuthenticationType_001, testing::
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForRemoteUserRemoved(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(localUserIds), Return()));
     deviceManagerServiceImpl_->HandleRemoteUserRemoved(userId, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, RequestCredential_003, testing::ext::TestSize.Level0)
+{
+    const std::string reqJsonStr = "test";
+    std::string returnJsonStr = "returntest";
+    if (deviceManagerServiceImpl_ == nullptr) {
+        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
+    }
+    if (deviceManagerServiceImpl_->credentialMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    int32_t ret = deviceManagerServiceImpl_->RequestCredential(reqJsonStr, returnJsonStr);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, ImportCredential_010, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string credentialInfo = "credentialInfo";
+    if (deviceManagerServiceImpl_ == nullptr) {
+        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
+    }
+    if (deviceManagerServiceImpl_->credentialMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    int32_t ret = deviceManagerServiceImpl_->ImportCredential(pkgName, credentialInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_010, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::string deleteInfo = "deleteInfo";
+    if (deviceManagerServiceImpl_ == nullptr) {
+        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
+    }
+    if (deviceManagerServiceImpl_->credentialMgr_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, deleteInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware

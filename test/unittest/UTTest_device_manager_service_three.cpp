@@ -454,6 +454,24 @@ HWTEST_F(DeviceManagerServiceThreeTest, RegisterAuthenticationType_301, testing:
     int32_t ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
     EXPECT_EQ(ret, ERR_DM_INIT_FAILED);
 }
+
+HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceProfileInfoList_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DmDeviceProfileInfoFilterOptions filterOptions;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceIconInfo_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DmDeviceProfileInfoFilterOptions filterOptions;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
