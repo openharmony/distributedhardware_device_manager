@@ -380,6 +380,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSi
     std::string accountName;
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterSoLoaded()).WillOnce(Return(false));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
 
     int32_t curUserId = 0;
