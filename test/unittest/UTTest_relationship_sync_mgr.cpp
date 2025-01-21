@@ -388,6 +388,71 @@ HWTEST_F(ReleationShipSyncMgrTest, EmptyRemoteList, testing::ext::TestSize.Level
     EXPECT_TRUE(foregroundUserIdInfos.empty());
     EXPECT_TRUE(backgroundUserIdInfos.empty());
 }
+
+HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    cJSON *payloadJson = NULL;
+    RelationShipChangeType type = RelationShipChangeType::TYPE_MAX;
+    bool ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
+
+    type = RelationShipChangeType::ACCOUNT_LOGOUT;
+    ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
+
+    type = RelationShipChangeType::DEVICE_UNBIND;
+    ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
+
+    type = RelationShipChangeType::APP_UNBIND;
+    ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
+
+    type = RelationShipChangeType::SYNC_USERID;
+    ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
+
+    type = RelationShipChangeType::DEL_USER;
+    ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
+
+    type = RelationShipChangeType::APP_UNINSTALL;
+    ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.type = 8;
+    bool ret = msg.IsValid();
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::ACCOUNT_LOGOUT;
+    bool ret = msg.IsChangeTypeValid();
+    EXPECT_TRUE(ret);
+
+    msg.type = RelationShipChangeType::DEVICE_UNBIND;
+    ret = msg.IsChangeTypeValid();
+    EXPECT_TRUE(ret);
+
+    msg.type = RelationShipChangeType::APP_UNBIND;
+    ret = msg.IsChangeTypeValid();
+    EXPECT_TRUE(ret);
+
+    msg.type = RelationShipChangeType::SYNC_USERID;
+    ret = msg.IsChangeTypeValid();
+    EXPECT_TRUE(ret);
+
+    msg.type = RelationShipChangeType::DEL_USER;
+    ret = msg.IsChangeTypeValid();
+    EXPECT_TRUE(ret);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
