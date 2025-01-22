@@ -1278,7 +1278,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_202, testing::ext::T
     std::string pkgName = "pkgName";
     OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize.Level0)

@@ -1920,7 +1920,7 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
     jsonObject1[TAG_MSG_TYPE] = 800;
     message = jsonObject1.dump();
     authManager_->authResponseState_ = nullptr;
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     authManager_->OnDataReceived(sessionId, message);
 
     authManager_->authRequestState_ = nullptr;
