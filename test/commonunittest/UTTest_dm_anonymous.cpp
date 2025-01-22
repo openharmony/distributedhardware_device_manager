@@ -721,7 +721,7 @@ HWTEST_F(DmAnonymousTest, IsIdLengthValid_002, testing::ext::TestSize.Level0)
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DmAnonymousTest, GetSubStr_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetSubStr_002, testing::ext::TestSize.Level0)
 {
     std::string rawStr = "";
     std::string separator = "";

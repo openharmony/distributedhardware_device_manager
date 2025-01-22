@@ -467,7 +467,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceProfileInfoList_301, testing::e
 HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceIconInfo_301, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
-    DmDeviceProfileInfoFilterOptions filterOptions;
+    DmDeviceIconInfoFilterOptions filterOptions;
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);

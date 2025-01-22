@@ -1284,7 +1284,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize
 {
     DeletePermission();
     std::string pkgName;
-    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -1292,7 +1292,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize
 HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
-    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
