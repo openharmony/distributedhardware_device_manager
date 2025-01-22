@@ -21,6 +21,7 @@ import Constant from '../common/constant';
 import accessibility from '@ohos.accessibility';
 import common from '@ohos.app.ability.common';
 
+
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:InputPinDialog]==>'
 const ACTION_CANCEL_PINCODE_INPUT: number = 4
