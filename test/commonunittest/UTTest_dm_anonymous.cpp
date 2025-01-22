@@ -705,7 +705,7 @@ HWTEST_F(DmAnonymousTest, GetSubscribeId_001, testing::ext::TestSize.Level0)
     EXPECT_GE(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, GetAnonyInt32List_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyInt32List_005, testing::ext::TestSize.Level0)
 {
     std::vector<int32_t> values;
     values.push_back(101);
@@ -714,7 +714,7 @@ HWTEST_F(DmAnonymousTest, GetAnonyInt32List_001, testing::ext::TestSize.Level0)
     EXPECT_FALSE(ret.empty());
 }
 
-HWTEST_F(DmAnonymousTest, IsIdLengthValid_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsIdLengthValid_002, testing::ext::TestSize.Level0)
 {
     std::string inputID = "";
     bool ret = IsIdLengthValid(inputID);

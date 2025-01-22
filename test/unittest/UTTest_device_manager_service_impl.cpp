@@ -1885,6 +1885,8 @@ HWTEST_F(DeviceManagerServiceImplTest, RegisterAuthenticationType_001, testing::
     int32_t ret = deviceManagerServiceImpl_->RegisterAuthenticationType(authenticationType);
     EXPECT_EQ(ret, DM_OK);
 
+    int32_t userId = 0;
+    std::string remoteUdid = "remoteUdid";
     std::vector<int32_t> localUserIds;
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForRemoteUserRemoved(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(localUserIds), Return()));

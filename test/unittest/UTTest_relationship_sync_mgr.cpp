@@ -422,14 +422,6 @@ HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_001, testing::ext::TestS
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, IsValid_001, testing::ext::TestSize.Level0)
-{
-    RelationShipChangeMsg msg;
-    msg.type = 8;
-    bool ret = msg.IsValid();
-    EXPECT_FALSE(ret);
-}
-
 HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize.Level0)
 {
     RelationShipChangeMsg msg;

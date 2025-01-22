@@ -1250,7 +1250,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
     std::vector<int32_t> backgroundUserIds;
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
-    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED))
+    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
     backgroundUserIds.push_back(102);
@@ -1267,7 +1267,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_201, testing::ext::T
 {
     DeletePermission();
     std::string pkgName;
-    DmDeviceProfileInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -1275,7 +1275,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_201, testing::ext::T
 HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_202, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
-    DmDeviceProfileInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -1284,7 +1284,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize
 {
     DeletePermission();
     std::string pkgName;
-    DmDeviceProfileInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -1292,7 +1292,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize
 HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
-    DmDeviceProfileInfoFilterOptions filterOptions;
+    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }

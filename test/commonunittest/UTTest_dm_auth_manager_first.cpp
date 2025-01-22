@@ -1911,12 +1911,12 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
 
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    int32_t sessionId = 1;
+    sessionId = 1;
     std::string message;
     authManager_->authResponseContext_->sessionId = sessionId;
-    nlohmann::json jsonObject;
-    jsonObject[TAG_MSG_TYPE] = 800;
-    message = jsonObject.dump();
+    nlohmann::json jsonObject1;
+    jsonObject1[TAG_MSG_TYPE] = 800;
+    message = jsonObject1.dump();
     authManager_->authResponseState_ = nullptr;
     authManager_->OnDataReceived(sessionId, message);
 
