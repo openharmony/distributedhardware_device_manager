@@ -27,7 +27,6 @@ export default class Constant {
   static readonly DIALOG_TITLE_FONT_SIZE = 20;
   static readonly DIALOG_TIPS_FONT_SIZE = 14;
   static readonly TIBETAN_LANGUAGES: Array<string> = ['bo'];
-  
   static isPhone(): boolean {
     return (deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'default');
   }
