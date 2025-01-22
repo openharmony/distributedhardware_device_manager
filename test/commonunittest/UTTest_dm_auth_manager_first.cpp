@@ -766,8 +766,9 @@ HWTEST_F(DmAuthManagerTest, ImportCredential001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
     std::string publicKey = "publicKey";
+    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = authManager_->ImportCredential(deviceId, publicKey);
-    ASSERT_NE(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, ResponseCredential001, testing::ext::TestSize.Level0)
@@ -1907,6 +1908,7 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
 
     int32_t sessionId = 1;
     authManager_->remoteUdidHash_ = "remoteUdidhash";
+    EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
     authManager_->DeleteOffLineTimer(sessionId);
 
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
@@ -1918,6 +1920,7 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
     jsonObject1[TAG_MSG_TYPE] = 800;
     message = jsonObject1.dump();
     authManager_->authResponseState_ = nullptr;
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
     authManager_->OnDataReceived(sessionId, message);
 
     authManager_->authRequestState_ = nullptr;

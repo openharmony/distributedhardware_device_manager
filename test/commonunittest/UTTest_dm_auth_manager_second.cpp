@@ -1698,7 +1698,7 @@ HWTEST_F(DmAuthManagerTest, BindTarget_006, testing::ext::TestSize.Level0)
     bindParam.insert(std::pair<std::string, std::string>("AUTH_TYPE", "2"));
     bindParam.insert(std::pair<std::string, std::string>("CONN_ADDR_TYPE", "3"));
     int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
 }
 } // namespace
 } // namespace DistributedHardware

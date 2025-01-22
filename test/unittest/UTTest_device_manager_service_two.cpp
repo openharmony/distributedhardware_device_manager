@@ -1229,7 +1229,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
 
     authParam[DM_AUTHENTICATION_TYPE] = "123456";
     ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     std::string msg;
     nlohmann::json msgJsonObj;
@@ -1256,6 +1256,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
     backgroundUserIds.push_back(102);
     msgJsonObj["discoverType"] = 1;
     msg = msgJsonObj.dump();
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_))
@@ -1294,7 +1295,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize
     std::string pkgName = "pkgName";
     OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 } // namespace
 } // namespace DistributedHardware

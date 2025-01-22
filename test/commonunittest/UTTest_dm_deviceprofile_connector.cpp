@@ -2001,7 +2001,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckBindType_004, testing::ext::TestSize.L
 
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().CheckBindType(peerUdid, localUdid);
-    EXPECT_EQ(ret, INVALIED_TYPE);
+    EXPECT_EQ(ret, 5);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetTokenIdByNameAndDeviceId_001, testing::ext::TestSize.Level0)

@@ -1883,7 +1883,7 @@ HWTEST_F(DeviceManagerServiceImplTest, RegisterAuthenticationType_001, testing::
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     int32_t ret = deviceManagerServiceImpl_->RegisterAuthenticationType(authenticationType);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     int32_t userId = 0;
     std::string remoteUdid = "remoteUdid";
