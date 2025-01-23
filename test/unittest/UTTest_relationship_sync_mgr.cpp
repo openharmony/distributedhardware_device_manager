@@ -389,7 +389,7 @@ HWTEST_F(ReleationShipSyncMgrTest, EmptyRemoteList, testing::ext::TestSize.Level
     EXPECT_TRUE(backgroundUserIdInfos.empty());
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_010, testing::ext::TestSize.Level0)
 {
     RelationShipChangeMsg msg;
     cJSON *payloadJson = NULL;
