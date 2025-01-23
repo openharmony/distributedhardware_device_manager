@@ -100,7 +100,7 @@ if (defined(ohos_lite)) {
         "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
         "//third_party/bounds_checking_function:libsec_shared",
-        "//third_party/openssl:libcrypto_shared",
+        "openssl:libcrypto_shared",
       ]
 
       cflags = [
