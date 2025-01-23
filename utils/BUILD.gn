@@ -64,7 +64,7 @@ if (defined(ohos_lite)) {
       deps = [
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//third_party/bounds_checking_function:libsec_shared",
-        "//third_party/openssl:libcrypto_shared",
+        "openssl:libcrypto_shared",
       ]
     }
   }
