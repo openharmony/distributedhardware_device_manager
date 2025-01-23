@@ -99,9 +99,10 @@ if (defined(ohos_lite)) {
         "//foundation/communication/dsoftbus:dsoftbus",
         "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
-        "openssl:libcrypto_shared",
         "//third_party/bounds_checking_function:libsec_shared",
       ]
+
+      external_deps = [ "openssl:libcrypto_shared" ]
 
       cflags = [
         "-Wall",
