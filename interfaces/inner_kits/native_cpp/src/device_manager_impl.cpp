@@ -74,7 +74,6 @@ namespace DistributedHardware {
 constexpr const char* DM_INIT_DEVICE_MANAGER_SUCCESS = "DM_INIT_DEVICE_MANAGER_SUCCESS";
 constexpr const char* DM_INIT_DEVICE_MANAGER_FAILED = "DM_INIT_DEVICE_MANAGER_FAILED";
 constexpr const char* START_DEVICE_DISCOVERY_SUCCESS = "START_DEVICE_DISCOVERY_SUCCESS";
-constexpr const char* START_DEVICE_DISCOVERY_FAILED = "START_DEVICE_DISCOVERY_FAILED";
 constexpr const char* GET_LOCAL_DEVICE_INFO_SUCCESS = "GET_LOCAL_DEVICE_INFO_SUCCESS";
 constexpr const char* GET_LOCAL_DEVICE_INFO_FAILED = "GET_LOCAL_DEVICE_INFO_FAILED";
 constexpr const char* DM_SEND_REQUEST_SUCCESS = "DM_SEND_REQUEST_SUCCESS";
@@ -84,7 +83,6 @@ constexpr const char* UNAUTHENTICATE_DEVICE_FAILED = "UNAUTHENTICATE_DEVICE_FAIL
 constexpr const char* DM_INIT_DEVICE_MANAGER_SUCCESS_MSG = "init devicemanager success.";
 constexpr const char* DM_INIT_DEVICE_MANAGER_FAILED_MSG = "init devicemanager failed.";
 constexpr const char* START_DEVICE_DISCOVERY_SUCCESS_MSG = "device manager discovery success.";
-constexpr const char* START_DEVICE_DISCOVERY_FAILED_MSG = "device manager discovery failed.";
 constexpr const char* GET_LOCAL_DEVICE_INFO_SUCCESS_MSG = "get local device info success.";
 constexpr const char* GET_LOCAL_DEVICE_INFO_FAILED_MSG = "get local device info failed.";
 constexpr const char* DM_SEND_REQUEST_SUCCESS_MSG = "send request success.";
