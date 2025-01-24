@@ -46,12 +46,15 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_local_display_device_name_req.h"
+#include "ipc_get_local_display_device_name_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_permission_req.h"
 #include "ipc_publish_req.h"
+#include "ipc_put_device_profile_info_list_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "ipc_set_credential_req.h"
@@ -2645,6 +2648,51 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
     }
     LOGI("Completed");
 #endif
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::PutDeviceProfileInfoList(const std::string &pkgName,
+    const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList)
+{
+    LOGI("In pkgName:%{public}s,", pkgName.c_str());
+    std::shared_ptr<IpcPutDeviceProfileInfoListReq> req = std::make_shared<IpcPutDeviceProfileInfoListReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDeviceProfileInfoList(deviceProfileInfoList);
+    int32_t ret = ipcClientProxy_->SendRequest(PUT_DEVICE_PROFILE_INFO_LIST, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
+    std::string &displayName)
+{
+    LOGI("In pkgName:%{public}s,", pkgName.c_str());
+    std::shared_ptr<IpcGetLocalDisplayDeviceNameReq> req = std::make_shared<IpcGetLocalDisplayDeviceNameReq>();
+    std::shared_ptr<IpcGetLocalDisplayDeviceNameRsp> rsp = std::make_shared<IpcGetLocalDisplayDeviceNameRsp>();
+    req->SetPkgName(pkgName);
+    req->SetMaxNameLength(maxNameLength);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DISPLAY_DEVICE_NAME, req, rsp);
+    if (ret != DM_OK) {
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        return ret;
+    }
+    displayName = rsp->GetDisplayName();
+    LOGI("Completed");
     return DM_OK;
 }
 } // namespace DistributedHardware

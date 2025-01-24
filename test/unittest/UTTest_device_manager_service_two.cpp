@@ -510,25 +510,6 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_201, testing::ext::TestSize.Level0)
-{
-    std::string localDeviceName = "localDeviceName_201";
-    std::string localDisplayName = "localDisplayName_201";
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
-
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, SetLocalDeviceName(_, _)).WillOnce(Return(DM_OK));
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, DM_OK);
-
-    EXPECT_CALL(*softbusListenerMock_, SetLocalDeviceName(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
 HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "com.ohos.test";

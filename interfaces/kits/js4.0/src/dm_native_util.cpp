@@ -68,6 +68,13 @@ void JsObjectToString(const napi_env &env, const napi_value &object, const std::
     }
 }
 
+std::string GetStrFromJsObj(const napi_env &env, const napi_value &jsObj, const std::string &fieldStr)
+{
+    char str[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, jsObj, fieldStr, str, sizeof(str));
+    return str;
+}
+
 void JsObjectToBool(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                     bool &fieldRef)
 {
@@ -108,6 +115,13 @@ void JsObjectToInt(const napi_env &env, const napi_value &object, const std::str
     } else {
         LOGE("devicemanager napi js to int no property: %{public}s", fieldStr.c_str());
     }
+}
+
+int32_t GetIntFromJsObj(const napi_env &env, const napi_value &object, const std::string &fieldStr)
+{
+    int32_t num = 0;
+    JsObjectToInt(env, object, fieldStr, num);
+    return num;
 }
 
 std::string GetDeviceTypeById(DmDeviceType type)
@@ -668,6 +682,107 @@ void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIco
             napi_set_named_property(env, jsObj, "icon", iconArray);
         }
     }
+}
+
+bool JsToDmServiceProfileInfo(const napi_env &env, const napi_value &jsObj, DmServiceProfileInfo &svrInfos)
+{
+    napi_valuetype jsObjType;
+    napi_typeof(env, jsObj, &jsObjType);
+    if (jsObjType != napi_object) {
+        LOGE("jsObjType is not object");
+        return false;
+    }
+    svrInfos.serviceId = GetStrFromJsObj(env, jsObj, "sid");
+    svrInfos.serviceType = GetStrFromJsObj(env, jsObj, "st");
+    return true;
+}
+
+std::vector<DmServiceProfileInfo> GetServiceProfileInfosFromJsObj(const napi_env &env, const napi_value &jsObj,
+    const std::string &fieldStr)
+{
+    bool hasProperty = false;
+    napi_has_named_property(env, jsObj, fieldStr.c_str(), &hasProperty);
+    if (!hasProperty) {
+        return {};
+    }
+    napi_value jsServicesArray = nullptr;
+    napi_get_named_property(env, jsObj, fieldStr.c_str(), &jsServicesArray);
+    bool isArr = false;
+    napi_is_array(env, jsObj, &isArr);
+    if (!isArr) {
+        LOGE("object is not array");
+        return {};
+    }
+    std::vector<DmServiceProfileInfo> services = {};
+    uint32_t length = 0;
+    napi_get_array_length(env, jsServicesArray, &length);
+    for (size_t i = 0; i < length; i++) {
+        napi_value element;
+        napi_get_element(env, jsServicesArray, i, &element);
+        DmServiceProfileInfo svrInfo;
+        if (JsToDmServiceProfileInfo(env, jsServicesArray, svrInfo)) {
+            services.emplace_back(svrInfo);
+        }
+    }
+    return services;
+}
+
+bool JsToDmDeviceProfileInfo(const napi_env &env, const napi_value &jsObj, DmDeviceProfileInfo &devInfo)
+{
+    napi_valuetype jsObjType;
+    napi_typeof(env, jsObj, &jsObjType);
+    if (jsObjType != napi_object) {
+        LOGE("jsObjType is not object");
+        return false;
+    }
+    devInfo.deviceId = GetStrFromJsObj(env, jsObj, "deviceId");
+    devInfo.deviceSn = GetStrFromJsObj(env, jsObj, "deviceSn");
+    devInfo.mac = GetStrFromJsObj(env, jsObj, "mac");
+    devInfo.model = GetStrFromJsObj(env, jsObj, "model");
+    devInfo.deviceType = GetStrFromJsObj(env, jsObj, "deviceType");
+    devInfo.manufacturer = GetStrFromJsObj(env, jsObj, "manufacturer");
+    devInfo.deviceName = GetStrFromJsObj(env, jsObj, "deviceName");
+    devInfo.productId = GetStrFromJsObj(env, jsObj, "productId");
+    devInfo.subProductId = GetStrFromJsObj(env, jsObj, "subProductId");
+    devInfo.sdkVersion = GetStrFromJsObj(env, jsObj, "sdkVersion");
+    devInfo.bleMac = GetStrFromJsObj(env, jsObj, "bleMac");
+    devInfo.brMac = GetStrFromJsObj(env, jsObj, "brMac");
+    devInfo.sleMac = GetStrFromJsObj(env, jsObj, "sleMac");
+    devInfo.firmwareVersion = GetStrFromJsObj(env, jsObj, "firmwareVersion");
+    devInfo.hardwareVersion = GetStrFromJsObj(env, jsObj, "hardwareVersion");
+    devInfo.softwareVersion = GetStrFromJsObj(env, jsObj, "softwareVersion");
+    devInfo.protocolType = GetIntFromJsObj(env, jsObj, "protocolType");
+    devInfo.setupType = GetIntFromJsObj(env, jsObj, "setupType");
+    devInfo.wiseDeviceId = GetStrFromJsObj(env, jsObj, "wiseDeviceId");
+    devInfo.registerTime = GetStrFromJsObj(env, jsObj, "registerTime");
+    devInfo.modifyTime = GetStrFromJsObj(env, jsObj, "modifyTime");
+    devInfo.shareTime = GetStrFromJsObj(env, jsObj, "shareTime");
+    devInfo.services = GetServiceProfileInfosFromJsObj(env, jsObj, "services");
+    for (auto &item : devInfo.services) {
+        item.deviceId = devInfo.deviceId;
+    }
+    return true;
+}
+
+bool JsToDmDeviceProfileInfos(const napi_env &env, const napi_value &jsObj, std::vector<DmDeviceProfileInfo> &devInfos)
+{
+    bool isArr = false;
+    napi_is_array(env, jsObj, &isArr);
+    if (!isArr) {
+        LOGE("object is not array");
+        return false;
+    }
+    uint32_t length = 0;
+    napi_get_array_length(env, jsObj, &length);
+    for (size_t i = 0; i < length; i++) {
+        napi_value element;
+        napi_get_element(env, jsObj, i, &element);
+        DmDeviceProfileInfo devInfo;
+        if (JsToDmDeviceProfileInfo(env, jsObj, devInfo)) {
+            devInfos.emplace_back(devInfo);
+        }
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

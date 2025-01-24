@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -194,7 +194,7 @@ int32_t LocalDeviceNameMgr::QueryLocalDeviceName()
         localDeviceName_ = localDeviceName;
         dataShareHelper->Release();
         LOGI("get user defined deviceName=%{public}s", localDeviceName.c_str());
-        DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName_, localDisplayName_);
+
         return DM_OK;
     }
     ret = GetDefaultDeviceName(dataShareHelper, localDeviceName);
@@ -206,7 +206,7 @@ int32_t LocalDeviceNameMgr::QueryLocalDeviceName()
     localDeviceName_ = localDeviceName;
     dataShareHelper->Release();
     LOGI("get default deviceName=%{public}s", localDeviceName.c_str());
-    DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName_, localDisplayName_);
+
     return DM_OK;
 }
 
@@ -257,7 +257,6 @@ int32_t LocalDeviceNameMgr::QueryLocalDisplayName()
     localDisplayName_ = localDisplayName;
     dataShareHelper->Release();
     LOGI("get display deviceName=%{public}s", localDisplayName.c_str());
-    DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName_, localDisplayName_);
     return DM_OK;
 }
 
