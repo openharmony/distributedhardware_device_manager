@@ -20,6 +20,7 @@ import common from '@ohos.app.ability.common';
 import display from '@ohos.display';
 import mediaQuery from '@ohos.mediaquery';
 
+
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
 const ACTION_ALLOW_AUTH_ONCE: number = 0;

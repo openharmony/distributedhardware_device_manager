@@ -18,6 +18,7 @@ import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSessi
 import deviceInfo from '@ohos.deviceInfo';
 import Constant from '../common/constant';
 
+
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:PinDialog]==>';
 const ACTION_CANCEL_PINCODE_DISPLAY: number = 3;
