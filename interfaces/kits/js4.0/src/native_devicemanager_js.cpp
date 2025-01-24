@@ -58,6 +58,7 @@ const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 const int32_t DM_MAX_DEVICE_SIZE = 100;
 
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
+napi_ref strategyForBleEnumConstructor_ = nullptr;
 
 std::map<std::string, DeviceManagerNapi *> g_deviceManagerMap;
 std::map<std::string, std::shared_ptr<DmNapiInitCallback>> g_initCallbackMap;
@@ -2099,6 +2100,49 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
     return GetDeviceIconInfoPromise(env, jsCallback);
 }
 
+napi_value DeviceManagerNapi::SetBroadcastPolicy(napi_env env, napi_callback_info info)
+{
+    LOGI("in");
+    if (!IsSystemApp()) {
+        LOGI("The caller is not SystemApp");
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
+    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    if (!CheckArgsType(env, valueType == napi_number, "policy", "number")) {
+        return nullptr;
+    }
+    int32_t policy = 0;
+    napi_get_value_int32(env, argv[0], &policy);
+
+    napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &valueType);
+    if (!CheckArgsType(env, valueType == napi_number, "delayTime", "number")) {
+        return nullptr;
+    }
+    int32_t delayTime = 0;
+    napi_get_value_int32(env, argv[DM_NAPI_ARGS_ONE], &delayTime);
+
+    napi_value result = nullptr;
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
+    std::map<std::string, std::string> policyParam;
+    policyParam[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = std::to_string(policy);
+    policyParam[PARAM_KEY_POLICY_TIME_OUT] = std::to_string(delayTime);
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(deviceManagerWrapper->bundleName_, policyParam);
+    if (ret != 0) {
+        LOGE("bundleName %{public}s failed, ret %{public}d",
+            deviceManagerWrapper->bundleName_.c_str(), ret);
+        CreateBusinessError(env, ret);
+    }
+    napi_get_undefined(env, &result);
+    return result;
+}
+
 void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
 {
     LOGI("ClearBundleCallbacks start for bundleName %{public}s", bundleName.c_str());
@@ -2262,6 +2306,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", JsOff),
         DECLARE_NAPI_FUNCTION("getDeviceProfileInfoList", JsGetDeviceProfileInfoList),
         DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo)};
+        DECLARE_NAPI_FUNCTION("SetBroadcastPolicy", SetBroadcastPolicy)};
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
@@ -2314,6 +2359,39 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
     return exports;
 }
 
+napi_value DeviceManagerNapi::InitStrategyForBleEnum(napi_env env, napi_value exports)
+{
+    const uint32_t disable_broadcast = 100;
+    const uint32_t enable_broadcast = 101;
+    const uint32_t start_broadcast = 102;
+    const uint32_t stop_broadcast = 103;
+
+    napi_value disable_broadcast_value;
+    napi_value enable_broadcast_value;
+    napi_value start_broadcast_value;
+    napi_value stop_broadcast_value;
+    int32_t refCount = 1;
+
+    napi_create_uint32(env, disable_broadcast, &disable_broadcast_value);
+    napi_create_uint32(env, enable_broadcast, &enable_broadcast_value);
+    napi_create_uint32(env, start_broadcast, &start_broadcast_value);
+    napi_create_uint32(env, stop_broadcast, &stop_broadcast_value);
+
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("DISABLEBROADCAST", disable_broadcast_value),
+        DECLARE_NAPI_STATIC_PROPERTY("ENABLEBROADCAST", enable_broadcast_value),
+        DECLARE_NAPI_STATIC_PROPERTY("STARTBROADCAST", start_broadcast_value),
+        DECLARE_NAPI_STATIC_PROPERTY("STOPBROADCAST", stop_broadcast_value),
+    };
+
+    napi_value result = nullptr;
+    napi_define_class(env, "StrategyForBle", NAPI_AUTO_LENGTH, EnumTypeConstructor,
+        nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_create_reference(env, result, refCount, &strategyForBleEnumConstructor_);
+    napi_set_named_property(env, exports, "StrategyForBle", result);
+    return exports;
+}
+
 int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
     const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback)
 {
@@ -2352,6 +2430,7 @@ static napi_value Export(napi_env env, napi_value exports)
     LOGI("Export() is called!");
     DeviceManagerNapi::Init(env, exports);
     DeviceManagerNapi::InitDeviceStatusChangeActionEnum(env, exports);
+    DeviceManagerNapi::InitStrategyForBleEnum(env, exports);
     return exports;
 }
 
