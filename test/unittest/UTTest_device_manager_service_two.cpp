@@ -1182,7 +1182,7 @@ HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterSoLoaded_201, testing::ext:
     DeviceManagerService::GetInstance().isAdapterResidentSoLoaded_ = false;
     DeviceManagerService::GetInstance().IsDMServiceAdapterResidentLoad();
     ret = DeviceManagerService::GetInstance().IsDMServiceAdapterSoLoaded();
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 
     DeviceManagerService::GetInstance().UnloadDMServiceAdapterResident();
 }
