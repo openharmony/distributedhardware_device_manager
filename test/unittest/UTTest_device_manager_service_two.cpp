@@ -1168,6 +1168,25 @@ HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_004, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
+HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterSoLoaded_201, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().isAdapterResidentSoLoaded_ = false;
+    bool ret = DeviceManagerService::GetInstance().IsDMServiceAdapterSoLoaded();
+    EXPECT_FALSE(ret);
+
+    DeviceManagerService::GetInstance().isAdapterResidentSoLoaded_ = true;
+    DeviceManagerService::GetInstance().dmServiceImplExtResident_ = nullptr;
+    ret = DeviceManagerService::GetInstance().IsDMServiceAdapterSoLoaded();
+    EXPECT_FALSE(ret);
+
+    DeviceManagerService::GetInstance().isAdapterResidentSoLoaded_ = false;
+    DeviceManagerService::GetInstance().IsDMServiceAdapterResidentLoad();
+    ret = DeviceManagerService::GetInstance().IsDMServiceAdapterSoLoaded();
+    EXPECT_TRUE(ret);
+
+    DeviceManagerService::GetInstance().UnloadDMServiceAdapterResident();
+}
+
 HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_202, testing::ext::TestSize.Level0)
 {
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
