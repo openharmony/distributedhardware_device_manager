@@ -307,8 +307,8 @@ public:
     void OnDmUiCall(const std::string &paramJson);
     void OnGetDeviceProfileInfoListCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback);
     void OnGetDeviceIconInfoCallbackResult(DeviceIconInfoAsyncCallbackInfo *jsCallback);
-    static napi_value InitStrategyForBleEnum(napi_env env, napi_value exports);
-    static napi_value SetBroadcastPolicy(napi_env env, napi_callback_info info);
+    static napi_value InitStrategyForHeartBeatEnum(napi_env env, napi_value exports);
+    static napi_value SetHeartBeatPolicy(napi_env env, napi_callback_info info);
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);

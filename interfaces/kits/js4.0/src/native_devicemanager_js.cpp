@@ -58,7 +58,7 @@ const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 const int32_t DM_MAX_DEVICE_SIZE = 100;
 
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
-napi_ref strategyForBleEnumConstructor_ = nullptr;
+napi_ref StrategyForHeartBeatEnumConstructor_ = nullptr;
 
 std::map<std::string, DeviceManagerNapi *> g_deviceManagerMap;
 std::map<std::string, std::shared_ptr<DmNapiInitCallback>> g_initCallbackMap;
@@ -2100,7 +2100,7 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
     return GetDeviceIconInfoPromise(env, jsCallback);
 }
 
-napi_value DeviceManagerNapi::SetBroadcastPolicy(napi_env env, napi_callback_info info)
+napi_value DeviceManagerNapi::SetHeartBeatPolicy(napi_env env, napi_callback_info info)
 {
     LOGI("in");
     if (!IsSystemApp()) {
@@ -2306,7 +2306,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", JsOff),
         DECLARE_NAPI_FUNCTION("getDeviceProfileInfoList", JsGetDeviceProfileInfoList),
         DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo)};
-        DECLARE_NAPI_FUNCTION("SetBroadcastPolicy", SetBroadcastPolicy)};
+        DECLARE_NAPI_FUNCTION("SetHeartBeatPolicy", SetHeartBeatPolicy)};
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
@@ -2359,36 +2359,36 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
     return exports;
 }
 
-napi_value DeviceManagerNapi::InitStrategyForBleEnum(napi_env env, napi_value exports)
+napi_value DeviceManagerNapi::InitStrategyForHeartBeatEnum(napi_env env, napi_value exports)
 {
-    const uint32_t disable_broadcast = 100;
-    const uint32_t enable_broadcast = 101;
-    const uint32_t start_broadcast = 102;
-    const uint32_t stop_broadcast = 103;
+    const uint32_t disable_heart_beat = 100;
+    const uint32_t enable_heart_beat = 101;
+    const uint32_t start_heart_beat = 102;
+    const uint32_t stop_heart_beat = 103;
 
-    napi_value disable_broadcast_value;
-    napi_value enable_broadcast_value;
-    napi_value start_broadcast_value;
-    napi_value stop_broadcast_value;
+    napi_value disable_heart_beat_value;
+    napi_value enable_heart_beat_value;
+    napi_value start_heart_beat_value;
+    napi_value stop_heart_beat_value;
     int32_t refCount = 1;
 
-    napi_create_uint32(env, disable_broadcast, &disable_broadcast_value);
-    napi_create_uint32(env, enable_broadcast, &enable_broadcast_value);
-    napi_create_uint32(env, start_broadcast, &start_broadcast_value);
-    napi_create_uint32(env, stop_broadcast, &stop_broadcast_value);
+    napi_create_uint32(env, disable_heart_beat, &disable_heart_beat_value);
+    napi_create_uint32(env, enable_heart_beat, &enable_heart_beat_value);
+    napi_create_uint32(env, start_heart_beat, &start_heart_beat_value);
+    napi_create_uint32(env, stop_heart_beat, &stop_heart_beat_value);
 
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("DISABLEBROADCAST", disable_broadcast_value),
-        DECLARE_NAPI_STATIC_PROPERTY("ENABLEBROADCAST", enable_broadcast_value),
-        DECLARE_NAPI_STATIC_PROPERTY("STARTBROADCAST", start_broadcast_value),
-        DECLARE_NAPI_STATIC_PROPERTY("STOPBROADCAST", stop_broadcast_value),
+        DECLARE_NAPI_STATIC_PROPERTY("DISABLEHEARTBEAT", disable_heart_beat_value),
+        DECLARE_NAPI_STATIC_PROPERTY("ENABLEHEARTBEAT", enable_heart_beat_value),
+        DECLARE_NAPI_STATIC_PROPERTY("STARTHEARTBEAT", start_heart_beat_value),
+        DECLARE_NAPI_STATIC_PROPERTY("STOPHEARTBEAT", stop_heart_beat_value),
     };
 
     napi_value result = nullptr;
-    napi_define_class(env, "StrategyForBle", NAPI_AUTO_LENGTH, EnumTypeConstructor,
+    napi_define_class(env, "StrategyForHeartBeat", NAPI_AUTO_LENGTH, EnumTypeConstructor,
         nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_create_reference(env, result, refCount, &strategyForBleEnumConstructor_);
-    napi_set_named_property(env, exports, "StrategyForBle", result);
+    napi_create_reference(env, result, refCount, &StrategyForHeartBeatEnumConstructor_);
+    napi_set_named_property(env, exports, "StrategyForHeartBeat", result);
     return exports;
 }
 
@@ -2430,7 +2430,7 @@ static napi_value Export(napi_env env, napi_value exports)
     LOGI("Export() is called!");
     DeviceManagerNapi::Init(env, exports);
     DeviceManagerNapi::InitDeviceStatusChangeActionEnum(env, exports);
-    DeviceManagerNapi::InitStrategyForBleEnum(env, exports);
+    DeviceManagerNapi::InitStrategyForHeartBeatEnum(env, exports);
     return exports;
 }
 
