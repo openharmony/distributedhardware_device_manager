@@ -304,7 +304,7 @@ int32_t DeviceNameManager::GetUserDefinedDeviceName(int32_t userId, std::string 
 std::string DeviceNameManager::SubstrByBytes(const std::string &str, int32_t maxNumBytes)
 {
     int32_t length = static_cast<int32_t>(str.size());
-    if (length < maxNumBytes || maxNumBytes <= 0) {
+    if (length <= maxNumBytes || maxNumBytes <= 0) {
         return str;
     }
     std::vector<std::string> substrVec;
@@ -330,7 +330,7 @@ std::string DeviceNameManager::SubstrByBytes(const std::string &str, int32_t max
         substrVec.emplace_back(substr);
         i += numBytes;
     }
-    std::string result;
+    std::string result = "";
     int32_t totalNumBytes = 0;
     for (const auto &item : substrVec) {
         int32_t cnt = totalNumBytes + static_cast<int32_t>(item.size());
