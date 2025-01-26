@@ -24,6 +24,69 @@ namespace {
 const std::string UK_SEPARATOR = "#";
 }
 
+void IpcModelCodec::DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
+{
+    std::string deviceIdStr = parcel.ReadString();
+    if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s deviceId failed!");
+        return;
+    }
+    std::string deviceNameStr = parcel.ReadString();
+    if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s deviceName failed!");
+        return;
+    }
+    devInfo.deviceTypeId = parcel.ReadUint16();
+    std::string networkIdStr = parcel.ReadString();
+    if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
+        LOGE("strcpy_s networkId failed!");
+        return;
+    }
+}
+
+bool IpcModelCodec::EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(targetId.deviceId));
+    bRet = (bRet && parcel.WriteString(targetId.brMac));
+    bRet = (bRet && parcel.WriteString(targetId.bleMac));
+    bRet = (bRet && parcel.WriteString(targetId.wifiIp));
+    bRet = (bRet && parcel.WriteUint16(targetId.wifiPort));
+    return bRet;
+}
+
+void IpcModelCodec::DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targetId)
+{
+    targetId.deviceId = parcel.ReadString();
+    targetId.brMac = parcel.ReadString();
+    targetId.bleMac = parcel.ReadString();
+    targetId.wifiIp = parcel.ReadString();
+    targetId.wifiPort = parcel.ReadUint16();
+}
+
+bool IpcModelCodec::EncodeDmAccessCaller(const DmAccessCaller &caller, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(caller.accountId));
+    bRet = (bRet && parcel.WriteString(caller.pkgName));
+    bRet = (bRet && parcel.WriteString(caller.networkId));
+    bRet = (bRet && parcel.WriteInt32(caller.userId));
+    bRet = (bRet && parcel.WriteUint64(caller.tokenId));
+    bRet = (bRet && parcel.WriteString(caller.extra));
+    return bRet;
+}
+
+bool IpcModelCodec::EncodeDmAccessCallee(const DmAccessCallee &callee, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(callee.accountId));
+    bRet = (bRet && parcel.WriteString(callee.networkId));
+    bRet = (bRet && parcel.WriteString(callee.peerId));
+    bRet = (bRet && parcel.WriteInt32(callee.userId));
+    bRet = (bRet && parcel.WriteString(callee.extra));
+    return bRet;
+}
+
 int32_t IpcModelCodec::DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &parcel,
     DmDeviceProfileInfoFilterOptions &filterOptions)
 {

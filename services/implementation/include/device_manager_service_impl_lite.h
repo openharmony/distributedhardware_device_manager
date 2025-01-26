@@ -53,7 +53,7 @@ public:
     int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
- 
+
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udid,
         int32_t bindLevel, const std::string &extra);
         

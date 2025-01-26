@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1042,26 +1042,6 @@ HWTEST_F(SoftbusListenerTest, GetNetworkIdByUdid_001, testing::ext::TestSize.Lev
     }
     int32_t ret = softbusListener->GetNetworkIdByUdid(udid, networkId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(SoftbusListenerTest, SetLocalDeviceName_001, testing::ext::TestSize.Level0)
-{
-    std::string localDeviceName;
-    std::string localDisplayName;
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
-    int32_t ret = softbusListener->SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, DM_OK);
-
-    localDeviceName = "localDeviceName";
-    ret = softbusListener->SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, DM_OK);
-
-    localDisplayName = "localDisplayName";
-    ret = softbusListener->SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, DM_OK);
-    softbusListener = nullptr;
 }
 
 HWTEST_F(SoftbusListenerTest, GetDeviceScreenStatus_001, testing::ext::TestSize.Level0)

@@ -1687,17 +1687,10 @@ ON_IPC_CMD(GET_DEVICE_PROFILE_INFO_LIST, MessageParcel &data, MessageParcel &rep
 {
     std::string pkgName = data.ReadString();
     DmDeviceProfileInfoFilterOptions filterOptions;
-    filterOptions.isCloud = data.ReadBool();
-    size_t size = data.ReadUint32();
-    if (size > MAX_DEVICE_PROFILE_SIZE) {
-        LOGE("size more than %{public}d,", MAX_DEVICE_PROFILE_SIZE);
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (size > 0) {
-        for (uint32_t i = 0; i < size; i++) {
-            std::string item = data.ReadString();
-            filterOptions.deviceIdList.emplace_back(item);
-        }
+    int32_t ret = IpcModelCodec::DecodeDmDeviceProfileInfoFilterOptions(data, filterOptions);
+    if (ret != DM_OK) {
+        LOGE("DecodeDmDeviceProfileInfoFilterOptions fail ret:%{public}d,", ret);
+        return ret;
     }
     int32_t result = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
     if (!reply.WriteInt32(result)) {
@@ -1748,6 +1741,26 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &reply, 
     return DM_OK;
 }
 
+ON_IPC_CMD(PUT_DEVICE_PROFILE_INFO_LIST, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t deviceNum = data.ReadInt32();
+    std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
+    if (deviceNum > 0 && deviceNum <= MAX_DEVICE_PROFILE_SIZE) {
+        for (int32_t i = 0; i < deviceNum; ++i) {
+            DmDeviceProfileInfo deviceInfo;
+            IpcModelCodec::DecodeDmDeviceProfileInfo(data, deviceInfo);
+            deviceProfileInfoList.emplace_back(deviceInfo);
+        }
+    }
+    int32_t result = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(GET_DEVICE_ICON_INFO, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
@@ -1792,6 +1805,23 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_ICON_INFO_RESULT, MessageParcel &reply, std::sha
         return ERR_DM_FAILED;
     }
     pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_LOCAL_DISPLAY_DEVICE_NAME, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t maxNameLength = data.ReadInt32();
+    std::string displayName = "";
+    int32_t result = DeviceManagerService::GetInstance().GetLocalDisplayDeviceName(pkgName, maxNameLength, displayName);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteString(displayName)) {
+        LOGE("write displayName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
     return DM_OK;
 }
 } // namespace DistributedHardware

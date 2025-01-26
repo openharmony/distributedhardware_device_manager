@@ -1939,7 +1939,7 @@ napi_value DeviceManagerNapi::GetDeviceProfileInfoListPromise(napi_env env,
     napi_create_promise(env, &deferred, &promise);
     asyncCallback->deferred = deferred;
     napi_value workName;
-    napi_create_string_latin1(env, "GetDeviceProfileInfosPromise", NAPI_AUTO_LENGTH, &workName);
+    napi_create_string_latin1(env, "GetDeviceProfileInfoListPromise", NAPI_AUTO_LENGTH, &workName);
     napi_create_async_work(env, nullptr, workName,
         [](napi_env env, void *data) {
             DeviceProfileInfosAsyncCallbackInfo *jsCallback =
@@ -1951,7 +1951,7 @@ napi_value DeviceManagerNapi::GetDeviceProfileInfoListPromise(napi_env env,
                 jsCallback->filterOptions, callback);
             jsCallback->code = ret;
             if (ret != DM_OK) {
-                LOGE("GetDeviceProfileInfos failed, bundleName:%{public}s, ret=%{public}d",
+                LOGE("GetDeviceProfileInfoList failed, bundleName:%{public}s, ret=%{public}d",
                     jsCallback->bundleName.c_str(), ret);
             }
         },
@@ -2097,6 +2097,169 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
     jsCallback->bundleName = deviceManagerWrapper->bundleName_;
     jsCallback->filterOptions = filterOptions;
     return GetDeviceIconInfoPromise(env, jsCallback);
+}
+
+napi_value DeviceManagerNapi::PutDeviceProfileInfoListPromise(napi_env env,
+    PutDeviceProfileInfoListAsyncCallbackInfo *asyncCallback)
+{
+    LOGI("In");
+    napi_value promise = 0;
+    napi_deferred deferred;
+    napi_create_promise(env, &deferred, &promise);
+    asyncCallback->deferred = deferred;
+    napi_value workName;
+    napi_create_string_latin1(env, "PutDeviceProfileInfoListPromise", NAPI_AUTO_LENGTH, &workName);
+    napi_create_async_work(env, nullptr, workName,
+        [](napi_env env, void *data) {
+            PutDeviceProfileInfoListAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<PutDeviceProfileInfoListAsyncCallbackInfo *>(data);
+            jsCallback->code = DeviceManager::GetInstance().PutDeviceProfileInfoList(jsCallback->bundleName,
+                jsCallback->deviceProfileInfos);
+        },
+        [](napi_env env, napi_status status, void *data) {
+            (void)status;
+            PutDeviceProfileInfoListAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<PutDeviceProfileInfoListAsyncCallbackInfo *>(data);
+            if (jsCallback->code != DM_OK) {
+                napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                napi_reject_deferred(env, jsCallback->deferred, error);
+            } else {
+                napi_value result = nullptr;
+                napi_create_int32(env, DM_OK, &result);
+                napi_resolve_deferred(env, jsCallback->deferred, result);
+            }
+            napi_delete_async_work(env, jsCallback->asyncWork);
+            delete jsCallback;
+            jsCallback = nullptr;
+        },
+        (void *)asyncCallback, &asyncCallback->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallback->asyncWork, napi_qos_user_initiated);
+    return promise;
+}
+
+napi_value DeviceManagerNapi::JsPutDeviceProfileInfoList(napi_env env, napi_callback_info info)
+{
+    LOGI("In");
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return nullptr;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
+
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
+        return nullptr;
+    }
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        LOGE("deviceManagerWrapper is NULL");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+    std::vector<DmDeviceProfileInfo> deviceProfileInfos;
+    if (!JsToDmDeviceProfileInfos(env, argv[0], deviceProfileInfos)) {
+        LOGE("JsToDmDeviceProfileInfos fail");
+        CreateBusinessError(env, ERR_INVALID_PARAMS);
+        return nullptr;
+    }
+    auto *jsCallback = new PutDeviceProfileInfoListAsyncCallbackInfo();
+    if (jsCallback == nullptr) {
+        LOGE("jsCallback is nullptr");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+    jsCallback->env = env;
+    jsCallback->bundleName = deviceManagerWrapper->bundleName_;
+    jsCallback->deviceProfileInfos = deviceProfileInfos;
+    return PutDeviceProfileInfoListPromise(env, jsCallback);
+}
+
+napi_value DeviceManagerNapi::GetLocalDisplayDeviceNamePromise(napi_env env,
+    GetLocalDisplayDeviceNameAsyncCallbackInfo *asyncCallback)
+{
+    LOGI("In");
+    napi_value promise = 0;
+    napi_deferred deferred;
+    napi_create_promise(env, &deferred, &promise);
+    asyncCallback->deferred = deferred;
+    napi_value workName;
+    napi_create_string_latin1(env, "GetLocalDisplayDeviceNamePromise", NAPI_AUTO_LENGTH, &workName);
+    napi_create_async_work(env, nullptr, workName,
+        [](napi_env env, void *data) {
+            GetLocalDisplayDeviceNameAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<GetLocalDisplayDeviceNameAsyncCallbackInfo *>(data);
+            jsCallback->code = DeviceManager::GetInstance().GetLocalDisplayDeviceName(jsCallback->bundleName,
+                jsCallback->maxNameLength, jsCallback->displayName);
+        },
+        [](napi_env env, napi_status status, void *data) {
+            (void)status;
+            GetLocalDisplayDeviceNameAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<GetLocalDisplayDeviceNameAsyncCallbackInfo *>(data);
+            if (jsCallback->code != DM_OK) {
+                napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                napi_reject_deferred(env, jsCallback->deferred, error);
+            } else {
+                napi_value result = nullptr;
+                napi_create_string_utf8(env, jsCallback->displayName.c_str(), NAPI_AUTO_LENGTH, &result);
+                napi_resolve_deferred(env, jsCallback->deferred, result);
+            }
+            napi_delete_async_work(env, jsCallback->asyncWork);
+            delete jsCallback;
+            jsCallback = nullptr;
+        },
+        (void *)asyncCallback, &asyncCallback->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallback->asyncWork, napi_qos_user_initiated);
+    return promise;
+}
+
+napi_value DeviceManagerNapi::JsGetLocalDisplayDeviceName(napi_env env, napi_callback_info info)
+{
+    LOGI("In");
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return nullptr;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+    int32_t maxNameLength = 0;
+    if (argc >= DM_NAPI_ARGS_ONE) {
+        napi_valuetype maxNameLengthType = napi_undefined;
+        napi_typeof(env, argv[0], &maxNameLengthType);
+        if (!CheckArgsType(env, maxNameLengthType == napi_number, "maxNameLength", "number")) {
+            return nullptr;
+        }
+        napi_get_value_int32(env, argv[0], &maxNameLength);
+    }
+
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        LOGE("deviceManagerWrapper is NULL");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+    auto *jsCallback = new GetLocalDisplayDeviceNameAsyncCallbackInfo();
+    if (jsCallback == nullptr) {
+        LOGE("jsCallback is nullptr");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+
+    jsCallback->env = env;
+    jsCallback->bundleName = deviceManagerWrapper->bundleName_;
+    jsCallback->maxNameLength = maxNameLength;
+    return GetLocalDisplayDeviceNamePromise(env, jsCallback);
 }
 
 void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
@@ -2261,7 +2424,9 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
         DECLARE_NAPI_FUNCTION("getDeviceProfileInfoList", JsGetDeviceProfileInfoList),
-        DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo)};
+        DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo),
+        DECLARE_NAPI_FUNCTION("putDeviceProfileInfoList", JsPutDeviceProfileInfoList),
+        DECLARE_NAPI_FUNCTION("getLocalDisplayDeviceName", JsGetLocalDisplayDeviceName)};
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),

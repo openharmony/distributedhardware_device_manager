@@ -86,6 +86,7 @@ void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &dev
 void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj);
 void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,
     napi_value &arrayResult);
+bool JsToDmDeviceProfileInfos(const napi_env &env, const napi_value &jsObj, std::vector<DmDeviceProfileInfo> &devInfos);
 
 } // namespace DistributedHardware
 } // namespace OHOS

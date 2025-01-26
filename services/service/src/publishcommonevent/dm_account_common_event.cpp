@@ -155,6 +155,11 @@ void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         beforeUserId = currentUserId;
         accountValidEvent = true;
     }
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED) {
+        currentUserId = data.GetCode();
+        beforeUserId = currentUserId;
+        accountValidEvent = true;
+    }
     LOGI("Received account event: %{public}s, currentUserId: %{public}d, beforeUserId: %{public}d",
         receiveEvent.c_str(), currentUserId, beforeUserId);
     if (!accountValidEvent) {

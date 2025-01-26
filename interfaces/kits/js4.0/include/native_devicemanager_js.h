@@ -72,6 +72,16 @@ struct DeviceProfileInfosAsyncCallbackInfo {
     std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> deviceProfileInfos;
 };
 
+struct GetLocalDisplayDeviceNameAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    std::string bundleName;
+    int32_t maxNameLength = 0;
+    napi_deferred deferred = nullptr;
+    int32_t code = -1;
+    std::string displayName;
+};
+
 struct DeviceIconInfoAsyncCallbackInfo {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
@@ -80,6 +90,15 @@ struct DeviceIconInfoAsyncCallbackInfo {
     int32_t code = -1;
     OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
     OHOS::DistributedHardware::DmDeviceIconInfo deviceIconInfo;
+};
+
+struct PutDeviceProfileInfoListAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    std::string bundleName;
+    napi_deferred deferred = nullptr;
+    int32_t code = -1;
+    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> deviceProfileInfos;
 };
 
 struct AuthAsyncCallbackInfo {
@@ -294,6 +313,8 @@ public:
     static napi_value JsOff(napi_env env, napi_callback_info info);
     static napi_value JsGetDeviceProfileInfoList(napi_env env, napi_callback_info info);
     static napi_value JsGetDeviceIconInfo(napi_env env, napi_callback_info info);
+    static napi_value JsPutDeviceProfileInfoList(napi_env env, napi_callback_info info);
+    static napi_value JsGetLocalDisplayDeviceName(napi_env env, napi_callback_info info);
     static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
@@ -331,6 +352,10 @@ private:
     static int32_t DumpDeviceInfo(DeviceBasicInfoListAsyncCallbackInfo *deviceBasicInfoListAsyncCallbackInfo);
     static napi_value GetDeviceProfileInfoListPromise(napi_env env, DeviceProfileInfosAsyncCallbackInfo *jsCallback);
     static napi_value GetDeviceIconInfoPromise(napi_env env, DeviceIconInfoAsyncCallbackInfo *jsCallback);
+    static napi_value PutDeviceProfileInfoListPromise(napi_env env,
+        PutDeviceProfileInfoListAsyncCallbackInfo *jsCallback);
+    static napi_value GetLocalDisplayDeviceNamePromise(napi_env env,
+        GetLocalDisplayDeviceNameAsyncCallbackInfo *jsCallback);
     
 private:
     napi_env env_;
