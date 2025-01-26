@@ -2361,25 +2361,17 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
 
 napi_value DeviceManagerNapi::InitStrategyForHeartBeatEnum(napi_env env, napi_value exports)
 {
-    const uint32_t disable_heart_beat = 100;
-    const uint32_t enable_heart_beat = 101;
-    const uint32_t start_heart_beat = 102;
-    const uint32_t stop_heart_beat = 103;
+    const uint32_t stop_heart_beat = 100;
+    const uint32_t start_heart_beat = 101;
 
-    napi_value disable_heart_beat_value;
-    napi_value enable_heart_beat_value;
     napi_value start_heart_beat_value;
     napi_value stop_heart_beat_value;
     int32_t refCount = 1;
 
-    napi_create_uint32(env, disable_heart_beat, &disable_heart_beat_value);
-    napi_create_uint32(env, enable_heart_beat, &enable_heart_beat_value);
     napi_create_uint32(env, start_heart_beat, &start_heart_beat_value);
     napi_create_uint32(env, stop_heart_beat, &stop_heart_beat_value);
 
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("DISABLEHEARTBEAT", disable_heart_beat_value),
-        DECLARE_NAPI_STATIC_PROPERTY("ENABLEHEARTBEAT", enable_heart_beat_value),
         DECLARE_NAPI_STATIC_PROPERTY("STARTHEARTBEAT", start_heart_beat_value),
         DECLARE_NAPI_STATIC_PROPERTY("STOPHEARTBEAT", stop_heart_beat_value),
     };
