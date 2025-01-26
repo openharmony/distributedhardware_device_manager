@@ -149,6 +149,12 @@ HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSi
     bool ret = PermissionManager::GetInstance().CheckMonitorPermission();
     ASSERT_FALSE(ret);
 }
+
+HWTEST_F(PermissionManagerTest, GetWhiteListSystemSA_001, testing::ext::TestSize.Level0)
+{
+    auto ret = PermissionManager::GetInstance().GetWhiteListSystemSA();
+    ASSERT_FALSE(ret.empty());
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS

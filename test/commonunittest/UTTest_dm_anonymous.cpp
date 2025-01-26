@@ -14,6 +14,7 @@
  */
 
 #include "UTTest_dm_anonymous.h"
+#include <iterator>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -702,6 +703,31 @@ HWTEST_F(DmAnonymousTest, GetSubscribeId_001, testing::ext::TestSize.Level0)
     std::string pkgName = "12345#pkgName";
     uint16_t ret = GetSubscribeId(pkgName);
     EXPECT_GE(ret, 0);
+}
+
+HWTEST_F(DmAnonymousTest, GetAnonyInt32List_005, testing::ext::TestSize.Level0)
+{
+    std::vector<int32_t> values;
+    values.push_back(101);
+    values.push_back(102);
+    std::string ret = GetAnonyInt32List(values);
+    EXPECT_FALSE(ret.empty());
+}
+
+HWTEST_F(DmAnonymousTest, IsIdLengthValid_002, testing::ext::TestSize.Level0)
+{
+    std::string inputID = "";
+    bool ret = IsIdLengthValid(inputID);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DmAnonymousTest, GetSubStr_002, testing::ext::TestSize.Level0)
+{
+    std::string rawStr = "";
+    std::string separator = "";
+    int32_t index = 1;
+    std::string ret = GetSubStr(rawStr, separator, index);
+    EXPECT_TRUE(ret.empty());
 }
 } // namespace
 } // namespace DistributedHardware
