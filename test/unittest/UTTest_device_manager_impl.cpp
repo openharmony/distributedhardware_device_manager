@@ -71,10 +71,13 @@ void DeviceManagerImplTest::TearDown()
 
 void DeviceManagerImplTest::SetUpTestCase()
 {
+    DmDeviceManagerNotify::dmDeviceManagerNotify = deviceManagerNotifyMock_;
 }
 
 void DeviceManagerImplTest::TearDownTestCase()
 {
+    DmDeviceManagerNotify::dmDeviceManagerNotify = nullptr;
+    deviceManagerNotifyMock_ = nullptr;
 }
 
 namespace {
