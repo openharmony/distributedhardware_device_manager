@@ -349,7 +349,7 @@ typedef enum {
 
 const std::string DEVICE_TYPE_UNKNOWN_STRING = "UNKNOWN";
 const std::string DEVICE_TYPE_PHONE_STRING = "PHONE";
-const std::string DEVICE_TYPE_PAD_STRING = "TABLET";
+const std::string DEVICE_TYPE_PAD_STRING = "PAD";
 const std::string DEVICE_TYPE_TV_STRING = "TV";
 const std::string DEVICE_TYPE_CAR_STRING = "CAR";
 const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
