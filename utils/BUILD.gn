@@ -61,14 +61,11 @@ if (defined(ohos_lite)) {
         "lOG_DOMAIN=0xD004110",
       ]
 
-      deps = [
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      ]
-
+      deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
       external_deps = [
         "bounds_checking_function:libsec_shared",
         "openssl:libcrypto_shared",
-     ]
+      ]
     }
   }
 } else {
