@@ -16,7 +16,7 @@
 #include "UTTest_device_manager_service_notify.h"
 #include "device_manager_service_notify.h"
 #include "dm_device_info.h"
-#include "softbus_error_code.h"
+#include "dm_constants.h"
 
 #include <unistd.h>
 
