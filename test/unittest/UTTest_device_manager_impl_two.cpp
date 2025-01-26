@@ -1549,7 +1549,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStatusCallback_201, testing::ext::Tes
 {
     std::string pkgName = "pkgName";
     std::string extra = "extra";
-    std::shared_ptr<DeviceStateCallback> callback = nullptr;
+    std::shared_ptr<DeviceStatusCallback> callback = nullptr;
     int32_t ret = DeviceManager::GetInstance().RegisterDevStatusCallback(pkgName, extra, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1579,11 +1579,11 @@ HWTEST_F(DeviceManagerImplTest, StopDeviceDiscovery_201, testing::ext::TestSize.
 {
     uint64_t tokenId = 1;
     std::string pkgName = "";
-    int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(pkgName);
+    int32_t ret = DeviceManager::GetInstance().StopDeviceDiscovery(tokenId, pkgName);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     pkgName = "pkgName";
-    ret = DeviceManager::GetInstance().StopDeviceDiscovery(pkgName);
+    ret = DeviceManager::GetInstance().StopDeviceDiscovery(tokenId, pkgName);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1603,7 +1603,7 @@ HWTEST_F(DeviceManagerImplTest, VerifyAuthentication_201, testing::ext::TestSize
     std::string pkgName = "";
     std::string authPara = "authPara";
     std::shared_ptr<VerifyAuthCallback> callback = nullptr;
-    int32_t ret = DeviceManager::GetInstance().VerifyAuthentication(pkgName);
+    int32_t ret = DeviceManager::GetInstance().VerifyAuthentication(pkgName, authPara, callback);
     ASSERT_EQ(ret, DM_OK);
 }
 
@@ -1634,14 +1634,14 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDevStateCallback_201, testing::ext::Te
 HWTEST_F(DeviceManagerImplTest, RegisterUiStateCallback_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
-    int32_t ret = DeviceManager::GetInstance().RegisterUiStateCallback(pkgName);
+    int32_t ret = DeviceManagerImpl::GetInstance().RegisterUiStateCallback(pkgName);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerImplTest, UnRegisterUiStateCallback_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
-    int32_t ret = DeviceManager::GetInstance().UnRegisterUiStateCallback(pkgName);
+    int32_t ret = DeviceManagerImpl::GetInstance().UnRegisterUiStateCallback(pkgName);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1695,8 +1695,8 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialCallback_201, testing::ext::
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     pkgName = "pkgName";
-    ret = DeviceManager::GetInstance().RegisterCredentialCallback(pkgName);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ret = DeviceManager::GetInstance().UnRegisterCredentialCallback(pkgName);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 
 HWTEST_F(DeviceManagerImplTest, NotifyEvent_201, testing::ext::TestSize.Level0)
@@ -1719,7 +1719,7 @@ HWTEST_F(DeviceManagerImplTest, NotifyEvent_201, testing::ext::TestSize.Level0)
 
 HWTEST_F(DeviceManagerImplTest, OnDmServiceDied_201, testing::ext::TestSize.Level0)
 {
-    int32_t ret = DeviceManager::GetInstance().OnDmServiceDied();
+    int32_t ret = DeviceManagerImpl::GetInstance().OnDmServiceDied();
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
@@ -1760,7 +1760,8 @@ HWTEST_F(DeviceManagerImplTest, StartAdvertising_201, testing::ext::TestSize.Lev
 {
     std::string pkgName = "";
     std::map<std::string, std::string> advertiseParam;
-    int32_t ret = DeviceManager::GetInstance().StartAdvertising(pkgName, advertiseParam);
+    std::shared_ptr<PublishCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().StartAdvertising(pkgName, advertiseParam, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1777,8 +1778,8 @@ HWTEST_F(DeviceManagerImplTest, AddDiscoveryCallback_201, testing::ext::TestSize
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
     std::shared_ptr<DiscoveryCallback> callback = nullptr;
-    int32_t ret = DeviceManager::GetInstance().AddDiscoveryCallback(pkgName, discoverParam, callback);
-    ASSERT_EQ(ret, DM_INVALID_FLAG_ID);
+    int32_t ret = DeviceManagerImpl::GetInstance().AddDiscoveryCallback(pkgName, discoverParam, callback);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy_201, testing::ext::TestSize.Level0)
@@ -1850,18 +1851,18 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialAuthStatusCallback_201, test
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE;
-    std::string pkgName = "";
-    DeviceManager::GetInstance().SyncCallbackToService(dmCommonNotifyEvent, pkgName);
+    pkgName = "";
+    DeviceManagerImpl::GetInstance().SyncCallbackToService(dmCommonNotifyEvent, pkgName);
 
     pkgName = "pkgName";
     dmCommonNotifyEvent = DmCommonNotifyEvent::MIN;
-    DeviceManager::GetInstance().SyncCallbackToService(dmCommonNotifyEvent, pkgName);
+    DeviceManagerImpl::GetInstance().SyncCallbackToService(dmCommonNotifyEvent, pkgName);
 }
 
 HWTEST_F(DeviceManagerImplTest, RegisterSinkBindCallback_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
-    std::shared_ptr<BindTargetCallback> callback callback = nullptr;
+    std::shared_ptr<BindTargetCallback> callback = nullptr;
     int32_t ret = DeviceManager::GetInstance().RegisterSinkBindCallback(pkgName, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1901,12 +1902,12 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceIconInfo_201, testing::ext::TestSize.Le
     std::shared_ptr<GetDeviceIconInfoCallback> callback = std::make_shared<GetDeviceIconInfoCallbackTest>();
     EXPECT_CALL(*deviceManagerNotifyMock_, RegisterGetDeviceIconInfoCallback(_, _, _))
         .WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions, callback);
+    int32_t ret = DeviceManager::GetInstance().GetDeviceIconInfo(pkgName, filterOptions, callback);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
     EXPECT_CALL(*deviceManagerNotifyMock_, RegisterGetDeviceIconInfoCallback(_, _, _))
         .WillOnce(Return(DM_OK));
-    int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions, callback);
+    ret = DeviceManager::GetInstance().GetDeviceIconInfo(pkgName, filterOptions, callback);
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
 } // namespace

@@ -16,6 +16,7 @@
 #include "UTTest_device_manager_service_notify.h"
 #include "device_manager_service_notify.h"
 #include "dm_device_info.h"
+#include "softbus_error_code.h"
 
 #include <unistd.h>
 
@@ -60,7 +61,6 @@ HWTEST_F(DeviceManagerServiceNotifyTest, RegisterCallBack_001, testing::ext::Tes
 
     dmCommonNotifyEvent = 3;
     DmCommonNotifyEvent notifyEvent = static_cast<DmCommonNotifyEvent>(dmCommonNotifyEvent);
-    std::set<ProcessInfo> processInfoSet;
     processInfoSet.insert(processInfo);
     DeviceManagerServiceNotify::GetInstance().callbackMap_[notifyEvent] = processInfoSet;
     processInfo.pkgName = "proName";
