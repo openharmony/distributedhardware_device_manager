@@ -73,6 +73,7 @@ void DeviceManagerServiceTest::SetUpTestCase()
     DmSoftbusCache::dmSoftbusCache = softbusCacheMock_;
     DmCrypto::dmCrypto = cryptoMock_;
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    DmDMCommTool::dmDMCommTool = dMCommToolMock_;
 }
 
 void DeviceManagerServiceTest::TearDownTestCase()
@@ -93,6 +94,8 @@ void DeviceManagerServiceTest::TearDownTestCase()
     cryptoMock_ = nullptr;
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
     multipleUserConnectorMock_ = nullptr;
+    DmDMCommTool::dmDMCommTool = nullptr;
+    dMCommToolMock_ = nullptr;
 }
 
 namespace {
