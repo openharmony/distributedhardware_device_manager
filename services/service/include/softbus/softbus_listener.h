@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,9 +104,9 @@ public:
     void SendAclChangedBroadcast(const std::string &msg);
     int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
     static int32_t GetNetworkIdByUdid(const std::string &udid, std::string &networkId);
-    int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName);
     int32_t SetForegroundUserIdsToDSoftBus(const std::string &remoteUserId, const std::vector<uint32_t> &userIds);
     void DeleteCacheDeviceInfo();
+    int32_t SetLocalDisplayName(const std::string &displayName);
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj);

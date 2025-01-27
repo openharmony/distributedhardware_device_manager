@@ -23,6 +23,7 @@
 #include "token_setproc.h"
 #include "softbus_common.h"
 #include "softbus_error_code.h"
+#include <cstring>
 #include <utility>
 
 using namespace OHOS::Security::AccessToken;
@@ -508,25 +509,6 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0
     EXPECT_CALL(*softbusListenerMock_, GetIPAddrTypeFromCache(_, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_201, testing::ext::TestSize.Level0)
-{
-    std::string localDeviceName = "localDeviceName_201";
-    std::string localDisplayName = "localDisplayName_201";
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
-
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, SetLocalDeviceName(_, _)).WillOnce(Return(DM_OK));
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, DM_OK);
-
-    EXPECT_CALL(*softbusListenerMock_, SetLocalDeviceName(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(localDeviceName, localDisplayName);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Level0)
@@ -1165,6 +1147,155 @@ HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_004, testing::ext::Tes
     EXPECT_CALL(*deviceManagerServiceImplMock_, StopAuthenticateDevice(_)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterSoLoaded_201, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().isAdapterResidentSoLoaded_ = false;
+    bool ret = DeviceManagerService::GetInstance().IsDMServiceAdapterSoLoaded();
+    EXPECT_FALSE(ret);
+
+    DeviceManagerService::GetInstance().isAdapterResidentSoLoaded_ = true;
+    DeviceManagerService::GetInstance().dmServiceImplExtResident_ = nullptr;
+    ret = DeviceManagerService::GetInstance().IsDMServiceAdapterSoLoaded();
+    EXPECT_FALSE(ret);
+
+    DeviceManagerService::GetInstance().isAdapterResidentSoLoaded_ = false;
+    DeviceManagerService::GetInstance().IsDMServiceAdapterResidentLoad();
+    ret = DeviceManagerService::GetInstance().IsDMServiceAdapterSoLoaded();
+    EXPECT_FALSE(ret);
+
+    DeviceManagerService::GetInstance().UnloadDMServiceAdapterResident();
+}
+
+HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_202, testing::ext::TestSize.Level0)
+{
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    std::vector<DmDeviceInfo> deviceList;
+    EXPECT_CALL(*softbusListenerMock_, GetTrustedDeviceList(_))
+        .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(DM_OK)));
+    DeviceManagerService::GetInstance().LoadHardwareFwkService();
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::map<std::string, std::string> authParam;
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+
+    std::string networkId;
+    std::vector<int32_t> foregroundUserIds;
+    std::vector<int32_t> backgroundUserIds;
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
+    DeviceManagerService::GetInstance().ProcessCheckSumByBT(networkId, foregroundUserIds, backgroundUserIds);
+
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
+    DeviceManagerService::GetInstance().ProcessCheckSumByBT(networkId, foregroundUserIds, backgroundUserIds);
+
+    foregroundUserIds.push_back(101);
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
+    DeviceManagerService::GetInstance().ProcessCheckSumByBT(networkId, foregroundUserIds, backgroundUserIds);
+
+    DeviceManagerService::GetInstance().localNetWorkId_ = "";
+    networkId = "networkId001";
+    std::string str = "deviceId";
+    DmDeviceInfo deviceInfo;
+    foregroundUserIds.push_back(102);
+    memcpy_s(deviceInfo.networkId, DM_MAX_DEVICE_ID_LEN, str.c_str(), str.length());
+    EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_)).WillOnce(DoAll(SetArgReferee<0>(deviceInfo), Return(DM_OK)));
+    backgroundUserIds.push_back(201);
+    backgroundUserIds.push_back(202);
+    DeviceManagerService::GetInstance().ProcessCheckSumByWifi(networkId, foregroundUserIds, backgroundUserIds);
+}
+
+HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::map<std::string, std::string> authParam;
+    int32_t ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    pkgName = "pkgName";
+    ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    authParam.insert(std::make_pair(DM_AUTHENTICATION_TYPE, "authentication"));
+    ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    authParam[DM_AUTHENTICATION_TYPE] = "123456";
+    ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    std::string msg;
+    nlohmann::json msgJsonObj;
+    msgJsonObj["networkId"] = "networkId";
+    msgJsonObj["discoverType"] = 123;
+    msgJsonObj["ischange"] = false;
+    msg = msgJsonObj.dump();
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    msgJsonObj["ischange"] = true;
+    msg = msgJsonObj.dump();
+    std::vector<int32_t> foregroundUserIds;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(ERR_DM_INPUT_PARA_INVALID)));
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    foregroundUserIds.push_back(101);
+    std::vector<int32_t> backgroundUserIds;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+
+    backgroundUserIds.push_back(102);
+    msgJsonObj["discoverType"] = 1;
+    msg = msgJsonObj.dump();
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(backgroundUserIds), Return(DM_OK)));
+    DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_201, testing::ext::TestSize.Level0)
+{
+    DeletePermission();
+    std::string pkgName;
+    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize.Level0)
+{
+    DeletePermission();
+    std::string pkgName;
+    OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 } // namespace
 } // namespace DistributedHardware

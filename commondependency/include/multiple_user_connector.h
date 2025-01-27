@@ -109,6 +109,7 @@ public:
     static int32_t GetFirstForegroundUserId(void);
     static int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec);
     static int32_t GetAllUserIds(std::vector<int32_t> &userIdVec);
+    static std::string GetAccountNickName(int32_t userId);
 
 private:
     static int32_t oldUserId_;

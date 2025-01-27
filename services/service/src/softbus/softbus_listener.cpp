@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -713,13 +713,6 @@ int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string
     return SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
 }
 
-int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName,
-                                            const std::string &localDisplayName)
-{
-    LOGI("SoftbusListener Start SetLocalDeviceName!");
-    return DM_OK;
-}
-
 int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId)
 {
     if (callerId.empty()) {
@@ -1180,6 +1173,17 @@ void SoftbusListener::DeleteCacheDeviceInfo()
         LOGI("networkId: %{public}s", GetAnonyString(it.networkId).c_str());
         DeviceOffLine(it);
     }
+}
+
+int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
+{
+    LOGI("SoftbusListener Start SetLocalDisplayName!");
+    uint32_t len = static_cast<uint32_t>(displayName.size());
+    int32_t ret = ::SetDisplayName(DM_PKG_NAME, displayName.c_str(), len);
+    if (ret != DM_OK) {
+        LOGE("SoftbusListener SetLocalDisplayName failed!");
+    }
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

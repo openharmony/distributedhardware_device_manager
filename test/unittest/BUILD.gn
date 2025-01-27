@@ -28,6 +28,7 @@ group("unittest") {
     ":UTTest_device_manager_service_impl",
     ":UTTest_device_manager_service_impl_first",
     ":UTTest_device_manager_service_listener",
+    ":UTTest_device_manager_service_notify",
     ":UTTest_device_manager_service_three",
     ":UTTest_discovery_filter",
     ":UTTest_discovery_manager",
@@ -419,6 +420,30 @@ ohos_unittest("UTTest_device_manager_service_three") {
 }
 
 ## UnitTest UTTest_device_manager_service_three }}}
+
+## UnitTest UTTest_device_manager_service_notify {{{
+ohos_unittest("UTTest_device_manager_service_notify") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_device_manager_service_notify.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+  ]
+}
+
+## UnitTest UTTest_device_manager_service_notify }}}
 
 ## UnitTest UTTest_hichain_auth_connector {{{
 ohos_unittest("UTTest_hichain_auth_connector") {
@@ -894,6 +919,7 @@ ohos_unittest("UTTest_device_manager_impl") {
     "UTTest_device_manager_impl.cpp",
     "UTTest_device_manager_impl_three.cpp",
     "UTTest_device_manager_impl_two.cpp",
+    "mock/device_manager_notify_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -906,6 +932,7 @@ ohos_unittest("UTTest_device_manager_impl") {
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 
   cflags = [
@@ -1234,6 +1261,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_crypto_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
+    "mock/multiple_user_connector_mock.cpp",
     "mock/softbus_session_mock.cpp",
   ]
 

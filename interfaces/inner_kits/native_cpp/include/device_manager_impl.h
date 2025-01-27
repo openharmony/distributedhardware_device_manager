@@ -416,6 +416,10 @@ public:
 
     virtual int32_t GetDeviceIconInfo(const std::string &pkgName, const DmDeviceIconInfoFilterOptions &filterOptions,
         std::shared_ptr<GetDeviceIconInfoCallback> callback) override;
+    virtual int32_t PutDeviceProfileInfoList(const std::string &pkgName,
+        const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) override;
+    virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
+        std::string &displayName) override;
 
 private:
     DeviceManagerImpl() = default;

@@ -26,6 +26,7 @@
 #include "dm_single_instance.h"
 #include "device_manager_impl.h"
 #include "softbus_error_code.h"
+#include "device_manager_notify_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,6 +36,9 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+
+    static inline  std::shared_ptr<DeviceManagerNotifyMock> deviceManagerNotifyMock_ =
+        std::make_shared<DeviceManagerNotifyMock>();
 };
 
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {
@@ -124,6 +128,22 @@ public:
     {
     }
     void OnCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode) override {}
+};
+
+class GetDeviceProfileInfoListCallbackTest : public GetDeviceProfileInfoListCallback {
+public:
+    virtual ~GetDeviceProfileInfoListCallbackTest()
+    {
+    }
+    void OnResult(const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override {}
+};
+
+class GetDeviceIconInfoCallbackTest : public GetDeviceIconInfoCallback {
+public:
+    virtual ~GetDeviceIconInfoCallbackTest()
+    {
+    }
+    void OnResult(const DmDeviceIconInfo &deviceIconInfo, int32_t code) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -395,7 +395,7 @@ public:
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId) = 0;
 
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &deviceId, const std::string &extra) = 0;
-    
+
     virtual int32_t CheckNewAPIAccessPermission() = 0;
 
     /**
@@ -649,6 +649,10 @@ public:
 
     virtual int32_t GetDeviceIconInfo(const std::string &pkgName, const DmDeviceIconInfoFilterOptions &filterOptions,
         std::shared_ptr<GetDeviceIconInfoCallback> callback) = 0;
+    virtual int32_t PutDeviceProfileInfoList(const std::string &pkgName,
+        const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
+    virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
+        std::string &displayName) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

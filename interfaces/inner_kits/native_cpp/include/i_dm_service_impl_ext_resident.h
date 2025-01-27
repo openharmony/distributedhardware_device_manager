@@ -98,6 +98,9 @@ public:
      */
     virtual int32_t GetDeviceIconInfo(const std::string &pkgName,
         const DmDeviceIconInfoFilterOptions &filterOptions) = 0;
+    virtual int32_t PutDeviceProfileInfoList(const std::string &pkgName,
+        const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
+    virtual std::vector<std::string> GetDeviceNamePrefixs() = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);

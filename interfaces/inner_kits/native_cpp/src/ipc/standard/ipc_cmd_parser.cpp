@@ -42,11 +42,14 @@
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_local_display_device_name_req.h"
+#include "ipc_get_local_display_device_name_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
 #include "ipc_model_codec.h"
 #include "ipc_notify_event_req.h"
+#include "ipc_put_device_profile_info_list_req.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
@@ -66,69 +69,6 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 const int32_t DM_MAX_TRUST_DEVICE_NUM = 200;
-}
-
-void DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
-{
-    std::string deviceIdStr = parcel.ReadString();
-    if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s deviceId failed!");
-        return;
-    }
-    std::string deviceNameStr = parcel.ReadString();
-    if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s deviceName failed!");
-        return;
-    }
-    devInfo.deviceTypeId = parcel.ReadUint16();
-    std::string networkIdStr = parcel.ReadString();
-    if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
-        LOGE("strcpy_s networkId failed!");
-        return;
-    }
-}
-
-bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(targetId.deviceId));
-    bRet = (bRet && parcel.WriteString(targetId.brMac));
-    bRet = (bRet && parcel.WriteString(targetId.bleMac));
-    bRet = (bRet && parcel.WriteString(targetId.wifiIp));
-    bRet = (bRet && parcel.WriteUint16(targetId.wifiPort));
-    return bRet;
-}
-
-void DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targetId)
-{
-    targetId.deviceId = parcel.ReadString();
-    targetId.brMac = parcel.ReadString();
-    targetId.bleMac = parcel.ReadString();
-    targetId.wifiIp = parcel.ReadString();
-    targetId.wifiPort = parcel.ReadUint16();
-}
-
-bool EncodeDmAccessCaller(const DmAccessCaller &caller, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(caller.accountId));
-    bRet = (bRet && parcel.WriteString(caller.pkgName));
-    bRet = (bRet && parcel.WriteString(caller.networkId));
-    bRet = (bRet && parcel.WriteInt32(caller.userId));
-    bRet = (bRet && parcel.WriteUint64(caller.tokenId));
-    bRet = (bRet && parcel.WriteString(caller.extra));
-    return bRet;
-}
-
-bool EncodeDmAccessCallee(const DmAccessCallee &callee, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(callee.accountId));
-    bRet = (bRet && parcel.WriteString(callee.networkId));
-    bRet = (bRet && parcel.WriteString(callee.peerId));
-    bRet = (bRet && parcel.WriteInt32(callee.userId));
-    bRet = (bRet && parcel.WriteString(callee.extra));
-    return bRet;
 }
 
 ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
@@ -564,7 +504,7 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
     DmDeviceInfo dmDeviceInfo;
     IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
     DmDeviceBasicInfo devBasicInfo;
-    DecodeDmDeviceBasicInfo(data, devBasicInfo);
+    IpcModelCodec::DecodeDmDeviceBasicInfo(data, devBasicInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, dmDeviceInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, devBasicInfo);
     reply.WriteInt32(DM_OK);
@@ -1376,7 +1316,7 @@ ON_IPC_SET_REQUEST(BIND_TARGET, std::shared_ptr<IpcReq> pBaseReq, MessageParcel 
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!EncodePeerTargetId(targetId, data)) {
+    if (!IpcModelCodec::EncodePeerTargetId(targetId, data)) {
         LOGE("write peer target id failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -1412,7 +1352,7 @@ ON_IPC_SET_REQUEST(UNBIND_TARGET, std::shared_ptr<IpcReq> pBaseReq, MessageParce
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!EncodePeerTargetId(targetId, data)) {
+    if (!IpcModelCodec::EncodePeerTargetId(targetId, data)) {
         LOGE("write peer target id failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -1437,7 +1377,7 @@ ON_IPC_CMD(BIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     PeerTargetId targetId;
-    DecodePeerTargetId(data, targetId);
+    IpcModelCodec::DecodePeerTargetId(data, targetId);
     int32_t result = data.ReadInt32();
     int32_t status = data.ReadInt32();
     std::string content = data.ReadString();
@@ -1451,7 +1391,7 @@ ON_IPC_CMD(UNBIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     PeerTargetId targetId;
-    DecodePeerTargetId(data, targetId);
+    IpcModelCodec::DecodePeerTargetId(data, targetId);
     int32_t result = data.ReadInt32();
     std::string content = data.ReadString();
 
@@ -1499,7 +1439,7 @@ ON_IPC_SET_REQUEST(CREATE_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, MessageP
     if (!data.WriteString(pkgName)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!EncodePeerTargetId(targetId, data)) {
+    if (!IpcModelCodec::EncodePeerTargetId(targetId, data)) {
         LOGE("write peer target id failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -1537,7 +1477,7 @@ ON_IPC_SET_REQUEST(DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, Message
     if (!data.WriteString(pkgName)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!EncodePeerTargetId(targetId, data)) {
+    if (!IpcModelCodec::EncodePeerTargetId(targetId, data)) {
         LOGE("write peer target id failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -1784,11 +1724,11 @@ ON_IPC_SET_REQUEST(CHECK_ACCESS_CONTROL, std::shared_ptr<IpcReq> pBaseReq, Messa
     std::shared_ptr<IpcCheckAcl> pReq = std::static_pointer_cast<IpcCheckAcl>(pBaseReq);
     DmAccessCaller caller = pReq->GetAccessCaller();
     DmAccessCallee callee = pReq->GetAccessCallee();
-    if (!EncodeDmAccessCaller(caller, data)) {
+    if (!IpcModelCodec::EncodeDmAccessCaller(caller, data)) {
         LOGE("write caller failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!EncodeDmAccessCallee(callee, data)) {
+    if (!IpcModelCodec::EncodeDmAccessCallee(callee, data)) {
         LOGE("write caller failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -1814,11 +1754,11 @@ ON_IPC_SET_REQUEST(CHECK_SAME_ACCOUNT, std::shared_ptr<IpcReq> pBaseReq, Message
     std::shared_ptr<IpcCheckAcl> pReq = std::static_pointer_cast<IpcCheckAcl>(pBaseReq);
     DmAccessCaller caller = pReq->GetAccessCaller();
     DmAccessCallee callee = pReq->GetAccessCallee();
-    if (!EncodeDmAccessCaller(caller, data)) {
+    if (!IpcModelCodec::EncodeDmAccessCaller(caller, data)) {
         LOGE("write caller failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!EncodeDmAccessCallee(callee, data)) {
+    if (!IpcModelCodec::EncodeDmAccessCallee(callee, data)) {
         LOGE("write caller failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
@@ -1984,7 +1924,7 @@ ON_IPC_CMD(SINK_BIND_TARGET_RESULT, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
     PeerTargetId targetId;
-    DecodePeerTargetId(data, targetId);
+    IpcModelCodec::DecodePeerTargetId(data, targetId);
     int32_t result = data.ReadInt32();
     int32_t status = data.ReadInt32();
     std::string content = data.ReadString();
@@ -2162,6 +2102,76 @@ ON_IPC_CMD(GET_DEVICE_ICON_INFO_RESULT, MessageParcel &data, MessageParcel &repl
     IpcModelCodec::DecodeDmDeviceIconInfo(data, deviceIconInfo);
     DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo, code);
     reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(PUT_DEVICE_PROFILE_INFO_LIST, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcPutDeviceProfileInfoListReq> pReq =
+        std::static_pointer_cast<IpcPutDeviceProfileInfoListReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    std::vector<DmDeviceProfileInfo> deviceProfileInfos = pReq->GetDeviceProfileInfoList();
+    if (!data.WriteInt32((int32_t)deviceProfileInfos.size())) {
+        LOGE("write device list size failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    for (const auto &devInfo : deviceProfileInfos) {
+        if (!IpcModelCodec::EncodeDmDeviceProfileInfo(devInfo, data)) {
+            LOGE("write dm device profile info failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(PUT_DEVICE_PROFILE_INFO_LIST, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_LOCAL_DISPLAY_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetLocalDisplayDeviceNameReq> pReq =
+        std::static_pointer_cast<IpcGetLocalDisplayDeviceNameReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteInt32(pReq->GetMaxNameLength())) {
+        LOGE("write maxNameLength failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_LOCAL_DISPLAY_DEVICE_NAME, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetLocalDisplayDeviceNameRsp> pRsp =
+        std::static_pointer_cast<IpcGetLocalDisplayDeviceNameRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetDisplayName(reply.ReadString());
     return DM_OK;
 }
 } // namespace DistributedHardware
