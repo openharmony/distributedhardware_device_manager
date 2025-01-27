@@ -2537,8 +2537,8 @@ napi_value DeviceManagerNapi::InitStrategyForHeartBeatEnum(napi_env env, napi_va
     napi_create_uint32(env, stop_heart_beat, &stop_heart_beat_value);
 
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("STARTHEARTBEAT", start_heart_beat_value),
-        DECLARE_NAPI_STATIC_PROPERTY("STOPHEARTBEAT", stop_heart_beat_value),
+        DECLARE_NAPI_STATIC_PROPERTY("START_HEARTBEAT", start_heart_beat_value),
+        DECLARE_NAPI_STATIC_PROPERTY("TEMP_STOP_HEARTBEAT", stop_heart_beat_value),
     };
 
     napi_value result = nullptr;
