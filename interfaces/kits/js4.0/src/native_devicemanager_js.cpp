@@ -2477,7 +2477,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo),
         DECLARE_NAPI_FUNCTION("putDeviceProfileInfoList", JsPutDeviceProfileInfoList),
         DECLARE_NAPI_FUNCTION("getLocalDisplayDeviceName", JsGetLocalDisplayDeviceName),
-        DECLARE_NAPI_FUNCTION("SetHeartBeatPolicy", SetHeartBeatPolicy)};
+        DECLARE_NAPI_FUNCTION("setHeartBeatPolicy", SetHeartBeatPolicy)};
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
