@@ -119,6 +119,7 @@ struct PinCustomDialog {
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
               .constraintSize({ minHeight: 40 })
               .width('100%')
+              .height(57)
               .backgroundColor(this.btnColor)
               .onClick(() => {
                 if (this.controller) {
