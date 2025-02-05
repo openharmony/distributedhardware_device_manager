@@ -58,7 +58,7 @@ const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 const int32_t DM_MAX_DEVICE_SIZE = 100;
 
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
-napi_ref StrategyForHeartBeatEnumConstructor_ = nullptr;
+napi_ref StrategyForHeartbeatEnumConstructor_ = nullptr;
 
 std::map<std::string, DeviceManagerNapi *> g_deviceManagerMap;
 std::map<std::string, std::shared_ptr<DmNapiInitCallback>> g_initCallbackMap;
@@ -2100,7 +2100,7 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
     return GetDeviceIconInfoPromise(env, jsCallback);
 }
 
-napi_value DeviceManagerNapi::SetHeartBeatPolicy(napi_env env, napi_callback_info info)
+napi_value DeviceManagerNapi::SetHeartbeatPolicy(napi_env env, napi_callback_info info)
 {
     LOGI("in");
     size_t argsCount = 0;
@@ -2477,7 +2477,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo),
         DECLARE_NAPI_FUNCTION("putDeviceProfileInfoList", JsPutDeviceProfileInfoList),
         DECLARE_NAPI_FUNCTION("getLocalDisplayDeviceName", JsGetLocalDisplayDeviceName),
-        DECLARE_NAPI_FUNCTION("setHeartBeatPolicy", SetHeartBeatPolicy)};
+        DECLARE_NAPI_FUNCTION("SetHeartbeatPolicy", SetHeartbeatPolicy)};
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
@@ -2530,28 +2530,28 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
     return exports;
 }
 
-napi_value DeviceManagerNapi::InitStrategyForHeartBeatEnum(napi_env env, napi_value exports)
+napi_value DeviceManagerNapi::InitStrategyForHeartbeatEnum(napi_env env, napi_value exports)
 {
-    const uint32_t stop_heart_beat = 100;
-    const uint32_t start_heart_beat = 101;
+    const uint32_t stop_heartbeat = 100;
+    const uint32_t start_heartbeat = 101;
 
-    napi_value start_heart_beat_value;
-    napi_value stop_heart_beat_value;
+    napi_value start_heartbeat_value;
+    napi_value stop_heartbeat_value;
     int32_t refCount = 1;
 
-    napi_create_uint32(env, start_heart_beat, &start_heart_beat_value);
-    napi_create_uint32(env, stop_heart_beat, &stop_heart_beat_value);
+    napi_create_uint32(env, start_heartbeat, &start_heartbeat_value);
+    napi_create_uint32(env, stop_heartbeat, &stop_heartbeat_value);
 
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("START_HEARTBEAT", start_heart_beat_value),
-        DECLARE_NAPI_STATIC_PROPERTY("TEMP_STOP_HEARTBEAT", stop_heart_beat_value),
+        DECLARE_NAPI_STATIC_PROPERTY("START_HEARTBEAT", start_heartbeat_value),
+        DECLARE_NAPI_STATIC_PROPERTY("TEMP_STOP_HEARTBEAT", stop_heartbeat_value),
     };
 
     napi_value result = nullptr;
-    napi_define_class(env, "StrategyForHeartBeat", NAPI_AUTO_LENGTH, EnumTypeConstructor,
+    napi_define_class(env, "StrategyForHeartbeat", NAPI_AUTO_LENGTH, EnumTypeConstructor,
         nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_create_reference(env, result, refCount, &StrategyForHeartBeatEnumConstructor_);
-    napi_set_named_property(env, exports, "StrategyForHeartBeat", result);
+    napi_create_reference(env, result, refCount, &StrategyForHeartbeatEnumConstructor_);
+    napi_set_named_property(env, exports, "StrategyForHeartbeat", result);
     return exports;
 }
 
@@ -2593,7 +2593,7 @@ static napi_value Export(napi_env env, napi_value exports)
     LOGI("Export() is called!");
     DeviceManagerNapi::Init(env, exports);
     DeviceManagerNapi::InitDeviceStatusChangeActionEnum(env, exports);
-    DeviceManagerNapi::InitStrategyForHeartBeatEnum(env, exports);
+    DeviceManagerNapi::InitStrategyForHeartbeatEnum(env, exports);
     return exports;
 }
 
