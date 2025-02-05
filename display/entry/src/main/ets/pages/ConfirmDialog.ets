@@ -248,7 +248,7 @@ struct ConfirmCustomDialog {
                 this.onAllowAlways();
               })
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .height(40)
+              .height(this.isTibetanLanguages() ? 55 : 40)
               .width(this.isPC ? 250 : '100%')
               .backgroundColor(this.btnColor)
               .onHover((isHover?: boolean, event?: HoverEvent): void => {
@@ -272,7 +272,7 @@ struct ConfirmCustomDialog {
                 this.onAllowOnce();
               })
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .height(40)
+              .height(this.isTibetanLanguages() ? 55 : 40)
               .width(this.isPC ? 250 : '100%')
               .backgroundColor(this.btnColor)
               .onHover((isHover?: boolean, event?: HoverEvent): void => {
@@ -296,7 +296,7 @@ struct ConfirmCustomDialog {
               .onClick(() => {
                 this.onCancel();
               })
-              .height(40)
+              .height(this.isTibetanLanguages() ? 55 : 40)
               .width(this.isPC ? 250 : '100%')
               .backgroundColor(this.btnColor)
               .onHover((isHover?: boolean, event?: HoverEvent): void => {
