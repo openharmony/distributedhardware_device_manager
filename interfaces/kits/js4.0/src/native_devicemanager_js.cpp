@@ -2103,6 +2103,12 @@ napi_value DeviceManagerNapi::JsGetDeviceIconInfo(napi_env env, napi_callback_in
 napi_value DeviceManagerNapi::SetHeartBeatPolicy(napi_env env, napi_callback_info info)
 {
     LOGI("in");
+    size_t argsCount = 0;
+    napi_value thisArg = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argsCount, nullptr, &thisArg, nullptr));
+    if (!CheckArgsCount(env, argsCount >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
+        return nullptr;
+    }
     if (!IsSystemApp()) {
         LOGI("The caller is not SystemApp");
         CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
