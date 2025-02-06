@@ -277,11 +277,8 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    bool isOnlyShowNetworkId = false;
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call GetTrustedDeviceList.", pkgName.c_str());
-        isOnlyShowNetworkId = true;
-    }
+    bool isOnlyShowNetworkId = !(PermissionManager::GetInstance().CheckPermission() ||
+        PermissionManager::GetInstance().CheckNewPermission());
     std::vector<DmDeviceInfo> onlineDeviceList;
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
