@@ -462,6 +462,34 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutAllTrustedDevices_201, testing::ex
         .WillOnce(Return(DM_OK));
     ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
     EXPECT_EQ(ret, DM_OK);
+
+    int32_t bindType = 0;
+    std::string peerUdid = "";
+    std::string localUdid = "";
+    int32_t localUserId = 1234;
+    std::string localAccountId = "";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
+    DeviceProfileConnector::GetInstance().HandleDeviceUnBind(bindType, peerUdid, localUdid, localUserId,
+        localAccountId);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level0)
+{
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
+    auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    EXPECT_TRUE(ret.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string localDeviceId = "";
+    std::string remoteDeviceId = "";
+    int32_t bindLevel = 2;
+    std::string extra = "";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    DmOfflineParam offlineParam = = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -39,5 +39,11 @@ std::string Crypto::GetGroupIdHash(const std::string &groupId)
 {
     return DmCrypto::dmCrypto->GetGroupIdHash(groupId);
 }
+
+int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId, const std::string &udidHash,
+    DmKVValue &kvValue)
+{
+    return DmCrypto::dmCrypto->ConvertUdidHashToAnoyDeviceId(appId, udidHash, kvValue);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

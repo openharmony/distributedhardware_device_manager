@@ -1155,7 +1155,13 @@ ohos_unittest("UTTest_device_manager_service_impl_first") {
 ohos_unittest("UTTest_device_manager_service_listener") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_device_manager_service_listener.cpp" ]
+  sources = [
+    "UTTest_device_manager_service_listener.cpp",
+    "mock/crypto_mgr_mock.cpp",
+    "mock/dm_softbus_cache_mock.cpp",
+    "mock/ipc_server_listener_mock.cpp",
+    "mock/kv_adapter_manager_mock.cpp",
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
@@ -1165,6 +1171,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 }
 
