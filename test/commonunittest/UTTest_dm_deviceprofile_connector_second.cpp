@@ -217,7 +217,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::e
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level0)
 {
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
     auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     EXPECT_TRUE(ret.empty());
 }
@@ -473,13 +473,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutAllTrustedDevices_201, testing::ex
         localAccountId);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level0)
-{
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
-    auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
-    EXPECT_TRUE(ret.empty());
-}
-
 HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing::ext::TestSize.Level0)
 {
     std::string pkgName;
@@ -488,7 +481,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing:
     int32_t bindLevel = 2;
     std::string extra = "";
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    DmOfflineParam offlineParam = = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
 }
 } // namespace DistributedHardware

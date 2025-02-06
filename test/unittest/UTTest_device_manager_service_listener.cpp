@@ -485,16 +485,14 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testin
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 
     processInfo.pkgName = "ohos.distributedhardware.devicemanager";
-    DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE;
-    std::set<ProcessInfo> notifyProcessInfos;
+    int32_t dmCommonNotifyEvent = 3;
     ProcessInfo processInfo1;
     processInfo1.pkgName = "pkgName";
     processInfo1.userId = 101;
-    notifyProcessInfos.insert(processInfo1);
-    DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent] = notifyProcessInfos;
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo1);
 
     std::vector<ProcessInfo> processInfos;
-    processInfos.push_back(processInfo);
+    processInfos.push_back(processInfo1);
     std::set<std::string> systemSA;
     systemSA.insert("pkgName");
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
@@ -647,13 +645,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceTrustChange_001, testing::ext
     std::string udid = "udid";
     std::string uuid = "uuid";
     DmAuthForm authForm = DmAuthForm::ACROSS_ACCOUNT;
-    DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY;
-    std::set<ProcessInfo> notifyProcessInfos;
+    int32_t dmCommonNotifyEvent = 7;
     ProcessInfo processInfo;
-    processInfo.pkgName = "pkgName";
-    processInfo.userId = 101;
-    notifyProcessInfos.insert(processInfo);
-    DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent] = notifyProcessInfos;
+    processInfo.pkgName = "pkgNameyh";
+    processInfo.userId = 103;
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
 
     std::vector<ProcessInfo> processInfos;
     processInfos.push_back(processInfo);
@@ -709,13 +705,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_002, testing::
     uint16_t deviceTypeId = 1;
     int32_t errcode = 2;
 
-    DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY;
-    std::set<ProcessInfo> notifyProcessInfos;
+    int32_t dmCommonNotifyEvent = 7;
     ProcessInfo processInfo1;
-    processInfo1.pkgName = "pkgName";
-    processInfo1.userId = 101;
-    notifyProcessInfos.insert(processInfo1);
-    DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent] = notifyProcessInfos;
+    processInfo1.pkgName = "pkgNameed";
+    processInfo1.userId = 102;
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo1);
     std::vector<ProcessInfo> processInfos;
     processInfos.push_back(processInfo1);
     std::set<std::string> systemSA;
@@ -734,12 +728,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetWhiteListSAProcessInfo_001, testin
     EXPECT_EQ(ret.empty(), true);
 
     dmCommonNotifyEvent = DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY;
-    std::set<ProcessInfo> notifyProcessInfos;
+    int32_t dmNotifyEvent = 7;
     ProcessInfo processInfo;
-    processInfo.pkgName = "pkgName";
-    processInfo.userId = 101;
-    notifyProcessInfos.insert(processInfo);
-    DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent] = notifyProcessInfos;
+    processInfo.pkgName = "pkgNamefg";
+    processInfo.userId = 108;
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
     ret = listener_->GetWhiteListSAProcessInfo(dmCommonNotifyEvent);
     EXPECT_EQ(ret.empty(), false);
 }
@@ -753,12 +746,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, tes
     EXPECT_EQ(ret.empty(), true);
 
     dmCommonNotifyEvent = DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY;
-    std::set<ProcessInfo> notifyProcessInfos;
+    int32_t dmNotifyEvent = 7;
     ProcessInfo processInfo;
     processInfo.pkgName = "pkgName";
     processInfo.userId = 101;
-    notifyProcessInfos.insert(processInfo);
-    DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent] = notifyProcessInfos;
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo);
 
     std::vector<ProcessInfo> processInfos;
     processInfos.push_back(processInfo);
@@ -788,7 +780,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, tes
     ret = listener_->GetNotifyProcessInfoByUserId(userId, dmCommonNotifyEvent);
     EXPECT_EQ(ret.empty(), true);
 
-    DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent].insert(processInfo1);
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo1);
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
     EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).WillOnce(Return(systemSA));
     ret = listener_->GetNotifyProcessInfoByUserId(userId, dmCommonNotifyEvent);
@@ -939,18 +931,16 @@ HWTEST_F(DeviceManagerServiceListenerTest, RemoveNotExistProcess_001, testing::e
     ProcessInfo processInfo;
     processInfo.pkgName = "pkgName";
     processInfo.userId = 101;
-    DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::REG_DEVICE_STATE;
-    std::set<ProcessInfo> notifyProcessInfos;
+    int32_t dmCommonNotifyEvent = 7;
     ProcessInfo processInfo1;
     processInfo1.pkgName = "pkgNamebmn";
     processInfo1.userId = 102;
-    notifyProcessInfos.insert(processInfo1);
-    notifyProcessInfos.insert(processInfo);
     ProcessInfo pro;
     pro.pkgName = "pkgNamejk";
     pro.userId = 103;
-    notifyProcessInfos.insert(pro);
-    DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent] = notifyProcessInfos;
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo);
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo1);
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, pro);
     notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId);
     DmDeviceInfo info;
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
