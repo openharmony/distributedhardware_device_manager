@@ -27,6 +27,8 @@
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_publish_result_req.h"
+#include "device_manager_service_notify.h"
+#include "app_manager.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -485,10 +487,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testin
     processInfo.pkgName = "ohos.distributedhardware.devicemanager";
     DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE;
     std::set<ProcessInfo> notifyProcessInfos;
-    ProcessInfo processInfo;
-    processInfo.pkgName = "pkgName";
-    processInfo.userId = 101;
-    notifyProcessInfos.insert(processInfo);
+    ProcessInfo processInfo1;
+    processInfo1.pkgName = "pkgName";
+    processInfo1.userId = 101;
+    notifyProcessInfos.insert(processInfo1);
     DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent] = notifyProcessInfos;
 
     std::vector<ProcessInfo> processInfos;
@@ -699,7 +701,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAppUnintall_001, testing::ext::Test
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -709,13 +711,13 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::
 
     DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY;
     std::set<ProcessInfo> notifyProcessInfos;
-    ProcessInfo processInfo;
-    processInfo.pkgName = "pkgName";
-    processInfo.userId = 101;
-    notifyProcessInfos.insert(processInfo);
+    ProcessInfo processInfo1;
+    processInfo1.pkgName = "pkgName";
+    processInfo1.userId = 101;
+    notifyProcessInfos.insert(processInfo1);
     DeviceManagerServiceNotify::GetInstance().callbackMap_[dmCommonNotifyEvent] = notifyProcessInfos;
     std::vector<ProcessInfo> processInfos;
-    processInfos.push_back(processInfo);
+    processInfos.push_back(processInfo1);
     std::set<std::string> systemSA;
     systemSA.insert("pkgName");
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));

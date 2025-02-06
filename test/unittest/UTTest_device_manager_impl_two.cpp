@@ -1995,7 +1995,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceProfileInfoList_202, testing::ext::Test
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(DM_OK));
-    ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions, callback);
+    int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions, callback);
     ASSERT_EQ(ret, DM_OK);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
@@ -2034,7 +2034,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceIconInfo_202, testing::ext::TestSize.Le
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
     EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(DM_OK));
-    ret = DeviceManager::GetInstance().GetDeviceIconInfo(pkgName, filterOptions, callback);
+    int32_t ret = DeviceManager::GetInstance().GetDeviceIconInfo(pkgName, filterOptions, callback);
     ASSERT_EQ(ret, DM_OK);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
@@ -2289,12 +2289,12 @@ HWTEST_F(DeviceManagerImplTest, GetNetworkIdByUdid_202, testing::ext::TestSize.L
     DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 
     std::map<DmCommonNotifyEvent, std::set<std::string>> callbackMap;
-    DeviceManager::GetInstance().SyncCallbacksToService(callbackMap);
+    DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
     std::set<std::string> strSet;
     callbackMap[DmCommonNotifyEvent::REG_DEVICE_STATE] = strSet;
     strSet.insert("pkgName02");
     callbackMap[DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE] = strSet;
-    DeviceManager::GetInstance().SyncCallbacksToService(callbackMap);
+    DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
 }
 } // namespace
 } // namespace DistributedHardware

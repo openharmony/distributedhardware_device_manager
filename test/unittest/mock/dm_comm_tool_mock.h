@@ -29,7 +29,7 @@ public:
     virtual int32_t SendUserIds(const std::string rmtNetworkId,
         const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds) = 0;
 public:
-    static inline std::shared_ptr<DmAppManager> dmDMCommTool = nullptr;
+    static inline std::shared_ptr<DmDMCommTool> dmDMCommTool = nullptr;
 };
 
 class DMCommToolMock : public DmDMCommTool {
