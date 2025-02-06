@@ -19,6 +19,7 @@
 #include "multiple_user_connector.h"
 #include "system_ability_definition.h"
 #include "device_manager_service.h"
+#include "dm_anonymous.h"
 #include "parameter.h"
 #include "softbus_bus_center.h"
 #include "string_ex.h"
@@ -202,11 +203,7 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
         InitDeviceNameToSoftBus("", userDefinedDeviceName);
         return;
     }
-    std::string deviceName;
-    GetDeviceName(deviceName);
-    if (deviceName.empty()) {
-        deviceName = GetLocalMarketName();
-    }
+    std::string deviceName = GetLocalMarketName();
     if (deviceName.empty()) {
         LOGE("deviceName is empty");
         return;
@@ -217,7 +214,8 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
 
 void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, const std::string &subffixName)
 {
-    LOGI("In");
+    LOGI("In prefixName:%{public}s, subffixName:%{public}s",
+        GetAnonyString(prefixName).c_str(), GetAnonyString(subffixName).c_str());
     std::string raw = GetLocalDisplayDeviceName(prefixName, subffixName, 0);
     std::string name18 = GetLocalDisplayDeviceName(prefixName, subffixName, NUM18);
     std::string name21 = GetLocalDisplayDeviceName(prefixName, subffixName, NUM21);
@@ -390,6 +388,7 @@ std::string DeviceNameManager::GetLocalMarketName()
     for (const auto &item : prefixs) {
         localMarketName_ = TrimStr(ReplaceStr(localMarketName_, item, ""));
     }
+    LOGI("localMarketName : %{public}s", GetAnonyString(localMarketName_).c_str());
     return localMarketName_;
 }
 
@@ -454,6 +453,7 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
     const std::string &key, std::string &value)
 {
     std::string proxyUri = GetProxyUriStr(tableName, userId);
+    LOGI("proxyUri : %{public}s", proxyUri.c_str());
     auto helper = CreateDataShareHelper(proxyUri);
     if (helper == nullptr) {
         LOGE("helper is nullptr");
@@ -485,6 +485,7 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
         return ret;
     }
     resultSet->Close();
+    LOGI("value : %{public}s", GetAnonyString(value).c_str());
     return DM_OK;
 }
 
