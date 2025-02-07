@@ -19,9 +19,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
 int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
-        const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds)
+    const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds)
 {
     return DmDMCommTool::dmDMCommTool->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
 }
