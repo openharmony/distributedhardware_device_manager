@@ -945,7 +945,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, RemoveNotExistProcess_001, testing::e
     ProcessInfo processInfo;
     processInfo.pkgName = "pkgName";
     processInfo.userId = 101;
-    int32_t dmCommonNotifyEvent = 7;
     ProcessInfo processInfo1;
     processInfo1.pkgName = "pkgNamebmn";
     processInfo1.userId = 102;
