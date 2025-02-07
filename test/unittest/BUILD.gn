@@ -1157,6 +1157,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
 
   sources = [
     "UTTest_device_manager_service_listener.cpp",
+    "mock/app_manager_mock.cpp",
     "mock/crypto_mgr_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
     "mock/ipc_server_listener_mock.cpp",

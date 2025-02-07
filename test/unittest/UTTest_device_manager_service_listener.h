@@ -26,6 +26,7 @@
 #include "dm_crypto_mock.h"
 #include "ipc_server_listener_mock.h"
 #include "kv_adapter_manager_mock.h"
+#include "app_manager_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -42,6 +43,7 @@ public:
         std::make_shared<IpcServerListenerMock>();
     static inline  std::shared_ptr<KVAdapterManagerMock> kVAdapterManagerMock_ =
         std::make_shared<KVAdapterManagerMock>();
+    static inline  std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
