@@ -157,6 +157,7 @@ bool IpcServerStub::Init()
         }
         registerToService_ = true;
         KVAdapterManager::GetInstance().Init();
+        DeviceNameManager::GetInstance().Init();
     }
     return true;
 }
