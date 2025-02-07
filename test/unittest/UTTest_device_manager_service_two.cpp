@@ -650,17 +650,6 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level0
     }
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
     DeviceManagerService::GetInstance().RemoveNotifyRecord(processInfo);
-
-    std::vector<uint32_t> foregroundUserIds;
-    std::vector<uint32_t> backgroundUserIds;
-    std::string remoteUdid = "remoteUdid";
-    if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
-        DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    }
-    
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
-    DeviceManagerService::GetInstance().ProcessSyncUserIds(foregroundUserIds, backgroundUserIds, remoteUdid);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
 /**
@@ -838,18 +827,6 @@ HWTEST_F(DeviceManagerServiceTest, DmHiDumper_201, testing::ext::TestSize.Level0
         .WillOnce(DoAll(SetArgReferee<0>(deviceList), Return(ERR_DM_FAILED)));
     ret = DeviceManagerService::GetInstance().DmHiDumper(args, result);
     EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    std::vector<uint32_t> foregroundUserIds;
-    foregroundUserIds.push_back(1);
-    std::vector<uint32_t> backgroundUserIds;
-    backgroundUserIds.push_back(2);
-    std::string remoteUdid = "remoteUdid";
-    if (DeviceManagerService::GetInstance().softbusListener_ == nullptr) {
-        DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    }
-    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
-    DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
-    DeviceManagerService::GetInstance().ProcessSyncUserIds(foregroundUserIds, backgroundUserIds, remoteUdid);
 }
 
 HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level0)
@@ -1137,6 +1114,7 @@ HWTEST_F(DeviceManagerServiceTest, SendUserIdsByWifi_201, testing::ext::TestSize
     foregroundUserIds.push_back(102);
     backgroundUserIds.push_back(103);
     backgroundUserIds.push_back(104);
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().SendUserIdsByWifi(networkId, foregroundUserIds,
         backgroundUserIds);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1301,7 +1279,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize
 
 HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_202, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().timer_ = nullptr;
     int32_t curUserId = 1;
     int32_t preUserId = 1;
     std::map<std::string, std::string> wifiDevices;

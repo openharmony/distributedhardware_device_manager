@@ -2147,7 +2147,7 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterDiscoveryCallback_202, testing::ext::T
 
 HWTEST_F(DeviceManagerImplTest, StopAdvertising_201, testing::ext::TestSize.Level0)
 {
-    std::string packName;
+    std::string packName = "pkgName";
     std::map<std::string, std::string> advertiseParam;
     advertiseParam[PARAM_KEY_PUBLISH_ID] = "10";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
@@ -2162,7 +2162,7 @@ HWTEST_F(DeviceManagerImplTest, StopAdvertising_201, testing::ext::TestSize.Leve
 
 HWTEST_F(DeviceManagerImplTest, StopAdvertising_202, testing::ext::TestSize.Level0)
 {
-    std::string packName;
+    std::string packName = "pkgName";
     std::map<std::string, std::string> advertiseParam;
     advertiseParam[PARAM_KEY_PUBLISH_ID] = "10";
     std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
