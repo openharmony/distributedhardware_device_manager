@@ -200,6 +200,7 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
     std::string userDefinedDeviceName;
     GetUserDefinedDeviceName(userId, userDefinedDeviceName);
     if (!userDefinedDeviceName.empty()) {
+        LOGI("userDefinedDeviceName:%{public}s", GetAnonyString(userDefinedDeviceName).c_str());
         InitDeviceNameToSoftBus("", userDefinedDeviceName);
         return;
     }
@@ -247,6 +248,13 @@ int32_t DeviceNameManager::GetLocalDisplayDeviceName(int32_t maxNamelength, std:
         maxNamelength > NAME_LENGTH_MAX) {
         LOGE("maxNamelength:%{public}d is invalid", maxNamelength);
         return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string userDefinedDeviceName;
+    GetUserDefinedDeviceName(userId, userDefinedDeviceName);
+    if (!userDefinedDeviceName.empty()) {
+        LOGI("userDefinedDeviceName:%{public}s", GetAnonyString(userDefinedDeviceName).c_str());
+        displayName = GetLocalDisplayDeviceName("", userDefinedDeviceName, maxNamelength);
+        return DM_OK;
     }
     MultipleUserConnector::GetCallerUserId(userId);
     std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
