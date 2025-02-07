@@ -959,13 +959,13 @@ HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize
 HWTEST_F(ReleationShipSyncMgrTest, IsValid_010, testing::ext::TestSize.Level0)
 {
     RelationShipChangeMsg msg;
-    RelationShipChangeType type = RelationShipChangeType::SYNC_USERID;
+    msg.type = RelationShipChangeType::SYNC_USERID;
     msg.userIdInfos.push_back({1, false});
     msg.userIdInfos.push_back({2, true});
     bool ret = msg.IsValid();
     EXPECT_TRUE(ret);
 
-    type = static_cast<RelationShipChangeType>(9);
+    msg.type = static_cast<RelationShipChangeType>(9);
     ret = msg.IsValid();
     EXPECT_FALSE(ret);
 }

@@ -1299,7 +1299,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
-HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteLocalUserSwitchByWifi_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_202, testing::ext::TestSize.Level0)
 {
     DeviceManagerService::GetInstance().timer_ = nullptr;
     int32_t curUserId = 1;

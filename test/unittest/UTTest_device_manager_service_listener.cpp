@@ -486,13 +486,17 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testin
     processInfo.userId = 100;
     processInfo.pkgName = "com.ohos.helloworld";
     DmDeviceInfo devInfo;
+    ProcessInfo processInfoTmp;
+    processInfoTmp.pkgName = "ohos.deviceprofile";
+    processInfoTmp.userId = 106;
+    int32_t dmCommonNotifyEvent = 3;
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfoTmp);
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDeviceScreenStateChange(processInfo, devInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 
     processInfo.pkgName = "ohos.distributedhardware.devicemanager";
-    int32_t dmCommonNotifyEvent = 3;
     ProcessInfo processInfo1;
     processInfo1.pkgName = "pkgName";
     processInfo1.userId = 101;
@@ -742,7 +746,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetWhiteListSAProcessInfo_001, testin
     ProcessInfo processInfo;
     processInfo.pkgName = "pkgNamefg";
     processInfo.userId = 108;
-    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
+    DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo);
     ret = listener_->GetWhiteListSAProcessInfo(dmCommonNotifyEvent);
     EXPECT_EQ(ret.empty(), false);
 }
@@ -948,10 +952,11 @@ HWTEST_F(DeviceManagerServiceListenerTest, RemoveNotExistProcess_001, testing::e
     ProcessInfo pro;
     pro.pkgName = "pkgNamejk";
     pro.userId = 103;
+    int32_t dmNotifyEvent = 1;
     DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo);
     DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo1);
     DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, pro);
-    notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId);
+    std::string notifyPkgName = processInfo.pkgName + "#" + std::to_string(processInfo.userId);
     DmDeviceInfo info;
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
     listener_->RemoveNotExistProcess();

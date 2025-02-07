@@ -481,7 +481,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing:
     int32_t bindLevel = 2;
     std::string extra = "";
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+        remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
 }
 } // namespace DistributedHardware
