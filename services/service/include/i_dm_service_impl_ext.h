@@ -22,6 +22,7 @@
 
 #include "idevice_manager_service_listener.h"
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -99,6 +100,14 @@ public:
      * @tc.type: FUNC
      */
     virtual int32_t AccountUserSwitched(int32_t userId, const std::string &accountId) = 0;
+
+    /**
+     * @tc.name: IDMServiceImplExt::GetDeviceProfileInfoList
+     * @tc.desc: GetDeviceProfileInfoList
+     * @tc.type: FUNC
+     */
+    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
+        const DmDeviceProfileInfoFilterOptions &filterOptions) = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);

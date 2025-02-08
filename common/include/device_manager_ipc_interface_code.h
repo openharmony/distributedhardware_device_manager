@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -96,6 +96,8 @@ enum DMIpcCmdInterfaceCode {
     SERVER_DEVICE_SCREEN_STATE_NOTIFY,
     GET_DEVICE_SCREEN_STATUS,
     SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY,
+    GET_DEVICE_PROFILE_INFO_LIST,
+    GET_DEVICE_PROFILE_INFO_LIST_RESULT,
     IPC_MSG_BUTT
 };
 } // namespace DistributedHardware

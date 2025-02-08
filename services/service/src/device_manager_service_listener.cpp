@@ -32,6 +32,7 @@
 #include "ipc_notify_device_discovery_req.h"
 #include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
+#include "ipc_notify_get_device_profile_info_list_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_server_stub.h"
@@ -531,6 +532,20 @@ void DeviceManagerServiceListener::OnCredentialAuthStatus(const std::string &pkg
         pReq->SetPkgName(pkgName);
         ipcServerListener_.SendRequest(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, pReq, pRsp);
     }
+}
+
+void DeviceManagerServiceListener::OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
+    const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code)
+{
+    LOGI("pkgName %{public}s.", processInfo.pkgName.c_str());
+    std::shared_ptr<IpcNotifyGetDeviceProfileInfoListReq> pReq =
+        std::make_shared<IpcNotifyGetDeviceProfileInfoListReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetPkgName(processInfo.pkgName);
+    pReq->SetDeviceProfileInfoList(deviceProfileInfos);
+    pReq->SetResult(code);
+    pReq->SetProcessInfo(processInfo);
+    ipcServerListener_.SendRequest(GET_DEVICE_PROFILE_INFO_LIST_RESULT, pReq, pRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

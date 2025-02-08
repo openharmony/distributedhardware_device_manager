@@ -361,6 +361,22 @@ typedef struct DmAccessCallee {
     int32_t userId;
     std::string extra;
 } DmAccessCallee;
+
+typedef struct ProcessInfo {
+    int32_t userId;
+    std::string pkgName;
+
+    bool operator==(const ProcessInfo &other) const
+    {
+        return (userId == other.userId) && (pkgName == other.pkgName);
+    }
+
+    bool operator<(const ProcessInfo &other) const
+    {
+        return (userId < other.userId) ||
+            (userId == other.userId && pkgName < other.pkgName);
+    }
+} ProcessInfo;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H
