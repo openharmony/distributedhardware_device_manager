@@ -270,9 +270,9 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndBindLevel_001, testing:
 {
     std::vector<int32_t> userIds = {4, 5, 6};
     std::string localUdid = "local_udid";
-    auto result = connector.GetDeviceIdAndBindLevel(userIds, localUdid);
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
         .Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    auto result = connector.GetDeviceIdAndBindLevel(userIds, localUdid);
     EXPECT_TRUE(result.empty());
 }
 

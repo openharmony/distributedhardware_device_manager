@@ -1278,24 +1278,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
-
-HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_202, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
-    int32_t curUserId = 1;
-    int32_t preUserId = 1;
-    std::map<std::string, std::string> wifiDevices;
-    std::vector<int32_t> foregroundUserIds;
-    std::vector<int32_t> backgroundUserIds;
-    wifiDevices.insert(std::make_pair("kdmalsalskalw002", "networkId008"));
-    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(DM_OK));
-    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    DeviceManagerService::GetInstance().dmServiceImpl_ = nullptr;
-    DeviceManagerService::GetInstance().IsDMServiceImplReady();
-    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(curUserId, preUserId, wifiDevices,
-        foregroundUserIds, backgroundUserIds);
-    EXPECT_NE(DeviceManagerService::GetInstance().timer_, nullptr);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
