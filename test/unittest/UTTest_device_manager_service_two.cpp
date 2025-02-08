@@ -1190,6 +1190,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_201, testing::ext:
     EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_)).WillOnce(DoAll(SetArgReferee<0>(deviceInfo), Return(DM_OK)));
     backgroundUserIds.push_back(201);
     backgroundUserIds.push_back(202);
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().ProcessCheckSumByWifi(networkId, foregroundUserIds, backgroundUserIds);
 }
 
@@ -1232,6 +1233,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
     backgroundUserIds.push_back(102);
