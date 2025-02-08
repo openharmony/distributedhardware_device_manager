@@ -19,6 +19,7 @@
 #include "multiple_user_connector.h"
 #include "system_ability_definition.h"
 #include "device_manager_service.h"
+#include "dm_anonymous.h"
 #include "parameter.h"
 #include "softbus_bus_center.h"
 #include "string_ex.h"
@@ -69,7 +70,7 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceNameManager);
 
 int32_t DeviceNameManager::Init()
 {
-    LOGI("In");
+    LOGI("DeviceNameManager In");
     GetRemoteObj();
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     InitDeviceName(userId);
@@ -93,6 +94,10 @@ int32_t DeviceNameManager::UnInit()
 int32_t DeviceNameManager::InitDeviceNameWhenUserSwitch(int32_t curUserId, int32_t preUserId)
 {
     LOGI("In");
+    if (GetRemoteObj() == nullptr) {
+        LOGE("dm sa not publish");
+        return ERR_DM_POINT_NULL;
+    }
     InitDeviceName(curUserId);
     RegisterDeviceNameChangeMonitor(curUserId, preUserId);
     return DM_OK;
@@ -137,12 +142,6 @@ void DeviceNameManager::RegisterDeviceNameChangeMonitor(int32_t curUserId, int32
         LOGW("userId invalid");
         return;
     }
-    std::string proxyUri = GetProxyUriStr(SETTINGSDATA_SECURE, curUserId);
-    auto helper = CreateDataShareHelper(proxyUri);
-    if (helper == nullptr) {
-        LOGE("helper is nullptr");
-        return;
-    }
     sptr<DeviceNameChangeMonitor> monitor = nullptr;
     {
         std::lock_guard<std::mutex> lock(monitorMapMtx_);
@@ -156,6 +155,19 @@ void DeviceNameManager::RegisterDeviceNameChangeMonitor(int32_t curUserId, int32
             return;
         }
         monitorMap_[curUserId] = monitor;
+    }
+    std::string proxyUri = GetProxyUriStr(SETTINGSDATA_SECURE, curUserId);
+    auto helper = CreateDataShareHelper(proxyUri);
+    if (helper == nullptr) {
+        LOGE("helper is nullptr");
+        {
+            std::lock_guard<std::mutex> lock(monitorMapMtx_);
+            auto iter = monitorMap_.find(curUserId);
+            if (iter != monitorMap_.end()) {
+                monitorMap_.erase(iter);
+            }
+        }
+        return;
     }
     Uri uri = MakeUri(proxyUri, SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME);
     helper->RegisterObserver(uri, monitor);
@@ -196,17 +208,14 @@ void DeviceNameManager::UnRegisterDeviceNameChangeMonitor(int32_t userId)
 void DeviceNameManager::InitDeviceName(int32_t userId)
 {
     LOGI("In userId:%{public}d", userId);
-    std::string userDefinedDeviceName;
+    std::string userDefinedDeviceName = "";
     GetUserDefinedDeviceName(userId, userDefinedDeviceName);
     if (!userDefinedDeviceName.empty()) {
+        LOGI("userDefinedDeviceName:%{public}s", GetAnonyString(userDefinedDeviceName).c_str());
         InitDeviceNameToSoftBus("", userDefinedDeviceName);
         return;
     }
-    std::string deviceName;
-    GetDeviceName(deviceName);
-    if (deviceName.empty()) {
-        deviceName = GetLocalMarketName();
-    }
+    std::string deviceName = GetLocalMarketName();
     if (deviceName.empty()) {
         LOGE("deviceName is empty");
         return;
@@ -217,7 +226,8 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
 
 void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, const std::string &subffixName)
 {
-    LOGI("In");
+    LOGI("In prefixName:%{public}s, subffixName:%{public}s",
+        GetAnonyString(prefixName).c_str(), GetAnonyString(subffixName).c_str());
     std::string raw = GetLocalDisplayDeviceName(prefixName, subffixName, 0);
     std::string name18 = GetLocalDisplayDeviceName(prefixName, subffixName, NUM18);
     std::string name21 = GetLocalDisplayDeviceName(prefixName, subffixName, NUM21);
@@ -250,6 +260,13 @@ int32_t DeviceNameManager::GetLocalDisplayDeviceName(int32_t maxNamelength, std:
         LOGE("maxNamelength:%{public}d is invalid", maxNamelength);
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::string userDefinedDeviceName = "";
+    GetUserDefinedDeviceName(userId, userDefinedDeviceName);
+    if (!userDefinedDeviceName.empty()) {
+        LOGI("userDefinedDeviceName:%{public}s", GetAnonyString(userDefinedDeviceName).c_str());
+        displayName = GetLocalDisplayDeviceName("", userDefinedDeviceName, maxNamelength);
+        return DM_OK;
+    }
     MultipleUserConnector::GetCallerUserId(userId);
     std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
     std::string localMarketName = GetLocalMarketName();
@@ -261,7 +278,10 @@ std::string DeviceNameManager::GetLocalDisplayDeviceName(const std::string &pref
     int32_t maxNameLength)
 {
     if (prefixName.empty()) {
-        return SubstrByBytes(subffixName, maxNameLength);
+        if (maxNameLength == 0 || static_cast<int32_t>(subffixName.size()) <= maxNameLength) {
+            return subffixName;
+        }
+        return SubstrByBytes(subffixName, maxNameLength - NUM3) + DEFAULT_CONCATENATION_CHARACTER;
     }
     int32_t defaultNameMaxLength = DEFAULT_DEVICE_NAME_MAX_LENGTH;
     if (maxNameLength >= NUM21) {
@@ -390,6 +410,7 @@ std::string DeviceNameManager::GetLocalMarketName()
     for (const auto &item : prefixs) {
         localMarketName_ = TrimStr(ReplaceStr(localMarketName_, item, ""));
     }
+    LOGI("localMarketName : %{public}s", GetAnonyString(localMarketName_).c_str());
     return localMarketName_;
 }
 
@@ -441,9 +462,9 @@ sptr<IRemoteObject> DeviceNameManager::GetRemoteObj()
         LOGE("get sa manager return nullptr");
         return nullptr;
     }
-    auto remoteObj = samgr->GetSystemAbility(DISTRIBUTED_DEVICE_PROFILE_SA_ID);
+    auto remoteObj = samgr->GetSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     if (remoteObj == nullptr) {
-        LOGE("get system ability failed, id=%{public}d", DISTRIBUTED_DEVICE_PROFILE_SA_ID);
+        LOGE("get system ability failed, id=%{public}d", DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         return nullptr;
     }
     remoteObj_ = remoteObj;
@@ -454,6 +475,7 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
     const std::string &key, std::string &value)
 {
     std::string proxyUri = GetProxyUriStr(tableName, userId);
+    LOGI("proxyUri : %{public}s", proxyUri.c_str());
     auto helper = CreateDataShareHelper(proxyUri);
     if (helper == nullptr) {
         LOGE("helper is nullptr");
@@ -485,6 +507,7 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
         return ret;
     }
     resultSet->Close();
+    LOGI("value : %{public}s", GetAnonyString(value).c_str());
     return DM_OK;
 }
 
