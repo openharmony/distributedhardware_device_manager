@@ -891,28 +891,34 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
 {
     std::vector<AccessControlProfile> profilesFilter;
     for (auto &item : profiles) {
-        if (item.GetAccesser().GetAccesserUserId() == caller.userId &&
-            item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
+        // cannot consider multi-user for old version
+        if (item.GetAccesser().GetAccesserUserId() == 0 || item.GetAccesser().GetAccesserUserId() == -1 ||
+        item.GetAccessee().GetAccesseeUserId() == 0 || item.GetAccessee().GetAccesseeUserId() == -1 ||
+        caller.userId == 0 || callee.userId == 0) {
+            if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
             item.GetAccessee().GetAccesseeDeviceId() == sinkUdid) {
-            if (callee.userId != 0 && callee.userId == item.GetAccessee().GetAccesseeUserId()) {
                 profilesFilter.push_back(item);
                 continue;
-            } else if (callee.userId == 0 || item.GetAccessee().GetAccesseeUserId() == -1) {
+            } else if (item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
+            item.GetAccesser().GetAccesserDeviceId() == sinkUdid) {
                 profilesFilter.push_back(item);
                 continue;
             }
         }
-        if ((item.GetAccessee().GetAccesseeUserId() == caller.userId ||
-            item.GetAccessee().GetAccesseeUserId() == -1) &&
-            item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
-            item.GetAccesser().GetAccesserDeviceId() == sinkUdid) {
-            if (callee.userId != 0 && callee.userId == item.GetAccesser().GetAccesserUserId()) {
-                profilesFilter.push_back(item);
-                continue;
-            } else if (callee.userId == 0 || item.GetAccesser().GetAccesserUserId() == -1) {
-                profilesFilter.push_back(item);
-                continue;
-            }
+        // consider multi-user for new version
+        if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
+        item.GetAccesser().GetAccesserUserId() == caller.userId &&
+        item.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
+        item.GetAccessee().GetAccesseeUserId() == callee.userId) {
+            profilesFilter.push_back(item);
+            continue;
+        }
+        if (item.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
+        item.GetAccesser().GetAccesserUserId() == callee.userId &&
+        item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
+        item.GetAccessee().GetAccesseeUserId() == caller.userId) {
+            profilesFilter.push_back(item);
+            continue;
         }
     }
     return profilesFilter;
