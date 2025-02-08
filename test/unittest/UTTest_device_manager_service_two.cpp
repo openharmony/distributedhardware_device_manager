@@ -1070,6 +1070,8 @@ HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitch_201, testing::ext
         backgroundUserIds);
     EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 
+    DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).Times(::testing::AtLeast(2))
         .WillOnce(DoAll(SetArgReferee<1>("networkId"), Return(DM_OK)));
     EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _)).Times(::testing::AtLeast(2))
