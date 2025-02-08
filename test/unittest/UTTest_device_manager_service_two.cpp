@@ -1281,6 +1281,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize
 
 HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_202, testing::ext::TestSize.Level0)
 {
+    DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
     int32_t curUserId = 1;
     int32_t preUserId = 1;
     std::map<std::string, std::string> wifiDevices;

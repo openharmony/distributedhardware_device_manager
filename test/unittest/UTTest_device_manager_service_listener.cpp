@@ -629,6 +629,8 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::e
     std::set<std::string> systemSA;
     systemSA.insert("pkgName");
     EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).WillOnce(Return(systemSA));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     listener_->ProcessAppStateChange(processInfo, state, info, deviceBasicInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
@@ -793,7 +795,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, tes
 
     processInfos.clear();
     processInfo.userId = 10;
+    processInfo.pkgName = "packName";
     processInfos.push_back(processInfo);
+    systemSA.insert("packName");
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
     EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).WillOnce(Return(systemSA));
     ret = listener_->GetNotifyProcessInfoByUserId(userId, dmCommonNotifyEvent);
