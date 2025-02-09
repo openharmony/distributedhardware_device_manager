@@ -108,6 +108,7 @@ enum DMIpcCmdInterfaceCode {
     SET_REMOTE_DEVICE_NAME_RESULT,
     SET_LOCAL_DEVICE_NAME,
     SET_LOCAL_DEVICE_NAME_RESULT,
+    GET_ALL_TRUST_DEVICE_LIST,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

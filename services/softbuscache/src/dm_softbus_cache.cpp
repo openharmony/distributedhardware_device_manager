@@ -446,6 +446,21 @@ int32_t SoftbusCache::GetNetworkIdFromCache(const std::string &udid, std::string
     return ERR_DM_FAILED;
 }
 
+int32_t SoftbusCache::GetDeviceNameFromCache(const std::string &udid, std::string &deviceName)
+{
+    LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
+    {
+        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+        if (deviceInfo_.find(udid) != deviceInfo_.end()) {
+            deviceName = deviceInfo_[udid].second.deviceName;
+            LOGI("GetDeviceNameFromCache success deviceName: %{public}s, udid: %{public}s.",
+                deviceName.c_str(), GetAnonyString(udid).c_str());
+            return DM_OK;
+        }
+    }
+    return ERR_DM_FAILED;
+}
+
 bool SoftbusCache::CheckIsOnline(const std::string &deviceId)
 {
     LOGI("deviceId %{public}s.", GetAnonyString(deviceId).c_str());
