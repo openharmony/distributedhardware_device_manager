@@ -2634,17 +2634,16 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
     req->SetFilterOptions(filterOptions);
     ret = ipcClientProxy_->SendRequest(GET_DEVICE_ICON_INFO, req, rsp);
     if (ret != DM_OK) {
-        LOGE("error: Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("error: Failed with ret %{public}d", ret);
+        LOGE("Failed with ret %{public}d", ret);
         DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
         return ret;
     }
-    LOGI("Completed");
 #endif
     return DM_OK;
 }
