@@ -1306,7 +1306,7 @@ int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string
         return DM_OK;
     }
     if (iter->second.size() > MAX_CONTAINER_SIZE) {
-        LOGE("callback map size is more than max size");
+        LOGE("callback map for pkg size is more than max size");
         return ERR_DM_MAX_SIZE_FAIL;
     }
     if (iter->second[uk].size() > MAX_CONTAINER_SIZE) {
