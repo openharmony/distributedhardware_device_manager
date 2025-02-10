@@ -390,9 +390,34 @@ ON_IPC_CMD(GET_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
     std::string pkgName = data.ReadString();
     std::string extra = data.ReadString();
     bool isRefresh = data.ReadBool();
-    DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, pkgName, isRefresh, false);
+    if (isRefresh) {
+        DeviceManagerService::GetInstance().ShiftLNNGear(pkgName, pkgName, isRefresh, false);
+    }
     std::vector<DmDeviceInfo> deviceList;
     int32_t result = DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
+    if (!reply.WriteInt32((int32_t)deviceList.size())) {
+        LOGE("write device list size failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    for (const auto &devInfo : deviceList) {
+        if (!EncodeDmDeviceInfo(devInfo, reply)) {
+            LOGE("write dm device info failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_ALL_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string extra = data.ReadString();
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t result = DeviceManagerService::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
     if (!reply.WriteInt32((int32_t)deviceList.size())) {
         LOGE("write device list size failed");
         return ERR_DM_IPC_WRITE_FAILED;

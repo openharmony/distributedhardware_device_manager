@@ -634,6 +634,8 @@ public:
     virtual int32_t RegisterSinkBindCallback(const std::string &pkgName,
         std::shared_ptr<BindTargetCallback> callback) = 0;
     virtual int32_t UnRegisterSinkBindCallback(const std::string &pkgName) = 0;
+    virtual int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+        std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam) = 0;
 

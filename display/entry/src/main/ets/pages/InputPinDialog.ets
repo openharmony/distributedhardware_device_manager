@@ -314,7 +314,6 @@ struct InputCustomDialog {
                   setTimeout(()=> {
                     gThis.passwordOnChange(value);
                   }, 50)
-                  console.log(TAG + 'this.password: ' + this.password);
                 })
             }.height(48)
             .margin({ top: 12, bottom: 16})

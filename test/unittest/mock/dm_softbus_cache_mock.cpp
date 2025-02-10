@@ -49,5 +49,10 @@ bool SoftbusCache::CheckIsOnline(const std::string &deviceId)
 {
     return DmSoftbusCache::dmSoftbusCache->CheckIsOnline(deviceId);
 }
+
+int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList)
+{
+    return DmSoftbusCache::dmSoftbusCache->GetDeviceInfoFromCache(deviceInfoList);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

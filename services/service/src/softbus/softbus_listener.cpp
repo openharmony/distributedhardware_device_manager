@@ -32,6 +32,7 @@
 #include "dm_transport_msg.h"
 #include "ffrt.h"
 #endif
+#include "ipc_skeleton.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
 
@@ -713,6 +714,11 @@ int32_t SoftbusListener::GetNetworkIdByUdid(const std::string &udid, std::string
     return SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
 }
 
+int32_t SoftbusListener::GetDeviceNameByUdid(const std::string &udid, std::string &deviceName)
+{
+    return SoftbusCache::GetInstance().GetDeviceNameFromCache(udid, deviceName);
+}
+
 int32_t SoftbusListener::ShiftLNNGear(bool isWakeUp, const std::string &callerId)
 {
     if (callerId.empty()) {
@@ -1184,6 +1190,102 @@ int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
         LOGE("SoftbusListener SetLocalDisplayName failed!");
     }
     return DM_OK;
+}
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void SoftbusListener::ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile,
+    DmDeviceInfo &deviceInfo)
+{
+    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetUdidHash(profile.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
+        LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(profile.GetTrustDeviceId()).c_str());
+        return;
+    }
+
+    if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
+                 std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
+        LOGE("GetAllTrustedDeviceList copy deviceId failed.");
+        return;
+    }
+
+    std::string networkId = "";
+    if (GetNetworkIdByUdid(profile.GetTrustDeviceId(), networkId) == DM_OK) {
+        if (memcpy_s(deviceInfo.networkId, sizeof(deviceInfo.networkId), networkId.c_str(),
+                     std::min(sizeof(deviceInfo.networkId), networkId.size())) != DM_OK) {
+            LOGE("GetAllTrustedDeviceList copy networkId data failed.");
+            return;
+        }
+    }
+
+    std::string deviceName = "";
+    if (GetDeviceNameByUdid(profile.GetTrustDeviceId(), deviceName) == DM_OK) {
+        if (memcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), deviceName.c_str(),
+                     std::min(sizeof(deviceInfo.deviceName), deviceName.size())) != DM_OK) {
+            LOGE("GetAllTrustedDeviceList copy deviceName data failed.");
+            return;
+        }
+    } else {
+        if (memcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), udidHash,
+                     std::min(sizeof(deviceInfo.deviceName), sizeof(udidHash))) != DM_OK) {
+            LOGE("GetAllTrustedDeviceList copy deviceName data failed.");
+            return;
+        }
+    }
+}
+#endif
+
+int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+    std::vector<DmDeviceInfo> &deviceList)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    (void)extra;
+    uint32_t tokenId = static_cast<uint32_t>(OHOS::IPCSkeleton::GetCallingTokenID());
+    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
+        if (profile.GetBindType() == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+            continue;
+        }
+        DistributedDeviceProfile::Accesser acer = profile.GetAccesser();
+        if (pkgName == acer.GetAccesserBundleName() && tokenId == acer.GetAccesserTokenId()) {
+            DmDeviceInfo deviceinfo;
+            ConvertAclToDeviceInfo(profile, deviceinfo);
+            deviceList.push_back(deviceinfo);
+            continue;
+        }
+        DistributedDeviceProfile::Accessee acee = profile.GetAccessee();
+        if (pkgName == acee.GetAccesseeBundleName() && tokenId == acee.GetAccesseeTokenId()) {
+            DmDeviceInfo deviceinfo;
+            ConvertAclToDeviceInfo(profile, deviceinfo);
+            deviceList.push_back(deviceinfo);
+            continue;
+        }
+    }
+#endif
+    return DM_OK;
+}
+
+int32_t SoftbusListener::GetUdidFromDp(const std::string &udidHash, std::string &udid)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
+        if (profile.GetBindType() == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+            continue;
+        }
+        char udidHashTemp[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetUdidHash(profile.GetTrustDeviceId(), reinterpret_cast<uint8_t *>(udidHashTemp)) != DM_OK) {
+            LOGE("get udidHash by udid: %{public}s failed.", GetAnonyString(profile.GetTrustDeviceId()).c_str());
+            continue;
+        }
+        if (udidHash == std::string(udidHashTemp)) {
+            udid = profile.GetTrustDeviceId();
+            return DM_OK;
+        }
+    }
+#endif
+    return ERR_DM_FAILED;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

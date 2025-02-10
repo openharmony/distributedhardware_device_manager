@@ -213,6 +213,8 @@ public:
     int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
     void HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo);
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
+    int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+        std::vector<DmDeviceInfo> &deviceList);
     int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam);
     int32_t GetDeviceProfileInfoList(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);

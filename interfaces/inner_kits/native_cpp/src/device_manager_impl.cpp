@@ -2542,6 +2542,46 @@ void DeviceManagerImpl::SyncCallbackToService(DmCommonNotifyEvent dmCommonNotify
     }
 }
 
+int32_t DeviceManagerImpl::GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+    std::vector<DmDeviceInfo> &deviceList)
+{
+    if (pkgName.empty()) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(
+            pkgName, "GetAllTrustedDeviceList", deviceList, ERR_DM_INPUT_PARA_INVALID, anonyLocalUdid_);
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    deviceList.clear();
+    LOGI("Start, pkgName: %{public}s, extra: %{public}s", GetAnonyString(pkgName).c_str(),
+        GetAnonyString(extra).c_str());
+
+    std::shared_ptr<IpcGetTrustDeviceReq> req = std::make_shared<IpcGetTrustDeviceReq>();
+    std::shared_ptr<IpcGetTrustDeviceRsp> rsp = std::make_shared<IpcGetTrustDeviceRsp>();
+    req->SetPkgName(pkgName);
+    req->SetExtra(extra);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_ALL_TRUST_DEVICE_LIST, req, rsp);
+    if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetAllTrustedDeviceList",
+            deviceList, ret, anonyLocalUdid_);
+        LOGE("DeviceManagerImpl::GetAllTrustedDeviceList error, Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetAllTrustedDeviceList",
+            deviceList, ret, anonyLocalUdid_);
+        LOGE("GetAllTrustedDeviceList error, failed ret: %{public}d", ret);
+        return ret;
+    }
+
+    deviceList = rsp->GetDeviceVec();
+    LOGI("Completed, device size %{public}zu", deviceList.size());
+    DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetAllTrustedDeviceList",
+        deviceList, DM_OK, anonyLocalUdid_);
+    return DM_OK;
+}
+
 void DeviceManagerImpl::SyncCallbacksToService(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap)
 {
     if (callbackMap.size() == 0) {
@@ -2634,17 +2674,16 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
     req->SetFilterOptions(filterOptions);
     ret = ipcClientProxy_->SendRequest(GET_DEVICE_ICON_INFO, req, rsp);
     if (ret != DM_OK) {
-        LOGE("error: Send Request failed ret: %{public}d", ret);
+        LOGE("Send Request failed ret: %{public}d", ret);
         DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGE("error: Failed with ret %{public}d", ret);
+        LOGE("Failed with ret %{public}d", ret);
         DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
         return ret;
     }
-    LOGI("Completed");
 #endif
     return DM_OK;
 }

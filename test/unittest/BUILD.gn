@@ -57,8 +57,10 @@ group("unittest") {
     ":UTTest_dm_timer",
     ":UTTest_dm_transport",
     ":UTTest_dm_transport_msg",
+    ":UTTest_dp_inited_callback",
     ":UTTest_hichain_auth_connector",
     ":UTTest_hichain_connector",
+    ":UTTest_hichain_listener",
     ":UTTest_ipc_client_manager",
     ":UTTest_ipc_client_proxy",
     ":UTTest_ipc_client_server_proxy",
@@ -70,6 +72,7 @@ group("unittest") {
     ":UTTest_ipc_server_client_proxy",
     ":UTTest_ipc_server_listener",
     ":UTTest_ipc_server_stub",
+    ":UTTest_kv_adapter_manager",
     ":UTTest_mine_hichain_connector",
     ":UTTest_mine_softbus_listener",
     ":UTTest_multiple_user_connector",
@@ -786,6 +789,8 @@ ohos_unittest("UTTest_dm_service_load") {
   sources = [ "UTTest_dm_service_load.cpp" ]
 
   deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "googletest:gmock" ]
 }
 
 ## UnitTest UTTest_dm_service_load }}}
@@ -1616,6 +1621,80 @@ ohos_unittest("UTTest_relationship_sync_mgr") {
 }
 
 ## UnitTest UTTest_relationship_sync_mgr }}}
+
+## UnitTest UTTest_hichain_listener {{{
+ohos_unittest("UTTest_hichain_listener") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/unittest" ]
+
+  sources =
+      [ "${devicemanager_path}/test/unittest/UTTest_hichain_listener.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [ "cJSON:cjson" ]
+}
+
+## UnitTest UTTest_hichain_listener }}}
+
+## UnitTest UTTest_dp_inited_callback {{{
+ohos_unittest("UTTest_dp_inited_callback") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/commondependency/include",
+    "${devicemanager_path}/test/commonunittest",
+  ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dp_inited_callback.cpp",
+    "${devicemanager_path}/test/unittest/mock/deviceprofile_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_softbus_cache_mock.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+  ]
+}
+
+## UnitTest UTTest_dp_inited_callback }}}
+
+## UnitTest UTTest_kv_adapter_manager {{{
+ohos_unittest("UTTest_kv_adapter_manager") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/commondependency/include",
+    "${devicemanager_path}/test/commonunittest",
+  ]
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_kv_adapter_manager.cpp",
+    "${devicemanager_path}/test/unittest/mock/mock_distributed_kv_data_manager.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+  ]
+}
+
+## UnitTest UTTest_kv_adapter_manager }}}
 
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {

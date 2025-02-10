@@ -272,16 +272,14 @@ void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName)
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
+    (void)extra;
     LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    bool isOnlyShowNetworkId = false;
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call GetTrustedDeviceList.", pkgName.c_str());
-        isOnlyShowNetworkId = true;
-    }
+    bool isOnlyShowNetworkId = !(PermissionManager::GetInstance().CheckPermission() ||
+        PermissionManager::GetInstance().CheckNewPermission());
     std::vector<DmDeviceInfo> onlineDeviceList;
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
@@ -318,6 +316,28 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
                 deviceList.push_back(item);
             }
         }
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+                                                      std::vector<DmDeviceInfo> &deviceList)
+{
+    (void)extra;
+    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName or extra is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call GetAllTrustedDeviceList.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    int32_t ret = softbusListener_->GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    if (ret != DM_OK) {
+        LOGE("GetAllTrustedDeviceList failed");
+        return ret;
     }
     return DM_OK;
 }
@@ -641,8 +661,9 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         realDeviceId = udidHashTemp;
     }
 #endif
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string udid = "";
-    if (SoftbusCache::GetInstance().GetUdidByUdidHash(realDeviceId, udid) != DM_OK) {
+    if (softbusListener_->GetUdidFromDp(realDeviceId, udid) != DM_OK) {
         LOGE("Get udid by udidhash failed.");
         return ERR_DM_FAILED;
     }
@@ -690,8 +711,9 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         realDeviceId = udidHashTemp;
     }
 #endif
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string udid = "";
-    if (SoftbusCache::GetInstance().GetUdidByUdidHash(realDeviceId, udid) != DM_OK) {
+    if (softbusListener_->GetUdidFromDp(realDeviceId, udid) != DM_OK) {
         LOGE("Get udid by udidhash failed.");
         return ERR_DM_FAILED;
     }
