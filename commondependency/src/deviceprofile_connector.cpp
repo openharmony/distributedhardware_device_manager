@@ -893,8 +893,7 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
     for (auto &item : profiles) {
         // cannot consider multi-user for old version
         if (item.GetAccesser().GetAccesserUserId() == 0 || item.GetAccesser().GetAccesserUserId() == -1 ||
-        item.GetAccessee().GetAccesseeUserId() == 0 || item.GetAccessee().GetAccesseeUserId() == -1 ||
-        caller.userId == 0 || callee.userId == 0) {
+        item.GetAccessee().GetAccesseeUserId() == 0 || item.GetAccessee().GetAccesseeUserId() == -1) {
             if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
             item.GetAccessee().GetAccesseeDeviceId() == sinkUdid) {
                 profilesFilter.push_back(item);
