@@ -955,6 +955,20 @@ HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize
     ret = msg.IsChangeTypeValid();
     EXPECT_TRUE(ret);
 }
+
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_010, testing::ext::TestSize.Level0)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SYNC_USERID;
+    msg.userIdInfos.push_back({1, false});
+    msg.userIdInfos.push_back({2, true});
+    bool ret = msg.IsValid();
+    EXPECT_TRUE(ret);
+
+    msg.type = static_cast<RelationShipChangeType>(9);
+    ret = msg.IsValid();
+    EXPECT_FALSE(ret);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS

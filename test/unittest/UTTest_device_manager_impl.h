@@ -145,6 +145,14 @@ public:
     }
     void OnResult(const DmDeviceIconInfo &deviceIconInfo, int32_t code) override {}
 };
+
+class BindTargetCallbackTest : public BindTargetCallback {
+public:
+    virtual ~BindTargetCallbackTest()
+    {
+    }
+    void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

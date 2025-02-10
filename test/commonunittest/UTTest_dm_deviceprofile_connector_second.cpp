@@ -217,7 +217,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::e
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level0)
 {
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
     auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     EXPECT_TRUE(ret.empty());
 }
@@ -237,6 +237,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAclForAccountLogOut_001, testin
     int32_t localUserId = 1;
     std::string peerUdid = "peer_device_id";
     int32_t peerUserId = 2;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     int32_t result = connector.DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
 
     EXPECT_EQ(result, false);
@@ -261,7 +262,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIsSameAccount_001, testing::ext:
     std::string srcUdid = "src_udid";
     DmAccessCallee callee;
     std::string sinkUdid = "non_identical_udid";
-
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     EXPECT_EQ(connector.CheckIsSameAccount(caller, srcUdid, callee, sinkUdid), ERR_DM_FAILED);
 }
 
@@ -269,8 +270,9 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndBindLevel_001, testing:
 {
     std::vector<int32_t> userIds = {4, 5, 6};
     std::string localUdid = "local_udid";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     auto result = connector.GetDeviceIdAndBindLevel(userIds, localUdid);
-
     EXPECT_TRUE(result.empty());
 }
 
@@ -279,6 +281,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_001, testing::e
     std::string localUdid = "localDevice";
     int32_t userId = -1;
     std::string remoteUdid = "remoteDevice";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     auto result = connector.GetAclProfileByUserId(localUdid, userId, remoteUdid);
 
     EXPECT_TRUE(result.empty());
@@ -289,6 +292,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_002, testing::e
     std::string localUdid = "localDevice";
     int32_t userId = 1;
     std::string remoteUdid = "nonExistentDevice";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     auto result = connector.GetAclProfileByUserId(localUdid, userId, remoteUdid);
     
     EXPECT_TRUE(result.empty());
@@ -299,6 +303,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_003, testing::e
     std::string localUdid = "";
     int32_t userId = 0;
     std::string remoteUdid = "";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     auto result = connector.GetAclProfileByUserId(localUdid, userId, remoteUdid);
 
     EXPECT_TRUE(result.empty());
@@ -310,6 +315,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_001, testing::e
     std::vector<int32_t> localUserIds = {1, 2};
     std::string remoteUdid = "remote_device";
     std::vector<int32_t> remoteUserIds = {3, 4};
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::vector<ProcessInfo> result =
         connector.GetOfflineProcessInfo(localUdid, localUserIds, remoteUdid, remoteUserIds);
 
@@ -322,6 +328,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_002, testing::e
     std::vector<int32_t> localUserIds = {1, 2};
     std::string remoteUdid = "remote_device";
     std::vector<int32_t> remoteUserIds = {99, 100};
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::vector<ProcessInfo> result =
         connector.GetOfflineProcessInfo(localUdid, localUserIds, remoteUdid, remoteUserIds);
 
@@ -334,6 +341,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_003, testing::e
     std::vector<int32_t> localUserIds = {};
     std::string remoteUdid = "remote_device";
     std::vector<int32_t> remoteUserIds = {3, 4};
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::vector<ProcessInfo> result =
         connector.GetOfflineProcessInfo(localUdid, localUserIds, remoteUdid, remoteUserIds);
 
@@ -344,6 +352,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_001, testing::e
 {
     std::string localUdid = "local_udid";
     std::string peerUdid = "peer_udid";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::map<int32_t, int32_t> result = connector.GetUserIdAndBindLevel(localUdid, peerUdid);
 
     EXPECT_TRUE(result.empty());
@@ -353,7 +362,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_002, testing::e
 {
     std::string localUdid = "local_udid";
     std::string peerUdid = "peer_udid";
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(DM_OK));
+        EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::map<int32_t, int32_t> result = connector.GetUserIdAndBindLevel(localUdid, peerUdid);
 
     EXPECT_TRUE(result.empty());
@@ -365,6 +374,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_001, testi
     std::string peerUdid = "peer_udid_456";
     int32_t peerUserId = 789;
     std::string peerAccountHash = "invalid_hash";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::multimap<std::string, int32_t> result =
         connector.GetDevIdAndUserIdByActHash(localUdid, peerUdid, peerUserId, peerAccountHash);
 
@@ -377,6 +387,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_002, testi
     std::string peerUdid = "non_matching_udid";
     int32_t peerUserId = 789;
     std::string peerAccountHash = "valid_hash";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::multimap<std::string, int32_t> result =
         connector.GetDevIdAndUserIdByActHash(localUdid, peerUdid, peerUserId, peerAccountHash);
 
@@ -389,6 +400,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_003, testi
     std::string peerUdid = "peer_udid_456";
     int32_t peerUserId = -1;
     std::string peerAccountHash = "valid_hash";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::multimap<std::string, int32_t> result =
         connector.GetDevIdAndUserIdByActHash(localUdid, peerUdid, peerUserId, peerAccountHash);
 
@@ -401,6 +413,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_004, testi
     std::string peerUdid = "";
     int32_t peerUserId = 0;
     std::string peerAccountHash = "";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::multimap<std::string, int32_t> result =
         connector.GetDevIdAndUserIdByActHash(localUdid, peerUdid, peerUserId, peerAccountHash);
 
@@ -409,12 +422,14 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_004, testi
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUserId_001, testing::ext::TestSize.Level0)
 {
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     auto result = connector.GetDeviceIdAndUserId("device4", 4);
     EXPECT_EQ(result.size(), 0);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUserId_002, testing::ext::TestSize.Level0)
 {
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     auto result = connector.GetDeviceIdAndUserId("", 0);
     EXPECT_EQ(result.size(), 0);
 }
@@ -462,6 +477,28 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutAllTrustedDevices_201, testing::ex
         .WillOnce(Return(DM_OK));
     ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
     EXPECT_EQ(ret, DM_OK);
+
+    int32_t bindType = 0;
+    std::string peerUdid = "";
+    std::string localUdid = "";
+    int32_t localUserId = 1234;
+    std::string localAccountId = "";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
+    DeviceProfileConnector::GetInstance().HandleDeviceUnBind(bindType, peerUdid, localUdid, localUserId,
+        localAccountId);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string localDeviceId = "";
+    std::string remoteDeviceId = "";
+    int32_t bindLevel = 2;
+    std::string extra = "";
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
+        remoteDeviceId, bindLevel, extra);
+    EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

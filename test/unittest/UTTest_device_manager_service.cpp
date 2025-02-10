@@ -73,6 +73,7 @@ void DeviceManagerServiceTest::SetUpTestCase()
     DmSoftbusCache::dmSoftbusCache = softbusCacheMock_;
     DmCrypto::dmCrypto = cryptoMock_;
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    DmDMCommTool::dmDMCommTool = dMCommToolMock_;
 }
 
 void DeviceManagerServiceTest::TearDownTestCase()
@@ -93,6 +94,8 @@ void DeviceManagerServiceTest::TearDownTestCase()
     cryptoMock_ = nullptr;
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
     multipleUserConnectorMock_ = nullptr;
+    DmDMCommTool::dmDMCommTool = nullptr;
+    dMCommToolMock_ = nullptr;
 }
 
 namespace {
@@ -1224,10 +1227,12 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_001, testing::ext::TestSize.Leve
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "1234";
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnBindDevice_002, testing::ext::TestSize.Level0)
@@ -1260,10 +1265,12 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_005, testing::ext::TestSize.Leve
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "1234";
     std::string extra = "extra";
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_CALL(*softbusCacheMock_, GetUdidByUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId, extra);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnBindDevice_006, testing::ext::TestSize.Level0)

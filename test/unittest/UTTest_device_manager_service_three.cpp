@@ -430,21 +430,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, UnBindDevice_302, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 }
 
-HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteLocalUserSwitchByWifi_301, testing::ext::TestSize.Level0)
-{
-    DeviceManagerService::GetInstance().timer_ = nullptr;
-    int32_t curUserId = 1;
-    int32_t preUserId = 1;
-    std::map<std::string, std::string> wifiDevices;
-    std::vector<int32_t> foregroundUserIds;
-    std::vector<int32_t> backgroundUserIds;
-    wifiDevices.insert(std::make_pair("kdmalsalskalw002", "networkId008"));
-    EXPECT_CALL(*deviceManagerServiceMock_, SendUserIdsByWifi(_, _, _)).WillOnce(Return(DM_OK));
-    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(curUserId, preUserId, wifiDevices,
-        foregroundUserIds, backgroundUserIds);
-    EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
-}
-
 HWTEST_F(DeviceManagerServiceThreeTest, RegisterAuthenticationType_301, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";

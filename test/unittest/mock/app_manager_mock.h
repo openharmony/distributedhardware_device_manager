@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@ public:
     virtual int32_t GetNativeTokenIdByName(std::string &processName, int64_t &tokenId) = 0;
     virtual int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex,
         int64_t &tokenId) = 0;
+    virtual int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId) = 0;
 public:
     static inline std::shared_ptr<DmAppManager> dmAppManager = nullptr;
 };
@@ -41,6 +42,7 @@ public:
     MOCK_METHOD(bool, IsSystemSA, ());
     MOCK_METHOD(int32_t, GetNativeTokenIdByName, (std::string &, int64_t &));
     MOCK_METHOD(int32_t, GetHapTokenIdByName, (int32_t, std::string &, int32_t, int64_t &));
+    MOCK_METHOD(int32_t, GetAppIdByPkgName, (const std::string &, std::string &));
 };
 }
 }

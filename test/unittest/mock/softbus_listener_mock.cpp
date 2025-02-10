@@ -80,5 +80,10 @@ int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
 {
     return DmSoftbusListener::dmSoftbusListener->SetLocalDisplayName(displayName);
 }
+
+int32_t SoftbusListener::GetUdidFromDp(const std::string &udidHash, std::string &udid)
+{
+    return DmSoftbusListener::dmSoftbusListener->GetUdidFromDp(udidHash, udid);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

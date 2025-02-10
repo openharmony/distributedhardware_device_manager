@@ -31,6 +31,8 @@ public:
         DmKVValue &kvValue) = 0;
     virtual int32_t GetUdidHash(const std::string &udid, unsigned char *udidHash) = 0;
     virtual std::string GetGroupIdHash(const std::string &groupId) = 0;
+    virtual int32_t ConvertUdidHashToAnoyDeviceId(const std::string &appId, const std::string &udidHash,
+        DmKVValue &kvValue) = 0;
 public:
     static inline std::shared_ptr<DmCrypto> dmCrypto = nullptr;
 };
@@ -41,6 +43,7 @@ public:
     MOCK_METHOD(int32_t, ConvertUdidHashToAnoyAndSave, (const std::string &, const std::string &, DmKVValue &));
     MOCK_METHOD(int32_t, GetUdidHash, (const std::string &, unsigned char *));
     MOCK_METHOD(std::string, GetGroupIdHash, (const std::string &));
+    MOCK_METHOD(int32_t, ConvertUdidHashToAnoyDeviceId, (const std::string &, const std::string &, DmKVValue &));
 };
 }
 }
