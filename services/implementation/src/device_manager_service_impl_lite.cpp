@@ -593,6 +593,17 @@ int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticat
     return DM_OK;
 }
 
+void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
+{
+    return;
+}
+
+void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUdid)
+{
+    (void)remoteUdid;
+    return;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

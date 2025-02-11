@@ -123,6 +123,7 @@ public:
     bool CheckSrcDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
     bool CheckSinkDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
     uint32_t DeleteTimeOutAcl(const std::string &deviceId);
+    void DeleteAclByControlId(const int64_t &controlId);
     int32_t GetTrustNumber(const std::string &deviceId);
     bool CheckDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
     std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,

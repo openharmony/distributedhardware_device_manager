@@ -857,6 +857,12 @@ uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
     return res;
 }
 
+void DeviceProfileConnector::DeleteAclByControlId(const int64_t &controlId)
+{
+    DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(controlId);
+    return;
+}
+
 int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
 {
     LOGI("Start");
