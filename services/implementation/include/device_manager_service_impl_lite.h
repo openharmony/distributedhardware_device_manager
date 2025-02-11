@@ -156,6 +156,7 @@ public:
     void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid, const std::string &localUdid,
         int32_t localUserId, const std::string &localAccountId);
     int32_t RegisterAuthenticationType(int32_t authenticationType);
+    int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

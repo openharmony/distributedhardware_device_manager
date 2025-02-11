@@ -1631,6 +1631,35 @@ int32_t DeviceProfileConnector::PutAllTrustedDevices(
     return DM_OK;
 }
 
+int32_t DeviceProfileConnector::CheckDeviceInfoPermission(const std::string &localUdid,
+    const std::string &peerDeviceId)
+{
+    LOGI("CheckDeviceInfoPermission Start.");
+    int32_t localUserId = 0;
+    uint32_t tempLocalTokenId = 0;
+    MultipleUserConnector::GetTokenIdAndForegroundUserId(tempLocalTokenId, localUserId);
+    int64_t localTokenId = static_cast<int64_t>(tempLocalTokenId);
+    std::string localAccountId = MultipleUserConnector::GetOhosAccountIdByUserId(localUserId);
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(localUserId);
+    for (auto &item : profiles) {
+        if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == localUserId &&
+            item.GetAccesser().GetAccesserAccountId() == localAccountId &&
+            item.GetAccesser().GetAccesserTokenId() == localTokenId &&
+            item.GetAccessee().GetAccesseeDeviceId() == peerDeviceId) {
+            return DM_OK;
+        }
+        if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == localUserId &&
+            item.GetAccessee().GetAccesseeAccountId() == localAccountId &&
+            item.GetAccessee().GetAccesseeTokenId() == localTokenId &&
+            item.GetAccesser().GetAccesserDeviceId() == peerDeviceId) {
+            return DM_OK;
+        }
+    }
+    return ERR_DM_NO_PERMISSION;
+}
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();

@@ -1016,6 +1016,17 @@ int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticat
     return authMgr_->RegisterAuthenticationType(authenticationType);
 }
 
+int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &localUdid,
+    const std::string &peerDeviceId)
+{
+    int32_t ret = DeviceProfileConnector::GetInstance().CheckDeviceInfoPermission(localUdid, peerDeviceId);
+    if (ret != DM_OK) {
+        LOGE("CheckDeviceInfoPermission failed, ret: %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
