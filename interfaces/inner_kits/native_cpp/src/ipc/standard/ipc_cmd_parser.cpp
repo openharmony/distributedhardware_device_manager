@@ -971,10 +971,7 @@ ON_IPC_READ_RESPONSE(EXPORT_AUTH_CODE, MessageParcel &reply, std::shared_ptr<Ipc
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     std::shared_ptr<IpcExportAuthCodeRsp> pRsp = std::static_pointer_cast<IpcExportAuthCodeRsp>(pBaseRsp);
-    if (pRsp == nullptr) {
-        LOGE("IpcExportAuthCodeRsp pRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pRsp, ERR_DM_FAILED);
     std::string authCode = reply.ReadString();
     pRsp->SetAuthCode(authCode);
     pRsp->SetErrCode(reply.ReadInt32());
@@ -1467,10 +1464,7 @@ ON_IPC_READ_RESPONSE(IS_SAME_ACCOUNT, MessageParcel &reply, std::shared_ptr<IpcR
 
 ON_IPC_SET_REQUEST(CHECK_API_PERMISSION, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        LOGE("pBaseReq is nullptr");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcPermissionReq> pReq = std::static_pointer_cast<IpcPermissionReq>(pBaseReq);
     if (!data.WriteInt32(pReq->GetPermissionLevel())) {
         LOGE("write permissionLevel failed");
@@ -1481,10 +1475,7 @@ ON_IPC_SET_REQUEST(CHECK_API_PERMISSION, std::shared_ptr<IpcReq> pBaseReq, Messa
 
 ON_IPC_READ_RESPONSE(CHECK_API_PERMISSION, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is nullptr");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }

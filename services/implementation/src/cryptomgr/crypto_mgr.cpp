@@ -148,7 +148,7 @@ int32_t CryptoMgr::MbedAesGcmEncrypt(const AesGcmCipherKey *cipherKey, const uns
     }
 
     if (memcpy_s(cipherText + GCM_IV_LEN + plainTextSize, cipherTextLen - GCM_IV_LEN - plainTextSize, tagBuf,
-        TAG_LEN) != 0) {
+                 TAG_LEN) != 0) {
         mbedtls_gcm_free(&aesContext);
         return ERR_DM_CRYPTO_OPT_FAILED;
     }
