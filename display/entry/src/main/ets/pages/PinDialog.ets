@@ -87,7 +87,7 @@ struct PinCustomDialog {
               .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontWeight(FontWeight.Bold)
-              .lineHeight(this.isTibetanLanguages() ? 33 : 0)
+              .lineHeight(this.isTibetanLanguages() ? 32.5 : 0)
               .margin({
                 left: 24,
                 right: 24
