@@ -51,6 +51,8 @@ public:
         std::vector<int32_t> &userIds) = 0;
     virtual OHOS::DistributedHardware::ProcessInfo HandleAppUnBindEvent(int32_t remoteUserId,
         const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId) = 0;
+    virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName,
+        const std::string &deviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -76,6 +78,8 @@ public:
     MOCK_METHOD(void, DeleteAclForRemoteUserRemoved, (std::string, int32_t, std::vector<int32_t> &));
     MOCK_METHOD((OHOS::DistributedHardware::ProcessInfo), HandleAppUnBindEvent, (int32_t, const std::string &,
         int32_t, const std::string &, int32_t));
+    MOCK_METHOD((std::unordered_map<std::string, DmAuthForm>), GetAppTrustDeviceList,
+        (const std::string &, const std::string &));
 };
 }
 }

@@ -21,7 +21,9 @@
 #include "bluetooth_def.h"
 #endif // SUPPORT_BLUETOOTH
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_log.h"
+#include "dm_softbus_cache.h"
 #include "system_ability_definition.h"
 #ifdef SUPPORT_WIFI
 #include "wifi_msg.h"
@@ -41,6 +43,13 @@ void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32
     LOGI("PublishCommonEventCallback start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d",
         bluetoothState, wifiState, screenState);
     std::lock_guard<std::mutex> saLock(g_publishMutex);
+    DmDeviceInfo info;
+    SoftbusCache::GetInstance().GetLocalDeviceInfo(info);
+    if (info.deviceTypeId == DmDeviceType::DEVICE_TYPE_WATCH) {
+        LOGE("deviceType: %{public}d is watch, not publish", static_cast<int32_t>(info.deviceTypeId));
+        return;
+    }
+    LOGI("deviceType: %{public}d", static_cast<int32_t>(info.deviceTypeId));
     SoftbusPublish softbusPublish;
     if (screenState == DM_SCREEN_OFF) {
         int32_t ret = softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);

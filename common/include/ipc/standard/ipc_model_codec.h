@@ -24,6 +24,11 @@ namespace OHOS {
 namespace DistributedHardware {
 class IpcModelCodec {
 public:
+    static void DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo);
+    static bool EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel);
+    static void DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targetId);
+    static bool EncodeDmAccessCaller(const DmAccessCaller &caller, MessageParcel &parcel);
+    static bool EncodeDmAccessCallee(const DmAccessCallee &callee, MessageParcel &parcel);
     static int32_t DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &parcel,
         DmDeviceProfileInfoFilterOptions &filterOptions);
     static bool EncodeDmDeviceProfileInfoFilterOptions(const DmDeviceProfileInfoFilterOptions &filterOptions,

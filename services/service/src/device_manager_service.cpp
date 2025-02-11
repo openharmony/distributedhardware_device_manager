@@ -32,6 +32,7 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "common_event_support.h"
 #include "datetime_ex.h"
+#include "device_name_manager.h"
 #include "dm_comm_tool.h"
 #include "dm_transport_msg.h"
 #include "iservice_registry.h"
@@ -252,6 +253,7 @@ void DeviceManagerService::UninitDMServiceListener()
     advertiseMgr_ = nullptr;
     discoveryMgr_ = nullptr;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    DeviceNameManager::GetInstance().UnInit();
     KVAdapterManager::GetInstance().UnInit();
 #endif
     LOGI("Uninit.");
@@ -270,16 +272,14 @@ void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName)
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
+    (void)extra;
     LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    bool isOnlyShowNetworkId = false;
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call GetTrustedDeviceList.", pkgName.c_str());
-        isOnlyShowNetworkId = true;
-    }
+    bool isOnlyShowNetworkId = !(PermissionManager::GetInstance().CheckPermission() ||
+        PermissionManager::GetInstance().CheckNewPermission());
     std::vector<DmDeviceInfo> onlineDeviceList;
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
@@ -316,6 +316,28 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
                 deviceList.push_back(item);
             }
         }
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+                                                      std::vector<DmDeviceInfo> &deviceList)
+{
+    (void)extra;
+    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName or extra is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call GetAllTrustedDeviceList.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    int32_t ret = softbusListener_->GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    if (ret != DM_OK) {
+        LOGE("GetAllTrustedDeviceList failed");
+        return ret;
     }
     return DM_OK;
 }
@@ -639,8 +661,9 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         realDeviceId = udidHashTemp;
     }
 #endif
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string udid = "";
-    if (SoftbusCache::GetInstance().GetUdidByUdidHash(realDeviceId, udid) != DM_OK) {
+    if (softbusListener_->GetUdidFromDp(realDeviceId, udid) != DM_OK) {
         LOGE("Get udid by udidhash failed.");
         return ERR_DM_FAILED;
     }
@@ -688,8 +711,9 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         realDeviceId = udidHashTemp;
     }
 #endif
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string udid = "";
-    if (SoftbusCache::GetInstance().GetUdidByUdidHash(realDeviceId, udid) != DM_OK) {
+    if (softbusListener_->GetUdidFromDp(realDeviceId, udid) != DM_OK) {
         LOGE("Get udid by udidhash failed.");
         return ERR_DM_FAILED;
     }
@@ -1625,6 +1649,7 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_REMOVED);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGIN);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED);
     if (accountCommonEventManager_->SubscribeAccountCommonEvent(AccountCommonEventVec, callback)) {
         LOGI("Success");
     }
@@ -1652,6 +1677,7 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
     LOGI("CommonEventType: %{public}s, currentUserId: %{public}d, beforeUserId: %{public}d", commonEventType.c_str(),
         currentUserId, beforeUserId);
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
         DMAccountInfo dmAccountInfo;
         dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
         dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
@@ -1665,11 +1691,13 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
             dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
         }
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
+        DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
         DMAccountInfo dmAccountInfo;
         dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
         dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
         MultipleUserConnector::SetAccountInfo(currentUserId, dmAccountInfo);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+        DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
         DMAccountInfo dmAccountInfo = MultipleUserConnector::GetAccountInfoByUserId(beforeUserId);
         if (dmAccountInfo.accountId.empty()) {
             return;
@@ -1687,6 +1715,8 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         curDmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
         curDmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
         MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), curDmAccountInfo);
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED) {
+        DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
     } else {
         LOGE("Invalied account common event.");
     }
@@ -2351,19 +2381,6 @@ void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceL
     }
 }
 
-int32_t DeviceManagerService::SetLocalDeviceName(const std::string &localDeviceName,
-                                                 const std::string &localDisplayName)
-{
-    LOGI("DeviceManagerService Start SetLocalDeviceName!");
-    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
-    int32_t ret = softbusListener_->SetLocalDeviceName(localDeviceName, localDisplayName);
-    if (ret != DM_OK) {
-        LOGE("SetLocalDeviceName error, failed ret: %{public}d", ret);
-        return ret;
-    }
-    return DM_OK;
-}
-
 void DeviceManagerService::RemoveNotifyRecord(const ProcessInfo &processInfo)
 {
     LOGI("start");
@@ -2606,6 +2623,57 @@ int32_t DeviceManagerService::GetDeviceIconInfo(const std::string &pkgName,
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->GetDeviceIconInfo(pkgName, filterOptions);
+}
+
+int32_t DeviceManagerService::PutDeviceProfileInfoList(const std::string &pkgName,
+    std::vector<DmDeviceProfileInfo> &deviceProfileInfoList)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("GetDeviceProfileInfoList failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
+}
+
+int32_t DeviceManagerService::SetLocalDisplayNameToSoftbus(const std::string &displayName)
+{
+    LOGI("DeviceManagerService Start SetLocalDisplayName!");
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    int32_t ret = softbusListener_->SetLocalDisplayName(displayName);
+    if (ret != DM_OK) {
+        LOGE("SetLocalDisplayName error, failed ret: %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
+    std::string &displayName)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(maxNameLength, displayName);
+#endif
+    return DM_OK;
+}
+
+std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
+{
+    LOGI("In");
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("GetDeviceNamePrefixs failed, adapter instance not init or init failed.");
+        return {};
+    }
+    return dmServiceImplExtResident_->GetDeviceNamePrefixs();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

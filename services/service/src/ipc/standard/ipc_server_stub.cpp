@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
 #include "device_manager_service_notify.h"
+#include "device_name_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
@@ -51,7 +52,6 @@ IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGE
 {
     registerToService_ = false;
     state_ = ServiceRunningState::STATE_NOT_START;
-    accountBootListener_ = std::make_shared<AccountBootListener>();
 }
 
 void IpcServerStub::OnStart()
@@ -87,6 +87,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().InitSoftbusListener();
+        DeviceNameManager::GetInstance().Init();
         if (!Init()) {
             LOGE("failed to init IpcServerStub");
             state_ = ServiceRunningState::STATE_NOT_START;
@@ -156,6 +157,7 @@ bool IpcServerStub::Init()
         }
         registerToService_ = true;
         KVAdapterManager::GetInstance().Init();
+        DeviceNameManager::GetInstance().Init();
     }
     return true;
 }

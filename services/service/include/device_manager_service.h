@@ -207,16 +207,22 @@ public:
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     void ProcessSyncUserIds(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
-    int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName);
+    int32_t SetLocalDisplayNameToSoftbus(const std::string &displayName);
     void RemoveNotifyRecord(const ProcessInfo &processInfo);
     int32_t RegDevStateCallbackToService(const std::string &pkgName);
     int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList);
     void HandleDeviceUnBind(const char *peerUdid, const GroupInformation &groupInfo);
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
+    int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+        std::vector<DmDeviceInfo> &deviceList);
     int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam);
     int32_t GetDeviceProfileInfoList(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);
     int32_t GetDeviceIconInfo(const std::string &pkgName, DmDeviceIconInfoFilterOptions &filterOptions);
+    int32_t PutDeviceProfileInfoList(const std::string &pkgName,
+        std::vector<DmDeviceProfileInfo> &deviceProfileInfoList);
+    int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength, std::string &displayName);
+    std::vector<std::string> GetDeviceNamePrefixs();
 
 private:
     bool IsDMServiceImplReady();

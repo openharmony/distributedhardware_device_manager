@@ -34,5 +34,25 @@ int32_t SoftbusCache::GetNetworkIdFromCache(const std::string &udid, std::string
 {
     return DmSoftbusCache::dmSoftbusCache->GetNetworkIdFromCache(udid, networkId);
 }
+
+int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
+{
+    return DmSoftbusCache::dmSoftbusCache->GetLocalDeviceInfo(nodeInfo);
+}
+
+int32_t SoftbusCache::GetUuidFromCache(const char *networkId, std::string &uuid)
+{
+    return DmSoftbusCache::dmSoftbusCache->GetUuidFromCache(networkId, uuid);
+}
+
+bool SoftbusCache::CheckIsOnline(const std::string &deviceId)
+{
+    return DmSoftbusCache::dmSoftbusCache->CheckIsOnline(deviceId);
+}
+
+int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList)
+{
+    return DmSoftbusCache::dmSoftbusCache->GetDeviceInfoFromCache(deviceInfoList);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

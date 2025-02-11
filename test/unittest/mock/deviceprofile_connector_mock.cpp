@@ -106,5 +106,11 @@ OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEv
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid,
         tokenId, localUdid, peerTokenId);
 }
+
+std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
+    const std::string &deviceId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAppTrustDeviceList(pkgName, deviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -31,6 +31,7 @@ public:
     virtual DMAccountInfo GetAccountInfoByUserId(int32_t userId) = 0;
     virtual int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec) = 0;
     virtual int32_t GetForegroundUserIds(std::vector<int32_t> &userVec) = 0;
+    virtual std::string GetOhosAccountId(void) = 0;
 public:
     static inline std::shared_ptr<DmMultipleUserConnector> dmMultipleUserConnector = nullptr;
 };
@@ -42,6 +43,7 @@ public:
     MOCK_METHOD(DMAccountInfo, GetAccountInfoByUserId, (int32_t));
     MOCK_METHOD(int32_t, GetBackgroundUserIds, (std::vector<int32_t> &));
     MOCK_METHOD(int32_t, GetForegroundUserIds, (std::vector<int32_t> &));
+    MOCK_METHOD(std::string, GetOhosAccountId, ());
 };
 }
 }

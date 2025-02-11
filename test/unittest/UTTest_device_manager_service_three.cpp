@@ -430,19 +430,32 @@ HWTEST_F(DeviceManagerServiceThreeTest, UnBindDevice_302, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 }
 
-HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteLocalUserSwitchByWifi_301, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceThreeTest, RegisterAuthenticationType_301, testing::ext::TestSize.Level0)
 {
-    DeviceManagerService::GetInstance().timer_ = nullptr;
-    int32_t curUserId = 1;
-    int32_t preUserId = 1;
-    std::map<std::string, std::string> wifiDevices;
-    std::vector<int32_t> foregroundUserIds;
-    std::vector<int32_t> backgroundUserIds;
-    wifiDevices.insert(std::make_pair("kdmalsalskalw002", "networkId008"));
-    EXPECT_CALL(*deviceManagerServiceMock_, SendUserIdsByWifi(_, _, _)).WillOnce(Return(DM_OK));
-    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(curUserId, preUserId, wifiDevices,
-        foregroundUserIds, backgroundUserIds);
-    EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
+    std::string pkgName = "pkgName";
+    std::map<std::string, std::string> authParam;
+    authParam.insert(std::make_pair(DM_AUTHENTICATION_TYPE, "123456"));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
+    EXPECT_EQ(ret, ERR_DM_INIT_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceProfileInfoList_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DmDeviceProfileInfoFilterOptions filterOptions;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceIconInfo_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    DmDeviceIconInfoFilterOptions filterOptions;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 } // namespace
 } // namespace DistributedHardware

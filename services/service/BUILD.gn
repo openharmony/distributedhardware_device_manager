@@ -99,8 +99,11 @@ if (defined(ohos_lite)) {
         "//foundation/communication/dsoftbus:dsoftbus",
         "//foundation/systemabilitymgr/safwk_lite:safwk_lite",
         "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
-        "//third_party/bounds_checking_function:libsec_shared",
-        "//third_party/openssl:libcrypto_shared",
+      ]
+
+      external_deps = [
+        "bounds_checking_function:libsec_shared",
+        "openssl:libcrypto_shared",
       ]
 
       cflags = [
@@ -183,6 +186,8 @@ if (defined(ohos_lite)) {
       "src/device_manager_service.cpp",
       "src/device_manager_service_listener.cpp",
       "src/devicenamemgr/account_boot_listener.cpp",
+      "src/devicenamemgr/device_name_change_monitor.cpp",
+      "src/devicenamemgr/device_name_manager.cpp",
       "src/devicenamemgr/local_device_name_mgr.cpp",
       "src/devicenamemgr/settings_data_event_monitor.cpp",
       "src/discovery/discovery_filter.cpp",

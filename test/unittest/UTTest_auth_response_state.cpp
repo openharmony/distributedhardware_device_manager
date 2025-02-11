@@ -506,6 +506,40 @@ HWTEST_F(AuthResponseStateTest, Enter_012, testing::ext::TestSize.Level0)
     authResponseState->SetAuthManager(nullptr);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authResponseContext_->publicKey = "";
+    authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
+    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
+    authResponseState->authManager_ = authManager;
+    ret = authResponseState->Enter();
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(AuthResponseStateTest, GetStateType_011, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseReCheckMsg>();
+    int32_t ret = authResponseState->GetStateType();
+    ASSERT_EQ(ret, AUTH_RESPONSE_RECHECK_MSG);
+}
+
+HWTEST_F(AuthResponseStateTest, Enter_013, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseReCheckMsg>();
+    authResponseState->SetAuthManager(nullptr);
+    int32_t ret = authResponseState->Enter();
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authManager->authResponseContext_->edition = "";
+    authManager->remoteVersion_ = "remoteVersion";
+    authManager->authResponseState_ = std::make_shared<AuthResponseFinishState>();
+    authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager);
+    authResponseState->authManager_ = authManager;
+    ret = authResponseState->Enter();
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

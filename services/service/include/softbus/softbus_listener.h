@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,10 +35,12 @@
 #include "session.h"
 #include "socket.h"
 #include "dm_anonymous.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "access_control_profile.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
-
 class SoftbusListener {
 public:
     SoftbusListener();
@@ -104,14 +106,20 @@ public:
     void SendAclChangedBroadcast(const std::string &msg);
     int32_t GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus);
     static int32_t GetNetworkIdByUdid(const std::string &udid, std::string &networkId);
-    int32_t SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName);
+    static int32_t GetDeviceNameByUdid(const std::string &udid, std::string &deviceName);
     int32_t SetForegroundUserIdsToDSoftBus(const std::string &remoteUserId, const std::vector<uint32_t> &userIds);
     void DeleteCacheDeviceInfo();
+    int32_t SetLocalDisplayName(const std::string &displayName);
+    int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+        std::vector<DmDeviceInfo> &deviceList);
+    int32_t GetUdidFromDp(const std::string &udidHash, std::string &udid);
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj);
     int32_t InitSoftPublishLNN();
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    void ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile, DmDeviceInfo &dmDevice);
+#endif
 private:
     static std::string hostName_;
     static bool isRadarSoLoad_;

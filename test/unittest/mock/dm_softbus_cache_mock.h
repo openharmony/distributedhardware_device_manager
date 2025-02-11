@@ -29,6 +29,10 @@ public:
     virtual int32_t GetUdidByUdidHash(const std::string &udidHash, std::string &udid) = 0;
     virtual int32_t GetUdidFromCache(const char *networkId, std::string &udid) = 0;
     virtual int32_t GetNetworkIdFromCache(const std::string &udid, std::string &networkId) = 0;
+    virtual int32_t GetLocalDeviceInfo(DmDeviceInfo &nodeInfo) = 0;
+    virtual int32_t GetUuidFromCache(const char *networkId, std::string &uuid) = 0;
+    virtual bool CheckIsOnline(const std::string &deviceId) = 0;
+    virtual int32_t GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusCache> dmSoftbusCache = nullptr;
 };
@@ -38,6 +42,10 @@ public:
     MOCK_METHOD(int32_t, GetUdidByUdidHash, (const std::string &, std::string &));
     MOCK_METHOD(int32_t, GetUdidFromCache, (const char *, std::string &));
     MOCK_METHOD(int32_t, GetNetworkIdFromCache, (const std::string &, std::string &));
+    MOCK_METHOD(int32_t, GetLocalDeviceInfo, (DmDeviceInfo &));
+    MOCK_METHOD(int32_t, GetUuidFromCache, (const char *, std::string &));
+    MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
+    MOCK_METHOD(int32_t, GetDeviceInfoFromCache, (std::vector<DmDeviceInfo> &));
 };
 }
 }

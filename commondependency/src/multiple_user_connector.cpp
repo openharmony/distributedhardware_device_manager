@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -298,6 +298,23 @@ int32_t MultipleUserConnector::GetAllUserIds(std::vector<int32_t> &userIdVec)
     return DM_OK;
 #else
     return DM_OK;
+#endif
+}
+
+std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return "";
+#elif OS_ACCOUNT_PART_EXISTS
+    OhosAccountInfo accountInfo;
+    ErrCode ret = OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, accountInfo);
+    if (ret != 0 || accountInfo.uid_ == "") {
+        LOGE("error ret: %{public}d", ret);
+        return "";
+    }
+    return accountInfo.nickname_;
+#else
+    return "";
 #endif
 }
 } // namespace DistributedHardware

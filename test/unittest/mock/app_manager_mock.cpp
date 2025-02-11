@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,11 @@ int32_t AppManager::GetNativeTokenIdByName(std::string &processName, int64_t &to
 int32_t AppManager::GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex, int64_t &tokenId)
 {
     return DmAppManager::dmAppManager->GetHapTokenIdByName(userId, bundleName, instIndex, tokenId);
+}
+
+int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &appId)
+{
+    return DmAppManager::dmAppManager->GetAppIdByPkgName(pkgName, appId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

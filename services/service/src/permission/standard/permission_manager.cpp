@@ -40,7 +40,7 @@ constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIB
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
 
-constexpr int32_t SYSTEM_SA_WHITE_LIST_NUM = 7;
+constexpr int32_t SYSTEM_SA_WHITE_LIST_NUM = 8;
 constexpr const static char SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "Samgr_Networking",
     "ohos.distributeddata.service",
@@ -49,6 +49,7 @@ constexpr const static char SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM][PKG_N
     "distributed_bundle_framework",
     "ohos.dhardware",
     "ohos.security.distributed_access_token",
+    "ohos.storage.distributedfile.daemon",
 };
 const std::string PERMISSION_JSON_PATH = "/system/etc/device_manager/dm_permission.json";
 const std::string ALL_PROC = "all";

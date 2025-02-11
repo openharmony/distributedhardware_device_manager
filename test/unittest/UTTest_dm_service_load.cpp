@@ -19,9 +19,14 @@
 
 #include "dm_constants.h"
 #include "dm_service_load.h"
+#include "dm_system_ability_manager_mock.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+
+using ::testing::_;
+using ::testing::An;
+using ::testing::Return;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -59,6 +64,20 @@ HWTEST_F(DmServiceLoadTest, SetLoadFinish_001, testing::ext::TestSize.Level0)
     dmLoadCallback.OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
     dmLoadCallback.OnLoadSystemAbilityFail(systemAbilityId);
     ASSERT_EQ(DmServiceLoad::GetInstance().isDMServiceLoading_, false);
+}
+
+HWTEST_F(DmServiceLoadTest, LoadDMService_002, testing::ext::TestSize.Level2)
+{
+    auto iSystemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    auto mockAbilityMgr = sptr<SystemAbilityManagerMock>(new SystemAbilityManagerMock());
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = mockAbilityMgr;
+    EXPECT_CALL(*mockAbilityMgr, LoadSystemAbility(_, An<const sptr<ISystemAbilityLoadCallback>&>()))
+        .Times(1)
+        .WillOnce(Return(ERR_DM_FAILED));
+
+    int32_t ret = DmServiceLoad::GetInstance().LoadDMService();
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+    SystemAbilityManagerClient::GetInstance().systemAbilityManager_ = iSystemAbilityMgr;
 }
 }
 } // namespace DistributedHardware

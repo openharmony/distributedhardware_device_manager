@@ -22,6 +22,11 @@
 #include "device_manager_service_listener.h"
 #include "dm_device_info.h"
 #include "ipc_server_listener.h"
+#include "dm_softbus_cache_mock.h"
+#include "dm_crypto_mock.h"
+#include "ipc_server_listener_mock.h"
+#include "kv_adapter_manager_mock.h"
+#include "app_manager_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -31,6 +36,14 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static inline  std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ =
+        std::make_shared<SoftbusCacheMock>();
+    static inline  std::shared_ptr<CryptoMock> cryptoMock_ = std::make_shared<CryptoMock>();
+    static inline  std::shared_ptr<IpcServerListenerMock> ipcServerListenerMock_ =
+        std::make_shared<IpcServerListenerMock>();
+    static inline  std::shared_ptr<KVAdapterManagerMock> kVAdapterManagerMock_ =
+        std::make_shared<KVAdapterManagerMock>();
+    static inline  std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -60,11 +60,6 @@ int32_t SoftbusListener::GetLocalDeviceInfo(DmDeviceInfo &deviceInfo)
     return DmSoftbusListener::dmSoftbusListener->GetLocalDeviceInfo(deviceInfo);
 }
 
-int32_t SoftbusListener::SetLocalDeviceName(const std::string &localDeviceName, const std::string &localDisplayName)
-{
-    return DmSoftbusListener::dmSoftbusListener->SetLocalDeviceName(localDeviceName, localDisplayName);
-}
-
 int32_t SoftbusListener::GetDeviceScreenStatus(const char *networkId, int32_t &screenStatus)
 {
     return DmSoftbusListener::dmSoftbusListener->GetDeviceScreenStatus(networkId, screenStatus);
@@ -79,6 +74,16 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
 int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
 {
     return DmSoftbusListener::dmSoftbusListener->GetNetworkTypeByNetworkId(networkId, networkType);
+}
+
+int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
+{
+    return DmSoftbusListener::dmSoftbusListener->SetLocalDisplayName(displayName);
+}
+
+int32_t SoftbusListener::GetUdidFromDp(const std::string &udidHash, std::string &udid)
+{
+    return DmSoftbusListener::dmSoftbusListener->GetUdidFromDp(udidHash, udid);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
