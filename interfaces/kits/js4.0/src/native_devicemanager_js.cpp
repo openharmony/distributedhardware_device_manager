@@ -58,7 +58,7 @@ const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 const int32_t DM_MAX_DEVICE_SIZE = 100;
 
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
-napi_ref StrategyForHeartbeatEnumConstructor_ = nullptr;
+napi_ref g_strategyForHeartbeatEnumConstructor = nullptr;
 
 std::map<std::string, DeviceManagerNapi *> g_deviceManagerMap;
 std::map<std::string, std::shared_ptr<DmNapiInitCallback>> g_initCallbackMap;
@@ -2550,7 +2550,7 @@ napi_value DeviceManagerNapi::InitStrategyForHeartbeatEnum(napi_env env, napi_va
     napi_value result = nullptr;
     napi_define_class(env, "StrategyForHeartbeat", NAPI_AUTO_LENGTH, EnumTypeConstructor,
         nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_create_reference(env, result, refCount, &StrategyForHeartbeatEnumConstructor_);
+    napi_create_reference(env, result, refCount, &g_strategyForHeartbeatEnumConstructor);
     napi_set_named_property(env, exports, "StrategyForHeartbeat", result);
     return exports;
 }
