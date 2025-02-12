@@ -1026,7 +1026,7 @@ void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     for (auto &item : profiles) {
         if ((currentTime - item.GetLastAuthTime()) > MAX_ALWAYS_ALLOW_SECONDS && item.GetLastAuthTime() > 0) {
-            DeviceProfileConnector::GetInstance().DeleteAclByControlId(item.GetAccessControlId());
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
             remoteUdid = item.GetTrustDeviceId();
             CheckDeleteCredential(remoteUdid);
         }
