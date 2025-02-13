@@ -1642,8 +1642,10 @@ int32_t DeviceProfileConnector::CheckDeviceInfoPermission(const std::string &loc
     std::string localAccountId = MultipleUserConnector::GetOhosAccountIdByUserId(localUserId);
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(localUserId);
     for (auto &item : profiles) {
-        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT || item.GetBindLevel() == DEVICE) {
-            return DM_OK;
+        if (item.GetTrustDeviceId() == peerDeviceId) {
+            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT || item.GetBindLevel() == DEVICE) {
+                return DM_OK;
+            }
         }
         int32_t profileUserId = item.GetAccesser().GetAccesserUserId();
         if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
