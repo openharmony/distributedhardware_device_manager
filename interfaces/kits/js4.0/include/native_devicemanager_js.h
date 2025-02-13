@@ -328,6 +328,8 @@ public:
     void OnDmUiCall(const std::string &paramJson);
     void OnGetDeviceProfileInfoListCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback);
     void OnGetDeviceIconInfoCallbackResult(DeviceIconInfoAsyncCallbackInfo *jsCallback);
+    static napi_value InitStrategyForHeartbeatEnum(napi_env env, napi_value exports);
+    static napi_value SetHeartbeatPolicy(napi_env env, napi_callback_info info);
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);
