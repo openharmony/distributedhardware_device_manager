@@ -380,7 +380,7 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string peerDeviceId = "";
-    int32_t udidRet = softbusListener_->GetUdidByNetworkId(networkId.c_str(), peerDeviceId);
+    int32_t udidRet = SoftbusListener::GetUdidByNetworkId(networkId.c_str(), peerDeviceId);
     if (udidRet != DM_OK) {
         LOGE("GetUdidByNetworkId failed, ret : %{public}d", udidRet);
         return ERR_DM_FAILED;

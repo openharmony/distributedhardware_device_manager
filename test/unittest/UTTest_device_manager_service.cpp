@@ -2319,8 +2319,10 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_003, testing::ext::TestSize.Lev
     std::string networkId = "networkIdTest3";
     DmDeviceInfo info;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusCacheMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusCacheMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
@@ -2561,10 +2563,12 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_005, testing::ext::TestSize.Lev
     DmDeviceInfo info;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
