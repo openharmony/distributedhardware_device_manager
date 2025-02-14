@@ -95,6 +95,7 @@ if (defined(ohos_lite)) {
         "-Wall",
         "-O2",
         "-Wdate-time",
+        "-Werror",
         "-Wextra",
         "-Wfloat-equal",
         "-Wshadow",
@@ -159,6 +160,7 @@ if (defined(ohos_lite)) {
     }
 
     cflags = [
+      "-Werror",
       "-fPIC",
       "-fstack-protector-strong",
     ]

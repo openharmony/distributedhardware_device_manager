@@ -279,6 +279,7 @@ ON_IPC_SERVER_CMD(STOP_DISCOVERING, IpcIo &req, IpcIo &reply)
 
 ON_IPC_SERVER_CMD(GET_LOCAL_DEVICE_INFO, IpcIo &req, IpcIo &reply)
 {
+    (void)req;
     LOGI("start.");
     DmDeviceInfo localDeviceInfo;
     int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceInfo(localDeviceInfo);

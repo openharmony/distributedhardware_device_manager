@@ -237,6 +237,7 @@ int MineHiChainConnector::CheckCredential(std::string reqJsonStr, std::string &r
 
 int MineHiChainConnector::ImportCredential(std::string reqJsonStr, std::string &returnJsonStr)
 {
+    (void)returnJsonStr;
     if (reqJsonStr.empty() || g_deviceGroupManager == nullptr) {
         LOGE("reqJsonStr is empty or g_deviceGroupManager is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -277,6 +278,7 @@ int MineHiChainConnector::ImportCredential(std::string reqJsonStr, std::string &
 
 int MineHiChainConnector::DeleteCredential(std::string reqJsonStr, std::string &returnJsonStr)
 {
+    (void)returnJsonStr;
     if (reqJsonStr.empty() || g_deviceGroupManager == nullptr) {
         LOGE("reqJsonStr is empty or g_deviceGroupManager is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;

@@ -52,7 +52,7 @@ static void DeathCb(void *arg)
         LOGE("package name is NULL.");
         return;
     }
-    CommonSvcId svcId = {0};
+    CommonSvcId svcId = {.handle = 0, .token = 0, .cookie = 0, .cbId = 0};
     std::string pkgName = reinterpret_cast<const char*>(arg);
     if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DM_OK) {
         LOGE("not found client by package name.");
@@ -61,7 +61,7 @@ static void DeathCb(void *arg)
     }
     IpcServerListenermgr::GetInstance().UnregisterListener(pkgName);
     free(arg);
-    SvcIdentity sid = {0};
+    SvcIdentity sid = {.handle = 0, .token = 0, .cookie = 0};
     sid.handle = svcId.handle;
     sid.token = svcId.token;
     sid.cookie = svcId.cookie;
@@ -70,6 +70,7 @@ static void DeathCb(void *arg)
 
 int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 {
+    (void)reply;
     LOGI("register service listener.");
     size_t len = 0;
     uint8_t *name = ReadString(req, &len);
@@ -80,7 +81,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    CommonSvcId svcId = {0};
+    CommonSvcId svcId = {.handle = 0, .token = 0, .cookie = 0, .cbId = 0};
     svcId.handle = svc.handle;
     svcId.token = svc.token;
     svcId.cookie = svc.cookie;
@@ -108,6 +109,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 
 int32_t UnRegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
 {
+    (void)reply;
     LOGI("unregister service listener.");
     size_t len = 0;
     std::string pkgName = reinterpret_cast<const char*>(ReadString(req, &len));
@@ -115,7 +117,7 @@ int32_t UnRegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
         LOGE("get para failed");
         return ERR_DM_FAILED;
     }
-    CommonSvcId svcId;
+    CommonSvcId svcId = {.handle = 0, .token = 0, .cookie = 0, .cbId = 0};
     if (IpcServerListenermgr::GetInstance().GetListenerByPkgName(pkgName, &svcId) != DM_OK) {
         LOGE("not found listener by package name.");
         return ERR_DM_FAILED;
@@ -169,6 +171,7 @@ static int32_t OnRemoteRequestLite(IServerProxy *iProxy, int32_t funcId, void *o
 {
     LOGI("Receive funcId:%{public}d", funcId);
     (void)origin;
+    (void)iProxy;
     return IpcCmdRegister::GetInstance().OnIpcServerCmd(funcId, *req, *reply);
 }
 

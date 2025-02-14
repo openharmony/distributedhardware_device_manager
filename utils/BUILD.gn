@@ -97,6 +97,7 @@ if (defined(ohos_lite)) {
     cflags = [
       "-fPIC",
       "-fstack-protector-strong",
+      "-Werror",
     ]
 
     ldflags = [

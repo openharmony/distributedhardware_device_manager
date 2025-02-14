@@ -245,6 +245,7 @@ int32_t PinHolder::ParseMsgType(const std::string &message)
 
 void PinHolder::ProcessCloseSessionMsg(const std::string &message)
 {
+    (void)message;
     if (listener_ == nullptr || session_ == nullptr) {
         LOGE("ProcessCloseSessionMsg listener or session is nullptr.");
         return;
