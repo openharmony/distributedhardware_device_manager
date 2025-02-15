@@ -158,6 +158,7 @@ public:
     int32_t RegisterAuthenticationType(int32_t authenticationType);
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid);
+    int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

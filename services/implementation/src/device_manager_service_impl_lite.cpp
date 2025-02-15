@@ -604,6 +604,14 @@ void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUd
     return;
 }
 
+int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &localUdid,
+    const std::string &peerDeviceId)
+{
+    (void)localUdid;
+    (void)peerDeviceId;
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

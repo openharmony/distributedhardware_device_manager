@@ -259,6 +259,7 @@ public:
     virtual int32_t RegisterAuthenticationType(int32_t authenticationType) = 0;
     virtual void DeleteAlwaysAllowTimeOut() = 0;
     virtual void CheckDeleteCredential(const std::string &remoteUdid) = 0;
+    virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
