@@ -2442,6 +2442,7 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
         return ret;
     }
     if (!onlineDeviceList.empty() && IsDMServiceImplReady()) {
+        dmServiceImpl_->DeleteAlwaysAllowTimeOut();
         std::unordered_map<std::string, DmAuthForm> udidMap;
         if (PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName)) {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));

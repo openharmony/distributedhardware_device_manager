@@ -257,6 +257,8 @@ public:
     virtual void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId) = 0;
     virtual int32_t RegisterAuthenticationType(int32_t authenticationType) = 0;
+    virtual void DeleteAlwaysAllowTimeOut() = 0;
+    virtual void CheckDeleteCredential(const std::string &remoteUdid) = 0;
     virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;
 };
 

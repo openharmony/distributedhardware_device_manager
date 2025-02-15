@@ -1016,6 +1016,42 @@ int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticat
     return authMgr_->RegisterAuthenticationType(authenticationType);
 }
 
+void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
+{
+    LOGI("Start DeleteAlwaysAllowTimeOut");
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    std::string remoteUdid = "";
+    int64_t currentTime =
+        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    for (auto &item : profiles) {
+        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            continue;
+        }
+        if ((currentTime - item.GetLastAuthTime()) > MAX_ALWAYS_ALLOW_SECONDS && item.GetLastAuthTime() > 0) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+            remoteUdid = item.GetTrustDeviceId();
+            CheckDeleteCredential(remoteUdid);
+        }
+    }
+}
+
+void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUdid)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    bool leftAcl = false;
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == remoteUdid) {
+            leftAcl = true;
+        }
+    }
+    if (!leftAcl) {
+        LOGI("CheckDeleteCredential delete credential");
+        hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID());
+    }
+}
+
 int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &localUdid,
     const std::string &peerDeviceId)
 {
