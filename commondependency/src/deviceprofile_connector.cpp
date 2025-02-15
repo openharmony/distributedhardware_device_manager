@@ -892,30 +892,58 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
     std::vector<AccessControlProfile> profilesFilter;
     for (auto &item : profiles) {
         // cannot consider multi-user for old version
-        if (item.GetAccesser().GetAccesserUserId() == 0 || item.GetAccesser().GetAccesserUserId() == -1 ||
-        item.GetAccessee().GetAccesseeUserId() == 0 || item.GetAccessee().GetAccesseeUserId() == -1) {
+        // the device is accesser
+        if (item.GetAccesser().GetAccesserUserId() != 0 &&
+            item.GetAccesser().GetAccesserUserId() != -1 &&
+            (item.GetAccessee().GetAccesseeUserId() == 0 || item.GetAccessee().GetAccesseeUserId() == -1)) {
+            // caller is accesser, callee is accessee
             if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
-            item.GetAccessee().GetAccesseeDeviceId() == sinkUdid) {
+                item.GetAccesser().GetAccesserUserId() == caller.userId &&
+                item.GetAccessee().GetAccesseeDeviceId() == sinkUdid) {
                 profilesFilter.push_back(item);
                 continue;
-            } else if (item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
-            item.GetAccesser().GetAccesserDeviceId() == sinkUdid) {
+            }
+            // caller is accessee, callee is accesser
+            if (item.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
+                item.GetAccesser().GetAccesserUserId() == callee.userId &&
+                item.GetAccessee().GetAccesseeDeviceId() == srcUdid) {
+                profilesFilter.push_back(item);
+                continue;
+            }
+        }
+        // the device is accessee
+        if ((item.GetAccesser().GetAccesserUserId() == 0 || item.GetAccesser().GetAccesserUserId() == -1) &&
+            item.GetAccessee().GetAccesseeUserId() != 0 &&
+            item.GetAccessee().GetAccesseeUserId() != -1) {
+            // caller is accesser, callee is accessee
+            if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
+                item.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
+                item.GetAccessee().GetAccesseeUserId() == callee.userId) {
+                profilesFilter.push_back(item);
+                continue;
+            }
+            // caller is accessee, callee is accesser
+            if (item.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
+                item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
+                item.GetAccessee().GetAccesseeUserId() == caller.userId) {
                 profilesFilter.push_back(item);
                 continue;
             }
         }
         // consider multi-user for new version
+        // caller is accesser, callee is accessee
         if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
-        item.GetAccesser().GetAccesserUserId() == caller.userId &&
-        item.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
-        item.GetAccessee().GetAccesseeUserId() == callee.userId) {
+            item.GetAccesser().GetAccesserUserId() == caller.userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
+            item.GetAccessee().GetAccesseeUserId() == callee.userId) {
             profilesFilter.push_back(item);
             continue;
         }
+        // caller is accessee, callee is accesser
         if (item.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
-        item.GetAccesser().GetAccesserUserId() == callee.userId &&
-        item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
-        item.GetAccessee().GetAccesseeUserId() == caller.userId) {
+            item.GetAccesser().GetAccesserUserId() == callee.userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
+            item.GetAccessee().GetAccesseeUserId() == caller.userId) {
             profilesFilter.push_back(item);
             continue;
         }
