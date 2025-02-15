@@ -593,6 +593,14 @@ int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticat
     return DM_OK;
 }
 
+int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &localUdid,
+    const std::string &peerDeviceId)
+{
+    (void)localUdid;
+    (void)peerDeviceId;
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

@@ -1631,6 +1631,42 @@ int32_t DeviceProfileConnector::PutAllTrustedDevices(
     return DM_OK;
 }
 
+int32_t DeviceProfileConnector::CheckDeviceInfoPermission(const std::string &localUdid,
+    const std::string &peerDeviceId)
+{
+    LOGI("CheckDeviceInfoPermission Start.");
+    int32_t localUserId = 0;
+    uint32_t tempLocalTokenId = 0;
+    MultipleUserConnector::GetTokenIdAndForegroundUserId(tempLocalTokenId, localUserId);
+    int64_t localTokenId = static_cast<int64_t>(tempLocalTokenId);
+    std::string localAccountId = MultipleUserConnector::GetOhosAccountIdByUserId(localUserId);
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(localUserId);
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == peerDeviceId) {
+            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT || item.GetBindLevel() == DEVICE) {
+                return DM_OK;
+            }
+        }
+        int32_t profileUserId = item.GetAccesser().GetAccesserUserId();
+        if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            (profileUserId == localUserId || profileUserId == -1 || profileUserId == 0) &&
+            item.GetAccesser().GetAccesserAccountId() == localAccountId &&
+            item.GetAccesser().GetAccesserTokenId() == localTokenId &&
+            item.GetAccessee().GetAccesseeDeviceId() == peerDeviceId) {
+            return DM_OK;
+        }
+        profileUserId = item.GetAccessee().GetAccesseeUserId();
+        if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            (profileUserId == localUserId || profileUserId == -1 || profileUserId == 0) &&
+            item.GetAccessee().GetAccesseeAccountId() == localAccountId &&
+            item.GetAccessee().GetAccesseeTokenId() == localTokenId &&
+            item.GetAccesser().GetAccesserDeviceId() == peerDeviceId) {
+            return DM_OK;
+        }
+    }
+    return ERR_DM_NO_PERMISSION;
+}
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();

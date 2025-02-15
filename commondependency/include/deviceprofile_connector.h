@@ -167,6 +167,7 @@ public:
     int32_t SubscribeDeviceProfileInited(sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback);
     int32_t UnSubscribeDeviceProfileInited();
     int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos);
+    int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
