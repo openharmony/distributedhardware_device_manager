@@ -887,7 +887,7 @@ int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
 }
 
 bool checkAccesserACL(AccessControlProfile& profile, const DmAccessCaller &caller,
-    const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid) 
+    const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     // the device is accesser
     if (profile.GetAccesser().GetAccesserUserId() != 0 &&
