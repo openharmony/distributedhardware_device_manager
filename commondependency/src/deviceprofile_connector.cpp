@@ -886,66 +886,83 @@ int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
     return ERR_DM_FAILED;
 }
 
+bool checkACLInOldVersion(AccessControlProfile& profile, const DmAccessCaller &caller,
+    const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    // cannot consider multi-user for old version
+    // the device is src
+    if (profile.GetAccesser().GetAccesserUserId() != 0 &&
+        profile.GetAccesser().GetAccesserUserId() != -1 &&
+        (profile.GetAccessee().GetAccesseeUserId() == 0 || profile.GetAccessee().GetAccesseeUserId() == -1)) {
+        // caller is accesser, callee is accessee
+        if (profile.GetAccesser().GetAccesserDeviceId() == srcUdid &&
+            profile.GetAccesser().GetAccesserUserId() == caller.userId &&
+            profile.GetAccessee().GetAccesseeDeviceId() == sinkUdid) {
+            LOGI("old version, the device is src, caller is accesser, callee is accessee");
+            return true;
+        }
+        // caller is accessee, callee is accesser
+        if (profile.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
+            profile.GetAccesser().GetAccesserUserId() == callee.userId &&
+            profile.GetAccessee().GetAccesseeDeviceId() == srcUdid) {
+            LOGI("old version, the device is src, caller is accessee, callee is accesser");
+            return true;
+        }
+    }
+    // the device is sink
+    if ((profile.GetAccesser().GetAccesserUserId() == 0 || profile.GetAccesser().GetAccesserUserId() == -1) &&
+        profile.GetAccessee().GetAccesseeUserId() != 0 &&
+        profile.GetAccessee().GetAccesseeUserId() != -1) {
+        // caller is accesser, callee is accessee
+        if (profile.GetAccesser().GetAccesserDeviceId() == srcUdid &&
+            profile.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
+            profile.GetAccessee().GetAccesseeUserId() == callee.userId) {
+            LOGI("old version, the device is sink, caller is accesser, callee is accessee");
+            return true;
+        }
+        // caller is accessee, callee is accesser
+        if (profile.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
+            profile.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
+            profile.GetAccessee().GetAccesseeUserId() == caller.userId) {
+            LOGI("old version, the device is sink, caller is accessee, callee is accesser");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool checkACLInNewVersion(AccessControlProfile& profile, const DmAccessCaller &caller,
+    const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    // consider multi-user for new version
+    // caller is accesser, callee is accessee
+    if (profile.GetAccesser().GetAccesserDeviceId() == srcUdid &&
+        profile.GetAccesser().GetAccesserUserId() == caller.userId &&
+        profile.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
+        profile.GetAccessee().GetAccesseeUserId() == callee.userId) {
+        LOGI("new version, caller is accesser, callee is accessee");
+        return true;
+    }
+    // caller is accessee, callee is accesser
+    if (profile.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
+        profile.GetAccesser().GetAccesserUserId() == callee.userId &&
+        profile.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
+        profile.GetAccessee().GetAccesseeUserId() == caller.userId) {
+        LOGI("new version, caller is accessee, callee is accesser");
+        return true;
+    }
+    return false;
+}
+
 std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessControlProfile> profiles,
     const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     std::vector<AccessControlProfile> profilesFilter;
-    for (auto &item : profiles) {
-        // cannot consider multi-user for old version
-        // the device is accesser
-        if (item.GetAccesser().GetAccesserUserId() != 0 &&
-            item.GetAccesser().GetAccesserUserId() != -1 &&
-            (item.GetAccessee().GetAccesseeUserId() == 0 || item.GetAccessee().GetAccesseeUserId() == -1)) {
-            // caller is accesser, callee is accessee
-            if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
-                item.GetAccesser().GetAccesserUserId() == caller.userId &&
-                item.GetAccessee().GetAccesseeDeviceId() == sinkUdid) {
-                profilesFilter.push_back(item);
-                continue;
-            }
-            // caller is accessee, callee is accesser
-            if (item.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
-                item.GetAccesser().GetAccesserUserId() == callee.userId &&
-                item.GetAccessee().GetAccesseeDeviceId() == srcUdid) {
-                profilesFilter.push_back(item);
-                continue;
-            }
-        }
-        // the device is accessee
-        if ((item.GetAccesser().GetAccesserUserId() == 0 || item.GetAccesser().GetAccesserUserId() == -1) &&
-            item.GetAccessee().GetAccesseeUserId() != 0 &&
-            item.GetAccessee().GetAccesseeUserId() != -1) {
-            // caller is accesser, callee is accessee
-            if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
-                item.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
-                item.GetAccessee().GetAccesseeUserId() == callee.userId) {
-                profilesFilter.push_back(item);
-                continue;
-            }
-            // caller is accessee, callee is accesser
-            if (item.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
-                item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
-                item.GetAccessee().GetAccesseeUserId() == caller.userId) {
-                profilesFilter.push_back(item);
-                continue;
-            }
-        }
-        // consider multi-user for new version
-        // caller is accesser, callee is accessee
-        if (item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
-            item.GetAccesser().GetAccesserUserId() == caller.userId &&
-            item.GetAccessee().GetAccesseeDeviceId() == sinkUdid &&
-            item.GetAccessee().GetAccesseeUserId() == callee.userId) {
-            profilesFilter.push_back(item);
-            continue;
-        }
-        // caller is accessee, callee is accesser
-        if (item.GetAccesser().GetAccesserDeviceId() == sinkUdid &&
-            item.GetAccesser().GetAccesserUserId() == callee.userId &&
-            item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
-            item.GetAccessee().GetAccesseeUserId() == caller.userId) {
-            profilesFilter.push_back(item);
-            continue;
+    for (int32_t i = 0; i < profiles.size(); i++) {
+        AccessControlProfile profile = profiles[i];
+        if (checkACLInOldVersion(profile, caller, srcUdid, callee, sinkUdid) ||
+            checkACLInNewVersion(profile, caller, srcUdid, callee, sinkUdid)) {
+            profilesFilter.push_back(profile);
         }
     }
     return profilesFilter;
