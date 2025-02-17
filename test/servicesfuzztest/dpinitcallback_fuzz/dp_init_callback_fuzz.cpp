@@ -27,7 +27,9 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-
+namespace {
+    constexpr uint32_t DATA_LEN = 10;
+}
 void DpInitedCallbackFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
@@ -62,7 +64,7 @@ void DpInitedCallbackFirstFuzzTest(const uint8_t* data, size_t size)
     deviceInfo.extraData = extraJson.dump();
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
 
-    extraJson[PARAM_KEY_OS_TYPE] = 10;
+    extraJson[PARAM_KEY_OS_TYPE] = DATA_LEN;
     deviceInfo.extraData = extraJson.dump();
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
 }

@@ -29,6 +29,9 @@
 namespace OHOS {
 namespace DistributedHardware {
 
+namespace {
+    constexpr uint32_t DATA_LEN = 10;
+}    
 std::shared_ptr<DMCommTool> dmCommToolPtr_ = std::make_shared<DMCommTool>();
 
 void DmCommToolFuzzTest(const uint8_t* data, size_t size)
@@ -43,8 +46,7 @@ void DmCommToolFuzzTest(const uint8_t* data, size_t size)
     dmCommToolPtr_->GetInstance();
     dmCommToolPtr_->UnInit();
     std::vector<uint32_t> foregroundUserIds;
-    foregroundUserIds.push_back(10);
-    foregroundUserIds.push_back(20);
+    foregroundUserIds.push_back(DATA_LEN);
     std::vector<uint32_t> backgroundUserIds;
     dmCommToolPtr_->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
     dmCommToolPtr_->RspLocalFrontOrBackUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds, socketId);

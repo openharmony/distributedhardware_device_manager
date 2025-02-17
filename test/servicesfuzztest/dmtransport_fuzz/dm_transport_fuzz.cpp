@@ -27,9 +27,13 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+    constexpr uint32_t DATA_LEN = 10;
+}
 
 std::shared_ptr<DMCommTool> dmCommToolPtr_ = std::make_shared<DMCommTool>();
 std::shared_ptr<DMTransport> dmTransPortPtr_ = std::make_shared<DMTransport>(dmCommToolPtr_);
+
 
 void DmTransPortFuzzTest(const uint8_t* data, size_t size)
 {
@@ -58,7 +62,7 @@ void DmTransPortFuzzTest(const uint8_t* data, size_t size)
 
     char *ptr = "helloworld";
     data = reinterpret_cast<void*>(ptr);
-    dataLen = 10;
+    dataLen = DATA_LEN;
     dmTransPortPtr_->OnSocketClosed(socketId, data, dataLen);
 
     std::string payload(reinterpret_cast<const char*>(data), size);
