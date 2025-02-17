@@ -1287,8 +1287,7 @@ void DmAuthManager::ShowConfigDialog()
     std::string localUdid = static_cast<std::string>(localDeviceId);
     DeviceProfileConnector::GetInstance().SyncAclByBindType(authResponseContext_->hostPkgName,
         authResponseContext_->bindType, localUdid, remoteDeviceId_);
-    DmDialogManager dialogMgr;
-    dialogMgr.ShowConfirmDialog(params);
+    DmDialogManager::GetInstance().ShowConfirmDialog(params);
     struct RadarInfo info = {
         .funcName = "ShowConfigDialog",
         .stageRes = static_cast<int32_t>(StageRes::STAGE_IDLE),
@@ -1320,8 +1319,7 @@ void DmAuthManager::ShowAuthInfoDialog()
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = authResponseContext_->code;
     std::string authParam = jsonObj.dump();
-    DmDialogManager dialogMgr;
-    dialogMgr.ShowPinDialog(std::to_string(authResponseContext_->code));
+    DmDialogManager::GetInstance().ShowPinDialog(std::to_string(authResponseContext_->code));
 }
 
 void DmAuthManager::ShowStartAuthDialog()
@@ -1345,8 +1343,7 @@ void DmAuthManager::ShowStartAuthDialog()
         return;
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
-    DmDialogManager dialogMgr;
-    dialogMgr.ShowInputDialog(authResponseContext_->targetDeviceName);
+    DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
 }
 
 int32_t DmAuthManager::ProcessPincode(int32_t pinCode)

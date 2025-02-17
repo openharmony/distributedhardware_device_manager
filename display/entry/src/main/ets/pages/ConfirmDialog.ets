@@ -129,14 +129,7 @@ struct ConfirmCustomDialog {
   }
 
   destruction() {
-    if (dmClass != null) {
-      try {
-        dmClass.release();
-        dmClass = null;
-      } catch (error) {
-        console.log('dmClass release failed')
-      }
-    }
+    console.log(TAG + 'ConfirmCustomDialog destruction')
     let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
     if (session) {
       session.terminateSelf();
@@ -342,6 +335,15 @@ struct dialogPlusPage {
   }
 
   destruction() {
+    console.log(TAG + 'dialogPlusPage destruction')
+    let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
+    if (session) {
+      session.terminateSelf();
+    }
+  }
+
+  aboutToDisappear() {
+    console.log(TAG + 'aboutToDisappear aboutToDisappear')
     if (dmClass != null) {
       try {
         dmClass.release();
@@ -349,10 +351,6 @@ struct dialogPlusPage {
       } catch (error) {
         console.log('dmClass release failed')
       }
-    }
-    let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
-    if (session) {
-      session.terminateSelf();
     }
   }
 
