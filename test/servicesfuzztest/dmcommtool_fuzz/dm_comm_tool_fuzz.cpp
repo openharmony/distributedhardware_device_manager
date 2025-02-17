@@ -31,7 +31,8 @@ namespace DistributedHardware {
 
 namespace {
     constexpr uint32_t DATA_LEN = 10;
-}    
+}
+
 std::shared_ptr<DMCommTool> dmCommToolPtr_ = std::make_shared<DMCommTool>();
 
 void DmCommToolFuzzTest(const uint8_t* data, size_t size)
