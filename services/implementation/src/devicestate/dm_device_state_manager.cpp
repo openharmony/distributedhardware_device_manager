@@ -170,11 +170,13 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
 
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo)
 {
+    LOGI("ProcessDeviceStateChange begin, devState = %{public}d", devState);
     CHECK_NULL_VOID(softbusConnector_);
     CHECK_NULL_VOID(listener_);
     std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
     for (const auto &item : processInfoVec) {
         if (!item.pkgName.empty()) {
+            LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
             listener_->OnDeviceStateChange(item, devState, devInfo);
         }
     }

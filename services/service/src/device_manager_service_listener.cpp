@@ -155,7 +155,7 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
     const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("In");
+    LOGI("DeviceManagerServiceListener::ProcessDeviceStateChange, state = %{public}d", state);
     std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId,
         DmCommonNotifyEvent::REG_DEVICE_STATE);
     std::vector<ProcessInfo> hpProcessInfoVec;
@@ -803,6 +803,7 @@ void DeviceManagerServiceListener::ProcessAppOnline(const std::vector<ProcessInf
                 alreadyOnlinePkgName_[notifyPkgName] = info;
             }
         }
+        LOGI("ProcessAppOnline notifyState = %{public}d", notifyState);
         SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
     }
