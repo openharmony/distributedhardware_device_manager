@@ -21,7 +21,7 @@
 #include <unordered_map>
 #include <fuzzer/FuzzedDataProvider.h>
 
-#include "dm_transport.h"
+#include "dm_transport_msg.h"
 #include "dm_comm_tool_fuzz.h"
 #include "dm_comm_tool.h"
 

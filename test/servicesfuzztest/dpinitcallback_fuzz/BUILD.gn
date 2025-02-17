@@ -73,6 +73,8 @@ ohos_fuzztest("DpInitCallbackFuzzTest") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
