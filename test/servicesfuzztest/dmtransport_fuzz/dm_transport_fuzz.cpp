@@ -55,6 +55,17 @@ void DmTransPortFuzzTest(const uint8_t* data, size_t size)
     void *data = nullptr;
     uint32_t dataLen = 0;
     dmTransPortPtr_->OnSocketClosed(socketId, data, dataLen);
+
+    char *ptr = "helloworld";
+    data = reinterpret_cast<void*>(ptr);
+    dataLen = 10;
+    dmTransPortPtr_->OnSocketClosed(socketId, data, dataLen);
+
+    std::string payload(reinterpret_cast<const char*>(data), size);
+    dmTransPortPtr_->HandleReceiveMessage(socketId, payload);
+
+    payload = "";
+    dmTransPortPtr_->HandleReceiveMessage(socketId, payload);
 }
 
 void DmTransPortFirstFuzzTest(const uint8_t* data, size_t size)
@@ -63,6 +74,50 @@ void DmTransPortFirstFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+
+    std::string payload(jsonString);
+    FuzzedDataProvider fdp(data, size);
+    int32_t socketId = fdp.ConsumeIntegral<int32_t>();
+    std::string rmtNetworkId(reinterpret_cast<const char*>(data), size);
+    std::string dmPkgName(reinterpret_cast<const char*>(data), size);
+    std::string peerSocketName(reinterpret_cast<const char*>(data), size);
+    PeerSocketInfo info = {
+        .name = const_cast<char*>(peerSocketName.c_str()),
+        .networkId = const_cast<char*>(rmtNetworkId.c_str()),
+        .pkgName = const_cast<char*>(dmPkgName.c_str()),
+        .dataType = DATA_TYPE_BYTES
+    };
+    dmTransPortPtr_->OnSocketOpened(socketId, info);
+    dmTransPortPtr_->HandleReceiveMessage(socketId, payload);
+    dmTransPortPtr_->CreateClientSocket(rmtNetworkId);
+    dmTransPortPtr_->IsDeviceSessionOpened(rmtNetworkId, socketId);
+    dmTransPortPtr_->StartSocket(rmtNetworkId, socketId);
+    dmTransPortPtr_->StopSocket(rmtNetworkId);
+    dmTransPortPtr_->Send(rmtNetworkId, payload, socketId);
+    rmtNetworkId = "";
+    dmTransPortPtr_->CreateClientSocket(rmtNetworkId);
+    dmTransPortPtr_->StartSocket(rmtNetworkId, socketId);
+    dmTransPortPtr_->StopSocket(rmtNetworkId);
+    dmTransPortPtr_->Send(rmtNetworkId, payload, socketId);
+    rmtNetworkId = "rmtNetworkId";
+    dmTransPortPtr_->CreateClientSocket(rmtNetworkId);
+    dmTransPortPtr_->UnInit();
+    dmTransPortPtr_->IsDeviceSessionOpened(rmtNetworkId, socketId);
+    std::string remoteDevId(reinterpret_cast<const char*>(data), size);
+    dmTransPortPtr_->ClearDeviceSocketOpened(remoteDevId, socketId);
 }
 }
 }
