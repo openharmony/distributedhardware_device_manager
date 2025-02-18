@@ -15,7 +15,7 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "cryptomgr_fuzz:fuzztest",
+    "cryptomgr_fuzzer:fuzztest",
     "devicediscovery_fuzzer:fuzztest",
     "devicelist_fuzzer:fuzztest",
     "devicelistrefresh_fuzzer:fuzztest",
@@ -23,9 +23,9 @@ group("fuzztest") {
     "devicemanagerservice_fuzzer:fuzztest",
     "deviceprofileconnector_fuzzer:fuzztest",
     "devicepublish_fuzzer:fuzztest",
-    "dmcommtool_fuzz:fuzztest",
-    "dmtransport_fuzz:fuzztest",
-    "dpinitcallback_fuzz:fuzztest",
+    "dmcommtool_fuzzer:fuzztest",
+    "dmtransport_fuzzer:fuzztest",
+    "dpinitcallback_fuzzer:fuzztest",
     "getlocaldeviceinfo_fuzzer:fuzztest",
     "gettrusteddevicelistservice_fuzzer:fuzztest",
     "getudidbynetworkid_fuzzer:fuzztest",

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DM_COMM_TOOL_FUZZ_TEST_H
-#define DM_COMM_TOOL_FUZZ_TEST_H
+#ifndef DM_COMM_TOOL_FUZZER_TEST_H
+#define DM_COMM_TOOL_FUZZER_TEST_H
 
-#define FUZZ_PROJECT_NAME "dmcommtool_fuzz"
+#define FUZZ_PROJECT_NAME "dmcommtool_fuzzer"
 
-#endif // DM_COMM_TOOL_FUZZ_TEST_H
+#endif // DM_COMM_TOOL_FUZZER_TEST_H

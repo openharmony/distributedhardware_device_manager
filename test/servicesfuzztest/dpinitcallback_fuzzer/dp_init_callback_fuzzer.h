@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DP_INIT_CALLBACK_FUZZ_TEST_H
-#define DP_INIT_CALLBACK_FUZZ_TEST_H
+#ifndef DP_INIT_CALLBACK_FUZZER_TEST_H
+#define DP_INIT_CALLBACK_FUZZER_TEST_H
 
-#define FUZZ_PROJECT_NAME "dpinitcallback_fuzz"
+#define FUZZ_PROJECT_NAME "dpinitcallback_fuzzer"
 
-#endif // DP_INIT_CALLBACK_FUZZ_TEST_H
+#endif // DP_INIT_CALLBACK_FUZZER_TEST_H

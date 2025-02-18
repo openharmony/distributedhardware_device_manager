@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DM_TRANSPORT_FUZZ_TEST_H
-#define DM_TRANSPORT_FUZZ_TEST_H
+#ifndef DM_TRANSPORT_FUZZER_TEST_H
+#define DM_TRANSPORT_FUZZER_TEST_H
 
-#define FUZZ_PROJECT_NAME "dmtransport_fuzz"
+#define FUZZ_PROJECT_NAME "dmtransport_fuzzer"
 
-#endif // DM_TRANSPORT_FUZZ_TEST_H
+#endif // DM_TRANSPORT_FUZZER_TEST_H

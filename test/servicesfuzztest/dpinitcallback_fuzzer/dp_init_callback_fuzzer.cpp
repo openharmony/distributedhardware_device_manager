@@ -20,7 +20,7 @@
 #include <unordered_map>
 
 #include "dp_inited_callback.h"
-#include "dp_init_callback_fuzz.h"
+#include "dp_init_callback_fuzzer.h"
 #include "dm_constants.h"
 #include "nlohmann/json.hpp"
 

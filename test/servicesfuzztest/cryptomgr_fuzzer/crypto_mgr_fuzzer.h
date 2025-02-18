@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef CRYPTO_MGR_FUZZ_TEST_H
-#define CRYPTO_MGR_FUZZ_TEST_H
+#ifndef CRYPTO_MGR_FUZZER_TEST_H
+#define CRYPTO_MGR_FUZZER_TEST_H
 
-#define FUZZ_PROJECT_NAME "cryptomgr_fuzz"
+#define FUZZ_PROJECT_NAME "cryptomgr_fuzzer"
 
-#endif // CRYPTO_MGR_FUZZ_TEST_H
+#endif // CRYPTO_MGR_FUZZER_TEST_H

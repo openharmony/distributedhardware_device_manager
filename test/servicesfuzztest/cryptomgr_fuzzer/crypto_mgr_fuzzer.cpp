@@ -22,7 +22,7 @@
 #include <fuzzer/FuzzedDataProvider.h>
 
 #include "crypto_mgr.h"
-#include "crypto_mgr_fuzz.h"
+#include "crypto_mgr_fuzzer.h"
 #include "dm_constants.h"
 #include "nlohmann/json.hpp"
 
