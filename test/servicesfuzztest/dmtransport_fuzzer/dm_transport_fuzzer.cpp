@@ -27,9 +27,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-    constexpr uint32_t DATA_LEN = 10;
-}
 
 std::shared_ptr<DMCommTool> dmCommToolPtr_ = std::make_shared<DMCommTool>();
 std::shared_ptr<DMTransport> dmTransPortPtr_ = std::make_shared<DMTransport>(dmCommToolPtr_);

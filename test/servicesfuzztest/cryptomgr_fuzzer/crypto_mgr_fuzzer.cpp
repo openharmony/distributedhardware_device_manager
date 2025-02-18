@@ -31,8 +31,6 @@ namespace OHOS {
 namespace DistributedHardware {
 
 namespace {
-    constexpr uint32_t DATA_LEN = 10;
-    constexpr uint32_t IN_LEN = 10;
     constexpr uint32_t CIPHER_TEXT_LEN = 128;
     constexpr uint32_t PLAIN_TEXT_SIZE = 5;
     constexpr uint32_t PLAIN_LEN = 10;
