@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,6 +15,7 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "cryptomgr_fuzzer:fuzztest",
     "devicediscovery_fuzzer:fuzztest",
     "devicelist_fuzzer:fuzztest",
     "devicelistrefresh_fuzzer:fuzztest",
@@ -22,6 +23,9 @@ group("fuzztest") {
     "devicemanagerservice_fuzzer:fuzztest",
     "deviceprofileconnector_fuzzer:fuzztest",
     "devicepublish_fuzzer:fuzztest",
+    "dmcommtool_fuzzer:fuzztest",
+    "dmtransport_fuzzer:fuzztest",
+    "dpinitcallback_fuzzer:fuzztest",
     "getlocaldeviceinfo_fuzzer:fuzztest",
     "gettrusteddevicelistservice_fuzzer:fuzztest",
     "getudidbynetworkid_fuzzer:fuzztest",

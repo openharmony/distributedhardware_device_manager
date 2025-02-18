@@ -345,6 +345,43 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     jsonDeviceList[FIELD_DEVICE_LIST] = "deviceList";
     hichainConnector->ParseRemoteCredential(groupType, userId, jsonDeviceList, params, osAccountUserId);
 }
+
+void HiChainConnectorSevenhFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(int32_t))) {
+        return;
+    }
+
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
+    std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
+    delACLInfoVec.push_back(std::make_pair(1, "aclinfo_001"));
+    std::vector<int32_t> userIdVec;
+    hichainConnector->DeleteGroupByACL(delACLInfoVec, userIdVec);
+    std::string groupName = "";
+    FuzzedDataProvider fdp(data, size);
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
+    hichainConnector->IsNeedDelete(groupName, userId, delACLInfoVec);
+    userId = 1;
+    groupName = "aclinfo_001";
+    hichainConnector->IsNeedDelete(groupName, userId, delACLInfoVec);
+    std::vector<std::string> udidList;
+    nlohmann::json jsonObject;
+    std::string jsonStr = "dkocosdpa";
+    hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
+    jsonObject["authId"] = 1;
+    jsonStr = jsonObject.dump();
+    hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
+
+    jsonObject["authId"] = "authInfoId";
+    jsonStr = jsonObject.dump();
+    hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
+    hichainConnector->deviceGroupManager_ = nullptr;
+    int32_t groupType = fdp.ConsumeIntegral<int32_t>();
+    std::string usersId(reinterpret_cast<const char*>(data), size);
+    nlohmann::json jsonDeviceList;
+    hichainConnector->deleteMultiMembers(groupType, usersId, jsonDeviceList);
+}
 }
 }
 
@@ -358,5 +395,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::HiChainConnectorForthFuzzTest(data, size);
     OHOS::DistributedHardware::HiChainConnectorFifthFuzzTest(data, size);
     OHOS::DistributedHardware::HiChainConnectorSixthFuzzTest(data, size);
+    OHOS::DistributedHardware::HiChainConnectorSevenhFuzzTest(data, size);
     return 0;
 }
