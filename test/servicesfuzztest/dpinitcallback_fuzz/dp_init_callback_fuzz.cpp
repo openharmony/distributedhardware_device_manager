@@ -22,6 +22,7 @@
 #include "dp_inited_callback.h"
 #include "dp_init_callback_fuzz.h"
 #include "dm_constants.h"
+#include "nlohmann/json.hpp"
 
 
 namespace OHOS {

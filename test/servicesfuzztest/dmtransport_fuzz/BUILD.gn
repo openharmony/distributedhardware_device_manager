@@ -74,6 +74,7 @@ ohos_fuzztest("DmTransPortFuzzTest") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "dsoftbus:softbus_client",
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
