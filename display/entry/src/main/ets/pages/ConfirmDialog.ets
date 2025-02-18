@@ -19,6 +19,7 @@ import Constant from '../common/constant';
 import common from '@ohos.app.ability.common';
 import display from '@ohos.display';
 import mediaQuery from '@ohos.mediaquery';
+import i18n from '@ohos.i18n';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
@@ -196,6 +197,13 @@ struct ConfirmCustomDialog {
     .margin({ bottom: 16, top: 24 })
   }
 
+  private isTibetanLanguages(): boolean {
+    console.info(`${TAG} isTibetanLanguages in`);
+    let locale = new Intl.Locale(i18n.System.getSystemLanguage()).toString();
+    console.info(`${TAG} isTibetanLanguages: ${locale}`);
+    return Constant.TIBETAN_LANGUAGES.includes(locale);
+  }
+
   build() {
     GridRow({
       columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
@@ -214,6 +222,7 @@ struct ConfirmCustomDialog {
               .minFontSize(12)
               .maxFontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
               .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+              .lineHeight(this.isTibetanLanguages() ? 22 : 0)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .width('auto')
               .maxLines(2)
@@ -225,6 +234,7 @@ struct ConfirmCustomDialog {
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .maxLines(2)
               .width('auto')
+              .lineHeight(this.isTibetanLanguages() ? 22 : 0)
               .margin({ top: 8 })
               .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
           }.margin({
@@ -238,7 +248,7 @@ struct ConfirmCustomDialog {
                 this.onAllowAlways();
               })
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .height(40)
+              .height(this.isTibetanLanguages() ? 'auto' : 40)
               .width(this.isPC ? 250 : '100%')
               .backgroundColor(this.btnColor)
               .onHover((isHover?: boolean, event?: HoverEvent): void => {
@@ -262,7 +272,7 @@ struct ConfirmCustomDialog {
                 this.onAllowOnce();
               })
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .height(40)
+              .height(this.isTibetanLanguages() ? 'auto' : 40)
               .width(this.isPC ? 250 : '100%')
               .backgroundColor(this.btnColor)
               .onHover((isHover?: boolean, event?: HoverEvent): void => {
@@ -286,7 +296,7 @@ struct ConfirmCustomDialog {
               .onClick(() => {
                 this.onCancel();
               })
-              .height(40)
+              .height(this.isTibetanLanguages() ? 'auto' : 40)
               .width(this.isPC ? 250 : '100%')
               .backgroundColor(this.btnColor)
               .onHover((isHover?: boolean, event?: HoverEvent): void => {

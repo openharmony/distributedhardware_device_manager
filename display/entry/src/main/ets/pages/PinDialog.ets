@@ -17,6 +17,7 @@ import { BusinessError } from '@ohos.base';
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession';
 import deviceInfo from '@ohos.deviceInfo';
 import Constant from '../common/constant';
+import i18n from '@ohos.i18n';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:PinDialog]==>';
@@ -66,6 +67,13 @@ struct PinCustomDialog {
     }
   }
 
+  private isTibetanLanguages(): boolean {
+    console.info(`${TAG} isTibetanLanguages in`);
+    let locale = new Intl.Locale(i18n.System.getSystemLanguage()).toString();
+    console.info(`${TAG} isTibetanLanguages: ${locale}`);
+    return Constant.TIBETAN_LANGUAGES.includes(locale);
+  }
+
   build() {
     GridRow({
       columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
@@ -79,6 +87,7 @@ struct PinCustomDialog {
               .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
               .fontColor($r('sys.color.ohos_id_color_text_primary'))
               .fontWeight(FontWeight.Bold)
+              .lineHeight(this.isTibetanLanguages() ? 32.5 : 0)
               .margin({
                 left: 24,
                 right: 24
@@ -110,6 +119,7 @@ struct PinCustomDialog {
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
               .constraintSize({ minHeight: 40 })
               .width('100%')
+              .height(57)
               .backgroundColor(this.btnColor)
               .onClick(() => {
                 if (this.controller) {
