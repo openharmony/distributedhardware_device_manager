@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "dm_log.h"
 #include "ipc_acl_profile_req.h"
 #include "ipc_authenticate_device_req.h"
@@ -32,6 +33,7 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
 #include "ipc_get_encrypted_uuid_req.h"
@@ -41,6 +43,7 @@
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
+#include "ipc_model_codec.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_req.h"
@@ -1726,6 +1729,55 @@ ON_IPC_CMD(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, MessageParcel &data, MessagePa
     int32_t errCode = data.ReadInt32();
     DeviceManagerNotify::GetInstance().OnCredentialAuthStatus(pkgName, proofInfo, deviceTypeId, errCode);
 
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFO_LIST, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetDeviceProfileInfoListReq> pReq =
+        std::static_pointer_cast<IpcGetDeviceProfileInfoListReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!IpcModelCodec::EncodeDmDeviceProfileInfoFilterOptions(pReq->GetFilterOptions(), data)) {
+        LOGE("write filterOptions failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFO_LIST, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t code = data.ReadInt32();
+    int32_t deviceNum = data.ReadInt32();
+    std::vector<DmDeviceProfileInfo> deviceProfileInfos;
+    if (deviceNum > 0 && deviceNum <= MAX_DEVICE_PROFILE_SIZE) {
+        for (int32_t i = 0; i < deviceNum; ++i) {
+            DmDeviceProfileInfo deviceInfo;
+            IpcModelCodec::DecodeDmDeviceProfileInfo(data, deviceInfo);
+            deviceProfileInfos.emplace_back(deviceInfo);
+        }
+    }
+
+    DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfoListResult(pkgName, deviceProfileInfos, code);
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }

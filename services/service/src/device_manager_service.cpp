@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1835,6 +1835,21 @@ void DeviceManagerService::HandleCredentialAuthStatus(const std::string &proofIn
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
     }
+}
+
+int32_t DeviceManagerService::GetDeviceProfileInfoList(const std::string &pkgName,
+    DmDeviceProfileInfoFilterOptions &filterOptions)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterLoad()) {
+        LOGE("GetDeviceProfileInfoList failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExt_->GetDeviceProfileInfoList(pkgName, filterOptions);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

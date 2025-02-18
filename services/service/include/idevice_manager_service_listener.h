@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include <string>
 
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -159,6 +160,9 @@ public:
      */
     virtual void OnCredentialAuthStatus(const std::string &pkgName, const std::string &proofInfo,
                                         uint16_t deviceTypeId, int32_t errcode) = 0;
+
+    virtual void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
+        const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

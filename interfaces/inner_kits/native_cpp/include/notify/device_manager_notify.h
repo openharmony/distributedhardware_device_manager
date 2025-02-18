@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@
 
 #include "device_manager_callback.h"
 #include "dm_device_info.h"
+#include "dm_device_profile_info.h"
 #include "dm_subscribe_info.h"
 #include "dm_single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -72,6 +73,12 @@ public:
     void RegisterCredentialAuthStatusCallback(const std::string &pkgName,
         std::shared_ptr<CredentialAuthStatusCallback> callback);
     void UnRegisterCredentialAuthStatusCallback(const std::string &pkgName);
+
+    int32_t RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
+        std::shared_ptr<GetDeviceProfileInfoListCallback> callback);
+    int32_t UnRegisterGetDeviceProfileInfoListCallback(const std::string &pkgName);
+    void OnGetDeviceProfileInfoListResult(const std::string &pkgName,
+        const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -135,6 +142,7 @@ private:
     std::map<std::string, std::shared_ptr<DeviceScreenStatusCallback>> deviceScreenStatusCallback_;
     std::map<std::string, std::shared_ptr<CredentialAuthStatusCallback>> credentialAuthStatusCallback_;
     std::mutex bindLock_;
+    std::map<std::string, std::shared_ptr<GetDeviceProfileInfoListCallback>> getDeviceProfileInfoCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
