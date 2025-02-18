@@ -53,17 +53,17 @@ void DmTransPortFuzzTest(const uint8_t* data, size_t size)
     };
     dmTransPortPtr_->OnSocketOpened(socketId, info);
     dmTransPortPtr_->OnSocketOpened(socketId, info);
-    ShutdownReason reason;
+    ShutdownReason reason = ShutdownReason::SHUTDOWN_REASON_LNN_CHANGED;
     dmTransPortPtr_->OnSocketClosed(socketId, reason);
 
-    void *data = nullptr;
+    void *dataInfo = nullptr;
     uint32_t dataLen = 0;
-    dmTransPortPtr_->OnSocketClosed(socketId, data, dataLen);
+    dmTransPortPtr_->OnBytesReceived(socketId, dataInfo, dataLen);
 
-    char *ptr = "helloworld";
-    data = reinterpret_cast<void*>(ptr);
-    dataLen = DATA_LEN;
-    dmTransPortPtr_->OnSocketClosed(socketId, data, dataLen);
+    std::string dataStr(reinterpret_cast<const char*>(data), size);
+    dataInfo = reinterpret_cast<void*>(dataStr.data());
+    dataLen = static_cast<uint32_t>(dataStr.length());
+    dmTransPortPtr_->OnBytesReceived(socketId, dataInfo, dataLen);
 
     std::string payload(reinterpret_cast<const char*>(data), size);
     dmTransPortPtr_->HandleReceiveMessage(socketId, payload);
