@@ -54,5 +54,10 @@ int32_t SoftbusCache::GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceIn
 {
     return DmSoftbusCache::dmSoftbusCache->GetDeviceInfoFromCache(deviceInfoList);
 }
+
+int32_t SoftbusCache::GetDeviceNameFromCache(const std::string &udid, std::string &deviceName)
+{
+    return DmSoftbusCache::dmSoftbusCache->GetDeviceNameFromCache(udid, deviceName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

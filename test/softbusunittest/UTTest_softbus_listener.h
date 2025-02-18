@@ -29,6 +29,9 @@
 #include "dm_subscribe_info.h"
 #include "inner_session.h"
 #include "session.h"
+#include "distributed_device_profile_client_mock.h"
+#include "dm_crypto_mock.h"
+#include "dm_softbus_cache_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -38,6 +41,11 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
+        distributedDeviceProfileClientMock_ =
+        std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
+    static inline std::shared_ptr<CryptoMock> cryptoMock_ = std::make_shared<CryptoMock>();
+    static inline std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ = std::make_shared<SoftbusCacheMock>();
 };
 
 class ISoftbusDiscoveringCallbackTest : public ISoftbusDiscoveringCallback {
