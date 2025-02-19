@@ -279,6 +279,8 @@ public:
     void OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status, int32_t reason);
     void OnDmUiCall(const std::string &paramJson);
     void OnGetDeviceProfileInfoListCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback);
+    static napi_value InitStrategyForHeartbeatEnum(napi_env env, napi_value exports);
+    static napi_value SetHeartbeatPolicy(napi_env env, napi_callback_info info);
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);
