@@ -899,7 +899,9 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
             if (callee.userId != 0 && callee.userId == item.GetAccessee().GetAccesseeUserId()) {
                 profilesFilter.push_back(item);
                 continue;
-            } else if (callee.userId == 0 || item.GetAccessee().GetAccesseeUserId() == -1) {
+            } else if (callee.userId == 0 ||
+                item.GetAccessee().GetAccesseeUserId() == -1 ||
+                item.GetAccessee().GetAccesseeUserId() == 0) {
                 profilesFilter.push_back(item);
                 continue;
             }
@@ -912,7 +914,9 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
             if (callee.userId != 0 && callee.userId == item.GetAccesser().GetAccesserUserId()) {
                 profilesFilter.push_back(item);
                 continue;
-            } else if (callee.userId == 0 || item.GetAccesser().GetAccesserUserId() == -1) {
+            } else if (callee.userId == 0 ||
+                item.GetAccesser().GetAccesserUserId() == -1 ||
+                item.GetAccesser().GetAccesserUserId() == 0) {
                 profilesFilter.push_back(item);
                 continue;
             }
@@ -924,9 +928,9 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
 int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("PkgName = %{public}s, srcUdid = %{public}s, caller.userId = {public}d,
-        sinkUdid = %{public}s, callee.userId = {public}d", 
-        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyInt32(caller.userId), 
+    LOGI("PkgName = %{public}s, srcUdid = %{public}s, caller.userId = %{public}s,
+        sinkUdid = %{public}s, callee.userId = %{public}s",
+        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyInt32(caller.userId),
         GetAnonyString(sinkUdid).c_str(), GetAnonyInt32(callee.userId));
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter =
