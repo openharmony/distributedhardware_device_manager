@@ -105,21 +105,9 @@ public:
         const std::shared_ptr<IDeviceManagerServiceListener> &listener) = 0;
     virtual void OnResidentBytesReceived(const int32_t sessionId, const std::string &message) = 0;
 
-    /**
-     * @tc.name: IDMServiceImplExt::GetDeviceProfileInfos
-     * @tc.desc: GetDeviceProfileInfos
-     * @tc.type: FUNC
-     */
-    virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
-        const DmDeviceProfileInfoFilterOptions &filterOptions) = 0;
-    virtual int32_t GetDeviceIconInfo(const std::string &pkgName,
-        const DmDeviceIconInfoFilterOptions &filterOptions) = 0;
     virtual void OnSessionOpened(int32_t sessionId, int32_t sessionSide, int32_t result) = 0;
     virtual void OnSessionClosed(const int32_t sessionId) = 0;
     virtual void OnBytesReceived(const int32_t sessionId, const std::string message) = 0;
-    virtual int32_t PutDeviceProfileInfoList(const std::string &pkgName,
-        const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
-    virtual std::vector<std::string> GetDeviceNamePrefixs() = 0;
 };
 
 using CreateDMServiceImplExtFuncPtr = IDMServiceImplExt *(*)(void);
