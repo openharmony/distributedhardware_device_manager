@@ -871,27 +871,14 @@ int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
     return trustNumber;
 }
 
-int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
-{
-    LOGI("Start.");
-    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
-    for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() == udid && item.GetStatus() == ACTIVE) {
-            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {  // 同账号
-                LOGI("The udid %{public}s is identical bind.", GetAnonyString(udid).c_str());
-                return DM_OK;
-            }
-        }
-    }
-    return ERR_DM_FAILED;
-}
-
 std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessControlProfile> profiles,
     const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     std::vector<AccessControlProfile> profilesFilter;
     for (auto &item : profiles) {
-        if (item.GetAccesser().GetAccesserUserId() == caller.userId &&
+        if ((item.GetAccesser().GetAccesserUserId() == caller.userId ||
+            item.GetAccesser().GetAccesserUserId() == 0 ||
+            item.GetAccesser().GetAccesserUserId() == -1) &&
             item.GetAccesser().GetAccesserDeviceId() == srcUdid &&
             item.GetAccessee().GetAccesseeDeviceId() == sinkUdid) {
             if (callee.userId != 0 && callee.userId == item.GetAccessee().GetAccesseeUserId()) {
@@ -903,6 +890,7 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
             }
         }
         if ((item.GetAccessee().GetAccesseeUserId() == caller.userId ||
+            item.GetAccessee().GetAccesseeUserId() == 0 ||
             item.GetAccessee().GetAccesseeUserId() == -1) &&
             item.GetAccessee().GetAccesseeDeviceId() == srcUdid &&
             item.GetAccesser().GetAccesserDeviceId() == sinkUdid) {
@@ -921,8 +909,8 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
 int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("PkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
-        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
+    LOGI("PkgName %{public}s, srcUdid = %{public}s, caller.userId = {public}d, sinkUdid = %{public}s, callee.userId = {public}d",
+        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyInt32(caller.userId), GetAnonyString(sinkUdid).c_str(), GetAnonyInt32(callee.userId));
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter =
         GetACLByDeviceIdAndUserId(profiles, caller, srcUdid, callee, sinkUdid);
