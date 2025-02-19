@@ -185,6 +185,9 @@ public:
     virtual void ReportGetDeviceInfo(std::string hostName,
         std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid) = 0;
     virtual std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
+    virtual int32_t ReportDiscoverUserResStageCancel(struct RadarInfo &info) = 0;
+    virtual int32_t ReportDiscoverUserResStageSucc(struct RadarInfo &info) = 0;
+    virtual int32_t ReportDiscoverUserResStageOther(struct RadarInfo &info) = 0;
 };
 
 class DmRadarHelper : public IDmRadarHelper {
@@ -225,6 +228,9 @@ public:
     std::string ConvertHexToString(uint16_t hex);
     int32_t GetErrCode(int32_t errCode);
     std::string GetAnonyLocalUdid();
+    int32_t ReportDiscoverUserResStageCancel(struct RadarInfo &info) override;
+    int32_t ReportDiscoverUserResStageSucc(struct RadarInfo &info) override;
+    int32_t ReportDiscoverUserResStageOther(struct RadarInfo &info) override;
 private:
     std::string GetAnonyUdid(std::string udid);
     int32_t GetApiType();
