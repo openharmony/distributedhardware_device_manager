@@ -21,6 +21,7 @@
 #include <unistd.h>
 
 #include "bundle_mgr_interface.h"
+#include "bundle_mgr_proxy.h"
 #include "iservice_registry.h"
 #if defined(SUPPORT_SCREENLOCK)
 #include "screenlock_manager.h"
