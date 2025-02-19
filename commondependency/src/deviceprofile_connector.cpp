@@ -924,8 +924,10 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
 int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("PkgName %{public}s, srcUdid = %{public}s, caller.userId = {public}d, sinkUdid = %{public}s, callee.userId = {public}d",
-        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyInt32(caller.userId), GetAnonyString(sinkUdid).c_str(), GetAnonyInt32(callee.userId));
+    LOGI("PkgName = %{public}s, srcUdid = %{public}s, caller.userId = {public}d,
+        sinkUdid = %{public}s, callee.userId = {public}d", 
+        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyInt32(caller.userId), 
+        GetAnonyString(sinkUdid).c_str(), GetAnonyInt32(callee.userId));
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter =
         GetACLByDeviceIdAndUserId(profiles, caller, srcUdid, callee, sinkUdid);
