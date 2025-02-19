@@ -930,8 +930,8 @@ int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller,
 {
     LOGI("PkgName = %{public}s, srcUdid = %{public}s, caller.userId = %{public}s,
         sinkUdid = %{public}s, callee.userId = %{public}s",
-        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyInt32(caller.userId),
-        GetAnonyString(sinkUdid).c_str(), GetAnonyInt32(callee.userId));
+        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyInt32(caller.userId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), GetAnonyInt32(callee.userId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter =
         GetACLByDeviceIdAndUserId(profiles, caller, srcUdid, callee, sinkUdid);
