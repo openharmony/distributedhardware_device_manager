@@ -871,6 +871,21 @@ int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
     return trustNumber;
 }
 
+int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
+{
+    LOGI("Start.");
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    for (auto &item : profiles) {
+        if (item.GetTrustDeviceId() == udid && item.GetStatus() == ACTIVE) {
+            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {  // 同账号
+                LOGI("The udid %{public}s is identical bind.", GetAnonyString(udid).c_str());
+                return DM_OK;
+            }
+        }
+    }
+    return ERR_DM_FAILED;
+}
+
 std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessControlProfile> profiles,
     const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
 {
