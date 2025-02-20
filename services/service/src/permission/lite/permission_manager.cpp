@@ -64,5 +64,11 @@ std::unordered_set<std::string> PermissionManager::GetSystemSA()
 {
     return std::unordered_set<std::string>{};
 }
+
+bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
+{
+    (void)processName;
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

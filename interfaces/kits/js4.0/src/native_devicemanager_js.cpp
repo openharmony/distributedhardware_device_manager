@@ -57,6 +57,7 @@ const int32_t DM_NAPI_ARGS_THREE = 3;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 
 napi_ref deviceStateChangeActionEnumConstructor_ = nullptr;
+napi_ref g_strategyForHeartbeatEnumConstructor = nullptr;
 
 std::map<std::string, DeviceManagerNapi *> g_deviceManagerMap;
 std::map<std::string, std::shared_ptr<DmNapiInitCallback>> g_initCallbackMap;
@@ -1982,6 +1983,55 @@ napi_value DeviceManagerNapi::JsGetDeviceProfileInfoList(napi_env env, napi_call
     return GetDeviceProfileInfoListPromise(env, jsCallback);
 }
 
+napi_value DeviceManagerNapi::SetHeartbeatPolicy(napi_env env, napi_callback_info info)
+{
+    LOGI("in");
+    size_t argsCount = 0;
+    napi_value thisArg = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argsCount, nullptr, &thisArg, nullptr));
+    if (!CheckArgsCount(env, argsCount >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
+        return nullptr;
+    }
+    if (!IsSystemApp()) {
+        LOGI("The caller is not SystemApp");
+        CreateBusinessError(env, ERR_NOT_SYSTEM_APP);
+        return nullptr;
+    }
+    GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    if (!CheckArgsType(env, valueType == napi_number, "policy", "number")) {
+        return nullptr;
+    }
+    int32_t policy = 0;
+    napi_get_value_int32(env, argv[0], &policy);
+
+    napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &valueType);
+    if (!CheckArgsType(env, valueType == napi_number, "delayTime", "number")) {
+        return nullptr;
+    }
+    int32_t delayTime = 0;
+    napi_get_value_int32(env, argv[DM_NAPI_ARGS_ONE], &delayTime);
+
+    napi_value result = nullptr;
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
+        return result;
+    }
+    std::map<std::string, std::string> policyParam;
+    policyParam[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = std::to_string(policy);
+    policyParam[PARAM_KEY_POLICY_TIME_OUT] = std::to_string(delayTime);
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(deviceManagerWrapper->bundleName_, policyParam);
+    if (ret != 0) {
+        LOGE("bundleName %{public}s failed, ret %{public}d",
+            deviceManagerWrapper->bundleName_.c_str(), ret);
+        CreateBusinessError(env, ret);
+    }
+    napi_get_undefined(env, &result);
+    return result;
+}
+
 void DeviceManagerNapi::ClearBundleCallbacks(std::string &bundleName)
 {
     LOGI("ClearBundleCallbacks start for bundleName %{public}s", bundleName.c_str());
@@ -2137,7 +2187,8 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("replyUiAction", SetUserOperationSync),
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
-        DECLARE_NAPI_FUNCTION("getDeviceProfileInfoList", JsGetDeviceProfileInfoList)};
+        DECLARE_NAPI_FUNCTION("getDeviceProfileInfoList", JsGetDeviceProfileInfoList),
+        DECLARE_NAPI_FUNCTION("setHeartbeatPolicy", SetHeartbeatPolicy)};
 
     napi_property_descriptor static_prop[] = {
         DECLARE_NAPI_STATIC_FUNCTION("createDeviceManager", CreateDeviceManager),
@@ -2190,6 +2241,31 @@ napi_value DeviceManagerNapi::InitDeviceStatusChangeActionEnum(napi_env env, nap
     return exports;
 }
 
+napi_value DeviceManagerNapi::InitStrategyForHeartbeatEnum(napi_env env, napi_value exports)
+{
+    const uint32_t stop_heartbeat = 100;
+    const uint32_t start_heartbeat = 101;
+
+    napi_value start_heartbeat_value;
+    napi_value stop_heartbeat_value;
+    int32_t refCount = 1;
+
+    napi_create_uint32(env, start_heartbeat, &start_heartbeat_value);
+    napi_create_uint32(env, stop_heartbeat, &stop_heartbeat_value);
+
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("START_HEARTBEAT", start_heartbeat_value),
+        DECLARE_NAPI_STATIC_PROPERTY("TEMP_STOP_HEARTBEAT", stop_heartbeat_value),
+    };
+
+    napi_value result = nullptr;
+    napi_define_class(env, "StrategyForHeartbeat", NAPI_AUTO_LENGTH, EnumTypeConstructor,
+        nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_create_reference(env, result, refCount, &g_strategyForHeartbeatEnumConstructor);
+    napi_set_named_property(env, exports, "StrategyForHeartbeat", result);
+    return exports;
+}
+
 int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const std::string &deviceId,
     const std::string &bindParam, std::shared_ptr<DmNapiBindTargetCallback> callback)
 {
@@ -2228,6 +2304,7 @@ static napi_value Export(napi_env env, napi_value exports)
     LOGI("Export() is called!");
     DeviceManagerNapi::Init(env, exports);
     DeviceManagerNapi::InitDeviceStatusChangeActionEnum(env, exports);
+    DeviceManagerNapi::InitStrategyForHeartbeatEnum(env, exports);
     return exports;
 }
 
