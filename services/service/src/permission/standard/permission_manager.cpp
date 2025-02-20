@@ -225,7 +225,6 @@ bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &pr
         LOGE("ProcessName is empty");
         return false;
     }
-
     uint16_t index = 0;
     for (; index < SETDNPOLICY_WHITE_LIST_NUM; ++index) {
         std::string tmp(g_setDnPolicyWhiteList[index]);
