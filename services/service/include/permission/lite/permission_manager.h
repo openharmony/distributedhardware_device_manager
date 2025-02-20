@@ -34,6 +34,7 @@ public:
     bool CheckProcessNameValidOnPinHolder(const std::string &processName);
     bool CheckSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetSystemSA();
+    bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
