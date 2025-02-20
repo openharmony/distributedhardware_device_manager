@@ -134,6 +134,7 @@ typedef struct DmAuthRequestContext {
     std::string addr;
     std::string hostPkgLabel;
     int32_t closeSessionDelaySeconds = 0;
+    std::string remoteDeviceName;
 } DmAuthRequestContext;
 
 typedef struct DmAuthResponseContext {
@@ -191,6 +192,7 @@ typedef struct DmAuthResponseContext {
     bool isFinish = false;
     std::string edition;
     int32_t localBindLevel;
+    std::string remoteDeviceName;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;

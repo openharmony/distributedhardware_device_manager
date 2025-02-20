@@ -77,6 +77,7 @@ public:
     static std::string ConvertBytesToUpperCaseHexString(const uint8_t arr[], const size_t size);
     static int32_t ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
         DmDeviceInfo &devInfo);
+    static void UpdateDeviceName(NodeBasicInfo *info);
 
     int32_t InitSoftbusListener();
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);

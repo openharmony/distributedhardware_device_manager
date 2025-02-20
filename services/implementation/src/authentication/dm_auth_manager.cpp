@@ -862,6 +862,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->localUserId = authRequestContext_->localUserId;
     authResponseContext_->isIdenticalAccount = false;
     authResponseContext_->edition = DM_VERSION_5_0_3;
+    authResponseContext_->remoteDeviceName = authRequestContext_->localDeviceName;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
@@ -965,6 +966,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         return;
     }
     remoteDeviceId_ = authResponseContext_->localDeviceId;
+    authRequestContext_->remoteDeviceName = authResponseContext_->targetDeviceName;
     remoteVersion_ = ConvertSinkVersion(authResponseContext_->dmVersion);
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(NEGOTIATE_TIMEOUT_TASK));
@@ -2500,19 +2502,23 @@ void DmAuthManager::PutAccessControlList()
         accesser.requestUserId = authRequestContext_->localUserId;
         accesser.requestAccountId = authRequestContext_->localAccountId;
         accesser.requestDeviceId = authRequestContext_->localDeviceId;
+        accesser.requestDeviceName = authRequestContext_->localDeviceName;
         accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
         accessee.trustUserId = authRequestContext_->remoteUserId;
         accessee.trustAccountId = authRequestContext_->remoteAccountId;
         accessee.trustDeviceId = remoteDeviceId_;
+        accessee.trustDeviceName = authRequestContext_->remoteDeviceName;
     } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
         accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
         accesser.requestUserId = authResponseContext_->remoteUserId;
         accesser.requestAccountId = authResponseContext_->remoteAccountId;
         accesser.requestDeviceId = remoteDeviceId_;
+        accesser.requestDeviceName = authResponseContext_->remoteDeviceName;
         accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
         accessee.trustUserId = authResponseContext_->localUserId;
         accessee.trustAccountId = authResponseContext_->localAccountId;
         accessee.trustDeviceId = localUdid;
+        accessee.trustDeviceName = authResponseContext_->targetDeviceName;
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
 }

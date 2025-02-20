@@ -217,6 +217,7 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_HAVE_CREDENTIAL] = authResponseContext_->haveCredential;
     json[TAG_HOST_PKGLABEL] = authResponseContext_->hostPkgLabel;
     json[TAG_EDITION] = authResponseContext_->edition;
+    json[TAG_REMOTE_DEVICE_NAME] = authResponseContext_->remoteDeviceName;
 }
 
 void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
@@ -598,6 +599,9 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
         authResponseContext_->peerBundleName = json[TAG_PEER_BUNDLE_NAME].get<std::string>();
     } else {
         authResponseContext_->peerBundleName = authResponseContext_->hostPkgName;
+    }
+    if (IsString(json, TAG_REMOTE_DEVICE_NAME)) {
+        authResponseContext_->remoteDeviceName = json[TAG_REMOTE_DEVICE_NAME].get<std::string>();
     }
     ParsePkgNegotiateMessage(json);
 }
