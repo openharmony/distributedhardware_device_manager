@@ -234,7 +234,7 @@ bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &pr
         }
     }
 
-    LOGE("CheckProcessNameValidOnPinHolder process name: %{public}s invalid.", processName.c_str());
+    LOGE("Process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 } // namespace DistributedHardware
