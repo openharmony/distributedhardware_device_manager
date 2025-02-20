@@ -59,6 +59,12 @@ constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME
     "ohos.dhardware",
     "ohos.security.distributed_access_token",
 };
+
+constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = 2;
+constexpr const static char g_setDnPolicyWhiteList[SETDNPOLICY_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+    "collaboration_service",
+    "com.huawei.hmos.walletservice",
+};
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -211,6 +217,25 @@ std::unordered_set<std::string> PermissionManager::GetSystemSA()
         systemSA.insert(tmp);
     }
     return systemSA;
+}
+
+bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
+{
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+
+    uint16_t index = 0;
+    for (; index < SETDNPOLICY_WHITE_LIST_NUM; ++index) {
+        std::string tmp(g_setDnPolicyWhiteList[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
+
+    LOGE("CheckProcessNameValidOnPinHolder process name: %{public}s invalid.", processName.c_str());
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
