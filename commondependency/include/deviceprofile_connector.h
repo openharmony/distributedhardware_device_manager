@@ -176,6 +176,8 @@ private:
     void ProcessBindType(DistributedDeviceProfile::AccessControlProfile profiles, std::string localDeviceId,
         std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex,
         uint32_t index, std::string targetDeviceId);
+    bool CheckAppLevelAccess(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const DmAccessCallee &callee);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
     int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,
