@@ -18,6 +18,7 @@ import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSessi
 import deviceInfo from '@ohos.deviceInfo';
 import Constant from '../common/constant';
 import i18n from '@ohos.i18n';
+import { KeyCode } from '@ohos.multimodalInput.keyCode';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:PinDialog]==>';
@@ -121,6 +122,21 @@ struct PinCustomDialog {
               .width('100%')
               .height(57)
               .backgroundColor(this.btnColor)
+              .defaultFocus(true)
+              .onKeyEvent((event?: KeyEvent) => {
+                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  return;
+                }
+                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  if (this.controller) {
+                    this.controller.close();
+                  }
+                  this.cancel();
+                  this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+                }
+              })
               .onClick(() => {
                 if (this.controller) {
                   this.controller.close();
@@ -164,6 +180,9 @@ struct dialogPlusPage {
     builder: PinCustomDialog(),
     cancel: this.onCancel,
     autoCancel: false,
+    onWillDismiss: ()=>{
+      this.onWillDismiss()
+    },
     alignment: DialogAlignment.Center,
     offset: { dx: 0, dy: -20 },
     customStyle: true,
@@ -171,6 +190,12 @@ struct dialogPlusPage {
   });
 
   onCancel() {
+    this.destruction();
+  }
+
+  onWillDismiss() {
+    console.log(TAG + 'onWillDismiss: ' + ACTION_CANCEL_PINCODE_DISPLAY)
+    this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
     this.destruction();
   }
 
