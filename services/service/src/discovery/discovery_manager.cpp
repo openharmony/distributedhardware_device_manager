@@ -60,7 +60,6 @@ DiscoveryManager::~DiscoveryManager()
 int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    (void)filterOptions;
     LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -529,7 +528,8 @@ void DiscoveryManager::HandleDiscoveryTimeout(const std::string &pkgName)
 void DiscoveryManager::UpdateInfoFreq(
     const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo)
 {
-    if (auto it = discoverParam.find(PARAM_KEY_DISC_FREQ); it != discoverParam.end()) {
+    auto it = discoverParam.find(PARAM_KEY_DISC_FREQ);
+    if (it != discoverParam.end()) {
         int32_t freq = StringToInt(it->second, DECIMALISM);
         if (freq < DmExchangeFreq::DM_LOW || freq > DmExchangeFreq::DM_FREQ_BUTT) {
             LOGE("Invalid freq value.");
