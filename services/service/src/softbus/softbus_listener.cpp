@@ -333,6 +333,7 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
 
 void SoftbusListener::UpdateDeviceName(NodeBasicInfo *info)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (info == nullptr) {
         LOGE("NodeBasicInfo is nullptr, not update device name");
         return;
@@ -344,6 +345,7 @@ void SoftbusListener::UpdateDeviceName(NodeBasicInfo *info)
     }
     LOGI("UpdateDeviceName, info->deviceName: %{public}s.", GetAnonyString(info->deviceName).c_str());
     DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, info->deviceName);
+#endif
 }
 
 void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)
@@ -388,6 +390,7 @@ void SoftbusListener::OnLocalDevInfoChange()
 {
     LOGI("SoftbusListener::OnLocalDevInfoChange");
     SoftbusCache::GetInstance().UpDataLocalDevInfo();
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     NodeBasicInfo nodeBasicInfo;
     int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
     if (ret != DM_OK) {
@@ -401,6 +404,7 @@ void SoftbusListener::OnLocalDevInfoChange()
         return;
     }
     DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, nodeBasicInfo.deviceName);
+#endif
 }
 
 void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *msg, uint32_t msgLen)
