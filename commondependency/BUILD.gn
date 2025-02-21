@@ -39,6 +39,7 @@ ohos_shared_library("devicemanagerdependency") {
     "include",
     "${common_path}/include",
     "${innerkits_path}/native_cpp/include",
+    "${servicesimpl_path}/include/cryptomgr",
     "${utils_path}/include/crypto",
   ]
 

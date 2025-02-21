@@ -414,6 +414,41 @@ typedef struct DmNotifyKey {
             notifyUserId == other.notifyUserId && udid < other.udid);
     }
 } DmNotifyKey;
+
+enum class DMServiceInfoAuthType : int32_t {
+    TRUST_ONETIME = 0,
+    TRUST_ALWAYS = 6,
+    CANCEL = 1
+};
+
+enum class DMServiceInfoPinExchangeType : int32_t {
+    PINBOX = 1,
+    ULTRASOUND = 2,
+    FROMDP = 3
+};
+
+enum class DMServiceInfoAuthBoxType : int32_t {
+    STATE3 = 1,
+    SKIP_CONFIRM = 2,
+    TWO_IN1 = 3
+};
+
+typedef struct DMServiceInfo {
+    int64_t serviceId = 0;
+    std::string serviceType;
+    std::string serviceName;
+    std::string serviceDisplayName;
+    std::string customData;
+    std::string bundleName;
+    std::string moduleName;
+    std::string abilityName;
+    int32_t authBoxType = 0;
+    int32_t authType = 0;
+    int32_t pinExchangeType = 0;
+    std::string pinCode;
+    std::string description;
+    std::string serviceDiscoveryScope;
+} DMServiceInfo;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

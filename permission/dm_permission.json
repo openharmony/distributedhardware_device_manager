@@ -1,5 +1,5 @@
 {
-    "ImportAuthCode": ["com.huawei.msdp.hmringgenerator", "com.huawei.msdp.hmringdiscriminator", "CollaborationFwk", "wear_link_service", "watch_system_service"],
+    "ImportAuthCode": ["com.huawei.msdp.hmringgenerator", "com.huawei.msdp.hmringdiscriminator", "CollaborationFwk", "wear_link_service", "watch_system_service", "com.huawei.hmos.huaweicast"],
     "ExportAuthCode": ["com.huawei.msdp.hmringgenerator", "com.huawei.msdp.hmringdiscriminator", "CollaborationFwk", "wear_link_service", "watch_system_service"],
     "RegisterPinHolderCallback": ["CollaborationFwk"],
     "CreatePinHolder": ["CollaborationFwk"],

@@ -24,6 +24,8 @@ namespace OHOS {
 namespace DistributedHardware {
 class Crypto {
 public:
+    static void DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
+        uint32_t startIndex);
     static std::string Sha256(const std::string &text, bool isUpper = false);
     static std::string Sha256(const void *data, size_t size, bool isUpper = false);
     static int32_t ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLen,

@@ -147,6 +147,7 @@ if (defined(ohos_lite)) {
       "${devicemanager_path}/commondependency/include",
       "${devicemanager_path}/radar/include",
       "${innerkits_path}/native_cpp/include",
+      "${servicesimpl_path}/include/dependency/deviceprofile",
       "${softbuscache_parh}/include",
       "${utils_path}/include/appInfo/standard",
       "${utils_path}/include/crypto",

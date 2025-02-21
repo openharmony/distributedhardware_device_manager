@@ -50,7 +50,7 @@ uint32_t HexifyLen(uint32_t len)
     return len * HEX_TO_UINT8 + 1;
 }
 
-void DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
+void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
     uint32_t startIndex)
 {
     if (data == nullptr || outBuf == nullptr || startIndex > outBufLen) {

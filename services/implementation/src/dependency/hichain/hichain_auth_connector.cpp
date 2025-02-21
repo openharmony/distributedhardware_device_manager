@@ -145,7 +145,11 @@ void HiChainAuthConnector::onError(int64_t requestId, int operationCode, int err
         LOGE("HiChainAuthConnector::onError dmDeviceAuthCallback_ is nullptr.");
         return;
     }
-    dmDeviceAuthCallback_->AuthDeviceError(requestId, ERR_DM_FAILED);
+    int32_t dmErrorCode = ERR_DM_FAILED;
+    if (errorCode == PROOF_MISMATCH) {
+        dmErrorCode = ERR_DM_HICHAIN_PROOFMISMATCH;
+    }
+    dmDeviceAuthCallback_->AuthDeviceError(requestId, dmErrorCode);
 }
 
 void HiChainAuthConnector::onSessionKeyReturned(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen)

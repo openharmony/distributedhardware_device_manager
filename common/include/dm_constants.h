@@ -129,7 +129,8 @@ enum {
     ERR_DM_HILINKSVC_ICON_URL_EMPTY = 96929828,
     ERR_DM_HILINKSVC_DISCONNECT = 96929829,
     ERR_DM_WISE_NEED_LOGIN = 96929830,
-    ERR_DM_NAME_EMPTY = 96929831
+    ERR_DM_NAME_EMPTY = 96929831,
+    ERR_DM_HICHAIN_PROOFMISMATCH = 96929832
 };
 
 constexpr const char* TAG_GROUP_ID = "groupId";
@@ -262,6 +263,12 @@ constexpr const char* PROCESS_NAME = "PROCESS_NAME";
 constexpr const char* PARAM_CLOSE_SESSION_DELAY_SECONDS = "DM_CLOSE_SESSION_DELAY_SECONDS";
 constexpr const char* DM_AUTHENTICATION_TYPE = "DM_AUTHENTICATION_TYPE";
 
+constexpr const char* PARAM_KEY_CONN_SESSIONTYPE = "connSessionType";
+constexpr const char* PARAM_KEY_HML_ENABLE_160M = "hmlEnable160M";
+constexpr const char* PARAM_KEY_HML_ACTIONID = "hmlActionId";
+
+const std::string CONN_SESSION_TYPE_HML = "HML";
+const std::string CONN_SESSION_TYPE_BLE = "BLE";
 // screen state
 constexpr int32_t DM_SCREEN_UNKNOWN = -1;
 constexpr int32_t DM_SCREEN_ON = 0;

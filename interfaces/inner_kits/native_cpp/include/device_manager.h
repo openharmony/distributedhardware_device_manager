@@ -655,6 +655,12 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
     virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
         std::string &displayName) = 0;
+    virtual int32_t GenerateServiceId(int64_t &serviceId) = 0;
+    virtual int32_t RegisterServiceInfo(const DMServiceInfo &info) = 0;
+    virtual int32_t UnRegisterServiceInfo(int64_t serviceId) = 0;
+    virtual int32_t UpdateServiceInfo(const DMServiceInfo &info) = 0;
+    virtual int32_t GetServiceInfoByServiceId(int64_t serviceId, DMServiceInfo &info) = 0;
+    virtual int32_t GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

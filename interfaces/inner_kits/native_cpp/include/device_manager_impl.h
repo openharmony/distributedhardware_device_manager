@@ -422,6 +422,12 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) override;
     virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
         std::string &displayName) override;
+    virtual int32_t GenerateServiceId(int64_t &serviceId) override;
+    virtual int32_t RegisterServiceInfo(const DMServiceInfo &info) override;
+    virtual int32_t UnRegisterServiceInfo(int64_t serviceId) override;
+    virtual int32_t UpdateServiceInfo(const DMServiceInfo &info) override;
+    virtual int32_t GetServiceInfoByServiceId(int64_t serviceId, DMServiceInfo &info) override;
+    virtual int32_t GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos) override;
 
 private:
     DeviceManagerImpl() = default;
