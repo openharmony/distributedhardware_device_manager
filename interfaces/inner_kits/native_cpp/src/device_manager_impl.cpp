@@ -100,7 +100,8 @@ constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
 const uint16_t DM_MIN_RANDOM = 1;
 const uint16_t DM_MAX_RANDOM = 65535;
 const uint16_t DM_INVALID_FLAG_ID = 0;
-const uint16_t DM_IMPORT_AUTH_CODE_LENGTH = 6;
+const uint16_t DM_IMPORT_AUTH_CODE_MIN_LENGTH = 6;
+const uint16_t DM_IMPORT_AUTH_CODE_MAX_LENGTH = 1024;
 const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
@@ -1644,7 +1645,7 @@ int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std:
     }
     LOGI("Start, authCode: %{public}s", GetAnonyString(authCode).c_str());
     int32_t length = static_cast<int32_t>(authCode.length());
-    if (length != DM_IMPORT_AUTH_CODE_LENGTH) {
+    if (length < DM_IMPORT_AUTH_CODE_MIN_LENGTH || length > DM_IMPORT_AUTH_CODE_MAX_LENGTH) {
         LOGE("ImportAuthCode error: Invalid para, authCode size error.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
