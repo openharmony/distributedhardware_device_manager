@@ -128,10 +128,7 @@ void DecodeDmAccessCallee(MessageParcel &parcel, DmAccessCallee &callee)
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
-
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::static_pointer_cast<IpcNotifyDeviceStateReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t deviceState = pReq->GetDeviceState();
@@ -158,20 +155,14 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
-
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyDeviceFoundReq> pReq = std::static_pointer_cast<IpcNotifyDeviceFoundReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     uint16_t subscribeId = pReq->GetSubscribeId();
@@ -198,20 +189,14 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FOUND, std::shared_ptr<IpcReq> pBaseReq, Messag
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_FOUND, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_DISCOVERY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
-
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyDeviceDiscoveryReq> pReq = std::static_pointer_cast<IpcNotifyDeviceDiscoveryReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     uint16_t subscribeId = pReq->GetSubscribeId();
@@ -233,19 +218,14 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_DISCOVERY, std::shared_ptr<IpcReq> pBaseReq, Me
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_DISCOVERY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::static_pointer_cast<IpcNotifyDiscoverResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     uint16_t subscribeId = pReq->GetSubscribeId();
@@ -267,19 +247,14 @@ ON_IPC_SET_REQUEST(SERVER_DISCOVER_FINISH, std::shared_ptr<IpcReq> pBaseReq, Mes
 
 ON_IPC_READ_RESPONSE(SERVER_DISCOVER_FINISH, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_PUBLISH_FINISH, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::static_pointer_cast<IpcNotifyPublishResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t publishId = pReq->GetPublishId();
@@ -301,19 +276,14 @@ ON_IPC_SET_REQUEST(SERVER_PUBLISH_FINISH, std::shared_ptr<IpcReq> pBaseReq, Mess
 
 ON_IPC_READ_RESPONSE(SERVER_PUBLISH_FINISH, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyAuthResultReq> pReq = std::static_pointer_cast<IpcNotifyAuthResultReq>(pBaseReq);
 
     std::string pkgName = pReq->GetPkgName();
@@ -346,20 +316,14 @@ ON_IPC_SET_REQUEST(SERVER_AUTH_RESULT, std::shared_ptr<IpcReq> pBaseReq, Message
 
 ON_IPC_READ_RESPONSE(SERVER_AUTH_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
-
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyDMFAResultReq> pReq = std::static_pointer_cast<IpcNotifyDMFAResultReq>(pBaseReq);
 
     std::string packagname = pReq->GetPkgName();
@@ -377,10 +341,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_FA_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, Me
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_FA_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -769,9 +730,7 @@ ON_IPC_CMD(NOTIFY_EVENT, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(SERVER_CREDENTIAL_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyCredentialReq> pReq = std::static_pointer_cast<IpcNotifyCredentialReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t action = pReq->GetCredentialAction();
@@ -794,10 +753,7 @@ ON_IPC_SET_REQUEST(SERVER_CREDENTIAL_RESULT, std::shared_ptr<IpcReq> pBaseReq, M
 
 ON_IPC_READ_RESPONSE(SERVER_CREDENTIAL_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -1062,9 +1018,7 @@ ON_IPC_CMD(UNBIND_TARGET, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(BIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::static_pointer_cast<IpcNotifyBindResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     PeerTargetId targetId = pReq->GetPeerTargetId();
@@ -1097,19 +1051,14 @@ ON_IPC_SET_REQUEST(BIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, Message
 
 ON_IPC_READ_RESPONSE(BIND_TARGET_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SINK_BIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::static_pointer_cast<IpcNotifyBindResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     PeerTargetId targetId = pReq->GetPeerTargetId();
@@ -1142,19 +1091,14 @@ ON_IPC_SET_REQUEST(SINK_BIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, Me
 
 ON_IPC_READ_RESPONSE(SINK_BIND_TARGET_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(UNBIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::static_pointer_cast<IpcNotifyBindResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     PeerTargetId targetId = pReq->GetPeerTargetId();
@@ -1182,10 +1126,7 @@ ON_IPC_SET_REQUEST(UNBIND_TARGET_RESULT, std::shared_ptr<IpcReq> pBaseReq, Messa
 
 ON_IPC_READ_RESPONSE(UNBIND_TARGET_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -1233,9 +1174,7 @@ ON_IPC_CMD(DESTROY_PIN_HOLDER, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(SERVER_CREATE_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcCreatePinHolderReq> pReq = std::static_pointer_cast<IpcCreatePinHolderReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     std::string deviceId = pReq->GetDeviceId();
@@ -1263,19 +1202,14 @@ ON_IPC_SET_REQUEST(SERVER_CREATE_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, M
 
 ON_IPC_READ_RESPONSE(SERVER_CREATE_PIN_HOLDER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcDestroyPinHolderReq> pReq = std::static_pointer_cast<IpcDestroyPinHolderReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t pinType = pReq->GetPinType();
@@ -1298,19 +1232,14 @@ ON_IPC_SET_REQUEST(SERVER_DESTROY_PIN_HOLDER, std::shared_ptr<IpcReq> pBaseReq, 
 
 ON_IPC_READ_RESPONSE(SERVER_DESTROY_PIN_HOLDER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_CREATE_PIN_HOLDER_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::static_pointer_cast<IpcNotifyPublishResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t result = pReq->GetResult();
@@ -1328,19 +1257,14 @@ ON_IPC_SET_REQUEST(SERVER_CREATE_PIN_HOLDER_RESULT, std::shared_ptr<IpcReq> pBas
 
 ON_IPC_READ_RESPONSE(SERVER_CREATE_PIN_HOLDER_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DESTROY_PIN_HOLDER_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::static_pointer_cast<IpcNotifyPublishResultReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t result = pReq->GetResult();
@@ -1358,10 +1282,7 @@ ON_IPC_SET_REQUEST(SERVER_DESTROY_PIN_HOLDER_RESULT, std::shared_ptr<IpcReq> pBa
 
 ON_IPC_READ_RESPONSE(SERVER_DESTROY_PIN_HOLDER_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -1394,9 +1315,7 @@ ON_IPC_CMD(GET_SECURITY_LEVEL, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(SERVER_ON_PIN_HOLDER_EVENT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyPinHolderEventReq> pReq = std::static_pointer_cast<IpcNotifyPinHolderEventReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t pinHolderEvent = pReq->GetPinHolderEvent();
@@ -1424,10 +1343,7 @@ ON_IPC_SET_REQUEST(SERVER_ON_PIN_HOLDER_EVENT, std::shared_ptr<IpcReq> pBaseReq,
 
 ON_IPC_READ_RESPONSE(SERVER_ON_PIN_HOLDER_EVENT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -1521,9 +1437,7 @@ ON_IPC_CMD(STOP_AUTHENTICATE_DEVICE, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(REMOTE_DEVICE_TRUST_CHANGE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyDevTrustChangeReq> pReq = std::static_pointer_cast<IpcNotifyDevTrustChangeReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     std::string udid = pReq->GetUdid();
@@ -1550,19 +1464,14 @@ ON_IPC_SET_REQUEST(REMOTE_DEVICE_TRUST_CHANGE, std::shared_ptr<IpcReq> pBaseReq,
 
 ON_IPC_READ_RESPONSE(REMOTE_DEVICE_TRUST_CHANGE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_SCREEN_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::static_pointer_cast<IpcNotifyDeviceStateReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     DmDeviceInfo deviceInfo = pReq->GetDeviceInfo();
@@ -1580,10 +1489,7 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_SCREEN_STATE_NOTIFY, std::shared_ptr<IpcReq> pB
 
 ON_IPC_READ_RESPONSE(SERVER_DEVICE_SCREEN_STATE_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -1637,9 +1543,7 @@ ON_IPC_CMD(GET_ANONY_LOCAL_UDID, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyCredentialAuthStatusReq> pReq =
         std::static_pointer_cast<IpcNotifyCredentialAuthStatusReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -1668,10 +1572,7 @@ ON_IPC_SET_REQUEST(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, std::shared_ptr<IpcReq
 
 ON_IPC_READ_RESPONSE(SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -1727,9 +1628,7 @@ ON_IPC_CMD(GET_DEVICE_PROFILE_INFO_LIST, MessageParcel &data, MessageParcel &rep
 
 ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFO_LIST_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyGetDeviceProfileInfoListReq> pReq =
         std::static_pointer_cast<IpcNotifyGetDeviceProfileInfoListReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -1758,10 +1657,7 @@ ON_IPC_SET_REQUEST(GET_DEVICE_PROFILE_INFO_LIST_RESULT, std::shared_ptr<IpcReq> 
 
 ON_IPC_READ_RESPONSE(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
@@ -1801,9 +1697,7 @@ ON_IPC_CMD(GET_DEVICE_ICON_INFO, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_SET_REQUEST(GET_DEVICE_ICON_INFO_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    if (pBaseReq == nullptr) {
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
     std::shared_ptr<IpcNotifyGetDeviceIconInfoReq> pReq =
         std::static_pointer_cast<IpcNotifyGetDeviceIconInfoReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -1825,10 +1719,7 @@ ON_IPC_SET_REQUEST(GET_DEVICE_ICON_INFO_RESULT, std::shared_ptr<IpcReq> pBaseReq
 
 ON_IPC_READ_RESPONSE(GET_DEVICE_ICON_INFO_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    if (pBaseRsp == nullptr) {
-        LOGE("pBaseRsp is null");
-        return ERR_DM_FAILED;
-    }
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
