@@ -243,16 +243,18 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
         }
     }
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
+    LOGI("Start add death recipient.");
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
     }
-    
+    LOGI("Checking the number of listeners.");
     if (dmListener_.size() > MAX_CALLBACK_NUM || appRecipient_.size() > MAX_CALLBACK_NUM) {
         LOGE("dmListener_ or appRecipient_ size exceed the limit!");
         return ERR_DM_FAILED;
     }
     dmListener_[processInfo] = listener;
     appRecipient_[processInfo] = appRecipient;
+    LOGI("Start add system sa.");
     AddSystemSA(processInfo.pkgName);
     LOGI("Register listener complete.");
     return DM_OK;
@@ -358,6 +360,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 void IpcServerStub::AddSystemSA(const std::string &pkgName)
 {
     if (PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
+    LOGI("Start insert pkgName.");
         systemSA_.insert(pkgName);
     }
 }
