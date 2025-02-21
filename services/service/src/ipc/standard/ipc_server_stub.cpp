@@ -246,6 +246,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
     }
+    
     if (dmListener_.size() > MAX_CALLBACK_NUM || appRecipient_.size() > MAX_CALLBACK_NUM) {
         LOGE("dmListener_ or appRecipient_ size exceed the limit!");
         return ERR_DM_FAILED;

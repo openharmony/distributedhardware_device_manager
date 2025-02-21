@@ -278,6 +278,7 @@ std::unordered_set<std::string> PermissionManager::GetWhiteListSystemSA()
 
 bool PermissionManager::CheckSystemSA(const std::string &pkgName)
 {
+    
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
         LOGE("CheckMonitorPermission GetCallingTokenID error.");
