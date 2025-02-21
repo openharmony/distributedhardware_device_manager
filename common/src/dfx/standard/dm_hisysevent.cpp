@@ -37,8 +37,6 @@ void SysEventWrite(const std::string &status, int32_t eventType, const std::stri
     if (res != DM_OK) {
         LOGE("%{public}s Write HiSysEvent error, res:%{public}d", status.c_str(), res);
     }
-
-
 }
 } // namespace DistributedHardware
 } // namespace OHOS
