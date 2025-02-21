@@ -360,7 +360,6 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 void IpcServerStub::AddSystemSA(const std::string &pkgName)
 {
     if (PermissionManager::GetInstance().CheckSystemSA(pkgName)) {
-    LOGI("Start insert pkgName.");
         systemSA_.insert(pkgName);
     }
 }
