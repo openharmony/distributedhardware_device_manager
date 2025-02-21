@@ -899,6 +899,7 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
         } else {
             napi_call_function(env_, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
             napi_delete_reference(env_, authAsyncCallbackInfo_.callback);
+            authAsyncCallbackInfo_.callback = nullptr;
         }
     } else {
         LOGE("handler is nullptr");
@@ -1668,6 +1669,7 @@ void DeviceManagerNapi::CallGetTrustedDeviceListStatus(napi_env env, napi_status
     if (handler != nullptr) {
         NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &array[0], &callResult));
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, deviceInfoListAsyncCallbackInfo->callback));
+        deviceInfoListAsyncCallbackInfo->callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }
@@ -1695,6 +1697,7 @@ void DeviceManagerNapi::CallRequestCreInfoStatus(napi_env env, napi_status &stat
     if (handler != nullptr) {
         napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_ONE, &result, &callResult);
         napi_delete_reference(env, creAsyncCallbackInfo->callback);
+        creAsyncCallbackInfo->callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }
@@ -1741,6 +1744,7 @@ void DeviceManagerNapi::CallGetLocalDeviceInfo(napi_env env, napi_status &status
         NAPI_CALL_RETURN_VOID(env, napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO,
             &result[0], &callResult));
         NAPI_CALL_RETURN_VOID(env, napi_delete_reference(env, deviceInfoAsyncCallbackInfo->callback));
+        deviceInfoAsyncCallbackInfo->callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }
@@ -3074,6 +3078,7 @@ void DeviceManagerNapi::CallGetDeviceInfoCB(napi_env env, napi_status &status,
     if (handler != nullptr) {
         napi_call_function(env, nullptr, handler, DM_NAPI_ARGS_TWO, &result[0], &callResult);
         napi_delete_reference(env, networkIdAsyncCallbackInfo->callback);
+        networkIdAsyncCallbackInfo->callback = nullptr;
     } else {
         LOGE("handler is nullptr");
     }
