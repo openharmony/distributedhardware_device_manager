@@ -72,14 +72,14 @@ void DmTransPortMsgFuzzTest(const uint8_t* data, size_t size)
     ToJson(jsonObject, userIdsMsg);
     FromJson(jsonObject, userIdsMsg);
     ToJson(jsonObject, commMsg);
-    FromJson(jsonString, commMsg);
+    FromJson(jsonObject, commMsg);
     ToJson(jsonObject, notifyUserIds);
     FromJson(jsonObject, notifyUserIds);
     jsonObject = cJSON_Parse(jsonString);
     ToJson(jsonObject, userIdsMsg);
     FromJson(jsonObject, userIdsMsg);
     ToJson(jsonObject, commMsg);
-    FromJson(jsonString, commMsg);
+    FromJson(jsonObject, commMsg);
     GetCommMsgString(commMsg);
     ToJson(jsonObject, notifyUserIds);
     FromJson(jsonObject, notifyUserIds);

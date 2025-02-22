@@ -22,6 +22,7 @@
 #include "softbus_session.h"
 #include <memory>
 #include "softbus_listener_fuzzer.h"
+#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -29,7 +30,7 @@ namespace DistributedHardware {
 namespace {
     constexpr int32_t INT32NUM = 3;
     constexpr int32_t DATA_LEN = 20;
-    constexpr int32_t CONNECTION_ADDR_USB = 5;
+    constexpr int32_t CONNECTION_ADDR_USB_VALUE = 5;
 }
 
 class ISoftbusDiscoveringCallbackTest : public ISoftbusDiscoveringCallback {
@@ -99,9 +100,9 @@ void SoftBusListenerFuzzTest(const uint8_t* data, size_t size)
         .meshType = 1,
         .reserved = {1}
     };
-    softbusListener_->OnDeviceScreenStatusChanged(type, status);
+    softbusListener_->OnDeviceScreenStatusChanged(type, &nodeStatus);
     type = NodeStatusType::TYPE_AUTH_STATUS;
-    softbusListener_->OnDeviceScreenStatusChanged(type, status);
+    softbusListener_->OnDeviceScreenStatusChanged(type, &nodeStatus);
     softbusListener_->OnSoftbusDeviceOnline(&nodeBasicInfo);
 }
 
@@ -118,10 +119,10 @@ void SoftBusListenerFirstFuzzTest(const uint8_t* data, size_t size)
         .osVersion = {1}
     };
     NodeBasicInfoType typeInfo = NodeBasicInfoType::TYPE_DEVICE_NAME;
-    softbusListener_->OnSoftbusDeviceOffline(typeInfo, &nodeBasicInfo);
+    softbusListener_->OnSoftbusDeviceOffline( &nodeBasicInfo);
     softbusListener_->OnSoftbusDeviceInfoChanged(typeInfo, &nodeBasicInfo);
     typeInfo = NodeBasicInfoType::TYPE_NETWORK_INFO;
-    softbusListener_->OnSoftbusDeviceOffline(typeInfo, &nodeBasicInfo);
+    softbusListener_->OnSoftbusDeviceOffline(&nodeBasicInfo);
     softbusListener_->OnSoftbusDeviceInfoChanged(typeInfo, &nodeBasicInfo);
     softbusListener_->OnLocalDevInfoChange();
     TrustChangeType changeType = TrustChangeType::DEVICE_NOT_TRUSTED;
@@ -147,7 +148,7 @@ void SoftBusListenerFirstFuzzTest(const uint8_t* data, size_t size)
     softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
     std::string networkId(reinterpret_cast<const char*>(data), size);
     DmDeviceInfo dmInfo;
-    softbusListener_->GetDeviceInfo(dmInfo);
+    softbusListener_->GetDeviceInfo(networkId, dmInfo);
     softbusListener_->GetLocalDeviceInfo(dmInfo);
     std::string udid(reinterpret_cast<const char*>(data), size);
     softbusListener_->GetNetworkIdByUdid(udid, networkId);
@@ -169,9 +170,6 @@ void SoftBusListenerSecondFuzzTest(const uint8_t* data, size_t size)
         .osType = 1,
         .osVersion = {1}
     };
-    NodeBasicInfoType typeInfo = NodeBasicInfoType::TYPE_DEVICE_NAME;
-    
-    softbusListener_->OnSoftbusDeviceFound(&deviceInfo);
     FuzzedDataProvider fdp(data, size);
     int32_t devScreenStatus = fdp.ConsumeIntegral<int32_t>();
     DmDeviceInfo devInfo;
@@ -197,12 +195,13 @@ void SoftBusListenerSecondFuzzTest(const uint8_t* data, size_t size)
             }
         }
     };
+    softbusListener_->OnSoftbusDeviceFound(&deviceInfo);
     softbusListener_->ConvertDeviceInfoToDmDevice(deviceInfo, devInfo);
     int32_t networkType = fdp.ConsumeIntegral<int32_t>();
     std::string networkId(reinterpret_cast<const char*>(data), size);
     softbusListener_->GetNetworkTypeByNetworkId(networkId.data(), networkType);
     int32_t securityLevel = fdp.ConsumeIntegral<int32_t>();
-    softbusListener_->GetDeviceSecurityLevel(networkId.data(), securityLevel)
+    softbusListener_->GetDeviceSecurityLevel(networkId.data(), securityLevel);
     softbusListener_->CacheDiscoveredDevice(&deviceInfo);
     softbusListener_->GetDeviceScreenStatus(networkId.data(), securityLevel);
 }
@@ -215,48 +214,45 @@ void SoftBusListenerThirdFuzzTest(const uint8_t* data, size_t size)
     ConnectionAddr addrInfo = {
         .type = ConnectionAddrType::CONNECTION_ADDR_ETH,
         .info {
+            .ip {
+                .ip = "172.0.0.2",
+                .port = 1,
+                .udidHash = {1}
+            }
+        }
+    };
+
+    ConnectionAddr addrInfo1 = {
+        .type = ConnectionAddrType::CONNECTION_ADDR_BR,
+        .info {
             .br {
                 .brMac = "1.0.0.1"
-            },
+            }
+        }
+    };
+
+    ConnectionAddr addrInfo2 = {
+        .type = ConnectionAddrType::CONNECTION_ADDR_BLE,
+        .info {
             .ble {
                 .protocol = BleProtocolType::BLE_GATT,
                 .bleMac = "4.0.0.2",
                 .udidHash = {1},
                 .psm = 1
-            },
-            .ip {
-                .ip = "172.0.0.2",
-                .port = 1,
-                .udidHash = {1}
-            },
-            .session {
-                .sessionId = 1,
-                .channelId = 1,
-                .type = 1
-            },
-        },
-        .peerUid = "peerUid"
+            }
+        }
     };
     nlohmann::json jsonObj;
     softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
     addrInfo.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
     softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
-    addrInfo.type = ConnectionAddrType::CONNECTION_ADDR_BR;
-    softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
-    addrInfo.type = ConnectionAddrType::CONNECTION_ADDR_BLE;
-    softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
-    addrInfo.type = static_cast<ConnectionAddrType>(CONNECTION_ADDR_USB);
+    softbusListener_->ParseConnAddrInfo(&addrInfo1, jsonObj);
+    softbusListener_->ParseConnAddrInfo(&addrInfo2, jsonObj);
+    addrInfo.type = static_cast<ConnectionAddrType>(CONNECTION_ADDR_USB_VALUE);
     softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
     std::string remoteUdid(reinterpret_cast<const char*>(data), size);
     std::vector<uint32_t> userIds;
     softbusListener_->SetForegroundUserIdsToDSoftBus(remoteUdid, userIds);
-    DistributedDeviceProfile::AccessControlProfile profile;
-    DmDeviceInfo deviceInfo;
-    softbusListener_->ConvertAclToDeviceInfo(profile, deviceInfo);
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string extra(reinterpret_cast<const char*>(data), size);
-    std::vector<DmDeviceInfo> deviceList;
-    softbusListener_->GetAllTrustedDeviceList(pkgName, extra, deviceList);
 }
 
 void SoftBusListenerForthFuzzTest(const uint8_t* data, size_t size)
@@ -275,6 +271,13 @@ void SoftBusListenerForthFuzzTest(const uint8_t* data, size_t size)
         .osVersion = {1}
     };
     softbusListener_->OnSoftbusDeviceOffline(&nodeBasicInfo);
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DmDeviceInfo deviceInfo;
+    softbusListener_->ConvertAclToDeviceInfo(profile, deviceInfo);
+    std::string pkgName(reinterpret_cast<const char*>(data), size);
+    std::string extra(reinterpret_cast<const char*>(data), size);
+    std::vector<DmDeviceInfo> deviceList;
+    softbusListener_->GetAllTrustedDeviceList(pkgName, extra, deviceList);
 }
 }
 }
