@@ -776,7 +776,7 @@ HWTEST_F(DmAuthManagerTest, ResponseCredential001, testing::ext::TestSize.Level0
     authManager_->ResponseCredential();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 
-    authManager_->authResponseContext_->publicKey == "publicKey";
+    authManager_->authResponseContext_->publicKey = "publicKey";
     EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 
@@ -1944,6 +1944,23 @@ HWTEST_F(DmAuthManagerTest, RegisterAuthenticationType_001, testing::ext::TestSi
     authManager_->authResponseState_ = std::make_shared<AuthResponseAuthFinish>();
     authManager_->ProcessReqPublicKey();
 }
+
+HWTEST_F(DmAuthManagerTest, CheckProcessNameInWhiteList_001, testing::ext::TestSize.Level0)
+{
+    std::string processName = "";
+    bool ret = authManager_->CheckProcessNameInWhiteList(processName);
+    ASSERT_FALSE(ret);
+
+    processName = "processName";
+    ret = authManager_->CheckProcessNameInWhiteList(processName);
+    ASSERT_FALSE(ret);
+
+    processName = "com.example.myapplication";
+    ret = authManager_->CheckProcessNameInWhiteList(processName);
+    ASSERT_TRUE(ret);
+}
+
+
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

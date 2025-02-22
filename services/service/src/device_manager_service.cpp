@@ -780,6 +780,7 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
 
 void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
+    LOGI("DeviceManagerService::HandleDeviceStatusChange start, devState = %{public}d", devState);
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
     }

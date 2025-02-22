@@ -65,19 +65,19 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
     }
 
     if (memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
-        std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
+                 std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
         LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
         return;
     }
 
     if (memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
-        std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
+                 std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
         return;
     }
 
     if (memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
-        std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
+                 std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
         return;
     }
@@ -108,7 +108,7 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
         return;
     }
     if (memcpy_s(dmDeviceBasicInfo.deviceId, sizeof(dmDeviceBasicInfo.deviceId), dmDeviceInfo.deviceId,
-        std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(dmDeviceInfo.deviceId))) != DM_OK) {
+                 std::min(sizeof(dmDeviceBasicInfo.deviceId), sizeof(dmDeviceInfo.deviceId))) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
         return;
     }
@@ -155,7 +155,7 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
     const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("In");
+    LOGI("DeviceManagerServiceListener::ProcessDeviceStateChange, state = %{public}d", state);
     std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId,
         DmCommonNotifyEvent::REG_DEVICE_STATE);
     std::vector<ProcessInfo> hpProcessInfoVec;
@@ -468,7 +468,7 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::st
         return ERR_DM_FAILED;
     }
     if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), kvValue.anoyDeviceId.c_str(),
-        std::min(sizeof(deviceInfo.deviceId), kvValue.anoyDeviceId.length())) != DM_OK) {
+                 std::min(sizeof(deviceInfo.deviceId), kvValue.anoyDeviceId.length())) != DM_OK) {
         LOGE("copy deviceId data failed.");
         return ERR_DM_FAILED;
     }
@@ -803,6 +803,7 @@ void DeviceManagerServiceListener::ProcessAppOnline(const std::vector<ProcessInf
                 alreadyOnlinePkgName_[notifyPkgName] = info;
             }
         }
+        LOGI("ProcessAppOnline notifyState = %{public}d", notifyState);
         SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
     }

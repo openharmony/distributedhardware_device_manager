@@ -363,7 +363,7 @@ typedef struct DmAccessCaller {
     std::string pkgName;
     std::string networkId;
     int32_t userId;
-    uint64_t tokenId;
+    uint64_t tokenId = 0;
     std::string extra;
 } DmAccessCaller;
 
@@ -372,6 +372,7 @@ typedef struct DmAccessCallee {
     std::string networkId;
     std::string peerId;
     int32_t userId;
+    uint64_t tokenId = 0;
     std::string extra;
 } DmAccessCallee;
 

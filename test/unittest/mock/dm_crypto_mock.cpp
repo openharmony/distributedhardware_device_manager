@@ -19,6 +19,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+
 int32_t Crypto::GetAccountIdHash(const std::string &accountId, unsigned char *accountIdHash)
 {
     return DmCrypto::dmCrypto->GetAccountIdHash(accountId, accountIdHash);

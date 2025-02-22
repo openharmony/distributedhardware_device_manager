@@ -91,6 +91,7 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
     dmPubInfo->mode = DmDiscoverMode::DM_DISCOVER_MODE_PASSIVE;
     dmPubInfo->freq = DmExchangeFreq::DM_LOW;
     dmPubInfo->ranging = true;
+    dmPubInfo->medium = DmExchangeMedium::DM_AUTO;
 
     if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
         LOGI("StartAdvertising input MetaType=%{public}s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
@@ -105,6 +106,12 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
     if (advertiseParam.find(PARAM_KEY_DISC_FREQ) != advertiseParam.end()) {
         dmPubInfo->freq =
             static_cast<DmExchangeFreq>(std::atoi((advertiseParam.find(PARAM_KEY_DISC_FREQ)->second).c_str()));
+    }
+    if (advertiseParam.find(PARAM_KEY_DISC_MEDIUM) != advertiseParam.end()) {
+        if (IsNumberString(advertiseParam.find(PARAM_KEY_DISC_MEDIUM)->second)) {
+            dmPubInfo->medium =
+                static_cast<DmExchangeMedium>(std::atoi((advertiseParam.find(PARAM_KEY_DISC_MEDIUM)->second).c_str()));
+        }
     }
 }
 

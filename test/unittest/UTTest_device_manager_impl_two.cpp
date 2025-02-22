@@ -2296,6 +2296,54 @@ HWTEST_F(DeviceManagerImplTest, GetNetworkIdByUdid_202, testing::ext::TestSize.L
     callbackMap[DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE] = strSet;
     DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
 }
+
+HWTEST_F(DeviceManagerImplTest, PutDeviceProfileInfoList_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> deviceProfileInfoList;
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret = DeviceManager::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
+}
+
+HWTEST_F(DeviceManagerImplTest, PutDeviceProfileInfoList_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> deviceProfileInfoList;
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    int32_t ret = DeviceManager::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
+}
+
+HWTEST_F(DeviceManagerImplTest, GetLocalDisplayDeviceName_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    int32_t maxNameLength = 1;
+    std::string displayName = "displayName";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret = DeviceManager::GetInstance().GetLocalDisplayDeviceName(pkgName, maxNameLength, displayName);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    ret = DeviceManager::GetInstance().GetLocalDisplayDeviceName(pkgName, maxNameLength, displayName);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

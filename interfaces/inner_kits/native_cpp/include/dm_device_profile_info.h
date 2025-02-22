@@ -24,69 +24,69 @@
 namespace OHOS {
 namespace DistributedHardware {
 typedef struct DmProductInfo {
-    std::string prodId;
-    std::string model;
-    std::string prodName;
-    std::string prodShortName;
-    std::string imageVersion;
+    std::string prodId = "";
+    std::string model = "";
+    std::string prodName = "";
+    std::string prodShortName = "";
+    std::string imageVersion = "";
 } DmProductInfo;
 
 typedef struct DmDeviceIconInfo {
-    std::string productId;
-    std::string subProductId;
-    std::string imageType;
-    std::string specName;
-    std::string wiseVersion;
-    std::string version;
-    std::string url;
+    std::string productId = "";
+    std::string subProductId = "";
+    std::string imageType = "";
+    std::string specName = "";
+    std::string wiseVersion = "";
+    std::string version = "";
+    std::string url = "";
     std::vector<uint8_t> icon = {};
 } DmDeviceIconInfo;
 
 typedef struct DmServiceProfileInfo {
-    std::string deviceId;
-    std::string serviceId;
-    std::string serviceType;
+    std::string deviceId = "";
+    std::string serviceId = "";
+    std::string serviceType = "";
     std::map<std::string, std::string> data = {};
 } DmServiceProfileInfo;
 
 typedef struct DmDeviceProfileInfoFilterOptions {
-    bool isCloud;
+    bool isCloud = true;
     std::vector<std::string> deviceIdList = {};
 } DmDeviceProfileInfoFilterOptions;
 
 typedef struct DmDeviceIconInfoFilterOptions {
-    std::string productId;
-    std::string subProductId;
-    std::string imageType;
-    std::string specName;
+    std::string productId = "";
+    std::string subProductId = "";
+    std::string imageType = "";
+    std::string specName = "";
 } DmDeviceIconInfoFilterOptions;
 
 typedef struct DmDeviceProfileInfo {
-    std::string deviceId;
-    std::string deviceSn;
-    std::string mac;
-    std::string model;
-    std::string innerModel;
-    std::string deviceType;
-    std::string manufacturer;
-    std::string deviceName;
-    std::string productId;
-    std::string subProductId;
-    std::string sdkVersion;
-    std::string bleMac;
-    std::string brMac;
-    std::string sleMac;
-    std::string firmwareVersion;
-    std::string hardwareVersion;
-    std::string softwareVersion;
-    int32_t protocolType;
-    int32_t setupType;
-    std::string wiseDeviceId;
-    std::string wiseUserId;
-    std::string registerTime;
-    std::string modifyTime;
-    std::string shareTime;
-    bool isLocalDevice;
+    std::string deviceId = "";
+    std::string deviceSn = "";
+    std::string mac = "";
+    std::string model = "";
+    std::string innerModel = "";
+    std::string deviceType = "";
+    std::string manufacturer = "";
+    std::string deviceName = "";
+    std::string productId = "";
+    std::string subProductId = "";
+    std::string sdkVersion = "";
+    std::string bleMac = "";
+    std::string brMac = "";
+    std::string sleMac = "";
+    std::string firmwareVersion = "";
+    std::string hardwareVersion = "";
+    std::string softwareVersion = "";
+    int32_t protocolType = 0;
+    int32_t setupType = 0;
+    std::string wiseDeviceId = "";
+    std::string wiseUserId = "";
+    std::string registerTime = "";
+    std::string modifyTime = "";
+    std::string shareTime = "";
+    bool isLocalDevice = false;
     std::vector<DmServiceProfileInfo> services = {};
 } DmDeviceProfileInfo;
 

@@ -1288,6 +1288,66 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceIconInfo(pkgName, filterOptions);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
+
+HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_201, testing::ext::TestSize.Level0)
+{
+    DeletePermission();
+    std::string pkgName = "pkgName";
+    std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
+    int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
+    int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SetLocalDisplayNameToSoftbus_201, testing::ext::TestSize.Level0)
+{
+    std::string displayName = "displayName";
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    int32_t ret = DeviceManagerService::GetInstance().SetLocalDisplayNameToSoftbus(displayName);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusListenerMock_, SetLocalDisplayName(_)).WillOnce(Return(DM_OK));
+    ret = DeviceManagerService::GetInstance().SetLocalDisplayNameToSoftbus(displayName);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*softbusListenerMock_, SetLocalDisplayName(_)).WillOnce(Return(ERR_DM_NO_PERMISSION));
+    ret = DeviceManagerService::GetInstance().SetLocalDisplayNameToSoftbus(displayName);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_201, testing::ext::TestSize.Level0)
+{
+    DeletePermission();
+    std::string pkgName = "packName";
+    int32_t maxNameLength = 1;
+    std::string displayName = "displayName";
+    int32_t ret = DeviceManagerService::GetInstance().GetLocalDisplayDeviceName(pkgName, maxNameLength, displayName);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_202, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "packName";
+    int32_t maxNameLength = 1;
+    std::string displayName = "displayName";
+    int32_t ret = DeviceManagerService::GetInstance().GetLocalDisplayDeviceName(pkgName, maxNameLength, displayName);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceNamePrefixs_201, testing::ext::TestSize.Level0)
+{
+    auto ret = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
+    EXPECT_EQ(ret.empty(), true);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

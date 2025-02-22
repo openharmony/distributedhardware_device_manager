@@ -33,6 +33,7 @@ public:
     virtual int32_t GetUuidFromCache(const char *networkId, std::string &uuid) = 0;
     virtual bool CheckIsOnline(const std::string &deviceId) = 0;
     virtual int32_t GetDeviceInfoFromCache(std::vector<DmDeviceInfo> &deviceInfoList) = 0;
+    virtual int32_t GetDeviceNameFromCache(const std::string &udid, std::string &deviceName) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusCache> dmSoftbusCache = nullptr;
 };
@@ -46,6 +47,7 @@ public:
     MOCK_METHOD(int32_t, GetUuidFromCache, (const char *, std::string &));
     MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
     MOCK_METHOD(int32_t, GetDeviceInfoFromCache, (std::vector<DmDeviceInfo> &));
+    MOCK_METHOD(int32_t, GetDeviceNameFromCache, (const std::string &, std::string &));
 };
 }
 }
