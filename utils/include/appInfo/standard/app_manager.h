@@ -21,6 +21,7 @@
 #include <string>
 
 #include "bundle_mgr_interface.h"
+#include "bundle_mgr_proxy.h"
 #include "event_handler.h"
 
 #include "dm_single_instance.h"
