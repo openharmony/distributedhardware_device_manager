@@ -631,7 +631,11 @@ int32_t SoftbusListener::PublishSoftbusLNN(const DmPublishInfo &dmPubInfo, const
     PublishInfo publishInfo;
     publishInfo.publishId = dmPubInfo.publishId;
     publishInfo.mode = static_cast<DiscoverMode>(dmPubInfo.mode);
-    publishInfo.medium = (capability == DM_CAPABILITY_APPROACH) ? ExchangeMedium::BLE : ExchangeMedium::AUTO;
+    if (capability == DM_CAPABILITY_APPROACH) {
+        publishInfo.medium = ExchangeMedium::BLE;
+    } else {
+        publishInfo.medium = static_cast<ExchangeMedium>(dmPubInfo.medium);
+    }
     publishInfo.freq = static_cast<ExchangeFreq>(dmPubInfo.freq);
     publishInfo.capability = capability.c_str();
     publishInfo.capabilityData = const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(customData.c_str()));
