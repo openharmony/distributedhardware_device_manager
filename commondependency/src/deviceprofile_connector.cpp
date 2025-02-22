@@ -249,11 +249,16 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
 std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
     std::string trustUdid)
 {
-    LOGI("Start.");
+    LOGI("Start requestDeviceId %{public}s, trustUdid %{public}s.", GetAnonyString(requestDeviceId).c_str(),
+        GetAnonyString(trustUdid).c_str());
+    std::vector<int32_t> bindTypeVec;
+    if (requestDeviceId.empty() || trustUdid.empty() || requestDeviceId == trustUdid) {
+        LOGE("Input udid param invalied.");
+        return bindTypeVec;
+    }
     std::vector<AccessControlProfile> profiles =
         GetAccessControlProfileByUserId(MultipleUserConnector::GetFirstForegroundUserId());
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
-    std::vector<int32_t> bindTypeVec;
     for (auto &item : profiles) {
         if (trustUdid != item.GetTrustDeviceId() || item.GetStatus() != ACTIVE) {
             continue;
@@ -285,38 +290,37 @@ uint64_t DeviceProfileConnector::GetTokenIdByNameAndDeviceId(std::string pkgName
 void DeviceProfileConnector::GetParamBindTypeVec(AccessControlProfile profiles, std::string requestDeviceId,
     std::vector<int32_t> &bindTypeVec, std::string trustUdid)
 {
-    if (profiles.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-        bindTypeVec.push_back(IDENTICAL_ACCOUNT_TYPE);
+    if (!(profiles.GetAccesser().GetAccesserDeviceId() == trustUdid &&
+        profiles.GetAccessee().GetAccesseeDeviceId() == requestDeviceId) &&
+        !(profiles.GetAccessee().GetAccesseeDeviceId() == trustUdid &&
+        profiles.GetAccesser().GetAccesserDeviceId() == requestDeviceId)) {
+        LOGE("input udid param invalied.");
+        return;
     }
-    if (profiles.GetBindType() == DM_POINT_TO_POINT) {
-        if (profiles.GetBindLevel() == DEVICE) {
-            bindTypeVec.push_back(DEVICE_PEER_TO_PEER_TYPE);
-        }
-        if (profiles.GetBindLevel() == APP) {
-            if (profiles.GetAccesser().GetAccesserDeviceId() == trustUdid &&
-                profiles.GetAccessee().GetAccesseeDeviceId() == requestDeviceId) {
+    uint32_t bindType = profiles.GetBindType();
+    switch (bindType) {
+        case DM_IDENTICAL_ACCOUNT:
+            bindTypeVec.push_back(IDENTICAL_ACCOUNT_TYPE);
+            break;
+        case DM_POINT_TO_POINT:
+            if (profiles.GetBindLevel() == DEVICE) {
+                bindTypeVec.push_back(DEVICE_PEER_TO_PEER_TYPE);
+            }
+            if (profiles.GetBindLevel() == APP) {
                 bindTypeVec.push_back(APP_PEER_TO_PEER_TYPE);
             }
-            if (profiles.GetAccessee().GetAccesseeDeviceId() == trustUdid &&
-                profiles.GetAccesser().GetAccesserDeviceId() == requestDeviceId) {
-                bindTypeVec.push_back(APP_PEER_TO_PEER_TYPE);
+            break;
+        case DM_ACROSS_ACCOUNT:
+            if (profiles.GetBindLevel() == DEVICE) {
+                bindTypeVec.push_back(DEVICE_ACROSS_ACCOUNT_TYPE);
             }
-        }
-    }
-    if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
-        if (profiles.GetBindLevel() == DEVICE) {
-            bindTypeVec.push_back(DEVICE_ACROSS_ACCOUNT_TYPE);
-        }
-        if (profiles.GetBindLevel() == APP) {
-            if (profiles.GetAccesser().GetAccesserDeviceId() == trustUdid &&
-                profiles.GetAccessee().GetAccesseeDeviceId() == requestDeviceId) {
+            if (profiles.GetBindLevel() == APP) {
                 bindTypeVec.push_back(APP_ACROSS_ACCOUNT_TYPE);
             }
-            if (profiles.GetAccessee().GetAccesseeDeviceId() == trustUdid &&
-                profiles.GetAccesser().GetAccesserDeviceId() == requestDeviceId) {
-                bindTypeVec.push_back(APP_ACROSS_ACCOUNT_TYPE);
-            }
-        }
+            break;
+        default:
+            LOGE("unknown bind type %{public}d.", bindType);
+            break;
     }
 }
 
