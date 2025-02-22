@@ -42,6 +42,10 @@ typedef struct {
      * Discovery ranging. For details, see {@link PublishInfo}.
      */
     bool ranging;
+    /**
+     * Service subscription medium. For details, see {@link DmExchangeMedium}.
+     */
+    DmExchangeMedium medium;
 } DmPublishInfo;
 } // namespace DistributedHardware
 } // namespace OHOS
