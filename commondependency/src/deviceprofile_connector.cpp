@@ -287,34 +287,34 @@ uint64_t DeviceProfileConnector::GetTokenIdByNameAndDeviceId(std::string pkgName
     return peerTokenId;
 }
 
-void DeviceProfileConnector::GetParamBindTypeVec(AccessControlProfile profiles, std::string requestDeviceId,
+void DeviceProfileConnector::GetParamBindTypeVec(AccessControlProfile profile, std::string requestDeviceId,
     std::vector<int32_t> &bindTypeVec, std::string trustUdid)
 {
-    if (!(profiles.GetAccesser().GetAccesserDeviceId() == trustUdid &&
-        profiles.GetAccessee().GetAccesseeDeviceId() == requestDeviceId) &&
-        !(profiles.GetAccessee().GetAccesseeDeviceId() == trustUdid &&
-        profiles.GetAccesser().GetAccesserDeviceId() == requestDeviceId)) {
+    if (!(profile.GetAccesser().GetAccesserDeviceId() == trustUdid &&
+        profile.GetAccessee().GetAccesseeDeviceId() == requestDeviceId) &&
+        !(profile.GetAccessee().GetAccesseeDeviceId() == trustUdid &&
+        profile.GetAccesser().GetAccesserDeviceId() == requestDeviceId)) {
         LOGE("input udid param invalied.");
         return;
     }
-    uint32_t bindType = profiles.GetBindType();
+    uint32_t bindType = profile.GetBindType();
     switch (bindType) {
         case DM_IDENTICAL_ACCOUNT:
             bindTypeVec.push_back(IDENTICAL_ACCOUNT_TYPE);
             break;
         case DM_POINT_TO_POINT:
-            if (profiles.GetBindLevel() == DEVICE) {
+            if (profile.GetBindLevel() == DEVICE) {
                 bindTypeVec.push_back(DEVICE_PEER_TO_PEER_TYPE);
             }
-            if (profiles.GetBindLevel() == APP) {
+            if (profile.GetBindLevel() == APP) {
                 bindTypeVec.push_back(APP_PEER_TO_PEER_TYPE);
             }
             break;
         case DM_ACROSS_ACCOUNT:
-            if (profiles.GetBindLevel() == DEVICE) {
+            if (profile.GetBindLevel() == DEVICE) {
                 bindTypeVec.push_back(DEVICE_ACROSS_ACCOUNT_TYPE);
             }
-            if (profiles.GetBindLevel() == APP) {
+            if (profile.GetBindLevel() == APP) {
                 bindTypeVec.push_back(APP_ACROSS_ACCOUNT_TYPE);
             }
             break;
