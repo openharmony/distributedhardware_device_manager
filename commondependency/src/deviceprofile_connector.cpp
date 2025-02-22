@@ -453,12 +453,14 @@ int32_t DeviceProfileConnector::PutAccessControlList(DmAclInfo aclInfo, DmAccess
     accesser.SetAccesserAccountId(dmAccesser.requestAccountId);
     accesser.SetAccesserTokenId(dmAccesser.requestTokenId);
     accesser.SetAccesserBundleName(dmAccesser.requestBundleName);
+    accesser.SetAccesserDeviceName(dmAccesser.requestDeviceName);
     Accessee accessee;
     accessee.SetAccesseeDeviceId(dmAccessee.trustDeviceId);
     accessee.SetAccesseeUserId(dmAccessee.trustUserId);
     accessee.SetAccesseeAccountId(dmAccessee.trustAccountId);
     accessee.SetAccesseeTokenId(dmAccessee.trustTokenId);
     accessee.SetAccesseeBundleName(dmAccessee.trustBundleName);
+    accessee.SetAccesseeDeviceName(dmAccessee.trustDeviceName);
     AccessControlProfile profile;
     profile.SetBindType(aclInfo.bindType);
     profile.SetBindLevel(aclInfo.bindLevel);
@@ -1712,6 +1714,29 @@ int32_t DeviceProfileConnector::CheckDeviceInfoPermission(const std::string &loc
         }
     }
     return ERR_DM_NO_PERMISSION;
+}
+
+int32_t DeviceProfileConnector::UpdateAclDeviceName(const std::string &udid, const std::string &newDeviceName)
+{
+    std::vector<AccessControlProfile> allProfile =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    for (AccessControlProfile profile : allProfile) {
+        Accessee acee = profile.GetAccessee();
+        if (acee.GetAccesseeDeviceId() == udid) {
+            acee.SetAccesseeDeviceName(newDeviceName);
+            profile.SetAccessee(acee);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+            return DM_OK;
+        }
+        Accesser acer = profile.GetAccesser();
+        if (acer.GetAccesserDeviceId() == udid) {
+            acer.SetAccesserDeviceName(newDeviceName);
+            profile.SetAccesser(acer);
+            DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+            return DM_OK;
+        }
+    }
+    return ERR_DM_FAILED;
 }
 
 IDeviceProfileConnector *CreateDpConnectorInstance()

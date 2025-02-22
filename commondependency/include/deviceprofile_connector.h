@@ -68,6 +68,7 @@ typedef struct DmAccesser {
     std::string requestAccountId;
     std::string requestDeviceId;
     int32_t requestTargetClass;
+    std::string requestDeviceName;
 } DmAccesser;
 
 typedef struct DmAccessee {
@@ -77,6 +78,7 @@ typedef struct DmAccessee {
     std::string trustAccountId;
     std::string trustDeviceId;
     int32_t trustTargetClass;
+    std::string trustDeviceName;
 } DmAccessee;
 
 typedef struct DmOfflineParam {
@@ -168,6 +170,7 @@ public:
     int32_t UnSubscribeDeviceProfileInited();
     int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
+    int32_t UpdateAclDeviceName(const std::string &udid, const std::string &newDeviceName);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

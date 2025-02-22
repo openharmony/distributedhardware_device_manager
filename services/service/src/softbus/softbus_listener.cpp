@@ -250,6 +250,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     SoftbusCache::GetInstance().SaveDeviceInfo(dmDeviceInfo);
     SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmDeviceInfo.networkId);
     SoftbusCache::GetInstance().SaveLocalDeviceInfo();
+    UpdateDeviceName(info);
     {
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
         g_onlineDeviceNum++;
@@ -330,6 +331,23 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
 }
 
+void SoftbusListener::UpdateDeviceName(NodeBasicInfo *info)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (info == nullptr) {
+        LOGE("NodeBasicInfo is nullptr, not update device name");
+        return;
+    }
+    std::string udid = "";
+    if (GetUdidByNetworkId(info->networkId, udid) != DM_OK) {
+        LOGE("GetUdidByNetworkId failed, not update device name");
+        return;
+    }
+    LOGI("UpdateDeviceName, info->deviceName: %{public}s.", GetAnonyString(info->deviceName).c_str());
+    DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, info->deviceName);
+#endif
+}
+
 void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBasicInfo *info)
 {
     LOGI("received device info change from softbus.");
@@ -348,6 +366,9 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
                 return;
             }
             LOGI("OnSoftbusDeviceInfoChanged NetworkType %{public}d.", networkType);
+        }
+        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
+            UpdateDeviceName(info);
         }
         ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
         LOGI("device changed networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
@@ -369,6 +390,21 @@ void SoftbusListener::OnLocalDevInfoChange()
 {
     LOGI("SoftbusListener::OnLocalDevInfoChange");
     SoftbusCache::GetInstance().UpDataLocalDevInfo();
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    NodeBasicInfo nodeBasicInfo;
+    int32_t ret = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]GetLocalNodeDeviceInfo failed, not update deviceName ret: %{public}d.", ret);
+        return;
+    }
+    std::string udid = "";
+    ret = GetUdidByNetworkId(nodeBasicInfo.networkId, udid);
+    if (ret != DM_OK) {
+        LOGE("GetUdidByNetworkId failed, not update deviceName ret: %{public}d.", ret);
+        return;
+    }
+    DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, nodeBasicInfo.deviceName);
+#endif
 }
 
 void SoftbusListener::OnDeviceTrustedChange(TrustChangeType type, const char *msg, uint32_t msgLen)
@@ -1229,10 +1265,14 @@ void SoftbusListener::ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessCon
             return;
         }
     } else {
-        if (memcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), udidHash,
-                     std::min(sizeof(deviceInfo.deviceName), sizeof(udidHash))) != DM_OK) {
-            LOGE("GetAllTrustedDeviceList copy deviceName data failed.");
-            return;
+        if (profile.GetTrustDeviceId() == profile.GetAccessee().GetAccesseeDeviceId()) {
+            deviceName = profile.GetAccessee().GetAccesseeDeviceName();
+        } else if (profile.GetTrustDeviceId() == profile.GetAccesser().GetAccesserDeviceId()) {
+            deviceName = profile.GetAccesser().GetAccesserDeviceName();
+        }
+        if (memcpy_s(deviceInfo.deviceName, sizeof(deviceInfo.deviceName), deviceName.c_str(),
+                     std::min(sizeof(deviceInfo.deviceName), deviceName.size())) != DM_OK) {
+            LOGE("GetAllTrustedDeviceList copy deviceName data from dp failed.");
         }
     }
 }

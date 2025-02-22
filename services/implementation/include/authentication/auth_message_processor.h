@@ -77,6 +77,7 @@ constexpr const char* TAG_EDITION = "edition";
 constexpr const char* TAG_BUNDLE_NAME = "bundleName";
 constexpr const char* TAG_CRYPTIC_MSG = "encryptMsg";
 constexpr const char* TAG_PEER_BUNDLE_NAME = "PEER_BUNDLE_NAME";
+constexpr const char* TAG_REMOTE_DEVICE_NAME = "REMOTE_DEVICE_NAME";
 
 class DmAuthManager;
 struct DmAuthRequestContext;
