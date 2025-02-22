@@ -119,7 +119,7 @@ void SoftBusListenerFirstFuzzTest(const uint8_t* data, size_t size)
         .osVersion = {1}
     };
     NodeBasicInfoType typeInfo = NodeBasicInfoType::TYPE_DEVICE_NAME;
-    softbusListener_->OnSoftbusDeviceOffline( &nodeBasicInfo);
+    softbusListener_->OnSoftbusDeviceOffline(&nodeBasicInfo);
     softbusListener_->OnSoftbusDeviceInfoChanged(typeInfo, &nodeBasicInfo);
     typeInfo = NodeBasicInfoType::TYPE_NETWORK_INFO;
     softbusListener_->OnSoftbusDeviceOffline(&nodeBasicInfo);
