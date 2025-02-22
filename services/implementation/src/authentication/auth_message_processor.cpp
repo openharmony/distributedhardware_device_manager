@@ -401,6 +401,8 @@ void AuthMessageProcessor::ParseResponseFinishMessage(nlohmann::json &json)
 
 void AuthMessageProcessor::GetAuthReqMessage(nlohmann::json &json)
 {
+    authResponseContext_->localDeviceId = "";
+    authResponseContext_->deviceId = "";
     if (IsInt32(json, TAG_AUTH_TYPE)) {
         authResponseContext_->authType = json[TAG_AUTH_TYPE].get<int32_t>();
     }
