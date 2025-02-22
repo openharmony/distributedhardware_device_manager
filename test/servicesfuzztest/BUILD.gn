@@ -25,6 +25,7 @@ group("fuzztest") {
     "devicepublish_fuzzer:fuzztest",
     "dmcommtool_fuzzer:fuzztest",
     "dmtransport_fuzzer:fuzztest",
+    "dm_transport_msg_fuzzer:fuzztest",
     "dpinitcallback_fuzzer:fuzztest",
     "getlocaldeviceinfo_fuzzer:fuzztest",
     "gettrusteddevicelistservice_fuzzer:fuzztest",
