@@ -259,7 +259,7 @@ void SoftBusListenerThirdFuzzTest(const uint8_t* data, size_t size)
     softbusListener_->GetAllTrustedDeviceList(pkgName, extra, deviceList);
 }
 
-void SoftBusListenerThirdFuzzTest(const uint8_t* data, size_t size)
+void SoftBusListenerForthFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
@@ -287,6 +287,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::SoftBusListenerFirstFuzzTest(data, size);
     OHOS::DistributedHardware::SoftBusListenerSecondFuzzTest(data, size);
     OHOS::DistributedHardware::SoftBusListenerThirdFuzzTest(data, size);
+    OHOS::DistributedHardware::SoftBusListenerForthFuzzTest(data, size);
 
     return 0;
 }
