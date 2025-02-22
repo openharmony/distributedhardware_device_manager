@@ -103,7 +103,6 @@ void SoftBusListenerFuzzTest(const uint8_t* data, size_t size)
     type = NodeStatusType::TYPE_AUTH_STATUS;
     softbusListener_->OnDeviceScreenStatusChanged(type, status);
     softbusListener_->OnSoftbusDeviceOnline(&nodeBasicInfo);
-    softbusListener_->OnSoftbusDeviceOffline(&nodeBasicInfo);
 }
 
 void SoftBusListenerFirstFuzzTest(const uint8_t* data, size_t size)
@@ -155,8 +154,7 @@ void SoftBusListenerFirstFuzzTest(const uint8_t* data, size_t size)
     bool isWakeUp = false;
     std::string callerId(reinterpret_cast<const char*>(data), size);
     softbusListener_->ShiftLNNGear(isWakeUp, callerId);
-    callerId = "";
-    softbusListener_->ShiftLNNGear(isWakeUp, callerId);
+    softbusListener_->ShiftLNNGear(isWakeUp, "");
 }
 
 void SoftBusListenerSecondFuzzTest(const uint8_t* data, size_t size)
@@ -259,7 +257,24 @@ void SoftBusListenerThirdFuzzTest(const uint8_t* data, size_t size)
     std::string extra(reinterpret_cast<const char*>(data), size);
     std::vector<DmDeviceInfo> deviceList;
     softbusListener_->GetAllTrustedDeviceList(pkgName, extra, deviceList);
-    softbusListener_->GetUdidFromDp(pkgName, extra);
+}
+
+void SoftBusListenerThirdFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    std::string udidHash(reinterpret_cast<const char*>(data), size);
+    std::string udid(reinterpret_cast<const char*>(data), size);
+    softbusListener_->GetUdidFromDp(udidHash, udid);
+    NodeBasicInfo nodeBasicInfo = {
+        .networkId = {"networkId"},
+        .deviceName = {"deviceNameInfo"},
+        .deviceTypeId = 1,
+        .osType = 1,
+        .osVersion = {1}
+    };
+    softbusListener_->OnSoftbusDeviceOffline(&nodeBasicInfo);
 }
 }
 }
