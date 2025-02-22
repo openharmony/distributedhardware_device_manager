@@ -746,7 +746,15 @@ int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &calle
 int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    return DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    CHECK_NULL_RETURN(hiChainConnector_, ERR_DM_POINT_NULL);
+    bool ret = hiChainConnector_->IsDevicesInP2PGroup(srcUdid, sinkUdid);
+    if (!ret) {
+        int32_t checkRet = DeviceProfileConnector::GetInstance().CheckAccessControl(caller,
+            srcUdid, callee, sinkUdid);
+        return checkRet;
+    } else {
+        return DM_OK;
+    }
 }
 
 void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)

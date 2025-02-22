@@ -999,7 +999,7 @@ bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::A
             } else if (profile.GetBindLevel() == APP &&
                 (profile.GetAccesser().GetAccesserBundleName() == caller.pkgName ||
                 profile.GetAccessee().GetAccesseeBundleName() == caller.pkgName)) {
-                ret = true;
+                ret = CheckAppLevelAccess(profile, caller, callee);
             }
             break;
         case DM_ACROSS_ACCOUNT:
@@ -1008,7 +1008,7 @@ bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::A
             } else if (profile.GetBindLevel() == APP &&
                 (profile.GetAccesser().GetAccesserBundleName() == caller.pkgName ||
                 profile.GetAccessee().GetAccesseeBundleName() == caller.pkgName)) {
-                ret = true;
+                ret = CheckAppLevelAccess(profile, caller, callee);
             }
             break;
         default:
@@ -1016,6 +1016,23 @@ bool DeviceProfileConnector::SingleUserProcess(const DistributedDeviceProfile::A
             break;
     }
     return ret;
+}
+
+bool DeviceProfileConnector::CheckAppLevelAccess(const DistributedDeviceProfile::AccessControlProfile &profile,
+    const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    if (caller.tokenId == 0 || callee.tokenId == 0) {
+        return true;
+    } else {
+        if ((profile.GetAccesser().GetAccesserTokenId() == caller.tokenId &&
+            profile.GetAccessee().GetAccesseeTokenId() == callee.tokenId) ||
+            (profile.GetAccesser().GetAccesserTokenId() == callee.tokenId &&
+            profile.GetAccessee().GetAccesseeTokenId() == caller.tokenId)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
 int32_t DeviceProfileConnector::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
