@@ -230,6 +230,7 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "mbedtls:mbedtls_shared",
+      "openssl:libcrypto_shared",
       "os_account:libaccountkits",
       "resource_management:resmgr_napi_core",
       "samgr:samgr_proxy",

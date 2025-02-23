@@ -33,6 +33,7 @@
 #include "dm_timer.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
+#include "service_info_unique_key.h"
 #include "softbus_connector.h"
 #include "softbus_session.h"
 
@@ -135,6 +136,9 @@ typedef struct DmAuthRequestContext {
     std::string hostPkgLabel;
     int32_t closeSessionDelaySeconds = 0;
     std::string remoteDeviceName;
+    std::string connSessionType;
+    int32_t hmlActionId = 0;
+    bool hmlEnable160M = false;
 } DmAuthRequestContext;
 
 typedef struct DmAuthResponseContext {
@@ -193,6 +197,9 @@ typedef struct DmAuthResponseContext {
     std::string edition;
     int32_t localBindLevel;
     std::string remoteDeviceName;
+    bool isSrcPincodeImported = false;
+    int32_t localSessionKeyId = 0;
+    int32_t remoteSessionKeyId = 0;
 } DmAuthResponseContext;
 
 class AuthMessageProcessor;
@@ -405,7 +412,7 @@ public:
      * @tc.desc: Show AuthInfo Dialog of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    void ShowAuthInfoDialog();
+    void ShowAuthInfoDialog(bool authDeviceError = false);
 
     /**
      * @tc.name: DmAuthManager::ShowStartAuthDialog
@@ -474,8 +481,22 @@ public:
     void HandleSessionHeartbeat(std::string name);
 
     int32_t RegisterAuthenticationType(int32_t authenticationType);
+    static bool IsPinCodeValid(const std::string strpin);
+    static bool IsPinCodeValid(int32_t numpin);
+    bool IsImportedAuthCodeValid();
 
 private:
+    bool IsHmlSessionType();
+    bool CanUsePincodeFromDp();
+    void InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key);
+    bool IsServiceInfoAuthTypeValid(int32_t authType);
+    bool IsServiceInfoAuthBoxTypeValid(int32_t authBoxType);
+    bool IsServiceInfoPinExchangeTypeValid(int32_t pinExchangeType);
+    bool IsServiceInfoProfileValid(const DistributedDeviceProfile::ServiceInfoProfile &profile);
+    void GetServiceInfoProfile();
+    bool CheckNeedShowAuthInfoDialog(int32_t errorCode);
+    void UpdateInputPincodeDialog(int32_t errorCode);
+    void JoinLnn(const std::string &deviceId);
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra);
@@ -529,6 +550,7 @@ private:
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     void ParseJsonObject(nlohmann::json jsonObject);
+    void ParseHmlInfoInJsonObject(nlohmann::json jsonObject);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
     void ProcessAuthRequestExt(const int32_t &sessionId);
@@ -599,6 +621,8 @@ private:
     bool isNeedProcCachedSrcReqMsg_ = false;
     std::string srcReqMsg_ = "";
     int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
+    DistributedDeviceProfile::ServiceInfoProfile serviceInfoProfile_;
+    bool pincodeDialogEverShown_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

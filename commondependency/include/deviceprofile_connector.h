@@ -21,6 +21,8 @@
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
 #include "i_dp_inited_callback.h"
+#include "service_info_profile.h"
+#include "service_info_unique_key.h"
 #include "trusted_device_info.h"
 
 constexpr uint32_t ALLOW_AUTH_ONCE = 1;
@@ -171,6 +173,16 @@ public:
     int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     int32_t UpdateAclDeviceName(const std::string &udid, const std::string &newDeviceName);
+    int32_t PutServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile);
+    int32_t DeleteServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoUniqueKey &key);
+    int32_t UpdateServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile);
+    int32_t GetServiceInfoProfileByUniqueKey(const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
+        DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile);
+    int32_t GetServiceInfoProfileListByTokenId(const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
+        std::vector<DistributedDeviceProfile::ServiceInfoProfile> &serviceInfoProfiles);
+    int32_t GetServiceInfoProfileListByBundleName(const DistributedDeviceProfile::ServiceInfoUniqueKey& key,
+        std::vector<DistributedDeviceProfile::ServiceInfoProfile>& serviceInfoProfiles);
+    int32_t PutSessionKey(const uint8_t* sessionKey, uint32_t length, int32_t& sessionKeyId);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

@@ -32,6 +32,7 @@
 #include "ipc_def.h"
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
+#include "ipc_gen_serviceid_rsp.h"
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
@@ -44,6 +45,8 @@
 #include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_local_display_device_name_req.h"
 #include "ipc_get_local_display_device_name_rsp.h"
+#include "ipc_get_serviceinfo_byid_rsp.h"
+#include "ipc_get_serviceinfo_bycaller_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
@@ -51,6 +54,7 @@
 #include "ipc_notify_event_req.h"
 #include "ipc_put_device_profile_info_list_req.h"
 #include "ipc_register_listener_req.h"
+#include "ipc_register_serviceinfo_req.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "ipc_set_credential_req.h"
@@ -1859,6 +1863,167 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DISPLAY_DEVICE_NAME, MessageParcel &reply, std::s
         std::static_pointer_cast<IpcGetLocalDisplayDeviceNameRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
     pRsp->SetDisplayName(reply.ReadString());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GEN_SERVICEID, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GEN_SERVICEID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    std::shared_ptr<IpcGenServiceIdRsp> pRsp = std::static_pointer_cast<IpcGenServiceIdRsp>(pBaseRsp);
+    if (pRsp == nullptr) {
+        LOGE("pRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pRsp->SetErrCode(reply.ReadInt32());
+    if (pRsp->GetErrCode() == DM_OK) {
+        pRsp->SetServiceId(reply.ReadInt64());
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(REG_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcRegServiceInfoReq> pReq = std::static_pointer_cast<IpcRegServiceInfoReq>(pBaseReq);
+    const DMServiceInfo& info = pReq->GetServiceInfo();
+    if (!IpcModelCodec::EncodeServiceInfo(info, data)) {
+        LOGE("EncodeServiceInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(REG_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(UNREG_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
+    int64_t serviceId = pReq->GetInt64Param();
+    if (!data.WriteInt64(serviceId)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(UNREG_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(UPDATE_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcRegServiceInfoReq> pReq = std::static_pointer_cast<IpcRegServiceInfoReq>(pBaseReq);
+    const DMServiceInfo& info = pReq->GetServiceInfo();
+    if (!IpcModelCodec::EncodeServiceInfo(info, data)) {
+        LOGE("EncodeServiceInfo failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(UPDATE_SERVICE_INFO, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_SERVICEINFO_BYID, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
+    int64_t serviceId = pReq->GetInt64Param();
+    if (!data.WriteInt64(serviceId)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_SERVICEINFO_BYID, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    if (pBaseRsp->GetErrCode() == DM_OK) {
+        std::shared_ptr<IpcGetServiceInfoByIdRsp> pRsp = std::static_pointer_cast<IpcGetServiceInfoByIdRsp>(pBaseRsp);
+        DMServiceInfo info;
+        bool ret = IpcModelCodec::DecodeServiceInfo(reply, info);
+        if (!ret) {
+            LOGE("DecodeServiceInfo failed");
+            pBaseRsp->SetErrCode(ERR_DM_IPC_READ_FAILED);
+        }
+        pRsp->SetServiceInfo(info);
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_SERVICEINFOS_CALLER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_SERVICEINFOS_CALLER, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    if (pBaseRsp->GetErrCode() == DM_OK) {
+        std::shared_ptr<IpcGetServiceInfoByCallerRsp> pRsp =
+            std::static_pointer_cast<IpcGetServiceInfoByCallerRsp>(pBaseRsp);
+        std::vector<DMServiceInfo> infos;
+        bool ret = IpcModelCodec::DecodeServiceInfos(reply, infos);
+        if (!ret) {
+            LOGE("DecodeServiceInfo failed");
+            pBaseRsp->SetErrCode(ERR_DM_IPC_READ_FAILED);
+        }
+        pRsp->SetServiceInfos(infos);
+    }
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -42,6 +42,7 @@
 #include "dm_random.h"
 #include "multiple_user_connector.h"
 #include "nlohmann/json.hpp"
+#include "openssl/sha.h"
 #include "parameter.h"
 #include "show_confirm.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -64,6 +65,7 @@ const int32_t CLONE_ADD_TIMEOUT = 10;
 const int32_t CLONE_WAIT_NEGOTIATE_TIMEOUT = 10;
 const int32_t CLONE_WAIT_REQUEST_TIMEOUT = 10;
 const int32_t CLONE_SESSION_HEARTBEAT_TIMEOUT = 20;
+const int32_t HML_SESSION_TIMEOUT = 10;
 const int32_t CANCEL_PIN_CODE_DISPLAY = 1;
 const int32_t DEVICE_ID_HALF = 2;
 const int32_t MAX_AUTH_TIMES = 3;
@@ -129,6 +131,12 @@ DmAuthManager::~DmAuthManager()
     LOGI("DmAuthManager destructor");
 }
 
+bool DmAuthManager::IsHmlSessionType()
+{
+    CHECK_NULL_RETURN(authRequestContext_, false);
+    return authRequestContext_->connSessionType == CONN_SESSION_TYPE_HML;
+}
+
 int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
@@ -181,6 +189,25 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
+    if (jsonObject.is_discarded()) {
+        return DM_OK;
+    }
+    std::string connSessionType;
+    if (IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE)) {
+        connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].get<std::string>();
+    }
+    if (connSessionType == CONN_SESSION_TYPE_HML) {
+        if (!IsInt32(jsonObject, PARAM_KEY_HML_ACTIONID)) {
+            LOGE("CONN_SESSION_TYPE_HML, input actionId is !Int32");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        int32_t actionId = jsonObject[PARAM_KEY_HML_ACTIONID].get<int32_t>();
+        if (actionId <= 0) {
+            LOGE("CONN_SESSION_TYPE_HML, input actionId is <=0");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+    }
+
     if (jsonObject.is_discarded() || jsonObject.find(TAG_BIND_LEVEL) == jsonObject.end() ||
         !IsInt32(jsonObject, TAG_BIND_LEVEL)) {
         return DM_OK;
@@ -283,8 +310,33 @@ void DmAuthManager::ParseJsonObject(nlohmann::json jsonObject)
         } else {
             authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
         }
+        ParseHmlInfoInJsonObject(jsonObject);
     }
     authRequestContext_->bundleName = GetBundleName(jsonObject);
+}
+
+void DmAuthManager::ParseHmlInfoInJsonObject(nlohmann::json jsonObject)
+{
+    CHECK_NULL_VOID(authRequestContext_);
+    if (IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE)) {
+        authRequestContext_->connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].get<std::string>();
+        LOGI("connSessionType %{public}s", authRequestContext_->connSessionType.c_str());
+    }
+    if (!IsHmlSessionType()) {
+        return;
+    }
+    authRequestContext_->closeSessionDelaySeconds = HML_SESSION_TIMEOUT;
+    if (IsBool(jsonObject, PARAM_KEY_HML_ENABLE_160M)) {
+        authRequestContext_->hmlEnable160M = jsonObject[PARAM_KEY_HML_ENABLE_160M].get<bool>();
+        LOGI("hmlEnable160M %{public}d", authRequestContext_->hmlEnable160M);
+    }
+    if (IsInt32(jsonObject, PARAM_KEY_HML_ACTIONID)) {
+        authRequestContext_->hmlActionId = jsonObject[PARAM_KEY_HML_ACTIONID].get<int32_t>();
+        if (authRequestContext_->hmlActionId <= 0) {
+            authRequestContext_->hmlActionId = 0;
+        }
+        LOGI("hmlActionId %{public}d", authRequestContext_->hmlActionId);
+    }
 }
 
 int32_t DmAuthManager::GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
@@ -802,7 +854,17 @@ void DmAuthManager::HandleAuthenticateTimeout(std::string name)
 
 int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
 {
-    int32_t sessionId = softbusConnector_->GetSoftbusSession()->OpenAuthSession(deviceId);
+    int32_t sessionId = 0;
+    if (IsHmlSessionType()) {
+        CHECK_NULL_RETURN(authRequestContext_, ERR_DM_FAILED);
+        LOGI("hmlActionId %{public}d, hmlReleaseTime %{public}d, hmlEnable160M %{public}d",
+            authRequestContext_->hmlActionId, authRequestContext_->closeSessionDelaySeconds,
+            authRequestContext_->hmlEnable160M);
+        sessionId = softbusConnector_->GetSoftbusSession()->OpenAuthSessionWithPara(deviceId,
+            authRequestContext_->hmlActionId, authRequestContext_->hmlEnable160M);
+    } else {
+        sessionId = softbusConnector_->GetSoftbusSession()->OpenAuthSession(deviceId);
+    }
     struct RadarInfo info = {
         .funcName = "EstablishAuthChannel",
         .stageRes = (sessionId > 0) ?
@@ -1098,7 +1160,7 @@ bool DmAuthManager::IsAuthFinish()
 
     if ((authResponseContext_->isIdenticalAccount && !authResponseContext_->authed) ||
         (authResponseContext_->authed && !authResponseContext_->isOnline)) {
-        softbusConnector_->JoinLnn(authRequestContext_->addr);
+        JoinLnn(authRequestContext_->addr);
         authRequestContext_->reason = DM_OK;
         authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
         authResponseContext_->reply = DM_OK;
@@ -1147,7 +1209,10 @@ int32_t DmAuthManager::ConfirmProcessExt(const int32_t &action)
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH &&
         authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_CONFIRM) {
-        if (!authResponseContext_->isShowDialog) {
+        if (CanUsePincodeFromDp()) {
+            authResponseContext_->code = std::atoi(serviceInfoProfile_.GetPinCode().c_str());
+            LOGI("import pincode from dp");
+        } else if (!authResponseContext_->isShowDialog) {
             GetAuthCode(authResponseContext_->hostPkgName, authResponseContext_->code);
         } else {
             authResponseContext_->code = GeneratePincode();
@@ -1383,6 +1448,8 @@ void DmAuthManager::AuthenticateFinish()
         srcReqMsg_ = "";
         isNeedProcCachedSrcReqMsg_ = false;
     }
+    pincodeDialogEverShown_ = false;
+    serviceInfoProfile_ = {};
     authType_ = AUTH_TYPE_UNKNOW;
     std::lock_guard<std::mutex> autoLock(g_authFinishLock);
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
@@ -1445,6 +1512,100 @@ int32_t DmAuthManager::UnRegisterUiStateCallback(const std::string pkgName)
 int32_t DmAuthManager::GeneratePincode()
 {
     return GenRandInt(MIN_PIN_CODE, MAX_PIN_CODE);
+}
+
+bool DmAuthManager::IsPinCodeValid(const std::string strpin)
+{
+    if (strpin.empty()) {
+        return false;
+    }
+    for (size_t i = 0; i < strpin.length(); i++) {
+        if (!isdigit(strpin[i])) {
+            return false;
+        }
+    }
+    int32_t pinnum = std::atoi(strpin.c_str());
+    return IsPinCodeValid(pinnum);
+}
+
+bool DmAuthManager::IsPinCodeValid(int32_t numpin)
+{
+    if (numpin < MIN_PIN_CODE || numpin > MAX_PIN_CODE) {
+        return false;
+    }
+    return true;
+}
+
+bool DmAuthManager::CanUsePincodeFromDp()
+{
+    CHECK_NULL_RETURN(authResponseContext_, false);
+    return (authResponseContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE &&
+        authResponseContext_->isSrcPincodeImported &&
+        IsPinCodeValid(serviceInfoProfile_.GetPinCode()) &&
+        serviceInfoProfile_.GetPinExchangeType() == (int32_t)DMServiceInfoPinExchangeType::FROMDP);
+}
+
+void DmAuthManager::InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key)
+{
+    CHECK_NULL_VOID(authResponseContext_);
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    key.SetDeviceId(std::string(localDeviceId));
+    key.SetBundleName(authResponseContext_->hostPkgName);
+    int32_t userId = MultipleUserConnector::GetFirstForegroundUserId();
+    key.SetUserId(userId);
+    LOGI("localDeviceId %{public}s, bundleName %{public}s",
+        GetAnonyString(std::string(localDeviceId)).c_str(), GetAnonyString(authResponseContext_->hostPkgName).c_str());
+}
+
+bool DmAuthManager::IsServiceInfoAuthTypeValid(int32_t authType)
+{
+    if (authType != (int32_t)DMServiceInfoAuthType::TRUST_ONETIME &&
+        authType != (int32_t)DMServiceInfoAuthType::TRUST_ALWAYS &&
+        authType != (int32_t)DMServiceInfoAuthType::CANCEL) {
+        return false;
+    }
+    return true;
+}
+
+bool DmAuthManager::IsServiceInfoAuthBoxTypeValid(int32_t authBoxType)
+{
+    if (authBoxType != (int32_t)DMServiceInfoAuthBoxType::STATE3 &&
+        authBoxType != (int32_t)DMServiceInfoAuthBoxType::SKIP_CONFIRM) {
+        return false;
+    }
+    return true;
+}
+
+bool DmAuthManager::IsServiceInfoPinExchangeTypeValid(int32_t pinExchangeType)
+{
+    if (pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::PINBOX &&
+        pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::FROMDP &&
+        pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::ULTRASOUND) {
+        return false;
+    }
+    return true;
+}
+
+bool DmAuthManager::IsServiceInfoProfileValid(const DistributedDeviceProfile::ServiceInfoProfile &profile)
+{
+    if (!IsServiceInfoAuthTypeValid(profile.GetAuthType())) {
+        LOGE("AuthType not valid, %{public}d", profile.GetAuthType());
+        return false;
+    }
+    if (!IsServiceInfoAuthBoxTypeValid(profile.GetAuthBoxType())) {
+        LOGE("AuthBoxType not valid, %{public}d", profile.GetAuthBoxType());
+        return false;
+    }
+    if (!IsServiceInfoPinExchangeTypeValid(profile.GetPinExchangeType())) {
+        LOGE("PinExchangeType not valid, %{public}d", profile.GetPinExchangeType());
+        return false;
+    }
+    if (!IsPinCodeValid(profile.GetPinCode())) {
+        LOGE("pincode not valid");
+        return false;
+    }
+    return true;
 }
 
 std::string DmAuthManager::GenerateGroupName()
@@ -1526,6 +1687,12 @@ void DmAuthManager::ShowConfigDialog()
         LOGE("failed to ShowConfigDialog because authResponseContext_ is nullptr");
         return;
     }
+    if (CanUsePincodeFromDp() &&
+        serviceInfoProfile_.GetAuthBoxType() == (int32_t)DMServiceInfoAuthBoxType::SKIP_CONFIRM) {
+        LOGI("no need confirm dialog");
+        StartAuthProcess(serviceInfoProfile_.GetAuthType());
+        return;
+    }
     if (!authResponseContext_->isShowDialog) {
         LOGI("start auth process");
         StartAuthProcess(authenticationType_);
@@ -1558,13 +1725,20 @@ void DmAuthManager::ShowConfigDialog()
     LOGI("ShowConfigDialog end");
 }
 
-void DmAuthManager::ShowAuthInfoDialog()
+void DmAuthManager::ShowAuthInfoDialog(bool authDeviceError)
 {
     if (authResponseContext_ == nullptr) {
         LOGE("failed to ShowAuthInfoDialog because authResponseContext_ is nullptr");
         return;
     }
     LOGI("DmAuthManager::ShowAuthInfoDialog start");
+    if (!authDeviceError && CanUsePincodeFromDp()) {
+        LOGI("pin import from dp, not show dialog");
+        return;
+    }
+    if (pincodeDialogEverShown_) {
+        return;
+    }
     if (!authResponseContext_->isShowDialog) {
         LOGI("not show dialog.");
         return;
@@ -1579,6 +1753,7 @@ void DmAuthManager::ShowAuthInfoDialog()
     nlohmann::json jsonObj;
     jsonObj[PIN_CODE_KEY] = authResponseContext_->code;
     std::string authParam = SafetyDump(jsonObj);
+    pincodeDialogEverShown_ = true;
     DmDialogManager::GetInstance().ShowPinDialog(std::to_string(authResponseContext_->code));
 }
 
@@ -1613,7 +1788,14 @@ void DmAuthManager::ShowStartAuthDialog()
         return;
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
-    DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
+    int32_t pincode = 0;
+    if (GetAuthCode(authResponseContext_->hostPkgName, pincode) == DM_OK) {
+        LOGI("already has pin code");
+        ProcessPincode(pincode);
+    } else {
+        pincodeDialogEverShown_ = true;
+        DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
+    }
 }
 
 int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
@@ -1952,10 +2134,8 @@ bool DmAuthManager::IsAuthCodeReady(const std::string &pkgName)
 
 int32_t DmAuthManager::DeleteAuthCode()
 {
-    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
-        importAuthCode_ = "";
-        importPkgName_ = "";
-    }
+    importAuthCode_ = "";
+    importPkgName_ = "";
     return DM_OK;
 }
 
@@ -1971,6 +2151,15 @@ int32_t DmAuthManager::GetAuthCode(const std::string &pkgName, int32_t &pinCode)
     }
     pinCode = std::atoi(importAuthCode_.c_str());
     return DM_OK;
+}
+
+bool DmAuthManager::IsImportedAuthCodeValid()
+{
+    int32_t pinCode = 0;
+    if (GetAuthCode(authRequestContext_->hostPkgName, pinCode) == DM_OK) {
+        return true;
+    }
+    return false;
 }
 
 bool DmAuthManager::IsAuthTypeSupported(const int32_t &authType)
@@ -2031,7 +2220,7 @@ void DmAuthManager::RequestCredentialDone()
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
     }
-    softbusConnector_->JoinLnn(authRequestContext_->addr);
+    JoinLnn(authRequestContext_->addr);
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
     authResponseContext_->reply = DM_OK;
@@ -2125,7 +2314,7 @@ void DmAuthManager::SrcAuthDeviceFinish()
         return;
     }
     if (!authResponseContext_->isOnline && authResponseContext_->haveCredential) {
-        softbusConnector_->JoinLnn(authRequestContext_->addr);
+        JoinLnn(authRequestContext_->addr);
         timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
         ConverToFinish();
         return;
@@ -2208,8 +2397,10 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
     LOGI("AuthDeviceError start.");
     isAuthDevice_ = false;
     if (authRequestState_ == nullptr || authResponseState_ != nullptr) {
+        if (CheckNeedShowAuthInfoDialog(errorCode)) {
+            return;
+        }
         authTimes_++;
-        LOGI("AuthDeviceError sink authTimes %{public}d.", authTimes_);
         if (authTimes_ >= MAX_AUTH_TIMES) {
             authResponseContext_->isFinish = false;
             authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;
@@ -2234,7 +2425,6 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTH_DEVICE_TIMEOUT_TASK));
     }
-
     if (errorCode != DM_OK || requestId != authResponseContext_->requestId) {
         if (authRequestState_ != nullptr && authTimes_ >= MAX_AUTH_TIMES) {
             authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
@@ -2248,7 +2438,7 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
                         DmAuthManager::HandleAuthenticateTimeout(name);
                     });
             }
-            authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
+            UpdateInputPincodeDialog(errorCode);
         }
     }
 }
@@ -2264,6 +2454,15 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
     int32_t ret = authMessageProcessor_->SaveSessionKey(sessionKey, sessionKeyLen);
     if (ret != DM_OK) {
         LOGE("Save session key err, ret: %{public}d", ret);
+        return;
+    }
+    authResponseContext_->localSessionKeyId = 0;
+    unsigned char hash[SHA256_DIGEST_LENGTH] = { 0 };
+    Crypto::DmGenerateStrHash(sessionKey, sessionKeyLen, hash, SHA256_DIGEST_LENGTH, 0);
+    int32_t sessionKeyId = 0;
+    ret = DeviceProfileConnector::GetInstance().PutSessionKey(hash, SHA256_DIGEST_LENGTH, sessionKeyId);
+    if (ret == DM_OK && sessionKeyId > 0) {
+        authResponseContext_->localSessionKeyId = sessionKeyId;
     }
 }
 
@@ -2360,6 +2559,10 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     }
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
+
+    if (authResponseContext_->isSrcPincodeImported) {
+        GetServiceInfoProfile();
+    }
 }
 
 void DmAuthManager::ProcRespNegotiate(const int32_t &sessionId)
@@ -2565,7 +2768,7 @@ int32_t DmAuthManager::CheckTrustState()
     }
     if (authResponseContext_->isIdenticalAccount) {
         if (IsIdenticalAccount()) {
-            softbusConnector_->JoinLnn(authResponseContext_->deviceId);
+            JoinLnn(authResponseContext_->deviceId);
             authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
             authRequestContext_->reason = DM_OK;
             authResponseContext_->reply = DM_OK;
@@ -2578,7 +2781,7 @@ int32_t DmAuthManager::CheckTrustState()
             authResponseContext_->localDeviceId)) {
             CompatiblePutAcl();
         }
-        softbusConnector_->JoinLnn(authResponseContext_->deviceId);
+        JoinLnn(authResponseContext_->deviceId);
         authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return ALREADY_BIND;
@@ -2894,8 +3097,8 @@ void DmAuthManager::RequestReCheckMsgDone()
         authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         return;
     }
-    PutAccessControlList();
     authRequestState_->TransitionTo(std::make_shared<AuthRequestCredential>());
+    PutAccessControlList();
 }
 
 bool DmAuthManager::IsSinkMsgValid()
@@ -2945,6 +3148,70 @@ void DmAuthManager::ProcessReqPublicKey()
         std::lock_guard<std::mutex> lock(srcReqMsgLock_);
         isNeedProcCachedSrcReqMsg_ = true;
     }
+}
+
+void DmAuthManager::GetServiceInfoProfile()
+{
+    DistributedDeviceProfile::ServiceInfoUniqueKey key;
+    InitServiceInfoUniqueKey(key);
+    std::vector<DistributedDeviceProfile::ServiceInfoProfile> profiles;
+    int32_t result = DeviceProfileConnector::GetInstance().GetServiceInfoProfileListByBundleName(key, profiles);
+    if (result != DM_OK) {
+        return;
+    }
+    for (auto &item : profiles) {
+        if (IsServiceInfoProfileValid(item)) {
+            serviceInfoProfile_ = item;
+            LOGI("authBoxType %{public}d, authType %{public}d, pinExchangeType %{public}d",
+                serviceInfoProfile_.GetAuthBoxType(), serviceInfoProfile_.GetAuthType(),
+                serviceInfoProfile_.GetPinExchangeType());
+            auto updateProfile = serviceInfoProfile_;
+            updateProfile.SetPinCode("######");
+            DeviceProfileConnector::GetInstance().UpdateServiceInfoProfile(updateProfile);
+            break;
+        }
+    }
+}
+
+bool DmAuthManager::CheckNeedShowAuthInfoDialog(int32_t errorCode)
+{
+    CHECK_NULL_RETURN(authResponseContext_, false);
+    if (errorCode == ERR_DM_HICHAIN_PROOFMISMATCH && !pincodeDialogEverShown_ && CanUsePincodeFromDp()) {
+        authResponseContext_->code = GeneratePincode();
+        LOGI("AuthDeviceError, GeneratePincode, ShowAuthInfoDialog");
+        authTimes_ = 0;
+        ShowAuthInfoDialog(true);
+        return true;
+    }
+    return false;
+}
+
+void DmAuthManager::UpdateInputPincodeDialog(int32_t errorCode)
+{
+    CHECK_NULL_VOID(authResponseContext_);
+    CHECK_NULL_VOID(authUiStateMgr_);
+    if (authResponseContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE && !pincodeDialogEverShown_ &&
+        IsImportedAuthCodeValid() && errorCode == ERR_DM_HICHAIN_PROOFMISMATCH) {
+        LOGI("AuthDeviceError, ShowStartAuthDialog");
+        authTimes_ = 0;
+        DeleteAuthCode();
+        ShowStartAuthDialog();
+    } else {
+        authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
+    }
+}
+
+void DmAuthManager::JoinLnn(const std::string &deviceId)
+{
+    CHECK_NULL_VOID(authRequestContext_);
+    CHECK_NULL_VOID(authResponseContext_);
+    CHECK_NULL_VOID(softbusConnector_);
+    if (IsHmlSessionType()) {
+        softbusConnector_->JoinLnnByHml(authRequestContext_->sessionId, authResponseContext_->localSessionKeyId,
+            authResponseContext_->remoteSessionKeyId);
+        return;
+    }
+    softbusConnector_->JoinLnn(deviceId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

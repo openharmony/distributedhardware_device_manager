@@ -96,6 +96,26 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
     return;
 }
 
+void SoftbusConnector::JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId)
+{
+    LOGI("start, JoinLnnByHml sessionId: %{public}d.", sessionId);
+    ConnectionAddr addrInfo;
+    addrInfo.type = CONNECTION_ADDR_SESSION_WITH_KEY;
+    addrInfo.info.session.sessionId = sessionId;
+    if (sessionKeyId > 0 && remoteSessionKeyId > 0) {
+        addrInfo.info.session.localDeviceKeyId = sessionKeyId;
+        addrInfo.info.session.remoteDeviceKeyId = remoteSessionKeyId;
+        LOGI("sessionKeyId valid");
+    } else {
+        addrInfo.info.session.localDeviceKeyId = 0;
+        addrInfo.info.session.remoteDeviceKeyId = 0;
+    }
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]JoinLNN failed, ret: %{public}d.", ret);
+    }
+}
+
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
     LOGI("start, networkId: %{public}s.", GetAnonyString(std::string(networkId)).c_str());

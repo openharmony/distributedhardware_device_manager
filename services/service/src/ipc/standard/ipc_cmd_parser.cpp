@@ -1740,5 +1740,89 @@ ON_IPC_CMD(GET_LOCAL_DISPLAY_DEVICE_NAME, MessageParcel &data, MessageParcel &re
     }
     return DM_OK;
 }
+
+ON_IPC_CMD(GEN_SERVICEID, MessageParcel &data, MessageParcel &reply)
+{
+    int64_t serviceId = DeviceManagerService::GetInstance().GenerateSerivceId();
+    int32_t result = DM_OK;
+    if (serviceId == 0) {
+        result = ERR_DM_FAILED;
+    }
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt64(serviceId)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(REG_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    DMServiceInfo serviceInfo;
+    IpcModelCodec::DecodeServiceInfo(data, serviceInfo);
+    int32_t result = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceInfo);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(UNREG_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    int64_t serviceId = data.ReadInt64();
+    int32_t result = DeviceManagerService::GetInstance().UnRegisterServiceInfo(serviceId);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(UPDATE_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
+{
+    DMServiceInfo serviceInfo;
+    IpcModelCodec::DecodeServiceInfo(data, serviceInfo);
+    int32_t result = DeviceManagerService::GetInstance().UpdateServiceInfo(serviceInfo);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_SERVICEINFO_BYID, MessageParcel &data, MessageParcel &reply)
+{
+    int64_t serviceId = data.ReadInt64();
+    DMServiceInfo serviceInfo;
+    int32_t result = DeviceManagerService::GetInstance().GetServiceInfoById(serviceId, serviceInfo);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (result == DM_OK && !IpcModelCodec::EncodeServiceInfo(serviceInfo, reply)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(GET_SERVICEINFOS_CALLER, MessageParcel &data, MessageParcel &reply)
+{
+    std::vector<DMServiceInfo> serviceInfos;
+    int32_t result = DeviceManagerService::GetInstance().GetCallerServiceInfos(serviceInfos);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (result == DM_OK && !IpcModelCodec::EncodeServiceInfos(serviceInfos, reply)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

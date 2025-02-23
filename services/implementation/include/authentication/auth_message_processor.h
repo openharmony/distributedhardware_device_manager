@@ -43,6 +43,7 @@ constexpr const char* TAG_INDEX = "INDEX";
 constexpr const char* TAG_SLICE_NUM = "SLICE";
 constexpr const char* TAG_IS_AUTH_CODE_READY = "IS_AUTH_CODE_READY";
 constexpr const char* TAG_IS_SHOW_DIALOG = "IS_SHOW_DIALOG";
+constexpr const char* TAG_SRC_PINCODE_IMPORTED = "TAG_SRC_PINCODE_IMPORTED";
 constexpr const char* TAG_TOKEN = "TOKEN";
 constexpr const char* TAG_CRYPTO_NAME = "CRYPTONAME";
 constexpr const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
@@ -78,6 +79,7 @@ constexpr const char* TAG_BUNDLE_NAME = "bundleName";
 constexpr const char* TAG_CRYPTIC_MSG = "encryptMsg";
 constexpr const char* TAG_PEER_BUNDLE_NAME = "PEER_BUNDLE_NAME";
 constexpr const char* TAG_REMOTE_DEVICE_NAME = "REMOTE_DEVICE_NAME";
+constexpr const char* TAG_SESSIONKEY_ID = "sessionKeyId";
 
 class DmAuthManager;
 struct DmAuthRequestContext;
@@ -119,6 +121,7 @@ private:
     void GetJsonObj(nlohmann::json &jsonObj);
     void CreateReqReCheckMessage(nlohmann::json &jsonObj);
     void ParseReqReCheckMessage(nlohmann::json &json);
+    bool IsPincodeImported();
 
 private:
     std::weak_ptr<DmAuthManager> authMgr_;

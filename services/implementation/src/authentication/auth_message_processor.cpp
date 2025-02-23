@@ -82,6 +82,15 @@ void AuthMessageProcessor::GetJsonObj(nlohmann::json &jsonObj)
     }
 }
 
+bool AuthMessageProcessor::IsPincodeImported()
+{
+    auto sptrAuthMgr = authMgr_.lock();
+    if (sptrAuthMgr == nullptr) {
+        return false;
+    }
+    return sptrAuthMgr->IsImportedAuthCodeValid();
+}
+
 std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
 {
     LOGI("AuthMessageProcessor::CreateAuthRequestMessage start.");
@@ -167,6 +176,7 @@ void AuthMessageProcessor::CreatePublicKeyMessageExt(nlohmann::json &json)
         return;
     } else {
         nlohmann::json jsonTemp;
+        jsonTemp[TAG_SESSIONKEY_ID] = authResponseContext_->localSessionKeyId;
         jsonTemp[TAG_PUBLICKEY] = authResponseContext_->publicKey;
         std::string strTemp = SafetyDump(jsonTemp);
         std::string encryptStr = "";
@@ -218,6 +228,13 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_HOST_PKGLABEL] = authResponseContext_->hostPkgLabel;
     json[TAG_EDITION] = authResponseContext_->edition;
     json[TAG_REMOTE_DEVICE_NAME] = authResponseContext_->remoteDeviceName;
+    if (authRequestContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE && IsPincodeImported()) {
+        LOGI("TAG_SRC_PINCODE_IMPORTED set");
+        json[TAG_SRC_PINCODE_IMPORTED] = true;
+    } else {
+        LOGI("TAG_SRC_PINCODE_IMPORTED not set");
+        json[TAG_SRC_PINCODE_IMPORTED] = false;
+    }
 }
 
 void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
@@ -368,6 +385,10 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(nlohmann::json &json)
         }
         if (IsString(jsonObject, TAG_PUBLICKEY)) {
             authResponseContext_->publicKey = jsonObject[TAG_PUBLICKEY].get<std::string>();
+        }
+        if (IsInt32(jsonObject, TAG_SESSIONKEY_ID)) {
+            authResponseContext_->remoteSessionKeyId = jsonObject[TAG_SESSIONKEY_ID].get<int32_t>();
+            LOGI("got remoteSessionKeyId");
         }
         return;
     }
@@ -606,6 +627,9 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
         authResponseContext_->remoteDeviceName = json[TAG_REMOTE_DEVICE_NAME].get<std::string>();
     }
     ParsePkgNegotiateMessage(json);
+    if (IsBool(json, TAG_SRC_PINCODE_IMPORTED)) {
+        authResponseContext_->isSrcPincodeImported = json[TAG_SRC_PINCODE_IMPORTED].get<bool>();
+    }
 }
 
 void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)

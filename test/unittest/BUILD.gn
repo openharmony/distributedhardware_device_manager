@@ -149,6 +149,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_client") {
   include_dirs = [ "${devicemanager_path}/commondependency/include" ]
 
   sources = [
+    "${common_path}/src/ipc/standard/ipc_model_codec.cpp",
     "${innerkits_path}/native_cpp/src/ipc/standard/ipc_cmd_parser.cpp",
     "UTTest_ipc_cmd_parser_client.cpp",
   ]

@@ -50,6 +50,10 @@ public:
     static bool EncodeDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFilterOptions &filterOptions,
         MessageParcel &parcel);
     static void DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo);
+    static bool EncodeServiceInfo(const DMServiceInfo &serviceInfo, MessageParcel &parcel);
+    static bool EncodeServiceInfos(const std::vector<DMServiceInfo> &serviceInfos, MessageParcel &parcel);
+    static bool DecodeServiceInfo(MessageParcel &parcel, DMServiceInfo &serviceInfo);
+    static bool DecodeServiceInfos(MessageParcel &parcel, std::vector<DMServiceInfo> &serviceInfos);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
