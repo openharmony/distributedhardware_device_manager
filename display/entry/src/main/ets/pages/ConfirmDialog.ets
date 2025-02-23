@@ -20,6 +20,7 @@ import common from '@ohos.app.ability.common';
 import display from '@ohos.display';
 import mediaQuery from '@ohos.mediaquery';
 import i18n from '@ohos.i18n';
+import { KeyCode } from '@ohos.multimodalInput.keyCode';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
@@ -293,6 +294,17 @@ struct ConfirmCustomDialog {
             Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
               .margin({ left: 16, right: 16 })
               .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .defaultFocus(true)
+              .onKeyEvent((event?: KeyEvent) => {
+                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  return;
+                }
+                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  this.onCancel();
+                }
+              })
               .onClick(() => {
                 this.onCancel();
               })
@@ -335,6 +347,9 @@ struct dialogPlusPage {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: ConfirmCustomDialog(),
     autoCancel: false,
+    onWillDismiss: ()=>{
+      this.onWillDismiss()
+    },
     alignment: DialogAlignment.Center,
     offset: { dx: 0, dy: -20 },
     customStyle: true,
@@ -364,6 +379,25 @@ struct dialogPlusPage {
           }
         })
       })
+  }
+
+  onWillDismiss() {
+    console.log(TAG + 'onWillDismiss: ' + ACTION_CANCEL_AUTH)
+    this.setUserOperation(ACTION_CANCEL_AUTH);
+    this.destruction();
+  }
+
+  setUserOperation(operation: number) {
+    console.log(TAG + 'setUserOperation: ' + operation)
+    if (dmClass == null) {
+      console.log(TAG + 'setUserOperation: ' + 'dmClass null')
+      return;
+    }
+    try {
+      dmClass.setUserOperation(operation, 'extra');
+    } catch (error) {
+      console.log(TAG + 'dmClass setUserOperation failed')
+    }
   }
 
   onPageShow() {
