@@ -258,7 +258,8 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
     ]
 
-    if ((support_bluetooth || support_wifi) && device_manager_feature_product == "default") {
+    if ((support_bluetooth || support_wifi) &&
+        device_manager_feature_product == "default") {
       sources += [
         "src/publishcommonevent/dm_publish_common_event.cpp",
         "src/softbus/softbus_publish.cpp",
