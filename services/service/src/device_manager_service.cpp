@@ -1000,8 +1000,10 @@ int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgNa
 
 bool DeviceManagerService::IsDMServiceImplReady()
 {
+    LOGI("Start.");
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
+        LOGI("devicemanagerserviceimpl so has loaded.");
         return true;
     }
     void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
@@ -1030,6 +1032,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
         return false;
     }
     isImplsoLoaded_ = true;
+    LOGI("Sussess.");
     return true;
 }
 
@@ -1258,6 +1261,7 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
     }
     std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
     if (isAdapterResidentSoLoaded_ && (dmServiceImplExtResident_ != nullptr)) {
+        LOGI("devicemanagerresident so has loaded.");
         return true;
     }
     residentSoHandle_ = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
@@ -1434,11 +1438,11 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("BindTarget failed, DMServiceImpl instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
     if (bindParam.find(PARAM_KEY_META_TYPE) == bindParam.end()) {
+        if (!IsDMServiceImplReady()) {
+            LOGE("BindTarget failed, DMServiceImpl instance not init or init failed.");
+            return ERR_DM_NOT_INIT;
+        }
         LOGI("BindTarget stardard begin.");
         if (targetId.wifiIp.empty() || targetId.wifiIp.length() > IP_STR_MAX_LEN) {
             return dmServiceImpl_->BindTarget(pkgName, targetId, bindParam);
