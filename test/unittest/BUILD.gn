@@ -1301,6 +1301,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
@@ -1364,6 +1365,7 @@ ohos_unittest("UTTest_dm_auth_manager_third") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]

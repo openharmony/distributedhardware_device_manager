@@ -26,6 +26,7 @@ ohos_shared_library("devicemanagerdependency") {
   }
 
   cflags = [
+    "-Werror",
     "-fPIC",
     "-fstack-protector-strong",
   ]
