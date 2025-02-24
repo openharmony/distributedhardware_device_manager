@@ -297,7 +297,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     bool bRet = false;
-    if (ret == DM_OK || ret == ERR_DM_UNSUPPORTED_METHOD || ret == ERR_DM_FAILED) {
+    if (ret == DM_OK || ret == ERR_DM_UNSUPPORTED_METHOD || ret == ERR_DM_INPUT_PARA_INVALID) {
         bRet = true;
     }
     ASSERT_EQ(bRet, true);
