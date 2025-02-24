@@ -63,6 +63,8 @@ bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
     } else {
         HiSysEventParam params[] = {
             {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
+            {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
+                .v = { .s = (char *)info.hostName.c_str() }, .arraySize = 0, },
             {.name = "FUNC", .t = HISYSEVENT_STRING, .v = { .s = (char *)info.funcName.c_str() }, .arraySize = 0, },
             {.name = "API_TYPE", .t = HISYSEVENT_INT32, .v = { .i32 = GetApiType(), }, .arraySize = 0, },
             {.name = "BIZ_SCENE", .t = HISYSEVENT_INT32,
@@ -102,6 +104,8 @@ int32_t DmRadarHelper::ReportDiscoverResCallbackStageSucc(struct RadarInfo &info
             .v = { .i32 = static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK), }, .arraySize = 0, },
         {.name = "STAGE_RES", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(StageRes::STAGE_SUCC), }, .arraySize = 0, },
+        {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
+            .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
         {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)GetAnonyUdid(info.peerUdid).c_str() }, .arraySize = 0, },
         {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
@@ -114,7 +118,7 @@ int32_t DmRadarHelper::ReportDiscoverResCallbackStageSucc(struct RadarInfo &info
     size_t len = sizeof(params) / sizeof(params[0]);
     return OH_HiSysEvent_Write(
         OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
-        DM_DISCOVER_BEHAVIOR.c_str(), HISYSEVENT_BEHAVIOR, params, len);    
+        DM_DISCOVER_BEHAVIOR.c_str(), HISYSEVENT_BEHAVIOR, params, len);
 }
 
 bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
@@ -143,6 +147,8 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
                 .v = { .s = (char *)GetAnonyLocalUdid().c_str() }, .arraySize = 0, },
             {.name = "COMM_SERV", .t = HISYSEVENT_INT32,
                 .v = { .i32 = static_cast<int32_t>(CommServ::USE_SOFTBUS), }, .arraySize = 0, },
+            {.name = "PEER_NET_ID", .t = HISYSEVENT_STRING,
+                .v = { .s = (char *)GetAnonyUdid(info.peerNetId).c_str() }, .arraySize = 0, },
             {.name = "ERROR_CODE", .t = HISYSEVENT_INT32, .v = { .i32 = info.errCode, }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
@@ -185,6 +191,8 @@ int32_t DmRadarHelper::ReportDiscoverUserResStageSucc(struct RadarInfo &info)
 {
     HiSysEventParam params[] = {
         {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
+        {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
+            .v = { .s = (char *)info.hostName.c_str() }, .arraySize = 0, },
         {.name = "FUNC", .t = HISYSEVENT_STRING, .v = { .s = (char *)info.funcName.c_str() }, .arraySize = 0, },
         {.name = "API_TYPE", .t = HISYSEVENT_INT32, .v = { .i32 = GetApiType(), }, .arraySize = 0, },
         {.name = "BIZ_SCENE", .t = HISYSEVENT_INT32,
@@ -194,6 +202,8 @@ int32_t DmRadarHelper::ReportDiscoverUserResStageSucc(struct RadarInfo &info)
         {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = info.stageRes, }, .arraySize = 0, },
         {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
+        {.name = "COMM_SERV", .t = HISYSEVENT_INT32,
+            .v = { .i32 = static_cast<int32_t>(CommServ::USE_SOFTBUS), }, .arraySize = 0, },
     };
     size_t len = sizeof(params) / sizeof(params[0]);
     return OH_HiSysEvent_Write(
@@ -287,6 +297,7 @@ int32_t DmRadarHelper::ReportAuthOpenSessionStageIdle(struct RadarInfo &info)
             .v = { .i32 = static_cast<int32_t>(AuthScene::DM_AUTHCATION), }, .arraySize = 0, },
         {.name = "BIZ_STAGE", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(AuthStage::AUTH_OPEN_SESSION), }, .arraySize = 0, },
+        {.name = "BIZ_STATE", .t = HISYSEVENT_INT32, .v = { .i32 = info.bizState, }, .arraySize = 0, },
         {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = info.stageRes, }, .arraySize = 0, },
         {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)GetAnonyUdid(info.peerUdid).c_str() }, .arraySize = 0, },
@@ -439,6 +450,7 @@ bool DmRadarHelper::ReportAuthConfirmBox(struct RadarInfo &info)
             {.name = "BIZ_STAGE", .t = HISYSEVENT_INT32,
                 .v = { .i32 = static_cast<int32_t>(AuthStage::AUTH_PULL_AUTH_BOX), }, .arraySize = 0, },
             {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = info.stageRes, }, .arraySize = 0, },
+            {.name = "BIZ_STATE", .t = HISYSEVENT_INT32, .v = { .i32 = info.bizState, }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
         res = OH_HiSysEvent_Write(
@@ -478,10 +490,11 @@ int32_t DmRadarHelper::ReportAuthCreateGroupStageIdle(struct RadarInfo &info)
         {.name = "BIZ_STAGE", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP), }, .arraySize = 0, },
         {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = info.stageRes, }, .arraySize = 0, },
-        {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
-            .v = { .s = (char *)GetAnonyLocalUdid().c_str() }, .arraySize = 0, },
+        {.name = "BIZ_STATE", .t = HISYSEVENT_INT32, .v = { .i32 = info.bizState, }, .arraySize = 0, },
         {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)info.toCallPkg.c_str() }, .arraySize = 0, },
+        {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
+            .v = { .s = (char *)GetAnonyLocalUdid().c_str() }, .arraySize = 0, },
     };
     size_t len = sizeof(params) / sizeof(params[0]);
     return OH_HiSysEvent_Write(
@@ -535,6 +548,8 @@ bool DmRadarHelper::ReportAuthCreateGroupCb(std::string funcName, int32_t stageR
                 .v = { .i32 = static_cast<int32_t>(AuthStage::AUTH_CREATE_HICHAIN_GROUP), }, .arraySize = 0, },
             {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = stageRes, }, .arraySize = 0, },
             {.name = "HOST_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)HICHAINNAME.c_str() }, .arraySize = 0, },
+            {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
+                .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
         res = OH_HiSysEvent_Write(
@@ -601,6 +616,7 @@ bool DmRadarHelper::ReportAuthInputPinBox(struct RadarInfo &info)
             {.name = "BIZ_STAGE", .t = HISYSEVENT_INT32,
                 .v = { .i32 = static_cast<int32_t>(AuthStage::AUTH_PULL_PIN_INPUT_BOX_END), }, .arraySize = 0, },
             {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = info.stageRes, }, .arraySize = 0, },
+            {.name = "BIZ_STATE", .t = HISYSEVENT_INT32, .v = { .i32 = info.bizState, }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
         res = OH_HiSysEvent_Write(
@@ -646,6 +662,8 @@ int32_t DmRadarHelper::ReportAuthAddGroupStageIdle(struct RadarInfo &info)
             .v = { .s = (char *)GetAnonyUdid(info.peerUdid).c_str() }, .arraySize = 0, },
         {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)HICHAINNAME.c_str() }, .arraySize = 0, },
+        {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
+            .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
     };
     size_t len = sizeof(params) / sizeof(params[0]);
     return OH_HiSysEvent_Write(
@@ -701,10 +719,10 @@ bool DmRadarHelper::ReportAuthAddGroupCb(std::string funcName, int32_t stageRes)
             {.name = "BIZ_STAGE", .t = HISYSEVENT_INT32,
                 .v = { .i32 = static_cast<int32_t>(AuthStage::AUTH_ADD_HICHAIN_GROUP), }, .arraySize = 0, },
             {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = stageRes, }, .arraySize = 0, },
-            {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
-                .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
             {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
                 .v = { .s = (char *)HICHAINNAME.c_str() }, .arraySize = 0, },
+            {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
+                .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
         res = OH_HiSysEvent_Write(
@@ -855,7 +873,7 @@ int32_t DmRadarHelper::ReportCreatePinHolderStageSucc(std::string hostName,
         {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)GetAnonyUdid(peerUdid).c_str() }, .arraySize = 0, },
         {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
-                .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
+            .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
     };
     size_t len = sizeof(params) / sizeof(params[0]);
     return OH_HiSysEvent_Write(
@@ -924,12 +942,14 @@ int32_t DmRadarHelper::ReportDestroyPinHolderStageSucc(std::string hostName,
             .v = { .i32 = static_cast<int32_t>(PinHolderStage::DESTROY_PIN_HOLDER), }, .arraySize = 0, },
         {.name = "STAGE_RES", .t = HISYSEVENT_INT32,
             .v = { .i32 = static_cast<int32_t>(StageRes::STAGE_SUCC), }, .arraySize = 0, },
+        {.name = "BIZ_STATE", .t = HISYSEVENT_INT32,
+            .v = { .i32 = static_cast<int32_t>(BizState::BIZ_STATE_END), }, .arraySize = 0, },
         {.name = "LOCAL_UDID", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)GetAnonyLocalUdid().c_str() }, .arraySize = 0, },
         {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)GetAnonyUdid(peerUdid).c_str() }, .arraySize = 0, },
         {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
-                .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
+            .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
     };
     size_t len = sizeof(params) / sizeof(params[0]);
     return OH_HiSysEvent_Write(
@@ -967,7 +987,7 @@ void DmRadarHelper::ReportDestroyPinHolder(std::string hostName,
             {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
                 .v = { .s = (char *)GetAnonyUdid(peerUdid).c_str() }, .arraySize = 0, },
             {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
-                    .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
+                .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
             {.name = "ERROR_CODE", .t = HISYSEVENT_INT32, .v = { .i32 = errCode, }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
@@ -998,7 +1018,7 @@ int32_t DmRadarHelper::ReportSendOrReceiveHolderMsgStageOther(int32_t bizStage,
         {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)GetAnonyUdid(peerUdid).c_str() }, .arraySize = 0, },
         {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
-                .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
+            .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
     };
     size_t len = sizeof(params) / sizeof(params[0]);
     return OH_HiSysEvent_Write(
@@ -1025,7 +1045,7 @@ void DmRadarHelper::ReportSendOrReceiveHolderMsg(int32_t bizStage, std::string f
             {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
                 .v = { .s = (char *)GetAnonyUdid(peerUdid).c_str() }, .arraySize = 0, },
             {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
-                    .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
+                .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
         res = OH_HiSysEvent_Write(
@@ -1050,7 +1070,7 @@ int32_t DmRadarHelper::ReportGetTrustDeviceListResultFailed(std::string hostName
     int32_t errCode, std::string localUdid, std::string discoverDevList)
 {
     HiSysEventParam params[] = {
-        {.name = "ORG_PKG", .t = HISYSEVENT_STRING, 
+        {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
         {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1088,7 +1108,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
         if (deviceCount > 0 && TrustCallerName != hostName) {
             TrustCallerName = hostName;
             HiSysEventParam params[] = {
-                {.name = "ORG_PKG", .t = HISYSEVENT_STRING, 
+                {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
                 {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1114,7 +1134,7 @@ void DmRadarHelper::ReportGetTrustDeviceList(std::string hostName,
                 DM_AUTHCATION_BEHAVIOR.c_str(), HISYSEVENT_BEHAVIOR, params, len);
         }
     } else {
-        res = ReportGetTrustDeviceListResultFailed(hostName, funcName, 
+        res = ReportGetTrustDeviceListResultFailed(hostName, funcName,
             deviceInfoList, errCode, localUdid, discoverDevList);
     }
     if (res != DM_OK) {
@@ -1127,7 +1147,7 @@ int32_t DmRadarHelper::ReportDmBehaviorResultSucc(std::string hostName, std::str
     int32_t errCode, std::string localUdid)
 {
     HiSysEventParam params[] = {
-        {.name = "ORG_PKG", .t = HISYSEVENT_STRING, 
+        {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
         {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1157,7 +1177,7 @@ void DmRadarHelper::ReportDmBehavior(std::string hostName, std::string funcName,
         res = ReportDmBehaviorResultSucc(hostName, funcName, errCode, localUdid);
     } else {
         HiSysEventParam params[] = {
-            {.name = "ORG_PKG", .t = HISYSEVENT_STRING, 
+            {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
                 .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
             {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
                 .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1189,7 +1209,7 @@ int32_t DmRadarHelper::ReportGetLocalDevInfoResultSucc(std::string hostName,
     std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid)
 {
     HiSysEventParam params[] = {
-        {.name = "ORG_PKG", .t = HISYSEVENT_STRING, 
+        {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
         {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1226,7 +1246,7 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
             res = ReportGetLocalDevInfoResultSucc(hostName, funcName, info, errCode, localUdid);
         } else {
             HiSysEventParam params[] = {
-                {.name = "ORG_PKG", .t = HISYSEVENT_STRING, 
+                {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
                 {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1263,7 +1283,7 @@ int32_t DmRadarHelper::ReportGetDeviceInfoResultSucc(std::string hostName,
     std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid)
 {
     HiSysEventParam params[] = {
-        {.name = "ORG_PKG", .t = HISYSEVENT_STRING, 
+        {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
         {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
@@ -1302,7 +1322,7 @@ void DmRadarHelper::ReportGetDeviceInfo(std::string hostName,
             res = ReportGetDeviceInfoResultSucc(hostName, funcName, info, errCode, localUdid);
         } else {
             HiSysEventParam params[] = {
-                {.name = "ORG_PKG", .t = HISYSEVENT_STRING, 
+                {.name = "ORG_PKG", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
                 {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
                     .v = { .s = (char *)hostName.c_str() }, .arraySize = 0, },
