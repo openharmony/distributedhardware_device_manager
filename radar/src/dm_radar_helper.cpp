@@ -842,7 +842,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
         {.name = "PEER_NET_ID", .t = HISYSEVENT_STRING,
             .v = { .s = (char *)GetAnonyUdid(info.peerUdid).c_str() }, .arraySize = 0, },
         {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
-                .v = { .s = (char *)info.toCallPkg.c_str() }, .arraySize = 0, },
+            .v = { .s = (char *)info.toCallPkg.c_str() }, .arraySize = 0, },
     };
     size_t len = sizeof(params) / sizeof(params[0]);
     int32_t res = OH_HiSysEvent_Write(
