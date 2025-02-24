@@ -1003,7 +1003,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
     LOGI("Start.");
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
-        LOGI("devicemanagerserviceimpl so has loaded.");
+        LOGI("Devicemanagerserviceimpl so has been loaded.");
         return true;
     }
     void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
@@ -1261,7 +1261,7 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
     }
     std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
     if (isAdapterResidentSoLoaded_ && (dmServiceImplExtResident_ != nullptr)) {
-        LOGI("devicemanagerresident so has loaded.");
+        LOGI("Devicemanagerresident so has been loaded.");
         return true;
     }
     residentSoHandle_ = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
