@@ -278,11 +278,13 @@ std::unordered_set<std::string> PermissionManager::GetWhiteListSystemSA()
 
 bool PermissionManager::CheckSystemSA(const std::string &pkgName)
 {
+    LOGI("Get calling tokenID.");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
         LOGE("CheckMonitorPermission GetCallingTokenID error.");
         return false;
     }
+    LOGI("Get token type flag.");
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
         return true;

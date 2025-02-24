@@ -243,15 +243,18 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
         }
     }
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
+    LOGI("Add death recipient.");
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
     }
+    LOGI("Checking the number of listeners.");
     if (dmListener_.size() > MAX_CALLBACK_NUM || appRecipient_.size() > MAX_CALLBACK_NUM) {
         LOGE("dmListener_ or appRecipient_ size exceed the limit!");
         return ERR_DM_FAILED;
     }
     dmListener_[processInfo] = listener;
     appRecipient_[processInfo] = appRecipient;
+    LOGI("Add system sa.");
     AddSystemSA(processInfo.pkgName);
     LOGI("Register listener complete.");
     return DM_OK;
