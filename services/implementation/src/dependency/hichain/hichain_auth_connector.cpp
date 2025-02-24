@@ -59,7 +59,6 @@ int32_t HiChainAuthConnector::RegisterHiChainAuthCallback(std::shared_ptr<IDmDev
 int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, std::string udid, int64_t requestId)
 {
     LOGI("HiChainAuthConnector::AuthDevice start.");
-    (void)udid;
     nlohmann::json authParamJson;
     authParamJson["osAccountId"] = osAccountId;
     authParamJson["pinCode"] = std::to_string(pinCode);
@@ -104,7 +103,6 @@ char *HiChainAuthConnector::onRequest(int64_t requestId, int operationCode, cons
     LOGI("HiChainAuthConnector::onRequest start.");
     (void)requestId;
     (void)reqParams;
-    (void)operationCode;
     if (dmDeviceAuthCallback_ == nullptr) {
         LOGE("HiChainAuthConnector::onRequest dmDeviceAuthCallback_ is nullptr.");
         return nullptr;

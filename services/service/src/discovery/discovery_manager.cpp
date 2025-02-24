@@ -528,8 +528,7 @@ void DiscoveryManager::HandleDiscoveryTimeout(const std::string &pkgName)
 void DiscoveryManager::UpdateInfoFreq(
     const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo)
 {
-    auto it = discoverParam.find(PARAM_KEY_DISC_FREQ);
-    if (it != discoverParam.end()) {
+    if (auto it = discoverParam.find(PARAM_KEY_DISC_FREQ); it != discoverParam.end()) {
         int32_t freq = StringToInt(it->second, DECIMALISM);
         if (freq < DmExchangeFreq::DM_LOW || freq > DmExchangeFreq::DM_FREQ_BUTT) {
             LOGE("Invalid freq value.");

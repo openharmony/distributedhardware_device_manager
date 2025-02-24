@@ -242,7 +242,6 @@ int32_t MultipleUserConnector::GetFirstForegroundUserId(void)
 int32_t MultipleUserConnector::GetBackgroundUserIds(std::vector<int32_t> &userIdVec)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    (void)userIdVec;
     return DM_OK;
 #elif OS_ACCOUNT_PART_EXISTS
     userIdVec.clear();
@@ -283,7 +282,6 @@ int32_t MultipleUserConnector::GetBackgroundUserIds(std::vector<int32_t> &userId
 int32_t MultipleUserConnector::GetAllUserIds(std::vector<int32_t> &userIdVec)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    (void)userIdVec;
     return DM_OK;
 #elif OS_ACCOUNT_PART_EXISTS
     userIdVec.clear();
@@ -306,7 +304,6 @@ int32_t MultipleUserConnector::GetAllUserIds(std::vector<int32_t> &userIdVec)
 std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    (void)userId;
     return "";
 #elif OS_ACCOUNT_PART_EXISTS
     OhosAccountInfo accountInfo;
