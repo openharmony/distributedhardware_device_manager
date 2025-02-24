@@ -47,7 +47,8 @@ const int32_t MAX_OBJECT_LEN = 4096;
 void JsObjectToString(const napi_env &env, const napi_value &object, const std::string &fieldStr,
                       char *dest, const int32_t destLen)
 {
-    if (dest == nullptr || destLen < 0 || destLen > MAX_OBJECT_LEN) {
+    if (dest == nullptr || destLen < 0 || (destLen > MAX_OBJECT_LEN && fieldStr != CUSTOM_DESCRIPTION) ||
+        destLen > DM_NAPI_DESCRIPTION_BUF_LENGTH) {
         return;
     }
     bool hasProperty = false;
@@ -292,6 +293,7 @@ void DmDeviceBasicToJsObject(napi_env env, const DmDeviceBasicInfo &devInfo, nap
     SetValueUtf8String(env, "deviceName", devInfo.deviceName, result);
     std::string deviceType = GetDeviceTypeById(static_cast<DmDeviceType>(devInfo.deviceTypeId));
     SetValueUtf8String(env, "deviceType", deviceType.c_str(), result);
+    SetValueUtf8String(env, "extraData", devInfo.extraData.c_str(), result);
 }
 
 void JsToDmPublishInfo(const napi_env &env, const napi_value &object, DmPublishInfo &info)
@@ -429,6 +431,17 @@ void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::st
     }
     extra = SafetyDump(jsonObj);
     LOGI("JsToDmDiscoveryExtra, extra :%{public}s", extra.c_str());
+}
+
+void JsToDiscoveryParam(const napi_env &env, const napi_value &object,
+    std::map<std::string, std::string> &discParam)
+{
+    char customData[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "CUSTOM_DATA", customData, sizeof(customData));
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_CUSTOM_DATA, customData));
+    char capability[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "DISC_CAPABILITY", capability, sizeof(capability));
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_DISC_CAPABILITY, capability));
 }
 
 void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap)

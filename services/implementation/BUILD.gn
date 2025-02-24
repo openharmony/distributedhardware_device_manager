@@ -124,6 +124,7 @@ if (defined(ohos_lite)) {
       "include/dependency/multipleuser",
       "include/dependency/hichain",
       "include/dependency/softbus",
+      "include/i18n",
       "${common_path}/include",
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
@@ -191,6 +192,7 @@ if (defined(ohos_lite)) {
       "src/dependency/softbus/softbus_session.cpp",
       "src/device_manager_service_impl.cpp",
       "src/devicestate/dm_device_state_manager.cpp",
+      "src/i18n/dm_language_manager.cpp",
     ]
 
     public_configs = [ ":devicemanagerserviceimpl_config" ]

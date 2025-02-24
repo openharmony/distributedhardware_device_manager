@@ -536,6 +536,7 @@ ohos_unittest("UTTest_mine_softbus_listener") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1433,6 +1434,7 @@ ohos_unittest("UTTest_discovery_manager") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",

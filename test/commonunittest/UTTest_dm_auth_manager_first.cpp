@@ -1382,21 +1382,21 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize
     std::string extra = R"({"extra": {"bindLevel": "123"}})";
     nlohmann::json jsonObject;
     jsonObject["bindLevel"] = 1;
-    int32_t ret = authManager_->CheckAuthParamVaildExtra(extra);
-    EXPECT_EQ(ret, DM_OK);
+    int32_t ret = authManager_->CheckAuthParamVaildExtra(extra, "");
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     extra = SafetyDump(jsonObject);
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
-    ret = authManager_->CheckAuthParamVaildExtra(extra);
+    ret = authManager_->CheckAuthParamVaildExtra(extra, "");
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
-    ret = authManager_->CheckAuthParamVaildExtra(extra);
-    EXPECT_EQ(ret, DM_OK);
+    ret = authManager_->CheckAuthParamVaildExtra(extra, "");
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     jsonObject["bindLevel"] = 15;
     extra = SafetyDump(jsonObject);
-    ret = authManager_->CheckAuthParamVaildExtra(extra);
+    ret = authManager_->CheckAuthParamVaildExtra(extra, "");
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 

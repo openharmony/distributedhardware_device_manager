@@ -208,6 +208,11 @@ DmDeviceBasicInfo {
      * NetworkId of the device.
      */
     char networkId[DM_MAX_DEVICE_ID_LEN] = {0};
+    /**
+     * Extra data of the device.
+     * include json keys: "CUSTOM_DATA"
+     */
+    std::string extraData;
 } DmDeviceBasicInfo;
 
 /**

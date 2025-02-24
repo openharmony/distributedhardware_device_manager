@@ -1482,8 +1482,8 @@ napi_value DeviceManagerNapi::GetDeviceType(napi_env env, napi_callback_info inf
     return result;
 }
 
-void DeviceManagerNapi::LockDiscoveryCallbackMutex(napi_env env, std::string &bundleName, std::string &extra,
-    uint32_t subscribeId)
+void DeviceManagerNapi::LockDiscoveryCallbackMutex(napi_env env, std::string &bundleName,
+    std::map<std::string, std::string> discParam, std::string &extra, uint32_t subscribeId)
 {
     std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = nullptr;
     {
@@ -1497,7 +1497,10 @@ void DeviceManagerNapi::LockDiscoveryCallbackMutex(napi_env env, std::string &bu
         }
     }
     uint64_t tokenId = OHOS::IPCSkeleton::GetSelfTokenID();
-    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, tokenId, extra, discoveryCallback);
+    discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_SUBSCRIBE_ID, std::to_string(tokenId)));
+    std::map<std::string, std::string> filterOps;
+    filterOps.insert(std::pair<std::string, std::string>(PARAM_KEY_FILTER_OPTIONS, extra));
+    int32_t ret = DeviceManager::GetInstance().StartDiscovering(bundleName, discParam, filterOps, discoveryCallback);
     if (ret != 0) {
         LOGE("Discovery failed, bundleName %{public}s, ret %{public}d", bundleName.c_str(), ret);
         CreateBusinessError(env, ret);
@@ -1510,6 +1513,7 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
 {
     LOGI("StartDeviceDiscover in");
     std::string extra = "";
+    std::map<std::string, std::string> discParam;
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     size_t argcNum = 0;
@@ -1526,11 +1530,13 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
         if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
             return nullptr;
         }
+        JsToDiscoveryParam(env, argv[DM_NAPI_ARGS_ZERO], discParam);
     } else if (argcNum == DM_NAPI_ARGS_TWO) {
         GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
         if (!JsToDiscoverTargetType(env, argv[DM_NAPI_ARGS_ZERO], discoverTargetType) || discoverTargetType != 1) {
             return nullptr;
         }
+        JsToDiscoveryParam(env, argv[DM_NAPI_ARGS_ZERO], discParam);
         napi_valuetype objectType = napi_undefined;
         napi_typeof(env, argv[DM_NAPI_ARGS_ONE], &objectType);
         if (!(CheckArgsType(env, objectType == napi_object, "filterOptions", "object or undefined"))) {
@@ -1538,7 +1544,7 @@ napi_value DeviceManagerNapi::StartDeviceDiscover(napi_env env, napi_callback_in
         }
         JsToDmDiscoveryExtra(env, argv[DM_NAPI_ARGS_ONE], extra);
     }
-    LockDiscoveryCallbackMutex(env, deviceManagerWrapper->bundleName_, extra, subscribeId);
+    LockDiscoveryCallbackMutex(env, deviceManagerWrapper->bundleName_, discParam, extra, subscribeId);
     napi_get_undefined(env, &result);
     return result;
 }

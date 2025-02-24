@@ -51,6 +51,7 @@ void IpcModelCodec::DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasic
         LOGE("strcpy_s networkId failed!");
         return;
     }
+    devInfo.extraData = parcel.ReadString();
 }
 
 bool IpcModelCodec::EncodePeerTargetId(const PeerTargetId &targetId, MessageParcel &parcel)

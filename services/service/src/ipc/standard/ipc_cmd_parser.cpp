@@ -84,6 +84,7 @@ bool EncodeDmDeviceBasicInfo(const DmDeviceBasicInfo &devInfo, MessageParcel &pa
     bRet = (bRet && parcel.WriteUint16(devInfo.deviceTypeId));
     std::string networkIdStr(devInfo.networkId);
     bRet = (bRet && parcel.WriteString(networkIdStr));
+    bRet = (bRet && parcel.WriteString(devInfo.extraData));
     return bRet;
 }
 

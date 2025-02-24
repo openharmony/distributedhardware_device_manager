@@ -37,6 +37,7 @@
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_dialog_manager.h"
+#include "dm_language_manager.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
 #include "dm_random.h"
@@ -168,14 +169,6 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
-    if (!softbusConnector_->HaveDeviceInMap(deviceId)) {
-        LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
-        listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT,
-            ERR_DM_INPUT_PARA_INVALID);
-        listener_->OnBindResult(processInfo_, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-
     if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
         LOGE("Auth code not exist.");
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT,
@@ -186,9 +179,18 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
     return DM_OK;
 }
 
-int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra)
+int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId)
 {
     nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
+    if ((jsonObject.is_discarded() || !IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE) ||
+        jsonObject[PARAM_KEY_CONN_SESSIONTYPE].get<std::string>() != CONN_SESSION_TYPE_HML) &&
+        !softbusConnector_->HaveDeviceInMap(deviceId)) {
+        LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
+        listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT,
+            ERR_DM_INPUT_PARA_INVALID);
+        listener_->OnBindResult(processInfo_, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     if (jsonObject.is_discarded()) {
         return DM_OK;
     }
@@ -251,8 +253,10 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    authRequestContext_->hostPkgName = pkgName;
-    authRequestContext_->hostPkgLabel = GetBundleLable(pkgName);
+    std::string realPkgName = GetSubStr(pkgName, PICKER_PROXY_SPLIT, 1);
+    realPkgName = realPkgName.empty() ? pkgName : realPkgName;
+    authRequestContext_->hostPkgName = realPkgName;
+    authRequestContext_->hostPkgLabel = GetBundleLable(realPkgName);
     authRequestContext_->authType = authType;
     authRequestContext_->localDeviceName = softbusConnector_->GetLocalDeviceName();
     authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
@@ -263,6 +267,9 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     uint32_t tokenId = 0 ;
     MultipleUserConnector::GetTokenIdAndForegroundUserId(tokenId, authRequestContext_->localUserId);
     authRequestContext_->tokenId = static_cast<int64_t>(tokenId);
+    if (realPkgName != pkgName) {
+        GetTokenIdByBundleName(authRequestContext_->localUserId, realPkgName, authRequestContext_->tokenId);
+    }
     authRequestContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authRequestContext_->localUserId);
     authRequestContext_->isOnline = false;
@@ -288,7 +295,8 @@ void DmAuthManager::ParseJsonObject(nlohmann::json jsonObject)
             authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].get<std::string>();
         }
         if (IsString(jsonObject, CUSTOM_DESCRIPTION_KEY)) {
-            authRequestContext_->customDesc = jsonObject[CUSTOM_DESCRIPTION_KEY].get<std::string>();
+            authRequestContext_->customDesc = DmLanguageManager::GetInstance().
+                GetTextBySystemLanguage(jsonObject[CUSTOM_DESCRIPTION_KEY].get<std::string>());
         }
         if (IsString(jsonObject, APP_THUMBNAIL)) {
             authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].get<std::string>();
@@ -398,7 +406,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
         return ret;
     }
-    ret = CheckAuthParamVaildExtra(extra);
+    ret = CheckAuthParamVaildExtra(extra, deviceId);
     if (ret != DM_OK) {
         LOGE("CheckAuthParamVaildExtra failed, param is invaild.");
         return ret;
@@ -3212,6 +3220,19 @@ void DmAuthManager::JoinLnn(const std::string &deviceId)
         return;
     }
     softbusConnector_->JoinLnn(deviceId);
+}
+
+int32_t DmAuthManager::GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId)
+{
+    int32_t ret = AppManager::GetInstance().GetNativeTokenIdByName(bundleName, tokenId);
+    if (ret == DM_OK) {
+        return DM_OK;
+    }
+    ret = AppManager::GetInstance().GetHapTokenIdByName(userId, bundleName, 0, tokenId);
+    if (ret != DM_OK) {
+        LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(bundleName).c_str());
+    }
+    return ret;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
