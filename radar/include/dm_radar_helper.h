@@ -225,6 +225,7 @@ public:
     std::string ConvertHexToString(uint16_t hex);
     int32_t GetErrCode(int32_t errCode);
     std::string GetAnonyLocalUdid();
+    int32_t ReportDiscoverRegCallbackStageIdle(struct RadarInfo &info);
     int32_t ReportDiscoverUserResStageCancel(struct RadarInfo &info);
     int32_t ReportDiscoverUserResStageSucc(struct RadarInfo &info);
     int32_t ReportDiscoverUserResStageOther(struct RadarInfo &info);

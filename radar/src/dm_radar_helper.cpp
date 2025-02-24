@@ -36,30 +36,35 @@ namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DmRadarHelper);
 
+int32_t DmRadarHelper::ReportDiscoverRegCallbackStageIdle(struct RadarInfo &info)
+{
+    HiSysEventParam params[] = {
+        {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
+        {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
+            .v = { .s = (char *)info.hostName.c_str() }, .arraySize = 0, },
+        {.name = "FUNC", .t = HISYSEVENT_STRING, .v = { .s = (char *)info.funcName.c_str() }, .arraySize = 0, },
+        {.name = "API_TYPE", .t = HISYSEVENT_INT32, .v = { .i32 = GetApiType(), }, .arraySize = 0, },
+        {.name = "BIZ_SCENE", .t = HISYSEVENT_INT32,
+            .v = { .i32 = static_cast<int32_t>(DiscoverScene::DM_DISCOVER), }, .arraySize = 0, },
+        {.name = "BIZ_STAGE", .t = HISYSEVENT_INT32,
+            .v = { .i32 = static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK), }, .arraySize = 0, },
+        {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = info.stageRes, }, .arraySize = 0, },
+        {.name = "BIZ_STATE", .t = HISYSEVENT_INT32, .v = { .i32 = info.bizState, }, .arraySize = 0, },
+        {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
+            .v = { .s = (char *)info.toCallPkg.c_str() }, .arraySize = 0, },
+        {.name = "COMM_SERV", .t = HISYSEVENT_INT32, .v = { .i32 = info.commServ, }, .arraySize = 0, },
+    };
+    size_t len = sizeof(params) / sizeof(params[0]);
+    return OH_HiSysEvent_Write(
+        OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
+        DM_DISCOVER_BEHAVIOR.c_str(), HISYSEVENT_BEHAVIOR, params, len);
+}
+
 bool DmRadarHelper::ReportDiscoverRegCallback(struct RadarInfo &info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_IDLE)) {
-        HiSysEventParam params[] = {
-            {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
-            {.name = "HOST_PKG", .t = HISYSEVENT_STRING,
-                .v = { .s = (char *)info.hostName.c_str() }, .arraySize = 0, },
-            {.name = "FUNC", .t = HISYSEVENT_STRING, .v = { .s = (char *)info.funcName.c_str() }, .arraySize = 0, },
-            {.name = "API_TYPE", .t = HISYSEVENT_INT32, .v = { .i32 = GetApiType(), }, .arraySize = 0, },
-            {.name = "BIZ_SCENE", .t = HISYSEVENT_INT32,
-                .v = { .i32 = static_cast<int32_t>(DiscoverScene::DM_DISCOVER), }, .arraySize = 0, },
-            {.name = "BIZ_STAGE", .t = HISYSEVENT_INT32,
-                .v = { .i32 = static_cast<int32_t>(DisCoverStage::DISCOVER_REGISTER_CALLBACK), }, .arraySize = 0, },
-            {.name = "STAGE_RES", .t = HISYSEVENT_INT32, .v = { .i32 = info.stageRes, }, .arraySize = 0, },
-            {.name = "BIZ_STATE", .t = HISYSEVENT_INT32, .v = { .i32 = info.bizState, }, .arraySize = 0, },
-            {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
-                .v = { .s = (char *)info.toCallPkg.c_str() }, .arraySize = 0, },
-            {.name = "COMM_SERV", .t = HISYSEVENT_INT32, .v = { .i32 = info.commServ, }, .arraySize = 0, },
-        };
-        size_t len = sizeof(params) / sizeof(params[0]);
-        res = OH_HiSysEvent_Write(
-            OHOS::HiviewDFX::HiSysEvent::Domain::DISTRIBUTED_DEVICE_MANAGER,
-            DM_DISCOVER_BEHAVIOR.c_str(), HISYSEVENT_BEHAVIOR, params, len);
+        res = ReportDiscoverRegCallbackStageIdle(info);
     } else {
         HiSysEventParam params[] = {
             {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME.c_str() }, .arraySize = 0, },
@@ -912,7 +917,7 @@ void DmRadarHelper::ReportCreatePinHolder(std::string hostName,
             {.name = "PEER_UDID", .t = HISYSEVENT_STRING,
                 .v = { .s = (char *)GetAnonyUdid(peerUdid).c_str() }, .arraySize = 0, },
             {.name = "TO_CALL_PKG", .t = HISYSEVENT_STRING,
-                    .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
+                .v = { .s = (char *)SOFTBUSNAME.c_str() }, .arraySize = 0, },
             {.name = "ERROR_CODE", .t = HISYSEVENT_INT32, .v = { .i32 = errCode, }, .arraySize = 0, },
         };
         size_t len = sizeof(params) / sizeof(params[0]);
