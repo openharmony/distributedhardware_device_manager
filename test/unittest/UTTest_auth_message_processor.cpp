@@ -131,13 +131,16 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
+    std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
+    authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     int32_t msgType = MSG_TYPE_NEGOTIATE;
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = msgType;
     jsonObj[TAG_AUTH_TYPE] = authMessageProcessor->authResponseContext_->authType;
     authMessageProcessor->SetResponseContext(authResponseContext);
+    authMessageProcessor->SetRequestContext(authRequestContext);
     authMessageProcessor->cryptoAdapter_ = nullptr;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
     std::string str1 = SafetyDump(jsonObj);

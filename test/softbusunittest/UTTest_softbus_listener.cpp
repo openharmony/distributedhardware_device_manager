@@ -1009,6 +1009,7 @@ HWTEST_F(SoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Leve
         .basicInfo = nodeBasicInfo
     };
     status = &nodeStatus;
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(SOFTBUS_INVALID_PARAM));
     softbusListener->OnDeviceScreenStatusChanged(type, status);
     type = NodeStatusType::TYPE_AUTH_STATUS;
     softbusListener->OnDeviceScreenStatusChanged(type, status);

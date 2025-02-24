@@ -36,6 +36,7 @@
 #include "dm_crypto_mock.h"
 #include "multiple_user_connector_mock.h"
 #include "dm_comm_tool_mock.h"
+#include "deviceprofile_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -62,6 +63,8 @@ public:
     static inline  std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
         std::make_shared<MultipleUserConnectorMock>();
     static inline  std::shared_ptr<DMCommToolMock> dMCommToolMock_ = std::make_shared<DMCommToolMock>();
+    static inline  std::shared_ptr<DMCommToolMock> deviceProfileConnectorMock_ =
+        std::make_shared<DeviceProfileConnectorMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

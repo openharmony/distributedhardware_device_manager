@@ -41,6 +41,8 @@ public:
     virtual int32_t GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType) = 0;
     virtual int32_t SetLocalDisplayName(const std::string &displayName) = 0;
     virtual int32_t GetUdidFromDp(const std::string &udidHash, std::string &udid) = 0;
+    virtual int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+        std::vector<DmDeviceInfo> &deviceList) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusListener> dmSoftbusListener = nullptr;
 };
@@ -60,6 +62,8 @@ public:
     MOCK_METHOD(int32_t, GetNetworkTypeByNetworkId, (const char *, int32_t &));
     MOCK_METHOD(int32_t, SetLocalDisplayName, (const std::string &));
     MOCK_METHOD(int32_t, GetUdidFromDp, (const std::string &, std::string &));
+    MOCK_METHOD(int32_t, GetAllTrustedDeviceList, (const std::string &, const std::string &,
+        std::vector<DmDeviceInfo> &));
 };
 }
 }
