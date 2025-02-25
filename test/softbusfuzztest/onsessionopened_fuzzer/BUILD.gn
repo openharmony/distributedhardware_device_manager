@@ -63,6 +63,7 @@ ohos_fuzztest("OnSessionOpenedFuzzTest") {
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
+    "hilog:libhilog",
     "safwk:system_ability_fwk",
   ]
 

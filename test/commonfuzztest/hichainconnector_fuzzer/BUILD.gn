@@ -56,6 +56,7 @@ ohos_fuzztest("HichainConnectorFuzzTest") {
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
+    "hilog:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
   ]

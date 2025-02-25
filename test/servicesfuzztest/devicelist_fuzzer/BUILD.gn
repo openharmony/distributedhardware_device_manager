@@ -74,6 +74,7 @@ ohos_fuzztest("DeviceListFuzzTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 

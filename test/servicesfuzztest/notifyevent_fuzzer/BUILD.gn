@@ -46,6 +46,12 @@ ohos_fuzztest("NotifyEventFuzzTest") {
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 
+  external_deps = [
+    "bounds_checking_function:libsec_shared",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"NotifyEventFuzzTest\"",
