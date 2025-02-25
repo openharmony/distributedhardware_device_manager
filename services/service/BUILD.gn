@@ -260,19 +260,20 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
     ]
 
-    if (support_bluetooth || support_wifi) {
+    if ((support_bluetooth || support_wifi) &&
+        device_manager_feature_product == "default") {
       sources += [
         "src/publishcommonevent/dm_publish_common_event.cpp",
         "src/softbus/softbus_publish.cpp",
       ]
     }
 
-    if (support_bluetooth) {
+    if (support_bluetooth && device_manager_feature_product == "default") {
       defines += [ "SUPPORT_BLUETOOTH" ]
       external_deps += [ "bluetooth:btframework" ]
     }
 
-    if (support_wifi) {
+    if (support_wifi && device_manager_feature_product == "default") {
       defines += [ "SUPPORT_WIFI" ]
       external_deps += [ "wifi:wifi_sdk" ]
     }

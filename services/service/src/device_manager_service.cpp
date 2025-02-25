@@ -1047,6 +1047,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
         return false;
     }
     isImplsoLoaded_ = true;
+    LOGI("Sussess.");
     return true;
 }
 
@@ -1451,11 +1452,11 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!IsDMServiceImplReady()) {
-        LOGE("BindTarget failed, DMServiceImpl instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
     if (bindParam.find(PARAM_KEY_META_TYPE) == bindParam.end()) {
+        if (!IsDMServiceImplReady()) {
+            LOGE("BindTarget failed, DMServiceImpl instance not init or init failed.");
+            return ERR_DM_NOT_INIT;
+        }
         LOGI("BindTarget stardard begin.");
         if (targetId.wifiIp.empty() || targetId.wifiIp.length() > IP_STR_MAX_LEN) {
             return dmServiceImpl_->BindTarget(pkgName, targetId, bindParam);
