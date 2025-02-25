@@ -87,13 +87,14 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().InitSoftbusListener();
-        DeviceNameManager::GetInstance().Init();
         if (!Init()) {
             LOGE("failed to init IpcServerStub");
             state_ = ServiceRunningState::STATE_NOT_START;
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
+        int32_t ret = DeviceNameManager::GetInstance().Init();
+        LOGI("int device name ret:%{public}d", ret);
         return;
     }
 
@@ -157,7 +158,6 @@ bool IpcServerStub::Init()
         }
         registerToService_ = true;
         KVAdapterManager::GetInstance().Init();
-        DeviceNameManager::GetInstance().Init();
     }
     return true;
 }

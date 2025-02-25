@@ -71,7 +71,10 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceNameManager);
 int32_t DeviceNameManager::Init()
 {
     LOGI("DeviceNameManager In");
-    GetRemoteObj();
+    if (GetRemoteObj() == nullptr) {
+        LOGE("dm sa not publish");
+        return ERR_DM_POINT_NULL;
+    }
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     InitDeviceName(userId);
     RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
