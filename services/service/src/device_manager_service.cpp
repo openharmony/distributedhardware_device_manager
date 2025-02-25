@@ -1259,7 +1259,6 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
     }
     std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
     if (isAdapterResidentSoLoaded_ && (dmServiceImplExtResident_ != nullptr)) {
-        LOGI("Devicemanagerresident so has been loaded.");
         return true;
     }
     residentSoHandle_ = dlopen(LIB_DM_RESIDENT_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
