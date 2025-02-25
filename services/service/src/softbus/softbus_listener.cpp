@@ -58,6 +58,10 @@ constexpr static uint16_t ARRAY_DOUBLE_SIZE = 2;
 constexpr static uint16_t BIN_HIGH_FOUR_NUM = 4;
 constexpr uint32_t SOFTBUS_MAX_RETRY_TIME = 10;
 
+constexpr const char* CUSTOM_DATA_ACTIONID = "actionId";
+constexpr const char* CUSTOM_DATA_NETWORKID = "networkId";
+constexpr const char* CUSTOM_DATA_DISPLAY_NAME = "displayName";
+
 static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
@@ -73,6 +77,7 @@ static std::mutex g_credentialAuthStatus;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
+static std::map<std::string, int32_t> discoveredDeviceActionIdMap;
 static std::set<std::string> deviceIdSet;
 bool SoftbusListener::isRadarSoLoad_ = false;
 IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
@@ -482,8 +487,14 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         "isOnline=%{public}d, capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
         GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range,
         device->isOnline, device->capabilityBitmap[0]);
-
+    int32_t actionId = 0;
+    int32_t ret = GetAttrFromExtraData(dmDevInfo, actionId);
+    if (ret != DM_OK) {
+        LOGE("GetAttrFromExtraData failed");
+        return;
+    }
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
+    discoveredDeviceActionIdMap[dmDevInfo.deviceId] = actionId;
     CacheDiscoveredDevice(device);
     for (auto &iter : lnnOpsCbkMap) {
         iter.second->OnDeviceFound(iter.first, dmDevInfo, device->isOnline);
@@ -1330,6 +1341,73 @@ int32_t SoftbusListener::GetUdidFromDp(const std::string &udidHash, std::string 
     }
 #endif
     return ERR_DM_FAILED;
+}
+
+int32_t SoftbusListener::GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &actionId)
+{
+    cJSON *extraDataJsonObj = cJSON_Parse(dmDevInfo.extraData.c_str());
+    if (extraDataJsonObj == NULL) {
+        return DM_OK;
+    }
+    cJSON *customData = cJSON_GetObjectItem(extraDataJsonObj, PARAM_KEY_CUSTOM_DATA);
+    if (customData == NULL) {
+        cJSON_Delete(extraDataJsonObj);
+        return DM_OK;
+    }
+    cJSON *customDataJson = cJSON_Parse(customData->valuestring);
+    if (customDataJson == NULL) {
+        cJSON_Delete(extraDataJsonObj);
+        return DM_OK;
+    }
+    int32_t ret = GetAttrFromCustomData(customDataJson, dmDevInfo, actionId);
+    cJSON_Delete(customDataJson);
+    cJSON_Delete(extraDataJsonObj);
+    return ret;
+}
+
+int32_t SoftbusListener::GetAttrFromCustomData(const cJSON *const customDataJson, DmDeviceInfo &dmDevInfo,
+    int32_t &actionId)
+{
+    cJSON *actionIdJson = cJSON_GetObjectItem(customDataJson, CUSTOM_DATA_ACTIONID);
+    if (actionIdJson == NULL || !cJSON_IsNumber(actionIdJson)) {
+        return DM_OK;
+    }
+    actionId = actionIdJson->valueint;
+    cJSON *networkIdJson = cJSON_GetObjectItem(customDataJson, CUSTOM_DATA_NETWORKID);
+    if (networkIdJson == NULL || !cJSON_IsString(networkIdJson)) {
+        return DM_OK;
+    }
+    std::string networkId = networkIdJson->valuestring;
+    if (memcpy_s(dmDevInfo.deviceId, sizeof(dmDevInfo.deviceId), networkId.c_str(),
+        std::min(sizeof(dmDevInfo.deviceId), sizeof(networkId))) != DM_OK) {
+        LOGE("copy deviceId failed.");
+        return ERR_DM_FAILED;
+    }
+    if (memcpy_s(dmDevInfo.networkId, sizeof(dmDevInfo.networkId), networkId.c_str(),
+        std::min(sizeof(dmDevInfo.networkId), sizeof(networkId))) != DM_OK) {
+        LOGE("copy networkId failed.");
+        return ERR_DM_FAILED;
+    }
+    cJSON *displayNameJson = cJSON_GetObjectItem(customDataJson, CUSTOM_DATA_DISPLAY_NAME);
+    if (displayNameJson == NULL || !cJSON_IsString(displayNameJson)) {
+        return DM_OK;
+    }
+    std::string displayName = displayNameJson->valuestring;
+    if (memcpy_s(dmDevInfo.deviceName, sizeof(dmDevInfo.deviceName), displayName.c_str(),
+        std::min(sizeof(dmDevInfo.deviceName), sizeof(displayName))) != DM_OK) {
+        LOGE("copy deviceName failed.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+void SoftbusListener::GetActionId(const std::string &deviceId, int32_t &actionId)
+{
+    std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
+    if (discoveredDeviceActionIdMap.find(deviceId) == discoveredDeviceActionIdMap.end()) {
+        return;
+    }
+    actionId = discoveredDeviceActionIdMap.find(deviceId)->second;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

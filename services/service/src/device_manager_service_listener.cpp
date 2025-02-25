@@ -14,6 +14,7 @@
  */
 
 #include <set>
+#include "cJSON.h"
 
 #include "device_manager_service_listener.h"
 
@@ -83,6 +84,33 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
     }
 
     deviceBasicInfo.deviceTypeId = info.deviceTypeId;
+    cJSON *extraDataJsonObj = cJSON_Parse(info.extraData.c_str());
+    if (extraDataJsonObj == NULL) {
+        return;
+    }
+    cJSON *customDataJson = cJSON_GetObjectItem(extraDataJsonObj, PARAM_KEY_CUSTOM_DATA);
+    if (customDataJson == NULL || !cJSON_IsString(customDataJson)) {
+        cJSON_Delete(extraDataJsonObj);
+        return;
+    }
+    char *customData = cJSON_PrintUnformatted(customDataJson);
+    if (customData == nullptr) {
+        cJSON_Delete(extraDataJsonObj);
+        return;
+    }
+    cJSON_Delete(extraDataJsonObj);
+    cJSON *basicExtraDataJsonObj = cJSON_CreateObject();
+    if (basicExtraDataJsonObj == NULL) {
+        return;
+    }
+    cJSON_AddStringToObject(basicExtraDataJsonObj, PARAM_KEY_CUSTOM_DATA, customData);
+    char *basicExtraData = cJSON_PrintUnformatted(basicExtraDataJsonObj);
+    if (basicExtraData == nullptr) {
+        cJSON_Delete(basicExtraDataJsonObj);
+        return;
+    }
+    deviceBasicInfo.extraData = std::string(basicExtraData);
+    cJSON_Delete(basicExtraDataJsonObj);
 }
 
 void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq,
@@ -194,6 +222,12 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
     std::vector<ProcessInfo> processInfoVec = GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_STATE);
     ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
     processInfoVec.push_back(bindProcessInfo);
+    std::vector<ProcessInfo> allProcessInfos = ipcServerListener_.GetAllProcessInfo();
+    for (auto item : allProcessInfos) {
+        if (item.pkgName.find(PICKER_PROXY_SPLIT + processInfo.pkgName) != std::string::npos) {
+            processInfoVec.push_back(item);
+        }
+    }
     switch (static_cast<int32_t>(state)) {
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_ONLINE):
             ProcessAppOnline(processInfoVec, processInfo, state, info, deviceBasicInfo);

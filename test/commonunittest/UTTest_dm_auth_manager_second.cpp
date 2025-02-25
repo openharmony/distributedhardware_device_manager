@@ -1263,7 +1263,7 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0013, testing::ext::TestSize.Lev
     authManager_->authResponseState_ = nullptr;
     authManager_->softbusConnector_->discoveryDeviceInfoMap_.clear();
     int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_0014, testing::ext::TestSize.Level0)

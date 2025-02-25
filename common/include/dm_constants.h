@@ -153,6 +153,7 @@ constexpr const char* DM_CAPABILITY_CASTPLUS = "castPlus";
 constexpr const char* DM_CAPABILITY_VIRTUAL_LINK = "virtualLink";
 constexpr const char* DM_CAPABILITY_SHARE = "share";
 constexpr const char* DM_CAPABILITY_WEAR = "wear";
+constexpr const char* DM_CAPABILITY_OOP = "oop";
 constexpr const char* DM_CREDENTIAL_TYPE = "CREDENTIAL_TYPE";
 constexpr const char* DM_CREDENTIAL_REQJSONSTR = "CREDENTIAL_REQJSONSTR";
 constexpr const char* DM_CREDENTIAL_RETURNJSONSTR = "CREDENTIAL_RETURNJSONSTR";
@@ -264,6 +265,7 @@ constexpr const char* PARAM_CLOSE_SESSION_DELAY_SECONDS = "DM_CLOSE_SESSION_DELA
 constexpr const char* DM_AUTHENTICATION_TYPE = "DM_AUTHENTICATION_TYPE";
 
 constexpr const char* PARAM_KEY_CONN_SESSIONTYPE = "connSessionType";
+constexpr const char* PARAM_KEY_HML_RELEASETIME = "hmlReleaseTime";
 constexpr const char* PARAM_KEY_HML_ENABLE_160M = "hmlEnable160M";
 constexpr const char* PARAM_KEY_HML_ACTIONID = "hmlActionId";
 
@@ -298,6 +300,8 @@ constexpr int32_t MAX_ICON_SIZE = 4 * 1024 * 1024;
 constexpr int32_t MAX_CONTAINER_SIZE = 500;
 // One year 365 * 24 * 60 * 60
 constexpr int32_t MAX_ALWAYS_ALLOW_SECONDS = 31536000;
+
+const std::string PICKER_PROXY_SPLIT = "_pickerProxy_";
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

@@ -15,6 +15,7 @@
 
 #include "device_manager_service.h"
 
+#include "cJSON.h"
 #include <dlfcn.h>
 #include <functional>
 
@@ -303,11 +304,13 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         return DM_OK;
     }
     if (!onlineDeviceList.empty() && IsDMServiceImplReady()) {
+        std::string queryPkgName = GetSubStr(pkgName, PICKER_PROXY_SPLIT, 1);
+        queryPkgName = queryPkgName.empty() ? pkgName : queryPkgName;
         std::unordered_map<std::string, DmAuthForm> udidMap;
-        if (PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName)) {
+        if (PermissionManager::GetInstance().CheckWhiteListSystemSA(queryPkgName)) {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
         } else {
-            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(queryPkgName);
         }
         for (auto item : onlineDeviceList) {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -648,16 +651,24 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
     }
 #endif
     PeerTargetId targetId;
-    ConnectionAddrType addrType;
-    int32_t ret = SoftbusListener::GetTargetInfoFromCache(queryDeviceId, targetId, addrType);
-    if (ret != DM_OK) {
-        LOGE("BindDevice failed, cannot get target info from cached discovered device map.");
-        return ERR_DM_BIND_INPUT_PARA_INVALID;
-    }
     std::map<std::string, std::string> bindParamMap;
+    std::string bindParamStr = bindParam;
+    int32_t actionId = 0;
+    SoftbusListener::GetActionId(queryDeviceId, actionId);
+    if (actionId > 0) {
+        targetId.deviceId = queryDeviceId;
+        AddHmlInfoToBindParam(actionId, bindParamStr);
+    } else {
+        ConnectionAddrType addrType;
+        int32_t ret = SoftbusListener::GetTargetInfoFromCache(queryDeviceId, targetId, addrType);
+        if (ret != DM_OK) {
+            LOGE("BindDevice failed, cannot get target info from cached discovered device map.");
+            return ERR_DM_BIND_INPUT_PARA_INVALID;
+        }
+        bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_CONN_ADDR_TYPE, std::to_string(addrType)));
+    }
     bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
-    bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_BIND_EXTRA_DATA, bindParam));
-    bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_CONN_ADDR_TYPE, std::to_string(addrType)));
+    bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_BIND_EXTRA_DATA, bindParamStr));
     return dmServiceImpl_->BindTarget(pkgName, targetId, bindParamMap);
 }
 
@@ -692,13 +703,15 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
     uint64_t tokenId = 0;
-    int32_t bindLevel = dmServiceImpl_->GetBindLevel(pkgName, std::string(localUdid), udid, tokenId);
+    std::string unbindPkgName = GetSubStr(pkgName, PICKER_PROXY_SPLIT, 1);
+    unbindPkgName = unbindPkgName.empty() ? pkgName : unbindPkgName;
+    int32_t bindLevel = dmServiceImpl_->GetBindLevel(unbindPkgName, std::string(localUdid), udid, tokenId);
     LOGI("UnAuthenticateDevice get bindlevel %{public}d.", bindLevel);
     if (bindLevel == INVALIED_BIND_LEVEL) {
         LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
         return ERR_DM_FAILED;
     }
-    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
+    if (dmServiceImpl_->UnBindDevice(unbindPkgName, udid, bindLevel) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
         return ERR_DM_FAILED;
     }
@@ -2915,6 +2928,27 @@ std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
         return {};
     }
     return dmServiceImplExtResident_->GetDeviceNamePrefixs();
+}
+
+void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam)
+{
+    cJSON *bindParamObj = cJSON_Parse(bindParam.c_str());
+    if (bindParamObj == NULL) {
+        bindParamObj = cJSON_CreateObject();
+        if (bindParamObj == NULL) {
+            LOGE("Create bindParamObj object failed.");
+            return;
+        }
+    }
+    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_CONN_SESSIONTYPE, CONN_SESSION_TYPE_HML.c_str());
+    cJSON_AddNumberToObject(bindParamObj, PARAM_KEY_HML_ACTIONID, actionId);
+    char *str = cJSON_PrintUnformatted(bindParamObj);
+    if (str == nullptr) {
+        cJSON_Delete(bindParamObj);
+        return;
+    }
+    bindParam = std::string(str);
+    cJSON_Delete(bindParamObj);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

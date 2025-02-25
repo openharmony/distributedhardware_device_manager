@@ -384,7 +384,7 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
 
     while (end != std::string::npos) {
         strVec.push_back(rawStr.substr(start, end - start));
-        start = end + 1;
+        start = end + separator.size();
         end = rawStr.find(separator, start);
     }
     strVec.push_back(rawStr.substr(start));
