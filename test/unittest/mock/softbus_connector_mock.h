@@ -28,6 +28,8 @@ public:
 public:
     virtual int32_t GetUdidByNetworkId(const char *networkId, std::string &udid) = 0;
     virtual bool CheckIsOnline(const std::string &targetDeviceId) = 0;
+    virtual std::vector<ProcessInfo> GetProcessInfo() = 0;
+    virtual DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusConnector> dmSoftbusConnector = nullptr;
 };
@@ -36,6 +38,8 @@ class SoftbusConnectorMock : public DmSoftbusConnector {
 public:
     MOCK_METHOD(int32_t, GetUdidByNetworkId, (const char *, std::string &));
     MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
+    MOCK_METHOD(std::vector<ProcessInfo>, GetProcessInfo, ());
+    MOCK_METHOD(DmDeviceInfo, GetDeviceInfoByDeviceId, (const std::string &deviceId));
 };
 }
 }
