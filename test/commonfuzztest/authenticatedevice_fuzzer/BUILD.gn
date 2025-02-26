@@ -76,6 +76,7 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 

@@ -31,10 +31,7 @@ ohos_benchmarktest("DeviceManagerFaTest") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
 
-  deps = [
-    "${common_path}/include/show_confirm_dialog/dialog_ui/js:dialog_js_files_etc",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-  ]
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -44,6 +41,7 @@ ohos_benchmarktest("DeviceManagerFaTest") {
     "dsoftbus:softbus_client",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 }
 
