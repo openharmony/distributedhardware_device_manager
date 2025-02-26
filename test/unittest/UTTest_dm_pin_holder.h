@@ -195,7 +195,7 @@ public:
         (void)errcode;
     }
 
-    virtual void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
+    void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override
     {
         (void)processInfo;
