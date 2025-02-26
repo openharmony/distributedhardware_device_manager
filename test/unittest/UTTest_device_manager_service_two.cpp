@@ -1410,7 +1410,7 @@ HWTEST_F(DeviceManagerServiceTest, InitSoftbusListener_201, testing::ext::TestSi
     onlineDeviceList.push_back(dmDeviceInfo);
     EXPECT_CALL(*softbusCacheMock_, GetDeviceInfoFromCache(_))
         .WillOnce(DoAll(SetArgReferee<0>(onlineDeviceList), Return(DM_OK)));
-    int32_t ret = DeviceManagerService::GetInstance()InitSoftbusListener();
+    int32_t ret = DeviceManagerService::GetInstance().InitSoftbusListener();
     EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
