@@ -75,7 +75,7 @@ int32_t SoftbusConnector::UnRegisterSoftbusStateCallback()
     return DM_OK;
 }
 
-void SoftbusConnector::JoinLnn(const std::string &deviceId)
+void SoftbusConnector::JoinLnn(const std::string &deviceId, bool isForceJoin)
 {
     std::string connectAddr;
     LOGI("start, deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
@@ -89,7 +89,7 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId)
         LOGE("convert remoteUdid hash failed, remoteUdidHash_: %{public}s.", GetAnonyString(remoteUdidHash_).c_str());
         return;
     }
-    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo, OnSoftbusJoinLNNResult);
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo, OnSoftbusJoinLNNResult, isForceJoin);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]JoinLNN failed, ret: %{public}d.", ret);
     }
@@ -110,7 +110,7 @@ void SoftbusConnector::JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int
         addrInfo.info.session.localDeviceKeyId = 0;
         addrInfo.info.session.remoteDeviceKeyId = 0;
     }
-    int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult);
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult, false);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]JoinLNN failed, ret: %{public}d.", ret);
     }
@@ -122,7 +122,7 @@ void SoftbusConnector::JoinLnnByHml(const int32_t sessionId)
     ConnectionAddr addrInfo;
     addrInfo.type = CONNECTION_ADDR_SESSION;
     addrInfo.info.session.sessionId = sessionId;
-    int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult);
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult, false);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]JoinLNN failed, ret: %{public}d.", ret);
     }

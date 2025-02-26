@@ -414,7 +414,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     isAuthenticateDevice_ = true;
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
-        softbusConnector_->JoinLnn(deviceId);
+        softbusConnector_->JoinLnn(deviceId, true);
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(processInfo_, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
         return DM_OK;
@@ -2228,7 +2228,11 @@ void DmAuthManager::RequestCredentialDone()
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
     }
-    JoinLnn(authRequestContext_->addr);
+    if (softbusConnector_->CheckIsOnline(remoteDeviceId_) && !authResponseContext_->isOnline) {
+        softbusConnector_->JoinLnn(authRequestContext_->addr, true);
+    } else {
+        softbusConnector_->JoinLnn(authRequestContext_->addr, false);
+    }
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
     authResponseContext_->reply = DM_OK;
