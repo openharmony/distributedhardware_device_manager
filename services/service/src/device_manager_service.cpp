@@ -399,6 +399,13 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
+    if (localUdid == peerDeviceId) {
+        int32_t ret = softbusListener_->GetDeviceInfo(networkId, info);
+        if (ret != DM_OK) {
+            LOGE("Get DeviceInfo By NetworkId failed, ret : %{public}d", ret);
+        }
+        return ret;
+    }
     int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
     if (permissionRet == DM_OK) {
         int32_t ret = softbusListener_->GetDeviceInfo(networkId, info);
