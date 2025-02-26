@@ -2256,19 +2256,19 @@ HWTEST_F(DeviceProfileConnectorTest, CheckDeviceInfoPermission_001, testing::ext
     int32_t ret = DeviceProfileConnector::GetInstance().CheckDeviceInfoPermission(localUdid, peerDeviceId);
     EXPECT_EQ(ret, DM_OK);
 
-    localdeviceId = "localDeviceId";
+    localUdid = "localDeviceId";
     peerDeviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetTokenIdAndForegroundUserId(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(1001), SetArgReferee<1>(456), Return()));
-    EXPECT_CALL(*multipleUserConnectorMock_, GetTokenIdAndForegroundUserId(_, _)).WillOnce(Return(""));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetOhosAccountIdByUserId(_, _)).WillOnce(Return(""));
     ret = DeviceProfileConnector::GetInstance().CheckDeviceInfoPermission(localUdid, peerDeviceId);
     EXPECT_EQ(ret, DM_OK);
 
-    localdeviceId = "remoteDeviceId";
+    localUdid = "remoteDeviceId";
     peerDeviceId = "localDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetTokenIdAndForegroundUserId(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(1001), SetArgReferee<1>(456), Return()));
-    EXPECT_CALL(*multipleUserConnectorMock_, GetTokenIdAndForegroundUserId(_, _)).WillOnce(Return("newAccountId"));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetOhosAccountIdByUserId(_, _)).WillOnce(Return("newAccountId"));
     ret = DeviceProfileConnector::GetInstance().CheckDeviceInfoPermission(localUdid, peerDeviceId);
     EXPECT_EQ(ret, DM_OK);
 }

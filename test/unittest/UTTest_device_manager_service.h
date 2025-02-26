@@ -63,7 +63,7 @@ public:
     static inline  std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
         std::make_shared<MultipleUserConnectorMock>();
     static inline  std::shared_ptr<DMCommToolMock> dMCommToolMock_ = std::make_shared<DMCommToolMock>();
-    static inline  std::shared_ptr<DMCommToolMock> deviceProfileConnectorMock_ =
+    static inline  std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ =
         std::make_shared<DeviceProfileConnectorMock>();
 };
 } // namespace DistributedHardware
