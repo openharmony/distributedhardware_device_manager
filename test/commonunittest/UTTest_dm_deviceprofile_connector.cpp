@@ -2248,5 +2248,46 @@ HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_002, testing::ext::TestSi
     ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
     EXPECT_EQ(ret, true);
 }
+
+HWTEST_F(DeviceProfileConnectorTest, CheckDeviceInfoPermission_001, testing::ext::TestSize.Level0)
+{
+    std::string localUdid = "localUdid";
+    std::string peerDeviceId = "localDeviceId";
+    int32_t ret = DeviceProfileConnector::GetInstance().CheckDeviceInfoPermission(localUdid, peerDeviceId);
+    EXPECT_EQ(ret, DM_OK);
+
+    localdeviceId = "localDeviceId";
+    peerDeviceId = "remoteDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetTokenIdAndForegroundUserId(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(1001), SetArgReferee<1>(456), Return()));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetTokenIdAndForegroundUserId(_, _)).WillOnce(Return(""));
+    ret = DeviceProfileConnector::GetInstance().CheckDeviceInfoPermission(localUdid, peerDeviceId);
+    EXPECT_EQ(ret, DM_OK);
+
+    localdeviceId = "remoteDeviceId";
+    peerDeviceId = "localDeviceId";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetTokenIdAndForegroundUserId(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(1001), SetArgReferee<1>(456), Return()));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetTokenIdAndForegroundUserId(_, _)).WillOnce(Return("newAccountId"));
+    ret = DeviceProfileConnector::GetInstance().CheckDeviceInfoPermission(localUdid, peerDeviceId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorTest, UpdateAclDeviceName_001, testing::ext::TestSize.Level0)
+{
+    std::string udid = "localDeviceId";
+    std::string newDeviceName = "deviceName";
+    int32_t ret = DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, newDeviceName);
+    EXPECT_EQ(ret, DM_OK);
+
+    udid = "remoteDeviceId";
+    newDeviceName = "deviceNameInfo";
+    ret = DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, newDeviceName);
+    EXPECT_EQ(ret, DM_OK);
+
+    udid = "UDID";
+    ret = DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, newDeviceName);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
