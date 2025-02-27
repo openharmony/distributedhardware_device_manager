@@ -4,6 +4,6 @@
     "RegisterPinHolderCallback": ["CollaborationFwk"],
     "CreatePinHolder": ["CollaborationFwk"],
     "DestroyPinHolder": ["CollaborationFwk"],
-    "SetDnPolicy": ["collaboration_service", "watch_system_service", "com.huawei.hmos.walletservice"],
+    "SetDnPolicy": ["collaboration_service", "watch_system_service", "com.huawei.hmos.walletservice", "com.ohos.distributedjstest"],
     "BindForDeviceLevel": [""]
 }
