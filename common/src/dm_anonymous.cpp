@@ -97,7 +97,6 @@ std::string GetAnonyInt32List(const std::vector<int32_t> &values)
 
 bool IsNumberString(const std::string &inputString)
 {
-    LOGI("IsNumberString for DeviceManagerNapi");
     if (inputString.length() == 0 || inputString.length() > MAX_INT_LEN) {
         LOGE("inputString is Null or inputString length is too long");
         return false;

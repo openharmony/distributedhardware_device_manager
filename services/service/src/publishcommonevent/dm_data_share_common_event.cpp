@@ -52,7 +52,6 @@ DmDataShareCommonEventManager::~DmDataShareCommonEventManager()
 bool DmDataShareCommonEventManager::SubscribeDataShareCommonEvent(const std::vector<std::string> &eventNameVec,
     const DataShareEventCallback &callback)
 {
-    LOGI("start");
     if (eventNameVec.empty() || callback == nullptr) {
         LOGE("eventNameVec is empty or callback is nullptr.");
         return false;

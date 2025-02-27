@@ -181,7 +181,6 @@ int32_t LocalDeviceNameMgr::GetActiveOsAccountIds()
 
 int32_t LocalDeviceNameMgr::QueryLocalDeviceName()
 {
-    LOGI("start");
     auto dataShareHelper = GetDataShareHelper();
     if (dataShareHelper == nullptr) {
         LOGE("dataShareHelper is null");
@@ -212,7 +211,6 @@ int32_t LocalDeviceNameMgr::QueryLocalDeviceName()
 
 void LocalDeviceNameMgr::RegisterDeviceNameChangeCb()
 {
-    LOGI("start");
     auto dataShareHelper = GetDataShareHelper();
     if (dataShareHelper == nullptr) {
         LOGE("dataShareHelper is null");
@@ -241,7 +239,6 @@ void LocalDeviceNameMgr::RegisterDeviceNameChangeCb()
 
 int32_t LocalDeviceNameMgr::QueryLocalDisplayName()
 {
-    LOGI("start");
     auto dataShareHelper = GetDataShareHelper();
     if (dataShareHelper == nullptr) {
         LOGE("dataShareHelper is null");
@@ -262,7 +259,6 @@ int32_t LocalDeviceNameMgr::QueryLocalDisplayName()
 
 void LocalDeviceNameMgr::RegisterDisplayNameChangeCb()
 {
-    LOGI("start");
     auto dataShareHelper = GetDataShareHelper();
     if (dataShareHelper == nullptr) {
         LOGE("dataShareHelper is null");
