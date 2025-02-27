@@ -45,6 +45,7 @@ ohos_fuzztest("DMCredentialImplFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
@@ -62,6 +63,7 @@ ohos_fuzztest("DMCredentialImplFuzzTest") {
   external_deps = [
     "device_auth:deviceauth_sdk",
     "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 }
 

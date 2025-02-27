@@ -87,13 +87,14 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
         DeviceManagerService::GetInstance().InitSoftbusListener();
-        DeviceNameManager::GetInstance().Init();
         if (!Init()) {
             LOGE("failed to init IpcServerStub");
             state_ = ServiceRunningState::STATE_NOT_START;
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
+        int32_t ret = DeviceNameManager::GetInstance().Init();
+        LOGI("int device name ret:%{public}d", ret);
         return;
     }
 
@@ -157,7 +158,6 @@ bool IpcServerStub::Init()
         }
         registerToService_ = true;
         KVAdapterManager::GetInstance().Init();
-        DeviceNameManager::GetInstance().Init();
     }
     return true;
 }
@@ -243,15 +243,18 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
         }
     }
     sptr<AppDeathRecipient> appRecipient = sptr<AppDeathRecipient>(new AppDeathRecipient());
+    LOGI("Add death recipient.");
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
     }
+    LOGI("Checking the number of listeners.");
     if (dmListener_.size() > MAX_CALLBACK_NUM || appRecipient_.size() > MAX_CALLBACK_NUM) {
         LOGE("dmListener_ or appRecipient_ size exceed the limit!");
         return ERR_DM_FAILED;
     }
     dmListener_[processInfo] = listener;
     appRecipient_[processInfo] = appRecipient;
+    LOGI("Add system sa.");
     AddSystemSA(processInfo.pkgName);
     LOGI("Register listener complete.");
     return DM_OK;

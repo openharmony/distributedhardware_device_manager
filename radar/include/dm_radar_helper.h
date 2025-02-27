@@ -225,6 +225,29 @@ public:
     std::string ConvertHexToString(uint16_t hex);
     int32_t GetErrCode(int32_t errCode);
     std::string GetAnonyLocalUdid();
+    int32_t ReportDiscoverRegCallbackStageIdle(struct RadarInfo &info);
+    int32_t ReportDiscoverUserResStageCancel(struct RadarInfo &info);
+    int32_t ReportDiscoverUserResStageSucc(struct RadarInfo &info);
+    int32_t ReportDiscoverUserResStageOther(struct RadarInfo &info);
+    int32_t ReportDiscoverResCallbackStageSucc(struct RadarInfo &info);
+    int32_t ReportAuthOpenSessionStageIdle(struct RadarInfo &info);
+    int32_t ReportAuthCreateGroupStageIdle(struct RadarInfo &info);
+    int32_t ReportAuthAddGroupStageIdle(struct RadarInfo &info);
+    int32_t ReportCreatePinHolderStageSucc(std::string hostName,
+        int32_t channelId, std::string peerUdid, int32_t errCode, int32_t stageRes);
+    int32_t ReportDestroyPinHolderStageSucc(std::string hostName,
+        std::string peerUdid, int32_t errCode, int32_t stageRes);
+    int32_t ReportSendOrReceiveHolderMsgStageOther(int32_t bizStage,
+        std::string funcName, std::string peerUdid);
+    int32_t ReportGetTrustDeviceListResultFailed(std::string hostName,
+        std::string funcName, std::vector<DmDeviceInfo> &deviceInfoList,
+        int32_t errCode, std::string localUdid, std::string discoverDevList);
+    int32_t ReportDmBehaviorResultSucc(std::string hostName, std::string funcName,
+        int32_t errCode, std::string localUdid);
+    int32_t ReportGetLocalDevInfoResultSucc(std::string hostName,
+        std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid);
+    int32_t ReportGetDeviceInfoResultSucc(std::string hostName,
+        std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid);
 private:
     std::string GetAnonyUdid(std::string udid);
     int32_t GetApiType();

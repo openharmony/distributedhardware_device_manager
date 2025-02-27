@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,3 +40,27 @@ int32_t GetAllNodeDeviceInfo(const char *pkgName, NodeBasicInfo **info, int32_t 
     (void)infoNum;
     return 0;
 }
+
+int32_t PublishLNN(const char *pkgName, const PublishInfo *info, const IPublishCb *cb)
+{
+    (void)pkgName;
+    (void)info;
+    (void)cb;
+    return 0;
+}
+
+int32_t StopPublishLNN(const char *pkgName, int32_t publishId)
+{
+    (void)pkgName;
+    (void)publishId;
+    return 0;
+}
+
+int CreateSessionServer(const char *pkgName, const char *sessionName, const ISessionListener *listener)
+{
+    (void)pkgName;
+    (void)sessionName;
+    (void)listener;
+    return 0;
+}
+

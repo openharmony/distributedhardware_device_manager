@@ -55,6 +55,7 @@ struct ConfirmCustomDialog {
       this.peerDeviceName = AppStorage.get('deviceName') as string;
       console.log('peerDeviceName is ' + this.peerDeviceName);
     }
+    let customDescriptionStr: string = AppStorage.get('customDescriptionStr') as string;
     let hostPkgLabel: string = AppStorage.get('hostPkgLabel') as string;
     if (hostPkgLabel === CAST_PKG_NAME) {
       this.title =
@@ -63,6 +64,9 @@ struct ConfirmCustomDialog {
       this.title = context.resourceManager.getStringSync($r('app.string.dm_confirm_title_hap').id, hostPkgLabel,
         this.peerDeviceName);
       this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_intention').id);
+      if (customDescriptionStr != undefined && customDescriptionStr != '') {
+        this.peerCustomDescription = this.peerDeviceName + customDescriptionStr;
+      }
     } else {
       let titleFirst: string =
         context.resourceManager.getStringSync($r('app.string.dm_connect_device').id, this.peerDeviceName);

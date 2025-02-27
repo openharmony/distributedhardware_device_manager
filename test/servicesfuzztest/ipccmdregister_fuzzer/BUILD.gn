@@ -54,6 +54,7 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]

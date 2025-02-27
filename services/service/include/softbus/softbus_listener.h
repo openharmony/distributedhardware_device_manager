@@ -25,6 +25,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "cJSON.h"
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
 #include "dm_publish_info.h"
@@ -114,6 +115,7 @@ public:
     int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
         std::vector<DmDeviceInfo> &deviceList);
     int32_t GetUdidFromDp(const std::string &udidHash, std::string &udid);
+    static void GetActionId(const std::string &deviceId, int32_t &actionId);
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj);
@@ -121,6 +123,9 @@ private:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile, DmDeviceInfo &dmDevice);
 #endif
+    static int32_t GetAttrFromCustomData(const cJSON *const customDataJson, DmDeviceInfo &dmDevInfo,
+        int32_t &actionId);
+    static int32_t GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &actionId);
 private:
     static std::string hostName_;
     static bool isRadarSoLoad_;

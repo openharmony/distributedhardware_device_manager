@@ -43,6 +43,7 @@ ohos_fuzztest("OnBytesReceivedFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]

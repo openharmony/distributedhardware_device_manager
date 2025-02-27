@@ -51,6 +51,9 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
     if (capability == DM_CAPABILITY_APPROACH || capability == DM_CAPABILITY_TOUCH) {
         dmPubInfo.mode = DmDiscoverMode::DM_DISCOVER_MODE_ACTIVE;
     }
+    if (capability == DM_CAPABILITY_OOP) {
+        dmPubInfo.ranging = false;
+    }
     std::string customData = "";
     if (advertiseParam.find(PARAM_KEY_CUSTOM_DATA) != advertiseParam.end()) {
         customData = advertiseParam.find(PARAM_KEY_CUSTOM_DATA)->second;

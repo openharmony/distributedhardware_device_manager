@@ -28,6 +28,7 @@ ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
@@ -43,6 +44,7 @@ ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
   external_deps = [
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ipc:ipc_single",
   ]
 
   defines = [

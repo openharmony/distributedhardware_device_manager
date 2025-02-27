@@ -20,6 +20,7 @@
 #include "system_ability_definition.h"
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "parameter.h"
 #include "softbus_bus_center.h"
 #include "string_ex.h"
@@ -71,7 +72,10 @@ IMPLEMENT_SINGLE_INSTANCE(DeviceNameManager);
 int32_t DeviceNameManager::Init()
 {
     LOGI("DeviceNameManager In");
-    GetRemoteObj();
+    if (GetRemoteObj() == nullptr) {
+        LOGE("dm sa not publish");
+        return ERR_DM_POINT_NULL;
+    }
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     InitDeviceName(userId);
     RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);

@@ -499,7 +499,7 @@ private:
     void JoinLnn(const std::string &deviceId);
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
-    int32_t CheckAuthParamVaildExtra(const std::string &extra);
+    int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
     bool CheckProcessNameInWhiteList(const std::string &processName);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
@@ -582,6 +582,7 @@ private:
     bool IsSinkMsgValid();
     bool IsSourceMsgValid();
     void ProcessReqPublicKey();
+    int32_t GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;

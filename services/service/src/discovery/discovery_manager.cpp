@@ -235,8 +235,14 @@ int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName
 int32_t DiscoveryManager::StartDiscoveringNoMetaType(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
-    (void)param;
-    if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD) != EOK) {
+    if (param.find(PARAM_KEY_DISC_CAPABILITY) != param.end() &&
+        !param.find(PARAM_KEY_DISC_CAPABILITY)->second.empty()) {
+        if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN,
+            param.find(PARAM_KEY_DISC_CAPABILITY)->second.c_str()) != EOK) {
+            LOGE("capability copy err.");
+            return ERR_DM_START_DISCOVERING_FAILED;
+        }
+    } else if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_OSD) != EOK) {
         LOGE("capability copy err.");
         return ERR_DM_START_DISCOVERING_FAILED;
     }
@@ -247,7 +253,11 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(const std::string &pkgName,
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
         capabilityMap_[pkgName] = std::string(dmSubInfo.capability);
     }
-    int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
+    std::string customData = LNN_DISC_CAPABILITY;
+    if (param.find(PARAM_KEY_CUSTOM_DATA) != param.end() && !param.find(PARAM_KEY_CUSTOM_DATA)->second.empty()) {
+        customData = param.find(PARAM_KEY_CUSTOM_DATA)->second;
+    }
+    int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, customData);
     if (ret != DM_OK) {
         LOGE("StartDiscoveringNoMetaType failed, softbus refresh lnn ret: %{public}d.", ret);
     }

@@ -50,6 +50,7 @@ ohos_fuzztest("AuthenticateDeviceServiceFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
@@ -77,6 +78,7 @@ ohos_fuzztest("AuthenticateDeviceServiceFuzzTest") {
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
+    "hilog:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
   ]

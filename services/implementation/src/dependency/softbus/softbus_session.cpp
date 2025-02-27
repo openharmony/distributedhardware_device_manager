@@ -114,7 +114,7 @@ int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
     return sessionId;
 }
 
-int32_t SoftbusSession::OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool enable160m)
+int32_t SoftbusSession::OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m)
 {
 #ifdef DEVICE_MANAGER_COMMON_FLAG
     LOGE("[SOFTBUS] OpenAuthSessionWithPara no implement");
@@ -124,7 +124,7 @@ int32_t SoftbusSession::OpenAuthSessionWithPara(const std::string &deviceId, int
     LinkPara para;
     para.type = PARA_ACTION;
     para.action.actionId = actionId;
-    para.enable160M = enable160m;
+    para.enable160M = isEnable160m;
     para.accountInfo = false;
     int32_t sessionId = ::OpenAuthSessionWithPara(DM_SESSION_NAME, &para);
     if (sessionId < 0) {

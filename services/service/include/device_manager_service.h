@@ -273,6 +273,7 @@ private:
         std::vector<int32_t> backgroundUserIds);
     void ProcessCheckSumByBT(std::string networkId, std::vector<int32_t> foregroundUserIds,
         std::vector<int32_t> backgroundUserIds);
+    void AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam);
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();

@@ -33,6 +33,7 @@ ohos_fuzztest("GetLocalDeviceInfoFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
@@ -51,7 +52,11 @@ ohos_fuzztest("GetLocalDeviceInfoFuzzTest") {
     "LOG_DOMAIN=0xD004110",
   ]
 
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
 }
 
 ###############################################################################

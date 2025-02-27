@@ -52,6 +52,7 @@ ohos_fuzztest("GetUuidByNetworkIdFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
@@ -71,6 +72,7 @@ ohos_fuzztest("GetUuidByNetworkIdFuzzTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 

@@ -59,6 +59,7 @@ if (defined(ohos_lite)) {
     }
 
     cflags = [
+      "-Werror",
       "-fPIC",
       "-fstack-protector-strong",
     ]

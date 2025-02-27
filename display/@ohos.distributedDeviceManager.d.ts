@@ -54,7 +54,7 @@ declare namespace distributedDeviceManager {
      * @syscap SystemCapability.DistributedHardware.DeviceManager
      * @since 10
      */
-    deviceType: number;
+    deviceType: string;
 
     /**
      * Device network id.
@@ -62,6 +62,14 @@ declare namespace distributedDeviceManager {
      * @since 10
      */
     networkId?: string;
+
+    /**
+     * Device extra data.
+     * @type { ?string }
+     * @syscap SystemCapability.DistributedHardware.DeviceManager
+     * @since 16
+     */
+    extraData?: string;
   }
 
   /**

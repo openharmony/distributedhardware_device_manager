@@ -37,6 +37,7 @@ ohos_fuzztest("SoftbusConnectorPublishFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
@@ -49,6 +50,7 @@ ohos_fuzztest("SoftbusConnectorPublishFuzzTest") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "dsoftbus:softbus_client",
     "safwk:system_ability_fwk",
   ]

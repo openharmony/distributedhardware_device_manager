@@ -51,6 +51,7 @@ ohos_fuzztest("RegisterDevStateCallbackFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
@@ -70,6 +71,7 @@ ohos_fuzztest("RegisterDevStateCallbackFuzzTest") {
     "device_auth:deviceauth_sdk",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 

@@ -24,10 +24,20 @@ int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string 
 {
     return DmSoftbusConnector::dmSoftbusConnector->GetUdidByNetworkId(networkId, udid);
 }
+
 bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
 {
     return DmSoftbusConnector::dmSoftbusConnector->CheckIsOnline(targetDeviceId);
 }
 
+std::vector<ProcessInfo> SoftbusConnector::GetProcessInfo()
+{
+    return DmSoftbusConnector::dmSoftbusConnector->GetProcessInfo();
+}
+
+DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId)
+{
+    return DmSoftbusConnector::dmSoftbusConnector->GetDeviceInfoByDeviceId(deviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -58,5 +58,15 @@ std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t userId)
 {
     return DmMultipleUserConnector::dmMultipleUserConnector->GetOhosAccountIdByUserId(userId);
 }
+
+std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetAccountNickName(userId);
+}
+
+void MultipleUserConnector::GetCallerUserId(int32_t &userId)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetCallerUserId(userId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
