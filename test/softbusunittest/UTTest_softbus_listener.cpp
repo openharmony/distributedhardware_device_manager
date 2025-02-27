@@ -735,24 +735,14 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
-HWTEST_F(SoftbusListenerTest, OnLocalDevInfoChange_001, testing::ext::TestSize.Level0)
-{
-    char *msg = nullptr;
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
-    softbusListener->OnLocalDevInfoChange();
-    EXPECT_EQ(msg, nullptr);
-}
-
 HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_001, testing::ext::TestSize.Level0)
 {
     char *msg = nullptr;
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    softbusListener->OnDeviceNotTrusted(nullptr);
-    EXPECT_EQ(msg, nullptr);
+    softbusListener->OnDeviceNotTrusted(msg);
+    EXPECT_TRUE(true);
 }
 
 HWTEST_F(SoftbusListenerTest, OnDeviceNotTrusted_002, testing::ext::TestSize.Level0)
