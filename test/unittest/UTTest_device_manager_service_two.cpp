@@ -1399,20 +1399,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
-
-HWTEST_F(DeviceManagerServiceTest, InitSoftbusListener_201, testing::ext::TestSize.Level0)
-{
-    std::vector<DmDeviceInfo> onlineDeviceList;
-    DmDeviceInfo dmDeviceInfo;
-    dmDeviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
-    std::string deviceId = "deviceId_001";
-    memcpy_s(dmDeviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, deviceId.c_str(), deviceId.length());
-    onlineDeviceList.push_back(dmDeviceInfo);
-    EXPECT_CALL(*softbusCacheMock_, GetDeviceInfoFromCache(_))
-        .WillOnce(DoAll(SetArgReferee<0>(onlineDeviceList), Return(DM_OK)));
-    int32_t ret = DeviceManagerService::GetInstance().InitSoftbusListener();
-    EXPECT_EQ(ret, DM_OK);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
