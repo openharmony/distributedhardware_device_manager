@@ -34,6 +34,10 @@ int64_t FfiOHOSDistributedDeviceManagerCreateDeviceManager(const char *name, int
 void FfiOHOSDistributedDeviceManagerReleaseDeviceManager(int64_t id, int32_t *errCode)
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return;
+    }
     *errCode = instance->ReleaseDeviceManager();
 }
 
@@ -41,6 +45,10 @@ void FfiOHOSDistributedDeviceManagerGetAvailableDeviceList(
     int64_t id, FfiDeviceBasicInfoArray *deviceInfoList, int32_t *errCode)
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return;
+    }
     *errCode = instance->GetAvailableDeviceList(*deviceInfoList);
 }
 
@@ -53,6 +61,10 @@ const char *FfiOHOSDistributedDeviceManagerGetLocalDeviceNetworkId(int64_t id, i
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
     const char *networkIdPtr = nullptr;
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return networkIdPtr;
+    }
     *errCode = instance->GetLocalDeviceNetworkId(networkIdPtr);
     return networkIdPtr;
 }
@@ -61,6 +73,10 @@ const char *FfiOHOSDistributedDeviceManagerGetLocalDeviceName(int64_t id, int32_
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
     const char *deviceName = nullptr;
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return deviceName;
+    }
     *errCode = instance->GetLocalDeviceName(deviceName);
     return deviceName;
 }
@@ -69,6 +85,10 @@ int32_t FfiOHOSDistributedDeviceManagerGetLocalDeviceType(int64_t id, int32_t *e
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
     int32_t deviceType = 0;
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return deviceType;
+    }
     *errCode = instance->GetLocalDeviceType(deviceType);
     return deviceType;
 }
@@ -77,6 +97,10 @@ const char *FfiOHOSDistributedDeviceManagerGetLocalDeviceId(int64_t id, int32_t 
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
     const char *deviceId = nullptr;
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return deviceId;
+    }
     *errCode = instance->GetLocalDeviceId(deviceId);
     return deviceId;
 }
@@ -85,6 +109,10 @@ const char *FfiOHOSDistributedDeviceManagerGetDeviceName(int64_t id, const char 
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
     const char *deviceName = nullptr;
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return deviceName;
+    }
     *errCode = instance->GetDeviceName(networkId, deviceName);
     return deviceName;
 }
@@ -93,6 +121,10 @@ int32_t FfiOHOSDistributedDeviceManagerGetDeviceType(int64_t id, const char *net
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
     int32_t deviceType = 0;
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return deviceType;
+    }
     *errCode = instance->GetDeviceType(networkId, deviceType);
     return deviceType;
 }
@@ -100,12 +132,20 @@ int32_t FfiOHOSDistributedDeviceManagerGetDeviceType(int64_t id, const char *net
 void FfiOHOSDistributedDeviceManagerStartDiscovering(int64_t id, const char *extra, int32_t *errCode)
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return;
+    }
     *errCode = instance->StartDiscovering(extra);
 }
 
 void FfiOHOSDistributedDeviceManagerStopDiscovering(int64_t id, int32_t *errCode)
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return;
+    }
     *errCode = instance->StopDiscovering();
 }
 
@@ -113,24 +153,40 @@ void FfiOHOSDistributedDeviceManagerBindTarget(
     int64_t id, const char *deviceId, const char *bindParam, bool isMetaType, int32_t *errCode)
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return;
+    }
     *errCode = instance->BindTarget(deviceId, bindParam, isMetaType);
 }
 
 void FfiOHOSDistributedDeviceManagerUnbindTarget(int64_t id, const char *deviceId, int32_t *errCode)
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return;
+    }
     *errCode = instance->UnbindTarget(deviceId);
 }
 
 void FfiOHOSDistributedDeviceManagerOn(int64_t id, const char *type, void *callback, int32_t *errCode)
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return;
+    }
     *errCode = instance->EventOn(type, callback);
 }
 
 void FfiOHOSDistributedDeviceManagerOff(int64_t id, const char *type, int32_t *errCode)
 {
     auto instance = OHOS::FFI::FFIData::GetData<OHOS::DistributedHardware::DeviceManagerFfiImpl>(id);
+    if (instance == nullptr) {
+        LOGE("instance is nullptr");
+        return;
+    }
     *errCode = instance->EventOff(type);
 }
 }
