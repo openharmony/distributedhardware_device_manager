@@ -15,8 +15,6 @@
 
 #include "dm_ability_manager.h"
 
-#include "dm_constants.h"
-
 namespace OHOS {
 namespace DistributedHardware {
 AbilityStatus DmAbilityManager::StartAbility(const std::string &params)

@@ -23,10 +23,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-    const std::string PRINT_LIST_SPLIT = ", ";
-    const int32_t LIST_SPLIT_LEN = 2;
-}
+extern const char* PRINT_LIST_SPLIT;
+extern const int32_t LIST_SPLIT_LEN;
+
 std::string GetAnonyString(const std::string &value);
 std::string GetAnonyStringList(const std::vector<std::string> &values);
 std::string GetAnonyInt32(const int32_t value);

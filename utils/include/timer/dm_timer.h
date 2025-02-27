@@ -28,17 +28,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
-constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
-constexpr const char* CONFIRM_TIMEOUT_TASK = "deviceManagerTimer:confirm";
-constexpr const char* INPUT_TIMEOUT_TASK = "deviceManagerTimer:input";
-constexpr const char* ADD_TIMEOUT_TASK = "deviceManagerTimer:add";
-constexpr const char* WAIT_NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:waitNegotiate";
-constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitRequest";
-constexpr const char* STATE_TIMER_PREFIX = "deviceManagerTimer:stateTimer_";
-constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_";
-constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
-
 using TimerCallback = std::function<void (std::string name)>;
 
 class DmTimer {

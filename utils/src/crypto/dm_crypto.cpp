@@ -41,6 +41,7 @@ constexpr int SHORT_DEVICE_ID_HASH_LENGTH = 16;
 constexpr int32_t SALT_LENGTH = 8;
 const std::string SALT_DEFAULT = "salt_defsalt_def";
 constexpr int SHORT_ACCOUNTID_ID_HASH_LENGTH = 6;
+constexpr const char* DB_KEY_DELIMITER = "###";
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #define DM_MAX_DEVICE_ID_LEN (97)
 #endif

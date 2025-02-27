@@ -2941,7 +2941,7 @@ void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &
             return;
         }
     }
-    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_CONN_SESSIONTYPE, CONN_SESSION_TYPE_HML.c_str());
+    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_CONN_SESSIONTYPE, CONN_SESSION_TYPE_HML);
     cJSON_AddNumberToObject(bindParamObj, PARAM_KEY_HML_ACTIONID, actionId);
     char *str = cJSON_PrintUnformatted(bindParamObj);
     if (str == nullptr) {

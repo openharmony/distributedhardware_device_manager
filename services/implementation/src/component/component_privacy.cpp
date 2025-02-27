@@ -32,6 +32,12 @@ namespace DistributedHardware {
 #undef DH_LOG_TAG
 #define DH_LOG_TAG "ComponentPrivacy"
 
+constexpr const char* PRIVACY_SUBTYPE = "subtype";
+constexpr const char* PRIVACY_NETWORKID = "networkId";
+constexpr uint32_t COMP_START_PAGE = 1;
+constexpr uint32_t COMP_STOP_PAGE = 2;
+constexpr uint32_t COMP_PRIVACY_DELAY_TIME = 1000; // million seconds
+
 ComponentPrivacy::ComponentPrivacy()
 {
     DHLOGI("ComponentPrivacy ctor.");

@@ -16,7 +16,7 @@
 #include "ipc_client_proxy.h"
 
 #include "device_manager_ipc_interface_code.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 namespace OHOS::DistributedHardware { class IpcReq; }
 namespace OHOS::DistributedHardware { class IpcRsp; }

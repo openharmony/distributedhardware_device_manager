@@ -73,6 +73,7 @@ constexpr char DEVICE_TYPE_TYPE = 1;
 constexpr char DEVICE_SN_TYPE = 2;
 constexpr char DEVICE_UDID_TYPE = 3;
 constexpr char FIND_NOTRUST_DEVICE = 2;
+constexpr uint32_t EVP_OK = 1;
 
 static std::mutex g_matchWaitDeviceLock;
 static std::mutex g_publishLnnLock;

@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
 void TimeHeapTest::SetUp()
 {
 }

@@ -41,6 +41,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr int32_t DM_STRING_LENGTH_MAX = 1024;
 void DeviceManagerImplTest::SetUp()
 {
     const int32_t permsNum = 2;

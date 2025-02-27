@@ -27,12 +27,10 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string bundleName = "com.ohos.devicemanagerui";
-const std::string abilityName = "com.ohos.devicemanagerui.ConfirmServiceExtAbility";
-const std::string peerDeviceName = "deviceName";
-const std::string appOperation = "appOperation";
-const std::string customDescription = "customDescription";
-const std::string peerdeviceType = "deviceType";
+constexpr const char* BUNDLE_NAME = "com.ohos.devicemanagerui";
+constexpr const char* ABILITY_NAME = "com.ohos.devicemanagerui.ConfirmServiceExtAbility";
+constexpr const char* PEER_DEVICE_NAME = "deviceName";
+constexpr const char* PEER_DEVICE_TYPE = "deviceType";
 } // namespace
 
 AbilityStatus DmAbilityManager::StartAbility(const std::string &params)
@@ -62,13 +60,13 @@ AbilityStatus DmAbilityManager::StartAbility(const std::string &params)
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string deviceId = localDeviceId;
     AAFwk::Want want;
-    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    AppExecFwk::ElementName element(deviceId, BUNDLE_NAME, ABILITY_NAME);
     want.SetElement(element);
-    want.SetParam(peerDeviceName, deviceName);
-    want.SetParam(customDescription, customDescriptionStr);
-    want.SetParam(peerdeviceType, deviceType);
+    want.SetParam(PEER_DEVICE_NAME, deviceName);
+    want.SetParam(CUSTOM_DESCRIPTION, customDescriptionStr);
+    want.SetParam(PEER_DEVICE_TYPE, deviceType);
     if (!appOperationStr.empty()) {
-        want.SetParam(appOperation, appOperationStr);
+        want.SetParam(APP_OPERATION, appOperationStr);
     }
 
     AAFwk::AbilityManagerClient::GetInstance()->Connect();

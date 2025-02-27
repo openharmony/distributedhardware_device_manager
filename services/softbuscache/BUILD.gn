@@ -75,10 +75,7 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/crypto",
     ]
 
-    sources = [
-      "${common_path}/src/dm_anonymous.cpp",
-      "src/dm_softbus_cache.cpp",
-    ]
+    sources = [ "src/dm_softbus_cache.cpp" ]
 
     defines = [
       "HI_LOG_ENABLE",
@@ -86,7 +83,10 @@ if (defined(ohos_lite)) {
       "LOG_DOMAIN=0xD004113",
     ]
 
-    deps = [ "${utils_path}:devicemanagerutils" ]
+    deps = [
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${utils_path}:devicemanagerutils",
+    ]
 
     external_deps = [
       "bounds_checking_function:libsec_shared",

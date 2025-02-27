@@ -15,7 +15,7 @@
 
 #include "ipc_server_client_proxy.h"
 
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"

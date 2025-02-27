@@ -26,7 +26,7 @@
 #include "uri.h"
 
 #include "device_manager_service.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 #include "settings_data_event_monitor.h"
 

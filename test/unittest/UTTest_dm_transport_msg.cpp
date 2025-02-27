@@ -17,6 +17,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const char* const DSOFTBUS_NOTIFY_USERIDS_UDIDKEY = "remoteUdid";
+const char* const DSOFTBUS_NOTIFY_USERIDS_USERIDKEY = "foregroundUserIds";
 void DMTransportMsgTest::SetUp()
 {
 }

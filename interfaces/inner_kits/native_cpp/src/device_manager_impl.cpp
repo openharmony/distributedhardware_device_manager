@@ -111,6 +111,8 @@ const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
 const int32_t USLEEP_TIME_US_100000 = 100000; // 100ms
 constexpr int32_t SERVICE_INIT_MAX_NUM = 20;
+constexpr int32_t DM_STRING_LENGTH_MAX = 1024;
+
 uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
 {
     std::random_device randDevice;
