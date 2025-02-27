@@ -43,6 +43,7 @@ group("unittest") {
     ":UTTest_dm_credential_manager",
     ":UTTest_dm_crypto",
     ":UTTest_dm_device_state_manager",
+    ":UTTest_dm_device_state_manager_two",
     ":UTTest_dm_deviceprofile_connector",
     ":UTTest_dm_deviceprofile_connector_second",
     ":UTTest_dm_dfx",
@@ -1114,6 +1115,31 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 }
 
 ## UnitTest UTTest_dm_device_state_manager }}}
+
+## UnitTest UTTest_dm_device_state_manager_two {{{
+ohos_unittest("UTTest_dm_device_state_manager_two") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
+
+  sources = [
+    "${devicemanager_path}/test/commonunittest/UTTest_dm_device_state_manager_two.cpp",
+    "mock/softbus_connector_mock.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+  ]
+}
+
+## UnitTest UTTest_dm_device_state_manager_two }}}
 
 ## UnitTest UTTest_dm_dfx {{{
 ohos_unittest("UTTest_dm_dfx") {
