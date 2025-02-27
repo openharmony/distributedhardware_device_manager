@@ -1009,6 +1009,7 @@ HWTEST_F(SoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Leve
         .basicInfo = nodeBasicInfo
     };
     status = &nodeStatus;
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(SOFTBUS_INVALID_PARAM));
     softbusListener->OnDeviceScreenStatusChanged(type, status);
     type = NodeStatusType::TYPE_AUTH_STATUS;
     softbusListener->OnDeviceScreenStatusChanged(type, status);
@@ -1184,6 +1185,28 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_001, testing::ext::TestSiz
         .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
     int32_t ret = softbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, DM_OK);
+
+    TrustChangeType type = TrustChangeType::DEVICE_NOT_TRUSTED;
+    std::string strMsg = "messageInfo";
+    uint32_t msgLen = static_cast<uint32_t>(strMsg.length());
+    softbusListener->OnDeviceTrustedChange(type, strMsg.c_str(), msgLen);
+    type = TrustChangeType::DEVICE_TRUST_RELATIONSHIP_CHANGE;
+    softbusListener->OnDeviceTrustedChange(type, strMsg.c_str(), msgLen);
+    type = TrustChangeType::DEVICE_FOREGROUND_USERID_CHANGE;
+    softbusListener->OnDeviceTrustedChange(type, strMsg.c_str(), msgLen);
+    ConnectionAddr addrInfo = {
+        .type = ConnectionAddrType::CONNECTION_ADDR_ETH,
+        .info {
+            .ip {
+                .ip = "172.0.0.2",
+                .port = 1,
+                .udidHash = {1}
+            }
+        }
+    };
+    addrInfo.type = static_cast<ConnectionAddrType>(5);
+    nlohmann::json jsonObj;
+    softbusListener->ParseConnAddrInfo(&addrInfo, jsonObj);
     softbusListener = nullptr;
 }
 } // namespace

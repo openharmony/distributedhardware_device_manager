@@ -112,5 +112,10 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustD
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAppTrustDeviceList(pkgName, deviceId);
 }
+
+int32_t DeviceProfileConnector::CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckDeviceInfoPermission(localUdid, peerDeviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

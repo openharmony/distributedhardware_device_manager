@@ -85,5 +85,11 @@ int32_t SoftbusListener::GetUdidFromDp(const std::string &udidHash, std::string 
 {
     return DmSoftbusListener::dmSoftbusListener->GetUdidFromDp(udidHash, udid);
 }
+
+int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
+    std::vector<DmDeviceInfo> &deviceList)
+{
+    return DmSoftbusListener::dmSoftbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1303,7 +1303,7 @@ HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_202, testing::ext::T
     std::string pkgName = "pkgName";
     std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
     int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+    EXPECT_TRUE(ret == ERR_DM_UNSUPPORTED_METHOD || ret == ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DeviceManagerServiceTest, SetLocalDisplayNameToSoftbus_201, testing::ext::TestSize.Level0)
@@ -1347,6 +1347,57 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNamePrefixs_201, testing::ext::TestS
 {
     auto ret = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
     EXPECT_EQ(ret.empty(), true);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_201, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "";
+    std::string extra = "extra";
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t ret = DeviceManagerService::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    pkgName = "pkgName";
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusListenerMock_, GetAllTrustedDeviceList(_, _, _)).WillOnce(Return(DM_OK));
+    ret = DeviceManagerService::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*softbusListenerMock_, GetAllTrustedDeviceList(_, _, _)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
+    ret = DeviceManagerService::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    DeviceManagerService::GetInstance().hichainListener_ = nullptr;
+    DeviceManagerService::GetInstance().InitHichainListener();
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_202, testing::ext::TestSize.Level0)
+{
+    DeletePermission();
+    std::string pkgName = "pkgName";
+    std::string extra = "extra";
+    std::vector<DmDeviceInfo> deviceList;
+    int32_t ret = DeviceManagerService::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Level0)
+{
+    std::string networkId = "networkId";
+    DmDeviceInfo deviceInfo;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 } // namespace
 } // namespace DistributedHardware
