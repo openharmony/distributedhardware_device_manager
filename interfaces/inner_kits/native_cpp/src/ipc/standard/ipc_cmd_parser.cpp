@@ -432,13 +432,7 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
     IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
 
     DmDeviceBasicInfo dmDeviceBasicInfo;
-    size_t deviceBasicSize = sizeof(DmDeviceBasicInfo);
-    void *deviceBasicInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceBasicSize)));
-    if (deviceBasicInfo != nullptr &&
-        memcpy_s(&dmDeviceBasicInfo, deviceBasicSize, deviceBasicInfo, deviceBasicSize) != 0) {
-        reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
-        return DM_OK;
-    }
+    IpcModelCodec::DecodeDmDeviceBasicInfo(data, dmDeviceBasicInfo);
     switch (deviceState) {
         case DEVICE_STATE_ONLINE:
             DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, dmDeviceInfo);
@@ -483,12 +477,7 @@ ON_IPC_CMD(SERVER_DEVICE_DISCOVERY, MessageParcel &data, MessageParcel &reply)
     std::string pkgName = data.ReadString();
     int16_t subscribeId = data.ReadInt16();
     DmDeviceBasicInfo dmDeviceBasicInfo;
-    size_t deviceSize = sizeof(DmDeviceBasicInfo);
-    void *deviceInfo = static_cast<void *>(const_cast<void *>(data.ReadRawData(deviceSize)));
-    if (deviceInfo != nullptr && memcpy_s(&dmDeviceBasicInfo, deviceSize, deviceInfo, deviceSize) != 0) {
-        reply.WriteInt32(ERR_DM_IPC_COPY_FAILED);
-        return ERR_DM_IPC_COPY_FAILED;
-    }
+    IpcModelCodec::DecodeDmDeviceBasicInfo(data, dmDeviceBasicInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, dmDeviceBasicInfo);
     reply.WriteInt32(DM_OK);
     return DM_OK;

@@ -147,8 +147,8 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq,
         LOGE("write dm device info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteRawData(&deviceBasicInfo, sizeof(DmDeviceBasicInfo))) {
-        LOGE("write deviceBasicInfo failed");
+    if (!EncodeDmDeviceBasicInfo(deviceBasicInfo, data)) {
+        LOGE("write dm device basic info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
@@ -210,8 +210,8 @@ ON_IPC_SET_REQUEST(SERVER_DEVICE_DISCOVERY, std::shared_ptr<IpcReq> pBaseReq, Me
         LOGE("write subscribeId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    if (!data.WriteRawData(&deviceBasicInfo, sizeof(DmDeviceBasicInfo))) {
-        LOGE("write deviceBasicInfo failed");
+    if (!EncodeDmDeviceBasicInfo(deviceBasicInfo, data)) {
+        LOGE("write dm device basic info failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
