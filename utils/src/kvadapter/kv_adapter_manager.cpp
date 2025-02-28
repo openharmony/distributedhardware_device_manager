@@ -21,13 +21,14 @@
 #include "string_ex.h"
 
 #include "dm_anonymous.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string DM_KV_STORE_PREFIX = "DM2_";
+constexpr const char* DM_KV_STORE_PREFIX = "DM2_";
+constexpr const char* DB_KEY_DELIMITER = "###";
 constexpr int64_t DM_KV_STORE_REFRESH_TIME = 24 * 60 * 60; // one day
 constexpr int64_t MAX_SUPPORTED_EXIST_TIME = 3 * 24 * 60 * 60; // 3days
 }

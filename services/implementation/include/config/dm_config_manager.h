@@ -33,12 +33,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-constexpr const char* AUTH_LOAD_JSON_KEY = "devicemanager_auth_components";
-constexpr const char* ADAPTER_LOAD_JSON_KEY = "devicemanager_adapter_components";
-constexpr const char* AUTH_JSON_TYPE_KEY = "AUTHENTICATE";
-constexpr const char* CPYPTO_JSON_TYPE_KEY = "CPYPTO";
-constexpr const char* DECISION_JSON_TYPE_KEY = "DECISION";
-
 typedef struct {
     std::string name;
     std::string type;

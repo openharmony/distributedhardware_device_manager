@@ -34,7 +34,7 @@
 #include "device_manager_service.h"
 #include "device_manager_service_notify.h"
 #include "device_name_manager.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "multiple_user_connector.h"

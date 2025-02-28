@@ -25,6 +25,22 @@
 
 using namespace OHOS::DistributedDeviceProfile;
 
+const uint32_t INVALIED_TYPE = 0;
+const uint32_t APP_PEER_TO_PEER_TYPE = 1;
+const uint32_t APP_ACROSS_ACCOUNT_TYPE = 2;
+const uint32_t DEVICE_PEER_TO_PEER_TYPE = 3;
+const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 4;
+const uint32_t IDENTICAL_ACCOUNT_TYPE = 5;
+
+const uint32_t DM_IDENTICAL_ACCOUNT = 1;
+const uint32_t DM_POINT_TO_POINT = 256;
+const uint32_t DM_ACROSS_ACCOUNT = 1282;
+const uint32_t DM_INVALIED_BINDTYPE = 2048;
+const uint32_t DEVICE = 1;
+const uint32_t SERVICE = 2;
+const uint32_t APP = 3;
+constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
+
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);

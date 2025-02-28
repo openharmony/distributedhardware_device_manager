@@ -37,6 +37,7 @@ if (defined(ohos_lite)) {
       ]
 
       deps = [
+        "${innerkits_path}/native_cpp:devicemanagersdk",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//commonlibrary/utils_lite:utils",
@@ -70,6 +71,8 @@ if (defined(ohos_lite)) {
       "DH_LOG_TAG=\"devicemanagerradar\"",
       "LOG_DOMAIN=0xD004110",
     ]
+
+    deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",

@@ -17,14 +17,15 @@
 #include <thread>
 #include "device_manager.h"
 #include "dm_anonymous.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string UK_SEPARATOR = "#";
+constexpr const char* UK_SEPARATOR = "#";
+constexpr int32_t MAX_CONTAINER_SIZE = 500;
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerNotify);
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))

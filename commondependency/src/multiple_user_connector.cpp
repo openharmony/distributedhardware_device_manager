@@ -15,7 +15,7 @@
 
 #include "multiple_user_connector.h"
 
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "account_info.h"

@@ -82,9 +82,19 @@ const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
+
+constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
+constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
+constexpr const char* CONFIRM_TIMEOUT_TASK = "deviceManagerTimer:confirm";
+constexpr const char* INPUT_TIMEOUT_TASK = "deviceManagerTimer:input";
+constexpr const char* ADD_TIMEOUT_TASK = "deviceManagerTimer:add";
+constexpr const char* WAIT_NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:waitNegotiate";
+constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitRequest";
+constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_";
+constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
+
 constexpr int32_t PROCESS_NAME_WHITE_LIST_NUM = 1;
-constexpr int32_t PROCESS_NAME_SIZE_MAX = 256;
-constexpr const static char PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM][PROCESS_NAME_SIZE_MAX] = {
+constexpr const static char* PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM] = {
     "com.example.myapplication",
 };
 

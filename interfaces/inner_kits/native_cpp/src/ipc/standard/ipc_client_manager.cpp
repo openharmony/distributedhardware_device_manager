@@ -20,7 +20,7 @@
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "device_manager_impl.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 #include "dm_service_load.h"
 #include "ipc_client_server_proxy.h"

@@ -19,13 +19,12 @@
 #include <utility>             // for pair
 
 #include "dm_anonymous.h"      // for GetAnonyString
+#include "dm_error_type.h"
 #include "dm_log.h"            // for LOGI, LOGE
 
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(HiDumpHelper);
-constexpr int32_t DM_OK = 0;
-constexpr int32_t ERR_DM_FAILED = 96929744;
 namespace {
 static DumperInfo g_dumperDeviceType[] = {
     {DEVICE_TYPE_UNKNOWN, "DEVICE_TYPE_UNKNOWN"},
@@ -38,6 +37,17 @@ static DumperInfo g_dumperDeviceType[] = {
     {DEVICE_TYPE_CAR, "DEVICE_TYPE_CAR"},
     {DEVICE_TYPE_TV, "DEVICE_TYPE_TV"},
 };
+
+// HiDumper info
+constexpr const char* ARGS_HELP_INFO = "-help";
+constexpr const char* HIDUMPER_GET_TRUSTED_LIST_INFO = "-getTrustlist";
+
+// HiDumper command
+const std::unordered_map<std::string, HidumperFlag> MAP_ARGS = {
+    { std::string(ARGS_HELP_INFO), HidumperFlag::HIDUMPER_GET_HELP },
+    { std::string(HIDUMPER_GET_TRUSTED_LIST_INFO), HidumperFlag::HIDUMPER_GET_TRUSTED_LIST },
+};
+
 } // namespace
 int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &result)
 {

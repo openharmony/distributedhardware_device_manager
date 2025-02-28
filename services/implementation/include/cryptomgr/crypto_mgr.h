@@ -22,16 +22,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-namespace {
-    constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
-    constexpr uint32_t SESSION_KEY_LENGTH = 32;
-    constexpr uint32_t GCM_IV_LEN = 12;
-    constexpr uint32_t TAG_LEN = 16;
-    constexpr uint32_t OVERHEAD_LEN = GCM_IV_LEN + TAG_LEN;
-    constexpr uint32_t MAX_ENCRY_MSG_LEN = 10 * 1024 * 1024; // 10MB
-    constexpr uint32_t KEY_BITS_UNIT = 8;
-    constexpr uint32_t HEX_TO_UINT8 = 2;
-}
+#define SESSION_KEY_LENGTH 32
+#define GCM_IV_LEN 12
+
 typedef struct DMSessionKey {
     uint8_t *key = nullptr;
     uint32_t keyLen = 0;

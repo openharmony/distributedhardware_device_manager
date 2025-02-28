@@ -24,6 +24,8 @@ constexpr uint32_t MAX_MAP_LEN = 1000;
 constexpr uint32_t MAX_INT_LEN = 20;
 constexpr uint32_t MAX_ID_LEN = 256;
 }
+const char* PRINT_LIST_SPLIT = ", ";
+const int32_t LIST_SPLIT_LEN = 2;
 
 std::string GetAnonyString(const std::string &value)
 {

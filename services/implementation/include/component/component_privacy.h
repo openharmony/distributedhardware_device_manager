@@ -21,11 +21,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string PRIVACY_SUBTYPE = "subtype";
-const std::string PRIVACY_NETWORKID = "networkId";
-constexpr uint32_t COMP_START_PAGE = 1;
-constexpr uint32_t COMP_STOP_PAGE = 2;
-constexpr uint32_t COMP_PRIVACY_DELAY_TIME = 1000; // million seconds
 class ComponentPrivacy : public PrivacyResourcesListener {
 public:
     ComponentPrivacy();

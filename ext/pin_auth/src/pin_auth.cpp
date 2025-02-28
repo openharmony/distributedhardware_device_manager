@@ -19,7 +19,7 @@
 #include <string>
 
 #include "dm_anonymous.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 

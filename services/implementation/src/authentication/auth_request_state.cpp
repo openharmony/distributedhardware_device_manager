@@ -16,7 +16,7 @@
 #include "auth_request_state.h"
 
 #include "dm_auth_manager.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -25,26 +25,30 @@
 #include "service_info_unique_key.h"
 #include "trusted_device_info.h"
 
-constexpr uint32_t ALLOW_AUTH_ONCE = 1;
-constexpr uint32_t ALLOW_AUTH_ALWAYS = 2;
+enum AllowAuthType {
+    ALLOW_AUTH_ONCE = 1,
+    ALLOW_AUTH_ALWAYS = 2
+};
 
-constexpr uint32_t INVALIED_TYPE = 0;
-constexpr uint32_t APP_PEER_TO_PEER_TYPE = 1;
-constexpr uint32_t APP_ACROSS_ACCOUNT_TYPE = 2;
-constexpr uint32_t DEVICE_PEER_TO_PEER_TYPE = 3;
-constexpr uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 4;
-constexpr uint32_t IDENTICAL_ACCOUNT_TYPE = 5;
+extern const uint32_t INVALIED_TYPE;
+extern const uint32_t APP_PEER_TO_PEER_TYPE;
+extern const uint32_t APP_ACROSS_ACCOUNT_TYPE;
+extern const uint32_t DEVICE_PEER_TO_PEER_TYPE;
+extern const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE;
+extern const uint32_t IDENTICAL_ACCOUNT_TYPE;
 
-constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
-constexpr uint32_t DM_POINT_TO_POINT = 256;
-constexpr uint32_t DM_ACROSS_ACCOUNT = 1282;
-constexpr uint32_t DM_INVALIED_BINDTYPE = 2048;
-constexpr uint32_t DEVICE = 1;
-constexpr uint32_t SERVICE = 2;
-constexpr uint32_t APP = 3;
+extern const uint32_t DM_IDENTICAL_ACCOUNT;
+extern const uint32_t DM_POINT_TO_POINT;
+extern const uint32_t DM_ACROSS_ACCOUNT;
+extern const uint32_t DM_INVALIED_BINDTYPE;
+extern const uint32_t DEVICE;
+extern const uint32_t SERVICE;
+extern const uint32_t APP;
 
-constexpr uint32_t INACTIVE = 0;
-constexpr uint32_t ACTIVE = 1;
+enum ProfileState {
+    INACTIVE = 0,
+    ACTIVE = 1
+};
 
 typedef struct DmDiscoveryInfo {
     std::string pkgname;

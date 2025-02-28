@@ -50,14 +50,10 @@ std::mutex g_dmUiCallbackMapMutex;
 const int32_t DM_AUTH_REQUEST_SUCCESS_STATUS = 7;
 const int32_t DM_FFI_BUF_LENGTH = 256;
 
-const std::string DM_FFI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
-const std::string DM_FFI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
-const std::string DM_FFI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFailure";
-const std::string DM_FFI_EVENT_DEVICE_PUBLISH_SUCCESS = "publishSuccess";
-const std::string DM_FFI_EVENT_DEVICE_PUBLISH_FAIL = "publishFailure";
-const std::string DEVICE_MANAGER_FFI_CLASS_NAME = "DeviceManager";
-const std::string DM_FFI_EVENT_REPLY_RESULT = "replyResult";
-const std::string DM_FFI_EVENT_DEVICE_NAME_CHANGE = "deviceNameChange";
+constexpr const char* DM_FFI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
+constexpr const char* DM_FFI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
+constexpr const char* DM_FFI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFailure";
+constexpr const char* DM_FFI_EVENT_DEVICE_NAME_CHANGE = "deviceNameChange";
 
 enum ErrorCode {
     // OK

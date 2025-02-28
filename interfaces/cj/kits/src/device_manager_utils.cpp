@@ -188,16 +188,16 @@ void DmFfiBindTargetCallback::OnBindResult(const PeerTargetId &targetId, int32_t
 const std::string &GetDeviceTypeById(DmDeviceType type)
 {
     const static std::pair<const DmDeviceType, const std::string &> mapArray[] = {
-        {DEVICE_TYPE_UNKNOWN, DEVICE_TYPE_UNKNOWN_STRING},
-        {DEVICE_TYPE_PHONE, DEVICE_TYPE_PHONE_STRING},
-        {DEVICE_TYPE_PAD, DEVICE_TYPE_PAD_STRING},
-        {DEVICE_TYPE_TV, DEVICE_TYPE_TV_STRING},
-        {DEVICE_TYPE_CAR, DEVICE_TYPE_CAR_STRING},
-        {DEVICE_TYPE_WATCH, DEVICE_TYPE_WATCH_STRING},
-        {DEVICE_TYPE_WIFI_CAMERA, DEVICE_TYPE_WIFICAMERA_STRING},
-        {DEVICE_TYPE_PC, DEVICE_TYPE_PC_STRING},
-        {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
-        {DEVICE_TYPE_2IN1, DEVICE_TYPE_2IN1_STRING},
+        {DEVICE_TYPE_UNKNOWN, std::string(DEVICE_TYPE_UNKNOWN_STRING)},
+        {DEVICE_TYPE_PHONE, std::string(DEVICE_TYPE_PHONE_STRING)},
+        {DEVICE_TYPE_PAD, std::string(DEVICE_TYPE_PAD_STRING)},
+        {DEVICE_TYPE_TV, std::string(DEVICE_TYPE_TV_STRING)},
+        {DEVICE_TYPE_CAR, std::string(DEVICE_TYPE_CAR_STRING)},
+        {DEVICE_TYPE_WATCH, std::string(DEVICE_TYPE_WATCH_STRING)},
+        {DEVICE_TYPE_WIFI_CAMERA, std::string(DEVICE_TYPE_WIFICAMERA_STRING)},
+        {DEVICE_TYPE_PC, std::string(DEVICE_TYPE_PC_STRING)},
+        {DEVICE_TYPE_SMART_DISPLAY, std::string(DEVICE_TYPE_SMART_DISPLAY_STRING)},
+        {DEVICE_TYPE_2IN1, std::string(DEVICE_TYPE_2IN1_STRING)},
     };
     for (const auto& item : mapArray) {
         if (item.first == type) {

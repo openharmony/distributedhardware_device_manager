@@ -15,7 +15,6 @@
 
 #include "dm_adapter_manager.h"
 
-#include "dm_constants.h"
 #include "dm_log.h"
 
 namespace OHOS {

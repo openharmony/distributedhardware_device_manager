@@ -32,6 +32,7 @@ using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
+constexpr const char* PARAM_KEY_TARGET_ID = "TARGET_ID";
 void DeletePermission()
 {
     const int32_t permsNum = 1;

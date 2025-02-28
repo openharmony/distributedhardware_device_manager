@@ -20,7 +20,7 @@
 
 #include "common_event_support.h"
 #include "dm_anonymous.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"

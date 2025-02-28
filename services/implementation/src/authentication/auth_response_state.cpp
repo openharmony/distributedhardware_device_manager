@@ -16,7 +16,7 @@
 #include "auth_response_state.h"
 
 #include "dm_auth_manager.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_log.h"
 
 namespace OHOS {
