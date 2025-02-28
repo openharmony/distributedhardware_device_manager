@@ -1701,7 +1701,6 @@ int32_t DeviceManagerService::GetServiceInfoById(int64_t serviceId, DMServiceInf
 int32_t DeviceManagerService::GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start");
     DistributedDeviceProfile::ServiceInfoUniqueKey key;
     bool result = InitServiceInfoUniqueKey(key);
     if (!result) {

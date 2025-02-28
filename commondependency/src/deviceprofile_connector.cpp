@@ -786,7 +786,6 @@ void DeviceProfileConnector::DeleteServiceBindLevel(DmOfflineParam &offlineParam
 int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::string &oldAccountId,
     std::string &newAccountId)
 {
-    LOGI("Start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
@@ -810,7 +809,6 @@ int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::str
 
 bool DeviceProfileConnector::CheckSrcDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
@@ -826,7 +824,6 @@ bool DeviceProfileConnector::CheckSrcDevIdInAclForDevBind(const std::string &pkg
 
 bool DeviceProfileConnector::CheckSinkDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     for (auto &item : profiles) {
@@ -847,7 +844,6 @@ bool DeviceProfileConnector::CheckDevIdInAclForDevBind(const std::string &pkgNam
 
 uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
 {
-    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     uint32_t res = 0;
@@ -866,7 +862,6 @@ uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
 
 int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
 {
-    LOGI("Start");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     int32_t trustNumber = 0;
@@ -880,7 +875,6 @@ int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
 
 int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
 {
-    LOGI("Start.");
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() == udid && item.GetStatus() == ACTIVE) {
@@ -973,7 +967,6 @@ int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller,
 
 bool DeviceProfileConnector::CheckIdenticalAccount(int32_t userId, const std::string &accountId)
 {
-    LOGI("Start");
     std::vector<AccessControlProfile> profiles;
     std::map<std::string, std::string> queryParams;
     queryParams[USERID] = std::to_string(userId);
@@ -1298,7 +1291,6 @@ void DeviceProfileConnector::DeleteAccessControlById(int64_t accessControlId)
 int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
     const std::vector<std::string> &deviceVec, int32_t currentUserId, int32_t beforeUserId)
 {
-    LOGI("Start.");
     if (deviceVec.empty()) {
         LOGI("no remote device.");
         return DM_OK;
