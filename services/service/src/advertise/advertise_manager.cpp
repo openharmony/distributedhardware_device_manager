@@ -18,11 +18,15 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_publish_info.h"
+#include "dm_random.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t AUTO_STOP_ADVERTISE_DEFAULT_TIME = 120;
 const std::string AUTO_STOP_ADVERTISE_TASK = "AutoStopAdvertisingTask";
+const int32_t DM_MIN_RANDOM = 1;
+const int32_t DM_MAX_RANDOM = INT32_MAX;
+const int32_t DM_INVALID_FLAG_ID = 0;
 
 AdvertiseManager::AdvertiseManager(std::shared_ptr<SoftbusListener> softbusListener) : softbusListener_(softbusListener)
 {
@@ -43,7 +47,7 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DmPublishInfo dmPubInfo;
-    ConfigAdvParam(advertiseParam, &dmPubInfo);
+    ConfigAdvParam(advertiseParam, &dmPubInfo, pkgName);
     std::string capability = DM_CAPABILITY_OSD;
     if (advertiseParam.find(PARAM_KEY_DISC_CAPABILITY) != advertiseParam.end()) {
         capability = advertiseParam.find(PARAM_KEY_DISC_CAPABILITY)->second;
@@ -84,7 +88,7 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
 }
 
 void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &advertiseParam,
-    DmPublishInfo *dmPubInfo)
+    DmPublishInfo *dmPubInfo, const std::string &pkgName)
 {
     if (dmPubInfo == nullptr) {
         LOGE("ConfigAdvParam failed, dmPubInfo is nullptr.");
@@ -99,8 +103,11 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
     if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
         LOGI("StartAdvertising input MetaType=%{public}s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
-    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end()) {
-        dmPubInfo->publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
+    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end() &&
+        IsNumberString(advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second)) {
+            int32_t publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
+            LOGI("PublishId=%{public}d", publishId);
+            dmPubInfo->publishId = GenInnerPublishId(pkgName, publishId);
     }
     if (advertiseParam.find(PARAM_KEY_DISC_MODE) != advertiseParam.end()) {
         dmPubInfo->mode =
@@ -120,12 +127,18 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
 
 int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t publishId)
 {
-    LOGI("AdvertiseManager::StopDiscovering begin for pkgName = %{public}s.", pkgName.c_str());
+    LOGI("AdvertiseManager::StopDiscovering begin for pkgName = %{public}s, publishId = %{public}d.", pkgName.c_str(),
+         publishId);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return softbusListener_->StopPublishSoftbusLNN(publishId);
+    int32_t innerPublishId = GetAndRemoveInnerPublishId(pkgName, publishId);
+    if (innerPublishId == DM_INVALID_FLAG_ID) {
+        LOGE("Failed: cannot find pkgName in cache map.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return softbusListener_->StopPublishSoftbusLNN(innerPublishId);
 }
 
 void AdvertiseManager::HandleAutoStopAdvertise(const std::string &timerName, const std::string &pkgName,
@@ -133,6 +146,67 @@ void AdvertiseManager::HandleAutoStopAdvertise(const std::string &timerName, con
 {
     LOGI("HandleAutoStopAdvertise, auto stop advertise task timeout, timerName=%{public}s", timerName.c_str());
     StopAdvertising(pkgName, publishId);
+}
+
+int32_t AdvertiseManager::GenInnerPublishId(const std::string &pkgName, int32_t publishId)
+{
+    int32_t tempPublishId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(pubMapLock_);
+        if (pkgName2PubIdMap_[pkgName].find(publishId) != pkgName2PubIdMap_[pkgName].end()) {
+            softbusListener_->StopPublishSoftbusLNN(pkgName2PubIdMap_[pkgName][publishId]);
+            publishIdSet_.erase(pkgName2PubIdMap_[pkgName][publishId]);
+        }
+        if (pkgName2PubIdMap_.find(pkgName) == pkgName2PubIdMap_.end()) {
+            pkgName2PubIdMap_[pkgName] = std::map<int32_t, int32_t>();
+        }
+        bool isExist = false;
+        do {
+            tempPublishId = GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM);
+            if (publishIdSet_.find(tempPublishId) != publishIdSet_.end()) {
+                LOGE("The tempPublishId: %{public}d is exist.", tempPublishId);
+                isExist = true;
+            } else {
+                isExist = false;
+            }
+        } while (isExist);
+        publishIdSet_.emplace(tempPublishId);
+        pkgName2PubIdMap_[pkgName][publishId] = tempPublishId;
+    }
+    return tempPublishId;
+}
+
+int32_t AdvertiseManager::GetAndRemoveInnerPublishId(const std::string &pkgName, int32_t publishId)
+{
+    int32_t tempPublishId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(pubMapLock_);
+        if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end() &&
+            pkgName2PubIdMap_[pkgName].find(publishId) != pkgName2PubIdMap_[pkgName].end()) {
+                tempPublishId = pkgName2PubIdMap_[pkgName][publishId];
+                pkgName2PubIdMap_[pkgName].erase(publishId);
+                publishIdSet_.erase(tempPublishId);
+        }
+        if (pkgName2PubIdMap_[pkgName].empty()) {
+            pkgName2PubIdMap_.erase(pkgName);
+        }
+    }
+    return tempPublishId;
+}
+
+void AdvertiseManager::ClearPulishIdCache(const std::string &pkgName)
+{
+    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(pubMapLock_);
+    for (auto iter : pkgName2PubIdMap_[pkgName]) {
+        softbusListener_->StopPublishSoftbusLNN(iter.second);
+        publishIdSet_.erase(iter.second);
+    }
+    pkgName2PubIdMap_.erase(pkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

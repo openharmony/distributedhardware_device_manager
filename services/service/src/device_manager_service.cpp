@@ -2950,5 +2950,11 @@ void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &
     bindParam = std::string(str);
     cJSON_Delete(bindParamObj);
 }
+
+void DeviceManagerService::ClearPulishIdCache(const std::string &pkgName)
+{
+    CHECK_NULL_VOID(advertiseMgr_);
+    advertiseMgr_->ClearPulishIdCache(pkgName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
