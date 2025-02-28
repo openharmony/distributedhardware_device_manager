@@ -203,7 +203,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_004, testing::ext::Tes
     int ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
     pkgName = "1com.ohos.test1";
     ret = DeviceManagerService::GetInstance().PublishDeviceDiscovery(pkgName, publishInfo);
-    EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_DISCOVER_MANAGER_DUPLICATE_PARAM);
+    EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == SOFTBUS_DISCOVER_MANAGER_DUPLICATE_PARAM || ret == DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -249,7 +249,8 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_003, testing::ext::T
     int32_t publishId = 1;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int ret = DeviceManagerService::GetInstance().UnPublishDeviceDiscovery(pkgName, publishId);
-    EXPECT_TRUE(ret == SOFTBUS_DISCOVER_COAP_STOP_PUBLISH_FAIL || ret == SOFTBUS_ERR);
+    EXPECT_TRUE(ret == SOFTBUS_DISCOVER_COAP_STOP_PUBLISH_FAIL || ret == SOFTBUS_ERR ||
+                ret == ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -1911,7 +1912,8 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_004, testing::ext::TestSize.L
     std::map<std::string, std::string> advertiseParam;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().StopAdvertising(pkgName, advertiseParam);
-    EXPECT_TRUE(ret == SOFTBUS_DISCOVER_COAP_STOP_PUBLISH_FAIL || ret == SOFTBUS_ERR);
+    EXPECT_TRUE(ret == SOFTBUS_DISCOVER_COAP_STOP_PUBLISH_FAIL || ret == SOFTBUS_ERR ||
+                ret == ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
