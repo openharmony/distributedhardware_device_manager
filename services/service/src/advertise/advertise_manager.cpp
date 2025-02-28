@@ -103,7 +103,7 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
     if (advertiseParam.find(PARAM_KEY_META_TYPE) != advertiseParam.end()) {
         LOGI("StartAdvertising input MetaType=%{public}s", (advertiseParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
-    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end() && 
+    if (advertiseParam.find(PARAM_KEY_PUBLISH_ID) != advertiseParam.end() &&
         IsNumberString(advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second)) {
             int32_t publishId = std::atoi((advertiseParam.find(PARAM_KEY_PUBLISH_ID)->second).c_str());
             LOGI("PublishId=%{public}d", publishId);
