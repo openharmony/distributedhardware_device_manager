@@ -21,7 +21,6 @@
 #include "ability_manager_client.h"
 #include "auth_message_processor.h"
 #include "dm_anonymous.h"
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "nlohmann/json.hpp"
 #include "parameter.h"
@@ -36,11 +35,11 @@ static constexpr int32_t INVALID_USERID = -1;
 static constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
 static constexpr int32_t WINDOW_LEVEL_UPPER = 2;
 static constexpr int32_t WINDOW_LEVEL_DEFAULT = 1;
-const std::string CONNECT_PIN_DIALOG = "pinDialog";
-const std::string DM_UI_BUNDLE_NAME = "com.ohos.devicemanagerui";
-const std::string CONFIRM_ABILITY_NAME = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
-const std::string PIN_ABILITY_NAME = "com.ohos.devicemanagerui.PincodeUIExtAbility";
-const std::string INPUT_ABILITY_NAME = "com.ohos.devicemanagerui.InputUIExtAbility";
+constexpr const char* CONNECT_PIN_DIALOG = "pinDialog";
+constexpr const char* DM_UI_BUNDLE_NAME = "com.ohos.devicemanagerui";
+constexpr const char* CONFIRM_ABILITY_NAME = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
+constexpr const char* PIN_ABILITY_NAME = "com.ohos.devicemanagerui.PincodeUIExtAbility";
+constexpr const char* INPUT_ABILITY_NAME = "com.ohos.devicemanagerui.InputUIExtAbility";
 
 std::string DmDialogManager::bundleName_ = "";
 std::string DmDialogManager::abilityName_ = "";

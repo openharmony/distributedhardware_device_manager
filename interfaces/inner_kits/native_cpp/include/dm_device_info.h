@@ -352,16 +352,16 @@ typedef enum {
     MAX = 9,
 } DmCommonNotifyEvent;
 
-const std::string DEVICE_TYPE_UNKNOWN_STRING = "UNKNOWN";
-const std::string DEVICE_TYPE_PHONE_STRING = "PHONE";
-const std::string DEVICE_TYPE_PAD_STRING = "PAD";
-const std::string DEVICE_TYPE_TV_STRING = "TV";
-const std::string DEVICE_TYPE_CAR_STRING = "CAR";
-const std::string DEVICE_TYPE_WATCH_STRING = "WATCH";
-const std::string DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamera";
-const std::string DEVICE_TYPE_PC_STRING = "PC";
-const std::string DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
-const std::string DEVICE_TYPE_2IN1_STRING = "2IN1";
+extern const char* DEVICE_TYPE_UNKNOWN_STRING;
+extern const char* DEVICE_TYPE_PHONE_STRING;
+extern const char* DEVICE_TYPE_PAD_STRING;
+extern const char* DEVICE_TYPE_TV_STRING;
+extern const char* DEVICE_TYPE_CAR_STRING;
+extern const char* DEVICE_TYPE_WATCH_STRING;
+extern const char* DEVICE_TYPE_WIFICAMERA_STRING;
+extern const char* DEVICE_TYPE_PC_STRING;
+extern const char* DEVICE_TYPE_SMART_DISPLAY_STRING;
+extern const char* DEVICE_TYPE_2IN1_STRING;
 
 typedef struct DmAccessCaller {
     std::string accountId;

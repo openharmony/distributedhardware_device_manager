@@ -22,7 +22,6 @@
 #include "dm_single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
-const uint32_t MAX_USER_ID_NUM = 5;
 enum class RelationShipChangeType : uint32_t {
     ACCOUNT_LOGOUT = 0,
     DEVICE_UNBIND = 1,

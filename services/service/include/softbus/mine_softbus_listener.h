@@ -41,10 +41,9 @@ using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
-constexpr uint32_t DM_HASH_DATA_LEN = 16;
-constexpr uint32_t DM_DEVICE_NUMBER_LEN = 11;
-constexpr uint32_t DM_DE_LEN = 16;
-constexpr uint32_t EVP_OK = 1;
+
+#define DM_DEVICE_NUMBER_LEN 11
+#define DM_HASH_DATA_LEN 16
 
 typedef struct {
     string type;

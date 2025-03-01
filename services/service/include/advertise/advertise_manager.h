@@ -28,14 +28,24 @@ public:
 
     int32_t StartAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
     int32_t StopAdvertising(const std::string &pkgName, int32_t publishId);
+    void ClearPulishIdCache(const std::string &pkgName);
 
 private:
     void HandleAutoStopAdvertise(const std::string &timerName, const std::string &pkgName, int32_t publishId);
-    void ConfigAdvParam(const std::map<std::string, std::string> &advertiseParam, DmPublishInfo *dmPubInfo);
+    void ConfigAdvParam(const std::map<std::string, std::string> &advertiseParam, DmPublishInfo *dmPubInfo,
+                        const std::string &pkgName);
+    int32_t GenInnerPublishId(const std::string &pkgName, int32_t publishId);
+    int32_t GetAndRemoveInnerPublishId(const std::string &pkgName, int32_t publishId);
 
 private:
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<SoftbusListener> softbusListener_;
+
+    std::mutex pubMapLock_;
+    // Caller publishId to inner publishId. The key is the caller pkgName, the value is
+    // a list of externals publishId to inner publishId.
+    std::map<std::string, std::map<int32_t, int32_t>> pkgName2PubIdMap_;
+    std::set<int32_t> publishIdSet_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

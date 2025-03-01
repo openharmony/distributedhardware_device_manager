@@ -21,7 +21,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string UK_SEPARATOR = "#";
+constexpr const char* UK_SEPARATOR = "#";
+constexpr int32_t MAX_ICON_SIZE = 4 * 1024 * 1024;
 }
 
 #define READ_HELPER_RET(parcel, type, out, failRet) \

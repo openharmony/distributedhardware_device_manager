@@ -20,12 +20,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string DB_KEY_DELIMITER = "###";
-const std::string UDID_HASH_KEY = "udidHash";
-const std::string APP_ID_KEY = "appID";
-const std::string ANOY_DEVICE_ID_KEY = "anoyDeviceId";
-const std::string SALT_KEY = "salt";
-const std::string LAST_MODIFY_TIME_KEY = "lastModifyTime";
 
 typedef struct DmKVValue {
     std::string udidHash;

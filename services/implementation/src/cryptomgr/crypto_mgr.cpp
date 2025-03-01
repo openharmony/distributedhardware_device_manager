@@ -28,12 +28,18 @@
 
 #include "securec.h"
 
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
+constexpr uint32_t TAG_LEN = 16;
+constexpr uint32_t OVERHEAD_LEN = GCM_IV_LEN + TAG_LEN;
+constexpr uint32_t MAX_ENCRY_MSG_LEN = 10 * 1024 * 1024; // 10MB
+constexpr uint32_t KEY_BITS_UNIT = 8;
+constexpr uint32_t HEX_TO_UINT8 = 2;
 CryptoMgr::CryptoMgr()
 {
     LOGI("CryptoMgr ctor");

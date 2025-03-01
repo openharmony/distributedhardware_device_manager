@@ -15,7 +15,7 @@
 
 #include "dm_log.h"
 #include "dm_timer.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {

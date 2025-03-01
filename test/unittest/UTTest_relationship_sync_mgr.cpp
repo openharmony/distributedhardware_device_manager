@@ -19,6 +19,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+const int32_t MAX_USER_ID_NUM = 5;
 void ReleationShipSyncMgrTest::SetUp()
 {
 }

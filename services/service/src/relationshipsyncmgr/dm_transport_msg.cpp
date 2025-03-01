@@ -21,8 +21,14 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-    const int32_t MAX_USER_ID_NUM = 5;
-    const int32_t MAX_BACKGROUND_USER_ID_NUM = 5;
+const int32_t MAX_USER_ID_NUM = 5;
+const int32_t MAX_BACKGROUND_USER_ID_NUM = 5;
+const char* const FOREGROUND_USERIDS_MSG_USERIDS_KEY = "foregroundUserIds";
+const char* const BACKGROUND_USERIDS_MSG_USERIDS_KEY = "backgroundUserIds";
+const char* const COMM_MSG_CODE_KEY = "code";
+const char* const COMM_MSG_MSG_KEY = "msg";
+const char* const DSOFTBUS_NOTIFY_USERIDS_UDIDKEY = "remoteUdid";
+const char* const DSOFTBUS_NOTIFY_USERIDS_USERIDKEY = "foregroundUserIds";
 }
 void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
 {

@@ -1701,7 +1701,6 @@ int32_t DeviceManagerService::GetServiceInfoById(int64_t serviceId, DMServiceInf
 int32_t DeviceManagerService::GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start");
     DistributedDeviceProfile::ServiceInfoUniqueKey key;
     bool result = InitServiceInfoUniqueKey(key);
     if (!result) {
@@ -2941,7 +2940,7 @@ void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &
             return;
         }
     }
-    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_CONN_SESSIONTYPE, CONN_SESSION_TYPE_HML.c_str());
+    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_CONN_SESSIONTYPE, CONN_SESSION_TYPE_HML);
     cJSON_AddNumberToObject(bindParamObj, PARAM_KEY_HML_ACTIONID, actionId);
     char *str = cJSON_PrintUnformatted(bindParamObj);
     if (str == nullptr) {
@@ -2950,6 +2949,12 @@ void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &
     }
     bindParam = std::string(str);
     cJSON_Delete(bindParamObj);
+}
+
+void DeviceManagerService::ClearPulishIdCache(const std::string &pkgName)
+{
+    CHECK_NULL_VOID(advertiseMgr_);
+    advertiseMgr_->ClearPulishIdCache(pkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

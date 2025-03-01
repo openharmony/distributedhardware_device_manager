@@ -27,15 +27,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string ORGPKGNAME = "deviceManager";
-const std::string SOFTBUSNAME = "dsoftbus";
-const std::string HICHAINNAME = "hichain";
-const std::string DM_DISCOVER_BEHAVIOR = "DM_DISCOVER_BEHAVIOR";
-const std::string DM_AUTHCATION_BEHAVIOR = "DM_AUTHCATION_BEHAVIOR";
-constexpr int32_t SUBSYS_DISTRIBUTEDHARDWARE_DM = 204;
-constexpr int32_t INVALID_UDID_LENGTH = 10;
-constexpr int32_t SUBSTR_UDID_LENGTH = 5;
-constexpr int32_t DEFAULT_STAGE = 1;
+extern const char* ORGPKGNAME;
+extern const char* SOFTBUSNAME;
+extern const char* HICHAINNAME;
 enum class DiscoverScene : int32_t {
     DM_DISCOVER = 0x1,
     DM_GET_TRUST_DEVICE_LIST = 0x2,

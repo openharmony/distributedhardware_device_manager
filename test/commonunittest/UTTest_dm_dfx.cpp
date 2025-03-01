@@ -17,6 +17,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* ARGS_HELP_INFO = "-help";
+constexpr const char* HIDUMPER_GET_TRUSTED_LIST_INFO = "-getTrustlist";
 void DmDfxTest::SetUp()
 {
 }

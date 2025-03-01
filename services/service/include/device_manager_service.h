@@ -230,6 +230,7 @@ public:
     int32_t UpdateServiceInfo(const DMServiceInfo &serviceInfo);
     int32_t GetServiceInfoById(int64_t serviceId, DMServiceInfo &serviceInfo);
     int32_t GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos);
+    void ClearPulishIdCache(const std::string &pkgName);
 
 private:
     bool IsDMServiceImplReady();

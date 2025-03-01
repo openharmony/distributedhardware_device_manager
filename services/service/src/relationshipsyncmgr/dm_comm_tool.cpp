@@ -19,7 +19,7 @@
 
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "dm_transport.h"
 #include "dm_transport_msg.h"
 #include "dm_log.h"
@@ -28,6 +28,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+// send local foreground userids msg
+constexpr int32_t DM_COMM_SEND_LOCAL_USERIDS = 1;
+// if receive remote device send foreground userids, response local foreground uerids
+// This msg no need response
+constexpr int32_t DM_COMM_RSP_LOCAL_USERIDS = 2;
+
 DMCommTool::DMCommTool() : dmTransportPtr_(nullptr)
 {
     LOGI("Ctor DMCommTool");

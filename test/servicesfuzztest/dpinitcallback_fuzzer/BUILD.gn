@@ -62,6 +62,7 @@ ohos_fuzztest("DpInitCallbackFuzzTest") {
 
   deps = [
     "${devicemanager_path}/services/implementation:devicemanagerserviceimpl",
+    "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
   ]
 

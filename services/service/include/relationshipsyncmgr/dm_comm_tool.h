@@ -27,11 +27,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-// send local foreground userids msg
-constexpr int32_t DM_COMM_SEND_LOCAL_USERIDS = 1;
-// if receive remote device send foreground userids, response local foreground uerids
-// This msg no need response
-constexpr int32_t DM_COMM_RSP_LOCAL_USERIDS = 2;
 
 class DMCommTool : public std::enable_shared_from_this<DMCommTool> {
 public:

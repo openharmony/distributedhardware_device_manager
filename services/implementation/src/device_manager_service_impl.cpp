@@ -35,6 +35,9 @@ using namespace OHOS::EventFwk;
 
 namespace OHOS {
 namespace DistributedHardware {
+// One year 365 * 24 * 60 * 60
+constexpr int32_t MAX_ALWAYS_ALLOW_SECONDS = 31536000;
+
 DeviceManagerServiceImpl::DeviceManagerServiceImpl()
 {
     LOGI("DeviceManagerServiceImpl constructor");

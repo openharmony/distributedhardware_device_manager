@@ -33,6 +33,7 @@ namespace DistributedHardware {
 const uint32_t DM_EVENT_QUEUE_CAPACITY = 20;
 const uint32_t DM_EVENT_WAIT_TIMEOUT = 2;
 constexpr const char* THREAD_LOOP = "ThreadLoop";
+constexpr const char* STATE_TIMER_PREFIX = "deviceManagerTimer:stateTimer_";
 DmDeviceStateManager::DmDeviceStateManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     std::shared_ptr<IDeviceManagerServiceListener> listener, std::shared_ptr<HiChainConnector> hiChainConnector,
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector)

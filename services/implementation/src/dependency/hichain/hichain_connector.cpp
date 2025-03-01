@@ -53,6 +53,16 @@ constexpr const char* ADD_HICHAIN_GROUP_FAILED_MSG = "dm add member to group fai
 constexpr const char* DM_CREATE_GROUP_SUCCESS_MSG = "dm create group success.";
 constexpr const char* DM_CREATE_GROUP_FAILED_MSG = "dm create group failed.";
 constexpr const char* DM_PKG_NAME_EXT = "com.huawei.devicemanager";
+constexpr const char* FIELD_OPERATION_CODE = "operationCode";
+constexpr const char* FIELD_META_NODE_TYPE = "metaNodeType";
+constexpr const char* FIELD_TYPE = "TType";
+
+static const std::unordered_map<int32_t, AuthFormPriority> g_authFormPriorityMap = {
+    {GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP, AuthFormPriority::PRIORITY_IDENTICAL_ACCOUNT},
+    {GROUP_TYPE_ACROSS_ACCOUNT_GROUP, AuthFormPriority::PRIORITY_ACROSS_ACCOUNT},
+    {GROUP_TYPE_PEER_TO_PEER_GROUP, AuthFormPriority::PRIORITY_PEER_TO_PEER}
+};
+
 void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
 {
     if (jsonObject.find(FIELD_GROUP_NAME) != jsonObject.end() && jsonObject.at(FIELD_GROUP_NAME).is_string()) {

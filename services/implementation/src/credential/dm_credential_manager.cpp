@@ -43,6 +43,7 @@ constexpr const char* FIELD_AUTH_TYPE = "authType";
 constexpr const char* FIELD_CREDENTIAL_DATA = "credentialData";
 constexpr const char* FIELD_CREDENTIAL_ID = "credentialId";
 constexpr const char* FIELD_PEER_CREDENTIAL_INFO = "peerCredentialInfo";
+constexpr const char* FIELD_TYPE = "TType";
 
 struct CredentialDataInfo {
     int32_t credentialType;

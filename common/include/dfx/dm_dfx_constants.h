@@ -23,10 +23,12 @@
 namespace OHOS {
 namespace DistributedHardware {
 // HisysEvent Type
-const int DM_HISYEVENT_FAULT = 1;
-const int DM_HISYEVENT_STATISTIC = 2;
-const int DM_HISYEVENT_SECURITY = 3;
-const int DM_HISYEVENT_BEHAVIOR = 4;
+enum HisysEventType {
+    DM_HISYEVENT_FAULT = 1,
+    DM_HISYEVENT_STATISTIC = 2,
+    DM_HISYEVENT_SECURITY = 3,
+    DM_HISYEVENT_BEHAVIOR = 4
+};
 
 // HiDumper Flag
 enum class HidumperFlag {
@@ -34,16 +36,6 @@ enum class HidumperFlag {
     HIDUMPER_GET_HELP,
     HIDUMPER_GET_TRUSTED_LIST,
     HIDUMPER_GET_DEVICE_STATE,
-};
-
-// HiDumper info
-constexpr const char* ARGS_HELP_INFO = "-help";
-constexpr const char* HIDUMPER_GET_TRUSTED_LIST_INFO = "-getTrustlist";
-
-// HiDumper command
-const std::unordered_map<std::string, HidumperFlag> MAP_ARGS = {
-    { std::string(ARGS_HELP_INFO), HidumperFlag::HIDUMPER_GET_HELP },
-    { std::string(HIDUMPER_GET_TRUSTED_LIST_INFO), HidumperFlag::HIDUMPER_GET_TRUSTED_LIST },
 };
 
 // HiDumper device type

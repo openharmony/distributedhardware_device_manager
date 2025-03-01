@@ -33,6 +33,7 @@ static bool g_reportAuthConfirmBoxReturnBoolValue = false;
 constexpr const char* DM_VERSION_4_1_5_1 = "4.1.5";
 constexpr const char* DM_VERSION_5_0_1 = "5.0.1";
 constexpr const char* DM_VERSION_5_0_2 = "5.0.2";
+constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
 
 using namespace testing;
 using namespace testing::ext;

@@ -45,6 +45,7 @@ ohos_fuzztest("DmAuthManagerFuzzTest") {
   sources = [ "dm_auth_manager_fuzzer.cpp" ]
 
   deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
     "${services_path}:devicemanagerservice",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutils",

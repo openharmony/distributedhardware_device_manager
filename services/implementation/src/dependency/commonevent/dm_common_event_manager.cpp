@@ -18,7 +18,7 @@
 #include <pthread.h>
 #include <thread>
 
-#include "dm_constants.h"
+#include "dm_error_type.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "common_event_support.h"

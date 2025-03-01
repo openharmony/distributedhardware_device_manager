@@ -1139,6 +1139,7 @@ ohos_unittest("UTTest_dm_device_state_manager_two") {
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
+    "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
   ]

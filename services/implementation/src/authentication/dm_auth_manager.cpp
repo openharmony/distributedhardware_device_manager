@@ -82,9 +82,19 @@ const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
+
+constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
+constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
+constexpr const char* CONFIRM_TIMEOUT_TASK = "deviceManagerTimer:confirm";
+constexpr const char* INPUT_TIMEOUT_TASK = "deviceManagerTimer:input";
+constexpr const char* ADD_TIMEOUT_TASK = "deviceManagerTimer:add";
+constexpr const char* WAIT_NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:waitNegotiate";
+constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitRequest";
+constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_";
+constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
+
 constexpr int32_t PROCESS_NAME_WHITE_LIST_NUM = 1;
-constexpr int32_t PROCESS_NAME_SIZE_MAX = 256;
-constexpr const static char PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM][PROCESS_NAME_SIZE_MAX] = {
+constexpr const static char* PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM] = {
     "com.example.myapplication",
 };
 
@@ -414,7 +424,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     isAuthenticateDevice_ = true;
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
-        softbusConnector_->JoinLnn(deviceId);
+        softbusConnector_->JoinLnn(deviceId, true);
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(processInfo_, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
         return DM_OK;
@@ -2228,7 +2238,11 @@ void DmAuthManager::RequestCredentialDone()
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
     }
-    JoinLnn(authRequestContext_->addr);
+    if (softbusConnector_->CheckIsOnline(remoteDeviceId_) && !authResponseContext_->isOnline) {
+        softbusConnector_->JoinLnn(authRequestContext_->addr, true);
+    } else {
+        softbusConnector_->JoinLnn(authRequestContext_->addr, false);
+    }
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
     authResponseContext_->reply = DM_OK;

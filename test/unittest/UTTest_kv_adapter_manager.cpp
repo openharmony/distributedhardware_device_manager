@@ -37,6 +37,11 @@ const size_t ARG_SECOND = 1;
 const size_t ARG_THIRD = 2;
 const size_t ARG_FOURTH = 3;
 constexpr int64_t ANCHOR_TIME = 2025;
+constexpr const char* UDID_HASH_KEY = "udidHash";
+constexpr const char* APP_ID_KEY = "appID";
+constexpr const char* ANOY_DEVICE_ID_KEY = "anoyDeviceId";
+constexpr const char* SALT_KEY = "salt";
+constexpr const char* LAST_MODIFY_TIME_KEY = "lastModifyTime";
 } // namespace
 void KVAdapterManagerTest::SetUp()
 {

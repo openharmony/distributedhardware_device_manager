@@ -90,6 +90,7 @@ namespace {
     const uint16_t FOREGROUND_USERID_LEN_MASK = 0b00000111;
     const uint16_t ALL_USERID_NUM_MASK = 0b00111000;
     const uint32_t MAX_MEM_MALLOC_SIZE = 4 * 1024;
+    const uint32_t MAX_USER_ID_NUM = 5;
 }
 
 RelationShipChangeMsg::RelationShipChangeMsg() : type(RelationShipChangeType::TYPE_MAX),

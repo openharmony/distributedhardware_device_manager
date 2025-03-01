@@ -17,13 +17,26 @@
 #include <dlfcn.h>
 
 #include "dm_anonymous.h"
-#include "dm_constants.h"
 #include "dm_log.h"
 #include "json_config.h"
 #include "nlohmann/json.hpp"
 
+#ifdef __LP64__
+constexpr const char* DM_LIB_LOAD_PATH = "/system/lib64/";
+#else
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+constexpr const char* DM_LIB_LOAD_PATH = "/system/lib/";
+#else
+constexpr const char* DM_LIB_LOAD_PATH = "/usr/lib/";
+#endif
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* AUTH_LOAD_JSON_KEY = "devicemanager_auth_components";
+constexpr const char* ADAPTER_LOAD_JSON_KEY = "devicemanager_adapter_components";
+constexpr const char* AUTH_JSON_TYPE_KEY = "AUTHENTICATE";
+constexpr const char* CPYPTO_JSON_TYPE_KEY = "CPYPTO";
 void from_json(const nlohmann::json &jsonObject, AdapterSoLoadInfo &soLoadInfo)
 {
     if (!IsString(jsonObject, "name") || !IsString(jsonObject, "type") || !IsString(jsonObject, "version") ||

@@ -16,10 +16,15 @@
 
 #include "cJSON.h"
 #include "dm_anonymous.h"
-#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* UDID_HASH_KEY = "udidHash";
+constexpr const char* APP_ID_KEY = "appID";
+constexpr const char* ANOY_DEVICE_ID_KEY = "anoyDeviceId";
+constexpr const char* SALT_KEY = "salt";
+constexpr const char* LAST_MODIFY_TIME_KEY = "lastModifyTime";
+
 void ConvertDmKVValueToJson(const DmKVValue &kvValue, std::string &result)
 {
     nlohmann::json jsonObj;

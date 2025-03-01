@@ -23,12 +23,16 @@
 #include "device_manager_service_listener.h"
 #include "dm_anonymous.h"
 #include "dm_auth_manager.h"
+#include "dm_constants.h"
 #include "hichain_connector.h"
 
 #include "hichain_connector_fuzzer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+constexpr const char* FIELD_OPERATION_CODE = "operationCode";
+constexpr const char* FIELD_META_NODE_TYPE = "metaNodeType";
+constexpr const char* FIELD_TYPE = "TType";
 
 class HiChainConnectorCallbackTest : public IHiChainConnectorCallback {
 public:
