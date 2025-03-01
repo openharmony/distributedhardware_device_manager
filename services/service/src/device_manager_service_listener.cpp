@@ -110,6 +110,8 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
         return;
     }
     deviceBasicInfo.extraData = std::string(basicExtraData);
+    cJSON_free(customData);
+    cJSON_free(basicExtraData);
     cJSON_Delete(basicExtraDataJsonObj);
 }
 
