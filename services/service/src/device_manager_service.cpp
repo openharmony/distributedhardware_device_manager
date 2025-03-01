@@ -2950,6 +2950,7 @@ void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &
         return;
     }
     bindParam = std::string(str);
+    cJSON_free(str);
     cJSON_Delete(bindParamObj);
 }
 
