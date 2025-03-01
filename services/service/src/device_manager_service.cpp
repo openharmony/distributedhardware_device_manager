@@ -387,11 +387,8 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string peerDeviceId = "";
-    int32_t udidRet = SoftbusListener::GetUdidByNetworkId(networkId.c_str(), peerDeviceId);
-    if (udidRet != DM_OK) {
-        LOGE("GetUdidByNetworkId failed, ret : %{public}d", udidRet);
-        return ERR_DM_FAILED;
-    }
+    SoftbusListener::GetUdidByNetworkId(networkId.c_str(), peerDeviceId);
+    int32_t ret = DM_OK;
     if (!IsDMServiceImplReady()) {
         LOGE("GetDeviceInfo failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -399,16 +396,21 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
+    if (localUdid == peerDeviceId) {
+        int32_t ret = softbusListener_->GetDeviceInfo(networkId, info);
+        if (ret != DM_OK) {
+            LOGE("Get DeviceInfo By NetworkId failed, ret : %{public}d", ret);
+        }
+        return ret;
+    }
     int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
     if (permissionRet == DM_OK) {
         int32_t ret = softbusListener_->GetDeviceInfo(networkId, info);
         if (ret != DM_OK) {
             LOGE("Get DeviceInfo By NetworkId failed, ret : %{public}d", ret);
         }
-        return ret;
-    } else {
-        return ERR_DM_NO_PERMISSION;
     }
+    return ret;
 }
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
