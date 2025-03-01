@@ -145,8 +145,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     authMessageProcessor->cryptoAdapter_ = nullptr;
     authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_NFC;
     authManager->authRequestContext_->hostPkgName = "hostPkgName";
-    authManager->authRequestContext_->importAuthCode_ = "123";
-    authManager->authRequestContext_->importPkgName_ = "hostPkgName";
+    authManager->importAuthCode_ = "123";
+    authManager->importPkgName_ = "hostPkgName";
     authMessageProcessor->authMgr_ = authManager;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
     std::string str1 = SafetyDump(jsonObj);

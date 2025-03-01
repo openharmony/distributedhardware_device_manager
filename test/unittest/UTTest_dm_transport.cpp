@@ -211,9 +211,15 @@ HWTEST_F(DMTransportTest, Send_SessionNotOpened_Failure, testing::ext::TestSize.
 HWTEST_F(DMTransportTest, OnSocketOpened_001, testing::ext::TestSize.Level0)
 {
     int32_t socketId = 1;
-    PeerSocketInfo info;
-    info.name = "socketName";
-    info.networkId = "ne*****1v";
+    std::string name = "socketName";
+    std::string networkId = "ne*****1v";
+    std::string pkgName = "ohos.objectstore";
+    PeerSocketInfo info = {
+        .name = name.data(),
+        .networkId = networkId.data(),
+        .pkgName = pkgName.data(),
+        .dataType = DATA_TYPE_BYTES
+    };
     int32_t ret = dmTransport_->OnSocketOpened(socketId, info);
     EXPECT_EQ(ret, DM_OK);
 
@@ -225,18 +231,22 @@ HWTEST_F(DMTransportTest, OnSocketOpened_001, testing::ext::TestSize.Level0)
 HWTEST_F(DMTransportTest, OnSocketClosed_001, testing::ext::TestSize.Level0)
 {
     int32_t socketId = 10;
-    PeerSocketInfo info;
-    info.name = "socketName";
-    info.networkId = "ne*****1v";
-    info.pkgName = "dmPkgName";
-    info.dataType = DATA_TYPE_BYTES;
+    std::string name = "socketName";
+    std::string networkId = "ne*****1v";
+    std::string pkgName = "ohos.objectstore";
+    PeerSocketInfo info = {
+        .name = name.data(),
+        .networkId = networkId.data(),
+        .pkgName = pkgName.data(),
+        .dataType = DATA_TYPE_BYTES
+    };
     dmTransport_->OnSocketOpened(socketId, info);
     
     ShutdownReason reason = ShutdownReason::SHUTDOWN_REASON_LNN_CHANGED;
     int32_t ret = dmTransport_->OnSocketClosed(socketId, reason);
     EXPECT_EQ(ret, DM_OK);
 
-    int32_t socketId = -1;
+    socketId = -1;
     void *data = nullptr;
     uint32_t dataLen = 0;
     dmTransport_->OnBytesReceived(socketId, data, dataLen);

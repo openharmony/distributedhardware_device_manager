@@ -103,7 +103,7 @@ HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level0)
         ]
     })";
     std::shared_ptr<CommMsg> commMsg_ = std::make_shared<CommMsg>(1, strMsg);
-    int32_t socketId = 0;
+    socketId = 0;
     std::shared_ptr<InnerCommMsg> InnerCommMsg_ = std::make_shared<InnerCommMsg>(remoteNetworkId, commMsg_, socketId);
     std::string rmtUdid = "";
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
