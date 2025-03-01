@@ -1379,6 +1379,10 @@ HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_202, testing::ext::Te
     std::vector<DmDeviceInfo> deviceList;
     int32_t ret = DeviceManagerService::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+
+    int32_t actionId = 1;
+    std::string bindParam = "bindParamData";
+    DeviceManagerService::GetInstance().AddHmlInfoToBindParam(actionId, bindParam);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Level0)

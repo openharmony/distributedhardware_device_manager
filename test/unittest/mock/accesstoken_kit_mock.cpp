@@ -44,6 +44,11 @@ AccessTokenID AccessTokenKit::GetHapTokenID(int32_t userID, const std::string &b
 {
     return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetHapTokenID(userID, bundleName, instIndex);
 }
+
+int AccessTokenKit::VerifyAccessToken(AccessTokenID tokenID, const std::string& permissionName)
+{
+    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->VerifyAccessToken(tokenID, permissionName);
+}
 } // namespace AccessToken
 } // namespace Security
 

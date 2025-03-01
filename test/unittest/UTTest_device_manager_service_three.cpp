@@ -469,6 +469,24 @@ HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceInfo_301, testing::ext::TestSiz
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
+
+HWTEST_F(DeviceManagerServiceThreeTest, PutDeviceProfileInfoList_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+    
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceNamePrefixs_301, testing::ext::TestSize.Level0)
+{
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    auto ret = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
+    EXPECT_TRUE(ret.empty());
+    
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

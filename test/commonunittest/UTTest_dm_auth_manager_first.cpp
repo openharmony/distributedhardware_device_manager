@@ -1960,7 +1960,12 @@ HWTEST_F(DmAuthManagerTest, CheckProcessNameInWhiteList_001, testing::ext::TestS
     ASSERT_TRUE(ret);
 }
 
-
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_001, testing::ext::TestSize.Level0)
+{
+    std::string delaySecondsStr = "";
+    int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
+    ASSERT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -55,6 +55,7 @@ void SoftbusListenerTest::TearDownTestCase()
     cryptoMock_ = nullptr;
     DmSoftbusCache::dmSoftbusCache = nullptr;
     softbusCacheMock_ = nullptr;
+    ipcSkeletonMock_ = nullptr;
 }
 
 namespace {
@@ -1149,6 +1150,15 @@ HWTEST_F(SoftbusListenerTest, SetLocalDisplayName_001, testing::ext::TestSize.Le
     softbusListener->DeleteCacheDeviceInfo();
 
     DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser acer;
+    DistributedDeviceProfile::Accessee acee;
+    std::string deviceIdEr = "localDeviceId";
+    std::string deviceIdEe = "remoteDeviceId";
+    acee.SetAccesseeDeviceId(deviceIdEe);
+    acer.SetAccesserDeviceId(deviceIdEr);
+    profile.SetTrustDeviceId("remoteDeviceId");
+    profile.SetAccesser(acer);
+    profile.SetAccessee(acee);
     DmDeviceInfo deviceInfo;
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
     softbusListener->ConvertAclToDeviceInfo(profile, deviceInfo);
@@ -1181,6 +1191,7 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_001, testing::ext::TestSiz
     DistributedDeviceProfile::AccessControlProfile profile;
     profile.SetBindType(1);
     allProfile.push_back(profile);
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
         .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
     int32_t ret = softbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
@@ -1208,6 +1219,110 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_001, testing::ext::TestSiz
     nlohmann::json jsonObj;
     softbusListener->ParseConnAddrInfo(&addrInfo, jsonObj);
     softbusListener = nullptr;
+}
+
+HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "bundleName";
+    std::string extra = "extra";
+    std::vector<DmDeviceInfo> deviceList;
+    if (softbusListener == nullptr) {
+        softbusListener = std::make_shared<SoftbusListener>();
+    }
+    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    DistributedDeviceProfile::Accesser acer;
+    acer.SetAccesserTokenId(1001);
+    acer.SetAccesserBundleName("bundleName");
+    profile.SetAccesser(acer);
+    profile.SetBindType(2);
+    allProfile.push_back(profile);
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = softbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, DM_OK);
+
+    DistributedDeviceProfile::Accessee acee;
+    acee.SetAccesserTokenId(1002);
+    acee.SetAccesserBundleName("bundleNameInfo");
+    profile.SetAccesser(acee);
+    allProfile.push_back(profile);
+    pkgName = "bundleNameInfo";
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1002));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
+    ret = softbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    EXPECT_EQ(ret, DM_OK);
+
+    DistributedDeviceProfile::AccessControlProfile profileInfo;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    std::string deviceIdEr = "localDeviceId";
+    std::string deviceIdEe = "remoteDeviceId";
+    accessee.SetAccesseeDeviceId(deviceIdEe);
+    accesser.SetAccesserDeviceId(deviceIdEr);
+    profileInfo.SetTrustDeviceId(deviceIdEr);
+    profileInfo.SetAccesser(accesser);
+    profileInfo.SetAccessee(accessee);
+    DmDeviceInfo deviceInfo;
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusCacheMock_, GetDeviceNameFromCache(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    softbusListener->ConvertAclToDeviceInfo(profileInfo, deviceInfo);
+}
+
+HWTEST_F(SoftbusListenerTest, GetAttrFromExtraData_001, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo dmDevInfo;
+    const char* jsonString = R"({
+        "MsgType": 0,
+        "userId": 12345,
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "CUSTOM_DATA": "customDataInfo",
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    dmDevInfo.extraData = std::string(jsonString);
+    int32_t actionId = 1;
+    int32_t ret = softbusListener->GetAttrFromExtraData(dmDevInfo, actionId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.Level0)
+{
+    const char* jsonString = R"({
+        "MsgType": 0,
+        "userId": 12345,
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "customData": ["customDataInfo", "custom*****info"],
+        "actionId": 14526,
+        "networkId": "a******1",
+        "displayName": "displayNameInfo",
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON* customDataJson = cJSON_Parse(jsonString);
+    DmDeviceInfo dmDevInfo;
+    int32_t actionId = 1;
+    int32_t ret = softbusListener->GetAttrFromCustomData(customDataJson, dmDevInfo, actionId);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
