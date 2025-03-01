@@ -1165,12 +1165,10 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
 void SoftbusListener::SetHostPkgName(const std::string hostName)
 {
     hostName_ = hostName;
-    LOGI("SetHostPkgName::hostName_ :%s.", hostName_.c_str());
 }
 
 std::string SoftbusListener::GetHostPkgName()
 {
-    LOGI("GetHostPkgName::hostName_ :%s.", hostName_.c_str());
     return hostName_;
 }
 
