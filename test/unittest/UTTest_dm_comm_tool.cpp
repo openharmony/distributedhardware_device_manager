@@ -15,6 +15,7 @@
 
 #include "UTTest_dm_comm_tool.h"
 #include <memory>
+#include "dm_error_type.h"
 
 using namespace testing;
 using namespace testing::ext;

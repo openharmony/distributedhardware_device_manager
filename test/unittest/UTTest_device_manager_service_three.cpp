@@ -477,7 +477,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, PutDeviceProfileInfoList_301, testing::e
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
-    
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceNamePrefixs_301, testing::ext::TestSize.Level0)
@@ -485,7 +484,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceNamePrefixs_301, testing::ext::
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     auto ret = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
     EXPECT_TRUE(ret.empty());
-    
 }
 } // namespace
 } // namespace DistributedHardware

@@ -1351,6 +1351,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_first.cpp",
     "mock/app_manager_mock.cpp",
+    "mock/crypto_mgr_mock.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_crypto_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",

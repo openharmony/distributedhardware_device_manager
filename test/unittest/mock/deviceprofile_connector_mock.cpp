@@ -117,5 +117,18 @@ int32_t DeviceProfileConnector::CheckDeviceInfoPermission(const std::string &loc
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckDeviceInfoPermission(localUdid, peerDeviceId);
 }
+
+int32_t DeviceProfileConnector::GetServiceInfoProfileListByBundleName(
+    const DistributedDeviceProfile::ServiceInfoUniqueKey& key,
+    std::vector<DistributedDeviceProfile::ServiceInfoProfile>& serviceInfoProfiles)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileListByBundleName(key,
+        serviceInfoProfiles);
+}
+
+int32_t DeviceProfileConnector::PutSessionKey(const uint8_t* sessionKey, uint32_t length, int32_t& sessionKeyId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->(sessionKey, length, sessionKeyId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

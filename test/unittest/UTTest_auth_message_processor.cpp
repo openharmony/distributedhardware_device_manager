@@ -134,6 +134,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authMessageProcessor->authMgr_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     int32_t msgType = MSG_TYPE_NEGOTIATE;
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
@@ -142,9 +143,14 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->SetRequestContext(authRequestContext);
     authMessageProcessor->cryptoAdapter_ = nullptr;
+    authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_NFC;
+    authMessageProcessor->authMgr_->authRequestContext_->hostPkgName = "hostPkgName";
+    authMessageProcessor->authMgr_->authRequestContext_->importAuthCode_ = "123";
+    authMessageProcessor->authMgr_->authRequestContext_->importPkgName_ = "hostPkgName";
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
     std::string str1 = SafetyDump(jsonObj);
     authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
 
     nlohmann::json jsonObject;
@@ -1873,6 +1879,20 @@ HWTEST_F(AuthMessageProcessorTest, GetJsonObj_010, testing::ext::TestSize.Level0
     authMessageProcessor->authResponseContext_->bindType.push_back(103);
     authMessageProcessor->GetJsonObj(jsonObj);
     ASSERT_FALSE(authMessageProcessor->authResponseContext_->bindType.empty());
+}
+
+HWTEST_F(AuthMessageProcessorTest, IsPincodeImported_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> data =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    authMessageProcessor->authMgr_ = nullptr;
+    bool ret = authMessageProcessor->IsPincodeImported();
+    ASSERT_FALSE(ret);
+
+    authMessageProcessor->authMgr_ = data;
+    ret = authMessageProcessor->IsPincodeImported();
+    ASSERT_FALSE(ret);
 }
 } // namespace
 } // namespace DistributedHardware
