@@ -127,14 +127,14 @@ HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestS
  */
 HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> data =
+    std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(authManager);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authMessageProcessor->authMgr_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     int32_t msgType = MSG_TYPE_NEGOTIATE;
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
@@ -144,9 +144,10 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     authMessageProcessor->SetRequestContext(authRequestContext);
     authMessageProcessor->cryptoAdapter_ = nullptr;
     authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_NFC;
-    authMessageProcessor->authMgr_->authRequestContext_->hostPkgName = "hostPkgName";
-    authMessageProcessor->authMgr_->authRequestContext_->importAuthCode_ = "123";
-    authMessageProcessor->authMgr_->authRequestContext_->importPkgName_ = "hostPkgName";
+    authManager->authRequestContext_->hostPkgName = "hostPkgName";
+    authManager->authRequestContext_->importAuthCode_ = "123";
+    authManager->authRequestContext_->importPkgName_ = "hostPkgName";
+    authMessageProcessor->authMgr_ = authManager;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
     std::string str1 = SafetyDump(jsonObj);
     authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();

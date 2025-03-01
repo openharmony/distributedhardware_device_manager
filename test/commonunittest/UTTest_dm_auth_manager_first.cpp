@@ -2049,14 +2049,14 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     serviceInfoProfile.SetPinCode(std::to_string(PINCODE));
     profiles.push_back(serviceInfoProfile);
     EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileListByBundleName(_, _))
-        .WillOnce(DoAll(SetArgReferee<1(profiles),  Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<1>(profiles), Return(DM_OK)));
     authManager_->GetServiceInfoProfile();
 
     int64_t requestId = 1;
-    std::string strSessionkey = "se**********12";
-    uint8_t *sessionKey = reinterpret_cast<uint8_t *>(strSessionkey.c_str());
-    uint32_t sessionKeyLen = static_cast<uint32_t>(strSessionkey.length());
-    authResponseContext_->requestId = 1;
+    uint8_t arrayPtr[] = {1, 2, 3, 4};
+    uint8_t *sessionKey = arrayPtr;
+    uint32_t sessionKeyLen = static_cast<uint32_t>(sizeof(arrayPtr));
+    authManager_->authResponseContext_->requestId = 1;
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     EXPECT_CALL(*cryptoMgrMock_, SaveSessionKey(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, PutSessionKey(_, _, _))
@@ -2070,7 +2070,7 @@ HWTEST_F(DmAuthManagerTest, IsPinCodeValid_001, testing::ext::TestSize.Level0)
     authManager_->ShowConfigDialog();
 
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->serviceInfoProfile.SetAuthBoxType(static_cast<int32_t>(DMServiceInfoAuthBoxType::SKIP_CONFIRM));
+    authManager_->serviceInfoProfile_.SetAuthBoxType(static_cast<int32_t>(DMServiceInfoAuthBoxType::SKIP_CONFIRM));
 
     authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
     authManager_->authResponseContext_->isSrcPincodeImported = true;
@@ -2165,23 +2165,23 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
     authManager_->softbusConnector_->AddMemberToDiscoverMap(deviceId, deviceInfo);
     std::string strExtra = jsonObject.dump();
-    int32_t ret = CheckAuthParamVaildExtra(strExtra, deviceId);
+    int32_t ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = 0;
     strExtra = jsonObject.dump();
-    ret = CheckAuthParamVaildExtra(strExtra, deviceId);
+    ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
     jsonObject[TAG_BIND_LEVEL] = 1;
     strExtra = jsonObject.dump();
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
-    ret = CheckAuthParamVaildExtra(strExtra, deviceId);
+    ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, DM_OK);
 
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
-    ret = CheckAuthParamVaildExtra(strExtra, deviceId);
+    ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 } // namespace
