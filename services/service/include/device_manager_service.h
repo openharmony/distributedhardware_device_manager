@@ -309,6 +309,16 @@ private:
     void InitServiceInfos(const std::vector<DistributedDeviceProfile::ServiceInfoProfile> &profiles,
         std::vector<DMServiceInfo> &serviceInfos);
     bool InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key);
+    void HandleUserSwitched();
+    void NotifyRemoteLocalUserSwitch(const std::string &localUdid, const std::vector<std::string> &peerUdids,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void NotifyRemoteLocalUserSwitchByWifi(const std::string &localUdid,
+        const std::map<std::string, std::string> &wifiDevices, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds);
+    void HandleUserSwitchTimeout(const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds, const std::string &udid);
+    void UpdateAclAndDeleteGroup(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

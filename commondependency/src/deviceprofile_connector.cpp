@@ -1840,6 +1840,91 @@ int32_t DeviceProfileConnector::PutSessionKey(
     return DM_OK;
 }
 
+bool DeviceProfileConnector::CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
+    const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    if ((profile.GetAccesser().GetAccesserDeviceId() == localUdid &&
+        (find(backgroundUserIds.begin(), backgroundUserIds.end(), profile.GetAccesser().GetAccesserUserId()) !=
+        backgroundUserIds.end()) && profile.GetStatus() == ACTIVE) ||
+        (profile.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+        (find(backgroundUserIds.begin(), backgroundUserIds.end(), profile.GetAccessee().GetAccesseeUserId()) !=
+        backgroundUserIds.end()) && profile.GetStatus() == ACTIVE)) {
+        return true;
+    }
+    if ((profile.GetAccesser().GetAccesserDeviceId() == localUdid &&
+        (find(foregroundUserIds.begin(), foregroundUserIds.end(), profile.GetAccesser().GetAccesserUserId()) !=
+        foregroundUserIds.end()) && profile.GetStatus() == INACTIVE) ||
+        (profile.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+        (find(foregroundUserIds.begin(), foregroundUserIds.end(), profile.GetAccessee().GetAccesseeUserId()) !=
+        foregroundUserIds.end()) && profile.GetStatus() == INACTIVE)) {
+        return true;
+    }
+    return false;
+}
+
+bool DeviceProfileConnector::CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
+{
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    LOGI("CheckAclStatusAndForegroundNotMatch profiles size is %{public}zu", profiles.size());
+    for (auto &item : profiles) {
+        if (CheckAclStatusNotMatch(item, localUdid, foregroundUserIds, backgroundUserIds)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
+    const std::vector<std::string> &deviceVec, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    LOGI("OnStart HandleUserSwitched");
+    if (deviceVec.empty()) {
+        LOGI("no remote device.");
+        return DM_OK;
+    }
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<AccessControlProfile> activeProfiles;
+    std::vector<AccessControlProfile> inActiveProfiles;
+    for (auto &item : profiles) {
+        if (std::find(deviceVec.begin(), deviceVec.end(), item.GetTrustDeviceId()) == deviceVec.end()) {
+            continue;
+        }
+        if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            (find(backgroundUserIds.begin(), backgroundUserIds.end(),
+            item.GetAccesser().GetAccesserUserId()) != backgroundUserIds.end()) && item.GetStatus() == ACTIVE) ||
+            (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            (find(backgroundUserIds.begin(), backgroundUserIds.end(),
+            item.GetAccessee().GetAccesseeUserId()) != backgroundUserIds.end()) && item.GetStatus() == ACTIVE)) {
+            item.SetStatus(INACTIVE);
+            inActiveProfiles.push_back(item);
+            continue;
+        }
+        if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            (find(foregroundUserIds.begin(), foregroundUserIds.end(),
+            item.GetAccesser().GetAccesserUserId()) != foregroundUserIds.end()) && item.GetStatus() == INACTIVE) || (
+            item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            (find(foregroundUserIds.begin(), foregroundUserIds.end(),
+            item.GetAccessee().GetAccesseeUserId()) != foregroundUserIds.end()) && item.GetStatus() == INACTIVE)) {
+            item.SetStatus(ACTIVE);
+            activeProfiles.push_back(item);
+            continue;
+        }
+    }
+    for (auto &item : inActiveProfiles) {
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        if (item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+        }
+    }
+    for (auto &item : activeProfiles) {
+        DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+    }
+    return DM_OK;
+}
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();

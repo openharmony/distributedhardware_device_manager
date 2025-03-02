@@ -38,13 +38,37 @@ struct GroupInformation {
     }
 };
 
+struct GroupsInfo {
+    std::string groupName;
+    std::string groupId;
+    std::string groupOwner;
+    int32_t groupType;
+    int32_t groupVisibility;
+    std::string userId;
+
+    GroupsInfo() : groupName(""), groupId(""), groupOwner(""), groupType(0), groupVisibility(0), userId("")
+    {
+    }
+};
+
 void from_json(const nlohmann::json &jsonObject, GroupInformation &groupInfo);
+void from_json(const nlohmann::json &jsonObject, GroupsInfo &groupInfo);
 
 class HichainListener {
 public:
     HichainListener();
     ~HichainListener();
     void RegisterDataChangeCb();
+    void DeleteAllGroup(const std::string &localUdid, const std::vector<int32_t> &backgroundUserIds);
+    int32_t GetRelatedGroups(int32_t userId, const std::string &deviceId,
+        std::vector<GroupsInfo> &groupList);
+    int32_t GetRelatedGroupsCommon(int32_t userId, const std::string &deviceId, const char* pkgName,
+        std::vector<GroupsInfo> &groupList);
+    int32_t DeleteGroup(const int32_t userId, std::string &groupId);
+    int32_t GetRelatedGroupsExt(int32_t userId, const std::string &deviceId, std::vector<GroupsInfo> &groupList);
+    int32_t DeleteGroupExt(int32_t userId, std::string &groupId);
+    int64_t GenRequestId();
+
     static void OnHichainDeviceUnBound(const char *peerUdid, const char *groupInfo);
 
 private:
