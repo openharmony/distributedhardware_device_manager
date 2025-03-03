@@ -879,6 +879,8 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::Test
     jsonObj[TAG_EDITION] = "edition";
     jsonObj[TAG_BUNDLE_NAME] = "bundleName";
     jsonObj[TAG_PEER_BUNDLE_NAME] = "peerbundleName";
+    jsonObj[TAG_REMOTE_DEVICE_NAME] = "remoteDeviceName";
+    jsonObj[TAG_SRC_PINCODE_IMPORTED] = false;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
@@ -1755,6 +1757,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::T
     nlohmann::json jsonObj;
     jsonObj[TAG_PUBLICKEY] = "123456";
     jsonObj[TAG_CRYPTIC_MSG] = "cryptic";
+    jsonObj[TAG_SESSIONKEY_ID] = 1;
     authMessageProcessor->cryptoMgr_ = std::make_shared<CryptoMgr>();
         
     authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
@@ -1765,6 +1768,10 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::T
     decryptStr = jsonObj.dump();
     EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(decryptStr), Return(DM_OK)));
+    authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
+
+    EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(decryptStr), Return(ERR_DM_FAILED)));
     authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), false);
 }

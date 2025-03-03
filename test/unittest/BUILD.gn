@@ -1618,7 +1618,7 @@ ohos_unittest("UTTest_dm_comm_tool") {
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_dm_comm_tool.cpp",
     "mock/dm_softbus_cache_mock.cpp",
-     "mock/dm_transport_mock.cpp",
+    "mock/dm_transport_mock.cpp",
   ]
   deps = [ ":device_manager_test_common" ]
   external_deps = [

@@ -240,8 +240,8 @@ HWTEST_F(DMTransportTest, OnSocketClosed_001, testing::ext::TestSize.Level0)
         .pkgName = pkgName.data(),
         .dataType = DATA_TYPE_BYTES
     };
-    dmTransport_->OnSocketOpened(socketId, info);
-    int32_t ret = EXPECT_EQ(ret, DM_OK);
+    int32_t ret = dmTransport_->OnSocketOpened(socketId, info);
+    EXPECT_EQ(ret, DM_OK);
     
     ShutdownReason reason = ShutdownReason::SHUTDOWN_REASON_LNN_CHANGED;
     dmTransport_->OnSocketClosed(socketId, reason);
