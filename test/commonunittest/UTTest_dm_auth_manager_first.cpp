@@ -2029,6 +2029,7 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     authManager_->pincodeDialogEverShown_ = false;
     authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
     authManager_->authResponseContext_->isSrcPincodeImported = true;
+    authManager_->serviceInfoProfile_.SetPinCode(std::to_string(PINCODE));
     authManager_->serviceInfoProfile_.SetPinExchangeType(static_cast<int32_t>(DMServiceInfoPinExchangeType::FROMDP));
     bool ret = authManager_->CheckNeedShowAuthInfoDialog(errorCode);
     ASSERT_TRUE(ret);
@@ -2087,8 +2088,8 @@ HWTEST_F(DmAuthManagerTest, IsPinCodeValid_001, testing::ext::TestSize.Level0)
 
     DistributedDeviceProfile::ServiceInfoUniqueKey key;
     authManager_->InitServiceInfoUniqueKey(key);
-    ASSERT_TRUE(authManager_->IsPinCodeValid(MIN_PIN_CODE_VALUE));
-    ASSERT_TRUE(authManager_->IsPinCodeValid(MAX_PIN_CODE_VALUE));
+    ASSERT_FALSE(authManager_->IsPinCodeValid(MIN_PIN_CODE_VALUE));
+    ASSERT_FALSE(authManager_->IsPinCodeValid(MAX_PIN_CODE_VALUE));
     ASSERT_TRUE(authManager_->IsPinCodeValid(PINCODE));
 }
 

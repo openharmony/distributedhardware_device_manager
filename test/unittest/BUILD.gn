@@ -1615,13 +1615,18 @@ ohos_unittest("UTTest_dm_distributed_hardware_load") {
 ohos_unittest("UTTest_dm_comm_tool") {
   module_out_path = module_out_path
   include_dirs = [ "${devicemanager_path}/test/unittest" ]
-  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_comm_tool.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_comm_tool.cpp",
+    "mock/dm_softbus_cache_mock.cpp",
+     "mock/dm_transport_mock.cpp",
+  ]
   deps = [ ":device_manager_test_common" ]
   external_deps = [
     "cJSON:cjson",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "googletest:gmock",
+    googletest:gmock_main",
   ]
 }
 
