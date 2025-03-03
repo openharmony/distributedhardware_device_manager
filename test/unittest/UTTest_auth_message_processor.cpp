@@ -1884,14 +1884,14 @@ HWTEST_F(AuthMessageProcessorTest, GetJsonObj_010, testing::ext::TestSize.Level0
 
 HWTEST_F(AuthMessageProcessorTest, IsPincodeImported_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> data =
-        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
-    authMessageProcessor->authMgr_ = nullptr;
+    std::shared_ptr<DmAuthManager> authManager = nullptr;
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(authManager);
+    authMessageProcessor->authMgr_ = authManager;
     bool ret = authMessageProcessor->IsPincodeImported();
     ASSERT_FALSE(ret);
 
-    authMessageProcessor->authMgr_ = data;
+    authManager = std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    authMessageProcessor->authMgr_ = authManager;
     ret = authMessageProcessor->IsPincodeImported();
     ASSERT_FALSE(ret);
 }

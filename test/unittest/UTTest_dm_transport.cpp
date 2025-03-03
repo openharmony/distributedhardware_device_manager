@@ -241,11 +241,11 @@ HWTEST_F(DMTransportTest, OnSocketClosed_001, testing::ext::TestSize.Level0)
         .dataType = DATA_TYPE_BYTES
     };
     dmTransport_->OnSocketOpened(socketId, info);
+    int32_t ret = EXPECT_EQ(ret, DM_OK);
     
     ShutdownReason reason = ShutdownReason::SHUTDOWN_REASON_LNN_CHANGED;
-    int32_t ret = dmTransport_->OnSocketClosed(socketId, reason);
-    EXPECT_EQ(ret, DM_OK);
-
+    dmTransport_->OnSocketClosed(socketId, reason);
+    
     socketId = -1;
     void *data = nullptr;
     uint32_t dataLen = 0;
@@ -253,7 +253,7 @@ HWTEST_F(DMTransportTest, OnSocketClosed_001, testing::ext::TestSize.Level0)
     socketId = SOCKETED;
     dmTransport_->OnBytesReceived(socketId, data, dataLen);
     std::string dataStr = "a**************2";
-    data = reinterpret_cast<void *>(dataStr);
+    data = reinterpret_cast<void *>(dataStr.data());
     dataLen = static_cast<uint32_t>(dataStr.length());
     dmTransport_->OnBytesReceived(socketId, data, dataLen);
     socketId = 0;

@@ -149,13 +149,15 @@ HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSi
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
-    EXPECT_CALL(*accessTokenKitMock_, VerifyAccessToken(_, _)).WillOnce(Return(PermissionState::PERMISSION_DENIED));
+    EXPECT_CALL(*accessTokenKitMock_, VerifyAccessToken(_, _))
+        .WillOnce(Return(Security::AccessToken::PermissionState::PERMISSION_DENIED));
     ret = PermissionManager::GetInstance().CheckMonitorPermission();
     ASSERT_FALSE(ret);
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
-    EXPECT_CALL(*accessTokenKitMock_, VerifyAccessToken(_, _)).WillOnce(Return(PermissionState::PERMISSION_GRANTED));
+    EXPECT_CALL(*accessTokenKitMock_, VerifyAccessToken(_, _))
+        .WillOnce(Return(Security::AccessToken::PermissionState::PERMISSION_GRANTED));
     ret = PermissionManager::GetInstance().CheckMonitorPermission();
     ASSERT_TRUE(ret);
 }
@@ -193,25 +195,25 @@ HWTEST_F(PermissionManagerTest, GetCallerProcessName_002, testing::ext::TestSize
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_HAP));
-    EXPECT_CALL(*accessTokenKitMock_, GetHapTokenInfo(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*accessTokenKitMock_, GetHapTokenInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_HAP));
-    EXPECT_CALL(*accessTokenKitMock_, GetHapTokenInfo(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*accessTokenKitMock_, GetHapTokenInfo(_, _)).WillOnce(Return(DM_OK));
     ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
-    EXPECT_CALL(*accessTokenKitMock_, GetNativeTokenInfo(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*accessTokenKitMock_, GetNativeTokenInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
-    EXPECT_CALL(*accessTokenKitMock_, GetNativeTokenInfo(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*accessTokenKitMock_, GetNativeTokenInfo(_, _)).WillOnce(Return(DM_OK));
     ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
     ASSERT_EQ(ret, DM_OK);
 
