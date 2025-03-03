@@ -22,11 +22,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "file_ex.h"
-#include "hap_token_info.h"
 #include "ipc_skeleton.h"
-#include "native_token_info.h"
-#include "securec.h"
 #include "tokenid_kit.h"
 
 using namespace OHOS::Security::AccessToken;

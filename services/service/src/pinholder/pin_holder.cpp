@@ -19,7 +19,6 @@
 #include "dm_crypto.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
-#include "nlohmann/json.hpp"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
 #endif

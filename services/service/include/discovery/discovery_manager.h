@@ -23,7 +23,6 @@
 #include "discovery_filter.h"
 #include "idevice_manager_service_listener.h"
 #include "dm_timer.h"
-#include "softbus_listener.h"
 #include "mine_softbus_listener.h"
 
 namespace OHOS {

@@ -15,7 +15,6 @@
 
 #ifndef OHOS_ACCOUNT_BOOT_LISTENER_H
 #define OHOS_ACCOUNT_BOOT_LISTENER_H
-#include <atomic>
 
 #include "dm_data_share_common_event.h"
 #include "local_device_name_mgr.h"

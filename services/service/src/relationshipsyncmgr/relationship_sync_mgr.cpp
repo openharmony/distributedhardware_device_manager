@@ -14,13 +14,8 @@
  */
 
 #include "relationship_sync_mgr.h"
-
-#include <cstdint>
-#include <vector>
 #include "dm_anonymous.h"
-#include "dm_crypto.h"
 #include "dm_log.h"
-#include "multiple_user_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {

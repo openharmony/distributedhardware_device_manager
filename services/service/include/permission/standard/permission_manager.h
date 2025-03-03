@@ -17,9 +17,7 @@
 #define OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
 
 #include "cJSON.h"
-#include <cstdint>
 #include <mutex>
-#include <string>
 #include <unordered_set>
 #include "dm_single_instance.h"
 

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include <memory>
 #include "xcollie/xcollie.h"
 #include "xcollie/xcollie_define.h"
 
@@ -22,11 +21,6 @@
 #include "device_manager_service_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-#include "dm_device_info.h"
-#include "dm_device_profile_info.h"
-#include "dm_log.h"
-#include "dm_subscribe_info.h"
-#include "dm_publish_info.h"
 #include "ipc_acl_profile_req.h"
 #include "ipc_cmd_register.h"
 #include "ipc_def.h"
@@ -49,8 +43,6 @@
 #include "ipc_server_client_proxy.h"
 #include "ipc_server_stub.h"
 #include "multiple_user_connector.h"
-#include "nlohmann/json.hpp"
-#include "parameter.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
 #endif

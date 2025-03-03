@@ -14,12 +14,8 @@
  */
 
 #include "ipc_server_stub.h"
-
-#include "if_system_ability_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"
-#include "ipc_types.h"
-#include "iservice_registry.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "kv_adapter_manager.h"
 #endif
@@ -27,10 +23,7 @@
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
 #endif // SUPPORT_MEMMGR
-
-#include "string_ex.h"
 #include "system_ability_definition.h"
-#include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
 #include "device_manager_service_notify.h"
 #include "device_name_manager.h"

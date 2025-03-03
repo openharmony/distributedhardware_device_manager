@@ -14,9 +14,6 @@
  */
 
 #include "dm_comm_tool.h"
-
-#include "cJSON.h"
-
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
 #include "dm_error_type.h"

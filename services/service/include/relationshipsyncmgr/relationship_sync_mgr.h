@@ -16,7 +16,6 @@
 #ifndef OHOS_RELATIONSHIP_SYNC_MGR_H
 #define OHOS_RELATIONSHIP_SYNC_MGR_H
 
-#include <cinttypes>
 #include <string>
 #include "cJSON.h"
 #include "dm_single_instance.h"

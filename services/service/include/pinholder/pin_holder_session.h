@@ -21,7 +21,6 @@
 
 #include "inner_session.h"
 #include "session.h"
-#include "softbus_bus_center.h"
 
 namespace OHOS {
 namespace DistributedHardware {

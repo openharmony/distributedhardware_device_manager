@@ -16,14 +16,8 @@
 #ifndef OHOS_DM_COMM_TOOL_H
 #define OHOS_DM_COMM_TOOL_H
 
-#include <cstdint>
-#include <string>
-#include <vector>
-#include <memory>
-
 #include "dm_transport.h"
 #include "dm_transport_msg.h"
-#include "event_handler.h"
 
 namespace OHOS {
 namespace DistributedHardware {

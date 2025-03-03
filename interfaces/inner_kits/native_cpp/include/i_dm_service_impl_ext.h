@@ -16,13 +16,6 @@
 #ifndef OHOS_I_DM_SERVICE_IMPL_EXT_H
 #define OHOS_I_DM_SERVICE_IMPL_EXT_H
 
-#include <map>
-#include <string>
-#include <vector>
-
-#include "idevice_manager_service_listener.h"
-#include "dm_device_info.h"
-#include "dm_device_profile_info.h"
 #include "i_dm_bind_manager_ext_resident.h"
 
 namespace OHOS {
