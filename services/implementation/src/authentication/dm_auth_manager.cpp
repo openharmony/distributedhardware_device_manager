@@ -2229,9 +2229,9 @@ void DmAuthManager::RequestCredentialDone()
         timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
     }
     if (softbusConnector_->CheckIsOnline(remoteDeviceId_) && !authResponseContext_->isOnline) {
-        softbusConnector_->JoinLnn(authRequestContext_->addr, true);
+        JoinLnn(authRequestContext_->addr, true);
     } else {
-        softbusConnector_->JoinLnn(authRequestContext_->addr, false);
+        JoinLnn(authRequestContext_->addr, false);
     }
     authResponseContext_->state = AuthState::AUTH_REQUEST_FINISH;
     authRequestContext_->reason = DM_OK;
@@ -3213,7 +3213,7 @@ void DmAuthManager::UpdateInputPincodeDialog(int32_t errorCode)
     }
 }
 
-void DmAuthManager::JoinLnn(const std::string &deviceId)
+void DmAuthManager::JoinLnn(const std::string &deviceId, bool isForceJoin)
 {
     CHECK_NULL_VOID(authRequestContext_);
     CHECK_NULL_VOID(authResponseContext_);
@@ -3223,7 +3223,7 @@ void DmAuthManager::JoinLnn(const std::string &deviceId)
             authResponseContext_->remoteSessionKeyId);
         return;
     }
-    softbusConnector_->JoinLnn(deviceId);
+    softbusConnector_->JoinLnn(deviceId, isForceJoin);
 }
 
 int32_t DmAuthManager::GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId)
