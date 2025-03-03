@@ -1626,7 +1626,7 @@ ohos_unittest("UTTest_dm_comm_tool") {
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "googletest:gmock",
-    googletest:gmock_main",
+    "googletest:gmock_main",
   ]
 }
 
