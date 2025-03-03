@@ -1245,9 +1245,9 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_002, testing::ext::TestSiz
     EXPECT_EQ(ret, DM_OK);
 
     DistributedDeviceProfile::Accessee acee;
-    acee.SetAccesserTokenId(1002);
-    acee.SetAccesserBundleName("bundleNameInfo");
-    profile.SetAccesser(acee);
+    acee.SetAccesseeTokenId(1002);
+    acee.SetAccesseeBundleName("bundleNameInfo");
+    profile.SetAccessee(acee);
     allProfile.push_back(profile);
     pkgName = "bundleNameInfo";
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1002));
