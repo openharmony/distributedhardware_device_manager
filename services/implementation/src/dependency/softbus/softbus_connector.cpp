@@ -116,18 +116,6 @@ void SoftbusConnector::JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int
     }
 }
 
-void SoftbusConnector::JoinLnnByHml(const int32_t sessionId)
-{
-    LOGI("start, JoinLnnByHml sessionId: %{public}d.", sessionId);
-    ConnectionAddr addrInfo;
-    addrInfo.type = CONNECTION_ADDR_SESSION;
-    addrInfo.info.session.sessionId = sessionId;
-    int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult, false);
-    if (ret != DM_OK) {
-        LOGE("[SOFTBUS]JoinLNN failed, ret: %{public}d.", ret);
-    }
-}
-
 int32_t SoftbusConnector::GetUdidByNetworkId(const char *networkId, std::string &udid)
 {
     LOGI("start, networkId: %{public}s.", GetAnonyString(std::string(networkId)).c_str());

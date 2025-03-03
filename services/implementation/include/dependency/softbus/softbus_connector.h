@@ -85,12 +85,6 @@ public:
      */
     static void JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId);
 
-    /**
-     * @tc.name: SoftbusConnector::JoinLnnByHml
-     * @tc.desc: join lnn by session id
-     * @tc.type: FUNC
-     */
-    static void JoinLnnByHml(const int32_t sessionId);
 public:
     SoftbusConnector();
     ~SoftbusConnector();

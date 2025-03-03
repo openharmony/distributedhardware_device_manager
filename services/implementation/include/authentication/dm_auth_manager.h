@@ -496,7 +496,7 @@ private:
     void GetServiceInfoProfile();
     bool CheckNeedShowAuthInfoDialog(int32_t errorCode);
     void UpdateInputPincodeDialog(int32_t errorCode);
-    void JoinLnn(const std::string &deviceId);
+    void JoinLnn(const std::string &deviceId, bool isForceJoin = false);
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
