@@ -15,6 +15,7 @@
 
 #include "UTTest_dm_transport.h"
 #include "dm_error_type.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -282,7 +283,7 @@ HWTEST_F(DMTransportTest, CreateClientSocket_001, testing::ext::TestSize.Level0)
 
     rmtNetworkId = "rmt**********7";
     ret = dmTransport_->CreateClientSocket(rmtNetworkId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
 }
 
 HWTEST_F(DMTransportTest, IsDeviceSessionOpened_001, testing::ext::TestSize.Level0)

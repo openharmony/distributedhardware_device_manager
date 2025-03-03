@@ -23,7 +23,7 @@
 
 #include "dm_constants.h"
 #include "permission_manager.h"
-#include "ipc_skeleton_mock.h"
+#include "dm_ipc_skeleton_mock.h"
 #include "accesstoken_kit_mock.h"
 
 namespace OHOS {

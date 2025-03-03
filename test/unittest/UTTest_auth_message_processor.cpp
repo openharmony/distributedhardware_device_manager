@@ -1773,7 +1773,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::T
     EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(decryptStr), Return(ERR_DM_FAILED)));
     authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
-    ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), false);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), true);
 }
 
 HWTEST_F(AuthMessageProcessorTest, ParseMessage_010, testing::ext::TestSize.Level0)

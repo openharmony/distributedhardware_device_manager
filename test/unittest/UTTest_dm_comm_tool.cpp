@@ -71,12 +71,12 @@ HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level0)
     int32_t ret = dmCommTool->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
+    rmtNetworkId = "rmtNetworkId";
     foregroundUserIds.push_back(1);
     EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = dmCommTool->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    rmtNetworkId = "rmtNetworkId";
     backgroundUserIds.push_back(10);
     EXPECT_CALL(*dmTransportMock_, StartSocket(_, _)).WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
     EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
@@ -89,7 +89,7 @@ HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, DM_OK);
 
     int32_t socketId = 1;
-    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(ERR_DM_FAILED));
     dmCommTool->RspLocalFrontOrBackUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds, socketId);
 
     std::string remoteNetworkId = "network******12";

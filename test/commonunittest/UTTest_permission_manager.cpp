@@ -62,10 +62,12 @@ void PermissionManagerTest::TearDown()
 
 void PermissionManagerTest::SetUpTestCase()
 {
+    DMIPCSkeleton::dmIpcSkeleton_ = ipcSkeletonMock_;
 }
 
 void PermissionManagerTest::TearDownTestCase()
 {
+    DMIPCSkeleton::dmIpcSkeleton_ = nullptr;
     ipcSkeletonMock_ = nullptr;
     accessTokenKitMock_ = nullptr;
 }
