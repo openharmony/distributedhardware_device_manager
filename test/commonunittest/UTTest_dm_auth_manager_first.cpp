@@ -2005,7 +2005,7 @@ HWTEST_F(DmAuthManagerTest, GetTokenIdByBundleName_001, testing::ext::TestSize.L
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager_->authRequestContext_->connSessionType = CONN_SESSION_TYPE_HML;
-    authManager_->JoinLnn(deviceId);
+    authManager_->JoinLnn(deviceId, false);
 
     int32_t errorCode = 0;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
