@@ -1041,7 +1041,7 @@ ohos_unittest("UTTest_permission_manager") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_permission_manager.cpp",
-    "mock/accesstoken_kit_mock.cpp",
+    "mock/dm_accesstoken_kit_mock.cpp",
     "mock/dm_ipc_skeleton_mock.cpp",
   ]
 

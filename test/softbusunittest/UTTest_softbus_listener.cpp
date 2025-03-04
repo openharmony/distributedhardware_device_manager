@@ -46,6 +46,7 @@ void SoftbusListenerTest::SetUpTestCase()
         distributedDeviceProfileClientMock_;
     DmCrypto::dmCrypto = cryptoMock_;
     DmSoftbusCache::dmSoftbusCache = softbusCacheMock_;
+    DMIPCSkeleton::dmIpcSkeleton_ = ipcSkeletonMock_;
 }
 void SoftbusListenerTest::TearDownTestCase()
 {
@@ -55,6 +56,7 @@ void SoftbusListenerTest::TearDownTestCase()
     cryptoMock_ = nullptr;
     DmSoftbusCache::dmSoftbusCache = nullptr;
     softbusCacheMock_ = nullptr;
+    DMIPCSkeleton::dmIpcSkeleton_ = nullptr;
     ipcSkeletonMock_ = nullptr;
 }
 
