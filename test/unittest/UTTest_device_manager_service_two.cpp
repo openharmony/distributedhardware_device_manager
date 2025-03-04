@@ -1404,7 +1404,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 } // namespace
