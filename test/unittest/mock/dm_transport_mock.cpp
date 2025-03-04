@@ -13,25 +13,20 @@
  * limitations under the License.
  */
 
-#include "crypto_mgr_mock.h"
+#include "dm_transport_mock.h"
 
 #include "gtest/gtest.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outputMsg)
+int32_t DMTransport::StartSocket(const std::string &rmtNetworkId, int32_t &socketId)
 {
-    return DmCryptoMgr::dmCryptoMgr->EncryptMessage(inputMsg, outputMsg);
+    return DmDMTransport::dMTransport_->StartSocket(rmtNetworkId, socketId);
 }
 
-int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outputMsg)
+int32_t DMTransport::Send(const std::string &rmtNetworkId, const std::string &payload, int32_t socketId)
 {
-    return DmCryptoMgr::dmCryptoMgr->DecryptMessage(inputMsg, outputMsg);
-}
-
-int32_t CryptoMgr::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
-{
-    return DmCryptoMgr::dmCryptoMgr->SaveSessionKey(sessionKey, keyLen);
+    return DmDMTransport::dMTransport_->Send(rmtNetworkId, payload, socketId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

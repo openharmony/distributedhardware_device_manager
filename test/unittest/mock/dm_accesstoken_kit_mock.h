@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_ACCESS_TOKEN_KIT_MOCK_H
-#define OHOS_DM_ACCESS_TOKEN_KIT_MOCK_H
+#ifndef OHOS_DM_ACCESSTOKEN_KIT_MOCK_H
+#define OHOS_DM_ACCESSTOKEN_KIT_MOCK_H
 
 #include <gmock/gmock.h>
 
@@ -28,10 +28,9 @@ using OHOS::Security::AccessToken::NativeTokenInfo;
 
 namespace OHOS {
 namespace DistributedHardware {
-class AccessTokenKitInterface {
+class DmAccessTokenKit {
 public:
-    AccessTokenKitInterface() = default;
-    virtual ~AccessTokenKitInterface() = default;
+    virtual ~DmAccessTokenKit() = default;
 
     virtual ATokenTypeEnum GetTokenTypeFlag(AccessTokenID) = 0;
     virtual int GetHapTokenInfo(AccessTokenID, HapTokenInfo &) = 0;
@@ -39,18 +38,12 @@ public:
     virtual AccessTokenID GetNativeTokenId(const std::string &) = 0;
     virtual AccessTokenID GetHapTokenID(int32_t, const std::string &, int32_t) = 0;
     virtual int VerifyAccessToken(AccessTokenID tokenID, const std::string& permissionName) = 0;
-
-    static std::shared_ptr<AccessTokenKitInterface> GetOrCreateAccessTokenKit();
-    static void ReleaseAccessTokenKit();
-private:
-    static std::shared_ptr<AccessTokenKitInterface> token_;
+public:
+    static inline std::shared_ptr<DmAccessTokenKit> accessToken_ = nullptr;
 };
 
-class AccessTokenKitMock : public AccessTokenKitInterface {
+class DmAccessTokenKitMock : public DmAccessTokenKit {
 public:
-    AccessTokenKitMock() = default;
-    ~AccessTokenKitMock() override = default;
-
     MOCK_METHOD(ATokenTypeEnum, GetTokenTypeFlag, (AccessTokenID));
     MOCK_METHOD(int, GetHapTokenInfo, (AccessTokenID, HapTokenInfo &));
     MOCK_METHOD(int, GetNativeTokenInfo, (AccessTokenID, NativeTokenInfo &));

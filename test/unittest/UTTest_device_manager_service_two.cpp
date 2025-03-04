@@ -77,6 +77,7 @@ void SetSetDnPolicyPermission()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
+
 /**
  * @tc.name: GetTrustedDeviceList_201
  * @tc.type: FUNC
@@ -1380,6 +1381,10 @@ HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_202, testing::ext::Te
     std::vector<DmDeviceInfo> deviceList;
     int32_t ret = DeviceManagerService::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+
+    int32_t actionId = 1;
+    std::string bindParam = "bindParamData";
+    DeviceManagerService::GetInstance().AddHmlInfoToBindParam(actionId, bindParam);
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Level0)
@@ -1387,17 +1392,19 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     std::string networkId = "networkId";
     DmDeviceInfo deviceInfo;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
 
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 } // namespace

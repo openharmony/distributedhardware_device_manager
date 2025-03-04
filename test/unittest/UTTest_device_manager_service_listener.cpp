@@ -623,14 +623,21 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::e
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
+    processInfo.pkgName = "procName";
     DmDeviceState state = DmDeviceState::DEVICE_INFO_CHANGED;
     DmDeviceInfo info;
     DmDeviceBasicInfo deviceBasicInfo;
     std::set<std::string> systemSA;
     systemSA.insert("pkgName");
+    std::vector<ProcessInfo> allProcessInfos;
+    ProcessInfo processInfo1;
+    processInfo1.pkgName = "_pickerProxy_" + processInfo.pkgName;
+    allProcessInfos.push_back(processInfo1);
     EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).WillOnce(Return(systemSA));
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(allProcessInfos));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
+        .Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
     listener_->ProcessAppStateChange(processInfo, state, info, deviceBasicInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }

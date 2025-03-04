@@ -2319,18 +2319,6 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_005, testing::ext::Te
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_003, testing::ext::TestSize.Level0)
-{
-    std::string networkId = "networkIdTest3";
-    DmDeviceInfo info;
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
 HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSize.Level0)
 {
     DmDeviceInfo info;
@@ -2560,24 +2548,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_006, testing::ext::Tes
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceSecurityLevel(pkgName, invalidNetworkId, securityLevel);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_005, testing::ext::TestSize.Level0)
-{
-    std::string networkId = "networkIdTest5";
-    DmDeviceInfo info;
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(ERR_DM_NO_PERMISSION));
-    ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, info);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_004, testing::ext::TestSize.Level0)

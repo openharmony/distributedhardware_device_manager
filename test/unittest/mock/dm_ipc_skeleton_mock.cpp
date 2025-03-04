@@ -13,25 +13,18 @@
  * limitations under the License.
  */
 
-#include "crypto_mgr_mock.h"
+#include "dm_ipc_skeleton_mock.h"
 
-#include "gtest/gtest.h"
+using namespace OHOS::DistributedHardware;
 
 namespace OHOS {
-namespace DistributedHardware {
-int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outputMsg)
+pid_t IPCSkeleton::GetCallingUid()
 {
-    return DmCryptoMgr::dmCryptoMgr->EncryptMessage(inputMsg, outputMsg);
+    return DMIPCSkeleton::dmIpcSkeleton_->GetCallingUid();
 }
 
-int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outputMsg)
+uint32_t IPCSkeleton::GetCallingTokenID()
 {
-    return DmCryptoMgr::dmCryptoMgr->DecryptMessage(inputMsg, outputMsg);
+    return DMIPCSkeleton::dmIpcSkeleton_->GetCallingTokenID();
 }
-
-int32_t CryptoMgr::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
-{
-    return DmCryptoMgr::dmCryptoMgr->SaveSessionKey(sessionKey, keyLen);
-}
-} // namespace DistributedHardware
 } // namespace OHOS

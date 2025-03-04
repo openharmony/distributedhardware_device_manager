@@ -611,6 +611,7 @@ ohos_unittest("UTTest_softbus_listener") {
     "mock/distributed_device_profile_client_mock.cpp",
     "mock/dm_crypto_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
+    "mock/ipc_skeleton_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -1040,6 +1041,8 @@ ohos_unittest("UTTest_permission_manager") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_permission_manager.cpp",
+    "mock/dm_accesstoken_kit_mock.cpp",
+    "mock/dm_ipc_skeleton_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -1051,6 +1054,7 @@ ohos_unittest("UTTest_permission_manager") {
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 }
 
@@ -1347,6 +1351,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_auth_manager_first.cpp",
     "mock/app_manager_mock.cpp",
+    "mock/crypto_mgr_mock.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_crypto_mock.cpp",
     "mock/hichain_auth_connector_mock.cpp",
@@ -1610,13 +1615,18 @@ ohos_unittest("UTTest_dm_distributed_hardware_load") {
 ohos_unittest("UTTest_dm_comm_tool") {
   module_out_path = module_out_path
   include_dirs = [ "${devicemanager_path}/test/unittest" ]
-  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_comm_tool.cpp" ]
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_dm_comm_tool.cpp",
+    "mock/dm_softbus_cache_mock.cpp",
+    "mock/dm_transport_mock.cpp",
+  ]
   deps = [ ":device_manager_test_common" ]
   external_deps = [
     "cJSON:cjson",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "googletest:gmock",
+    "googletest:gmock_main",
   ]
 }
 
