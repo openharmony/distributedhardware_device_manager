@@ -2282,6 +2282,7 @@ bool DmAuthManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, u
 
 void DmAuthManager::SrcAuthDeviceFinish()
 {
+    LOGI("DmAuthManager::SrcAuthDeviceFinish Start.");
     CHECK_NULL_VOID(authRequestState_);
     authRequestState_->TransitionTo(std::make_shared<AuthRequestAuthFinish>());
     if (authResponseContext_->confirmOperation != USER_OPERATION_TYPE_ALLOW_AUTH &&
