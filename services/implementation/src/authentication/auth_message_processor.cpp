@@ -230,7 +230,11 @@ void AuthMessageProcessor::CreatePublicKeyMessageExt(nlohmann::json &json)
         return;
     } else {
         nlohmann::json jsonTemp;
-        jsonTemp[TAG_SESSIONKEY_ID] = authResponseContext_->localSessionKeyId;
+        auto sptr = authMgr_.lock();
+        if (sptr != nullptr && !sptr->IsSrc()) {
+            authResponseContext_->localSessionKeyId = sptr->GetSessionKeyIdSync(authResponseContext_->requestId);
+            jsonTemp[TAG_SESSIONKEY_ID] = authResponseContext_->localSessionKeyId;
+        }
         jsonTemp[TAG_PUBLICKEY] = authResponseContext_->publicKey;
         std::string strTemp = SafetyDump(jsonTemp);
         std::string encryptStr = "";

@@ -82,6 +82,7 @@ const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
+const int32_t MAX_PUT_SESSIONKEY_TIMEOUT = 100; //ms
 
 constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
 constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
@@ -1471,6 +1472,8 @@ void DmAuthManager::AuthenticateFinish()
         std::lock_guard<std::mutex> lock(srcReqMsgLock_);
         srcReqMsg_ = "";
         isNeedProcCachedSrcReqMsg_ = false;
+        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        sessionKeyIdAsyncResult_.clear();
     }
     pincodeDialogEverShown_ = false;
     serviceInfoProfile_ = {};
@@ -2187,6 +2190,15 @@ bool DmAuthManager::IsImportedAuthCodeValid()
     return false;
 }
 
+bool DmAuthManager::IsSrc()
+{
+    if (authRequestState_ != nullptr) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool DmAuthManager::IsAuthTypeSupported(const int32_t &authType)
 {
     if (authenticationMap_.find(authType) == authenticationMap_.end()) {
@@ -2493,13 +2505,52 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
         }
     }
     authResponseContext_->localSessionKeyId = 0;
+    {
+        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        sessionKeyIdAsyncResult_.clear();
+        sessionKeyIdAsyncResult_[requestId] = std::optional<int32_t>();
+    }
     unsigned char hash[SHA256_DIGEST_LENGTH] = { 0 };
     Crypto::DmGenerateStrHash(sessionKey, sessionKeyLen, hash, SHA256_DIGEST_LENGTH, 0);
-    int32_t sessionKeyId = 0;
-    int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(hash, SHA256_DIGEST_LENGTH, sessionKeyId);
-    if (ret == DM_OK && sessionKeyId > 0) {
-        authResponseContext_->localSessionKeyId = sessionKeyId;
+    std::vector<unsigned char> hashVector(hash, hash + SHA256_DIGEST_LENGTH);
+    std::shared_ptr<DmAuthManager> sharePtrThis = shared_from_this();
+    auto asyncTaskFunc = [sharePtrThis, requestId, hashVector]() {
+        sharePtrThis->PutSessionKeyAsync(requestId, hashVector);
+    };
+    ffrt::submit(asyncTaskFunc, ffrt::task_attr().delay(0));
+}
+
+void DmAuthManager::PutSessionKeyAsync(int64_t requestId, std::vector<unsigned char> hash)
+{
+    {
+        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        int32_t sessionKeyId = 0;
+        int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(hash, sessionKeyId);
+        if (ret != DM_OK) {
+            LOGI("PutSessionKey failed.");
+            sessionKeyId = 0;
+        }
+        sessionKeyIdAsyncResult_[requestId] = sessionKeyId;
     }
+    sessionKeyIdCondition_.notify_one();
+}
+
+int32_t DmAuthManager::GetSessionKeyIdSync(int64_t requestId)
+{
+    std::unique_lock<std::mutex> guard(sessionKeyIdMutex_);
+    if (sessionKeyIdAsyncResult_.find(requestId) == sessionKeyIdAsyncResult_.end()) {
+        LOGW("GetSessionKeyIdSync failed, not find by requestId");
+        return 0;
+    }
+    if (sessionKeyIdAsyncResult_[requestId].has_value()) {
+        LOGI("GetSessionKeyIdSync, already ready");
+        return sessionKeyIdAsyncResult_[requestId].value();
+    }
+    LOGI("GetSessionKeyIdSync need wait");
+    sessionKeyIdCondition_.wait_for(guard, std::chrono::milliseconds(MAX_PUT_SESSIONKEY_TIMEOUT));
+    int32_t keyid = sessionKeyIdAsyncResult_[requestId].value_or(0);
+    LOGI("GetSessionKeyIdSync exit");
+    return keyid;
 }
 
 void DmAuthManager::GetRemoteDeviceId(std::string &deviceId)
@@ -3253,6 +3304,7 @@ void DmAuthManager::JoinLnn(const std::string &deviceId, bool isForceJoin)
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(softbusConnector_);
     if (IsHmlSessionType()) {
+        authResponseContext_->localSessionKeyId = GetSessionKeyIdSync(authResponseContext_->requestId);
         softbusConnector_->JoinLnnByHml(authRequestContext_->sessionId, authResponseContext_->localSessionKeyId,
             authResponseContext_->remoteSessionKeyId);
         return;

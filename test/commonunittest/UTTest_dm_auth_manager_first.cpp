@@ -1010,6 +1010,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceError005, testing::ext::TestSize.Level0)
     authManager_->AuthDeviceError(requestId, errorCode);
     authManager_->AuthDeviceSessionKey(requestId, nullptr, sessionKeyLen);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
+    authManager_->GetSessionKeyIdSync(requestId);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthDeviceError006, testing::ext::TestSize.Level0)
@@ -1033,6 +1034,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceSessionKey001, testing::ext::TestSize.Leve
     uint32_t sessionKeyLen = 0;
     authManager_->AuthDeviceSessionKey(requestId, sessionKey, sessionKeyLen);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
+    authManager_->GetSessionKeyIdSync(requestId);
 }
 
 HWTEST_F(DmAuthManagerTest, GetRemoteDeviceId001, testing::ext::TestSize.Level0)
@@ -2060,9 +2062,10 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     authManager_->authResponseContext_->requestId = 1;
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     EXPECT_CALL(*cryptoMgrMock_, SaveSessionKey(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceProfileConnectorMock_, PutSessionKey(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(1), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, PutSessionKey(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
     authManager_->AuthDeviceSessionKey(requestId, sessionKey, sessionKeyLen);
+    authManager_->GetSessionKeyIdSync(requestId);
 }
 
 HWTEST_F(DmAuthManagerTest, IsPinCodeValid_001, testing::ext::TestSize.Level0)

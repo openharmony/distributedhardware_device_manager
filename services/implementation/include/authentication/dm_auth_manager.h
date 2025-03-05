@@ -484,6 +484,7 @@ public:
     static bool IsPinCodeValid(const std::string strpin);
     static bool IsPinCodeValid(int32_t numpin);
     bool IsImportedAuthCodeValid();
+    bool IsSrc();
 
 private:
     bool IsHmlSessionType();
@@ -536,6 +537,7 @@ public:
     void AuthDeviceError(int64_t requestId, int32_t errorCode);
     void GetRemoteDeviceId(std::string &deviceId);
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
+    int32_t GetSessionKeyIdSync(int64_t requestId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnScreenLocked();
     void HandleDeviceNotTrust(const std::string &udid);
@@ -551,6 +553,7 @@ private:
         const std::string &extra);
     void ParseJsonObject(nlohmann::json jsonObject);
     void ParseHmlInfoInJsonObject(nlohmann::json jsonObject);
+    void PutSessionKeyAsync(int64_t requestId, std::vector<unsigned char> hash);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
     void ProcessAuthRequestExt(const int32_t &sessionId);
@@ -625,6 +628,9 @@ private:
     DistributedDeviceProfile::ServiceInfoProfile serviceInfoProfile_;
     bool pincodeDialogEverShown_ = false;
     std::string bundleName_ = "";
+    std::mutex sessionKeyIdMutex_;
+    std::condition_variable sessionKeyIdCondition_;
+    std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

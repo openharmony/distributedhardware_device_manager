@@ -1807,8 +1807,8 @@ int32_t DeviceProfileConnector::GetServiceInfoProfileListByTokenId(
 }
 
 int32_t DeviceProfileConnector::GetServiceInfoProfileListByBundleName(
-    const DistributedDeviceProfile::ServiceInfoUniqueKey& key,
-    std::vector<DistributedDeviceProfile::ServiceInfoProfile>& serviceInfoProfiles)
+    const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
+    std::vector<DistributedDeviceProfile::ServiceInfoProfile> &serviceInfoProfiles)
 {
     int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfoProfileListByBundleName(
         key, serviceInfoProfiles);
@@ -1819,19 +1819,13 @@ int32_t DeviceProfileConnector::GetServiceInfoProfileListByBundleName(
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::PutSessionKey(
-    const uint8_t* sessionKey, uint32_t length, int32_t& sessionKeyId)
+int32_t DeviceProfileConnector::PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId)
 {
-    if (sessionKey == nullptr) {
-        LOGE("sessionKey nullptr");
-        return ERR_DM_FAILED;
-    }
-    if (length > MAX_SESSION_KEY_LENGTH) {
-        LOGE("SessionKey too long, len: %{public}d", length);
+    if (sessionKeyArray.empty() || sessionKeyArray.size() > MAX_SESSION_KEY_LENGTH) {
+        LOGE("SessionKey size invalid");
         return ERR_DM_FAILED;
     }
     uint32_t userId = static_cast<uint32_t>(MultipleUserConnector::GetCurrentAccountUserID());
-    std::vector<uint8_t> sessionKeyArray(sessionKey, sessionKey + length);
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutSessionKey(userId, sessionKeyArray, sessionKeyId);
     if (ret != DM_OK) {
         LOGE("failed: %{public}d", ret);

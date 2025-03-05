@@ -184,9 +184,9 @@ public:
         DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile);
     int32_t GetServiceInfoProfileListByTokenId(const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
         std::vector<DistributedDeviceProfile::ServiceInfoProfile> &serviceInfoProfiles);
-    int32_t GetServiceInfoProfileListByBundleName(const DistributedDeviceProfile::ServiceInfoUniqueKey& key,
-        std::vector<DistributedDeviceProfile::ServiceInfoProfile>& serviceInfoProfiles);
-    int32_t PutSessionKey(const uint8_t* sessionKey, uint32_t length, int32_t& sessionKeyId);
+    int32_t GetServiceInfoProfileListByBundleName(const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
+        std::vector<DistributedDeviceProfile::ServiceInfoProfile> &serviceInfoProfiles);
+    int32_t PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

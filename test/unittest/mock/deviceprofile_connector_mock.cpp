@@ -126,9 +126,9 @@ int32_t DeviceProfileConnector::GetServiceInfoProfileListByBundleName(
         serviceInfoProfiles);
 }
 
-int32_t DeviceProfileConnector::PutSessionKey(const uint8_t* sessionKey, uint32_t length, int32_t& sessionKeyId)
+int32_t DeviceProfileConnector::PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId)
 {
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->PutSessionKey(sessionKey, length, sessionKeyId);
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->PutSessionKey(sessionKeyArray, sessionKeyId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
