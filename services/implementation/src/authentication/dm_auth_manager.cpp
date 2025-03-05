@@ -458,31 +458,6 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
     return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel, extra);
 }
 
-int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel)
-{
-    if (pkgName.empty()) {
-        LOGE("Invalid parameter, pkgName is empty.");
-        return ERR_DM_FAILED;
-    }
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    struct RadarInfo info = {
-        .funcName = "UnAuthenticateDevice",
-        .toCallPkg = HICHAINNAME,
-        .hostName = pkgName,
-        .peerUdid = udid,
-    };
-    if (!DmRadarHelper::GetInstance().ReportDeleteTrustRelation(info)) {
-        LOGE("ReportDeleteTrustRelation failed");
-    }
-    remoteDeviceId_ = udid;
-    if (bindLevel == DEVICE) {
-        DeleteGroup(pkgName, udid);
-    }
-    std::string extra = "";
-    return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel, extra);
-}
-
 int32_t DmAuthManager::StopAuthenticateDevice(const std::string &pkgName)
 {
     if (pkgName.empty() || authRequestContext_ == nullptr || authResponseContext_ == nullptr) {
