@@ -756,10 +756,12 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     }
 
     int32_t pinCode = -1;
-    if (authResponseContext_->isShowDialog) {
+    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
+        GetAuthCode(authResponseContext_->hostPkgName, pinCode);
+    } else if (authResponseContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE) {
         pinCode = GeneratePincode();
     } else {
-        GetAuthCode(authResponseContext_->hostPkgName, pinCode);
+        LOGE("authType invalied.");
     }
     nlohmann::json jsonObj;
     jsonObj[PIN_TOKEN] = authResponseContext_->token;
@@ -960,6 +962,9 @@ void DmAuthManager::AbilityNegotiate()
 {
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
+    authResponseContext_->remoteUserId = authResponseContext_->localUserId;
+    GetBinderInfo();
     bool ret = hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
@@ -1230,7 +1235,7 @@ int32_t DmAuthManager::ConfirmProcessExt(const int32_t &action)
         if (CanUsePincodeFromDp()) {
             authResponseContext_->code = std::atoi(serviceInfoProfile_.GetPinCode().c_str());
             LOGI("import pincode from dp");
-        } else if (!authResponseContext_->isShowDialog) {
+        } else if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
             GetAuthCode(authResponseContext_->hostPkgName, authResponseContext_->code);
         } else {
             authResponseContext_->code = GeneratePincode();
@@ -1502,6 +1507,7 @@ void DmAuthManager::AuthenticateFinish()
     authPtr_ = nullptr;
     authRequestStateTemp_ = nullptr;
     authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
+    bundleName_ = "";
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
@@ -1711,7 +1717,7 @@ void DmAuthManager::ShowConfigDialog()
         StartAuthProcess(serviceInfoProfile_.GetAuthType());
         return;
     }
-    if (!authResponseContext_->isShowDialog) {
+    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
         LOGI("start auth process");
         StartAuthProcess(authenticationType_);
         return;
@@ -1757,7 +1763,7 @@ void DmAuthManager::ShowAuthInfoDialog(bool authDeviceError)
     if (pincodeDialogEverShown_) {
         return;
     }
-    if (!authResponseContext_->isShowDialog) {
+    if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
         LOGI("not show dialog.");
         return;
     }
@@ -2516,25 +2522,28 @@ void DmAuthManager::CompatiblePutAcl()
     aclInfo.deviceIdHash = localUdidHash;
 
     DmAccesser accesser;
-    accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
-    accesser.requestBundleName = authResponseContext_->hostPkgName;
+    DmAccessee accessee;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
+        accesser.requestBundleName = authResponseContext_->hostPkgName;
+        accesser.requestDeviceId = localUdid;
         accesser.requestUserId = MultipleUserConnector::GetCurrentAccountUserID();
         accesser.requestAccountId = MultipleUserConnector::GetAccountInfoByUserId(accesser.requestUserId).accountId;
-        accesser.requestDeviceId = localUdid;
-    } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
-        accesser.requestDeviceId = authResponseContext_->localDeviceId;
-    }
-
-    DmAccessee accessee;
-    accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
-    accessee.trustBundleName = authResponseContext_->hostPkgName;
-    if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
+        accesser.requestTokenId = static_cast<uint64_t>(authRequestContext_->tokenId);
+        accessee.trustBundleName = authResponseContext_->hostPkgName;
         accessee.trustDeviceId = remoteDeviceId_;
-    } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
+        accessee.trustUserId = -1;
+    }
+    if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
+        accesser.requestBundleName = authResponseContext_->hostPkgName;
+        accesser.requestDeviceId = remoteDeviceId_;
+        accesser.requestUserId = authResponseContext_->remoteUserId;
+        accesser.requestAccountId = authResponseContext_->remoteAccountId;
+        accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
+        accessee.trustBundleName = authResponseContext_->hostPkgName;
+        accessee.trustDeviceId = localUdid;
         accessee.trustUserId = MultipleUserConnector::GetCurrentAccountUserID();
         accessee.trustAccountId = MultipleUserConnector::GetAccountInfoByUserId(accessee.trustUserId).accountId;
-        accessee.trustDeviceId = localUdid;
+        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
 }
@@ -3003,12 +3012,16 @@ int32_t DmAuthManager::GetBinderInfo()
         LOGI("bundleName is empty");
         authResponseContext_->localUserId = MultipleUserConnector::GetCurrentAccountUserID();
         authResponseContext_->localAccountId = MultipleUserConnector::GetOhosAccountId();
-        authResponseContext_->tokenId = authResponseContext_->remoteTokenId;
         return DM_OK;
     }
     authResponseContext_->localUserId = MultipleUserConnector::GetFirstForegroundUserId();
     authResponseContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authResponseContext_->localUserId);
+    if (authResponseContext_->peerBundleName == authResponseContext_->hostPkgName) {
+        bundleName_ = authResponseContext_->bundleName;
+    } else {
+        bundleName_ = authResponseContext_->peerBundleName;
+    }
     int32_t ret = AppManager::GetInstance().
         GetNativeTokenIdByName(authResponseContext_->bundleName, authResponseContext_->tokenId);
     if (ret == DM_OK) {
@@ -3019,7 +3032,6 @@ int32_t DmAuthManager::GetBinderInfo()
         authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId);
     if (ret != DM_OK) {
         LOGI("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
-        authResponseContext_->tokenId = authResponseContext_->remoteTokenId;
     }
     return ret;
 }
@@ -3068,10 +3080,10 @@ void DmAuthManager::RequestReCheckMsg()
     authResponseContext_->edition = DM_VERSION_5_0_4;
     authResponseContext_->localDeviceId = static_cast<std::string>(localDeviceId);
     authResponseContext_->localUserId = localUserId;
-    authResponseContext_->localAccountId = localAccountId;
-    authResponseContext_->tokenId = authRequestContext_->tokenId;
     authResponseContext_->bundleName = authRequestContext_->hostPkgName;
     authResponseContext_->bindLevel = authRequestContext_->bindLevel;
+    authResponseContext_->localAccountId = localAccountId;
+    authResponseContext_->tokenId = authRequestContext_->tokenId;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_RECHECK_MSG);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
@@ -3097,9 +3109,13 @@ void DmAuthManager::ResponseReCheckMsg()
     authResponseContext_->localUserId = MultipleUserConnector::GetFirstForegroundUserId();
     authResponseContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authResponseContext_->localUserId);
-    if (AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
-        authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId) != DM_OK) {
-        LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
+    if (AppManager::GetInstance().GetNativeTokenIdByName(bundleName_, authResponseContext_->tokenId) != DM_OK) {
+        LOGE("BundleName %{public}s, GetNativeTokenIdByName failed.", GetAnonyString(bundleName_).c_str());
+        if (AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
+            bundleName_, 0, authResponseContext_->tokenId) != DM_OK) {
+            LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(bundleName_).c_str());
+            authResponseContext_->tokenId = 0;
+        }
     }
     authResponseContext_->bundleName = authResponseContext_->peerBundleName;
     authMessageProcessor_->SetEncryptFlag(true);
