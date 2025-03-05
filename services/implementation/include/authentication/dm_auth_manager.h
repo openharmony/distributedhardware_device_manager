@@ -624,6 +624,7 @@ private:
     int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
     DistributedDeviceProfile::ServiceInfoProfile serviceInfoProfile_;
     bool pincodeDialogEverShown_ = false;
+    std::string bundleName_ = "";
 };
 } // namespace DistributedHardware
 } // namespace OHOS

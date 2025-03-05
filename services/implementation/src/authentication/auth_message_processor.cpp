@@ -757,6 +757,8 @@ void AuthMessageProcessor::CreateReqReCheckMessage(nlohmann::json &jsonObj)
     jsonTemp[TAG_LOCAL_USERID] = authResponseContext_->localUserId;
     jsonTemp[TAG_BUNDLE_NAME] = authResponseContext_->bundleName;
     jsonTemp[TAG_BIND_LEVEL] = authResponseContext_->bindLevel;
+    jsonTemp[TAG_LOCAL_ACCOUNTID] = authResponseContext_->localAccountId;
+    jsonTemp[TAG_TOKENID] = authResponseContext_->tokenId;
     std::string strTemp = SafetyDump(jsonTemp);
     std::string encryptStr = "";
     CHECK_NULL_VOID(cryptoMgr_);
@@ -779,6 +781,8 @@ void AuthMessageProcessor::ParseReqReCheckMessage(nlohmann::json &json)
     authResponseContext_->localUserId = 0;
     authResponseContext_->bundleName = "";
     authResponseContext_->localBindLevel = -1;
+    authResponseContext_->localAccountId = "";
+    authResponseContext_->tokenId = 0;
     CHECK_NULL_VOID(cryptoMgr_);
     if (cryptoMgr_->DecryptMessage(encryptStr, decryptStr) != DM_OK) {
         LOGE("DecryptMessage failed.");
@@ -803,6 +807,12 @@ void AuthMessageProcessor::ParseReqReCheckMessage(nlohmann::json &json)
     }
     if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
         authResponseContext_->localBindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
+    }
+    if (IsString(jsonObject, TAG_LOCAL_ACCOUNTID)) {
+        authResponseContext_->localAccountId = jsonObject[TAG_LOCAL_ACCOUNTID].get<std::string>();
+    }
+    if (IsInt64(jsonObject, TAG_TOKENID)) {
+        authResponseContext_->tokenId = jsonObject[TAG_TOKENID].get<int64_t>();
     }
 }
 

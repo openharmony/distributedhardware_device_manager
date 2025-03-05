@@ -1507,6 +1507,7 @@ void DmAuthManager::AuthenticateFinish()
     authPtr_ = nullptr;
     authRequestStateTemp_ = nullptr;
     authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
+    bundleName_ = "";
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
@@ -3015,6 +3016,11 @@ int32_t DmAuthManager::GetBinderInfo()
     authResponseContext_->localUserId = MultipleUserConnector::GetFirstForegroundUserId();
     authResponseContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authResponseContext_->localUserId);
+    if (authResponseContext_->peerBundleName == authResponseContext_->hostPkgName) {
+        bundleName_ = authResponseContext_->bundleName;
+    } else {
+        bundleName_ = authResponseContext_->peerBundleName;
+    }
     int32_t ret = AppManager::GetInstance().
         GetNativeTokenIdByName(authResponseContext_->bundleName, authResponseContext_->tokenId);
     if (ret == DM_OK) {
@@ -3075,6 +3081,8 @@ void DmAuthManager::RequestReCheckMsg()
     authResponseContext_->localUserId = localUserId;
     authResponseContext_->bundleName = authRequestContext_->hostPkgName;
     authResponseContext_->bindLevel = authRequestContext_->bindLevel;
+    authResponseContext_->localAccountId = localAccountId;
+    authResponseContext_->tokenId = authRequestContext_->tokenId;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_RECHECK_MSG);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
@@ -3098,9 +3106,15 @@ void DmAuthManager::ResponseReCheckMsg()
     authResponseContext_->edition = DM_VERSION_5_0_4;
     authResponseContext_->localDeviceId = std::string(localDeviceId);
     authResponseContext_->localUserId = MultipleUserConnector::GetFirstForegroundUserId();
-    if (AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
-        authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId) != DM_OK) {
-        LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
+    authResponseContext_->localAccountId =
+        MultipleUserConnector::GetOhosAccountIdByUserId(authResponseContext_->localUserId);
+    if (AppManager::GetInstance().GetNativeTokenIdByName(bundleName_, authResponseContext_->tokenId) != DM_OK) {
+        LOGI("BundleName %{public}s, GetNativeTokenIdByName failed.", GetAnonyString(bundleName_).c_str());
+        if (AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
+            bundleName_, 0, authResponseContext_->tokenId) != DM_OK) {
+            LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(bundleName_).c_str());
+            authResponseContext_->tokenId = 0;
+        }
     }
     authResponseContext_->bundleName = authResponseContext_->peerBundleName;
     authMessageProcessor_->SetEncryptFlag(true);
