@@ -3109,7 +3109,7 @@ void DmAuthManager::ResponseReCheckMsg()
     authResponseContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authResponseContext_->localUserId);
     if (AppManager::GetInstance().GetNativeTokenIdByName(bundleName_, authResponseContext_->tokenId) != DM_OK) {
-        LOGI("BundleName %{public}s, GetNativeTokenIdByName failed.", GetAnonyString(bundleName_).c_str());
+        LOGE("BundleName %{public}s, GetNativeTokenIdByName failed.", GetAnonyString(bundleName_).c_str());
         if (AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
             bundleName_, 0, authResponseContext_->tokenId) != DM_OK) {
             LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(bundleName_).c_str());
