@@ -50,7 +50,7 @@ struct InputCustomDialog {
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
     if (mediaQueryResult.matches as boolean) {
-      this.heightNum = 300;
+      this.heightNum = 100;
     } else {
       this.heightNum = 800;
     }
