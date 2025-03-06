@@ -36,7 +36,7 @@
 #include "dm_package_common_event.h"
 #include "dm_screen_common_event.h"
 #include "relationship_sync_mgr.h"
-#include "service_info_profile.h"
+#include "local_service_info.h"
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 #include "dm_publish_common_event.h"
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
@@ -221,11 +221,11 @@ public:
     int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength, std::string &displayName);
     std::vector<std::string> GetDeviceNamePrefixs();
     int64_t GenerateSerivceId();
-    int32_t RegisterServiceInfo(const DMServiceInfo &serviceInfo);
-    int32_t UnRegisterServiceInfo(int64_t serviceId);
-    int32_t UpdateServiceInfo(const DMServiceInfo &serviceInfo);
-    int32_t GetServiceInfoById(int64_t serviceId, DMServiceInfo &serviceInfo);
-    int32_t GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos);
+    int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
+    int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType);
+    int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
+    int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName, int32_t pinExchangeType,
+        DMLocalServiceInfo &serviceInfo);
     void ClearPulishIdCache(const std::string &pkgName);
 
 private:
@@ -299,12 +299,12 @@ private:
     int32_t SendUserIdsByWifi(const std::string &networkId, const std::vector<int32_t> &foregroundUserIds,
         const std::vector<int32_t> &backgroundUserIds);
     void HandleUserSwitchTimeout(int32_t curUserId, int32_t preUserId, const std::string &udid);
-    bool InitServiceInfoProfile(const DMServiceInfo &serviceInfo,
-        DistributedDeviceProfile::ServiceInfoProfile &profile);
-    void InitServiceInfo(const DistributedDeviceProfile::ServiceInfoProfile &profile, DMServiceInfo &serviceInfo);
-    void InitServiceInfos(const std::vector<DistributedDeviceProfile::ServiceInfoProfile> &profiles,
-        std::vector<DMServiceInfo> &serviceInfos);
-    bool InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key);
+    bool InitDPLocalServiceInfo(const DMLocalServiceInfo &serviceInfo,
+        DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem);
+    void InitServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem,
+        DMLocalServiceInfo &serviceInfo);
+    void InitServiceInfos(const std::vector<DistributedDeviceProfile::LocalServiceInfo> &dpLocalServiceItems,
+        std::vector<DMLocalServiceInfo> &serviceInfos);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

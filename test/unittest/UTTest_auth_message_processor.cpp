@@ -880,7 +880,6 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::Test
     jsonObj[TAG_BUNDLE_NAME] = "bundleName";
     jsonObj[TAG_PEER_BUNDLE_NAME] = "peerbundleName";
     jsonObj[TAG_REMOTE_DEVICE_NAME] = "remoteDeviceName";
-    jsonObj[TAG_SRC_PINCODE_IMPORTED] = false;
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);

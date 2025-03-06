@@ -136,6 +136,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
     authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
     authenticationMap_[AUTH_TYPE_CRE] = nullptr;
+    authenticationMap_[AUTH_TYPE_NFC] = nullptr;
     dmVersion_ = DM_VERSION_5_0_5;
 }
 
@@ -181,7 +182,7 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
-    if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
+    if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE || authType == AUTH_TYPE_NFC) && (!IsAuthCodeReady(pkgName))) {
         LOGE("Auth code not exist.");
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT,
             ERR_DM_INPUT_PARA_INVALID);
@@ -1567,30 +1568,16 @@ bool DmAuthManager::IsPinCodeValid(int32_t numpin)
 bool DmAuthManager::CanUsePincodeFromDp()
 {
     CHECK_NULL_RETURN(authResponseContext_, false);
-    return (authResponseContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE &&
-        authResponseContext_->isSrcPincodeImported &&
+    return (authResponseContext_->authType == AUTH_TYPE_NFC &&
         IsPinCodeValid(serviceInfoProfile_.GetPinCode()) &&
-        serviceInfoProfile_.GetPinExchangeType() == (int32_t)DMServiceInfoPinExchangeType::FROMDP);
-}
-
-void DmAuthManager::InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key)
-{
-    CHECK_NULL_VOID(authResponseContext_);
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    key.SetDeviceId(std::string(localDeviceId));
-    key.SetBundleName(authResponseContext_->hostPkgName);
-    int32_t userId = MultipleUserConnector::GetFirstForegroundUserId();
-    key.SetUserId(userId);
-    LOGI("localDeviceId %{public}s, bundleName %{public}s",
-        GetAnonyString(std::string(localDeviceId)).c_str(), GetAnonyString(authResponseContext_->hostPkgName).c_str());
+        serviceInfoProfile_.GetPinExchangeType() == (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP);
 }
 
 bool DmAuthManager::IsServiceInfoAuthTypeValid(int32_t authType)
 {
-    if (authType != (int32_t)DMServiceInfoAuthType::TRUST_ONETIME &&
-        authType != (int32_t)DMServiceInfoAuthType::TRUST_ALWAYS &&
-        authType != (int32_t)DMServiceInfoAuthType::CANCEL) {
+    if (authType != (int32_t)DMLocalServiceInfoAuthType::TRUST_ONETIME &&
+        authType != (int32_t)DMLocalServiceInfoAuthType::TRUST_ALWAYS &&
+        authType != (int32_t)DMLocalServiceInfoAuthType::CANCEL) {
         return false;
     }
     return true;
@@ -1598,8 +1585,8 @@ bool DmAuthManager::IsServiceInfoAuthTypeValid(int32_t authType)
 
 bool DmAuthManager::IsServiceInfoAuthBoxTypeValid(int32_t authBoxType)
 {
-    if (authBoxType != (int32_t)DMServiceInfoAuthBoxType::STATE3 &&
-        authBoxType != (int32_t)DMServiceInfoAuthBoxType::SKIP_CONFIRM) {
+    if (authBoxType != (int32_t)DMLocalServiceInfoAuthBoxType::STATE3 &&
+        authBoxType != (int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
         return false;
     }
     return true;
@@ -1607,29 +1594,29 @@ bool DmAuthManager::IsServiceInfoAuthBoxTypeValid(int32_t authBoxType)
 
 bool DmAuthManager::IsServiceInfoPinExchangeTypeValid(int32_t pinExchangeType)
 {
-    if (pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::PINBOX &&
-        pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::FROMDP &&
-        pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::ULTRASOUND) {
+    if (pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::PINBOX &&
+        pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP &&
+        pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::ULTRASOUND) {
         return false;
     }
     return true;
 }
 
-bool DmAuthManager::IsServiceInfoProfileValid(const DistributedDeviceProfile::ServiceInfoProfile &profile)
+bool DmAuthManager::IsLocalServiceInfoValid(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo)
 {
-    if (!IsServiceInfoAuthTypeValid(profile.GetAuthType())) {
-        LOGE("AuthType not valid, %{public}d", profile.GetAuthType());
+    if (!IsServiceInfoAuthTypeValid(localServiceInfo.GetAuthType())) {
+        LOGE("AuthType not valid, %{public}d", localServiceInfo.GetAuthType());
         return false;
     }
-    if (!IsServiceInfoAuthBoxTypeValid(profile.GetAuthBoxType())) {
-        LOGE("AuthBoxType not valid, %{public}d", profile.GetAuthBoxType());
+    if (!IsServiceInfoAuthBoxTypeValid(localServiceInfo.GetAuthBoxType())) {
+        LOGE("AuthBoxType not valid, %{public}d", localServiceInfo.GetAuthBoxType());
         return false;
     }
-    if (!IsServiceInfoPinExchangeTypeValid(profile.GetPinExchangeType())) {
-        LOGE("PinExchangeType not valid, %{public}d", profile.GetPinExchangeType());
+    if (!IsServiceInfoPinExchangeTypeValid(localServiceInfo.GetPinExchangeType())) {
+        LOGE("PinExchangeType not valid, %{public}d", localServiceInfo.GetPinExchangeType());
         return false;
     }
-    if (!IsPinCodeValid(profile.GetPinCode())) {
+    if (!IsPinCodeValid(localServiceInfo.GetPinCode())) {
         LOGE("pincode not valid");
         return false;
     }
@@ -1716,7 +1703,7 @@ void DmAuthManager::ShowConfigDialog()
         return;
     }
     if (CanUsePincodeFromDp() &&
-        serviceInfoProfile_.GetAuthBoxType() == (int32_t)DMServiceInfoAuthBoxType::SKIP_CONFIRM) {
+        serviceInfoProfile_.GetAuthBoxType() == (int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
         LOGI("no need confirm dialog");
         StartAuthProcess(serviceInfoProfile_.GetAuthType());
         return;
@@ -2650,8 +2637,8 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
 
-    if (authResponseContext_->isSrcPincodeImported) {
-        GetServiceInfoProfile();
+    if (authResponseContext_->authType == AUTH_TYPE_NFC) {
+        GetLocalServiceInfoInDp();
     }
 }
 
@@ -3247,26 +3234,22 @@ void DmAuthManager::ProcessReqPublicKey()
     }
 }
 
-void DmAuthManager::GetServiceInfoProfile()
+void DmAuthManager::GetLocalServiceInfoInDp()
 {
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    InitServiceInfoUniqueKey(key);
-    std::vector<DistributedDeviceProfile::ServiceInfoProfile> profiles;
-    int32_t result = DeviceProfileConnector::GetInstance().GetServiceInfoProfileListByBundleName(key, profiles);
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    int32_t result = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        authResponseContext_->hostPkgName, (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP, localServiceInfo);
     if (result != DM_OK) {
         return;
     }
-    for (auto &item : profiles) {
-        if (IsServiceInfoProfileValid(item)) {
-            serviceInfoProfile_ = item;
-            LOGI("authBoxType %{public}d, authType %{public}d, pinExchangeType %{public}d",
-                serviceInfoProfile_.GetAuthBoxType(), serviceInfoProfile_.GetAuthType(),
-                serviceInfoProfile_.GetPinExchangeType());
-            auto updateProfile = serviceInfoProfile_;
-            updateProfile.SetPinCode("######");
-            DeviceProfileConnector::GetInstance().UpdateServiceInfoProfile(updateProfile);
-            break;
-        }
+    if (IsLocalServiceInfoValid(localServiceInfo)) {
+        serviceInfoProfile_ = localServiceInfo;
+        LOGI("authBoxType %{public}d, authType %{public}d, pinExchangeType %{public}d",
+            serviceInfoProfile_.GetAuthBoxType(), serviceInfoProfile_.GetAuthType(),
+            serviceInfoProfile_.GetPinExchangeType());
+        auto updateProfile = serviceInfoProfile_;
+        updateProfile.SetPinCode("******");
+        DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(updateProfile);
     }
 }
 

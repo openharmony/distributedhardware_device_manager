@@ -197,7 +197,6 @@ typedef struct DmAuthResponseContext {
     std::string edition;
     int32_t localBindLevel;
     std::string remoteDeviceName;
-    bool isSrcPincodeImported = false;
     int32_t localSessionKeyId = 0;
     int32_t remoteSessionKeyId = 0;
 } DmAuthResponseContext;
@@ -489,12 +488,11 @@ public:
 private:
     bool IsHmlSessionType();
     bool CanUsePincodeFromDp();
-    void InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key);
     bool IsServiceInfoAuthTypeValid(int32_t authType);
     bool IsServiceInfoAuthBoxTypeValid(int32_t authBoxType);
     bool IsServiceInfoPinExchangeTypeValid(int32_t pinExchangeType);
-    bool IsServiceInfoProfileValid(const DistributedDeviceProfile::ServiceInfoProfile &profile);
-    void GetServiceInfoProfile();
+    bool IsLocalServiceInfoValid(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
+    void GetLocalServiceInfoInDp();
     bool CheckNeedShowAuthInfoDialog(int32_t errorCode);
     void UpdateInputPincodeDialog(int32_t errorCode);
     void JoinLnn(const std::string &deviceId, bool isForceJoin = false);
@@ -625,7 +623,7 @@ private:
     bool isNeedProcCachedSrcReqMsg_ = false;
     std::string srcReqMsg_ = "";
     int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
-    DistributedDeviceProfile::ServiceInfoProfile serviceInfoProfile_;
+    DistributedDeviceProfile::LocalServiceInfo serviceInfoProfile_;
     bool pincodeDialogEverShown_ = false;
     std::string bundleName_ = "";
     std::mutex sessionKeyIdMutex_;
