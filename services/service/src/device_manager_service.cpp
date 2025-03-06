@@ -391,7 +391,7 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     if (localUdid == peerDeviceId) {
-        int32_t ret = softbusListener_->GetDeviceInfo(networkId, info);
+        ret = softbusListener_->GetDeviceInfo(networkId, info);
         if (ret != DM_OK) {
             LOGE("Get DeviceInfo By NetworkId failed, ret : %{public}d", ret);
         }
@@ -402,11 +402,11 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
         std::string processName = "";
         if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
             LOGE("Get caller process name failed.");
-            return permissionRet;
+            return ret;
         }
         if (!PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName)) {
             LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-            return permissionRet;
+            return ret;
         }
     }
     ret = softbusListener_->GetDeviceInfo(networkId, info);
