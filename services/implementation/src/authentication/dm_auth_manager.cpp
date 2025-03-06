@@ -2483,12 +2483,12 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
     CHECK_NULL_VOID(authMessageProcessor_);
     if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_4))) {
         if (authMessageProcessor_->ProcessSessionKey(sessionKey, sessionKeyLen) != DM_OK) {
-            LOGE("Save session key err, ret: %{public}d", ret);
+            LOGE("Process session key err.");
             return;
         }
     } else {
         if (authMessageProcessor_->SaveSessionKey(sessionKey, sessionKeyLen) != DM_OK) {
-            LOGE("Process session key err, ret: %{public}d", ret);
+            LOGE("Save session key err.");
             return;
         }
     }
@@ -2496,7 +2496,7 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
     unsigned char hash[SHA256_DIGEST_LENGTH] = { 0 };
     Crypto::DmGenerateStrHash(sessionKey, sessionKeyLen, hash, SHA256_DIGEST_LENGTH, 0);
     int32_t sessionKeyId = 0;
-    ret = DeviceProfileConnector::GetInstance().PutSessionKey(hash, SHA256_DIGEST_LENGTH, sessionKeyId);
+    int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(hash, SHA256_DIGEST_LENGTH, sessionKeyId);
     if (ret == DM_OK && sessionKeyId > 0) {
         authResponseContext_->localSessionKeyId = sessionKeyId;
     }
