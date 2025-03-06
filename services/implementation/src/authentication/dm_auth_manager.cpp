@@ -119,6 +119,7 @@ constexpr const char* DM_VERSION_5_0_1 = "5.0.1";
 constexpr const char* DM_VERSION_5_0_2 = "5.0.2";
 constexpr const char* DM_VERSION_5_0_3 = "5.0.3";
 constexpr const char* DM_VERSION_5_0_4 = "5.0.4";
+constexpr const char* DM_VERSION_5_0_4 = "5.0.5";
 std::mutex g_authFinishLock;
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -2480,10 +2481,16 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
         return;
     }
     CHECK_NULL_VOID(authMessageProcessor_);
-    int32_t ret = authMessageProcessor_->SaveSessionKey(sessionKey, sessionKeyLen);
-    if (ret != DM_OK) {
-        LOGE("Save session key err, ret: %{public}d", ret);
-        return;
+    if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_4))) {
+        if (authMessageProcessor_->SaveSessionKey(sessionKey, sessionKeyLen) != DM_OK) {
+            LOGE("Save session key err, ret: %{public}d", ret);
+            return;
+        }
+    } else {
+        if (authMessageProcessor_->ProcessSessionKey(sessionKey, sessionKeyLen) != DM_OK) {
+            LOGE("Process session key err, ret: %{public}d", ret);
+            return;
+        }
     }
     authResponseContext_->localSessionKeyId = 0;
     unsigned char hash[SHA256_DIGEST_LENGTH] = { 0 };
