@@ -16,9 +16,6 @@
 #include "hichain_listener.h"
 
 #include "device_manager_service.h"
-#include "dm_anonymous.h"
-#include "dm_constants.h"
-#include "dm_log.h"
 #include "multiple_user_connector.h"
 
 namespace OHOS {

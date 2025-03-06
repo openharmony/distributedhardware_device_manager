@@ -26,7 +26,6 @@
 #include "ffrt.h"
 #endif
 #include "iservice_registry.h"
-#include "multiple_user_connector.h"
 #include "system_ability_definition.h"
 
 namespace OHOS {

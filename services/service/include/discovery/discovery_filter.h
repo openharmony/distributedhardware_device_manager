@@ -16,7 +16,6 @@
 #ifndef OHOS_DISCOVERY_FILTER_H
 #define OHOS_DISCOVERY_FILTER_H
 
-#include <vector>
 #include <string>
 
 #include "dm_log.h"

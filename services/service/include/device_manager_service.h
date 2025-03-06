@@ -26,15 +26,11 @@
 
 #include "advertise_manager.h"
 #include "discovery_manager.h"
-#include "dm_device_profile_info.h"
 #include "pin_holder.h"
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
 #include "hichain_listener.h"
-#include "i_dm_service_impl_ext.h"
 #include "i_dm_service_impl_ext_resident.h"
-#include "dm_single_instance.h"
-#include "dm_timer.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
 #include "dm_package_common_event.h"

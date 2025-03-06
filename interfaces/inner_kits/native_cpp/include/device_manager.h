@@ -16,16 +16,8 @@
 #ifndef OHOS_DEVICE_MANAGER_H
 #define OHOS_DEVICE_MANAGER_H
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
 #include "device_manager_callback.h"
-#include "dm_device_info.h"
-#include "dm_device_profile_info.h"
 #include "dm_publish_info.h"
-#include "dm_subscribe_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -19,10 +19,7 @@
 #include "multiple_user_connector.h"
 #include "system_ability_definition.h"
 #include "device_manager_service.h"
-#include "dm_anonymous.h"
 #include "parameter.h"
-#include "softbus_bus_center.h"
-#include "string_ex.h"
 
 namespace OHOS {
 namespace DistributedHardware {

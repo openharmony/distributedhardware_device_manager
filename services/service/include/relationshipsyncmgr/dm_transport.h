@@ -16,17 +16,10 @@
 #ifndef OHOS_DM_TRANSPORT_H
 #define OHOS_DM_TRANSPORT_H
 
-#include <atomic>
-#include <cstdint>
-#include <map>
-#include <memory>
-#include <mutex>
 #include <set>
-#include <string>
 
 #include "event_handler.h"
 #include "socket.h"
-#include "softbus_bus_center.h"
 
 namespace OHOS {
 namespace DistributedHardware {

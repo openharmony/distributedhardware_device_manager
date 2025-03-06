@@ -16,8 +16,6 @@
 #ifndef OHOS_DM_PUBLISH_INFO_H
 #define OHOS_DM_PUBLISH_INFO_H
 
-#include <cstdbool>
-
 #include "dm_subscribe_info.h"
 
 namespace OHOS {

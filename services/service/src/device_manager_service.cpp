@@ -18,16 +18,10 @@
 #include "cJSON.h"
 #include <dlfcn.h>
 #include <functional>
-
 #include "app_manager.h"
-#include "nlohmann/json.hpp"
-#include "dm_anonymous.h"
-#include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_hidumper.h"
-#include "dm_log.h"
 #include "dm_softbus_cache.h"
-#include "dm_radar_helper.h"
 #include "parameter.h"
 #include "permission_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
