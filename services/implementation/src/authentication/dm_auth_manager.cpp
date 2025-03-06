@@ -2482,12 +2482,12 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
     }
     CHECK_NULL_VOID(authMessageProcessor_);
     if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_4))) {
-        if (authMessageProcessor_->SaveSessionKey(sessionKey, sessionKeyLen) != DM_OK) {
+        if (authMessageProcessor_->ProcessSessionKey(sessionKey, sessionKeyLen) != DM_OK) {
             LOGE("Save session key err, ret: %{public}d", ret);
             return;
         }
     } else {
-        if (authMessageProcessor_->ProcessSessionKey(sessionKey, sessionKeyLen) != DM_OK) {
+        if (authMessageProcessor_->SaveSessionKey(sessionKey, sessionKeyLen) != DM_OK) {
             LOGE("Process session key err, ret: %{public}d", ret);
             return;
         }
