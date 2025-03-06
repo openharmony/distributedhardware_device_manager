@@ -14,9 +14,6 @@
  */
 
 #include "discovery_filter.h"
-
-#include "dm_device_info.h"
-#include "dm_log.h"
 #include "nlohmann/json.hpp"
 
 namespace OHOS {

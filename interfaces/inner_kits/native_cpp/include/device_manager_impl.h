@@ -21,8 +21,6 @@
 #include "ipc_client_manager.h"
 #include "ipc_client_proxy.h"
 #endif
-#include <map>
-#include <mutex>
 #include <set>
 
 namespace OHOS {

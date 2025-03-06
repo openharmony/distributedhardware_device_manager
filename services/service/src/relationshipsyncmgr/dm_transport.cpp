@@ -14,11 +14,6 @@
  */
 
 #include "dm_transport.h"
-
-#include <cinttypes>
-
-#include "cJSON.h"
-#include <securec.h>
 #include "dm_anonymous.h"
 #include "dm_comm_tool.h"
 #include "dm_constants.h"

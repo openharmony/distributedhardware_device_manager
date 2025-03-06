@@ -19,11 +19,6 @@
 #include "dm_timer.h"
 #include "idevice_manager_service_listener.h"
 #include "pin_holder_session.h"
-#include "pinholder_session_callback.h"
-
-#include <atomic>
-#include <map>
-#include <mutex>
 
 namespace OHOS {
 namespace DistributedHardware {

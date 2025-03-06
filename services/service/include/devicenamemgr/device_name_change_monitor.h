@@ -16,8 +16,6 @@
 #ifndef OHOS_DEVICE_NAME_CHANGE_MONITOR_H
 #define OHOS_DEVICE_NAME_CHANGE_MONITOR_H
 
-#include <memory>
-
 #include "data_ability_observer_stub.h"
 
 namespace OHOS {

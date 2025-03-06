@@ -14,13 +14,11 @@
  */
 
 #include "device_manager_impl.h"
-#include <unistd.h>
 #include <random>
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-#include "dm_device_info.h"
 #include "dm_dfx_constants.h"
 #include "dm_hisysevent.h"
 #include "dm_hitrace.h"
@@ -43,7 +41,6 @@
 #include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
-#include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
@@ -59,8 +56,6 @@
 #include "ipc_publish_req.h"
 #include "ipc_put_device_profile_info_list_req.h"
 #include "ipc_register_serviceinfo_req.h"
-#include "ipc_req.h"
-#include "ipc_rsp.h"
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
