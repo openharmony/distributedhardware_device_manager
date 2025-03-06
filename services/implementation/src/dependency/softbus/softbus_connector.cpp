@@ -203,6 +203,7 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
     if (addr != nullptr) {
         jsonPara[BLE_MAC] = addr->info.ble.bleMac;
         connectAddr = SafetyDump(jsonPara);
+        addr->info.ble.priority = BLE_PRIORITY_HIGH;
         return addr;
     }
     LOGE("[SOFTBUS]failed to get ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
