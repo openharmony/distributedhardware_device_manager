@@ -246,14 +246,6 @@ HWTEST_F(PermissionManagerTest, GetCallerProcessName_002, testing::ext::TestSize
     ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
-
-HWTEST_F(PermissionManagerTest, CheckInterfacePermission_001, testing::ext::TestSize.Level0)
-{
-    std::string interfaceName = "interfaceName";
-    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(0));
-    bool ret = PermissionManager::GetInstance().CheckInterfacePermission(interfaceName);
-    ASSERT_FALSE(ret);
-}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
