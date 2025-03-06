@@ -773,7 +773,7 @@ bool DmRadarHelper::ReportNetworkOnline(struct RadarInfo &info)
 {
     std::string peerUdid = GetAnonyUdid(info.peerUdid);
     std::string localUdid = GetAnonyLocalUdid();
-    std::string peerNetId = GetAnonyUdid(info.peerNetId);
+    std::string peerNetId = GetAnonyUdid(info.peerUdid);
     HiSysEventParam params[] = {
         {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
         {.name = "FUNC", .t = HISYSEVENT_STRING, .v = { .s = (char *)info.funcName.c_str() }, .arraySize = 0, },
@@ -803,7 +803,7 @@ bool DmRadarHelper::ReportNetworkOffline(struct RadarInfo &info)
 {
     std::string peerUdid = GetAnonyUdid(info.peerUdid);
     std::string localUdid = GetAnonyLocalUdid();
-    std::string peerNetId = GetAnonyUdid(info.peerNetId);
+    std::string peerNetId = GetAnonyUdid(info.peerUdid);
     HiSysEventParam params[] = {
         {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
         {.name = "FUNC", .t = HISYSEVENT_STRING, .v = { .s = (char *)info.funcName.c_str() }, .arraySize = 0, },
@@ -832,7 +832,7 @@ bool DmRadarHelper::ReportDeleteTrustRelation(struct RadarInfo &info)
 {
     std::string peerUdid = GetAnonyUdid(info.peerUdid);
     std::string localUdid = GetAnonyLocalUdid();
-    std::string peerNetId = GetAnonyUdid(info.peerNetId);
+    std::string peerNetId = GetAnonyUdid(info.peerUdid);
     HiSysEventParam params[] = {
         {.name = "ORG_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)ORGPKGNAME }, .arraySize = 0, },
         {.name = "HOST_PKG", .t = HISYSEVENT_STRING, .v = { .s = (char *)info.hostName.c_str() }, .arraySize = 0, },
