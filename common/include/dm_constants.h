@@ -159,16 +159,6 @@ enum ScreenState {
 
 // errCode map
 extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
-
-/* Interface Name */
-extern const char* IMPORT_AUTHCODE;
-extern const char* EXPORT_AUTHCODE;
-extern const char* REGISTER_PINHOLDER_CALLBACK;
-extern const char* CREATE_PINHOLDER;
-extern const char* DESTROY_PINHOLDER;
-extern const char* SET_DNPOLICY;
-extern const char* BIND_FOR_DEVICE_LEVEL;
-
 // wise device
 extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 
