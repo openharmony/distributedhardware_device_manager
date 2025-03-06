@@ -119,7 +119,7 @@ constexpr const char* DM_VERSION_5_0_1 = "5.0.1";
 constexpr const char* DM_VERSION_5_0_2 = "5.0.2";
 constexpr const char* DM_VERSION_5_0_3 = "5.0.3";
 constexpr const char* DM_VERSION_5_0_4 = "5.0.4";
-constexpr const char* DM_VERSION_5_0_4 = "5.0.5";
+constexpr const char* DM_VERSION_5_0_5 = "5.0.5";
 std::mutex g_authFinishLock;
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -135,7 +135,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
     authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
     authenticationMap_[AUTH_TYPE_CRE] = nullptr;
-    dmVersion_ = DM_VERSION_5_0_4;
+    dmVersion_ = DM_VERSION_5_0_5;
 }
 
 DmAuthManager::~DmAuthManager()
@@ -274,7 +274,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->localDeviceId = localUdid;
     authRequestContext_->deviceId = deviceId;
     authRequestContext_->addr = deviceId;
-    authRequestContext_->dmVersion = DM_VERSION_5_0_4;
+    authRequestContext_->dmVersion = DM_VERSION_5_0_5;
     uint32_t tokenId = 0 ;
     MultipleUserConnector::GetTokenIdAndForegroundUserId(tokenId, authRequestContext_->localUserId);
     authRequestContext_->tokenId = static_cast<int64_t>(tokenId);
@@ -946,7 +946,7 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     authResponseContext_->localAccountId = authRequestContext_->localAccountId;
     authResponseContext_->localUserId = authRequestContext_->localUserId;
     authResponseContext_->isIdenticalAccount = false;
-    authResponseContext_->edition = DM_VERSION_5_0_4;
+    authResponseContext_->edition = DM_VERSION_5_0_5;
     authResponseContext_->remoteDeviceName = authRequestContext_->localDeviceName;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
@@ -3077,14 +3077,14 @@ void DmAuthManager::ConverToFinish()
 
 void DmAuthManager::RequestReCheckMsg()
 {
-    LOGI("dmVersion %{public}s.", DM_VERSION_5_0_4);
+    LOGI("dmVersion %{public}s.", DM_VERSION_5_0_5);
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     uint32_t tokenId = 0;
     int32_t localUserId = 0;
     MultipleUserConnector::GetTokenIdAndForegroundUserId(tokenId, localUserId);
     std::string localAccountId = MultipleUserConnector::GetOhosAccountIdByUserId(localUserId);
-    authResponseContext_->edition = DM_VERSION_5_0_4;
+    authResponseContext_->edition = DM_VERSION_5_0_5;
     authResponseContext_->localDeviceId = static_cast<std::string>(localDeviceId);
     authResponseContext_->localUserId = localUserId;
     authResponseContext_->bundleName = authRequestContext_->hostPkgName;
@@ -3111,7 +3111,7 @@ void DmAuthManager::ResponseReCheckMsg()
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    authResponseContext_->edition = DM_VERSION_5_0_4;
+    authResponseContext_->edition = DM_VERSION_5_0_5;
     authResponseContext_->localDeviceId = std::string(localDeviceId);
     authResponseContext_->localUserId = MultipleUserConnector::GetFirstForegroundUserId();
     authResponseContext_->localAccountId =
