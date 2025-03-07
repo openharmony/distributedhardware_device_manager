@@ -618,6 +618,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
 void DmAuthManager::OnSessionClosed(const int32_t sessionId)
 {
     LOGI("DmAuthManager::OnSessionClosed sessionId = %{public}d", sessionId);
+    AuthenticateFinish();
 }
 
 void DmAuthManager::ProcessSourceMsg()
@@ -1446,7 +1447,7 @@ void DmAuthManager::SrcAuthenticateFinish()
         authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
-    usleep(USLEEP_TIME_US_500000); // 500ms
+
     int32_t sessionId = authRequestContext_->sessionId;
     auto taskFunc = [this, sessionId]() {
         CHECK_NULL_VOID(softbusConnector_);
