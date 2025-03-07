@@ -98,6 +98,12 @@ class IDeviceProfileConnector {
 public:
     virtual ~IDeviceProfileConnector() {}
     virtual int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm) = 0;
+    virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
+        const std::string &localUdid) = 0;
+    virtual int32_t HandleUserSwitched(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
+    virtual bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
@@ -156,6 +162,10 @@ public:
     void DeleteAccessControlById(int64_t accessControlId);
     int32_t HandleUserSwitched(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         int32_t currentUserId, int32_t beforeUserId);
+    int32_t HandleUserSwitched(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
     std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
@@ -218,6 +228,9 @@ private:
     void UpdatePeerUserId(DistributedDeviceProfile::AccessControlProfile profile, std::string &localUdid,
         const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &remoteFrontUserIds);
+    bool CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();
