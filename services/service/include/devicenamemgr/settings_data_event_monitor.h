@@ -16,8 +16,6 @@
 #ifndef OHOS_SETTINGS_DATA_EVENT_MONITOR_H
 #define OHOS_SETTINGS_DATA_EVENT_MONITOR_H
 
-#include <memory>
-
 #include "data_ability_observer_stub.h"
 #include "local_device_name_mgr.h"
 

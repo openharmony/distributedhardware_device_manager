@@ -262,6 +262,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
 
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
+    LOGI("DeviceManagerServiceImpl::HandleDeviceStatusChange start, devState = %{public}d.", devState);
     if (deviceStateMgr_ == nullptr) {
         LOGE("deviceStateMgr_ is nullpter!");
         return;

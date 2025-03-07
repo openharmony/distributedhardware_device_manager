@@ -14,13 +14,11 @@
  */
 
 #include "device_manager_impl.h"
-#include <unistd.h>
 #include <random>
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-#include "dm_device_info.h"
 #include "dm_dfx_constants.h"
 #include "dm_hisysevent.h"
 #include "dm_hitrace.h"
@@ -36,21 +34,18 @@
 #include "ipc_destroy_pin_holder_req.h"
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
-#include "ipc_gen_serviceid_rsp.h"
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
-#include "ipc_get_encrypted_uuid_req.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_local_display_device_name_req.h"
 #include "ipc_get_local_display_device_name_rsp.h"
-#include "ipc_get_serviceinfo_bycaller_rsp.h"
-#include "ipc_get_serviceinfo_byid_rsp.h"
+#include "ipc_get_localserviceinfo_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
 #include "ipc_import_auth_code_req.h"
@@ -59,8 +54,6 @@
 #include "ipc_publish_req.h"
 #include "ipc_put_device_profile_info_list_req.h"
 #include "ipc_register_serviceinfo_req.h"
-#include "ipc_req.h"
-#include "ipc_rsp.h"
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
 #include "ipc_set_useroperation_req.h"
@@ -2740,33 +2733,13 @@ int32_t DeviceManagerImpl::GetLocalDisplayDeviceName(const std::string &pkgName,
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::GenerateServiceId(int64_t &serviceId)
-{
-    LOGI("Start");
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGenServiceIdRsp> rsp = std::make_shared<IpcGenServiceIdRsp>();
-    int32_t ret = ipcClientProxy_->SendRequest(GEN_SERVICEID, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("Failed with ret %{public}d", ret);
-        return ret;
-    }
-    serviceId = rsp->GetServiceId();
-    LOGI("Completed, serviceId %{public}" PRId64, serviceId);
-    return DM_OK;
-}
-
-int32_t DeviceManagerImpl::RegisterServiceInfo(const DMServiceInfo &info)
+int32_t DeviceManagerImpl::RegisterLocalServiceInfo(const DMLocalServiceInfo &info)
 {
     LOGI("Start");
     std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetServiceInfo(info);
-    int32_t ret = ipcClientProxy_->SendRequest(REG_SERVICE_INFO, req, rsp);
+    req->SetLocalServiceInfo(info);
+    int32_t ret = ipcClientProxy_->SendRequest(REG_LOCALSERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
@@ -2780,13 +2753,14 @@ int32_t DeviceManagerImpl::RegisterServiceInfo(const DMServiceInfo &info)
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::UnRegisterServiceInfo(int64_t serviceId)
+int32_t DeviceManagerImpl::UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType)
 {
     LOGI("Start");
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetInt64Param(serviceId);
-    int32_t ret = ipcClientProxy_->SendRequest(UNREG_SERVICE_INFO, req, rsp);
+    req->SetFirstParam(bundleName);
+    req->SetInt32Param(pinExchangeType);
+    int32_t ret = ipcClientProxy_->SendRequest(UNREG_LOCALSERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
@@ -2800,13 +2774,13 @@ int32_t DeviceManagerImpl::UnRegisterServiceInfo(int64_t serviceId)
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::UpdateServiceInfo(const DMServiceInfo &info)
+int32_t DeviceManagerImpl::UpdateLocalServiceInfo(const DMLocalServiceInfo &info)
 {
     LOGI("Start");
     std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetServiceInfo(info);
-    int32_t ret = ipcClientProxy_->SendRequest(UPDATE_SERVICE_INFO, req, rsp);
+    req->SetLocalServiceInfo(info);
+    int32_t ret = ipcClientProxy_->SendRequest(UPDATE_LOCALSERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
@@ -2820,13 +2794,14 @@ int32_t DeviceManagerImpl::UpdateServiceInfo(const DMServiceInfo &info)
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::GetServiceInfoByServiceId(int64_t serviceId, DMServiceInfo &info)
+int32_t DeviceManagerImpl::GetLocalServiceInfoByBundleNameAndPinExchangeType(
+    const std::string &bundleName, int32_t pinExchangeType, DMLocalServiceInfo &info)
 {
-    LOGI("Start GetServiceInfoByServiceId, %{public}" PRId64, serviceId);
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
-    std::shared_ptr<IpcGetServiceInfoByIdRsp> rsp = std::make_shared<IpcGetServiceInfoByIdRsp>();
-    req->SetInt64Param(serviceId);
-    int32_t ret = ipcClientProxy_->SendRequest(GET_SERVICEINFO_BYID, req, rsp);
+    std::shared_ptr<IpcGetLocalServiceInfoRsp> rsp = std::make_shared<IpcGetLocalServiceInfoRsp>();
+    req->SetFirstParam(bundleName);
+    req->SetInt32Param(pinExchangeType);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
@@ -2836,28 +2811,8 @@ int32_t DeviceManagerImpl::GetServiceInfoByServiceId(int64_t serviceId, DMServic
         LOGE("Failed with ret %{public}d", ret);
         return ret;
     }
-    info = rsp->GetServiceInfo();
+    info = rsp->GetLocalServiceInfo();
     LOGI("Completed");
-    return DM_OK;
-}
-
-int32_t DeviceManagerImpl::GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos)
-{
-    LOGI("Start");
-    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::shared_ptr<IpcGetServiceInfoByCallerRsp> rsp = std::make_shared<IpcGetServiceInfoByCallerRsp>();
-    int32_t ret = ipcClientProxy_->SendRequest(GET_SERVICEINFOS_CALLER, req, rsp);
-    if (ret != DM_OK) {
-        LOGE("Send Request failed ret: %{public}d", ret);
-        return ERR_DM_IPC_SEND_REQUEST_FAILED;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        LOGE("Failed with ret %{public}d", ret);
-        return ret;
-    }
-    serviceInfos = rsp->GetServiceInfos();
-    LOGI("Completed, serviceInfos size %{public}zu", serviceInfos.size());
     return DM_OK;
 }
 } // namespace DistributedHardware

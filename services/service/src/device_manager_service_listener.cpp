@@ -34,8 +34,6 @@
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_device_found_req.h"
-#include "ipc_notify_device_discovery_req.h"
-#include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_get_device_icon_info_req.h"
 #include "ipc_notify_get_device_profile_info_list_req.h"

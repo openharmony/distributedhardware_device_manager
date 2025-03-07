@@ -13,30 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_GET_SERVICEINFO_BYID_RSP_H
-#define OHOS_DM_IPC_GET_SERVICEINFO_BYID_RSP_H
+#include "dm_ipc_skeleton_mock.h"
 
-#include "ipc_req.h"
-#include "dm_device_info.h"
+using namespace OHOS::DistributedHardware;
 
 namespace OHOS {
-namespace DistributedHardware {
-class IpcGetServiceInfoByIdRsp : public IpcRsp {
-    DECLARE_IPC_MODEL(IpcGetServiceInfoByIdRsp);
+pid_t IPCSkeleton::GetCallingUid()
+{
+    return DMIPCSkeleton::dmIpcSkeleton_->GetCallingUid();
+}
 
-public:
-    const DMServiceInfo &GetServiceInfo() const
-    {
-        return serviceInfo_;
-    }
-
-    void SetServiceInfo(const DMServiceInfo &info)
-    {
-        serviceInfo_ = info;
-    }
-private:
-    DMServiceInfo serviceInfo_;
-};
-} // namespace DistributedHardware
+uint32_t IPCSkeleton::GetCallingTokenID()
+{
+    return DMIPCSkeleton::dmIpcSkeleton_->GetCallingTokenID();
+}
 } // namespace OHOS
-#endif // OHOS_DM_IPC_GET_SERVICEINFO_BYID_RSP_H

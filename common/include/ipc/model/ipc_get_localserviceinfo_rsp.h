@@ -13,31 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_GEN_SERVICEID_RSP_H
-#define OHOS_DM_IPC_GEN_SERVICEID_RSP_H
+#ifndef OHOS_DM_IPC_GET_LOCALSERVICEINFO_RSP_H
+#define OHOS_DM_IPC_GET_LOCALSERVICEINFO_RSP_H
 
-#include "ipc_rsp.h"
+#include "ipc_req.h"
 #include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcGenServiceIdRsp : public IpcRsp {
-    DECLARE_IPC_MODEL(IpcGenServiceIdRsp);
+class IpcGetLocalServiceInfoRsp : public IpcRsp {
+    DECLARE_IPC_MODEL(IpcGetLocalServiceInfoRsp);
 
 public:
-    int64_t GetServiceId() const
+    const DMLocalServiceInfo &GetLocalServiceInfo() const
     {
-        return serviceId_;
+        return serviceInfo_;
     }
 
-    void SetServiceId(const int64_t &serviceId)
+    void SetLocalServiceInfo(const DMLocalServiceInfo &info)
     {
-        serviceId_ = serviceId;
+        serviceInfo_ = info;
     }
-
 private:
-    int64_t serviceId_ = 0;
+    DMLocalServiceInfo serviceInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_GEN_SERVICEID_RSP_H
+#endif // OHOS_DM_IPC_GET_LOCALSERVICEINFO_RSP_H

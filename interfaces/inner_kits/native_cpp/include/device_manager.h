@@ -16,16 +16,8 @@
 #ifndef OHOS_DEVICE_MANAGER_H
 #define OHOS_DEVICE_MANAGER_H
 
-#include <map>
-#include <memory>
-#include <string>
-#include <vector>
-
 #include "device_manager_callback.h"
-#include "dm_device_info.h"
-#include "dm_device_profile_info.h"
 #include "dm_publish_info.h"
-#include "dm_subscribe_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -655,12 +647,11 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
     virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
         std::string &displayName) = 0;
-    virtual int32_t GenerateServiceId(int64_t &serviceId) = 0;
-    virtual int32_t RegisterServiceInfo(const DMServiceInfo &info) = 0;
-    virtual int32_t UnRegisterServiceInfo(int64_t serviceId) = 0;
-    virtual int32_t UpdateServiceInfo(const DMServiceInfo &info) = 0;
-    virtual int32_t GetServiceInfoByServiceId(int64_t serviceId, DMServiceInfo &info) = 0;
-    virtual int32_t GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos) = 0;
+    virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
+    virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) = 0;
+    virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
+    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+        int32_t pinExchangeType, DMLocalServiceInfo &info) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -16,7 +16,6 @@
 #ifndef OHOS_DM_HICHAIN_LISTENER_H
 #define OHOS_DM_HICHAIN_LISTENER_H
 
-#include <string>
 
 #include "device_auth.h"
 #include "nlohmann/json.hpp"

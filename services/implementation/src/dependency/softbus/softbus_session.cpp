@@ -203,7 +203,9 @@ int SoftbusSession::OnSessionOpened(int sessionId, int result)
 
 void SoftbusSession::OnSessionClosed(int sessionId)
 {
-    LOGD("OnSessionClosed, sessionId: %{public}d.", sessionId);
+    LOGI("OnSessionClosed, sessionId: %{public}d.", sessionId);
+    CHECK_NULL_VOID(sessionCallback_);
+    sessionCallback_->OnSessionClosed(sessionId);
 }
 
 void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)

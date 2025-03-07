@@ -16,10 +16,6 @@
 #ifndef OHOS_DEVICE_NAME_MGR_H
 #define OHOS_DEVICE_NAME_MGR_H
 
-#include <memory>
-#include <mutex>
-#include <string>
-
 #include "datashare_helper.h"
 
 namespace OHOS {

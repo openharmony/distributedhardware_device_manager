@@ -16,10 +16,6 @@
 #ifndef OHOS_DM_IPC_CLIENT_H
 #define OHOS_DM_IPC_CLIENT_H
 
-#include <cstdint>
-#include <memory>
-#include <string>
-
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 

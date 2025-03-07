@@ -43,7 +43,6 @@ extern const char* TAG_INDEX;
 extern const char* TAG_SLICE_NUM;
 extern const char* TAG_IS_AUTH_CODE_READY;
 extern const char* TAG_IS_SHOW_DIALOG;
-extern const char* TAG_SRC_PINCODE_IMPORTED;
 extern const char* TAG_TOKEN;
 extern const char* TAG_CRYPTO_NAME;
 extern const char* TAG_CRYPTO_VERSION;
@@ -101,6 +100,7 @@ public:
     void ParseAuthResponseMessageExt(nlohmann::json &json);
     void SetEncryptFlag(bool flag);
     int32_t SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
+    int32_t ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
 
 private:
     std::string CreateRequestAuthMessage(nlohmann::json &json);

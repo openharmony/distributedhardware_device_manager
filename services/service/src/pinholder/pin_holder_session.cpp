@@ -19,7 +19,6 @@
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
 
 namespace OHOS {
 namespace DistributedHardware {

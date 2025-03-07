@@ -419,7 +419,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceName_104, testing::ext::TestSize.Level0
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     ret = DeviceManager::GetInstance().GetDeviceName(packName, networkId, deviceName);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -477,7 +477,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceType_103, testing::ext::TestSize.Level0
     std::string networkId = "networkId";
     int32_t deviceType = 0;
     int32_t ret = DeviceManager::GetInstance().GetDeviceType(packName, networkId, deviceType);
-    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    ASSERT_EQ(ret, DM_OK);
 }
 
 /**
@@ -499,7 +499,7 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceType_104, testing::ext::TestSize.Level0
     std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     ret = DeviceManager::GetInstance().GetDeviceType(packName, networkId, deviceType);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
@@ -550,8 +550,14 @@ HWTEST_F(DeviceManagerImplTest, UnBindDevice_103, testing::ext::TestSize.Level0)
 {
     std::string packName = "com.ohos.test";
     std::string deviceId = "deviceId";
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     int32_t ret = DeviceManager::GetInstance().UnBindDevice(packName, deviceId);
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**
@@ -658,8 +664,14 @@ HWTEST_F(DeviceManagerImplTest, BindDevice_103, testing::ext::TestSize.Level0)
     std::string deviceId = "deviceId";
     std::string bindParam = "{\"status\":1}";
     std::shared_ptr<AuthenticateCallback> callback = nullptr;
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     int32_t ret = DeviceManager::GetInstance().BindDevice(packName, bindType, deviceId, bindParam, callback);
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**

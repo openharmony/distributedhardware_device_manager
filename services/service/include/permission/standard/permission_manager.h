@@ -16,10 +16,6 @@
 #ifndef OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
 #define OHOS_DM_PERMISSION_STANDARD_PERMISSION_MANAGER_H
 
-#include "cJSON.h"
-#include <cstdint>
-#include <mutex>
-#include <string>
 #include <unordered_set>
 #include "dm_single_instance.h"
 
@@ -29,24 +25,17 @@ class PermissionManager {
     DM_DECLARE_SINGLE_INSTANCE(PermissionManager);
 
 public:
-    int32_t Init();
-    int32_t UnInit();
     bool CheckPermission(void);
     bool CheckNewPermission(void);
     bool CheckMonitorPermission(void);
     int32_t GetCallerProcessName(std::string &processName);
+    bool CheckProcessNameValidOnAuthCode(const std::string &processName);
+    bool CheckProcessNameValidOnPinHolder(const std::string &processName);
     bool CheckWhiteListSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetWhiteListSystemSA();
     bool CheckSystemSA(const std::string &pkgName);
-    bool CheckInterfacePermission(const std::string &interfaceName);
-private:
-    int32_t LoadPermissionCfg(const std::string &filePath);
-    int32_t ParsePermissionJson(const cJSON *const permissionJson);
-    void SetPermissionMap(const cJSON *const permissionJson, const std::string &interfaceName);
-
-private:
-    std::mutex permissionMutex_;
-    std::unordered_map<std::string, std::unordered_set<std::string>> permissionMap_;
+    bool CheckProcessNameValidOnSetDnPolicy(const std::string &processName);
+    bool CheckProcessNameValidOnGetDeviceInfo(const std::string &processName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "accesstoken_kit_mock.h"
+#include "dm_accesstoken_kit_mock.h"
 
 using namespace OHOS::DistributedHardware;
 
@@ -22,51 +22,33 @@ namespace Security {
 namespace AccessToken {
 ATokenTypeEnum AccessTokenKit::GetTokenTypeFlag(AccessTokenID tokenID)
 {
-    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetTokenTypeFlag(tokenID);
+    return DmAccessTokenKit::accessToken_->GetTokenTypeFlag(tokenID);
 }
 
 int AccessTokenKit::GetHapTokenInfo(AccessTokenID tokenID, HapTokenInfo &hapTokenInfoRes)
 {
-    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetHapTokenInfo(tokenID, hapTokenInfoRes);
+    return DmAccessTokenKit::accessToken_->GetHapTokenInfo(tokenID, hapTokenInfoRes);
 }
 
 int AccessTokenKit::GetNativeTokenInfo(AccessTokenID tokenID, NativeTokenInfo &nativeTokenInfoRes)
 {
-    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetNativeTokenInfo(tokenID, nativeTokenInfoRes);
+    return DmAccessTokenKit::accessToken_->GetNativeTokenInfo(tokenID, nativeTokenInfoRes);
 }
 
 AccessTokenID AccessTokenKit::GetNativeTokenId(const std::string &GetNativeTokenId)
 {
-    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetNativeTokenId(GetNativeTokenId);
+    return DmAccessTokenKit::accessToken_->GetNativeTokenId(GetNativeTokenId);
 }
 
 AccessTokenID AccessTokenKit::GetHapTokenID(int32_t userID, const std::string &bundleName, int32_t instIndex)
 {
-    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetHapTokenID(userID, bundleName, instIndex);
+    return DmAccessTokenKit::accessToken_->GetHapTokenID(userID, bundleName, instIndex);
 }
 
 int AccessTokenKit::VerifyAccessToken(AccessTokenID tokenID, const std::string& permissionName)
 {
-    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->VerifyAccessToken(tokenID, permissionName);
+    return DmAccessTokenKit::accessToken_->VerifyAccessToken(tokenID, permissionName);
 }
 } // namespace AccessToken
 } // namespace Security
-
-namespace DistributedHardware {
-std::shared_ptr<AccessTokenKitInterface> AccessTokenKitInterface::token_ = nullptr;
-
-std::shared_ptr<AccessTokenKitInterface> AccessTokenKitInterface::GetOrCreateAccessTokenKit()
-{
-    if (!token_) {
-        token_ = std::make_shared<AccessTokenKitMock>();
-    }
-    return token_;
-}
-
-void AccessTokenKitInterface::ReleaseAccessTokenKit()
-{
-    token_.reset();
-    token_ = nullptr;
-}
-} // namespace DistributedHardware
 } // namespace OHOS

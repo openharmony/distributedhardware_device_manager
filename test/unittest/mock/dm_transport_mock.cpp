@@ -13,33 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_GET_SERVICEINFO_BYCALLER_RSP_H
-#define OHOS_DM_IPC_GET_SERVICEINFO_BYCALLER_RSP_H
+#include "dm_transport_mock.h"
 
-#include <vector>
-
-#include "dm_device_info.h"
-#include "ipc_req.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcGetServiceInfoByCallerRsp : public IpcRsp {
-    DECLARE_IPC_MODEL(IpcGetServiceInfoByCallerRsp);
+int32_t DMTransport::StartSocket(const std::string &rmtNetworkId, int32_t &socketId)
+{
+    return DmDMTransport::dMTransport_->StartSocket(rmtNetworkId, socketId);
+}
 
-public:
-    const std::vector<DMServiceInfo>& GetServiceInfos() const
-    {
-        return serviceInfos_;
-    }
-
-    void SetServiceInfos(const std::vector<DMServiceInfo> &infos)
-    {
-        serviceInfos_ = infos;
-    }
-
-private:
-    std::vector<DMServiceInfo> serviceInfos_;
-};
+int32_t DMTransport::Send(const std::string &rmtNetworkId, const std::string &payload, int32_t socketId)
+{
+    return DmDMTransport::dMTransport_->Send(rmtNetworkId, payload, socketId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_GET_SERVICEINFO_BYCALLER_RSP_H

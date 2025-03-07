@@ -351,7 +351,8 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
 {
     std::string pkgName = "pkgName";
     std::string authCode = "authCode";
-    EXPECT_CALL(*permissionManagerMock_, CheckInterfacePermission(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
@@ -370,7 +371,8 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_301, testing::ext::TestSi
 HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSize.Level0)
 {
     std::string authCode = "authCode";
-    EXPECT_CALL(*permissionManagerMock_, CheckInterfacePermission(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().ExportAuthCode(authCode);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
@@ -410,7 +412,9 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetDnPolicy_301, testing::ext::TestSize.
     policy[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = "100";
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
-    EXPECT_CALL(*permissionManagerMock_, CheckInterfacePermission(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
@@ -468,6 +472,22 @@ HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceInfo_301, testing::ext::TestSiz
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, PutDeviceProfileInfoList_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceNamePrefixs_301, testing::ext::TestSize.Level0)
+{
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    auto ret = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
+    EXPECT_TRUE(ret.empty());
 }
 } // namespace
 } // namespace DistributedHardware

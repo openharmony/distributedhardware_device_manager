@@ -16,10 +16,6 @@
 #ifndef OHOS_DEVICE_NAME_MANAGER_H
 #define OHOS_DEVICE_NAME_MANAGER_H
 
-#include <memory>
-#include <mutex>
-#include <string>
-
 #include "datashare_helper.h"
 #include "device_name_change_monitor.h"
 #include "single_instance.h"
