@@ -101,6 +101,7 @@ public:
     void ParseAuthResponseMessageExt(nlohmann::json &json);
     void SetEncryptFlag(bool flag);
     int32_t SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
+    int32_t ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
 
 private:
     std::string CreateRequestAuthMessage(nlohmann::json &json);

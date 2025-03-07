@@ -827,5 +827,11 @@ void AuthMessageProcessor::SetEncryptFlag(bool flag)
     std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
     encryptFlag_ = flag;
 }
+
+int32_t AuthMessageProcessor::ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
+{
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
+    return cryptoMgr_->ProcessSessionKey(sessionKey, keyLen);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
