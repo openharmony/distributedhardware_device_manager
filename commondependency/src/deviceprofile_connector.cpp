@@ -1748,10 +1748,10 @@ int32_t DeviceProfileConnector::UpdateAclDeviceName(const std::string &udid, con
     return ERR_DM_FAILED;
 }
 
-int32_t DeviceProfileConnector::PutServiceInfoProfile(
-    const DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile)
+int32_t DeviceProfileConnector::PutLocalServiceInfo(
+    const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo)
 {
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().PutLocalServiceInfo(localServiceInfo);
     if (ret != DM_OK) {
         LOGE("failed: %{public}d", ret);
         return ret;
@@ -1759,9 +1759,9 @@ int32_t DeviceProfileConnector::PutServiceInfoProfile(
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::DeleteServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoUniqueKey &key)
+int32_t DeviceProfileConnector::DeleteLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType)
 {
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().DeleteServiceInfoProfile(key);
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
     if (ret != DM_OK) {
         LOGE("failed: %{public}d", ret);
         return ret;
@@ -1769,10 +1769,10 @@ int32_t DeviceProfileConnector::DeleteServiceInfoProfile(const DistributedDevice
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::UpdateServiceInfoProfile(
-    const DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile)
+int32_t DeviceProfileConnector::UpdateLocalServiceInfo(
+    const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo)
 {
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateServiceInfoProfile(serviceInfoProfile);
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().UpdateLocalServiceInfo(localServiceInfo);
     if (ret != DM_OK) {
         LOGE("failed: %{public}d", ret);
         return ret;
@@ -1780,12 +1780,11 @@ int32_t DeviceProfileConnector::UpdateServiceInfoProfile(
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::GetServiceInfoProfileByUniqueKey(
-    const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
-    DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile)
+int32_t DeviceProfileConnector::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+    int32_t pinExchangeType, DistributedDeviceProfile::LocalServiceInfo &localServiceInfo)
 {
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfoProfileByUniqueKey(
-        key, serviceInfoProfile);
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetLocalServiceInfoByBundleAndPinType(bundleName,
+        pinExchangeType, localServiceInfo);
     if (ret != DM_OK) {
         LOGE("failed: %{public}d", ret);
         return ret;
@@ -1793,45 +1792,13 @@ int32_t DeviceProfileConnector::GetServiceInfoProfileByUniqueKey(
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::GetServiceInfoProfileListByTokenId(
-    const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
-    std::vector<DistributedDeviceProfile::ServiceInfoProfile> &serviceInfoProfiles)
+int32_t DeviceProfileConnector::PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId)
 {
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfoProfileListByTokenId(
-        key, serviceInfoProfiles);
-    if (ret != DM_OK) {
-        LOGE("failed: %{public}d", ret);
-        return ret;
-    }
-    return DM_OK;
-}
-
-int32_t DeviceProfileConnector::GetServiceInfoProfileListByBundleName(
-    const DistributedDeviceProfile::ServiceInfoUniqueKey& key,
-    std::vector<DistributedDeviceProfile::ServiceInfoProfile>& serviceInfoProfiles)
-{
-    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfoProfileListByBundleName(
-        key, serviceInfoProfiles);
-    if (ret != DM_OK) {
-        LOGE("failed: %{public}d", ret);
-        return ret;
-    }
-    return DM_OK;
-}
-
-int32_t DeviceProfileConnector::PutSessionKey(
-    const uint8_t* sessionKey, uint32_t length, int32_t& sessionKeyId)
-{
-    if (sessionKey == nullptr) {
-        LOGE("sessionKey nullptr");
-        return ERR_DM_FAILED;
-    }
-    if (length > MAX_SESSION_KEY_LENGTH) {
-        LOGE("SessionKey too long, len: %{public}d", length);
+    if (sessionKeyArray.empty() || sessionKeyArray.size() > MAX_SESSION_KEY_LENGTH) {
+        LOGE("SessionKey size invalid");
         return ERR_DM_FAILED;
     }
     uint32_t userId = static_cast<uint32_t>(MultipleUserConnector::GetCurrentAccountUserID());
-    std::vector<uint8_t> sessionKeyArray(sessionKey, sessionKey + length);
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutSessionKey(userId, sessionKeyArray, sessionKeyId);
     if (ret != DM_OK) {
         LOGE("failed: %{public}d", ret);

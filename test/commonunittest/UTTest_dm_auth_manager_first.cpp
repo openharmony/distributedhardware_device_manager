@@ -1010,6 +1010,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceError005, testing::ext::TestSize.Level0)
     authManager_->AuthDeviceError(requestId, errorCode);
     authManager_->AuthDeviceSessionKey(requestId, nullptr, sessionKeyLen);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
+    authManager_->GetSessionKeyIdSync(requestId);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthDeviceError006, testing::ext::TestSize.Level0)
@@ -1033,6 +1034,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceSessionKey001, testing::ext::TestSize.Leve
     uint32_t sessionKeyLen = 0;
     authManager_->AuthDeviceSessionKey(requestId, sessionKey, sessionKeyLen);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
+    authManager_->GetSessionKeyIdSync(requestId);
 }
 
 HWTEST_F(DmAuthManagerTest, GetRemoteDeviceId001, testing::ext::TestSize.Level0)
@@ -2028,9 +2030,9 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     int32_t errorCode = ERR_DM_HICHAIN_PROOFMISMATCH;
     authManager_->pincodeDialogEverShown_ = false;
     authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
-    authManager_->authResponseContext_->isSrcPincodeImported = true;
     authManager_->serviceInfoProfile_.SetPinCode(std::to_string(PINCODE));
-    authManager_->serviceInfoProfile_.SetPinExchangeType(static_cast<int32_t>(DMServiceInfoPinExchangeType::FROMDP));
+    authManager_->serviceInfoProfile_.SetPinExchangeType(
+        static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
     bool ret = authManager_->CheckNeedShowAuthInfoDialog(errorCode);
     ASSERT_TRUE(ret);
 
@@ -2038,20 +2040,18 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     ret = authManager_->CheckNeedShowAuthInfoDialog(errorCode);
     ASSERT_FALSE(ret);
 
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileListByBundleName(_, _))
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
         .WillOnce(Return(ERR_DM_FAILED));
-    authManager_->GetServiceInfoProfile();
+    authManager_->GetLocalServiceInfoInDp();
 
-    std::vector<DistributedDeviceProfile::ServiceInfoProfile> profiles;
-    DistributedDeviceProfile::ServiceInfoProfile serviceInfoProfile;
-    serviceInfoProfile.SetAuthType(static_cast<int32_t>(DMServiceInfoAuthType::TRUST_ONETIME));
-    serviceInfoProfile.SetAuthBoxType(static_cast<int32_t>(DMServiceInfoAuthBoxType::STATE3));
-    serviceInfoProfile.SetPinExchangeType(static_cast<int32_t>(DMServiceInfoPinExchangeType::FROMDP));
-    serviceInfoProfile.SetPinCode(std::to_string(PINCODE));
-    profiles.push_back(serviceInfoProfile);
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileListByBundleName(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(profiles), Return(DM_OK)));
-    authManager_->GetServiceInfoProfile();
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    localServiceInfo.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME));
+    localServiceInfo.SetAuthBoxType(static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3));
+    localServiceInfo.SetPinExchangeType(static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
+    localServiceInfo.SetPinCode(std::to_string(PINCODE));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(DoAll(Return(DM_OK)));
+    authManager_->GetLocalServiceInfoInDp();
 
     int64_t requestId = 1;
     uint8_t arrayPtr[] = {1, 2, 3, 4};
@@ -2060,9 +2060,10 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     authManager_->authResponseContext_->requestId = 1;
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     EXPECT_CALL(*cryptoMgrMock_, SaveSessionKey(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceProfileConnectorMock_, PutSessionKey(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(1), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, PutSessionKey(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
     authManager_->AuthDeviceSessionKey(requestId, sessionKey, sessionKeyLen);
+    authManager_->GetSessionKeyIdSync(requestId);
 }
 
 HWTEST_F(DmAuthManagerTest, IsPinCodeValid_001, testing::ext::TestSize.Level0)
@@ -2071,23 +2072,23 @@ HWTEST_F(DmAuthManagerTest, IsPinCodeValid_001, testing::ext::TestSize.Level0)
     authManager_->ShowConfigDialog();
 
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->serviceInfoProfile_.SetAuthBoxType(static_cast<int32_t>(DMServiceInfoAuthBoxType::SKIP_CONFIRM));
+    authManager_->serviceInfoProfile_.SetAuthBoxType(
+        static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM));
 
     authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
-    authManager_->authResponseContext_->isSrcPincodeImported = true;
     authManager_->serviceInfoProfile_.SetPinCode(std::to_string(PINCODE));
-    authManager_->serviceInfoProfile_.SetPinExchangeType(static_cast<int32_t>(DMServiceInfoPinExchangeType::FROMDP));
+    authManager_->serviceInfoProfile_.SetPinExchangeType(
+        static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
     authManager_->ShowConfigDialog();
 
     authManager_->authResponseContext_->isShowDialog = false;
-    authManager_->serviceInfoProfile_.SetPinExchangeType(static_cast<int32_t>(DMServiceInfoPinExchangeType::PINBOX));
+    authManager_->serviceInfoProfile_.SetPinExchangeType(
+        static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::PINBOX));
     authManager_->ShowConfigDialog();
 
     authManager_->authResponseContext_->isShowDialog = true;
     authManager_->ShowConfigDialog();
 
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    authManager_->InitServiceInfoUniqueKey(key);
     ASSERT_FALSE(authManager_->IsPinCodeValid(MIN_PIN_CODE_VALUE));
     ASSERT_FALSE(authManager_->IsPinCodeValid(MAX_PIN_CODE_VALUE));
     ASSERT_TRUE(authManager_->IsPinCodeValid(PINCODE));
@@ -2119,26 +2120,26 @@ HWTEST_F(DmAuthManagerTest, IsServiceInfoPinExchangeTypeValid_001, testing::ext:
     ASSERT_FALSE(authManager_->IsServiceInfoPinExchangeTypeValid(pinExchangeType));
 }
 
-HWTEST_F(DmAuthManagerTest, IsServiceInfoProfileValid_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, IsLocalServiceInfoValid_001, testing::ext::TestSize.Level0)
 {
-    DistributedDeviceProfile::ServiceInfoProfile profile;
+    DistributedDeviceProfile::LocalServiceInfo profile;
     profile.SetAuthType(2);
-    ASSERT_FALSE(authManager_->IsServiceInfoProfileValid(profile));
+    ASSERT_FALSE(authManager_->IsLocalServiceInfoValid(profile));
 
-    profile.SetAuthType(static_cast<int32_t>(DMServiceInfoAuthType::TRUST_ONETIME));
+    profile.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME));
     profile.SetAuthBoxType(3);
-    ASSERT_FALSE(authManager_->IsServiceInfoProfileValid(profile));
+    ASSERT_FALSE(authManager_->IsLocalServiceInfoValid(profile));
 
-    profile.SetAuthBoxType(static_cast<int32_t>(DMServiceInfoAuthBoxType::STATE3));
+    profile.SetAuthBoxType(static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3));
     profile.SetPinExchangeType(4);
-    ASSERT_FALSE(authManager_->IsServiceInfoProfileValid(profile));
+    ASSERT_FALSE(authManager_->IsLocalServiceInfoValid(profile));
 
-    profile.SetPinExchangeType(static_cast<int32_t>(DMServiceInfoPinExchangeType::FROMDP));
+    profile.SetPinExchangeType(static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
     profile.SetPinCode("");
-    ASSERT_FALSE(authManager_->IsServiceInfoProfileValid(profile));
+    ASSERT_FALSE(authManager_->IsLocalServiceInfoValid(profile));
 
     profile.SetPinCode(std::to_string(PINCODE));
-    ASSERT_TRUE(authManager_->IsServiceInfoProfileValid(profile));
+    ASSERT_TRUE(authManager_->IsLocalServiceInfoValid(profile));
 }
 
 HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_003, testing::ext::TestSize.Level0)

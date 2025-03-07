@@ -82,6 +82,7 @@ const int32_t AUTH_DEVICE_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
+const int32_t MAX_PUT_SESSIONKEY_TIMEOUT = 100; //ms
 
 constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
 constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
@@ -135,6 +136,7 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
     authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
     authenticationMap_[AUTH_TYPE_CRE] = nullptr;
+    authenticationMap_[AUTH_TYPE_NFC] = nullptr;
     dmVersion_ = DM_VERSION_5_0_5;
 }
 
@@ -180,7 +182,7 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
         return ERR_DM_AUTH_BUSINESS_BUSY;
     }
 
-    if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE) && (!IsAuthCodeReady(pkgName))) {
+    if ((authType == AUTH_TYPE_IMPORT_AUTH_CODE || authType == AUTH_TYPE_NFC) && (!IsAuthCodeReady(pkgName))) {
         LOGE("Auth code not exist.");
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT,
             ERR_DM_INPUT_PARA_INVALID);
@@ -1471,6 +1473,8 @@ void DmAuthManager::AuthenticateFinish()
         std::lock_guard<std::mutex> lock(srcReqMsgLock_);
         srcReqMsg_ = "";
         isNeedProcCachedSrcReqMsg_ = false;
+        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        sessionKeyIdAsyncResult_.clear();
     }
     pincodeDialogEverShown_ = false;
     serviceInfoProfile_ = {};
@@ -1564,30 +1568,16 @@ bool DmAuthManager::IsPinCodeValid(int32_t numpin)
 bool DmAuthManager::CanUsePincodeFromDp()
 {
     CHECK_NULL_RETURN(authResponseContext_, false);
-    return (authResponseContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE &&
-        authResponseContext_->isSrcPincodeImported &&
+    return (authResponseContext_->authType == AUTH_TYPE_NFC &&
         IsPinCodeValid(serviceInfoProfile_.GetPinCode()) &&
-        serviceInfoProfile_.GetPinExchangeType() == (int32_t)DMServiceInfoPinExchangeType::FROMDP);
-}
-
-void DmAuthManager::InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key)
-{
-    CHECK_NULL_VOID(authResponseContext_);
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    key.SetDeviceId(std::string(localDeviceId));
-    key.SetBundleName(authResponseContext_->hostPkgName);
-    int32_t userId = MultipleUserConnector::GetFirstForegroundUserId();
-    key.SetUserId(userId);
-    LOGI("localDeviceId %{public}s, bundleName %{public}s",
-        GetAnonyString(std::string(localDeviceId)).c_str(), GetAnonyString(authResponseContext_->hostPkgName).c_str());
+        serviceInfoProfile_.GetPinExchangeType() == (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP);
 }
 
 bool DmAuthManager::IsServiceInfoAuthTypeValid(int32_t authType)
 {
-    if (authType != (int32_t)DMServiceInfoAuthType::TRUST_ONETIME &&
-        authType != (int32_t)DMServiceInfoAuthType::TRUST_ALWAYS &&
-        authType != (int32_t)DMServiceInfoAuthType::CANCEL) {
+    if (authType != (int32_t)DMLocalServiceInfoAuthType::TRUST_ONETIME &&
+        authType != (int32_t)DMLocalServiceInfoAuthType::TRUST_ALWAYS &&
+        authType != (int32_t)DMLocalServiceInfoAuthType::CANCEL) {
         return false;
     }
     return true;
@@ -1595,8 +1585,8 @@ bool DmAuthManager::IsServiceInfoAuthTypeValid(int32_t authType)
 
 bool DmAuthManager::IsServiceInfoAuthBoxTypeValid(int32_t authBoxType)
 {
-    if (authBoxType != (int32_t)DMServiceInfoAuthBoxType::STATE3 &&
-        authBoxType != (int32_t)DMServiceInfoAuthBoxType::SKIP_CONFIRM) {
+    if (authBoxType != (int32_t)DMLocalServiceInfoAuthBoxType::STATE3 &&
+        authBoxType != (int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
         return false;
     }
     return true;
@@ -1604,29 +1594,29 @@ bool DmAuthManager::IsServiceInfoAuthBoxTypeValid(int32_t authBoxType)
 
 bool DmAuthManager::IsServiceInfoPinExchangeTypeValid(int32_t pinExchangeType)
 {
-    if (pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::PINBOX &&
-        pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::FROMDP &&
-        pinExchangeType != (int32_t)DMServiceInfoPinExchangeType::ULTRASOUND) {
+    if (pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::PINBOX &&
+        pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP &&
+        pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::ULTRASOUND) {
         return false;
     }
     return true;
 }
 
-bool DmAuthManager::IsServiceInfoProfileValid(const DistributedDeviceProfile::ServiceInfoProfile &profile)
+bool DmAuthManager::IsLocalServiceInfoValid(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo)
 {
-    if (!IsServiceInfoAuthTypeValid(profile.GetAuthType())) {
-        LOGE("AuthType not valid, %{public}d", profile.GetAuthType());
+    if (!IsServiceInfoAuthTypeValid(localServiceInfo.GetAuthType())) {
+        LOGE("AuthType not valid, %{public}d", localServiceInfo.GetAuthType());
         return false;
     }
-    if (!IsServiceInfoAuthBoxTypeValid(profile.GetAuthBoxType())) {
-        LOGE("AuthBoxType not valid, %{public}d", profile.GetAuthBoxType());
+    if (!IsServiceInfoAuthBoxTypeValid(localServiceInfo.GetAuthBoxType())) {
+        LOGE("AuthBoxType not valid, %{public}d", localServiceInfo.GetAuthBoxType());
         return false;
     }
-    if (!IsServiceInfoPinExchangeTypeValid(profile.GetPinExchangeType())) {
-        LOGE("PinExchangeType not valid, %{public}d", profile.GetPinExchangeType());
+    if (!IsServiceInfoPinExchangeTypeValid(localServiceInfo.GetPinExchangeType())) {
+        LOGE("PinExchangeType not valid, %{public}d", localServiceInfo.GetPinExchangeType());
         return false;
     }
-    if (!IsPinCodeValid(profile.GetPinCode())) {
+    if (!IsPinCodeValid(localServiceInfo.GetPinCode())) {
         LOGE("pincode not valid");
         return false;
     }
@@ -1713,7 +1703,7 @@ void DmAuthManager::ShowConfigDialog()
         return;
     }
     if (CanUsePincodeFromDp() &&
-        serviceInfoProfile_.GetAuthBoxType() == (int32_t)DMServiceInfoAuthBoxType::SKIP_CONFIRM) {
+        serviceInfoProfile_.GetAuthBoxType() == (int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
         LOGI("no need confirm dialog");
         StartAuthProcess(serviceInfoProfile_.GetAuthType());
         return;
@@ -2187,6 +2177,15 @@ bool DmAuthManager::IsImportedAuthCodeValid()
     return false;
 }
 
+bool DmAuthManager::IsSrc()
+{
+    if (authRequestState_ != nullptr) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool DmAuthManager::IsAuthTypeSupported(const int32_t &authType)
 {
     if (authenticationMap_.find(authType) == authenticationMap_.end()) {
@@ -2493,13 +2492,52 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
         }
     }
     authResponseContext_->localSessionKeyId = 0;
+    {
+        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        sessionKeyIdAsyncResult_.clear();
+        sessionKeyIdAsyncResult_[requestId] = std::optional<int32_t>();
+    }
     unsigned char hash[SHA256_DIGEST_LENGTH] = { 0 };
     Crypto::DmGenerateStrHash(sessionKey, sessionKeyLen, hash, SHA256_DIGEST_LENGTH, 0);
-    int32_t sessionKeyId = 0;
-    int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(hash, SHA256_DIGEST_LENGTH, sessionKeyId);
-    if (ret == DM_OK && sessionKeyId > 0) {
-        authResponseContext_->localSessionKeyId = sessionKeyId;
+    std::vector<unsigned char> hashVector(hash, hash + SHA256_DIGEST_LENGTH);
+    std::shared_ptr<DmAuthManager> sharePtrThis = shared_from_this();
+    auto asyncTaskFunc = [sharePtrThis, requestId, hashVector]() {
+        sharePtrThis->PutSessionKeyAsync(requestId, hashVector);
+    };
+    ffrt::submit(asyncTaskFunc, ffrt::task_attr().delay(0));
+}
+
+void DmAuthManager::PutSessionKeyAsync(int64_t requestId, std::vector<unsigned char> hash)
+{
+    {
+        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        int32_t sessionKeyId = 0;
+        int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(hash, sessionKeyId);
+        if (ret != DM_OK) {
+            LOGI("PutSessionKey failed.");
+            sessionKeyId = 0;
+        }
+        sessionKeyIdAsyncResult_[requestId] = sessionKeyId;
     }
+    sessionKeyIdCondition_.notify_one();
+}
+
+int32_t DmAuthManager::GetSessionKeyIdSync(int64_t requestId)
+{
+    std::unique_lock<std::mutex> guard(sessionKeyIdMutex_);
+    if (sessionKeyIdAsyncResult_.find(requestId) == sessionKeyIdAsyncResult_.end()) {
+        LOGW("GetSessionKeyIdSync failed, not find by requestId");
+        return 0;
+    }
+    if (sessionKeyIdAsyncResult_[requestId].has_value()) {
+        LOGI("GetSessionKeyIdSync, already ready");
+        return sessionKeyIdAsyncResult_[requestId].value();
+    }
+    LOGI("GetSessionKeyIdSync need wait");
+    sessionKeyIdCondition_.wait_for(guard, std::chrono::milliseconds(MAX_PUT_SESSIONKEY_TIMEOUT));
+    int32_t keyid = sessionKeyIdAsyncResult_[requestId].value_or(0);
+    LOGI("GetSessionKeyIdSync exit");
+    return keyid;
 }
 
 void DmAuthManager::GetRemoteDeviceId(std::string &deviceId)
@@ -2599,8 +2637,8 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
 
-    if (authResponseContext_->isSrcPincodeImported) {
-        GetServiceInfoProfile();
+    if (authResponseContext_->authType == AUTH_TYPE_NFC) {
+        GetLocalServiceInfoInDp();
     }
 }
 
@@ -3196,26 +3234,22 @@ void DmAuthManager::ProcessReqPublicKey()
     }
 }
 
-void DmAuthManager::GetServiceInfoProfile()
+void DmAuthManager::GetLocalServiceInfoInDp()
 {
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    InitServiceInfoUniqueKey(key);
-    std::vector<DistributedDeviceProfile::ServiceInfoProfile> profiles;
-    int32_t result = DeviceProfileConnector::GetInstance().GetServiceInfoProfileListByBundleName(key, profiles);
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    int32_t result = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        authResponseContext_->hostPkgName, (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP, localServiceInfo);
     if (result != DM_OK) {
         return;
     }
-    for (auto &item : profiles) {
-        if (IsServiceInfoProfileValid(item)) {
-            serviceInfoProfile_ = item;
-            LOGI("authBoxType %{public}d, authType %{public}d, pinExchangeType %{public}d",
-                serviceInfoProfile_.GetAuthBoxType(), serviceInfoProfile_.GetAuthType(),
-                serviceInfoProfile_.GetPinExchangeType());
-            auto updateProfile = serviceInfoProfile_;
-            updateProfile.SetPinCode("######");
-            DeviceProfileConnector::GetInstance().UpdateServiceInfoProfile(updateProfile);
-            break;
-        }
+    if (IsLocalServiceInfoValid(localServiceInfo)) {
+        serviceInfoProfile_ = localServiceInfo;
+        LOGI("authBoxType %{public}d, authType %{public}d, pinExchangeType %{public}d",
+            serviceInfoProfile_.GetAuthBoxType(), serviceInfoProfile_.GetAuthType(),
+            serviceInfoProfile_.GetPinExchangeType());
+        auto updateProfile = serviceInfoProfile_;
+        updateProfile.SetPinCode("******");
+        DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(updateProfile);
     }
 }
 
@@ -3253,6 +3287,7 @@ void DmAuthManager::JoinLnn(const std::string &deviceId, bool isForceJoin)
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(softbusConnector_);
     if (IsHmlSessionType()) {
+        authResponseContext_->localSessionKeyId = GetSessionKeyIdSync(authResponseContext_->requestId);
         softbusConnector_->JoinLnnByHml(authRequestContext_->sessionId, authResponseContext_->localSessionKeyId,
             authResponseContext_->remoteSessionKeyId);
         return;

@@ -54,9 +54,9 @@ public:
     virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName,
         const std::string &deviceId) = 0;
     virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;
-    virtual int32_t GetServiceInfoProfileListByBundleName(const DistributedDeviceProfile::ServiceInfoUniqueKey& key,
-        std::vector<DistributedDeviceProfile::ServiceInfoProfile>& serviceInfoProfiles) = 0;
-    virtual int32_t PutSessionKey(const uint8_t* sessionKey, uint32_t length, int32_t& sessionKeyId) = 0;
+    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string& bundleName,
+        int32_t pinExchangeType, DistributedDeviceProfile::LocalServiceInfo &serviceInfo) = 0;
+    virtual int32_t PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -85,9 +85,9 @@ public:
     MOCK_METHOD((std::unordered_map<std::string, DmAuthForm>), GetAppTrustDeviceList,
         (const std::string &, const std::string &));
     MOCK_METHOD(int32_t, CheckDeviceInfoPermission, (const std::string &, const std::string &));
-    MOCK_METHOD(int32_t, GetServiceInfoProfileListByBundleName, (const DistributedDeviceProfile::ServiceInfoUniqueKey&,
-            (std::vector<DistributedDeviceProfile::ServiceInfoProfile>&)));
-    MOCK_METHOD(int32_t, PutSessionKey, (const uint8_t*, uint32_t, int32_t&));
+    MOCK_METHOD(int32_t, GetLocalServiceInfoByBundleNameAndPinExchangeType, (const std::string&, int32_t,
+        DistributedDeviceProfile::LocalServiceInfo &serviceInfo));
+    MOCK_METHOD(int32_t, PutSessionKey, (const std::vector<unsigned char> &, int32_t&));
 };
 }
 }

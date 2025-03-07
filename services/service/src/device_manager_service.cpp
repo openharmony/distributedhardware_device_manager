@@ -766,7 +766,7 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
         return ERR_DM_FAILED;
     }
-    uint64_t peerTokenId = dmServiceImpl_->GetTokenIdByNameAndDeviceId(extra, udid);
+    [[maybe_unused]] uint64_t peerTokenId = dmServiceImpl_->GetTokenIdByNameAndDeviceId(extra, udid);
     if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
         return ERR_DM_FAILED;
@@ -1519,217 +1519,101 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-bool DeviceManagerService::InitServiceInfoProfile(const DMServiceInfo &serviceInfo,
-    DistributedDeviceProfile::ServiceInfoProfile &profile)
+bool DeviceManagerService::InitDPLocalServiceInfo(const DMLocalServiceInfo &serviceInfo,
+    DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceInfo)
 {
-    DmDeviceInfo devInfo;
-    int32_t ret = GetLocalDeviceInfo(devInfo);
-    if (ret != DM_OK) {
-        LOGE("GetLocalDeviceInfo failed");
-        return false;
-    }
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    profile.SetDeviceId(std::string(localDeviceId));
-    profile.SetNetworkId(devInfo.networkId);
-    profile.SetUserId(MultipleUserConnector::GetFirstForegroundUserId());
-    profile.SetTokenId(std::to_string(IPCSkeleton::GetCallingTokenID()));
-    profile.SetServiceId(serviceInfo.serviceId);
-    profile.SetServiceType(serviceInfo.serviceType);
-    profile.SetServiceName(serviceInfo.serviceName);
-    profile.SetServiceDisplayName(serviceInfo.serviceDisplayName);
-    profile.SetCustomData(serviceInfo.customData);
-    profile.SetCustomDataLen(serviceInfo.customData.size());
-    profile.SetBundleName(serviceInfo.bundleName);
-    profile.SetModuleName(serviceInfo.moduleName);
-    profile.SetAbilityName(serviceInfo.abilityName);
-    profile.SetAuthBoxType(serviceInfo.authBoxType);
-    profile.SetAuthType(serviceInfo.authType);
-    profile.SetPinExchangeType(serviceInfo.pinExchangeType);
-    profile.SetPinCode(serviceInfo.pinCode);
-    profile.SetDescription(serviceInfo.description);
-    profile.SetServiceDicoveryScope(serviceInfo.serviceDiscoveryScope);
+    dpLocalServiceInfo.SetBundleName(serviceInfo.bundleName);
+    dpLocalServiceInfo.SetAuthBoxType(serviceInfo.authBoxType);
+    dpLocalServiceInfo.SetAuthType(serviceInfo.authType);
+    dpLocalServiceInfo.SetPinExchangeType(serviceInfo.pinExchangeType);
+    dpLocalServiceInfo.SetPinCode(serviceInfo.pinCode);
+    dpLocalServiceInfo.SetDescription(serviceInfo.description);
+    dpLocalServiceInfo.SetExtraInfo(serviceInfo.extraInfo);
     return true;
 }
 
-void DeviceManagerService::InitServiceInfo(const DistributedDeviceProfile::ServiceInfoProfile &profile,
-    DMServiceInfo &serviceInfo)
+void DeviceManagerService::InitServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceInfo,
+    DMLocalServiceInfo &serviceInfo)
 {
-    serviceInfo.serviceId = profile.GetServiceId();
-    serviceInfo.serviceType = profile.GetServiceType();
-    serviceInfo.serviceName = profile.GetServiceName();
-    serviceInfo.serviceDisplayName = profile.GetServiceDisplayName();
-    serviceInfo.customData = profile.GetCustomData();
-    serviceInfo.bundleName = profile.GetBundleName();
-    serviceInfo.moduleName = profile.GetModuleName();
-    serviceInfo.abilityName = profile.GetAbilityName();
-    serviceInfo.authBoxType = profile.GetAuthBoxType();
-    serviceInfo.authType = profile.GetAuthType();
-    serviceInfo.pinExchangeType = profile.GetPinExchangeType();
-    serviceInfo.pinCode = profile.GetPinCode();
-    serviceInfo.description = profile.GetDescription();
-    serviceInfo.serviceDiscoveryScope = profile.GetServiceDicoveryScope();
+    serviceInfo.bundleName = dpLocalServiceInfo.GetBundleName();
+    serviceInfo.authBoxType = dpLocalServiceInfo.GetAuthBoxType();
+    serviceInfo.authType = dpLocalServiceInfo.GetAuthType();
+    serviceInfo.pinExchangeType = dpLocalServiceInfo.GetPinExchangeType();
+    serviceInfo.pinCode = dpLocalServiceInfo.GetPinCode();
+    serviceInfo.description = dpLocalServiceInfo.GetDescription();
+    serviceInfo.extraInfo = dpLocalServiceInfo.GetExtraInfo();
 }
 
-void DeviceManagerService::InitServiceInfos(const std::vector<DistributedDeviceProfile::ServiceInfoProfile> &profiles,
-    std::vector<DMServiceInfo> &serviceInfos)
+void DeviceManagerService::InitServiceInfos(
+    const std::vector<DistributedDeviceProfile::LocalServiceInfo> &dpLocalServiceInfos,
+    std::vector<DMLocalServiceInfo> &serviceInfos)
 {
-    for (const auto &profileItem : profiles) {
-        DMServiceInfo infoItem;
-        InitServiceInfo(profileItem, infoItem);
+    for (const auto &dpInfoItem : dpLocalServiceInfos) {
+        DMLocalServiceInfo infoItem;
+        InitServiceInfo(dpInfoItem, infoItem);
         serviceInfos.emplace_back(infoItem);
     }
 }
-
-bool DeviceManagerService::InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key)
-{
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    key.SetDeviceId(std::string(localDeviceId));
-    key.SetUserId(MultipleUserConnector::GetFirstForegroundUserId());
-    key.SetTokenId(std::to_string(IPCSkeleton::GetCallingTokenID()));
-    return true;
-}
 #endif
 
-int64_t DeviceManagerService::GenerateSerivceId()
+int32_t DeviceManagerService::RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    DmDeviceInfo devInfo;
-    int32_t ret = GetLocalDeviceInfo(devInfo);
-    if (ret != DM_OK) {
-        LOGE("GetLocalDeviceInfo failed");
-        return 0;
-    }
-    std::string udid = devInfo.deviceId;
-    if (udid.empty()) {
-        LOGE("udid empty");
-        return 0;
-    }
-    int64_t tokenId = IPCSkeleton::GetCallingTokenID();
-    const uint32_t dataLength = sizeof(int64_t) + sizeof(int64_t) + udid.length();
-    std::unique_ptr<unsigned char[]> data = std::make_unique<unsigned char[]>(dataLength);
-    int64_t randomSeed = GenRandLongLong(0, std::numeric_limits<int64_t>::max());
-    unsigned char* dataPtr = data.get();
-    *((int64_t*)dataPtr) = randomSeed;
-    dataPtr += sizeof(int64_t);
-    *((int64_t*)dataPtr) = tokenId;
-    dataPtr += sizeof(int64_t);
-    if (memcpy_s(dataPtr, udid.length(), udid.c_str(), udid.length()) != EOK) {
-        LOGE("memcpy udid failed");
-        return 0;
-    }
-    unsigned char hash[SHA256_DIGEST_LENGTH] = {0};
-    Crypto::DmGenerateStrHash(data.get(), dataLength, hash, SHA256_DIGEST_LENGTH, 0);
-    if (memset_s(data.get(), dataLength, 0, dataLength) != EOK) {
-        LOGW("memset_s failed.");
-    }
-    int64_t serviceId = 0;
-    if (memcpy_s(&serviceId, sizeof(int64_t), hash, sizeof(int64_t)) != EOK) {
-        serviceId = 0;
-        LOGE("memcpy serviceId failed");
-    }
-    serviceId = std::abs(serviceId);
-    LOGI("GenerateSeivceId %{public}" PRId64, serviceId);
-    return serviceId;
-#else
-    return ERR_DM_FAILED;
-#endif
-}
-
-int32_t DeviceManagerService::RegisterServiceInfo(const DMServiceInfo &serviceInfo)
-{
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start, serviceId %{public}" PRId64, serviceInfo.serviceId);
-    DistributedDeviceProfile::ServiceInfoProfile profile;
-    bool success = InitServiceInfoProfile(serviceInfo, profile);
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    bool success = InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
     if (!success) {
-        LOGE("InitServiceInfoProfile failed");
+        LOGE("InitDPLocalServiceInfo failed");
         return ERR_DM_FAILED;
     }
-    return DeviceProfileConnector::GetInstance().PutServiceInfoProfile(profile);
+    return DeviceProfileConnector::GetInstance().PutLocalServiceInfo(dpLocalServiceInfo);
 #else
     (void)serviceInfo;
     return ERR_DM_FAILED;
 #endif
 }
 
-int32_t DeviceManagerService::UnRegisterServiceInfo(int64_t serviceId)
+int32_t DeviceManagerService::UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start, serviceId %{public}" PRId64, serviceId);
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    bool result = InitServiceInfoUniqueKey(key);
-    if (!result) {
-        LOGE("InitServiceInfoUniqueKey failed");
-        return ERR_DM_FAILED;
-    }
-    key.SetServiceId(serviceId);
-    return DeviceProfileConnector::GetInstance().DeleteServiceInfoProfile(key);
+    return DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
 #else
-    (void)serviceId;
+    (void)bundleName;
+    (void)pinExchangeType;
     return ERR_DM_FAILED;
 #endif
 }
 
-int32_t DeviceManagerService::UpdateServiceInfo(const DMServiceInfo &serviceInfo)
+int32_t DeviceManagerService::UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start, serviceId %{public}" PRId64, serviceInfo.serviceId);
-    DistributedDeviceProfile::ServiceInfoProfile profile;
-    bool success = InitServiceInfoProfile(serviceInfo, profile);
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    bool success = InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
     if (!success) {
-        LOGE("InitServiceInfoProfile failed");
+        LOGE("InitDPLocalServiceInfo failed");
         return ERR_DM_FAILED;
     }
-    return DeviceProfileConnector::GetInstance().UpdateServiceInfoProfile(profile);
+    return DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(dpLocalServiceInfo);
 #else
     (void)serviceInfo;
     return ERR_DM_FAILED;
 #endif
 }
 
-int32_t DeviceManagerService::GetServiceInfoById(int64_t serviceId, DMServiceInfo &serviceInfo)
+int32_t DeviceManagerService::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+    int32_t pinExchangeType, DMLocalServiceInfo &serviceInfo)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start, serviceId %{public}" PRId64, serviceId);
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    bool result = InitServiceInfoUniqueKey(key);
-    if (!result) {
-        LOGE("InitServiceInfoUniqueKey failed");
-        return ERR_DM_FAILED;
-    }
-    key.SetServiceId(serviceId);
-    DistributedDeviceProfile::ServiceInfoProfile profile;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByUniqueKey(key, profile);
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
+        pinExchangeType, dpLocalServiceInfo);
     if (ret == DM_OK) {
-        InitServiceInfo(profile, serviceInfo);
+        InitServiceInfo(dpLocalServiceInfo, serviceInfo);
     }
     return ret;
 #else
-    (void)serviceId;
+    (void)bundleName;
+    (void)pinExchangeType;
     (void)serviceInfo;
-    return ERR_DM_FAILED;
-#endif
-}
-
-int32_t DeviceManagerService::GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos)
-{
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    bool result = InitServiceInfoUniqueKey(key);
-    if (!result) {
-        LOGE("InitServiceInfoUniqueKey failed");
-        return ERR_DM_FAILED;
-    }
-    std::vector<DistributedDeviceProfile::ServiceInfoProfile> profiles;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileListByTokenId(key, profiles);
-    if (ret == DM_OK) {
-        InitServiceInfos(profiles, serviceInfos);
-    }
-    return ret;
-#else
-    (void)serviceInfos;
     return ERR_DM_FAILED;
 #endif
 }
