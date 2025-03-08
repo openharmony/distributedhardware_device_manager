@@ -1419,7 +1419,8 @@ void DmAuthManager::SinkAuthenticateFinish()
     processInfo_.pkgName = authResponseContext_->peerBundleName;
     listener_->OnSinkBindResult(processInfo_, peerTargetId_, authResponseContext_->reply,
         authResponseContext_->state, GenerateBindResultContent());
-    if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
+    if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH &&
+        (authResponseContext_->authType == AUTH_TYPE_NFC || authPtr_ != nullptr)) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_CONFIRM_SHOW);
     }
@@ -1804,7 +1805,8 @@ void DmAuthManager::ShowStartAuthDialog()
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     int32_t pincode = 0;
-    if (GetAuthCode(authResponseContext_->hostPkgName, pincode) == DM_OK) {
+    if (authResponseContext_->authType == AUTH_TYPE_NFC &&
+        GetAuthCode(authResponseContext_->hostPkgName, pincode) == DM_OK) {
         LOGI("already has pin code");
         ProcessPincode(pincode);
     } else {
@@ -3270,7 +3272,7 @@ void DmAuthManager::UpdateInputPincodeDialog(int32_t errorCode)
 {
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(authUiStateMgr_);
-    if (authResponseContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE && !pincodeDialogEverShown_ &&
+    if (authResponseContext_->authType == AUTH_TYPE_NFC && !pincodeDialogEverShown_ &&
         IsImportedAuthCodeValid() && errorCode == ERR_DM_HICHAIN_PROOFMISMATCH) {
         LOGI("AuthDeviceError, ShowStartAuthDialog");
         authTimes_ = 0;
