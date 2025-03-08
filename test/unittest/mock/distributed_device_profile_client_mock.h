@@ -34,6 +34,7 @@ public:
     virtual int32_t UnSubscribeDeviceProfileInited(int32_t saId) = 0;
     virtual int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos)
         = 0;
+    virtual int32_t PutSessionKey(uint32_t userId, const std::vector<uint8_t>& sessionKey, int32_t& sessionKeyId) = 0;
 public:
     static inline std::shared_ptr<DpDistributedDeviceProfileClient> dpDistributedDeviceProfileClient = nullptr;
 };
@@ -47,6 +48,7 @@ public:
     MOCK_METHOD(int32_t, SubscribeDeviceProfileInited, (int32_t, sptr<IDpInitedCallback>));
     MOCK_METHOD(int32_t, UnSubscribeDeviceProfileInited, (int32_t));
     MOCK_METHOD(int32_t, PutAllTrustedDevices, (const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &));
+    MOCK_METHOD(int32_t, PutSessionKey, (uint32_t, (const std::vector<uint8_t>&), int32_t&));
 };
 }
 }

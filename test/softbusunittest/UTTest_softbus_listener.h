@@ -33,6 +33,7 @@
 #include "dm_crypto_mock.h"
 #include "dm_softbus_cache_mock.h"
 #include "dm_ipc_skeleton_mock.h"
+#include "softbus_center_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -48,6 +49,7 @@ public:
     static inline std::shared_ptr<CryptoMock> cryptoMock_ = std::make_shared<CryptoMock>();
     static inline std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ = std::make_shared<SoftbusCacheMock>();
     static inline std::shared_ptr<DMIPCSkeletonMock> ipcSkeletonMock_ = std::make_shared<DMIPCSkeletonMock>();
+    static inline std::shared_ptr<SoftbusCenterMock> softbusCenterMock_ = std::make_shared<SoftbusCenterMock>();
 };
 
 class ISoftbusDiscoveringCallbackTest : public ISoftbusDiscoveringCallback {

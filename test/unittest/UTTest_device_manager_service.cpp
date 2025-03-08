@@ -1847,8 +1847,9 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::T
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     DeviceManagerService::GetInstance().InitDMServiceListener();
+    EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_NETWORK_NOT_INIT);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 

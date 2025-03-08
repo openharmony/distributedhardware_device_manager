@@ -1933,6 +1933,23 @@ HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_010, testing::ext::TestS
     }
     int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, deleteInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile accessProfile;
+    accessProfile.SetBindType(1);
+    profiles.push_back(accessProfile);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    deviceManagerServiceImpl_->DeleteAlwaysAllowTimeOut();
+
+    std::string remoteUdid = "remoteUdid";
+    profiles.clear();
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    deviceManagerServiceImpl_->CheckDeleteCredential(remoteUdid);
+
+    accessProfile.SetTrustDeviceId(remoteUdid);
+    profiles.push_back(accessProfile);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    deviceManagerServiceImpl_->CheckDeleteCredential(remoteUdid);
 }
 } // namespace
 } // namespace DistributedHardware

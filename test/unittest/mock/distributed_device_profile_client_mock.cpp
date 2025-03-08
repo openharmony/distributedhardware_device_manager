@@ -56,5 +56,12 @@ int32_t DistributedDeviceProfileClient::PutAllTrustedDevices(
 {
     return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->PutAllTrustedDevices(deviceInfos);
 }
+
+int32_t DistributedDeviceProfileClient::PutSessionKey(
+    uint32_t userId, const std::vector<uint8_t>& sessionKey, int32_t& sessionKeyId)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->
+        PutSessionKey(userId, sessionKey, sessionKeyId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

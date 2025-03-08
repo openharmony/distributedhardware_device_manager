@@ -183,5 +183,25 @@ HWTEST_F(DMTransportMsgTest, NotifyUserIds_ToString_EmptyInput, testing::ext::Te
     std::string result = notifyUserIds.ToString();
     EXPECT_FALSE(result.empty());
 }
+
+HWTEST_F(DMTransportMsgTest, ToJson_UserIdsMsg, testing::ext::TestSize.Level0)
+{
+    std::vector<uint32_t> foregroundUserIds{1, 2, 3};
+    std::vector<uint32_t> backgroundUserIds{4, 5, 6};
+    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds);
+    const char* jsonStr = R"({
+        "MsgType": "0",
+        "msg": "messgaeinfo",
+        "code": 145,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonStr);
+    ToJson(jsonObject, userIdsMsg);
+    cJSON_Delete(jsonObject);
+    EXPECT_FALSE(userIdsMsg.foregroundUserIds.empty());
+}
 } // DistributedHardware
 } // OHOS
