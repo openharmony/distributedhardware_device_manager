@@ -515,9 +515,6 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_201, testing::ext::Test
     sessionKeyArray.push_back('3');
     sessionKeyArray.push_back('4');
     sessionKeyArray.push_back('5');
-    ret = DeviceProfileConnector::GetInstance().PutSessionKey(sessionKeyArray, sessionKeyId);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
-
     EXPECT_CALL(*distributedDeviceProfileClientMock_, PutSessionKey(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceProfileConnector::GetInstance().PutSessionKey(sessionKeyArray, sessionKeyId);
     EXPECT_EQ(ret, ERR_DM_FAILED);

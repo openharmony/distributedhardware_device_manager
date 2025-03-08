@@ -39,5 +39,10 @@ bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &pr
 {
     return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnSetDnPolicy(processName);
 }
+
+bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &processName)
+{
+    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnGetDeviceInfo(processName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

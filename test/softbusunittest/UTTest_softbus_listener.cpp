@@ -817,6 +817,7 @@ HWTEST_F(SoftbusListenerTest, GetDeviceInfo_001, testing::ext::TestSize.Level0)
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(SOFTBUS_INVALID_PARAM));
     int32_t ret = softbusListener->GetDeviceInfo(networkId, info);
     EXPECT_EQ(true, checkSoftbusRes(ret));
 }
@@ -850,6 +851,7 @@ HWTEST_F(SoftbusListenerTest, GetDeviceSecurityLevel_001, testing::ext::TestSize
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = softbusListener->GetDeviceSecurityLevel(networkId.c_str(), securityLevel);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -1038,6 +1040,11 @@ HWTEST_F(SoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
+    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
+        .Times(::testing::AtLeast(3)).WillOnce(Return(SOFTBUS_INVALID_PARAM));
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).Times(::testing::AtLeast(2))
+        .WillOnce(Return(SOFTBUS_INVALID_PARAM));
     int32_t ret = softbusListener->StopRefreshSoftbusLNN(subscribeId);
     softbusListener->OnLocalDevInfoChange();
     std::string msg = "123";
@@ -1347,15 +1354,19 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
     int32_t ret = softbusListener->GetAttrFromCustomData(customDataJson, dmDevInfo, actionId);
     EXPECT_EQ(ret, DM_OK);
 
-    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).Times(::testing::AtLeast(2))
+        .WillOnce(Return(ERR_DM_FAILED));
     softbusListener->OnLocalDevInfoChange();
 
-    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED))
+        .WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(ERR_DM_FAILED));
     softbusListener->OnLocalDevInfoChange();
 
-    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED))
+        .WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
     softbusListener->OnLocalDevInfoChange();
 
     NodeBasicInfo *info = nullptr;
@@ -1367,9 +1378,7 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
         .deviceTypeId = 1
     };
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
-    softbusListener->UpdateDeviceName(&nodeBasicInfo);
-
-    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
     softbusListener->UpdateDeviceName(&nodeBasicInfo);
 }
 } // namespace
