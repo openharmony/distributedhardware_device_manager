@@ -1292,6 +1292,27 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAppBindLevel_003, testing::ext::TestS
     EXPECT_EQ(offlineParam.bindType, APP);
 }
 
+HWTEST_F(DeviceProfileConnectorTest, CheckAppLevelAccess_001, testing::ext::TestSize.Level0)
+{
+    DmAccessCaller caller;
+    caller.tokenId = 0;
+    DmAccessCallee callee;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    AddAccessControlProfileFirst(profile);
+    bool ret = DeviceProfileConnector::GetInstance().CheckAppLevelAccess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+
+    caller.tokenId = 1001;
+    callee.tokenId = 1001;
+    ret = DeviceProfileConnector::GetInstance().CheckAppLevelAccess(profile, caller, callee);
+    EXPECT_EQ(ret, true);
+
+    caller.tokenId = 6666;
+    caller.tokenId = 6655;
+    ret = DeviceProfileConnector::GetInstance().CheckAppLevelAccess(profile, caller, callee);
+    EXPECT_EQ(ret, false);
+}
+
 HWTEST_F(DeviceProfileConnectorTest, DeleteDeviceBindLevel_001, testing::ext::TestSize.Level0)
 {
     DmOfflineParam offlineParam;
