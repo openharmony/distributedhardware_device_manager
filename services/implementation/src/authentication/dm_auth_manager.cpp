@@ -211,16 +211,9 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
     if (IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE)) {
         connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].get<std::string>();
     }
-    if (connSessionType == CONN_SESSION_TYPE_HML) {
-        if (!IsInt32(jsonObject, PARAM_KEY_HML_ACTIONID)) {
-            LOGE("CONN_SESSION_TYPE_HML, input actionId is !Int32");
-            return ERR_DM_INPUT_PARA_INVALID;
-        }
-        int32_t actionId = jsonObject[PARAM_KEY_HML_ACTIONID].get<int32_t>();
-        if (actionId <= 0) {
-            LOGE("CONN_SESSION_TYPE_HML, input actionId is <=0");
-            return ERR_DM_INPUT_PARA_INVALID;
-        }
+    if (connSessionType == CONN_SESSION_TYPE_HML && !CheckHmlParamValid(jsonObject)) {
+        LOGE("CONN_SESSION_TYPE_HML, CheckHmlParamValid failed");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if (jsonObject.is_discarded() || jsonObject.find(TAG_BIND_LEVEL) == jsonObject.end() ||
@@ -238,6 +231,25 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
+}
+
+bool DmAuthManager::CheckHmlParamValid(nlohmann::json &jsonObject)
+{
+    if (!IsString(jsonObject, PARAM_KEY_HML_ACTIONID)) {
+        LOGE("PARAM_KEY_HML_ACTIONID is not string");
+        return false;
+    }
+    std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].get<std::string>();
+    if (!IsNumberString(actionIdStr)) {
+        LOGE("PARAM_KEY_HML_ACTIONID is not number");
+        return false;
+    }
+    int32_t actionId = std::atoi(actionIdStr.c_str());
+    if (actionId <= 0) {
+        LOGE("PARAM_KEY_HML_ACTIONID is <= 0");
+        return false;
+    }
+    return true;
 }
 
 bool DmAuthManager::CheckProcessNameInWhiteList(const std::string &processName)
@@ -346,13 +358,11 @@ void DmAuthManager::ParseHmlInfoInJsonObject(nlohmann::json jsonObject)
     if (!IsHmlSessionType()) {
         return;
     }
-    authRequestContext_->closeSessionDelaySeconds = HML_SESSION_TIMEOUT;
-    if (IsBool(jsonObject, PARAM_KEY_HML_ENABLE_160M)) {
-        authRequestContext_->hmlEnable160M = jsonObject[PARAM_KEY_HML_ENABLE_160M].get<bool>();
-        LOGI("hmlEnable160M %{public}d", authRequestContext_->hmlEnable160M);
-    }
-    if (IsInt32(jsonObject, PARAM_KEY_HML_ACTIONID)) {
-        authRequestContext_->hmlActionId = jsonObject[PARAM_KEY_HML_ACTIONID].get<int32_t>();
+    if (IsString(jsonObject, PARAM_KEY_HML_ACTIONID)) {
+        std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].get<std::string>();
+        if (IsNumberString(actionIdStr)) {
+            authRequestContext_->hmlActionId = std::atoi(actionIdStr.c_str());
+        }
         if (authRequestContext_->hmlActionId <= 0) {
             authRequestContext_->hmlActionId = 0;
         }
