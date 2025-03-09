@@ -39,7 +39,7 @@ constexpr const static char* g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM] = {
     "CollaborationFwk",
     "wear_link_service",
     "watch_system_service",
-    "com.huawei.hmos.huaweicast",
+    "cast_engine_service",
 };
 
 constexpr int32_t PIN_HOLDER_WHITE_LIST_NUM = 1;
