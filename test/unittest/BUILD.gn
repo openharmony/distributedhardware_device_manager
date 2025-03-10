@@ -575,6 +575,8 @@ ohos_unittest("UTTest_softbus_connector") {
 
   sources = [
     "${devicemanager_path}/test/softbusunittest/UTTest_softbus_connector.cpp",
+    "mock/dm_crypto_mock.cpp",
+    "mock/softbus_center_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -587,6 +589,7 @@ ohos_unittest("UTTest_softbus_connector") {
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
+    "googletest:gmock_main",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
@@ -608,10 +611,11 @@ ohos_unittest("UTTest_softbus_listener") {
   sources = [
     "${devicemanager_path}/test/softbusunittest/UTTest_softbus_listener.cpp",
     "${devicemanager_path}/test/unittest/mock/parameter.cpp",
-    "mock/distributed_device_profile_client_mock.cpp",
+    "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_crypto_mock.cpp",
+    "mock/dm_ipc_skeleton_mock.cpp",
     "mock/dm_softbus_cache_mock.cpp",
-    "mock/ipc_skeleton_mock.cpp",
+    "mock/softbus_center_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]

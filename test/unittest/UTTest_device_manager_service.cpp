@@ -1727,9 +1727,12 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> discoverParam;
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
+    EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).Times(::testing::AtLeast(1))
+        .WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
     EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == DM_OK || ret == SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
-    DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
+    ret = DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
+    EXPECT_EQ(ret, SOFTBUS_NETWORK_NOT_INIT);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -1773,8 +1776,10 @@ HWTEST_F(DeviceManagerServiceTest, StopDiscovering_003, testing::ext::TestSize.L
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
     DeviceManagerService::GetInstance().InitDMServiceListener();
+    EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).Times(::testing::AtLeast(1))
+        .WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_NETWORK_NOT_INIT);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -1847,8 +1852,9 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::T
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     DeviceManagerService::GetInstance().InitDMServiceListener();
+    EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, SOFTBUS_NETWORK_NOT_INIT);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 

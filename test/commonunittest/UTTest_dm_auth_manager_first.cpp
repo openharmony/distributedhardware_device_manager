@@ -1925,8 +1925,13 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
 
     int32_t sessionId = 1;
     authManager_->remoteUdidHash_ = "remoteUdidhash";
+    std::string udidHashTemp = "remoteUdidhash";
     EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1))
+    .WillOnce(WithArgs<1>(Invoke([udidHashTemp](unsigned char *udidHash) {
+        memcpy_s(udidHash, (udidHashTemp.length() + 1), udidHashTemp.c_str(), (udidHashTemp.length()));
+        return DM_OK;
+    })));
     authManager_->DeleteOffLineTimer(sessionId);
 
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);

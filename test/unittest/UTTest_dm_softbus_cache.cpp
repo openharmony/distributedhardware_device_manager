@@ -76,7 +76,7 @@ namespace {
 bool CheckSoftbusRes(int32_t ret)
 {
     return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR ||
-        ret == SOFTBUS_IPC_ERR || ret == ERR_DM_FAILED || ret == SOFTBUS_NETWORK_GET_ALL_NODE_INFO_ERR;
+        ret == SOFTBUS_IPC_ERR || ret == ERR_DM_FAILED || ret == SOFTBUS_NETWORK_GET_NODE_INFO_ERR;
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetDeviceInfoFromCache_001, testing::ext::TestSize.Level0)

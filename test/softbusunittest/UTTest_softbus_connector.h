@@ -31,6 +31,8 @@
 #include "softbus_connector.h"
 #include "softbus_listener.h"
 #include "softbus_session.h"
+#include "softbus_center_mock.h"
+#include "dm_crypto_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -41,6 +43,8 @@ public:
     void SetUp() override;
     void TearDown() override;
     bool CheckReturnResult(int ret);
+    static inline std::shared_ptr<SoftbusCenterMock> softbusCenterMock_ = std::make_shared<SoftbusCenterMock>();
+    static inline std::shared_ptr<CryptoMock> cryptoMock_ = std::make_shared<CryptoMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
