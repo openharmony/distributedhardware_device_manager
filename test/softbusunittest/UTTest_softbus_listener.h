@@ -29,7 +29,7 @@
 #include "dm_subscribe_info.h"
 #include "inner_session.h"
 #include "session.h"
-#include "distributed_device_profile_client_mock.h"
+#include "deviceprofile_connector_mock.h"
 #include "dm_crypto_mock.h"
 #include "dm_softbus_cache_mock.h"
 #include "dm_ipc_skeleton_mock.h"
@@ -43,9 +43,8 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
-    static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
-        distributedDeviceProfileClientMock_ =
-        std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
+    static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ =
+        std::make_shared<DeviceProfileConnectorMock>();;
     static inline std::shared_ptr<CryptoMock> cryptoMock_ = std::make_shared<CryptoMock>();
     static inline std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ = std::make_shared<SoftbusCacheMock>();
     static inline std::shared_ptr<DMIPCSkeletonMock> ipcSkeletonMock_ = std::make_shared<DMIPCSkeletonMock>();

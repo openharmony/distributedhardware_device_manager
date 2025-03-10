@@ -42,17 +42,14 @@ void SoftbusListenerTest::TearDown()
 }
 void SoftbusListenerTest::SetUpTestCase()
 {
-    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
-        distributedDeviceProfileClientMock_;
     DmCrypto::dmCrypto = cryptoMock_;
     DmSoftbusCache::dmSoftbusCache = softbusCacheMock_;
     DMIPCSkeleton::dmIpcSkeleton_ = ipcSkeletonMock_;
     SoftbusCenterInterface::softbusCenterInterface_ = softbusCenterMock_;
+    DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
 }
 void SoftbusListenerTest::TearDownTestCase()
 {
-    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
-    distributedDeviceProfileClientMock_ = nullptr;
     DmCrypto::dmCrypto = nullptr;
     cryptoMock_ = nullptr;
     DmSoftbusCache::dmSoftbusCache = nullptr;
@@ -61,6 +58,8 @@ void SoftbusListenerTest::TearDownTestCase()
     ipcSkeletonMock_ = nullptr;
     SoftbusCenterInterface::softbusCenterInterface_ = nullptr;
     softbusCenterMock_ = nullptr;
+    DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
+    deviceProfileConnectorMock_ = nullptr;
 }
 
 namespace {
@@ -1126,30 +1125,28 @@ HWTEST_F(SoftbusListenerTest, GetUdidFromDp_001, testing::ext::TestSize.Level0)
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
     }
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(allProfile));
     int32_t ret = softbusListener->GetUdidFromDp(udidHashTemp, udid);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile;
     DistributedDeviceProfile::AccessControlProfile profile;
     profile.SetBindType(1);
     allProfile.push_back(profile);
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
-        .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(allProfile));
     ret = softbusListener->GetUdidFromDp(udidHashTemp, udid);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
     profile.SetBindType(2);
     profile.SetTrustDeviceId("trustDeviceId");
     allProfile.push_back(profile);
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
-        .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(allProfile));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
     ret = softbusListener->GetUdidFromDp(udidHashTemp, udid);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
-        .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(allProfile));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1))
     .WillOnce(WithArgs<1>(Invoke([udidHashTemp](unsigned char *udidHash) {
         memcpy_s(udidHash, (udidHashTemp.length() + 1), udidHashTemp.c_str(), udidHashTemp.length());
@@ -1223,8 +1220,7 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_001, testing::ext::TestSiz
     profile.SetBindType(1);
     allProfile.push_back(profile);
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
-        .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(allProfile));
     int32_t ret = softbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, DM_OK);
 
@@ -1269,8 +1265,7 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_002, testing::ext::TestSiz
     profile.SetBindType(2);
     allProfile.push_back(profile);
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
-        .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(allProfile));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = softbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, DM_OK);
@@ -1282,8 +1277,7 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_002, testing::ext::TestSiz
     allProfile.push_back(profile);
     pkgName = "bundleNameInfo";
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1002));
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
-        .WillOnce(DoAll(SetArgReferee<0>(allProfile), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(allProfile));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
     ret = softbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, DM_OK);
@@ -1367,8 +1361,6 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
     EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED))
         .WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).Times(::testing::AtLeast(2))
-        .WillRepeatedly(Return(ERR_DM_FAILED));
     softbusListener->OnLocalDevInfoChange();
 
     NodeBasicInfo *info = nullptr;
@@ -1380,8 +1372,6 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
         .deviceTypeId = 1
     };
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).Times(::testing::AtLeast(2))
-        .WillRepeatedly(Return(ERR_DM_FAILED));
     softbusListener->UpdateDeviceName(&nodeBasicInfo);
 }
 } // namespace
