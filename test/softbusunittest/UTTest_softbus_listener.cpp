@@ -1368,7 +1368,7 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
         .WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).Times(::testing::AtLeast(2))
-        .WillOnce(Return(ERR_DM_FAILED));
+        .WillRepeatedly(Return(ERR_DM_FAILED));
     softbusListener->OnLocalDevInfoChange();
 
     NodeBasicInfo *info = nullptr;
@@ -1381,7 +1381,7 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
     };
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).Times(::testing::AtLeast(2))
-        .WillOnce(Return(ERR_DM_FAILED));
+        .WillRepeatedly(Return(ERR_DM_FAILED));
     softbusListener->UpdateDeviceName(&nodeBasicInfo);
 }
 } // namespace
