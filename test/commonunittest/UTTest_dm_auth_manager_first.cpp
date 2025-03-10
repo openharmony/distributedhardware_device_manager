@@ -2180,7 +2180,7 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
-    jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
     jsonObject[TAG_BIND_LEVEL] = 1;
     strExtra = jsonObject.dump();
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
