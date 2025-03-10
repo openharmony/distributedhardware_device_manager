@@ -44,7 +44,7 @@ public:
     void SetUp();
     void TearDown();
     static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ =
-        std::make_shared<DeviceProfileConnectorMock>();;
+        std::make_shared<DeviceProfileConnectorMock>();
     static inline std::shared_ptr<CryptoMock> cryptoMock_ = std::make_shared<CryptoMock>();
     static inline std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ = std::make_shared<SoftbusCacheMock>();
     static inline std::shared_ptr<DMIPCSkeletonMock> ipcSkeletonMock_ = std::make_shared<DMIPCSkeletonMock>();
