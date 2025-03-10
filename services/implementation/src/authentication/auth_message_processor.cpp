@@ -438,7 +438,7 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(nlohmann::json &json)
         }
         if (IsInt32(jsonObject, TAG_SESSIONKEY_ID)) {
             authResponseContext_->remoteSessionKeyId = jsonObject[TAG_SESSIONKEY_ID].get<int32_t>();
-            LOGI("got remoteSessionKeyId");
+            LOGI("get remoteSessionKeyId");
         }
         return;
     }

@@ -2136,7 +2136,7 @@ HWTEST_F(DmAuthManagerTest, IsLocalServiceInfoValid_001, testing::ext::TestSize.
 
     profile.SetPinExchangeType(static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
     profile.SetPinCode("");
-    ASSERT_FALSE(authManager_->IsLocalServiceInfoValid(profile));
+    ASSERT_TRUE(authManager_->IsLocalServiceInfoValid(profile));
 
     profile.SetPinCode(std::to_string(PINCODE));
     ASSERT_TRUE(authManager_->IsLocalServiceInfoValid(profile));
@@ -2176,6 +2176,11 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
+    strExtra = jsonObject.dump();
+    ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
     jsonObject[TAG_BIND_LEVEL] = 1;
     strExtra = jsonObject.dump();
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));

@@ -1580,8 +1580,7 @@ bool DmAuthManager::IsPinCodeValid(int32_t numpin)
 bool DmAuthManager::CanUsePincodeFromDp()
 {
     CHECK_NULL_RETURN(authResponseContext_, false);
-    return (authResponseContext_->authType == AUTH_TYPE_NFC &&
-        IsPinCodeValid(serviceInfoProfile_.GetPinCode()) &&
+    return (IsPinCodeValid(serviceInfoProfile_.GetPinCode()) &&
         serviceInfoProfile_.GetPinExchangeType() == (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP);
 }
 
@@ -1626,10 +1625,6 @@ bool DmAuthManager::IsLocalServiceInfoValid(const DistributedDeviceProfile::Loca
     }
     if (!IsServiceInfoPinExchangeTypeValid(localServiceInfo.GetPinExchangeType())) {
         LOGE("PinExchangeType not valid, %{public}d", localServiceInfo.GetPinExchangeType());
-        return false;
-    }
-    if (!IsPinCodeValid(localServiceInfo.GetPinCode())) {
-        LOGE("pincode not valid");
         return false;
     }
     return true;
@@ -1714,7 +1709,7 @@ void DmAuthManager::ShowConfigDialog()
         LOGE("failed to ShowConfigDialog because authResponseContext_ is nullptr");
         return;
     }
-    if (CanUsePincodeFromDp() &&
+    if (authResponseContext_->authType == AUTH_TYPE_NFC &&
         serviceInfoProfile_.GetAuthBoxType() == (int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
         LOGI("no need confirm dialog");
         StartAuthProcess(serviceInfoProfile_.GetAuthType());
@@ -1820,10 +1815,11 @@ void DmAuthManager::ShowStartAuthDialog()
         GetAuthCode(authResponseContext_->hostPkgName, pincode) == DM_OK) {
         LOGI("already has pin code");
         ProcessPincode(pincode);
-    } else {
-        pincodeDialogEverShown_ = true;
-        DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
+        return;
     }
+
+    pincodeDialogEverShown_ = true;
+    DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
 }
 
 int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
