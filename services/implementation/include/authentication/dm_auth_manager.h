@@ -499,6 +499,7 @@ private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
+    bool CheckHmlParamValid(nlohmann::json &jsonObject);
     bool CheckProcessNameInWhiteList(const std::string &processName);
     void ProcessSourceMsg();
     void ProcessSinkMsg();

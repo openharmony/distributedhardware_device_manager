@@ -211,16 +211,9 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
     if (IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE)) {
         connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].get<std::string>();
     }
-    if (connSessionType == CONN_SESSION_TYPE_HML) {
-        if (!IsInt32(jsonObject, PARAM_KEY_HML_ACTIONID)) {
-            LOGE("CONN_SESSION_TYPE_HML, input actionId is !Int32");
-            return ERR_DM_INPUT_PARA_INVALID;
-        }
-        int32_t actionId = jsonObject[PARAM_KEY_HML_ACTIONID].get<int32_t>();
-        if (actionId <= 0) {
-            LOGE("CONN_SESSION_TYPE_HML, input actionId is <=0");
-            return ERR_DM_INPUT_PARA_INVALID;
-        }
+    if (connSessionType == CONN_SESSION_TYPE_HML && !CheckHmlParamValid(jsonObject)) {
+        LOGE("CONN_SESSION_TYPE_HML, CheckHmlParamValid failed");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
 
     if (jsonObject.is_discarded() || jsonObject.find(TAG_BIND_LEVEL) == jsonObject.end() ||
@@ -238,6 +231,25 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
+}
+
+bool DmAuthManager::CheckHmlParamValid(nlohmann::json &jsonObject)
+{
+    if (!IsString(jsonObject, PARAM_KEY_HML_ACTIONID)) {
+        LOGE("PARAM_KEY_HML_ACTIONID is not string");
+        return false;
+    }
+    std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].get<std::string>();
+    if (!IsNumberString(actionIdStr)) {
+        LOGE("PARAM_KEY_HML_ACTIONID is not number");
+        return false;
+    }
+    int32_t actionId = std::atoi(actionIdStr.c_str());
+    if (actionId <= 0) {
+        LOGE("PARAM_KEY_HML_ACTIONID is <= 0");
+        return false;
+    }
+    return true;
 }
 
 bool DmAuthManager::CheckProcessNameInWhiteList(const std::string &processName)
@@ -346,13 +358,11 @@ void DmAuthManager::ParseHmlInfoInJsonObject(nlohmann::json jsonObject)
     if (!IsHmlSessionType()) {
         return;
     }
-    authRequestContext_->closeSessionDelaySeconds = HML_SESSION_TIMEOUT;
-    if (IsBool(jsonObject, PARAM_KEY_HML_ENABLE_160M)) {
-        authRequestContext_->hmlEnable160M = jsonObject[PARAM_KEY_HML_ENABLE_160M].get<bool>();
-        LOGI("hmlEnable160M %{public}d", authRequestContext_->hmlEnable160M);
-    }
-    if (IsInt32(jsonObject, PARAM_KEY_HML_ACTIONID)) {
-        authRequestContext_->hmlActionId = jsonObject[PARAM_KEY_HML_ACTIONID].get<int32_t>();
+    if (IsString(jsonObject, PARAM_KEY_HML_ACTIONID)) {
+        std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].get<std::string>();
+        if (IsNumberString(actionIdStr)) {
+            authRequestContext_->hmlActionId = std::atoi(actionIdStr.c_str());
+        }
         if (authRequestContext_->hmlActionId <= 0) {
             authRequestContext_->hmlActionId = 0;
         }
@@ -1420,7 +1430,8 @@ void DmAuthManager::SinkAuthenticateFinish()
     processInfo_.pkgName = authResponseContext_->peerBundleName;
     listener_->OnSinkBindResult(processInfo_, peerTargetId_, authResponseContext_->reply,
         authResponseContext_->state, GenerateBindResultContent());
-    if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH && authPtr_ != nullptr) {
+    if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_FINISH &&
+        (authResponseContext_->authType == AUTH_TYPE_NFC || authPtr_ != nullptr)) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_CONFIRM_SHOW);
     }
@@ -1569,8 +1580,7 @@ bool DmAuthManager::IsPinCodeValid(int32_t numpin)
 bool DmAuthManager::CanUsePincodeFromDp()
 {
     CHECK_NULL_RETURN(authResponseContext_, false);
-    return (authResponseContext_->authType == AUTH_TYPE_NFC &&
-        IsPinCodeValid(serviceInfoProfile_.GetPinCode()) &&
+    return (IsPinCodeValid(serviceInfoProfile_.GetPinCode()) &&
         serviceInfoProfile_.GetPinExchangeType() == (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP);
 }
 
@@ -1615,10 +1625,6 @@ bool DmAuthManager::IsLocalServiceInfoValid(const DistributedDeviceProfile::Loca
     }
     if (!IsServiceInfoPinExchangeTypeValid(localServiceInfo.GetPinExchangeType())) {
         LOGE("PinExchangeType not valid, %{public}d", localServiceInfo.GetPinExchangeType());
-        return false;
-    }
-    if (!IsPinCodeValid(localServiceInfo.GetPinCode())) {
-        LOGE("pincode not valid");
         return false;
     }
     return true;
@@ -1703,7 +1709,7 @@ void DmAuthManager::ShowConfigDialog()
         LOGE("failed to ShowConfigDialog because authResponseContext_ is nullptr");
         return;
     }
-    if (CanUsePincodeFromDp() &&
+    if (authResponseContext_->authType == AUTH_TYPE_NFC &&
         serviceInfoProfile_.GetAuthBoxType() == (int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
         LOGI("no need confirm dialog");
         StartAuthProcess(serviceInfoProfile_.GetAuthType());
@@ -1805,13 +1811,15 @@ void DmAuthManager::ShowStartAuthDialog()
     }
     LOGI("DmAuthManager::ShowStartAuthDialog start");
     int32_t pincode = 0;
-    if (GetAuthCode(authResponseContext_->hostPkgName, pincode) == DM_OK) {
+    if (authResponseContext_->authType == AUTH_TYPE_NFC &&
+        GetAuthCode(authResponseContext_->hostPkgName, pincode) == DM_OK) {
         LOGI("already has pin code");
         ProcessPincode(pincode);
-    } else {
-        pincodeDialogEverShown_ = true;
-        DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
+        return;
     }
+
+    pincodeDialogEverShown_ = true;
+    DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
 }
 
 int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
@@ -3271,7 +3279,7 @@ void DmAuthManager::UpdateInputPincodeDialog(int32_t errorCode)
 {
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(authUiStateMgr_);
-    if (authResponseContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE && !pincodeDialogEverShown_ &&
+    if (authResponseContext_->authType == AUTH_TYPE_NFC && !pincodeDialogEverShown_ &&
         IsImportedAuthCodeValid() && errorCode == ERR_DM_HICHAIN_PROOFMISMATCH) {
         LOGI("AuthDeviceError, ShowStartAuthDialog");
         authTimes_ = 0;
