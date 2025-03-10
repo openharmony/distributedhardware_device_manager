@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -144,7 +144,9 @@ void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         beforeUserId = std::atoi(data.GetWant().GetStringParam("oldId").c_str());
         accountValidEvent = true;
     }
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_STOPPED ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
         beforeUserId = data.GetCode();
         accountValidEvent = true;
     }

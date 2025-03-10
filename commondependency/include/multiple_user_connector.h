@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -110,6 +110,9 @@ public:
     static int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec);
     static int32_t GetAllUserIds(std::vector<int32_t> &userIdVec);
     static std::string GetAccountNickName(int32_t userId);
+    static bool IsUserUnlocked(int32_t userId);
+    static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec);
+    static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec, std::vector<int32_t> &backgroundUserVec);
 
 private:
     static int32_t oldUserId_;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,7 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #include "multiple_user_connector.h"
+#include "parameter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -30,6 +31,10 @@ constexpr int32_t DM_COMM_SEND_LOCAL_USERIDS = 1;
 // if receive remote device send foreground userids, response local foreground uerids
 // This msg no need response
 constexpr int32_t DM_COMM_RSP_LOCAL_USERIDS = 2;
+constexpr int32_t DM_COMM_SEND_USER_STOP = 3;
+constexpr int32_t DM_COMM_RSP_USER_STOP = 4;
+
+const char* const USER_STOP_MSG_KEY = "stopUserId";
 
 DMCommTool::DMCommTool() : dmTransportPtr_(nullptr)
 {
@@ -89,6 +94,7 @@ int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
     }
     std::string msgStr(msg);
     cJSON_Delete(root);
+    cJSON_free(msg);
     CommMsg commMsg(DM_COMM_SEND_LOCAL_USERIDS, msgStr);
     std::string payload = GetCommMsgString(commMsg);
 
@@ -118,6 +124,7 @@ void DMCommTool::RspLocalFrontOrBackUserIds(const std::string rmtNetworkId,
     }
     std::string msgStr(msg);
     cJSON_Delete(root);
+    cJSON_free(msg);
     CommMsg commMsg(DM_COMM_RSP_LOCAL_USERIDS, msgStr);
     std::string payload = GetCommMsgString(commMsg);
 
@@ -164,6 +171,14 @@ void DMCommTool::DMCommToolEventHandler::ProcessEvent(
             dmCommToolPtr->ProcessResponseUserIdsEvent(commMsg);
             break;
         }
+        case DM_COMM_SEND_USER_STOP: {
+            dmCommToolPtr->ProcessReceiveUserStopEvent(commMsg);
+            break;
+        }
+        case DM_COMM_RSP_USER_STOP: {
+            dmCommToolPtr->ProcessResponseUserStopEvent(commMsg);
+            break;
+        }
         default:
             LOGE("event is undefined, id is %{public}d", eventId);
             break;
@@ -197,6 +212,9 @@ void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> 
     std::vector<int32_t> backgroundUserIds;
     MultipleUserConnector::GetForegroundUserIds(foregroundUserIds);
     MultipleUserConnector::GetBackgroundUserIds(backgroundUserIds);
+    if (DeviceManagerService::GetInstance().IsPC()) {
+        MultipleUserConnector::ClearLockedUser(foregroundUserIds, backgroundUserIds);
+    }
     std::vector<uint32_t> foregroundUserIdsU32;
     std::vector<uint32_t> backgroundUserIdsU32;
     for (auto const &u : foregroundUserIds) {
@@ -260,6 +278,145 @@ std::shared_ptr<DMCommTool::DMCommToolEventHandler> DMCommTool::GetEventHandler(
 const std::shared_ptr<DMTransport> DMCommTool::GetDMTransportPtr()
 {
     return this->dmTransportPtr_;
+}
+
+int32_t DMCommTool::CreateUserStopMessage(int32_t stopUserId, std::string &msgStr)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        LOGE("Create cJSON object failed.");
+        return ERR_DM_FAILED;
+    }
+    cJSON *numberObj = cJSON_CreateNumber(stopUserId);
+    if (numberObj == nullptr) {
+        cJSON_Delete(root);
+        return ERR_DM_FAILED;
+    }
+    cJSON_AddItemToObject(root, USER_STOP_MSG_KEY, numberObj);
+    char *msg = cJSON_PrintUnformatted(root);
+    if (msg == nullptr) {
+        cJSON_Delete(root);
+        return ERR_DM_FAILED;
+    }
+    msgStr = std::string(msg);
+    cJSON_free(msg);
+    cJSON_Delete(root);
+    return DM_OK;
+}
+
+int32_t DMCommTool::ParseUserStopMessage(const std::string &msgStr, int32_t &stopUserId)
+{
+    cJSON *root = cJSON_Parse(msgStr.c_str());
+    if (root == NULL) {
+        LOGE("the msg is not json format");
+        return ERR_DM_FAILED;
+    }
+    cJSON *stopUserIdObj = cJSON_GetObjectItem(root, USER_STOP_MSG_KEY);
+    if (stopUserIdObj == NULL || !cJSON_IsNumber(stopUserIdObj)) {
+        LOGE("parse stopUserId id failed.");
+        cJSON_Delete(root);
+        return ERR_DM_FAILED;
+    }
+    stopUserId = static_cast<int32_t>(stopUserIdObj->valueint);
+    cJSON_Delete(root);
+    return DM_OK;
+}
+
+int32_t DMCommTool::SendUserStop(const std::string rmtNetworkId, int32_t stopUserId)
+{
+    std::string msgStr;
+    int32_t ret = CreateUserStopMessage(stopUserId, msgStr);
+    if (ret != DM_OK) {
+        LOGE("error ret: %{public}d", ret);
+        return ret;
+    }
+    return SendMsg(rmtNetworkId, DM_COMM_SEND_USER_STOP, msgStr);
+}
+
+int32_t DMCommTool::SendMsg(const std::string rmtNetworkId, int32_t msgType, const std::string &msg)
+{
+    if (!IsIdLengthValid(rmtNetworkId) || dmTransportPtr_ == nullptr) {
+        LOGE("param invalid, networkId: %{public}s", GetAnonyString(rmtNetworkId).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t socketId;
+    if (dmTransportPtr_->StartSocket(rmtNetworkId, socketId) != DM_OK || socketId <= 0) {
+        LOGE("Start socket error");
+        return ERR_DM_FAILED;
+    }
+    CommMsg commMsg(msgType, msg);
+    std::string payload = GetCommMsgString(commMsg);
+    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
+    if (ret != DM_OK) {
+        LOGE("SendMsg failed, ret: %{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("SendMsg success");
+    return DM_OK;
+}
+
+void DMCommTool::ProcessReceiveUserStopEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    LOGI("start");
+    CHECK_NULL_VOID(commMsg);
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
+        return;
+    }
+    int32_t stopUserId = -1;
+    int32_t ret = ParseUserStopMessage(commMsg->commMsg->msg, stopUserId);
+    if (ret != DM_OK) {
+        LOGE("ParseUserStopMessage error ret: %{public}d", ret);
+        return;
+    }
+    RspUserStop(commMsg->remoteNetworkId, commMsg->socketId, stopUserId);
+    DeviceManagerService::GetInstance().HandleUserStop(stopUserId, rmtUdid);
+}
+
+void DMCommTool::RspUserStop(const std::string rmtNetworkId, int32_t socketId, int32_t stopUserId)
+{
+    std::string msgStr = "";
+    CHECK_NULL_VOID(dmTransportPtr_);
+    int32_t ret = CreateUserStopMessage(stopUserId, msgStr);
+    if (ret != DM_OK || msgStr.empty()) {
+        LOGE("error ret: %{public}d", ret);
+        return;
+    }
+    CommMsg commMsg(DM_COMM_RSP_USER_STOP, msgStr);
+    std::string payload = GetCommMsgString(commMsg);
+    ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
+    if (ret != DM_OK) {
+        LOGE("failed, ret: %{public}d", ret);
+        return;
+    }
+    LOGI("success");
+}
+
+void DMCommTool::ProcessResponseUserStopEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    LOGI("start");
+    CHECK_NULL_VOID(commMsg);
+    this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
+        return;
+    }
+    int32_t stopUserId = -1;
+    int32_t ret = ParseUserStopMessage(commMsg->commMsg->msg, stopUserId);
+    if (ret != DM_OK) {
+        LOGE("ParseUserStopMessage error ret: %{public}d", ret);
+        return;
+    }
+    std::vector<std::string> acceptEventUdids;
+    acceptEventUdids.push_back(rmtUdid);
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    DeviceManagerService::GetInstance().HandleUserStop(stopUserId, localUdid, acceptEventUdids);
 }
 } // DistributedHardware
 } // OHOS
