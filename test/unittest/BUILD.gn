@@ -77,6 +77,7 @@ group("unittest") {
     ":UTTest_ipc_server_client_proxy",
     ":UTTest_ipc_server_listener",
     ":UTTest_ipc_server_stub",
+    ":UTTest_json_object",
     ":UTTest_kv_adapter_manager",
     ":UTTest_mine_hichain_connector",
     ":UTTest_mine_softbus_listener",
@@ -1910,6 +1911,27 @@ ohos_unittest("UTTest_advertise_manager") {
 }
 
 ## UnitTest UTTest_advertise_manager }}}
+
+## UnitTest UTTest_json_object {{{
+ohos_unittest("UTTest_json_object") {
+  module_out_path = module_out_path
+
+  include_dirs = [ "${devicemanager_path}/common/include" ]
+
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_json_object.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_json_object }}}
 
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {
