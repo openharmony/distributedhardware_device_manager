@@ -735,6 +735,7 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
 {
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
         LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback on screen locked.");
+        
         authMgr_->OnScreenLocked();
         return;
     }
