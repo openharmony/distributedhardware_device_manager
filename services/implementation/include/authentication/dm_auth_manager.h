@@ -525,6 +525,8 @@ private:
     int32_t CheckTrustState();
     void ProcIncompatible(const int32_t &sessionId);
     void MemberJoinAuthRequest(int64_t requestId, int32_t status);
+    void PutSrcAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
+    void PutSinkAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
 
 public:
     void RequestCredential();

@@ -2792,29 +2792,49 @@ void DmAuthManager::PutAccessControlList()
     DmAccessee accessee;
     accessee.trustBundleName = authResponseContext_->peerBundleName;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
-        accesser.requestTokenId = static_cast<uint64_t>(authRequestContext_->tokenId);
-        accesser.requestUserId = authRequestContext_->localUserId;
-        accesser.requestAccountId = authRequestContext_->localAccountId;
-        accesser.requestDeviceId = authRequestContext_->localDeviceId;
-        accesser.requestDeviceName = authRequestContext_->localDeviceName;
-        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
-        accessee.trustUserId = authRequestContext_->remoteUserId;
-        accessee.trustAccountId = authRequestContext_->remoteAccountId;
-        accessee.trustDeviceId = remoteDeviceId_;
-        accessee.trustDeviceName = authRequestContext_->remoteDeviceName;
+        PutSrcAccessControlList(accesser, accessee, localUdid);
     } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
-        accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
-        accesser.requestUserId = authResponseContext_->remoteUserId;
-        accesser.requestAccountId = authResponseContext_->remoteAccountId;
-        accesser.requestDeviceId = remoteDeviceId_;
-        accesser.requestDeviceName = authResponseContext_->remoteDeviceName;
-        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
-        accessee.trustUserId = authResponseContext_->localUserId;
-        accessee.trustAccountId = authResponseContext_->localAccountId;
-        accessee.trustDeviceId = localUdid;
-        accessee.trustDeviceName = authResponseContext_->targetDeviceName;
+        PutSinkAccessControlList(accesser, accessee, localUdid);
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
+}
+
+void DmAuthManager::PutSrcAccessControlList(DmAccesser &accesser, DmAccessee &accessee,
+    const std::string &localUdid)
+{
+    accesser.requestTokenId = static_cast<uint64_t>(authRequestContext_->tokenId);
+    accesser.requestUserId = authRequestContext_->localUserId;
+    accesser.requestAccountId = authRequestContext_->localAccountId;
+    accesser.requestDeviceId = authRequestContext_->localDeviceId;
+    accesser.requestDeviceName = authRequestContext_->localDeviceName;
+    if (authResponseContext_->remoteTokenId == authRequestContext_->tokenId) {
+        accessee.trustTokenId = 0;
+    } else {
+        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
+    }
+    accessee.trustUserId = authRequestContext_->remoteUserId;
+    accessee.trustAccountId = authRequestContext_->remoteAccountId;
+    accessee.trustDeviceId = remoteDeviceId_;
+    accessee.trustDeviceName = authRequestContext_->remoteDeviceName;
+}
+
+void DmAuthManager::PutSinkAccessControlList(DmAccesser &accesser, DmAccessee &accessee,
+    const std::string &localUdid)
+{
+    accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
+    accesser.requestUserId = authResponseContext_->remoteUserId;
+    accesser.requestAccountId = authResponseContext_->remoteAccountId;
+    accesser.requestDeviceId = remoteDeviceId_;
+    accesser.requestDeviceName = authResponseContext_->remoteDeviceName;
+    if (authResponseContext_->remoteTokenId == authResponseContext_->tokenId) {
+        accessee.trustTokenId = 0;
+    } else {
+        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
+    }
+    accessee.trustUserId = authResponseContext_->localUserId;
+    accessee.trustAccountId = authResponseContext_->localAccountId;
+    accessee.trustDeviceId = localUdid;
+    accessee.trustDeviceName = authResponseContext_->targetDeviceName;
 }
 
 void DmAuthManager::HandleSessionHeartbeat(std::string name)
