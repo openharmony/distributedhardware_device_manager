@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,6 +104,9 @@ public:
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
     virtual bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
+    virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid) = 0;
+    virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
+        const std::vector<std::string> &acceptEventUdids) = 0;
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
@@ -166,6 +169,9 @@ public:
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void HandleUserSwitched(const std::vector<DistributedDeviceProfile::AccessControlProfile> &activeProfiles,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &inActiveProfiles,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &delActiveProfiles);
     void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
     std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
@@ -192,6 +198,9 @@ public:
     int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
         int32_t pinExchangeType, DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
     int32_t PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId);
+    int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
+    int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
+        const std::vector<std::string> &acceptEventUdids);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

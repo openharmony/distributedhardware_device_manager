@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -237,7 +237,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_007, testing::ex
     }
     )";
     relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
-    ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
+    ASSERT_EQ(relationShipMsg.userId, 0);
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, IsValid_001, testing::ext::TestSize.Level0)

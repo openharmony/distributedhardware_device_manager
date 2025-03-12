@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,8 @@ enum class RelationShipChangeType : uint32_t {
     DEL_USER = 4,
     APP_UNINSTALL = 5,
     SYNC_USERID = 6,
-    TYPE_MAX = 7
+    STOP_USER = 7,
+    TYPE_MAX = 8
 };
 
 struct UserIdInfo {
@@ -69,6 +70,7 @@ struct RelationShipChangeMsg {
     void ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     bool ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const;
+    void ToStopUserPayLoad(uint8_t *&msg, uint32_t &len) const;
     cJSON *ToPayLoadJson() const;
 
     bool FromAccountLogoutPayLoad(const cJSON *payloadJson);
@@ -76,6 +78,7 @@ struct RelationShipChangeMsg {
     bool FromAppUnbindPayLoad(const cJSON *payloadJson);
     bool FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloadJson);
     bool FromDelUserPayLoad(const cJSON *payloadJson);
+    bool FromStopUserPayLoad(const cJSON *payloadJson);
 
     std::string ToJson() const;
     bool FromJson(const std::string &msgJson);

@@ -193,6 +193,9 @@ public:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void HandleDeviceTrustedChange(const std::string &msg);
     void HandleUserIdCheckSumChange(const std::string &msg);
+    void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
+    void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid,
+        const std::vector<std::string> &acceptEventUdids);
 #endif
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
     void ClearDiscoveryCache(const ProcessInfo &processInfo);
@@ -227,6 +230,7 @@ public:
     int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName, int32_t pinExchangeType,
         DMLocalServiceInfo &serviceInfo);
     void ClearPulishIdCache(const std::string &pkgName);
+    bool IsPC();
 
 private:
     bool IsDMServiceImplReady();
@@ -315,6 +319,16 @@ private:
         const std::vector<int32_t> &backgroundUserIds, const std::string &udid);
     void UpdateAclAndDeleteGroup(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId);
+    void HandleUserStopEvent(int32_t stopUserId);
+    void DivideNotifyMethod(const std::vector<std::string> &peerUdids, std::vector<std::string> &bleUdids,
+        std::map<std::string, std::string> &wifiDevices);
+    void NotifyRemoteLocalUserStop(const std::string &localUdid,
+        const std::vector<std::string> &peerUdids, int32_t stopUserId);
+    void SendUserStopBroadCast(const std::vector<std::string> &peerUdids, int32_t stopUserId);
+    void HandleUserStopBroadCast(int32_t stopUserId, const std::string &remoteUdid);
+    void NotifyRemoteLocalUserStopByWifi(const std::string &localUdid,
+        const std::map<std::string, std::string> &wifiDevices, int32_t stopUserId);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

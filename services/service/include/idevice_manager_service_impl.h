@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -249,7 +249,7 @@ public:
                                             int32_t errcode) = 0;
     virtual int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId) = 0;
     virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid) = 0;
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus) = 0;
     virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId) = 0;
     virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId) = 0;
