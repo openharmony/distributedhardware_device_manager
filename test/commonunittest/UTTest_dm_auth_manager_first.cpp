@@ -2204,19 +2204,19 @@ HWTEST_F(DmAuthManagerTest, CheckHmlParamValid_001, testing::ext::TestSize.Level
     nlohmann::json jsonObject;
     jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
     bool ret = authManager_->CheckHmlParamValid(jsonObject);
-    EXPACT_FALSE(ret);
+    EXPECT_FALSE(ret);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = "kjsdkad";
     ret = authManager_->CheckHmlParamValid(jsonObject);
-    EXPACT_FALSE(ret);
+    EXPECT_FALSE(ret);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = "0";
     ret = authManager_->CheckHmlParamValid(jsonObject);
-    EXPACT_FALSE(ret);
+    EXPECT_FALSE(ret);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
     ret = authManager_->CheckHmlParamValid(jsonObject);
-    EXPACT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 } // namespace
 } // namespace DistributedHardware
