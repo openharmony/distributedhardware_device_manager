@@ -2061,7 +2061,7 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     int64_t requestId = 1;
     uint8_t arrayPtr[] = {1, 2, 3, 4};
     uint8_t *sessionKey = arrayPtr;
-    uint32_t sessionKeyLen = static_cast<uint32_t>(sizeof(arrayPtr));
+    uint32_t sessionKeyLen = static_cast<uint32_t>(sizeof(arrayPtr) / sizeof(arrayPtr[0]));
     authManager_->authResponseContext_->requestId = 1;
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     EXPECT_CALL(*cryptoMgrMock_, SaveSessionKey(_, _)).WillOnce(Return(DM_OK));
@@ -2180,11 +2180,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
-    jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
-    strExtra = jsonObject.dump();
-    ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-
     jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
     jsonObject[TAG_BIND_LEVEL] = 1;
     strExtra = jsonObject.dump();
@@ -2195,6 +2190,33 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    std::string pkgName = "pkgName_pickerProxy_Info";
+    int32_t authType = 1;
+    std::string deviceId = "devi*********4";
+    std::string extra = "extra";
+    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager_->GetAuthParam(pkgName, authType, deviceId, extra);
+}
+
+HWTEST_F(DmAuthManagerTest, CheckHmlParamValid_001, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
+    bool ret = authManager_->CheckHmlParamValid(jsonObject);
+    EXPACT_FALSE(ret);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "kjsdkad";
+    ret = authManager_->CheckHmlParamValid(jsonObject);
+    EXPACT_FALSE(ret);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "0";
+    ret = authManager_->CheckHmlParamValid(jsonObject);
+    EXPACT_FALSE(ret);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
+    ret = authManager_->CheckHmlParamValid(jsonObject);
+    EXPACT_TRUE(ret);
 }
 } // namespace
 } // namespace DistributedHardware

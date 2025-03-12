@@ -523,5 +523,61 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_201, testing::ext::Test
     ret = DeviceProfileConnector::GetInstance().PutSessionKey(sessionKeyArray, sessionKeyId);
     EXPECT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(DeviceProfileConnectorSecondTest, PutLocalServiceInfo_201, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutLocalServiceInfo(_)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().PutLocalServiceInfo(localServiceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutLocalServiceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().PutLocalServiceInfo(localServiceInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteLocalServiceInfo_201, testing::ext::TestSize.Level0)
+{
+    std::string bundleName = "b********pl";
+    int32_t pinExchangeType = 1;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, DeleteLocalServiceInfo(_, _)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, DeleteLocalServiceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, UpdateLocalServiceInfo_201, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateLocalServiceInfo(_)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(localServiceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateLocalServiceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(localServiceInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetLocalServiceInfoByBundleNameAndPinExchangeType_201,
+        testing::ext::TestSize.Level0)
+{
+    std::string bundleName = "b********pl";
+    int32_t pinExchangeType = 1;
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
+        pinExchangeType, localServiceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
+        pinExchangeType, localServiceInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

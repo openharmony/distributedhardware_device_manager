@@ -1901,6 +1901,16 @@ HWTEST_F(AuthMessageProcessorTest, IsPincodeImported_001, testing::ext::TestSize
     ret = authMessageProcessor->IsPincodeImported();
     ASSERT_FALSE(ret);
 }
+
+HWTEST_F(AuthMessageProcessorTest, ProcessSessionKey_001, testing::ext::TestSize.Level0)
+{
+    authMessageProcessor->cryptoMgr_ = std::make_shared<CryptoMgr>();
+    uint8_t arrSession[] = {1, 2, 3, 4, 5};
+    uint8_t *sessionKey = arrSession;
+    uint32_t keyLen = static_cast<uint32_t>(sizeof(arrSession) / sizeof(arrSession[0]));
+    int32_t ret = authMessageProcessor->ProcessSessionKey(sessionKey, keyLen);
+    ASSERT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

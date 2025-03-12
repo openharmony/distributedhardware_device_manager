@@ -246,6 +246,21 @@ HWTEST_F(PermissionManagerTest, GetCallerProcessName_002, testing::ext::TestSize
     ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
+
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnGetDeviceInfo_001, testing::ext::TestSize.Level0)
+{
+    std::string processName = "";
+    auto ret = PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName);
+    ASSERT_FALSE(ret);
+
+    processName = "processName";
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName);
+    ASSERT_FALSE(ret);
+
+    processName = "gameservice_server";
+    ret = PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName);
+    ASSERT_TRUE(ret);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
