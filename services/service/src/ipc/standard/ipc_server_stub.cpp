@@ -29,6 +29,11 @@
 #include "device_name_manager.h"
 #include "dm_error_type.h"
 #include "dm_device_info.h"
+#include "ffrt.h"
+#include <unistd.h>
+#include <string>
+#include <fcntl.h>
+#include <sys/types.h>
 #include "dm_log.h"
 #include "multiple_user_connector.h"
 #include "permission_manager.h"
@@ -40,6 +45,7 @@ DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(&IpcServerStub::GetInstance());
 constexpr int32_t DM_IPC_THREAD_NUM = 32;
 constexpr int32_t MAX_CALLBACK_NUM = 5000;
+constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000;
 
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
@@ -74,19 +80,81 @@ void IpcServerStub::OnStart()
     DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
 }
 
+void IpcServerStub::ReclaimMemmgrFileMemForDM()
+{
+    int32_t memmgrPid = getpid();
+    int32_t echoCnt = 2;
+    for (int32_t i = 0; i < echoCnt; ++i) {
+        if (memmgrPid <= 0) {
+            LOGE("Get invalid pid : %{public}d.", memmgrPid);
+            return;
+        }
+        std::string path = JoinPath("/proc/", std::to_string(memmgrPid), "reclaim");
+        std::string contentStr = "1";
+        LOGI("Start echo %{public}s to pid : %{public}d.", contentStr.c_str(), memmgrPid);
+        LOGI("ReclaimMemmgrFileMemForDM path: %{public}s", path.c_str());
+        int32_t fd = open(path.c_str(), O_WRONLY);
+        if (fd == -1) {
+            LOGE("ReclaimMemmgrFileMemForDM open file failed.");
+            return;
+        }
+        if (write(fd, contentStr.c_str(), strlen(contentStr.c_str())) < 0) {
+            LOGE("ReclaimMemmgrFileMemForDM write file failed.");
+            close(fd);
+            return;
+        }
+        close(fd);
+    }
+    LOGI("ReclaimMemmgrFileMemForDM success.");
+}
+
+std::string IpcServerStub::AddDelimiter(const std::string &path)
+{
+    if (path.empty()) {
+        return path;
+    }
+    if (path.rfind("/") != path.size() - 1) {
+        return path + "/";
+    }
+    return path;
+}
+
+std::string IpcServerStub::JoinPath(const std::string &prefixPath, const std::string &subPath)
+{
+    return AddDelimiter(prefixPath) + subPath;
+}
+
+std::string IpcServerStub::JoinPath(const std::string &prefixPath, const std::string &midPath,
+    const std::string &subPath)
+{
+    return JoinPath(JoinPath(prefixPath, midPath), subPath);
+}
+
+void IpcServerStub::HandleSoftBusServerAdd()
+{
+    DeviceManagerService::GetInstance().InitSoftbusListener();
+    if (!Init()) {
+        LOGE("failed to init IpcServerStub");
+        state_ = ServiceRunningState::STATE_NOT_START;
+        return;
+    }
+    state_ = ServiceRunningState::STATE_RUNNING;
+    int32_t ret = DeviceNameManager::GetInstance().Init();
+    LOGI("Init device name ret:%{public}d", ret);
+    ReclaimMemmgrFileMemForDM();
+    std::function<void()> task = [this]() {
+        LOGI("HandleSoftBusServerAdd After 5mins.");
+        ReclaimMemmgrFileMemForDM();
+    };
+    ffrt::submit(task, ffrt::task_attr().delay(RECLAIM_DELAY_TIME));
+    return;
+}
+
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     LOGI("OnAddSystemAbility systemAbilityId:%{public}d added!", systemAbilityId);
     if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
-        DeviceManagerService::GetInstance().InitSoftbusListener();
-        if (!Init()) {
-            LOGE("failed to init IpcServerStub");
-            state_ = ServiceRunningState::STATE_NOT_START;
-            return;
-        }
-        state_ = ServiceRunningState::STATE_RUNNING;
-        int32_t ret = DeviceNameManager::GetInstance().Init();
-        LOGI("int device name ret:%{public}d", ret);
+        HandleSoftBusServerAdd();
         return;
     }
 
