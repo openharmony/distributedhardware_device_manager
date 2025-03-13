@@ -1904,7 +1904,8 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         if (IsPC()) {
             HandleUserSwitched();
             if (IsDMServiceAdapterResidentLoad()) {
-                dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
+                dmServiceImplExtResident_->AccountUserSwitched(currentUserId,
+                    MultipleUserConnector::GetOhosAccountId());
             }
         }
     } else {
