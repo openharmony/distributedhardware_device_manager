@@ -1432,6 +1432,13 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
     authManager_->authenticationMap_.insert(std::pair<int32_t, std::shared_ptr<IAuthentication>>(authType, nullptr));
     int32_t ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
+
+    nlohmann::json jsonObject;
+    jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = "TML";
+    deviceId = "sdcwafefawe";
+    extra = jsonObject.dump();
+    ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.Level0)
