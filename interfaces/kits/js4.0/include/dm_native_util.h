@@ -81,7 +81,6 @@ void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &ob
     DmDeviceIconInfoFilterOptions &info);
 void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
     napi_value &arrayResult);
-void DmProductInfoToJs(const napi_env &env, const DmProductInfo &prodInfos, napi_value &jsObj);
 void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &devInfo, napi_value &jsObj);
 void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj);
 void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,

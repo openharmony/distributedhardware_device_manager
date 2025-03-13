@@ -334,6 +334,7 @@ private:
     void QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
 #endif
+    void CheckRegisterInfoWithWise(int32_t curUserId);
 
 private:
     bool isImplsoLoaded_ = false;

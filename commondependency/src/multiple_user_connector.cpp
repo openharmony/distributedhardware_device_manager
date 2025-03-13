@@ -358,5 +358,13 @@ void MultipleUserConnector::ClearLockedUser(std::vector<int32_t> &foregroundUser
         }
     }
 }
+
+DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
+{
+    DMAccountInfo dmAccountInfo;
+    dmAccountInfo.accountId = GetOhosAccountId();
+    dmAccountInfo.accountName = GetOhosAccountName();
+    return dmAccountInfo;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

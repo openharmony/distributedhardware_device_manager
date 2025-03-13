@@ -587,23 +587,17 @@ void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServ
     }
 }
 
-void DmProductInfoToJs(const napi_env &env, const DmProductInfo &prodInfo, napi_value &jsObj)
-{
-    SetValueUtf8String(env, "prodId", prodInfo.prodId, jsObj);
-    SetValueUtf8String(env, "model", prodInfo.model, jsObj);
-    SetValueUtf8String(env, "prodName", prodInfo.prodName, jsObj);
-    SetValueUtf8String(env, "prodShortName", prodInfo.prodShortName, jsObj);
-}
-
 void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &devInfo, napi_value &jsObj)
 {
     SetValueUtf8String(env, "deviceId", devInfo.deviceId, jsObj);
     SetValueUtf8String(env, "deviceSn", devInfo.deviceSn, jsObj);
     SetValueUtf8String(env, "mac", devInfo.mac, jsObj);
     SetValueUtf8String(env, "model", devInfo.model, jsObj);
+    SetValueUtf8String(env, "internalModel", devInfo.internalModel, jsObj);
     SetValueUtf8String(env, "deviceType", devInfo.deviceType, jsObj);
     SetValueUtf8String(env, "manufacturer", devInfo.manufacturer, jsObj);
     SetValueUtf8String(env, "deviceName", devInfo.deviceName, jsObj);
+    SetValueUtf8String(env, "productName", devInfo.productName, jsObj);
     SetValueUtf8String(env, "productId", devInfo.productId, jsObj);
     SetValueUtf8String(env, "subProductId", devInfo.subProductId, jsObj);
     SetValueUtf8String(env, "sdkVersion", devInfo.sdkVersion, jsObj);
@@ -665,6 +659,9 @@ void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &ob
     char subProductId[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "subProductId", subProductId, sizeof(subProductId));
     info.subProductId = subProductId;
+    char internalModel[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "internalModel", subProductId, sizeof(internalModel));
+    info.internalModel = internalModel;
     char imageType[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "imageType", imageType, sizeof(imageType));
     info.imageType = imageType;
@@ -676,6 +673,7 @@ void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &ob
 void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj)
 {
     SetValueUtf8String(env, "productId", deviceIconInfo.productId, jsObj);
+    SetValueUtf8String(env, "internalModel", deviceIconInfo.internalModel, jsObj);
     SetValueUtf8String(env, "subProductId", deviceIconInfo.subProductId, jsObj);
     SetValueUtf8String(env, "imageType", deviceIconInfo.imageType, jsObj);
     SetValueUtf8String(env, "specName", deviceIconInfo.specName, jsObj);
@@ -749,9 +747,11 @@ bool JsToDmDeviceProfileInfo(const napi_env &env, const napi_value &jsObj, DmDev
     devInfo.deviceSn = GetStrFromJsObj(env, jsObj, "deviceSn");
     devInfo.mac = GetStrFromJsObj(env, jsObj, "mac");
     devInfo.model = GetStrFromJsObj(env, jsObj, "model");
+    devInfo.internalModel = GetStrFromJsObj(env, jsObj, "internalModel");
     devInfo.deviceType = GetStrFromJsObj(env, jsObj, "deviceType");
     devInfo.manufacturer = GetStrFromJsObj(env, jsObj, "manufacturer");
     devInfo.deviceName = GetStrFromJsObj(env, jsObj, "deviceName");
+    devInfo.productName = GetStrFromJsObj(env, jsObj, "productName");
     devInfo.productId = GetStrFromJsObj(env, jsObj, "productId");
     devInfo.subProductId = GetStrFromJsObj(env, jsObj, "subProductId");
     devInfo.sdkVersion = GetStrFromJsObj(env, jsObj, "sdkVersion");

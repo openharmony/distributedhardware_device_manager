@@ -24,16 +24,16 @@
 namespace OHOS {
 namespace DistributedHardware {
 typedef struct DmProductInfo {
-    std::string prodId = "";
-    std::string model = "";
-    std::string prodName = "";
-    std::string prodShortName = "";
+    std::string productId = "";
+    std::string externalName = "";
+    std::string shortName = "";
     std::string imageVersion = "";
 } DmProductInfo;
 
 typedef struct DmDeviceIconInfo {
     std::string productId = "";
     std::string subProductId = "";
+    std::string internalModel = "";
     std::string imageType = "";
     std::string specName = "";
     std::string wiseVersion = "";
@@ -57,6 +57,7 @@ typedef struct DmDeviceProfileInfoFilterOptions {
 typedef struct DmDeviceIconInfoFilterOptions {
     std::string productId = "";
     std::string subProductId = "";
+    std::string internalModel = "";
     std::string imageType = "";
     std::string specName = "";
 } DmDeviceIconInfoFilterOptions;
@@ -66,10 +67,11 @@ typedef struct DmDeviceProfileInfo {
     std::string deviceSn = "";
     std::string mac = "";
     std::string model = "";
-    std::string innerModel = "";
+    std::string internalModel = "";
     std::string deviceType = "";
     std::string manufacturer = "";
     std::string deviceName = "";
+    std::string productName = "";
     std::string productId = "";
     std::string subProductId = "";
     std::string sdkVersion = "";
