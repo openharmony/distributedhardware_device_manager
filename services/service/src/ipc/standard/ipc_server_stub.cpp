@@ -45,7 +45,8 @@ DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(&IpcServerStub::GetInstance());
 constexpr int32_t DM_IPC_THREAD_NUM = 32;
 constexpr int32_t MAX_CALLBACK_NUM = 5000;
-constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000;
+constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000; // 5 minutes
+constexpr int32_t ECHO_COUNT = 2;
 
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
@@ -83,7 +84,7 @@ void IpcServerStub::OnStart()
 void IpcServerStub::ReclaimMemmgrFileMemForDM()
 {
     int32_t memmgrPid = getpid();
-    int32_t echoCnt = 2;
+    int32_t echoCnt = ECHO_COUNT;
     for (int32_t i = 0; i < echoCnt; ++i) {
         if (memmgrPid <= 0) {
             LOGE("Get invalid pid : %{public}d.", memmgrPid);
@@ -91,8 +92,7 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
         }
         std::string path = JoinPath("/proc/", std::to_string(memmgrPid), "reclaim");
         std::string contentStr = "1";
-        LOGI("Start echo %{public}s to pid : %{public}d.", contentStr.c_str(), memmgrPid);
-        LOGI("ReclaimMemmgrFileMemForDM path: %{public}s", path.c_str());
+        LOGI("Start echo 1 to pid : %{public}d, path: %{public}s", memmgrPid, path.c_str());
         int32_t fd = open(path.c_str(), O_WRONLY);
         if (fd == -1) {
             LOGE("ReclaimMemmgrFileMemForDM open file failed.");
