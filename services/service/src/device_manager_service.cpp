@@ -115,6 +115,7 @@ int32_t DeviceManagerService::InitSoftbusListener()
     SubscribePublishCommonEvent();
     QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
+    SubscribeDataShareCommonEvent();
 #endif
     LOGI("SoftbusListener init success.");
     if (!IsDMServiceAdapterResidentLoad()) {
@@ -160,6 +161,23 @@ void DeviceManagerService::SubscribePublishCommonEvent()
     return;
 }
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
+void DeviceManagerService::SubscribeDataShareCommonEvent()
+{
+    LOGI("DeviceManagerServiceImpl::SubscribeDataShareCommonEvent");
+    if (dataShareCommonEventManager_ == nullptr) {
+        dataShareCommonEventManager_ = std::make_shared<DmDataShareCommonEventManager>();
+    }
+    DataShareEventCallback callback = [=](const auto &arg1) {
+        if (arg1 == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
+            DeviceNameManager::GetInstance().DataShareReady();
+        }
+    };
+    std::vector<std::string> commonEventVec;
+    commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    if (dataShareCommonEventManager_->SubscribeDataShareCommonEvent(commonEventVec, callback)) {
+        LOGI("subscribe datashare common event success");
+    }
+}
 #endif
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -1881,10 +1899,13 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED && IsPC()) {
         HandleUserStopEvent(beforeUserId);
-    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED && IsPC()) {
-        HandleUserSwitched();
-        if (IsDMServiceAdapterResidentLoad()) {
-            dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
+        DeviceNameManager::GetInstance().AccountSysReady(beforeUserId);
+        if (IsPC()) {
+            HandleUserSwitched();
+            if (IsDMServiceAdapterResidentLoad()) {
+                dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
+            }
         }
     } else {
         LOGE("Invalied account common event.");

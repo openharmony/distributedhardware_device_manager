@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DATA_SHARE_COMMON_EVENT_H
-#define OHOS_DATA_SHARE_COMMON_EVENT_H
+#ifndef OHOS_DM_DATASAHRE_COMMON_EVENT_H
+#define OHOS_DM_DATASAHRE_COMMON_EVENT_H
 
 #include "common_event_manager.h"
 #include "system_ability_status_change_stub.h"
@@ -24,7 +24,7 @@ namespace DistributedHardware {
 using OHOS::EventFwk::CommonEventData;
 using OHOS::EventFwk::CommonEventSubscriber;
 using OHOS::EventFwk::CommonEventSubscribeInfo;
-using DataShareEventCallback = std::function<void()>;
+using DataShareEventCallback = std::function<void(std::string)>;
 
 class DmDataShareEventSubscriber : public CommonEventSubscriber {
 public:
@@ -71,4 +71,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DATA_SHARE_COMMON_EVENT_H
+#endif // OHOS_DM_DATASAHRE_COMMON_EVENT_H

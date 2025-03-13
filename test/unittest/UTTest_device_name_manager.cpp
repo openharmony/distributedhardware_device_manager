@@ -83,7 +83,7 @@ HWTEST_F(DeviceNameManagerTest, Init_001, testing::ext::TestSize.Level0)
         DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
 
-    DeviceNameManager::GetInstance().Init();
+    DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
     DeviceNameManager::GetInstance().UnInit();
 }
 
@@ -119,7 +119,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_001, testing::ext::
         DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
 
-    DeviceNameManager::GetInstance().Init();
+    DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(curUserId, preUserId);
     DeviceNameManager::GetInstance().UnInit();
 }
