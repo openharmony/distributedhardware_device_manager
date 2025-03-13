@@ -223,7 +223,6 @@ public:
         std::vector<DmDeviceProfileInfo> &deviceProfileInfoList);
     int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength, std::string &displayName);
     std::vector<std::string> GetDeviceNamePrefixs();
-    int64_t GenerateSerivceId();
     int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
     int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType);
     int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);

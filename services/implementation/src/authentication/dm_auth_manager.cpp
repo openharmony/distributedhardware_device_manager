@@ -1458,7 +1458,8 @@ void DmAuthManager::SrcAuthenticateFinish()
         authRequestContext_->reason = authResponseContext_->reply;
     }
     if ((authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN ||
-        authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
+        authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) &&
+        (authResponseContext_->authType == AUTH_TYPE_NFC || authPtr_ != nullptr)) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
 
