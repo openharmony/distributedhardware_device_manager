@@ -85,8 +85,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
-        int32_t ret = DeviceNameManager::GetInstance().Init();
-        LOGI("int device name ret:%{public}d", ret);
+        DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
         return;
     }
 

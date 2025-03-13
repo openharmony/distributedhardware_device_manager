@@ -33,6 +33,7 @@
 #include "i_dm_service_impl_ext_resident.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
+#include "dm_datashare_common_event.h"
 #include "dm_package_common_event.h"
 #include "dm_screen_common_event.h"
 #include "relationship_sync_mgr.h"
@@ -332,6 +333,7 @@ private:
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+    void SubscribeDataShareCommonEvent();
 #endif
 
 private:
@@ -357,6 +359,7 @@ private:
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+    std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
 #endif
     std::string localNetWorkId_ = "";
     std::shared_ptr<DmTimer> timer_;

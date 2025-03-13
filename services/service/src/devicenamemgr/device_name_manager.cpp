@@ -19,6 +19,8 @@
 #include "multiple_user_connector.h"
 #include "system_ability_definition.h"
 #include "device_manager_service.h"
+#include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "parameter.h"
 
 namespace OHOS {
@@ -65,16 +67,49 @@ constexpr int32_t DEFAULT_USER_ID = -1;
 
 IMPLEMENT_SINGLE_INSTANCE(DeviceNameManager);
 
-int32_t DeviceNameManager::Init()
+void DeviceNameManager::DataShareReady()
 {
-    LOGI("DeviceNameManager In");
+    LOGI("In");
+    isDataShareReady_ = true;
+    if (DependsIsReady()) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        InitDeviceName(userId);
+    }
+}
+
+void DeviceNameManager::AccountSysReady(int32_t userId)
+{
+    LOGI("In userId : %{public}d", userId);
+    isAccountSysReady_ = true;
+    if ((userId != -1) && DependsIsReady()) {
+        InitDeviceName(userId);
+    }
+}
+
+bool DeviceNameManager::DependsIsReady()
+{
+    if (!isDataShareReady_) {
+        LOGE("data share not ready");
+        return false;
+    }
+    if (!isAccountSysReady_) {
+        LOGE("Account system not ready");
+        return false;
+    }
     if (GetRemoteObj() == nullptr) {
         LOGE("dm sa not publish");
-        return ERR_DM_POINT_NULL;
+        return false;
     }
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    InitDeviceName(userId);
-    RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
+    return true;
+}
+
+int32_t DeviceNameManager::InitDeviceNameWhenSoftBusReady()
+{
+    LOGI("In");
+    if (DependsIsReady()) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        InitDeviceName(userId);
+    }
     return DM_OK;
 }
 
@@ -93,44 +128,51 @@ int32_t DeviceNameManager::UnInit()
 
 int32_t DeviceNameManager::InitDeviceNameWhenUserSwitch(int32_t curUserId, int32_t preUserId)
 {
+    isAccountSysReady_ = true;
     LOGI("In");
-    if (GetRemoteObj() == nullptr) {
-        LOGE("dm sa not publish");
-        return ERR_DM_POINT_NULL;
+    if (DependsIsReady()) {
+        InitDeviceName(curUserId);
+        RegisterDeviceNameChangeMonitor(curUserId, preUserId);
     }
-    InitDeviceName(curUserId);
-    RegisterDeviceNameChangeMonitor(curUserId, preUserId);
     return DM_OK;
 }
 
 int32_t DeviceNameManager::InitDeviceNameWhenLogout()
 {
     LOGI("In");
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    InitDeviceName(userId);
+    if (DependsIsReady()) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        InitDeviceName(userId);
+    }
     return DM_OK;
 }
 
 int32_t DeviceNameManager::InitDeviceNameWhenLogin()
 {
     LOGI("In");
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    InitDeviceName(userId);
+    if (DependsIsReady()) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        InitDeviceName(userId);
+    }
     return DM_OK;
 }
 
 int32_t DeviceNameManager::InitDeviceNameWhenNickChange()
 {
     LOGI("In");
-    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    InitDeviceName(userId);
+    if (DependsIsReady()) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        InitDeviceName(userId);
+    }
     return DM_OK;
 }
 
 int32_t DeviceNameManager::InitDeviceNameWhenNameChange(int32_t userId)
 {
     LOGI("In");
-    InitDeviceName(userId);
+    if (DependsIsReady()) {
+        InitDeviceName(userId);
+    }
     return DM_OK;
 }
 
@@ -208,6 +250,10 @@ void DeviceNameManager::UnRegisterDeviceNameChangeMonitor(int32_t userId)
 void DeviceNameManager::InitDeviceName(int32_t userId)
 {
     LOGI("In userId:%{public}d", userId);
+    if (userId == -1) {
+        LOGI("userId:%{public}d is invalid", userId);
+        return;
+    }
     std::string userDefinedDeviceName = "";
     GetUserDefinedDeviceName(userId, userDefinedDeviceName);
     if (!userDefinedDeviceName.empty()) {
