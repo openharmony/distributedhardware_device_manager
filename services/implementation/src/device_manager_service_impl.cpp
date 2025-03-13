@@ -229,12 +229,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     ProcessInfo processInfo;
     processInfo.pkgName = std::string(DM_PKG_NAME);
     processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
-    if (bindType == INVALIED_TYPE && isCredentialType_.load()) {
-        PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
-        devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
-        isCredentialType_.store(false);
-        softbusConnector_->SetProcessInfo(processInfo);
-    } else if (bindType == IDENTICAL_ACCOUNT_TYPE) {
+    if (bindType == IDENTICAL_ACCOUNT_TYPE) {
         devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
         softbusConnector_->SetProcessInfo(processInfo);
     } else if (bindType == DEVICE_PEER_TO_PEER_TYPE) {
