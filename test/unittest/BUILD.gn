@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
-module_out_path = "device_manager/component_loader_test"
+module_out_path = "device_manager/device_manager"
 
 group("unittest") {
   testonly = true
