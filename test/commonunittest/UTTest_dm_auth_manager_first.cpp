@@ -45,6 +45,7 @@ namespace {
     constexpr int32_t PINCODE = 100001;
     constexpr int32_t MIN_PIN_CODE_VALUE = 10;
     constexpr int32_t MAX_PIN_CODE_VALUE = 9999999;
+    constexpr int32_t INVALID_AUTHBOX_TYPE = 100;
 }
 
 bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
@@ -2160,6 +2161,54 @@ HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_003, testing::ext::TestSize.Lev
     jsonObject[PARAM_KEY_HML_ENABLE_160M] = true;
     jsonObject[PARAM_KEY_HML_ACTIONID] = 0;
     authManager_->ParseHmlInfoInJsonObject(jsonObject);
+}
+
+HWTEST_F(DmAuthManagerTest, ParseHmlInfoInJsonObject_001, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = CONN_SESSION_TYPE_HML;
+    jsonObject[PARAM_KEY_HML_ACTIONID] = 0;
+    authManager_->ParseHmlInfoInJsonObject(jsonObject);
+    ASSERT_EQ(authManager_->authRequestContext_->hmlActionId, 0);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
+    authManager_->ParseHmlInfoInJsonObject(jsonObject);
+    ASSERT_EQ(authManager_->authRequestContext_->hmlActionId, 0);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
+    authManager_->ParseHmlInfoInJsonObject(jsonObject);
+    ASSERT_EQ(authManager_->authRequestContext_->hmlActionId, 1);
+
+    authManager_->authRequestContext_->hmlActionId = 0;
+    jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = CONN_SESSION_TYPE_BLE;
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
+    authManager_->ParseHmlInfoInJsonObject(jsonObject);
+    ASSERT_EQ(authManager_->authRequestContext_->hmlActionId, 0);
+}
+
+HWTEST_F(DmAuthManagerTest, CanUsePincodeFromDp_001, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::LocalServiceInfo info;
+    info.SetAuthBoxType((int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM);
+    info.SetAuthType((int32_t)DMLocalServiceInfoAuthType::TRUST_ONETIME);
+    info.SetPinExchangeType((int32_t)DMLocalServiceInfoPinExchangeType::FROMDP);
+    info.SetPinCode("******");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_FALSE(authManager_->CanUsePincodeFromDp());
+
+    info.SetPinCode("123456");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_TRUE(authManager_->CanUsePincodeFromDp());
+
+    info.SetAuthBoxType(INVALID_AUTHBOX_TYPE);
+    info.SetPinCode("123456");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_TRUE(authManager_->CanUsePincodeFromDp());
+
+    info.SetPinExchangeType((int32_t)DMLocalServiceInfoPinExchangeType::ULTRASOUND);
+    info.SetPinCode("123456");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_FALSE(authManager_->CanUsePincodeFromDp());
 }
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize.Level0)
