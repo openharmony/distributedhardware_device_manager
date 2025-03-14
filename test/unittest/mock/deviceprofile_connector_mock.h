@@ -98,7 +98,7 @@ public:
     MOCK_METHOD(int32_t, PutLocalServiceInfo, (const DistributedDeviceProfile::LocalServiceInfo &));
     MOCK_METHOD(int32_t, DeleteLocalServiceInfo, (const std::string &, int32_t));
     MOCK_METHOD(int32_t, UpdateLocalServiceInfo, (const DistributedDeviceProfile::LocalServiceInfo &));
-    MOCK_METHOD(bool, CheckAclStatusAndForegroundNotMatch, 
+    MOCK_METHOD(bool, CheckAclStatusAndForegroundNotMatch,
         (const std::string &, (const std::vector<int32_t> &), (const std::vector<int32_t> &)));
     MOCK_METHOD((std::map<std::string, int32_t>), GetDeviceIdAndBindLevel,
         ((std::vector<int32_t>), const std::string &));
