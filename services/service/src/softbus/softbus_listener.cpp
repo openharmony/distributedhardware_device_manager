@@ -483,7 +483,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
             }
         }
     }
-    LOGI("DevId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
+    LOGD("DevId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
         "isOnline=%{public}d, capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
         GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range,
         device->isOnline, device->capabilityBitmap[0]);
