@@ -541,13 +541,14 @@ HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSiz
         .deviceName = "deviceName",
         .deviceTypeId = 1
     };
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    std::string ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
+    EXPECT_EQ(ret.empty(), true);
 
-    NodeBasicInfo *basicInfo = &nodeBasicInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
-        .WillOnce(WithArgs<1, 2>(Invoke([&basicInfo, &deviceCount](NodeBasicInfo **info, int32_t *infoNum) {
+        .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
             infoNum = &deviceCount;
-            info = &basicInfo;
             return DM_OK;
         })));
     EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
@@ -555,7 +556,7 @@ HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSiz
             memcpy_s(info, (deviceId.length() + 1), deviceId.c_str(), deviceId.length());
             return DM_OK;
         })));
-    std::string ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
+    ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
     EXPECT_EQ(ret.empty(), true);
 
     EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(DM_OK));
@@ -638,17 +639,9 @@ HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
     bool ret = softbusConnector->CheckIsOnline(targetId);
     EXPECT_FALSE(ret);
 
-    NodeBasicInfo nodeBasicInfo = {
-        .networkId = "network*1",
-        .deviceName = "deviceName",
-        .deviceTypeId = 1
-    };
-
-    NodeBasicInfo *basicInfo = &nodeBasicInfo;
     EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
-        .WillOnce(WithArgs<1, 2>(Invoke([&basicInfo, &deviceCount](NodeBasicInfo **info, int32_t *infoNum) {
+        .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
             infoNum = &deviceCount;
-            info = &basicInfo;
             return DM_OK;
         })));
     EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))

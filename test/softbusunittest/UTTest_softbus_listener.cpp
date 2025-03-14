@@ -1373,6 +1373,9 @@ HWTEST_F(SoftbusListenerTest, GetAttrFromCustomData_001, testing::ext::TestSize.
     };
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(DM_OK));
     softbusListener->UpdateDeviceName(&nodeBasicInfo);
+
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    softbusListener->UpdateDeviceName(&nodeBasicInfo);
 }
 } // namespace
 } // namespace DistributedHardware
