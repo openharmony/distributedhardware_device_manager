@@ -30,7 +30,7 @@
 #include "dm_error_message.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #define DM_NAPI_BUF_LENGTH (256)
 #define DM_NAPI_CREDENTIAL_BUF_LENGTH (64000)
 #define DM_NAPI_DESCRIPTION_BUF_LENGTH (16384)
@@ -330,10 +330,11 @@ public:
     static void JsToDmExtra(const napi_env &env, const napi_value &object, std::string &extra, int32_t &authType);
     static void JsToDmAuthInfo(const napi_env &env, const napi_value &object, std::string &extra);
     static void JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                               nlohmann::json &jsonObj);
+                               OHOS::DistributedHardware::JsonObject &jsonObj);
     static void JsToDmTokenInfo(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                nlohmann::json &jsonObj);
-    static void JsToDmAuthExtra(const napi_env &env, const napi_value &param, nlohmann::json &jsonObj);
+                                OHOS::DistributedHardware::JsonObject &jsonObj);
+    static void JsToDmAuthExtra(const napi_env &env, const napi_value &param,
+                                OHOS::DistributedHardware::JsonObject &jsonObj);
     static void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
     static void DmDeviceInfotoJsDeviceInfo(const napi_env &env,
                                            const OHOS::DistributedHardware::DmDeviceInfo &vecDevInfo,

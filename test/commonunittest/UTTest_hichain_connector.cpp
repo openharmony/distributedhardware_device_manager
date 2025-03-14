@@ -112,7 +112,7 @@ HWTEST_F(HichainConnectorTest, CreateGroup_003, testing::ext::TestSize.Level0)
     int64_t requestId = 159357;
     int32_t authType = 1;
     std::string userId = "userIdTest";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     hiChainConnector->deviceGroupManager_ = nullptr;
     int32_t ret = hiChainConnector->CreateGroup(requestId, authType, userId, jsonOutObj);
@@ -217,13 +217,13 @@ HWTEST_F(HichainConnectorTest, from_json_001, testing::ext::TestSize.Level0)
     groupInfo.groupOwner = "lllll";
     groupInfo.groupType = 5;
     groupInfo.groupVisibility = 5;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[FIELD_GROUP_NAME] = groupInfo.groupName;
     jsonObject[FIELD_GROUP_ID] = groupInfo.groupId;
     jsonObject[FIELD_GROUP_OWNER] = groupInfo.groupOwner;
     jsonObject[FIELD_GROUP_TYPE] = groupInfo.groupType;
     jsonObject[FIELD_GROUP_VISIBILITY] = groupInfo.groupVisibility;
-    from_json(jsonObject, groupInfo);
+    FromJson(jsonObject, groupInfo);
     EXPECT_EQ(groupInfo.groupName, "aaaa");
     EXPECT_EQ(groupInfo.groupId, "345678");
     EXPECT_EQ(groupInfo.groupOwner, "lllll");
@@ -242,23 +242,23 @@ HWTEST_F(HichainConnectorTest, from_json_002, testing::ext::TestSize.Level0)
     GroupInfo groupInfo;
     groupInfo.userId = "test";
     groupInfo.groupName = "test";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[FIELD_GROUP_NAME] = 0;
     jsonObject[FIELD_GROUP_ID] = 0;
     jsonObject[FIELD_GROUP_OWNER] = 0;
     jsonObject[FIELD_GROUP_TYPE] = "test";
     jsonObject[FIELD_GROUP_VISIBILITY] = "test";
     jsonObject[FIELD_USER_ID] = "userId";
-    from_json(jsonObject, groupInfo);
+    FromJson(jsonObject, groupInfo);
     EXPECT_EQ(groupInfo.userId, "userId");
 
     jsonObject[FIELD_USER_ID] = "0";
-    jsonObject.erase(FIELD_GROUP_NAME);
-    jsonObject.erase(FIELD_GROUP_ID);
-    jsonObject.erase(FIELD_GROUP_OWNER);
-    jsonObject.erase(FIELD_GROUP_TYPE);
-    jsonObject.erase(FIELD_GROUP_VISIBILITY);
-    from_json(jsonObject, groupInfo);
+    jsonObject.Erase(FIELD_GROUP_NAME);
+    jsonObject.Erase(FIELD_GROUP_ID);
+    jsonObject.Erase(FIELD_GROUP_OWNER);
+    jsonObject.Erase(FIELD_GROUP_TYPE);
+    jsonObject.Erase(FIELD_GROUP_VISIBILITY);
+    FromJson(jsonObject, groupInfo);
     EXPECT_EQ(groupInfo.groupName, "test");
 }
 
@@ -851,7 +851,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredential_001, testing::ext::TestSize
 {
     int32_t groupType = 1;
     std::string userId;
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     std::string params = "paramsTest";
     int32_t osAccountUserId = 0;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -869,7 +869,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredential_002, testing::ext::TestSize
 {
     int32_t groupType = 1;
     std::string userId = "1321231";
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     std::string params = "paramsTest";
     int32_t osAccountUserId = 0;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -887,7 +887,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredential_003, testing::ext::TestSize
 {
     int32_t groupType = 1;
     std::string userId = "1321231";
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     jsonDeviceList[FIELD_DEVICE_LIST] = "15264646";
     std::string params = "paramsTest";
     int32_t osAccountUserId = 0;
@@ -906,7 +906,7 @@ HWTEST_F(HichainConnectorTest, addMultiMembers_001, testing::ext::TestSize.Level
 {
     int32_t groupType = 1;
     std::string userId = "";
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     hiChainConnector->deviceGroupManager_ = nullptr;
     int32_t ret = hiChainConnector->addMultiMembers(groupType, userId, jsonDeviceList);
@@ -923,7 +923,7 @@ HWTEST_F(HichainConnectorTest, addMultiMembers_002, testing::ext::TestSize.Level
 {
     int32_t groupType = 1;
     std::string userId = "userIdTest";
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     EXPECT_NE(hiChainConnector->deviceGroupManager_, nullptr);
     int32_t ret = hiChainConnector->addMultiMembers(groupType, userId, jsonDeviceList);
@@ -940,7 +940,7 @@ HWTEST_F(HichainConnectorTest, deleteMultiMembers_001, testing::ext::TestSize.Le
 {
     int32_t groupType = 1;
     std::string userId = "userIdTest";
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     hiChainConnector->deviceGroupManager_ = nullptr;
     int32_t ret = hiChainConnector->deleteMultiMembers(groupType, userId, jsonDeviceList);
@@ -957,7 +957,7 @@ HWTEST_F(HichainConnectorTest, deleteMultiMembers_002, testing::ext::TestSize.Le
 {
     int32_t groupType = 1;
     std::string userId = "";
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     EXPECT_NE(hiChainConnector->deviceGroupManager_, nullptr);
     int32_t ret = hiChainConnector->deleteMultiMembers(groupType, userId, jsonDeviceList);
@@ -1104,7 +1104,7 @@ HWTEST_F(HichainConnectorTest, GetGroupId_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(HichainConnectorTest, GetJsonStr_001, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::string key;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     auto ret = hiChainConnector->GetJsonStr(jsonObj, key);
@@ -1120,7 +1120,7 @@ HWTEST_F(HichainConnectorTest, GetJsonStr_001, testing::ext::TestSize.Level0)
 HWTEST_F(HichainConnectorTest, GetJsonStr_002, testing::ext::TestSize.Level0)
 {
     std::string key = "key";
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[key] = "232513";
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     auto ret = hiChainConnector->GetJsonStr(jsonObj, key);
@@ -1135,7 +1135,7 @@ HWTEST_F(HichainConnectorTest, GetJsonStr_002, testing::ext::TestSize.Level0)
  */
 HWTEST_F(HichainConnectorTest, GetJsonInt_001, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::string key;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t ret = hiChainConnector->GetJsonInt(jsonObj, key);
@@ -1151,7 +1151,7 @@ HWTEST_F(HichainConnectorTest, GetJsonInt_001, testing::ext::TestSize.Level0)
 HWTEST_F(HichainConnectorTest, GetJsonInt_002, testing::ext::TestSize.Level0)
 {
     std::string key = "12";
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[key] = 232513;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t ret = hiChainConnector->GetJsonInt(jsonObj, key);
@@ -1199,7 +1199,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_001, testing::ext::TestS
  */
 HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::string credentialInfo = SafetyDump(jsonObj);
     std::string params;
     std::string groupOwner;
@@ -1216,7 +1216,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_002, testing::ext::TestS
  */
 HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_003, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["authType"] = 1;
     jsonObj[FIELD_USER_ID] = "156103";
     std::string credentialInfo = SafetyDump(jsonObj);
@@ -1235,7 +1235,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_003, testing::ext::TestS
  */
 HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_004, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["authType"] = 4;
     jsonObj[FIELD_USER_ID] = "156103";
     std::string credentialInfo = SafetyDump(jsonObj);
@@ -1269,7 +1269,7 @@ HWTEST_F(HichainConnectorTest, addMultiMembersExt_001, testing::ext::TestSize.Le
  */
 HWTEST_F(HichainConnectorTest, addMultiMembersExt_002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::string credentialInfo = SafetyDump(jsonObj);
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t ret = hiChainConnector->addMultiMembersExt(credentialInfo);
@@ -1313,7 +1313,7 @@ HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_001, testing::ext::TestSize
  */
 HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::string jsonStr = SafetyDump(jsonObj);
     std::vector<std::string> udidList;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();

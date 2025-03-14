@@ -20,7 +20,7 @@
 #include <string>
 
 #include "device_auth.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "dm_single_instance.h"
 #include "softbus_connector.h"
 

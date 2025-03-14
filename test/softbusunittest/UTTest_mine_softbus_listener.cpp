@@ -25,7 +25,7 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "parameter.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "system_ability_definition.h"
 #include "softbus_error_code.h"
 
@@ -64,7 +64,7 @@ HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.
 
 HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = 4;
     string pkgName;
     string searchJson = SafetyDump(jsonObj);
@@ -142,7 +142,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_002, testing::ext::TestSize.Le
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(1);
     string pkgName;
     string searchJson = SafetyDump(jsonObj);
@@ -155,7 +155,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_003, testing::ext::TestSize.Le
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     string pkgName;
     string searchJson = SafetyDump(jsonObj);
@@ -168,7 +168,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_004, testing::ext::TestSize.Le
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(3);
     string pkgName;
     string searchJson = SafetyDump(jsonObj);
@@ -181,7 +181,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_005, testing::ext::TestSize.Le
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(4);
     string pkgName;
     string searchJson = SafetyDump(jsonObj);
@@ -194,7 +194,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_001, testing::ext::TestSi
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     string pkgName;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -206,7 +206,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_002, testing::ext::TestSi
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     string pkgName = "1234656";
@@ -219,7 +219,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_001, testing::ext::Test
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     string pkgName;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -231,7 +231,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_002, testing::ext::Test
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     string pkgName = "1231301230213";
@@ -244,7 +244,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_003, testing::ext::Test
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     jsonObj["filterOptions"] = 1;
@@ -259,7 +259,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_004, testing::ext::Test
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     std::vector<int> info;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     jsonObj["filterOptions"] = info;
@@ -276,7 +276,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_005, testing::ext::Test
     int parameter = 6;
     std::vector<int> info;
     info.push_back(parameter);
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     jsonObj["filterOptions"] = info;
@@ -290,7 +290,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_001, testing::ext::Tes
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     string pkgName;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -302,7 +302,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_002, testing::ext::Tes
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     string pkgName = "1231301230213";
@@ -315,7 +315,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_003, testing::ext::Tes
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     jsonObj["filterOptions"] = 1;
@@ -330,7 +330,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_004, testing::ext::Tes
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     std::vector<int> info;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     jsonObj["filterOptions"] = info;
@@ -347,7 +347,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_005, testing::ext::Tes
     int parameter = 6;
     std::vector<int> info;
     info.push_back(parameter);
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     jsonObj["filterOptions"] = info;
@@ -359,7 +359,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_005, testing::ext::Tes
 
 HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_001, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     string pkgName;
     BroadcastHead broadcastHead;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -370,7 +370,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_001, testing::ext::TestSize.L
 HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_002, testing::ext::TestSize.Level0)
 {
     BroadcastHead broadcastHead;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     string pkgName;
@@ -382,7 +382,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_002, testing::ext::TestSize.L
 HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_003, testing::ext::TestSize.Level0)
 {
     BroadcastHead broadcastHead;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["findDeviceMode"] = static_cast<char>(2);
     jsonObj["tructOptions"] = true;
     string pkgName = "1231301230213";
@@ -576,7 +576,7 @@ HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_004, testing::ext::TestSize.Leve
 HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_001, testing::ext::TestSize.Level0)
 {
     BroadcastHead broadcastHead;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->SetBroadcastTrustOptions(jsonObj, broadcastHead);
     EXPECT_EQ(ret, DM_OK);
@@ -585,7 +585,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_001, testing::ext::Te
 HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_002, testing::ext::TestSize.Level0)
 {
     BroadcastHead broadcastHead;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["tructOptions"] = "tructOptions";
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->SetBroadcastTrustOptions(jsonObj, broadcastHead);
@@ -595,7 +595,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_002, testing::ext::Te
 HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_003, testing::ext::TestSize.Level0)
 {
     BroadcastHead broadcastHead;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["tructOptions"] = true;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->SetBroadcastTrustOptions(jsonObj, broadcastHead);
@@ -605,7 +605,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_003, testing::ext::Te
 HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_004, testing::ext::TestSize.Level0)
 {
     BroadcastHead broadcastHead;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj["tructOptions"] = false;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->SetBroadcastTrustOptions(jsonObj, broadcastHead);

@@ -25,7 +25,7 @@
 #include "dm_log.h"
 #include "dm_radar_helper.h"
 #include "multiple_user_connector.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "softbus_error_code.h"
 
 static bool g_checkIsOnlineReturnBoolValue = false;
@@ -132,7 +132,7 @@ void DmAuthManagerTest::TearDownTestCase() {}
 
 HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     int32_t sessionId = 0;
     authManager_->remoteDeviceId_ = "ProcRespNegotiate001";
@@ -178,7 +178,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
     int32_t sessionId = 0;
     authManager_->authResponseState_->context_ = std::make_shared<DmAuthResponseContext>();
@@ -191,7 +191,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level0)
     authManager_->importAuthCode_ = "test";
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->authResponseState_->context_->cryptoSupport = true;
-    authManager_->authResponseState_->context_->cryptoName = jsonObject[TAG_CRYPTO_NAME];
+    authManager_->authResponseState_->context_->cryptoName = jsonObject[TAG_CRYPTO_NAME].Get<std::string>();
     authManager_->ProcRespNegotiate(sessionId);
     EXPECT_FALSE(authManager_->authResponseContext_->isOnline);
 
@@ -205,8 +205,8 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level0)
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->authResponseState_->context_->cryptoSupport = true;
-    authManager_->authResponseState_->context_->cryptoName = jsonObject[TAG_CRYPTO_NAME];
-    authManager_->authResponseState_->context_->cryptoVer = jsonObject[TAG_CRYPTO_VERSION];
+    authManager_->authResponseState_->context_->cryptoName = jsonObject[TAG_CRYPTO_NAME].Get<std::string>();
+    authManager_->authResponseState_->context_->cryptoVer = jsonObject[TAG_CRYPTO_VERSION].Get<std::string>();
     authManager_->ProcRespNegotiate(sessionId);
     EXPECT_FALSE(authManager_->authResponseContext_->isOnline);
 }

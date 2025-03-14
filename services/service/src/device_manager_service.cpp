@@ -2272,8 +2272,8 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
         LOGE("DeviceManagerService::HandleDeviceNotTrust msg is empty.");
         return;
     }
-    nlohmann::json msgJsonObj = nlohmann::json::parse(msg, nullptr, false);
-    if (msgJsonObj.is_discarded()) {
+    JsonObject msgJsonObj(msg);
+    if (msgJsonObj.IsDiscarded()) {
         LOGE("HandleDeviceNotTrust msg prase error.");
         return;
     }
@@ -2281,7 +2281,7 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
         LOGE("HandleDeviceNotTrust msg not contain networkId.");
         return;
     }
-    std::string networkId = msgJsonObj[NETWORKID].get<std::string>();
+    std::string networkId = msgJsonObj[NETWORKID].Get<std::string>();
     std::string udid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(networkId.c_str(), udid);
     LOGI("NetworkId: %{public}s, udid: %{public}s.",
@@ -2526,8 +2526,8 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
 int32_t DeviceManagerService::ParseCheckSumMsg(const std::string &msg, std::string &networkId, uint32_t &discoveryType,
     bool &isChange)
 {
-    nlohmann::json msgJsonObj = nlohmann::json::parse(msg, nullptr, false);
-    if (msgJsonObj.is_discarded()) {
+    JsonObject msgJsonObj(msg);
+    if (msgJsonObj.IsDiscarded()) {
         LOGE("msg prase error.");
         return ERR_DM_FAILED;
     }
@@ -2543,9 +2543,9 @@ int32_t DeviceManagerService::ParseCheckSumMsg(const std::string &msg, std::stri
         LOGE("msg not contain ischange.");
         return ERR_DM_FAILED;
     }
-    networkId = msgJsonObj[USERID_CHECKSUM_NETWORKID_KEY].get<std::string>();
-    discoveryType = msgJsonObj[USERID_CHECKSUM_DISCOVER_TYPE_KEY].get<uint32_t>();
-    isChange = msgJsonObj[USERID_CHECKSUM_ISCHANGE_KEY].get<bool>();
+    networkId = msgJsonObj[USERID_CHECKSUM_NETWORKID_KEY].Get<std::string>();
+    discoveryType = msgJsonObj[USERID_CHECKSUM_DISCOVER_TYPE_KEY].Get<uint32_t>();
+    isChange = msgJsonObj[USERID_CHECKSUM_ISCHANGE_KEY].Get<bool>();
     return DM_OK;
 }
 

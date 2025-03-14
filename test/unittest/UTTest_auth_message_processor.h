@@ -19,7 +19,7 @@
 #include <memory>
 #include <vector>
 #include <gtest/gtest.h>
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "auth_message_processor.h"
 #include "crypto_mgr_mock.h"
 

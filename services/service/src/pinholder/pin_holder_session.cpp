@@ -112,8 +112,8 @@ void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned
 
 int32_t PinHolderSession::SendData(int32_t sessionId, const std::string &message)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(message);
+    if (jsonObject.IsDiscarded()) {
         LOGE("extrasJson error, message: %{public}s.", GetAnonyString(message).c_str());
         return ERR_DM_FAILED;
     }
@@ -121,7 +121,7 @@ int32_t PinHolderSession::SendData(int32_t sessionId, const std::string &message
         LOGE("SoftbusSession::SendData err json string.");
         return ERR_DM_FAILED;
     }
-    int32_t msgType = jsonObject[TAG_MSG_TYPE].get<int32_t>();
+    int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
     LOGI("start, msgType: %{public}d.", msgType);
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
     if (ret != DM_OK) {

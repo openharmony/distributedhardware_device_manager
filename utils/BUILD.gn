@@ -36,7 +36,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${innerkits_path}/native_cpp/include",
         "${interfaces_path}/c/ipc/include",
-        "//third_party/json/include",
+        "//third_party/cJSON",
         "//third_party/bounds_checking_function/include",
       ]
 
@@ -47,6 +47,7 @@ if (defined(ohos_lite)) {
         "${common_path}/src/dm_anonymous.cpp",
         "${common_path}/src/dm_error_message.cpp",
         "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
+        "${common_path}/src/json_object.cpp",
         "src/appInfo/lite/app_manager.cpp",
         "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
@@ -107,6 +108,7 @@ if (defined(ohos_lite)) {
 
     sources = [
       "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/json_object.cpp",
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
@@ -147,7 +149,7 @@ if (defined(ohos_lite)) {
 
     public_external_deps = [
       "bundle_framework:appexecfwk_core",
-      "json:nlohmann_json_static",
+      "cJSON:cjson",
       "kv_store:distributeddata_inner",
     ]
 

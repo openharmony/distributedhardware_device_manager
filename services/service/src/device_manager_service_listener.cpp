@@ -173,14 +173,14 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
         LOGE("extraData is empty, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
         return ERR_DM_FAILED;
     }
-    nlohmann::json extraJson = nlohmann::json::parse(extraData, nullptr, false);
-    if (extraJson.is_discarded()) {
+    JsonObject extraJson(extraData);
+    if (extraJson.IsDiscarded()) {
         LOGE("parse extraData fail, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
         return ERR_DM_FAILED;
     }
     extraJson[PARAM_KEY_UDID] = udid;
     extraJson[PARAM_KEY_UUID] = uuid;
-    dmDeviceInfo.extraData = to_string(extraJson);
+    dmDeviceInfo.extraData = ToString(extraJson);
     return DM_OK;
 }
 

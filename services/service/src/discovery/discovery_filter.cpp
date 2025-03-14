@@ -14,7 +14,7 @@
  */
 
 #include "discovery_filter.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -32,37 +32,42 @@ enum class DmDiscoveryDeviceFilter : int32_t {
 
 int32_t DeviceFilterOption::ParseFilterJson(const std::string &str)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(str, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(str);
+    if (jsonObject.IsDiscarded()) {
         LOGE("FilterOptions parse error.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!jsonObject.contains(FILTERS_KEY) || !jsonObject[FILTERS_KEY].is_array() || jsonObject[FILTERS_KEY].empty()) {
+    if (!jsonObject.Contains(FILTERS_KEY) || !jsonObject[FILTERS_KEY].IsArray()) {
         LOGE("Filters invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (jsonObject.contains(FILTER_OP_KEY) && !jsonObject[FILTER_OP_KEY].is_string()) {
+    std::vector<JsonItemObject> children = jsonObject[FILTERS_KEY].Items();
+    if (children.empty()) {
+        LOGE("Filters invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (jsonObject.Contains(FILTER_OP_KEY) && !jsonObject[FILTER_OP_KEY].IsString()) {
         LOGE("Filters_op invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!jsonObject.contains(FILTER_OP_KEY)) {
+    if (!jsonObject.Contains(FILTER_OP_KEY)) {
         filterOp_ = FILTERS_TYPE_OR; // filterOp optional, "OR" default
     } else {
-        jsonObject[FILTER_OP_KEY].get_to(filterOp_);
+        jsonObject[FILTER_OP_KEY].GetTo(filterOp_);
     }
 
-    for (const auto &object : jsonObject[FILTERS_KEY]) {
-        if (!object.contains("type") || !object["type"].is_string()) {
+    for (const auto &object : children) {
+        if (!object.Contains("type") || !object["type"].IsString()) {
             LOGE("Filters type invalid");
             return ERR_DM_INPUT_PARA_INVALID;
         }
-        if (!object.contains("value") || !object["value"].is_number_integer()) {
+        if (!object.Contains("value") || !object["value"].IsNumberInteger()) {
             LOGE("Filters value invalid");
             return ERR_DM_INPUT_PARA_INVALID;
         }
         DeviceFilters deviceFilters;
-        deviceFilters.type = object["type"];
-        deviceFilters.value = object["value"];
+        deviceFilters.type = object["type"].Get<std::string>();
+        deviceFilters.value = object["value"].Get<int32_t>();
         filters_.push_back(deviceFilters);
     }
     return DM_OK;
@@ -70,36 +75,36 @@ int32_t DeviceFilterOption::ParseFilterJson(const std::string &str)
 
 int32_t DeviceFilterOption::ParseFilterOptionJson(const std::string &str)
 {
-    nlohmann::json object = nlohmann::json::parse(str, nullptr, false);
-    if (object.is_discarded()) {
+    JsonObject object(str);
+    if (object.IsDiscarded()) {
         LOGE("ParseFilterOptionJson parse error.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     filterOp_ = FILTERS_TYPE_AND;
     DeviceFilters deviceFilters;
-    if (object.contains("credible") && object["credible"].is_number_integer()) {
+    if (object.Contains("credible") && object["credible"].IsNumberInteger()) {
         deviceFilters.type = "credible";
-        deviceFilters.value = object["credible"];
+        deviceFilters.value = object["credible"].Get<int32_t>();
         filters_.push_back(deviceFilters);
     }
-    if (object.contains("range") && object["range"].is_number_integer()) {
+    if (object.Contains("range") && object["range"].IsNumberInteger()) {
         deviceFilters.type = "range";
-        deviceFilters.value = object["range"];
+        deviceFilters.value = object["range"].Get<int32_t>();
         filters_.push_back(deviceFilters);
     }
-    if (object.contains("isTrusted") && object["isTrusted"].is_number_integer()) {
+    if (object.Contains("isTrusted") && object["isTrusted"].IsNumberInteger()) {
         deviceFilters.type = "isTrusted";
-        deviceFilters.value = object["isTrusted"];
+        deviceFilters.value = object["isTrusted"].Get<int32_t>();
         filters_.push_back(deviceFilters);
     }
-    if (object.contains("authForm") && object["authForm"].is_number_integer()) {
+    if (object.Contains("authForm") && object["authForm"].IsNumberInteger()) {
         deviceFilters.type = "authForm";
-        deviceFilters.value = object["authForm"];
+        deviceFilters.value = object["authForm"].Get<int32_t>();
         filters_.push_back(deviceFilters);
     }
-    if (object.contains("deviceType") && object["deviceType"].is_number_integer()) {
+    if (object.Contains("deviceType") && object["deviceType"].IsNumberInteger()) {
         deviceFilters.type = "deviceType";
-        deviceFilters.value = object["deviceType"];
+        deviceFilters.value = object["deviceType"].Get<int32_t>();
         filters_.push_back(deviceFilters);
     }
     return DM_OK;

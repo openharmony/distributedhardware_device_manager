@@ -293,7 +293,7 @@ if (defined(ohos_lite)) {
       defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
     }
 
-    public_external_deps = [ "json:nlohmann_json_static" ]
+    public_external_deps = [ "cJSON:cjson" ]
 
     subsystem_name = "distributedhardware"
 

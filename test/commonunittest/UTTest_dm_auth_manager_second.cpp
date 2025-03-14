@@ -23,7 +23,7 @@
 #include "dm_crypto.h"
 #include "dm_dialog_manager.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "softbus_error_code.h"
 
 using namespace testing;
@@ -116,7 +116,7 @@ HWTEST_F(DmAuthManagerTest, OnDataReceived_003, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, OnDataReceived_007, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = 200;
     std::string message = SafetyDump(jsonObject);
     authManager_->OnDataReceived(sessionId, message);
@@ -1332,7 +1332,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_001, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["targetPkgName"] = 1234;
     std::string extra = SafetyDump(jsonObject);
     int32_t authType = 5;
@@ -1344,7 +1344,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_002, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_003, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = 1234;
     std::string extra = SafetyDump(jsonObject);
@@ -1357,7 +1357,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_003, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_004, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = 1234;
@@ -1371,7 +1371,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_004, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_005, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = "1234";
@@ -1386,7 +1386,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_005, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_006, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = "1234";
@@ -1402,7 +1402,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_006, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_007, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = "1234";
@@ -1419,7 +1419,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_007, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_008, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = "1234";
@@ -1436,7 +1436,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_008, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_009, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["DM_CLOSE_SESSION_DELAY_SECONDS"] = 1234;
     std::string extra = SafetyDump(jsonObject);
     int32_t authType = 5;
@@ -1448,7 +1448,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_009, testing::ext::TestSize.Level0)
 
 HWTEST_F(DmAuthManagerTest, GetAuthParam_010, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["DM_CLOSE_SESSION_DELAY_SECONDS"] = "1234";
     std::string extra = SafetyDump(jsonObject);
     int32_t authType = 5;
@@ -1542,7 +1542,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _)).WillOnce(Return(true));
     authManager_->GetAuthRequestContext();
 
-    nlohmann::json jsonPeerGroupIdObj;
+    JsonObject jsonPeerGroupIdObj;
     jsonPeerGroupIdObj["groupId"] = "123456";
     authManager_->authResponseContext_->accountGroupIdHash = SafetyDump(jsonPeerGroupIdObj);
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
@@ -1569,10 +1569,10 @@ HWTEST_F(DmAuthManagerTest, GetAccountGroupIdHash_201, testing::ext::TestSize.Le
     groupInfo.groupName = "group101";
     groupInfo.groupType = 1;
     groupList.push_back(groupInfo);
-    nlohmann::json jsonPeerGroupIdObj;
+    JsonObject jsonPeerGroupIdObj;
     jsonPeerGroupIdObj["groupId"] = "123456";
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.dump();
+    authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.Dump();
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(groupList), Return(true)));

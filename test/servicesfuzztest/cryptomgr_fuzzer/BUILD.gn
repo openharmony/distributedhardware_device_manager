@@ -76,6 +76,7 @@ ohos_fuzztest("CryptoMgrFuzzTest") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "hilog:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",

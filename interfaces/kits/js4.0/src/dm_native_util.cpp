@@ -350,7 +350,7 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     int32_t bindLevel = 0;
     JsObjectToInt(env, object, "bindLevel", bindLevel);
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[AUTH_TYPE] = bindType;
     jsonObj[APP_OPERATION] = std::string(appOperation);
     jsonObj[CUSTOM_DESCRIPTION] = std::string(customDescription);
@@ -399,7 +399,7 @@ bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &dis
 
 void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     int32_t availableStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
     JsObjectToInt(env, object, "availableStatus", availableStatus);
     if (availableStatus != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
@@ -443,44 +443,43 @@ void JsToDiscoveryParam(const napi_env &env, const napi_value &object,
     JsObjectToString(env, object, "DISC_CAPABILITY", capability, sizeof(capability));
     discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_DISC_CAPABILITY, capability));
 }
-
-void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap)
+void InsertMapParames(JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap)
 {
     LOGI("Insert map parames start");
     if (IsInt32(bindParamObj, AUTH_TYPE)) {
-        int32_t authType = bindParamObj[AUTH_TYPE].get<int32_t>();
+        int32_t authType = bindParamObj[AUTH_TYPE].Get<int32_t>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
     }
     if (IsString(bindParamObj, APP_OPERATION)) {
-        std::string appOperation = bindParamObj[APP_OPERATION].get<std::string>();
+        std::string appOperation = bindParamObj[APP_OPERATION].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_APP_OPER, appOperation));
     }
     if (IsString(bindParamObj, CUSTOM_DESCRIPTION)) {
-        std::string appDescription = bindParamObj[CUSTOM_DESCRIPTION].get<std::string>();
+        std::string appDescription = bindParamObj[CUSTOM_DESCRIPTION].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_APP_DESC, appDescription));
     }
     if (IsString(bindParamObj, PARAM_KEY_TARGET_PKG_NAME)) {
-        std::string targetPkgName = bindParamObj[PARAM_KEY_TARGET_PKG_NAME].get<std::string>();
+        std::string targetPkgName = bindParamObj[PARAM_KEY_TARGET_PKG_NAME].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_TARGET_PKG_NAME, targetPkgName));
     }
     if (IsString(bindParamObj, PARAM_KEY_META_TYPE)) {
-        std::string metaType = bindParamObj[PARAM_KEY_META_TYPE].get<std::string>();
+        std::string metaType = bindParamObj[PARAM_KEY_META_TYPE].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_META_TYPE, metaType));
     }
     if (IsString(bindParamObj, PARAM_KEY_PIN_CODE)) {
-        std::string pinCode = bindParamObj[PARAM_KEY_PIN_CODE].get<std::string>();
+        std::string pinCode = bindParamObj[PARAM_KEY_PIN_CODE].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_PIN_CODE, pinCode));
     }
     if (IsString(bindParamObj, PARAM_KEY_AUTH_TOKEN)) {
-        std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].get<std::string>();
+        std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TOKEN, authToken));
     }
     if (IsString(bindParamObj, PARAM_KEY_IS_SHOW_TRUST_DIALOG)) {
-        std::string isShowTrustDialog = bindParamObj[PARAM_KEY_IS_SHOW_TRUST_DIALOG].get<std::string>();
+        std::string isShowTrustDialog = bindParamObj[PARAM_KEY_IS_SHOW_TRUST_DIALOG].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_IS_SHOW_TRUST_DIALOG, isShowTrustDialog));
     }
     if (IsInt32(bindParamObj, BIND_LEVEL)) {
-        int32_t bindLevel = bindParamObj[BIND_LEVEL].get<std::int32_t>();
+        int32_t bindLevel = bindParamObj[BIND_LEVEL].Get<std::int32_t>();
         bindParamMap.insert(std::pair<std::string, std::string>(BIND_LEVEL, std::to_string(bindLevel)));
     }
 }

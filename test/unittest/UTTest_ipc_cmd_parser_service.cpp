@@ -48,7 +48,7 @@
 #include "ipc_set_useroperation_req.h"
 #include "ipc_unauthenticate_device_req.h"
 #include "ipc_unpublish_req.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -1247,7 +1247,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_053, testing::ext::TestSize.Level
     MessageParcel data;
     MessageParcel reply;
     std::string pkgName = "ohos.dm.test";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
     jsonObject[DM_CREDENTIAL_REQJSONSTR] = "";
     std::string credentialInfo = SafetyDump(jsonObject);
@@ -1285,7 +1285,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_054, testing::ext::TestSize.Level
     MessageParcel data;
     MessageParcel reply;
     std::string pkgName = "ohos.dm.test";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
     jsonObject[DM_CREDENTIAL_REQJSONSTR] = "";
     std::string credentialInfo = SafetyDump(jsonObject);

@@ -24,7 +24,7 @@
 #include "dm_constants.h"
 #include "discovery_filter.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
