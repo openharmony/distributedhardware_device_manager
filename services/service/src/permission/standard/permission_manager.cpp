@@ -39,7 +39,7 @@ constexpr const static char* g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM] = {
     "CollaborationFwk",
     "wear_link_service",
     "watch_system_service",
-    "com.huawei.hmos.huaweicast",
+    "cast_engine_service",
 };
 
 constexpr int32_t PIN_HOLDER_WHITE_LIST_NUM = 1;
@@ -67,9 +67,10 @@ constexpr const static char* g_setDnPolicyWhiteList[SETDNPOLICY_WHITE_LIST_NUM] 
     "com.ohos.distributedjstest",
 };
 
-constexpr uint32_t GETDEVICEINFO_WHITE_LIST_NUM = 1;
+constexpr uint32_t GETDEVICEINFO_WHITE_LIST_NUM = 2;
 constexpr const static char* g_getDeviceInfoWhiteList[GETDEVICEINFO_WHITE_LIST_NUM] = {
     "gameservice_server",
+    "com.huawei.hmos.slassistant",
 };
 }
 

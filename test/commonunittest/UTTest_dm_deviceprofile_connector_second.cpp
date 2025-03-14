@@ -19,11 +19,13 @@
 #include "deviceprofile_connector.h"
 #include <iterator>
 #include "dp_inited_callback_stub.h"
+#include "dm_error_type.h"
 
 using namespace testing;
 using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
+
 void DeviceProfileConnectorSecondTest::SetUp()
 {
 }
@@ -499,6 +501,27 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing:
     DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);
     EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_201, testing::ext::TestSize.Level0)
+{
+    std::vector<unsigned char> sessionKeyArray;
+    int32_t sessionKeyId = 1;
+    int32_t ret = DeviceProfileConnector::GetInstance().PutSessionKey(sessionKeyArray, sessionKeyId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    sessionKeyArray.push_back('1');
+    sessionKeyArray.push_back('2');
+    sessionKeyArray.push_back('3');
+    sessionKeyArray.push_back('4');
+    sessionKeyArray.push_back('5');
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutSessionKey(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().PutSessionKey(sessionKeyArray, sessionKeyId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutSessionKey(_, _, _)).WillOnce(Return(DM_OK));
+    ret = DeviceProfileConnector::GetInstance().PutSessionKey(sessionKeyArray, sessionKeyId);
+    EXPECT_EQ(ret, DM_OK);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

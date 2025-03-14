@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,6 +45,7 @@ namespace {
      * | userid lower 2 bytes |
      */
     const int32_t DEL_USER_PAYLOAD_LEN = 2;
+    const int32_t STOP_USER_PAYLOAD_LEN = 2;
     /**
      * @brief the userid payload cost 2 bytes.
      *
@@ -122,6 +123,10 @@ bool RelationShipChangeMsg::ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) con
             ToDelUserPayLoad(msg, len);
             ret = true;
             break;
+        case RelationShipChangeType::STOP_USER:
+            ToStopUserPayLoad(msg, len);
+            ret = true;
+            break;
         default:
             LOGE("RelationShipChange type invalid");
             break;
@@ -153,6 +158,9 @@ bool RelationShipChangeMsg::FromBroadcastPayLoad(const cJSON *payloadJson, Relat
         case RelationShipChangeType::DEL_USER:
             ret = FromDelUserPayLoad(payloadJson);
             break;
+        case RelationShipChangeType::STOP_USER:
+            ret = FromStopUserPayLoad(payloadJson);
+            break;
         default:
             LOGE("RelationShipChange type invalid");
             break;
@@ -174,6 +182,9 @@ bool RelationShipChangeMsg::IsValid() const
             ret = (userId != UINT32_MAX && tokenId != UINT64_MAX);
             break;
         case RelationShipChangeType::DEL_USER:
+            ret = (userId != UINT32_MAX);
+            break;
+        case RelationShipChangeType::STOP_USER:
             ret = (userId != UINT32_MAX);
             break;
         case RelationShipChangeType::SERVICE_UNBIND:
@@ -199,7 +210,7 @@ bool RelationShipChangeMsg::IsChangeTypeValid()
 {
     return (type == RelationShipChangeType::ACCOUNT_LOGOUT) || (type == RelationShipChangeType::DEVICE_UNBIND) ||
         (type == RelationShipChangeType::APP_UNBIND) || (type == RelationShipChangeType::SYNC_USERID) ||
-        (type == RelationShipChangeType::DEL_USER);
+        (type == RelationShipChangeType::DEL_USER) || (type == RelationShipChangeType::STOP_USER);
 }
 
 bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
@@ -208,7 +219,8 @@ bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
         (type == (uint32_t)RelationShipChangeType::DEVICE_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::APP_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::SYNC_USERID) ||
-        (type == (uint32_t)RelationShipChangeType::DEL_USER);
+        (type == (uint32_t)RelationShipChangeType::DEL_USER) ||
+        (type == (uint32_t)RelationShipChangeType::STOP_USER);
 }
 
 void RelationShipChangeMsg::ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const
@@ -291,6 +303,15 @@ void RelationShipChangeMsg::ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const
     len = DEL_USER_PAYLOAD_LEN;
     msg = new uint8_t[DEL_USER_PAYLOAD_LEN]();
     for (int i = 0; i < DEL_USER_PAYLOAD_LEN; i++) {
+        msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
+    }
+}
+
+void RelationShipChangeMsg::ToStopUserPayLoad(uint8_t *&msg, uint32_t &len) const
+{
+    len = STOP_USER_PAYLOAD_LEN;
+    msg = new uint8_t[STOP_USER_PAYLOAD_LEN]();
+    for (int i = 0; i < STOP_USER_PAYLOAD_LEN; i++) {
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
     }
 }
@@ -450,6 +471,29 @@ bool RelationShipChangeMsg::FromDelUserPayLoad(const cJSON *payloadJson)
 
     int32_t arraySize = cJSON_GetArraySize(payloadJson);
     if (arraySize < DEL_USER_PAYLOAD_LEN) {
+        LOGE("Payload invalid, the size is %{public}d.", arraySize);
+        return false;
+    }
+    this->userId = 0;
+    for (uint32_t i = 0; i < USERID_PAYLOAD_LEN; i++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, i);
+        CHECK_NULL_RETURN(payloadItem, false);
+        if (cJSON_IsNumber(payloadItem)) {
+            this->userId |= (static_cast<uint8_t>(payloadItem->valueint)) << (i * BITS_PER_BYTE);
+        }
+    }
+    return true;
+}
+
+bool RelationShipChangeMsg::FromStopUserPayLoad(const cJSON *payloadJson)
+{
+    if (payloadJson == NULL) {
+        LOGE("FromStopUserPayLoad payloadJson is null.");
+        return false;
+    }
+
+    int32_t arraySize = cJSON_GetArraySize(payloadJson);
+    if (arraySize < STOP_USER_PAYLOAD_LEN) {
         LOGE("Payload invalid, the size is %{public}d.", arraySize);
         return false;
     }

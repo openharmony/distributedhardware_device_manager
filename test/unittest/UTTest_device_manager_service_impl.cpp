@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1752,7 +1752,7 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     std::vector<uint32_t> foregroundUserIds;
     std::vector<uint32_t> backgroundUserIds;
     std::string remoteUdid = "deviceId";
-    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
+    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, false);
 
     std::vector<std::string> deviceVec;
     int32_t currentUserId = 1;
@@ -1933,6 +1933,23 @@ HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_010, testing::ext::TestS
     }
     int32_t ret = deviceManagerServiceImpl_->DeleteCredential(pkgName, deleteInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile accessProfile;
+    accessProfile.SetBindType(1);
+    profiles.push_back(accessProfile);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    deviceManagerServiceImpl_->DeleteAlwaysAllowTimeOut();
+
+    std::string remoteUdid = "remoteUdid";
+    profiles.clear();
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    deviceManagerServiceImpl_->CheckDeleteCredential(remoteUdid);
+
+    accessProfile.SetTrustDeviceId(remoteUdid);
+    profiles.push_back(accessProfile);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    deviceManagerServiceImpl_->CheckDeleteCredential(remoteUdid);
 }
 } // namespace
 } // namespace DistributedHardware

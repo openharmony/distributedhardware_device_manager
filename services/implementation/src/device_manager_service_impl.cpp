@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -229,12 +229,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     ProcessInfo processInfo;
     processInfo.pkgName = std::string(DM_PKG_NAME);
     processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
-    if (bindType == INVALIED_TYPE && isCredentialType_.load()) {
-        PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
-        devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
-        isCredentialType_.store(false);
-        softbusConnector_->SetProcessInfo(processInfo);
-    } else if (bindType == IDENTICAL_ACCOUNT_TYPE) {
+    if (bindType == IDENTICAL_ACCOUNT_TYPE) {
         devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
         softbusConnector_->SetProcessInfo(processInfo);
     } else if (bindType == DEVICE_PEER_TO_PEER_TYPE) {
@@ -892,7 +887,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
 }
 
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus)
 {
     LOGI("remote udid: %{public}s, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
         GetAnonyString(remoteUdid).c_str(), GetIntegerList<uint32_t>(foregroundUserIds).c_str(),
@@ -904,9 +899,12 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     std::vector<int32_t> rmtBackUserIdsTemp(backgroundUserIds.begin(), backgroundUserIds.end());
     std::vector<int32_t> localUserIds;
     int32_t ret = MultipleUserConnector::GetForegroundUserIds(localUserIds);
-    if (ret != DM_OK || localUserIds.empty()) {
+    if (ret != DM_OK) {
         LOGE("Get foreground userids failed, ret: %{public}d", ret);
         return;
+    }
+    if (isCheckUserStatus) {
+        MultipleUserConnector::ClearLockedUser(localUserIds);
     }
     DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
         rmtFrontUserIdsTemp, rmtBackUserIdsTemp);

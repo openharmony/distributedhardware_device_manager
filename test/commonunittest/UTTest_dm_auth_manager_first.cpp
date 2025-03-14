@@ -45,6 +45,7 @@ namespace {
     constexpr int32_t PINCODE = 100001;
     constexpr int32_t MIN_PIN_CODE_VALUE = 10;
     constexpr int32_t MAX_PIN_CODE_VALUE = 9999999;
+    constexpr int32_t INVALID_AUTHBOX_TYPE = 100;
 }
 
 bool DmRadarHelper::ReportAuthOpenSession(struct RadarInfo &info)
@@ -1925,8 +1926,13 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
 
     int32_t sessionId = 1;
     authManager_->remoteUdidHash_ = "remoteUdidhash";
+    std::string udidHashTemp = "remoteUdidhash";
     EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1))
+    .WillOnce(WithArgs<1>(Invoke([udidHashTemp](unsigned char *udidHash) {
+        memcpy_s(udidHash, (udidHashTemp.length() + 1), udidHashTemp.c_str(), (udidHashTemp.length()));
+        return DM_OK;
+    })));
     authManager_->DeleteOffLineTimer(sessionId);
 
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
@@ -2136,7 +2142,7 @@ HWTEST_F(DmAuthManagerTest, IsLocalServiceInfoValid_001, testing::ext::TestSize.
 
     profile.SetPinExchangeType(static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
     profile.SetPinCode("");
-    ASSERT_FALSE(authManager_->IsLocalServiceInfoValid(profile));
+    ASSERT_TRUE(authManager_->IsLocalServiceInfoValid(profile));
 
     profile.SetPinCode(std::to_string(PINCODE));
     ASSERT_TRUE(authManager_->IsLocalServiceInfoValid(profile));
@@ -2155,6 +2161,54 @@ HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_003, testing::ext::TestSize.Lev
     jsonObject[PARAM_KEY_HML_ENABLE_160M] = true;
     jsonObject[PARAM_KEY_HML_ACTIONID] = 0;
     authManager_->ParseHmlInfoInJsonObject(jsonObject);
+}
+
+HWTEST_F(DmAuthManagerTest, ParseHmlInfoInJsonObject_001, testing::ext::TestSize.Level0)
+{
+    nlohmann::json jsonObject;
+    jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = CONN_SESSION_TYPE_HML;
+    jsonObject[PARAM_KEY_HML_ACTIONID] = 0;
+    authManager_->ParseHmlInfoInJsonObject(jsonObject);
+    ASSERT_EQ(authManager_->authRequestContext_->hmlActionId, 0);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
+    authManager_->ParseHmlInfoInJsonObject(jsonObject);
+    ASSERT_EQ(authManager_->authRequestContext_->hmlActionId, 0);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
+    authManager_->ParseHmlInfoInJsonObject(jsonObject);
+    ASSERT_EQ(authManager_->authRequestContext_->hmlActionId, 1);
+
+    authManager_->authRequestContext_->hmlActionId = 0;
+    jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = CONN_SESSION_TYPE_BLE;
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
+    authManager_->ParseHmlInfoInJsonObject(jsonObject);
+    ASSERT_EQ(authManager_->authRequestContext_->hmlActionId, 0);
+}
+
+HWTEST_F(DmAuthManagerTest, CanUsePincodeFromDp_001, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::LocalServiceInfo info;
+    info.SetAuthBoxType((int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM);
+    info.SetAuthType((int32_t)DMLocalServiceInfoAuthType::TRUST_ONETIME);
+    info.SetPinExchangeType((int32_t)DMLocalServiceInfoPinExchangeType::FROMDP);
+    info.SetPinCode("******");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_FALSE(authManager_->CanUsePincodeFromDp());
+
+    info.SetPinCode("123456");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_TRUE(authManager_->CanUsePincodeFromDp());
+
+    info.SetAuthBoxType(INVALID_AUTHBOX_TYPE);
+    info.SetPinCode("123456");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_TRUE(authManager_->CanUsePincodeFromDp());
+
+    info.SetPinExchangeType((int32_t)DMLocalServiceInfoPinExchangeType::ULTRASOUND);
+    info.SetPinCode("123456");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_FALSE(authManager_->CanUsePincodeFromDp());
 }
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize.Level0)
@@ -2176,6 +2230,11 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
+    strExtra = jsonObject.dump();
+    ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
     jsonObject[TAG_BIND_LEVEL] = 1;
     strExtra = jsonObject.dump();
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));

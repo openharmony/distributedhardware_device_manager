@@ -476,8 +476,14 @@ HWTEST_F(DeviceManagerImplTest, GetDeviceType_103, testing::ext::TestSize.Level0
     std::string packName = "com.ohos.test";
     std::string networkId = "networkId";
     int32_t deviceType = 0;
+    std::shared_ptr<MockIpcClientProxy> mockInstance = std::make_shared<MockIpcClientProxy>();
+    std::shared_ptr<IpcClientProxy> ipcClientProxy = DeviceManagerImpl::GetInstance().ipcClientProxy_;
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = mockInstance;
+    EXPECT_CALL(*mockInstance, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_FAILED));
     int32_t ret = DeviceManager::GetInstance().GetDeviceType(packName, networkId, deviceType);
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+    DeviceManagerImpl::GetInstance().ipcClientProxy_ = ipcClientProxy;
 }
 
 /**

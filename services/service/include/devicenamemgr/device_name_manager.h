@@ -25,8 +25,11 @@ namespace DistributedHardware {
 class DeviceNameManager {
     DECLARE_SINGLE_INSTANCE_BASE(DeviceNameManager);
 public:
-    int32_t Init();
     int32_t UnInit();
+
+    void DataShareReady();
+    void AccountSysReady(int32_t userId);
+    int32_t InitDeviceNameWhenSoftBusReady();
 
     int32_t GetLocalDisplayDeviceName(int32_t maxNamelength, std::string &displayName);
     int32_t InitDeviceNameWhenUserSwitch(int32_t curUserId, int32_t preUserId);
@@ -38,6 +41,7 @@ public:
 private:
     DeviceNameManager() = default;
     ~DeviceNameManager() = default;
+    bool DependsIsReady();
     void RegisterDeviceNameChangeMonitor(int32_t curUserId, int32_t preUserId);
     void UnRegisterDeviceNameChangeMonitor(int32_t userId);
     void InitDeviceName(int32_t userId);
@@ -71,6 +75,8 @@ private:
     std::string localMarketName_ = "";
     std::mutex monitorMapMtx_;
     std::map<int32_t, sptr<DeviceNameChangeMonitor>> monitorMap_;
+    std::atomic<bool> isDataShareReady_ = false;
+    std::atomic<bool> isAccountSysReady_ = false;
 };
 } // DistributedHardware
 } // OHOS

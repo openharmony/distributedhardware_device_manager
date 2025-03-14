@@ -139,8 +139,7 @@ void IpcServerStub::HandleSoftBusServerAdd()
         return;
     }
     state_ = ServiceRunningState::STATE_RUNNING;
-    int32_t ret = DeviceNameManager::GetInstance().Init();
-    LOGI("Init device name ret:%{public}d", ret);
+    DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
     ReclaimMemmgrFileMemForDM();
     std::function<void()> task = [this]() {
         LOGI("HandleSoftBusServerAdd After 5mins.");
@@ -279,6 +278,7 @@ ServiceRunningState IpcServerStub::QueryServiceState() const
 
 int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener)
 {
+    LOGI("RegisterDeviceManagerListener start");
     if (processInfo.pkgName.empty() || listener == nullptr) {
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
         return ERR_DM_POINT_NULL;
