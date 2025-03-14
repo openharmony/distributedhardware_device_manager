@@ -2200,7 +2200,6 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
 
     std::string pkgName = "pkgName_pickerProxy_Info";
     int32_t authType = 1;
-    std::string deviceId = "devi*********4";
     std::string extra = "extra";
     authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     authManager_->GetAuthParam(pkgName, authType, deviceId, extra);

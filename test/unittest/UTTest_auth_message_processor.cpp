@@ -1904,6 +1904,10 @@ HWTEST_F(AuthMessageProcessorTest, IsPincodeImported_001, testing::ext::TestSize
 
 HWTEST_F(AuthMessageProcessorTest, ProcessSessionKey_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(authManager);
     authMessageProcessor->cryptoMgr_ = std::make_shared<CryptoMgr>();
     uint8_t arrSession[] = {1, 2, 3, 4, 5};
     uint8_t *sessionKey = arrSession;

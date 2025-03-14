@@ -533,6 +533,7 @@ HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Le
  */
 HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSize.Level0)
 {
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::string deviceId = "deviceId";
     std::string strNetworkId = "net******12";
     int32_t deviceCount = 1;
@@ -545,7 +546,6 @@ HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSiz
     std::string ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
     EXPECT_EQ(ret.empty(), true);
 
-    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
         .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
             infoNum = &deviceCount;

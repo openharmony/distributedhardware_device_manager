@@ -1582,7 +1582,7 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalServiceInfoByBundleNameAndPinExchange
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckAclStatusAndForegroundNotMatch(_, _, _)).WillOnce(Return(true));
     std::map<std::string, int32_t> curUserDeviceMap;
-    std::map<std::string, int32_t> preUserDeviceMap
+    std::map<std::string, int32_t> preUserDeviceMap;
     curUserDeviceMap.insert(std::make_pair("curdevice***ww", 10));
     preUserDeviceMap.insert(std::make_pair("preUser******info", 11));
     EXPECT_CALL(*deviceProfileConnectorMock_,
