@@ -17,7 +17,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "softbus_connector.h"
 #include "softbus_session.h"
 #include "softbus_error_code.h"
@@ -104,7 +104,7 @@ HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
 {
     int32_t msgType = 2;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = msgType;
     std::string message = SafetyDump(jsonObj);

@@ -17,7 +17,7 @@
 
 #include <atomic>
 
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 #include "device_manager_callback.h"
 #include "dm_device_info.h"
@@ -126,7 +126,7 @@ private:
 
 const std::string &GetDeviceTypeById(DmDeviceType type);
 char *MallocCStr(const char *in);
-void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap);
+void InsertMapParames(JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap);
 } // namespace DistributedHardware
 } // namespace OHOS
 

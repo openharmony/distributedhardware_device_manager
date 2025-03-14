@@ -1077,7 +1077,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_037, testing::ext::TestSize.Le
     auto ptr = GetResponseFunc(IMPORT_CREDENTIAL);
     ASSERT_TRUE(ptr != nullptr);
 
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
     std::string message = SafetyDump(jsonObject);
 
@@ -1094,7 +1094,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_038, testing::ext::TestSize.Le
     ASSERT_TRUE(ptr != nullptr);
 
     std::string credential = "git:https://gitee.com";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
     jsonObject[DM_CREDENTIAL_RETURNJSONSTR] = credential;
     std::string message = SafetyDump(jsonObject);
@@ -1111,7 +1111,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_039, testing::ext::TestSize.Le
     auto ptr = GetResponseFunc(DELETE_CREDENTIAL);
     ASSERT_TRUE(ptr != nullptr);
 
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
     std::string message = SafetyDump(jsonObject);
 
@@ -1128,7 +1128,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_040, testing::ext::TestSize.Le
     ASSERT_TRUE(ptr != nullptr);
 
     std::string credential = "git:https://gitee.com";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
     jsonObject[DM_CREDENTIAL_RETURNJSONSTR] = credential;
     std::string message = SafetyDump(jsonObject);

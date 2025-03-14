@@ -42,7 +42,7 @@
 #include "dm_radar_helper.h"
 #include "dm_random.h"
 #include "multiple_user_connector.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "openssl/sha.h"
 #include "parameter.h"
 #include "show_confirm.h"
@@ -194,9 +194,9 @@ int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t a
 
 int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
-    if ((jsonObject.is_discarded() || !IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE) ||
-        jsonObject[PARAM_KEY_CONN_SESSIONTYPE].get<std::string>() != CONN_SESSION_TYPE_HML) &&
+    JsonObject jsonObject(extra);
+    if ((jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE) ||
+        jsonObject[PARAM_KEY_CONN_SESSIONTYPE].Get<std::string>() != CONN_SESSION_TYPE_HML) &&
         !softbusConnector_->HaveDeviceInMap(deviceId)) {
         LOGE("CheckAuthParamVaild failed, the discoveryDeviceInfoMap_ not have this device.");
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT,
@@ -204,23 +204,23 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
         listener_->OnBindResult(processInfo_, peerTargetId_, ERR_DM_INPUT_PARA_INVALID, STATUS_DM_AUTH_DEFAULT, "");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (jsonObject.is_discarded()) {
+    if (jsonObject.IsDiscarded()) {
         return DM_OK;
     }
     std::string connSessionType;
     if (IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE)) {
-        connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].get<std::string>();
+        connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].Get<std::string>();
     }
     if (connSessionType == CONN_SESSION_TYPE_HML && !CheckHmlParamValid(jsonObject)) {
         LOGE("CONN_SESSION_TYPE_HML, CheckHmlParamValid failed");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    if (jsonObject.is_discarded() || jsonObject.find(TAG_BIND_LEVEL) == jsonObject.end() ||
+    if (jsonObject.IsDiscarded() || !jsonObject.Contains(TAG_BIND_LEVEL) ||
         !IsInt32(jsonObject, TAG_BIND_LEVEL)) {
         return DM_OK;
     }
-    int32_t bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
+    int32_t bindLevel = jsonObject[TAG_BIND_LEVEL].Get<int32_t>();
     if (static_cast<uint32_t>(bindLevel) > APP || bindLevel < INVALID_TYPE) {
         LOGE("bindlevel error %{public}d.", bindLevel);
         return ERR_DM_INPUT_PARA_INVALID;
@@ -233,13 +233,13 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
     return DM_OK;
 }
 
-bool DmAuthManager::CheckHmlParamValid(nlohmann::json &jsonObject)
+bool DmAuthManager::CheckHmlParamValid(JsonObject &jsonObject)
 {
     if (!IsString(jsonObject, PARAM_KEY_HML_ACTIONID)) {
         LOGE("PARAM_KEY_HML_ACTIONID is not string");
         return false;
     }
-    std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].get<std::string>();
+    std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].Get<std::string>();
     if (!IsNumberString(actionIdStr)) {
         LOGE("PARAM_KEY_HML_ACTIONID is not number");
         return false;
@@ -300,8 +300,8 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->isOnline = false;
     authRequestContext_->authed = !authRequestContext_->bindType.empty();
     authRequestContext_->bindLevel = INVALIED_TYPE;
-    nlohmann::json jsonObject = nlohmann::json::parse(extra, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(extra);
+    if (jsonObject.IsDiscarded()) {
         LOGE("extra string not a json type.");
         return;
     }
@@ -310,32 +310,32 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
 }
 
-void DmAuthManager::ParseJsonObject(nlohmann::json jsonObject)
+void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
 {
-    if (!jsonObject.is_discarded()) {
+    if (!jsonObject.IsDiscarded()) {
         if (IsString(jsonObject, TARGET_PKG_NAME_KEY)) {
-            authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY].get<std::string>();
+            authRequestContext_->targetPkgName = jsonObject[TARGET_PKG_NAME_KEY].Get<std::string>();
         }
         if (IsString(jsonObject, APP_OPERATION_KEY)) {
-            authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].get<std::string>();
+            authRequestContext_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
         }
         if (IsString(jsonObject, CUSTOM_DESCRIPTION_KEY)) {
             authRequestContext_->customDesc = DmLanguageManager::GetInstance().
-                GetTextBySystemLanguage(jsonObject[CUSTOM_DESCRIPTION_KEY].get<std::string>());
+                GetTextBySystemLanguage(jsonObject[CUSTOM_DESCRIPTION_KEY].Get<std::string>());
         }
         if (IsString(jsonObject, APP_THUMBNAIL)) {
-            authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].get<std::string>();
+            authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].Get<std::string>();
         }
         if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
-            authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
+            authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].Get<int32_t>();
         }
         authRequestContext_->closeSessionDelaySeconds = 0;
         if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
-            std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].get<std::string>();
+            std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
             authRequestContext_->closeSessionDelaySeconds = GetCloseSessionDelaySeconds(delaySecondsStr);
         }
         if (IsString(jsonObject, TAG_PEER_BUNDLE_NAME)) {
-            authRequestContext_->peerBundleName = jsonObject[TAG_PEER_BUNDLE_NAME].get<std::string>();
+            authRequestContext_->peerBundleName = jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>();
             if (authRequestContext_->peerBundleName == "") {
                 authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
             }
@@ -348,18 +348,18 @@ void DmAuthManager::ParseJsonObject(nlohmann::json jsonObject)
     authRequestContext_->bundleName = GetBundleName(jsonObject);
 }
 
-void DmAuthManager::ParseHmlInfoInJsonObject(nlohmann::json jsonObject)
+void DmAuthManager::ParseHmlInfoInJsonObject(JsonObject &jsonObject)
 {
     CHECK_NULL_VOID(authRequestContext_);
     if (IsString(jsonObject, PARAM_KEY_CONN_SESSIONTYPE)) {
-        authRequestContext_->connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].get<std::string>();
+        authRequestContext_->connSessionType = jsonObject[PARAM_KEY_CONN_SESSIONTYPE].Get<std::string>();
         LOGI("connSessionType %{public}s", authRequestContext_->connSessionType.c_str());
     }
     if (!IsHmlSessionType()) {
         return;
     }
     if (IsString(jsonObject, PARAM_KEY_HML_ACTIONID)) {
-        std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].get<std::string>();
+        std::string actionIdStr = jsonObject[PARAM_KEY_HML_ACTIONID].Get<std::string>();
         if (IsNumberString(actionIdStr)) {
             authRequestContext_->hmlActionId = std::atoi(actionIdStr.c_str());
         }
@@ -628,7 +628,10 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
 void DmAuthManager::OnSessionClosed(const int32_t sessionId)
 {
     LOGI("DmAuthManager::OnSessionClosed sessionId = %{public}d", sessionId);
-    AuthenticateFinish();
+    if (authResponseState_ != nullptr) {
+        isFinishOfLocal_ = false;
+        authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
+    }
 }
 
 void DmAuthManager::ProcessSourceMsg()
@@ -777,7 +780,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     } else {
         LOGE("authType invalied.");
     }
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[PIN_TOKEN] = authResponseContext_->token;
     jsonObj[QR_CODE_KEY] = GenerateGroupName();
     jsonObj[NFC_CODE_KEY] = GenerateGroupName();
@@ -1355,7 +1358,7 @@ int32_t DmAuthManager::AddMember(int32_t pinCode)
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(INPUT_TIMEOUT_TASK));
     }
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[TAG_GROUP_ID] = authResponseContext_->groupId;
     jsonObject[TAG_GROUP_NAME] = authResponseContext_->groupName;
     jsonObject[PIN_CODE_KEY] = pinCode;
@@ -1455,7 +1458,8 @@ void DmAuthManager::SrcAuthenticateFinish()
         authRequestContext_->reason = authResponseContext_->reply;
     }
     if ((authResponseContext_->state == AuthState::AUTH_REQUEST_JOIN ||
-        authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) && authPtr_ != nullptr) {
+        authResponseContext_->state == AuthState::AUTH_REQUEST_FINISH) &&
+        (authResponseContext_->authType == AUTH_TYPE_NFC || authPtr_ != nullptr)) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
 
@@ -1721,7 +1725,7 @@ void DmAuthManager::ShowConfigDialog()
         return;
     }
     LOGI("ShowConfigDialog start");
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
     jsonObj[TAG_TOKEN] = authResponseContext_->token;
     jsonObj[TARGET_PKG_NAME_KEY] = authResponseContext_->targetPkgName;
@@ -1772,7 +1776,7 @@ void DmAuthManager::ShowAuthInfoDialog(bool authDeviceError)
     if (!DmRadarHelper::GetInstance().ReportAuthPullPinBox(info)) {
         LOGE("ReportAuthPullPinBox failed");
     }
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[PIN_CODE_KEY] = authResponseContext_->code;
     std::string authParam = SafetyDump(jsonObj);
     pincodeDialogEverShown_ = true;
@@ -1954,7 +1958,7 @@ int32_t DmAuthManager::SetReasonAndFinish(int32_t reason, int32_t state)
 
 bool DmAuthManager::IsIdenticalAccount()
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
     std::string queryParams = SafetyDump(jsonObj);
 
@@ -1975,15 +1979,16 @@ bool DmAuthManager::IsIdenticalAccount()
         LOGI("The old version.");
         return true;
     }
-    nlohmann::json jsonPeerGroupIdObj = nlohmann::json::parse(authResponseContext_->accountGroupIdHash,
-        nullptr, false);
-    if (jsonPeerGroupIdObj.is_discarded()) {
+    JsonObject jsonPeerGroupIdObj(authResponseContext_->accountGroupIdHash);
+    if (jsonPeerGroupIdObj.IsDiscarded()) {
         LOGE("accountGroupIdHash string not a json type.");
         return false;
     }
+
+    std::vector<JsonItemObject> items = jsonPeerGroupIdObj.Items();
     for (auto &groupInfo : groupList) {
-        for (nlohmann::json::iterator it = jsonPeerGroupIdObj.begin(); it != jsonPeerGroupIdObj.end(); ++it) {
-            if ((*it) == Crypto::GetGroupIdHash(groupInfo.groupId)) {
+        for (auto it = items.begin(); it != items.end(); ++it) {
+            if (it->IsString() && it->Get<std::string>() == Crypto::GetGroupIdHash(groupInfo.groupId)) {
                 LOGI("Is identical Account.");
                 return true;
             }
@@ -1994,7 +1999,7 @@ bool DmAuthManager::IsIdenticalAccount()
 
 std::string DmAuthManager::GetAccountGroupIdHash()
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
     std::string queryParams = SafetyDump(jsonObj);
 
@@ -2007,9 +2012,9 @@ std::string DmAuthManager::GetAccountGroupIdHash()
     if (!hiChainConnector_->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
         return "";
     }
-    nlohmann::json jsonAccountObj;
+    JsonObject jsonAccountObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     for (auto &groupInfo : groupList) {
-        jsonAccountObj.push_back(Crypto::GetGroupIdHash(groupInfo.groupId));
+        jsonAccountObj.PushBack(Crypto::GetGroupIdHash(groupInfo.groupId));
     }
     return SafetyDump(jsonAccountObj);
 }
@@ -2206,7 +2211,7 @@ bool DmAuthManager::IsAuthTypeSupported(const int32_t &authType)
 
 std::string DmAuthManager::GenerateBindResultContent()
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[DM_BIND_RESULT_NETWORK_ID] = authResponseContext_->networkId;
     if (remoteDeviceId_.empty()) {
         jsonObj[TAG_DEVICE_ID] = "";
@@ -2657,8 +2662,8 @@ void DmAuthManager::ProcRespNegotiate(const int32_t &sessionId)
     AbilityNegotiate();
     authResponseContext_->isOnline = softbusConnector_->CheckIsOnline(remoteDeviceId_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
-    nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(message);
+    if (jsonObject.IsDiscarded()) {
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
         return;
     }
@@ -2675,10 +2680,10 @@ void DmAuthManager::ProcRespNegotiate(const int32_t &sessionId)
     }
     jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
-    if (jsonObject[TAG_CRYPTO_SUPPORT] == true && authResponseContext_->cryptoSupport) {
+    if (jsonObject[TAG_CRYPTO_SUPPORT].Get<bool>() == true && authResponseContext_->cryptoSupport) {
         if (IsString(jsonObject, TAG_CRYPTO_NAME) && IsString(jsonObject, TAG_CRYPTO_VERSION)) {
-            if (jsonObject[TAG_CRYPTO_NAME] == authResponseContext_->cryptoName &&
-                jsonObject[TAG_CRYPTO_VERSION] == authResponseContext_->cryptoVer) {
+            if (jsonObject[TAG_CRYPTO_NAME].Get<std::string>() == authResponseContext_->cryptoName &&
+                jsonObject[TAG_CRYPTO_VERSION].Get<std::string>() == authResponseContext_->cryptoVer) {
                 isCryptoSupport_ = true;
                 softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
                 return;
@@ -2693,7 +2698,7 @@ void DmAuthManager::ProcRespNegotiate(const int32_t &sessionId)
 void DmAuthManager::ProcIncompatible(const int32_t &sessionId)
 {
     LOGI("DmAuthManager::ProcIncompatible sessionId %{public}d.", sessionId);
-    nlohmann::json respNegotiateMsg;
+    JsonObject respNegotiateMsg;
     respNegotiateMsg[TAG_REPLY] = ERR_DM_VERSION_INCOMPATIBLE;
     respNegotiateMsg[TAG_VER] = DM_ITF_VER;
     respNegotiateMsg[TAG_MSG_TYPE] = MSG_TYPE_RESP_NEGOTIATE;
@@ -2710,8 +2715,8 @@ void DmAuthManager::OnAuthDeviceDataReceived(const int32_t sessionId, const std:
     }
     authResponseContext_->sessionId = sessionId;
     authMessageProcessor_->SetResponseContext(authResponseContext_);
-    nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(message);
+    if (jsonObject.IsDiscarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
         return;
     }
@@ -2719,8 +2724,8 @@ void DmAuthManager::OnAuthDeviceDataReceived(const int32_t sessionId, const std:
         LOGE("Auth device data is error.");
         return;
     }
-    LOGI("OnAuthDeviceDataReceived start msgType %{public}d.", jsonObject[TAG_MSG_TYPE].get<int32_t>());
-    std::string authData = jsonObject[TAG_DATA].get<std::string>();
+    LOGI("OnAuthDeviceDataReceived start msgType %{public}d.", jsonObject[TAG_MSG_TYPE].Get<int32_t>());
+    std::string authData = jsonObject[TAG_DATA].Get<std::string>();
     int32_t osAccountId = MultipleUserConnector::GetCurrentAccountUserID();
     hiChainAuthConnector_->ProcessAuthData(authResponseContext_->requestId, authData, osAccountId);
 }
@@ -2792,29 +2797,49 @@ void DmAuthManager::PutAccessControlList()
     DmAccessee accessee;
     accessee.trustBundleName = authResponseContext_->peerBundleName;
     if (authRequestState_ != nullptr && authResponseState_ == nullptr) {
-        accesser.requestTokenId = static_cast<uint64_t>(authRequestContext_->tokenId);
-        accesser.requestUserId = authRequestContext_->localUserId;
-        accesser.requestAccountId = authRequestContext_->localAccountId;
-        accesser.requestDeviceId = authRequestContext_->localDeviceId;
-        accesser.requestDeviceName = authRequestContext_->localDeviceName;
-        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
-        accessee.trustUserId = authRequestContext_->remoteUserId;
-        accessee.trustAccountId = authRequestContext_->remoteAccountId;
-        accessee.trustDeviceId = remoteDeviceId_;
-        accessee.trustDeviceName = authRequestContext_->remoteDeviceName;
+        PutSrcAccessControlList(accesser, accessee, localUdid);
     } else if (authRequestState_ == nullptr && authResponseState_ != nullptr) {
-        accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
-        accesser.requestUserId = authResponseContext_->remoteUserId;
-        accesser.requestAccountId = authResponseContext_->remoteAccountId;
-        accesser.requestDeviceId = remoteDeviceId_;
-        accesser.requestDeviceName = authResponseContext_->remoteDeviceName;
-        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
-        accessee.trustUserId = authResponseContext_->localUserId;
-        accessee.trustAccountId = authResponseContext_->localAccountId;
-        accessee.trustDeviceId = localUdid;
-        accessee.trustDeviceName = authResponseContext_->targetDeviceName;
+        PutSinkAccessControlList(accesser, accessee, localUdid);
     }
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
+}
+
+void DmAuthManager::PutSrcAccessControlList(DmAccesser &accesser, DmAccessee &accessee,
+    const std::string &localUdid)
+{
+    accesser.requestTokenId = static_cast<uint64_t>(authRequestContext_->tokenId);
+    accesser.requestUserId = authRequestContext_->localUserId;
+    accesser.requestAccountId = authRequestContext_->localAccountId;
+    accesser.requestDeviceId = authRequestContext_->localDeviceId;
+    accesser.requestDeviceName = authRequestContext_->localDeviceName;
+    if (authResponseContext_->remoteTokenId == authRequestContext_->tokenId) {
+        accessee.trustTokenId = 0;
+    } else {
+        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
+    }
+    accessee.trustUserId = authRequestContext_->remoteUserId;
+    accessee.trustAccountId = authRequestContext_->remoteAccountId;
+    accessee.trustDeviceId = remoteDeviceId_;
+    accessee.trustDeviceName = authRequestContext_->remoteDeviceName;
+}
+
+void DmAuthManager::PutSinkAccessControlList(DmAccesser &accesser, DmAccessee &accessee,
+    const std::string &localUdid)
+{
+    accesser.requestTokenId = static_cast<uint64_t>(authResponseContext_->remoteTokenId);
+    accesser.requestUserId = authResponseContext_->remoteUserId;
+    accesser.requestAccountId = authResponseContext_->remoteAccountId;
+    accesser.requestDeviceId = remoteDeviceId_;
+    accesser.requestDeviceName = authResponseContext_->remoteDeviceName;
+    if (authResponseContext_->remoteTokenId == authResponseContext_->tokenId) {
+        accessee.trustTokenId = 0;
+    } else {
+        accessee.trustTokenId = static_cast<uint64_t>(authResponseContext_->tokenId);
+    }
+    accessee.trustUserId = authResponseContext_->localUserId;
+    accessee.trustAccountId = authResponseContext_->localAccountId;
+    accessee.trustDeviceId = localUdid;
+    accessee.trustDeviceName = authResponseContext_->targetDeviceName;
 }
 
 void DmAuthManager::HandleSessionHeartbeat(std::string name)
@@ -2823,7 +2848,7 @@ void DmAuthManager::HandleSessionHeartbeat(std::string name)
         timer_->DeleteTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK));
     }
     LOGI("DmAuthManager::HandleSessionHeartbeat name %{public}s", name.c_str());
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[TAG_SESSION_HEARTBEAT] = TAG_SESSION_HEARTBEAT;
     std::string message = SafetyDump(jsonObj);
     softbusConnector_->GetSoftbusSession()->SendHeartbeatData(authResponseContext_->sessionId, message);
@@ -3048,10 +3073,10 @@ int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
     return bindLevel;
 }
 
-std::string DmAuthManager::GetBundleName(nlohmann::json &jsonObject)
+std::string DmAuthManager::GetBundleName(JsonObject &jsonObject)
 {
-    if (!jsonObject.is_discarded() && IsString(jsonObject, BUNDLE_NAME_KEY)) {
-        return jsonObject[BUNDLE_NAME_KEY].get<std::string>();
+    if (!jsonObject.IsDiscarded() && IsString(jsonObject, BUNDLE_NAME_KEY)) {
+        return jsonObject[BUNDLE_NAME_KEY].Get<std::string>();
     }
     bool isSystemSA = false;
     std::string bundleName;

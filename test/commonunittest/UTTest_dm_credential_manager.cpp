@@ -178,7 +178,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_001, testing::ext::TestSize.
     int32_t ret = dmCreMgr_->RequestCredential(reqJsonStr, returnJsonStr);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = "test";
     jsonObject["version"] = "test";
     reqJsonStr = SafetyDump(jsonObject);
@@ -276,7 +276,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_001, testing::ext::TestSize.L
     int32_t ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
+    JsonObject jsonObject(credentialInfo);
     jsonObject["TType"] = 1;
     jsonObject["processType"] = 1;
     credentialInfo = SafetyDump(jsonObject);
@@ -708,11 +708,12 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_001, testing::ext::Test
     credentialDataInfo.peerDeviceId = "peer_device_id";
     credentialDataInfo.userId = "user_id";
     credentialDataInfo.credentialType = SAME_ACCOUNT_TYPE;
-    nlohmann::json jsonObject1 = nlohmann::json(credentialDataInfo);
-    nlohmann::json credentialJson = nlohmann::json::array();
-    credentialJson.push_back(jsonObject1);
-    nlohmann::json jsonObject;
-    jsonObject[FIELD_CREDENTIAL_DATA] = credentialJson;
+    JsonObject jsonObject1;
+    jsonObject1 = credentialDataInfo;
+    JsonObject credentialJson(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    credentialJson.PushBack(jsonObject1);
+    JsonObject jsonObject;
+    jsonObject.Insert(FIELD_CREDENTIAL_DATA, credentialJson);
     jsonObject[FIELD_AUTH_TYPE] = CROSS_ACCOUNT_TYPE;
     jsonObject[FIELD_USER_ID] = 0;
     jsonObject[FIELD_PEER_USER_ID] = "peerUserId";
@@ -1323,7 +1324,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_001, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, DM_OK);
@@ -1364,7 +1365,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_002, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1408,7 +1409,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_003, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1451,7 +1452,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_004, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1494,7 +1495,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_005, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1537,7 +1538,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_006, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1580,7 +1581,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_007, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1624,7 +1625,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_008, testing::ext::TestSize.
     credentialData.pkInfo = "";
     credentialData.authCode = "1234567812345678123456781234567812345678123456781234567812345678";
     credentialData.peerDeviceId = "";
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     int32_t ret = dmCreMgr->GetCredentialData(credentialInfo, credentialData, jsonOutObj);
     EXPECT_EQ(ret, DM_OK);
@@ -1638,10 +1639,10 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_008, testing::ext::TestSize.
  */
 HWTEST_F(DmCredentialManagerTest, from_json_001, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     CredentialDataInfo credentialDataInfo;
     jsonOutObj[FIELD_CREDENTIAL_TYPE] = "test";
-    from_json(jsonOutObj, credentialDataInfo);
+    FromJson(jsonOutObj, credentialDataInfo);
 
     jsonOutObj[FIELD_CREDENTIAL_TYPE] = NONSYMMETRY_CREDENTIAL_TYPE;
     jsonOutObj[FIELD_SERVER_PK] = 0;
@@ -1649,29 +1650,29 @@ HWTEST_F(DmCredentialManagerTest, from_json_001, testing::ext::TestSize.Level0)
     jsonOutObj[FIELD_PKINFO] = 0;
     jsonOutObj[FIELD_PEER_DEVICE_ID] = 0;
     credentialDataInfo.serverPk = "";
-    from_json(jsonOutObj, credentialDataInfo);
+    FromJson(jsonOutObj, credentialDataInfo);
     EXPECT_TRUE(credentialDataInfo.serverPk.empty());
 
-    nlohmann::json jsonPkInfo;
+    JsonObject jsonPkInfo;
     jsonOutObj[FIELD_SERVER_PK] = "serverPk";
     jsonOutObj[FIELD_PKINFO_SIGNATURE] = "pkInfoSignature";
     jsonOutObj[FIELD_PKINFO] = SafetyDump(jsonPkInfo);
     jsonOutObj[FIELD_PEER_DEVICE_ID] = "peerDeviceId";
-    from_json(jsonOutObj, credentialDataInfo);
+    FromJson(jsonOutObj, credentialDataInfo);
     EXPECT_FALSE(credentialDataInfo.serverPk.empty());
 
     jsonOutObj[FIELD_CREDENTIAL_TYPE] = SYMMETRY_CREDENTIAL_TYPE;
     jsonOutObj[FIELD_AUTH_CODE] = 0;
     credentialDataInfo.authCode = "";
-    from_json(jsonOutObj, credentialDataInfo);
+    FromJson(jsonOutObj, credentialDataInfo);
     EXPECT_TRUE(credentialDataInfo.authCode.empty());
 
     jsonOutObj[FIELD_AUTH_CODE] = "authCode";
-    from_json(jsonOutObj, credentialDataInfo);
+    FromJson(jsonOutObj, credentialDataInfo);
     EXPECT_FALSE(credentialDataInfo.authCode.empty());
 
     jsonOutObj[FIELD_CREDENTIAL_TYPE] = 0;
-    from_json(jsonOutObj, credentialDataInfo);
+    FromJson(jsonOutObj, credentialDataInfo);
     EXPECT_FALSE(credentialDataInfo.authCode.empty());
 }
 
@@ -1683,10 +1684,10 @@ HWTEST_F(DmCredentialManagerTest, from_json_001, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmCredentialManagerTest, from_json_002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     PeerCredentialInfo peerCredentialInfo;
     jsonObject[FIELD_PEER_USER_ID] = "peerDeviceId";
-    from_json(jsonObject, peerCredentialInfo);
+    FromJson(jsonObject, peerCredentialInfo);
     EXPECT_EQ(peerCredentialInfo.peerDeviceId, "peerDeviceId");
 
     std::string deviceList = "deviceList";
@@ -1713,17 +1714,17 @@ HWTEST_F(DmCredentialManagerTest, to_json_001, testing::ext::TestSize.Level0)
     credentialDataInfo.pkInfoSignature = "test";
     credentialDataInfo.pkInfo = "test";
     credentialDataInfo.authCode = "test";
-    nlohmann::json jsonObject;
-    to_json(jsonObject, credentialDataInfo);
-    EXPECT_EQ(jsonObject[FIELD_SERVER_PK].get<std::string>(), "test");
+    JsonObject jsonObject;
+    ToJson(jsonObject, credentialDataInfo);
+    EXPECT_EQ(jsonObject[FIELD_SERVER_PK].Get<std::string>(), "test");
 
     credentialDataInfo.credentialType = SYMMETRY_CREDENTIAL_TYPE;
-    to_json(jsonObject, credentialDataInfo);
-    EXPECT_EQ(jsonObject[FIELD_AUTH_CODE].get<std::string>(), "test");
+    ToJson(jsonObject, credentialDataInfo);
+    EXPECT_EQ(jsonObject[FIELD_AUTH_CODE].Get<std::string>(), "test");
 
     credentialDataInfo.credentialType = UNKNOWN_CREDENTIAL_TYPE;
-    to_json(jsonObject, credentialDataInfo);
-    EXPECT_EQ(jsonObject[FIELD_AUTH_CODE].get<std::string>(), "test");
+    ToJson(jsonObject, credentialDataInfo);
+    EXPECT_EQ(jsonObject[FIELD_AUTH_CODE].Get<std::string>(), "test");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

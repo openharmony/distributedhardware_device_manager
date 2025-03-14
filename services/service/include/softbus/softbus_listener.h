@@ -113,7 +113,7 @@ public:
     static void GetActionId(const std::string &deviceId, int32_t &actionId);
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
-    static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj);
+    static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObject &jsonObj);
     int32_t InitSoftPublishLNN();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile, DmDeviceInfo &dmDevice);

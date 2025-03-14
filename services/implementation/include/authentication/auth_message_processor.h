@@ -23,7 +23,7 @@
 #include "crypto_adapter.h"
 #include "crypto_mgr.h"
 #include "dm_auth_manager.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -96,31 +96,31 @@ public:
     std::shared_ptr<DmAuthResponseContext> GetResponseContext();
     std::shared_ptr<DmAuthRequestContext> GetRequestContext();
     std::string CreateDeviceAuthMessage(int32_t msgType, const uint8_t *data, uint32_t dataLen);
-    void CreateResponseAuthMessageExt(nlohmann::json &json);
-    void ParseAuthResponseMessageExt(nlohmann::json &json);
+    void CreateResponseAuthMessageExt(JsonObject &json);
+    void ParseAuthResponseMessageExt(JsonObject &json);
     void SetEncryptFlag(bool flag);
     int32_t SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
     int32_t ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
 
 private:
-    std::string CreateRequestAuthMessage(nlohmann::json &json);
-    void CreateNegotiateMessage(nlohmann::json &json);
-    void CreateRespNegotiateMessage(nlohmann::json &json);
-    void CreateSyncGroupMessage(nlohmann::json &json);
-    void CreateResponseAuthMessage(nlohmann::json &json);
-    void ParseAuthResponseMessage(nlohmann::json &json);
-    int32_t ParseAuthRequestMessage(nlohmann::json &json);
-    void ParseNegotiateMessage(const nlohmann::json &json);
-    void ParseRespNegotiateMessage(const nlohmann::json &json);
-    void CreateResponseFinishMessage(nlohmann::json &json);
-    void ParseResponseFinishMessage(nlohmann::json &json);
-    void GetAuthReqMessage(nlohmann::json &json);
-    void ParsePkgNegotiateMessage(const nlohmann::json &json);
-    void CreatePublicKeyMessageExt(nlohmann::json &json);
-    void ParsePublicKeyMessageExt(nlohmann::json &json);
-    void GetJsonObj(nlohmann::json &jsonObj);
-    void CreateReqReCheckMessage(nlohmann::json &jsonObj);
-    void ParseReqReCheckMessage(nlohmann::json &json);
+    std::string CreateRequestAuthMessage(JsonObject &json);
+    void CreateNegotiateMessage(JsonObject &json);
+    void CreateRespNegotiateMessage(JsonObject &json);
+    void CreateSyncGroupMessage(JsonObject &json);
+    void CreateResponseAuthMessage(JsonObject &json);
+    void ParseAuthResponseMessage(JsonObject &json);
+    int32_t ParseAuthRequestMessage(JsonObject &json);
+    void ParseNegotiateMessage(const JsonObject &json);
+    void ParseRespNegotiateMessage(const JsonObject &json);
+    void CreateResponseFinishMessage(JsonObject &json);
+    void ParseResponseFinishMessage(JsonObject &json);
+    void GetAuthReqMessage(JsonObject &json);
+    void ParsePkgNegotiateMessage(const JsonObject &json);
+    void CreatePublicKeyMessageExt(JsonObject &json);
+    void ParsePublicKeyMessageExt(JsonObject &json);
+    void GetJsonObj(JsonObject &jsonObj);
+    void CreateReqReCheckMessage(JsonObject &jsonObj);
+    void ParseReqReCheckMessage(JsonObject &json);
     bool IsPincodeImported();
 
 private:
@@ -128,7 +128,6 @@ private:
     std::shared_ptr<ICryptoAdapter> cryptoAdapter_;
     std::shared_ptr<DmAuthRequestContext> authRequestContext_;
     std::shared_ptr<DmAuthResponseContext> authResponseContext_;
-    std::vector<nlohmann::json> authSplitJsonList_;
     std::mutex encryptFlagMutex_;
     bool encryptFlag_ = false;
     std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;

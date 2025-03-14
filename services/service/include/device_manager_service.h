@@ -33,6 +33,7 @@
 #include "i_dm_service_impl_ext_resident.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
+#include "dm_datashare_common_event.h"
 #include "dm_package_common_event.h"
 #include "dm_screen_common_event.h"
 #include "relationship_sync_mgr.h"
@@ -193,6 +194,9 @@ public:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void HandleDeviceTrustedChange(const std::string &msg);
     void HandleUserIdCheckSumChange(const std::string &msg);
+    void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
+    void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid,
+        const std::vector<std::string> &acceptEventUdids);
 #endif
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
     void ClearDiscoveryCache(const ProcessInfo &processInfo);
@@ -220,13 +224,13 @@ public:
         std::vector<DmDeviceProfileInfo> &deviceProfileInfoList);
     int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength, std::string &displayName);
     std::vector<std::string> GetDeviceNamePrefixs();
-    int64_t GenerateSerivceId();
     int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
     int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType);
     int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
     int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName, int32_t pinExchangeType,
         DMLocalServiceInfo &serviceInfo);
     void ClearPulishIdCache(const std::string &pkgName);
+    bool IsPC();
 
 private:
     bool IsDMServiceImplReady();
@@ -315,11 +319,23 @@ private:
         const std::vector<int32_t> &backgroundUserIds, const std::string &udid);
     void UpdateAclAndDeleteGroup(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId);
+    void HandleUserStopEvent(int32_t stopUserId);
+    void DivideNotifyMethod(const std::vector<std::string> &peerUdids, std::vector<std::string> &bleUdids,
+        std::map<std::string, std::string> &wifiDevices);
+    void NotifyRemoteLocalUserStop(const std::string &localUdid,
+        const std::vector<std::string> &peerUdids, int32_t stopUserId);
+    void SendUserStopBroadCast(const std::vector<std::string> &peerUdids, int32_t stopUserId);
+    void HandleUserStopBroadCast(int32_t stopUserId, const std::string &remoteUdid);
+    void NotifyRemoteLocalUserStopByWifi(const std::string &localUdid,
+        const std::map<std::string, std::string> &wifiDevices, int32_t stopUserId);
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+    void SubscribeDataShareCommonEvent();
 #endif
+    void CheckRegisterInfoWithWise(int32_t curUserId);
 
 private:
     bool isImplsoLoaded_ = false;
@@ -344,6 +360,7 @@ private:
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
+    std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
 #endif
     std::string localNetWorkId_ = "";
     std::shared_ptr<DmTimer> timer_;

@@ -164,8 +164,8 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     StartDiscoveryTimer(pkgNameTemp);
 
     auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
-    nlohmann::json jsonObject = nlohmann::json::parse(it->second, nullptr, false);
-    if (!jsonObject.is_discarded() && jsonObject.contains(TYPE_MINE)) {
+    JsonObject jsonObject(it->second);
+    if (!jsonObject.IsDiscarded() && jsonObject.Contains(TYPE_MINE)) {
         return StartDiscovering4MineLibary(pkgNameTemp, dmSubInfo, it->second);
     }
 
@@ -361,8 +361,8 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         filterPara.authForm) != DM_OK) {
         LOGE("The found device get online param failed.");
     }
-    nlohmann::json jsonObject = nlohmann::json::parse(info.extraData, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(info.extraData);
+    if (jsonObject.IsDiscarded()) {
         LOGE("OnDeviceFound jsonStr error");
         return;
     }
@@ -370,7 +370,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         LOGE("err json string: %{public}s", PARAM_KEY_DISC_CAPABILITY);
         return;
     }
-    uint32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].get<uint32_t>();
+    uint32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].Get<uint32_t>();
     OnDeviceFound(pkgName, capabilityType, info, filterPara);
 }
 

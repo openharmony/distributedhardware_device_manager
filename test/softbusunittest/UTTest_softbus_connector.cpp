@@ -720,10 +720,11 @@ HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext:
         .deviceName = "name",
     };
     DmDeviceInfo dmDeviceInfo;
-    nlohmann::json extraJson;
+    JsonObject extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = 1;
-    extraJson[PARAM_KEY_OS_VERSION] = {0};
-    dmDeviceInfo.extraData = extraJson.dump();
+    std::vector<int32_t> versions = {0};
+    extraJson[PARAM_KEY_OS_VERSION] = versions;
+    dmDeviceInfo.extraData = extraJson.Dump();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
     EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);

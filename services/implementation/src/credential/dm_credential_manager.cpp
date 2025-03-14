@@ -64,7 +64,7 @@ struct PeerCredentialInfo {
     std::string peerCredentialId;
 };
 
-void from_json(const nlohmann::json &jsonObject, CredentialData &credentialData)
+void FromJson(const JsonItemObject &jsonObject, CredentialData &credentialData)
 {
     if (!IsInt32(jsonObject, FIELD_CREDENTIAL_TYPE) || !IsString(jsonObject, FIELD_CREDENTIAL_ID) ||
         !IsString(jsonObject, FIELD_SERVER_PK) || !IsString(jsonObject, FIELD_PKINFO_SIGNATURE) ||
@@ -73,13 +73,13 @@ void from_json(const nlohmann::json &jsonObject, CredentialData &credentialData)
         LOGE("CredentialData json key not complete");
         return;
     }
-    credentialData.credentialType = jsonObject[FIELD_CREDENTIAL_TYPE].get<int32_t>();
-    credentialData.credentialId = jsonObject[FIELD_CREDENTIAL_ID].get<std::string>();
-    credentialData.serverPk = jsonObject[FIELD_SERVER_PK].get<std::string>();
-    credentialData.pkInfoSignature = jsonObject[FIELD_PKINFO_SIGNATURE].get<std::string>();
-    credentialData.pkInfo = jsonObject[FIELD_PKINFO].get<std::string>();
-    credentialData.authCode = jsonObject[FIELD_AUTH_CODE].get<std::string>();
-    credentialData.peerDeviceId = jsonObject[FIELD_PEER_DEVICE_ID].get<std::string>();
+    credentialData.credentialType = jsonObject[FIELD_CREDENTIAL_TYPE].Get<int32_t>();
+    credentialData.credentialId = jsonObject[FIELD_CREDENTIAL_ID].Get<std::string>();
+    credentialData.serverPk = jsonObject[FIELD_SERVER_PK].Get<std::string>();
+    credentialData.pkInfoSignature = jsonObject[FIELD_PKINFO_SIGNATURE].Get<std::string>();
+    credentialData.pkInfo = jsonObject[FIELD_PKINFO].Get<std::string>();
+    credentialData.authCode = jsonObject[FIELD_AUTH_CODE].Get<std::string>();
+    credentialData.peerDeviceId = jsonObject[FIELD_PEER_DEVICE_ID].Get<std::string>();
 }
 
 DmCredentialManager::DmCredentialManager(std::shared_ptr<HiChainConnector> hiChainConnector,
@@ -100,8 +100,8 @@ int32_t DmCredentialManager::RequestCredential(const std::string &reqJsonStr, st
     LOGI("start to request credential.");
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    nlohmann::json jsonObject = nlohmann::json::parse(reqJsonStr, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(reqJsonStr);
+    if (jsonObject.IsDiscarded()) {
         LOGE("reqJsonStr string not a json type.");
         return ERR_DM_FAILED;
     }
@@ -109,9 +109,9 @@ int32_t DmCredentialManager::RequestCredential(const std::string &reqJsonStr, st
         LOGE("user id or credential version string key not exist!");
         return ERR_DM_FAILED;
     }
-    std::string userId = jsonObject[FIELD_USER_ID].get<std::string>();
-    std::string credentialVersion = jsonObject[FIELD_CREDENTIAL_VERSION].get<std::string>();
-    nlohmann::json jsonObj;
+    std::string userId = jsonObject[FIELD_USER_ID].Get<std::string>();
+    std::string credentialVersion = jsonObject[FIELD_CREDENTIAL_VERSION].Get<std::string>();
+    JsonObject jsonObj;
     jsonObj[FIELD_CREDENTIAL_VERSION] = credentialVersion;
     jsonObj[FIELD_USER_ID] = userId;
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
@@ -127,8 +127,8 @@ int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const 
         LOGE("credentialInfo not found by pkgName %{public}s", GetAnonyString(pkgName).c_str());
         return ERR_DM_FAILED;
     }
-    nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(credentialInfo);
+    if (jsonObject.IsDiscarded()) {
         LOGE("credentialInfo string not a json type.");
         return ERR_DM_FAILED;
     }
@@ -136,7 +136,7 @@ int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const 
         LOGE("credential type string key not exist!");
         return ERR_DM_FAILED;
     }
-    int32_t processType = jsonObject[FIELD_PROCESS_TYPE].get<int32_t>();
+    int32_t processType = jsonObject[FIELD_PROCESS_TYPE].Get<int32_t>();
     if (IsString(jsonObject, FIELD_TYPE) && processType == REMOTE_CREDENTIAL_DEAL_TYPE) {
         int32_t ret = ImportRemoteCredentialExt(credentialInfo);
         if (ret == DM_OK) {
@@ -169,8 +169,8 @@ int32_t DmCredentialManager::ImportRemoteCredentialExt(const std::string &creden
 int32_t DmCredentialManager::ImportLocalCredential(const std::string &credentialInfo)
 {
     LOGI("ImportLocalCredential start");
-    nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(credentialInfo);
+    if (jsonObject.IsDiscarded()) {
         LOGE("credentialInfo string not a json type.");
         return ERR_DM_FAILED;
     }
@@ -179,24 +179,24 @@ int32_t DmCredentialManager::ImportLocalCredential(const std::string &credential
         LOGE("auth type or user id or credential data string key not exist!");
         return ERR_DM_FAILED;
     }
-    int32_t authType = jsonObject[FIELD_AUTH_TYPE].get<int32_t>();
+    int32_t authType = jsonObject[FIELD_AUTH_TYPE].Get<int32_t>();
     if (authType == SAME_ACCOUNT_TYPE) {
         authType = IDENTICAL_ACCOUNT_GROUP;
     }
     if (authType == CROSS_ACCOUNT_TYPE) {
         authType = ACROSS_ACCOUNT_AUTHORIZE_GROUP;
     }
-    std::string userId = jsonObject[FIELD_USER_ID].get<std::string>();
+    std::string userId = jsonObject[FIELD_USER_ID].Get<std::string>();
     requestId_ = GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
 
-    std::vector<CredentialData> vecCredentialData =
-        jsonObject[FIELD_CREDENTIAL_DATA].get<std::vector<CredentialData>>();
+    std::vector<CredentialData> vecCredentialData;
+    jsonObject[FIELD_CREDENTIAL_DATA].Get(vecCredentialData);
     if (vecCredentialData.size() != 1) {
         LOGI("ImportLocalCredential credentialData err");
         return ERR_DM_FAILED;
     }
     LOGI("ImportLocalCredential get credentialData success!");
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     if (GetCredentialData(credentialInfo, vecCredentialData[0], jsonOutObj) != DM_OK) {
         LOGE("failed to get credentialData field from input credential.");
         return ERR_DM_FAILED;
@@ -222,8 +222,8 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
 #endif
     processInfo_.pkgName = pkgName;
     processInfo_.userId = callerUserId;
-    nlohmann::json jsonObject = nlohmann::json::parse(deleteInfo, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(deleteInfo);
+    if (jsonObject.IsDiscarded()) {
         LOGE("deleteInfo string not a json type.");
         return ERR_DM_FAILED;
     }
@@ -232,15 +232,15 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
         LOGE("DmCredentialManager::DeleteCredential err json string!");
         return ERR_DM_FAILED;
     }
-    int32_t processType = jsonObject[FIELD_PROCESS_TYPE].get<int32_t>();
-    int32_t authType = jsonObject[FIELD_AUTH_TYPE].get<int32_t>();
+    int32_t processType = jsonObject[FIELD_PROCESS_TYPE].Get<int32_t>();
+    int32_t authType = jsonObject[FIELD_AUTH_TYPE].Get<int32_t>();
     if (authType == SAME_ACCOUNT_TYPE) {
         authType = IDENTICAL_ACCOUNT_GROUP;
     }
     if (authType == CROSS_ACCOUNT_TYPE) {
         authType = ACROSS_ACCOUNT_AUTHORIZE_GROUP;
     }
-    std::string userId = jsonObject[FIELD_USER_ID].get<std::string>();
+    std::string userId = jsonObject[FIELD_USER_ID].Get<std::string>();
     requestId_ = GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
     if (processType == LOCAL_CREDENTIAL_DEAL_TYPE) {
         return hiChainConnector_->DeleteGroup(requestId_, userId, authType);
@@ -309,14 +309,14 @@ int32_t DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkg
 }
 
 int32_t DmCredentialManager::GetCredentialData(const std::string &credentialInfo, const CredentialData &inputCreData,
-    nlohmann::json &jsonOutObj)
+    JsonObject &jsonOutObj)
 {
-    nlohmann::json jsonCreObj;
+    JsonObject jsonCreObj;
     jsonCreObj[FIELD_CREDENTIAL_TYPE] = inputCreData.credentialType;
     int32_t credentialType = inputCreData.credentialType;
     if (credentialType == NONSYMMETRY_CREDENTIAL_TYPE) {
-        nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
-        if (jsonObject.is_discarded()) {
+        JsonObject jsonObject(credentialInfo);
+        if (jsonObject.IsDiscarded()) {
             LOGE("credentialInfo string not a json type.");
             return ERR_DM_FAILED;
         }
@@ -325,16 +325,16 @@ int32_t DmCredentialManager::GetCredentialData(const std::string &credentialInfo
             LOGE("DmCredentialManager::GetCredentialData err json string!");
             return ERR_DM_FAILED;
         }
-        std::string userId = jsonObject[FIELD_USER_ID].get<std::string>();
-        std::string deviceId = jsonObject[FIELD_DEVICE_ID].get<std::string>();
-        std::string verSion = jsonObject[FIELD_CREDENTIAL_VERSION].get<std::string>();
-        std::string devicePk = jsonObject[FIELD_DEVICE_PK].get<std::string>();
-        nlohmann::json jsonPkInfo;
+        std::string userId = jsonObject[FIELD_USER_ID].Get<std::string>();
+        std::string deviceId = jsonObject[FIELD_DEVICE_ID].Get<std::string>();
+        std::string verSion = jsonObject[FIELD_CREDENTIAL_VERSION].Get<std::string>();
+        std::string devicePk = jsonObject[FIELD_DEVICE_PK].Get<std::string>();
+        JsonObject jsonPkInfo;
         jsonPkInfo[FIELD_USER_ID] = userId;
         jsonPkInfo[FIELD_DEVICE_ID] = deviceId;
         jsonPkInfo[FIELD_CREDENTIAL_VERSION] = verSion;
         jsonPkInfo[FIELD_DEVICE_PK] = devicePk;
-        jsonCreObj[FIELD_PKINFO] = jsonPkInfo;
+        jsonCreObj.Insert(FIELD_PKINFO, jsonPkInfo);
         jsonCreObj[FIELD_SERVER_PK] = inputCreData.serverPk;
         jsonCreObj[FIELD_PKINFO_SIGNATURE] = inputCreData.pkInfoSignature;
     } else if (credentialType == SYMMETRY_CREDENTIAL_TYPE) {
@@ -343,45 +343,45 @@ int32_t DmCredentialManager::GetCredentialData(const std::string &credentialInfo
         LOGE("invalid credentialType field!");
         return ERR_DM_FAILED;
     }
-    jsonOutObj = jsonCreObj;
+    jsonOutObj.Duplicate(jsonCreObj);
     return DM_OK;
 }
 
-void from_json(const nlohmann::json &jsonObject, CredentialDataInfo &credentialDataInfo)
+void FromJson(const JsonItemObject &jsonObject, CredentialDataInfo &credentialDataInfo)
 {
     if (!IsInt32(jsonObject, FIELD_CREDENTIAL_TYPE)) {
         LOGE("credentialType json key not exist");
         return;
     }
-    credentialDataInfo.credentialType = jsonObject[FIELD_CREDENTIAL_TYPE].get<int32_t>();
+    credentialDataInfo.credentialType = jsonObject[FIELD_CREDENTIAL_TYPE].Get<int32_t>();
     if (IsString(jsonObject, FIELD_CREDENTIAL_ID)) {
-        credentialDataInfo.credentailId = jsonObject[FIELD_CREDENTIAL_ID].get<std::string>();
+        credentialDataInfo.credentailId = jsonObject[FIELD_CREDENTIAL_ID].Get<std::string>();
     }
     if (credentialDataInfo.credentialType == NONSYMMETRY_CREDENTIAL_TYPE) {
         if (IsString(jsonObject, FIELD_SERVER_PK)) {
-            credentialDataInfo.serverPk = jsonObject[FIELD_SERVER_PK].get<std::string>();
+            credentialDataInfo.serverPk = jsonObject[FIELD_SERVER_PK].Get<std::string>();
         }
         if (IsString(jsonObject, FIELD_PKINFO_SIGNATURE)) {
-            credentialDataInfo.pkInfoSignature = jsonObject[FIELD_PKINFO_SIGNATURE].get<std::string>();
+            credentialDataInfo.pkInfoSignature = jsonObject[FIELD_PKINFO_SIGNATURE].Get<std::string>();
         }
         if (IsString(jsonObject, FIELD_PKINFO)) {
-            nlohmann::json jsonPkInfo = jsonObject[FIELD_PKINFO];
+            JsonItemObject jsonPkInfo = jsonObject[FIELD_PKINFO];
             credentialDataInfo.pkInfo = SafetyDump(jsonPkInfo);
         }
     } else if (credentialDataInfo.credentialType == SYMMETRY_CREDENTIAL_TYPE) {
         if (IsString(jsonObject, FIELD_AUTH_CODE)) {
-            credentialDataInfo.authCode = jsonObject[FIELD_AUTH_CODE].get<std::string>();
+            credentialDataInfo.authCode = jsonObject[FIELD_AUTH_CODE].Get<std::string>();
         }
     } else {
         LOGE("credentialType john key is unknown");
         return;
     }
     if (IsString(jsonObject, FIELD_PEER_DEVICE_ID)) {
-        credentialDataInfo.peerDeviceId = jsonObject[FIELD_PEER_DEVICE_ID].get<std::string>();
+        credentialDataInfo.peerDeviceId = jsonObject[FIELD_PEER_DEVICE_ID].Get<std::string>();
     }
 }
 
-void to_json(nlohmann::json &jsonObject, const CredentialDataInfo &credentialDataInfo)
+void ToJson(JsonItemObject &jsonObject, const CredentialDataInfo &credentialDataInfo)
 {
     jsonObject[FIELD_DEVICE_ID] = credentialDataInfo.peerDeviceId;
     jsonObject[FIELD_UDID] =credentialDataInfo.peerDeviceId;
@@ -397,38 +397,38 @@ void to_json(nlohmann::json &jsonObject, const CredentialDataInfo &credentialDat
     }
 }
 
-int32_t DmCredentialManager::GetAddDeviceList(const nlohmann::json &jsonObject, nlohmann::json &jsonDeviceList)
+int32_t DmCredentialManager::GetAddDeviceList(const JsonObject &jsonObject, JsonObject &jsonDeviceList)
 {
-    if (!jsonObject.contains(FIELD_CREDENTIAL_DATA) || !jsonObject[FIELD_CREDENTIAL_DATA].is_array() ||
+    if (!jsonObject.Contains(FIELD_CREDENTIAL_DATA) || !jsonObject[FIELD_CREDENTIAL_DATA].IsArray() ||
         !IsInt32(jsonObject, FIELD_AUTH_TYPE)) {
         LOGE("credentaildata or authType string key not exist!");
         return ERR_DM_FAILED;
     }
-    nlohmann::json credentialJson = jsonObject[FIELD_CREDENTIAL_DATA];
-    auto credentialDataList = credentialJson.get<std::vector<CredentialDataInfo>>();
-    int32_t authType = jsonObject[FIELD_AUTH_TYPE].get<int32_t>();
+    JsonItemObject credentialJson = jsonObject[FIELD_CREDENTIAL_DATA];
+    std::vector<CredentialDataInfo> credentialDataList;
+    credentialJson.Get(credentialDataList);
+    int32_t authType = jsonObject[FIELD_AUTH_TYPE].Get<int32_t>();
 
     for (auto &credentialData : credentialDataList) {
         if (authType == SAME_ACCOUNT_TYPE) {
             if (IsString(jsonObject, FIELD_USER_ID)) {
-                credentialData.userId = jsonObject[FIELD_USER_ID].get<std::string>();
+                credentialData.userId = jsonObject[FIELD_USER_ID].Get<std::string>();
             }
         } else if (authType == CROSS_ACCOUNT_TYPE) {
             if (IsString(jsonObject, FIELD_PEER_USER_ID)) {
-                credentialData.userId = jsonObject[FIELD_PEER_USER_ID].get<std::string>();
+                credentialData.userId = jsonObject[FIELD_PEER_USER_ID].Get<std::string>();
             }
         }
     }
-    for (size_t i = 0; i < credentialDataList.size(); i++) {
-        jsonDeviceList[FIELD_DEVICE_LIST][i] = credentialDataList.at(i);
-    }
+
+    jsonDeviceList[FIELD_DEVICE_LIST] = credentialDataList;
     return DM_OK;
 }
 
 int32_t DmCredentialManager::ImportRemoteCredential(const std::string &credentialInfo)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(credentialInfo);
+    if (jsonObject.IsDiscarded()) {
         LOGE("credentialInfo string not a json type.");
         return ERR_DM_FAILED;
     }
@@ -436,7 +436,7 @@ int32_t DmCredentialManager::ImportRemoteCredential(const std::string &credentia
         LOGE("auth type string key not exist!");
         return ERR_DM_FAILED;
     }
-    int32_t authType = jsonObject[FIELD_AUTH_TYPE].get<int32_t>();
+    int32_t authType = jsonObject[FIELD_AUTH_TYPE].Get<int32_t>();
     std::string userId;
     int32_t groupType = 0;
     if (authType == SAME_ACCOUNT_TYPE) {
@@ -445,7 +445,7 @@ int32_t DmCredentialManager::ImportRemoteCredential(const std::string &credentia
             LOGE("userId string key not exist!");
             return ERR_DM_FAILED;
         } else {
-            userId = jsonObject[FIELD_USER_ID].get<std::string>();
+            userId = jsonObject[FIELD_USER_ID].Get<std::string>();
         }
     } else if (authType == CROSS_ACCOUNT_TYPE) {
         groupType = ACROSS_ACCOUNT_AUTHORIZE_GROUP;
@@ -453,10 +453,10 @@ int32_t DmCredentialManager::ImportRemoteCredential(const std::string &credentia
             LOGE("peerUserId string key not exist!");
             return ERR_DM_FAILED;
         } else {
-            userId = jsonObject[FIELD_PEER_USER_ID].get<std::string>();
+            userId = jsonObject[FIELD_PEER_USER_ID].Get<std::string>();
         }
     }
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     if (GetAddDeviceList(jsonObject, jsonDeviceList) != DM_OK) {
         LOGE("failed to get add DeviceList.");
         return ERR_DM_FAILED;
@@ -468,35 +468,34 @@ int32_t DmCredentialManager::ImportRemoteCredential(const std::string &credentia
     return DM_OK;
 }
 
-void from_json(const nlohmann::json &jsonObject, PeerCredentialInfo &peerCredentialInfo)
+void FromJson(const JsonItemObject &jsonObject, PeerCredentialInfo &peerCredentialInfo)
 {
     if (IsString(jsonObject, FIELD_PEER_USER_ID)) {
-        peerCredentialInfo.peerDeviceId = jsonObject[FIELD_PEER_USER_ID].get<std::string>();
+        peerCredentialInfo.peerDeviceId = jsonObject[FIELD_PEER_USER_ID].Get<std::string>();
     }
 }
 
-void to_json(nlohmann::json &jsonObject, const PeerCredentialInfo &peerCredentialInfo)
+void ToJson(JsonItemObject &jsonObject, const PeerCredentialInfo &peerCredentialInfo)
 {
     jsonObject[FIELD_DEVICE_ID] = peerCredentialInfo.peerDeviceId;
 }
 
-int32_t GetDeleteDeviceList(const nlohmann::json &jsonObject, nlohmann::json &deviceList)
+int32_t GetDeleteDeviceList(const JsonObject &jsonObject, JsonObject &deviceList)
 {
     if (!IsArray(jsonObject, FIELD_PEER_CREDENTIAL_INFO)) {
         LOGE("devicelist string key not exist!");
         return ERR_DM_FAILED;
     }
-    auto peerCredentialInfo = jsonObject[FIELD_PEER_CREDENTIAL_INFO].get<std::vector<PeerCredentialInfo>>();
-    for (size_t i = 0; i < peerCredentialInfo.size(); i++) {
-        deviceList[FIELD_DEVICE_LIST][i] = peerCredentialInfo[i];
-    }
+    std::vector<PeerCredentialInfo> peerCredentialInfo;
+    jsonObject[FIELD_PEER_CREDENTIAL_INFO].Get(peerCredentialInfo);
+    deviceList[FIELD_DEVICE_LIST] = peerCredentialInfo;
     return DM_OK;
 }
 
 int32_t DmCredentialManager::DeleteRemoteCredential(const std::string &deleteInfo)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(deleteInfo, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(deleteInfo);
+    if (jsonObject.IsDiscarded()) {
         LOGE("credentialInfo string not a json type.");
         return ERR_DM_FAILED;
     }
@@ -504,7 +503,7 @@ int32_t DmCredentialManager::DeleteRemoteCredential(const std::string &deleteInf
         LOGE("authType, peerCredential or peerUserId string key not exist!");
         return ERR_DM_FAILED;
     }
-    int32_t authType = jsonObject[FIELD_AUTH_TYPE].get<int32_t>();
+    int32_t authType = jsonObject[FIELD_AUTH_TYPE].Get<int32_t>();
     std::string userId;
     int32_t groupType = 0;
     if (authType == SAME_ACCOUNT_TYPE) {
@@ -512,7 +511,7 @@ int32_t DmCredentialManager::DeleteRemoteCredential(const std::string &deleteInf
             LOGE("userId string key not exist.");
             return ERR_DM_FAILED;
         } else {
-            userId = jsonObject[FIELD_USER_ID].get<std::string>();
+            userId = jsonObject[FIELD_USER_ID].Get<std::string>();
         }
         groupType = IDENTICAL_ACCOUNT_GROUP;
     } else if (authType == CROSS_ACCOUNT_TYPE) {
@@ -520,11 +519,11 @@ int32_t DmCredentialManager::DeleteRemoteCredential(const std::string &deleteInf
             LOGE("peerUserId string key not exist.");
             return ERR_DM_FAILED;
         } else {
-            userId = jsonObject[FIELD_PEER_USER_ID].get<std::string>();
+            userId = jsonObject[FIELD_PEER_USER_ID].Get<std::string>();
         }
         groupType = ACROSS_ACCOUNT_AUTHORIZE_GROUP;
     }
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     if (GetDeleteDeviceList(jsonObject, jsonDeviceList) != DM_OK) {
         LOGE("failed to get delete DeviceList.");
         return ERR_DM_FAILED;

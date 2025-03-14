@@ -22,7 +22,7 @@
 #include "softbus_session.h"
 #include <memory>
 #include "softbus_listener_fuzzer.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -242,7 +242,7 @@ void SoftBusListenerThirdFuzzTest(const uint8_t* data, size_t size)
             }
         }
     };
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
     addrInfo.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
     softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);

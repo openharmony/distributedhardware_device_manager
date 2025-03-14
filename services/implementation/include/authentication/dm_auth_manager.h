@@ -499,7 +499,7 @@ private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
-    bool CheckHmlParamValid(nlohmann::json &jsonObject);
+    bool CheckHmlParamValid(JsonObject &jsonObject);
     bool CheckProcessNameInWhiteList(const std::string &processName);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
@@ -525,6 +525,8 @@ private:
     int32_t CheckTrustState();
     void ProcIncompatible(const int32_t &sessionId);
     void MemberJoinAuthRequest(int64_t requestId, int32_t status);
+    void PutSrcAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
+    void PutSinkAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
 
 public:
     void RequestCredential();
@@ -550,8 +552,8 @@ private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
-    void ParseJsonObject(nlohmann::json jsonObject);
-    void ParseHmlInfoInJsonObject(nlohmann::json jsonObject);
+    void ParseJsonObject(JsonObject &jsonObject);
+    void ParseHmlInfoInJsonObject(JsonObject &jsonObject);
     void PutSessionKeyAsync(int64_t requestId, std::vector<unsigned char> hash);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
@@ -576,7 +578,7 @@ private:
     void DeleteOffLineTimer(int32_t sessionId);
     bool IsAllowDeviceBind();
     int32_t GetBindLevel(int32_t bindLevel);
-    std::string GetBundleName(nlohmann::json &jsonObject);
+    std::string GetBundleName(JsonObject &jsonObject);
     int32_t GetBinderInfo();
     void SetProcessInfo();
     int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);

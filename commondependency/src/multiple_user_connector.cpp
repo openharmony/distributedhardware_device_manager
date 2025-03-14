@@ -317,5 +317,54 @@ std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
     return "";
 #endif
 }
+
+bool MultipleUserConnector::IsUserUnlocked(int32_t userId)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return true;
+#elif OS_ACCOUNT_PART_EXISTS
+    bool isUserUnlocked = false;
+    ErrCode ret = OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
+    if (ret != 0) {
+        LOGE("IsUserUnlocked error ret: %{public}d", ret);
+        return false;
+    }
+    return isUserUnlocked;
+#else
+    return true;
+#endif
+}
+
+void MultipleUserConnector::ClearLockedUser(std::vector<int32_t> &foregroundUserVec)
+{
+    for (auto iter = foregroundUserVec.begin(); iter != foregroundUserVec.end();) {
+        if (!IsUserUnlocked(*iter)) {
+            iter = foregroundUserVec.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+}
+
+void MultipleUserConnector::ClearLockedUser(std::vector<int32_t> &foregroundUserVec,
+    std::vector<int32_t> &backgroundUserVec)
+{
+    for (auto iter = foregroundUserVec.begin(); iter != foregroundUserVec.end();) {
+        if (!IsUserUnlocked(*iter)) {
+            backgroundUserVec.push_back(*iter);
+            iter = foregroundUserVec.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+}
+
+DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
+{
+    DMAccountInfo dmAccountInfo;
+    dmAccountInfo.accountId = GetOhosAccountId();
+    dmAccountInfo.accountName = GetOhosAccountName();
+    return dmAccountInfo;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

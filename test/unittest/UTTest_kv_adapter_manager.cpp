@@ -88,7 +88,7 @@ bool KVAdapterManagerTest::UnInitKvStoreEnv()
 
 std::string KVAdapterManagerTest::CreateDmKVValueStr(const std::string &appId, int64_t lastModifyTime) const
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[UDID_HASH_KEY] = "udid";
     jsonObject[APP_ID_KEY] = appId;
     jsonObject[ANOY_DEVICE_ID_KEY] = "anoy_device";

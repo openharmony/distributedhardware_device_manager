@@ -29,7 +29,7 @@
 #include "dm_radar_helper.h"
 #include "hichain_connector_callback.h"
 #include "multiple_user_connector.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "parameter.h"
 #include "unistd.h"
 
@@ -63,31 +63,31 @@ static const std::unordered_map<int32_t, AuthFormPriority> g_authFormPriorityMap
     {GROUP_TYPE_PEER_TO_PEER_GROUP, AuthFormPriority::PRIORITY_PEER_TO_PEER}
 };
 
-void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo)
+void FromJson(const JsonItemObject &jsonObject, GroupInfo &groupInfo)
 {
-    if (jsonObject.find(FIELD_GROUP_NAME) != jsonObject.end() && jsonObject.at(FIELD_GROUP_NAME).is_string()) {
-        groupInfo.groupName = jsonObject.at(FIELD_GROUP_NAME).get<std::string>();
+    if (jsonObject.Contains(FIELD_GROUP_NAME) && jsonObject.At(FIELD_GROUP_NAME).IsString()) {
+        groupInfo.groupName = jsonObject.At(FIELD_GROUP_NAME).Get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_ID) != jsonObject.end() && jsonObject.at(FIELD_GROUP_ID).is_string()) {
-        groupInfo.groupId = jsonObject.at(FIELD_GROUP_ID).get<std::string>();
+    if (jsonObject.Contains(FIELD_GROUP_ID) && jsonObject.At(FIELD_GROUP_ID).IsString()) {
+        groupInfo.groupId = jsonObject.At(FIELD_GROUP_ID).Get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_OWNER) != jsonObject.end() && jsonObject.at(FIELD_GROUP_OWNER).is_string()) {
-        groupInfo.groupOwner = jsonObject.at(FIELD_GROUP_OWNER).get<std::string>();
+    if (jsonObject.Contains(FIELD_GROUP_OWNER) && jsonObject.At(FIELD_GROUP_OWNER).IsString()) {
+        groupInfo.groupOwner = jsonObject.At(FIELD_GROUP_OWNER).Get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_TYPE) != jsonObject.end() && jsonObject.at(FIELD_GROUP_TYPE).is_number_integer()) {
-        groupInfo.groupType = jsonObject.at(FIELD_GROUP_TYPE).get<int32_t>();
+    if (jsonObject.Contains(FIELD_GROUP_TYPE) && jsonObject.At(FIELD_GROUP_TYPE).IsNumberInteger()) {
+        groupInfo.groupType = jsonObject.At(FIELD_GROUP_TYPE).Get<int32_t>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_VISIBILITY) != jsonObject.end() &&
-        jsonObject.at(FIELD_GROUP_VISIBILITY).is_number_integer()) {
-        groupInfo.groupVisibility = jsonObject.at(FIELD_GROUP_VISIBILITY).get<int32_t>();
+    if (jsonObject.Contains(FIELD_GROUP_VISIBILITY) &&
+        jsonObject.At(FIELD_GROUP_VISIBILITY).IsNumberInteger()) {
+        groupInfo.groupVisibility = jsonObject.At(FIELD_GROUP_VISIBILITY).Get<int32_t>();
     }
 
-    if (jsonObject.find(FIELD_USER_ID) != jsonObject.end() && jsonObject.at(FIELD_USER_ID).is_string()) {
-        groupInfo.userId = jsonObject.at(FIELD_USER_ID).get<std::string>();
+    if (jsonObject.Contains(FIELD_USER_ID) && jsonObject.At(FIELD_USER_ID).IsString()) {
+        groupInfo.userId = jsonObject.At(FIELD_USER_ID).Get<std::string>();
     }
 }
 
@@ -151,7 +151,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string sLocalDeviceId = localDeviceId;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
     jsonObj[FIELD_DEVICE_ID] = sLocalDeviceId;
     jsonObj[FIELD_GROUP_NAME] = groupName;
@@ -185,7 +185,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &grou
 
 bool HiChainConnector::IsGroupCreated(std::string groupName, GroupInfo &groupInfo)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_NAME] = groupName.c_str();
     std::string queryParams = SafetyDump(jsonObj);
     std::vector<GroupInfo> groupList;
@@ -198,7 +198,7 @@ bool HiChainConnector::IsGroupCreated(std::string groupName, GroupInfo &groupInf
 
 bool HiChainConnector::IsRedundanceGroup(const std::string &userId, int32_t authType, std::vector<GroupInfo> &groupList)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = authType;
     std::string queryParams = SafetyDump(jsonObj);
 
@@ -267,17 +267,18 @@ bool HiChainConnector::GetGroupInfoCommon(const int32_t userId, const std::strin
     LOGI("HiChainConnector::GetGroupInfo groupNum(%{public}u)", num);
     std::string relatedGroups = std::string(groupVec);
     deviceGroupManager_->destroyInfo(&groupVec);
-    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(relatedGroups);
+    if (jsonObject.IsDiscarded()) {
         LOGE("returnGroups parse error");
         return false;
     }
-    if (!jsonObject.is_array()) {
+    if (!jsonObject.IsArray()) {
         LOGE("json string is not array.");
         return false;
     }
-    std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
-    if (groupInfos.size() == 0) {
+    std::vector<GroupInfo> groupInfos;
+    jsonObject.Get(groupInfos);
+    if (groupInfos.empty()) {
         LOGE("HiChainConnector::GetGroupInfo group failed, groupInfos is empty.");
         return false;
     }
@@ -329,8 +330,8 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
         LOGI("HiChainConnector::AddMember group manager is null.");
         return ERR_DM_POINT_NULL;
     }
-    nlohmann::json jsonObject = nlohmann::json::parse(connectInfo, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(connectInfo);
+    if (jsonObject.IsDiscarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
@@ -342,20 +343,20 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string connectInfomation = GetConnectPara(deviceId, jsonObject[TAG_DEVICE_ID].get<std::string>());
+    std::string connectInfomation = GetConnectPara(deviceId, jsonObject[TAG_DEVICE_ID].Get<std::string>());
 
-    int32_t pinCode = jsonObject[PIN_CODE_KEY].get<int32_t>();
-    std::string groupId = jsonObject[TAG_GROUP_ID].get<std::string>();
-    nlohmann::json jsonObj;
+    int32_t pinCode = jsonObject[PIN_CODE_KEY].Get<int32_t>();
+    std::string groupId = jsonObject[TAG_GROUP_ID].Get<std::string>();
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
     jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode).c_str();
     jsonObj[FIELD_IS_ADMIN] = false;
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
-    jsonObj[FIELD_GROUP_NAME] = jsonObject[TAG_GROUP_NAME].get<std::string>();
+    jsonObj[FIELD_GROUP_NAME] = jsonObject[TAG_GROUP_NAME].Get<std::string>();
     jsonObj[FIELD_CONNECT_PARAMS] = connectInfomation.c_str();
     std::string tmpStr = SafetyDump(jsonObj);
-    int64_t requestId = jsonObject[TAG_REQUEST_ID].get<int64_t>();
+    int64_t requestId = jsonObject[TAG_REQUEST_ID].Get<int64_t>();
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (userId < 0) {
         LOGE("get current process account user id failed");
@@ -485,7 +486,7 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
         LOGE("HiChainConnector::onRequest hiChainConnectorCallback_ is nullptr.");
         return nullptr;
     }
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     int32_t pinCode = INVALID_PINCODE;
     if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == INVALID_PINCODE) {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
@@ -515,8 +516,8 @@ std::string HiChainConnector::GetConnectPara(std::string deviceId, std::string r
         return "";
     }
     std::string connectAddr = hiChainConnectorCallback_->GetConnectAddr(deviceId);
-    nlohmann::json jsonObject = nlohmann::json::parse(connectAddr, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(connectAddr);
+    if (jsonObject.IsDiscarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
         return connectAddr;
     }
@@ -616,7 +617,7 @@ int32_t HiChainConnector::DelMemberFromGroup(const std::string &groupId, const s
     int64_t requestId = GenRequestId();
     LOGI("Start to delete member from group, requestId %{public}" PRId64", deviceId %{public}s, groupId %{public}s",
         requestId, GetAnonyString(deviceId).c_str(), GetAnonyString(groupId).c_str());
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_DELETE_ID] = deviceId;
     std::string deleteParams = SafetyDump(jsonObj);
@@ -636,7 +637,7 @@ int32_t HiChainConnector::DelMemberFromGroup(const std::string &groupId, const s
 int32_t HiChainConnector::DeleteGroup(std::string &groupId)
 {
     int64_t requestId = GenRequestId();
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     std::string disbandParams = SafetyDump(jsonObj);
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -656,7 +657,7 @@ int32_t HiChainConnector::DeleteGroup(std::string &groupId)
 int32_t HiChainConnector::DeleteGroupExt(std::string &groupId)
 {
     int64_t requestId = GenRequestId();
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     std::string disbandParams = SafetyDump(jsonObj);
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
@@ -676,7 +677,7 @@ int32_t HiChainConnector::DeleteGroupExt(std::string &groupId)
 int32_t HiChainConnector::DeleteGroupExt(int32_t userId, std::string &groupId)
 {
     int64_t requestId = GenRequestId();
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     std::string disbandParams = SafetyDump(jsonObj);
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME_EXT, disbandParams.c_str());
@@ -690,7 +691,7 @@ int32_t HiChainConnector::DeleteGroupExt(int32_t userId, std::string &groupId)
 int32_t HiChainConnector::DeleteGroup(int64_t requestId_, const std::string &userId, const int32_t authType)
 {
     networkStyle_ = CREDENTIAL_NETWORK;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = authType;
     std::string queryParams = SafetyDump(jsonObj);
     std::vector<GroupInfo> groupList;
@@ -795,7 +796,7 @@ void HiChainConnector::DealRedundanceGroup(const std::string &userId, int32_t au
 }
 
 int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const std::string &userId,
-    nlohmann::json &jsonOutObj)
+    JsonObject &jsonOutObj)
 {
     LOGI("HiChainConnector::CreateGroup start.");
     if (deviceGroupManager_ == nullptr) {
@@ -808,10 +809,10 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string sLocalDeviceId = localDeviceId;
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = authType;
     jsonObj[FIELD_USER_ID] = userId;
-    jsonObj[FIELD_CREDENTIAL] = jsonOutObj;
+    jsonObj.Insert(FIELD_CREDENTIAL, jsonOutObj);
     jsonObj[FIELD_DEVICE_ID] = sLocalDeviceId;
     jsonObj[FIELD_USER_TYPE] = 0;
     jsonObj[FIELD_GROUP_VISIBILITY] = GROUP_VISIBILITY_PUBLIC;
@@ -872,7 +873,7 @@ int32_t HiChainConnector::getRegisterInfo(const std::string &queryParams, std::s
 
 int32_t HiChainConnector::GetGroupId(const std::string &userId, const int32_t groupType, std::string &groupId)
 {
-    nlohmann::json jsonObjGroup;
+    JsonObject jsonObjGroup;
     jsonObjGroup[FIELD_GROUP_TYPE] = groupType;
     std::string queryParams = SafetyDump(jsonObjGroup);
     std::vector<GroupInfo> groupList;
@@ -892,9 +893,9 @@ int32_t HiChainConnector::GetGroupId(const std::string &userId, const int32_t gr
 }
 
 int32_t HiChainConnector::ParseRemoteCredential(const int32_t groupType, const std::string &userId,
-    const nlohmann::json &jsonDeviceList, std::string &params, int32_t &osAccountUserId)
+    const JsonObject &jsonDeviceList, std::string &params, int32_t &osAccountUserId)
 {
-    if (userId.empty() || !jsonDeviceList.contains(FIELD_DEVICE_LIST)) {
+    if (userId.empty() || !jsonDeviceList.Contains(FIELD_DEVICE_LIST)) {
         LOGE("userId or deviceList is empty");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -903,7 +904,7 @@ int32_t HiChainConnector::ParseRemoteCredential(const int32_t groupType, const s
         LOGE("failed to get groupid");
         return ERR_DM_FAILED;
     }
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_GROUP_TYPE] = groupType;
     jsonObj[FIELD_DEVICE_LIST] = jsonDeviceList[FIELD_DEVICE_LIST];
@@ -917,7 +918,7 @@ int32_t HiChainConnector::ParseRemoteCredential(const int32_t groupType, const s
 }
 
 int32_t HiChainConnector::addMultiMembers(const int32_t groupType, const std::string &userId,
-    const nlohmann::json &jsonDeviceList)
+    const JsonObject &jsonDeviceList)
 {
     if (deviceGroupManager_ == nullptr) {
         LOGE("HiChainConnector::deviceGroupManager_ is nullptr.");
@@ -938,28 +939,28 @@ int32_t HiChainConnector::addMultiMembers(const int32_t groupType, const std::st
     return DM_OK;
 }
 
-std::string HiChainConnector::GetJsonStr(const nlohmann::json &jsonObj, const std::string &key)
+std::string HiChainConnector::GetJsonStr(const JsonObject &jsonObj, const std::string &key)
 {
     if (!IsString(jsonObj, key)) {
         LOGE("User string key not exist!");
         return "";
     }
-    return jsonObj[key].get<std::string>();
+    return jsonObj[key].Get<std::string>();
 }
 
-int32_t HiChainConnector::GetJsonInt(const nlohmann::json &jsonObj, const std::string &key)
+int32_t HiChainConnector::GetJsonInt(const JsonObject &jsonObj, const std::string &key)
 {
     if (!IsInt32(jsonObj, key)) {
         LOGE("User string key not exist!");
         return ERR_DM_FAILED;
     }
-    return jsonObj[key].get<int32_t>();
+    return jsonObj[key].Get<int32_t>();
 }
 
 int32_t HiChainConnector::GetGroupIdExt(const std::string &userId, const int32_t groupType,
     std::string &groupId, std::string &groupOwner)
 {
-    nlohmann::json jsonObjGroup;
+    JsonObject jsonObjGroup;
     jsonObjGroup[FIELD_GROUP_TYPE] = groupType;
     std::string queryParams = SafetyDump(jsonObjGroup);
     std::vector<GroupInfo> groupList;
@@ -983,12 +984,12 @@ int32_t HiChainConnector::ParseRemoteCredentialExt(const std::string &credential
     std::string &groupOwner)
 {
     LOGI("ParseRemoteCredentialExt start.");
-    nlohmann::json jsonObject = nlohmann::json::parse(credentialInfo, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(credentialInfo);
+    if (jsonObject.IsDiscarded()) {
         LOGE("CredentialInfo string not a json type.");
         return ERR_DM_FAILED;
     }
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     int32_t groupType = 0;
     std::string userId = "";
     int32_t authType = GetJsonInt(jsonObject, AUTH_TYPE);
@@ -1010,7 +1011,7 @@ int32_t HiChainConnector::ParseRemoteCredentialExt(const std::string &credential
     jsonObj[FIELD_CREDENTIAL_TYPE] = GetJsonInt(jsonObject, FIELD_CREDENTIAL_TYPE);
     jsonObj[FIELD_OPERATION_CODE] = GetJsonInt(jsonObject, FIELD_OPERATION_CODE);
     jsonObj[FIELD_META_NODE_TYPE] = GetJsonStr(jsonObject, FIELD_TYPE);
-    if (!jsonObject.contains(FIELD_DEVICE_LIST)) {
+    if (!jsonObject.Contains(FIELD_DEVICE_LIST)) {
         LOGE("Credentaildata or authType string key not exist!");
         return ERR_DM_FAILED;
     }
@@ -1045,7 +1046,7 @@ int32_t HiChainConnector::addMultiMembersExt(const std::string &credentialInfo)
 }
 
 int32_t HiChainConnector::deleteMultiMembers(const int32_t groupType, const std::string &userId,
-    const nlohmann::json &jsonDeviceList)
+    const JsonObject &jsonDeviceList)
 {
     if (deviceGroupManager_ == nullptr) {
         LOGE("HiChainConnector::deviceGroupManager_ is nullptr.");
@@ -1101,16 +1102,17 @@ std::vector<std::string> HiChainConnector::GetTrustedDevices(const std::string &
 
 int32_t HiChainConnector::GetTrustedDevicesUdid(const char* jsonStr, std::vector<std::string> &udidList)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(jsonStr, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(jsonStr);
+    if (jsonObject.IsDiscarded()) {
         LOGE("credentialInfo string not a json type.");
         return ERR_DM_FAILED;
     }
-    for (nlohmann::json::iterator it1 = jsonObject.begin(); it1 != jsonObject.end(); it1++) {
+    std::vector<JsonItemObject> children = jsonObject.Items();
+    for (auto it1 = children.begin(); it1 != children.end(); it1++) {
         if (!IsString((*it1), FIELD_AUTH_ID)) {
             continue;
         }
-        std::string udid = (*it1)[FIELD_AUTH_ID];
+        std::string udid = (*it1)[FIELD_AUTH_ID].Get<std::string>();
         udidList.push_back(udid);
     }
     return DM_OK;
@@ -1173,16 +1175,17 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, co
     }
     std::string relatedGroups = std::string(returnGroups);
     deviceGroupManager_->destroyInfo(&returnGroups);
-    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(relatedGroups);
+    if (jsonObject.IsDiscarded()) {
         LOGE("returnGroups parse error");
         return ERR_DM_FAILED;
     }
-    if (!jsonObject.is_array()) {
+    if (!jsonObject.IsArray()) {
         LOGE("jsonObject is not an array.");
         return ERR_DM_FAILED;
     }
-    std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
+    std::vector<GroupInfo> groupInfos;
+    jsonObject.Get(groupInfos);
     if (groupInfos.empty()) {
         LOGE("HiChainConnector::GetRelatedGroups group failed, groupInfos is empty.");
         return ERR_DM_FAILED;
@@ -1198,7 +1201,7 @@ int32_t HiChainConnector::DeleteGroup(const int32_t userId, std::string &groupId
         return ERR_DM_FAILED;
     }
     int64_t requestId = GenRequestId();
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     std::string disbandParams = SafetyDump(jsonObj);
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME, disbandParams.c_str());
@@ -1237,16 +1240,17 @@ int32_t HiChainConnector::GetRelatedGroupsCommon(int32_t userId, const std::stri
     }
     std::string relatedGroups = std::string(returnGroups);
     deviceGroupManager_->destroyInfo(&returnGroups);
-    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(relatedGroups);
+    if (jsonObject.IsDiscarded()) {
         LOGE("returnGroups parse error");
         return ERR_DM_FAILED;
     }
-    if (!jsonObject.is_array()) {
+    if (!jsonObject.IsArray()) {
         LOGE("jsonObject is not an array.");
         return ERR_DM_FAILED;
     }
-    std::vector<GroupInfo> groupInfos = jsonObject.get<std::vector<GroupInfo>>();
+    std::vector<GroupInfo> groupInfos;
+    jsonObject.Get(groupInfos);
     if (groupInfos.empty()) {
         LOGE("HiChainConnector::GetRelatedGroups group failed, groupInfos is empty.");
         return ERR_DM_FAILED;
@@ -1285,7 +1289,7 @@ int32_t HiChainConnector::DeleteGroupByACL(std::vector<std::pair<int32_t, std::s
         LOGI("userIdVec is empty");
         return DM_OK;
     }
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
     std::string queryParams = SafetyDump(jsonObj);
     for (int32_t userId : userIdVec) {

@@ -312,7 +312,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_001, testing::ext::TestSize.L
 
 HWTEST_F(HiChainAuthConnectorTest, QueryCredential_002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -323,7 +323,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_002, testing::ext::TestSize.L
 
 HWTEST_F(HiChainAuthConnectorTest, QueryCredential_003, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -336,7 +336,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_003, testing::ext::TestSize.L
 
 HWTEST_F(HiChainAuthConnectorTest, QueryCredential_004, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -349,7 +349,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_004, testing::ext::TestSize.L
 
 HWTEST_F(HiChainAuthConnectorTest, QueryCredential_005, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -362,7 +362,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_005, testing::ext::TestSize.L
 
 HWTEST_F(HiChainAuthConnectorTest, QueryCredential_006, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -375,7 +375,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_006, testing::ext::TestSize.L
 
 HWTEST_F(HiChainAuthConnectorTest, QueryCredential_007, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -388,7 +388,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_007, testing::ext::TestSize.L
 
 HWTEST_F(HiChainAuthConnectorTest, QueryCredential_008, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);

@@ -50,7 +50,7 @@ struct InputCustomDialog {
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
     if (mediaQueryResult.matches as boolean) {
-      this.heightNum = 300;
+      this.heightNum = 100;
     } else {
       this.heightNum = 800;
     }
@@ -69,6 +69,9 @@ struct InputCustomDialog {
     ims.on('imeShow', (info: Array<inputMethod.InputWindowInfo>) => {
       this.scroller.scrollTo({yOffset: 72, xOffset: 0});
     });
+    if (AppStorage.get('mediaQueryResult') != null && AppStorage.get('mediaQueryResult') as boolean) {
+      this.heightNum = 100;
+    }
     if (AppStorage.get('targetDeviceName') != null) {
       this.targetDeviceName = AppStorage.get('targetDeviceName') as string;
       console.log('targetDeviceName is ' + this.targetDeviceName);
@@ -380,6 +383,7 @@ struct InputCustomDialog {
 @Entry
 @Component
 struct dialogPlusPage {
+  mediaQueryListener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
   dialogController: CustomDialogController = new CustomDialogController({
     builder: InputCustomDialog(),
     autoCancel: false,
@@ -391,6 +395,11 @@ struct dialogPlusPage {
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear aboutToAppear');
+    this.mediaQueryListener.on('change', this.onPortrait.bind(this));
+  }
+
+  onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
+    AppStorage.setOrCreate('mediaQueryResult', mediaQueryResult.matches as boolean);
   }
 
   aboutToDisappear() {

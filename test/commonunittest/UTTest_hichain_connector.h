@@ -24,7 +24,7 @@
 #include <map>
 #include <vector>
 
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "device_auth.h"
 #include "dm_single_instance.h"
 #include "hichain_connector_callback.h"

@@ -65,10 +65,10 @@ ohos_shared_library("distributeddevicemanager") {
     "access_token:libtokenid_sdk",
     "bounds_checking_function:libsec_shared",
     "bundle_framework:appexecfwk_base",
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
-    "json:nlohmann_json_static",
     "napi:ace_napi",
   ]
 

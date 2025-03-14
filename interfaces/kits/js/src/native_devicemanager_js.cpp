@@ -22,7 +22,7 @@
 #include "ipc_skeleton.h"
 #include "js_native_api.h"
 #include "tokenid_kit.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 using namespace OHOS::DistributedHardware;
 
@@ -1194,7 +1194,7 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
     int32_t bindLevel = 0;
     JsObjectToInt(env, object, "bindLevel", bindLevel);
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[AUTH_TYPE] = authType;
     jsonObj[APP_OPERATION] = appOperationStr;
     jsonObj[CUSTOM_DESCRIPTION] = customDescriptionStr;
@@ -1206,7 +1206,7 @@ void DeviceManagerNapi::JsToDmExtra(const napi_env &env, const napi_value &objec
 }
 
 void DeviceManagerNapi::JsToJsonObject(const napi_env &env, const napi_value &object, const std::string &fieldStr,
-                                       nlohmann::json &jsonObj)
+                                       JsonObject &jsonObj)
 {
     bool hasProperty = false;
     NAPI_CALL_RETURN_VOID(env, napi_has_named_property(env, object, fieldStr.c_str(), &hasProperty));
@@ -1267,7 +1267,7 @@ void DeviceManagerNapi::JsToDmAuthInfo(const napi_env &env, const napi_value &ob
 
     JsObjectToInt(env, object, "authType", authType);
     JsObjectToInt(env, object, "token", token);
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[AUTH_TYPE] = authType;
     jsonObj[PIN_TOKEN] = token;
     JsToJsonObject(env, object, "extraInfo", jsonObj);

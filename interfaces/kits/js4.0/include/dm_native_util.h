@@ -26,7 +26,7 @@
 #include "dm_publish_info.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -65,7 +65,7 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
 void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra);
 bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &discoverTargetType);
 bool IsSystemApp();
-void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap);
+void InsertMapParames(JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap);
 napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = true);
 bool CheckArgsCount(napi_env env, bool assertion, const std::string &message);
 bool CheckArgsType(napi_env env, bool assertion, const std::string &paramName, const std::string &type);
@@ -81,7 +81,6 @@ void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &ob
     DmDeviceIconInfoFilterOptions &info);
 void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
     napi_value &arrayResult);
-void DmProductInfoToJs(const napi_env &env, const DmProductInfo &prodInfos, napi_value &jsObj);
 void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &devInfo, napi_value &jsObj);
 void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj);
 void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,

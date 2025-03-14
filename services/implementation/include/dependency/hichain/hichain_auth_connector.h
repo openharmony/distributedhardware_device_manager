@@ -20,7 +20,7 @@
 #include "device_auth.h"
 #include "device_auth_defines.h"
 #include "hichain_connector_callback.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {

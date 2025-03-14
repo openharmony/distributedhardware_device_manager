@@ -111,7 +111,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_001, testing::ext::TestSize.L
 HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = 123456789;
     std::string reqJsonStr = SafetyDump(jsonObject);
     int32_t ret = minHiChain->CreateGroup(reqJsonStr);
@@ -121,7 +121,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_002, testing::ext::TestSize.L
 HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = "123456789";
     std::string reqJsonStr = SafetyDump(jsonObject);
     int32_t ret = minHiChain->CreateGroup(reqJsonStr);
@@ -131,7 +131,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_003, testing::ext::TestSize.L
 HWTEST_F(MiniHiChainAuthConnectorTest, RequestCredential_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = "123456789";
     std::string returnJsonStr = SafetyDump(jsonObject);
     int32_t ret = minHiChain->RequestCredential(returnJsonStr);
@@ -168,7 +168,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_001, testing::ext::TestS
 HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = 123456789;
     std::string reqJsonStr = SafetyDump(jsonObject);
     std::string returnJsonStr;

@@ -593,9 +593,9 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_001, test
     ret = listener_->FillUdidAndUuidToDeviceInfo(pkgName, dmDeviceInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    nlohmann::json extraJson;
+    JsonObject extraJson;
     extraJson["extraData"] = "extraDataInfo";
-    dmDeviceInfo.extraData = extraJson.dump();
+    dmDeviceInfo.extraData = extraJson.Dump();
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("udid"), Return(DM_OK)));
     EXPECT_CALL(*softbusCacheMock_, GetUuidFromCache(_, _))

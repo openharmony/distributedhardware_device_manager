@@ -17,7 +17,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "softbus_connector.h"
 #include "softbus_error_code.h"
 

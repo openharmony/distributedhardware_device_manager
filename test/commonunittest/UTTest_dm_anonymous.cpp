@@ -183,7 +183,7 @@ HWTEST_F(DmAnonymousTest, IsString_001, testing::ext::TestSize.Level0)
         "pinToken" : "IsString"
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsString(jsonObj, PIN_TOKEN);
     EXPECT_EQ(ret, true);
 }
@@ -201,7 +201,7 @@ HWTEST_F(DmAnonymousTest, IsString_002, testing::ext::TestSize.Level0)
         "pinToken" : 123
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsString(jsonObj, PIN_TOKEN);
     EXPECT_EQ(ret, false);
 }
@@ -219,7 +219,7 @@ HWTEST_F(DmAnonymousTest, IsInt32_001, testing::ext::TestSize.Level0)
         "AUTHTYPE" : 369
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsInt32(jsonObj, TAG_AUTH_TYPE);
     EXPECT_EQ(ret, true);
 }
@@ -237,7 +237,7 @@ HWTEST_F(DmAnonymousTest, IsInt32_002, testing::ext::TestSize.Level0)
         "AUTHTYPE" : "authtypeTest"
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsInt32(jsonObj, TAG_AUTH_TYPE);
     EXPECT_EQ(ret, false);
 }
@@ -255,7 +255,7 @@ HWTEST_F(DmAnonymousTest, IsUint32_001, testing::ext::TestSize.Level0)
         "AUTHTYPE" : "authtypeTest"
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsUint32(jsonObj, TAG_AUTH_TYPE);
     EXPECT_EQ(ret, false);
 }
@@ -273,7 +273,7 @@ HWTEST_F(DmAnonymousTest, IsInt64_001, testing::ext::TestSize.Level0)
         "REQUESTID" : 789
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsInt64(jsonObj, TAG_REQUEST_ID);
     EXPECT_EQ(ret, true);
 }
@@ -291,7 +291,7 @@ HWTEST_F(DmAnonymousTest, IsInt64_002, testing::ext::TestSize.Level0)
         "REQUESTID" : "requestidTest"
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsInt64(jsonObj, TAG_REQUEST_ID);
     EXPECT_EQ(ret, false);
 }
@@ -322,7 +322,7 @@ HWTEST_F(DmAnonymousTest, IsArray_001, testing::ext::TestSize.Level0)
         ]
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsArray(jsonObj, FIELD_CREDENTIAL_DATA);
     EXPECT_EQ(ret, true);
 }
@@ -342,7 +342,7 @@ HWTEST_F(DmAnonymousTest, IsArray_002, testing::ext::TestSize.Level0)
         "credentialData" : "credentialDataTest"
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsArray(jsonObj, FIELD_CREDENTIAL_DATA);
     EXPECT_EQ(ret, false);
 }
@@ -362,7 +362,7 @@ HWTEST_F(DmAnonymousTest, IsBool_001, testing::ext::TestSize.Level0)
         "credentialData" : "credentialDataTest"
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsBool(jsonObj, TAG_CRYPTO_SUPPORT);
     EXPECT_EQ(ret, true);
 }
@@ -382,7 +382,7 @@ HWTEST_F(DmAnonymousTest, IsBool_002, testing::ext::TestSize.Level0)
         "credentialData" : "credentialDataTest"
     }
     )";
-    nlohmann::json jsonObj = nlohmann::json::parse(str, nullptr, false);
+    JsonObject jsonObj(str);
     bool ret = IsBool(jsonObj, TAG_CRYPTO_SUPPORT);
     EXPECT_EQ(ret, false);
 }
@@ -461,7 +461,7 @@ HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_001, testing::ext::TestSize.Lev
     }
     )";
     std::map<std::string, std::string> paramMap;
-    nlohmann::json jsonObj = nlohmann::json::parse(jsonStr, nullptr, false);
+    JsonObject jsonObj(jsonStr);
     ParseMapFromJsonString(jsonStr, paramMap);
     EXPECT_GE(paramMap.size(), 0);
 }
@@ -487,7 +487,7 @@ HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_002, testing::ext::TestSize.Lev
         ]
     )";
     std::map<std::string, std::string> paramMap;
-    nlohmann::json jsonObj = nlohmann::json::parse(jsonStr, nullptr, false);
+    JsonObject jsonObj(jsonStr);
     ParseMapFromJsonString(jsonStr, paramMap);
     EXPECT_EQ(paramMap.size(), 0);
 }
@@ -496,7 +496,7 @@ HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_003, testing::ext::TestSize.Lev
 {
     std::string jsonStr = "";
     std::map<std::string, std::string> paramMap;
-    nlohmann::json jsonObj = nlohmann::json::parse(jsonStr, nullptr, false);
+    JsonObject jsonObj(jsonStr);
     ParseMapFromJsonString(jsonStr, paramMap);
     EXPECT_EQ(paramMap.size(), 0);
 }

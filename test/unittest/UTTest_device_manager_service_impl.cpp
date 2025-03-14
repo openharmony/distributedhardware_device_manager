@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -174,7 +174,7 @@ HWTEST_F(DeviceManagerServiceImplTest, Initialize_003, testing::ext::TestSize.Le
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_001, testing::ext::TestSize.Level0)
 {
     std::string event = R"({"extra": {"deviceId": "123"})";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -190,7 +190,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_001, testing::ext::T
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_002, testing::ext::TestSize.Level0)
 {
     std::string event = R"({"content": {"deviceid": "123"}})";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -206,7 +206,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_002, testing::ext::T
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_003, testing::ext::TestSize.Level0)
 {
     std::string event = R"({"extra": {"deviceaId": "123"}})";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -222,7 +222,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_003, testing::ext::T
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_004, testing::ext::TestSize.Level0)
 {
     std::string event = R"({"extra": {"deviceId": 123}})";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -238,7 +238,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_004, testing::ext::T
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_005, testing::ext::TestSize.Level0)
 {
     std::string event = R"({"Extra": {"deviceId": "123"}})";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -254,7 +254,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_005, testing::ext::T
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_006, testing::ext::TestSize.Level0)
 {
     std::string event = R"({"extra":"123"}})";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -270,7 +270,7 @@ HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_006, testing::ext::T
 HWTEST_F(DeviceManagerServiceImplTest, PraseNotifyEventJson_007, testing::ext::TestSize.Level0)
 {
     std::string event = R"({"extra": {"deviceId": "123"}})";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
     }
@@ -1752,7 +1752,7 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     std::vector<uint32_t> foregroundUserIds;
     std::vector<uint32_t> backgroundUserIds;
     std::string remoteUdid = "deviceId";
-    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
+    deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, false);
 
     std::vector<std::string> deviceVec;
     int32_t currentUserId = 1;
