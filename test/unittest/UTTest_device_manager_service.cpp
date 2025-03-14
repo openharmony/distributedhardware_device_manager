@@ -271,6 +271,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
     std::string accountName = "openharmony123";
     std::map<std::string, int32_t> curUserDeviceMap;
     std::map<std::string, int32_t> preUserDeviceMap;
+    std::multimap<std::string, int32_t> curMultiMap;
     std::string commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
     EXPECT_CALL(*deviceManagerServiceImplMock_,
         GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
@@ -280,14 +281,17 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
     EXPECT_CALL(*multipleUserConnectorMock_, GetAccountInfoByUserId(_)).WillOnce(Return(dmAccountInfo));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(curMultiMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(curMultiMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_))
+        .WillOnce(Return(curMultiMap)).WillOnce(Return(curMultiMap));
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, pkgName);
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap));
+    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(curMultiMap));
     DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     DeviceManagerService::GetInstance().SendAccountLogoutBroadCast(peerUdids, accountId, accountName, userId);
