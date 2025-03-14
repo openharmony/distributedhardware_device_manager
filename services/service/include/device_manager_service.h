@@ -233,6 +233,7 @@ public:
     bool IsPC();
 
 private:
+    bool IsCheckDeviceInfoPermission();
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
     bool IsDMServiceAdapterSoLoaded();

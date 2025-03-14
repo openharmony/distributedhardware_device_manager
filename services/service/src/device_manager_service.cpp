@@ -390,6 +390,14 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
     return DM_OK;
 }
 
+bool DeviceManagerService::IsCheckDeviceInfoPermission()
+{
+    if (AppManager::GetInstance().IsSystemSA()) {
+        return true;
+    }
+    return false;
+}
+
 int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
     LOGI("Begin networkId %{public}s.", GetAnonyString(networkId).c_str());
@@ -420,16 +428,18 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
         }
         return ret;
     }
-    int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
-    if (permissionRet != DM_OK) {
-        std::string processName = "";
-        if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-            LOGE("Get caller process name failed.");
-            return ret;
-        }
-        if (!PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName)) {
-            LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-            return ret;
+    if (!IsCheckDeviceInfoPermission()) {
+        int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
+        if (permissionRet != DM_OK) {
+            std::string processName = "";
+            if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+                LOGE("Get caller process name failed.");
+                return ret;
+            }
+            if (!PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName)) {
+                LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+                return ret;
+            }
         }
     }
     ret = softbusListener_->GetDeviceInfo(networkId, info);
