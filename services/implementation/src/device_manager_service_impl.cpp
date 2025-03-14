@@ -474,18 +474,18 @@ int32_t DeviceManagerServiceImpl::UnRegisterUiStateCallback(const std::string &p
     return authMgr_->UnRegisterUiStateCallback(pkgName);
 }
 
-int32_t DeviceManagerServiceImpl::PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject)
+int32_t DeviceManagerServiceImpl::PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject)
 {
-    jsonObject = nlohmann::json::parse(event, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    jsonObject.Parse(event);
+    if (jsonObject.IsDiscarded()) {
         LOGE("event prase error.");
         return ERR_DM_FAILED;
     }
-    if ((!jsonObject.contains("extra")) || (!jsonObject["extra"].is_object())) {
+    if ((!jsonObject.Contains("extra")) || (!jsonObject["extra"].IsObject())) {
         LOGE("extra error");
         return ERR_DM_FAILED;
     }
-    if ((!jsonObject["extra"].contains("deviceId")) || (!jsonObject["extra"]["deviceId"].is_string())) {
+    if ((!jsonObject["extra"].Contains("deviceId")) || (!jsonObject["extra"]["deviceId"].IsString())) {
         LOGE("NotifyEvent deviceId invalid");
         return ERR_DM_FAILED;
     }
@@ -501,13 +501,13 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (eventId == DM_NOTIFY_EVENT_ONDEVICEREADY) {
-        nlohmann::json jsonObject;
+        JsonObject jsonObject;
         if (PraseNotifyEventJson(event, jsonObject) != DM_OK) {
             LOGE("NotifyEvent json invalid");
             return ERR_DM_INPUT_PARA_INVALID;
         }
         std::string deviceId;
-        jsonObject["extra"]["deviceId"].get_to(deviceId);
+        jsonObject["extra"]["deviceId"].GetTo(deviceId);
         if (deviceStateMgr_== nullptr) {
             LOGE("deviceStateMgr_ is nullptr");
             return ERR_DM_POINT_NULL;

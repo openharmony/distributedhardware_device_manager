@@ -22,7 +22,7 @@
 #include "dp_inited_callback.h"
 #include "dp_init_callback_fuzzer.h"
 #include "dm_constants.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 
 namespace OHOS {
@@ -55,18 +55,18 @@ void DpInitedCallbackFirstFuzzTest(const uint8_t* data, size_t size)
     deviceInfo.extraData = "extraInfo";
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
 
-    nlohmann::json extraJson;
+    JsonObject extraJson;
     extraJson[PARAM_KEY_OS_VERSION] = 1;
-    deviceInfo.extraData = extraJson.dump();
+    deviceInfo.extraData = extraJson.Dump();
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
 
     extraJson[PARAM_KEY_OS_VERSION] = "os_version";
     extraJson[PARAM_KEY_OS_TYPE] = "os_type";
-    deviceInfo.extraData = extraJson.dump();
+    deviceInfo.extraData = extraJson.Dump();
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
 
     extraJson[PARAM_KEY_OS_TYPE] = DATA_LEN;
-    deviceInfo.extraData = extraJson.dump();
+    deviceInfo.extraData = extraJson.Dump();
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
 }
 }

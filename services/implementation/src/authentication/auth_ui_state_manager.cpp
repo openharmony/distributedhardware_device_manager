@@ -16,7 +16,7 @@
 #include "auth_ui_state_manager.h"
 #include "dm_anonymous.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
 #endif
@@ -60,7 +60,7 @@ void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
         LOGE("AuthUiStateManager::UpdateUiState listener is null.");
         return;
     }
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[UI_STATE_MSG] = msg;
     std::string paramJson = SafetyDump(jsonObj);
     std::lock_guard<std::mutex> lock(pkgSetMutex_);

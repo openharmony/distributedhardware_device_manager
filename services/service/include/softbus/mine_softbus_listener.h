@@ -20,7 +20,6 @@
 
 using std::vector;
 using std::string;
-using json = nlohmann::json;
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -93,15 +92,15 @@ public:
 private:
     int32_t InitSoftPublishLNN();
     int32_t ParseSearchJson(const string &pkgName, const string &searchJsonStr, char *output, size_t *outLen);
-    int32_t ParseSearchAllDevice(const json &object, const string &pkgName, char *output, size_t *outLen);
-    int32_t ParseSearchScopeDevice(const json &object, const string &pkgName, char *output, size_t *outLen);
-    int32_t ParseSearchVertexDevice(const json &object, const string &pkgName, char *output, size_t *outLen);
-    int32_t SetBroadcastHead(const json &object, const string &pkgName, BroadcastHead &broadcastHead);
+    int32_t ParseSearchAllDevice(const JsonObject &object, const string &pkgName, char *output, size_t *outLen);
+    int32_t ParseSearchScopeDevice(const JsonObject &object, const string &pkgName, char *output, size_t *outLen);
+    int32_t ParseSearchVertexDevice(const JsonObject &object, const string &pkgName, char *output, size_t *outLen);
+    int32_t SetBroadcastHead(const JsonObject &object, const string &pkgName, BroadcastHead &broadcastHead);
     void AddHeadToBroadcast(const BroadcastHead &broadcastHead, char *output);
     int32_t ParseScopeDeviceJsonArray(const std::vector<ScopeOptionInfo> &optionInfo, char *output, size_t *outLen);
     int32_t ParseVertexDeviceJsonArray(const std::vector<VertexOptionInfo> &optionInfo, char *output, size_t *outLen);
     static int32_t GetSha256Hash(const char *data, size_t len, char *output);
-    int32_t SetBroadcastTrustOptions(const json &object, BroadcastHead &broadcastHead);
+    int32_t SetBroadcastTrustOptions(const JsonObject &object, BroadcastHead &broadcastHead);
     int32_t SetBroadcastPkgname(const string &pkgName, BroadcastHead &broadcastHead);
     int32_t SendBroadcastInfo(const string &pkgName, SubscribeInfo &subscribeInfo, char *output, size_t outputLen);
     void SetSubscribeInfo(const DmSubscribeInfo &dmSubscribeInfo, SubscribeInfo &subscribeInfo);

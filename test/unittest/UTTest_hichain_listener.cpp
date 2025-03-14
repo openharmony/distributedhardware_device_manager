@@ -64,7 +64,7 @@ HWTEST_F(HichainListenerTest, OnHichainDeviceUnBound_001, testing::ext::TestSize
     HichainListener listerner;
     char peerUdid[] = "zhangsan";
 
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     constexpr int32_t  DM_IDENTICAL_ACCOUNT = 1;
     jsonObject[FIELD_GROUP_TYPE] = DM_IDENTICAL_ACCOUNT;
     jsonObject[FIELD_USER_ID] = "hdaoiudhifvafiouoahf-ZhangSan";

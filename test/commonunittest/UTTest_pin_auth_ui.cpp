@@ -21,7 +21,7 @@
 #include "dm_ability_manager.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "device_manager_service_listener.h"
 
 namespace OHOS {

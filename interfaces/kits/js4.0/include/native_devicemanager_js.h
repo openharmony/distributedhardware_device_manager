@@ -31,7 +31,7 @@
 #include "dm_error_message.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #define DM_NAPI_BUF_LENGTH (256)
 
 struct AsyncCallbackInfo {

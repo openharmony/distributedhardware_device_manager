@@ -22,7 +22,7 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "pin_holder.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "parameter.h"
 #include "device_manager_service_listener.h"
 

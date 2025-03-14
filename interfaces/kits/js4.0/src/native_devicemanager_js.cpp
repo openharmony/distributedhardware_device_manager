@@ -29,7 +29,7 @@
 #include "ipc_skeleton.h"
 #include "js_native_api.h"
 #include "tokenid_kit.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 using namespace OHOS::DistributedHardware;
 
@@ -2569,23 +2569,23 @@ int32_t DeviceManagerNapi::BindTargetWarpper(const std::string &pkgName, const s
     if (bindParam.empty()) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    nlohmann::json bindParamObj = nlohmann::json::parse(bindParam, nullptr, false);
-    if (bindParamObj.is_discarded()) {
+    JsonObject bindParamObj(bindParam);
+    if (bindParamObj.IsDiscarded()) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
     PeerTargetId targetId;
     targetId.deviceId = deviceId;
     if (IsString(bindParamObj, PARAM_KEY_BR_MAC)) {
-        targetId.brMac = bindParamObj[PARAM_KEY_BR_MAC].get<std::string>();
+        targetId.brMac = bindParamObj[PARAM_KEY_BR_MAC].Get<std::string>();
     }
     if (IsString(bindParamObj, PARAM_KEY_BLE_MAC)) {
-        targetId.bleMac = bindParamObj[PARAM_KEY_BLE_MAC].get<std::string>();
+        targetId.bleMac = bindParamObj[PARAM_KEY_BLE_MAC].Get<std::string>();
     }
     if (IsString(bindParamObj, PARAM_KEY_WIFI_IP)) {
-        targetId.wifiIp = bindParamObj[PARAM_KEY_WIFI_IP].get<std::string>();
+        targetId.wifiIp = bindParamObj[PARAM_KEY_WIFI_IP].Get<std::string>();
     }
     if (IsInt32(bindParamObj, PARAM_KEY_WIFI_PORT)) {
-        targetId.wifiPort = (uint16_t)(bindParamObj[PARAM_KEY_WIFI_PORT].get<int32_t>());
+        targetId.wifiPort = (uint16_t)(bindParamObj[PARAM_KEY_WIFI_PORT].Get<int32_t>());
     }
 
     std::map<std::string, std::string> bindParamMap;

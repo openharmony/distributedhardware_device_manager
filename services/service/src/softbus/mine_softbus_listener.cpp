@@ -32,7 +32,7 @@
 #include "parameter.h"
 #include "system_ability_definition.h"
 #include "softbus_listener.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "dm_crypto.h"
 #include "openssl/sha.h"
 #include "openssl/evp.h"
@@ -92,37 +92,37 @@ static IPublishCb publishLNNCallback_ = {
 #endif
 };
 
-void from_json(const json &object, VertexOptionInfo &optionInfo)
+void FromJson(const JsonItemObject &object, VertexOptionInfo &optionInfo)
 {
-    if (!object.contains("type") || !object["type"].is_string()) {
+    if (!object.Contains("type") || !object["type"].IsString()) {
         LOGE("OptionInfo type json key is not exist or type error.");
         return;
     }
-    if (!object.contains("value") || !object["value"].is_string()) {
+    if (!object.Contains("value") || !object["value"].IsString()) {
         LOGE("OptionInfo value json key is not exist or type error.");
         return;
     }
-    object["type"].get_to(optionInfo.type);
-    object["value"].get_to(optionInfo.value);
+    object["type"].GetTo(optionInfo.type);
+    object["value"].GetTo(optionInfo.value);
 }
 
-void from_json(const json &object, ScopeOptionInfo &optionInfo)
+void FromJson(const JsonItemObject &object, ScopeOptionInfo &optionInfo)
 {
-    if (!object.contains("deviceAlias") || !object["deviceAlias"].is_string()) {
+    if (!object.Contains("deviceAlias") || !object["deviceAlias"].IsString()) {
         LOGE("OptionInfo deviceAlias json key is not exist or error.");
         return;
     }
-    if (!object.contains("startNumber") || !object["startNumber"].is_number_integer()) {
+    if (!object.Contains("startNumber") || !object["startNumber"].IsNumberInteger()) {
         LOGE("OptionInfo startNumber json key is not exist or error.");
         return;
     }
-    if (!object.contains("endNumber") || !object["endNumber"].is_number_integer()) {
+    if (!object.Contains("endNumber") || !object["endNumber"].IsNumberInteger()) {
         LOGE("OptionInfo endNumber json key is not exist or error.");
         return;
     }
-    object["deviceAlias"].get_to(optionInfo.deviceAlias);
-    object["startNumber"].get_to(optionInfo.startNumber);
-    object["endNumber"].get_to(optionInfo.endNumber);
+    object["deviceAlias"].GetTo(optionInfo.deviceAlias);
+    object["startNumber"].GetTo(optionInfo.startNumber);
+    object["endNumber"].GetTo(optionInfo.endNumber);
 }
 
 MineSoftbusListener::MineSoftbusListener()
@@ -241,13 +241,13 @@ void MineSoftbusListener::OnRePublish(void)
 int32_t MineSoftbusListener::ParseSearchJson(const string &pkgName, const string &searchJson, char *output,
     size_t *outLen)
 {
-    json object = json::parse(searchJson, nullptr, false);
-    if (object.is_discarded()) {
+    JsonObject object(searchJson);
+    if (object.IsDiscarded()) {
         LOGE("failed to parse filter options string.");
         return ERR_DM_INVALID_JSON_STRING;
     }
     int32_t retValue = DM_OK;
-    uint32_t findMode = object[FIELD_DEVICE_MODE];
+    uint32_t findMode = object[FIELD_DEVICE_MODE].Get<uint32_t>();
     LOGI("quick search device mode is: %{public}u", findMode);
     switch (findMode) {
         case FIND_ALL_DEVICE:
@@ -270,7 +270,7 @@ int32_t MineSoftbusListener::ParseSearchJson(const string &pkgName, const string
     return DM_OK;
 }
 
-int32_t MineSoftbusListener::ParseSearchAllDevice(const nlohmann::json &object, const string &pkgName, char *output,
+int32_t MineSoftbusListener::ParseSearchAllDevice(const JsonObject &object, const string &pkgName, char *output,
     size_t *outLen)
 {
     BroadcastHead broadcastHead;
@@ -285,7 +285,7 @@ int32_t MineSoftbusListener::ParseSearchAllDevice(const nlohmann::json &object, 
     return DM_OK;
 }
 
-int32_t MineSoftbusListener::ParseSearchScopeDevice(const nlohmann::json &object, const string &pkgName, char *output,
+int32_t MineSoftbusListener::ParseSearchScopeDevice(const JsonObject &object, const string &pkgName, char *output,
     size_t *outLen)
 {
     BroadcastHead broadcastHead;
@@ -293,11 +293,12 @@ int32_t MineSoftbusListener::ParseSearchScopeDevice(const nlohmann::json &object
         LOGE("fail to set broadcast head.");
         return ERR_DM_FAILED;
     }
-    if (!object.contains(FIELD_FILTER_OPTIONS) || !object[FIELD_FILTER_OPTIONS].is_array()) {
+    if (!object.Contains(FIELD_FILTER_OPTIONS) || !object[FIELD_FILTER_OPTIONS].IsArray()) {
         LOGE("failed to get %{public}s scope cjson object or is not array.", FIELD_FILTER_OPTIONS);
         return ERR_DM_FAILED;
     }
-    auto optionInfoVec = object[FIELD_FILTER_OPTIONS].get<std::vector<ScopeOptionInfo>>();
+    std::vector<ScopeOptionInfo> optionInfoVec;
+    object[FIELD_FILTER_OPTIONS].Get(optionInfoVec);
     size_t optionInfoVecSize = optionInfoVec.size();
     if (optionInfoVecSize == 0 || optionInfoVecSize > DM_MAX_SCOPE_TLV_NUM) {
         LOGE("failed to get search josn array lenght.");
@@ -316,7 +317,7 @@ int32_t MineSoftbusListener::ParseSearchScopeDevice(const nlohmann::json &object
     return DM_OK;
 }
 
-int32_t MineSoftbusListener::ParseSearchVertexDevice(const nlohmann::json &object, const string &pkgName, char *output,
+int32_t MineSoftbusListener::ParseSearchVertexDevice(const JsonObject &object, const string &pkgName, char *output,
     size_t *outLen)
 {
     BroadcastHead broadcastHead;
@@ -324,11 +325,12 @@ int32_t MineSoftbusListener::ParseSearchVertexDevice(const nlohmann::json &objec
         LOGE("fail to set broadcast head.");
         return ERR_DM_FAILED;
     }
-    if (!object.contains(FIELD_FILTER_OPTIONS) || !object[FIELD_FILTER_OPTIONS].is_array()) {
+    if (!object.Contains(FIELD_FILTER_OPTIONS) || !object[FIELD_FILTER_OPTIONS].IsArray()) {
         LOGE("failed to get %{public}s vertex cjson object or is not array.", FIELD_FILTER_OPTIONS);
         return ERR_DM_FAILED;
     }
-    auto optionInfoVec = object[FIELD_FILTER_OPTIONS].get<std::vector<VertexOptionInfo>>();
+    std::vector<VertexOptionInfo> optionInfoVec;
+    object[FIELD_FILTER_OPTIONS].Get(optionInfoVec);
     size_t optionInfoVecSize = optionInfoVec.size();
     if (optionInfoVecSize == 0 || optionInfoVecSize > DM_MAX_VERTEX_TLV_NUM) {
         LOGE("failed to get search josn array lenght.");
@@ -347,7 +349,8 @@ int32_t MineSoftbusListener::ParseSearchVertexDevice(const nlohmann::json &objec
     return DM_OK;
 }
 
-int32_t MineSoftbusListener::SetBroadcastHead(const json &object, const string &pkgName, BroadcastHead &broadcastHead)
+int32_t MineSoftbusListener::SetBroadcastHead(const JsonObject &object, const string &pkgName,
+    BroadcastHead &broadcastHead)
 {
     broadcastHead.version = BROADCAST_VERSION;
     broadcastHead.headDataLen = sizeof(BroadcastHead);
@@ -464,15 +467,15 @@ int32_t MineSoftbusListener::GetSha256Hash(const char *data, size_t len, char *o
     return DM_OK;
 }
 
-int32_t MineSoftbusListener::SetBroadcastTrustOptions(const json &object, BroadcastHead &broadcastHead)
+int32_t MineSoftbusListener::SetBroadcastTrustOptions(const JsonObject &object, BroadcastHead &broadcastHead)
 {
-    if (!object.contains(FIELD_TRUST_OPTIONS)) {
+    if (!object.Contains(FIELD_TRUST_OPTIONS)) {
         broadcastHead.trustFilter = 0;
         return DM_OK;
-    } else if (object[FIELD_TRUST_OPTIONS].is_boolean() && object[FIELD_TRUST_OPTIONS]) {
+    } else if (object[FIELD_TRUST_OPTIONS].IsBoolean() && object[FIELD_TRUST_OPTIONS].Get<bool>()) {
         broadcastHead.trustFilter = FIND_TRUST_DEVICE;
         return DM_OK;
-    } else if (object[FIELD_TRUST_OPTIONS].is_boolean() && !object[FIELD_TRUST_OPTIONS]) {
+    } else if (object[FIELD_TRUST_OPTIONS].IsBoolean() && !object[FIELD_TRUST_OPTIONS].Get<bool>()) {
         broadcastHead.trustFilter = FIND_NOTRUST_DEVICE;
         return DM_OK;
     }

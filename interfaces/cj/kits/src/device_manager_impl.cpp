@@ -108,25 +108,25 @@ int32_t TransformErrCode(const int32_t errCode)
     return 0;
 }
 
-inline void InsertIntItem(nlohmann::json &jsonObj, std::map<std::string, std::string> &jsonMap,
+inline void InsertIntItem(JsonObject &jsonObj, std::map<std::string, std::string> &jsonMap,
     const std::string &searchKey, const std::string &insertKey)
 {
     if (IsInt32(jsonObj, searchKey)) {
-        int32_t value = jsonObj[searchKey].get<int32_t>();
+        int32_t value = jsonObj[searchKey].Get<int32_t>();
         jsonMap.insert(std::pair<std::string, std::string>(insertKey, std::to_string(value)));
     }
 }
 
-inline void InsertStringItem(nlohmann::json &jsonObj, std::map<std::string, std::string> &jsonMap,
+inline void InsertStringItem(JsonObject &jsonObj, std::map<std::string, std::string> &jsonMap,
     const std::string &searchKey, const std::string &insertKey)
 {
     if (IsString(jsonObj, searchKey)) {
-        std::string value = jsonObj[searchKey].get<std::string>();
+        std::string value = jsonObj[searchKey].Get<std::string>();
         jsonMap.insert(std::pair<std::string, std::string>(insertKey, value));
     }
 }
 
-void InsertJsonParamesToMap(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap)
+void InsertJsonParamesToMap(JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap)
 {
     LOGI("Insert map parames start");
     InsertIntItem(bindParamObj, bindParamMap, AUTH_TYPE, PARAM_KEY_AUTH_TYPE);
@@ -675,23 +675,23 @@ int32_t DeviceManagerFfiImpl::BindTargetWarpper(const std::string &deviceId,
     if (bindParam.empty()) {
         return ERR_INVALID_PARAMS;
     }
-    nlohmann::json bindParamObj = nlohmann::json::parse(bindParam, nullptr, false);
-    if (bindParamObj.is_discarded()) {
+    JsonObject bindParamObj(bindParam);
+    if (bindParamObj.IsDiscarded()) {
         return ERR_INVALID_PARAMS;
     }
     PeerTargetId targetId;
     targetId.deviceId = deviceId;
     if (IsString(bindParamObj, PARAM_KEY_BR_MAC)) {
-        targetId.brMac = bindParamObj[PARAM_KEY_BR_MAC].get<std::string>();
+        targetId.brMac = bindParamObj[PARAM_KEY_BR_MAC].Get<std::string>();
     }
     if (IsString(bindParamObj, PARAM_KEY_BLE_MAC)) {
-        targetId.bleMac = bindParamObj[PARAM_KEY_BLE_MAC].get<std::string>();
+        targetId.bleMac = bindParamObj[PARAM_KEY_BLE_MAC].Get<std::string>();
     }
     if (IsString(bindParamObj, PARAM_KEY_WIFI_IP)) {
-        targetId.wifiIp = bindParamObj[PARAM_KEY_WIFI_IP].get<std::string>();
+        targetId.wifiIp = bindParamObj[PARAM_KEY_WIFI_IP].Get<std::string>();
     }
     if (IsInt32(bindParamObj, PARAM_KEY_WIFI_PORT)) {
-        targetId.wifiPort = (uint16_t)(bindParamObj[PARAM_KEY_WIFI_PORT].get<int32_t>());
+        targetId.wifiPort = (uint16_t)(bindParamObj[PARAM_KEY_WIFI_PORT].Get<int32_t>());
     }
 
     std::map<std::string, std::string> bindParamMap;

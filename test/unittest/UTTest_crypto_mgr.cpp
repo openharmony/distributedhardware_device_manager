@@ -16,7 +16,7 @@
 #include "UTTest_crypto_mgr.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -39,7 +39,7 @@ HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_001, testing::ext::TestSize.Lev
     auto ret = cryptoMgr->SaveSessionKey(sessionKey, SESSION_KEY_LENGTH);
     ASSERT_EQ(ret, DM_OK);
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[TAG_DEVICE_ID] = "51352xxxx";
     jsonObj[TAG_CRYPTO_SUPPORT] = true;
     std::string message = SafetyDump(jsonObj);
@@ -58,7 +58,7 @@ HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_002, testing::ext::TestSize.Lev
     auto ret = cryptoMgr->SaveSessionKey(sessionKey, SESSION_KEY_LENGTH);
     ASSERT_EQ(ret, DM_OK);
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[TAG_DEVICE_ID] = "51352xxxx";
     jsonObj[TAG_CRYPTO_SUPPORT] = true;
     std::string message = SafetyDump(jsonObj);
@@ -112,7 +112,7 @@ HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_005, testing::ext::TestSize.Lev
 {
     auto cryptoMgr = std::make_shared<CryptoMgr>();
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[TAG_DEVICE_ID] = "51352xxxx";
     jsonObj[TAG_CRYPTO_SUPPORT] = true;
     std::string message = SafetyDump(jsonObj);

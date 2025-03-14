@@ -765,10 +765,10 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ex
     })";
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
-    nlohmann::json msgJsonObj;
+    JsonObject msgJsonObj;
     msgJsonObj["networkId"] = "networkId_001";
     msgJsonObj["discoverType"] = 0;
-    msg = msgJsonObj.dump();
+    msg = msgJsonObj.Dump();
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
@@ -777,7 +777,7 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ex
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
     msgJsonObj["discoverType"] = 1;
-    msg = msgJsonObj.dump();
+    msg = msgJsonObj.Dump();
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
 
@@ -925,11 +925,11 @@ HWTEST_F(DeviceManagerServiceTest, ParseCheckSumMsg_201, testing::ext::TestSize.
     std::string networkId;
     uint32_t discoveryType = 0;
     bool isChange = false;
-    nlohmann::json msgJsonObj;
+    JsonObject msgJsonObj;
     msgJsonObj["networkId"] = "networkId001";
     msgJsonObj["discoverType"] = 1;
     msgJsonObj["ischange"] = false;
-    msg = msgJsonObj.dump();
+    msg = msgJsonObj.Dump();
     int ret = DeviceManagerService::GetInstance().ParseCheckSumMsg(msg, networkId, discoveryType, isChange);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1243,15 +1243,15 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     std::string msg;
-    nlohmann::json msgJsonObj;
+    JsonObject msgJsonObj;
     msgJsonObj["networkId"] = "networkId";
     msgJsonObj["discoverType"] = 123;
     msgJsonObj["ischange"] = false;
-    msg = msgJsonObj.dump();
+    msg = msgJsonObj.Dump();
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
     msgJsonObj["ischange"] = true;
-    msg = msgJsonObj.dump();
+    msg = msgJsonObj.Dump();
     std::vector<int32_t> foregroundUserIds;
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(ERR_DM_INPUT_PARA_INVALID)));
@@ -1267,7 +1267,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
 
     backgroundUserIds.push_back(102);
     msgJsonObj["discoverType"] = 1;
-    msg = msgJsonObj.dump();
+    msg = msgJsonObj.Dump();
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));

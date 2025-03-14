@@ -214,7 +214,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
     ]
 
-    public_external_deps = [ "json:nlohmann_json_static" ]
+    public_external_deps = [ "cJSON:cjson" ]
 
     subsystem_name = "distributedhardware"
 

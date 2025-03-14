@@ -21,7 +21,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "device_manager_service_listener.h"
 
 namespace OHOS {
@@ -72,7 +72,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_001, testing::ext::TestSize.Level0)
 HWTEST_F(PinAuthTest, ShowAuthInfo_002, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[PIN_TOKEN] = 123456;
     std::string authToken = SafetyDump(jsonObject);
     int32_t ret = pinAuth->ShowAuthInfo(authToken, authManager);
@@ -88,7 +88,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_002, testing::ext::TestSize.Level0)
 HWTEST_F(PinAuthTest, ShowAuthInfo_003, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[PIN_CODE_KEY] = 123456;
     std::string authToken = SafetyDump(jsonObject);
     int32_t ret = pinAuth->ShowAuthInfo(authToken, nullptr);
@@ -104,7 +104,7 @@ HWTEST_F(PinAuthTest, ShowAuthInfo_003, testing::ext::TestSize.Level0)
 HWTEST_F(PinAuthTest, ShowAuthInfo_004, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<PinAuth> pinAuth = std::make_shared<PinAuth>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[PIN_CODE_KEY] = 123456;
     std::string authToken = SafetyDump(jsonObject);
     int32_t ret = pinAuth->ShowAuthInfo(authToken, authManager);

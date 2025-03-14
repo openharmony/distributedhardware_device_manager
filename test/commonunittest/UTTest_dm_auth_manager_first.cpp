@@ -23,7 +23,7 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "softbus_error_code.h"
 #include <memory>
 
@@ -272,7 +272,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseInitState>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     authManager_->authResponseContext_->groupId = "111";
     authManager_->authResponseContext_->groupName = "222";
     authManager_->authResponseContext_->code = 123;
@@ -373,14 +373,14 @@ HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level0)
     std::string message = "messageTest";
     int64_t requestId = 555;
     int32_t status = 2;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_AUTH_BY_PIN;
     authManager_->OnMemberJoin(requestId, status);
     authManager_->OnDataReceived(sessionId, message);
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();
     authManager_->authResponseContext_->sessionId = sessionId;
-    message = jsonObject.dump();
+    message = jsonObject.Dump();
     authManager_->authResponseState_ = nullptr;
     authManager_->OnDataReceived(sessionId, message);
     authManager_->authRequestState_ = nullptr;
@@ -519,9 +519,9 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_001, testing::ext::TestSize.Level
     ASSERT_EQ(ret, ERR_DM_AUTH_FAILED);
 
     authType = 0;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["bindLevel"] = 5;
-    extra = jsonObject.dump();
+    extra = jsonObject.Dump();
     ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
 }
@@ -1137,7 +1137,7 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived001, testing::ext::TestSize.
 HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived002, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[TAG_DATA] = 123;
     std::string message = SafetyDump(jsonObject);
     authManager_->OnAuthDeviceDataReceived(sessionId, message);
@@ -1147,7 +1147,7 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived002, testing::ext::TestSize.
 HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived003, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[TAG_DATA] = "123";
     jsonObject[TAG_DATA_LEN] = "123";
     std::string message = SafetyDump(jsonObject);
@@ -1158,7 +1158,7 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived003, testing::ext::TestSize.
 HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived004, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[TAG_DATA] = "123";
     jsonObject[TAG_DATA_LEN] = 123;
     jsonObject[TAG_MSG_TYPE] = "123";
@@ -1170,7 +1170,7 @@ HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived004, testing::ext::TestSize.
 HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived005, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[TAG_DATA] = "123";
     jsonObject[TAG_DATA_LEN] = 123;
     jsonObject[TAG_MSG_TYPE] = 123;
@@ -1398,7 +1398,7 @@ HWTEST_F(DmAuthManagerTest, GetTaskTimeout_001, testing::ext::TestSize.Level0)
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_001, testing::ext::TestSize.Level0)
 {
     std::string extra = R"({"extra": {"bindLevel": "123"}})";
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["bindLevel"] = 1;
     int32_t ret = authManager_->CheckAuthParamVaildExtra(extra, "");
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
@@ -1664,11 +1664,11 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt002, testing::ext::TestSize.Leve
 HWTEST_F(DmAuthManagerTest, OnAuthDeviceDataReceived006, testing::ext::TestSize.Level0)
 {
     int32_t sessionId = 0;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[TAG_DATA] = "123";
     jsonObject[TAG_DATA_LEN] = 123;
     jsonObject[TAG_MSG_TYPE] = 123;
-    std::string message = jsonObject.dump();
+    std::string message = jsonObject.Dump();
     authManager_->authResponseContext_ = nullptr;
     authManager_->OnAuthDeviceDataReceived(sessionId, message);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
@@ -1783,9 +1783,9 @@ HWTEST_F(DmAuthManagerTest, SinkAuthDeviceFinish_002, testing::ext::TestSize.Lev
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 
     authManager_->authResponseContext_->haveCredential = true;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["MSG_TYPE"] = MSG_TYPE_REQ_RECHECK_MSG;
-    authManager_->srcReqMsg_ = jsonObject.dump();
+    authManager_->srcReqMsg_ = jsonObject.Dump();
     authManager_->remoteVersion_ = "4.0.1";
     authManager_->SinkAuthDeviceFinish();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
@@ -1919,7 +1919,7 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
     ret = authManager_->StopAuthenticateDevice(pkgName);
     ASSERT_EQ(ret, DM_OK);
 
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["PEER_BUNDLE_NAME"] = "";
     authManager_->authRequestContext_->hostPkgName = "hostPkgName";
     authManager_->ParseJsonObject(jsonObject);
@@ -1940,9 +1940,9 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_002, testing::ext::TestSize.L
     sessionId = 1;
     std::string message;
     authManager_->authResponseContext_->sessionId = sessionId;
-    nlohmann::json jsonObject1;
+    JsonObject jsonObject1;
     jsonObject1[TAG_MSG_TYPE] = 800;
-    message = jsonObject1.dump();
+    message = jsonObject1.Dump();
     authManager_->authResponseState_ = nullptr;
     authManager_->OnDataReceived(sessionId, message);
 
@@ -2156,7 +2156,7 @@ HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_003, testing::ext::TestSize.Lev
     int32_t ret = authManager_->EstablishAuthChannel(deviceId);
     ASSERT_EQ(ret, DM_OK);
 
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = "param_key_conn_sessionType";
     jsonObject[PARAM_KEY_HML_ENABLE_160M] = true;
     jsonObject[PARAM_KEY_HML_ACTIONID] = 0;
@@ -2165,7 +2165,7 @@ HWTEST_F(DmAuthManagerTest, EstablishAuthChannel_003, testing::ext::TestSize.Lev
 
 HWTEST_F(DmAuthManagerTest, ParseHmlInfoInJsonObject_001, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = CONN_SESSION_TYPE_HML;
     jsonObject[PARAM_KEY_HML_ACTIONID] = 0;
     authManager_->ParseHmlInfoInJsonObject(jsonObject);
@@ -2213,30 +2213,30 @@ HWTEST_F(DmAuthManagerTest, CanUsePincodeFromDp_001, testing::ext::TestSize.Leve
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize.Level0)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = CONN_SESSION_TYPE_HML;
     jsonObject[PARAM_KEY_HML_ENABLE_160M] = true;
     jsonObject[PARAM_KEY_HML_ACTIONID] = "kwjewkkl";
     std::string deviceId = "de*************12";
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
     authManager_->softbusConnector_->AddMemberToDiscoverMap(deviceId, deviceInfo);
-    std::string strExtra = jsonObject.dump();
+    std::string strExtra = jsonObject.Dump();
     int32_t ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = 0;
-    strExtra = jsonObject.dump();
+    strExtra = jsonObject.Dump();
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = 1;
-    strExtra = jsonObject.dump();
+    strExtra = jsonObject.Dump();
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 
     jsonObject[PARAM_KEY_HML_ACTIONID] = "1";
     jsonObject[TAG_BIND_LEVEL] = 1;
-    strExtra = jsonObject.dump();
+    strExtra = jsonObject.Dump();
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
     ASSERT_EQ(ret, DM_OK);

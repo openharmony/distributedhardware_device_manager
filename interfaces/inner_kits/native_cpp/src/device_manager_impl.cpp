@@ -692,8 +692,8 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 
     std::string strDeviceId = deviceInfo.deviceId;
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, strDeviceId, callback);
-    nlohmann::json extraJson = nlohmann::json::parse(extra, nullptr, false);
-    if (extraJson.is_discarded()) {
+    JsonObject extraJson(extra);
+    if (extraJson.IsDiscarded()) {
         LOGE("extra bindParam %{public}s.", extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1517,8 +1517,8 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("BindDevice start, pkgName: %{public}s", pkgName.c_str());
-    nlohmann::json paramJson = nlohmann::json::parse(bindParam, nullptr, false);
-    if (paramJson.is_discarded()) {
+    JsonObject paramJson(bindParam);
+    if (paramJson.IsDiscarded()) {
         LOGE("BindDevice bindParam %{public}s.", bindParam.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }

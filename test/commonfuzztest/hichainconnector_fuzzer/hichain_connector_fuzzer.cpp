@@ -107,7 +107,7 @@ void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
     std::string hostDevice(reinterpret_cast<const char*>(data), size);
     std::vector<std::string> remoteGroupIdList;
     int32_t groupType = fdp.ConsumeIntegral<int32_t>();
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     std::string groupOwner(reinterpret_cast<const char*>(data), size);
     std::string credentialInfo(reinterpret_cast<const char*>(data), size);
     std::string jsonStr(reinterpret_cast<const char*>(data), size);
@@ -143,7 +143,7 @@ void HiChainConnectorSecondFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
     std::vector<GroupInfo> groupList;
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     GroupInfo groupInfo;
     std::vector<std::string> syncGroupList;
     hichainConnector->GetSyncGroupList(groupList, syncGroupList);
@@ -171,7 +171,7 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     std::string groupId(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
     std::string reqDeviceId(reinterpret_cast<const char*>(data), size);
-    nlohmann::json jsonOutObj;
+    JsonObject jsonOutObj;
     std::shared_ptr<IDmGroupResCallback> callback;
     std::string jsonStr(reinterpret_cast<const char*>(data), size);
     int32_t groupType = fdp.ConsumeIntegral<int32_t>();
@@ -269,7 +269,7 @@ void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
     std::string params = "params";
     int32_t osAccountUserId = fdp.ConsumeIntegral<int32_t>();
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
     std::vector<int32_t> userIdVec;
     std::vector<std::pair<int32_t, std::string>> delAclInfoVec1;
@@ -280,7 +280,7 @@ void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
     std::string credentialInfo = R"({"content": {"deviceid": "123"}}, authId: "123456"))";
     std::string groupOwner(reinterpret_cast<const char*>(data), size);
     delAclInfoVec1.push_back(std::make_pair(key, value));
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[AUTH_TYPE] = 1;
     jsonObj[FIELD_USER_ID] = "123456";
     jsonObj[FIELD_CREDENTIAL_TYPE] = 1;
@@ -315,7 +315,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
     std::string groupOwner(reinterpret_cast<const char*>(data), size);
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::string deviceId = "deviceId";
     std::string key = "localDeviceId";
     jsonObj["deviceId"] = 1;
@@ -332,7 +332,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     jsonObj[TAG_GROUP_NAME] = "groupName";
     hichainConnector->AddMember(deviceId, SafetyDump(jsonObj));
 
-    nlohmann::json jsonObjCre;
+    JsonObject jsonObjCre;
     std::string params;
     jsonObjCre[AUTH_TYPE] = 1;
     jsonObjCre["userId"] = "user_001";
@@ -343,7 +343,7 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     std::string credentialInfo = SafetyDump(jsonObjCre);
     hichainConnector->ParseRemoteCredentialExt(credentialInfo, params, groupOwner);
     int32_t groupType = *(reinterpret_cast<const int32_t*>(data));
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     int32_t osAccountUserId = 0;
     std::string userId = "user_002";
     jsonDeviceList[FIELD_DEVICE_LIST] = "deviceList";
@@ -370,20 +370,20 @@ void HiChainConnectorSevenhFuzzTest(const uint8_t* data, size_t size)
     groupName = "aclinfo_001";
     hichainConnector->IsNeedDelete(groupName, userId, delACLInfoVec);
     std::vector<std::string> udidList;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     std::string jsonStr = "dkocosdpa";
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
     jsonObject["authId"] = 1;
-    jsonStr = jsonObject.dump();
+    jsonStr = jsonObject.Dump();
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
 
     jsonObject["authId"] = "authInfoId";
-    jsonStr = jsonObject.dump();
+    jsonStr = jsonObject.Dump();
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
     hichainConnector->deviceGroupManager_ = nullptr;
     int32_t groupType = fdp.ConsumeIntegral<int32_t>();
     std::string usersId(reinterpret_cast<const char*>(data), size);
-    nlohmann::json jsonDeviceList;
+    JsonObject jsonDeviceList;
     hichainConnector->deleteMultiMembers(groupType, usersId, jsonDeviceList);
 }
 }

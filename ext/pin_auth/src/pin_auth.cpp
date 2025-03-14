@@ -21,7 +21,7 @@
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -37,8 +37,8 @@ PinAuth::~PinAuth()
 
 int32_t PinAuth::ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthManager> authManager)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(authToken, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(authToken);
+    if (jsonObject.IsDiscarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
@@ -46,7 +46,7 @@ int32_t PinAuth::ShowAuthInfo(std::string &authToken, std::shared_ptr<DmAuthMana
         LOGE("err json string, first time");
         return ERR_DM_FAILED;
     }
-    return pinAuthUi_->ShowPinDialog(jsonObject[PIN_CODE_KEY].get<int32_t>(), authManager);
+    return pinAuthUi_->ShowPinDialog(jsonObject[PIN_CODE_KEY].Get<int32_t>(), authManager);
 }
 
 int32_t PinAuth::StartAuth(std::string &authToken, std::shared_ptr<DmAuthManager> authManager)

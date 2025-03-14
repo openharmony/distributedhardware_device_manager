@@ -809,11 +809,11 @@ int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &node
         return ERR_DM_FAILED;
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
-    nlohmann::json extraJson;
+    JsonObject extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
     extraJson[DEVICE_SCREEN_STATUS] = devScreenStatus;
-    devInfo.extraData = to_string(extraJson);
+    devInfo.extraData = ToString(extraJson);
     return DM_OK;
 }
 
@@ -836,10 +836,10 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
         return ERR_DM_FAILED;
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
-    nlohmann::json extraJson;
+    JsonObject extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
-    devInfo.extraData = to_string(extraJson);
+    devInfo.extraData = ToString(extraJson);
     return DM_OK;
 }
 
@@ -911,7 +911,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     dmDevice.deviceTypeId = device.devType;
     dmDevice.range = device.range;
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::string customData = ConvertCharArray2String(device.custData, DISC_MAX_CUST_DATA_LEN);
     jsonObj[PARAM_KEY_CUSTOM_DATA] = customData;
 
@@ -926,7 +926,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     dmDevice.extraData = SafetyDump(jsonObj);
 }
 
-void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj)
+void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObject &jsonObj)
 {
     if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
         std::string wifiIp((addrInfo->info).ip.ip);

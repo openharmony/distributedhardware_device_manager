@@ -25,7 +25,7 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "parameter.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "system_ability_definition.h"
 #include "softbus_listener.cpp"
 #include "softbus_error_code.h"
@@ -1243,7 +1243,7 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_001, testing::ext::TestSiz
         }
     };
     addrInfo.type = static_cast<ConnectionAddrType>(5);
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     softbusListener->ParseConnAddrInfo(&addrInfo, jsonObj);
     softbusListener = nullptr;
 }
