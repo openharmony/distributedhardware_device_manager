@@ -51,6 +51,8 @@ enum DMBussinessErrorCode {
     DM_ERR_FROM_CLOUD_FAILED = 11600106,
     // Need Login.
     DM_ERR_NEED_LOGIN = 11600107,
+    // The device name contains non-compliant content.
+    DM_ERR_SCAS_CHECK_FAILED = 11600108,
 };
 void DeviceBasicInfoToJsArray(const napi_env &env,
                               const std::vector<DmDeviceBasicInfo> &vecDevInfo,

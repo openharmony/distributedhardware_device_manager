@@ -652,6 +652,11 @@ public:
     virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
     virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
         int32_t pinExchangeType, DMLocalServiceInfo &info) = 0;
+    virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
+        std::shared_ptr<SetLocalDeviceNameCallback> callback) = 0;
+    virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
+        const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback) = 0;
+    virtual int32_t RestoreLocalDeivceName(const std::string &pkgName) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

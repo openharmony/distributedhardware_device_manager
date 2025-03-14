@@ -16,6 +16,10 @@
 #ifndef OHOS_DEVICE_NAME_MANAGER_H
 #define OHOS_DEVICE_NAME_MANAGER_H
 
+#include <memory>
+#include <mutex>
+#include <string>
+
 #include "datashare_helper.h"
 #include "device_name_change_monitor.h"
 #include "single_instance.h"
@@ -37,6 +41,8 @@ public:
     int32_t InitDeviceNameWhenLogin();
     int32_t InitDeviceNameWhenNickChange();
     int32_t InitDeviceNameWhenNameChange(int32_t userId);
+    int32_t ModifyUserDefinedName(const std::string &deviceName);
+    int32_t RestoreLocalDeviceName();
 
 private:
     DeviceNameManager() = default;
@@ -54,10 +60,13 @@ private:
     std::string GetSystemRegion();
     std::string GetLocalMarketName();
 
+    int32_t InitDisplayDeviceNameToSettingsData(const std::string &nickName, const std::string &deviceName,
+        int32_t userId);
     int32_t GetUserDefinedDeviceName(int32_t userId, std::string &deviceName);
     int32_t SetUserDefinedDeviceName(const std::string &deviceName, int32_t userId);
     int32_t GetDisplayDeviceName(int32_t userId, std::string &deviceName);
     int32_t SetDisplayDeviceName(const std::string &deviceName, int32_t userId);
+    int32_t SetDisplayDeviceNameState(const std::string &state, int32_t userId);
     int32_t GetDeviceName(std::string &deviceName);
     int32_t SetDeviceName(const std::string &deviceName);
     int32_t GetValue(const std::string &tableName, int32_t userId, const std::string &key, std::string &value);

@@ -71,7 +71,13 @@ bool PermissionManager::CheckSystemSA(const std::string &pkgName)
     return true;
 }
 
-bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
+bool PermissionManager::CheckProcessNameValidModifyLocalDeviceName(const std::string &processName)
+{
+    (void)processName;
+    return true;
+}
+
+bool PermissionManager::CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName)
 {
     (void)processName;
     return true;

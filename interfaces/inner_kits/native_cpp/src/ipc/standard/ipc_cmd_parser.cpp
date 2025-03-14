@@ -57,6 +57,8 @@
 #include "ipc_rsp.h"
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
+#include "ipc_set_local_device_name_req.h"
+#include "ipc_set_remote_device_name_req.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_sync_callback_req.h"
 #include "ipc_permission_req.h"
@@ -1968,6 +1970,113 @@ ON_IPC_READ_RESPONSE(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE, MessageParcel
             pBaseRsp->SetErrCode(ERR_DM_IPC_READ_FAILED);
         }
         pRsp->SetLocalServiceInfo(info);
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SET_LOCAL_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcSetLocalDeviceNameReq> pReq = std::static_pointer_cast<IpcSetLocalDeviceNameReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    std::string deviceName = pReq->GetDeviceName();
+    if (!data.WriteString(deviceName)) {
+        LOGE("write deviceName failed");
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SET_LOCAL_DEVICE_NAME, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(SET_LOCAL_DEVICE_NAME_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t code = data.ReadInt32();
+    DeviceManagerNotify::GetInstance().OnSetLocalDeviceNameResult(pkgName, code);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(SET_REMOTE_DEVICE_NAME, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(SET_REMOTE_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcSetRemoteDeviceNameReq> pReq = std::static_pointer_cast<IpcSetRemoteDeviceNameReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    std::string deviceId = pReq->GetDeviceId();
+    if (!data.WriteString(deviceId)) {
+        LOGE("write deviceId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    std::string deviceName = pReq->GetDeviceName();
+    if (!data.WriteString(deviceName)) {
+        LOGE("write deviceName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_CMD(SET_REMOTE_DEVICE_NAME_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string deviceId = data.ReadString();
+    int32_t code = data.ReadInt32();
+    DeviceManagerNotify::GetInstance().OnSetRemoteDeviceNameResult(pkgName, deviceId, code);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(RESTORE_LOCAL_DEVICE_NAME, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(RESTORE_LOCAL_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::string pkgName = pBaseReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }

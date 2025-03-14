@@ -223,7 +223,10 @@ public:
     int32_t PutDeviceProfileInfoList(const std::string &pkgName,
         std::vector<DmDeviceProfileInfo> &deviceProfileInfoList);
     int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength, std::string &displayName);
+    int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName);
+    int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId, const std::string &deviceName);
     std::vector<std::string> GetDeviceNamePrefixs();
+    int32_t RestoreLocalDeviceName(const std::string &pkgName);
     int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
     int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType);
     int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo);
