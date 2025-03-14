@@ -516,7 +516,24 @@ HWTEST_F(DmAuthManagerTest, ConfirmProcessExt_003, testing::ext::TestSize.Level1
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, StartRespAuthProcess_001, testing::ext::TestSize.Level1)
+HWTEST_F(DmAuthManagerTest, ConfirmProcessExt_004, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::LocalServiceInfo info;
+    info.SetAuthBoxType((int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM);
+    info.SetAuthType((int32_t)DMLocalServiceInfoAuthType::TRUST_ONETIME);
+    info.SetPinExchangeType((int32_t)DMLocalServiceInfoPinExchangeType::FROMDP);
+    info.SetPinCode("123456");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_TRUE(authManager_->CanUsePincodeFromDp());
+    int32_t action = 1;
+    authManager_->action_ = 6;
+    authManager_->authResponseState_ = std::make_shared<AuthResponseConfirmState>();
+    authManager_->authResponseContext_->isShowDialog = true;
+    int32_t ret = authManager_->ConfirmProcessExt(action);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmAuthManagerTest, StartRespAuthProcess_001, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_ = nullptr;
     authManager_->StartRespAuthProcess();
@@ -727,7 +744,28 @@ HWTEST_F(DmAuthManagerTest, ShowAuthInfoDialog_003, testing::ext::TestSize.Level
     ASSERT_EQ(authManager_->authResponseContext_->isShowDialog, true);
 }
 
-HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog_001, testing::ext::TestSize.Level1)
+HWTEST_F(DmAuthManagerTest, ShowAuthInfoDialog_004, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::LocalServiceInfo info;
+    info.SetAuthBoxType((int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM);
+    info.SetAuthType((int32_t)DMLocalServiceInfoAuthType::TRUST_ONETIME);
+    info.SetPinExchangeType((int32_t)DMLocalServiceInfoPinExchangeType::FROMDP);
+    info.SetPinCode("123456");
+    authManager_->serviceInfoProfile_ = info;
+    ASSERT_TRUE(authManager_->CanUsePincodeFromDp());
+    authManager_->authResponseContext_->isShowDialog = true;
+    authManager_->ShowAuthInfoDialog();
+    ASSERT_EQ(authManager_->authResponseContext_->isShowDialog, true);
+    info.SetPinCode("******");
+    authManager_->serviceInfoProfile_ = info;
+    authManager_->pincodeDialogEverShown_ = true;
+    authManager_->ShowAuthInfoDialog();
+    ASSERT_EQ(authManager_->authResponseContext_->isShowDialog, true);
+    authManager_->pincodeDialogEverShown_ = false;
+    authManager_->serviceInfoProfile_ = {};
+}
+
+HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog_001, testing::ext::TestSize.Level0)
 {
     authManager_->authResponseContext_ = nullptr;
     authManager_->ShowStartAuthDialog();

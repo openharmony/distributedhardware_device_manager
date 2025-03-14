@@ -33,6 +33,7 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 constexpr const char* PARAM_KEY_TARGET_ID = "TARGET_ID";
+constexpr int32_t NUM_5 = 5;
 void DeletePermission()
 {
     const int32_t permsNum = 1;
@@ -1602,6 +1603,48 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalServiceInfoByBundleNameAndPinExchange
         backgroundUserIds);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
+
+HWTEST_F(DeviceManagerServiceTest, InitDPLocalServiceInfo_001, testing::ext::TestSize.Level0)
+{
+    DMLocalServiceInfo dmServiceInfo;
+    dmServiceInfo.bundleName = "testbundle";
+    dmServiceInfo.extraInfo = "testextra";
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    DeviceManagerService::GetInstance().InitDPLocalServiceInfo(dmServiceInfo, dpLocalServiceInfo);
+    EXPECT_TRUE(dmServiceInfo.bundleName == dpLocalServiceInfo.GetBundleName());
+    EXPECT_TRUE(dmServiceInfo.extraInfo == dpLocalServiceInfo.GetExtraInfo());
+}
+
+HWTEST_F(DeviceManagerServiceTest, InitServiceInfo_001, testing::ext::TestSize.Level0)
+{
+    DMLocalServiceInfo dmServiceInfo;
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    dpLocalServiceInfo.SetBundleName("testbundle");
+    dpLocalServiceInfo.SetExtraInfo("testextra");
+    DeviceManagerService::GetInstance().InitServiceInfo(dpLocalServiceInfo, dmServiceInfo);
+    EXPECT_TRUE(dmServiceInfo.bundleName == dpLocalServiceInfo.GetBundleName());
+    EXPECT_TRUE(dmServiceInfo.extraInfo == dpLocalServiceInfo.GetExtraInfo());
+}
+
+HWTEST_F(DeviceManagerServiceTest, InitServiceInfos_001, testing::ext::TestSize.Level0)
+{
+    std::vector<DMLocalServiceInfo> dmServiceInfos;
+    std::vector<DistributedDeviceProfile::LocalServiceInfo> dpLocalServiceInfos;
+    for (int k = 0; k < NUM_5; k++) {
+        DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+        dpLocalServiceInfo.SetBundleName(std::string("testbundle") + std::to_string(k));
+        dpLocalServiceInfo.SetExtraInfo(std::string("testextra") + std::to_string(k));
+        dpLocalServiceInfos.emplace_back(dpLocalServiceInfo);
+    }
+    DeviceManagerService::GetInstance().InitServiceInfos(dpLocalServiceInfos, dmServiceInfos);
+    for (int k = 0; k < NUM_5; k++) {
+        DMLocalServiceInfo &dmServiceInfo = dmServiceInfos[k];
+        DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceInfo = dpLocalServiceInfos[k];
+        EXPECT_TRUE(dmServiceInfo.bundleName == dpLocalServiceInfo.GetBundleName());
+        EXPECT_TRUE(dmServiceInfo.extraInfo == dpLocalServiceInfo.GetExtraInfo());
+    }
+}
+
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

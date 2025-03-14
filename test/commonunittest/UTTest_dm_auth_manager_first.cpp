@@ -2063,7 +2063,7 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     localServiceInfo.SetPinExchangeType(static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
     localServiceInfo.SetPinCode(std::to_string(PINCODE));
     EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
-        .WillOnce(DoAll(Return(DM_OK)));
+        .WillOnce(DoAll(SetArgReferee<2>(localServiceInfo), Return(DM_OK)));
     authManager_->GetLocalServiceInfoInDp();
 
     int64_t requestId = 1;
