@@ -1434,10 +1434,10 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
     int32_t ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, DM_OK);
 
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[PARAM_KEY_CONN_SESSIONTYPE] = "TML";
     deviceId = "sdcwafefawe";
-    extra = jsonObject.dump();
+    extra = jsonObject.Dump();
     ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
