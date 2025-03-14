@@ -102,7 +102,7 @@ int32_t IpcModelCodec::DecodeDmDeviceProfileInfoFilterOptions(MessageParcel &par
     DmDeviceProfileInfoFilterOptions &filterOptions)
 {
     filterOptions.isCloud = parcel.ReadBool();
-    size_t size = parcel.ReadUint32();
+    uint32_t size = parcel.ReadUint32();
     if (size > MAX_DEVICE_PROFILE_SIZE) {
         LOGE("size more than %{public}d,", MAX_DEVICE_PROFILE_SIZE);
         return ERR_DM_IPC_WRITE_FAILED;
@@ -129,15 +129,6 @@ bool IpcModelCodec::EncodeDmDeviceProfileInfoFilterOptions(const DmDeviceProfile
         }
     }
     return bRet;
-}
-
-void IpcModelCodec::DecodeDmProductInfo(MessageParcel &parcel, DmProductInfo &prodInfo)
-{
-    prodInfo.prodId = parcel.ReadString();
-    prodInfo.model = parcel.ReadString();
-    prodInfo.prodName = parcel.ReadString();
-    prodInfo.prodShortName = parcel.ReadString();
-    prodInfo.imageVersion = parcel.ReadString();
 }
 
 void IpcModelCodec::DecodeDmServiceProfileInfo(MessageParcel &parcel, DmServiceProfileInfo &svrInfo)
@@ -173,10 +164,11 @@ void IpcModelCodec::DecodeDmDeviceProfileInfo(MessageParcel &parcel, DmDevicePro
     devInfo.deviceSn = parcel.ReadString();
     devInfo.mac = parcel.ReadString();
     devInfo.model = parcel.ReadString();
-    devInfo.innerModel = parcel.ReadString();
+    devInfo.internalModel = parcel.ReadString();
     devInfo.deviceType = parcel.ReadString();
     devInfo.manufacturer = parcel.ReadString();
     devInfo.deviceName = parcel.ReadString();
+    devInfo.productName = parcel.ReadString();
     devInfo.productId = parcel.ReadString();
     devInfo.subProductId = parcel.ReadString();
     devInfo.sdkVersion = parcel.ReadString();
@@ -194,17 +186,6 @@ void IpcModelCodec::DecodeDmDeviceProfileInfo(MessageParcel &parcel, DmDevicePro
     devInfo.shareTime = parcel.ReadString();
     devInfo.isLocalDevice = parcel.ReadBool();
     DecodeDmServiceProfileInfos(parcel, devInfo.services);
-}
-
-bool IpcModelCodec::EncodeDmProductInfo(const DmProductInfo &prodInfo, MessageParcel &parcel)
-{
-    bool bRet = true;
-    bRet = (bRet && parcel.WriteString(prodInfo.prodId));
-    bRet = (bRet && parcel.WriteString(prodInfo.model));
-    bRet = (bRet && parcel.WriteString(prodInfo.prodName));
-    bRet = (bRet && parcel.WriteString(prodInfo.prodShortName));
-    bRet = (bRet && parcel.WriteString(prodInfo.imageVersion));
-    return bRet;
 }
 
 bool IpcModelCodec::EncodeDmServiceProfileInfo(const DmServiceProfileInfo &svrInfo, MessageParcel &parcel)
@@ -251,10 +232,11 @@ bool IpcModelCodec::EncodeDmDeviceProfileInfo(const DmDeviceProfileInfo &devInfo
     bRet = (bRet && parcel.WriteString(devInfo.deviceSn));
     bRet = (bRet && parcel.WriteString(devInfo.mac));
     bRet = (bRet && parcel.WriteString(devInfo.model));
-    bRet = (bRet && parcel.WriteString(devInfo.innerModel));
+    bRet = (bRet && parcel.WriteString(devInfo.internalModel));
     bRet = (bRet && parcel.WriteString(devInfo.deviceType));
     bRet = (bRet && parcel.WriteString(devInfo.manufacturer));
     bRet = (bRet && parcel.WriteString(devInfo.deviceName));
+    bRet = (bRet && parcel.WriteString(devInfo.productName));
     bRet = (bRet && parcel.WriteString(devInfo.productId));
     bRet = (bRet && parcel.WriteString(devInfo.subProductId));
     bRet = (bRet && parcel.WriteString(devInfo.sdkVersion));
@@ -278,19 +260,20 @@ bool IpcModelCodec::EncodeDmDeviceProfileInfo(const DmDeviceProfileInfo &devInfo
 std::string IpcModelCodec::GetDeviceIconInfoUniqueKey(const DmDeviceIconInfoFilterOptions &iconFiter)
 {
     return iconFiter.productId + UK_SEPARATOR + iconFiter.subProductId + UK_SEPARATOR +
-        iconFiter.imageType + UK_SEPARATOR + iconFiter.specName;
+        iconFiter.internalModel + UK_SEPARATOR + iconFiter.imageType + UK_SEPARATOR + iconFiter.specName;
 }
 
 std::string IpcModelCodec::GetDeviceIconInfoUniqueKey(const DmDeviceIconInfo &iconInfo)
 {
     return iconInfo.productId + UK_SEPARATOR + iconInfo.subProductId + UK_SEPARATOR +
-        iconInfo.imageType + UK_SEPARATOR + iconInfo.specName;
+        iconInfo.internalModel + UK_SEPARATOR + iconInfo.imageType + UK_SEPARATOR + iconInfo.specName;
 }
 
 void IpcModelCodec::DecodeDmDeviceIconInfo(MessageParcel &parcel, DmDeviceIconInfo &deviceIconInfo)
 {
     deviceIconInfo.productId = parcel.ReadString();
     deviceIconInfo.subProductId = parcel.ReadString();
+    deviceIconInfo.internalModel = parcel.ReadString();
     deviceIconInfo.imageType = parcel.ReadString();
     deviceIconInfo.specName = parcel.ReadString();
     deviceIconInfo.version = parcel.ReadString();
@@ -312,6 +295,7 @@ bool IpcModelCodec::EncodeDmDeviceIconInfo(const DmDeviceIconInfo &deviceIconInf
     bool bRet = true;
     bRet = (bRet && parcel.WriteString(deviceIconInfo.productId));
     bRet = (bRet && parcel.WriteString(deviceIconInfo.subProductId));
+    bRet = (bRet && parcel.WriteString(deviceIconInfo.internalModel));
     bRet = (bRet && parcel.WriteString(deviceIconInfo.imageType));
     bRet = (bRet && parcel.WriteString(deviceIconInfo.specName));
     bRet = (bRet && parcel.WriteString(deviceIconInfo.version));
@@ -330,6 +314,7 @@ void IpcModelCodec::DecodeDmDeviceIconInfoFilterOptions(MessageParcel &parcel,
 {
     filterOptions.productId = parcel.ReadString();
     filterOptions.subProductId = parcel.ReadString();
+    filterOptions.internalModel = parcel.ReadString();
     filterOptions.imageType = parcel.ReadString();
     filterOptions.specName = parcel.ReadString();
 }
@@ -340,6 +325,7 @@ bool IpcModelCodec::EncodeDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFi
     bool bRet = true;
     bRet = (bRet && parcel.WriteString(filterOptions.productId));
     bRet = (bRet && parcel.WriteString(filterOptions.subProductId));
+    bRet = (bRet && parcel.WriteString(filterOptions.internalModel));
     bRet = (bRet && parcel.WriteString(filterOptions.imageType));
     bRet = (bRet && parcel.WriteString(filterOptions.specName));
     return bRet;

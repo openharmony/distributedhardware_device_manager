@@ -19,6 +19,9 @@
 #include "dm_error_type.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ipc_model_codec.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -1340,9 +1343,9 @@ void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, 
         return;
     }
     LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
-    std::string uk =  deviceIconInfo.productId + UK_SEPARATOR + deviceIconInfo.subProductId + UK_SEPARATOR +
-        deviceIconInfo.imageType + UK_SEPARATOR + deviceIconInfo.specName;
     std::map<std::string, std::set<std::shared_ptr<GetDeviceIconInfoCallback>>> tempCbks;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string uk = IpcModelCodec::GetDeviceIconInfoUniqueKey(deviceIconInfo);
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
         auto iter = getDeviceIconInfoCallback_.find(pkgName);
@@ -1358,6 +1361,7 @@ void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, 
             iter->second.erase(uk);
         }
     }
+#endif
     if (tempCbks.empty()) {
         LOGE("error, registered GetDeviceIconInfoResult callback is nullptr.");
         return;

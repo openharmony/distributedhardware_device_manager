@@ -33,11 +33,9 @@ public:
         DmDeviceProfileInfoFilterOptions &filterOptions);
     static bool EncodeDmDeviceProfileInfoFilterOptions(const DmDeviceProfileInfoFilterOptions &filterOptions,
         MessageParcel &parcel);
-    static void DecodeDmProductInfo(MessageParcel &parcel, DmProductInfo &prodInfo);
     static void DecodeDmServiceProfileInfo(MessageParcel &parcel, DmServiceProfileInfo &svrInfo);
     static void DecodeDmServiceProfileInfos(MessageParcel &parcel, std::vector<DmServiceProfileInfo> &svrInfos);
     static void DecodeDmDeviceProfileInfo(MessageParcel &parcel, DmDeviceProfileInfo &devInfo);
-    static bool EncodeDmProductInfo(const DmProductInfo &prodInfo, MessageParcel &parcel);
     static bool EncodeDmServiceProfileInfo(const DmServiceProfileInfo &svrInfo, MessageParcel &parcel);
     static bool EncodeDmServiceProfileInfos(const std::vector<DmServiceProfileInfo> &svrInfos, MessageParcel &parcel);
     static bool EncodeDmDeviceProfileInfo(const DmDeviceProfileInfo &devInfo, MessageParcel &parcel);

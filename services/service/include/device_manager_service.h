@@ -335,6 +335,7 @@ private:
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
     void SubscribeDataShareCommonEvent();
 #endif
+    void CheckRegisterInfoWithWise(int32_t curUserId);
 
 private:
     bool isImplsoLoaded_ = false;

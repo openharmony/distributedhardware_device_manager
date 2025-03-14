@@ -1872,10 +1872,7 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         HandleUserSwitchedEvent(currentUserId, beforeUserId);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
-        DMAccountInfo dmAccountInfo;
-        dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
-        dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
-        MultipleUserConnector::SetAccountInfo(currentUserId, dmAccountInfo);
+        MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
         DMAccountInfo dmAccountInfo = MultipleUserConnector::GetAccountInfoByUserId(beforeUserId);
@@ -1884,17 +1881,13 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         }
         HandleAccountLogout(currentUserId, dmAccountInfo.accountId, dmAccountInfo.accountName);
         MultipleUserConnector::DeleteAccountInfoByUserId(currentUserId);
-        DMAccountInfo curDmAccountInfo;
-        curDmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
-        curDmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
-        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), curDmAccountInfo);
+        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
+            MultipleUserConnector::GetCurrentDMAccountInfo());
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(beforeUserId);
         MultipleUserConnector::DeleteAccountInfoByUserId(beforeUserId);
-        DMAccountInfo curDmAccountInfo;
-        curDmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
-        curDmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
-        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), curDmAccountInfo);
+        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
+            MultipleUserConnector::GetCurrentDMAccountInfo());
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED && IsPC()) {
@@ -2909,13 +2902,11 @@ void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t pr
 void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId)
 {
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
+    CheckRegisterInfoWithWise(currentUserId);
     if (IsPC()) {
         return;
     }
-    DMAccountInfo dmAccountInfo;
-    dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
-    dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
-    MultipleUserConnector::SetAccountInfo(currentUserId, dmAccountInfo);
+    MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     if (beforeUserId == -1 || currentUserId == -1) {
         HandleUserSwitched();
         return;
@@ -3186,6 +3177,19 @@ std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
         return {};
     }
     return dmServiceImplExtResident_->GetDeviceNamePrefixs();
+}
+
+void DeviceManagerService::CheckRegisterInfoWithWise(int32_t curUserId)
+{
+    LOGI("In curUserId:%{public}d", curUserId);
+    if (curUserId == -1) {
+        return;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("CheckRegisterInfoWithWise failed, adapter instance not init or init failed.");
+        return;
+    }
+    dmServiceImplExtResident_->CheckRegisterInfoWithWise();
 }
 
 void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam)

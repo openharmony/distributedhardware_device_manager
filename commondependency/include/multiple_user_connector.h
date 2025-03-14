@@ -113,7 +113,7 @@ public:
     static bool IsUserUnlocked(int32_t userId);
     static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec);
     static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec, std::vector<int32_t> &backgroundUserVec);
-
+    static DMAccountInfo GetCurrentDMAccountInfo();
 private:
     static int32_t oldUserId_;
     static std::string accountId_;
