@@ -152,6 +152,12 @@ private:
     bool Init();
     void AddSystemSA(const std::string &pkgName);
     void RemoveSystemSA(const std::string &pkgName);
+    std::string JoinPath(const std::string &prefixPath, const std::string &midPath,
+        const std::string &subPath);
+    std::string JoinPath(const std::string &prefixPath, const std::string &subPath);
+    std::string AddDelimiter(const std::string &path);
+    void ReclaimMemmgrFileMemForDM();
+    void HandleSoftBusServerAdd();
 
 private:
     bool registerToService_;
