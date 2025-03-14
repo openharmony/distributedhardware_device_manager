@@ -26,16 +26,17 @@ class PermissionManager {
     DM_DECLARE_SINGLE_INSTANCE(PermissionManager);
 
 public:
-    int32_t Init();
-    int32_t UnInit();
     bool CheckPermission(void);
     bool CheckNewPermission(void);
     bool CheckMonitorPermission(void);
     int32_t GetCallerProcessName(std::string &processName);
+    bool CheckProcessNameValidOnAuthCode(const std::string &processName);
+    bool CheckProcessNameValidOnPinHolder(const std::string &processName);
     bool CheckWhiteListSystemSA(const std::string &pkgName);
     std::unordered_set<std::string> GetWhiteListSystemSA();
     bool CheckSystemSA(const std::string &pkgName);
-    bool CheckInterfacePermission(const std::string &interfaceName);
+    bool CheckProcessNameValidOnSetDnPolicy(const std::string &processName);
+    bool CheckProcessNameValidOnGetDeviceInfo(const std::string &processName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

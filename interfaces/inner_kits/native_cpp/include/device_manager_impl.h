@@ -21,8 +21,6 @@
 #include "ipc_client_manager.h"
 #include "ipc_client_proxy.h"
 #endif
-#include <map>
-#include <mutex>
 #include <set>
 
 namespace OHOS {
@@ -422,12 +420,11 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) override;
     virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
         std::string &displayName) override;
-    virtual int32_t GenerateServiceId(int64_t &serviceId) override;
-    virtual int32_t RegisterServiceInfo(const DMServiceInfo &info) override;
-    virtual int32_t UnRegisterServiceInfo(int64_t serviceId) override;
-    virtual int32_t UpdateServiceInfo(const DMServiceInfo &info) override;
-    virtual int32_t GetServiceInfoByServiceId(int64_t serviceId, DMServiceInfo &info) override;
-    virtual int32_t GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos) override;
+    virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) override;
+    virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) override;
+    virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) override;
+    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+        int32_t pinExchangeType, DMLocalServiceInfo &info) override;
 
 private:
     DeviceManagerImpl() = default;

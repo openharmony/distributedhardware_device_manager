@@ -23,6 +23,8 @@
 
 #include "dm_constants.h"
 #include "permission_manager.h"
+#include "dm_ipc_skeleton_mock.h"
+#include "dm_accesstoken_kit_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -32,6 +34,8 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static inline std::shared_ptr<DMIPCSkeletonMock> ipcSkeletonMock_ = std::make_shared<DMIPCSkeletonMock>();
+    static inline std::shared_ptr<DmAccessTokenKitMock> accessTokenKitMock_ = std::make_shared<DmAccessTokenKitMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

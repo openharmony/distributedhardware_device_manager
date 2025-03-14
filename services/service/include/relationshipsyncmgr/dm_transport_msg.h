@@ -16,7 +16,6 @@
 #ifndef OHOS_DM_TRANSPORT_MSG_H
 #define OHOS_DM_TRANSPORT_MSG_H
 
-#include <cstdint>
 #include <string>
 #include <cJSON.h>
 

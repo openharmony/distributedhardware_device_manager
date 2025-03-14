@@ -16,24 +16,7 @@
 #ifndef OHOS_DM_MINE_SOFTBUS_LISTENER_H
 #define OHOS_DM_MINE_SOFTBUS_LISTENER_H
 
-#include <map>
-#include <memory>
-#include <mutex>
-#include <string>
-#include <sstream>
-#include <type_traits>
-#include <vector>
-
 #include "softbus_listener.h"
-#include "dm_device_info.h"
-#include "dm_publish_info.h"
-#include "dm_radar_helper.h"
-#include "dm_timer.h"
-#include "dm_subscribe_info.h"
-#include "i_softbus_discovering_callback.h"
-#include "inner_session.h"
-#include "session.h"
-#include "nlohmann/json.hpp"
 
 using std::vector;
 using std::string;

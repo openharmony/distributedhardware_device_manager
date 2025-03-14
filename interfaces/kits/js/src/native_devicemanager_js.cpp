@@ -14,11 +14,7 @@
  */
 
 #include "native_devicemanager_js.h"
-
-#include <securec.h>
 #include <uv.h>
-#include <mutex>
-
 #include "device_manager.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"

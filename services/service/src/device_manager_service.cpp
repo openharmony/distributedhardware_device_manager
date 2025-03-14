@@ -18,16 +18,10 @@
 #include "cJSON.h"
 #include <dlfcn.h>
 #include <functional>
-
 #include "app_manager.h"
-#include "nlohmann/json.hpp"
-#include "dm_anonymous.h"
-#include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_hidumper.h"
-#include "dm_log.h"
 #include "dm_softbus_cache.h"
-#include "dm_radar_helper.h"
 #include "parameter.h"
 #include "permission_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -86,6 +80,7 @@ namespace {
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
     const std::string USERID_CHECKSUM_ISCHANGE_KEY = "ischange";
     constexpr const char* USER_SWITCH_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userSwitchByWifi";
+    constexpr const char* USER_STOP_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userStopByWifi";
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
 }
 
@@ -120,6 +115,7 @@ int32_t DeviceManagerService::InitSoftbusListener()
     SubscribePublishCommonEvent();
     QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
+    SubscribeDataShareCommonEvent();
 #endif
     LOGI("SoftbusListener init success.");
     if (!IsDMServiceAdapterResidentLoad()) {
@@ -165,6 +161,23 @@ void DeviceManagerService::SubscribePublishCommonEvent()
     return;
 }
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
+void DeviceManagerService::SubscribeDataShareCommonEvent()
+{
+    LOGI("DeviceManagerServiceImpl::SubscribeDataShareCommonEvent");
+    if (dataShareCommonEventManager_ == nullptr) {
+        dataShareCommonEventManager_ = std::make_shared<DmDataShareCommonEventManager>();
+    }
+    DataShareEventCallback callback = [=](const auto &arg1) {
+        if (arg1 == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
+            DeviceNameManager::GetInstance().DataShareReady();
+        }
+    };
+    std::vector<std::string> commonEventVec;
+    commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    if (dataShareCommonEventManager_->SubscribeDataShareCommonEvent(commonEventVec, callback)) {
+        LOGI("subscribe datashare common event success");
+    }
+}
 #endif
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -247,6 +260,10 @@ int32_t DeviceManagerService::InitDMServiceListener()
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DMCommTool::GetInstance()->Init();
+    int32_t currentUserId = MultipleUserConnector::GetFirstForegroundUserId();
+    if (IsPC() && !MultipleUserConnector::IsUserUnlocked(currentUserId)) {
+        HandleUserStopEvent(currentUserId);
+    }
 #endif
     LOGI("Init success.");
     return DM_OK;
@@ -387,11 +404,8 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
     }
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string peerDeviceId = "";
-    int32_t udidRet = SoftbusListener::GetUdidByNetworkId(networkId.c_str(), peerDeviceId);
-    if (udidRet != DM_OK) {
-        LOGE("GetUdidByNetworkId failed, ret : %{public}d", udidRet);
-        return ERR_DM_FAILED;
-    }
+    SoftbusListener::GetUdidByNetworkId(networkId.c_str(), peerDeviceId);
+    int32_t ret = DM_OK;
     if (!IsDMServiceImplReady()) {
         LOGE("GetDeviceInfo failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
@@ -399,16 +413,30 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
-    if (permissionRet == DM_OK) {
-        int32_t ret = softbusListener_->GetDeviceInfo(networkId, info);
+    if (localUdid == peerDeviceId) {
+        ret = softbusListener_->GetDeviceInfo(networkId, info);
         if (ret != DM_OK) {
             LOGE("Get DeviceInfo By NetworkId failed, ret : %{public}d", ret);
         }
         return ret;
-    } else {
-        return ERR_DM_NO_PERMISSION;
     }
+    int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
+    if (permissionRet != DM_OK) {
+        std::string processName = "";
+        if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+            LOGE("Get caller process name failed.");
+            return ret;
+        }
+        if (!PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName)) {
+            LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+            return ret;
+        }
+    }
+    ret = softbusListener_->GetDeviceInfo(networkId, info);
+    if (ret != DM_OK) {
+        LOGE("Get DeviceInfo By NetworkId failed, ret : %{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
@@ -761,7 +789,7 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
         return ERR_DM_FAILED;
     }
-    uint64_t peerTokenId = dmServiceImpl_->GetTokenIdByNameAndDeviceId(extra, udid);
+    [[maybe_unused]] uint64_t peerTokenId = dmServiceImpl_->GetTokenIdByNameAndDeviceId(extra, udid);
     if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
         return ERR_DM_FAILED;
@@ -1220,8 +1248,13 @@ int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const s
         LOGE("The caller: %{public}s does not have permission to call ImportAuthCode.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    if (!PermissionManager::GetInstance().CheckInterfacePermission(IMPORT_AUTHCODE)) {
-        LOGE("The caller: %{public}s is not in white list.", pkgName.c_str());
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerService::ImportAuthCode begin.");
@@ -1242,8 +1275,13 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
         LOGE("The caller does not have permission to call ExportAuthCode.");
         return ERR_DM_NO_PERMISSION;
     }
-    if (!PermissionManager::GetInstance().CheckInterfacePermission(EXPORT_AUTHCODE)) {
-        LOGE("The caller is not in white list.");
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, processName: %{public}s.", processName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnAuthCode(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (!IsDMServiceImplReady()) {
@@ -1504,217 +1542,101 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-bool DeviceManagerService::InitServiceInfoProfile(const DMServiceInfo &serviceInfo,
-    DistributedDeviceProfile::ServiceInfoProfile &profile)
+bool DeviceManagerService::InitDPLocalServiceInfo(const DMLocalServiceInfo &serviceInfo,
+    DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceInfo)
 {
-    DmDeviceInfo devInfo;
-    int32_t ret = GetLocalDeviceInfo(devInfo);
-    if (ret != DM_OK) {
-        LOGE("GetLocalDeviceInfo failed");
-        return false;
-    }
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    profile.SetDeviceId(std::string(localDeviceId));
-    profile.SetNetworkId(devInfo.networkId);
-    profile.SetUserId(MultipleUserConnector::GetFirstForegroundUserId());
-    profile.SetTokenId(std::to_string(IPCSkeleton::GetCallingTokenID()));
-    profile.SetServiceId(serviceInfo.serviceId);
-    profile.SetServiceType(serviceInfo.serviceType);
-    profile.SetServiceName(serviceInfo.serviceName);
-    profile.SetServiceDisplayName(serviceInfo.serviceDisplayName);
-    profile.SetCustomData(serviceInfo.customData);
-    profile.SetCustomDataLen(serviceInfo.customData.size());
-    profile.SetBundleName(serviceInfo.bundleName);
-    profile.SetModuleName(serviceInfo.moduleName);
-    profile.SetAbilityName(serviceInfo.abilityName);
-    profile.SetAuthBoxType(serviceInfo.authBoxType);
-    profile.SetAuthType(serviceInfo.authType);
-    profile.SetPinExchangeType(serviceInfo.pinExchangeType);
-    profile.SetPinCode(serviceInfo.pinCode);
-    profile.SetDescription(serviceInfo.description);
-    profile.SetServiceDicoveryScope(serviceInfo.serviceDiscoveryScope);
+    dpLocalServiceInfo.SetBundleName(serviceInfo.bundleName);
+    dpLocalServiceInfo.SetAuthBoxType(serviceInfo.authBoxType);
+    dpLocalServiceInfo.SetAuthType(serviceInfo.authType);
+    dpLocalServiceInfo.SetPinExchangeType(serviceInfo.pinExchangeType);
+    dpLocalServiceInfo.SetPinCode(serviceInfo.pinCode);
+    dpLocalServiceInfo.SetDescription(serviceInfo.description);
+    dpLocalServiceInfo.SetExtraInfo(serviceInfo.extraInfo);
     return true;
 }
 
-void DeviceManagerService::InitServiceInfo(const DistributedDeviceProfile::ServiceInfoProfile &profile,
-    DMServiceInfo &serviceInfo)
+void DeviceManagerService::InitServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceInfo,
+    DMLocalServiceInfo &serviceInfo)
 {
-    serviceInfo.serviceId = profile.GetServiceId();
-    serviceInfo.serviceType = profile.GetServiceType();
-    serviceInfo.serviceName = profile.GetServiceName();
-    serviceInfo.serviceDisplayName = profile.GetServiceDisplayName();
-    serviceInfo.customData = profile.GetCustomData();
-    serviceInfo.bundleName = profile.GetBundleName();
-    serviceInfo.moduleName = profile.GetModuleName();
-    serviceInfo.abilityName = profile.GetAbilityName();
-    serviceInfo.authBoxType = profile.GetAuthBoxType();
-    serviceInfo.authType = profile.GetAuthType();
-    serviceInfo.pinExchangeType = profile.GetPinExchangeType();
-    serviceInfo.pinCode = profile.GetPinCode();
-    serviceInfo.description = profile.GetDescription();
-    serviceInfo.serviceDiscoveryScope = profile.GetServiceDicoveryScope();
+    serviceInfo.bundleName = dpLocalServiceInfo.GetBundleName();
+    serviceInfo.authBoxType = dpLocalServiceInfo.GetAuthBoxType();
+    serviceInfo.authType = dpLocalServiceInfo.GetAuthType();
+    serviceInfo.pinExchangeType = dpLocalServiceInfo.GetPinExchangeType();
+    serviceInfo.pinCode = dpLocalServiceInfo.GetPinCode();
+    serviceInfo.description = dpLocalServiceInfo.GetDescription();
+    serviceInfo.extraInfo = dpLocalServiceInfo.GetExtraInfo();
 }
 
-void DeviceManagerService::InitServiceInfos(const std::vector<DistributedDeviceProfile::ServiceInfoProfile> &profiles,
-    std::vector<DMServiceInfo> &serviceInfos)
+void DeviceManagerService::InitServiceInfos(
+    const std::vector<DistributedDeviceProfile::LocalServiceInfo> &dpLocalServiceInfos,
+    std::vector<DMLocalServiceInfo> &serviceInfos)
 {
-    for (const auto &profileItem : profiles) {
-        DMServiceInfo infoItem;
-        InitServiceInfo(profileItem, infoItem);
+    for (const auto &dpInfoItem : dpLocalServiceInfos) {
+        DMLocalServiceInfo infoItem;
+        InitServiceInfo(dpInfoItem, infoItem);
         serviceInfos.emplace_back(infoItem);
     }
 }
-
-bool DeviceManagerService::InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key)
-{
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    key.SetDeviceId(std::string(localDeviceId));
-    key.SetUserId(MultipleUserConnector::GetFirstForegroundUserId());
-    key.SetTokenId(std::to_string(IPCSkeleton::GetCallingTokenID()));
-    return true;
-}
 #endif
 
-int64_t DeviceManagerService::GenerateSerivceId()
+int32_t DeviceManagerService::RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    DmDeviceInfo devInfo;
-    int32_t ret = GetLocalDeviceInfo(devInfo);
-    if (ret != DM_OK) {
-        LOGE("GetLocalDeviceInfo failed");
-        return 0;
-    }
-    std::string udid = devInfo.deviceId;
-    if (udid.empty()) {
-        LOGE("udid empty");
-        return 0;
-    }
-    int64_t tokenId = IPCSkeleton::GetCallingTokenID();
-    const uint32_t dataLength = sizeof(int64_t) + sizeof(int64_t) + udid.length();
-    std::unique_ptr<unsigned char[]> data = std::make_unique<unsigned char[]>(dataLength);
-    int64_t randomSeed = GenRandLongLong(0, std::numeric_limits<int64_t>::max());
-    unsigned char* dataPtr = data.get();
-    *((int64_t*)dataPtr) = randomSeed;
-    dataPtr += sizeof(int64_t);
-    *((int64_t*)dataPtr) = tokenId;
-    dataPtr += sizeof(int64_t);
-    if (memcpy_s(dataPtr, udid.length(), udid.c_str(), udid.length()) != EOK) {
-        LOGE("memcpy udid failed");
-        return 0;
-    }
-    unsigned char hash[SHA256_DIGEST_LENGTH] = {0};
-    Crypto::DmGenerateStrHash(data.get(), dataLength, hash, SHA256_DIGEST_LENGTH, 0);
-    if (memset_s(data.get(), dataLength, 0, dataLength) != EOK) {
-        LOGW("memset_s failed.");
-    }
-    int64_t serviceId = 0;
-    if (memcpy_s(&serviceId, sizeof(int64_t), hash, sizeof(int64_t)) != EOK) {
-        serviceId = 0;
-        LOGE("memcpy serviceId failed");
-    }
-    serviceId = std::abs(serviceId);
-    LOGI("GenerateSeivceId %{public}" PRId64, serviceId);
-    return serviceId;
-#else
-    return ERR_DM_FAILED;
-#endif
-}
-
-int32_t DeviceManagerService::RegisterServiceInfo(const DMServiceInfo &serviceInfo)
-{
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start, serviceId %{public}" PRId64, serviceInfo.serviceId);
-    DistributedDeviceProfile::ServiceInfoProfile profile;
-    bool success = InitServiceInfoProfile(serviceInfo, profile);
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    bool success = InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
     if (!success) {
-        LOGE("InitServiceInfoProfile failed");
+        LOGE("InitDPLocalServiceInfo failed");
         return ERR_DM_FAILED;
     }
-    return DeviceProfileConnector::GetInstance().PutServiceInfoProfile(profile);
+    return DeviceProfileConnector::GetInstance().PutLocalServiceInfo(dpLocalServiceInfo);
 #else
     (void)serviceInfo;
     return ERR_DM_FAILED;
 #endif
 }
 
-int32_t DeviceManagerService::UnRegisterServiceInfo(int64_t serviceId)
+int32_t DeviceManagerService::UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start, serviceId %{public}" PRId64, serviceId);
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    bool result = InitServiceInfoUniqueKey(key);
-    if (!result) {
-        LOGE("InitServiceInfoUniqueKey failed");
-        return ERR_DM_FAILED;
-    }
-    key.SetServiceId(serviceId);
-    return DeviceProfileConnector::GetInstance().DeleteServiceInfoProfile(key);
+    return DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
 #else
-    (void)serviceId;
+    (void)bundleName;
+    (void)pinExchangeType;
     return ERR_DM_FAILED;
 #endif
 }
 
-int32_t DeviceManagerService::UpdateServiceInfo(const DMServiceInfo &serviceInfo)
+int32_t DeviceManagerService::UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start, serviceId %{public}" PRId64, serviceInfo.serviceId);
-    DistributedDeviceProfile::ServiceInfoProfile profile;
-    bool success = InitServiceInfoProfile(serviceInfo, profile);
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    bool success = InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
     if (!success) {
-        LOGE("InitServiceInfoProfile failed");
+        LOGE("InitDPLocalServiceInfo failed");
         return ERR_DM_FAILED;
     }
-    return DeviceProfileConnector::GetInstance().UpdateServiceInfoProfile(profile);
+    return DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(dpLocalServiceInfo);
 #else
     (void)serviceInfo;
     return ERR_DM_FAILED;
 #endif
 }
 
-int32_t DeviceManagerService::GetServiceInfoById(int64_t serviceId, DMServiceInfo &serviceInfo)
+int32_t DeviceManagerService::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+    int32_t pinExchangeType, DMLocalServiceInfo &serviceInfo)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    LOGI("start, serviceId %{public}" PRId64, serviceId);
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    bool result = InitServiceInfoUniqueKey(key);
-    if (!result) {
-        LOGE("InitServiceInfoUniqueKey failed");
-        return ERR_DM_FAILED;
-    }
-    key.SetServiceId(serviceId);
-    DistributedDeviceProfile::ServiceInfoProfile profile;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByUniqueKey(key, profile);
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
+        pinExchangeType, dpLocalServiceInfo);
     if (ret == DM_OK) {
-        InitServiceInfo(profile, serviceInfo);
+        InitServiceInfo(dpLocalServiceInfo, serviceInfo);
     }
     return ret;
 #else
-    (void)serviceId;
+    (void)bundleName;
+    (void)pinExchangeType;
     (void)serviceInfo;
-    return ERR_DM_FAILED;
-#endif
-}
-
-int32_t DeviceManagerService::GetCallerServiceInfos(std::vector<DMServiceInfo> &serviceInfos)
-{
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    DistributedDeviceProfile::ServiceInfoUniqueKey key;
-    bool result = InitServiceInfoUniqueKey(key);
-    if (!result) {
-        LOGE("InitServiceInfoUniqueKey failed");
-        return ERR_DM_FAILED;
-    }
-    std::vector<DistributedDeviceProfile::ServiceInfoProfile> profiles;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileListByTokenId(key, profiles);
-    if (ret == DM_OK) {
-        InitServiceInfos(profiles, serviceInfos);
-    }
-    return ret;
-#else
-    (void)serviceInfos;
     return ERR_DM_FAILED;
 #endif
 }
@@ -1725,8 +1647,13 @@ int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgNa
         LOGE("The caller: %{public}s does not have permission to call ImportAuthCode.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    if (!PermissionManager::GetInstance().CheckInterfacePermission(REGISTER_PINHOLDER_CALLBACK)) {
-        LOGE("The caller: %{public}s is not in white list.", pkgName.c_str());
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerService::RegisterPinHolderCallback begin.");
@@ -1745,8 +1672,13 @@ int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const 
         LOGE("The caller: %{public}s does not have permission to call CreatePinHolder.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    if (!PermissionManager::GetInstance().CheckInterfacePermission(CREATE_PINHOLDER)) {
-        LOGE("The caller: %{public}s is not in white list.", pkgName.c_str());
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("DeviceManagerService::CreatePinHolder begin.");
@@ -1765,8 +1697,13 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
         LOGE("The caller: %{public}s does not have permission to call DestroyPinHolder.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    if (!PermissionManager::GetInstance().CheckInterfacePermission(DESTROY_PINHOLDER)) {
-        LOGE("The caller: %{public}s is not in white list.", pkgName.c_str());
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Begin.");
@@ -1903,6 +1840,8 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGIN);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_STOPPED);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_UNLOCKED);
     if (accountCommonEventManager_->SubscribeAccountCommonEvent(AccountCommonEventVec, callback)) {
         LOGI("Success");
     }
@@ -1930,19 +1869,7 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
     LOGI("CommonEventType: %{public}s, currentUserId: %{public}d, beforeUserId: %{public}d", commonEventType.c_str(),
         currentUserId, beforeUserId);
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-        DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
-        DMAccountInfo dmAccountInfo;
-        dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
-        dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
-        MultipleUserConnector::SetAccountInfo(currentUserId, dmAccountInfo);
-        if (beforeUserId == -1 || currentUserId == -1) {
-            return;
-        } else if (beforeUserId != -1 && currentUserId != -1) {
-            HandleUserSwitched(currentUserId, beforeUserId);
-        }
-        if (IsDMServiceAdapterResidentLoad()) {
-            dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
-        }
+        HandleUserSwitchedEvent(currentUserId, beforeUserId);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
         DMAccountInfo dmAccountInfo;
@@ -1970,11 +1897,165 @@ void DeviceManagerService::AccountCommonEventCallback(const std::string commonEv
         MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), curDmAccountInfo);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED && IsPC()) {
+        HandleUserStopEvent(beforeUserId);
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
+        DeviceNameManager::GetInstance().AccountSysReady(beforeUserId);
+        if (IsPC()) {
+            HandleUserSwitched();
+            if (IsDMServiceAdapterResidentLoad()) {
+                dmServiceImplExtResident_->AccountUserSwitched(currentUserId,
+                    MultipleUserConnector::GetOhosAccountId());
+            }
+        }
     } else {
         LOGE("Invalied account common event.");
     }
     return;
 }
+
+void DeviceManagerService::HandleUserSwitched()
+{
+    LOGI("onStart, HandleUserSwitched.");
+    std::vector<int32_t> foregroundUserVec;
+    int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
+    std::vector<int32_t> backgroundUserVec;
+    int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
+    if (retFront != DM_OK || retBack != DM_OK || foregroundUserVec.empty()) {
+        LOGE("Get userids failed, retFront: %{public}d, retBack: %{public}d, foreground user num: %{public}d",
+            retFront, retBack, static_cast<int32_t>(foregroundUserVec.size()));
+        return;
+    }
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    if (!discoveryMgr_->GetCommonDependencyObj()->CheckAclStatusAndForegroundNotMatch(localUdid,
+        foregroundUserVec, backgroundUserVec)) {
+        LOGI("no unreasonable data.");
+        return;
+    }
+    std::map<std::string, int32_t> curUserDeviceMap =
+        discoveryMgr_->GetCommonDependencyObj()->GetDeviceIdAndBindLevel(foregroundUserVec, localUdid);
+    std::map<std::string, int32_t> preUserDeviceMap =
+        discoveryMgr_->GetCommonDependencyObj()->GetDeviceIdAndBindLevel(backgroundUserVec, localUdid);
+    std::vector<std::string> peerUdids;
+    for (const auto &item : curUserDeviceMap) {
+        peerUdids.push_back(item.first);
+    }
+    for (const auto &item : preUserDeviceMap) {
+        if (find(peerUdids.begin(), peerUdids.end(), item.first) == peerUdids.end()) {
+            peerUdids.push_back(item.first);
+        }
+    }
+    if (peerUdids.empty()) {
+        return;
+    }
+    NotifyRemoteLocalUserSwitch(localUdid, peerUdids, foregroundUserVec, backgroundUserVec);
+}
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void DeviceManagerService::NotifyRemoteLocalUserSwitch(const std::string &localUdid,
+    const std::vector<std::string> &peerUdids, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    LOGI("onstart UserSwitch, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
+        GetIntegerList<int32_t>(foregroundUserIds).c_str(), GetIntegerList<int32_t>(backgroundUserIds).c_str());
+    if (peerUdids.empty()) {
+        return;
+    }
+    if (softbusListener_ == nullptr) {
+        UpdateAclAndDeleteGroup(localUdid, peerUdids, foregroundUserIds, backgroundUserIds);
+        LOGE("softbusListener_ is null");
+        return;
+    }
+    std::vector<std::string> bleUdids;
+    std::map<std::string, std::string> wifiDevices;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+    if (!bleUdids.empty()) {
+        UpdateAclAndDeleteGroup(localUdid, peerUdids, foregroundUserIds, backgroundUserIds);
+        SendUserIdsBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, true);
+    }
+    if (!wifiDevices.empty()) {
+        NotifyRemoteLocalUserSwitchByWifi(localUdid, wifiDevices, foregroundUserIds, backgroundUserIds);
+    }
+}
+
+void DeviceManagerService::NotifyRemoteLocalUserSwitchByWifi(const std::string &localUdid,
+    const std::map<std::string, std::string> &wifiDevices, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    for (const auto &it : wifiDevices) {
+        int32_t result = SendUserIdsByWifi(it.second, foregroundUserIds, backgroundUserIds);
+        if (result != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            std::vector<std::string> updateUdids;
+            updateUdids.push_back(it.first);
+            UpdateAclAndDeleteGroup(localUdid, updateUdids, foregroundUserIds, backgroundUserIds);
+            continue;
+        }
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        timer_->StartTimer(std::string(USER_SWITCH_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S,
+            [this, localUdid, foregroundUserIds, backgroundUserIds, udid] (std::string name) {
+                DeviceManagerService::HandleUserSwitchTimeout(localUdid, foregroundUserIds, backgroundUserIds, udid);
+            });
+    }
+}
+
+void DeviceManagerService::HandleUserSwitchTimeout(const std::string &localUdid,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+    const std::string &udid)
+{
+    LOGI("start udid: %{public}s", GetAnonyString(udid).c_str());
+    std::vector<std::string> updateUdids;
+    updateUdids.push_back(udid);
+    UpdateAclAndDeleteGroup(localUdid, updateUdids, foregroundUserIds, backgroundUserIds);
+}
+
+void DeviceManagerService::UpdateAclAndDeleteGroup(const std::string &localUdid,
+    const std::vector<std::string> &deviceVec, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    discoveryMgr_->GetCommonDependencyObj()->HandleUserSwitched(localUdid, deviceVec,
+        foregroundUserIds, backgroundUserIds);
+    //delete group
+    CHECK_NULL_VOID(hichainListener_);
+    hichainListener_->DeleteAllGroup(localUdid, backgroundUserIds);
+}
+#endif
 
 void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string &accountId,
     const std::string &accountName)
@@ -2126,7 +2207,10 @@ void DeviceManagerService::HandleUserIdsBroadCast(const std::vector<UserIdInfo> 
         std::vector<int32_t> backgroundUserVec;
         int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
         int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
-        if (retFront != DM_OK || retBack!= DM_OK || foregroundUserVec.empty()) {
+        if (IsPC()) {
+            MultipleUserConnector::ClearLockedUser(foregroundUserVec, backgroundUserVec);
+        }
+        if (retFront != DM_OK || retBack!= DM_OK) {
             LOGE("Get userid failed, retFront: %{public}d, retBack: %{public}d, frontUserNum:%{public}d,"
                  "backUserNum: %{public}d", retFront, retBack, static_cast<int32_t>(foregroundUserVec.size()),
                  static_cast<int32_t>(backgroundUserVec.size()));
@@ -2141,26 +2225,22 @@ void DeviceManagerService::HandleUserIdsBroadCast(const std::vector<UserIdInfo> 
     std::vector<UserIdInfo> foregroundUserIdInfos;
     std::vector<UserIdInfo> backgroundUserIdInfos;
     GetFrontAndBackUserIdInfos(remoteUserIdInfos, foregroundUserIdInfos, backgroundUserIdInfos);
-    if (foregroundUserIdInfos.empty()) {
-        LOGE("receive remote foreground userid empty");
-    } else {
-        LOGI("process foreground and background userids");
-        // Notify received remote foreground userids to dsoftbus
-        std::vector<uint32_t> foregroundUserIds;
-        for (const auto &u : foregroundUserIdInfos) {
-            foregroundUserIds.push_back(static_cast<uint32_t>(u.userId));
-        }
-        std::vector<uint32_t> backgroundUserIds;
-        for (const auto &u : backgroundUserIdInfos) {
-            backgroundUserIds.push_back(static_cast<uint32_t>(u.userId));
-        }
-        if (softbusListener_ != nullptr) {
-            softbusListener_->SetForegroundUserIdsToDSoftBus(remoteUdid, foregroundUserIds);
-        }
+    LOGI("process foreground and background userids");
+    // Notify received remote foreground userids to dsoftbus
+    std::vector<uint32_t> foregroundUserIds;
+    for (const auto &u : foregroundUserIdInfos) {
+        foregroundUserIds.push_back(static_cast<uint32_t>(u.userId));
+    }
+    std::vector<uint32_t> backgroundUserIds;
+    for (const auto &u : backgroundUserIdInfos) {
+        backgroundUserIds.push_back(static_cast<uint32_t>(u.userId));
+    }
+    if (softbusListener_ != nullptr) {
+        softbusListener_->SetForegroundUserIdsToDSoftBus(remoteUdid, foregroundUserIds);
+    }
 
-        if (IsDMServiceImplReady()) {
-            dmServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
-        }
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, IsPC());
     }
 }
 
@@ -2178,7 +2258,7 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
         timer_->DeleteTimer(std::string(USER_SWITCH_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
     }
     if (IsDMServiceImplReady()) {
-        dmServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid);
+        dmServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, IsPC());
     }
 }
 
@@ -2228,8 +2308,13 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    if (!PermissionManager::GetInstance().CheckInterfacePermission(SET_DNPOLICY)) {
-        LOGE("The caller: %{public}s is not in white list.", pkgName.c_str());
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnSetDnPolicy(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
@@ -2434,6 +2519,9 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
             break;
         case RelationShipChangeType::DEL_USER:
             dmServiceImpl_->HandleRemoteUserRemoved(relationShipMsg.userId, relationShipMsg.peerUdid);
+            break;
+        case RelationShipChangeType::STOP_USER:
+            HandleUserStopBroadCast(relationShipMsg.userId, relationShipMsg.peerUdid);
             break;
         default:
             LOGI("Dm have not this event type.");
@@ -2817,6 +2905,176 @@ void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t pr
     updateUdids.push_back(udid);
     dmServiceImpl_->HandleUserSwitched(updateUdids, curUserId, preUserId);
 }
+
+void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId)
+{
+    DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
+    if (IsPC()) {
+        return;
+    }
+    DMAccountInfo dmAccountInfo;
+    dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
+    dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
+    MultipleUserConnector::SetAccountInfo(currentUserId, dmAccountInfo);
+    if (beforeUserId == -1 || currentUserId == -1) {
+        HandleUserSwitched();
+        return;
+    }
+    if (beforeUserId != -1 && currentUserId != -1) {
+        HandleUserSwitched(currentUserId, beforeUserId);
+    }
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
+    }
+}
+
+void DeviceManagerService::HandleUserStopEvent(int32_t stopUserId)
+{
+    LOGI("onStart, HandleUserStopEvent %{public}s.", GetAnonyInt32(stopUserId).c_str());
+    std::vector<int32_t> stopUserVec;
+    stopUserVec.push_back(stopUserId);
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    std::map<std::string, int32_t> stopUserDeviceMap;
+    std::vector<std::string> peerUdids;
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    stopUserDeviceMap = discoveryMgr_->GetCommonDependencyObj()->
+        GetDeviceIdAndBindLevel(stopUserVec, localUdid);
+    for (const auto &item : stopUserDeviceMap) {
+        peerUdids.push_back(item.first);
+    }
+    if (peerUdids.empty()) {
+        LOGI("no data to be stoped.");
+        return;
+    }
+    NotifyRemoteLocalUserStop(localUdid, peerUdids, stopUserId);
+}
+
+void DeviceManagerService::DivideNotifyMethod(const std::vector<std::string> &peerUdids,
+    std::vector<std::string> &bleUdids, std::map<std::string, std::string> &wifiDevices)
+{
+    if (peerUdids.empty()) {
+        return;
+    }
+    if (softbusListener_ == nullptr) {
+        bleUdids = peerUdids;
+        LOGI("softbusListener_ is null");
+        return;
+    }
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+}
+
+void DeviceManagerService::HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid,
+    const std::vector<std::string> &acceptEventUdids)
+{
+    if (timer_ != nullptr) {
+        for (const auto &udid : acceptEventUdids) {
+            timer_->DeleteTimer(std::string(USER_STOP_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid));
+        }
+    }
+    if (MultipleUserConnector::IsUserUnlocked(stopUserId)) {
+        LOGE("user has unlocked %{public}s.", GetAnonyInt32(stopUserId).c_str());
+        return;
+    }
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    discoveryMgr_->GetCommonDependencyObj()->HandleUserStop(stopUserId, stopEventUdid, acceptEventUdids);
+}
+
+void DeviceManagerService::HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid)
+{
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    discoveryMgr_->GetCommonDependencyObj()->HandleUserStop(stopUserId, stopEventUdid);
+}
+
+void DeviceManagerService::NotifyRemoteLocalUserStop(const std::string &localUdid,
+    const std::vector<std::string> &peerUdids, int32_t stopUserId)
+{
+    std::vector<std::string> bleUdids;
+    std::map<std::string, std::string> wifiDevices;
+    DivideNotifyMethod(peerUdids, bleUdids, wifiDevices);
+    if (!bleUdids.empty()) {
+        HandleUserStop(stopUserId, localUdid, bleUdids);
+        SendUserStopBroadCast(bleUdids, stopUserId);
+    }
+    if (!wifiDevices.empty()) {
+        NotifyRemoteLocalUserStopByWifi(localUdid, wifiDevices, stopUserId);
+    }
+}
+
+void DeviceManagerService::SendUserStopBroadCast(const std::vector<std::string> &peerUdids, int32_t stopUserId)
+{
+    LOGI("peerUdids: %{public}s", GetAnonyStringList(peerUdids).c_str());
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::STOP_USER;
+    msg.userId = static_cast<uint32_t>(stopUserId);
+    msg.peerUdids = peerUdids;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+
+void DeviceManagerService::HandleUserStopBroadCast(int32_t stopUserId, const std::string &remoteUdid)
+{
+    LOGI("start");
+    HandleUserStop(stopUserId, remoteUdid);
+}
+
+void DeviceManagerService::NotifyRemoteLocalUserStopByWifi(const std::string &localUdid,
+    const std::map<std::string, std::string> &wifiDevices, int32_t stopUserId)
+{
+    for (const auto &it : wifiDevices) {
+        std::vector<std::string> updateUdids;
+        updateUdids.push_back(it.first);
+        int32_t result = DMCommTool::GetInstance()->SendUserStop(it.second, stopUserId);
+        if (result != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            HandleUserStop(stopUserId, localUdid, updateUdids);
+            continue;
+        }
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        timer_->StartTimer(std::string(USER_STOP_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S,
+            [this, stopUserId, localUdid, updateUdids] (std::string name) {
+                DeviceManagerService::HandleUserStop(stopUserId, localUdid, updateUdids);
+            });
+    }
+}
 #endif
 
 int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgName,
@@ -2941,13 +3199,14 @@ void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &
         }
     }
     cJSON_AddStringToObject(bindParamObj, PARAM_KEY_CONN_SESSIONTYPE, CONN_SESSION_TYPE_HML);
-    cJSON_AddNumberToObject(bindParamObj, PARAM_KEY_HML_ACTIONID, actionId);
+    cJSON_AddStringToObject(bindParamObj, PARAM_KEY_HML_ACTIONID, std::to_string(actionId).c_str());
     char *str = cJSON_PrintUnformatted(bindParamObj);
     if (str == nullptr) {
         cJSON_Delete(bindParamObj);
         return;
     }
     bindParam = std::string(str);
+    cJSON_free(str);
     cJSON_Delete(bindParamObj);
 }
 
@@ -2955,6 +3214,17 @@ void DeviceManagerService::ClearPulishIdCache(const std::string &pkgName)
 {
     CHECK_NULL_VOID(advertiseMgr_);
     advertiseMgr_->ClearPulishIdCache(pkgName);
+}
+
+bool DeviceManagerService::IsPC()
+{
+    if (softbusListener_ == nullptr) {
+        LOGE("softbusListener_ is null.");
+        return false;
+    }
+    DmDeviceInfo info;
+    GetLocalDeviceInfo(info);
+    return (info.deviceTypeId == DmDeviceType::DEVICE_TYPE_PC || info.deviceTypeId == DmDeviceType::DEVICE_TYPE_2IN1);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

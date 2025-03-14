@@ -39,6 +39,7 @@
 #include "deviceprofile_connector_mock.h"
 #include "hichain_auth_connector_mock.h"
 #include "multiple_user_connector_mock.h"
+#include "crypto_mgr_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -62,6 +63,7 @@ public:
     static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ = nullptr;
     static inline std::shared_ptr<HiChainAuthConnectorMock> hiChainAuthConnectorMock_ = nullptr;
     static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;
+    static inline std::shared_ptr<CryptoMgrMock> cryptoMgrMock_ = nullptr;
 };
 
 class AuthRequestFinishStateMock : public AuthRequestFinishState {

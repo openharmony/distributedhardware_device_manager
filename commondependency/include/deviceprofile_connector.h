@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,8 +21,7 @@
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
 #include "i_dp_inited_callback.h"
-#include "service_info_profile.h"
-#include "service_info_unique_key.h"
+#include "local_service_info.h"
 #include "trusted_device_info.h"
 
 enum AllowAuthType {
@@ -99,6 +98,15 @@ class IDeviceProfileConnector {
 public:
     virtual ~IDeviceProfileConnector() {}
     virtual int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm) = 0;
+    virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
+        const std::string &localUdid) = 0;
+    virtual int32_t HandleUserSwitched(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
+    virtual bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
+    virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid) = 0;
+    virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
+        const std::vector<std::string> &acceptEventUdids) = 0;
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
@@ -157,6 +165,13 @@ public:
     void DeleteAccessControlById(int64_t accessControlId);
     int32_t HandleUserSwitched(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         int32_t currentUserId, int32_t beforeUserId);
+    int32_t HandleUserSwitched(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void HandleUserSwitched(const std::vector<DistributedDeviceProfile::AccessControlProfile> &activeProfiles,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &inActiveProfiles,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &delActiveProfiles);
     void HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
     std::vector<ProcessInfo> GetOfflineProcessInfo(std::string &localUdid, const std::vector<int32_t> &localUserIds,
@@ -177,16 +192,15 @@ public:
     int32_t PutAllTrustedDevices(const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     int32_t UpdateAclDeviceName(const std::string &udid, const std::string &newDeviceName);
-    int32_t PutServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile);
-    int32_t DeleteServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoUniqueKey &key);
-    int32_t UpdateServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile);
-    int32_t GetServiceInfoProfileByUniqueKey(const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
-        DistributedDeviceProfile::ServiceInfoProfile &serviceInfoProfile);
-    int32_t GetServiceInfoProfileListByTokenId(const DistributedDeviceProfile::ServiceInfoUniqueKey &key,
-        std::vector<DistributedDeviceProfile::ServiceInfoProfile> &serviceInfoProfiles);
-    int32_t GetServiceInfoProfileListByBundleName(const DistributedDeviceProfile::ServiceInfoUniqueKey& key,
-        std::vector<DistributedDeviceProfile::ServiceInfoProfile>& serviceInfoProfiles);
-    int32_t PutSessionKey(const uint8_t* sessionKey, uint32_t length, int32_t& sessionKeyId);
+    int32_t PutLocalServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
+    int32_t DeleteLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType);
+    int32_t UpdateLocalServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
+    int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+        int32_t pinExchangeType, DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
+    int32_t PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId);
+    int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
+    int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
+        const std::vector<std::string> &acceptEventUdids);
 
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
@@ -223,6 +237,9 @@ private:
     void UpdatePeerUserId(DistributedDeviceProfile::AccessControlProfile profile, std::string &localUdid,
         const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &remoteFrontUserIds);
+    bool CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

@@ -34,7 +34,7 @@ public:
 protected:
     std::shared_ptr<DMCommTool> dmCommTool;
     std::shared_ptr<DMCommTool> dmCommToolPtr = std::make_shared<DMCommTool>();
-    DMTransport dmTransport = DMTransport(dmCommToolPtr);
+    std::shared_ptr<DMTransport> dmTransport_ = std::make_shared<DMTransport>(dmCommToolPtr);
 
     int32_t ERR_DM_FAILED = 96929744;
     int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;

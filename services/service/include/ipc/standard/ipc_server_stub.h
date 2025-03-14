@@ -30,7 +30,6 @@
 #include "iremote_stub.h"
 #include "system_ability.h"
 
-#include "account_boot_listener.h"
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
 

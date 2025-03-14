@@ -16,16 +16,7 @@
 #ifndef OHOS_SCREEN_COMMON_EVENT_H
 #define OHOS_SCREEN_COMMON_EVENT_H
 
-#include <functional>
-#include <mutex>
-#include <string>
-#include <vector>
-
-#include "common_event_data.h"
 #include "common_event_manager.h"
-#include "common_event_subscribe_info.h"
-#include "common_event_subscriber.h"
-#include "matching_skills.h"
 #include "system_ability_status_change_stub.h"
 
 namespace OHOS {

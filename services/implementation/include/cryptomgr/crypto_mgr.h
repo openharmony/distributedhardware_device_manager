@@ -43,6 +43,7 @@ public:
     int32_t EncryptMessage(const std::string &inputMsg, std::string &outputMsg);
     int32_t DecryptMessage(const std::string &inputMsg, std::string &outputMsg);
     int32_t SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
+    int32_t ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
     void ClearSessionKey();
 
 private:

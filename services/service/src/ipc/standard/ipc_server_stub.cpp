@@ -14,12 +14,8 @@
  */
 
 #include "ipc_server_stub.h"
-
-#include "if_system_ability_manager.h"
 #include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"
-#include "ipc_types.h"
-#include "iservice_registry.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "kv_adapter_manager.h"
 #endif
@@ -27,10 +23,7 @@
 #include "mem_mgr_client.h"
 #include "mem_mgr_proxy.h"
 #endif // SUPPORT_MEMMGR
-
-#include "string_ex.h"
 #include "system_ability_definition.h"
-#include "device_manager_ipc_interface_code.h"
 #include "device_manager_service.h"
 #include "device_manager_service_notify.h"
 #include "device_name_manager.h"
@@ -79,7 +72,6 @@ void IpcServerStub::OnStart()
     AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);
     AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
     DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
-    PermissionManager::GetInstance().Init();
 }
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
@@ -93,8 +85,7 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
             return;
         }
         state_ = ServiceRunningState::STATE_RUNNING;
-        int32_t ret = DeviceNameManager::GetInstance().Init();
-        LOGI("int device name ret:%{public}d", ret);
+        DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
         return;
     }
 
@@ -172,7 +163,6 @@ void IpcServerStub::OnStop()
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 #endif // SUPPORT_MEMMGR
-    PermissionManager::GetInstance().UnInit();
     LOGI("IpcServerStub::OnStop end.");
 }
 
@@ -220,6 +210,7 @@ ServiceRunningState IpcServerStub::QueryServiceState() const
 
 int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener)
 {
+    LOGI("RegisterDeviceManagerListener start");
     if (processInfo.pkgName.empty() || listener == nullptr) {
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
         return ERR_DM_POINT_NULL;

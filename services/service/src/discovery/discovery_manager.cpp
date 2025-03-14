@@ -16,8 +16,6 @@
 #include "discovery_manager.h"
 
 #include <dlfcn.h>
-#include <securec.h>
-
 #include "softbus_common.h"
 
 #include "dm_anonymous.h"

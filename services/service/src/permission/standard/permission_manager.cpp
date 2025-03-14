@@ -15,18 +15,12 @@
 
 #include "permission_manager.h"
 
-#include <fstream>
-
 #include "accesstoken_kit.h"
 #include "access_token.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "file_ex.h"
-#include "hap_token_info.h"
 #include "ipc_skeleton.h"
-#include "native_token_info.h"
-#include "securec.h"
 #include "tokenid_kit.h"
 
 using namespace OHOS::Security::AccessToken;
@@ -38,10 +32,23 @@ namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
 constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
-constexpr int32_t PKG_NAME_SIZE_MAX = 256;
+constexpr int32_t AUTH_CODE_WHITE_LIST_NUM = 6;
+constexpr const static char* g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM] = {
+    "com.huawei.msdp.hmringgenerator",
+    "com.huawei.msdp.hmringdiscriminator",
+    "CollaborationFwk",
+    "wear_link_service",
+    "watch_system_service",
+    "cast_engine_service",
+};
+
+constexpr int32_t PIN_HOLDER_WHITE_LIST_NUM = 1;
+constexpr const static char* g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM] = {
+    "CollaborationFwk",
+};
 
 constexpr int32_t SYSTEM_SA_WHITE_LIST_NUM = 8;
-constexpr const static char SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
+constexpr const static char* SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM] = {
     "Samgr_Networking",
     "ohos.distributeddata.service",
     "ohos.dslm",
@@ -51,117 +58,20 @@ constexpr const static char SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM][PKG_N
     "ohos.security.distributed_access_token",
     "ohos.storage.distributedfile.daemon",
 };
-const std::string PERMISSION_JSON_PATH = "/system/etc/device_manager/dm_permission.json";
-const std::string ALL_PROC = "all";
-constexpr int32_t MAX_INTERFACE_SIZE = 20;
-}
 
-int32_t PermissionManager::Init()
-{
-    LOGI("PermissionManager::call!");
-    if (!LoadPermissionCfg(PERMISSION_JSON_PATH)) {
-        return ERR_DM_FAILED;
-    }
-    LOGI("PermissionManager::init succeeded");
-    return DM_OK;
-}
+constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = 4;
+constexpr const static char* g_setDnPolicyWhiteList[SETDNPOLICY_WHITE_LIST_NUM] = {
+    "collaboration_service",
+    "watch_system_service",
+    "com.huawei.hmos.walletservice",
+    "com.ohos.distributedjstest",
+};
 
-int32_t PermissionManager::UnInit()
-{
-    LOGI("PermissionManager::UnInit");
-    std::lock_guard<std::mutex> autoLock(permissionMutex_);
-    permissionMap_.clear();
-    return DM_OK;
-}
-
-int32_t PermissionManager::LoadPermissionCfg(const std::string &filePath)
-{
-    char path[PATH_MAX + 1] = {0x00};
-    if (filePath.length() == 0 || filePath.length() > PATH_MAX || realpath(filePath.c_str(), path) == nullptr) {
-        LOGE("File canonicalization failed");
-        return ERR_DM_FAILED;
-    }
-    std::ifstream ifs(path);
-    if (!ifs.is_open()) {
-        LOGE("load json file failed");
-        return ERR_DM_FAILED;
-    }
-    std::string fileContent(std::istreambuf_iterator<char>{ifs}, std::istreambuf_iterator<char>{});
-    ifs.close();
-
-    cJSON *permissionJson = cJSON_Parse(fileContent.c_str());
-    if (!cJSON_IsObject(permissionJson)) {
-        LOGE("Permission json parse failed!");
-        cJSON_Delete(permissionJson);
-        return ERR_DM_FAILED;
-    }
-    int32_t parseResult = ParsePermissionJson(permissionJson);
-    LOGI("PermissionManager::permission json load result %{public}d!", parseResult);
-    cJSON_Delete(permissionJson);
-    return parseResult;
-}
-
-int32_t PermissionManager::ParsePermissionJson(const cJSON *const permissionJson)
-{
-    int size = cJSON_GetArraySize(permissionJson);
-    if (size == 0 || size > MAX_INTERFACE_SIZE) {
-        LOGE("Permission json size is invalid!size: %{public}d!", size);
-        return ERR_DM_FAILED;
-    }
-    SetPermissionMap(permissionJson, IMPORT_AUTHCODE);
-    SetPermissionMap(permissionJson, EXPORT_AUTHCODE);
-    SetPermissionMap(permissionJson, REGISTER_PINHOLDER_CALLBACK);
-    SetPermissionMap(permissionJson, CREATE_PINHOLDER);
-    SetPermissionMap(permissionJson, DESTROY_PINHOLDER);
-    SetPermissionMap(permissionJson, SET_DNPOLICY);
-    SetPermissionMap(permissionJson, BIND_FOR_DEVICE_LEVEL);
-    char *jsonChars = cJSON_PrintUnformatted(permissionJson);
-    if (jsonChars == NULL) {
-        LOGW("cJSON formatted to string failed!");
-    } else {
-        LOGI("permission json parse success!");
-        cJSON_free(jsonChars);
-    }
-    return DM_OK;
-}
-
-void PermissionManager::SetPermissionMap(const cJSON *const permissionJson, const std::string& interfaceName)
-{
-    cJSON *item = cJSON_GetObjectItem(permissionJson, interfaceName.c_str());
-    int32_t itemSize = static_cast<int32_t>(cJSON_GetArraySize(item));
-    if (!cJSON_IsArray(item) || itemSize == 0 || itemSize > MAX_INTERFACE_SIZE) {
-        LOGE("PermissionJson not contains the key, %{public}s!", interfaceName.c_str());
-        return;
-    }
-    std::unordered_set<std::string> interfaceNameSets;
-    item = item->child;
-    while (item != NULL) {
-        if (cJSON_IsString(item)) {
-            interfaceNameSets.emplace(item->valuestring);
-        }
-        item = item->next;
-    }
-    {
-        std::lock_guard<std::mutex> autoLock(permissionMutex_);
-        permissionMap_[interfaceName] = interfaceNameSets;
-    }
-}
-
-bool PermissionManager::CheckInterfacePermission(const std::string &interfaceName)
-{
-    std::string callProcName = "";
-    if (GetCallerProcessName(callProcName) != DM_OK) {
-        LOGE("Get caller process name failed");
-        return false;
-    }
-    std::unordered_set<std::string> permittedProcNames;
-    {
-        std::lock_guard<std::mutex> autoLock(permissionMutex_);
-        permittedProcNames = permissionMap_[interfaceName];
-    }
-    bool checkResult = (permittedProcNames.count(callProcName) != 0 || permittedProcNames.count(ALL_PROC) != 0);
-    LOGD("success interface %{public}s callProc %{public}s!", interfaceName.c_str(), callProcName.c_str());
-    return checkResult;
+constexpr uint32_t GETDEVICEINFO_WHITE_LIST_NUM = 2;
+constexpr const static char* g_getDeviceInfoWhiteList[GETDEVICEINFO_WHITE_LIST_NUM] = {
+    "gameservice_server",
+    "com.huawei.hmos.slassistant",
+};
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -255,6 +165,46 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
     return DM_OK;
 }
 
+bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
+{
+    LOGI("Enter PermissionManager::CheckProcessNameValidOnAuthCode");
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+
+    uint16_t index = 0;
+    for (; index < AUTH_CODE_WHITE_LIST_NUM; ++index) {
+        std::string tmp(g_authCodeWhiteList[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
+
+    LOGE("CheckProcessNameValidOnAuthCode process name: %{public}s invalid.", processName.c_str());
+    return false;
+}
+
+bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
+{
+    LOGI("Enter PermissionManager::CheckProcessNameValidOnPinHolder");
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+
+    uint16_t index = 0;
+    for (; index < PIN_HOLDER_WHITE_LIST_NUM; ++index) {
+        std::string tmp(g_pinHolderWhiteList[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
+
+    LOGE("CheckProcessNameValidOnPinHolder process name: %{public}s invalid.", processName.c_str());
+    return false;
+}
+
 bool PermissionManager::CheckWhiteListSystemSA(const std::string &pkgName)
 {
     for (uint16_t index = 0; index < SYSTEM_SA_WHITE_LIST_NUM; ++index) {
@@ -289,6 +239,42 @@ bool PermissionManager::CheckSystemSA(const std::string &pkgName)
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
         return true;
     }
+    return false;
+}
+
+bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &processName)
+{
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < SETDNPOLICY_WHITE_LIST_NUM; ++index) {
+        std::string tmp(g_setDnPolicyWhiteList[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
+
+    LOGE("Process name: %{public}s invalid.", processName.c_str());
+    return false;
+}
+
+bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &processName)
+{
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < GETDEVICEINFO_WHITE_LIST_NUM; ++index) {
+        std::string tmp(g_getDeviceInfoWhiteList[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
+
+    LOGE("Process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 } // namespace DistributedHardware

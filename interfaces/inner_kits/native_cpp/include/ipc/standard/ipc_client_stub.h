@@ -16,9 +16,6 @@
 #ifndef OHOS_DM_IPC_CLIENT_STUB_H
 #define OHOS_DM_IPC_CLIENT_STUB_H
 
-#include <cstdint>
-#include <memory>
-
 #include "ipc_remote_broker.h"
 #include "iremote_stub.h"
 namespace OHOS { class MessageOption; }

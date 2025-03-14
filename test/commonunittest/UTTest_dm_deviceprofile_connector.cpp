@@ -2289,5 +2289,34 @@ HWTEST_F(DeviceProfileConnectorTest, UpdateAclDeviceName_001, testing::ext::Test
     ret = DeviceProfileConnector::GetInstance().UpdateAclDeviceName(udid, newDeviceName);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
+
+HWTEST_F(DeviceProfileConnectorTest, CheckAppLevelAccess_001, testing::ext::TestSize.Level0)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t acerTokenId = 1001;
+    int32_t aceeTokenId = 1002;
+    DmAccessCaller caller;
+    DmAccessCallee callee;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    accesser.SetAccesserTokenId(acerTokenId);
+    accessee.SetAccesseeTokenId(aceeTokenId);
+    profile.SetAccesser(accesser);
+    profile.SetAccessee(accessee);
+    caller.tokenId = acerTokenId;
+    callee.tokenId = aceeTokenId;
+    bool ret = DeviceProfileConnector::GetInstance().CheckAppLevelAccess(profile, caller, callee);
+    EXPECT_TRUE(ret);
+
+    caller.tokenId = aceeTokenId;
+    callee.tokenId = acerTokenId;
+    ret = DeviceProfileConnector::GetInstance().CheckAppLevelAccess(profile, caller, callee);
+    EXPECT_TRUE(ret);
+
+    caller.tokenId = 1;
+    callee.tokenId = 1;
+    ret = DeviceProfileConnector::GetInstance().CheckAppLevelAccess(profile, caller, callee);
+    EXPECT_FALSE(ret);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

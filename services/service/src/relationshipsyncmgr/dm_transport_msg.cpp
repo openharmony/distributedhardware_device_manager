@@ -14,8 +14,6 @@
  */
 
 #include "dm_transport_msg.h"
-
-#include "dm_anonymous.h"
 #include "dm_log.h"
 
 namespace OHOS {

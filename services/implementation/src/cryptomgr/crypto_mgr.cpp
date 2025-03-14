@@ -318,5 +318,24 @@ void CryptoMgr::ClearSessionKey()
         sessionKey_.keyLen = 0;
     }
 }
+
+int32_t CryptoMgr::ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
+{
+    if (sessionKey == nullptr || keyLen > MAX_SESSION_KEY_LENGTH) {
+        LOGE("Invalid param, SessionKey len: %{public}d", keyLen);
+        return ERR_DM_PROCESS_SESSION_KEY_FAILED;
+    }
+    ClearSessionKey();
+    {
+        std::lock_guard<std::mutex> lock(sessionKeyMtx_);
+        sessionKey_.key = (uint8_t*)calloc(keyLen, sizeof(uint8_t));
+        if (memcpy_s(sessionKey_.key, keyLen, sessionKey, keyLen) != DM_OK) {
+            LOGE("memcpy_s failed.");
+            return ERR_DM_PROCESS_SESSION_KEY_FAILED;
+        }
+        sessionKey_.keyLen = keyLen;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

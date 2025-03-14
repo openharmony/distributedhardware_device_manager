@@ -47,13 +47,15 @@ Status DistributedKvDataManager::GetSingleKvStore(const Options &options, const 
         options, appId, storeId, singleKvStore);
 }
 
-Status DistributedKvDataManager::GetAllKvStoreId(const AppId &appId, std::vector<StoreId> &storeIds)
+Status DistributedKvDataManager::GetAllKvStoreId(const AppId &appId, std::vector<StoreId> &storeIds, int32_t subUser)
 {
+    (void)subUser;
     return IDistributedKvDataManager::GetOrCreateDistributedKvDataManager()->GetAllKvStoreId(appId, storeIds);
 }
 
-Status DistributedKvDataManager::CloseKvStore(const AppId &appId, const StoreId &storeId)
+Status DistributedKvDataManager::CloseKvStore(const AppId &appId, const StoreId &storeId, int32_t subUser)
 {
+    (void)subUser;
     return IDistributedKvDataManager::GetOrCreateDistributedKvDataManager()->CloseKvStore(appId, storeId);
 }
 
@@ -62,18 +64,22 @@ Status DistributedKvDataManager::CloseKvStore(const AppId &appId, std::shared_pt
     return IDistributedKvDataManager::GetOrCreateDistributedKvDataManager()->CloseKvStore(appId, kvStore);
 }
 
-Status DistributedKvDataManager::CloseAllKvStore(const AppId &appId)
+Status DistributedKvDataManager::CloseAllKvStore(const AppId &appId, int32_t subUser)
 {
+    (void)subUser;
     return IDistributedKvDataManager::GetOrCreateDistributedKvDataManager()->CloseAllKvStore(appId);
 }
 
-Status DistributedKvDataManager::DeleteKvStore(const AppId &appId, const StoreId &storeId, const std::string &path)
+Status DistributedKvDataManager::DeleteKvStore(const AppId &appId, const StoreId &storeId, const std::string &path,
+    int32_t subUser)
 {
+    (void)subUser;
     return IDistributedKvDataManager::GetOrCreateDistributedKvDataManager()->DeleteKvStore(appId, storeId, path);
 }
 
-Status DistributedKvDataManager::DeleteAllKvStore(const AppId &appId, const std::string &path)
+Status DistributedKvDataManager::DeleteAllKvStore(const AppId &appId, const std::string &path, int32_t subUser)
 {
+    (void)subUser;
     return IDistributedKvDataManager::GetOrCreateDistributedKvDataManager()->DeleteAllKvStore(appId, path);
 }
 

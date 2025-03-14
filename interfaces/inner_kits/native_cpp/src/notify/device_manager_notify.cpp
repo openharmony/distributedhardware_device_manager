@@ -15,7 +15,6 @@
 
 #include "device_manager_notify.h"
 #include <thread>
-#include "device_manager.h"
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_device_info.h"

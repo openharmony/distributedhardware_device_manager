@@ -127,13 +127,14 @@ HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestS
  */
 HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::TestSize.Level0)
 {
-    std::shared_ptr<DmAuthManager> data =
+    std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
-    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(data);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(authManager);
     std::shared_ptr<DmAuthResponseContext> authResponseContext = std::make_shared<DmAuthResponseContext>();
     std::shared_ptr<DmAuthRequestContext> authRequestContext = std::make_shared<DmAuthRequestContext>();
     authMessageProcessor->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authMessageProcessor->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
     int32_t msgType = MSG_TYPE_NEGOTIATE;
     nlohmann::json jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
@@ -142,9 +143,15 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->SetRequestContext(authRequestContext);
     authMessageProcessor->cryptoAdapter_ = nullptr;
+    authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_NFC;
+    authManager->authRequestContext_->hostPkgName = "hostPkgName";
+    authManager->importAuthCode_ = "123";
+    authManager->importPkgName_ = "hostPkgName";
+    authMessageProcessor->authMgr_ = authManager;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
     std::string str1 = SafetyDump(jsonObj);
     authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
+    authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
 
     nlohmann::json jsonObject;
@@ -872,6 +879,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::Test
     jsonObj[TAG_EDITION] = "edition";
     jsonObj[TAG_BUNDLE_NAME] = "bundleName";
     jsonObj[TAG_PEER_BUNDLE_NAME] = "peerbundleName";
+    jsonObj[TAG_REMOTE_DEVICE_NAME] = "remoteDeviceName";
     authMessageProcessor->SetResponseContext(authResponseContext);
     authMessageProcessor->ParseNegotiateMessage(jsonObj);
     ASSERT_EQ(authMessageProcessor->authResponseContext_, authResponseContext);
@@ -1748,6 +1756,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::T
     nlohmann::json jsonObj;
     jsonObj[TAG_PUBLICKEY] = "123456";
     jsonObj[TAG_CRYPTIC_MSG] = "cryptic";
+    jsonObj[TAG_SESSIONKEY_ID] = 1;
     authMessageProcessor->cryptoMgr_ = std::make_shared<CryptoMgr>();
         
     authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
@@ -1759,7 +1768,11 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::T
     EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(decryptStr), Return(DM_OK)));
     authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
-    ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), false);
+
+    EXPECT_CALL(*cryptoMgrMock_, DecryptMessage(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(decryptStr), Return(ERR_DM_FAILED)));
+    authMessageProcessor->ParsePublicKeyMessageExt(jsonObj);
+    ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), true);
 }
 
 HWTEST_F(AuthMessageProcessorTest, ParseMessage_010, testing::ext::TestSize.Level0)
@@ -1873,6 +1886,20 @@ HWTEST_F(AuthMessageProcessorTest, GetJsonObj_010, testing::ext::TestSize.Level0
     authMessageProcessor->authResponseContext_->bindType.push_back(103);
     authMessageProcessor->GetJsonObj(jsonObj);
     ASSERT_FALSE(authMessageProcessor->authResponseContext_->bindType.empty());
+}
+
+HWTEST_F(AuthMessageProcessorTest, IsPincodeImported_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<DmAuthManager> authManager = nullptr;
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(authManager);
+    authMessageProcessor->authMgr_ = authManager;
+    bool ret = authMessageProcessor->IsPincodeImported();
+    ASSERT_FALSE(ret);
+
+    authManager = std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    authMessageProcessor->authMgr_ = authManager;
+    ret = authMessageProcessor->IsPincodeImported();
+    ASSERT_FALSE(ret);
 }
 } // namespace
 } // namespace DistributedHardware

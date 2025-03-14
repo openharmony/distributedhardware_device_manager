@@ -197,7 +197,6 @@ typedef struct DmAuthResponseContext {
     std::string edition;
     int32_t localBindLevel;
     std::string remoteDeviceName;
-    bool isSrcPincodeImported = false;
     int32_t localSessionKeyId = 0;
     int32_t remoteSessionKeyId = 0;
 } DmAuthResponseContext;
@@ -484,22 +483,23 @@ public:
     static bool IsPinCodeValid(const std::string strpin);
     static bool IsPinCodeValid(int32_t numpin);
     bool IsImportedAuthCodeValid();
+    bool IsSrc();
 
 private:
     bool IsHmlSessionType();
     bool CanUsePincodeFromDp();
-    void InitServiceInfoUniqueKey(DistributedDeviceProfile::ServiceInfoUniqueKey &key);
     bool IsServiceInfoAuthTypeValid(int32_t authType);
     bool IsServiceInfoAuthBoxTypeValid(int32_t authBoxType);
     bool IsServiceInfoPinExchangeTypeValid(int32_t pinExchangeType);
-    bool IsServiceInfoProfileValid(const DistributedDeviceProfile::ServiceInfoProfile &profile);
-    void GetServiceInfoProfile();
+    bool IsLocalServiceInfoValid(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo);
+    void GetLocalServiceInfoInDp();
     bool CheckNeedShowAuthInfoDialog(int32_t errorCode);
     void UpdateInputPincodeDialog(int32_t errorCode);
-    void JoinLnn(const std::string &deviceId);
+    void JoinLnn(const std::string &deviceId, bool isForceJoin = false);
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
+    bool CheckHmlParamValid(nlohmann::json &jsonObject);
     bool CheckProcessNameInWhiteList(const std::string &processName);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
@@ -525,6 +525,8 @@ private:
     int32_t CheckTrustState();
     void ProcIncompatible(const int32_t &sessionId);
     void MemberJoinAuthRequest(int64_t requestId, int32_t status);
+    void PutSrcAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
+    void PutSinkAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
 
 public:
     void RequestCredential();
@@ -536,6 +538,7 @@ public:
     void AuthDeviceError(int64_t requestId, int32_t errorCode);
     void GetRemoteDeviceId(std::string &deviceId);
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
+    int32_t GetSessionKeyIdSync(int64_t requestId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnScreenLocked();
     void HandleDeviceNotTrust(const std::string &udid);
@@ -551,6 +554,7 @@ private:
         const std::string &extra);
     void ParseJsonObject(nlohmann::json jsonObject);
     void ParseHmlInfoInJsonObject(nlohmann::json jsonObject);
+    void PutSessionKeyAsync(int64_t requestId, std::vector<unsigned char> hash);
     int32_t DeleteAcl(const std::string &pkgName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
     void ProcessAuthRequestExt(const int32_t &sessionId);
@@ -622,8 +626,12 @@ private:
     bool isNeedProcCachedSrcReqMsg_ = false;
     std::string srcReqMsg_ = "";
     int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
-    DistributedDeviceProfile::ServiceInfoProfile serviceInfoProfile_;
+    DistributedDeviceProfile::LocalServiceInfo serviceInfoProfile_;
     bool pincodeDialogEverShown_ = false;
+    std::string bundleName_ = "";
+    std::mutex sessionKeyIdMutex_;
+    std::condition_variable sessionKeyIdCondition_;
+    std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

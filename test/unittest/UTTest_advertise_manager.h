@@ -13,33 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_GET_SERVICEINFO_BYCALLER_RSP_H
-#define OHOS_DM_IPC_GET_SERVICEINFO_BYCALLER_RSP_H
+#ifndef OHOS_DM_ADVERTISE_MANAGER_TEST_H
+#define OHOS_DM_ADVERTISE_MANAGER_TEST_H
 
-#include <vector>
-
-#include "dm_device_info.h"
-#include "ipc_req.h"
+#include <gtest/gtest.h>
+#include "advertise_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcGetServiceInfoByCallerRsp : public IpcRsp {
-    DECLARE_IPC_MODEL(IpcGetServiceInfoByCallerRsp);
-
+class AdvertiseManagerTest : public testing::Test {
 public:
-    const std::vector<DMServiceInfo>& GetServiceInfos() const
-    {
-        return serviceInfos_;
-    }
-
-    void SetServiceInfos(const std::vector<DMServiceInfo> &infos)
-    {
-        serviceInfos_ = infos;
-    }
-
-private:
-    std::vector<DMServiceInfo> serviceInfos_;
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_GET_SERVICEINFO_BYCALLER_RSP_H
+#endif // OHOS_DM_ADVERTISE_MANAGER_TEST_H

@@ -13,31 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_GEN_SERVICEID_RSP_H
-#define OHOS_DM_IPC_GEN_SERVICEID_RSP_H
+#ifndef OHOS_DM_APP_MANAGER_TEST_H
+#define OHOS_DM_APP_MANAGER_TEST_H
 
-#include "ipc_rsp.h"
-#include "dm_device_info.h"
+#include <gtest/gtest.h>
+#include "app_manager.h"
+#include "ipc_skeleton_mock.h"
+#include "accesstoken_kit_mock.h"
+#include "system_ability_manager_client_mock.h"
+#include "os_account_manager_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcGenServiceIdRsp : public IpcRsp {
-    DECLARE_IPC_MODEL(IpcGenServiceIdRsp);
-
+class AppManagerTest : public testing::Test {
 public:
-    int64_t GetServiceId() const
-    {
-        return serviceId_;
-    }
-
-    void SetServiceId(const int64_t &serviceId)
-    {
-        serviceId_ = serviceId;
-    }
-
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
 private:
-    int64_t serviceId_ = 0;
+    std::shared_ptr<IPCSkeletonMock> skeleton_;
+    std::shared_ptr<AccessTokenKitMock> token_;
+    std::shared_ptr<SystemAbilityManagerClientMock> client_;
+    std::shared_ptr<OsAccountManagerMock> accountManager_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_GEN_SERVICEID_RSP_H
+#endif

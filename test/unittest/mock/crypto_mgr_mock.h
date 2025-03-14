@@ -28,6 +28,7 @@ public:
 public:
     virtual int32_t EncryptMessage(const std::string &inputMsg, std::string &outputMsg) = 0;
     virtual int32_t DecryptMessage(const std::string &inputMsg, std::string &outputMsg) = 0;
+    virtual int32_t SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen) = 0;
 public:
     static inline std::shared_ptr<DmCryptoMgr> dmCryptoMgr = nullptr;
 };
@@ -36,6 +37,7 @@ class CryptoMgrMock : public DmCryptoMgr {
 public:
     MOCK_METHOD(int32_t, EncryptMessage, (const std::string &, std::string &));
     MOCK_METHOD(int32_t, DecryptMessage, (const std::string &, std::string &));
+    MOCK_METHOD(int32_t, SaveSessionKey, (const uint8_t *, const uint32_t));
 };
 }
 }

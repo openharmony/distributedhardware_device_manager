@@ -28,5 +28,10 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
 {
     return DmCryptoMgr::dmCryptoMgr->DecryptMessage(inputMsg, outputMsg);
 }
+
+int32_t CryptoMgr::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
+{
+    return DmCryptoMgr::dmCryptoMgr->SaveSessionKey(sessionKey, keyLen);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

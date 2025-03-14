@@ -22,13 +22,8 @@
 #include <memory>
 #include <mutex>
 #include <set>
-#include <string>
-#include <vector>
 
 #include "device_manager_callback.h"
-#include "dm_device_info.h"
-#include "dm_device_profile_info.h"
-#include "dm_subscribe_info.h"
 #include "dm_single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"

@@ -25,17 +25,17 @@ class IpcRegServiceInfoReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcRegServiceInfoReq);
 
 public:
-    const DMServiceInfo &GetServiceInfo() const
+    const DMLocalServiceInfo &GetLocalServiceInfo() const
     {
         return serviceInfo_;
     }
 
-    void SetServiceInfo(const DMServiceInfo &info)
+    void SetLocalServiceInfo(const DMLocalServiceInfo &info)
     {
         serviceInfo_ = info;
     }
 private:
-    DMServiceInfo serviceInfo_;
+    DMLocalServiceInfo serviceInfo_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

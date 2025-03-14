@@ -16,9 +16,7 @@
 #ifndef OHOS_DM_IPC_SERVER_LISTENER_H
 #define OHOS_DM_IPC_SERVER_LISTENER_H
 
-#include <cstdint>
 #include <set>
-#include "dm_device_info.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 

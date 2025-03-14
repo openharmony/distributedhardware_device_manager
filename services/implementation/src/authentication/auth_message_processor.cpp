@@ -38,7 +38,6 @@ const char* TAG_INDEX = "INDEX";
 const char* TAG_SLICE_NUM = "SLICE";
 const char* TAG_IS_AUTH_CODE_READY = "IS_AUTH_CODE_READY";
 const char* TAG_IS_SHOW_DIALOG = "IS_SHOW_DIALOG";
-const char* TAG_SRC_PINCODE_IMPORTED = "TAG_SRC_PINCODE_IMPORTED";
 const char* TAG_TOKEN = "TOKEN";
 const char* TAG_CRYPTO_NAME = "CRYPTONAME";
 const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
@@ -230,7 +229,11 @@ void AuthMessageProcessor::CreatePublicKeyMessageExt(nlohmann::json &json)
         return;
     } else {
         nlohmann::json jsonTemp;
-        jsonTemp[TAG_SESSIONKEY_ID] = authResponseContext_->localSessionKeyId;
+        auto sptr = authMgr_.lock();
+        if (sptr != nullptr && !sptr->IsSrc()) {
+            authResponseContext_->localSessionKeyId = sptr->GetSessionKeyIdSync(authResponseContext_->requestId);
+            jsonTemp[TAG_SESSIONKEY_ID] = authResponseContext_->localSessionKeyId;
+        }
         jsonTemp[TAG_PUBLICKEY] = authResponseContext_->publicKey;
         std::string strTemp = SafetyDump(jsonTemp);
         std::string encryptStr = "";
@@ -282,13 +285,6 @@ void AuthMessageProcessor::CreateNegotiateMessage(nlohmann::json &json)
     json[TAG_HOST_PKGLABEL] = authResponseContext_->hostPkgLabel;
     json[TAG_EDITION] = authResponseContext_->edition;
     json[TAG_REMOTE_DEVICE_NAME] = authResponseContext_->remoteDeviceName;
-    if (authRequestContext_->authType != AUTH_TYPE_IMPORT_AUTH_CODE && IsPincodeImported()) {
-        LOGI("TAG_SRC_PINCODE_IMPORTED set");
-        json[TAG_SRC_PINCODE_IMPORTED] = true;
-    } else {
-        LOGI("TAG_SRC_PINCODE_IMPORTED not set");
-        json[TAG_SRC_PINCODE_IMPORTED] = false;
-    }
 }
 
 void AuthMessageProcessor::CreateRespNegotiateMessage(nlohmann::json &json)
@@ -442,7 +438,7 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(nlohmann::json &json)
         }
         if (IsInt32(jsonObject, TAG_SESSIONKEY_ID)) {
             authResponseContext_->remoteSessionKeyId = jsonObject[TAG_SESSIONKEY_ID].get<int32_t>();
-            LOGI("got remoteSessionKeyId");
+            LOGI("get remoteSessionKeyId");
         }
         return;
     }
@@ -681,9 +677,6 @@ void AuthMessageProcessor::ParseNegotiateMessage(const nlohmann::json &json)
         authResponseContext_->remoteDeviceName = json[TAG_REMOTE_DEVICE_NAME].get<std::string>();
     }
     ParsePkgNegotiateMessage(json);
-    if (IsBool(json, TAG_SRC_PINCODE_IMPORTED)) {
-        authResponseContext_->isSrcPincodeImported = json[TAG_SRC_PINCODE_IMPORTED].get<bool>();
-    }
 }
 
 void AuthMessageProcessor::ParseRespNegotiateMessage(const nlohmann::json &json)
@@ -755,10 +748,10 @@ void AuthMessageProcessor::CreateReqReCheckMessage(nlohmann::json &jsonObj)
     jsonTemp[TAG_EDITION] = authResponseContext_->edition;
     jsonTemp[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
     jsonTemp[TAG_LOCAL_USERID] = authResponseContext_->localUserId;
-    jsonTemp[TAG_LOCAL_ACCOUNTID] = authResponseContext_->localAccountId;
-    jsonTemp[TAG_TOKENID] = authResponseContext_->tokenId;
     jsonTemp[TAG_BUNDLE_NAME] = authResponseContext_->bundleName;
     jsonTemp[TAG_BIND_LEVEL] = authResponseContext_->bindLevel;
+    jsonTemp[TAG_LOCAL_ACCOUNTID] = authResponseContext_->localAccountId;
+    jsonTemp[TAG_TOKENID] = authResponseContext_->tokenId;
     std::string strTemp = SafetyDump(jsonTemp);
     std::string encryptStr = "";
     CHECK_NULL_VOID(cryptoMgr_);
@@ -779,10 +772,10 @@ void AuthMessageProcessor::ParseReqReCheckMessage(nlohmann::json &json)
     authResponseContext_->edition = "";
     authResponseContext_->localDeviceId = "";
     authResponseContext_->localUserId = 0;
-    authResponseContext_->localAccountId = "";
-    authResponseContext_->tokenId = 0;
     authResponseContext_->bundleName = "";
     authResponseContext_->localBindLevel = -1;
+    authResponseContext_->localAccountId = "";
+    authResponseContext_->tokenId = 0;
     CHECK_NULL_VOID(cryptoMgr_);
     if (cryptoMgr_->DecryptMessage(encryptStr, decryptStr) != DM_OK) {
         LOGE("DecryptMessage failed.");
@@ -802,17 +795,17 @@ void AuthMessageProcessor::ParseReqReCheckMessage(nlohmann::json &json)
     if (IsInt32(jsonObject, TAG_LOCAL_USERID)) {
         authResponseContext_->localUserId = jsonObject[TAG_LOCAL_USERID].get<int32_t>();
     }
-    if (IsString(jsonObject, TAG_LOCAL_ACCOUNTID)) {
-        authResponseContext_->localAccountId = jsonObject[TAG_LOCAL_ACCOUNTID].get<std::string>();
-    }
-    if (IsInt64(jsonObject, TAG_TOKENID)) {
-        authResponseContext_->tokenId = jsonObject[TAG_TOKENID].get<int64_t>();
-    }
     if (IsString(jsonObject, TAG_BUNDLE_NAME)) {
         authResponseContext_->bundleName = jsonObject[TAG_BUNDLE_NAME].get<std::string>();
     }
     if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
         authResponseContext_->localBindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
+    }
+    if (IsString(jsonObject, TAG_LOCAL_ACCOUNTID)) {
+        authResponseContext_->localAccountId = jsonObject[TAG_LOCAL_ACCOUNTID].get<std::string>();
+    }
+    if (IsInt64(jsonObject, TAG_TOKENID)) {
+        authResponseContext_->tokenId = jsonObject[TAG_TOKENID].get<int64_t>();
     }
 }
 
@@ -826,6 +819,12 @@ void AuthMessageProcessor::SetEncryptFlag(bool flag)
 {
     std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
     encryptFlag_ = flag;
+}
+
+int32_t AuthMessageProcessor::ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
+{
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
+    return cryptoMgr_->ProcessSessionKey(sessionKey, keyLen);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

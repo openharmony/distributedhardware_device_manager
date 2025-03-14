@@ -16,8 +16,6 @@
 #ifndef OHOS_DM_APP_IMAGE_INFO_H
 #define OHOS_DM_APP_IMAGE_INFO_H
 
-#include <cstdint>
-
 #include "securec.h"
 
 namespace OHOS {

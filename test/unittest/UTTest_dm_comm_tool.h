@@ -19,6 +19,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "dm_comm_tool.h"
+#include "dm_transport_mock.h"
+#include "dm_softbus_cache_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -28,6 +30,8 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static inline  std::shared_ptr<DMTransportMock> dmTransportMock_ = std::make_shared<DMTransportMock>();
+    static inline  std::shared_ptr<SoftbusCacheMock> softbusCacheMock_ = std::make_shared<SoftbusCacheMock>();
 
 protected:
     std::shared_ptr<DMCommTool> dmCommTool;

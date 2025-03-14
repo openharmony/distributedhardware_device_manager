@@ -33,6 +33,8 @@
 #include "system_ability_definition.h"
 #include "softbus_error_code.h"
 
+using namespace testing;
+using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
 
@@ -53,9 +55,15 @@ void SoftbusConnectorTest::TearDown()
 }
 void SoftbusConnectorTest::SetUpTestCase()
 {
+    SoftbusCenterInterface::softbusCenterInterface_ = softbusCenterMock_;
+    DmCrypto::dmCrypto = cryptoMock_;
 }
 void SoftbusConnectorTest::TearDownTestCase()
 {
+    SoftbusCenterInterface::softbusCenterInterface_ = nullptr;
+    softbusCenterMock_ = nullptr;
+    DmCrypto::dmCrypto = nullptr;
+    cryptoMock_ = nullptr;
 }
 
 namespace {
@@ -103,8 +111,9 @@ HWTEST_F(SoftbusConnectorTest, GetUdidByNetworkId_001, testing::ext::TestSize.Le
     const char *networkId = "123456";
     std::string udid;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int ret = softbusConnector->GetUdidByNetworkId(networkId, udid);
-    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -118,8 +127,9 @@ HWTEST_F(SoftbusConnectorTest, GetUuidByNetworkId_001, testing::ext::TestSize.Le
     const char *networkId = "123456";
     std::string uuid;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int ret = softbusConnector->GetUuidByNetworkId(networkId, uuid);
-    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
 /**
@@ -484,8 +494,9 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_001, testing::ext::TestSi
 {
     std::string udid = "123456789";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
     std::string ret = softbusConnector->GetDeviceUdidHashByUdid(udid);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 /**
@@ -497,7 +508,7 @@ HWTEST_F(SoftbusConnectorTest, EraseUdidFromMap_001, testing::ext::TestSize.Leve
     std::string udid = "123456789";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->EraseUdidFromMap(udid);
-    EXPECT_EQ(softbusConnector->deviceUdidMap_.empty(), false);
+    EXPECT_EQ(softbusConnector->deviceUdidMap_.empty(), true);
 }
 
 /**
@@ -507,7 +518,12 @@ HWTEST_F(SoftbusConnectorTest, EraseUdidFromMap_001, testing::ext::TestSize.Leve
 HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Level0)
 {
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     std::string ret = softbusConnector->GetLocalDeviceName();
+    EXPECT_EQ(ret.empty(), true);
+
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(DM_OK));
+    ret = softbusConnector->GetLocalDeviceName();
     EXPECT_EQ(ret.empty(), true);
 }
 
@@ -518,8 +534,32 @@ HWTEST_F(SoftbusConnectorTest, GetLocalDeviceName_001, testing::ext::TestSize.Le
 HWTEST_F(SoftbusConnectorTest, GetNetworkIdByDeviceId_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
+    std::string strNetworkId = "net******12";
+    int32_t deviceCount = 1;
+    NodeBasicInfo nodeBasicInfo = {
+        .networkId = "network*1",
+        .deviceName = "deviceName",
+        .deviceTypeId = 1
+    };
+
+    NodeBasicInfo *basicInfo = &nodeBasicInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
+        .WillOnce(WithArgs<1, 2>(Invoke([&basicInfo, &deviceCount](NodeBasicInfo **info, int32_t *infoNum) {
+            infoNum = &deviceCount;
+            info = &basicInfo;
+            return DM_OK;
+        })));
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
+        .WillOnce(WithArgs<3>(Invoke([deviceId](uint8_t *info) {
+            memcpy_s(info, (deviceId.length() + 1), deviceId.c_str(), deviceId.length());
+            return DM_OK;
+        })));
     std::string ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
+    EXPECT_EQ(ret.empty(), true);
+
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(DM_OK));
+    ret = softbusConnector->GetNetworkIdByDeviceId(deviceId);
     EXPECT_EQ(ret.empty(), true);
 }
 
@@ -591,10 +631,37 @@ HWTEST_F(SoftbusConnectorTest, HandleDeviceOffline_001, testing::ext::TestSize.L
  */
 HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
 {
-    std::string targetDeviceId = "targetDeviceId";
+    std::string targetId = "targetDeviceId";
+    int32_t deviceCount = 1;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    softbusConnector->CheckIsOnline(targetDeviceId);
-    EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    bool ret = softbusConnector->CheckIsOnline(targetId);
+    EXPECT_FALSE(ret);
+
+    NodeBasicInfo nodeBasicInfo = {
+        .networkId = "network*1",
+        .deviceName = "deviceName",
+        .deviceTypeId = 1
+    };
+
+    NodeBasicInfo *basicInfo = &nodeBasicInfo;
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
+        .WillOnce(WithArgs<1, 2>(Invoke([&basicInfo, &deviceCount](NodeBasicInfo **info, int32_t *infoNum) {
+            infoNum = &deviceCount;
+            info = &basicInfo;
+            return DM_OK;
+        })));
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
+        .WillOnce(WithArgs<3>(Invoke([targetId](uint8_t *info) {
+            memcpy_s(info, (targetId.length() + 1), targetId.c_str(), targetId.length());
+            return DM_OK;
+        })));
+    ret = softbusConnector->CheckIsOnline(targetId);
+    EXPECT_FALSE(ret);
+
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(DM_OK));
+    ret = softbusConnector->CheckIsOnline(targetId);
+    EXPECT_FALSE(ret);
 }
 
 /**
@@ -604,8 +671,48 @@ HWTEST_F(SoftbusConnectorTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
 HWTEST_F(SoftbusConnectorTest, GetDeviceInfoByDeviceId_001, testing::ext::TestSize.Level0)
 {
     std::string deviceId = "deviceId";
+    int32_t deviceCount = 1;
+    std::string strNetworkId = "networkId**1";
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     auto ret = softbusConnector->GetDeviceInfoByDeviceId(deviceId);
+    EXPECT_EQ(ret.deviceId == deviceId, false);
+
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
+        .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
+            infoNum = &deviceCount;
+            return DM_OK;
+        })));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_EQ(ret.deviceId == deviceId, false);
+
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
+        .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
+            infoNum = &deviceCount;
+            return DM_OK;
+        })));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
+    .WillOnce(WithArgs<3>(Invoke([](uint8_t *info) {
+        info[0] = 'd';
+        info[1] = 'e';
+        info[2] = 'v';
+        info[3] = 'i';
+        return DM_OK;
+    })));
+    EXPECT_EQ(ret.deviceId == deviceId, false);
+
+    EXPECT_CALL(*softbusCenterMock_, GetAllNodeDeviceInfo(_, _, _))
+        .WillOnce(WithArgs<2>(Invoke([&deviceCount](int32_t *infoNum) {
+            infoNum = &deviceCount;
+            return DM_OK;
+        })));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusCenterMock_, GetNodeKeyInfo(_, _, _, _, _))
+        .WillOnce(WithArgs<3>(Invoke([deviceId, strNetworkId](uint8_t *info) {
+            memcpy_s(info, (strNetworkId.length() + 1), strNetworkId.c_str(), (strNetworkId.length()));
+            return DM_OK;
+        })));
     EXPECT_EQ(ret.deviceId == deviceId, false);
 }
 
@@ -620,9 +727,81 @@ HWTEST_F(SoftbusConnectorTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext:
         .deviceName = "name",
     };
     DmDeviceInfo dmDeviceInfo;
+    nlohmann::json extraJson;
+    extraJson[PARAM_KEY_OS_TYPE] = 1;
+    extraJson[PARAM_KEY_OS_VERSION] = {0};
+    dmDeviceInfo.extraData = extraJson.dump();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
     EXPECT_EQ(softbusConnector->processInfoVec_.empty(), true);
+}
+
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceTypeId_001, testing::ext::TestSize.Level0)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = softbusConnector->GetLocalDeviceTypeId();
+    EXPECT_EQ(ret, static_cast<int32_t>(DmDeviceType::DEVICE_TYPE_UNKNOWN));
+
+    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _))
+    .WillOnce(WithArgs<1>(Invoke([](NodeBasicInfo *info) {
+        if (info != nullptr) {
+            info->deviceTypeId = 1;
+        }
+        return DM_OK;
+    })));
+    ret = softbusConnector->GetLocalDeviceTypeId();
+    EXPECT_EQ(ret, 1);
+}
+
+HWTEST_F(SoftbusConnectorTest, GetLocalDeviceNetworkId_001, testing::ext::TestSize.Level0)
+{
+    std::string networkId = "network*1";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    auto ret = softbusConnector->GetLocalDeviceNetworkId();
+    EXPECT_EQ(ret.empty(), true);
+
+    EXPECT_CALL(*softbusCenterMock_, GetLocalNodeDeviceInfo(_, _))
+        .WillOnce(WithArgs<1>(Invoke([networkId](NodeBasicInfo *info) {
+            if (info != nullptr) {
+                memcpy_s(info->networkId, sizeof(info->networkId), networkId.c_str(), networkId.length());
+            }
+            return DM_OK;
+        })));
+    ret = softbusConnector->GetLocalDeviceNetworkId();
+    EXPECT_EQ(ret.empty(), false);
+}
+
+HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_002, testing::ext::TestSize.Level0)
+{
+    std::string udid = "1********69";
+    std::string udidHashTemp = "ajj*********47";
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    std::string ret = softbusConnector->GetDeviceUdidHashByUdid(udid);
+    EXPECT_EQ(ret.empty(), true);
+
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(WithArgs<1>(Invoke([udidHashTemp](unsigned char *udidHash) {
+        memcpy_s(udidHash, (udidHashTemp.length() + 1), udidHashTemp.c_str(), (udidHashTemp.length()));
+        return DM_OK;
+    })));
+    ret = softbusConnector->GetDeviceUdidHashByUdid(udid);
+    EXPECT_EQ(ret.empty(), false);
+
+    ret = softbusConnector->GetDeviceUdidHashByUdid(udid);
+    EXPECT_EQ(ret.empty(), false);
+
+    int32_t sessionId = 1;
+    int32_t sessionKeyId = 1;
+    int32_t remoteSessionKeyId = 1;
+    softbusConnector->JoinLnnByHml(sessionId, sessionKeyId, remoteSessionKeyId);
+
+    sessionId = 0;
+    softbusConnector->JoinLnnByHml(sessionId, sessionKeyId, remoteSessionKeyId);
+    std::string deviceId = "deviceId";
+    bool isForceJoin = false;
+    softbusConnector->JoinLnn(deviceId, isForceJoin);
 }
 } // namespace
 } // namespace DistributedHardware

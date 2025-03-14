@@ -15,9 +15,6 @@
 
 #include "local_device_name_mgr.h"
 
-#include "data_ability_observer_stub.h"
-#include "datashare_helper.h"
-#include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "ohos_account_kits.h"
 #include "os_account_manager.h"

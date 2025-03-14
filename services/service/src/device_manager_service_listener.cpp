@@ -34,8 +34,6 @@
 #include "ipc_notify_credential_req.h"
 #include "ipc_notify_devicetrustchange_req.h"
 #include "ipc_notify_device_found_req.h"
-#include "ipc_notify_device_discovery_req.h"
-#include "ipc_notify_device_state_req.h"
 #include "ipc_notify_discover_result_req.h"
 #include "ipc_notify_get_device_icon_info_req.h"
 #include "ipc_notify_get_device_profile_info_list_req.h"
@@ -56,34 +54,9 @@ std::mutex DeviceManagerServiceListener::alreadyNotifyPkgNameLock_;
 std::map<std::string, DmDeviceInfo> DeviceManagerServiceListener::alreadyOnlinePkgName_ = {};
 std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNameSet_ = { "ohos.deviceprofile",
     "ohos.distributeddata.service" };
-void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
-    const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
+
+void handleExtraData(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
-    (void)pkgName;
-    if (memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != DM_OK) {
-        LOGE("ConvertDeviceInfoToDeviceBasicInfo memset_s failed.");
-        return;
-    }
-
-    if (memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
-                 std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
-        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
-        return;
-    }
-
-    if (memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
-                 std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
-        return;
-    }
-
-    if (memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
-                 std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
-        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
-        return;
-    }
-
-    deviceBasicInfo.deviceTypeId = info.deviceTypeId;
     cJSON *extraDataJsonObj = cJSON_Parse(info.extraData.c_str());
     if (extraDataJsonObj == NULL) {
         return;
@@ -101,16 +74,47 @@ void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std:
     cJSON_Delete(extraDataJsonObj);
     cJSON *basicExtraDataJsonObj = cJSON_CreateObject();
     if (basicExtraDataJsonObj == NULL) {
+        cJSON_free(customData);
         return;
     }
     cJSON_AddStringToObject(basicExtraDataJsonObj, PARAM_KEY_CUSTOM_DATA, customData);
     char *basicExtraData = cJSON_PrintUnformatted(basicExtraDataJsonObj);
     if (basicExtraData == nullptr) {
+        cJSON_free(customData);
         cJSON_Delete(basicExtraDataJsonObj);
         return;
     }
     deviceBasicInfo.extraData = std::string(basicExtraData);
+    cJSON_free(customData);
+    cJSON_free(basicExtraData);
     cJSON_Delete(basicExtraDataJsonObj);
+}
+
+void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
+    const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
+{
+    (void)pkgName;
+    if (memset_s(&deviceBasicInfo, sizeof(DmDeviceBasicInfo), 0, sizeof(DmDeviceBasicInfo)) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDeviceBasicInfo memset_s failed.");
+        return;
+    }
+    if (memcpy_s(deviceBasicInfo.deviceName, sizeof(deviceBasicInfo.deviceName), info.deviceName,
+                 std::min(sizeof(deviceBasicInfo.deviceName), sizeof(info.deviceName))) != DM_OK) {
+        LOGE("ConvertDeviceInfoToDmDevice copy deviceName data failed.");
+        return;
+    }
+    if (memcpy_s(deviceBasicInfo.networkId, sizeof(deviceBasicInfo.networkId), info.networkId,
+                 std::min(sizeof(deviceBasicInfo.networkId), sizeof(info.networkId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy networkId data failed.");
+        return;
+    }
+    if (memcpy_s(deviceBasicInfo.deviceId, sizeof(deviceBasicInfo.deviceId), info.deviceId,
+                 std::min(sizeof(deviceBasicInfo.deviceId), sizeof(info.deviceId))) != DM_OK) {
+        LOGE("ConvertNodeBasicInfoToDmDevice copy deviceId data failed.");
+        return;
+    }
+    deviceBasicInfo.deviceTypeId = info.deviceTypeId;
+    handleExtraData(info, deviceBasicInfo);
 }
 
 void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDeviceStateReq> pReq,

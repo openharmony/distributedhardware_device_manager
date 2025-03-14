@@ -16,9 +16,6 @@
 #ifndef OHOS_DM_CALLBACK_H
 #define OHOS_DM_CALLBACK_H
 
-#include <cstdint>
-#include <string>
-
 #include "dm_device_info.h"
 #include "dm_device_profile_info.h"
 

@@ -16,9 +16,6 @@
 #ifndef OHOS_I_DM_SERVICE_LISTENER_H
 #define OHOS_I_DM_SERVICE_LISTENER_H
 
-#include <map>
-#include <string>
-
 #include "dm_device_info.h"
 #include "dm_device_profile_info.h"
 

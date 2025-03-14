@@ -16,9 +16,6 @@
 #ifndef OHOS_DM_IPC_CLIENT_PROXY_H
 #define OHOS_DM_IPC_CLIENT_PROXY_H
 
-#include <cstdint>
-#include <memory>
-
 #include "ipc_client.h"
 
 namespace OHOS {

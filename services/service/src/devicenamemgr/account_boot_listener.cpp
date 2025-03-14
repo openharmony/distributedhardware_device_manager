@@ -14,11 +14,7 @@
  */
 
 #include "account_boot_listener.h"
-
-#include <cinttypes>
-
 #include "common_event_support.h"
-#include "device_manager_service.h"
 #include "parameter.h"
 
 #include "dm_log.h"

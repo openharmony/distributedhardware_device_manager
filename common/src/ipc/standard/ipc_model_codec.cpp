@@ -369,27 +369,20 @@ void IpcModelCodec::DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devI
     devInfo.extraData = parcel.ReadString();
 }
 
-bool IpcModelCodec::EncodeServiceInfo(const DMServiceInfo &serviceInfo, MessageParcel &parcel)
+bool IpcModelCodec::EncodeLocalServiceInfo(const DMLocalServiceInfo &serviceInfo, MessageParcel &parcel)
 {
     bool bRet = true;
-    bRet = (bRet && parcel.WriteInt64(serviceInfo.serviceId));
-    bRet = (bRet && parcel.WriteString(serviceInfo.serviceType));
-    bRet = (bRet && parcel.WriteString(serviceInfo.serviceName));
-    bRet = (bRet && parcel.WriteString(serviceInfo.serviceDisplayName));
-    bRet = (bRet && parcel.WriteString(serviceInfo.customData));
     bRet = (bRet && parcel.WriteString(serviceInfo.bundleName));
-    bRet = (bRet && parcel.WriteString(serviceInfo.moduleName));
-    bRet = (bRet && parcel.WriteString(serviceInfo.abilityName));
     bRet = (bRet && parcel.WriteInt32(serviceInfo.authBoxType));
     bRet = (bRet && parcel.WriteInt32(serviceInfo.authType));
     bRet = (bRet && parcel.WriteInt32(serviceInfo.pinExchangeType));
     bRet = (bRet && parcel.WriteString(serviceInfo.pinCode));
     bRet = (bRet && parcel.WriteString(serviceInfo.description));
-    bRet = (bRet && parcel.WriteString(serviceInfo.serviceDiscoveryScope));
+    bRet = (bRet && parcel.WriteString(serviceInfo.extraInfo));
     return bRet;
 }
 
-bool IpcModelCodec::EncodeServiceInfos(const std::vector<DMServiceInfo> &serviceInfos, MessageParcel &parcel)
+bool IpcModelCodec::EncodeLocalServiceInfos(const std::vector<DMLocalServiceInfo> &serviceInfos, MessageParcel &parcel)
 {
     uint32_t num = static_cast<uint32_t>(serviceInfos.size());
     if (!parcel.WriteUint32(num)) {
@@ -398,45 +391,38 @@ bool IpcModelCodec::EncodeServiceInfos(const std::vector<DMServiceInfo> &service
     }
     bool bRet = true;
     for (uint32_t k = 0; k < num; k++) {
-        DMServiceInfo serviceInfo = serviceInfos[k];
-        bRet = EncodeServiceInfo(serviceInfo, parcel);
+        DMLocalServiceInfo serviceInfo = serviceInfos[k];
+        bRet = EncodeLocalServiceInfo(serviceInfo, parcel);
         if (!bRet) {
-            LOGE("EncodeServiceInfo failed");
+            LOGE("EncodeLocalServiceInfo failed");
             break;
         }
     }
     return bRet;
 }
 
-bool IpcModelCodec::DecodeServiceInfo(MessageParcel &parcel, DMServiceInfo &serviceInfo)
+bool IpcModelCodec::DecodeLocalServiceInfo(MessageParcel &parcel, DMLocalServiceInfo &serviceInfo)
 {
-    READ_HELPER_RET(parcel, Int64, serviceInfo.serviceId, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.serviceType, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.serviceName, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.serviceDisplayName, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.customData, false);
     READ_HELPER_RET(parcel, String, serviceInfo.bundleName, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.moduleName, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.abilityName, false);
     READ_HELPER_RET(parcel, Int32, serviceInfo.authBoxType, false);
     READ_HELPER_RET(parcel, Int32, serviceInfo.authType, false);
     READ_HELPER_RET(parcel, Int32, serviceInfo.pinExchangeType, false);
     READ_HELPER_RET(parcel, String, serviceInfo.pinCode, false);
     READ_HELPER_RET(parcel, String, serviceInfo.description, false);
-    READ_HELPER_RET(parcel, String, serviceInfo.serviceDiscoveryScope, false);
+    READ_HELPER_RET(parcel, String, serviceInfo.extraInfo, false);
     return true;
 }
 
-bool IpcModelCodec::DecodeServiceInfos(MessageParcel &parcel, std::vector<DMServiceInfo> &serviceInfos)
+bool IpcModelCodec::DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<DMLocalServiceInfo> &serviceInfos)
 {
     uint32_t num = 0;
     READ_HELPER_RET(parcel, Uint32, num, false);
     bool bRet = true;
     for (uint32_t k = 0; k < num; k++) {
-        DMServiceInfo serviceInfo;
-        bRet = DecodeServiceInfo(parcel, serviceInfo);
+        DMLocalServiceInfo serviceInfo;
+        bRet = DecodeLocalServiceInfo(parcel, serviceInfo);
         if (!bRet) {
-            LOGE("DecodeServiceInfo failed");
+            LOGE("DecodeLocalServiceInfo failed");
             break;
         }
         serviceInfos.emplace_back(serviceInfo);

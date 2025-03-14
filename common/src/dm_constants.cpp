@@ -153,15 +153,6 @@ const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
     { ERR_DM_SYNC_DELETE_DEVICE_REPEATED, 96929801 }
 };
 
-/* Interface Name */
-const char* IMPORT_AUTHCODE = "ImportAuthCode";
-const char* EXPORT_AUTHCODE = "ExportAuthCode";
-const char* REGISTER_PINHOLDER_CALLBACK = "RegisterPinHolderCallback";
-const char* CREATE_PINHOLDER = "CreatePinHolder";
-const char* DESTROY_PINHOLDER = "DestroyPinHolder";
-const char* SET_DNPOLICY = "SetDnPolicy";
-const char* BIND_FOR_DEVICE_LEVEL = "BindForDeviceLevel";
-
 // wise device
 const int32_t MAX_DEVICE_PROFILE_SIZE = 500;
 
