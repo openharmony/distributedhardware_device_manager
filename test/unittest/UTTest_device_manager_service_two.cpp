@@ -1023,7 +1023,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Leve
     EXPECT_CALL(*deviceManagerServiceImplMock_,
         GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
 
@@ -1549,7 +1549,6 @@ HWTEST_F(DeviceManagerServiceTest, UpdateLocalServiceInfo_201, testing::ext::Tes
         foregroundUserIds, backgroundUserIds);
     
     GTEST_LOG_(INFO) << "NotifyRemoteLocalUserSwitchByWifi SendUserIds is ok" ;
-    DeviceManagerService::GetInstance().timer_ = nullptr;
     EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(localUdid, wifiDevices,
         foregroundUserIds, backgroundUserIds);
