@@ -232,7 +232,6 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
     if (isInt32) {
         bindLevel = jsonObject[TAG_BIND_LEVEL].Get<int32_t>();
     }
-    int32_t bindLevel = std::atoi(jsonObject[TAG_BIND_LEVEL].Get<std::string>().c_str());
     if (static_cast<uint32_t>(bindLevel) > APP || bindLevel < INVALID_TYPE) {
         LOGE("bindlevel error %{public}d.", bindLevel);
         return ERR_DM_INPUT_PARA_INVALID;
