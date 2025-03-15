@@ -102,6 +102,9 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
     virtual std::vector<std::string> GetDeviceNamePrefixs() = 0;
     virtual void CheckRegisterInfoWithWise() = 0;
+    virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName) = 0;
+    virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
+        const std::string &deviceName) = 0;
     virtual int32_t GetDeviceProfileInfosFromLocalCache(const NetworkIdQueryFilter &queryFilter,
         std::vector<DmDeviceProfileInfo> &dmDeviceProfileInfos) = 0;
 };

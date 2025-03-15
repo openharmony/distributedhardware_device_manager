@@ -34,8 +34,11 @@ const std::string SETTINGSDATA_GLOBAL = "SETTINGSDATA";
 const std::string SETTINGS_GENERAL_DEVICE_NAME = "settings.general.device_name";
 const std::string SETTINGSDATA_SYSTEM = "USER_SETTINGSDATA_";
 const std::string SETTINGSDATA_SECURE = "USER_SETTINGSDATA_SECURE_";
-const std::string SETTINGS_GENERAL_DISPLAY_DEVICE_NAME = "settings.general.display_device_name";
-const std::string SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME = "settings.general.user_defined_device_name";
+const std::string DISPLAY_DEVICE_NAME = "display_device_name";
+const std::string SETTINGS_GENERAL_DISPLAY_DEVICE_NAME = "settings.general." + DISPLAY_DEVICE_NAME;
+const std::string USER_DEFINED_DEVICE_NAME = "user_defined_device_name";
+const std::string SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME = "settings.general." + USER_DEFINED_DEVICE_NAME;
+const std::string SETTINGS_GENERAL_DISPLAY_DEVICE_NAME_STATE = "settings.general.display_device_name_state";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
 constexpr int32_t NUM1 = 1;
@@ -132,7 +135,6 @@ int32_t DeviceNameManager::InitDeviceNameWhenUserSwitch(int32_t curUserId, int32
     LOGI("In");
     if (DependsIsReady()) {
         InitDeviceName(curUserId);
-        RegisterDeviceNameChangeMonitor(curUserId, preUserId);
     }
     return DM_OK;
 }
@@ -259,6 +261,7 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
     if (!userDefinedDeviceName.empty()) {
         LOGI("userDefinedDeviceName:%{public}s", GetAnonyString(userDefinedDeviceName).c_str());
         InitDeviceNameToSoftBus("", userDefinedDeviceName);
+        InitDisplayDeviceNameToSettingsData("", userDefinedDeviceName, userId);
         return;
     }
     std::string deviceName = GetLocalMarketName();
@@ -268,6 +271,7 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
     }
     std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
     InitDeviceNameToSoftBus(nickName, deviceName);
+    InitDisplayDeviceNameToSettingsData(nickName, deviceName, userId);
 }
 
 void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, const std::string &subffixName)
@@ -360,6 +364,46 @@ std::string DeviceNameManager::GetLocalDisplayDeviceName(const std::string &pref
     }
     displayName = prefix + subffix;
     return displayName;
+}
+
+int32_t DeviceNameManager::ModifyUserDefinedName(const std::string &deviceName)
+{
+    LOGI("In");
+    if (deviceName.empty()) {
+        LOGE("deviceName is empty");
+        return ERR_DM_NAME_EMPTY;
+    }
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    SetUserDefinedDeviceName(deviceName, userId);
+    SetDisplayDeviceNameState(USER_DEFINED_DEVICE_NAME, userId);
+    SetDisplayDeviceName(deviceName, userId);
+    InitDeviceNameToSoftBus("", deviceName);
+    return DM_OK;
+}
+
+int32_t DeviceNameManager::RestoreLocalDeviceName()
+{
+    LOGI("In");
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    SetUserDefinedDeviceName("", userId);
+    SetDisplayDeviceNameState("", userId);
+    std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
+    std::string localMarketName = GetLocalMarketName();
+    InitDeviceNameToSoftBus(nickName, localMarketName);
+    InitDisplayDeviceNameToSettingsData(nickName, localMarketName, userId);
+    return DM_OK;
+}
+
+int32_t DeviceNameManager::InitDisplayDeviceNameToSettingsData(const std::string &nickName,
+    const std::string &deviceName, int32_t userId)
+{
+    std::string newDisplayName = GetLocalDisplayDeviceName(nickName, deviceName, 0);
+    std::string oldDisplayName = "";
+    GetDisplayDeviceName(userId, oldDisplayName);
+    if (oldDisplayName != newDisplayName) {
+        SetDisplayDeviceName(newDisplayName, userId);
+    }
+    return DM_OK;
 }
 
 int32_t DeviceNameManager::GetUserDefinedDeviceName(int32_t userId, std::string &deviceName)
@@ -462,10 +506,7 @@ std::string DeviceNameManager::GetLocalMarketName()
 
 int32_t DeviceNameManager::SetUserDefinedDeviceName(const std::string &deviceName, int32_t userId)
 {
-    if (deviceName.empty()) {
-        LOGE("deviceName is empty");
-        return ERR_DM_NAME_EMPTY;
-    }
+    LOGI("SetUserDefinedDeviceName:%{public}s, userId:%{publid}d", GetAnonyString(deviceName).c_str(), userId);
     return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME, deviceName);
 }
 
@@ -474,12 +515,19 @@ int32_t DeviceNameManager::GetDisplayDeviceName(int32_t userId, std::string &dev
     return GetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_DISPLAY_DEVICE_NAME, deviceName);
 }
 
+int32_t DeviceNameManager::SetDisplayDeviceNameState(const std::string &state, int32_t userId)
+{
+    LOGI("SetDisplayDeviceNameState:%{public}s, userId:%{publid}d", state.c_str(), userId);
+    return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_DISPLAY_DEVICE_NAME_STATE, state);
+}
+
 int32_t DeviceNameManager::SetDisplayDeviceName(const std::string &deviceName, int32_t userId)
 {
     if (deviceName.empty()) {
-        LOGE("deviceName is empty");
+        LOGE("SetDisplayDeviceName deviceName is empty, userId:%{publid}d", userId);
         return ERR_DM_NAME_EMPTY;
     }
+    LOGI("SetDisplayDeviceName:%{public}s, userId:%{publid}d",  GetAnonyString(deviceName).c_str(), userId);
     return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_DISPLAY_DEVICE_NAME, deviceName);
 }
 
@@ -521,10 +569,9 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
     const std::string &key, std::string &value)
 {
     std::string proxyUri = GetProxyUriStr(tableName, userId);
-    LOGI("proxyUri : %{public}s", proxyUri.c_str());
     auto helper = CreateDataShareHelper(proxyUri);
     if (helper == nullptr) {
-        LOGE("helper is nullptr");
+        LOGE("helper is nullptr, proxyUri=%{public}s", proxyUri.c_str());
         return ERR_DM_POINT_NULL;
     }
     std::vector<std::string> columns = { SETTING_COLUMN_VALUE };
@@ -534,13 +581,13 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
     auto resultSet = helper->Query(uri, predicates, columns);
     ReleaseDataShareHelper(helper);
     if (resultSet == nullptr) {
-        LOGE("Query failed key=%{public}s", key.c_str());
+        LOGE("Query failed key=%{public}s, proxyUri=%{public}s", key.c_str(), proxyUri.c_str());
         return ERR_DM_POINT_NULL;
     }
     int32_t count = 0;
     resultSet->GetRowCount(count);
     if (count == 0) {
-        LOGW("no value, key=%{public}s", key.c_str());
+        LOGW("no value, key=%{public}s, proxyUri=%{public}s", key.c_str(), proxyUri.c_str());
         resultSet->Close();
         return DM_OK;
     }
@@ -548,12 +595,12 @@ int32_t DeviceNameManager::GetValue(const std::string &tableName, int32_t userId
     resultSet->GoToRow(index);
     int32_t ret = resultSet->GetString(index, value);
     if (ret != DataShare::E_OK) {
-        LOGE("get value failed, ret=%{public}d", ret);
+        LOGE("get value failed, ret=%{public}d, proxyUri=%{public}s", ret, proxyUri.c_str());
         resultSet->Close();
         return ret;
     }
     resultSet->Close();
-    LOGI("value : %{public}s", GetAnonyString(value).c_str());
+    LOGI("proxyUri=%{public}s, value=%{public}s", proxyUri.c_str(), GetAnonyString(value).c_str());
     return DM_OK;
 }
 
@@ -563,7 +610,8 @@ int32_t DeviceNameManager::SetValue(const std::string &tableName, int32_t userId
     std::string proxyUri = GetProxyUriStr(tableName, userId);
     auto helper = CreateDataShareHelper(proxyUri);
     if (helper == nullptr) {
-        LOGE("helper is nullptr");
+        LOGE("helper is nullptr, proxyUri=%{public}s, value=%{public}s",
+            proxyUri.c_str(), GetAnonyString(value).c_str());
         return ERR_DM_POINT_NULL;
     }
     DataShare::DataShareValuesBucket val;
@@ -574,12 +622,14 @@ int32_t DeviceNameManager::SetValue(const std::string &tableName, int32_t userId
     predicates.EqualTo(SETTING_COLUMN_KEYWORD, key);
     int32_t ret = helper->Update(uri, predicates, val);
     if (ret <= 0) {
-        LOGW("Update failed, ret=%{public}d", ret);
+        LOGW("Update failed, ret=%{public}d, proxyUri=%{public}s, value=%{public}s",
+            ret, proxyUri.c_str(), GetAnonyString(value).c_str());
         ret = helper->Insert(uri, val);
     }
     ReleaseDataShareHelper(helper);
     if (ret <= 0) {
-        LOGE("set value failed, ret=%{public}d", ret);
+        LOGE("set value failed, ret=%{public}d, proxyUri=%{public}s, value=%{public}s",
+            ret, proxyUri.c_str(), GetAnonyString(value).c_str());
         return ret;
     }
     return ret;

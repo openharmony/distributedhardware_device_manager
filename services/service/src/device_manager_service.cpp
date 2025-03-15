@@ -3169,6 +3169,53 @@ int32_t DeviceManagerService::GetLocalDisplayDeviceName(const std::string &pkgNa
     return DM_OK;
 }
 
+int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("SetLocalDeviceName failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->SetLocalDeviceName(pkgName, deviceName);
+}
+
+int32_t DeviceManagerService::SetRemoteDeviceName(const std::string &pkgName,
+    const std::string &deviceId, const std::string &deviceName)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidModifyRemoteDeviceName(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("SetRemoteDeviceName failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->SetRemoteDeviceName(pkgName, deviceId, deviceName);
+}
+
 std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
 {
     LOGI("In");
@@ -3190,6 +3237,28 @@ void DeviceManagerService::CheckRegisterInfoWithWise(int32_t curUserId)
         return;
     }
     dmServiceImplExtResident_->CheckRegisterInfoWithWise();
+}
+
+int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
+{
+    LOGI("In");
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DeviceNameManager::GetInstance().RestoreLocalDeviceName();
+#endif
+    return DM_OK;
 }
 
 void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &bindParam)

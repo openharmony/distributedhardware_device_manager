@@ -72,6 +72,14 @@ constexpr const static char* g_getDeviceInfoWhiteList[GETDEVICEINFO_WHITE_LIST_N
     "gameservice_server",
     "com.huawei.hmos.slassistant",
 };
+constexpr int32_t MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST_NUM = 1;
+constexpr const static char* g_modifyLocalDeviceNameWhiteList[MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST_NUM] = {
+    "com.huawei.hmos.settings",
+};
+constexpr int32_t MODIFY_REMOTE_DEVICE_NAME_WHITE_LIST_NUM = 1;
+constexpr const static char* g_modifyRemoteDeviceNameWhiteList[MODIFY_REMOTE_DEVICE_NAME_WHITE_LIST_NUM] = {
+    "com.ohos.settings",
+};
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -269,6 +277,42 @@ bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &
     uint16_t index = 0;
     for (; index < GETDEVICEINFO_WHITE_LIST_NUM; ++index) {
         std::string tmp(g_getDeviceInfoWhiteList[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
+
+    LOGE("Process name: %{public}s invalid.", processName.c_str());
+    return false;
+}
+
+bool PermissionManager::CheckProcessNameValidModifyLocalDeviceName(const std::string &processName)
+{
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST_NUM; ++index) {
+        std::string tmp(g_modifyLocalDeviceNameWhiteList[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
+
+    LOGE("Process name: %{public}s invalid.", processName.c_str());
+    return false;
+}
+
+bool PermissionManager::CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName)
+{
+    if (processName.empty()) {
+        LOGE("ProcessName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < MODIFY_REMOTE_DEVICE_NAME_WHITE_LIST_NUM; ++index) {
+        std::string tmp(g_modifyRemoteDeviceNameWhiteList[index]);
         if (processName == tmp) {
             return true;
         }

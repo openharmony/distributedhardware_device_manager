@@ -37,6 +37,7 @@ const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
 const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
 const std::string ERR_MESSAGE_FROM_CLOUD_FAILED = "Get data from cloud failed.";
 const std::string ERR_MESSAGE_NEED_LOGIN = "A login account is required.";
+const std::string ERR_MESSAGE_SCAS_CHECK_FAILED = "The device name contains non-compliant content.";
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
@@ -241,6 +242,9 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             break;
         case ERR_DM_WISE_NEED_LOGIN:
             error = CreateErrorForCall(env, DM_ERR_NEED_LOGIN, ERR_MESSAGE_NEED_LOGIN, isAsync);
+            break;
+        case ERR_DM_HILINKSVC_SCAS_CHECK_FAILED:
+            error = CreateErrorForCall(env, DM_ERR_SCAS_CHECK_FAILED, ERR_MESSAGE_SCAS_CHECK_FAILED, isAsync);
             break;
         default:
             error = CreateErrorForCall(env, DM_ERR_FAILED, ERR_MESSAGE_FAILED, isAsync);
