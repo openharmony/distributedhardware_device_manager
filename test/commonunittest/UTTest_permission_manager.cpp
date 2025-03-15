@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,7 +82,7 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(PermissionManagerTest, CheckPermission_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckPermission_001, testing::ext::TestSize.Level1)
 {
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(0));
     bool ret = PermissionManager::GetInstance().CheckPermission();
@@ -114,7 +114,7 @@ HWTEST_F(PermissionManagerTest, CheckPermission_001, testing::ext::TestSize.Leve
  * @tc.type：FUNC
  * @tc.require: AR000GHSJK
 */
-HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
@@ -130,7 +130,7 @@ HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_001, testing::ext::TestSi
  * @tc.type：FUNC
  * @tc.require: AR000GHSJK
 */
-HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_002, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName1(systemSaWhiteList[0]);
     bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName1);
@@ -146,21 +146,21 @@ HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_002, testing::ext::TestSi
     ASSERT_EQ(ret, true);
 }
 
-HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_101, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_101, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
     ASSERT_FALSE(ret);
 }
 
-HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_102, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_102, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos.dhardware";
     bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
     ASSERT_TRUE(ret);
 }
 
-HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSize.Level1)
 {
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(0));
     bool ret = PermissionManager::GetInstance().CheckMonitorPermission();
@@ -186,13 +186,13 @@ HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSi
     ASSERT_TRUE(ret);
 }
 
-HWTEST_F(PermissionManagerTest, GetWhiteListSystemSA_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, GetWhiteListSystemSA_001, testing::ext::TestSize.Level1)
 {
     auto ret = PermissionManager::GetInstance().GetWhiteListSystemSA();
     ASSERT_FALSE(ret.empty());
 }
 
-HWTEST_F(PermissionManagerTest, CheckSystemSA_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckSystemSA_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(0));
@@ -210,7 +210,7 @@ HWTEST_F(PermissionManagerTest, CheckSystemSA_001, testing::ext::TestSize.Level0
     ASSERT_FALSE(ret);
 }
 
-HWTEST_F(PermissionManagerTest, GetCallerProcessName_002, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, GetCallerProcessName_002, testing::ext::TestSize.Level1)
 {
     std::string processName;
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(0));
@@ -247,7 +247,7 @@ HWTEST_F(PermissionManagerTest, GetCallerProcessName_002, testing::ext::TestSize
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnGetDeviceInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnGetDeviceInfo_001, testing::ext::TestSize.Level1)
 {
     std::string processName = "";
     auto ret = PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName);

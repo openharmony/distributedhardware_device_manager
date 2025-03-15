@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, GetAnonyString_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyString_001, testing::ext::TestSize.Level1)
 {
     const std::string value = "valueTest";
     std::string str = GetAnonyString(value);
@@ -53,7 +53,7 @@ HWTEST_F(DmAnonymousTest, GetAnonyString_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, GetAnonyString_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyString_002, testing::ext::TestSize.Level1)
 {
     const std::string value = "va";
     std::string str = GetAnonyString(value);
@@ -67,7 +67,7 @@ HWTEST_F(DmAnonymousTest, GetAnonyString_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, GetAnonyString_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyString_003, testing::ext::TestSize.Level1)
 {
     const std::string value = "ohos.distributedhardware.devicemanager.resident";
     std::string str = GetAnonyString(value);
@@ -81,7 +81,7 @@ HWTEST_F(DmAnonymousTest, GetAnonyString_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, GetAnonyInt32_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyInt32_001, testing::ext::TestSize.Level1)
 {
     const int32_t value = 1;
     std::string str = GetAnonyInt32(value);
@@ -95,7 +95,7 @@ HWTEST_F(DmAnonymousTest, GetAnonyInt32_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, GetAnonyInt32_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyInt32_002, testing::ext::TestSize.Level1)
 {
     const int32_t value = 12;
     std::string str = GetAnonyInt32(value);
@@ -109,7 +109,7 @@ HWTEST_F(DmAnonymousTest, GetAnonyInt32_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, GetAnonyInt32_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyInt32_003, testing::ext::TestSize.Level1)
 {
     const int32_t value = 123456;
     std::string str = GetAnonyInt32(value);
@@ -123,7 +123,7 @@ HWTEST_F(DmAnonymousTest, GetAnonyInt32_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsNumberString_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsNumberString_001, testing::ext::TestSize.Level1)
 {
     const std::string inputString = "";
     bool ret = IsNumberString(inputString);
@@ -136,7 +136,7 @@ HWTEST_F(DmAnonymousTest, IsNumberString_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsNumberString_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsNumberString_002, testing::ext::TestSize.Level1)
 {
     const std::string inputString = "123inputstring";
     bool ret = IsNumberString(inputString);
@@ -149,7 +149,7 @@ HWTEST_F(DmAnonymousTest, IsNumberString_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsNumberString_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsNumberString_003, testing::ext::TestSize.Level1)
 {
     const std::string inputString = "25633981";
     bool ret = IsNumberString(inputString);
@@ -162,7 +162,7 @@ HWTEST_F(DmAnonymousTest, IsNumberString_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, GetErrorString_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetErrorString_001, testing::ext::TestSize.Level1)
 {
     int failedReason = 96929744;
     std::string errorMessage = "dm process execution failed...";
@@ -176,7 +176,7 @@ HWTEST_F(DmAnonymousTest, GetErrorString_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsString_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsString_001, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -194,7 +194,7 @@ HWTEST_F(DmAnonymousTest, IsString_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsString_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsString_002, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -212,7 +212,7 @@ HWTEST_F(DmAnonymousTest, IsString_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsInt32_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsInt32_001, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -230,7 +230,7 @@ HWTEST_F(DmAnonymousTest, IsInt32_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsInt32_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsInt32_002, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -248,7 +248,7 @@ HWTEST_F(DmAnonymousTest, IsInt32_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsUint32_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsUint32_001, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -266,7 +266,7 @@ HWTEST_F(DmAnonymousTest, IsUint32_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsInt64_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsInt64_001, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -284,7 +284,7 @@ HWTEST_F(DmAnonymousTest, IsInt64_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsInt64_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsInt64_002, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -302,7 +302,7 @@ HWTEST_F(DmAnonymousTest, IsInt64_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsArray_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsArray_001, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -333,7 +333,7 @@ HWTEST_F(DmAnonymousTest, IsArray_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsArray_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsArray_002, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -353,7 +353,7 @@ HWTEST_F(DmAnonymousTest, IsArray_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsBool_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsBool_001, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -373,7 +373,7 @@ HWTEST_F(DmAnonymousTest, IsBool_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, IsBool_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsBool_002, testing::ext::TestSize.Level1)
 {
     std::string str = R"(
     {
@@ -393,7 +393,7 @@ HWTEST_F(DmAnonymousTest, IsBool_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmAnonymousTest, ConvertCharArray2String_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, ConvertCharArray2String_001, testing::ext::TestSize.Level1)
 {
     constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
     char *srcData = nullptr;
@@ -414,7 +414,7 @@ HWTEST_F(DmAnonymousTest, ConvertCharArray2String_001, testing::ext::TestSize.Le
     EXPECT_EQ(ret, "1234");
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt_001, testing::ext::TestSize.Level1)
 {
     std::string str = "12344";
     int32_t base = 10;
@@ -422,7 +422,7 @@ HWTEST_F(DmAnonymousTest, StringToInt_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, 12344);
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt_002, testing::ext::TestSize.Level1)
 {
     std::string str;
     int32_t base = 10;
@@ -430,7 +430,7 @@ HWTEST_F(DmAnonymousTest, StringToInt_002, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt64_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt64_001, testing::ext::TestSize.Level1)
 {
     std::string str;
     int32_t base = 10;
@@ -439,7 +439,7 @@ HWTEST_F(DmAnonymousTest, StringToInt64_001, testing::ext::TestSize.Level0)
 }
 
 
-HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_001, testing::ext::TestSize.Level1)
 {
     std::string jsonStr = R"(
     {
@@ -466,7 +466,7 @@ HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_001, testing::ext::TestSize.Lev
     EXPECT_GE(paramMap.size(), 0);
 }
 
-HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_002, testing::ext::TestSize.Level1)
 {
     std::string jsonStr = R"(
     {
@@ -492,7 +492,7 @@ HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_002, testing::ext::TestSize.Lev
     EXPECT_EQ(paramMap.size(), 0);
 }
 
-HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_003, testing::ext::TestSize.Level1)
 {
     std::string jsonStr = "";
     std::map<std::string, std::string> paramMap;
@@ -501,7 +501,7 @@ HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_003, testing::ext::TestSize.Lev
     EXPECT_EQ(paramMap.size(), 0);
 }
 
-HWTEST_F(DmAnonymousTest, GetAnonyStringList_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyStringList_001, testing::ext::TestSize.Level1)
 {
     std::string value = "valueTest";
     std::vector<std::string> valueVec;
@@ -511,7 +511,7 @@ HWTEST_F(DmAnonymousTest, GetAnonyStringList_001, testing::ext::TestSize.Level0)
     EXPECT_GE(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt64_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt64_002, testing::ext::TestSize.Level1)
 {
     std::string str = "12345";
     int32_t base = 10;
@@ -519,63 +519,63 @@ HWTEST_F(DmAnonymousTest, StringToInt64_002, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, 12345);
 }
 
-HWTEST_F(DmAnonymousTest, GetCallerPkgName_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetCallerPkgName_001, testing::ext::TestSize.Level1)
 {
     std::string str = "pkgName#12345";
     std::string ret = GetCallerPkgName(str);
     EXPECT_FALSE(ret.empty());
 }
 
-HWTEST_F(DmAnonymousTest, IsMessageLengthValid_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsMessageLengthValid_001, testing::ext::TestSize.Level1)
 {
     std::string inputMessage;
     bool ret = IsMessageLengthValid(inputMessage);
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DmAnonymousTest, IsDmCommonNotifyEventValid_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsDmCommonNotifyEventValid_001, testing::ext::TestSize.Level1)
 {
     DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::MAX;
     bool ret = IsDmCommonNotifyEventValid(dmCommonNotifyEvent);
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DmAnonymousTest, GetAnonyInt32List_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyInt32List_001, testing::ext::TestSize.Level1)
 {
     std::vector<int32_t> values = {1, 1};
     std::string test = "[ *, * ]";
     EXPECT_EQ(GetAnonyInt32List(values), test);
 }
 
-HWTEST_F(DmAnonymousTest, GetAnonyInt32List_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyInt32List_002, testing::ext::TestSize.Level1)
 {
     std::vector<int32_t> values = {};
     std::string test = "[  ]";
     EXPECT_EQ(GetAnonyInt32List(values), test);
 }
 
-HWTEST_F(DmAnonymousTest, GetAnonyStringList_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyStringList_002, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> valueVec = {};
     std::string test = "[  ]";
     EXPECT_EQ(GetAnonyStringList(valueVec), test);
 }
 
-HWTEST_F(DmAnonymousTest, IsNumberString_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsNumberString_004, testing::ext::TestSize.Level1)
 {
     const std::string inputString = "1233214569876678012312312312455644413123123";
     bool ret = IsNumberString(inputString);
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DmAnonymousTest, IsNumberString_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsNumberString_005, testing::ext::TestSize.Level1)
 {
     const std::string inputString = "123*+123";
     bool ret = IsNumberString(inputString);
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(DmAnonymousTest, ConvertMapToJsonString_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, ConvertMapToJsonString_001, testing::ext::TestSize.Level1)
 {
     std::map<std::string, std::string> paramMap;
     for (int i = 0; i < 1001; i++) {
@@ -584,7 +584,7 @@ HWTEST_F(DmAnonymousTest, ConvertMapToJsonString_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ConvertMapToJsonString(paramMap), "");
 }
 
-HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_004, testing::ext::TestSize.Level1)
 {
     std::map<std::string, std::string> paramMap;
     for (int i = 0; i < 1001; i++) {
@@ -595,14 +595,14 @@ HWTEST_F(DmAnonymousTest, ParseMapFromJsonString_004, testing::ext::TestSize.Lev
     EXPECT_EQ(paramMap.size(), 1001);
 }
 
-HWTEST_F(DmAnonymousTest, CompareVersion_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, CompareVersion_001, testing::ext::TestSize.Level1)
 {
     std::string remoteVersion = "1.2.3.4";
     std::string oldVersion = "1.2.3";
     EXPECT_EQ(CompareVersion(remoteVersion, oldVersion), true);
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt_003, testing::ext::TestSize.Level1)
 {
     std::string str = "!++";
     int32_t base = 10;
@@ -610,7 +610,7 @@ HWTEST_F(DmAnonymousTest, StringToInt_003, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt_004, testing::ext::TestSize.Level1)
 {
     std::string str = "-9223372036854775809";
     int32_t base = 10;
@@ -618,7 +618,7 @@ HWTEST_F(DmAnonymousTest, StringToInt_004, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt64_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt64_003, testing::ext::TestSize.Level1)
 {
     std::string str = "!++";
     int32_t base = 10;
@@ -626,7 +626,7 @@ HWTEST_F(DmAnonymousTest, StringToInt64_003, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, StringToInt64_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, StringToInt64_004, testing::ext::TestSize.Level1)
 {
     std::string str = "-9223372036854775809";
     int32_t base = 10;
@@ -634,14 +634,14 @@ HWTEST_F(DmAnonymousTest, StringToInt64_004, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, GetSubscribeId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetSubscribeId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "12345pkgName";
     uint16_t ret = GetSubscribeId(pkgName);
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, IsIdLengthValid_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsIdLengthValid_001, testing::ext::TestSize.Level1)
 {
     std::string inputID;
     inputID.assign(300, 'A');
@@ -655,7 +655,7 @@ HWTEST_F(DmAnonymousTest, IsIdLengthValid_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, true);
 }
 
-HWTEST_F(DmAnonymousTest, IsMessageLengthValid_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsMessageLengthValid_002, testing::ext::TestSize.Level1)
 {
     std::string inputMessage;
     inputMessage.assign(40 * 1024 * 1024 + 1, 'A');
@@ -663,7 +663,7 @@ HWTEST_F(DmAnonymousTest, IsMessageLengthValid_002, testing::ext::TestSize.Level
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DmAnonymousTest, IsValueExist_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsValueExist_001, testing::ext::TestSize.Level1)
 {
     std::multimap<std::string, int32_t> unorderedmap = {{"1", 1}};
     std::string udid = "1";
@@ -677,14 +677,14 @@ HWTEST_F(DmAnonymousTest, IsValueExist_001, testing::ext::TestSize.Level0)
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DmAnonymousTest, IsDmCommonNotifyEventValid_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsDmCommonNotifyEventValid_002, testing::ext::TestSize.Level1)
 {
     DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::MIN;
     bool ret = IsDmCommonNotifyEventValid(dmCommonNotifyEvent);
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DmAnonymousTest, GetSubStr_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetSubStr_001, testing::ext::TestSize.Level1)
 {
     std::string rawStr = "123";
     std::string separator = "2";
@@ -698,14 +698,14 @@ HWTEST_F(DmAnonymousTest, GetSubStr_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(GetSubStr(rawStr, separator, index), "");
 }
 
-HWTEST_F(DmAnonymousTest, GetSubscribeId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetSubscribeId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "12345#pkgName";
     uint16_t ret = GetSubscribeId(pkgName);
     EXPECT_GE(ret, 0);
 }
 
-HWTEST_F(DmAnonymousTest, GetAnonyInt32List_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetAnonyInt32List_005, testing::ext::TestSize.Level1)
 {
     std::vector<int32_t> values;
     values.push_back(101);
@@ -714,14 +714,14 @@ HWTEST_F(DmAnonymousTest, GetAnonyInt32List_005, testing::ext::TestSize.Level0)
     EXPECT_FALSE(ret.empty());
 }
 
-HWTEST_F(DmAnonymousTest, IsIdLengthValid_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, IsIdLengthValid_002, testing::ext::TestSize.Level1)
 {
     std::string inputID = "";
     bool ret = IsIdLengthValid(inputID);
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DmAnonymousTest, GetSubStr_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAnonymousTest, GetSubStr_002, testing::ext::TestSize.Level1)
 {
     std::string rawStr = "";
     std::string separator = "";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ void DmCredentialManagerTest::TearDownTestCase()
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DmCredentialManager_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DmCredentialManager_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmCredentialManager> Test = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     ASSERT_NE(Test, nullptr);
@@ -87,7 +87,7 @@ HWTEST_F(DmCredentialManagerTest, DmCredentialManager_001, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DmCredentialManager_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DmCredentialManager_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmCredentialManager> Test = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
     Test.reset();
@@ -100,7 +100,7 @@ HWTEST_F(DmCredentialManagerTest, DmCredentialManager_002, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, RegisterCredentialCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, RegisterCredentialCallback_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -114,7 +114,7 @@ HWTEST_F(DmCredentialManagerTest, RegisterCredentialCallback_001, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, RegisterCredentialCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, RegisterCredentialCallback_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -128,7 +128,7 @@ HWTEST_F(DmCredentialManagerTest, RegisterCredentialCallback_002, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -142,7 +142,7 @@ HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_001, testing::ext
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     std::shared_ptr<DmCredentialManager> dmCreMgr = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
@@ -156,7 +156,7 @@ HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_002, testing::ext
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     int32_t ret = dmCreMgr_->RegisterCredentialCallback(pkgName);
@@ -171,7 +171,7 @@ HWTEST_F(DmCredentialManagerTest, UnRegisterCredentialCallback_003, testing::ext
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, RequestCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, RequestCredential_001, testing::ext::TestSize.Level1)
 {
     std::string reqJsonStr = "invalid json string";
     std::string returnJsonStr;
@@ -192,7 +192,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_001, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, RequestCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, RequestCredential_002, testing::ext::TestSize.Level1)
 {
     std::string reqJsonStr = R"(
     {
@@ -211,7 +211,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_002, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, RequestCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, RequestCredential_003, testing::ext::TestSize.Level1)
 {
     std::string reqJsonStr = R"(
     {
@@ -230,7 +230,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_003, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, RequestCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, RequestCredential_004, testing::ext::TestSize.Level1)
 {
     std::string reqJsonStr = R"(
     {
@@ -249,7 +249,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_004, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportCredential_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -305,7 +305,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_001, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportCredential_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo;
@@ -319,7 +319,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_002, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportCredential_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -339,7 +339,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_003, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportCredential_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -371,7 +371,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_004, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportCredential_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -405,7 +405,7 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_005, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredentialExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredentialExt_001, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = "";
     dmCreMgr_->hiChainConnector_->deviceGroupManager_ = nullptr;
@@ -419,7 +419,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredentialExt_001, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_001, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -459,7 +459,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -478,7 +478,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_002, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_003, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -509,7 +509,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_003, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_004, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -540,7 +540,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_004, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_005, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -560,7 +560,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_005, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_006, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_006, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -601,7 +601,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_006, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_007, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_007, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -632,7 +632,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_007, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_008, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_008, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -664,7 +664,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_008, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_009, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_009, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -696,7 +696,7 @@ HWTEST_F(DmCredentialManagerTest, ImportLocalCredential_009, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_001, testing::ext::TestSize.Level1)
 {
     CredentialDataInfo credentialDataInfo;
     credentialDataInfo.credentialType = SAME_ACCOUNT_TYPE;
@@ -735,7 +735,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_001, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_002, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -753,7 +753,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_002, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_003, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -773,7 +773,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_003, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_004, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -801,7 +801,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_004, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_005, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -829,7 +829,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_005, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_006, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_006, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -857,7 +857,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_006, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_007, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_007, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -886,7 +886,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_007, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_008, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_008, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -914,7 +914,7 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_008, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_001, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -934,7 +934,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_001, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_002, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -952,7 +952,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_002, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_003, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -977,7 +977,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_003, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_004, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -997,7 +997,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_004, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_005, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1023,7 +1023,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_005, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_006, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_006, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1048,7 +1048,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_006, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_007, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_007, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1073,7 +1073,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_007, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_008, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_008, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1092,7 +1092,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_008, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_009, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_009, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1111,7 +1111,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_009, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_0010, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_0010, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1137,7 +1137,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_0010, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_0011, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_0011, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1163,7 +1163,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteRemoteCredential_0011, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteCredential_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string resultInfo;
@@ -1189,7 +1189,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteCredential_001, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteCredential_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     std::string credentialInfo = R"(
@@ -1211,7 +1211,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteCredential_002, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteCredential_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -1231,7 +1231,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteCredential_003, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteCredential_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -1252,7 +1252,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteCredential_004, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteCredential_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -1273,7 +1273,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteCredential_005, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, DeleteCredential_006, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, DeleteCredential_006, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.helloworld";
     std::string credentialInfo = R"(
@@ -1295,7 +1295,7 @@ HWTEST_F(DmCredentialManagerTest, DeleteCredential_006, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, GetCredentialData_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_001, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1336,7 +1336,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_001, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, GetCredentialData_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_002, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1377,7 +1377,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_002, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, GetCredentialData_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_003, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1421,7 +1421,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_003, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, GetCredentialData_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_004, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1464,7 +1464,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_004, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, GetCredentialData_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_005, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1507,7 +1507,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_005, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, GetCredentialData_006, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_006, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1550,7 +1550,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_006, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, GetCredentialData_007, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_007, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1593,7 +1593,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_007, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, GetCredentialData_008, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, GetCredentialData_008, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo = R"(
     {
@@ -1637,7 +1637,7 @@ HWTEST_F(DmCredentialManagerTest, GetCredentialData_008, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, from_json_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, from_json_001, testing::ext::TestSize.Level1)
 {
     JsonObject jsonOutObj;
     CredentialDataInfo credentialDataInfo;
@@ -1682,7 +1682,7 @@ HWTEST_F(DmCredentialManagerTest, from_json_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, from_json_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, from_json_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     PeerCredentialInfo peerCredentialInfo;
@@ -1703,7 +1703,7 @@ HWTEST_F(DmCredentialManagerTest, from_json_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCredentialManagerTest, to_json_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCredentialManagerTest, to_json_001, testing::ext::TestSize.Level1)
 {
     CredentialDataInfo credentialDataInfo;
     credentialDataInfo.peerDeviceId = "test";

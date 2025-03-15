@@ -38,7 +38,7 @@ void ReleationShipSyncMgrTest::TearDownTestCase()
 
 namespace {
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_001, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -51,7 +51,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_001, testing::ext::Test
     ASSERT_EQ(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_002, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_002, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -64,7 +64,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_002, testing::ext::Test
     ASSERT_EQ(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_003, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_003, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -77,7 +77,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_003, testing::ext::Test
     ASSERT_NE(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_004, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_004, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -90,7 +90,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_004, testing::ext::Test
     ASSERT_EQ(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_005, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_005, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -103,7 +103,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_005, testing::ext::Test
     ASSERT_NE(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_006, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_006, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -116,7 +116,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_006, testing::ext::Test
     ASSERT_EQ(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_007, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_007, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -130,7 +130,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_007, testing::ext::Test
     ASSERT_EQ(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_008, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_008, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -144,7 +144,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_008, testing::ext::Test
     ASSERT_NE(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_009, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_009, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     RelationShipChangeMsg msg;
@@ -164,7 +164,7 @@ HWTEST_F(ReleationShipSyncMgrTest, SyncTrustRelationShip_009, testing::ext::Test
     ASSERT_EQ(broadCastMsg, "");
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_006, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_006, testing::ext::TestSize.Level1)
 {
     std::string msg = R"(
     {
@@ -202,7 +202,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_006, testing::ex
     ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_007, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_007, testing::ext::TestSize.Level1)
 {
     std::string msg = R"(
     {
@@ -240,7 +240,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_007, testing::ex
     ASSERT_EQ(relationShipMsg.userId, 0);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, IsValid_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msgObj;
     msgObj.type = static_cast<RelationShipChangeType>(10);
@@ -248,7 +248,7 @@ HWTEST_F(ReleationShipSyncMgrTest, IsValid_001, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msgObj;
     cJSON payloadJson;
@@ -260,7 +260,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_001, testing::ext::TestS
     ASSERT_EQ(ret, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.userIdInfos.push_back({1, false});
@@ -275,7 +275,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_001, testing::
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_002, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_002, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.userIdInfos.push_back({1, false});
@@ -287,7 +287,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_002, testing::
     ASSERT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     cJSON payloadJson;
@@ -297,7 +297,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_001, testing::ext::T
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_002, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_002, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -319,7 +319,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_002, testing::ext::T
     ASSERT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_003, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_003, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -341,7 +341,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_003, testing::ext::T
     ASSERT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_004, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_004, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -367,7 +367,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_004, testing::ext::T
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     cJSON payloadJson;
@@ -398,7 +398,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_001, testing::ext::Te
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_002, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_002, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -420,7 +420,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_002, testing::ext::Te
     ASSERT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_003, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_003, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -442,7 +442,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromDeviceUnbindPayLoad_003, testing::ext::Te
     ASSERT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     cJSON payloadJson;
@@ -473,7 +473,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_001, testing::ext::TestS
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_002, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_002, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -495,7 +495,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_002, testing::ext::TestS
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_003, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_003, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -517,7 +517,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromAppUnbindPayLoad_003, testing::ext::TestS
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     cJSON payloadJson;
@@ -548,7 +548,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_001, testing
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_002, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_002, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -570,7 +570,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_002, testing
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_003, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_003, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -592,7 +592,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_003, testing
     ASSERT_EQ(result, false);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_004, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_004, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -614,7 +614,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_004, testing
     ASSERT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_005, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_005, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     const char* jsonString = R"({
@@ -636,7 +636,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_005, testing
     ASSERT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromDelUserPayLoad_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromDelUserPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     cJSON payloadJson;
@@ -655,7 +655,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromDelUserPayLoad_001, testing::ext::TestSiz
     ASSERT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::APP_UNBIND;
@@ -674,7 +674,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData_001, testing::ext::TestSiz
     EXPECT_EQ(msg.ToString(), expected);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_001, testing::ext::TestSize.Level1)
 {
     std::string msg = "";
     RelationShipChangeMsg relationShipMsg =
@@ -682,7 +682,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_001, testing::ex
     ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_002, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_002, testing::ext::TestSize.Level1)
 {
     std::string msg = R"(
     {
@@ -694,7 +694,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_002, testing::ex
     ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_003, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_003, testing::ext::TestSize.Level1)
 {
     std::string msg = R"(
     {
@@ -706,7 +706,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_003, testing::ex
     ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_004, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_004, testing::ext::TestSize.Level1)
 {
     std::string msg = R"(
     {
@@ -739,7 +739,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_004, testing::ex
     ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_005, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_005, testing::ext::TestSize.Level1)
 {
     std::string msg = R"(
     {
@@ -752,7 +752,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_005, testing::ex
     ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_ValidInput, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_ValidInput, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.userIdInfos.push_back({12345, true});
@@ -771,7 +771,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_ValidInput, te
     msg.userIdInfos.clear();
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToDelUserPayLoad_ValidInput, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToDelUserPayLoad_ValidInput, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.userId = 12345;
@@ -788,7 +788,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToDelUserPayLoad_ValidInput, testing::ext::Te
     msg.userIdInfos.clear();
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_TooManyUserIds, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_TooManyUserIds, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     for (int i = 0; i < MAX_USER_ID_NUM + 1; ++i) {
@@ -805,7 +805,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_TooManyUserIds
     msg.userIdInfos.clear();
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_LengthExceedsLimit, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_LengthExceedsLimit, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.userIdInfos.push_back({12345, true});
@@ -816,7 +816,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_LengthExceedsL
     ASSERT_TRUE(result);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::APP_UNBIND;
@@ -838,7 +838,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData, testing::ext::TestSize.Le
     EXPECT_EQ(msg.ToString(), expected);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData02, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData02, testing::ext::TestSize.Level1)
 {
     bool isForeground = true;
     std::uint16_t userId = 123;
@@ -847,7 +847,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData02, testing::ext::TestSize.
     EXPECT_EQ(userIdInfo.ToString(), expected);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToString_ZeroUserId, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ToString_ZeroUserId, testing::ext::TestSize.Level1)
 {
     bool isForeground = false;
     std::uint16_t userId = 0;
@@ -857,7 +857,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToString_ZeroUserId, testing::ext::TestSize.L
     EXPECT_EQ(userIdInfo.ToString(), expected);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ValidList, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ValidList, testing::ext::TestSize.Level1)
 {
     std::vector<UserIdInfo> list = {{true, 1}, {false, 2}};
     std::string expected = "[ { 1, userId: 1 }, { 0, userId: 2 } ]";
@@ -865,7 +865,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ValidList, testing::ext::TestSize.Level0)
     EXPECT_EQ(GetUserIdInfoList(list), expected);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, EmptyList, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, EmptyList, testing::ext::TestSize.Level1)
 {
     std::vector<UserIdInfo> list;
     std::string expected = "[  ]";
@@ -873,7 +873,7 @@ HWTEST_F(ReleationShipSyncMgrTest, EmptyList, testing::ext::TestSize.Level0)
     EXPECT_EQ(GetUserIdInfoList(list), expected);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ValidData, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, ValidData, testing::ext::TestSize.Level1)
 {
     std::vector<UserIdInfo> remoteUserIdInfos = {{true, 1}, {false, 2}, {true, 3}};
     std::vector<UserIdInfo> foregroundUserIdInfos;
@@ -888,7 +888,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ValidData, testing::ext::TestSize.Level0)
     EXPECT_EQ(backgroundUserIdInfos[0].userId, 2);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, EmptyRemoteList, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, EmptyRemoteList, testing::ext::TestSize.Level1)
 {
     std::vector<UserIdInfo> remoteUserIdInfos;
     std::vector<UserIdInfo> foregroundUserIdInfos;
@@ -900,7 +900,7 @@ HWTEST_F(ReleationShipSyncMgrTest, EmptyRemoteList, testing::ext::TestSize.Level
     EXPECT_TRUE(backgroundUserIdInfos.empty());
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_010, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_010, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     cJSON *payloadJson = NULL;
@@ -933,7 +933,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_010, testing::ext::TestS
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::ACCOUNT_LOGOUT;
@@ -957,7 +957,7 @@ HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize
     EXPECT_TRUE(ret);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, IsValid_010, testing::ext::TestSize.Level0)
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_010, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::SYNC_USERID;

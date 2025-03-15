@@ -32,7 +32,7 @@ void CryptoMgrTest::SetUpTestCase()
 void CryptoMgrTest::TearDownTestCase()
 {}
 
-HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_001, testing::ext::TestSize.Level1)
 {
     auto cryptoMgr = std::make_shared<CryptoMgr>();
     uint8_t sessionKey[SESSION_KEY_LENGTH] = "sessionKey_fm88";
@@ -51,7 +51,7 @@ HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_001, testing::ext::TestSize.Lev
     EXPECT_STREQ(decryptData.c_str(), message.c_str());
 }
 
-HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_002, testing::ext::TestSize.Level1)
 {
     auto cryptoMgr = std::make_shared<CryptoMgr>();
     uint8_t sessionKey[SESSION_KEY_LENGTH] = "sessionKey_fm88";
