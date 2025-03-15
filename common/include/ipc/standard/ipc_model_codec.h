@@ -52,6 +52,10 @@ public:
     static bool EncodeLocalServiceInfos(const std::vector<DMLocalServiceInfo> &serviceInfos, MessageParcel &parcel);
     static bool DecodeLocalServiceInfo(MessageParcel &parcel, DMLocalServiceInfo &serviceInfo);
     static bool DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<DMLocalServiceInfo> &serviceInfos);
+    static bool EncodeNetworkIdQueryFilter(const NetworkIdQueryFilter &queryFilter, MessageParcel &parcel);
+    static bool DecodeNetworkIdQueryFilter(MessageParcel &parcel, NetworkIdQueryFilter &queryFilter);
+    static bool EncodeStringVector(const std::vector<std::string> &vec, MessageParcel &parcel);
+    static bool DecodeStringVector(MessageParcel &parcel, std::vector<std::string> &vec);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
