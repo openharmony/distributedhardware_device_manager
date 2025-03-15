@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(MultipleUserConnectorTest, GetCurrentAccountUserID_001, testing::ext::TestSize.Level0)
+HWTEST_F(MultipleUserConnectorTest, GetCurrentAccountUserID_001, testing::ext::TestSize.Level1)
 {
     int32_t ret = DM_OK;
     ret = MultipleUserConnector::GetCurrentAccountUserID();
@@ -57,7 +57,7 @@ HWTEST_F(MultipleUserConnectorTest, GetCurrentAccountUserID_001, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(MultipleUserConnectorTest, SetSwitchOldUserId_001, testing::ext::TestSize.Level0)
+HWTEST_F(MultipleUserConnectorTest, SetSwitchOldUserId_001, testing::ext::TestSize.Level1)
 {
     int32_t userIdIn = 1234;
     int32_t userIdOut = -1;
@@ -74,7 +74,7 @@ HWTEST_F(MultipleUserConnectorTest, SetSwitchOldUserId_001, testing::ext::TestSi
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(MultipleUserConnectorTest, GetSwitchOldUserId_001, testing::ext::TestSize.Level0)
+HWTEST_F(MultipleUserConnectorTest, GetSwitchOldUserId_001, testing::ext::TestSize.Level1)
 {
     int32_t userIdIn = 1234;
     int32_t userIdOut = -1;
@@ -83,7 +83,7 @@ HWTEST_F(MultipleUserConnectorTest, GetSwitchOldUserId_001, testing::ext::TestSi
     ASSERT_EQ(userIdIn, userIdOut);
 }
 
-HWTEST_F(MultipleUserConnectorTest, GetSwitchOldAccountId_001, testing::ext::TestSize.Level0)
+HWTEST_F(MultipleUserConnectorTest, GetSwitchOldAccountId_001, testing::ext::TestSize.Level1)
 {
     std::string accountId = "accountId";
     MultipleUserConnector::SetSwitchOldAccountId(accountId);
@@ -91,7 +91,7 @@ HWTEST_F(MultipleUserConnectorTest, GetSwitchOldAccountId_001, testing::ext::Tes
     ASSERT_EQ(accountId, accountIdOut);
 }
 
-HWTEST_F(MultipleUserConnectorTest, GetSwitchOldAccountName_001, testing::ext::TestSize.Level0)
+HWTEST_F(MultipleUserConnectorTest, GetSwitchOldAccountName_001, testing::ext::TestSize.Level1)
 {
     std::string accountName = "accountName";
     MultipleUserConnector::SetSwitchOldAccountName(accountName);
@@ -99,14 +99,14 @@ HWTEST_F(MultipleUserConnectorTest, GetSwitchOldAccountName_001, testing::ext::T
     ASSERT_EQ(accountName, accountNameOut);
 }
 
-HWTEST_F(MultipleUserConnectorTest, GetAllUserIds_001, testing::ext::TestSize.Level0)
+HWTEST_F(MultipleUserConnectorTest, GetAllUserIds_001, testing::ext::TestSize.Level1)
 {
     std::vector<int32_t> userIdVec;
     int32_t ret = MultipleUserConnector::GetAllUserIds(userIdVec);
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MultipleUserConnectorTest, GetAccountInfoByUserId_001, testing::ext::TestSize.Level0)
+HWTEST_F(MultipleUserConnectorTest, GetAccountInfoByUserId_001, testing::ext::TestSize.Level1)
 {
     int32_t userId = 123;
     DMAccountInfo dmAccountInfo;

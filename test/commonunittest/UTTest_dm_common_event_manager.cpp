@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,7 +46,7 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_001, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> strEvent;
     CommomEventCallback callback = nullptr;
@@ -61,7 +61,7 @@ HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_001, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_002, testing::ext::TestSize.Level1)
 {
     std::string strEvent = "test";
     std::vector<std::string> strEventVec;
@@ -78,7 +78,7 @@ HWTEST_F(DmCommonEventManagerTest, SubscribeServiceEvent_002, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmCommonEventManagerTest, UnsubscribeServiceEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, UnsubscribeServiceEvent_001, testing::ext::TestSize.Level1)
 {
     auto commonEventManager = std::make_shared<DmCommonEventManager>();
     bool result = commonEventManager->UnsubscribeServiceEvent();
@@ -90,7 +90,7 @@ HWTEST_F(DmCommonEventManagerTest, UnsubscribeServiceEvent_001, testing::ext::Te
  * @tc.desc: call OnAddSystemAbility()
  * @tc.type: FUNC
  */
-HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_001, testing::ext::TestSize.Level1)
 {
     int32_t systemAbilityId = COMMON_EVENT_SERVICE_ID;
     std::string deviceId;
@@ -106,7 +106,7 @@ HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_001, testing::ext::TestSiz
  * @tc.desc: call OnAddSystemAbility()
  * @tc.type: FUNC
  */
-HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_002, testing::ext::TestSize.Level1)
 {
     int32_t systemAbilityId = 0;
     std::string deviceId;
@@ -122,7 +122,7 @@ HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_002, testing::ext::TestSiz
  * @tc.desc: call OnAddSystemAbility()
  * @tc.type: FUNC
  */
-HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_003, testing::ext::TestSize.Level1)
 {
     int32_t systemAbilityId = COMMON_EVENT_SERVICE_ID;
     std::string deviceId;
@@ -145,7 +145,7 @@ HWTEST_F(DmCommonEventManagerTest, OnAddSystemAbility_003, testing::ext::TestSiz
  * @tc.desc: call OnRemoveSystemAbility()
  * @tc.type: FUNC
  */
-HWTEST_F(DmCommonEventManagerTest, OnRemoveSystemAbility_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, OnRemoveSystemAbility_001, testing::ext::TestSize.Level1)
 {
     int32_t systemAbilityId = COMMON_EVENT_SERVICE_ID;
     std::string deviceId;
@@ -161,7 +161,7 @@ HWTEST_F(DmCommonEventManagerTest, OnRemoveSystemAbility_001, testing::ext::Test
  * @tc.desc: call OnReceiveEvent()
  * @tc.type: FUNC
  */
-HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Level1)
 {
     AAFwk::Want want;
     EventFwk::CommonEventData data;
@@ -189,7 +189,7 @@ HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Le
  * @tc.desc: call OnReceiveEvent()
  * @tc.type: FUNC
  */
-HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmCommonEventManagerTest, OnReceiveEvent_002, testing::ext::TestSize.Level1)
 {
     AAFwk::Want want;
     EventFwk::CommonEventData data;

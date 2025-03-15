@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,7 +76,7 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, CreateGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, CreateGroup_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 123456;
     std::string groupName = "dfggg";
@@ -92,7 +92,7 @@ HWTEST_F(HichainConnectorTest, CreateGroup_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, CreateGroup_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, CreateGroup_002, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 123456;
     std::string groupName = "uuiioo";
@@ -107,7 +107,7 @@ HWTEST_F(HichainConnectorTest, CreateGroup_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, CreateGroup_003, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, CreateGroup_003, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 159357;
     int32_t authType = 1;
@@ -127,7 +127,7 @@ HWTEST_F(HichainConnectorTest, CreateGroup_003, testing::ext::TestSize.Level0)
  * @tc.require: AR000GHSJK
  */
 
-HWTEST_F(HichainConnectorTest, IsGroupInfoInvalid_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, IsGroupInfoInvalid_001, testing::ext::TestSize.Level1)
 {
     GroupInfo group;
     group.groupName = "dkdkkdkdk";
@@ -147,7 +147,7 @@ HWTEST_F(HichainConnectorTest, IsGroupInfoInvalid_001, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, IsGroupInfoInvalid_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, IsGroupInfoInvalid_002, testing::ext::TestSize.Level1)
 {
     GroupInfo group;
     group.groupName = "test";
@@ -166,7 +166,7 @@ HWTEST_F(HichainConnectorTest, IsGroupInfoInvalid_002, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DelMemberFromGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DelMemberFromGroup_001, testing::ext::TestSize.Level1)
 {
     std::string groupId;
     std::string deviceId;
@@ -181,7 +181,7 @@ HWTEST_F(HichainConnectorTest, DelMemberFromGroup_001, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DelMemberFromGroup_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DelMemberFromGroup_002, testing::ext::TestSize.Level1)
 {
     std::string groupId = "34451";
     std::string deviceId = "123";
@@ -196,7 +196,7 @@ HWTEST_F(HichainConnectorTest, DelMemberFromGroup_002, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GenRequestId_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GenRequestId_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int ret = hiChainConnector->GenRequestId();
@@ -209,7 +209,7 @@ HWTEST_F(HichainConnectorTest, GenRequestId_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, from_json_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, from_json_001, testing::ext::TestSize.Level1)
 {
     GroupInfo groupInfo;
     groupInfo.groupName = "aaaa";
@@ -237,7 +237,7 @@ HWTEST_F(HichainConnectorTest, from_json_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, from_json_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, from_json_002, testing::ext::TestSize.Level1)
 {
     GroupInfo groupInfo;
     groupInfo.userId = "test";
@@ -268,7 +268,7 @@ HWTEST_F(HichainConnectorTest, from_json_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, HiChainConnector_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, HiChainConnector_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> m_HiChainConnector = std::make_shared<HiChainConnector>();
     ASSERT_NE(m_HiChainConnector, nullptr);
@@ -280,7 +280,7 @@ HWTEST_F(HichainConnectorTest, HiChainConnector_001, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, HiChainConnector_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, HiChainConnector_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> m_HiChainConnector = std::make_shared<HiChainConnector>();
     m_HiChainConnector.reset();
@@ -293,7 +293,7 @@ HWTEST_F(HichainConnectorTest, HiChainConnector_002, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, RegisterHiChainCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, RegisterHiChainCallback_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int ret = hiChainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
@@ -306,7 +306,7 @@ HWTEST_F(HichainConnectorTest, RegisterHiChainCallback_001, testing::ext::TestSi
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, AddMember_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, AddMember_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     hiChainConnector->deviceGroupManager_ = nullptr;
@@ -322,7 +322,7 @@ HWTEST_F(HichainConnectorTest, AddMember_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, AddMember_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, AddMember_002, testing::ext::TestSize.Level1)
 {
     std::string deviceId;
     std::string connectInfo;
@@ -337,7 +337,7 @@ HWTEST_F(HichainConnectorTest, AddMember_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, AddMember_003, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, AddMember_003, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "123456";
     std::string connectInfo = "dkdkk";
@@ -352,7 +352,7 @@ HWTEST_F(HichainConnectorTest, AddMember_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, AddMember_004, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, AddMember_004, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "deviceIdTest";
     std::string connectInfo = R"(
@@ -374,7 +374,7 @@ HWTEST_F(HichainConnectorTest, AddMember_004, testing::ext::TestSize.Level0)
  * @tc.desc:set operationCode != GroupOperationCode::MEMBER_JOIN(3);  return nullptr;
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, onRequest_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, onRequest_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 2;
     int32_t operationCode = 2;
@@ -389,7 +389,7 @@ HWTEST_F(HichainConnectorTest, onRequest_001, testing::ext::TestSize.Level0)
  * @tc.desc: operationCode = GroupOperationCode::MEMBER_JOIN(3)/hiChainConnectorCallback_ is nullptr; return nullptr;
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, onRequest_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, onRequest_002, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 2;
     int32_t operationCode = 3;
@@ -406,7 +406,7 @@ HWTEST_F(HichainConnectorTest, onRequest_002, testing::ext::TestSize.Level0)
  *           return values from GetPinCode correctly.
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, onRequest_003, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, onRequest_003, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 2;
     int32_t operationCode = 3;
@@ -432,7 +432,7 @@ HWTEST_F(HichainConnectorTest, onRequest_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetConnectPara_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetConnectPara_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     hiChainConnector->hiChainConnectorCallback_ = nullptr;
@@ -449,7 +449,7 @@ HWTEST_F(HichainConnectorTest, GetConnectPara_001, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetConnectPara_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetConnectPara_002, testing::ext::TestSize.Level1)
 {
     std::string deviceId;
     std::string reqDeviceId = "12345";
@@ -470,7 +470,7 @@ HWTEST_F(HichainConnectorTest, GetConnectPara_002, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetConnectPara_003, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetConnectPara_003, testing::ext::TestSize.Level1)
 {
     std::string deviceId;
     std::string reqDeviceId = "12345";
@@ -490,7 +490,7 @@ HWTEST_F(HichainConnectorTest, GetConnectPara_003, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DeleteGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DeleteGroup_001, testing::ext::TestSize.Level1)
 {
     std::string groupId = "34567";
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -504,7 +504,7 @@ HWTEST_F(HichainConnectorTest, DeleteGroup_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetRelatedGroups_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetRelatedGroups_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "123";
     std::vector<GroupInfo> groupList;
@@ -519,7 +519,7 @@ HWTEST_F(HichainConnectorTest, GetRelatedGroups_001, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetRelatedGroupsExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetRelatedGroupsExt_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "12345";
     std::vector<GroupInfo> groupList;
@@ -534,7 +534,7 @@ HWTEST_F(HichainConnectorTest, GetRelatedGroupsExt_001, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, SyncGroups_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, SyncGroups_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "34567";
     std::vector<std::string> remoteGroupIdList;
@@ -549,7 +549,7 @@ HWTEST_F(HichainConnectorTest, SyncGroups_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetSyncGroupList_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetSyncGroupList_001, testing::ext::TestSize.Level1)
 {
     std::vector<GroupInfo> groupList;
     std::vector<std::string> syncGroupList;
@@ -564,7 +564,7 @@ HWTEST_F(HichainConnectorTest, GetSyncGroupList_001, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetSyncGroupList_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetSyncGroupList_002, testing::ext::TestSize.Level1)
 {
     std::vector<GroupInfo> groupList;
     GroupInfo groupList1;
@@ -593,7 +593,7 @@ HWTEST_F(HichainConnectorTest, GetSyncGroupList_002, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, IsGroupCreated_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, IsGroupCreated_001, testing::ext::TestSize.Level1)
 {
     std::string groupName = "groupNameTest";
     GroupInfo groupInfo;
@@ -608,7 +608,7 @@ HWTEST_F(HichainConnectorTest, IsGroupCreated_001, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, IsRedundanceGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, IsRedundanceGroup_001, testing::ext::TestSize.Level1)
 {
     const std::string userId = "userIdTest";
     int32_t authType = 1;
@@ -624,7 +624,7 @@ HWTEST_F(HichainConnectorTest, IsRedundanceGroup_001, testing::ext::TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, onFinish_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, onFinish_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 1;
     int operationCode = GroupOperationCode::MEMBER_JOIN;
@@ -651,7 +651,7 @@ HWTEST_F(HichainConnectorTest, onFinish_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, onFinish_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, onFinish_002, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 1;
     int operationCode = GroupOperationCode::MEMBER_JOIN;
@@ -691,7 +691,7 @@ HWTEST_F(HichainConnectorTest, onFinish_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, onError_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, onError_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 1;
     int operationCode = GroupOperationCode::MEMBER_JOIN;
@@ -718,7 +718,7 @@ HWTEST_F(HichainConnectorTest, onError_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, onError_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, onError_002, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 1;
     int operationCode = GroupOperationCode::MEMBER_JOIN;
@@ -757,7 +757,7 @@ HWTEST_F(HichainConnectorTest, onError_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DeleteGroup_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DeleteGroup_002, testing::ext::TestSize.Level1)
 {
     const int32_t userId = 1;
     std::string groupId = "groupIdTest";
@@ -772,7 +772,7 @@ HWTEST_F(HichainConnectorTest, DeleteGroup_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DeleteGroup_003, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DeleteGroup_003, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 1;
     std::string userId = "userIdTest";
@@ -789,7 +789,7 @@ HWTEST_F(HichainConnectorTest, DeleteGroup_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, RegisterHiChainGroupCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, RegisterHiChainGroupCallback_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDmGroupResCallback> callback = nullptr;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -803,7 +803,7 @@ HWTEST_F(HichainConnectorTest, RegisterHiChainGroupCallback_001, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, UnRegisterHiChainGroupCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, UnRegisterHiChainGroupCallback_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t ret = hiChainConnector->UnRegisterHiChainGroupCallback();
@@ -816,7 +816,7 @@ HWTEST_F(HichainConnectorTest, UnRegisterHiChainGroupCallback_001, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, getRegisterInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, getRegisterInfo_001, testing::ext::TestSize.Level1)
 {
     std::string queryParams;
     std::string returnJsonStr;
@@ -832,7 +832,7 @@ HWTEST_F(HichainConnectorTest, getRegisterInfo_001, testing::ext::TestSize.Level
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, getRegisterInfo_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, getRegisterInfo_002, testing::ext::TestSize.Level1)
 {
     std::string queryParams;
     std::string returnJsonStr;
@@ -847,7 +847,7 @@ HWTEST_F(HichainConnectorTest, getRegisterInfo_002, testing::ext::TestSize.Level
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, ParseRemoteCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, ParseRemoteCredential_001, testing::ext::TestSize.Level1)
 {
     int32_t groupType = 1;
     std::string userId;
@@ -865,7 +865,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredential_001, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, ParseRemoteCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, ParseRemoteCredential_002, testing::ext::TestSize.Level1)
 {
     int32_t groupType = 1;
     std::string userId = "1321231";
@@ -883,7 +883,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredential_002, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, ParseRemoteCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, ParseRemoteCredential_003, testing::ext::TestSize.Level1)
 {
     int32_t groupType = 1;
     std::string userId = "1321231";
@@ -902,7 +902,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredential_003, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, addMultiMembers_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, addMultiMembers_001, testing::ext::TestSize.Level1)
 {
     int32_t groupType = 1;
     std::string userId = "";
@@ -919,7 +919,7 @@ HWTEST_F(HichainConnectorTest, addMultiMembers_001, testing::ext::TestSize.Level
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, addMultiMembers_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, addMultiMembers_002, testing::ext::TestSize.Level1)
 {
     int32_t groupType = 1;
     std::string userId = "userIdTest";
@@ -936,7 +936,7 @@ HWTEST_F(HichainConnectorTest, addMultiMembers_002, testing::ext::TestSize.Level
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, deleteMultiMembers_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, deleteMultiMembers_001, testing::ext::TestSize.Level1)
 {
     int32_t groupType = 1;
     std::string userId = "userIdTest";
@@ -953,7 +953,7 @@ HWTEST_F(HichainConnectorTest, deleteMultiMembers_001, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, deleteMultiMembers_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, deleteMultiMembers_002, testing::ext::TestSize.Level1)
 {
     int32_t groupType = 1;
     std::string userId = "";
@@ -970,7 +970,7 @@ HWTEST_F(HichainConnectorTest, deleteMultiMembers_002, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, IsDevicesInP2PGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, IsDevicesInP2PGroup_001, testing::ext::TestSize.Level1)
 {
     std::string hostDevice = "hostDeviceTest";
     std::string peerDevice = "peerDeviceTest";
@@ -985,7 +985,7 @@ HWTEST_F(HichainConnectorTest, IsDevicesInP2PGroup_001, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, UnRegisterHiChainCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, UnRegisterHiChainCallback_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t ret = hiChainConnector->UnRegisterHiChainCallback();
@@ -999,7 +999,7 @@ HWTEST_F(HichainConnectorTest, UnRegisterHiChainCallback_001, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetGroupInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetGroupInfo_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     std::string queryParams;
@@ -1014,7 +1014,7 @@ HWTEST_F(HichainConnectorTest, GetGroupInfo_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetGroupInfo_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetGroupInfo_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t userId = 12;
@@ -1030,7 +1030,7 @@ HWTEST_F(HichainConnectorTest, GetGroupInfo_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetGroupType_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetGroupType_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     std::string deviceId;
@@ -1044,7 +1044,7 @@ HWTEST_F(HichainConnectorTest, GetGroupType_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DeleteGroupExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DeleteGroupExt_001, testing::ext::TestSize.Level1)
 {
     std::string groupId = "34567";
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -1058,7 +1058,7 @@ HWTEST_F(HichainConnectorTest, DeleteGroupExt_001, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DeleteTimeOutGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DeleteTimeOutGroup_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "13245631";
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -1071,7 +1071,7 @@ HWTEST_F(HichainConnectorTest, DeleteTimeOutGroup_001, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DealRedundanceGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DealRedundanceGroup_001, testing::ext::TestSize.Level1)
 {
     std::string userId = "13245631";
     int32_t authType = 1;
@@ -1086,7 +1086,7 @@ HWTEST_F(HichainConnectorTest, DealRedundanceGroup_001, testing::ext::TestSize.L
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetGroupId_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetGroupId_001, testing::ext::TestSize.Level1)
 {
     std::string userId = "13245631";
     int32_t authType = 1;
@@ -1102,7 +1102,7 @@ HWTEST_F(HichainConnectorTest, GetGroupId_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetJsonStr_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetJsonStr_001, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     std::string key;
@@ -1117,7 +1117,7 @@ HWTEST_F(HichainConnectorTest, GetJsonStr_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetJsonStr_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetJsonStr_002, testing::ext::TestSize.Level1)
 {
     std::string key = "key";
     JsonObject jsonObj;
@@ -1133,7 +1133,7 @@ HWTEST_F(HichainConnectorTest, GetJsonStr_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetJsonInt_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetJsonInt_001, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     std::string key;
@@ -1148,7 +1148,7 @@ HWTEST_F(HichainConnectorTest, GetJsonInt_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetJsonInt_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetJsonInt_002, testing::ext::TestSize.Level1)
 {
     std::string key = "12";
     JsonObject jsonObj;
@@ -1164,7 +1164,7 @@ HWTEST_F(HichainConnectorTest, GetJsonInt_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetGroupIdExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetGroupIdExt_001, testing::ext::TestSize.Level1)
 {
     std::string userId = "12";
     int32_t groupType = 1;
@@ -1181,7 +1181,7 @@ HWTEST_F(HichainConnectorTest, GetGroupIdExt_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_001, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo;
     std::string params;
@@ -1197,7 +1197,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     std::string credentialInfo = SafetyDump(jsonObj);
@@ -1214,7 +1214,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_002, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_003, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_003, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     jsonObj["authType"] = 1;
@@ -1233,7 +1233,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_003, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_004, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_004, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     jsonObj["authType"] = 4;
@@ -1252,7 +1252,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_004, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, addMultiMembersExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, addMultiMembersExt_001, testing::ext::TestSize.Level1)
 {
     std::string credentialInfo;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -1267,7 +1267,7 @@ HWTEST_F(HichainConnectorTest, addMultiMembersExt_001, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, addMultiMembersExt_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, addMultiMembersExt_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     std::string credentialInfo = SafetyDump(jsonObj);
@@ -1282,7 +1282,7 @@ HWTEST_F(HichainConnectorTest, addMultiMembersExt_002, testing::ext::TestSize.Le
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetTrustedDevices_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetTrustedDevices_001, testing::ext::TestSize.Level1)
 {
     std::string localDeviceUdid;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -1296,7 +1296,7 @@ HWTEST_F(HichainConnectorTest, GetTrustedDevices_001, testing::ext::TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_001, testing::ext::TestSize.Level1)
 {
     std::string jsonStr;
     std::vector<std::string> udidList;
@@ -1311,7 +1311,7 @@ HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_001, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_002, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     std::string jsonStr = SafetyDump(jsonObj);
@@ -1327,7 +1327,7 @@ HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_002, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_003, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_003, testing::ext::TestSize.Level1)
 {
     const char* jsonStr = R"({
         "device1": {
@@ -1355,7 +1355,7 @@ HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_003, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, DeleteAllGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, DeleteAllGroup_001, testing::ext::TestSize.Level1)
 {
     int32_t userId = 1;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -1369,7 +1369,7 @@ HWTEST_F(HichainConnectorTest, DeleteAllGroup_001, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(HichainConnectorTest, GetRelatedGroupsCommon_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainConnectorTest, GetRelatedGroupsCommon_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId;
     std::string  pkgName;
