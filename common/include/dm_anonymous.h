@@ -103,6 +103,7 @@ bool IsValueExist(const std::multimap<std::string, int32_t> unorderedmap, const 
 bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent);
 std::string SafetyDump(const JsonItemObject &jsonObj);
 std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index);
+bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &key);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H
