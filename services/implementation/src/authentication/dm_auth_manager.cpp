@@ -238,12 +238,12 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
 
 bool DmAuthManager::CheckBindLevel(const JsonItemObject &jsonObj, const std::string &key, int32_t &bindLevel)
 {
-    if (IsJsonValIntegerString(jsonObject, TAG_BIND_LEVEL)) {
-        bindLevel = std::atoi(jsonObject[TAG_BIND_LEVEL].Get<std::string>().c_str());
+    if (IsJsonValIntegerString(jsonObj, TAG_BIND_LEVEL)) {
+        bindLevel = std::atoi(jsonObj[TAG_BIND_LEVEL].Get<std::string>().c_str());
         return true;
     }
-    if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
-        bindLevel = jsonObject[TAG_BIND_LEVEL].Get<int32_t>();
+    if (IsInt32(jsonObj, TAG_BIND_LEVEL)) {
+        bindLevel = jsonObj[TAG_BIND_LEVEL].Get<int32_t>();
         return true;
     }
     return false;
