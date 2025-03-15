@@ -221,7 +221,7 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
     }
     bool isIntegerString = IsJsonValIntegerString(jsonObject, TAG_BIND_LEVEL);
     bool isInt32 = IsInt32(jsonObject, TAG_BIND_LEVEL);
-    if (!isIntegerString || !isInt32) {
+    if (!isIntegerString && !isInt32) {
         LOGE("TAG_BIND_LEVEL is not integer string or int32.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
