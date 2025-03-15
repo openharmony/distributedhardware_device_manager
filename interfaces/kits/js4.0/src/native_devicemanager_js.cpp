@@ -1981,6 +1981,86 @@ napi_value DeviceManagerNapi::GetDeviceProfileInfoListPromise(napi_env env,
     return promise;
 }
 
+napi_value DeviceManagerNapi::GetDeviceNetworkIdListPromise(napi_env env,
+    GetDeviceNetworkIdListAsyncCallbackInfo *asyncCallback)
+{
+    LOGI("[network node js] 8");
+    napi_value promise = 0;
+    napi_deferred deferred;
+    napi_create_promise(env, &deferred, &promise);
+    asyncCallback->deferred = deferred;
+    napi_value workName;
+    napi_create_string_latin1(env, "GetDeviceNetworkIdListPromise", NAPI_AUTO_LENGTH, &workName);
+    LOGI("[network node js] 9");
+    napi_create_async_work(env, nullptr, workName,
+        [](napi_env env, void *data) {
+            GetDeviceNetworkIdListAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<GetDeviceNetworkIdListAsyncCallbackInfo *>(data);
+            LOGI("[network node js] 10");
+            jsCallback->code = DeviceManager::GetInstance().GetDeviceNetworkIdList(jsCallback->bundleName,
+                jsCallback->filterOptions, jsCallback->deviceNetworkIds);
+        },
+        [](napi_env env, napi_status status, void *data) {
+            (void)status;
+            GetDeviceNetworkIdListAsyncCallbackInfo *jsCallback =
+                reinterpret_cast<GetDeviceNetworkIdListAsyncCallbackInfo *>(data);
+            if (jsCallback->code != DM_OK) {
+                napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                napi_reject_deferred(env, jsCallback->deferred, error);
+            }
+            napi_delete_async_work(env, jsCallback->asyncWork);
+            delete jsCallback;
+            jsCallback = nullptr;
+        },
+        (void *)asyncCallback, &asyncCallback->asyncWork);
+    napi_queue_async_work_with_qos(env, asyncCallback->asyncWork, napi_qos_user_initiated);
+    return promise;
+}
+
+napi_value DeviceManagerNapi::JsGetDeviceNetworkIdList(napi_env env, napi_callback_info info)
+{
+    LOGI("In");
+    LOGI("[network node js] 1");
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(env, static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return nullptr;
+    }
+    LOGI("[network node js] 2");
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    LOGI("[network node js] 3");
+    if (ret != DM_OK) {
+        LOGE("Do not have correct access");
+        CreateBusinessError(env, ret);
+        return nullptr;
+    }
+    LOGI("[network node js] 4");
+    GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
+
+    DeviceManagerNapi *deviceManagerWrapper = nullptr;
+    if (IsDeviceManagerNapiNull(env, thisVar, &deviceManagerWrapper)) {
+        LOGE("deviceManagerWrapper is NULL");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+    LOGI("[network node js] 5");
+    auto *jsCallback = new GetDeviceNetworkIdListAsyncCallbackInfo();
+    if (jsCallback == nullptr) {
+        LOGE("jsCallback is nullptr");
+        CreateBusinessError(env, ERR_DM_POINT_NULL);
+        return nullptr;
+    }
+    NetworkIdQueryFilter filterOptions;
+    JsToDmDeviceNetworkIdFilterOptions(env, argv[0], filterOptions);
+    LOGI("[network node js] 6");
+    jsCallback->env = env;
+    jsCallback->bundleName = deviceManagerWrapper->bundleName_;
+    jsCallback->filterOptions = filterOptions;
+    LOGI("[network node js] 7");
+    return GetDeviceNetworkIdListPromise(env, jsCallback);
+}
+
 napi_value DeviceManagerNapi::JsGetDeviceProfileInfoList(napi_env env, napi_callback_info info)
 {
     LOGI("In");
@@ -2485,6 +2565,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getDeviceIconInfo", JsGetDeviceIconInfo),
         DECLARE_NAPI_FUNCTION("putDeviceProfileInfoList", JsPutDeviceProfileInfoList),
         DECLARE_NAPI_FUNCTION("getLocalDisplayDeviceName", JsGetLocalDisplayDeviceName),
+        DECLARE_NAPI_FUNCTION("getDeviceNetworkIdList", JsGetDeviceNetworkIdList),
         DECLARE_NAPI_FUNCTION("setHeartbeatPolicy", SetHeartbeatPolicy)};
 
     napi_property_descriptor static_prop[] = {

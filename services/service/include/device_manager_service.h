@@ -231,6 +231,8 @@ public:
         DMLocalServiceInfo &serviceInfo);
     void ClearPulishIdCache(const std::string &pkgName);
     bool IsPC();
+    int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
+        std::vector<std::string> &networkIds);
 
 private:
     bool IsDMServiceImplReady();

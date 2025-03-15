@@ -652,6 +652,8 @@ public:
     virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
     virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
         int32_t pinExchangeType, DMLocalServiceInfo &info) = 0;
+    virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
+        std::vector<std::string> &networkIds) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

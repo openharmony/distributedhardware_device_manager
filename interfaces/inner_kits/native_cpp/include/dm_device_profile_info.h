@@ -92,6 +92,13 @@ typedef struct DmDeviceProfileInfo {
     std::vector<DmServiceProfileInfo> services = {};
 } DmDeviceProfileInfo;
 
+typedef struct NetworkIdQueryFilter {
+    std::string wiseDeviceId = "";
+    int32_t onlineStatus = 0;
+    std::string deviceType = "";
+    std::string deviceProductId = "";
+    std::string deviceModel = "";
+} NetworkIdQueryFilter;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_PROFILE_INFO_H
