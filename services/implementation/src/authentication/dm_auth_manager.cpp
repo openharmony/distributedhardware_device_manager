@@ -216,15 +216,14 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    if (jsonObject.IsDiscarded() || !jsonObject.Contains(TAG_BIND_LEVEL) ||
-        !IsString(jsonObject, TAG_BIND_LEVEL)) {
+    if (jsonObject.IsDiscarded() || !jsonObject.Contains(TAG_BIND_LEVEL)) {
         return DM_OK;
     }
-    if (!IsJsonValIntegerString(jsonObject, TAG_BIND_LEVEL)) {
-        LOGE("TAG_BIND_LEVEL is not integer string.");
+    int32_t bindLevel = INVALID_TYPE;
+    if (!CheckBindLevel(jsonObject, TAG_BIND_LEVEL, bindLevel)) {
+        LOGE("TAG_BIND_LEVEL is not integer string or int32.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t bindLevel = std::atoi(jsonObject[TAG_BIND_LEVEL].Get<std::string>().c_str());
     if (static_cast<uint32_t>(bindLevel) > APP || bindLevel < INVALID_TYPE) {
         LOGE("bindlevel error %{public}d.", bindLevel);
         return ERR_DM_INPUT_PARA_INVALID;
@@ -235,6 +234,19 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
+}
+
+bool DmAuthManager::CheckBindLevel(const JsonItemObject &jsonObj, const std::string &key, int32_t &bindLevel)
+{
+    if (IsJsonValIntegerString(jsonObj, TAG_BIND_LEVEL)) {
+        bindLevel = std::atoi(jsonObj[TAG_BIND_LEVEL].Get<std::string>().c_str());
+        return true;
+    }
+    if (IsInt32(jsonObj, TAG_BIND_LEVEL)) {
+        bindLevel = jsonObj[TAG_BIND_LEVEL].Get<int32_t>();
+        return true;
+    }
+    return false;
 }
 
 bool DmAuthManager::CheckHmlParamValid(JsonObject &jsonObject)
@@ -330,9 +342,7 @@ void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
         if (IsString(jsonObject, APP_THUMBNAIL)) {
             authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].Get<std::string>();
         }
-        if (IsJsonValIntegerString(jsonObject, TAG_BIND_LEVEL)) {
-            authRequestContext_->bindLevel = std::atoi(jsonObject[TAG_BIND_LEVEL].Get<std::string>().c_str());
-        }
+        CheckBindLevel(jsonObject, TAG_BIND_LEVEL, authRequestContext_->bindLevel);
         authRequestContext_->closeSessionDelaySeconds = 0;
         if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
             std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
