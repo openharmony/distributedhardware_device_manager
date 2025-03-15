@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,7 +94,7 @@ std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<Hi
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> Test =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
@@ -109,7 +109,7 @@ HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> Test =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
@@ -125,7 +125,7 @@ HWTEST_F(AuthMessageProcessorTest, AuthMessageProcessor_002, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
@@ -173,7 +173,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, CreateSyncGroupMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateSyncGroupMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -200,7 +200,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateSyncGroupMessage_001, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -240,7 +240,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, CreateResponseFinishMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateResponseFinishMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -264,7 +264,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseFinishMessage_001, testing::ext
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -286,7 +286,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_001, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -306,7 +306,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_002, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -333,7 +333,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseResponseFinishMessage_003, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -368,7 +368,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_001, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -387,7 +387,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_002, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -407,7 +407,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_003, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_004, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -427,7 +427,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_004, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_005, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_005, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -448,7 +448,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_005, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_006, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_006, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -474,7 +474,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_006, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_007, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_007, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -500,7 +500,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_007, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_008, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_008, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -526,7 +526,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_008, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_009, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_009, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -552,7 +552,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_009, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_0010, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_0010, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -578,7 +578,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessage_0010, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -611,7 +611,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_001, testing::ext::Te
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -657,7 +657,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_002, testing::ext::Te
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -684,7 +684,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_003, testing::ext::Te
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_004, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -715,7 +715,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthRequestMessage_004, testing::ext::Te
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -743,7 +743,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_001, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -771,7 +771,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_002, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -799,7 +799,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_003, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_004, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -827,7 +827,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_004, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -855,7 +855,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -895,7 +895,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -916,7 +916,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_001, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -937,7 +937,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_002, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -964,7 +964,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_003, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_004, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -990,7 +990,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseRespNegotiateMessage_004, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, SetRequestContext_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, SetRequestContext_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1007,7 +1007,7 @@ HWTEST_F(AuthMessageProcessorTest, SetRequestContext_001, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, SetRequestContext_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, SetRequestContext_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1024,7 +1024,7 @@ HWTEST_F(AuthMessageProcessorTest, SetRequestContext_002, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, SetResponseContext_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, SetResponseContext_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1041,7 +1041,7 @@ HWTEST_F(AuthMessageProcessorTest, SetResponseContext_001, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, SetResponseContext_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, SetResponseContext_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1058,7 +1058,7 @@ HWTEST_F(AuthMessageProcessorTest, SetResponseContext_002, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, GetResponseContext_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetResponseContext_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1075,7 +1075,7 @@ HWTEST_F(AuthMessageProcessorTest, GetResponseContext_001, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, GetResponseContext_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetResponseContext_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1092,7 +1092,7 @@ HWTEST_F(AuthMessageProcessorTest, GetResponseContext_002, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, CreateSimpleMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateSimpleMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1135,7 +1135,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateSimpleMessage_001, testing::ext::TestSi
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, GetRequestContext_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetRequestContext_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1153,7 +1153,7 @@ HWTEST_F(AuthMessageProcessorTest, GetRequestContext_001, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1181,7 +1181,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_001, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1209,7 +1209,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_002, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1250,7 +1250,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_003, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_004, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1282,7 +1282,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_004, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_005, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_005, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1307,7 +1307,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_005, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_006, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_006, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1326,7 +1326,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_006, testing::ext::TestSize.Leve
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_007, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_007, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1346,7 +1346,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_007, testing::ext::TestSize.Leve
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_008, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_008, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1385,7 +1385,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_008, testing::ext::TestSize.Leve
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_009, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_009, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1419,7 +1419,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_009, testing::ext::TestSize.Leve
     authMessageProcessor->ParsePkgNegotiateMessage(jsonObj);
 }
 
-HWTEST_F(AuthMessageProcessorTest, GetJsonObj_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetJsonObj_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1436,7 +1436,7 @@ HWTEST_F(AuthMessageProcessorTest, GetJsonObj_001, testing::ext::TestSize.Level0
     ASSERT_EQ(jsonObj[TAG_IS_SHOW_DIALOG].Get<bool>(), false);
 }
 
-HWTEST_F(AuthMessageProcessorTest, GetJsonObj_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetJsonObj_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1453,7 +1453,7 @@ HWTEST_F(AuthMessageProcessorTest, GetJsonObj_002, testing::ext::TestSize.Level0
     ASSERT_EQ(jsonObj[TAG_IS_SHOW_DIALOG].Get<bool>(), true);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreatePublicKeyMessageExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreatePublicKeyMessageExt_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1466,7 +1466,7 @@ HWTEST_F(AuthMessageProcessorTest, CreatePublicKeyMessageExt_001, testing::ext::
     ASSERT_EQ(jsonObj[TAG_PUBLICKEY].Get<std::string>(), authMessageProcessor->authResponseContext_->publicKey);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessageExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessageExt_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1482,7 +1482,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessageExt_001, testing::ex
     ASSERT_EQ(jsonObj[TAG_REPLY].Get<int32_t>(), authMessageProcessor->authResponseContext_->reply);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1495,7 +1495,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_001, testing::ext:
     ASSERT_EQ(jsonObj[TAG_CRYPTO_SUPPORT].Get<bool>(), false);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1508,7 +1508,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_002, testing::ext:
     ASSERT_EQ(jsonObj[TAG_CRYPTO_SUPPORT].Get<bool>(), true);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1522,7 +1522,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_001, testing::ext::T
     ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), true);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1536,7 +1536,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_002, testing::ext::T
     ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), false);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessageExt_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessageExt_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1553,7 +1553,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessageExt_001, testing::ext
     ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, 2121);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessageExt_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessageExt_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1570,7 +1570,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseAuthResponseMessageExt_002, testing::ext
     ASSERT_NE(authMessageProcessor->authResponseContext_->reply, 2121);
 }
 
-HWTEST_F(AuthMessageProcessorTest, GetAuthReqMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetAuthReqMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1593,7 +1593,7 @@ HWTEST_F(AuthMessageProcessorTest, GetAuthReqMessage_001, testing::ext::TestSize
     ASSERT_EQ(authMessageProcessor->authResponseContext_->authType, 21);
 }
 
-HWTEST_F(AuthMessageProcessorTest, GetAuthReqMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetAuthReqMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1616,7 +1616,7 @@ HWTEST_F(AuthMessageProcessorTest, GetAuthReqMessage_002, testing::ext::TestSize
     ASSERT_NE(authMessageProcessor->authResponseContext_->authType, 21);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1638,7 +1638,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_001, testing::ext::T
     ASSERT_NE(authMessageProcessor->authResponseContext_->authType, 21);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1666,7 +1666,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePkgNegotiateMessage_002, testing::ext::T
     ASSERT_NE(authMessageProcessor->authResponseContext_->authType, 21);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateDeviceAuthMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateDeviceAuthMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1694,7 +1694,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateDeviceAuthMessage_001, testing::ext::Te
     authUiStateManager_->UpdateUiState(msg);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateReqReCheckMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateReqReCheckMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1719,7 +1719,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateReqReCheckMessage_001, testing::ext::Te
     ASSERT_NE(authMessageProcessor->authResponseContext_, nullptr);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParseReqReCheckMessage_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseReqReCheckMessage_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1752,7 +1752,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseReqReCheckMessage_001, testing::ext::Tes
     ASSERT_NE(authMessageProcessor->authResponseContext_, nullptr);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1782,7 +1782,7 @@ HWTEST_F(AuthMessageProcessorTest, ParsePublicKeyMessageExt_003, testing::ext::T
     ASSERT_EQ(authMessageProcessor->authResponseContext_->publicKey.empty(), true);
 }
 
-HWTEST_F(AuthMessageProcessorTest, ParseMessage_010, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, ParseMessage_010, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1810,7 +1810,7 @@ HWTEST_F(AuthMessageProcessorTest, ParseMessage_010, testing::ext::TestSize.Leve
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1826,7 +1826,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_002, testing::ext::
     ASSERT_EQ(authMessageProcessor->authResponseContext_->reply, 0);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1845,7 +1845,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateRespNegotiateMessage_003, testing::ext:
     ASSERT_FALSE(authMessageProcessor->authResponseContext_->bindType.empty());
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreatePublicKeyMessageExt_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreatePublicKeyMessageExt_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1865,7 +1865,7 @@ HWTEST_F(AuthMessageProcessorTest, CreatePublicKeyMessageExt_002, testing::ext::
     ASSERT_EQ(jsonObj[TAG_CRYPTIC_MSG].Get<std::string>(), authMessageProcessor->authResponseContext_->publicKey);
 }
 
-HWTEST_F(AuthMessageProcessorTest, CreateAuthRequestMessage_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, CreateAuthRequestMessage_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1876,7 +1876,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateAuthRequestMessage_002, testing::ext::T
     ASSERT_TRUE(ret.empty());
 }
 
-HWTEST_F(AuthMessageProcessorTest, GetJsonObj_010, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, GetJsonObj_010, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
     std::shared_ptr<DmAuthManager> data =
@@ -1895,7 +1895,7 @@ HWTEST_F(AuthMessageProcessorTest, GetJsonObj_010, testing::ext::TestSize.Level0
     ASSERT_FALSE(authMessageProcessor->authResponseContext_->bindType.empty());
 }
 
-HWTEST_F(AuthMessageProcessorTest, IsPincodeImported_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthMessageProcessorTest, IsPincodeImported_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager = nullptr;
     std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(authManager);
@@ -1907,6 +1907,20 @@ HWTEST_F(AuthMessageProcessorTest, IsPincodeImported_001, testing::ext::TestSize
     authMessageProcessor->authMgr_ = authManager;
     ret = authMessageProcessor->IsPincodeImported();
     ASSERT_FALSE(ret);
+}
+
+HWTEST_F(AuthMessageProcessorTest, ProcessSessionKey_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
+    std::shared_ptr<DmAuthManager> authManager =
+        std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector_, listener, hiChainAuthConnector);
+    std::shared_ptr<AuthMessageProcessor> authMessageProcessor = std::make_shared<AuthMessageProcessor>(authManager);
+    authMessageProcessor->cryptoMgr_ = std::make_shared<CryptoMgr>();
+    uint8_t arrSession[] = {1, 2, 3, 4, 5};
+    uint8_t *sessionKey = arrSession;
+    uint32_t keyLen = static_cast<uint32_t>(sizeof(arrSession) / sizeof(arrSession[0]));
+    int32_t ret = authMessageProcessor->ProcessSessionKey(sessionKey, keyLen);
+    ASSERT_EQ(ret, DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware

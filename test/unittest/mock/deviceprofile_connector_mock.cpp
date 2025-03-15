@@ -129,5 +129,35 @@ int32_t DeviceProfileConnector::PutSessionKey(const std::vector<unsigned char> &
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->PutSessionKey(sessionKeyArray, sessionKeyId);
 }
+
+int32_t DeviceProfileConnector::PutLocalServiceInfo(
+    const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->PutLocalServiceInfo(localServiceInfo);
+}
+
+int32_t DeviceProfileConnector::DeleteLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteLocalServiceInfo(bundleName, pinExchangeType);
+}
+
+int32_t DeviceProfileConnector::UpdateLocalServiceInfo(
+    const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->UpdateLocalServiceInfo(localServiceInfo);
+}
+
+bool DeviceProfileConnector::CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->CheckAclStatusAndForegroundNotMatch(localUdid,
+        foregroundUserIds, backgroundUserIds);
+}
+
+std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
+    const std::string &localUdid)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetDeviceIdAndBindLevel(userIds, localUdid);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -130,7 +130,7 @@ void DmAuthManagerTest::TearDown()
 void DmAuthManagerTest::SetUpTestCase() {}
 void DmAuthManagerTest::TearDownTestCase() {}
 
-HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
@@ -176,7 +176,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate001, testing::ext::TestSize.Level0)
     EXPECT_FALSE(authManager_->authResponseContext_->isOnline);
 }
 
-HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     g_createSimpleMessageReturnDataStr = SafetyDump(jsonObject);
@@ -211,7 +211,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiate002, testing::ext::TestSize.Level0)
     EXPECT_FALSE(authManager_->authResponseContext_->isOnline);
 }
 
-HWTEST_F(DmAuthManagerTest, AuthenticateFinish001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, AuthenticateFinish001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
@@ -256,7 +256,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateFinish001, testing::ext::TestSize.Level0
     ASSERT_EQ(authManager_->authMessageProcessor_, nullptr);
 }
 
-HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->authType = AUTH_TYPE_UNKNOW;
     authManager_->authRequestState_ = nullptr;
@@ -271,7 +271,7 @@ HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog001, testing::ext::TestSize.Level
     ASSERT_EQ(authManager_->authResponseContext_->targetDeviceName, DmDialogManager::GetInstance().targetDeviceName_);
 }
 
-HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string localUdid = "localUdid";
@@ -284,7 +284,7 @@ HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmAuthManagerTest, DeleteAccessControlList001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, DeleteAccessControlList001, testing::ext::TestSize.Level1)
 {
     DmOfflineParam offlineParam;
     offlineParam.leftAclNumber = 1;
@@ -298,7 +298,7 @@ HWTEST_F(DmAuthManagerTest, DeleteAccessControlList001, testing::ext::TestSize.L
     EXPECT_EQ(0, ret.leftAclNumber);
 }
 
-HWTEST_F(DmAuthManagerTest, DeleteAccessControlList002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, DeleteAccessControlList002, testing::ext::TestSize.Level1)
 {
     DmOfflineParam offlineParam;
     offlineParam.leftAclNumber = 1;
@@ -312,7 +312,7 @@ HWTEST_F(DmAuthManagerTest, DeleteAccessControlList002, testing::ext::TestSize.L
     EXPECT_EQ(0, ret.leftAclNumber);
 }
 
-HWTEST_F(DmAuthManagerTest, DeleteAccessControlList003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, DeleteAccessControlList003, testing::ext::TestSize.Level1)
 {
     DmOfflineParam offlineParam;
     offlineParam.leftAclNumber = 1;
@@ -326,7 +326,7 @@ HWTEST_F(DmAuthManagerTest, DeleteAccessControlList003, testing::ext::TestSize.L
     EXPECT_EQ(0, ret.leftAclNumber);
 }
 
-HWTEST_F(DmAuthManagerTest, DeleteAccessControlList004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, DeleteAccessControlList004, testing::ext::TestSize.Level1)
 {
     DmOfflineParam offlineParam;
     offlineParam.leftAclNumber = 1;
@@ -340,7 +340,7 @@ HWTEST_F(DmAuthManagerTest, DeleteAccessControlList004, testing::ext::TestSize.L
     EXPECT_EQ(0, ret.leftAclNumber);
 }
 
-HWTEST_F(DmAuthManagerTest, OnUserOperation001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, OnUserOperation001, testing::ext::TestSize.Level1)
 {
     int32_t action = USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT;
     std::string params = "12345";
@@ -352,7 +352,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation001, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, OnUserOperation002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, OnUserOperation002, testing::ext::TestSize.Level1)
 {
     int32_t action = USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY;
     std::string params = "12345";
@@ -364,7 +364,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation002, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, OnUserOperation003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, OnUserOperation003, testing::ext::TestSize.Level1)
 {
     int32_t action = USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT;
     std::string params = "12345";
@@ -376,7 +376,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation003, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, OnUserOperation004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, OnUserOperation004, testing::ext::TestSize.Level1)
 {
     int32_t action = USER_OPERATION_TYPE_DONE_PINCODE_INPUT;
     std::string params = "12345";
@@ -388,7 +388,7 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation004, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Level1)
 {
     int32_t sessionId = 0;
     g_accountId = "test";
@@ -402,7 +402,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt001, testing::ext::TestSize.Leve
     g_accountId = "";
 }
 
-HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt002, testing::ext::TestSize.Level1)
 {
     authManager_->authenticationMap_.clear();
     authManager_->authResponseContext_->hostPkgName = "test";
@@ -416,7 +416,7 @@ HWTEST_F(DmAuthManagerTest, ProcRespNegotiateExt002, testing::ext::TestSize.Leve
     g_accountId = "";
 }
 
-HWTEST_F(DmAuthManagerTest, CheckTrustState_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, CheckTrustState_001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->authResponseContext_->importAuthCode = "importAuthCode";
@@ -429,7 +429,7 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_001, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, 1);
 }
 
-HWTEST_F(DmAuthManagerTest, CheckTrustState_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, CheckTrustState_002, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->authResponseContext_->importAuthCode = "";
@@ -445,7 +445,7 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_002, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, 1);
 }
 
-HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->authType = AUTH_TYPE_UNKNOW;
     authManager_->authResponseContext_->importAuthCode = "";
@@ -461,7 +461,7 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, 1);
 }
 
-HWTEST_F(DmAuthManagerTest, CheckTrustState_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, CheckTrustState_004, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->authType = AUTH_TYPE_UNKNOW;
     authManager_->authResponseContext_->importAuthCode = "";
@@ -474,7 +474,7 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_004, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, CheckTrustState_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, CheckTrustState_005, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->authType = AUTH_TYPE_UNKNOW;
     authManager_->authResponseContext_->importAuthCode = "";
@@ -487,7 +487,7 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_005, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_BIND_PEER_UNSUPPORTED);
 }
 
-HWTEST_F(DmAuthManagerTest, CheckTrustState_006, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, CheckTrustState_006, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->authResponseContext_->importAuthCode = "";
@@ -501,7 +501,7 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_006, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_BIND_PEER_UNSUPPORTED);
 }
 
-HWTEST_F(DmAuthManagerTest, CheckTrustState_007, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, CheckTrustState_007, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->authType = AUTH_TYPE_UNKNOW;
     authManager_->authResponseContext_->importAuthCode = "";
@@ -515,35 +515,35 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_007, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_001, testing::ext::TestSize.Level1)
 {
     std::string delaySecondsStr("123jlk");
     int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
     ASSERT_EQ(ret, 0);
 }
 
-HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_002, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_002, testing::ext::TestSize.Level1)
 {
     std::string delaySecondsStr("123");
     int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
     ASSERT_EQ(ret, 0);
 }
 
-HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_003, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_003, testing::ext::TestSize.Level1)
 {
     std::string delaySecondsStr("5");
     int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
     ASSERT_EQ(ret, 5);
 }
 
-HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_004, testing::ext::TestSize.Level1)
 {
     std::string delaySecondsStr("10");
     int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);
     ASSERT_EQ(ret, 10);
 }
 
-HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_005, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_005, testing::ext::TestSize.Level1)
 {
     std::string delaySecondsStr("0");
     int32_t ret = authManager_->GetCloseSessionDelaySeconds(delaySecondsStr);

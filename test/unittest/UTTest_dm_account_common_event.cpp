@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ void AccountCommonEventCallbacks(const std::string commonEventType, int32_t curr
 {
 }
 namespace {
-HWTEST_F(DmAccountCommonEventManagerTest, SubscribeAccountCommonEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAccountCommonEventManagerTest, SubscribeAccountCommonEvent_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager
         = std::make_shared<DmAccountCommonEventManager>();
@@ -54,7 +54,7 @@ HWTEST_F(DmAccountCommonEventManagerTest, SubscribeAccountCommonEvent_001, testi
     ASSERT_EQ(ret, false);
 }
 
-HWTEST_F(DmAccountCommonEventManagerTest, UnSubscribeAccountCommonEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAccountCommonEventManagerTest, UnSubscribeAccountCommonEvent_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager
         = std::make_shared<DmAccountCommonEventManager>();
@@ -65,7 +65,7 @@ HWTEST_F(DmAccountCommonEventManagerTest, UnSubscribeAccountCommonEvent_001, tes
     ASSERT_EQ(ret, true);
 }
 
-HWTEST_F(DmAccountCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmAccountCommonEventManagerTest, OnReceiveEvent_001, testing::ext::TestSize.Level1)
 {
     AAFwk::Want want;
     EventFwk::CommonEventData data;

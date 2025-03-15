@@ -415,5 +415,58 @@ bool IpcModelCodec::DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<D
     }
     return bRet;
 }
+
+bool IpcModelCodec::EncodeNetworkIdQueryFilter(const NetworkIdQueryFilter &queryFilter, MessageParcel &parcel)
+{
+    bool bRet = true;
+    bRet = (bRet && parcel.WriteString(queryFilter.wiseDeviceId));
+    bRet = (bRet && parcel.WriteInt32(queryFilter.onlineStatus));
+    bRet = (bRet && parcel.WriteString(queryFilter.deviceType));
+    bRet = (bRet && parcel.WriteString(queryFilter.deviceProductId));
+    bRet = (bRet && parcel.WriteString(queryFilter.deviceModel));
+    return bRet;
+}
+
+bool IpcModelCodec::DecodeNetworkIdQueryFilter(MessageParcel &parcel, NetworkIdQueryFilter &queryFilter)
+{
+    READ_HELPER_RET(parcel, String, queryFilter.wiseDeviceId, false);
+    READ_HELPER_RET(parcel, Int32, queryFilter.onlineStatus, false);
+    READ_HELPER_RET(parcel, String, queryFilter.deviceType, false);
+    READ_HELPER_RET(parcel, String, queryFilter.deviceProductId, false);
+    READ_HELPER_RET(parcel, String, queryFilter.deviceModel, false);
+    return true;
+}
+
+bool IpcModelCodec::EncodeStringVector(const std::vector<std::string> &vec, MessageParcel &parcel)
+{
+    uint32_t num = static_cast<uint32_t>(vec.size());
+    if (!parcel.WriteUint32(num)) {
+        LOGE("WriteUint32 num failed");
+        return false;
+    }
+    bool bRet = true;
+    for (uint32_t k = 0; k < num; k++) {
+        std::string str = vec[k];
+        bRet = parcel.WriteString(vec[k]);
+        if (!bRet) {
+            LOGE("EncodeStringVector failed");
+            break;
+        }
+    }
+    return bRet;
+}
+
+bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::string> &vec)
+{
+    uint32_t num = 0;
+    READ_HELPER_RET(parcel, Uint32, num, false);
+    for (uint32_t k = 0; k < num; k++) {
+        std::string str = "";
+        READ_HELPER_RET(parcel, String, str, false);
+        vec.emplace_back(str);
+    }
+    return true;
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

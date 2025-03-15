@@ -58,7 +58,7 @@ void DeviceNameManagerTest::TearDownTestCase()
  * @tc.name: Init_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceNameManagerTest, Init_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceNameManagerTest, Init_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(client_ != nullptr);
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
@@ -74,6 +74,7 @@ HWTEST_F(DeviceNameManagerTest, Init_001, testing::ext::TestSize.Level0)
     EXPECT_CALL(*multipleUserConnector_, GetCurrentAccountUserID()).WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
     auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
     EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
@@ -87,7 +88,7 @@ HWTEST_F(DeviceNameManagerTest, Init_001, testing::ext::TestSize.Level0)
  * @tc.name: InitDeviceNameWhenUserSwitch_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(client_ != nullptr);
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
@@ -105,6 +106,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_001, testing::ext::
     EXPECT_CALL(*multipleUserConnector_, GetCurrentAccountUserID()).WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
     auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
     EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
@@ -150,7 +152,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_002, testing::ext::
  * @tc.name: InitDeviceNameWhenLogout_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogout_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogout_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(client_ != nullptr);
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
@@ -180,7 +182,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogout_001, testing::ext::Test
  * @tc.name: InitDeviceNameWhenLogin_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogin_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogin_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(client_ != nullptr);
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
@@ -210,7 +212,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogin_001, testing::ext::TestS
  * @tc.name: InitDeviceNameWhenNickChange_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNickChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNickChange_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(client_ != nullptr);
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
@@ -240,7 +242,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNickChange_001, testing::ext::
  * @tc.name: InitDeviceNameWhenNameChange_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNameChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNameChange_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(client_ != nullptr);
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
@@ -265,7 +267,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNameChange_001, testing::ext::
  * @tc.name: GetLocalDisplayDeviceName_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(client_ != nullptr);
     ASSERT_TRUE(multipleUserConnector_ != nullptr);

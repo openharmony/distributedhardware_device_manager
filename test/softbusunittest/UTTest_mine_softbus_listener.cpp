@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,7 +52,7 @@ bool CheckSoftbusRes(int32_t ret)
         ret == SOFTBUS_IPC_ERR;
 }
 
-HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.Level1)
 {
     string pkgName;
     string searchJson;
@@ -62,7 +62,7 @@ HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_001, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_JSON_PARSE_STRING);
 }
 
-HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     jsonObj["findDeviceMode"] = 4;
@@ -74,7 +74,7 @@ HWTEST_F(MineSoftbusListenerTest, RefreshSoftbusLNN_002, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_SOFTBUS_SEND_BROADCAST);
 }
 
-HWTEST_F(MineSoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestSize.Level1)
 {
     uint16_t subscribeId = 1;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -82,7 +82,7 @@ HWTEST_F(MineSoftbusListenerTest, StopRefreshSoftbusLNN_001, testing::ext::TestS
     EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
-HWTEST_F(MineSoftbusListenerTest, OnPublishResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, OnPublishResult_001, testing::ext::TestSize.Level1)
 {
     int publishId = 1;
     PublishResult reason = PublishResult::PUBLISH_LNN_SUCCESS;
@@ -91,7 +91,7 @@ HWTEST_F(MineSoftbusListenerTest, OnPublishResult_001, testing::ext::TestSize.Le
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, OnPublishResult_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, OnPublishResult_002, testing::ext::TestSize.Level1)
 {
     int publishId = 1;
     PublishResult reason = static_cast<PublishResult>(12);
@@ -100,7 +100,7 @@ HWTEST_F(MineSoftbusListenerTest, OnPublishResult_002, testing::ext::TestSize.Le
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, OnPublishDeviceFound_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, OnPublishDeviceFound_001, testing::ext::TestSize.Level1)
 {
     DeviceInfo *deviceInfo = nullptr;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -108,7 +108,7 @@ HWTEST_F(MineSoftbusListenerTest, OnPublishDeviceFound_001, testing::ext::TestSi
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, OnPublishDeviceFound_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, OnPublishDeviceFound_002, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -120,14 +120,14 @@ HWTEST_F(MineSoftbusListenerTest, OnPublishDeviceFound_002, testing::ext::TestSi
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, OnRePublish_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, OnRePublish_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     mineListener->OnRePublish();
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_001, testing::ext::TestSize.Level1)
 {
     string pkgName;
     string searchJson;
@@ -138,7 +138,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_001, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_INVALID_JSON_STRING);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_002, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -151,7 +151,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_002, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_003, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -164,7 +164,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_003, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_004, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -177,7 +177,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_004, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_005, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_005, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -190,7 +190,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchJson_005, testing::ext::TestSize.Le
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_001, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -202,7 +202,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_001, testing::ext::TestSi
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_002, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -215,7 +215,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchAllDevice_002, testing::ext::TestSi
     EXPECT_EQ(ret, DM_OK);
 }
   
-HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_001, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -227,7 +227,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_001, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_002, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -240,7 +240,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_002, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_003, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -254,7 +254,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_003, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_004, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -269,7 +269,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_004, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_INVALID_JSON_STRING);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_005, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_005, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -286,7 +286,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchScopeDevice_005, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_001, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -298,7 +298,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_001, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_002, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -311,7 +311,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_002, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_003, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -325,7 +325,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_003, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_004, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -340,7 +340,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_004, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_005, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_005, testing::ext::TestSize.Level1)
 {
     size_t outLen = 0;
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
@@ -357,7 +357,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseSearchVertexDevice_005, testing::ext::Tes
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_001, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
     string pkgName;
@@ -367,7 +367,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_002, testing::ext::TestSize.Level1)
 {
     BroadcastHead broadcastHead;
     JsonObject jsonObj;
@@ -379,7 +379,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_002, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_003, testing::ext::TestSize.Level1)
 {
     BroadcastHead broadcastHead;
     JsonObject jsonObj;
@@ -391,7 +391,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastHead_003, testing::ext::TestSize.L
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, AddHeadToBroadcast_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, AddHeadToBroadcast_001, testing::ext::TestSize.Level1)
 {
     BroadcastHead broadcastHead = {
         .version = '1',
@@ -407,7 +407,7 @@ HWTEST_F(MineSoftbusListenerTest, AddHeadToBroadcast_001, testing::ext::TestSize
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseScopeDeviceJsonArray_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseScopeDeviceJsonArray_001, testing::ext::TestSize.Level1)
 {
     vector<ScopeOptionInfo> optionInfo;
     size_t outLen = 0;
@@ -417,7 +417,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseScopeDeviceJsonArray_001, testing::ext::T
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseScopeDeviceJsonArray_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseScopeDeviceJsonArray_002, testing::ext::TestSize.Level1)
 {
     ScopeOptionInfo info = {
         .deviceAlias = "deviceAlias",
@@ -433,7 +433,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseScopeDeviceJsonArray_002, testing::ext::T
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_001, testing::ext::TestSize.Level1)
 {
     vector<VertexOptionInfo> optionInfo;
     size_t outLen = 0;
@@ -443,7 +443,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_001, testing::ext::
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_002, testing::ext::TestSize.Level1)
 {
     VertexOptionInfo info = {
         .type = "",
@@ -458,7 +458,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_002, testing::ext::
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_003, testing::ext::TestSize.Level1)
 {
     VertexOptionInfo info = {
         .type = "1",
@@ -473,7 +473,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_003, testing::ext::
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_004, testing::ext::TestSize.Level1)
 {
     VertexOptionInfo info = {
         .type = "1",
@@ -488,7 +488,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_004, testing::ext::
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_005, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_005, testing::ext::TestSize.Level1)
 {
     VertexOptionInfo info = {
         .type = "deviceUdid",
@@ -503,7 +503,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_005, testing::ext::
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_006, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_006, testing::ext::TestSize.Level1)
 {
     VertexOptionInfo info = {
         .type = "deviceType",
@@ -518,7 +518,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_006, testing::ext::
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_007, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_007, testing::ext::TestSize.Level1)
 {
     VertexOptionInfo info = {
         .type = "deviceSn",
@@ -533,7 +533,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseVertexDeviceJsonArray_007, testing::ext::
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_001, testing::ext::TestSize.Level1)
 {
     char *data = nullptr;
     size_t outLen = 1024;
@@ -543,7 +543,7 @@ HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_001, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_002, testing::ext::TestSize.Level1)
 {
     std::string data = "data";
     size_t outLen = 1024;
@@ -553,7 +553,7 @@ HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_002, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_003, testing::ext::TestSize.Level1)
 {
     std::string data = "data";
     size_t outLen = 0;
@@ -563,7 +563,7 @@ HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_003, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_004, testing::ext::TestSize.Level1)
 {
     std::string data = "data";
     size_t outLen = 1024;
@@ -573,7 +573,7 @@ HWTEST_F(MineSoftbusListenerTest, GetSha256Hash_004, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_001, testing::ext::TestSize.Level1)
 {
     BroadcastHead broadcastHead;
     JsonObject jsonObj;
@@ -582,7 +582,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_001, testing::ext::Te
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_002, testing::ext::TestSize.Level1)
 {
     BroadcastHead broadcastHead;
     JsonObject jsonObj;
@@ -592,7 +592,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_002, testing::ext::Te
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_003, testing::ext::TestSize.Level1)
 {
     BroadcastHead broadcastHead;
     JsonObject jsonObj;
@@ -602,7 +602,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_003, testing::ext::Te
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_004, testing::ext::TestSize.Level1)
 {
     BroadcastHead broadcastHead;
     JsonObject jsonObj;
@@ -612,7 +612,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastTrustOptions_004, testing::ext::Te
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastPkgname_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastPkgname_001, testing::ext::TestSize.Level1)
 {
     string pkgName;
     BroadcastHead broadcastHead;
@@ -621,7 +621,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastPkgname_001, testing::ext::TestSiz
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetBroadcastPkgname_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetBroadcastPkgname_002, testing::ext::TestSize.Level1)
 {
     string pkgName = "2134165415";
     BroadcastHead broadcastHead;
@@ -630,7 +630,7 @@ HWTEST_F(MineSoftbusListenerTest, SetBroadcastPkgname_002, testing::ext::TestSiz
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SetSubscribeInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SetSubscribeInfo_001, testing::ext::TestSize.Level1)
 {
     SubscribeInfo subscribeInfo;
     DmSubscribeInfo dmSubscribeInfo;
@@ -639,7 +639,7 @@ HWTEST_F(MineSoftbusListenerTest, SetSubscribeInfo_001, testing::ext::TestSize.L
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SendBroadcastInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SendBroadcastInfo_001, testing::ext::TestSize.Level1)
 {
     string pkgName;
     SubscribeInfo subscribeInfo;
@@ -650,7 +650,7 @@ HWTEST_F(MineSoftbusListenerTest, SendBroadcastInfo_001, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_001, testing::ext::TestSize.Level1)
 {
     char *output = nullptr;
     size_t outputLen = 1024;
@@ -662,7 +662,7 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_002, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     size_t outputLen = 1024;
@@ -674,7 +674,7 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_002, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_003, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     size_t outputLen = 0;
@@ -686,7 +686,7 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_003, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_004, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     size_t outputLen = 1024;
@@ -698,7 +698,7 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Encode_004, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_001, testing::ext::TestSize.Level1)
 {
     char *output = nullptr;
     size_t outputLen = 1024;
@@ -710,7 +710,7 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_002, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     size_t outputLen = 1024;
@@ -722,7 +722,7 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_002, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_003, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     size_t outputLen = 0;
@@ -734,7 +734,7 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_003, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_004, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     size_t outputLen = 1024;
@@ -746,7 +746,7 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_004, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_005, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_005, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {0};
     size_t outputLen = 1024;
@@ -758,21 +758,21 @@ HWTEST_F(MineSoftbusListenerTest, DmBase64Decode_005, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     int32_t ret = mineListener->PublishDeviceDiscovery();
     EXPECT_TRUE(CheckSoftbusRes(ret));
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchDealTask_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchDealTask_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
     mineListener->MatchSearchDealTask();
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseBroadcastInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseBroadcastInfo_001, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -780,7 +780,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseBroadcastInfo_001, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, ParseBroadcastInfo_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, ParseBroadcastInfo_002, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -792,7 +792,7 @@ HWTEST_F(MineSoftbusListenerTest, ParseBroadcastInfo_002, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetBroadcastData_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetBroadcastData_001, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -806,7 +806,7 @@ HWTEST_F(MineSoftbusListenerTest, GetBroadcastData_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, true);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_001, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -820,7 +820,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_001, testing::ext::TestSi
     EXPECT_EQ(ret, BUSINESS_EXACT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_002, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -835,7 +835,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_002, testing::ext::TestSi
     EXPECT_EQ(ret, BUSINESS_EXACT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_003, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -850,7 +850,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_003, testing::ext::TestSi
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_004, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -866,7 +866,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_004, testing::ext::TestSi
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_005, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_005, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "123456",
@@ -882,7 +882,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchAllDevice_005, testing::ext::TestSi
     EXPECT_EQ(ret, BUSINESS_EXACT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetScopeDevicePolicyInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetScopeDevicePolicyInfo_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -890,7 +890,7 @@ HWTEST_F(MineSoftbusListenerTest, GetScopeDevicePolicyInfo_001, testing::ext::Te
     EXPECT_NE(mineListener->PublishDeviceDiscovery(), DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_001, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo;
     deviceInfo.isOnline = true;
@@ -903,7 +903,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_001, testing::ext::Test
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_002, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo;
     deviceInfo.isOnline = false;
@@ -916,7 +916,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_002, testing::ext::Test
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_003, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo;
     deviceInfo.isOnline = false;
@@ -929,7 +929,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchScopeDevice_003, testing::ext::Test
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetVertexDevicePolicyInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetVertexDevicePolicyInfo_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -937,7 +937,7 @@ HWTEST_F(MineSoftbusListenerTest, GetVertexDevicePolicyInfo_001, testing::ext::T
     EXPECT_EQ(devicePolicyInfo.snHashValid, true);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_001, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo;
     deviceInfo.isOnline = true;
@@ -950,7 +950,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_001, testing::ext::Tes
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_002, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo;
     deviceInfo.isOnline = false;
@@ -963,7 +963,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_002, testing::ext::Tes
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_003, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo;
     deviceInfo.isOnline = false;
@@ -976,7 +976,7 @@ HWTEST_F(MineSoftbusListenerTest, MatchSearchVertexDevice_003, testing::ext::Tes
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, SendReturnwave_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, SendReturnwave_001, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo;
     BroadcastHead broadcastHead;
@@ -986,7 +986,7 @@ HWTEST_F(MineSoftbusListenerTest, SendReturnwave_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetDeviceAliasHash_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetDeviceAliasHash_001, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -994,7 +994,7 @@ HWTEST_F(MineSoftbusListenerTest, GetDeviceAliasHash_001, testing::ext::TestSize
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetDeviceSnHash_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetDeviceSnHash_001, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -1002,7 +1002,7 @@ HWTEST_F(MineSoftbusListenerTest, GetDeviceSnHash_001, testing::ext::TestSize.Le
     EXPECT_EQ(ret, true);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetDeviceUdidHash_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetDeviceUdidHash_001, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -1010,7 +1010,7 @@ HWTEST_F(MineSoftbusListenerTest, GetDeviceUdidHash_001, testing::ext::TestSize.
     EXPECT_EQ(ret, true);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetDeviceTypeHash_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetDeviceTypeHash_001, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -1018,7 +1018,7 @@ HWTEST_F(MineSoftbusListenerTest, GetDeviceTypeHash_001, testing::ext::TestSize.
     EXPECT_EQ(ret, true);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetDeviceNumber_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetDeviceNumber_001, testing::ext::TestSize.Level1)
 {
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
     std::shared_ptr<MineSoftbusListener> mineListener = std::make_shared<MineSoftbusListener>();
@@ -1026,7 +1026,7 @@ HWTEST_F(MineSoftbusListenerTest, GetDeviceNumber_001, testing::ext::TestSize.Le
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceAliasMatch_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceAliasMatch_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     devicePolicyInfo.aliasHashValid = false;
@@ -1036,7 +1036,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceAliasMatch_001, testing::ext::TestS
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceAliasMatch_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceAliasMatch_002, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     devicePolicyInfo.aliasHashValid = true;
@@ -1046,7 +1046,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceAliasMatch_002, testing::ext::TestS
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     devicePolicyInfo.aliasHashValid = false;
@@ -1057,7 +1057,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_001, testing::ext::Test
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_002, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     devicePolicyInfo.aliasHashValid = true;
@@ -1068,7 +1068,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_002, testing::ext::Test
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_003, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_003, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     devicePolicyInfo.aliasHashValid = true;
@@ -1079,7 +1079,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_003, testing::ext::Test
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatchh_004, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatchh_004, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo = {
         .number = "1",
@@ -1092,7 +1092,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatchh_004, testing::ext::Tes
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_005, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_005, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo = {
         .number = "3",
@@ -1105,7 +1105,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_005, testing::ext::Test
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_006, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_006, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo = {
         .number = "10",
@@ -1118,7 +1118,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceNumberMatch_006, testing::ext::Test
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
@@ -1128,7 +1128,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_001, testing::ext::TestSize
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_002, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
@@ -1138,7 +1138,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceSnMatch_002, testing::ext::TestSize
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
@@ -1148,7 +1148,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_001, testing::ext::TestSi
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_002, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
@@ -1158,7 +1158,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceTypeMatch_002, testing::ext::TestSi
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_001, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
@@ -1168,7 +1168,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_001, testing::ext::TestSi
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_002, testing::ext::TestSize.Level1)
 {
     DevicePolicyInfo devicePolicyInfo;
     char output[DISC_MAX_CUST_DATA_LEN] = {1};
@@ -1178,7 +1178,7 @@ HWTEST_F(MineSoftbusListenerTest, CheckDeviceUdidMatch_002, testing::ext::TestSi
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetMatchResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetMatchResult_001, testing::ext::TestSize.Level1)
 {
     std::vector<int> matchItemNum;
     std::vector<int> matchItemResult;
@@ -1187,7 +1187,7 @@ HWTEST_F(MineSoftbusListenerTest, GetMatchResult_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, BUSINESS_EXACT_NOT_MATCH);
 }
 
-HWTEST_F(MineSoftbusListenerTest, GetMatchResult_002, testing::ext::TestSize.Level0)
+HWTEST_F(MineSoftbusListenerTest, GetMatchResult_002, testing::ext::TestSize.Level1)
 {
     std::vector<int> matchItemNum;
     matchItemNum.push_back(1);

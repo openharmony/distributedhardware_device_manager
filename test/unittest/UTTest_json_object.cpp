@@ -59,7 +59,7 @@ void JsonObjectTest::TearDownTestCase()
 {
 }
 
-HWTEST_F(JsonObjectTest, SetValue_001, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_001, testing::ext::TestSize.Level1)
 {
     uint8_t value1 = 200;
     int16_t value2 = -20000;
@@ -83,7 +83,7 @@ HWTEST_F(JsonObjectTest, SetValue_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet2, object2.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_002, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_002, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     const char* strValue1 = "value1";
@@ -94,7 +94,7 @@ HWTEST_F(JsonObjectTest, SetValue_002, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_003, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_003, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST"] = 15.3;
@@ -102,7 +102,7 @@ HWTEST_F(JsonObjectTest, SetValue_003, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_004, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_004, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST1"] = true;
@@ -111,7 +111,7 @@ HWTEST_F(JsonObjectTest, SetValue_004, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_005, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_005, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST1"] = "value1";
@@ -122,7 +122,7 @@ HWTEST_F(JsonObjectTest, SetValue_005, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_006, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_006, testing::ext::TestSize.Level1)
 {
     JsonObject object1;
     object1["TEST1"] = "value1";
@@ -133,7 +133,7 @@ HWTEST_F(JsonObjectTest, SetValue_006, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object1.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_007, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_007, testing::ext::TestSize.Level1)
 {
     JsonObject subObj;
     subObj["TEST"] = "test";
@@ -146,7 +146,7 @@ HWTEST_F(JsonObjectTest, SetValue_007, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_008, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_008, testing::ext::TestSize.Level1)
 {
     std::vector<int32_t> verData = {45, 23, 68, 74, 56};
     JsonObject object;
@@ -155,7 +155,7 @@ HWTEST_F(JsonObjectTest, SetValue_008, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_009, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_009, testing::ext::TestSize.Level1)
 {
     TestJsonStru testObj;
     testObj.value1 = 44523;
@@ -172,7 +172,7 @@ HWTEST_F(JsonObjectTest, SetValue_009, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object1.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_010, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_010, testing::ext::TestSize.Level1)
 {
     TestJsonStru testObj;
     testObj.value1 = 10;
@@ -192,7 +192,7 @@ HWTEST_F(JsonObjectTest, SetValue_010, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object.Dump());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_011, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_011, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST"] = 25;
@@ -200,7 +200,7 @@ HWTEST_F(JsonObjectTest, SetValue_011, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object.DumpFormated());
 }
 
-HWTEST_F(JsonObjectTest, SetValue_012, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_012, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST1"] = "value1";
@@ -215,7 +215,7 @@ HWTEST_F(JsonObjectTest, SetValue_012, testing::ext::TestSize.Level0)
     EXPECT_EQ(strRet, object1.Dump());
 }
 
-HWTEST_F(JsonObjectTest, Parse_001, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Parse_001, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"(
     {
@@ -268,14 +268,14 @@ HWTEST_F(JsonObjectTest, Parse_001, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Parse_002, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Parse_002, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"TEST1":"value1","TEST2":15,"TEST3":true, "TEST4":0.03)";
     JsonObject object(strJson);
     EXPECT_TRUE(object.IsDiscarded());
 }
 
-HWTEST_F(JsonObjectTest, Parse_003, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Parse_003, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"TEST1":15.0,"TEST2":15.01})";
     JsonObject object(strJson);
@@ -289,7 +289,7 @@ HWTEST_F(JsonObjectTest, Parse_003, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Parse_004, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Parse_004, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"TEST1":15.0,"TEST2":15.01})";
     JsonObject object;
@@ -300,7 +300,7 @@ HWTEST_F(JsonObjectTest, Parse_004, testing::ext::TestSize.Level0)
     EXPECT_FALSE(object1.Parse(strJson1));
 }
 
-HWTEST_F(JsonObjectTest, Get_001, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_001, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"TEST1":"value1","TEST2":15,"TEST3":true, "TEST4":0.03})";
     JsonObject object(strJson);
@@ -318,7 +318,7 @@ HWTEST_F(JsonObjectTest, Get_001, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_002, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_002, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"TEST1":"value1","TEST2":15,"TEST3":true, "TEST4":0.03})";
     JsonObject object(strJson);
@@ -349,7 +349,7 @@ HWTEST_F(JsonObjectTest, Get_002, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_003, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_003, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"value1":124,"value2":"MyTest","value3":true})";
     JsonObject object(strJson);
@@ -363,7 +363,7 @@ HWTEST_F(JsonObjectTest, Get_003, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_004, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_004, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"Object":{"value1":124,"value2":"MyTest","value3":true}})";
     JsonObject object(strJson);
@@ -377,7 +377,7 @@ HWTEST_F(JsonObjectTest, Get_004, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_005, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_005, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"Object":{"value1":124,"value2":"MyTest","value3":true}})";
     JsonObject object(strJson);
@@ -389,7 +389,7 @@ HWTEST_F(JsonObjectTest, Get_005, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_006, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_006, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"Object":{"value1":124,"value2":"MyTest","value3":true}})";
     JsonObject object(strJson);
@@ -401,7 +401,7 @@ HWTEST_F(JsonObjectTest, Get_006, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_007, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_007, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"ARRAY":[13, 24, 36, 48]})";
     std::vector<int32_t> verValues = {13, 24, 36, 48};
@@ -418,7 +418,7 @@ HWTEST_F(JsonObjectTest, Get_007, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_008, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_008, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"ARRAY":[13, 24, 36, 48]})";
     std::vector<int32_t> verValues = {13, 24, 36, 48};
@@ -437,7 +437,7 @@ HWTEST_F(JsonObjectTest, Get_008, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_009, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_009, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"(
     {
@@ -468,7 +468,7 @@ HWTEST_F(JsonObjectTest, Get_009, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_010, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_010, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"Object":{"value1":124,"value2":"MyTest","value3":true}})";
     JsonObject object(strJson);
@@ -482,7 +482,7 @@ HWTEST_F(JsonObjectTest, Get_010, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_011, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_011, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"value1":124,"value2":"MyTest","value3":true})";
     JsonObject object(strJson);
@@ -498,7 +498,7 @@ HWTEST_F(JsonObjectTest, Get_011, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_012, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_012, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"value1":124,"value2":"MyTest","value3":true})";
     JsonObject object(strJson);
@@ -513,7 +513,7 @@ HWTEST_F(JsonObjectTest, Get_012, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_013, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_013, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"ARRAY":[13,24,36,48]})";
     JsonObject object;
@@ -525,7 +525,7 @@ HWTEST_F(JsonObjectTest, Get_013, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_014, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_014, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"value1":124,"value2":"MyTest","value3":true})";
     JsonObject object;
@@ -537,7 +537,7 @@ HWTEST_F(JsonObjectTest, Get_014, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, Get_015, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, Get_015, testing::ext::TestSize.Level1)
 {
     std::string strJson = R"({"Object":{"value1":124,"value2":"MyTest","value3":true}})";
     JsonObject object;
@@ -549,7 +549,7 @@ HWTEST_F(JsonObjectTest, Get_015, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(JsonObjectTest, SetValue_016, testing::ext::TestSize.Level0)
+HWTEST_F(JsonObjectTest, SetValue_016, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST1"] = "value1";

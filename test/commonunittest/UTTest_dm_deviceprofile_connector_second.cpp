@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -112,14 +112,14 @@ void AddAccessControlProfile(std::vector<DistributedDeviceProfile::AccessControl
     accessControlProfiles.push_back(profileFifth);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAccessControlProfile_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAccessControlProfile_201, testing::ext::TestSize.Level1)
 {
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
     auto ret = DeviceProfileConnector::GetInstance().GetAccessControlProfile();
     EXPECT_TRUE(ret.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAccessControlProfileByUserId_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAccessControlProfileByUserId_201, testing::ext::TestSize.Level1)
 {
     int32_t userId = DEVICE;
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
@@ -128,7 +128,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAccessControlProfileByUserId_201, 
     EXPECT_TRUE(profiles.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, CheckAuthForm_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckAuthForm_201, testing::ext::TestSize.Level1)
 {
     DmAuthForm form = DmAuthForm::ACROSS_ACCOUNT;
     DistributedDeviceProfile::AccessControlProfile profiles;
@@ -156,7 +156,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckAuthForm_201, testing::ext::Test
     EXPECT_EQ(ret, DmAuthForm::ACROSS_ACCOUNT);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, PutAccessControlList_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, PutAccessControlList_201, testing::ext::TestSize.Level1)
 {
     DmAclInfo aclInfo;
     DmAccesser dmAccesser;
@@ -166,7 +166,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutAccessControlList_201, testing::ex
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::ext::TestSize.Level1)
 {
     int32_t userId = 0;
     std::string accountId;
@@ -217,14 +217,14 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::e
         remoteUdid, remoteFrontUserIds);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level1)
 {
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
     auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     EXPECT_TRUE(ret.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByDeviceIdAndUserId_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByDeviceIdAndUserId_201, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "deviceId";
     int32_t userId = 123456;
@@ -233,7 +233,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByDeviceIdAndUserId_201,
     EXPECT_TRUE(ret.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAclForAccountLogOut_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAclForAccountLogOut_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "local_device_id";
     int32_t localUserId = 1;
@@ -245,7 +245,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAclForAccountLogOut_001, testin
     EXPECT_EQ(result, false);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAppBindLevel_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAppBindLevel_001, testing::ext::TestSize.Level1)
 {
     DmOfflineParam offlineParam;
     std::string pkgName = "com.example.app";
@@ -257,7 +257,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAppBindLevel_001, testing::ext:
     EXPECT_EQ(offlineParam.processVec.size(), 0);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, CheckIsSameAccount_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckIsSameAccount_001, testing::ext::TestSize.Level1)
 {
     DmAccessCaller caller;
     caller.pkgName = "test_pkg";
@@ -268,7 +268,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIsSameAccount_001, testing::ext:
     EXPECT_EQ(connector.CheckIsSameAccount(caller, srcUdid, callee, sinkUdid), ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndBindLevel_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndBindLevel_001, testing::ext::TestSize.Level1)
 {
     std::vector<int32_t> userIds = {4, 5, 6};
     std::string localUdid = "local_udid";
@@ -278,7 +278,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndBindLevel_001, testing:
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "localDevice";
     int32_t userId = -1;
@@ -289,7 +289,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_001, testing::e
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_002, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "localDevice";
     int32_t userId = 1;
@@ -300,7 +300,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_002, testing::e
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_003, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "";
     int32_t userId = 0;
@@ -311,7 +311,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAclProfileByUserId_003, testing::e
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "invalid_device";
     std::vector<int32_t> localUserIds = {1, 2};
@@ -324,7 +324,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_001, testing::e
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_002, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "local_device";
     std::vector<int32_t> localUserIds = {1, 2};
@@ -337,7 +337,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_002, testing::e
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_003, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "local_device";
     std::vector<int32_t> localUserIds = {};
@@ -350,7 +350,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetOfflineProcessInfo_003, testing::e
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "local_udid";
     std::string peerUdid = "peer_udid";
@@ -360,7 +360,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_001, testing::e
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_002, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "local_udid";
     std::string peerUdid = "peer_udid";
@@ -370,7 +370,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_002, testing::e
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "local_udid_123";
     std::string peerUdid = "peer_udid_456";
@@ -383,7 +383,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_001, testi
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_002, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "local_udid_123";
     std::string peerUdid = "non_matching_udid";
@@ -396,7 +396,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_002, testi
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_003, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "local_udid_123";
     std::string peerUdid = "peer_udid_456";
@@ -409,7 +409,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_003, testi
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_004, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "";
     std::string peerUdid = "";
@@ -422,21 +422,21 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDevIdAndUserIdByActHash_004, testi
     EXPECT_TRUE(result.empty());
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUserId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUserId_001, testing::ext::TestSize.Level1)
 {
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     auto result = connector.GetDeviceIdAndUserId("device4", 4);
     EXPECT_EQ(result.size(), 0);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUserId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUserId_002, testing::ext::TestSize.Level1)
 {
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     auto result = connector.GetDeviceIdAndUserId("", 0);
     EXPECT_EQ(result.size(), 0);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, SubscribeDeviceProfileInited_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, SubscribeDeviceProfileInited_201, testing::ext::TestSize.Level1)
 {
     OHOS::sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback = nullptr;
     int32_t ret = DeviceProfileConnector::GetInstance().SubscribeDeviceProfileInited(dpInitedCallback);
@@ -454,7 +454,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, SubscribeDeviceProfileInited_201, tes
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, UnSubscribeDeviceProfileInited_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, UnSubscribeDeviceProfileInited_201, testing::ext::TestSize.Level1)
 {
     EXPECT_CALL(*distributedDeviceProfileClientMock_, UnSubscribeDeviceProfileInited(_))
         .WillOnce(Return(ERR_DM_FAILED));
@@ -467,7 +467,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, UnSubscribeDeviceProfileInited_201, t
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, PutAllTrustedDevices_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, PutAllTrustedDevices_201, testing::ext::TestSize.Level1)
 {
     std::vector<DistributedDeviceProfile::TrustedDeviceInfo> deviceInfos;
     EXPECT_CALL(*distributedDeviceProfileClientMock_, PutAllTrustedDevices(_))
@@ -490,7 +490,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutAllTrustedDevices_201, testing::ex
         localAccountId);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string localDeviceId = "";
@@ -503,7 +503,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAccessControlList_201, testing:
     EXPECT_EQ(offlineParam.bindType, INVALIED_TYPE);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_201, testing::ext::TestSize.Level1)
 {
     std::vector<unsigned char> sessionKeyArray;
     int32_t sessionKeyId = 1;
@@ -522,6 +522,62 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutSessionKey_201, testing::ext::Test
     EXPECT_CALL(*distributedDeviceProfileClientMock_, PutSessionKey(_, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceProfileConnector::GetInstance().PutSessionKey(sessionKeyArray, sessionKeyId);
     EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, PutLocalServiceInfo_201, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutLocalServiceInfo(_)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().PutLocalServiceInfo(localServiceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, PutLocalServiceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().PutLocalServiceInfo(localServiceInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteLocalServiceInfo_201, testing::ext::TestSize.Level1)
+{
+    std::string bundleName = "b********pl";
+    int32_t pinExchangeType = 1;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, DeleteLocalServiceInfo(_, _)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, DeleteLocalServiceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, UpdateLocalServiceInfo_201, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateLocalServiceInfo(_)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(localServiceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, UpdateLocalServiceInfo(_)).WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().UpdateLocalServiceInfo(localServiceInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetLocalServiceInfoByBundleNameAndPinExchangeType_201,
+        testing::ext::TestSize.Level1)
+{
+    std::string bundleName = "b********pl";
+    int32_t pinExchangeType = 1;
+    DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
+        pinExchangeType, localServiceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetLocalServiceInfoByBundleAndPinType(_, _, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
+        pinExchangeType, localServiceInfo);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

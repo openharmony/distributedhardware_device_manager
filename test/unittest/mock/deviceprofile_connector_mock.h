@@ -57,6 +57,13 @@ public:
     virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string& bundleName,
         int32_t pinExchangeType, DistributedDeviceProfile::LocalServiceInfo &serviceInfo) = 0;
     virtual int32_t PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId) = 0;
+    virtual int32_t PutLocalServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo) = 0;
+    virtual int32_t DeleteLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) = 0;
+    virtual int32_t UpdateLocalServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo) = 0;
+    virtual bool CheckAclStatusAndForegroundNotMatch(const std::string &localUdid,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
+    virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
+        const std::string &localUdid) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -88,6 +95,13 @@ public:
     MOCK_METHOD(int32_t, GetLocalServiceInfoByBundleNameAndPinExchangeType, (const std::string&, int32_t,
         DistributedDeviceProfile::LocalServiceInfo &serviceInfo));
     MOCK_METHOD(int32_t, PutSessionKey, (const std::vector<unsigned char> &, int32_t&));
+    MOCK_METHOD(int32_t, PutLocalServiceInfo, (const DistributedDeviceProfile::LocalServiceInfo &));
+    MOCK_METHOD(int32_t, DeleteLocalServiceInfo, (const std::string &, int32_t));
+    MOCK_METHOD(int32_t, UpdateLocalServiceInfo, (const DistributedDeviceProfile::LocalServiceInfo &));
+    MOCK_METHOD(bool, CheckAclStatusAndForegroundNotMatch,
+        (const std::string &, (const std::vector<int32_t> &), (const std::vector<int32_t> &)));
+    MOCK_METHOD((std::map<std::string, int32_t>), GetDeviceIdAndBindLevel,
+        ((std::vector<int32_t>), const std::string &));
 };
 }
 }

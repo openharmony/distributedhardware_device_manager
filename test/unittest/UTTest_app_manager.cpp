@@ -60,7 +60,7 @@ void AppManagerTest::SetUpTestCase()
 void AppManagerTest::TearDownTestCase()
 {}
 
-HWTEST_F(AppManagerTest, RegisterCallerAppId_success_001, testing::ext::TestSize.Level0)
+HWTEST_F(AppManagerTest, RegisterCallerAppId_success_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(skeleton_ != nullptr);
     ASSERT_TRUE(token_ != nullptr);
@@ -171,7 +171,7 @@ HWTEST_F(AppManagerTest, GetAppId_001, testing::ext::TestSize.Level2)
     }
 }
 
-HWTEST_F(AppManagerTest, IsSystemSA_001, testing::ext::TestSize.Level0)
+HWTEST_F(AppManagerTest, IsSystemSA_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(skeleton_ != nullptr);
     ASSERT_TRUE(token_ != nullptr);
@@ -198,7 +198,7 @@ HWTEST_F(AppManagerTest, IsSystemSA_001, testing::ext::TestSize.Level0)
     }
 }
 
-HWTEST_F(AppManagerTest, GetCallerName_001, testing::ext::TestSize.Level0)
+HWTEST_F(AppManagerTest, GetCallerName_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(skeleton_ != nullptr);
     ASSERT_TRUE(token_ != nullptr);
@@ -246,7 +246,7 @@ HWTEST_F(AppManagerTest, GetCallerName_002, testing::ext::TestSize.Level2)
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(AppManagerTest, GetNativeTokenIdByName_001, testing::ext::TestSize.Level0)
+HWTEST_F(AppManagerTest, GetNativeTokenIdByName_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(token_ != nullptr);
 
@@ -262,7 +262,7 @@ HWTEST_F(AppManagerTest, GetNativeTokenIdByName_001, testing::ext::TestSize.Leve
     EXPECT_EQ(tokenId, VALUABLE_TOKEN_ID);
 }
 
-HWTEST_F(AppManagerTest, GetHapTokenIdByName_001, testing::ext::TestSize.Level0)
+HWTEST_F(AppManagerTest, GetHapTokenIdByName_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(token_ != nullptr);
     EXPECT_CALL(*token_, GetHapTokenID(_, _, _)).WillOnce(Return(UNVALUABLE_TOKEN_ID));
@@ -279,7 +279,7 @@ HWTEST_F(AppManagerTest, GetHapTokenIdByName_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(tokenId, VALUABLE_TOKEN_ID);
 }
 
-HWTEST_F(AppManagerTest, GetCallerProcessName_001, testing::ext::TestSize.Level0)
+HWTEST_F(AppManagerTest, GetCallerProcessName_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(skeleton_ != nullptr);
     ASSERT_TRUE(token_ != nullptr);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ void SoftbusPublishTest::TearDownTestCase()
 }
 
 namespace {
-HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level1)
 {
     SoftbusPublish spftbusPublish;
     int32_t ret = spftbusPublish.PublishSoftbusLNN();
@@ -46,7 +46,7 @@ HWTEST_F(SoftbusPublishTest, PublishSoftbusLNN_001, testing::ext::TestSize.Level
     EXPECT_EQ(ret, ERR_DM_PUBLISH_FAILED);
 }
 
-HWTEST_F(SoftbusPublishTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusPublishTest, StopPublishSoftbusLNN_001, testing::ext::TestSize.Level1)
 {
     SoftbusPublish spftbusPublish;
     int publishId = 2;

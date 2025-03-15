@@ -82,6 +82,16 @@ struct GetLocalDisplayDeviceNameAsyncCallbackInfo {
     std::string displayName;
 };
 
+struct GetDeviceNetworkIdListAsyncCallbackInfo {
+    napi_env env = nullptr;
+    napi_async_work asyncWork = nullptr;
+    std::string bundleName;
+    napi_deferred deferred = nullptr;
+    int32_t code = -1;
+    OHOS::DistributedHardware::NetworkIdQueryFilter filterOptions;
+    std::vector<std::string> deviceNetworkIds;
+};
+
 struct DeviceIconInfoAsyncCallbackInfo {
     napi_env env = nullptr;
     napi_async_work asyncWork = nullptr;
@@ -367,6 +377,7 @@ public:
     static napi_value JsSetLocalDeviceName(napi_env env, napi_callback_info info);
     static napi_value JsSetRemoteDeviceName(napi_env env, napi_callback_info info);
     static napi_value JsRestoreLocalDeivceName(napi_env env, napi_callback_info info);
+    static napi_value JsGetDeviceNetworkIdList(napi_env env, napi_callback_info info);
     static DeviceManagerNapi *GetDeviceManagerNapi(std::string &bundleName);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType);
     static void CreateDmCallback(napi_env env, std::string &bundleName, std::string &eventType, std::string &extra);
@@ -414,7 +425,8 @@ private:
         GetLocalDisplayDeviceNameAsyncCallbackInfo *jsCallback);
     static napi_value SetLocalDeviceNamePromise(napi_env env, SetLocalDeviceNameAsyncCallbackInfo *jsCallback);
     static napi_value SetRemoteDeviceNamePromise(napi_env env, SetRemoteDeviceNameAsyncCallbackInfo *jsCallback);
-
+    static napi_value GetDeviceNetworkIdListPromise(napi_env env,
+        GetDeviceNetworkIdListAsyncCallbackInfo *jsCallback);
 private:
     napi_env env_;
     static thread_local napi_ref sConstructor_;

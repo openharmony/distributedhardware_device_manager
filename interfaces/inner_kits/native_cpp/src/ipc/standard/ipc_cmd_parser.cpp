@@ -35,6 +35,8 @@
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_network_id_list_req.h"
+#include "ipc_get_device_network_id_list_rsp.h"
 #include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
@@ -2078,6 +2080,46 @@ ON_IPC_SET_REQUEST(RESTORE_LOCAL_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, 
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
         return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_DEVICE_NETWORK_ID_LIST, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcGetDeviceNetworkIdListReq> pReq =
+        std::static_pointer_cast<IpcGetDeviceNetworkIdListReq>(pBaseReq);
+    if (!data.WriteString(pReq->GetPkgName())) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!IpcModelCodec::EncodeNetworkIdQueryFilter(pReq->GetQueryFilter(), data)) {
+        LOGE("write query filter failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_DEVICE_NETWORK_ID_LIST, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    if (pBaseRsp->GetErrCode() == DM_OK) {
+        std::shared_ptr<IpcGetDeviceNetworkIdListRsp> pRsp =
+            std::static_pointer_cast<IpcGetDeviceNetworkIdListRsp>(pBaseRsp);
+        std::vector<std::string> networkIds;
+        bool ret = IpcModelCodec::DecodeStringVector(reply, networkIds);
+        if (!ret) {
+            LOGE("DecodeLocalServiceInfo failed");
+            pBaseRsp->SetErrCode(ERR_DM_IPC_READ_FAILED);
+        }
+        pRsp->SetNetworkIds(networkIds);
     }
     return DM_OK;
 }

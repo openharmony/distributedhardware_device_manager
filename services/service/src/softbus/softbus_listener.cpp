@@ -1292,7 +1292,6 @@ int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, con
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     (void)extra;
-    uint32_t tokenId = static_cast<uint32_t>(OHOS::IPCSkeleton::GetCallingTokenID());
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
@@ -1300,14 +1299,14 @@ int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, con
             continue;
         }
         DistributedDeviceProfile::Accesser acer = profile.GetAccesser();
-        if (pkgName == acer.GetAccesserBundleName() && tokenId == acer.GetAccesserTokenId()) {
+        if (pkgName == acer.GetAccesserBundleName()) {
             DmDeviceInfo deviceinfo;
             ConvertAclToDeviceInfo(profile, deviceinfo);
             deviceList.push_back(deviceinfo);
             continue;
         }
         DistributedDeviceProfile::Accessee acee = profile.GetAccessee();
-        if (pkgName == acee.GetAccesseeBundleName() && tokenId == acee.GetAccesseeTokenId()) {
+        if (pkgName == acee.GetAccesseeBundleName()) {
             DmDeviceInfo deviceinfo;
             ConvertAclToDeviceInfo(profile, deviceinfo);
             deviceList.push_back(deviceinfo);

@@ -66,7 +66,7 @@ void DpInitedCallbackTest::TearDownTestCase()
  * @tc.name: PutAllTrustedDevices_001
  * @tc.type: FUNC
  */
-HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_001, testing::ext::TestSize.Level0)
+HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo;
     char networkId[] = "255.255.255.0";

@@ -48,7 +48,7 @@ bool CheckSoftbusRes(int32_t ret)
         ret == SOFTBUS_IPC_ERR;
 }
 
-HWTEST_F(SoftbusListenerTwoTest, OnCredentialAuthStatus_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTwoTest, OnCredentialAuthStatus_001, testing::ext::TestSize.Level1)
 {
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
@@ -74,7 +74,7 @@ HWTEST_F(SoftbusListenerTwoTest, OnCredentialAuthStatus_001, testing::ext::TestS
     EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
-HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceOnline_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceOnline_001, testing::ext::TestSize.Level1)
 {
     NodeBasicInfo info = {
         .networkId = "123456",
@@ -96,7 +96,7 @@ HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceOnline_001, testing::ext::TestSi
     softbusListener->OnSoftbusDeviceOffline(&info);
 }
 
-HWTEST_F(SoftbusListenerTwoTest, OnDeviceTrustedChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTwoTest, OnDeviceTrustedChange_001, testing::ext::TestSize.Level1)
 {
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
@@ -110,7 +110,7 @@ HWTEST_F(SoftbusListenerTwoTest, OnDeviceTrustedChange_001, testing::ext::TestSi
     EXPECT_GE(strlen(msg), 0);
 }
 
-HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceFound_001, testing::ext::TestSize.Level1)
 {
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();
@@ -134,7 +134,7 @@ HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceFound_001, testing::ext::TestSiz
     EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
-HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceInfoChanged_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceInfoChanged_001, testing::ext::TestSize.Level1)
 {
     NodeBasicInfoType type = static_cast<NodeBasicInfoType>(100);
     NodeBasicInfo nodeBasic = {
@@ -150,7 +150,7 @@ HWTEST_F(SoftbusListenerTwoTest, OnSoftbusDeviceInfoChanged_001, testing::ext::T
     EXPECT_GE(strlen(info->networkId), 0);
 }
 
-HWTEST_F(SoftbusListenerTwoTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTwoTest, ConvertDeviceInfoToDmDevice_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo dmDevice;
     DeviceInfo deviceInfo = {
@@ -175,7 +175,7 @@ HWTEST_F(SoftbusListenerTwoTest, ConvertDeviceInfoToDmDevice_001, testing::ext::
     EXPECT_NE(dmDevice.deviceId, deviceInfo.devId);
 }
 
-HWTEST_F(SoftbusListenerTwoTest, CacheDiscoveredDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTwoTest, CacheDiscoveredDevice_001, testing::ext::TestSize.Level1)
 {
     DeviceInfo deviceInfo = {
         .devId = "0",
@@ -211,7 +211,7 @@ HWTEST_F(SoftbusListenerTwoTest, CacheDiscoveredDevice_001, testing::ext::TestSi
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(SoftbusListenerTwoTest, GetIPAddrTypeFromCache_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusListenerTwoTest, GetIPAddrTypeFromCache_001, testing::ext::TestSize.Level1)
 {
     if (softbusListener == nullptr) {
         softbusListener = std::make_shared<SoftbusListener>();

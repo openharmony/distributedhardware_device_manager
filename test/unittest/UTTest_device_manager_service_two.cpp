@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,7 +82,7 @@ void SetSetDnPolicyPermission()
  * @tc.name: GetTrustedDeviceList_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     EXPECT_CALL(*appManagerMock_, GetAppId()).Times(::testing::AtLeast(1)).WillOnce(Return("appId"));
@@ -100,7 +100,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_201, testing::ext::TestS
  * @tc.name: GetDeviceInfo_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_201, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string networkId = "123";
@@ -115,7 +115,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_201, testing::ext::TestSize.Lev
  * @tc.name: RegisterUiStateCallback_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_201, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName = "pkgName";
@@ -127,7 +127,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_201, testing::ext::Te
  * @tc.name: UnRegisterUiStateCallback_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_201, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName = "pkgName";
@@ -139,7 +139,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_201, testing::ext::
  * @tc.name: IsDMImplSoLoaded_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> advertiseParam;
@@ -169,7 +169,7 @@ HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_201, testing::ext::TestSize.
  * @tc.name: RegisterPinHolderCallback_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "CollaborationFwk";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
@@ -182,7 +182,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_201, testing::ext::
  * @tc.name: CreatePinHolder_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "CollaborationFwk";
     PeerTargetId targetId;
@@ -199,7 +199,7 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_201, testing::ext::TestSize.L
  * @tc.name: GetDeviceSecurityLevel_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string networkId = "123";
@@ -215,7 +215,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_201, testing::ext::Tes
  * @tc.name: CheckAccessControl_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSize.Level1)
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
@@ -228,7 +228,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_201, testing::ext::TestSiz
  * @tc.name: CheckAccessControl_002
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSize.Level1)
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
@@ -241,7 +241,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_202, testing::ext::TestSiz
  * @tc.name: CheckIsSameAccount_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSize.Level1)
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
@@ -254,7 +254,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_201, testing::ext::TestSiz
  * @tc.name: CheckIsSameAccount_202
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSize.Level1)
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
@@ -267,7 +267,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_202, testing::ext::TestSiz
  * @tc.name: InitAccountInfo_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.Level1)
 {
     int32_t userId = 100;
     std::string commonEventType = "usual.event.USER_SWITCHED";
@@ -297,7 +297,7 @@ HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.L
  * @tc.name: InitScreenLockEvent_001
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, InitScreenLockEvent_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, InitScreenLockEvent_201, testing::ext::TestSize.Level1)
 {
     int32_t ret = DeviceManagerService::GetInstance().InitScreenLockEvent();
     EXPECT_EQ(ret, DM_OK);
@@ -307,7 +307,7 @@ HWTEST_F(DeviceManagerServiceTest, InitScreenLockEvent_201, testing::ext::TestSi
  * @tc.name: SubscribeAccountCommonEvent_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, SubscribeAccountCommonEvent_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SubscribeAccountCommonEvent_201, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().SubscribeAccountCommonEvent();
     DeviceManagerService::GetInstance().SubscribeScreenLockEvent();
@@ -320,7 +320,7 @@ HWTEST_F(DeviceManagerServiceTest, SubscribeAccountCommonEvent_201, testing::ext
  * @tc.name: SetDnPolicy_201
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level1)
 {
     SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
@@ -343,7 +343,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_201, testing::ext::TestSize.Level
  * @tc.name: SetDnPolicy_202
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level1)
 {
     SetSetDnPolicyPermission();
     std::string packName;
@@ -362,7 +362,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_202, testing::ext::TestSize.Level
  * @tc.name: SetDnPolicy_203
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.test";
     SetSetDnPolicyPermission();
@@ -380,7 +380,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_203, testing::ext::TestSize.Level
  * @tc.name: SetDnPolicy_204
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level1)
 {
     SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
@@ -398,7 +398,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_204, testing::ext::TestSize.Level
  * @tc.name: SetDnPolicy_205
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level1)
 {
     SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
@@ -417,7 +417,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_205, testing::ext::TestSize.Level
  * @tc.name: SetDnPolicy_206
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level1)
 {
     SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
@@ -432,7 +432,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_206, testing::ext::TestSize.Level
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.screenStatusTest";
     std::string networkId = "";
@@ -441,7 +441,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_201, testing::ext::Test
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     std::string networkId = "networkIdTest";
@@ -463,7 +463,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_202, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_204, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_204, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos_test";
     std::string extra = "jdddd";
@@ -483,7 +483,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_204, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_203, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_203, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo info;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
@@ -499,7 +499,7 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_203, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_204, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_204, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo info;
     DeletePermission();
@@ -510,7 +510,7 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_204, testing::ext::TestSiz
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     PeerTargetId targetId;
@@ -528,7 +528,7 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "123456";
@@ -541,7 +541,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "123456";
@@ -568,7 +568,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_202, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_201, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     std::vector<DmDeviceInfo> deviceList;
@@ -598,7 +598,7 @@ HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_201, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string networkId = "12345";
@@ -653,7 +653,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_201, testing::ext::TestS
     DeviceManagerService::GetInstance().HandleUserRemoved(userId);
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
@@ -679,7 +679,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
@@ -733,7 +733,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     int32_t ret = DeviceManagerService::GetInstance().RegDevStateCallbackToService(pkgName);
@@ -781,7 +781,7 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ex
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_205, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_205, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string extra = "extra";
@@ -828,7 +828,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_205, testing::ext::TestS
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, DmHiDumper_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DmHiDumper_201, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> args;
     args.push_back(std::string("-getTrustlist"));
@@ -850,7 +850,7 @@ HWTEST_F(DeviceManagerServiceTest, DmHiDumper_201, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level1)
 {
     SetSetDnPolicyPermission();
     std::string packName = "com.ohos.test";
@@ -871,9 +871,20 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_207, testing::ext::TestSize.Level
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(ERR_DM_FAILED)));
+    ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
+        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(false));
+    ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_206, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_206, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::vector<DmDeviceInfo> deviceList;
@@ -919,7 +930,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_206, testing::ext::TestS
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, ParseCheckSumMsg_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ParseCheckSumMsg_201, testing::ext::TestSize.Level1)
 {
     std::string msg;
     std::string networkId;
@@ -934,7 +945,7 @@ HWTEST_F(DeviceManagerServiceTest, ParseCheckSumMsg_201, testing::ext::TestSize.
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_203, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_203, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -944,7 +955,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_203, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_204, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_204, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string udidHash;
@@ -985,7 +996,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_204, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string udidHash = "udidHash";
@@ -1012,7 +1023,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Leve
     EXPECT_CALL(*deviceManagerServiceImplMock_,
         GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
-        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
 
@@ -1034,7 +1045,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_201, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     int32_t userId = 12;
@@ -1046,7 +1057,7 @@ HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_201, testing::ext::Tes
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_201, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1059,7 +1070,7 @@ HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_201, testing::ext::TestSize
     DeviceManagerService::GetInstance().HandleDeviceUnBind(peerUdid, groupInfo);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string anonyUdid;
@@ -1067,7 +1078,7 @@ HWTEST_F(DeviceManagerServiceTest, GetAnonyLocalUdid_202, testing::ext::TestSize
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitch_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitch_201, testing::ext::TestSize.Level1)
 {
     int32_t curUserId = 1;
     int32_t preUserId = 1;
@@ -1118,7 +1129,7 @@ HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitch_201, testing::ext
     EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_201, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
     int32_t curUserId = 1;
@@ -1136,7 +1147,7 @@ HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitchByWifi_201, testin
     DeviceManagerService::GetInstance().HandleUserSwitchTimeout(curUserId, preUserId, udid);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SendUserIdsByWifi_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SendUserIdsByWifi_201, testing::ext::TestSize.Level1)
 {
     std::string networkId = "networkId001";
     std::vector<int32_t> foregroundUserIds;
@@ -1151,7 +1162,7 @@ HWTEST_F(DeviceManagerServiceTest, SendUserIdsByWifi_201, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName_004";
     EXPECT_CALL(*deviceManagerServiceImplMock_, StopAuthenticateDevice(_)).WillOnce(Return(ERR_DM_FAILED));
@@ -1159,7 +1170,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_004, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterSoLoaded_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterSoLoaded_201, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isAdapterResidentSoLoaded_ = false;
     bool ret = DeviceManagerService::GetInstance().IsDMServiceAdapterSoLoaded();
@@ -1178,7 +1189,7 @@ HWTEST_F(DeviceManagerServiceTest, IsDMServiceAdapterSoLoaded_201, testing::ext:
     DeviceManagerService::GetInstance().UnloadDMServiceAdapterResident();
 }
 
-HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_202, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     std::vector<DmDeviceInfo> deviceList;
@@ -1189,7 +1200,7 @@ HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_202, testing::ext::Tes
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> authParam;
@@ -1223,7 +1234,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_201, testing::ext:
     DeviceManagerService::GetInstance().ProcessCheckSumByWifi(networkId, foregroundUserIds, backgroundUserIds);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> authParam;
@@ -1276,7 +1287,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_201, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1285,7 +1296,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_201, testing::ext::T
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions filterOptions;
@@ -1293,7 +1304,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceProfileInfoList_202, testing::ext::T
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1302,7 +1313,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_201, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions filterOptions;
@@ -1310,7 +1321,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceIconInfo_202, testing::ext::TestSize
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }
 
-HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_201, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName = "pkgName";
@@ -1319,7 +1330,7 @@ HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_201, testing::ext::T
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
@@ -1327,7 +1338,7 @@ HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_202, testing::ext::T
     EXPECT_TRUE(ret == ERR_DM_UNSUPPORTED_METHOD || ret == ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SetLocalDisplayNameToSoftbus_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetLocalDisplayNameToSoftbus_201, testing::ext::TestSize.Level1)
 {
     std::string displayName = "displayName";
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
@@ -1345,7 +1356,7 @@ HWTEST_F(DeviceManagerServiceTest, SetLocalDisplayNameToSoftbus_201, testing::ex
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_201, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName = "packName";
@@ -1355,7 +1366,7 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_201, testing::ext::
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "packName";
     int32_t maxNameLength = 1;
@@ -1364,13 +1375,13 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDisplayDeviceName_202, testing::ext::
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceNamePrefixs_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceNamePrefixs_201, testing::ext::TestSize.Level1)
 {
     auto ret = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
     EXPECT_EQ(ret.empty(), true);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_201, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     std::string extra = "extra";
@@ -1392,7 +1403,7 @@ HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_201, testing::ext::Te
     DeviceManagerService::GetInstance().InitHichainListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_202, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName = "pkgName";
@@ -1406,7 +1417,7 @@ HWTEST_F(DeviceManagerServiceTest, GetAllTrustedDeviceList_202, testing::ext::Te
     DeviceManagerService::GetInstance().AddHmlInfoToBindParam(actionId, bindParam);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Level1)
 {
     std::string networkId = "networkId";
     DmDeviceInfo deviceInfo;
@@ -1447,6 +1458,149 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceTest, InitDPLocalServiceInfo_201, testing::ext::TestSize.Level1)
+{
+    DMLocalServiceInfo serviceInfo;
+    DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
+    bool ret = DeviceManagerService::GetInstance().InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
+    EXPECT_TRUE(ret);
+
+    DeviceManagerService::GetInstance().InitServiceInfo(dpLocalServiceInfo, serviceInfo);
+    std::vector<DistributedDeviceProfile::LocalServiceInfo> dpLocalServiceInfos;
+    dpLocalServiceInfos.push_back(dpLocalServiceInfo);
+    std::vector<DMLocalServiceInfo> serviceInfos;
+    DeviceManagerService::GetInstance().InitServiceInfos(dpLocalServiceInfos, serviceInfos);
+}
+
+HWTEST_F(DeviceManagerServiceTest, RegisterLocalServiceInfo_201, testing::ext::TestSize.Level1)
+{
+    DMLocalServiceInfo serviceInfo;
+    EXPECT_CALL(*deviceProfileConnectorMock_, PutLocalServiceInfo(_)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceManagerService::GetInstance().RegisterLocalServiceInfo(serviceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    std::string localUdid = "U*******jkjk2";
+    std::vector<std::string> deviceVec{"deviceInfo"};
+    std::vector<int32_t> foregroundUserIds{10, 11};
+    std::vector<int32_t> backgroundUserIds{1, 2};
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    DeviceManagerService::GetInstance().hichainListener_ = std::make_shared<HichainListener>();
+    DeviceManagerService::GetInstance().UpdateAclAndDeleteGroup(localUdid, deviceVec,
+        foregroundUserIds, backgroundUserIds);
+    
+    std::string pkgName = "pkgName";
+    DeviceManagerService::GetInstance().ClearPulishIdCache(pkgName);
+    DeviceManagerService::GetInstance().hichainListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceTest, UnRegisterLocalServiceInfo_201, testing::ext::TestSize.Level1)
+{
+    std::string bundleName = "bund******98";
+    int32_t pinExchangeType = 1;
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteLocalServiceInfo(_, _)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceManagerService::GetInstance().UnRegisterLocalServiceInfo(bundleName, pinExchangeType);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceTest, UpdateLocalServiceInfo_201, testing::ext::TestSize.Level1)
+{
+    DMLocalServiceInfo serviceInfo;
+    EXPECT_CALL(*deviceProfileConnectorMock_, UpdateLocalServiceInfo(_)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceManagerService::GetInstance().UpdateLocalServiceInfo(serviceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    std::string localUdid = "localUdid";
+    std::vector<std::string> peerUdids{"kxjasdkaj"};
+    std::vector<int32_t> foregroundUserIds{1, 2};
+    std::vector<int32_t> backgroundUserIds{1, 2};
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(localUdid, peerUdids,
+        foregroundUserIds, backgroundUserIds);
+
+    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("net*****7"), Return(DM_OK)));
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(ERR_DM_FAILED)));
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(localUdid, peerUdids,
+        foregroundUserIds, backgroundUserIds);
+
+    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("net*****7"), Return(DM_OK)));
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(localUdid, peerUdids,
+        foregroundUserIds, backgroundUserIds);
+
+    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>("net*****7"), Return(DM_OK)));
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _))
+        .WillOnce(DoAll(SetArgReferee<1>(4), Return(DM_OK)));
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(localUdid, peerUdids,
+        foregroundUserIds, backgroundUserIds);
+
+    std::map<std::string, std::string> wifiDevices;
+    wifiDevices.insert(std::make_pair("deviceName", "networkwifi"));
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(localUdid, wifiDevices,
+        foregroundUserIds, backgroundUserIds);
+    
+    GTEST_LOG_(INFO) << "NotifyRemoteLocalUserSwitchByWifi SendUserIds is ok" ;
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(DM_OK));
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(localUdid, wifiDevices,
+        foregroundUserIds, backgroundUserIds);
+    GTEST_LOG_(INFO) << "NotifyRemoteLocalUserSwitchByWifi end" ;
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetLocalServiceInfoByBundleNameAndPinExchangeType_201,
+    testing::ext::TestSize.Level1)
+{
+    std::string bundleName = "bund******98";
+    int32_t pinExchangeType = 1;
+    DMLocalServiceInfo serviceInfo;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
+        .WillOnce(Return(DM_OK));
+    int32_t ret = DeviceManagerService::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
+            pinExchangeType, serviceInfo);
+    EXPECT_EQ(ret, DM_OK);
+
+    std::vector<int32_t> foregroundUserVec{1, 2, 3};
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckAclStatusAndForegroundNotMatch(_, _, _)).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().HandleUserSwitched();
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckAclStatusAndForegroundNotMatch(_, _, _)).WillOnce(Return(true));
+    std::map<std::string, int32_t> curUserDeviceMap;
+    std::map<std::string, int32_t> preUserDeviceMap;
+    curUserDeviceMap.insert(std::make_pair("curdevice***ww", 10));
+    preUserDeviceMap.insert(std::make_pair("preUser******info", 11));
+    EXPECT_CALL(*deviceProfileConnectorMock_,
+        GetDeviceIdAndBindLevel(_, _)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
+    DeviceManagerService::GetInstance().HandleUserSwitched();
+
+    std::string localUdid = "localUdid";
+    std::string udid = "u*********90";
+    std::vector<int32_t> backgroundUserIds{1, 2, 3};
+    DeviceManagerService::GetInstance().HandleUserSwitchTimeout(localUdid, foregroundUserVec, backgroundUserIds, udid);
+
+    std::vector<std::string> peerUdids;
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(localUdid, peerUdids, foregroundUserVec,
+        backgroundUserIds);
+
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(localUdid, peerUdids, foregroundUserVec,
+        backgroundUserIds);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 } // namespace
 } // namespace DistributedHardware

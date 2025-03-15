@@ -3299,5 +3299,37 @@ bool DeviceManagerService::IsPC()
     GetLocalDeviceInfo(info);
     return (info.deviceTypeId == DmDeviceType::DEVICE_TYPE_PC || info.deviceTypeId == DmDeviceType::DEVICE_TYPE_2IN1);
 }
+
+int32_t DeviceManagerService::GetDeviceNetworkIdList(const std::string &pkgName,
+    const NetworkIdQueryFilter &queryFilter, std::vector<std::string> &networkIds)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("GetDeviceProfileInfoList failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    std::vector<DmDeviceProfileInfo> dmDeviceProfileInfos;
+    int32_t ret = dmServiceImplExtResident_->GetDeviceProfileInfosFromLocalCache(queryFilter, dmDeviceProfileInfos);
+    if (ret != DM_OK) {
+        LOGW("GetDeviceProfileInfosFromLocalCache failed, ret = %{public}d.", ret);
+        return ret;
+    }
+    for (const auto &item : dmDeviceProfileInfos) {
+        std::string networkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(item.deviceId, networkId);
+        if (!networkId.empty()) {
+            networkIds.emplace_back(networkId);
+        }
+    }
+    if (networkIds.empty()) {
+        LOGW("networkIds is empty");
+        return ERR_DM_FIND_NETWORKID_LIST_EMPTY;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

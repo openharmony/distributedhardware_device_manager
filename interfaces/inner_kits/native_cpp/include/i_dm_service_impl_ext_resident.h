@@ -105,6 +105,8 @@ public:
     virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName) = 0;
     virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
         const std::string &deviceName) = 0;
+    virtual int32_t GetDeviceProfileInfosFromLocalCache(const NetworkIdQueryFilter &queryFilter,
+        std::vector<DmDeviceProfileInfo> &dmDeviceProfileInfos) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);

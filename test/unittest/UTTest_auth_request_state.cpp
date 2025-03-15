@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,7 +49,7 @@ std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<Hi
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Leave_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Leave_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -66,7 +66,7 @@ HWTEST_F(AuthRequestStateTest, Leave_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, SetAuthContext_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, SetAuthContext_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -86,7 +86,7 @@ HWTEST_F(AuthRequestStateTest, SetAuthContext_001, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, SetAuthContext_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, SetAuthContext_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     authRequestState->SetAuthContext(nullptr);
@@ -103,7 +103,7 @@ HWTEST_F(AuthRequestStateTest, SetAuthContext_002, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetAuthContext_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetAuthContext_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -123,7 +123,7 @@ HWTEST_F(AuthRequestStateTest, GetAuthContext_001, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, SetAuthManager_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, SetAuthManager_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -142,7 +142,7 @@ HWTEST_F(AuthRequestStateTest, SetAuthManager_001, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, SetAuthManager_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, SetAuthManager_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     authRequestState->SetAuthManager(nullptr);
@@ -159,7 +159,7 @@ HWTEST_F(AuthRequestStateTest, SetAuthManager_002, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, TransitionTo_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, TransitionTo_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -178,7 +178,7 @@ HWTEST_F(AuthRequestStateTest, TransitionTo_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, TransitionTo_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, TransitionTo_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -207,7 +207,7 @@ HWTEST_F(AuthRequestStateTest, TransitionTo_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestInitState>();
     int32_t ret = authRequestState->GetStateType();
@@ -222,7 +222,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_001, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -241,7 +241,7 @@ HWTEST_F(AuthRequestStateTest, Enter_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -264,7 +264,7 @@ HWTEST_F(AuthRequestStateTest, Enter_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_002, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateState>();
     int32_t ret = authRequestState->GetStateType();
@@ -279,7 +279,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -297,7 +297,7 @@ HWTEST_F(AuthRequestStateTest, Enter_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_004, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -326,7 +326,7 @@ HWTEST_F(AuthRequestStateTest, Enter_004, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_003, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNegotiateDoneState>();
     int32_t ret = authRequestState->GetStateType();
@@ -341,7 +341,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_005, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_005, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -359,7 +359,7 @@ HWTEST_F(AuthRequestStateTest, Enter_005, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_006, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_006, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -387,7 +387,7 @@ HWTEST_F(AuthRequestStateTest, Enter_006, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_004, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReplyState>();
     int32_t ret = authRequestState->GetStateType();
@@ -402,7 +402,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_004, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_007, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_007, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -420,7 +420,7 @@ HWTEST_F(AuthRequestStateTest, Enter_007, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_008, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_008, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -450,7 +450,7 @@ HWTEST_F(AuthRequestStateTest, Enter_008, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_006, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_006, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestJoinState>();
     int32_t ret = authRequestState->GetStateType();
@@ -465,7 +465,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_006, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_011, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_011, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -483,7 +483,7 @@ HWTEST_F(AuthRequestStateTest, Enter_011, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_012, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_012, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -517,7 +517,7 @@ HWTEST_F(AuthRequestStateTest, Enter_012, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_007, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_007, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestNetworkState>();
     int32_t ret = authRequestState->GetStateType();
@@ -532,7 +532,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_007, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_013, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_013, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -550,7 +550,7 @@ HWTEST_F(AuthRequestStateTest, Enter_013, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_014, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_014, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -577,7 +577,7 @@ HWTEST_F(AuthRequestStateTest, Enter_014, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_008, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_008, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestFinishState>();
     int32_t ret = authRequestState->GetStateType();
@@ -592,7 +592,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_008, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_015, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_015, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -610,7 +610,7 @@ HWTEST_F(AuthRequestStateTest, Enter_015, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_016, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_016, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmAuthManager> authManager =
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
@@ -641,7 +641,7 @@ HWTEST_F(AuthRequestStateTest, Enter_016, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_005, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_005, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredential>();
     int32_t ret = authRequestState->GetStateType();
@@ -655,7 +655,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_005, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_009, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_009, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredential>();
     int32_t ret = authRequestState->Enter();
@@ -678,7 +678,7 @@ HWTEST_F(AuthRequestStateTest, Enter_009, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, GetStateType_009, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_009, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredentialDone>();
     int32_t ret = authRequestState->GetStateType();
@@ -692,7 +692,7 @@ HWTEST_F(AuthRequestStateTest, GetStateType_009, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(AuthRequestStateTest, Enter_010, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_010, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestCredentialDone>();
     int32_t ret = authRequestState->Enter();
@@ -710,14 +710,14 @@ HWTEST_F(AuthRequestStateTest, Enter_010, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(AuthRequestStateTest, GetStateType_010, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_010, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReCheckMsgDone>();
     int32_t ret = authRequestState->GetStateType();
     ASSERT_EQ(ret, AUTH_REQUEST_RECHECK_MSG_DONE);
 }
 
-HWTEST_F(AuthRequestStateTest, Enter_021, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_021, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReCheckMsg>();
     int32_t ret = authRequestState->Enter();
@@ -735,21 +735,21 @@ HWTEST_F(AuthRequestStateTest, Enter_021, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(AuthRequestStateTest, GetStateType_011, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, GetStateType_011, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestAuthFinish>();
     int32_t ret = authRequestState->GetStateType();
     ASSERT_EQ(ret, AUTH_REQUEST_AUTH_FINISH);
 }
 
-HWTEST_F(AuthRequestStateTest, Enter_020, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_020, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestAuthFinish>();
     int32_t ret = authRequestState->Enter();
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(AuthRequestStateTest, Enter_022, testing::ext::TestSize.Level0)
+HWTEST_F(AuthRequestStateTest, Enter_022, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthRequestState> authRequestState = std::make_shared<AuthRequestReCheckMsgDone>();
     int32_t ret = authRequestState->Enter();

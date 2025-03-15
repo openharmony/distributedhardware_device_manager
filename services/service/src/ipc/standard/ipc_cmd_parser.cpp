@@ -1890,5 +1890,23 @@ ON_IPC_CMD(RESTORE_LOCAL_DEVICE_NAME, MessageParcel &data, MessageParcel &reply)
     }
     return DM_OK;
 }
+
+ON_IPC_CMD(GET_DEVICE_NETWORK_ID_LIST, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    NetworkIdQueryFilter queryFilter;
+    IpcModelCodec::DecodeNetworkIdQueryFilter(data, queryFilter);
+    std::vector<std::string> networkIds;
+    int32_t result = DeviceManagerService::GetInstance().GetDeviceNetworkIdList(pkgName, queryFilter, networkIds);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (result == DM_OK && !IpcModelCodec::EncodeStringVector(networkIds, reply)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
