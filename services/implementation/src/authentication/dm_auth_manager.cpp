@@ -225,7 +225,7 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
         LOGE("TAG_BIND_LEVEL is not integer string or int32.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int32_t bindLevel = 0;
+    int32_t bindLevel = INVALID_TYPE;
     if (isIntegerString) {
         bindLevel = std::atoi(jsonObject[TAG_BIND_LEVEL].Get<std::string>().c_str());
     }
