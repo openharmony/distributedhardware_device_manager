@@ -38,7 +38,7 @@ void AdvertiseManagerTest::SetUpTestCase()
 void AdvertiseManagerTest::TearDownTestCase()
 {}
 
-HWTEST_F(AdvertiseManagerTest, StartAdvertising_001, testing::ext::TestSize.Level0)
+HWTEST_F(AdvertiseManagerTest, StartAdvertising_001, testing::ext::TestSize.Level1)
 {
     std::string stopTime = std::to_string(100);
     auto softbusListener = std::make_shared<SoftbusListener>();
@@ -56,7 +56,7 @@ HWTEST_F(AdvertiseManagerTest, StartAdvertising_001, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(AdvertiseManagerTest, StartAdvertising_002, testing::ext::TestSize.Level0)
+HWTEST_F(AdvertiseManagerTest, StartAdvertising_002, testing::ext::TestSize.Level1)
 {
     std::string stopTime = std::to_string(-5);
     auto softbusListener = std::make_shared<SoftbusListener>();
@@ -93,7 +93,7 @@ HWTEST_F(AdvertiseManagerTest, StartAdvertising_003, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(AdvertiseManagerTest, HandleAutoStopAdvertise_001, testing::ext::TestSize.Level0)
+HWTEST_F(AdvertiseManagerTest, HandleAutoStopAdvertise_001, testing::ext::TestSize.Level1)
 {
     auto softbusListener = std::make_shared<SoftbusListener>();
     auto advertiseManager = std::make_shared<AdvertiseManager>(softbusListener);
@@ -111,7 +111,7 @@ HWTEST_F(AdvertiseManagerTest, StopAdvertising_001, testing::ext::TestSize.Level
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(AdvertiseManagerTest, StopAdvertising_002, testing::ext::TestSize.Level0)
+HWTEST_F(AdvertiseManagerTest, StopAdvertising_002, testing::ext::TestSize.Level1)
 {
     auto softbusListener = std::make_shared<SoftbusListener>();
     auto advertiseManager = std::make_shared<AdvertiseManager>(softbusListener);

@@ -51,7 +51,7 @@ void DeviceManagerServiceImplFirstTest::TearDownTestCase()
 }
 
 namespace {
-HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdAndUserId_101, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdAndUserId_101, testing::ext::TestSize.Level1)
 {
     int32_t userId = 1;
     std::string accountId = "accountId";

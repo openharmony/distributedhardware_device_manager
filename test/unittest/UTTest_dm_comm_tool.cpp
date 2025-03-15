@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,7 +47,7 @@ void DMCommToolTest::TearDownTestCase()
  * @tc.name: GetEventHandler_NotNull
  * @tc.type: FUNC
  */
-HWTEST_F(DMCommToolTest, GetEventHandler_NotNull, testing::ext::TestSize.Level0)
+HWTEST_F(DMCommToolTest, GetEventHandler_NotNull, testing::ext::TestSize.Level1)
 {
     auto handler = dmCommTool->GetEventHandler();
     EXPECT_NE(handler, nullptr);
@@ -57,13 +57,13 @@ HWTEST_F(DMCommToolTest, GetEventHandler_NotNull, testing::ext::TestSize.Level0)
  * @tc.name: GetDMTransportPtr_NotNull
  * @tc.type: FUNC
  */
-HWTEST_F(DMCommToolTest, GetDMTransportPtr_NotNull, testing::ext::TestSize.Level0)
+HWTEST_F(DMCommToolTest, GetDMTransportPtr_NotNull, testing::ext::TestSize.Level1)
 {
     auto transportPtr = dmCommTool->GetDMTransportPtr();
     EXPECT_NE(transportPtr, nullptr);
 }
 
-HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level1)
 {
     std::string rmtNetworkId = "";
     std::vector<uint32_t> foregroundUserIds;
@@ -115,7 +115,7 @@ HWTEST_F(DMCommToolTest, SendUserIds_001, testing::ext::TestSize.Level0)
     dmCommTool->ProcessReceiveUserIdsEvent(InnerCommMsg_);
 }
 
-HWTEST_F(DMCommToolTest, ProcessResponseUserIdsEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMCommToolTest, ProcessResponseUserIdsEvent_001, testing::ext::TestSize.Level1)
 {
     std::string remoteNetworkId = "network******12";
     std::string strMsg = R"({

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -141,7 +141,7 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_101, testing::ext::TestSize.Level1)
 {
     // 1. set packName not null
     std::string packName = "com.ohos.dmtest";
@@ -156,7 +156,7 @@ HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_101, testing::ext::TestSize.
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
-HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_102, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
@@ -166,7 +166,7 @@ HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_102, testing::ext::TestSize.
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_103, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
@@ -176,7 +176,7 @@ HWTEST_F(DmPinHolderTest, RegisterPinHolderCallback_103, testing::ext::TestSize.
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmPinHolderTest, CreatePinholder_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreatePinholder_101, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     std::shared_ptr<DmInitCallbackTest> callback = std::make_shared<DmInitCallbackTest>();
@@ -192,7 +192,7 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_101, testing::ext::TestSize.Level0)
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
-HWTEST_F(DmPinHolderTest, CreatePinholder_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreatePinholder_102, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId;
@@ -206,7 +206,7 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_102, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, CreatePinholder_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreatePinholder_103, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId;
@@ -220,7 +220,7 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_103, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, CreatePinholder_105, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreatePinholder_105, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -240,7 +240,7 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_105, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DmPinHolderTest, CreatePinholder_106, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreatePinholder_106, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -261,7 +261,7 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_106, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, CreatePinholder_107, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreatePinholder_107, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -282,7 +282,7 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_107, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, CreatePinholder_108, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreatePinholder_108, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -303,7 +303,7 @@ HWTEST_F(DmPinHolderTest, CreatePinholder_108, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, DestroyPinHolder_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_101, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -321,7 +321,7 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_101, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, DestroyPinHolder_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_102, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -339,7 +339,7 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_102, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, DestroyPinHolder_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_103, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -358,7 +358,7 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_103, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, DestroyPinHolder_104, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_104, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -377,7 +377,7 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_104, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, DestroyPinHolder_105, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_105, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -396,7 +396,7 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_105, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DmPinHolderTest, DestroyPinHolder_106, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, DestroyPinHolder_106, testing::ext::TestSize.Level1)
 {
     std::string packName = "com.ohos.dmtest";
     PeerTargetId targetId = {
@@ -418,7 +418,7 @@ HWTEST_F(DmPinHolderTest, DestroyPinHolder_106, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -427,7 +427,7 @@ HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_101, testing::ext::TestSize
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -436,7 +436,7 @@ HWTEST_F(DmPinHolderTest, CreateGeneratePinHolderMsg_102, testing::ext::TestSize
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, ParseMsgType_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ParseMsgType_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -445,7 +445,7 @@ HWTEST_F(DmPinHolderTest, ParseMsgType_101, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateMsg_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -455,7 +455,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateMsg_101, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateMsg_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -465,7 +465,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateMsg_102, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateMsg_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_103, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -475,7 +475,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateMsg_103, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateMsg_104, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_104, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -486,7 +486,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateMsg_104, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateMsg_105, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateMsg_105, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -498,7 +498,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateMsg_105, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -508,7 +508,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_101, testing::ext::TestSize.Level
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -520,7 +520,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_102, testing::ext::TestSize.Level
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_103, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -532,7 +532,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_103, testing::ext::TestSize.Level
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_104, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_104, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -544,7 +544,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_104, testing::ext::TestSize.Level
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -554,7 +554,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_101, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -564,7 +564,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_102, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_103, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -574,7 +574,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_103, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_104, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_104, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -585,7 +585,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_104, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_105, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_105, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -597,7 +597,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_105, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, CloseSession_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CloseSession_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -607,7 +607,7 @@ HWTEST_F(DmPinHolderTest, CloseSession_101, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, OnDataReceived_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OnDataReceived_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -619,7 +619,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_101, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, OnDataReceived_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OnDataReceived_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -631,7 +631,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_102, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, OnDataReceived_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OnDataReceived_103, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -643,7 +643,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_103, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, OnDataReceived_104, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OnDataReceived_104, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -655,7 +655,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_104, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, OnDataReceived_105, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OnDataReceived_105, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -668,7 +668,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_105, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, GetPeerDeviceId_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, GetPeerDeviceId_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -678,7 +678,7 @@ HWTEST_F(DmPinHolderTest, GetPeerDeviceId_101, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, OnSessionOpened_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OnSessionOpened_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -689,7 +689,7 @@ HWTEST_F(DmPinHolderTest, OnSessionOpened_101, testing::ext::TestSize.Level0)
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
 
-HWTEST_F(DmPinHolderTest, OnSessionOpened_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OnSessionOpened_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -702,7 +702,7 @@ HWTEST_F(DmPinHolderTest, OnSessionOpened_102, testing::ext::TestSize.Level0)
 }
 
 
-HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -716,7 +716,7 @@ HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_101, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -730,7 +730,7 @@ HWTEST_F(DmPinHolderTest, CheckTargetIdVaild_102, testing::ext::TestSize.Level0)
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmPinHolderTest, NotifyPinHolderEvent_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, NotifyPinHolderEvent_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -740,7 +740,7 @@ HWTEST_F(DmPinHolderTest, NotifyPinHolderEvent_101, testing::ext::TestSize.Level
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, OpenSessionServer_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OpenSessionServer_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
     PeerTargetId targetId = {
@@ -753,7 +753,7 @@ HWTEST_F(DmPinHolderTest, OpenSessionServer_101, testing::ext::TestSize.Level0)
     EXPECT_NE(ret, -1);
 }
 
-HWTEST_F(DmPinHolderTest, CloseSessionServer_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CloseSessionServer_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
     int32_t sessionId = 1;
@@ -761,7 +761,7 @@ HWTEST_F(DmPinHolderTest, CloseSessionServer_101, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmPinHolderTest, OnSessionOpened_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, OnSessionOpened_103, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -775,7 +775,7 @@ HWTEST_F(DmPinHolderTest, OnSessionOpened_103, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmPinHolderTest, SendData_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, SendData_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
     int32_t sessionId = 6;
@@ -784,7 +784,7 @@ HWTEST_F(DmPinHolderTest, SendData_101, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, SendData_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, SendData_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
     int32_t sessionId = 6;
@@ -797,7 +797,7 @@ HWTEST_F(DmPinHolderTest, SendData_102, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, SendData_103, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, SendData_103, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
     int32_t sessionId = 6;
@@ -841,7 +841,7 @@ HWTEST_F(DmPinHolderTest, SendData_103, testing::ext::TestSize.Level0)
     pinHolder->ProcessChangeMsg(message);
 }
 
-HWTEST_F(DmPinHolderTest, GetAddrByTargetId_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, GetAddrByTargetId_101, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
     PeerTargetId targetId = {
@@ -890,7 +890,7 @@ HWTEST_F(DmPinHolderTest, GetAddrByTargetId_101, testing::ext::TestSize.Level0)
     pinHolder->ProcessChangeRespMsg(message);
 }
 
-HWTEST_F(DmPinHolderTest, NotifyPinHolderEvent_102, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, NotifyPinHolderEvent_102, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -934,7 +934,7 @@ HWTEST_F(DmPinHolderTest, NotifyPinHolderEvent_102, testing::ext::TestSize.Level
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DmPinHolderTest, CreateMsgScene_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CreateMsgScene_101, testing::ext::TestSize.Level1)
 {
     JsonObject sourceJson;
     sourceJson[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER;
@@ -977,7 +977,7 @@ HWTEST_F(DmPinHolderTest, CreateRespMsgScene_101, testing::ext::TestSize.Level2)
     EXPECT_EQ(pinHolder->sessionId_, SESSION_ID_INVALID);
 }
 
-HWTEST_F(DmPinHolderTest, DestroyMsgScene_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, DestroyMsgScene_101, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER;
@@ -993,7 +993,7 @@ HWTEST_F(DmPinHolderTest, DestroyMsgScene_101, testing::ext::TestSize.Level0)
     EXPECT_TRUE(pinHolder->isDestroy_.load());
 }
 
-HWTEST_F(DmPinHolderTest, DestroyResMsgScene_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, DestroyResMsgScene_101, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER_RESP;
@@ -1009,7 +1009,7 @@ HWTEST_F(DmPinHolderTest, DestroyResMsgScene_101, testing::ext::TestSize.Level0)
     EXPECT_TRUE(pinHolder->isDestroy_.load());
 }
 
-HWTEST_F(DmPinHolderTest, ChangeMsgScene_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ChangeMsgScene_101, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE;
@@ -1025,7 +1025,7 @@ HWTEST_F(DmPinHolderTest, ChangeMsgScene_101, testing::ext::TestSize.Level0)
     EXPECT_TRUE(pinHolder->isDestroy_.load());
 }
 
-HWTEST_F(DmPinHolderTest, ChangeRespMsgScene_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, ChangeRespMsgScene_101, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE_RESP;
@@ -1041,7 +1041,7 @@ HWTEST_F(DmPinHolderTest, ChangeRespMsgScene_101, testing::ext::TestSize.Level0)
     EXPECT_TRUE(pinHolder->isDestroy_.load());
 }
 
-HWTEST_F(DmPinHolderTest, CloseSessionMsgScene_101, testing::ext::TestSize.Level0)
+HWTEST_F(DmPinHolderTest, CloseSessionMsgScene_101, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_PIN_CLOSE_SESSION;

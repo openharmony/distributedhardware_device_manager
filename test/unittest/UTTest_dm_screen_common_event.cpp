@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ void DmScreenCommonEventManagerTest::TearDownTestCase()
 
 namespace {
 
-HWTEST_F(DmScreenCommonEventManagerTest, SubscribeScreenCommonEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmScreenCommonEventManagerTest, SubscribeScreenCommonEvent_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager
         = std::make_shared<DmScreenCommonEventManager>();
@@ -54,7 +54,7 @@ HWTEST_F(DmScreenCommonEventManagerTest, SubscribeScreenCommonEvent_001, testing
     ASSERT_EQ(ret, false);
 }
 
-HWTEST_F(DmScreenCommonEventManagerTest, UnSubscribeScreenCommonEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmScreenCommonEventManagerTest, UnSubscribeScreenCommonEvent_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager
         = std::make_shared<DmScreenCommonEventManager>();

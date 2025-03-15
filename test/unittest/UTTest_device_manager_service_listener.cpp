@@ -73,7 +73,7 @@ namespace {
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -96,7 +96,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -118,7 +118,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_002, testing::ext
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string deviceId = "dkdkd";
@@ -138,7 +138,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string deviceId = "dkdkd";
@@ -158,7 +158,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_002, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string deviceId = "dkdkd";
@@ -179,7 +179,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_003, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
@@ -203,7 +203,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoveryFailed_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoveryFailed_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
@@ -222,7 +222,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoveryFailed_001, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
@@ -239,7 +239,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDiscoverySuccess_001, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
@@ -256,7 +256,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_001, testing::ext::Te
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
@@ -272,7 +272,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPublishResult_002, testing::ext::Te
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnUiCall_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnUiCall_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string paramJson = "ahaha";
@@ -288,7 +288,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUiCall_001, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
@@ -305,7 +305,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialResult_001, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     PeerTargetId targetId;
@@ -324,7 +324,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     PeerTargetId targetId;
@@ -343,7 +343,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_002, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     PeerTargetId targetId;
@@ -362,7 +362,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_003, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     PeerTargetId targetId;
@@ -380,7 +380,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_001, testing::ext::Tes
  * @tc.desc: ConvertDeviceInfoToDeviceBasicInfo, construct a dummy listener, pass in pkgName, DmDeviceInfo
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "com.ohos.helloworld";
@@ -399,7 +399,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertDeviceInfoToDeviceBasicInfo_00
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderCreate_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderCreate_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string deviceId = "153123";
@@ -417,7 +417,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderCreate_001, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderDestroy_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderDestroy_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -434,7 +434,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderDestroy_001, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnCreateResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnCreateResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -450,7 +450,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCreateResult_001, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnDestroyResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDestroyResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -466,7 +466,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDestroyResult_001, testing::ext::Te
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderEvent_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -479,7 +479,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnPinHolderEvent_001, testing::ext::T
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -514,7 +514,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testin
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -527,7 +527,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_001, testing::
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -546,7 +546,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_001, testing::ext::T
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnProcessRemove_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnProcessRemove_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -560,7 +560,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnProcessRemove_001, testing::ext::Te
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "ohos.deviceprofile";
@@ -604,7 +604,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, FillUdidAndUuidToDeviceInfo_001, test
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -619,7 +619,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceStateChange_001, testing
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -642,7 +642,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::e
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, ConvertUdidHashToAnoyAndSave_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ConvertUdidHashToAnoyAndSave_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "pkgName004";
@@ -658,7 +658,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertUdidHashToAnoyAndSave_001, tes
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, ConvertUdidHashToAnoyAndSave_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ConvertUdidHashToAnoyAndSave_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "pkgName002";
@@ -670,7 +670,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertUdidHashToAnoyAndSave_002, tes
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceTrustChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceTrustChange_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string udid = "udid";
@@ -692,7 +692,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceTrustChange_001, testing::ext
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceScreenInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceScreenInfo_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
@@ -705,7 +705,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceScreenInfo_001, testing::ext
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, RemoveOnlinePkgName_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, RemoveOnlinePkgName_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     DmDeviceInfo info;
@@ -717,7 +717,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, RemoveOnlinePkgName_001, testing::ext
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnAppUnintall_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnAppUnintall_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     DmDeviceInfo info;
@@ -729,7 +729,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAppUnintall_001, testing::ext::Test
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -752,7 +752,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnCredentialAuthStatus_002, testing::
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, GetWhiteListSAProcessInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, GetWhiteListSAProcessInfo_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::MIN;
@@ -776,7 +776,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetWhiteListSAProcessInfo_001, testin
     EXPECT_EQ(ret.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     DmCommonNotifyEvent dmCommonNotifyEvent = DmCommonNotifyEvent::MIN;
@@ -828,7 +828,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, tes
     EXPECT_EQ(ret.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, DealBindProcessInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, DealBindProcessInfo_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -840,7 +840,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, DealBindProcessInfo_001, testing::ext
     EXPECT_EQ(pro.pkgName, "pkgName");
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOnline_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOnline_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::vector<ProcessInfo> procInfoVec;
@@ -862,7 +862,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOnline_001, testing::ext
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOffline_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOffline_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::vector<ProcessInfo> procInfoVec;
@@ -880,7 +880,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOffline_001, testing::ex
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceInfoChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceInfoChange_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::vector<ProcessInfo> procInfoVec;
@@ -899,7 +899,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceInfoChange_001, testing:
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppOffline_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppOffline_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::vector<ProcessInfo> procInfoVec;
@@ -930,7 +930,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppOffline_001, testing::ext::
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnDevStateCallbackAdd_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnDevStateCallbackAdd_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -952,7 +952,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDevStateCallbackAdd_001, testing::e
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnGetDeviceProfileInfoListResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnGetDeviceProfileInfoListResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -964,7 +964,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnGetDeviceProfileInfoListResult_001,
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnGetDeviceIconInfoResult_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnGetDeviceIconInfoResult_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -976,7 +976,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnGetDeviceIconInfoResult_001, testin
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, RemoveNotExistProcess_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, RemoveNotExistProcess_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -999,7 +999,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, RemoveNotExistProcess_001, testing::e
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     PeerTargetId targetId;
@@ -1016,7 +1016,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_004, testing::ext::TestS
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_004, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string deviceId = "dkdkd";
@@ -1032,7 +1032,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_004, testing::ext::TestS
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     PeerTargetId targetId;
@@ -1048,7 +1048,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_002, testing::ext::Tes
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     ProcessInfo processInfo;
@@ -1068,7 +1068,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_002, testing::ext::T
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
 
-HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();

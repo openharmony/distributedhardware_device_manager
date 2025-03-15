@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,7 +52,7 @@ std::shared_ptr<DmAuthManager> discoveryMgr =
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, OpenAuthSession_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, OpenAuthSession_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "";
     if (softbusSession == nullptr) {
@@ -68,7 +68,7 @@ HWTEST_F(SoftbusSessionTest, OpenAuthSession_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, OpenAuthSession_002, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, OpenAuthSession_002, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "123456";
     if (softbusSession == nullptr) {
@@ -84,7 +84,7 @@ HWTEST_F(SoftbusSessionTest, OpenAuthSession_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level1)
 {
     std::string message = "";
     int32_t sessionId = -1;
@@ -101,7 +101,7 @@ HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level1)
 {
     int32_t msgType = 2;
     JsonObject jsonObj;
@@ -123,7 +123,7 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, SendData_003, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, SendData_003, testing::ext::TestSize.Level1)
 {
     std::string message = R"(
     {
@@ -144,7 +144,7 @@ HWTEST_F(SoftbusSessionTest, SendData_003, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, SoftbusSession_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, SoftbusSession_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<SoftbusSession> m_SoftbusSession = std::make_shared<SoftbusSession>();
     ASSERT_NE(m_SoftbusSession, nullptr);
@@ -156,7 +156,7 @@ HWTEST_F(SoftbusSessionTest, SoftbusSession_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, SoftbusSession_002, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, SoftbusSession_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<SoftbusSession> m_SoftbusSession = std::make_shared<SoftbusSession>();
     m_SoftbusSession.reset();
@@ -169,7 +169,7 @@ HWTEST_F(SoftbusSessionTest, SoftbusSession_002, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, CloseAuthSession_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, CloseAuthSession_001, testing::ext::TestSize.Level1)
 {
     int32_t sessionId = 3;
     if (softbusSession == nullptr) {
@@ -185,7 +185,7 @@ HWTEST_F(SoftbusSessionTest, CloseAuthSession_001, testing::ext::TestSize.Level0
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, GetPeerDeviceId_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, GetPeerDeviceId_001, testing::ext::TestSize.Level1)
 {
     int32_t sessionId = 3;
     std::string peerDevId;
@@ -202,7 +202,7 @@ HWTEST_F(SoftbusSessionTest, GetPeerDeviceId_001, testing::ext::TestSize.Level0)
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, RegisterSessionCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, RegisterSessionCallback_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<ISoftbusSessionCallback> callback;
     if (softbusSession == nullptr) {
@@ -218,7 +218,7 @@ HWTEST_F(SoftbusSessionTest, RegisterSessionCallback_001, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, UnRegisterSessionCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, UnRegisterSessionCallback_001, testing::ext::TestSize.Level1)
 {
     if (softbusSession == nullptr) {
         softbusSession = std::make_shared<SoftbusSession>();
@@ -233,7 +233,7 @@ HWTEST_F(SoftbusSessionTest, UnRegisterSessionCallback_001, testing::ext::TestSi
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(SoftbusSessionTest, OnSessionOpened_001, testing::ext::TestSize.Level0)
+HWTEST_F(SoftbusSessionTest, OnSessionOpened_001, testing::ext::TestSize.Level1)
 {
     if (softbusSession == nullptr) {
         softbusSession = std::make_shared<SoftbusSession>();

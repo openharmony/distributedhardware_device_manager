@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -130,7 +130,7 @@ void DeletePermission()
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, InitDMServiceListener_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, InitDMServiceListener_001, testing::ext::TestSize.Level1)
 {
     int ret = DeviceManagerService::GetInstance().InitDMServiceListener();
     EXPECT_EQ(ret, DM_OK);
@@ -143,7 +143,7 @@ HWTEST_F(DeviceManagerServiceTest, InitDMServiceListener_001, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName = "com.ohos.test12";
@@ -163,7 +163,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_001, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     DmPublishInfo publishInfo;
@@ -178,7 +178,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_002, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     DmPublishInfo publishInfo;
@@ -195,7 +195,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_003, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "PublishDeviceDiscovery_004";
     DmPublishInfo publishInfo;
@@ -213,7 +213,7 @@ HWTEST_F(DeviceManagerServiceTest, PublishDeviceDiscovery_004, testing::ext::Tes
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     int32_t publishId = 1;
@@ -227,7 +227,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_001, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     int32_t publishId = 1;
@@ -243,7 +243,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_002, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test003";
     int32_t publishId = 1;
@@ -260,7 +260,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_003, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: I5N1K3
  */
-HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test003";
     int32_t publishId = 1;
@@ -307,7 +307,7 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string extra = "jdddd";
@@ -322,7 +322,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos_test";
     std::string extra = "jdddd";
@@ -338,7 +338,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_002, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos_test";
     std::string extra = "jdddd";
@@ -358,7 +358,7 @@ HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_003, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string callerId = "com.ohos.test";
@@ -373,7 +373,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_001, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string callerId;
@@ -389,7 +389,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_002, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_003, testing::ext::TestSize.Level1)
 {
     const int32_t permsNum = 1;
     const int32_t indexZero = 0;
@@ -421,7 +421,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_003, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_004, testing::ext::TestSize.Level1)
 {
     const int32_t permsNum = 1;
     const int32_t indexZero = 0;
@@ -453,7 +453,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_004, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string callerId = "com.ohos.test";
@@ -468,7 +468,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_005, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_006, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_006, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ShiftLNNGear_006";
     std::string callerId = "ShiftLNNGear_006";
@@ -484,7 +484,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_006, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_007, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_007, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ShiftLNNGear_007";
     std::string callerId = "ShiftLNNGear_007";
@@ -502,7 +502,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_007, testing::ext::TestSize.Leve
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
@@ -518,7 +518,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_001, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string extra = "jdddd";
@@ -534,7 +534,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_002, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
@@ -553,7 +553,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_003, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string extra = "jdddd";
@@ -570,7 +570,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_004, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName = "com.ohos.test";
@@ -585,7 +585,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string networkId = "12345";
@@ -600,7 +600,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_002, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string networkId;
@@ -615,7 +615,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_003, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string networkId = "12345";
@@ -631,7 +631,7 @@ HWTEST_F(DeviceManagerServiceTest, UnAuthenticateDevice_004, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "123";
@@ -648,7 +648,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_001, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string netWorkId = "111";
@@ -664,7 +664,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_002, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string netWorkId = "";
@@ -680,7 +680,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_003, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string netWorkId = "123";
@@ -697,7 +697,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUdidByNetworkId_004, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "12";
@@ -714,7 +714,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_001, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string netWorkId = "12";
@@ -730,7 +730,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_002, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "";
@@ -746,7 +746,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_003, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string netWorkId = "";
@@ -763,7 +763,7 @@ HWTEST_F(DeviceManagerServiceTest, GetUuidByNetworkId_004, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, SetUserOperation_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetUserOperation_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName = "com.ohos.test";
@@ -780,7 +780,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_001, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     int32_t action = 0;
@@ -796,7 +796,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, SetUserOperation_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetUserOperation_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     int32_t action = 0;
@@ -812,7 +812,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_003, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, SetUserOperation_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetUserOperation_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     int32_t action = 0;
@@ -827,7 +827,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_004, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo info;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
@@ -841,7 +841,7 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_001, testing::ext::TestSiz
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, RequestCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RequestCredential_001, testing::ext::TestSize.Level1)
 {
     const std::string reqJsonStr = "test";
     std::string returnJsonStr = "returntest";
@@ -855,7 +855,7 @@ HWTEST_F(DeviceManagerServiceTest, RequestCredential_001, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, RequestCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RequestCredential_002, testing::ext::TestSize.Level1)
 {
     const std::string reqJsonStr = "";
     std::string returnJsonStr = "returntest";
@@ -869,7 +869,7 @@ HWTEST_F(DeviceManagerServiceTest, RequestCredential_002, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, RequestCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RequestCredential_003, testing::ext::TestSize.Level1)
 {
     const std::string reqJsonStr = "test";
     std::string returnJsonStr = "returntest";
@@ -884,7 +884,7 @@ HWTEST_F(DeviceManagerServiceTest, RequestCredential_003, testing::ext::TestSize
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ImportCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportCredential_001, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "pkgNametest";
     const std::string credentialInfo = "credentialInfotest";
@@ -898,7 +898,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportCredential_001, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ImportCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportCredential_002, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "";
     const std::string credentialInfo = "";
@@ -912,7 +912,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportCredential_002, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ImportCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportCredential_003, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "pkgNametest";
     const std::string credentialInfo = "credentialInfotest";
@@ -927,7 +927,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportCredential_003, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, DeleteCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DeleteCredential_001, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "pkgNametest";
     const std::string deleteInfo = "deleteInfotest";
@@ -941,7 +941,7 @@ HWTEST_F(DeviceManagerServiceTest, DeleteCredential_001, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, DeleteCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DeleteCredential_002, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "pkgNametest";
     const std::string deleteInfo = "deleteInfotest";
@@ -956,7 +956,7 @@ HWTEST_F(DeviceManagerServiceTest, DeleteCredential_002, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, DeleteCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DeleteCredential_003, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "";
     const std::string deleteInfo = "";
@@ -970,7 +970,7 @@ HWTEST_F(DeviceManagerServiceTest, DeleteCredential_003, testing::ext::TestSize.
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_001, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "pkgNametest";
     int32_t ret = DeviceManagerService::GetInstance().RegisterCredentialCallback(pkgName);
@@ -983,7 +983,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_001, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_002, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "";
     int32_t ret = DeviceManagerService::GetInstance().RegisterCredentialCallback(pkgName);
@@ -996,7 +996,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_002, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_003, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "pkgNametest";
     DeletePermission();
@@ -1010,7 +1010,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCredentialCallback_003, testing::ext:
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_001, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "pkgNametest";
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterCredentialCallback(pkgName);
@@ -1023,7 +1023,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_001, testing::ex
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_002, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "";
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterCredentialCallback(pkgName);
@@ -1036,7 +1036,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_002, testing::ex
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_003, testing::ext::TestSize.Level1)
 {
     const std::string pkgName = "pkgNametest";
     DeletePermission();
@@ -1050,7 +1050,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterCredentialCallback_003, testing::ex
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UninitSoftbusListener_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UninitSoftbusListener_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     DeviceManagerService::GetInstance().UninitSoftbusListener();
@@ -1063,7 +1063,7 @@ HWTEST_F(DeviceManagerServiceTest, UninitSoftbusListener_001, testing::ext::Test
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, UninitDMServiceListener_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UninitDMServiceListener_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().listener_ = std::make_shared<DeviceManagerServiceListener>();
     DeviceManagerService::GetInstance().UninitDMServiceListener();
@@ -1076,7 +1076,7 @@ HWTEST_F(DeviceManagerServiceTest, UninitDMServiceListener_001, testing::ext::Te
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, IsDMServiceImplReady_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, IsDMServiceImplReady_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     bool ret = DeviceManagerService::GetInstance().IsDMServiceImplReady();
@@ -1089,7 +1089,7 @@ HWTEST_F(DeviceManagerServiceTest, IsDMServiceImplReady_001, testing::ext::TestS
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_001, testing::ext::TestSize.Level1)
 {
     std::string networkId = "";
     DmDeviceInfo info;
@@ -1103,7 +1103,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_001, testing::ext::TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Level1)
 {
     std::string networkId = "networkIdTest";
     DmDeviceInfo info;
@@ -1117,7 +1117,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_002, testing::ext::TestSize.Lev
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_004, testing::ext::TestSize.Level1)
 {
     std::string networkId = "networkIdTest4";
     DmDeviceInfo info;
@@ -1131,7 +1131,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_004, testing::ext::TestSize.Lev
  * @tc.desc: The return value is DM_OK
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_001, testing::ext::TestSize.Level1)
 {
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(0);
     EXPECT_EQ(ret, DM_OK);
@@ -1142,7 +1142,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_001, testing::ext::TestSiz
  * @tc.desc: Set pkgName null
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
@@ -1154,7 +1154,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_001, testing::ext::TestSi
  * @tc.desc: Set pkgName null
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().listener_ = nullptr;
@@ -1167,7 +1167,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_002, testing::ext::TestSi
  * @tc.desc: Set pkgName null
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
@@ -1179,7 +1179,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_001, testing::ext::Test
  * @tc.desc: Set pkgName null
  * @tc.type: FUNC
  */
-HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     DeviceManagerService::GetInstance().listener_ = nullptr;
@@ -1187,7 +1187,7 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_002, testing::ext::Test
     EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindDevice_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     int32_t authType = 1;
@@ -1197,7 +1197,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_001, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindDevice_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
@@ -1207,7 +1207,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_002, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindDevice_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
@@ -1220,7 +1220,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_003, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_BIND_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindDevice_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindDevice_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     int32_t authType = 1;
@@ -1231,7 +1231,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_004, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "1234";
@@ -1243,7 +1243,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_001, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId;
@@ -1251,7 +1251,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_002, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string deviceId = "1234";
@@ -1259,7 +1259,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_003, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "1234";
@@ -1268,7 +1268,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_004, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "1234";
@@ -1281,7 +1281,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_005, testing::ext::TestSize.Leve
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_006, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_006, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId;
@@ -1290,7 +1290,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_006, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_007, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_007, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string deviceId = "1234";
@@ -1299,7 +1299,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_007, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnBindDevice_008, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnBindDevice_008, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string deviceId = "1234";
@@ -1309,7 +1309,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_008, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, OnSessionOpened_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, OnSessionOpened_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     int sessionId = 0;
@@ -1322,7 +1322,7 @@ HWTEST_F(DeviceManagerServiceTest, OnSessionOpened_001, testing::ext::TestSize.L
     EXPECT_NE(ret, ERR_DM_NOT_INIT);
 }
 
-HWTEST_F(DeviceManagerServiceTest, OnPinHolderSessionOpened_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, OnPinHolderSessionOpened_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     int sessionId = 0;
@@ -1335,7 +1335,7 @@ HWTEST_F(DeviceManagerServiceTest, OnPinHolderSessionOpened_001, testing::ext::T
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, MineRequestCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, MineRequestCredential_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     std::string pkgName;
@@ -1344,7 +1344,7 @@ HWTEST_F(DeviceManagerServiceTest, MineRequestCredential_001, testing::ext::Test
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, MineRequestCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, MineRequestCredential_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string returnJsonStr;
@@ -1353,7 +1353,7 @@ HWTEST_F(DeviceManagerServiceTest, MineRequestCredential_002, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckCredential_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string returnJsonStr;
@@ -1362,7 +1362,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckCredential_001, testing::ext::TestSize.L
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckCredential_002, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1372,7 +1372,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckCredential_002, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ImportCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportCredential_004, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
@@ -1383,7 +1383,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportCredential_004, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ImportCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportCredential_005, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     std::string pkgName;
@@ -1393,7 +1393,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportCredential_005, testing::ext::TestSize.
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DeleteCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DeleteCredential_004, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
@@ -1404,7 +1404,7 @@ HWTEST_F(DeviceManagerServiceTest, DeleteCredential_004, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DeleteCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DeleteCredential_005, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     std::string pkgName;
@@ -1414,21 +1414,21 @@ HWTEST_F(DeviceManagerServiceTest, DeleteCredential_005, testing::ext::TestSize.
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     int32_t ret = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     int32_t ret = DeviceManagerService::GetInstance().RegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     DeletePermission();
@@ -1436,21 +1436,21 @@ HWTEST_F(DeviceManagerServiceTest, RegisterUiStateCallback_003, testing::ext::Te
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     int32_t ret = DeviceManagerService::GetInstance().UnRegisterUiStateCallback(pkgName);
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     DeletePermission();
@@ -1459,14 +1459,14 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_003, testing::ext::
 }
 
 
-HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     bool ret = DeviceManagerService::GetInstance().IsDMImplSoLoaded();
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DmHiDumper_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DmHiDumper_001, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> args;
     std::string result;
@@ -1474,7 +1474,7 @@ HWTEST_F(DeviceManagerServiceTest, DmHiDumper_001, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     int32_t eventId = 0;
@@ -1505,7 +1505,7 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, NotifyEvent_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, NotifyEvent_002, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1515,7 +1515,7 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_002, testing::ext::TestSize.Level
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, NotifyEvent_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, NotifyEvent_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     int32_t eventId = DM_NOTIFY_EVENT_ON_PINHOLDER_EVENT;
@@ -1526,13 +1526,13 @@ HWTEST_F(DeviceManagerServiceTest, NotifyEvent_003, testing::ext::TestSize.Level
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, LoadHardwareFwkService_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().LoadHardwareFwkService();
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string networkId;
@@ -1541,7 +1541,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_001, testing::ext
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string networkId;
@@ -1550,7 +1550,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_002, testing::ext
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string networkId = "network_id";
@@ -1564,7 +1564,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_003, testing::ext
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string uuid;
@@ -1574,7 +1574,7 @@ HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string uuid;
@@ -1584,46 +1584,46 @@ HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_002, testing::ext::Test
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_002, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(0);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_003, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(1);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_004, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(2);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_005, testing::ext::TestSize.Level1)
 {
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(1);
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_006, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_006, testing::ext::TestSize.Level1)
 {
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(2);
     EXPECT_NE(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_007, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_007, testing::ext::TestSize.Level1)
 {
     int32_t ret = DeviceManagerService::GetInstance().CheckApiPermission(3);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1633,7 +1633,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_001, testing::ext::
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string netWorkId;
@@ -1642,7 +1642,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_002, testing::ext::
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string netWorkId = "netWorkId";
@@ -1651,7 +1651,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_003, testing::ext::
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string netWorkId = "netWorkId";
@@ -1664,7 +1664,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_004, testing::ext::
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1673,7 +1673,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_001, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string authCode = "authCode";
@@ -1683,7 +1683,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_002, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string authCode;
@@ -1691,7 +1691,7 @@ HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_001, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_002, testing::ext::TestSize.Level1)
 {
     std::string authCode = "authCode";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
@@ -1700,13 +1700,13 @@ HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_002, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceImplSo_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnloadDMServiceImplSo_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().UnloadDMServiceImplSo();
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StartDiscovering_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StartDiscovering_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1716,7 +1716,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_001, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StartDiscovering_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StartDiscovering_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> discoverParam;
@@ -1725,7 +1725,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_002, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
@@ -1740,7 +1740,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
@@ -1758,7 +1758,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_004, testing::ext::TestSize.
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopDiscovering_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopDiscovering_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1767,7 +1767,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDiscovering_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopDiscovering_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopDiscovering_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> discoverParam;
@@ -1775,7 +1775,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDiscovering_002, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopDiscovering_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopDiscovering_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
@@ -1787,7 +1787,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDiscovering_003, testing::ext::TestSize.L
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1797,7 +1797,7 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_001, testing::ext::Te
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> discoverParam;
@@ -1806,7 +1806,7 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_002, testing::ext::Te
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
@@ -1815,7 +1815,7 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_003, testing::ext::Te
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
@@ -1826,7 +1826,7 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_004, testing::ext::Te
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1835,7 +1835,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_001, testing::ext::T
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> extraParam;
@@ -1843,7 +1843,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_002, testing::ext::T
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
@@ -1851,7 +1851,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_003, testing::ext::T
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
@@ -1862,7 +1862,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::T
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, StartAdvertising_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StartAdvertising_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1871,7 +1871,7 @@ HWTEST_F(DeviceManagerServiceTest, StartAdvertising_001, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StartAdvertising_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StartAdvertising_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> advertiseParam;
@@ -1879,7 +1879,7 @@ HWTEST_F(DeviceManagerServiceTest, StartAdvertising_002, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StartAdvertising_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StartAdvertising_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::map<std::string, std::string> advertiseParam;
@@ -1893,7 +1893,7 @@ HWTEST_F(DeviceManagerServiceTest, StartAdvertising_003, testing::ext::TestSize.
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAdvertising_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAdvertising_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1902,7 +1902,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAdvertising_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAdvertising_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> advertiseParam;
@@ -1910,7 +1910,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_002, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAdvertising_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAdvertising_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> advertiseParam;
@@ -1918,7 +1918,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_003, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAdvertising_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAdvertising_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "StopAdvertising_004";
     std::map<std::string, std::string> advertiseParam;
@@ -1929,7 +1929,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_004, testing::ext::TestSize.L
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAdvertising_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAdvertising_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "StopAdvertising_005";
     std::map<std::string, std::string> advertiseParam;
@@ -1945,7 +1945,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAdvertising_005, testing::ext::TestSize.L
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindTarget_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindTarget_004, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1955,7 +1955,7 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_004, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindTarget_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindTarget_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     PeerTargetId targetId;
@@ -1964,7 +1964,7 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_005, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, BindTarget_006, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, BindTarget_006, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     PeerTargetId targetId;
@@ -1976,7 +1976,7 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_006, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnbindTarget_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnbindTarget_004, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -1986,7 +1986,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindTarget_004, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnbindTarget_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnbindTarget_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     PeerTargetId targetId;
@@ -1995,7 +1995,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindTarget_005, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, UnbindTarget_006, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, UnbindTarget_006, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     PeerTargetId targetId;
@@ -2004,7 +2004,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindTarget_006, testing::ext::TestSize.Leve
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -2012,7 +2012,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_001, testing::ext::
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
@@ -2021,7 +2021,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_002, testing::ext::
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -2032,7 +2032,7 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     PeerTargetId targetId;
@@ -2044,7 +2044,7 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_002, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string pkgName;
@@ -2055,7 +2055,7 @@ HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_001, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     PeerTargetId targetId;
@@ -2068,7 +2068,7 @@ HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_002, testing::ext::TestSize.
 }
 
 
-HWTEST_F(DeviceManagerServiceTest, DpAclAdd_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DpAclAdd_001, testing::ext::TestSize.Level1)
 {
     DeletePermission();
     std::string udid;
@@ -2076,14 +2076,14 @@ HWTEST_F(DeviceManagerServiceTest, DpAclAdd_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DpAclAdd_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DpAclAdd_002, testing::ext::TestSize.Level1)
 {
     std::string udid = "udid";
     int32_t ret = DeviceManagerService::GetInstance().DpAclAdd(udid);
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string networkId;
@@ -2092,7 +2092,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_001, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string invalidNetworkId = "12345";
@@ -2101,7 +2101,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_002, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string invalidNetworkId = "12345";
@@ -2111,7 +2111,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_003, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string invalidNetworkId;
@@ -2120,7 +2120,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_004, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string invalidNetworkId;
@@ -2131,7 +2131,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_005, testing::ext::Tes
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, IsSameAccount_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, IsSameAccount_001, testing::ext::TestSize.Level1)
 {
     std::string udid = "";
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
@@ -2139,7 +2139,7 @@ HWTEST_F(DeviceManagerServiceTest, IsSameAccount_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, IsSameAccount_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, IsSameAccount_002, testing::ext::TestSize.Level1)
 {
     std::string udid = "udidTest";
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_INPUT_PARA_INVALID));
@@ -2147,7 +2147,7 @@ HWTEST_F(DeviceManagerServiceTest, IsSameAccount_002, testing::ext::TestSize.Lev
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, IsSameAccount_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, IsSameAccount_003, testing::ext::TestSize.Level1)
 {
     std::string udid = "udidTest";
     DeletePermission();
@@ -2155,7 +2155,7 @@ HWTEST_F(DeviceManagerServiceTest, IsSameAccount_003, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::TestSize.Level1)
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
@@ -2164,7 +2164,7 @@ HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::T
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_001, testing::ext::TestSize.Level1)
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
@@ -2174,7 +2174,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_001, testing::ext::TestSiz
 }
 
 
-HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_001, testing::ext::TestSize.Level1)
 {
     DmAccessCaller caller;
     DmAccessCallee callee;
@@ -2183,7 +2183,7 @@ HWTEST_F(DeviceManagerServiceTest, CheckAccessControl_001, testing::ext::TestSiz
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::map<std::string, std::string> policy;
@@ -2195,7 +2195,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_001, testing::ext::TestSize.Level
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "openharmony123";
     std::map<std::string, std::string> policy;
@@ -2204,7 +2204,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_002, testing::ext::TestSize.Level
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "openharmony123";
     std::map<std::string, std::string> policy;
@@ -2226,7 +2226,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     PeerTargetId targetId;
@@ -2238,7 +2238,7 @@ HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_003, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_001, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     int32_t userId = 12;
@@ -2249,7 +2249,7 @@ HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_001, testing::ext::Tes
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_002, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     int32_t userId = 12;
@@ -2261,7 +2261,7 @@ HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_002, testing::ext::Tes
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, SendServiceUnBindBroadCast_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, SendServiceUnBindBroadCast_001, testing::ext::TestSize.Level1)
 {
     std::vector<std::string> peerUdids;
     int32_t userId = 12;
@@ -2272,7 +2272,7 @@ HWTEST_F(DeviceManagerServiceTest, SendServiceUnBindBroadCast_001, testing::ext:
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, ClearDiscoveryCache_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ClearDiscoveryCache_001, testing::ext::TestSize.Level1)
 {
     ProcessInfo processInfo;
     processInfo.pkgName = "pkgName001";
@@ -2282,7 +2282,7 @@ HWTEST_F(DeviceManagerServiceTest, ClearDiscoveryCache_001, testing::ext::TestSi
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string networkId;
@@ -2292,7 +2292,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_001, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string networkId;
@@ -2301,7 +2301,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_002, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgname";
     std::string networkId = "networkId_003";
@@ -2313,7 +2313,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_003, testing::ext::Test
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgname";
     std::string networkId = "networkId_003";
@@ -2322,7 +2322,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_004, testing::ext::Test
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, HandleDeviceScreenStatusChange_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, HandleDeviceScreenStatusChange_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo;
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
@@ -2332,7 +2332,7 @@ HWTEST_F(DeviceManagerServiceTest, HandleDeviceScreenStatusChange_001, testing::
     EXPECT_NE(DeviceManagerService::GetInstance().dmServiceImpl_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
@@ -2341,7 +2341,7 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_005, testing::ext::Te
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo info;
     DeletePermission();
@@ -2384,7 +2384,7 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string udid;
@@ -2394,7 +2394,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_001, testing::ext::TestSiz
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string udid;
@@ -2403,7 +2403,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_002, testing::ext::TestSiz
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName_003";
     std::string udid = "sewdwed98897";
@@ -2414,7 +2414,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_003, testing::ext::TestSiz
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     DeletePermission();
@@ -2422,14 +2422,14 @@ HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_001, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_002, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     int32_t ret = DeviceManagerService::GetInstance().StopAuthenticateDevice(pkgName);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName_003";
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
@@ -2439,7 +2439,7 @@ HWTEST_F(DeviceManagerServiceTest, StopAuthenticateDevice_003, testing::ext::Tes
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     PeerTargetId targetId;
@@ -2451,7 +2451,7 @@ HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_004, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_005, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_005, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName_005";
     PeerTargetId targetId;
@@ -2466,7 +2466,7 @@ HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_005, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "";
     PeerTargetId targetId;
@@ -2478,7 +2478,7 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_003, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     PeerTargetId targetId;
@@ -2493,7 +2493,7 @@ HWTEST_F(DeviceManagerServiceTest, CreatePinHolder_004, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
@@ -2502,7 +2502,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_003, testing::ext::
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
@@ -2520,7 +2520,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterPinHolderCallback_004, testing::ext::
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
-HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_008, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_008, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ShiftLNNGear_008";
     std::string callerId = "ShiftLNNGear_008";
@@ -2532,7 +2532,7 @@ HWTEST_F(DeviceManagerServiceTest, ShiftLNNGear_008, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string authCode;
@@ -2542,7 +2542,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_003, testing::ext::TestSize.Le
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string authCode = "authCode";
@@ -2552,7 +2552,7 @@ HWTEST_F(DeviceManagerServiceTest, ImportAuthCode_004, testing::ext::TestSize.Le
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_003, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_003, testing::ext::TestSize.Level1)
 {
     std::string authCode = "authCode";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
@@ -2561,7 +2561,7 @@ HWTEST_F(DeviceManagerServiceTest, ExportAuthCode_003, testing::ext::TestSize.Le
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, IsSameAccount_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, IsSameAccount_004, testing::ext::TestSize.Level1)
 {
     std::string udid = "udidTest";
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
@@ -2569,7 +2569,7 @@ HWTEST_F(DeviceManagerServiceTest, IsSameAccount_004, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_006, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_006, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "com.ohos.test";
     std::string invalidNetworkId = "networkId";
@@ -2581,7 +2581,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceSecurityLevel_006, testing::ext::Tes
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_004, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
     std::string networkId = "network_id";
@@ -2597,7 +2597,7 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_004, testing::ext
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoyDeviceId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoyDeviceId_001, testing::ext::TestSize.Level1)
 {
     std::string udidHash;
     std::string result;
@@ -2614,7 +2614,7 @@ HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoyDeviceId_001, testing::e
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceManagerServiceTest, GetUdidHashByAnoyDeviceId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceTest, GetUdidHashByAnoyDeviceId_001, testing::ext::TestSize.Level1)
 {
     std::string udidHash;
     std::string anoyDeviceId = "anoyDeviceId";
