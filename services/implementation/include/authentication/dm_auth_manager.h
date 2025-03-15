@@ -587,6 +587,7 @@ private:
     bool IsSourceMsgValid();
     void ProcessReqPublicKey();
     int32_t GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId);
+    bool IsVaildAndGetBindLevel(const JsonItemObject &jsonObj, const std::string &key, int32_t &bindLevel);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
