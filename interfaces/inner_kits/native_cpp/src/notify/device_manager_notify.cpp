@@ -1407,18 +1407,14 @@ int32_t DeviceManagerNotify::RegisterSetRemoteDeviceNameCallback(const std::stri
     }
     auto iter = setRemoteDeviceNameCallback_.find(pkgName);
     if (iter == setRemoteDeviceNameCallback_.end()) {
-        setRemoteDeviceNameCallback_[pkgName][deviceId] = {callback};
+        setRemoteDeviceNameCallback_[pkgName][deviceId] = callback;
         return DM_OK;
     }
     if (iter->second.size() > MAX_CONTAINER_SIZE) {
         LOGI("callback map size is more than max size");
         return ERR_DM_MAX_SIZE_FAIL;
     }
-    if (iter->second[deviceId].size() > MAX_CONTAINER_SIZE) {
-        LOGI("callback set size is more than max size");
-        return ERR_DM_MAX_SIZE_FAIL;
-    }
-    iter->second[deviceId].insert(callback);
+    iter->second[deviceId] = callback;
     return DM_OK;
 }
 
@@ -1448,7 +1444,7 @@ void DeviceManagerNotify::OnSetLocalDeviceNameResult(const std::string &pkgName,
     std::shared_ptr<SetLocalDeviceNameCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
-        if (setLocalDeviceNameCallback_.count(pkgName) == 0) {
+        if (setLocalDeviceNameCallback_.find(pkgName) == setLocalDeviceNameCallback_.end()) {
             LOGE("error, callback not register for pkgName %{public}s.", pkgName.c_str());
             return;
         }
@@ -1471,7 +1467,7 @@ void DeviceManagerNotify::OnSetRemoteDeviceNameResult(const std::string &pkgName
         return;
     }
     LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
-    std::map<std::string, std::set<std::shared_ptr<SetRemoteDeviceNameCallback>>> tempCbks;
+    std::map<std::string, std::shared_ptr<SetRemoteDeviceNameCallback>> tempCbks;
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
         auto iter = setRemoteDeviceNameCallback_.find(pkgName);
@@ -1482,20 +1478,20 @@ void DeviceManagerNotify::OnSetRemoteDeviceNameResult(const std::string &pkgName
         if (ERR_DM_HILINKSVC_DISCONNECT == code) {
             tempCbks = iter->second;
             setRemoteDeviceNameCallback_.erase(pkgName);
-        } else if (iter->second.count(deviceId) != 0) {
-            tempCbks[deviceId] = iter->second[deviceId];
-            iter->second.erase(deviceId);
+        } else {
+            if (iter->second.find(deviceId) != iter->second.end()) {
+                tempCbks[deviceId] = iter->second[deviceId];
+                iter->second.erase(deviceId);
+            }
         }
     }
     if (tempCbks.empty()) {
         LOGE("error, registered GetDeviceIconInfoResult callback is nullptr.");
         return;
     }
-    for (const auto &[key, callbacks] : tempCbks) {
-        for (auto callback : callbacks) {
-            if (callback != nullptr) {
-                callback->OnResult(code);
-            }
+    for (const auto &[key, callback] : tempCbks) {
+        if (callback != nullptr) {
+            callback->OnResult(code);
         }
     }
 }

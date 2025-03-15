@@ -168,7 +168,7 @@ private:
         std::map<std::string, std::set<std::shared_ptr<GetDeviceIconInfoCallback>>>> getDeviceIconInfoCallback_;
     std::map<std::string, std::shared_ptr<SetLocalDeviceNameCallback>> setLocalDeviceNameCallback_;
     std::map<std::string,
-        std::map<std::string, std::set<std::shared_ptr<SetRemoteDeviceNameCallback>>>> setRemoteDeviceNameCallback_;
+        std::map<std::string, std::shared_ptr<SetRemoteDeviceNameCallback>>> setRemoteDeviceNameCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

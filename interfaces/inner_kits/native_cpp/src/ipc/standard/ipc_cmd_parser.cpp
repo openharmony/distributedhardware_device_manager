@@ -1989,6 +1989,7 @@ ON_IPC_SET_REQUEST(SET_LOCAL_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, Mess
     std::string deviceName = pReq->GetDeviceName();
     if (!data.WriteString(deviceName)) {
         LOGE("write deviceName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
 }
