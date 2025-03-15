@@ -343,9 +343,6 @@ void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
             authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].Get<std::string>();
         }
         IsVaildAndGetBindLevel(jsonObject, TAG_BIND_LEVEL, authRequestContext_->bindLevel);
-        if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
-            authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].Get<int32_t>();
-        }
         authRequestContext_->closeSessionDelaySeconds = 0;
         if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
             std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
