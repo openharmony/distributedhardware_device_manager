@@ -1500,4 +1500,4 @@ void DeviceManagerNotify::OnSetRemoteDeviceNameResult(const std::string &pkgName
     }
 }
 } // namespace DistributedHardware
-} // namespace OHOS
+} // namespace OHOS
