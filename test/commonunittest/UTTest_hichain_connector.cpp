@@ -223,12 +223,13 @@ HWTEST_F(HichainConnectorTest, from_json_001, testing::ext::TestSize.Level1)
     jsonObject[FIELD_GROUP_OWNER] = groupInfo.groupOwner;
     jsonObject[FIELD_GROUP_TYPE] = groupInfo.groupType;
     jsonObject[FIELD_GROUP_VISIBILITY] = groupInfo.groupVisibility;
-    FromJson(jsonObject, groupInfo);
-    EXPECT_EQ(groupInfo.groupName, "aaaa");
-    EXPECT_EQ(groupInfo.groupId, "345678");
-    EXPECT_EQ(groupInfo.groupOwner, "lllll");
-    EXPECT_EQ(groupInfo.groupType, 5);
-    EXPECT_EQ(groupInfo.groupVisibility, 5);
+    GroupInfo groupInfo1;
+    FromJson(jsonObject, groupInfo1);
+    EXPECT_EQ(groupInfo1.groupName, "aaaa");
+    EXPECT_EQ(groupInfo1.groupId, "345678");
+    EXPECT_EQ(groupInfo1.groupOwner, "lllll");
+    EXPECT_EQ(groupInfo1.groupType, 5);
+    EXPECT_EQ(groupInfo1.groupVisibility, 5);
 }
 
 /**
@@ -258,8 +259,10 @@ HWTEST_F(HichainConnectorTest, from_json_002, testing::ext::TestSize.Level1)
     jsonObject.Erase(FIELD_GROUP_OWNER);
     jsonObject.Erase(FIELD_GROUP_TYPE);
     jsonObject.Erase(FIELD_GROUP_VISIBILITY);
-    FromJson(jsonObject, groupInfo);
-    EXPECT_EQ(groupInfo.groupName, "test");
+    GroupInfo groupInfo1;
+    jsonObject[FIELD_GROUP_NAME] = "test";
+    FromJson(jsonObject, groupInfo1);
+    EXPECT_EQ(groupInfo1.groupName, "test");
 }
 
 /**
