@@ -217,10 +217,14 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
     }
 
     if (jsonObject.IsDiscarded() || !jsonObject.Contains(TAG_BIND_LEVEL) ||
-        !IsInt32(jsonObject, TAG_BIND_LEVEL)) {
+        !IsString(jsonObject, TAG_BIND_LEVEL)) {
         return DM_OK;
     }
-    int32_t bindLevel = jsonObject[TAG_BIND_LEVEL].Get<int32_t>();
+    if (!IsJsonValIntegerString(jsonObject, TAG_BIND_LEVEL)) {
+        LOGE("TAG_BIND_LEVEL is not integer string.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t bindLevel = std::atoi(jsonObject[TAG_BIND_LEVEL].Get<std::string>().c_str());
     if (static_cast<uint32_t>(bindLevel) > APP || bindLevel < INVALID_TYPE) {
         LOGE("bindlevel error %{public}d.", bindLevel);
         return ERR_DM_INPUT_PARA_INVALID;
@@ -326,8 +330,8 @@ void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
         if (IsString(jsonObject, APP_THUMBNAIL)) {
             authRequestContext_->appThumbnail = jsonObject[APP_THUMBNAIL].Get<std::string>();
         }
-        if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
-            authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].Get<int32_t>();
+        if (IsJsonValIntegerString(jsonObject, TAG_BIND_LEVEL)) {
+            authRequestContext_->bindLevel = std::atoi(jsonObject[TAG_BIND_LEVEL].Get<std::string>().c_str());
         }
         authRequestContext_->closeSessionDelaySeconds = 0;
         if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {

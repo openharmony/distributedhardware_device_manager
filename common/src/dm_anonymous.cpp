@@ -395,5 +395,19 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
     LOGE("get failed");
     return "";
 }
+
+bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &key)
+{
+    if (!IsString(jsonObj, key)) {
+        LOGE("%{public}s is not string", key.c_str());
+        return false;
+    }
+    std::string retValStr = jsonObj[key].Get<std::string>();
+    if (!IsNumberString(retValStr)) {
+        LOGE("%{public}s is not number", key.c_str());
+        return false;
+    }
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
