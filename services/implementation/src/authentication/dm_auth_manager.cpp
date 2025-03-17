@@ -644,6 +644,7 @@ void DmAuthManager::OnSessionClosed(const int32_t sessionId)
     LOGI("DmAuthManager::OnSessionClosed sessionId = %{public}d", sessionId);
     if (authResponseState_ != nullptr) {
         isFinishOfLocal_ = false;
+        authResponseContext_->state = authResponseState_->GetStateType();
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
     }
 }
@@ -715,6 +716,10 @@ void DmAuthManager::ProcessSinkMsg()
         case MSG_TYPE_REQ_AUTH_TERMINATE:
             if (authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
                 isFinishOfLocal_ = false;
+                authResponseContext_->state = authResponseState_->GetStateType();
+                if (authResponseContext_->reply == DM_OK) {
+                    authResponseContext_->state = AuthState::AUTH_RESPONSE_FINISH;
+                }
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
             }
             break;
@@ -2299,6 +2304,7 @@ void DmAuthManager::ResponseCredential()
         authResponseContext_->isFinish = false;
         isFinishOfLocal_ = false;
         authMessageProcessor_->SetEncryptFlag(false);
+        authResponseContext_->state = authResponseState_->GetStateType();
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
         return;
     }
@@ -2306,6 +2312,7 @@ void DmAuthManager::ResponseCredential()
     GenerateCredential(publicKey);
     if (ImportCredential(remoteDeviceId_, authResponseContext_->publicKey) != DM_OK) {
         LOGE("ResponseCredential import credential failed.");
+        authResponseContext_->state = authResponseState_->GetStateType();
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
         return;
     }
@@ -3192,6 +3199,7 @@ void DmAuthManager::ResponseReCheckMsg()
         isFinishOfLocal_ = false;
         authMessageProcessor_->SetEncryptFlag(false);
         int32_t sessionId = authResponseContext_->sessionId;
+        authResponseContext_->state = authResponseState_->GetStateType();
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
         return;
     }
