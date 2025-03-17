@@ -139,6 +139,8 @@ static IRefreshCallback softbusRefreshCallback_ = {
 void SoftbusListener::DeviceOnLine(DmDeviceInfo deviceInfo)
 {
     std::lock_guard<std::mutex> lock(g_lockDeviceOnLine);
+    LOGI("received device online deviceId: %{public}s, networkId: %{public}s.",
+        GetAnonyString(deviceInfo.deviceId).c_str(), GetAnonyString(deviceInfo.networkId).c_str());
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_ONLINE, deviceInfo);
 }
 

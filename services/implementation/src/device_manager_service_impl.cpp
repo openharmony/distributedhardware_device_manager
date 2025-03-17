@@ -210,7 +210,8 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
 
 void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("DeviceManagerServiceImpl::HandleOnline");
+    LOGI("DeviceManagerServiceImpl::HandleOnline networkId: %{public}s.",
+        GetAnonyString(devInfo.networkId).c_str());
     std::string trustDeviceId = "";
     if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
         LOGE("HandleOnline get udid failed.");
@@ -257,7 +258,8 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
 
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("DeviceManagerServiceImpl::HandleDeviceStatusChange start, devState = %{public}d.", devState);
+    LOGI("DeviceManagerServiceImpl::HandleDeviceStatusChange start, devState = %{public}d, networkId: %{public}s.",
+        devState, GetAnonyString(devInfo.networkId).c_str());
     if (deviceStateMgr_ == nullptr) {
         LOGE("deviceStateMgr_ is nullpter!");
         return;

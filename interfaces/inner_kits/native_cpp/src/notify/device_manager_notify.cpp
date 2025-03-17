@@ -487,6 +487,8 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
+    LOGE("OnDeviceReady in, pkgName:%{public}s, networkId: %{public}s.",
+        pkgName.c_str(), GetAnonyString(deviceInfo.networkId).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
 #else
