@@ -171,7 +171,8 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
 
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo)
 {
-    LOGI("ProcessDeviceStateChange begin, devState = %{public}d", devState);
+    LOGI("ProcessDeviceStateChange begin, devState = %{public}d networkId: %{public}s.", devState,
+        GetAnonyString(devInfo.networkId).c_str());
     CHECK_NULL_VOID(softbusConnector_);
     CHECK_NULL_VOID(listener_);
     std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
