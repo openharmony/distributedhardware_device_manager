@@ -271,7 +271,18 @@ HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog001, testing::ext::TestSize.Level
     ASSERT_EQ(authManager_->authResponseContext_->targetDeviceName, DmDialogManager::GetInstance().targetDeviceName_);
 }
 
-HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level1)
+HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog002, testing::ext::TestSize.Level0)
+{
+    authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
+    authManager_->importAuthCode_ = "123456";
+    authManager_->importPkgName_ = "hostPkgName";
+    authManager_->authResponseContext_->hostPkgName = "hostPkgName";
+    authManager_->authResponseContext_->targetDeviceName = "ShowStartAuthDialog_004";
+    authManager_->ShowStartAuthDialog();
+    EXPECT_NE(authManager_->authResponseContext_->targetDeviceName, DmDialogManager::GetInstance().targetDeviceName_);
+}
+
+HWTEST_F(DmAuthManagerTest, DeleteAcl001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
     std::string localUdid = "localUdid";

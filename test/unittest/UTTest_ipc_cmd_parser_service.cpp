@@ -24,6 +24,7 @@
 #include "dm_device_info.h"
 #include "ipc_client_manager.h"
 #include "ipc_cmd_register.h"
+#include "ipc_common_param_req.h"
 #include "ipc_create_pin_holder_req.h"
 #include "ipc_credential_auth_status_req.h"
 #include "ipc_destroy_pin_holder_req.h"
@@ -41,6 +42,7 @@
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
 #include "ipc_publish_req.h"
+#include "ipc_register_serviceinfo_req.h"
 #include "ipc_register_listener_req.h"
 #include "ipc_req.h"
 #include "ipc_set_credential_req.h"
@@ -1314,6 +1316,94 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_054, testing::ext::TestSize.Level
         ret = ptr2(data, reply);
     }
     ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_060, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = REG_LOCALSERVICE_INFO;
+    DMLocalServiceInfo serviceInfo;
+    serviceInfo.bundleName = "testbundle";
+    serviceInfo.extraInfo = "testextra";
+    MessageParcel data;
+    std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
+    req->SetLocalServiceInfo(serviceInfo);
+
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+
+    auto cmdptr = GetIpcCmdFunc(cmdCode);
+    ASSERT_TRUE(cmdptr != nullptr);
+    MessageParcel reply;
+    EXPECT_EQ(cmdptr(data, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_061, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UNREG_LOCALSERVICE_INFO;
+    DMLocalServiceInfo serviceInfo;
+    MessageParcel data;
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    req->SetFirstParam(std::string("testbundle"));
+    req->SetInt32Param(100);
+
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+
+    auto cmdptr = GetIpcCmdFunc(cmdCode);
+    ASSERT_TRUE(cmdptr != nullptr);
+    MessageParcel reply;
+    EXPECT_EQ(cmdptr(data, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_062, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = UPDATE_LOCALSERVICE_INFO;
+    DMLocalServiceInfo serviceInfo;
+    MessageParcel data;
+    std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
+    req->SetLocalServiceInfo(serviceInfo);
+
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+
+    auto cmdptr = GetIpcCmdFunc(cmdCode);
+    ASSERT_TRUE(cmdptr != nullptr);
+    MessageParcel reply;
+    EXPECT_EQ(cmdptr(data, reply), DM_OK);
+}
+
+HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_063, testing::ext::TestSize.Level0)
+{
+    int32_t cmdCode = GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE;
+    DMLocalServiceInfo serviceInfo;
+    MessageParcel data;
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    req->SetFirstParam(std::string("testbundle"));
+    req->SetInt32Param(100);
+
+    int ret = ERR_DM_UNSUPPORTED_IPC_COMMAND;
+    SetIpcRequestFunc ptr = GetIpcRequestFunc(cmdCode);
+    if (ptr) {
+        ret = ptr(req, data);
+    }
+    ASSERT_EQ(DM_OK, ret);
+
+    auto cmdptr = GetIpcCmdFunc(cmdCode);
+    ASSERT_TRUE(cmdptr != nullptr);
+    MessageParcel reply;
+    EXPECT_EQ(cmdptr(data, reply), DM_OK);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, SetIpcRequestFunc_016, testing::ext::TestSize.Level0)
