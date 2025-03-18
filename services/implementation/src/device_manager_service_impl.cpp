@@ -830,11 +830,11 @@ DmAuthForm DeviceManagerServiceImpl::ConvertBindTypeToAuthForm(int32_t bindType)
 {
     LOGI("BindType %{public}d.", bindType);
     DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
-    if (static_cast<uint32_t(bindType) == DM_IDENTICAL_ACCOUNT) {
+    if (static_cast<uint32_t>(bindType) == DM_IDENTICAL_ACCOUNT) {
         authForm = IDENTICAL_ACCOUNT;
-    } else if (static_cast<uint32_t(bindType) == DM_POINT_TO_POINT) {
+    } else if (static_cast<uint32_t>(bindType) == DM_POINT_TO_POINT) {
         authForm = PEER_TO_PEER;
-    } else if (static_cast<uint32_t(bindType) == DM_ACROSS_ACCOUNT) {
+    } else if (static_cast<uint32_t>(bindType) == DM_ACROSS_ACCOUNT) {
         authForm = ACROSS_ACCOUNT;
     } else {
         LOGE("Invalied bindType.");
