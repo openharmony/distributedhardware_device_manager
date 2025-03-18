@@ -187,17 +187,17 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
         userIdAndBindLevel[processInfo.userId] = INVALIED_TYPE;
     }
     for (const auto &item : userIdAndBindLevel) {
-        if (item.second == INVALIED_TYPE) {
+        if (static_cast<uint32_t>(item.second) == INVALIED_TYPE) {
             LOGI("The offline device is identical account bind type.");
             devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
             processInfo.userId = item.first;
             softbusConnector_->SetProcessInfo(processInfo);
-        } else if (item.second == DEVICE) {
+        } else if (static_cast<uint32_t>(item.second) == DEVICE) {
             LOGI("The offline device is device bind type.");
             devInfo.authForm = DmAuthForm::PEER_TO_PEER;
             processInfo.userId = item.first;
             softbusConnector_->SetProcessInfo(processInfo);
-        } else if (item.second == SERVICE || item.second == APP) {
+        } else if (static_cast<uint32_t>(item.second) == SERVICE || static_cast<uint32_t>(item.second) == APP) {
             LOGI("The offline device is APP_PEER_TO_PEER_TYPE bind type.");
             std::vector<ProcessInfo> processInfoVec =
                 DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(requestDeviceId, trustDeviceId,
@@ -830,11 +830,11 @@ DmAuthForm DeviceManagerServiceImpl::ConvertBindTypeToAuthForm(int32_t bindType)
 {
     LOGI("BindType %{public}d.", bindType);
     DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
-    if (bindType == DM_IDENTICAL_ACCOUNT) {
+    if (static_cast<uint32_t(bindType) == DM_IDENTICAL_ACCOUNT) {
         authForm = IDENTICAL_ACCOUNT;
-    } else if (bindType == DM_POINT_TO_POINT) {
+    } else if (static_cast<uint32_t(bindType) == DM_POINT_TO_POINT) {
         authForm = PEER_TO_PEER;
-    } else if (bindType == DM_ACROSS_ACCOUNT) {
+    } else if (static_cast<uint32_t(bindType) == DM_ACROSS_ACCOUNT) {
         authForm = ACROSS_ACCOUNT;
     } else {
         LOGE("Invalied bindType.");
@@ -848,7 +848,7 @@ void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const 
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
     int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    if (bindType == DM_INVALIED_BINDTYPE) {
+    if (static_cast<uint32_t>(bindType) == DM_INVALIED_BINDTYPE) {
         LOGE("Invalied bindtype.");
         return;
     }
