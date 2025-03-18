@@ -1510,6 +1510,10 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
             const_cast<const std::map<std::string, std::string> &>(noConstBindParam);
         return dmServiceImpl_->BindTarget(pkgName, targetId, constBindParam);
     }
+    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("BindTarget failed, adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
@@ -1537,6 +1541,10 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
     if (unbindParam.find(PARAM_KEY_META_TYPE) == unbindParam.end()) {
         LOGE("input unbind parameter not contains META_TYPE, dm service adapter not supported.");
         return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
     }
     return dmServiceImplExtResident_->UnbindTargetExt(pkgName, targetId, unbindParam);
 }
