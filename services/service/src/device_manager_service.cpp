@@ -2903,10 +2903,10 @@ void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_
 {
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
     CheckRegisterInfoWithWise(currentUserId);
+    MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     if (IsPC()) {
         return;
     }
-    MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     if (beforeUserId == -1 || currentUserId == -1) {
         HandleUserSwitched();
         return;
