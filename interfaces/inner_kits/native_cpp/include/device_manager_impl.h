@@ -464,6 +464,9 @@ private:
     std::map<std::string, uint16_t> pkgName2PubIdMap_;
 
     std::string anonyLocalUdid_;
+
+    std::set<uint16_t> randSubIdSet_;
+    std::set<uint16_t> randPubIdSet_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

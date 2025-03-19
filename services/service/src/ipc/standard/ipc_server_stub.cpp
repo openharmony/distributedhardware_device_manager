@@ -412,7 +412,7 @@ void AppDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
     DeviceManagerServiceNotify::GetInstance().ClearDiedProcessCallback(processInfo);
-    DeviceManagerService::GetInstance().ClearPulishIdCache(processInfo.pkgName);
+    DeviceManagerService::GetInstance().ClearPublishIdCache(processInfo.pkgName);
 }
 
 void IpcServerStub::AddSystemSA(const std::string &pkgName)

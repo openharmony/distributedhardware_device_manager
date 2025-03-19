@@ -24,6 +24,7 @@
 #include "dm_hitrace.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"
+#include "dm_random.h"
 #include "ipc_acl_profile_req.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_bind_device_req.h"
@@ -98,8 +99,6 @@ constexpr const char* DM_HITRACE_GET_LOCAL_DEVICE_INFO = "DM_HITRACE_GET_LOCAL_D
 constexpr const char* DM_HITRACE_AUTH_TO_CONSULT = "DM_HITRACE_AUTH_TO_CONSULT";
 constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
 
-const uint16_t DM_MIN_RANDOM = 1;
-const uint16_t DM_MAX_RANDOM = 65535;
 const uint16_t DM_INVALID_FLAG_ID = 0;
 const uint16_t DM_IMPORT_AUTH_CODE_MIN_LENGTH = 6;
 const uint16_t DM_IMPORT_AUTH_CODE_MAX_LENGTH = 1024;
@@ -109,14 +108,6 @@ const int32_t SYSTEM_CORE = 2;
 const int32_t USLEEP_TIME_US_100000 = 100000; // 100ms
 constexpr int32_t SERVICE_INIT_MAX_NUM = 20;
 constexpr int32_t DM_STRING_LENGTH_MAX = 1024;
-
-uint16_t GenRandUint(uint16_t randMin, uint16_t randMax)
-{
-    std::random_device randDevice;
-    std::mt19937 genRand(randDevice());
-    std::uniform_int_distribution<int> disRand(randMin, randMax);
-    return disRand(genRand);
-}
 
 DeviceManagerImpl &DeviceManagerImpl::GetInstance()
 {
@@ -1976,10 +1967,11 @@ uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
         std::lock_guard<std::mutex> autoLock(subMapLock);
         auto item = pkgName2SubIdMap_.find(pkgNameTemp);
         if (item == pkgName2SubIdMap_.end() && subscribeId == DM_INVALID_FLAG_ID) {
-            subscribeId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
+            subscribeId = GenUniqueRandUint(randSubIdSet_);
             pkgName2SubIdMap_[pkgNameTemp] = subscribeId;
         } else if (item == pkgName2SubIdMap_.end() && subscribeId != DM_INVALID_FLAG_ID) {
             pkgName2SubIdMap_[pkgNameTemp] = subscribeId;
+            randSubIdSet_.emplace(subscribeId);
         } else if (item != pkgName2SubIdMap_.end()) {
             subscribeId = pkgName2SubIdMap_[pkgNameTemp];
         } else {
@@ -1998,6 +1990,7 @@ uint16_t DeviceManagerImpl::RemoveDiscoveryCallback(const std::string &pkgName)
         std::lock_guard<std::mutex> autoLock(subMapLock);
         if (pkgName2SubIdMap_.find(pkgName) != pkgName2SubIdMap_.end()) {
             subscribeId = pkgName2SubIdMap_[pkgName];
+            randSubIdSet_.erase(subscribeId);
             pkgName2SubIdMap_.erase(pkgName);
         }
     }
@@ -2014,7 +2007,7 @@ int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName)
         if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
             publishId = pkgName2PubIdMap_[pkgName];
         } else {
-            publishId = GenRandUint(DM_MIN_RANDOM, DM_MAX_RANDOM);
+            publishId = GenUniqueRandUint(randPubIdSet_);
             pkgName2PubIdMap_[pkgName] = publishId;
         }
     }
@@ -2026,9 +2019,10 @@ int32_t DeviceManagerImpl::RemovePublishCallback(const std::string &pkgName)
 {
     uint16_t publishId = DM_INVALID_FLAG_ID;
     {
-        std::lock_guard<std::mutex> autoLock(subMapLock);
+        std::lock_guard<std::mutex> autoLock(pubMapLock);
         if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
             publishId = pkgName2PubIdMap_[pkgName];
+            randPubIdSet_.erase(publishId);
             pkgName2PubIdMap_.erase(pkgName);
         }
     }

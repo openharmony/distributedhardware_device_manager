@@ -99,7 +99,7 @@ HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_002, testing::ext::TestS
     extraParam.insert(std::pair<std::string, std::string>("META_TYPE", "ohos.test"));
     extraParam.insert(std::pair<std::string, std::string>("SUBSCRIBE_ID", "ohos.test"));
     int32_t ret = manager->DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_003, testing::ext::TestSize.Level0)
@@ -107,7 +107,7 @@ HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_003, testing::ext::TestS
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     int32_t ret = manager->DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscovering_001, testing::ext::TestSize.Level0)
