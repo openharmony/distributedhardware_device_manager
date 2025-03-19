@@ -26,7 +26,7 @@
         },
         {
             "name":"dm_allow_temp",
-            "value":"临时信任",
+            "value":"仅本次信任",
             "attr":{
                 "priority":"translate"
             }
