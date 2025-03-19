@@ -2401,15 +2401,15 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
     uint64_t tokenId, int32_t bindLevel)
 {
     LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
-    if (bindLevel == DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) == DEVICE) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
     }
-    if (bindLevel == APP) {
+    if (static_cast<uint32_t>(bindLevel) == APP) {
         SendAppUnBindBroadCast(peerUdids, userId, tokenId);
         return;
     }
-    if (bindLevel == SERVICE) {
+    if (static_cast<uint32_t>(bindLevel) == SERVICE) {
         SendServiceUnBindBroadCast(peerUdids, userId, tokenId);
         return;
     }
@@ -2418,15 +2418,15 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
 void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, int32_t bindLevel, uint64_t peerTokenId)
 {
-    if (bindLevel == DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) == DEVICE) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
     }
-    if (bindLevel == APP) {
+    if (static_cast<uint32_t>(bindLevel) == APP) {
         SendAppUnBindBroadCast(peerUdids, userId, tokenId, peerTokenId);
         return;
     }
-    if (bindLevel == SERVICE) {
+    if (static_cast<uint32_t>(bindLevel) == SERVICE) {
         SendServiceUnBindBroadCast(peerUdids, userId, tokenId);
         return;
     }
