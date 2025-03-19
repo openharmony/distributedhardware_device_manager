@@ -100,12 +100,17 @@ private:
     std::string AddMultiUserIdentify(const std::string &pkgName);
     std::string RemoveMultiUserIdentify(const std::string &pkgName);
     void GetPkgNameAndUserId(const std::string &pkgName, std::string &callerPkgName, int32_t &userId);
+    int32_t GenInnerSubId(const std::string &pkgName, uint16_t subId);
+    int32_t GetAndRemoveInnerSubId(const std::string &pkgName, uint16_t subId);
+    int32_t StopDiscoveringByInnerSubId(const std::string &pkgName, uint16_t subscribeId);
 
 private:
     std::mutex locks_;
     std::mutex subIdMapLocks_;
     std::shared_ptr<DmTimer> timer_;
-    std::map<std::string, uint16_t> pkgName2SubIdMap_;
+    // Caller subId to inner subId. The key is the caller pkgName, the value is
+    // a list of externals subId to inner subId.
+    std::map<std::string, std::map<uint16_t, uint16_t>> pkgName2SubIdMap_;
     std::shared_ptr<SoftbusListener> softbusListener_;
     std::shared_ptr<MineSoftbusListener> mineSoftbusListener_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
@@ -122,6 +127,8 @@ private:
     static IDeviceProfileConnector *dpConnector_;
     static void *dpConnectorHandle_;
 #endif
+
+    std::set<uint16_t> randSubIdSet_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1492,7 +1492,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterLocalServiceInfo_201, testing::ext::T
         foregroundUserIds, backgroundUserIds);
     
     std::string pkgName = "pkgName";
-    DeviceManagerService::GetInstance().ClearPulishIdCache(pkgName);
+    DeviceManagerService::GetInstance().ClearPublishIdCache(pkgName);
     DeviceManagerService::GetInstance().hichainListener_ = nullptr;
 }
 

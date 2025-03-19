@@ -17,11 +17,14 @@
 #define OHOS_DM_RANDOM_H
 
 #include <cstdint>
+#include <set>
 
 namespace OHOS {
 namespace DistributedHardware {
 int32_t GenRandInt(int32_t randMin, int32_t randMax);
 int64_t GenRandLongLong(int64_t randMin, int64_t randMax);
+uint16_t GenRandUint(uint16_t randMin, uint16_t randMax);
+uint16_t GenUniqueRandUint(std::set<uint16_t> &randUint16Set);
 } // namespace DistributedHardware
 } // namespace OHOS
 

@@ -1736,7 +1736,7 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
     EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == DM_OK || ret == SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
     ret = DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
-    EXPECT_EQ(ret, SOFTBUS_NETWORK_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -1783,7 +1783,7 @@ HWTEST_F(DeviceManagerServiceTest, StopDiscovering_003, testing::ext::TestSize.L
     EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).Times(::testing::AtLeast(1))
         .WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
-    EXPECT_EQ(ret, SOFTBUS_NETWORK_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -1858,7 +1858,7 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::T
     DeviceManagerService::GetInstance().InitDMServiceListener();
     EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(ret, SOFTBUS_NETWORK_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 

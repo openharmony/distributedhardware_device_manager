@@ -82,6 +82,7 @@ if (defined(ohos_lite)) {
         "${samgr_lite_path}/kits/samgr",
         "${samgr_lite_path}/kits/registry",
         "${utils_lite_path}/include",
+        "${utils_path}/include",
         "//third_party/bounds_checking_function/include",
         "//third_party/json/include",
         "${interfaces_path}/c/ipc/include",
@@ -97,6 +98,7 @@ if (defined(ohos_lite)) {
         "${common_path}/src/dm_constants.cpp",
         "${common_path}/src/json_object.cpp",
         "${devicemanager_path}/radar/src/lite/dm_radar_helper.cpp",
+        "${utils_path}/src/dm_random.cpp",
         "src/device_manager.cpp",
         "src/device_manager_impl.cpp",
         "src/dm_device_info.cpp",
@@ -142,6 +144,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/dfx",
       "${common_path}/include/dfx/standard",
       "${devicemanager_path}/radar/include",
+      "${utils_path}/include",
     ]
   }
 
@@ -174,6 +177,7 @@ if (defined(ohos_lite)) {
       "${common_path}/src/ipc/standard/ipc_model_codec.cpp",
       "${common_path}/src/json_object.cpp",
       "${devicemanager_path}/radar/src/dm_radar_helper.cpp",
+      "${utils_path}/src/dm_random.cpp",
       "src/device_manager.cpp",
       "src/device_manager_impl.cpp",
       "src/dm_device_info.cpp",

@@ -28,7 +28,7 @@ public:
 
     int32_t StartAdvertising(const std::string &pkgName, const std::map<std::string, std::string> &advertiseParam);
     int32_t StopAdvertising(const std::string &pkgName, int32_t publishId);
-    void ClearPulishIdCache(const std::string &pkgName);
+    void ClearPublishIdCache(const std::string &pkgName);
 
 private:
     void HandleAutoStopAdvertise(const std::string &timerName, const std::string &pkgName, int32_t publishId);

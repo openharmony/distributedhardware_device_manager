@@ -3291,10 +3291,10 @@ void DeviceManagerService::AddHmlInfoToBindParam(int32_t actionId, std::string &
     cJSON_Delete(bindParamObj);
 }
 
-void DeviceManagerService::ClearPulishIdCache(const std::string &pkgName)
+void DeviceManagerService::ClearPublishIdCache(const std::string &pkgName)
 {
     CHECK_NULL_VOID(advertiseMgr_);
-    advertiseMgr_->ClearPulishIdCache(pkgName);
+    advertiseMgr_->ClearPublishIdCache(pkgName);
 }
 
 bool DeviceManagerService::IsPC()

@@ -20,6 +20,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_random.h"
 #include "parameter.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
@@ -79,12 +80,10 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
         std::string metaType = discoverParam.find(PARAM_KEY_META_TYPE)->second;
         LOGI("EnableDiscoveryListener, input MetaType = %{public}s in discoverParam map.", metaType.c_str());
     }
-    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end()) {
-        dmSubInfo.subscribeId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
-        {
-            std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-            pkgName2SubIdMap_[pkgNameTemp] = dmSubInfo.subscribeId;
-        }
+    if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end() &&
+        IsNumberString((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second))) {
+            uint16_t externalSubId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+            dmSubInfo.subscribeId = GenInnerSubId(pkgNameTemp, externalSubId);
     }
     if (discoverParam.find(PARAM_KEY_DISC_CAPABILITY) != discoverParam.end()) {
         std::string capability = discoverParam.find(PARAM_KEY_DISC_CAPABILITY)->second;
@@ -121,13 +120,11 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
         LOGI("DisableDiscoveryListener, input MetaType = %{public}s",
             (extraParam.find(PARAM_KEY_META_TYPE)->second).c_str());
     }
-    uint16_t subscribeId = DM_INVALID_FLAG_ID;
-    if (extraParam.find(PARAM_KEY_SUBSCRIBE_ID) != extraParam.end()) {
-        subscribeId = std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
-        {
-            std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-            pkgName2SubIdMap_.erase(pkgNameTemp);
-        }
+    uint16_t innerSubId = DM_INVALID_FLAG_ID;
+    if (extraParam.find(PARAM_KEY_SUBSCRIBE_ID) != extraParam.end() &&
+        IsNumberString(extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second)) {
+        uint16_t externalSubId = std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+        innerSubId = GetAndRemoveInnerSubId(pkgNameTemp, externalSubId);
     }
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
@@ -136,7 +133,11 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
         }
     }
     softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgNameTemp);
-    return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
+    if (innerSubId == DM_INVALID_FLAG_ID) {
+        LOGE("Invalid parameter, cannot find subscribeId in cache map.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return softbusListener_->StopRefreshSoftbusLNN(innerSubId);
 }
 
 int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
@@ -153,6 +154,7 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     if (HandleDiscoveryQueue(pkgNameTemp, dmSubInfo.subscribeId, filterOptions) != DM_OK) {
         return ERR_DM_DISCOVERY_REPEATED;
     }
+    dmSubInfo.subscribeId = GenInnerSubId(pkgNameTemp, dmSubInfo.subscribeId);
 
     bool isStandardMetaNode = true;
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
@@ -320,30 +322,45 @@ int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t s
         return ERR_DM_INPUT_PARA_INVALID;
     }
     std::string pkgNameTemp = RemoveMultiUserIdentify(pkgName);
+    return StopDiscoveringByInnerSubId(pkgNameTemp, subscribeId);
+}
+
+int32_t DiscoveryManager::StopDiscoveringByInnerSubId(const std::string &pkgName, uint16_t subscribeId)
+{
+    LOGI("DiscoveryManager::StopDiscovering begin for pkgName = %{public}s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    uint16_t innerSubId = GetAndRemoveInnerSubId(pkgName, subscribeId);
+    if (innerSubId == DM_INVALID_FLAG_ID) {
+        LOGE("Invalid parameter, cannot find subscribeId in cache map.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     {
         std::lock_guard<std::mutex> autoLock(locks_);
-        if (pkgNameSet_.find(pkgNameTemp) != pkgNameSet_.end()) {
-            pkgNameSet_.erase(pkgNameTemp);
+        if (pkgNameSet_.find(pkgName) != pkgNameSet_.end()) {
+            pkgNameSet_.erase(pkgName);
         }
 
-        if (discoveryContextMap_.find(pkgNameTemp) != discoveryContextMap_.end()) {
-            discoveryContextMap_.erase(pkgNameTemp);
+        if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
+            discoveryContextMap_.erase(pkgName);
             if (timer_ != nullptr) {
-                timer_->DeleteTimer(pkgNameTemp);
+                timer_->DeleteTimer(pkgName);
             }
         }
     }
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
-        if (capabilityMap_.find(pkgNameTemp) != capabilityMap_.end()) {
-            capabilityMap_.erase(pkgNameTemp);
+        if (capabilityMap_.find(pkgName) != capabilityMap_.end()) {
+            capabilityMap_.erase(pkgName);
         }
     }
-    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgNameTemp);
+    softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgName);
 #if (defined(MINE_HARMONY))
-    return mineSoftbusListener_->StopRefreshSoftbusLNN(subscribeId);
+    return mineSoftbusListener_->StopRefreshSoftbusLNN(innerSubId);
 #else
-    return softbusListener_->StopRefreshSoftbusLNN(subscribeId);
+    return softbusListener_->StopRefreshSoftbusLNN(innerSubId);
 #endif
 }
 
@@ -393,6 +410,14 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
             discoveryContext = iter->second;
         }
     }
+    uint16_t externalSubId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        for (auto iter : pkgName2SubIdMap_[pkgName]) {
+            externalSubId = iter.first;
+            break;
+        }
+    }
     if (!isIndiscoveryContextMap) {
         {
             std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
@@ -401,13 +426,8 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
                 return;
             }
         }
-        uint16_t subscribeId = 0;
-        {
-            std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-            subscribeId = pkgName2SubIdMap_[pkgName];
-        }
         LOGD("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
-        listener_->OnDeviceFound(processInfo, subscribeId, info);
+        listener_->OnDeviceFound(processInfo, externalSubId, info);
         return;
     }
     DiscoveryFilter filter;
@@ -420,7 +440,7 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
             }
         }
         LOGD("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
-        listener_->OnDeviceFound(processInfo, discoveryContext.subscribeId, info);
+        listener_->OnDeviceFound(processInfo, externalSubId, info);
     }
 }
 
@@ -448,10 +468,20 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
         LOGE("DiscoveryManager::OnDiscoveringResult failed, IDeviceManagerServiceListener is null.");
         return;
     }
+    uint16_t externalSubId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        for (auto iter : pkgName2SubIdMap_[pkgName]) {
+            if (iter.second == subscribeId) {
+                externalSubId = iter.first;
+                break;
+            }
+        }
+    }
     if (result == 0) {
         std::lock_guard<std::mutex> autoLock(locks_);
-        discoveryContextMap_[pkgName].subscribeId = (uint32_t)subscribeId;
-        listener_->OnDiscoverySuccess(processInfo, subscribeId);
+        discoveryContextMap_[pkgName].subscribeId = (uint32_t)externalSubId;
+        listener_->OnDiscoverySuccess(processInfo, externalSubId);
         return;
     }
     {
@@ -472,7 +502,7 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
             capabilityMap_.erase(pkgName);
         }
     }
-    listener_->OnDiscoveryFailed(processInfo, (uint32_t)subscribeId, result);
+    listener_->OnDiscoveryFailed(processInfo, (uint32_t)externalSubId, result);
     softbusListener_->StopRefreshSoftbusLNN(subscribeId);
 }
 
@@ -514,7 +544,7 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
 
 void DiscoveryManager::HandleDiscoveryTimeout(const std::string &pkgName)
 {
-    LOGI("DiscoveryManager::HandleDiscoveryTimeout");
+    LOGI("DiscoveryManager::HandleDiscoveryTimeout, pkgName: %{public}s.", pkgName.c_str());
     uint16_t subscribeId = 0;
     {
         std::lock_guard<std::mutex> autoLock(locks_);
@@ -530,7 +560,11 @@ void DiscoveryManager::HandleDiscoveryTimeout(const std::string &pkgName)
         }
         subscribeId = discoveryContextMap_[pkgName].subscribeId;
     }
-    StopDiscovering(pkgName, subscribeId);
+    StopDiscoveringByInnerSubId(pkgName, subscribeId);
+    {
+        std::lock_guard<std::mutex> autoLock(multiUserDiscLocks_);
+        multiUserDiscMap_.erase(pkgName);
+    }
 }
 
 void DiscoveryManager::UpdateInfoFreq(
@@ -642,7 +676,14 @@ void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
     for (auto it : subscribeIdSet) {
         std::string pkgNameTemp = (ComposeStr(ComposeStr(processInfo.pkgName, it), processInfo.userId));
         softbusListener_->UnRegisterSoftbusLnnOpsCbk(pkgNameTemp);
-        softbusListener_->StopRefreshSoftbusLNN(it);
+        uint16_t innerSubId = DM_INVALID_FLAG_ID;
+        {
+            std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+            innerSubId = pkgName2SubIdMap_[pkgNameTemp][it];
+            randSubIdSet_.erase(innerSubId);
+            pkgName2SubIdMap_.erase(pkgNameTemp);
+        }
+        softbusListener_->StopRefreshSoftbusLNN(innerSubId);
     }
 
     CHECK_NULL_VOID(timer_);
@@ -688,13 +729,12 @@ std::set<uint16_t> DiscoveryManager::ClearDiscoveryPkgName(const std::string &pk
     }
     {
         std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-        for (auto it = pkgName2SubIdMap_.begin(); it != pkgName2SubIdMap_.end();) {
+        for (auto it = pkgName2SubIdMap_.begin(); it != pkgName2SubIdMap_.end(); ++it) {
             if (it->first.find(pkgName) != std::string::npos) {
                 LOGI("Erase pkgname %{public}s from pkgName2SubIdMap_.", it->first.c_str());
-                subscribeIdSet.insert(it->second);
-                it = pkgName2SubIdMap_.erase(it);
-            } else {
-                ++it;
+                for (auto iter : it->second) {
+                    subscribeIdSet.insert(iter.first);
+                }
             }
         }
     }
@@ -754,6 +794,40 @@ void DiscoveryManager::GetPkgNameAndUserId(const std::string &pkgName, std::stri
         }
     }
     LOGE("find failed PkgName %{public}s.", pkgName.c_str());
+}
+
+int32_t DiscoveryManager::GenInnerSubId(const std::string &pkgName, uint16_t subId)
+{
+    uint16_t tempSubId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        if (pkgName2SubIdMap_[pkgName].find(subId) != pkgName2SubIdMap_[pkgName].end()) {
+            return pkgName2SubIdMap_[pkgName][subId];
+        }
+        if (pkgName2SubIdMap_.find(pkgName) == pkgName2SubIdMap_.end()) {
+            pkgName2SubIdMap_[pkgName] = std::map<uint16_t, uint16_t>();
+        }
+        tempSubId = GenUniqueRandUint(randSubIdSet_);
+        pkgName2SubIdMap_[pkgName][subId] = tempSubId;
+    }
+    return tempSubId;
+}
+
+int32_t DiscoveryManager::GetAndRemoveInnerSubId(const std::string &pkgName, uint16_t subId)
+{
+    uint16_t tempSubId = DM_INVALID_FLAG_ID;
+    {
+        std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        if (pkgName2SubIdMap_[pkgName].find(subId) != pkgName2SubIdMap_[pkgName].end()) {
+            tempSubId = pkgName2SubIdMap_[pkgName][subId];
+            pkgName2SubIdMap_[pkgName].erase(subId);
+            randSubIdSet_.erase(tempSubId);
+        }
+        if (pkgName2SubIdMap_[pkgName].empty()) {
+            pkgName2SubIdMap_.erase(pkgName);
+        }
+    }
+    return tempSubId;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

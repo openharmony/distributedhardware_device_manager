@@ -19,6 +19,7 @@
 #include "dm_log.h"
 #include "dm_publish_info.h"
 #include "dm_random.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -154,8 +155,7 @@ int32_t AdvertiseManager::GenInnerPublishId(const std::string &pkgName, int32_t 
     {
         std::lock_guard<std::mutex> autoLock(pubMapLock_);
         if (pkgName2PubIdMap_[pkgName].find(publishId) != pkgName2PubIdMap_[pkgName].end()) {
-            softbusListener_->StopPublishSoftbusLNN(pkgName2PubIdMap_[pkgName][publishId]);
-            publishIdSet_.erase(pkgName2PubIdMap_[pkgName][publishId]);
+            return pkgName2PubIdMap_[pkgName][publishId];
         }
         if (pkgName2PubIdMap_.find(pkgName) == pkgName2PubIdMap_.end()) {
             pkgName2PubIdMap_[pkgName] = std::map<int32_t, int32_t>();
@@ -163,7 +163,8 @@ int32_t AdvertiseManager::GenInnerPublishId(const std::string &pkgName, int32_t 
         bool isExist = false;
         do {
             tempPublishId = GenRandInt(DM_MIN_RANDOM, DM_MAX_RANDOM);
-            if (publishIdSet_.find(tempPublishId) != publishIdSet_.end()) {
+            if (publishIdSet_.find(tempPublishId) != publishIdSet_.end() ||
+                tempPublishId == DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID) {
                 LOGE("The tempPublishId: %{public}d is exist.", tempPublishId);
                 isExist = true;
             } else {
@@ -194,7 +195,7 @@ int32_t AdvertiseManager::GetAndRemoveInnerPublishId(const std::string &pkgName,
     return tempPublishId;
 }
 
-void AdvertiseManager::ClearPulishIdCache(const std::string &pkgName)
+void AdvertiseManager::ClearPublishIdCache(const std::string &pkgName)
 {
     LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
