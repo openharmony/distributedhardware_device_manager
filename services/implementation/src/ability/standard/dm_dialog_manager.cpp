@@ -22,7 +22,7 @@
 #include "auth_message_processor.h"
 #include "dm_anonymous.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "parameter.h"
 #include "dm_single_instance.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -79,22 +79,22 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
     std::string customDescriptionStr = "";
     std::string hostPkgLabel = "";
     int32_t deviceType = -1;
-    nlohmann::json jsonObject = nlohmann::json::parse(param, nullptr, false);
-    if (!jsonObject.is_discarded()) {
+    JsonObject jsonObject(param);
+    if (!jsonObject.IsDiscarded()) {
         if (IsString(jsonObject, TAG_REQUESTER)) {
-            deviceName = jsonObject[TAG_REQUESTER].get<std::string>();
+            deviceName = jsonObject[TAG_REQUESTER].Get<std::string>();
         }
         if (IsString(jsonObject, TAG_APP_OPERATION)) {
-            appOperationStr = jsonObject[TAG_APP_OPERATION].get<std::string>();
+            appOperationStr = jsonObject[TAG_APP_OPERATION].Get<std::string>();
         }
         if (IsString(jsonObject, TAG_CUSTOM_DESCRIPTION)) {
-            customDescriptionStr = jsonObject[TAG_CUSTOM_DESCRIPTION].get<std::string>();
+            customDescriptionStr = jsonObject[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
         }
         if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
-            deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].get<std::int32_t>();
+            deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
         }
         if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
-            hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].get<std::string>();
+            hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
         }
     }
 
@@ -187,7 +187,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     data.WriteString16(u"abilityName");
     data.WriteString16(Str8ToStr16(DmDialogManager::GetAbilityName()));
     data.WriteString16(u"parameters");
-    nlohmann::json param;
+    JsonObject param;
     param["ability.want.params.uiExtensionType"] = "sysDialog/common";
     param["sysDialogZOrder"] = WINDOW_LEVEL_DEFAULT;
     if (DmDialogManager::GetAbilityName() == INPUT_ABILITY_NAME) {

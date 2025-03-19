@@ -39,9 +39,12 @@
 #include "ipc_notify_get_device_profile_info_list_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
+#include "ipc_notify_set_local_device_name_req.h"
+#include "ipc_notify_set_remote_device_name_req.h"
 #include "ipc_server_stub.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "datetime_ex.h"
+#include "device_name_manager.h"
 #include "kv_adapter_manager.h"
 #include "multiple_user_connector.h"
 #endif
@@ -74,11 +77,13 @@ void handleExtraData(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInf
     cJSON_Delete(extraDataJsonObj);
     cJSON *basicExtraDataJsonObj = cJSON_CreateObject();
     if (basicExtraDataJsonObj == NULL) {
+        cJSON_free(customData);
         return;
     }
     cJSON_AddStringToObject(basicExtraDataJsonObj, PARAM_KEY_CUSTOM_DATA, customData);
     char *basicExtraData = cJSON_PrintUnformatted(basicExtraDataJsonObj);
     if (basicExtraData == nullptr) {
+        cJSON_free(customData);
         cJSON_Delete(basicExtraDataJsonObj);
         return;
     }
@@ -171,14 +176,14 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
         LOGE("extraData is empty, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
         return ERR_DM_FAILED;
     }
-    nlohmann::json extraJson = nlohmann::json::parse(extraData, nullptr, false);
-    if (extraJson.is_discarded()) {
+    JsonObject extraJson(extraData);
+    if (extraJson.IsDiscarded()) {
         LOGE("parse extraData fail, networkId:%{public}s ", GetAnonyString(dmDeviceInfo.networkId).c_str());
         return ERR_DM_FAILED;
     }
     extraJson[PARAM_KEY_UDID] = udid;
     extraJson[PARAM_KEY_UUID] = uuid;
-    dmDeviceInfo.extraData = to_string(extraJson);
+    dmDeviceInfo.extraData = ToString(extraJson);
     return DM_OK;
 }
 
@@ -965,6 +970,36 @@ void DeviceManagerServiceListener::OnGetDeviceIconInfoResult(const ProcessInfo &
     pReq->SetResult(code);
     pReq->SetProcessInfo(processInfo);
     ipcServerListener_.SendRequest(GET_DEVICE_ICON_INFO_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnSetLocalDeviceNameResult(const ProcessInfo &processInfo,
+    const std::string &deviceName, int32_t code)
+{
+    LOGI("pkgName %{public}s.", processInfo.pkgName.c_str());
+    std::shared_ptr<IpcNotifySetLocalDeviceNameReq> pReq = std::make_shared<IpcNotifySetLocalDeviceNameReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetPkgName(processInfo.pkgName);
+    pReq->SetResult(code);
+    pReq->SetProcessInfo(processInfo);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (code == DM_OK) {
+        DeviceNameManager::GetInstance().ModifyUserDefinedName(deviceName);
+    }
+#endif
+    ipcServerListener_.SendRequest(SET_LOCAL_DEVICE_NAME_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo,
+    const std::string &deviceId, const std::string &deviceName, int32_t code)
+{
+    LOGI("pkgName %{public}s.", processInfo.pkgName.c_str());
+    std::shared_ptr<IpcNotifySetRemoteDeviceNameReq> pReq = std::make_shared<IpcNotifySetRemoteDeviceNameReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetPkgName(processInfo.pkgName);
+    pReq->SetDeviceId(deviceId);
+    pReq->SetResult(code);
+    pReq->SetProcessInfo(processInfo);
+    ipcServerListener_.SendRequest(SET_REMOTE_DEVICE_NAME_RESULT, pReq, pRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

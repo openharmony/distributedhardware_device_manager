@@ -32,7 +32,7 @@ void DeviceManagerServiceNotifyTest::SetUpTestCase() {}
 void DeviceManagerServiceNotifyTest::TearDownTestCase() {}
 namespace {
 
-HWTEST_F(DeviceManagerServiceNotifyTest, RegisterCallBack_001, testing::ext::TestSize.Level0)
+HWTEST_F(DeviceManagerServiceNotifyTest, RegisterCallBack_001, testing::ext::TestSize.Level1)
 {
     int32_t dmCommonNotifyEvent = 1;
     ProcessInfo processInfo;

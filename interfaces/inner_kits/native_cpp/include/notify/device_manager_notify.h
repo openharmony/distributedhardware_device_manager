@@ -82,6 +82,14 @@ public:
         std::shared_ptr<GetDeviceIconInfoCallback> callback);
     int32_t UnRegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk);
     void OnGetDeviceIconInfoResult(const std::string &pkgName, const DmDeviceIconInfo &deviceIconInfo, int32_t code);
+    int32_t RegisterSetLocalDeviceNameCallback(const std::string &pkgName,
+        std::shared_ptr<SetLocalDeviceNameCallback> callback);
+    int32_t UnRegisterSetLocalDeviceNameCallback(const std::string &pkgName);
+    void OnSetLocalDeviceNameResult(const std::string &pkgName, int32_t code);
+    int32_t RegisterSetRemoteDeviceNameCallback(const std::string &pkgName, const std::string &deviceId,
+        std::shared_ptr<SetRemoteDeviceNameCallback> callback);
+    int32_t UnRegisterSetRemoteDeviceNameCallback(const std::string &pkgName, const std::string &deviceId);
+    void OnSetRemoteDeviceNameResult(const std::string &pkgName, const std::string &deviceId, int32_t code);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -158,6 +166,9 @@ private:
     std::map<std::string, std::shared_ptr<GetDeviceProfileInfoListCallback>> getDeviceProfileInfoCallback_;
     std::map<std::string,
         std::map<std::string, std::set<std::shared_ptr<GetDeviceIconInfoCallback>>>> getDeviceIconInfoCallback_;
+    std::map<std::string, std::shared_ptr<SetLocalDeviceNameCallback>> setLocalDeviceNameCallback_;
+    std::map<std::string,
+        std::map<std::string, std::shared_ptr<SetRemoteDeviceNameCallback>>> setRemoteDeviceNameCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

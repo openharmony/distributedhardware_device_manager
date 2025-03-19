@@ -25,7 +25,7 @@
 #include "dm_log.h"
 #include "dm_radar_helper.h"
 #include "dm_softbus_cache.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
 
@@ -175,7 +175,7 @@ ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, st
         LOGE("deviceInfo addrNum not valid, addrNum: %{public}d.", deviceInfo->addrNum);
         return nullptr;
     }
-    nlohmann::json jsonPara;
+    JsonObject jsonPara;
     ConnectionAddr *addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_ETH);
     if (addr != nullptr) {
         LOGI("[SOFTBUS]get ETH ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
@@ -519,14 +519,14 @@ void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeB
 
     dmDeviceInfo.deviceTypeId = nodeBasicInfo.deviceTypeId;
     std::string extraData = dmDeviceInfo.extraData;
-    nlohmann::json extraJson;
+    JsonObject extraJson;
     if (!extraData.empty()) {
-        extraJson = nlohmann::json::parse(extraData, nullptr, false);
+        extraJson.Parse(extraData);
     }
-    if (!extraJson.is_discarded()) {
+    if (!extraJson.IsDiscarded()) {
         extraJson[PARAM_KEY_OS_TYPE] = nodeBasicInfo.osType;
         extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
-        dmDeviceInfo.extraData = to_string(extraJson);
+        dmDeviceInfo.extraData = ToString(extraJson);
     }
 }
 } // namespace DistributedHardware

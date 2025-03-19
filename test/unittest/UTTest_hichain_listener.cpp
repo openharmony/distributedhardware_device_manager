@@ -35,7 +35,7 @@ void HichainListenerTest::TearDownTestCase()
  * @tc.name: RegisterDataChangeCb_001
  * @tc.type: FUNC
  */
-HWTEST_F(HichainListenerTest, RegisterDataChangeCb_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainListenerTest, RegisterDataChangeCb_001, testing::ext::TestSize.Level1)
 {
     HichainListener listerner;
     listerner.RegisterDataChangeCb();
@@ -59,12 +59,12 @@ HWTEST_F(HichainListenerTest, RegisterDataChangeCb_002, testing::ext::TestSize.L
  * @tc.name: OnHichainDeviceUnBound_001
  * @tc.type: FUNC
  */
-HWTEST_F(HichainListenerTest, OnHichainDeviceUnBound_001, testing::ext::TestSize.Level0)
+HWTEST_F(HichainListenerTest, OnHichainDeviceUnBound_001, testing::ext::TestSize.Level1)
 {
     HichainListener listerner;
     char peerUdid[] = "zhangsan";
 
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     constexpr int32_t  DM_IDENTICAL_ACCOUNT = 1;
     jsonObject[FIELD_GROUP_TYPE] = DM_IDENTICAL_ACCOUNT;
     jsonObject[FIELD_USER_ID] = "hdaoiudhifvafiouoahf-ZhangSan";

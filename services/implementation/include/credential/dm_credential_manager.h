@@ -114,8 +114,8 @@ private:
     ProcessInfo processInfo_;
 private:
     int32_t GetCredentialData(const std::string &credentialInfo, const CredentialData &inputCreData,
-        nlohmann::json &jsonOutObj);
-    int32_t GetAddDeviceList(const nlohmann::json &jsonObject, nlohmann::json &jsonDeviceList);
+        JsonObject &jsonOutObj);
+    int32_t GetAddDeviceList(const JsonObject &jsonObject, JsonObject &jsonDeviceList);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

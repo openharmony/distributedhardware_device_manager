@@ -37,6 +37,7 @@ const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
 const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
 const std::string ERR_MESSAGE_FROM_CLOUD_FAILED = "Get data from cloud failed.";
 const std::string ERR_MESSAGE_NEED_LOGIN = "A login account is required.";
+const std::string ERR_MESSAGE_SCAS_CHECK_FAILED = "The device name contains non-compliant content.";
 
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_ONE = -1;
 const int32_t DM_NAPI_DISCOVER_EXTRA_INIT_TWO = -2;
@@ -242,6 +243,9 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
         case ERR_DM_WISE_NEED_LOGIN:
             error = CreateErrorForCall(env, DM_ERR_NEED_LOGIN, ERR_MESSAGE_NEED_LOGIN, isAsync);
             break;
+        case ERR_DM_HILINKSVC_SCAS_CHECK_FAILED:
+            error = CreateErrorForCall(env, DM_ERR_SCAS_CHECK_FAILED, ERR_MESSAGE_SCAS_CHECK_FAILED, isAsync);
+            break;
         default:
             error = CreateErrorForCall(env, DM_ERR_FAILED, ERR_MESSAGE_FAILED, isAsync);
             break;
@@ -350,7 +354,7 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     int32_t bindLevel = 0;
     JsObjectToInt(env, object, "bindLevel", bindLevel);
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[AUTH_TYPE] = bindType;
     jsonObj[APP_OPERATION] = std::string(appOperation);
     jsonObj[CUSTOM_DESCRIPTION] = std::string(customDescription);
@@ -399,7 +403,7 @@ bool JsToDiscoverTargetType(napi_env env, const napi_value &object, int32_t &dis
 
 void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::string &extra)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     int32_t availableStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
     JsObjectToInt(env, object, "availableStatus", availableStatus);
     if (availableStatus != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
@@ -443,44 +447,43 @@ void JsToDiscoveryParam(const napi_env &env, const napi_value &object,
     JsObjectToString(env, object, "DISC_CAPABILITY", capability, sizeof(capability));
     discParam.insert(std::pair<std::string, std::string>(PARAM_KEY_DISC_CAPABILITY, capability));
 }
-
-void InsertMapParames(nlohmann::json &bindParamObj, std::map<std::string, std::string> &bindParamMap)
+void InsertMapParames(JsonObject &bindParamObj, std::map<std::string, std::string> &bindParamMap)
 {
     LOGI("Insert map parames start");
     if (IsInt32(bindParamObj, AUTH_TYPE)) {
-        int32_t authType = bindParamObj[AUTH_TYPE].get<int32_t>();
+        int32_t authType = bindParamObj[AUTH_TYPE].Get<int32_t>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TYPE, std::to_string(authType)));
     }
     if (IsString(bindParamObj, APP_OPERATION)) {
-        std::string appOperation = bindParamObj[APP_OPERATION].get<std::string>();
+        std::string appOperation = bindParamObj[APP_OPERATION].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_APP_OPER, appOperation));
     }
     if (IsString(bindParamObj, CUSTOM_DESCRIPTION)) {
-        std::string appDescription = bindParamObj[CUSTOM_DESCRIPTION].get<std::string>();
+        std::string appDescription = bindParamObj[CUSTOM_DESCRIPTION].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_APP_DESC, appDescription));
     }
     if (IsString(bindParamObj, PARAM_KEY_TARGET_PKG_NAME)) {
-        std::string targetPkgName = bindParamObj[PARAM_KEY_TARGET_PKG_NAME].get<std::string>();
+        std::string targetPkgName = bindParamObj[PARAM_KEY_TARGET_PKG_NAME].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_TARGET_PKG_NAME, targetPkgName));
     }
     if (IsString(bindParamObj, PARAM_KEY_META_TYPE)) {
-        std::string metaType = bindParamObj[PARAM_KEY_META_TYPE].get<std::string>();
+        std::string metaType = bindParamObj[PARAM_KEY_META_TYPE].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_META_TYPE, metaType));
     }
     if (IsString(bindParamObj, PARAM_KEY_PIN_CODE)) {
-        std::string pinCode = bindParamObj[PARAM_KEY_PIN_CODE].get<std::string>();
+        std::string pinCode = bindParamObj[PARAM_KEY_PIN_CODE].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_PIN_CODE, pinCode));
     }
     if (IsString(bindParamObj, PARAM_KEY_AUTH_TOKEN)) {
-        std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].get<std::string>();
+        std::string authToken = bindParamObj[PARAM_KEY_AUTH_TOKEN].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_AUTH_TOKEN, authToken));
     }
     if (IsString(bindParamObj, PARAM_KEY_IS_SHOW_TRUST_DIALOG)) {
-        std::string isShowTrustDialog = bindParamObj[PARAM_KEY_IS_SHOW_TRUST_DIALOG].get<std::string>();
+        std::string isShowTrustDialog = bindParamObj[PARAM_KEY_IS_SHOW_TRUST_DIALOG].Get<std::string>();
         bindParamMap.insert(std::pair<std::string, std::string>(PARAM_KEY_IS_SHOW_TRUST_DIALOG, isShowTrustDialog));
     }
     if (IsInt32(bindParamObj, BIND_LEVEL)) {
-        int32_t bindLevel = bindParamObj[BIND_LEVEL].get<std::int32_t>();
+        int32_t bindLevel = bindParamObj[BIND_LEVEL].Get<std::int32_t>();
         bindParamMap.insert(std::pair<std::string, std::string>(BIND_LEVEL, std::to_string(bindLevel)));
     }
 }
@@ -565,6 +568,25 @@ void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value 
     info.deviceIdList = deviceIdList;
 }
 
+void JsToDmDeviceNetworkIdFilterOptions(const napi_env &env, const napi_value &object,
+    NetworkIdQueryFilter &info)
+{
+    napi_valuetype filterOptionsType;
+    napi_typeof(env, object, &filterOptionsType);
+    if (filterOptionsType != napi_object) {
+        LOGE("filterOptions is not object");
+        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + " The type of filterOptions must be object";
+        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
+        return;
+    }
+    char wiseDeviceId[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "wiseDeviceId", wiseDeviceId, sizeof(wiseDeviceId));
+    info.wiseDeviceId = wiseDeviceId;
+    int32_t onlineStatus = 0;
+    JsObjectToInt(env, object, "onlineStatus", onlineStatus);
+    info.onlineStatus = onlineStatus;
+}
+
 void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
     napi_value &arrayResult)
 {
@@ -587,23 +609,17 @@ void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServ
     }
 }
 
-void DmProductInfoToJs(const napi_env &env, const DmProductInfo &prodInfo, napi_value &jsObj)
-{
-    SetValueUtf8String(env, "prodId", prodInfo.prodId, jsObj);
-    SetValueUtf8String(env, "model", prodInfo.model, jsObj);
-    SetValueUtf8String(env, "prodName", prodInfo.prodName, jsObj);
-    SetValueUtf8String(env, "prodShortName", prodInfo.prodShortName, jsObj);
-}
-
 void DmDeviceProfileInfoToJs(const napi_env &env, const DmDeviceProfileInfo &devInfo, napi_value &jsObj)
 {
     SetValueUtf8String(env, "deviceId", devInfo.deviceId, jsObj);
     SetValueUtf8String(env, "deviceSn", devInfo.deviceSn, jsObj);
     SetValueUtf8String(env, "mac", devInfo.mac, jsObj);
     SetValueUtf8String(env, "model", devInfo.model, jsObj);
+    SetValueUtf8String(env, "internalModel", devInfo.internalModel, jsObj);
     SetValueUtf8String(env, "deviceType", devInfo.deviceType, jsObj);
     SetValueUtf8String(env, "manufacturer", devInfo.manufacturer, jsObj);
     SetValueUtf8String(env, "deviceName", devInfo.deviceName, jsObj);
+    SetValueUtf8String(env, "productName", devInfo.productName, jsObj);
     SetValueUtf8String(env, "productId", devInfo.productId, jsObj);
     SetValueUtf8String(env, "subProductId", devInfo.subProductId, jsObj);
     SetValueUtf8String(env, "sdkVersion", devInfo.sdkVersion, jsObj);
@@ -665,6 +681,9 @@ void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &ob
     char subProductId[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "subProductId", subProductId, sizeof(subProductId));
     info.subProductId = subProductId;
+    char internalModel[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "internalModel", subProductId, sizeof(internalModel));
+    info.internalModel = internalModel;
     char imageType[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "imageType", imageType, sizeof(imageType));
     info.imageType = imageType;
@@ -676,6 +695,7 @@ void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &ob
 void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIconInfo, napi_value &jsObj)
 {
     SetValueUtf8String(env, "productId", deviceIconInfo.productId, jsObj);
+    SetValueUtf8String(env, "internalModel", deviceIconInfo.internalModel, jsObj);
     SetValueUtf8String(env, "subProductId", deviceIconInfo.subProductId, jsObj);
     SetValueUtf8String(env, "imageType", deviceIconInfo.imageType, jsObj);
     SetValueUtf8String(env, "specName", deviceIconInfo.specName, jsObj);
@@ -749,9 +769,11 @@ bool JsToDmDeviceProfileInfo(const napi_env &env, const napi_value &jsObj, DmDev
     devInfo.deviceSn = GetStrFromJsObj(env, jsObj, "deviceSn");
     devInfo.mac = GetStrFromJsObj(env, jsObj, "mac");
     devInfo.model = GetStrFromJsObj(env, jsObj, "model");
+    devInfo.internalModel = GetStrFromJsObj(env, jsObj, "internalModel");
     devInfo.deviceType = GetStrFromJsObj(env, jsObj, "deviceType");
     devInfo.manufacturer = GetStrFromJsObj(env, jsObj, "manufacturer");
     devInfo.deviceName = GetStrFromJsObj(env, jsObj, "deviceName");
+    devInfo.productName = GetStrFromJsObj(env, jsObj, "productName");
     devInfo.productId = GetStrFromJsObj(env, jsObj, "productId");
     devInfo.subProductId = GetStrFromJsObj(env, jsObj, "subProductId");
     devInfo.sdkVersion = GetStrFromJsObj(env, jsObj, "sdkVersion");

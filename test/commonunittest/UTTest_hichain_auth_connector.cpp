@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -84,14 +84,14 @@ private:
     int32_t pinCode = 0;
 };
 
-HWTEST_F(HiChainAuthConnectorTest, RegisterHiChainAuthCallback_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, RegisterHiChainAuthCallback_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<IDmDeviceAuthCallback> callback = nullptr;
     int32_t ret = hiChain_->RegisterHiChainAuthCallback(callback);
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, AuthDevice_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, AuthDevice_001, testing::ext::TestSize.Level1)
 {
     int32_t pinCode = 0;
     int32_t osAccountId = 0;
@@ -101,7 +101,7 @@ HWTEST_F(HiChainAuthConnectorTest, AuthDevice_001, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, ProcessAuthData_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, ProcessAuthData_001, testing::ext::TestSize.Level1)
 {
     int32_t requestId = 0;
     std::string authData;
@@ -110,7 +110,7 @@ HWTEST_F(HiChainAuthConnectorTest, ProcessAuthData_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onTransmit_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onTransmit_001, testing::ext::TestSize.Level1)
 {
     int32_t requestId = 0;
     uint8_t *data = nullptr;
@@ -120,7 +120,7 @@ HWTEST_F(HiChainAuthConnectorTest, onTransmit_001, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onTransmit_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onTransmit_002, testing::ext::TestSize.Level1)
 {
     int32_t requestId = 0;
     uint8_t *data = nullptr;
@@ -130,7 +130,7 @@ HWTEST_F(HiChainAuthConnectorTest, onTransmit_002, testing::ext::TestSize.Level0
     EXPECT_EQ(ret, true);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onRequest_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onRequest_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     int operationCode = 0;
@@ -140,7 +140,7 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onRequest_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onRequest_002, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     int operationCode = 0;
@@ -150,7 +150,7 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_002, testing::ext::TestSize.Level0)
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onRequest_003, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onRequest_003, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     int operationCode = 0;
@@ -162,7 +162,7 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_003, testing::ext::TestSize.Level0)
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onRequest_004, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onRequest_004, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     int operationCode = 0;
@@ -176,7 +176,7 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_004, testing::ext::TestSize.Level0)
     EXPECT_NE(hiChainAuthConnector->onRequest(requestId, operationCode, reqParams), nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     int operationCode = 0;
@@ -186,7 +186,7 @@ HWTEST_F(HiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onFinish_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onFinish_002, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     int operationCode = 0;
@@ -196,7 +196,7 @@ HWTEST_F(HiChainAuthConnectorTest, onFinish_002, testing::ext::TestSize.Level0)
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onError_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onError_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     int operationCode = 0;
@@ -207,7 +207,7 @@ HWTEST_F(HiChainAuthConnectorTest, onError_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onError_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onError_002, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     int operationCode = 0;
@@ -218,7 +218,7 @@ HWTEST_F(HiChainAuthConnectorTest, onError_002, testing::ext::TestSize.Level0)
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onSessionKeyReturned_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onSessionKeyReturned_001, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     uint8_t *sessionKey = nullptr;
@@ -228,7 +228,7 @@ HWTEST_F(HiChainAuthConnectorTest, onSessionKeyReturned_001, testing::ext::TestS
     EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, onSessionKeyReturned_003, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, onSessionKeyReturned_003, testing::ext::TestSize.Level1)
 {
     int64_t requestId = 0;
     uint8_t *sessionKey = nullptr;
@@ -238,7 +238,7 @@ HWTEST_F(HiChainAuthConnectorTest, onSessionKeyReturned_003, testing::ext::TestS
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid;
     int32_t osAccountId = 0;
@@ -247,7 +247,7 @@ HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_001, testing::ext::TestSiz
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_002, testing::ext::TestSize.Level1)
 {
     std::string localUdid;
     int32_t osAccountId = 0;
@@ -258,7 +258,7 @@ HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_002, testing::ext::TestSiz
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_003, testing::ext::TestSize.Level1)
 {
     std::string localUdid;
     int32_t osAccountId = 0;
@@ -269,7 +269,7 @@ HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_003, testing::ext::TestSiz
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_004, testing::ext::TestSize.Level1)
 {
     std::string localUdid;
     int32_t osAccountId = 0;
@@ -280,7 +280,7 @@ HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_004, testing::ext::TestSiz
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_005, testing::ext::TestSize.Level1)
 {
     std::string localUdid;
     int32_t osAccountId = 0;
@@ -291,7 +291,7 @@ HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_005, testing::ext::TestSiz
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_006, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_006, testing::ext::TestSize.Level1)
 {
     std::string localUdid;
     int32_t osAccountId = 0;
@@ -302,7 +302,7 @@ HWTEST_F(HiChainAuthConnectorTest, GenerateCredential_006, testing::ext::TestSiz
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, QueryCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "2131351352";
     int32_t osAccountId = 0;
@@ -310,9 +310,9 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, QueryCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_002, testing::ext::TestSize.Level1)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -321,9 +321,9 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_002, testing::ext::TestSize.L
     EXPECT_EQ(ret, false);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, QueryCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_003, testing::ext::TestSize.Level1)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -334,9 +334,9 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_003, testing::ext::TestSize.L
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, QueryCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_004, testing::ext::TestSize.Level1)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -347,9 +347,9 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_004, testing::ext::TestSize.L
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, QueryCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_005, testing::ext::TestSize.Level1)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -360,9 +360,9 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_005, testing::ext::TestSize.L
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, QueryCredential_006, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_006, testing::ext::TestSize.Level1)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -373,9 +373,9 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_006, testing::ext::TestSize.L
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, QueryCredential_007, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_007, testing::ext::TestSize.Level1)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -386,9 +386,9 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_007, testing::ext::TestSize.L
     EXPECT_FALSE(ret);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, QueryCredential_008, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, QueryCredential_008, testing::ext::TestSize.Level1)
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["result"] = 15;
     jsonObject["publicKey"] = 0;
     std::string localUdid = SafetyDump(jsonObject);
@@ -399,7 +399,7 @@ HWTEST_F(HiChainAuthConnectorTest, QueryCredential_008, testing::ext::TestSize.L
     EXPECT_TRUE(ret);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GetCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_001, testing::ext::TestSize.Level1)
 {
     std::string localUdid;
     int32_t osAccountId = 0;
@@ -408,7 +408,7 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_001, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GetCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_002, testing::ext::TestSize.Level1)
 {
     std::string localUdid = "GADGFADEFGSDA";
     int32_t osAccountId = 0;
@@ -417,7 +417,7 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_002, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GetCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_003, testing::ext::TestSize.Level1)
 {
     std::string publicKey = "test";
     std::string localUdid = "test";
@@ -428,7 +428,7 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_003, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GetCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_004, testing::ext::TestSize.Level1)
 {
     std::string publicKey = "test";
     std::string localUdid = "test";
@@ -439,7 +439,7 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_004, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GetCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_005, testing::ext::TestSize.Level1)
 {
     std::string publicKey = "test";
     std::string localUdid = "test";
@@ -450,7 +450,7 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_005, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GetCredential_006, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_006, testing::ext::TestSize.Level1)
 {
     std::string publicKey = "test";
     std::string localUdid = "test";
@@ -461,7 +461,7 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_006, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GetCredential_007, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_007, testing::ext::TestSize.Level1)
 {
     std::string publicKey = "test";
     std::string localUdid = "test";
@@ -472,7 +472,7 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_007, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, GetCredential_008, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, GetCredential_008, testing::ext::TestSize.Level1)
 {
     std::string publicKey = "test";
     std::string localUdid = "test";
@@ -483,7 +483,7 @@ HWTEST_F(HiChainAuthConnectorTest, GetCredential_008, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, ImportCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_001, testing::ext::TestSize.Level1)
 {
     int32_t localUdid = 0;
     std::string deviceId;
@@ -492,7 +492,7 @@ HWTEST_F(HiChainAuthConnectorTest, ImportCredential_001, testing::ext::TestSize.
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestSize.Level1)
 {
     int32_t localUdid = 0;
     std::string deviceId = "4513541351";
@@ -501,7 +501,7 @@ HWTEST_F(HiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestSize.
     EXPECT_NE(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, ImportCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_003, testing::ext::TestSize.Level1)
 {
     int32_t localUdid = 0;
     std::string deviceId = "test";
@@ -512,7 +512,7 @@ HWTEST_F(HiChainAuthConnectorTest, ImportCredential_003, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, ImportCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_004, testing::ext::TestSize.Level1)
 {
     int32_t localUdid = 0;
     std::string deviceId = "test";
@@ -523,7 +523,7 @@ HWTEST_F(HiChainAuthConnectorTest, ImportCredential_004, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, ImportCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_005, testing::ext::TestSize.Level1)
 {
     int32_t localUdid = 0;
     std::string deviceId = "test";
@@ -534,7 +534,7 @@ HWTEST_F(HiChainAuthConnectorTest, ImportCredential_005, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, ImportCredential_006, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, ImportCredential_006, testing::ext::TestSize.Level1)
 {
     int32_t localUdid = 0;
     std::string deviceId = "test";
@@ -545,7 +545,7 @@ HWTEST_F(HiChainAuthConnectorTest, ImportCredential_006, testing::ext::TestSize.
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId;
     int32_t userId = 0;
@@ -553,7 +553,7 @@ HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_001, testing::ext::TestSize.
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "864513535";
     int32_t userId = 0;
@@ -561,7 +561,7 @@ HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestSize.
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_003, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_003, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "test";
     int32_t userId = 0;
@@ -571,7 +571,7 @@ HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_003, testing::ext::TestSize.
     EXPECT_EQ(ret, 0);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_004, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_004, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "test";
     int32_t userId = 0;
@@ -581,7 +581,7 @@ HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_004, testing::ext::TestSize.
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_005, testing::ext::TestSize.Level0)
+HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_005, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "test";
     int32_t userId = 0;

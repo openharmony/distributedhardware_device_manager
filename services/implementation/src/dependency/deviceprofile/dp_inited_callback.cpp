@@ -20,7 +20,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "parameter.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"
@@ -106,19 +106,19 @@ bool DpInitedCallback::ConvertToTrustedDeviceInfo(const std::unordered_map<std::
         LOGE("extraData is empty, networkId:%{public}s", GetAnonyString(deviceInfo.networkId).c_str());
         return false;
     }
-    nlohmann::json extraJson = nlohmann::json::parse(deviceInfo.extraData, nullptr, false);
-    if (extraJson.is_discarded()) {
+    JsonObject extraJson(deviceInfo.extraData);
+    if (extraJson.IsDiscarded()) {
         LOGE("extraData parse failed, networkId:%{public}s", GetAnonyString(deviceInfo.networkId).c_str());
         return false;
     }
     if (IsString(extraJson, PARAM_KEY_OS_VERSION)) {
-        trustedDeviceInfo.SetOsVersion(extraJson[PARAM_KEY_OS_VERSION].get<std::string>());
+        trustedDeviceInfo.SetOsVersion(extraJson[PARAM_KEY_OS_VERSION].Get<std::string>());
     } else {
         LOGE("osVersion parse failed, networkId:%{public}s", GetAnonyString(deviceInfo.networkId).c_str());
         return false;
     }
     if (IsInt32(extraJson, PARAM_KEY_OS_TYPE)) {
-        trustedDeviceInfo.SetOsType(extraJson[PARAM_KEY_OS_TYPE].get<int32_t>());
+        trustedDeviceInfo.SetOsType(extraJson[PARAM_KEY_OS_TYPE].Get<int32_t>());
     } else {
         LOGE("osType parse failed, networkId:%{public}s", GetAnonyString(deviceInfo.networkId).c_str());
         return false;

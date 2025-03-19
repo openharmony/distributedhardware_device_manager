@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,7 @@ void MiniHiChainAuthConnectorTest::TearDownTestCase()
 {
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     int64_t requestId = 159357462;
@@ -47,7 +47,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Leve
     EXPECT_EQ(minHiChain->IsCredentialExist(), false);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, onFinish_002, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, onFinish_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     int64_t requestId = 0;
@@ -57,7 +57,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, onFinish_002, testing::ext::TestSize.Leve
     EXPECT_EQ(minHiChain->IsCredentialExist(), false);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, onError_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, onError_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     int64_t requestId = 159357462;
@@ -68,7 +68,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, onError_001, testing::ext::TestSize.Level
     EXPECT_EQ(minHiChain->IsCredentialExist(), false);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, onError_002, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, onError_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     int64_t requestId = 0;
@@ -79,28 +79,28 @@ HWTEST_F(MiniHiChainAuthConnectorTest, onError_002, testing::ext::TestSize.Level
     EXPECT_EQ(minHiChain->IsCredentialExist(), false);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, Init_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, Init_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     int32_t ret = minHiChain->Init();
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, UnInit_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, UnInit_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     int32_t ret = minHiChain->Init();
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, DeleteCredentialAndGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, DeleteCredentialAndGroup_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     int32_t ret = minHiChain->DeleteCredentialAndGroup();
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     std::string reqJsonStr;
@@ -108,37 +108,37 @@ HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_001, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_002, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = 123456789;
     std::string reqJsonStr = SafetyDump(jsonObject);
     int32_t ret = minHiChain->CreateGroup(reqJsonStr);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_003, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, CreateGroup_003, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = "123456789";
     std::string reqJsonStr = SafetyDump(jsonObject);
     int32_t ret = minHiChain->CreateGroup(reqJsonStr);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, RequestCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, RequestCredential_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = "123456789";
     std::string returnJsonStr = SafetyDump(jsonObject);
     int32_t ret = minHiChain->RequestCredential(returnJsonStr);
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, CheckCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, CheckCredential_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     std::string reqJsonStr;
@@ -147,7 +147,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, CheckCredential_001, testing::ext::TestSi
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, CheckCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, CheckCredential_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     std::string reqJsonStr = "reqJsonStr";
@@ -156,7 +156,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, CheckCredential_002, testing::ext::TestSi
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     std::string reqJsonStr;
@@ -165,10 +165,10 @@ HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_001, testing::ext::TestS
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["userId"] = 123456789;
     std::string reqJsonStr = SafetyDump(jsonObject);
     std::string returnJsonStr;
@@ -176,7 +176,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, ImportCredential_002, testing::ext::TestS
     EXPECT_EQ(ret, ERR_DM_HICHAIN_REGISTER_CALLBACK);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, DeleteCredential_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, DeleteCredential_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     std::string reqJsonStr;
@@ -185,7 +185,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, DeleteCredential_001, testing::ext::TestS
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     std::string reqJsonStr = "reqJsonStr";
@@ -194,7 +194,7 @@ HWTEST_F(MiniHiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestS
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(MiniHiChainAuthConnectorTest, IsCredentialExist_001, testing::ext::TestSize.Level0)
+HWTEST_F(MiniHiChainAuthConnectorTest, IsCredentialExist_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<MineHiChainConnector> minHiChain = std::make_shared<MineHiChainConnector>();
     bool ret = minHiChain->IsCredentialExist();

@@ -116,57 +116,58 @@ bool IsNumberString(const std::string &inputString)
     return true;
 }
 
-bool IsString(const nlohmann::json &jsonObj, const std::string &key)
+bool IsString(const JsonItemObject &jsonObj, const std::string &key)
 {
-    bool res = jsonObj.contains(key) && jsonObj[key].is_string() && jsonObj[key].size() <= MAX_MESSAGE_LEN;
+    bool res = (jsonObj.Contains(key) && jsonObj[key].IsString()
+        && jsonObj[key].Get<std::string>().size() <= MAX_MESSAGE_LEN);
     if (!res) {
         LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
     }
     return res;
 }
 
-bool IsInt32(const nlohmann::json &jsonObj, const std::string &key)
+bool IsInt32(const JsonItemObject &jsonObj, const std::string &key)
 {
-    bool res = jsonObj.contains(key) && jsonObj[key].is_number_integer() && jsonObj[key] >= INT32_MIN &&
-        jsonObj[key] <= INT32_MAX;
+    bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= INT32_MIN &&
+        jsonObj[key].Get<int64_t>() <= INT32_MAX;
     if (!res) {
         LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
     }
     return res;
 }
 
-bool IsUint32(const nlohmann::json &jsonObj, const std::string &key)
+bool IsUint32(const JsonItemObject &jsonObj, const std::string &key)
 {
-    bool res = jsonObj.contains(key) && jsonObj[key].is_number_unsigned() && jsonObj[key] >= 0 &&
-        jsonObj[key] <= UINT32_MAX;
+    bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= 0 &&
+        jsonObj[key].Get<int64_t>() <= UINT32_MAX;
     if (!res) {
         LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
     }
     return res;
 }
 
-bool IsInt64(const nlohmann::json &jsonObj, const std::string &key)
+bool IsInt64(const JsonItemObject &jsonObj, const std::string &key)
 {
-    bool res = jsonObj.contains(key) && jsonObj[key].is_number_integer() && jsonObj[key] >= INT64_MIN &&
-        jsonObj[key] <= INT64_MAX;
+    bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= INT64_MIN &&
+        jsonObj[key].Get<int64_t>() <= INT64_MAX;
     if (!res) {
         LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
     }
     return res;
 }
 
-bool IsArray(const nlohmann::json &jsonObj, const std::string &key)
+bool IsArray(const JsonItemObject &jsonObj, const std::string &key)
 {
-    bool res = jsonObj.contains(key) && jsonObj[key].is_array();
+    bool res = jsonObj.Contains(key) && jsonObj[key].IsArray();
     if (!res) {
         LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
     }
     return res;
 }
 
-bool IsBool(const nlohmann::json &jsonObj, const std::string &key)
+bool IsBool(const JsonItemObject &jsonObj, const std::string &key)
 {
-    bool res = jsonObj.contains(key) && jsonObj[key].is_boolean();
+    bool res = jsonObj.Contains(key) && jsonObj[key].IsBoolean();
     if (!res) {
         LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
     }
@@ -181,7 +182,7 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
         return jsonStr;
     }
     if (!paramMap.empty()) {
-        nlohmann::json jsonObj;
+        JsonObject jsonObj;
         for (const auto &it : paramMap) {
             jsonObj[it.first] = it.second;
         }
@@ -199,13 +200,13 @@ void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, st
         LOGE("invalid paramMap");
         return;
     }
-    nlohmann::json paramJson = nlohmann::json::parse(jsonStr, nullptr, false);
-    if (paramJson.is_discarded()) {
+    JsonObject paramJson(jsonStr);
+    if (paramJson.IsDiscarded()) {
         return;
     }
-    for (auto &element : paramJson.items()) {
-        if (element.value().is_string()) {
-            paramMap.insert(std::pair<std::string, std::string>(element.key(), element.value()));
+    for (auto &element : paramJson.Items()) {
+        if (element.IsString()) {
+            paramMap.insert(std::pair<std::string, std::string>(element.Key(), element.Get<std::string>()));
         }
     }
 }
@@ -367,10 +368,9 @@ bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent)
     return false;
 }
 
-std::string SafetyDump(const nlohmann::json &jsonObj)
+std::string SafetyDump(const JsonItemObject &jsonObj)
 {
-    int indent = -1;
-    return jsonObj.dump(indent, ' ', false, nlohmann::detail::error_handler_t::ignore);
+    return jsonObj.Dump();
 }
 
 std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index)
@@ -394,6 +394,20 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
     }
     LOGE("get failed");
     return "";
+}
+
+bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &key)
+{
+    if (!IsString(jsonObj, key)) {
+        LOGE("%{public}s is not string", key.c_str());
+        return false;
+    }
+    std::string retValStr = jsonObj[key].Get<std::string>();
+    if (!IsNumberString(retValStr)) {
+        LOGE("%{public}s is not number", key.c_str());
+        return false;
+    }
+    return true;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

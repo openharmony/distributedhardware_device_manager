@@ -25,7 +25,7 @@
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "parameter.h"
 
 
@@ -134,7 +134,7 @@ int32_t MineHiChainConnector::UnInit(void)
 
 int32_t MineHiChainConnector::DeleteCredentialAndGroup(void)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_IS_DELETE_ALL] = true;
     std::string params = SafetyDump(jsonObj);
 #if (defined(MINE_HARMONY))
@@ -154,12 +154,12 @@ int32_t MineHiChainConnector::CreateGroup(const std::string &reqJsonStr)
     int64_t requestId = CREATE_GROUP_REQUESTID;
     char deviceUdid[DEVICE_UDID_LENGTH + 1] = {0};
 
-    nlohmann::json jsonObject = nlohmann::json::parse(reqJsonStr, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(reqJsonStr);
+    if (jsonObject.IsDiscarded()) {
         LOGE("reqJsonStr string not a json type.");
         return ERR_DM_FAILED;
     }
-    if (!jsonObject.contains(FIELD_USER_ID) || !jsonObject[FIELD_USER_ID].is_string()) {
+    if (!jsonObject.Contains(FIELD_USER_ID) || !jsonObject[FIELD_USER_ID].IsString()) {
         LOGE("userId key is not exist in reqJsonStr.");
         return ERR_DM_FAILED;
     }
@@ -169,7 +169,7 @@ int32_t MineHiChainConnector::CreateGroup(const std::string &reqJsonStr)
         return ERR_DM_FAILED;
     }
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_USER_ID] = jsonObject[FIELD_USER_ID];
     jsonObj[FIELD_GROUP_NAME] = DEVICE_MANAGER_GROUPNAME;
     jsonObj[FIELD_DEVICE_ID] = std::string(deviceUdid);
@@ -241,8 +241,8 @@ int MineHiChainConnector::ImportCredential(std::string reqJsonStr, std::string &
         LOGE("reqJsonStr is empty or g_deviceGroupManager is nullptr.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    nlohmann::json jsonObject = nlohmann::json::parse(reqJsonStr, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(reqJsonStr);
+    if (jsonObject.IsDiscarded()) {
         LOGE("import credenfial input reqJsonStr string not a json string type.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -310,12 +310,12 @@ bool MineHiChainConnector::IsCredentialExist(void)
     }
 
     do {
-        nlohmann::json jsonObject = nlohmann::json::parse(returnInfo, nullptr, false);
-        if (jsonObject.is_discarded()) {
+        JsonObject jsonObject(returnInfo);
+        if (jsonObject.IsDiscarded()) {
             LOGE("reqJsonStr is not a json string type.");
             break;
         }
-        if (!jsonObject.contains(FIELD_CREDENTIAL_EXISTS) || !jsonObject[FIELD_CREDENTIAL_EXISTS].is_boolean()) {
+        if (!jsonObject.Contains(FIELD_CREDENTIAL_EXISTS) || !jsonObject[FIELD_CREDENTIAL_EXISTS].IsBoolean()) {
             LOGE("failed to get key:%{public}s from import json object.", FIELD_CREDENTIAL_EXISTS);
             break;
         }

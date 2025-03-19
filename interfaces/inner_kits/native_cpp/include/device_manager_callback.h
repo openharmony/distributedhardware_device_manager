@@ -124,6 +124,17 @@ public:
     virtual void OnResult(const DmDeviceIconInfo &deviceIconInfo, int32_t code) = 0;
 };
 
+class SetLocalDeviceNameCallback {
+public:
+    virtual ~SetLocalDeviceNameCallback() {}
+    virtual void OnResult(int32_t code) = 0;
+};
+
+class SetRemoteDeviceNameCallback {
+public:
+    virtual ~SetRemoteDeviceNameCallback() {}
+    virtual void OnResult(int32_t code) = 0;
+};
 
 class CredentialCallback {
 public:

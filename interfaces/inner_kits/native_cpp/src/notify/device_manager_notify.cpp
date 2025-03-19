@@ -19,6 +19,9 @@
 #include "dm_error_type.h"
 #include "dm_device_info.h"
 #include "dm_log.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ipc_model_codec.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -484,6 +487,8 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
+    LOGE("OnDeviceReady in, pkgName:%{public}s, networkId: %{public}s.",
+        pkgName.c_str(), GetAnonyString(deviceInfo.networkId).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
 #else
@@ -1340,9 +1345,9 @@ void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, 
         return;
     }
     LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
-    std::string uk =  deviceIconInfo.productId + UK_SEPARATOR + deviceIconInfo.subProductId + UK_SEPARATOR +
-        deviceIconInfo.imageType + UK_SEPARATOR + deviceIconInfo.specName;
     std::map<std::string, std::set<std::shared_ptr<GetDeviceIconInfoCallback>>> tempCbks;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string uk = IpcModelCodec::GetDeviceIconInfoUniqueKey(deviceIconInfo);
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
         auto iter = getDeviceIconInfoCallback_.find(pkgName);
@@ -1358,6 +1363,7 @@ void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, 
             iter->second.erase(uk);
         }
     }
+#endif
     if (tempCbks.empty()) {
         LOGE("error, registered GetDeviceIconInfoResult callback is nullptr.");
         return;
@@ -1367,6 +1373,127 @@ void DeviceManagerNotify::OnGetDeviceIconInfoResult(const std::string &pkgName, 
             if (callback != nullptr) {
                 callback->OnResult(deviceIconInfo, code);
             }
+        }
+    }
+}
+
+int32_t DeviceManagerNotify::RegisterSetLocalDeviceNameCallback(const std::string &pkgName,
+    std::shared_ptr<SetLocalDeviceNameCallback> callback)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    if (setLocalDeviceNameCallback_.size() > MAX_CONTAINER_SIZE) {
+        LOGI("callback map size is more than max size");
+        return ERR_DM_MAX_SIZE_FAIL;
+    }
+    setLocalDeviceNameCallback_[pkgName] = callback;
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::UnRegisterSetLocalDeviceNameCallback(const std::string &pkgName)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    setLocalDeviceNameCallback_.erase(pkgName);
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::RegisterSetRemoteDeviceNameCallback(const std::string &pkgName,
+    const std::string &deviceId, std::shared_ptr<SetRemoteDeviceNameCallback> callback)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    if (setRemoteDeviceNameCallback_.size() > MAX_CONTAINER_SIZE) {
+        LOGI("callback map size is more than max size");
+        return ERR_DM_MAX_SIZE_FAIL;
+    }
+    auto iter = setRemoteDeviceNameCallback_.find(pkgName);
+    if (iter == setRemoteDeviceNameCallback_.end()) {
+        setRemoteDeviceNameCallback_[pkgName][deviceId] = callback;
+        return DM_OK;
+    }
+    if (iter->second.size() > MAX_CONTAINER_SIZE) {
+        LOGI("callback map size is more than max size");
+        return ERR_DM_MAX_SIZE_FAIL;
+    }
+    iter->second[deviceId] = callback;
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::UnRegisterSetRemoteDeviceNameCallback(const std::string &pkgName,
+    const std::string &deviceId)
+{
+    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    std::lock_guard<std::mutex> autoLock(bindLock_);
+    auto iter = setRemoteDeviceNameCallback_.find(pkgName);
+    if (iter == setRemoteDeviceNameCallback_.end()) {
+        return DM_OK;
+    }
+    iter->second.erase(deviceId);
+    if (iter->second.empty()) {
+        getDeviceIconInfoCallback_.erase(pkgName);
+    }
+    return DM_OK;
+}
+
+void DeviceManagerNotify::OnSetLocalDeviceNameResult(const std::string &pkgName, int32_t code)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid para, pkgName : %{public}s", pkgName.c_str());
+        return;
+    }
+    LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
+    std::shared_ptr<SetLocalDeviceNameCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(bindLock_);
+        if (setLocalDeviceNameCallback_.find(pkgName) == setLocalDeviceNameCallback_.end()) {
+            LOGE("error, callback not register for pkgName %{public}s.", pkgName.c_str());
+            return;
+        }
+        tempCbk = setLocalDeviceNameCallback_[pkgName];
+        setLocalDeviceNameCallback_.erase(pkgName);
+    }
+    if (tempCbk == nullptr) {
+        LOGE("error, registered SetLocalDeviceName callback is nullptr.");
+        return;
+    }
+    tempCbk->OnResult(code);
+}
+
+void DeviceManagerNotify::OnSetRemoteDeviceNameResult(const std::string &pkgName, const std::string &deviceId,
+    int32_t code)
+{
+    if (pkgName.empty() || deviceId.empty()) {
+        LOGE("Invalid para, pkgName : %{public}s, deviceId : %{public}s",
+            pkgName.c_str(), GetAnonyString(deviceId).c_str());
+        return;
+    }
+    LOGI("In, pkgName:%{public}s, code:%{public}d", pkgName.c_str(), code);
+    std::map<std::string, std::shared_ptr<SetRemoteDeviceNameCallback>> tempCbks;
+    {
+        std::lock_guard<std::mutex> autoLock(bindLock_);
+        auto iter = setRemoteDeviceNameCallback_.find(pkgName);
+        if (iter == setRemoteDeviceNameCallback_.end()) {
+            LOGE("error, callback not register for pkgName %{public}s.", pkgName.c_str());
+            return;
+        }
+        if (ERR_DM_HILINKSVC_DISCONNECT == code) {
+            tempCbks = iter->second;
+            setRemoteDeviceNameCallback_.erase(pkgName);
+        } else {
+            if (iter->second.find(deviceId) != iter->second.end()) {
+                tempCbks[deviceId] = iter->second[deviceId];
+                iter->second.erase(deviceId);
+            }
+        }
+    }
+    if (tempCbks.empty()) {
+        LOGE("error, registered GetDeviceIconInfoResult callback is nullptr.");
+        return;
+    }
+    for (const auto &[key, callback] : tempCbks) {
+        if (callback != nullptr) {
+            callback->OnResult(code);
         }
     }
 }

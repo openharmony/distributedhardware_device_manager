@@ -88,7 +88,7 @@ bool KVAdapterManagerTest::UnInitKvStoreEnv()
 
 std::string KVAdapterManagerTest::CreateDmKVValueStr(const std::string &appId, int64_t lastModifyTime) const
 {
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[UDID_HASH_KEY] = "udid";
     jsonObject[APP_ID_KEY] = appId;
     jsonObject[ANOY_DEVICE_ID_KEY] = "anoy_device";
@@ -97,7 +97,7 @@ std::string KVAdapterManagerTest::CreateDmKVValueStr(const std::string &appId, i
     return SafetyDump(jsonObject);
 }
 
-HWTEST_F(KVAdapterManagerTest, Init_001, testing::ext::TestSize.Level0)
+HWTEST_F(KVAdapterManagerTest, Init_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(kvDataMgr_ != nullptr);
     EXPECT_CALL(*kvDataMgr_, GetSingleKvStore(_, _, _, _))
@@ -108,7 +108,7 @@ HWTEST_F(KVAdapterManagerTest, Init_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(KVAdapterManagerTest, ReInit_001, testing::ext::TestSize.Level0)
+HWTEST_F(KVAdapterManagerTest, ReInit_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(kvDataMgr_ != nullptr);
     EXPECT_CALL(*kvDataMgr_, GetSingleKvStore(_, _, _, _))
@@ -118,7 +118,7 @@ HWTEST_F(KVAdapterManagerTest, ReInit_001, testing::ext::TestSize.Level0)
     KVAdapterManager::GetInstance().ReInit();
 }
 
-HWTEST_F(KVAdapterManagerTest, PutByAnoyDeviceId_001, testing::ext::TestSize.Level0)
+HWTEST_F(KVAdapterManagerTest, PutByAnoyDeviceId_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(mockSingleKvStore_ != nullptr);
 
@@ -175,7 +175,7 @@ HWTEST_F(KVAdapterManagerTest, PutByAnoyDeviceId_003, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(KVAdapterManagerTest, Get_001, testing::ext::TestSize.Level0)
+HWTEST_F(KVAdapterManagerTest, Get_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(mockSingleKvStore_ != nullptr);
 
@@ -210,7 +210,7 @@ HWTEST_F(KVAdapterManagerTest, Get_002, testing::ext::TestSize.Level2)
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(KVAdapterManagerTest, DeleteAgedEntry_001, testing::ext::TestSize.Level0)
+HWTEST_F(KVAdapterManagerTest, DeleteAgedEntry_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(mockSingleKvStore_ != nullptr);
     for (int64_t i = 0; i < 2; ++i) {
@@ -238,7 +238,7 @@ HWTEST_F(KVAdapterManagerTest, DeleteAgedEntry_001, testing::ext::TestSize.Level
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(KVAdapterManagerTest, AppUnintall_001, testing::ext::TestSize.Level0)
+HWTEST_F(KVAdapterManagerTest, AppUnintall_001, testing::ext::TestSize.Level1)
 {
     ASSERT_TRUE(mockSingleKvStore_ != nullptr);
     std::map<std::string, std::string> registerMap;

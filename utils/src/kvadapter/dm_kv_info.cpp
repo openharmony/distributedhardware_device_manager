@@ -27,7 +27,7 @@ constexpr const char* LAST_MODIFY_TIME_KEY = "lastModifyTime";
 
 void ConvertDmKVValueToJson(const DmKVValue &kvValue, std::string &result)
 {
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[UDID_HASH_KEY] = kvValue.udidHash;
     jsonObj[APP_ID_KEY] = kvValue.appID;
     jsonObj[ANOY_DEVICE_ID_KEY] = kvValue.anoyDeviceId;
@@ -41,24 +41,24 @@ void ConvertJsonToDmKVValue(const std::string &result, DmKVValue &kvValue)
     if (result.empty()) {
         return;
     }
-    nlohmann::json resultJson = nlohmann::json::parse(result, nullptr, false);
-    if (resultJson.is_discarded()) {
+    JsonObject resultJson(result);
+    if (resultJson.IsDiscarded()) {
         return;
     }
     if (IsString(resultJson, UDID_HASH_KEY)) {
-        kvValue.udidHash = resultJson[UDID_HASH_KEY].get<std::string>();
+        kvValue.udidHash = resultJson[UDID_HASH_KEY].Get<std::string>();
     }
     if (IsString(resultJson, APP_ID_KEY)) {
-        kvValue.appID = resultJson[APP_ID_KEY].get<std::string>();
+        kvValue.appID = resultJson[APP_ID_KEY].Get<std::string>();
     }
     if (IsString(resultJson, ANOY_DEVICE_ID_KEY)) {
-        kvValue.anoyDeviceId = resultJson[ANOY_DEVICE_ID_KEY].get<std::string>();
+        kvValue.anoyDeviceId = resultJson[ANOY_DEVICE_ID_KEY].Get<std::string>();
     }
     if (IsString(resultJson, SALT_KEY)) {
-        kvValue.salt = resultJson[SALT_KEY].get<std::string>();
+        kvValue.salt = resultJson[SALT_KEY].Get<std::string>();
     }
     if (IsInt64(resultJson, LAST_MODIFY_TIME_KEY)) {
-        kvValue.lastModifyTime = resultJson[LAST_MODIFY_TIME_KEY].get<int64_t>();
+        kvValue.lastModifyTime = resultJson[LAST_MODIFY_TIME_KEY].Get<int64_t>();
     }
 }
 } // namespace DistributedHardware

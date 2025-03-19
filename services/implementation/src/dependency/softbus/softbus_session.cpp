@@ -20,7 +20,7 @@
 #include "dm_dfx_constants.h"
 #include "dm_hitrace.h"
 #include "dm_log.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "softbus_connector.h"
 #include "softbus_error_code.h"
 #ifndef DEVICE_MANAGER_COMMON_FLAG
@@ -161,8 +161,8 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
 
 int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
-    nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(message);
+    if (jsonObject.IsDiscarded()) {
         LOGE("extrasJson error, message: %{public}s.", GetAnonyString(message).c_str());
         return ERR_DM_FAILED;
     }
@@ -170,7 +170,7 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
         LOGE("SoftbusSession::SendData err json string.");
         return ERR_DM_FAILED;
     }
-    int32_t msgType = jsonObject[TAG_MSG_TYPE].get<int32_t>();
+    int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
     LOGI("start, msgType: %{public}d.", msgType);
     if (sessionCallback_->GetIsCryptoSupport()) {
         LOGI("SendData Start encryption.");
@@ -220,8 +220,8 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
         LOGI("Start decryption.");
     }
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
-    nlohmann::json jsonObject = nlohmann::json::parse(message, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(message);
+    if (jsonObject.IsDiscarded()) {
         LOGE("DecodeRequestAuth jsonStr error");
         return;
     }
@@ -229,8 +229,8 @@ void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned i
         LOGE("err json string, first time");
         return;
     }
-    if (jsonObject[TAG_MSG_TYPE].get<int32_t>() == AUTH_DEVICE_REQ_NEGOTIATE ||
-        jsonObject[TAG_MSG_TYPE].get<int32_t>() == AUTH_DEVICE_RESP_NEGOTIATE) {
+    if (jsonObject[TAG_MSG_TYPE].Get<int32_t>() == AUTH_DEVICE_REQ_NEGOTIATE ||
+        jsonObject[TAG_MSG_TYPE].Get<int32_t>() == AUTH_DEVICE_RESP_NEGOTIATE) {
         sessionCallback_->OnAuthDeviceDataReceived(sessionId, message);
     } else {
         sessionCallback_->OnDataReceived(sessionId, message);

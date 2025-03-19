@@ -153,6 +153,12 @@ bool AppManager::IsSystemSA()
     return false;
 }
 
+bool AppManager::IsSystemApp()
+{
+    uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
+    return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
+}
+
 int32_t AppManager::GetCallerName(bool isSystemSA, std::string &callerName)
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,7 @@ void DMTransportMsgTest::TearDownTestCase()
  * @tc.name: ToJsonAndFromJson
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson, testing::ext::TestSize.Level1)
 {
     UserIdsMsg userIdsMsg;
     userIdsMsg.foregroundUserIds = {1, 2, 3};
@@ -66,7 +66,7 @@ HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson, testing::ext::TestSize.Level0)
  * @tc.name: ToJsonAndFromJson01
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson01, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson01, testing::ext::TestSize.Level1)
 {
     CommMsg commMsg;
     commMsg.code = 200;
@@ -96,7 +96,7 @@ HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson01, testing::ext::TestSize.Level0)
  * @tc.name: PerformanceTest
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportMsgTest, PerformanceTest, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportMsgTest, PerformanceTest, testing::ext::TestSize.Level1)
 {
     UserIdsMsg userIdsMsg;
     for (int i = 0; i < 10000; ++i) {
@@ -117,7 +117,7 @@ HWTEST_F(DMTransportMsgTest, PerformanceTest, testing::ext::TestSize.Level0)
  * @tc.name: GetCommMsgString_EmptyInput
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportMsgTest, GetCommMsgString_EmptyInput, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportMsgTest, GetCommMsgString_EmptyInput, testing::ext::TestSize.Level1)
 {
     CommMsg commMsg;
     std::string result = GetCommMsgString(commMsg);
@@ -128,7 +128,7 @@ HWTEST_F(DMTransportMsgTest, GetCommMsgString_EmptyInput, testing::ext::TestSize
  * @tc.name: ToJson_ValidInput
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportMsgTest, ToJson_ValidInput, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportMsgTest, ToJson_ValidInput, testing::ext::TestSize.Level1)
 {
     cJSON *jsonObject = cJSON_CreateObject();
     NotifyUserIds notifyUserIds;
@@ -146,7 +146,7 @@ HWTEST_F(DMTransportMsgTest, ToJson_ValidInput, testing::ext::TestSize.Level0)
  * @tc.name: FromJson_InvalidJson
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportMsgTest, FromJson_InvalidJson, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportMsgTest, FromJson_InvalidJson, testing::ext::TestSize.Level1)
 {
     const char *jsonString = "{\"udid\":123,\"userIds\":\"invalid\"}";
     cJSON *jsonObject = cJSON_Parse(jsonString);
@@ -163,7 +163,7 @@ HWTEST_F(DMTransportMsgTest, FromJson_InvalidJson, testing::ext::TestSize.Level0
  * @tc.name: NotifyUserIds_ToString_ValidInput
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportMsgTest, NotifyUserIds_ToString_ValidInput, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportMsgTest, NotifyUserIds_ToString_ValidInput, testing::ext::TestSize.Level1)
 {
     NotifyUserIds notifyUserIds;
     notifyUserIds.remoteUdid = "test_udid";
@@ -177,11 +177,31 @@ HWTEST_F(DMTransportMsgTest, NotifyUserIds_ToString_ValidInput, testing::ext::Te
  * @tc.name: NotifyUserIds_ToString_EmptyInput
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportMsgTest, NotifyUserIds_ToString_EmptyInput, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportMsgTest, NotifyUserIds_ToString_EmptyInput, testing::ext::TestSize.Level1)
 {
     NotifyUserIds notifyUserIds;
     std::string result = notifyUserIds.ToString();
     EXPECT_FALSE(result.empty());
+}
+
+HWTEST_F(DMTransportMsgTest, ToJson_UserIdsMsg, testing::ext::TestSize.Level1)
+{
+    std::vector<uint32_t> foregroundUserIds{1, 2, 3};
+    std::vector<uint32_t> backgroundUserIds{4, 5, 6};
+    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds);
+    const char* jsonStr = R"({
+        "MsgType": "0",
+        "msg": "messgaeinfo",
+        "code": 145,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonStr);
+    ToJson(jsonObject, userIdsMsg);
+    cJSON_Delete(jsonObject);
+    EXPECT_FALSE(userIdsMsg.foregroundUserIds.empty());
 }
 } // DistributedHardware
 } // OHOS

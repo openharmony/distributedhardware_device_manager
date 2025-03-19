@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -187,17 +187,17 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
         userIdAndBindLevel[processInfo.userId] = INVALIED_TYPE;
     }
     for (const auto &item : userIdAndBindLevel) {
-        if (item.second == INVALIED_TYPE) {
+        if (static_cast<uint32_t>(item.second) == INVALIED_TYPE) {
             LOGI("The offline device is identical account bind type.");
             devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
             processInfo.userId = item.first;
             softbusConnector_->SetProcessInfo(processInfo);
-        } else if (item.second == DEVICE) {
+        } else if (static_cast<uint32_t>(item.second) == DEVICE) {
             LOGI("The offline device is device bind type.");
             devInfo.authForm = DmAuthForm::PEER_TO_PEER;
             processInfo.userId = item.first;
             softbusConnector_->SetProcessInfo(processInfo);
-        } else if (item.second == SERVICE || item.second == APP) {
+        } else if (static_cast<uint32_t>(item.second) == SERVICE || static_cast<uint32_t>(item.second) == APP) {
             LOGI("The offline device is APP_PEER_TO_PEER_TYPE bind type.");
             std::vector<ProcessInfo> processInfoVec =
                 DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(requestDeviceId, trustDeviceId,
@@ -210,7 +210,8 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
 
 void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("DeviceManagerServiceImpl::HandleOnline");
+    LOGI("DeviceManagerServiceImpl::HandleOnline networkId: %{public}s.",
+        GetAnonyString(devInfo.networkId).c_str());
     std::string trustDeviceId = "";
     if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
         LOGE("HandleOnline get udid failed.");
@@ -229,12 +230,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     ProcessInfo processInfo;
     processInfo.pkgName = std::string(DM_PKG_NAME);
     processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
-    if (bindType == INVALIED_TYPE && isCredentialType_.load()) {
-        PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
-        devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
-        isCredentialType_.store(false);
-        softbusConnector_->SetProcessInfo(processInfo);
-    } else if (bindType == IDENTICAL_ACCOUNT_TYPE) {
+    if (bindType == IDENTICAL_ACCOUNT_TYPE) {
         devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
         softbusConnector_->SetProcessInfo(processInfo);
     } else if (bindType == DEVICE_PEER_TO_PEER_TYPE) {
@@ -262,7 +258,8 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
 
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("DeviceManagerServiceImpl::HandleDeviceStatusChange start, devState = %{public}d.", devState);
+    LOGI("DeviceManagerServiceImpl::HandleDeviceStatusChange start, devState = %{public}d, networkId: %{public}s.",
+        devState, GetAnonyString(devInfo.networkId).c_str());
     if (deviceStateMgr_ == nullptr) {
         LOGE("deviceStateMgr_ is nullpter!");
         return;
@@ -479,18 +476,18 @@ int32_t DeviceManagerServiceImpl::UnRegisterUiStateCallback(const std::string &p
     return authMgr_->UnRegisterUiStateCallback(pkgName);
 }
 
-int32_t DeviceManagerServiceImpl::PraseNotifyEventJson(const std::string &event, nlohmann::json &jsonObject)
+int32_t DeviceManagerServiceImpl::PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject)
 {
-    jsonObject = nlohmann::json::parse(event, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    jsonObject.Parse(event);
+    if (jsonObject.IsDiscarded()) {
         LOGE("event prase error.");
         return ERR_DM_FAILED;
     }
-    if ((!jsonObject.contains("extra")) || (!jsonObject["extra"].is_object())) {
+    if ((!jsonObject.Contains("extra")) || (!jsonObject["extra"].IsObject())) {
         LOGE("extra error");
         return ERR_DM_FAILED;
     }
-    if ((!jsonObject["extra"].contains("deviceId")) || (!jsonObject["extra"]["deviceId"].is_string())) {
+    if ((!jsonObject["extra"].Contains("deviceId")) || (!jsonObject["extra"]["deviceId"].IsString())) {
         LOGE("NotifyEvent deviceId invalid");
         return ERR_DM_FAILED;
     }
@@ -506,13 +503,13 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (eventId == DM_NOTIFY_EVENT_ONDEVICEREADY) {
-        nlohmann::json jsonObject;
+        JsonObject jsonObject;
         if (PraseNotifyEventJson(event, jsonObject) != DM_OK) {
             LOGE("NotifyEvent json invalid");
             return ERR_DM_INPUT_PARA_INVALID;
         }
         std::string deviceId;
-        jsonObject["extra"]["deviceId"].get_to(deviceId);
+        jsonObject["extra"]["deviceId"].GetTo(deviceId);
         if (deviceStateMgr_== nullptr) {
             LOGE("deviceStateMgr_ is nullptr");
             return ERR_DM_POINT_NULL;
@@ -735,8 +732,12 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
 {
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
         LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback on screen locked.");
-        authMgr_->OnScreenLocked();
-        return;
+        if (authMgr_ != nullptr) {
+            authMgr_->OnScreenLocked();
+            return;
+        } else {
+            LOGE("authMgr_ is null, cannot call OnScreenLocked.");
+        }
     }
     LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback error.");
 }
@@ -829,11 +830,11 @@ DmAuthForm DeviceManagerServiceImpl::ConvertBindTypeToAuthForm(int32_t bindType)
 {
     LOGI("BindType %{public}d.", bindType);
     DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
-    if (bindType == DM_IDENTICAL_ACCOUNT) {
+    if (static_cast<uint32_t>(bindType) == DM_IDENTICAL_ACCOUNT) {
         authForm = IDENTICAL_ACCOUNT;
-    } else if (bindType == DM_POINT_TO_POINT) {
+    } else if (static_cast<uint32_t>(bindType) == DM_POINT_TO_POINT) {
         authForm = PEER_TO_PEER;
-    } else if (bindType == DM_ACROSS_ACCOUNT) {
+    } else if (static_cast<uint32_t>(bindType) == DM_ACROSS_ACCOUNT) {
         authForm = ACROSS_ACCOUNT;
     } else {
         LOGE("Invalied bindType.");
@@ -847,7 +848,7 @@ void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const 
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
     int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    if (bindType == DM_INVALIED_BINDTYPE) {
+    if (static_cast<uint32_t>(bindType) == DM_INVALIED_BINDTYPE) {
         LOGE("Invalied bindtype.");
         return;
     }
@@ -892,7 +893,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
 }
 
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
-    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus)
 {
     LOGI("remote udid: %{public}s, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
         GetAnonyString(remoteUdid).c_str(), GetIntegerList<uint32_t>(foregroundUserIds).c_str(),
@@ -904,9 +905,12 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     std::vector<int32_t> rmtBackUserIdsTemp(backgroundUserIds.begin(), backgroundUserIds.end());
     std::vector<int32_t> localUserIds;
     int32_t ret = MultipleUserConnector::GetForegroundUserIds(localUserIds);
-    if (ret != DM_OK || localUserIds.empty()) {
+    if (ret != DM_OK) {
         LOGE("Get foreground userids failed, ret: %{public}d", ret);
         return;
+    }
+    if (isCheckUserStatus) {
+        MultipleUserConnector::ClearLockedUser(localUserIds);
     }
     DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
         rmtFrontUserIdsTemp, rmtBackUserIdsTemp);

@@ -33,11 +33,9 @@ public:
         DmDeviceProfileInfoFilterOptions &filterOptions);
     static bool EncodeDmDeviceProfileInfoFilterOptions(const DmDeviceProfileInfoFilterOptions &filterOptions,
         MessageParcel &parcel);
-    static void DecodeDmProductInfo(MessageParcel &parcel, DmProductInfo &prodInfo);
     static void DecodeDmServiceProfileInfo(MessageParcel &parcel, DmServiceProfileInfo &svrInfo);
     static void DecodeDmServiceProfileInfos(MessageParcel &parcel, std::vector<DmServiceProfileInfo> &svrInfos);
     static void DecodeDmDeviceProfileInfo(MessageParcel &parcel, DmDeviceProfileInfo &devInfo);
-    static bool EncodeDmProductInfo(const DmProductInfo &prodInfo, MessageParcel &parcel);
     static bool EncodeDmServiceProfileInfo(const DmServiceProfileInfo &svrInfo, MessageParcel &parcel);
     static bool EncodeDmServiceProfileInfos(const std::vector<DmServiceProfileInfo> &svrInfos, MessageParcel &parcel);
     static bool EncodeDmDeviceProfileInfo(const DmDeviceProfileInfo &devInfo, MessageParcel &parcel);
@@ -54,6 +52,10 @@ public:
     static bool EncodeLocalServiceInfos(const std::vector<DMLocalServiceInfo> &serviceInfos, MessageParcel &parcel);
     static bool DecodeLocalServiceInfo(MessageParcel &parcel, DMLocalServiceInfo &serviceInfo);
     static bool DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<DMLocalServiceInfo> &serviceInfos);
+    static bool EncodeNetworkIdQueryFilter(const NetworkIdQueryFilter &queryFilter, MessageParcel &parcel);
+    static bool DecodeNetworkIdQueryFilter(MessageParcel &parcel, NetworkIdQueryFilter &queryFilter);
+    static bool EncodeStringVector(const std::vector<std::string> &vec, MessageParcel &parcel);
+    static bool DecodeStringVector(MessageParcel &parcel, std::vector<std::string> &vec);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -76,10 +76,10 @@ namespace {
 bool CheckSoftbusRes(int32_t ret)
 {
     return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR ||
-        ret == SOFTBUS_IPC_ERR || ret == ERR_DM_FAILED || ret == SOFTBUS_NETWORK_GET_ALL_NODE_INFO_ERR;
+        ret == SOFTBUS_IPC_ERR || ret == ERR_DM_FAILED || ret == SOFTBUS_NETWORK_GET_NODE_INFO_ERR;
 }
 
-HWTEST_F(DMSoftbusCacheTest, GetDeviceInfoFromCache_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, GetDeviceInfoFromCache_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo = {
         .deviceId = "deviceIdTest",
@@ -102,7 +102,7 @@ HWTEST_F(DMSoftbusCacheTest, GetDeviceInfoFromCache_001, testing::ext::TestSize.
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DMSoftbusCacheTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, CheckIsOnline_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo = {
         .deviceId = "deviceIdTest",
@@ -118,7 +118,7 @@ HWTEST_F(DMSoftbusCacheTest, CheckIsOnline_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(SoftbusCache::GetInstance().CheckIsOnline("deviceIdTest1"), false);
 }
 
-HWTEST_F(DMSoftbusCacheTest, GetUuidByUdid_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, GetUuidByUdid_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo = {
         .deviceId = "deviceIdTest",
@@ -137,7 +137,7 @@ HWTEST_F(DMSoftbusCacheTest, GetUuidByUdid_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
-HWTEST_F(DMSoftbusCacheTest, GetNetworkIdFromCache_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, GetNetworkIdFromCache_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo = {
         .deviceId = "deviceIdTest",
@@ -156,7 +156,7 @@ HWTEST_F(DMSoftbusCacheTest, GetNetworkIdFromCache_001, testing::ext::TestSize.L
     EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
-HWTEST_F(DMSoftbusCacheTest, GetUdidByUdidHash_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, GetUdidByUdidHash_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo = {
         .deviceId = "deviceIdTest",
@@ -175,7 +175,7 @@ HWTEST_F(DMSoftbusCacheTest, GetUdidByUdidHash_001, testing::ext::TestSize.Level
     EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
-HWTEST_F(DMSoftbusCacheTest, GetDevInfoByNetworkId_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, GetDevInfoByNetworkId_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo = {
         .deviceId = "deviceIdTest",
@@ -192,7 +192,7 @@ HWTEST_F(DMSoftbusCacheTest, GetDevInfoByNetworkId_001, testing::ext::TestSize.L
     EXPECT_EQ(SoftbusCache::GetInstance().GetDevInfoByNetworkId("networkid", nodeInfo), DM_OK);
 }
 
-HWTEST_F(DMSoftbusCacheTest, GetSecurityDeviceLevel_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, GetSecurityDeviceLevel_001, testing::ext::TestSize.Level1)
 {
     {
         std::lock_guard<std::mutex> mutexLock(SoftbusCache::GetInstance().deviceSecurityLevelMutex_);
@@ -205,7 +205,7 @@ HWTEST_F(DMSoftbusCacheTest, GetSecurityDeviceLevel_001, testing::ext::TestSize.
     EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
-HWTEST_F(DMSoftbusCacheTest, GetUuidFromCache_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, GetUuidFromCache_001, testing::ext::TestSize.Level1)
 {
     SoftbusCache::GetInstance().DeleteDeviceInfo();
     DmDeviceInfo nodeInfo = {
@@ -235,7 +235,7 @@ HWTEST_F(DMSoftbusCacheTest, GetUuidFromCache_001, testing::ext::TestSize.Level0
     EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
-HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level1)
 {
     DmDeviceInfo deviceInfo = {
         .deviceId = "deviceIdTest",

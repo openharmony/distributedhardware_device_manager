@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,7 +39,7 @@ namespace {
  * @tc.name: CreateClientSocket_InvalidInput
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, CreateClientSocket_InvalidInput, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, CreateClientSocket_InvalidInput, testing::ext::TestSize.Level1)
 {
     std::string rmtNetworkId = "";
     EXPECT_EQ(dmTransport_->CreateClientSocket(rmtNetworkId), ERR_DM_INPUT_PARA_INVALID);
@@ -49,7 +49,7 @@ HWTEST_F(DMTransportTest, CreateClientSocket_InvalidInput, testing::ext::TestSiz
  * @tc.name: Init_Success
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, Init_Success, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, Init_Success, testing::ext::TestSize.Level1)
 {
     EXPECT_EQ(dmTransport_->Init(), ERR_DM_FAILED);
 }
@@ -58,7 +58,7 @@ HWTEST_F(DMTransportTest, Init_Success, testing::ext::TestSize.Level0)
  * @tc.name: Init_AlreadyInitialized
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, Init_AlreadyInitialized, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, Init_AlreadyInitialized, testing::ext::TestSize.Level1)
 {
     dmTransport_->Init();
     EXPECT_EQ(dmTransport_->Init(), ERR_DM_FAILED);
@@ -68,7 +68,7 @@ HWTEST_F(DMTransportTest, Init_AlreadyInitialized, testing::ext::TestSize.Level0
  * @tc.name: UnInit_ShouldShutdownAllSockets
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, UnInit_ShouldShutdownAllSockets, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, UnInit_ShouldShutdownAllSockets, testing::ext::TestSize.Level1)
 {
     int32_t socketId;
     dmTransport_->StartSocket("device1", socketId);
@@ -83,7 +83,7 @@ HWTEST_F(DMTransportTest, UnInit_ShouldShutdownAllSockets, testing::ext::TestSiz
  * @tc.name: UnInit_ShouldNotShutdownWhenNoSockets
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, UnInit_ShouldNotShutdownWhenNoSockets, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, UnInit_ShouldNotShutdownWhenNoSockets, testing::ext::TestSize.Level1)
 {
     EXPECT_EQ(dmTransport_->UnInit(), DM_OK);
 }
@@ -92,7 +92,7 @@ HWTEST_F(DMTransportTest, UnInit_ShouldNotShutdownWhenNoSockets, testing::ext::T
  * @tc.name: IsDeviceSessionOpened_ShouldReturnFalseForClosedSession
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, IsDeviceSessionOpened_ShouldReturnFalseForClosedSession, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, IsDeviceSessionOpened_ShouldReturnFalseForClosedSession, testing::ext::TestSize.Level1)
 {
     int32_t socketId;
     EXPECT_FALSE(dmTransport_->IsDeviceSessionOpened("device2", socketId));
@@ -102,7 +102,7 @@ HWTEST_F(DMTransportTest, IsDeviceSessionOpened_ShouldReturnFalseForClosedSessio
  * @tc.name: GetRemoteNetworkIdBySocketIdReturnEmptyString
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, GetRemoteNetworkIdBySocketIdReturnEmptyString, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, GetRemoteNetworkIdBySocketIdReturnEmptyString, testing::ext::TestSize.Level1)
 {
     EXPECT_EQ(dmTransport_->GetRemoteNetworkIdBySocketId(-1), "");
 }
@@ -111,7 +111,7 @@ HWTEST_F(DMTransportTest, GetRemoteNetworkIdBySocketIdReturnEmptyString, testing
  * @tc.name: ClearDeviceSocketOpened_ShouldRemoveSocket
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldRemoveSocket, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldRemoveSocket, testing::ext::TestSize.Level1)
 {
     int32_t socketId = 1;
     dmTransport_->StartSocket("device1", socketId);
@@ -123,7 +123,7 @@ HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldRemoveSocket, testing::e
  * @tc.name: ClearDeviceSocketOpened_ShouldDoNothingForInvalidId
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldDoNothingForInvalidId, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldDoNothingForInvalidId, testing::ext::TestSize.Level1)
 {
     int32_t socketId = 1;
     dmTransport_->StartSocket("device1", socketId);
@@ -135,7 +135,7 @@ HWTEST_F(DMTransportTest, ClearDeviceSocketOpened_ShouldDoNothingForInvalidId, t
  * @tc.name: StartSocket_ShouldCreateSocket
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, StartSocket_ShouldCreateSocket, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, StartSocket_ShouldCreateSocket, testing::ext::TestSize.Level1)
 {
     int32_t socketId;
     EXPECT_EQ(dmTransport_->StartSocket("device1", socketId), ERR_DM_FAILED);
@@ -146,7 +146,7 @@ HWTEST_F(DMTransportTest, StartSocket_ShouldCreateSocket, testing::ext::TestSize
  * @tc.name: StartSocket_ShouldReturnErrorForInvalidId
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorForInvalidId, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorForInvalidId, testing::ext::TestSize.Level1)
 {
     int32_t socketId;
     EXPECT_EQ(dmTransport_->StartSocket("", socketId), ERR_DM_INPUT_PARA_INVALID);
@@ -156,7 +156,7 @@ HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorForInvalidId, testing::ex
  * @tc.name: StartSocket_ShouldReturnErrorIfAlreadyOpened
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorIfAlreadyOpened, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorIfAlreadyOpened, testing::ext::TestSize.Level1)
 {
     int32_t socketId;
     dmTransport_->StartSocket("device1", socketId);
@@ -167,7 +167,7 @@ HWTEST_F(DMTransportTest, StartSocket_ShouldReturnErrorIfAlreadyOpened, testing:
  * @tc.name: StopSocket_InvalidId_Failure
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, StopSocket_InvalidId_Failure, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, StopSocket_InvalidId_Failure, testing::ext::TestSize.Level1)
 {
     std::string invalidId = "invalidId";
     int32_t result = dmTransport_->StopSocket(invalidId);
@@ -178,7 +178,7 @@ HWTEST_F(DMTransportTest, StopSocket_InvalidId_Failure, testing::ext::TestSize.L
  * @tc.name: StopSocket_SessionNotOpened_Failure
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, StopSocket_SessionNotOpened_Failure, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, StopSocket_SessionNotOpened_Failure, testing::ext::TestSize.Level1)
 {
     std::string notOpenedId = "notOpenedId";
     int32_t result = dmTransport_->StopSocket(notOpenedId);
@@ -189,7 +189,7 @@ HWTEST_F(DMTransportTest, StopSocket_SessionNotOpened_Failure, testing::ext::Tes
  * @tc.name: Send_InvalidId_Failure
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, Send_InvalidId_Failure, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, Send_InvalidId_Failure, testing::ext::TestSize.Level1)
 {
     std::string invalidId = "invalidId";
     std::string payload = "Hello, World!";
@@ -201,7 +201,7 @@ HWTEST_F(DMTransportTest, Send_InvalidId_Failure, testing::ext::TestSize.Level0)
  * @tc.name: Send_SessionNotOpened_Failure
  * @tc.type: FUNC
  */
-HWTEST_F(DMTransportTest, Send_SessionNotOpened_Failure, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, Send_SessionNotOpened_Failure, testing::ext::TestSize.Level1)
 {
     std::string notOpenedId = "notOpenedId";
     std::string payload = "Hello, World!";
@@ -209,7 +209,7 @@ HWTEST_F(DMTransportTest, Send_SessionNotOpened_Failure, testing::ext::TestSize.
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
-HWTEST_F(DMTransportTest, OnSocketOpened_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, OnSocketOpened_001, testing::ext::TestSize.Level1)
 {
     int32_t socketId = 1;
     std::string name = "socketName";
@@ -229,7 +229,7 @@ HWTEST_F(DMTransportTest, OnSocketOpened_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DMTransportTest, OnSocketClosed_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, OnSocketClosed_001, testing::ext::TestSize.Level1)
 {
     int32_t socketId = 10;
     std::string name = "socketName";
@@ -275,7 +275,7 @@ HWTEST_F(DMTransportTest, OnSocketClosed_001, testing::ext::TestSize.Level0)
     dmTransport_->HandleReceiveMessage(socketId, payload);
 }
 
-HWTEST_F(DMTransportTest, CreateClientSocket_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, CreateClientSocket_001, testing::ext::TestSize.Level1)
 {
     std::string rmtNetworkId = "";
     int32_t ret = dmTransport_->CreateClientSocket(rmtNetworkId);
@@ -286,7 +286,7 @@ HWTEST_F(DMTransportTest, CreateClientSocket_001, testing::ext::TestSize.Level0)
     EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
 }
 
-HWTEST_F(DMTransportTest, IsDeviceSessionOpened_001, testing::ext::TestSize.Level0)
+HWTEST_F(DMTransportTest, IsDeviceSessionOpened_001, testing::ext::TestSize.Level1)
 {
     std::string rmtNetworkId = "";
     int32_t socketId = 1;

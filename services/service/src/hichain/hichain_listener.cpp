@@ -32,47 +32,47 @@ static DataChangeListener dataChangeListener_ = {
     .onDeviceUnBound = HichainListener::OnHichainDeviceUnBound,
 };
 
-void from_json(const nlohmann::json &jsonObject, GroupInformation &groupInfo)
+void FromJson(const JsonItemObject &jsonObject, GroupInformation &groupInfo)
 {
-    if (jsonObject.find(FIELD_GROUP_TYPE) != jsonObject.end() && jsonObject.at(FIELD_GROUP_TYPE).is_number_integer()) {
-        groupInfo.groupType = jsonObject.at(FIELD_GROUP_TYPE).get<int32_t>();
+    if (jsonObject.Contains(FIELD_GROUP_TYPE) && jsonObject.At(FIELD_GROUP_TYPE).IsNumberInteger()) {
+        groupInfo.groupType = jsonObject.At(FIELD_GROUP_TYPE).Get<int32_t>();
     }
     // FIELD_USER_ID is osAccountId
-    if (jsonObject.find(FIELD_USER_ID) != jsonObject.end() && jsonObject.at(FIELD_USER_ID).is_string()) {
-        groupInfo.osAccountId = jsonObject.at(FIELD_USER_ID).get<std::string>();
+    if (jsonObject.Contains(FIELD_USER_ID) && jsonObject.At(FIELD_USER_ID).IsString()) {
+        groupInfo.osAccountId = jsonObject.At(FIELD_USER_ID).Get<std::string>();
     }
     // FIELD_OS_ACCOUNT_ID is userId
-    if (jsonObject.find(FIELD_OS_ACCOUNT_ID) != jsonObject.end() &&
-        jsonObject.at(FIELD_OS_ACCOUNT_ID).is_number_integer()) {
-        groupInfo.userId = jsonObject.at(FIELD_OS_ACCOUNT_ID).get<int32_t>();
+    if (jsonObject.Contains(FIELD_OS_ACCOUNT_ID) &&
+        jsonObject.At(FIELD_OS_ACCOUNT_ID).IsNumberInteger()) {
+        groupInfo.userId = jsonObject.At(FIELD_OS_ACCOUNT_ID).Get<int32_t>();
     }
 }
 
-void from_json(const nlohmann::json &jsonObject, GroupsInfo &groupInfo)
+void FromJson(const JsonItemObject &jsonObject, GroupsInfo &groupInfo)
 {
-    if (jsonObject.find(FIELD_GROUP_NAME) != jsonObject.end() && jsonObject.at(FIELD_GROUP_NAME).is_string()) {
-        groupInfo.groupName = jsonObject.at(FIELD_GROUP_NAME).get<std::string>();
+    if (jsonObject.Contains(FIELD_GROUP_NAME) && jsonObject.At(FIELD_GROUP_NAME).IsString()) {
+        groupInfo.groupName = jsonObject.At(FIELD_GROUP_NAME).Get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_ID) != jsonObject.end() && jsonObject.at(FIELD_GROUP_ID).is_string()) {
-        groupInfo.groupId = jsonObject.at(FIELD_GROUP_ID).get<std::string>();
+    if (jsonObject.Contains(FIELD_GROUP_ID) && jsonObject.At(FIELD_GROUP_ID).IsString()) {
+        groupInfo.groupId = jsonObject.At(FIELD_GROUP_ID).Get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_OWNER) != jsonObject.end() && jsonObject.at(FIELD_GROUP_OWNER).is_string()) {
-        groupInfo.groupOwner = jsonObject.at(FIELD_GROUP_OWNER).get<std::string>();
+    if (jsonObject.Contains(FIELD_GROUP_OWNER) && jsonObject.At(FIELD_GROUP_OWNER).IsString()) {
+        groupInfo.groupOwner = jsonObject.At(FIELD_GROUP_OWNER).Get<std::string>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_TYPE) != jsonObject.end() && jsonObject.at(FIELD_GROUP_TYPE).is_number_integer()) {
-        groupInfo.groupType = jsonObject.at(FIELD_GROUP_TYPE).get<int32_t>();
+    if (jsonObject.Contains(FIELD_GROUP_TYPE) && jsonObject.At(FIELD_GROUP_TYPE).IsNumberInteger()) {
+        groupInfo.groupType = jsonObject.At(FIELD_GROUP_TYPE).Get<int32_t>();
     }
 
-    if (jsonObject.find(FIELD_GROUP_VISIBILITY) != jsonObject.end() &&
-        jsonObject.at(FIELD_GROUP_VISIBILITY).is_number_integer()) {
-        groupInfo.groupVisibility = jsonObject.at(FIELD_GROUP_VISIBILITY).get<int32_t>();
+    if (jsonObject.Contains(FIELD_GROUP_VISIBILITY) &&
+        jsonObject.At(FIELD_GROUP_VISIBILITY).IsNumberInteger()) {
+        groupInfo.groupVisibility = jsonObject.At(FIELD_GROUP_VISIBILITY).Get<int32_t>();
     }
 
-    if (jsonObject.find(FIELD_USER_ID) != jsonObject.end() && jsonObject.at(FIELD_USER_ID).is_string()) {
-        groupInfo.userId = jsonObject.at(FIELD_USER_ID).get<std::string>();
+    if (jsonObject.Contains(FIELD_USER_ID) && jsonObject.At(FIELD_USER_ID).IsString()) {
+        groupInfo.userId = jsonObject.At(FIELD_USER_ID).Get<std::string>();
     }
 }
 
@@ -120,13 +120,14 @@ void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *g
         LOGE("peerUdid or groupInfo is invalid");
         return;
     }
-    nlohmann::json groupInfoJsonObj = nlohmann::json::parse(std::string(groupInfo), nullptr, false);
-    if (groupInfoJsonObj.is_discarded()) {
+    std::string strJson(groupInfo);
+    JsonObject groupInfoJsonObj(strJson);
+    if (groupInfoJsonObj.IsDiscarded()) {
         LOGE("groupInfo parse error");
-        return ;
+        return;
     }
     GroupInformation hichainGroupInfo;
-    from_json(groupInfoJsonObj, hichainGroupInfo);
+    FromJson(groupInfoJsonObj, hichainGroupInfo);
     if (hichainGroupInfo.groupType != DM_IDENTICAL_ACCOUNT) {
         LOGI("groupType is %{public}d, not idential account.", hichainGroupInfo.groupType);
         return;
@@ -206,16 +207,17 @@ int32_t HichainListener::GetRelatedGroupsCommon(int32_t userId, const std::strin
     }
     std::string relatedGroups = std::string(returnGroups);
     deviceGroupManager_->destroyInfo(&returnGroups);
-    nlohmann::json jsonObject = nlohmann::json::parse(relatedGroups, nullptr, false);
-    if (jsonObject.is_discarded()) {
+    JsonObject jsonObject(relatedGroups);
+    if (jsonObject.IsDiscarded()) {
         LOGE("returnGroups parse error");
         return ERR_DM_FAILED;
     }
-    if (!jsonObject.is_array()) {
+    if (!jsonObject.IsArray()) {
         LOGE("jsonObject is not an array.");
         return ERR_DM_FAILED;
     }
-    std::vector<GroupsInfo> groupInfos = jsonObject.get<std::vector<GroupsInfo>>();
+    std::vector<GroupsInfo> groupInfos;
+    jsonObject.Get(groupInfos);
     if (groupInfos.empty()) {
         LOGE("HichainListener::GetRelatedGroups group failed, groupInfos is empty.");
         return ERR_DM_FAILED;
@@ -236,7 +238,7 @@ int32_t HichainListener::DeleteGroup(const int32_t userId, std::string &groupId)
         return ERR_DM_FAILED;
     }
     int64_t requestId = GenRequestId();
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     std::string disbandParams = SafetyDump(jsonObj);
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME, disbandParams.c_str());
@@ -250,7 +252,7 @@ int32_t HichainListener::DeleteGroup(const int32_t userId, std::string &groupId)
 int32_t HichainListener::DeleteGroupExt(int32_t userId, std::string &groupId)
 {
     int64_t requestId = GenRequestId();
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     std::string disbandParams = SafetyDump(jsonObj);
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME_EXT, disbandParams.c_str());

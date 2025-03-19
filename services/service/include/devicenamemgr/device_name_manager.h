@@ -16,6 +16,10 @@
 #ifndef OHOS_DEVICE_NAME_MANAGER_H
 #define OHOS_DEVICE_NAME_MANAGER_H
 
+#include <memory>
+#include <mutex>
+#include <string>
+
 #include "datashare_helper.h"
 #include "device_name_change_monitor.h"
 #include "single_instance.h"
@@ -25,8 +29,11 @@ namespace DistributedHardware {
 class DeviceNameManager {
     DECLARE_SINGLE_INSTANCE_BASE(DeviceNameManager);
 public:
-    int32_t Init();
     int32_t UnInit();
+
+    void DataShareReady();
+    void AccountSysReady(int32_t userId);
+    int32_t InitDeviceNameWhenSoftBusReady();
 
     int32_t GetLocalDisplayDeviceName(int32_t maxNamelength, std::string &displayName);
     int32_t InitDeviceNameWhenUserSwitch(int32_t curUserId, int32_t preUserId);
@@ -34,10 +41,13 @@ public:
     int32_t InitDeviceNameWhenLogin();
     int32_t InitDeviceNameWhenNickChange();
     int32_t InitDeviceNameWhenNameChange(int32_t userId);
+    int32_t ModifyUserDefinedName(const std::string &deviceName);
+    int32_t RestoreLocalDeviceName();
 
 private:
     DeviceNameManager() = default;
     ~DeviceNameManager() = default;
+    bool DependsIsReady();
     void RegisterDeviceNameChangeMonitor(int32_t curUserId, int32_t preUserId);
     void UnRegisterDeviceNameChangeMonitor(int32_t userId);
     void InitDeviceName(int32_t userId);
@@ -50,10 +60,13 @@ private:
     std::string GetSystemRegion();
     std::string GetLocalMarketName();
 
+    int32_t InitDisplayDeviceNameToSettingsData(const std::string &nickName, const std::string &deviceName,
+        int32_t userId);
     int32_t GetUserDefinedDeviceName(int32_t userId, std::string &deviceName);
     int32_t SetUserDefinedDeviceName(const std::string &deviceName, int32_t userId);
     int32_t GetDisplayDeviceName(int32_t userId, std::string &deviceName);
     int32_t SetDisplayDeviceName(const std::string &deviceName, int32_t userId);
+    int32_t SetDisplayDeviceNameState(const std::string &state, int32_t userId);
     int32_t GetDeviceName(std::string &deviceName);
     int32_t SetDeviceName(const std::string &deviceName);
     int32_t GetValue(const std::string &tableName, int32_t userId, const std::string &key, std::string &value);
@@ -71,6 +84,8 @@ private:
     std::string localMarketName_ = "";
     std::mutex monitorMapMtx_;
     std::map<int32_t, sptr<DeviceNameChangeMonitor>> monitorMap_;
+    std::atomic<bool> isDataShareReady_ = false;
+    std::atomic<bool> isAccountSysReady_ = false;
 };
 } // DistributedHardware
 } // OHOS

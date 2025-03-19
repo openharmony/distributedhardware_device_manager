@@ -56,5 +56,35 @@ int32_t DistributedDeviceProfileClient::PutAllTrustedDevices(
 {
     return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->PutAllTrustedDevices(deviceInfos);
 }
+
+int32_t DistributedDeviceProfileClient::PutSessionKey(
+    uint32_t userId, const std::vector<uint8_t>& sessionKey, int32_t& sessionKeyId)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->
+        PutSessionKey(userId, sessionKey, sessionKeyId);
+}
+
+int32_t DistributedDeviceProfileClient::PutLocalServiceInfo(const LocalServiceInfo& localServiceInfo)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->PutLocalServiceInfo(localServiceInfo);
+}
+
+int32_t DistributedDeviceProfileClient::DeleteLocalServiceInfo(const std::string& bundleName, int32_t pinExchangeType)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->DeleteLocalServiceInfo(bundleName,
+        pinExchangeType);
+}
+
+int32_t DistributedDeviceProfileClient::UpdateLocalServiceInfo(const LocalServiceInfo& localServiceInfo)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->UpdateLocalServiceInfo(localServiceInfo);
+}
+
+int32_t DistributedDeviceProfileClient::GetLocalServiceInfoByBundleAndPinType(const std::string& bundleName,
+    int32_t pinExchangeType, LocalServiceInfo& localServiceInfo)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->GetLocalServiceInfoByBundleAndPinType(
+        bundleName, pinExchangeType, localServiceInfo);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -139,6 +139,8 @@ static IRefreshCallback softbusRefreshCallback_ = {
 void SoftbusListener::DeviceOnLine(DmDeviceInfo deviceInfo)
 {
     std::lock_guard<std::mutex> lock(g_lockDeviceOnLine);
+    LOGI("received device online deviceId: %{public}s, networkId: %{public}s.",
+        GetAnonyString(deviceInfo.deviceId).c_str(), GetAnonyString(deviceInfo.networkId).c_str());
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_ONLINE, deviceInfo);
 }
 
@@ -483,7 +485,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
             }
         }
     }
-    LOGI("DevId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
+    LOGD("DevId=%{public}s, devName=%{public}s, devType=%{public}d, range=%{public}d,"
         "isOnline=%{public}d, capability=%{public}u", GetAnonyString(dmDevInfo.deviceId).c_str(),
         GetAnonyString(dmDevInfo.deviceName).c_str(), dmDevInfo.deviceTypeId, dmDevInfo.range,
         device->isOnline, device->capabilityBitmap[0]);
@@ -809,11 +811,11 @@ int32_t SoftbusListener::ConvertScreenStatusToDmDevice(const NodeBasicInfo &node
         return ERR_DM_FAILED;
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
-    nlohmann::json extraJson;
+    JsonObject extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
     extraJson[DEVICE_SCREEN_STATUS] = devScreenStatus;
-    devInfo.extraData = to_string(extraJson);
+    devInfo.extraData = ToString(extraJson);
     return DM_OK;
 }
 
@@ -836,10 +838,10 @@ int32_t SoftbusListener::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nod
         return ERR_DM_FAILED;
     }
     devInfo.deviceTypeId = nodeInfo.deviceTypeId;
-    nlohmann::json extraJson;
+    JsonObject extraJson;
     extraJson[PARAM_KEY_OS_TYPE] = nodeInfo.osType;
     extraJson[PARAM_KEY_OS_VERSION] = ConvertCharArray2String(nodeInfo.osVersion, OS_VERSION_BUF_LEN);
-    devInfo.extraData = to_string(extraJson);
+    devInfo.extraData = ToString(extraJson);
     return DM_OK;
 }
 
@@ -911,7 +913,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     dmDevice.deviceTypeId = device.devType;
     dmDevice.range = device.range;
 
-    nlohmann::json jsonObj;
+    JsonObject jsonObj;
     std::string customData = ConvertCharArray2String(device.custData, DISC_MAX_CUST_DATA_LEN);
     jsonObj[PARAM_KEY_CUSTOM_DATA] = customData;
 
@@ -926,7 +928,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     dmDevice.extraData = SafetyDump(jsonObj);
 }
 
-void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, nlohmann::json &jsonObj)
+void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObject &jsonObj)
 {
     if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
         std::string wifiIp((addrInfo->info).ip.ip);
@@ -1165,12 +1167,10 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
 void SoftbusListener::SetHostPkgName(const std::string hostName)
 {
     hostName_ = hostName;
-    LOGI("SetHostPkgName::hostName_ :%s.", hostName_.c_str());
 }
 
 std::string SoftbusListener::GetHostPkgName()
 {
-    LOGI("GetHostPkgName::hostName_ :%s.", hostName_.c_str());
     return hostName_;
 }
 
@@ -1294,7 +1294,6 @@ int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, con
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     (void)extra;
-    uint32_t tokenId = static_cast<uint32_t>(OHOS::IPCSkeleton::GetCallingTokenID());
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
@@ -1302,14 +1301,14 @@ int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, con
             continue;
         }
         DistributedDeviceProfile::Accesser acer = profile.GetAccesser();
-        if (pkgName == acer.GetAccesserBundleName() && tokenId == acer.GetAccesserTokenId()) {
+        if (pkgName == acer.GetAccesserBundleName()) {
             DmDeviceInfo deviceinfo;
             ConvertAclToDeviceInfo(profile, deviceinfo);
             deviceList.push_back(deviceinfo);
             continue;
         }
         DistributedDeviceProfile::Accessee acee = profile.GetAccessee();
-        if (pkgName == acee.GetAccesseeBundleName() && tokenId == acee.GetAccesseeTokenId()) {
+        if (pkgName == acee.GetAccesseeBundleName()) {
             DmDeviceInfo deviceinfo;
             ConvertAclToDeviceInfo(profile, deviceinfo);
             deviceList.push_back(deviceinfo);

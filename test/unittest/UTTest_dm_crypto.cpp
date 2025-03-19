@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,7 +45,7 @@ void DmCryptoTest::TearDownTestCase()
  * @tc.name: GetSecRandom_01
  * @tc.type: FUNC
  */
-HWTEST_F(DmCryptoTest, GetSecRandom_01, testing::ext::TestSize.Level0)
+HWTEST_F(DmCryptoTest, GetSecRandom_01, testing::ext::TestSize.Level1)
 {
     const size_t len = 8;
     uint8_t buffer[len] = {0};
@@ -57,7 +57,7 @@ HWTEST_F(DmCryptoTest, GetSecRandom_01, testing::ext::TestSize.Level0)
  * @tc.name: GetSecSalt_01
  * @tc.type: FUNC
  */
-HWTEST_F(DmCryptoTest, GetSecSalt_01, testing::ext::TestSize.Level0)
+HWTEST_F(DmCryptoTest, GetSecSalt_01, testing::ext::TestSize.Level1)
 {
     std::string salt = Crypto::GetSecSalt();
     EXPECT_EQ(salt.length(), SALT_STRING_LENGTH);
@@ -70,7 +70,7 @@ HWTEST_F(DmCryptoTest, GetSecSalt_01, testing::ext::TestSize.Level0)
  * @tc.name: GetUdidHash_01
  * @tc.type: FUNC
  */
-HWTEST_F(DmCryptoTest, GetUdidHash_01, testing::ext::TestSize.Level0)
+HWTEST_F(DmCryptoTest, GetUdidHash_01, testing::ext::TestSize.Level1)
 {
     char udidHash[DEVICE_UUID_LENGTH] = {0};
     EXPECT_EQ(Crypto::GetUdidHash(UDID_SAMPLE, reinterpret_cast<uint8_t *>(udidHash)), DM_OK);
@@ -83,7 +83,7 @@ HWTEST_F(DmCryptoTest, GetUdidHash_01, testing::ext::TestSize.Level0)
  * @tc.name: GetHashWithSalt_01
  * @tc.type: FUNC
  */
-HWTEST_F(DmCryptoTest, GetHashWithSalt_01, testing::ext::TestSize.Level0)
+HWTEST_F(DmCryptoTest, GetHashWithSalt_01, testing::ext::TestSize.Level1)
 {
     std::string text1 = "c9ed49e9e2fc8f4826d652b2839d";
     std::string text2 = "aaadfasdfasdfc9ed49e9e2sadfasdffc8f4826d6asdfasdf52basdf2839d";

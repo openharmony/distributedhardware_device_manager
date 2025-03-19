@@ -37,6 +37,8 @@
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_network_id_list_req.h"
+#include "ipc_get_device_network_id_list_rsp.h"
 #include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
@@ -56,6 +58,8 @@
 #include "ipc_register_serviceinfo_req.h"
 #include "ipc_set_credential_req.h"
 #include "ipc_set_credential_rsp.h"
+#include "ipc_set_local_device_name_req.h"
+#include "ipc_set_remote_device_name_req.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_skeleton.h"
 #include "ipc_sync_callback_req.h"
@@ -692,8 +696,8 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
 
     std::string strDeviceId = deviceInfo.deviceId;
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, strDeviceId, callback);
-    nlohmann::json extraJson = nlohmann::json::parse(extra, nullptr, false);
-    if (extraJson.is_discarded()) {
+    JsonObject extraJson(extra);
+    if (extraJson.IsDiscarded()) {
         LOGE("extra bindParam %{public}s.", extra.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1517,8 +1521,8 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("BindDevice start, pkgName: %{public}s", pkgName.c_str());
-    nlohmann::json paramJson = nlohmann::json::parse(bindParam, nullptr, false);
-    if (paramJson.is_discarded()) {
+    JsonObject paramJson(bindParam);
+    if (paramJson.IsDiscarded()) {
         LOGE("BindDevice bindParam %{public}s.", bindParam.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -2812,6 +2816,119 @@ int32_t DeviceManagerImpl::GetLocalServiceInfoByBundleNameAndPinExchangeType(
         return ret;
     }
     info = rsp->GetLocalServiceInfo();
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
+    std::shared_ptr<SetLocalDeviceNameCallback> callback)
+{
+    if (pkgName.empty() || deviceName.empty()) {
+        LOGE("param invalid, pkgName : %{public}s, deviceName = %{public}s",
+            pkgName.c_str(), GetAnonyString(deviceName).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    int32_t ret = DeviceManagerNotify::GetInstance().RegisterSetLocalDeviceNameCallback(pkgName, callback);
+    if (ret != DM_OK) {
+        LOGE("Register Callback failed ret: %{public}d", ret);
+        return ret;
+    }
+    std::shared_ptr<IpcSetLocalDeviceNameReq> req = std::make_shared<IpcSetLocalDeviceNameReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDeviceName(deviceName);
+    ret = ipcClientProxy_->SendRequest(SET_LOCAL_DEVICE_NAME, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterSetLocalDeviceNameCallback(pkgName);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterSetLocalDeviceNameCallback(pkgName);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
+    const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback)
+{
+    if (pkgName.empty() || deviceName.empty()) {
+        LOGE("param invalid, pkgName : %{public}s, deviceName = %{public}s",
+            pkgName.c_str(), GetAnonyString(deviceName).c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    int32_t ret = DeviceManagerNotify::GetInstance().RegisterSetRemoteDeviceNameCallback(pkgName, deviceId, callback);
+    if (ret != DM_OK) {
+        LOGE("Register Callback failed ret: %{public}d", ret);
+        return ret;
+    }
+    std::shared_ptr<IpcSetLocalDeviceNameReq> req = std::make_shared<IpcSetLocalDeviceNameReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDeviceName(deviceName);
+    ret = ipcClientProxy_->SendRequest(SET_REMOTE_DEVICE_NAME, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterSetRemoteDeviceNameCallback(pkgName, deviceId);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        DeviceManagerNotify::GetInstance().UnRegisterSetRemoteDeviceNameCallback(pkgName, deviceId);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RestoreLocalDeivceName(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("param invalid, pkgName : %{public}s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    int32_t ret = ipcClientProxy_->SendRequest(RESTORE_LOCAL_DEVICE_NAME, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("error: Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("error: Failed with ret %{public}d", ret);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceNetworkIdList(const std::string &bundleName,
+    const NetworkIdQueryFilter &queryFilter, std::vector<std::string> &networkIds)
+{
+    std::shared_ptr<IpcGetDeviceNetworkIdListReq> req = std::make_shared<IpcGetDeviceNetworkIdListReq>();
+    std::shared_ptr<IpcGetDeviceNetworkIdListRsp> rsp = std::make_shared<IpcGetDeviceNetworkIdListRsp>();
+    req->SetPkgName(bundleName);
+    req->SetQueryFilter(queryFilter);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_NETWORK_ID_LIST, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    networkIds = rsp->GetNetworkIds();
     LOGI("Completed");
     return DM_OK;
 }

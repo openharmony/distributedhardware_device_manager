@@ -18,8 +18,9 @@
 
 #include <map>
 #include <string>
-#include "nlohmann/json.hpp"
+
 #include "dm_device_info.h"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -31,12 +32,12 @@ std::string GetAnonyStringList(const std::vector<std::string> &values);
 std::string GetAnonyInt32(const int32_t value);
 std::string GetAnonyInt32List(const std::vector<int32_t> &values);
 bool IsNumberString(const std::string &inputString);
-bool IsString(const nlohmann::json &jsonObj, const std::string &key);
-bool IsInt32(const nlohmann::json &jsonObj, const std::string &key);
-bool IsUint32(const nlohmann::json &jsonObj, const std::string &key);
-bool IsInt64(const nlohmann::json &jsonObj, const std::string &key);
-bool IsArray(const nlohmann::json &jsonObj, const std::string &key);
-bool IsBool(const nlohmann::json &jsonObj, const std::string &key);
+bool IsString(const JsonItemObject &jsonObj, const std::string &key);
+bool IsInt32(const JsonItemObject &jsonObj, const std::string &key);
+bool IsUint32(const JsonItemObject &jsonObj, const std::string &key);
+bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
+bool IsArray(const JsonItemObject &jsonObj, const std::string &key);
+bool IsBool(const JsonItemObject &jsonObj, const std::string &key);
 std::string ConvertMapToJsonString(const std::map<std::string, std::string> &paramMap);
 void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, std::string> &paramMap);
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId);
@@ -100,8 +101,9 @@ bool IsIdLengthValid(const std::string &inputID);
 bool IsMessageLengthValid(const std::string &inputMessage);
 bool IsValueExist(const std::multimap<std::string, int32_t> unorderedmap, const std::string &udid, int32_t userId);
 bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent);
-std::string SafetyDump(const nlohmann::json &jsonObj);
+std::string SafetyDump(const JsonItemObject &jsonObj);
 std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index);
+bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &key);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

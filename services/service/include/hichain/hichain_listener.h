@@ -18,7 +18,7 @@
 
 
 #include "device_auth.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -50,8 +50,8 @@ struct GroupsInfo {
     }
 };
 
-void from_json(const nlohmann::json &jsonObject, GroupInformation &groupInfo);
-void from_json(const nlohmann::json &jsonObject, GroupsInfo &groupInfo);
+void FromJson(const JsonItemObject &jsonObject, GroupInformation &groupInfo);
+void FromJson(const JsonItemObject &jsonObject, GroupsInfo &groupInfo);
 
 class HichainListener {
 public:

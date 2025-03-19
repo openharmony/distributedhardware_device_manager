@@ -15,6 +15,8 @@
 
 #include "UTTest_discovery_filter.h"
 
+#include "nlohmann/json.hpp"
+
 namespace OHOS {
 namespace DistributedHardware {
 void DiscoveryFilterTest::SetUp()
@@ -44,7 +46,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_001, testing::ext::TestSize.Level0
 HWTEST_F(DiscoveryFilterTest, ParseFilterJson_002, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     std::string str = SafetyDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
@@ -53,7 +55,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_002, testing::ext::TestSize.Level0
 HWTEST_F(DiscoveryFilterTest, ParseFilterJson_003, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject[FILTERS_KEY] = "filters";
     std::string str = SafetyDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
@@ -63,7 +65,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_003, testing::ext::TestSize.Level0
 HWTEST_F(DiscoveryFilterTest, ParseFilterJson_004, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     std::vector<int> myArray;
     jsonObject[FILTERS_KEY] = myArray;
     std::string str = SafetyDump(jsonObject);
@@ -74,8 +76,8 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_004, testing::ext::TestSize.Level0
 HWTEST_F(DiscoveryFilterTest, ParseFilterJson_005, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
-    int myArray[5] = {1, 2, 3, 4, 5};
+    JsonObject jsonObject;
+    std::vector<int> myArray = {1, 2, 3, 4, 5};
     jsonObject[FILTERS_KEY] = myArray;
     std::string str = SafetyDump(jsonObject);
     int32_t ret = filterOption.ParseFilterJson(str);
@@ -85,8 +87,8 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_005, testing::ext::TestSize.Level0
 HWTEST_F(DiscoveryFilterTest, ParseFilterJson_006, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
-    int myArray[5] = {1, 2, 3, 4, 5};
+    JsonObject jsonObject;
+    std::vector<int> myArray = {1, 2, 3, 4, 5};
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = 12345;
     std::string str = SafetyDump(jsonObject);
@@ -97,8 +99,8 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_006, testing::ext::TestSize.Level0
 HWTEST_F(DiscoveryFilterTest, ParseFilterJson_007, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
-    int myArray[5] = {1, 2, 3, 4, 5};
+    JsonObject jsonObject;
+    std::vector<int> myArray = {1, 2, 3, 4, 5};
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = "filter_op";
     std::string str = SafetyDump(jsonObject);
@@ -116,7 +118,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_008, testing::ext::TestSize.Level0
     myArray.push_back(object);
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = "filter_op";
-    std::string str = SafetyDump(jsonObject);
+    std::string str = jsonObject.dump();
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -132,7 +134,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_009, testing::ext::TestSize.Level0
     myArray.push_back(object);
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = "filter_op";
-    std::string str = SafetyDump(jsonObject);
+    std::string str = jsonObject.dump();
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -148,7 +150,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterJson_0010, testing::ext::TestSize.Level
     myArray.push_back(object);
     jsonObject[FILTERS_KEY] = myArray;
     jsonObject[FILTER_OP_KEY] = "filter_op";
-    std::string str = SafetyDump(jsonObject);
+    std::string str = jsonObject.dump();
     int32_t ret = filterOption.ParseFilterJson(str);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -164,7 +166,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_001, testing::ext::TestSize.
 HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_002, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     std::string str = SafetyDump(jsonObject);
     filterOption.ParseFilterOptionJson(str);
     EXPECT_EQ(filterOption.filterOp_ == "AND", true);
@@ -173,7 +175,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_002, testing::ext::TestSize.
 HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_003, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["credible"] = "123";
     std::string str = SafetyDump(jsonObject);
     filterOption.ParseFilterOptionJson(str);
@@ -183,7 +185,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_003, testing::ext::TestSize.
 HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_004, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["credible"] = 1;
     jsonObject["isTrusted"] = "123";
     std::string str = SafetyDump(jsonObject);
@@ -194,7 +196,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_004, testing::ext::TestSize.
 HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_005, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["credible"] = 1;
     jsonObject["isTrusted"] = 2;
     jsonObject["authForm"] = "3";
@@ -206,7 +208,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_005, testing::ext::TestSize.
 HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_006, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["credible"] = 1;
     jsonObject["isTrusted"] = 2;
     jsonObject["authForm"] = 3;
@@ -219,7 +221,7 @@ HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_006, testing::ext::TestSize.
 HWTEST_F(DiscoveryFilterTest, ParseFilterOptionJson_007, testing::ext::TestSize.Level0)
 {
     DeviceFilterOption filterOption;
-    nlohmann::json jsonObject;
+    JsonObject jsonObject;
     jsonObject["credible"] = 1;
     jsonObject["isTrusted"] = 2;
     jsonObject["authForm"] = 3;

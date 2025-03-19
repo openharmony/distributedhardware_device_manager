@@ -93,12 +93,10 @@ void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32
 
 SoftbusPublish::SoftbusPublish()
 {
-    LOGI("SoftbusPublish constructor.");
 }
 
 SoftbusPublish::~SoftbusPublish()
 {
-    LOGI("SoftbusPublish destructor.");
 }
 
 void SoftbusPublish::OnSoftbusPublishResult(int publishId, PublishResult result)
@@ -108,7 +106,6 @@ void SoftbusPublish::OnSoftbusPublishResult(int publishId, PublishResult result)
 
 int32_t SoftbusPublish::PublishSoftbusLNN()
 {
-    LOGI("Begin.");
     PublishInfo publishInfo;
     publishInfo.publishId = DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID;
     publishInfo.mode = DiscoverMode::DISCOVER_MODE_PASSIVE;

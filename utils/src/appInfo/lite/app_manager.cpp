@@ -47,6 +47,11 @@ bool AppManager::IsSystemSA()
     return true;
 }
 
+bool AppManager::IsSystemApp()
+{
+    return true;
+}
+
 int32_t AppManager::GetCallerName(bool isSystemSA, std::string &callerName)
 {
     (void)isSystemSA;

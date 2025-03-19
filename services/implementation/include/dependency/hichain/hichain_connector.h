@@ -27,7 +27,7 @@
 #include "device_auth_defines.h"
 #include "dm_device_info.h"
 #include "hichain_connector_callback.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 #include "dm_single_instance.h"
 
 namespace OHOS {
@@ -51,7 +51,7 @@ enum class AuthFormPriority {
     PRIORITY_IDENTICAL_ACCOUNT = 2,
 };
 
-void from_json(const nlohmann::json &jsonObject, GroupInfo &groupInfo);
+void FromJson(const JsonItemObject &jsonObject, GroupInfo &groupInfo);
 
 class HiChainConnector {
 public:
@@ -91,7 +91,7 @@ public:
      * @tc.type: FUNC
      */
     int32_t CreateGroup(int64_t requestId, int32_t authType, const std::string &userId,
-        nlohmann::json &jsonOutObj);
+        JsonObject &jsonOutObj);
 
     /**
      * @tc.name: HiChainConnector::AddMember
@@ -201,14 +201,14 @@ public:
      * @tc.type: FUNC
      */
     int32_t addMultiMembers(const int32_t groupType, const std::string &userId,
-                            const nlohmann::json &jsonDeviceList);
+                            const JsonObject &jsonDeviceList);
     /**
      * @tc.name: HiChainConnector::deleteMultiMembers
      * @tc.desc: Get RegisterInfo Info of the HiChain Connector
      * @tc.type: FUNC
      */
     int32_t deleteMultiMembers(const int32_t groupType, const std::string &userId,
-                            const nlohmann::json &jsonDeviceList);
+                            const JsonObject &jsonDeviceList);
 
     /**
      * @tc.name: HiChainConnector::GetTrustedDevices
@@ -251,13 +251,13 @@ private:
     int32_t GetNumsFieldByType(const std::string &reqJsonStr, int32_t &outField, int32_t type);
     int32_t GetGroupId(const std::string &userId, const int32_t groupType, std::string &groupId);
     int32_t ParseRemoteCredential(const int32_t groupType, const std::string &userId,
-    const nlohmann::json &jsonDeviceList, std::string &params, int32_t &osAccountUserId);
+    const JsonObject &jsonDeviceList, std::string &params, int32_t &osAccountUserId);
     int32_t GetTrustedDevicesUdid(const char* jsonStr, std::vector<std::string> &udidList);
     int32_t GetGroupIdExt(const std::string &userId, const int32_t groupType,
         std::string &groupId, std::string &groupOwner);
     int32_t ParseRemoteCredentialExt(const std::string &credentialInfo, std::string &params, std::string &groupOwner);
-    int32_t GetJsonInt(const nlohmann::json &jsonObj, const std::string &key);
-    std::string GetJsonStr(const nlohmann::json &jsonObj, const std::string &key);
+    int32_t GetJsonInt(const JsonObject &jsonObj, const std::string &key);
+    std::string GetJsonStr(const JsonObject &jsonObj, const std::string &key);
 
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;

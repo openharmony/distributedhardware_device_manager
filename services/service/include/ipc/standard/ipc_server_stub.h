@@ -16,11 +16,21 @@
 #ifndef OHOS_DM_IPC_SERVER_STUB_H
 #define OHOS_DM_IPC_SERVER_STUB_H
 
+#include <map>
+#include <memory>
 #include <mutex>
+#include <set>
+#include <tuple>
+#include <unordered_set>
+#include <vector>
+
 #include "ipc_remote_broker.h"
+#include "ipc_req.h"
+#include "ipc_rsp.h"
+#include "iremote_stub.h"
 #include "system_ability.h"
 
-#include "account_boot_listener.h"
+#include "dm_device_info.h"
 #include "dm_single_instance.h"
 
 namespace OHOS {
@@ -142,6 +152,12 @@ private:
     bool Init();
     void AddSystemSA(const std::string &pkgName);
     void RemoveSystemSA(const std::string &pkgName);
+    std::string JoinPath(const std::string &prefixPath, const std::string &midPath,
+        const std::string &subPath);
+    std::string JoinPath(const std::string &prefixPath, const std::string &subPath);
+    std::string AddDelimiter(const std::string &path);
+    void ReclaimMemmgrFileMemForDM();
+    void HandleSoftBusServerAdd();
 
 private:
     bool registerToService_;

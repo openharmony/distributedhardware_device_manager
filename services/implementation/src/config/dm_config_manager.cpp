@@ -19,7 +19,7 @@
 #include "dm_anonymous.h"
 #include "dm_log.h"
 #include "json_config.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 #ifdef __LP64__
 constexpr const char* DM_LIB_LOAD_PATH = "/system/lib64/";
@@ -37,22 +37,22 @@ constexpr const char* AUTH_LOAD_JSON_KEY = "devicemanager_auth_components";
 constexpr const char* ADAPTER_LOAD_JSON_KEY = "devicemanager_adapter_components";
 constexpr const char* AUTH_JSON_TYPE_KEY = "AUTHENTICATE";
 constexpr const char* CPYPTO_JSON_TYPE_KEY = "CPYPTO";
-void from_json(const nlohmann::json &jsonObject, AdapterSoLoadInfo &soLoadInfo)
+void FromJson(const JsonItemObject &jsonObject, AdapterSoLoadInfo &soLoadInfo)
 {
     if (!IsString(jsonObject, "name") || !IsString(jsonObject, "type") || !IsString(jsonObject, "version") ||
         !IsString(jsonObject, "funcName") || !IsString(jsonObject, "soName") || !IsString(jsonObject, "soPath")) {
         LOGE("AdapterSoLoadInfo json key Not complete");
         return;
     }
-    soLoadInfo.name = jsonObject["name"].get<std::string>();
-    soLoadInfo.type = jsonObject["type"].get<std::string>();
-    soLoadInfo.version = jsonObject["version"].get<std::string>();
-    soLoadInfo.funcName = jsonObject["funcName"].get<std::string>();
-    soLoadInfo.soName = jsonObject["soName"].get<std::string>();
-    soLoadInfo.soPath = jsonObject["soPath"].get<std::string>();
+    soLoadInfo.name = jsonObject["name"].Get<std::string>();
+    soLoadInfo.type = jsonObject["type"].Get<std::string>();
+    soLoadInfo.version = jsonObject["version"].Get<std::string>();
+    soLoadInfo.funcName = jsonObject["funcName"].Get<std::string>();
+    soLoadInfo.soName = jsonObject["soName"].Get<std::string>();
+    soLoadInfo.soPath = jsonObject["soPath"].Get<std::string>();
 }
 
-void from_json(const nlohmann::json &jsonObject, AuthSoLoadInfo &soLoadInfo)
+void FromJson(const JsonItemObject &jsonObject, AuthSoLoadInfo &soLoadInfo)
 {
     if (!IsString(jsonObject, "name") || !IsString(jsonObject, "type") || !IsString(jsonObject, "version") ||
         !IsString(jsonObject, "funcName") || !IsString(jsonObject, "soName") || !IsString(jsonObject, "soPath") ||
@@ -60,13 +60,13 @@ void from_json(const nlohmann::json &jsonObject, AuthSoLoadInfo &soLoadInfo)
         LOGE("AdapterSoLoadInfo json key Not complete");
         return;
     }
-    soLoadInfo.authType = jsonObject["authType"].get<int32_t>();
-    soLoadInfo.name = jsonObject["name"].get<std::string>();
-    soLoadInfo.type = jsonObject["type"].get<std::string>();
-    soLoadInfo.version = jsonObject["version"].get<std::string>();
-    soLoadInfo.funcName = jsonObject["funcName"].get<std::string>();
-    soLoadInfo.soName = jsonObject["soName"].get<std::string>();
-    soLoadInfo.soPath = jsonObject["soPath"].get<std::string>();
+    soLoadInfo.authType = jsonObject["authType"].Get<int32_t>();
+    soLoadInfo.name = jsonObject["name"].Get<std::string>();
+    soLoadInfo.type = jsonObject["type"].Get<std::string>();
+    soLoadInfo.version = jsonObject["version"].Get<std::string>();
+    soLoadInfo.funcName = jsonObject["funcName"].Get<std::string>();
+    soLoadInfo.soName = jsonObject["soName"].Get<std::string>();
+    soLoadInfo.soPath = jsonObject["soPath"].Get<std::string>();
 }
 
 DmConfigManager &DmConfigManager::GetInstance()
@@ -77,8 +77,8 @@ DmConfigManager &DmConfigManager::GetInstance()
 
 void DmConfigManager::ParseAdapterConfig()
 {
-    nlohmann::json adapterJsonObject = nlohmann::json::parse(adapterJsonConfigString, nullptr, false);
-    if (adapterJsonObject.is_discarded()) {
+    JsonObject adapterJsonObject(adapterJsonConfigString);
+    if (adapterJsonObject.IsDiscarded()) {
         LOGE("adapter json config string parse error");
         return;
     }
@@ -86,7 +86,8 @@ void DmConfigManager::ParseAdapterConfig()
         LOGE("adapter json config string key not exist");
         return;
     }
-    auto soLoadInfo = adapterJsonObject[ADAPTER_LOAD_JSON_KEY].get<std::vector<AdapterSoLoadInfo>>();
+    std::vector<AdapterSoLoadInfo> soLoadInfo;
+    adapterJsonObject[ADAPTER_LOAD_JSON_KEY].Get(soLoadInfo);
     for (uint32_t i = 0; i < soLoadInfo.size(); i++) {
         if (soLoadInfo[i].name.size() == 0 || soLoadInfo[i].type.size() == 0 || soLoadInfo[i].version.size() == 0 ||
             soLoadInfo[i].funcName.size() == 0 || soLoadInfo[i].soName.size() == 0 ||
@@ -107,8 +108,8 @@ void DmConfigManager::ParseAdapterConfig()
 
 void DmConfigManager::ParseAuthConfig()
 {
-    nlohmann::json authJsonObject = nlohmann::json::parse(authJsonConfigString, nullptr, false);
-    if (authJsonObject.is_discarded()) {
+    JsonObject authJsonObject(authJsonConfigString);
+    if (authJsonObject.IsDiscarded()) {
         LOGE("auth json config string parse error!\n");
         return;
     }
@@ -116,7 +117,8 @@ void DmConfigManager::ParseAuthConfig()
         LOGE("auth json config string key not exist!\n");
         return;
     }
-    auto soLoadInfo = authJsonObject[AUTH_LOAD_JSON_KEY].get<std::vector<AuthSoLoadInfo>>();
+    std::vector<AuthSoLoadInfo> soLoadInfo;
+    authJsonObject[AUTH_LOAD_JSON_KEY].Get(soLoadInfo);
     for (uint32_t i = 0; i < soLoadInfo.size(); i++) {
         if (soLoadInfo[i].name.size() == 0 || soLoadInfo[i].type.size() == 0 || soLoadInfo[i].version.size() == 0 ||
             soLoadInfo[i].funcName.size() == 0 || soLoadInfo[i].soName.size() == 0 ||

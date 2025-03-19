@@ -24,7 +24,7 @@
 #include "crypto_mgr.h"
 #include "crypto_mgr_fuzzer.h"
 #include "dm_constants.h"
-#include "nlohmann/json.hpp"
+#include "json_object.h"
 
 
 namespace OHOS {
