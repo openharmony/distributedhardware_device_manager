@@ -271,7 +271,7 @@ struct Index {
         .height(40)
         .width('100%')
         .backgroundColor('#1F71FF')
-      Button($r('app.string.dm_allow_temp'))
+      Button($r('app.string.dm_allow_this_time'))
         .margin({ bottom: 12 })
         .onClick(() => {
           this.onAllowOnce();

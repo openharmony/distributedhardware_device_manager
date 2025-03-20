@@ -32,6 +32,10 @@
             }
         },
         {
+            "name":"dm_allow_this_time",
+            "value":"仅本次信任"
+        },
+        {
             "name":"dm_allow_always",
             "value":"始终信任",
             "attr":{
