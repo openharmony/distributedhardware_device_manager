@@ -26,7 +26,14 @@
         },
         {
             "name":"dm_allow_temp",
-            "value":"Only this trust",
+            "value":"Trust this time",
+            "attr":{
+                "priority":"LT"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Allow this time only",
             "attr":{
                 "priority":"LT"
             }
