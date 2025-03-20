@@ -115,6 +115,110 @@ void AddAccessControlProfileFirst(std::vector<AccessControlProfile>& accessContr
     accessControlProfiles.push_back(profileFirst);
 }
 
+void AddAccessControlProfileSecond(std::vector<AccessControlProfile>& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 1;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = DEVICE;
+    uint32_t status = 0;
+    uint32_t authenticationType = 2;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+
+    std::string oldAccountId = "accountId_123";
+    std::string newAccountId = "accountId_456";
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "123456";
+
+    Accesser accesser;
+    accesser.SetAccesserId(accesserId);
+    accesser.SetAccesserDeviceId(deviceId);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId(oldAccountId);
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("bundleName");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    AccessControlProfile profileFirst;
+    profileFirst.SetAccessControlId(accesserId);
+    profileFirst.SetAccesserId(accesserId);
+    profileFirst.SetAccesseeId(accesserId);
+    profileFirst.SetTrustDeviceId(trustDeviceId);
+    profileFirst.SetBindType(bindType);
+    profileFirst.SetAuthenticationType(authenticationType);
+    profileFirst.SetDeviceIdType(deviceIdType);
+    profileFirst.SetStatus(status);
+    profileFirst.SetBindLevel(bindLevel);
+    profileFirst.SetAccesser(accesser);
+    profileFirst.SetAccessee(accessee);
+    accessControlProfiles.push_back(profileFirst);
+}
+
+void AddAccessControlProfileThird(std::vector<AccessControlProfile>& accessControlProfiles)
+{
+    int32_t userId = 123456;
+    int32_t bindType = 4;
+    int32_t deviceIdType = 1;
+    uint32_t bindLevel = DEVICE;
+    uint32_t status = 0;
+    uint32_t authenticationType = 2;
+    uint32_t accesserId = 1;
+    uint32_t tokenId = 1001;
+    int32_t lastAuthTime = 2147483640;
+
+    std::string oldAccountId = "accountId_123";
+    std::string newAccountId = "accountId_456";
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "123456";
+
+    Accesser accesser;
+    accesser.SetAccesserId(accesserId);
+    accesser.SetAccesserDeviceId(deviceId);
+    accesser.SetAccesserUserId(userId);
+    accesser.SetAccesserAccountId(oldAccountId);
+    accesser.SetAccesserTokenId(tokenId);
+    accesser.SetAccesserBundleName("bundleName");
+    accesser.SetAccesserHapSignature("uph1");
+    accesser.SetAccesserBindLevel(bindLevel);
+
+    Accessee accessee;
+    accessee.SetAccesseeId(accesserId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeAccountId(newAccountId);
+    accessee.SetAccesseeTokenId(tokenId);
+    accessee.SetAccesseeBundleName("bundleName");
+    accessee.SetAccesseeHapSignature("uph1");
+    accessee.SetAccesseeBindLevel(bindLevel);
+
+    AccessControlProfile profileFirst;
+    profileFirst.SetAccessControlId(accesserId);
+    profileFirst.SetAccesserId(accesserId);
+    profileFirst.SetAccesseeId(accesserId);
+    profileFirst.SetTrustDeviceId(trustDeviceId);
+    profileFirst.SetBindType(bindType);
+    profileFirst.SetAuthenticationType(authenticationType);
+    profileFirst.SetDeviceIdType(deviceIdType);
+    profileFirst.SetStatus(status);
+    profileFirst.SetLastAuthTime(lastAuthTime);
+    profileFirst.SetBindLevel(bindLevel);
+    profileFirst.SetAccesser(accesser);
+    profileFirst.SetAccessee(accessee);
+    accessControlProfiles.push_back(profileFirst);
+}
+
 /**
  * @tc.name: Initialize_001
  * @tc.desc: return DM_OK
@@ -1308,6 +1412,34 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceNotTrust_001, testing::ext::T
     std::string udid = testID;
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, CheckDeleteCredential_001, testing::ext::TestSize.Level1)
+{
+    std::string remoteUdid = "123456";
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AddAccessControlProfileFirst(profiles);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    deviceManagerServiceImpl_->CheckDeleteCredential(remoteUdid);
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles1;
+    AddAccessControlProfileFirst(profiles1);
+    remoteUdid = "666678";
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles1));
+    deviceManagerServiceImpl_->CheckDeleteCredential(remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, DeleteAlwaysAllowTimeOut_001, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AddAccessControlProfileSecond(profiles);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
+    deviceManagerServiceImpl_->DeleteAlwaysAllowTimeOut();
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles1;
+    AddAccessControlProfileThird(profiles1);
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles1));
+    deviceManagerServiceImpl_->DeleteAlwaysAllowTimeOut();
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, UnAuthenticateDevice_101, testing::ext::TestSize.Level1)
