@@ -32,7 +32,7 @@
             }
         },
         {
-            "name":"dm_allow_only_once",
+            "name":"dm_allow_this_time",
             "value":"仅本次信任",
             "attr":{
                 "priority":"translate"
