@@ -478,7 +478,7 @@ int32_t DmAuthManager::UnAuthenticateDevice(const std::string &pkgName, const st
         LOGE("ReportDeleteTrustRelation failed");
     }
     remoteDeviceId_ = udid;
-    if (bindLevel == DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) == DEVICE) {
         DeleteGroup(pkgName, udid);
     }
     std::string extra = "";
@@ -514,7 +514,7 @@ int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &
         LOGE("Acl not contain the pkgname bind data.");
         return ERR_DM_FAILED;
     }
-    if (bindLevel == APP) {
+    if (static_cast<uint32_t>(bindLevel) == APP) {
         ProcessInfo processInfo;
         processInfo.pkgName = pkgName;
         processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
@@ -531,11 +531,11 @@ int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &
             return DM_OK;
         }
     }
-    if (bindLevel == DEVICE && offlineParam.leftAclNumber != 0) {
+    if (static_cast<uint32_t>(bindLevel) == DEVICE && offlineParam.leftAclNumber != 0) {
         LOGI("Unbind deivce-level, retain identical account bind type.");
         return DM_OK;
     }
-    if (bindLevel == DEVICE && offlineParam.leftAclNumber == 0) {
+    if (static_cast<uint32_t>(bindLevel) == DEVICE && offlineParam.leftAclNumber == 0) {
         LOGI("Unbind deivce-level, retain null.");
         hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID());
         return DM_OK;
@@ -552,7 +552,7 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    if (bindLevel == DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) == DEVICE) {
         DeleteGroup(pkgName, udid);
     }
     return DeleteAcl(pkgName, std::string(localDeviceId), udid, bindLevel, extra);
@@ -1053,7 +1053,7 @@ void DmAuthManager::RespNegotiate(const int32_t &sessionId)
                 DmAuthManager::HandleAuthenticateTimeout(name);
             });
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
-        authResponseContext_->bindLevel == INVALIED_TYPE) {
+        static_cast<uint32_t>(authResponseContext_->bindLevel) == INVALIED_TYPE) {
         ProcRespNegotiate(sessionId);
         timer_->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
             GetTaskTimeout(WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT), [this] (std::string name) {
@@ -1105,7 +1105,7 @@ void DmAuthManager::SendAuthRequest(const int32_t &sessionId)
         static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
         ProcessAuthRequestExt(sessionId);
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
-        authResponseContext_->bindLevel == INVALIED_TYPE) {
+        static_cast<uint32_t>(authResponseContext_->bindLevel) == INVALIED_TYPE) {
         ProcessAuthRequest(sessionId);
     } else {
         LOGE("Invalied bind mode.");
@@ -1309,7 +1309,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
         static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
         return ConfirmProcessExt(action);
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
-        authResponseContext_->bindLevel == INVALIED_TYPE) {
+        static_cast<uint32_t>(authResponseContext_->bindLevel) == INVALIED_TYPE) {
         return ConfirmProcess(action);
     } else {
         LOGE("Invalied bind mode.");
@@ -1820,7 +1820,7 @@ void DmAuthManager::ShowStartAuthDialog()
             static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
             AuthDevice(pinCode);
         } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
-            authResponseContext_->bindLevel == INVALIED_TYPE) {
+            static_cast<uint32_t>(authResponseContext_->bindLevel) == INVALIED_TYPE) {
             AddMember(pinCode);
         } else {
             LOGE("Invalied bind mode.");
@@ -1859,7 +1859,7 @@ int32_t DmAuthManager::ProcessPincode(int32_t pinCode)
         static_cast<uint32_t>(authResponseContext_->bindLevel) <= APP)) {
         return AuthDevice(pinCode);
     } else if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) ||
-        authResponseContext_->bindLevel == INVALIED_TYPE) {
+        static_cast<uint32_t>(authResponseContext_->bindLevel) == INVALIED_TYPE) {
         return AddMember(pinCode);
     } else {
         LOGE("Invalied bind mode.");
@@ -3140,7 +3140,7 @@ void DmAuthManager::SetProcessInfo()
 {
     CHECK_NULL_VOID(authResponseContext_);
     ProcessInfo processInfo;
-    if (authResponseContext_->bindLevel == APP) {
+    if (static_cast<uint32_t>(authResponseContext_->bindLevel) == APP) {
         if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
             processInfo.pkgName = authResponseContext_->hostPkgName;
             processInfo.userId = authRequestContext_->localUserId;
@@ -3150,7 +3150,8 @@ void DmAuthManager::SetProcessInfo()
         } else {
             LOGE("DMAuthManager::SetProcessInfo failed, state is invalid.");
         }
-    } else if (authResponseContext_->bindLevel == DEVICE || authResponseContext_->bindLevel == INVALIED_TYPE) {
+    } else if (static_cast<uint32_t>(authResponseContext_->bindLevel) == DEVICE ||
+        static_cast<uint32_t>(authResponseContext_->bindLevel) == INVALIED_TYPE) {
         processInfo.pkgName = std::string(DM_PKG_NAME);
         processInfo.userId = authResponseContext_->localUserId;
     } else {
