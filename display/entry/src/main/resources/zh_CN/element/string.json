@@ -26,6 +26,13 @@
         },
         {
             "name":"dm_allow_temp",
+            "value":"临时信任",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_only_once",
             "value":"仅本次信任",
             "attr":{
                 "priority":"translate"
