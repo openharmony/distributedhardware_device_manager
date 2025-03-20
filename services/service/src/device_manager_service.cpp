@@ -390,14 +390,6 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
     return DM_OK;
 }
 
-bool DeviceManagerService::IsCheckDeviceInfoPermission()
-{
-    if (AppManager::GetInstance().IsSystemSA()) {
-        return true;
-    }
-    return false;
-}
-
 int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
     LOGI("Begin networkId %{public}s.", GetAnonyString(networkId).c_str());
@@ -428,7 +420,7 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
         }
         return ret;
     }
-    if (!IsCheckDeviceInfoPermission()) {
+    if (!AppManager::GetInstance().IsSystemSA()) {
         int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
         if (permissionRet != DM_OK) {
             std::string processName = "";
