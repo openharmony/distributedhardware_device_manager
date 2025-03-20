@@ -74,7 +74,6 @@ HWTEST_F(DeviceNameManagerTest, Init_001, testing::ext::TestSize.Level0)
     EXPECT_CALL(*multipleUserConnector_, GetCurrentAccountUserID()).WillRepeatedly(Return(DEFAULT_VALUABLE_USER_ID));
     auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
     EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
-    EXPECT_CALL(*helper_, RegisterObserver(_, _)).Times(AtLeast(1));
     EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
@@ -110,7 +109,6 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_001, testing::ext::
     auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
     EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
     EXPECT_CALL(*helper_, RegisterObserver(_, _)).Times(AtLeast(1));
-    EXPECT_CALL(*helper_, UnregisterObserver(_, _)).Times(AtLeast(1));
     EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
@@ -151,7 +149,6 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_002, testing::ext::
     EXPECT_CALL(*resultSet, GoToRow(_)).Times(AtLeast(1));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
         DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
-    EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(curUserId, preUserId);
     DeviceNameManager::GetInstance().UnInit();
@@ -183,7 +180,6 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogout_001, testing::ext::Test
     EXPECT_CALL(*resultSet, GoToRow(_)).Times(AtLeast(1));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
         DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
-    EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
     DeviceNameManager::GetInstance().UnInit();
@@ -215,7 +211,6 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogin_001, testing::ext::TestS
     EXPECT_CALL(*resultSet, GoToRow(_)).Times(AtLeast(1));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
         DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
-    EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
     DeviceNameManager::GetInstance().UnInit();
@@ -247,7 +242,6 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNickChange_001, testing::ext::
     EXPECT_CALL(*resultSet, GoToRow(_)).Times(AtLeast(1));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
         DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
-    EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
     DeviceNameManager::GetInstance().UnInit();
