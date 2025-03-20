@@ -150,6 +150,7 @@ extern const char* PARAM_KEY_HML_ACTIONID;
 
 extern const char* CONN_SESSION_TYPE_HML;
 extern const char* CONN_SESSION_TYPE_BLE;
+extern const char* UN_BIND_PARAM_UDID_KEY;
 // screen state
 enum ScreenState {
     DM_SCREEN_UNKNOWN = -1,
