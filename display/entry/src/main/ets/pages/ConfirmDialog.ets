@@ -271,7 +271,7 @@ struct ConfirmCustomDialog {
                   .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                 }
               })
-            Button($r('app.string.dm_allow_temp'))
+            Button($r('app.string.dm_allow_this_time'))
               .margin({ bottom: 4 })
               .onClick(() => {
                 this.onAllowOnce();
