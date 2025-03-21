@@ -1520,7 +1520,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authResponseContext_->accountGroupIdHash = OLD_VERSION_ACCOUNT;
     EXPECT_CALL(*multipleUserConnectorMock_,
-        GetCurrentAccountUserID()).WillOnce(Return(0)).WillOnce(Return(0)).WillOnce(Return(0));
+        GetCurrentAccountUserID()).Times(::testing::AtLeast(4)).WillRepeatedly(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     ret = authManager_->IsIdenticalAccount();
     ASSERT_TRUE(ret);
