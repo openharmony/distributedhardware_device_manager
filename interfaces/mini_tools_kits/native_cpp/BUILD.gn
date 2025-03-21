@@ -11,78 +11,119 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/ohos.gni")
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+}
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
-config("devicemanagerminisdk_config") {
-  include_dirs = [
-    "include",
-    "include/ipc",
-    "${common_path}/include",
-    "${common_path}/include/ipc",
-    "${common_path}/include/ipc/model",
-    "${common_path}/include/ipc/standard",
-    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
-    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include/ipc",
-    "${devicemanager_path}/interfaces/inner_kits/native_cpp/include/ipc/standard",
-  ]
-}
+if (defined(ohos_lite)) {
+  if (ohos_kernel_type == "liteos_m") {
+    static_library("devicemanagerminisdk") {
+      include_dirs = []
 
-ohos_shared_library("devicemanagerminisdk") {
-  branch_protector_ret = "pac_ret"
+      sources = []
 
-  sanitize = {
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-    integer_overflow = true
-    ubsan = true
+      deps = []
+
+      cflags = [
+        "-Wall",
+        "-O2",
+        "-std=c99",
+        "-Wdate-time",
+        "-Wextra",
+        "-Wfloat-equal",
+      ]
+      cflags_cc = cflags
+    }
+  } else {
+    shared_library("devicemanagerminisdk") {
+      include_dirs = []
+
+      sources = []
+
+      defines = [
+        "LITE_DEVICE",
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerkit\"",
+        "LOG_DOMAIN=0xD004111",
+      ]
+
+      deps = []
+    }
+  }
+} else {
+  config("devicemanagerminisdk_config") {
+    include_dirs = [
+      "include",
+      "include/ipc",
+      "${common_path}/include",
+      "${common_path}/include/ipc",
+      "${common_path}/include/ipc/model",
+      "${common_path}/include/ipc/standard",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/include/ipc",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/include/ipc/standard",
+    ]
   }
 
-  cflags = [
-    "-Werror",
-    "-fPIC",
-    "-fstack-protector-strong",
-  ]
+  ohos_shared_library("devicemanagerminisdk") {
+    branch_protector_ret = "pac_ret"
 
-  ldflags = [
-    "-Wl,-z,relro",
-    "-Wl,-z,now",
-  ]
+    sanitize = {
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+      integer_overflow = true
+      ubsan = true
+    }
 
-  cflags_cc = cflags
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
 
-  sources = [
-    "${common_path}/src/dm_constants.cpp",
-    "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
-    "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/ipc_client_proxy.cpp",
-    "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/standard/dm_service_load.cpp",
-    "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/standard/ipc_client_server_proxy.cpp",
-    "src/device_manager_impl_mini.cpp",
-    "src/device_manager_mini.cpp",
-    "src/ipc/ipc_client_manager_mini.cpp",
-    "src/ipc/ipc_cmd_parser.cpp",
-  ]
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
 
-  public_configs = [ ":devicemanagerminisdk_config" ]
+    cflags_cc = cflags
 
-  innerapi_tags = [ "platformsdk" ]
+    sources = [
+      "${common_path}/src/dm_constants.cpp",
+      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/ipc_client_proxy.cpp",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/standard/dm_service_load.cpp",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/standard/ipc_client_server_proxy.cpp",
+      "src/device_manager_impl_mini.cpp",
+      "src/device_manager_mini.cpp",
+      "src/ipc/ipc_client_manager_mini.cpp",
+      "src/ipc/ipc_cmd_parser.cpp",
+    ]
 
-  defines = [
-    "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"devicemanagerminikit\"",
-    "LOG_DOMAIN=0xD004111",
-  ]
+    public_configs = [ ":devicemanagerminisdk_config" ]
 
-  external_deps = [
-    "c_utils:utils",
-    "hilog:libhilog",
-    "ipc:ipc_core",
-    "samgr:samgr_proxy",
-  ]
+    innerapi_tags = [ "platformsdk" ]
 
-  subsystem_name = "distributedhardware"
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerminikit\"",
+      "LOG_DOMAIN=0xD004111",
+    ]
 
-  part_name = "device_manager"
+    external_deps = [
+      "c_utils:utils",
+      "hilog:libhilog",
+      "ipc:ipc_core",
+      "samgr:samgr_proxy",
+    ]
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
 }
