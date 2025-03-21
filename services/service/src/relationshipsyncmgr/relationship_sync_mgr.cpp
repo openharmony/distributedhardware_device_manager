@@ -579,13 +579,17 @@ std::string RelationShipChangeMsg::ToJson() const
     char *retStr = cJSON_PrintUnformatted(msg);
     if (retStr == nullptr) {
         LOGE("to json is nullptr.");
+        cJSON_Delete(msg);
+        if (udidArrayObj != nullptr) {
+            cJSON_Delete(udidArrayObj);
+        }
         return "";
     }
     std::string ret = std::string(retStr);
+    cJSON_Delete(msg);
     if (udidArrayObj != nullptr) {
         cJSON_Delete(udidArrayObj);
     }
-    cJSON_Delete(msg);
     cJSON_free(retStr);
     return ret;
 }
