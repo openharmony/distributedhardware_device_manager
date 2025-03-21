@@ -78,7 +78,6 @@ ohos_shared_library("devicemanagerminisdk") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_core",
