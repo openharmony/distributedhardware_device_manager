@@ -460,6 +460,10 @@ bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::s
 {
     uint32_t num = 0;
     READ_HELPER_RET(parcel, Uint32, num, false);
+    if (num > MAX_DEVICE_PROFILE_SIZE) {
+        LOGE("num is Invalid value, num = %{public}zu", num);
+        return false;
+    }
     for (uint32_t k = 0; k < num; k++) {
         std::string str = "";
         READ_HELPER_RET(parcel, String, str, false);
