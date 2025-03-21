@@ -78,7 +78,7 @@ ohos_shared_library("devicemanagerminisdk") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "ipc:ipc_single",
+    "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
 
