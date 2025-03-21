@@ -65,6 +65,7 @@ if (defined(ohos_lite)) {
       "interfaces/cj:cj_distributed_device_manager_ffi_group",
       "interfaces/inner_kits/native_cpp:devicemanagersdk",
       "interfaces/kits:devicemanager_native_js",
+      "interfaces/mini_tools_kits/native_cpp:devicemanagerminisdk",
     ]
   }
   group("device_manager_test") {
