@@ -1744,7 +1744,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_201, testing::ext::Tes
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     int32_t stopUserId = 1;
-    std::string stopEventUdid = ud*********4;
+    std::string stopEventUdid = "ud*********4";
     std::vector<std::string> acceptEventUdids("acc**********7");
     DeviceManagerService::GetInstance().InitDMServiceListener();
     DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
@@ -1761,10 +1761,10 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_201, testing::ext::Tes
 
     std::map<std::string, std::string> wifiDevices;
     wifiDevices.insert(std::make_pair("wikjdmcsk", "deviceInfowifi"));
-    EXPECT_CALL(*dMCommToolMock_, SendUserStop(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dMCommToolMock_, SendUserStop(_, _)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserStopByWifi(localUdid, wifiDevices, stopUserId);
 
-    EXPECT_CALL(*dMCommToolMock_, SendUserStop(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*dMCommToolMock_, SendUserStop(_, _)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserStopByWifi(localUdid, wifiDevices, stopUserId);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
