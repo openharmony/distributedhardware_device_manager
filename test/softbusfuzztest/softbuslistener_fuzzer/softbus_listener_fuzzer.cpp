@@ -56,7 +56,7 @@ std::shared_ptr<SoftbusListener> softbusListener_ =  std::make_shared<SoftbusLis
 
 void SoftBusListenerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(uint32_t) + sizeof(uint16_t))) {
+    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(uint16_t))) {
         return;
     }
     std::string displayName(reinterpret_cast<const char*>(data), size);
@@ -81,7 +81,7 @@ void SoftBusListenerFuzzTest(const uint8_t* data, size_t size)
     int32_t errcode = fdp.ConsumeIntegral<int32_t>();
     uint16_t deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
     softbusListener_->CredentialAuthStatusProcess(deviceList, deviceTypeId, errcode);
-    uint32_t deviceListLen = fdp.ConsumeIntegral<uint32_t>();
+    uint32_t deviceListLen = static_cast<uint32_t>(deviceList.length());
     softbusListener_->OnCredentialAuthStatus(deviceList.data(), deviceListLen, deviceTypeId, errcode);
     NodeStatusType type = NodeStatusType::TYPE_SCREEN_STATUS;
     NodeStatus *status = nullptr;
