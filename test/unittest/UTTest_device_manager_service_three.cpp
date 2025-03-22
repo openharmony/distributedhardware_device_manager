@@ -489,6 +489,39 @@ HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceNamePrefixs_301, testing::ext::
     auto ret = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
     EXPECT_TRUE(ret.empty());
 }
+
+HWTEST_F(DeviceManagerServiceThreeTest, SetLocalDeviceName_301, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "pkgName";
+    std::string deviceName = "deviceName";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, SetRemoteDeviceName_301, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "pkgName";
+    std::string deviceName = "deviceName";
+    std::string deviceId = "d*********3";
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceNetworkIdList_301, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "pkgName";
+    NetworkIdQueryFilter queryFilter;
+    std::vector<std::string> networkIds{"uehd*****87"};
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().GetDeviceNetworkIdList(pkgName, queryFilter, networkIds);
+    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
