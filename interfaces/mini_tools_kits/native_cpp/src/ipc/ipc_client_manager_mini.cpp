@@ -129,6 +129,10 @@ int32_t IpcClientManagerMini::OnDmServiceDied()
             return ERR_DM_POINT_NULL;
         }
         if (dmRecipient_ != nullptr) {
+            if (dmInterface_->AsObject() == nullptr) {
+                LOGE("IpcClientManagerMini::OnDmServiceDied, dmInterface_->AsObject() null");
+                return ERR_DM_POINT_NULL;
+            }
             dmInterface_->AsObject()->RemoveDeathRecipient(dmRecipient_);
             dmRecipient_ = nullptr;
         }
