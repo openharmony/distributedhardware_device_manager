@@ -217,8 +217,6 @@ if (defined(ohos_lite)) {
       "ability_runtime:ability_connect_callback_stub",
       "ability_runtime:ability_manager",
       "access_token:libaccesstoken_sdk",
-      "bundle_framework:appexecfwk_base",
-      "bundle_framework:appexecfwk_core",
       "cJSON:cjson",
       "c_utils:utils",
       "common_event_service:cesfwk_core",

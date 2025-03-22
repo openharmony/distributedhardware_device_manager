@@ -81,8 +81,6 @@ ohos_shared_library("devicemanagerext_pin_auth") {
     "ability_base:session_info",
     "ability_base:want",
     "ability_runtime:ability_manager",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
     "cJSON:cjson",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
