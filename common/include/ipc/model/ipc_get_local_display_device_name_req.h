@@ -16,7 +16,6 @@
 #ifndef OHOS_DM_IPC_GET_LOCAL_DISPLAY_DEVICE_NAME_REQ_H
 #define OHOS_DM_IPC_GET_LOCAL_DISPLAY_DEVICE_NAME_REQ_H
 
-#include "dm_device_profile_info.h"
 #include "ipc_req.h"
 
 namespace OHOS {
