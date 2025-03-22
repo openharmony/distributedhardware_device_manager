@@ -1525,6 +1525,10 @@ void DeviceProfileConnector::UpdatePeerUserId(AccessControlProfile profile, std:
     const std::vector<int32_t> &remoteFrontUserIds)
 {
     LOGI("start.");
+    if (remoteFrontUserIds.empty() || localUserIds.empty()) {
+        LOGI("remoteFrontUserIds or localUserIds is empty.");
+        return;
+    }
     std::string accesserUdid = profile.GetAccesser().GetAccesserDeviceId();
     std::string accesseeUdid = profile.GetAccessee().GetAccesseeDeviceId();
     int32_t accesserUserid = profile.GetAccesser().GetAccesserUserId();
