@@ -642,7 +642,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
 void DmAuthManager::OnSessionClosed(const int32_t sessionId)
 {
     LOGI("DmAuthManager::OnSessionClosed sessionId = %{public}d", sessionId);
-    if (authResponseState_ != nullptr) {
+    if (authResponseState_ != nullptr && authResponseContext_ != nullptr) {
         isFinishOfLocal_ = false;
         authResponseContext_->state = authResponseState_->GetStateType();
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
