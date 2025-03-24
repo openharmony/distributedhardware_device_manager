@@ -119,6 +119,7 @@ void DecodeDmAccessCallee(MessageParcel &parcel, DmAccessCallee &callee)
     callee.peerId = parcel.ReadString();
     callee.userId = parcel.ReadInt32();
     callee.extra = parcel.ReadString();
+    callee.tokenId = parcel.ReadUint64();
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
