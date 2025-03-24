@@ -420,16 +420,18 @@ int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDevi
         }
         return ret;
     }
-    int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
-    if (permissionRet != DM_OK) {
-        std::string processName = "";
-        if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
-            LOGE("Get caller process name failed.");
-            return ret;
-        }
-        if (!PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName)) {
-            LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-            return ret;
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        int32_t permissionRet = dmServiceImpl_->CheckDeviceInfoPermission(localUdid, peerDeviceId);
+        if (permissionRet != DM_OK) {
+            std::string processName = "";
+            if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+                LOGE("Get caller process name failed.");
+                return ret;
+            }
+            if (!PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName)) {
+                LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+                return ret;
+            }
         }
     }
     ret = softbusListener_->GetDeviceInfo(networkId, info);
