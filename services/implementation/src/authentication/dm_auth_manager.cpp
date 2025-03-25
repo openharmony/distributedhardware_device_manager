@@ -294,10 +294,8 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
-    std::string realPkgName = GetSubStr(pkgName, PICKER_PROXY_SPLIT, 1);
-    realPkgName = realPkgName.empty() ? pkgName : realPkgName;
-    authRequestContext_->hostPkgName = realPkgName;
-    authRequestContext_->hostPkgLabel = GetBundleLable(realPkgName);
+    authRequestContext_->hostPkgName = pkgName;
+    authRequestContext_->hostPkgLabel = GetBundleLable(pkgName);
     authRequestContext_->authType = authType;
     authRequestContext_->localDeviceName = softbusConnector_->GetLocalDeviceName();
     authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
@@ -308,9 +306,6 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     uint32_t tokenId = 0 ;
     MultipleUserConnector::GetTokenIdAndForegroundUserId(tokenId, authRequestContext_->localUserId);
     authRequestContext_->tokenId = static_cast<int64_t>(tokenId);
-    if (realPkgName != pkgName) {
-        GetTokenIdByBundleName(authRequestContext_->localUserId, realPkgName, authRequestContext_->tokenId);
-    }
     authRequestContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authRequestContext_->localUserId);
     authRequestContext_->isOnline = false;

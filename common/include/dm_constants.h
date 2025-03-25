@@ -162,8 +162,6 @@ __attribute__ ((visibility ("default")))extern const std::map<int32_t, int32_t> 
 // wise device
 __attribute__ ((visibility ("default")))extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 const int32_t DEIVCE_NAME_MAX_BYTES = 100;
-
-__attribute__ ((visibility ("default")))extern const char* PICKER_PROXY_SPLIT;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H
