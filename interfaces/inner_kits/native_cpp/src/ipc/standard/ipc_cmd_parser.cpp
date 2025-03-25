@@ -1890,7 +1890,7 @@ ON_IPC_SET_REQUEST(UNREG_LOCALSERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, Me
     }
     std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
     std::string bundleName = pReq->GetFirstParam();
-    int64_t pinExchangeType = pReq->GetInt32Param();
+    int32_t pinExchangeType = pReq->GetInt32Param();
     if (!data.WriteString(bundleName)) {
         return ERR_DM_IPC_WRITE_FAILED;
     }

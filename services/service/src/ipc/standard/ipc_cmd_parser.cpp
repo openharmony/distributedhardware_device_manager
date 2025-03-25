@@ -1775,7 +1775,7 @@ ON_IPC_CMD(UPDATE_LOCALSERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 ON_IPC_CMD(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE, MessageParcel &data, MessageParcel &reply)
 {
     std::string bundleName = data.ReadString();
-    int64_t pinExchangeType = data.ReadInt32();
+    int32_t pinExchangeType = data.ReadInt32();
     DMLocalServiceInfo serviceInfo;
     int32_t result = DeviceManagerService::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
         bundleName, pinExchangeType, serviceInfo);

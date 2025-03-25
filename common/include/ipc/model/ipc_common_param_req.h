@@ -64,19 +64,19 @@ public:
         secondParam_ = secondParam;
     }
 
-    int64_t GetInt32Param() const
+    int32_t GetInt32Param() const
     {
         return int32Param_;
     }
 
-    void SetInt32Param(int64_t param)
+    void SetInt32Param(int32_t param)
     {
         int32Param_ = param;
     }
 private:
     std::string firstParam_;
     std::string secondParam_;
-    int64_t int32Param_ = 0;
+    int32_t int32Param_ = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
