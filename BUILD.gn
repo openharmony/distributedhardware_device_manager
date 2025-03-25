@@ -62,7 +62,7 @@ if (defined(ohos_lite)) {
         "radar:devicemanagerradartest",
         "services/service:devicemanagerservicetest",
         "utils:devicemanagerutilstest",
-    ]
+      ]
     }
     if (product_name != "qemu-arm-linux-min") {
       deps += [ "display/entry:DeviceManager_UI" ]
