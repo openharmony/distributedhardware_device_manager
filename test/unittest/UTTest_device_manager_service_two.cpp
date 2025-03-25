@@ -1745,7 +1745,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_201, testing::ext::Tes
 
     int32_t stopUserId = 1;
     std::string stopEventUdid = "ud*********4";
-    std::vector<std::string> acceptEventUdids("acc**********7");
+    std::vector<std::string> acceptEventUdids{"acc**********7"};
     DeviceManagerService::GetInstance().InitDMServiceListener();
     DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
     DeviceManagerService::GetInstance().HandleUserStop(stopUserId, stopEventUdid, acceptEventUdids);
