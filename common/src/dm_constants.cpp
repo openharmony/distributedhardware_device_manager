@@ -155,7 +155,5 @@ const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
 
 // wise device
 const int32_t MAX_DEVICE_PROFILE_SIZE = 500;
-
-const char* PICKER_PROXY_SPLIT = "_pickerProxy_";
 } // namespace DistributedHardware
 } // namespace OHOS

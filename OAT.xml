@@ -67,21 +67,6 @@ Note:If the text contains special characters, please escape them according to th
                 <filteritem type="filepath" name="figures/devicemanager_en.png" desc="pictures used to display project structure"/>
                 <filteritem type="filepath" name="display/entry/src/main/resources/base/media/icon.png" desc="pictures used for app icon"/>
                 <filteritem type="filepath" name="display/AppScope/resources/base/media/app_icon.png" desc="pictures used for app icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/background.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/background_picker.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/close.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/foreground.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/icon_background.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/icon_background_light.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/icon_ball.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/icon_ball_online.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/img.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/img_select.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/iocn_phone_self.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/phone.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/status.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/icon_pad.png" desc="pictures used for device select icon"/>
-                <filteritem type="filepath" name="display/entry/src/main/resources/base/media/startIcon.png" desc="pictures used for device select icon"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>

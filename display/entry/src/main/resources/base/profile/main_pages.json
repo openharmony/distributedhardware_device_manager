@@ -6,7 +6,6 @@
     "pages/BluetoothDialog",
     "pages/ConfirmDialogWearable",
     "pages/PinDialogWearable",
-    "pages/InputPinDialogWearable",
-    "pages/picker/DeviceSelect"
+    "pages/InputPinDialogWearable"
   ]
 }
