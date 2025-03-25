@@ -506,7 +506,7 @@ std::string DeviceNameManager::GetLocalMarketName()
 
 int32_t DeviceNameManager::SetUserDefinedDeviceName(const std::string &deviceName, int32_t userId)
 {
-    LOGI("SetUserDefinedDeviceName:%{public}s, userId:%{publid}d", GetAnonyString(deviceName).c_str(), userId);
+    LOGI("SetUserDefinedDeviceName:%{public}s, userId:%{public}d", GetAnonyString(deviceName).c_str(), userId);
     return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME, deviceName);
 }
 
@@ -517,17 +517,17 @@ int32_t DeviceNameManager::GetDisplayDeviceName(int32_t userId, std::string &dev
 
 int32_t DeviceNameManager::SetDisplayDeviceNameState(const std::string &state, int32_t userId)
 {
-    LOGI("SetDisplayDeviceNameState:%{public}s, userId:%{publid}d", state.c_str(), userId);
+    LOGI("SetDisplayDeviceNameState:%{public}s, userId:%{public}d", state.c_str(), userId);
     return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_DISPLAY_DEVICE_NAME_STATE, state);
 }
 
 int32_t DeviceNameManager::SetDisplayDeviceName(const std::string &deviceName, int32_t userId)
 {
     if (deviceName.empty()) {
-        LOGE("SetDisplayDeviceName deviceName is empty, userId:%{publid}d", userId);
+        LOGE("SetDisplayDeviceName deviceName is empty, userId:%{public}d", userId);
         return ERR_DM_NAME_EMPTY;
     }
-    LOGI("SetDisplayDeviceName:%{public}s, userId:%{publid}d",  GetAnonyString(deviceName).c_str(), userId);
+    LOGI("SetDisplayDeviceName:%{public}s, userId:%{public}d",  GetAnonyString(deviceName).c_str(), userId);
     return SetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_DISPLAY_DEVICE_NAME, deviceName);
 }
 
