@@ -2040,6 +2040,15 @@ napi_value DeviceManagerNapi::GetDeviceNetworkIdListPromise(napi_env env,
             if (jsCallback->code != DM_OK) {
                 napi_value error = CreateBusinessError(env, jsCallback->code, false);
                 napi_reject_deferred(env, jsCallback->deferred, error);
+            } else {
+                napi_value result = nullptr;
+                napi_create_array(env, &result);
+                for (uint32_t i = 0; i< jsCallback->deviceNetworkIds.size(); i++) {
+                    napi_value element = nullptr;
+                    napi_create_string_utf8(env,  jsCallback->deviceNetworkIds[i].c_str(), NAPI_AUTO_LENGTH, &element);
+                    napi_set_element(env, result, i, element);
+                }
+                napi_resolve_deferred(env, jsCallback->deferred, result);
             }
             napi_delete_async_work(env, jsCallback->asyncWork);
             delete jsCallback;
