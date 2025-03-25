@@ -56,7 +56,7 @@ if (defined(ohos_lite)) {
       "services/service:devicemanagerservice",
       "services/softbuscache:dmdevicecache",
     ]
-    if (!defined(ohos_lite)) {
+    if (!is_lite_system) {
       deps += [
         "commondependency:devicemanagerdependencytest",
         "radar:devicemanagerradartest",
