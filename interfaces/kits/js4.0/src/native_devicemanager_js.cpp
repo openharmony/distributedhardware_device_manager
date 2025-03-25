@@ -2043,9 +2043,9 @@ napi_value DeviceManagerNapi::GetDeviceNetworkIdListPromise(napi_env env,
             } else {
                 napi_value result = nullptr;
                 napi_create_array(env, &result);
-                for (uint32_t i = 0; i< jsCallback->deviceNetworkIds.size(); i++) {
+                for (uint32_t i = 0; i < jsCallback->deviceNetworkIds.size(); i++) {
                     napi_value element = nullptr;
-                    napi_create_string_utf8(env,  jsCallback->deviceNetworkIds[i].c_str(), NAPI_AUTO_LENGTH, &element);
+                    napi_create_string_utf8(env, jsCallback->deviceNetworkIds[i].c_str(), NAPI_AUTO_LENGTH, &element);
                     napi_set_element(env, result, i, element);
                 }
                 napi_resolve_deferred(env, jsCallback->deferred, result);
