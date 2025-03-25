@@ -25,5 +25,9 @@ int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
     return DmDMCommTool::dmDMCommTool->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
 }
 
+int32_t DMCommTool::SendUserStop(const std::string rmtNetworkId, int32_t stopUserId)
+{
+    return DmDMCommTool::dmDMCommTool->SendUserStop(rmtNetworkId, stopUserId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
