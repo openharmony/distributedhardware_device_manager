@@ -67,15 +67,6 @@
         "label": "$string:ServiceExtAbility_label",
         "exported": true,
         "type": "sysDialog/common"
-      },
-      {
-        "name": "com.ohos.devicemanagerui.picker.DeviceSelectAbility",
-        "srcEntrance": "./ets/UIExtAbility/picker/DeviceSelectAbility.ets",
-        "description": "$string:ServiceExtAbility_desc",
-        "icon": "$media:icon",
-        "label": "$string:ServiceExtAbility_label",
-        "exported": true,
-        "type": "sysDialog/common"
       }
     ],
     "requestPermissions": [

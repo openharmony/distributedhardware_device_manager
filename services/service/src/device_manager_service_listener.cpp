@@ -230,11 +230,6 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
     ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
     processInfoVec.push_back(bindProcessInfo);
     std::vector<ProcessInfo> allProcessInfos = ipcServerListener_.GetAllProcessInfo();
-    for (auto item : allProcessInfos) {
-        if (item.pkgName.find(PICKER_PROXY_SPLIT + processInfo.pkgName) != std::string::npos) {
-            processInfoVec.push_back(item);
-        }
-    }
     switch (static_cast<int32_t>(state)) {
         case static_cast<int32_t>(DmDeviceState::DEVICE_STATE_ONLINE):
             ProcessAppOnline(processInfoVec, processInfo, state, info, deviceBasicInfo);

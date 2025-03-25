@@ -48,10 +48,6 @@
             "attr":{
                 "priority":"translate"
             }
-        },
-        {
-            "name":"local_machine",
-            "value":"local machine"
         }
     ]
 }
