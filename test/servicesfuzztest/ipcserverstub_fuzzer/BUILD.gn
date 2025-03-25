@@ -60,7 +60,7 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
 
   sources = [ "ipc_server_stub_fuzzer.cpp" ]
 
-  deps = [ "${devicemanager_path}/services/service:devicemanagerservice" ]
+  deps = [ "${devicemanager_path}/services/service:devicemanagerservicetest" ]
 
   defines = [
     "HI_LOG_ENABLE",

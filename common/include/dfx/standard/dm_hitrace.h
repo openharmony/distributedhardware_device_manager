@@ -20,8 +20,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DmTraceStart(const std::string &msg);
-void DmTraceEnd();
+__attribute__ ((visibility ("default")))void DmTraceStart(const std::string &msg);
+__attribute__ ((visibility ("default")))void DmTraceEnd();
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif

@@ -24,25 +24,28 @@ namespace OHOS {
 namespace DistributedHardware {
 class Crypto {
 public:
-    static void DmGenerateStrHash(const void *data, size_t dataSize, unsigned char *outBuf, uint32_t outBufLen,
-        uint32_t startIndex);
-    static std::string Sha256(const std::string &text, bool isUpper = false);
-    static std::string Sha256(const void *data, size_t size, bool isUpper = false);
-    static int32_t ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLen,
-        const char *inBuf, uint32_t inLen);
-    static int32_t GetUdidHash(const std::string &udid, unsigned char *udidHash);
-    static std::string GetGroupIdHash(const std::string &groupId);
+    __attribute__ ((visibility ("default")))static void DmGenerateStrHash(const void *data, size_t dataSize,
+        unsigned char *outBuf, uint32_t outBufLen, uint32_t startIndex);
+    __attribute__ ((visibility ("default")))static std::string Sha256(const std::string &text, bool isUpper = false);
+    __attribute__ ((visibility ("default")))static std::string Sha256(const void *data, size_t size,
+        bool isUpper = false);
+    __attribute__ ((visibility ("default")))static int32_t ConvertHexStringToBytes(unsigned char *outBuf,
+        uint32_t outBufLen, const char *inBuf, uint32_t inLen);
+    __attribute__ ((visibility ("default")))static int32_t GetUdidHash(const std::string &udid,
+        unsigned char *udidHash);
+    __attribute__ ((visibility ("default")))static std::string GetGroupIdHash(const std::string &groupId);
     static int32_t GetSecRandom(uint8_t *out, size_t outLen);
     static std::string GetSecSalt();
     static std::string GetHashWithSalt(const std::string &text, const std::string &salt);
-    static int32_t GetAccountIdHash(const std::string &accountId, unsigned char *accountIdHash);
-    static int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
+    __attribute__ ((visibility ("default")))static int32_t GetAccountIdHash(const std::string &accountId,
+        unsigned char *accountIdHash);
+    __attribute__ ((visibility ("default")))static int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
         const unsigned char *inBuf, uint32_t inLen);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    static int32_t ConvertUdidHashToAnoyAndSave(const std::string &appId, const std::string &udidHash,
-        DmKVValue &kvValue);
-    static int32_t ConvertUdidHashToAnoyDeviceId(const std::string &appId, const std::string &udidHash,
-        DmKVValue &kvValue);
+    __attribute__ ((visibility ("default")))static int32_t ConvertUdidHashToAnoyAndSave(const std::string &appId,
+        const std::string &udidHash, DmKVValue &kvValue);
+    __attribute__ ((visibility ("default")))static int32_t ConvertUdidHashToAnoyDeviceId(const std::string &appId,
+        const std::string &udidHash, DmKVValue &kvValue);
     static int32_t GetAnoyDeviceInfo(const std::string &appId, const std::string &udidHash, DmKVValue &kvValue);
     static int32_t ConvertUdidHashToAnoyGenerate(const std::string &appId, const std::string &udidHash,
         DmKVValue &kvValue);

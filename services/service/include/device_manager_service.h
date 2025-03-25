@@ -58,15 +58,15 @@ public:
 
     void InitHichainListener();
 
-    void RegisterCallerAppId(const std::string &pkgName);
+    __attribute__ ((visibility ("default")))void RegisterCallerAppId(const std::string &pkgName);
 
-    void UnRegisterCallerAppId(const std::string &pkgName);
+    __attribute__ ((visibility ("default")))void UnRegisterCallerAppId(const std::string &pkgName);
     
     void UninitSoftbusListener();
 
     int32_t InitDMServiceListener();
 
-    void UninitDMServiceListener();
+    __attribute__ ((visibility ("default")))void UninitDMServiceListener();
 
     int32_t GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
                                  std::vector<DmDeviceInfo> &deviceList);
@@ -283,12 +283,15 @@ private:
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();
-    void AccountCommonEventCallback(const std::string commonEventType, int32_t currentUserId, int32_t beforeUserId);
+    __attribute__ ((visibility ("default")))void AccountCommonEventCallback(const std::string commonEventType,
+        int32_t currentUserId, int32_t beforeUserId);
     void SubscribeScreenLockEvent();
     void ScreenCommonEventCallback(std::string commonEventType);
-    void ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInfo);
-    int32_t ConvertUdidHashToAnoyDeviceId(const std::string &udidHash, std::string &anoyDeviceId);
-    int32_t GetUdidHashByAnoyDeviceId(const std::string &anoyDeviceId, std::string &udidHash);
+    __attribute__ ((visibility ("default")))void ConvertUdidHashToAnoyDeviceId(DmDeviceInfo &deviceInfo);
+    __attribute__ ((visibility ("default")))int32_t ConvertUdidHashToAnoyDeviceId(const std::string &udidHash,
+        std::string &anoyDeviceId);
+    __attribute__ ((visibility ("default")))int32_t GetUdidHashByAnoyDeviceId(const std::string &anoyDeviceId,
+        std::string &udidHash);
     void HandleAccountLogout(int32_t userId, const std::string &accountId, const std::string &accountName);
     void HandleUserRemoved(int32_t removedUserId);
     /**
@@ -338,7 +341,7 @@ private:
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
-    void SubscribeDataShareCommonEvent();
+    __attribute__ ((visibility ("default")))void SubscribeDataShareCommonEvent();
 #endif
     void CheckRegisterInfoWithWise(int32_t curUserId);
 
@@ -365,7 +368,7 @@ private:
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
-    std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
+    __attribute__ ((visibility ("default")))std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
 #endif
     std::string localNetWorkId_ = "";
     std::shared_ptr<DmTimer> timer_;

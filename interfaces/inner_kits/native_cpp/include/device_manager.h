@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DeviceManager {
 public:
-    static DeviceManager &GetInstance();
+    __attribute__ ((visibility ("default")))static DeviceManager &GetInstance();
 
 public:
     /**

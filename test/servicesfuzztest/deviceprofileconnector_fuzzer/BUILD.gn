@@ -36,8 +36,8 @@ ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
   sources = [ "device_profile_connector_fuzzer.cpp" ]
 
   deps = [
-    "${devicemanager_path}/commondependency:devicemanagerdependency",
-    "${services_path}:devicemanagerservice",
+    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
+    "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 

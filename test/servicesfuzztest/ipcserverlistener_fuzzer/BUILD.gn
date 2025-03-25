@@ -60,7 +60,7 @@ ohos_fuzztest("IpcServerListenerFuzzTest") {
 
   sources = [ "ipc_server_listener_fuzzer.cpp" ]
 
-  deps = [ "${devicemanager_path}/services/service:devicemanagerservice" ]
+  deps = [ "${devicemanager_path}/services/service:devicemanagerservicetest" ]
 
   external_deps = [
     "c_utils:utils",

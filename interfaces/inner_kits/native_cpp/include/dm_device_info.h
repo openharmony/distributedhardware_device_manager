@@ -351,16 +351,16 @@ typedef enum {
     MAX = 9,
 } DmCommonNotifyEvent;
 
-extern const char* DEVICE_TYPE_UNKNOWN_STRING;
-extern const char* DEVICE_TYPE_PHONE_STRING;
-extern const char* DEVICE_TYPE_PAD_STRING;
-extern const char* DEVICE_TYPE_TV_STRING;
-extern const char* DEVICE_TYPE_CAR_STRING;
-extern const char* DEVICE_TYPE_WATCH_STRING;
-extern const char* DEVICE_TYPE_WIFICAMERA_STRING;
-extern const char* DEVICE_TYPE_PC_STRING;
-extern const char* DEVICE_TYPE_SMART_DISPLAY_STRING;
-extern const char* DEVICE_TYPE_2IN1_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_UNKNOWN_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_PHONE_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_PAD_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_TV_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_CAR_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_WATCH_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_WIFICAMERA_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_PC_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_SMART_DISPLAY_STRING;
+__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_2IN1_STRING;
 
 typedef struct DmAccessCaller {
     std::string accountId;

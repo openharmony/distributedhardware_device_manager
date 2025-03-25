@@ -44,6 +44,7 @@ constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
+__attribute__ ((visibility ("default")))
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
@@ -89,6 +90,7 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
     return aclProfileVec;
 }
 
+__attribute__ ((visibility ("default")))
 std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
     const std::string &deviceId)
 {
@@ -213,7 +215,8 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
     return DmAuthForm::INVALID_TYPE;
 }
 
-uint32_t DeviceProfileConnector::CheckBindType(std::string peerUdid, std::string localUdid)
+__attribute__ ((visibility ("default")))uint32_t DeviceProfileConnector::CheckBindType(std::string peerUdid,
+    std::string localUdid)
 {
     std::vector<AccessControlProfile> filterProfiles = GetAclProfileByUserId(localUdid,
         MultipleUserConnector::GetFirstForegroundUserId(), peerUdid);
@@ -263,8 +266,8 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
     return priority;
 }
 
-std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pkgName, std::string requestDeviceId,
-    std::string trustUdid)
+__attribute__ ((visibility ("default")))std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(
+    std::string pkgName, std::string requestDeviceId, std::string trustUdid)
 {
     LOGI("Start requestDeviceId %{public}s, trustUdid %{public}s.", GetAnonyString(requestDeviceId).c_str(),
         GetAnonyString(trustUdid).c_str());
@@ -285,7 +288,8 @@ std::vector<int32_t> DeviceProfileConnector::GetBindTypeByPkgName(std::string pk
     return bindTypeVec;
 }
 
-uint64_t DeviceProfileConnector::GetTokenIdByNameAndDeviceId(std::string pkgName, std::string requestDeviceId)
+__attribute__ ((visibility ("default")))uint64_t DeviceProfileConnector::GetTokenIdByNameAndDeviceId(
+    std::string pkgName, std::string requestDeviceId)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     uint64_t peerTokenId = 0;
@@ -403,8 +407,8 @@ void DeviceProfileConnector::ProcessBindType(AccessControlProfile profiles, std:
     }
 }
 
-std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgName, std::vector<int32_t> bindTypeVec,
-    std::string localDeviceId, std::string targetDeviceId)
+__attribute__ ((visibility ("default")))std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(
+    std::string pkgName, std::vector<int32_t> bindTypeVec, std::string localDeviceId, std::string targetDeviceId)
 {
     std::vector<AccessControlProfile> profiles =
         GetAccessControlProfileByUserId(MultipleUserConnector::GetFirstForegroundUserId());
@@ -431,6 +435,7 @@ std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(std::string pkgNa
     return bindType;
 }
 
+__attribute__ ((visibility ("default")))
 std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConnector::GetProcessInfoFromAclByUserId(
     const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId)
 {
@@ -495,7 +500,8 @@ int32_t DeviceProfileConnector::PutAccessControlList(DmAclInfo aclInfo, DmAccess
     return ret;
 }
 
-bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
+__attribute__ ((visibility ("default")))bool DeviceProfileConnector::DeleteAclForAccountLogOut(
+    const std::string &localUdid, int32_t localUserId,
     const std::string &peerUdid, int32_t peerUserId)
 {
     LOGI("localUdid %{public}s, localUserId %{public}d, peerUdid %{public}s, peerUserId %{public}d.",
@@ -540,7 +546,8 @@ bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localU
     return notifyOffline;
 }
 
-void DeviceProfileConnector::DeleteAclForUserRemoved(std::string localUdid, int32_t userId)
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::DeleteAclForUserRemoved(std::string localUdid,
+    int32_t userId)
 {
     LOGI("localUdid %{public}s, userId %{public}d.", GetAnonyString(localUdid).c_str(), userId);
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(userId);
@@ -556,8 +563,8 @@ void DeviceProfileConnector::DeleteAclForUserRemoved(std::string localUdid, int3
     }
 }
 
-void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(std::string peerUdid, int32_t peerUserId,
-    std::vector<int32_t> &userIds)
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(
+    std::string peerUdid, int32_t peerUserId, std::vector<int32_t> &userIds)
 {
     LOGI("peerUdid %{public}s, peerUserId %{public}d.", GetAnonyString(peerUdid).c_str(), peerUserId);
     std::vector<AccessControlProfile> profiles = GetAccessControlProfileByUserId(peerUserId);
@@ -581,7 +588,7 @@ void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(std::string peerUdid,
     }
 }
 
-void DeviceProfileConnector::DeleteAccessControlList(const std::string &udid)
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::DeleteAccessControlList(const std::string &udid)
 {
     LOGI("Udid: %{public}s.", GetAnonyString(udid).c_str());
     if (udid.empty()) {
@@ -823,7 +830,8 @@ int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::str
     return DM_OK;
 }
 
-bool DeviceProfileConnector::CheckSrcDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId)
+__attribute__ ((visibility ("default")))bool DeviceProfileConnector::CheckSrcDevIdInAclForDevBind(
+    const std::string &pkgName, const std::string &deviceId)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
@@ -858,7 +866,7 @@ bool DeviceProfileConnector::CheckDevIdInAclForDevBind(const std::string &pkgNam
     return (CheckSinkDevIdInAclForDevBind(pkgName, deviceId) || CheckSrcDevIdInAclForDevBind(pkgName, deviceId));
 }
 
-uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
+__attribute__ ((visibility ("default")))uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
@@ -876,7 +884,7 @@ uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &deviceId)
     return res;
 }
 
-int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
@@ -889,7 +897,7 @@ int32_t DeviceProfileConnector::GetTrustNumber(const std::string &deviceId)
     return trustNumber;
 }
 
-int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
 {
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     for (auto &item : profiles) {
@@ -961,7 +969,8 @@ std::vector<AccessControlProfile> GetACLByDeviceIdAndUserId(std::vector<AccessCo
     return profilesFilter;
 }
 
-int32_t DeviceProfileConnector::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::CheckAccessControl(
+    const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     LOGI("PkgName = %{public}s, srcUdid = %{public}s, sinkUdid = %{public}s",
@@ -1040,10 +1049,10 @@ bool DeviceProfileConnector::CheckAppLevelAccess(const DistributedDeviceProfile:
     if (caller.tokenId == 0 || callee.tokenId == 0) {
         return true;
     } else {
-        if ((profile.GetAccesser().GetAccesserTokenId() == caller.tokenId &&
-            profile.GetAccessee().GetAccesseeTokenId() == callee.tokenId) ||
-            (profile.GetAccesser().GetAccesserTokenId() == callee.tokenId &&
-            profile.GetAccessee().GetAccesseeTokenId() == caller.tokenId)) {
+        if ((static_cast<uint64_t>(profile.GetAccesser().GetAccesserTokenId()) == caller.tokenId &&
+            static_cast<uint64_t>(profile.GetAccessee().GetAccesseeTokenId()) == callee.tokenId) ||
+            (static_cast<uint64_t>(profile.GetAccesser().GetAccesserTokenId()) == callee.tokenId &&
+            static_cast<uint64_t>(profile.GetAccessee().GetAccesseeTokenId()) == caller.tokenId)) {
             return true;
         } else {
             return false;
@@ -1051,7 +1060,8 @@ bool DeviceProfileConnector::CheckAppLevelAccess(const DistributedDeviceProfile:
     }
 }
 
-int32_t DeviceProfileConnector::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::CheckIsSameAccount(
+    const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     LOGI("DeviceProfileConnector::CheckIsSameAccount pkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
@@ -1072,8 +1082,8 @@ int32_t DeviceProfileConnector::CheckIsSameAccount(const DmAccessCaller &caller,
     return ERR_DM_FAILED;
 }
 
-int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgName, const std::string &localUdid,
-    const std::string &udid, uint64_t &tokenId)
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgName,
+    const std::string &localUdid, const std::string &udid, uint64_t &tokenId)
 {
     LOGI("pkgName %{public}s, tokenId %{public}" PRId64", udid %{public}s.", pkgName.c_str(),
         tokenId, GetAnonyString(udid).c_str());
@@ -1126,8 +1136,9 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(s
     return deviceIdMap;
 }
 
-std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(int32_t userId,
-    const std::string &accountId, const std::string &localUdid)
+__attribute__ ((visibility ("default")))
+std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(
+    int32_t userId, const std::string &accountId, const std::string &localUdid)
 {
     LOGI("localUdid %{public}s, userId %{public}d, accountId %{public}s.", GetAnonyString(localUdid).c_str(),
         userId, GetAnonyString(accountId).c_str());
@@ -1195,8 +1206,8 @@ int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId,
     return bindType;
 }
 
-int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-    const std::string &localUdid)
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId,
+    const std::string &remoteUdid, const std::string &localUdid)
 {
     LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, localUdid %{public}s.", remoteUserId,
         GetAnonyString(remoteUdid).c_str(), GetAnonyString(localUdid).c_str());
@@ -1216,6 +1227,7 @@ int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const
     return bindType;
 }
 
+__attribute__ ((visibility ("default")))
 OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
     const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
 {
@@ -1252,6 +1264,7 @@ OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEv
     return processInfo;
 }
 
+__attribute__ ((visibility ("default")))
 OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
     const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId)
 {
@@ -1290,6 +1303,7 @@ OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEv
     return processInfo;
 }
 
+__attribute__ ((visibility ("default")))
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
@@ -1299,13 +1313,15 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlPro
     return profiles;
 }
 
-void DeviceProfileConnector::DeleteAccessControlById(int64_t accessControlId)
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::DeleteAccessControlById(
+    int64_t accessControlId)
 {
     DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(accessControlId);
 }
 
-int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
-    const std::vector<std::string> &deviceVec, int32_t currentUserId, int32_t beforeUserId)
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::HandleUserSwitched(
+    const std::string &localUdid, const std::vector<std::string> &deviceVec, int32_t currentUserId,
+    int32_t beforeUserId)
 {
     if (deviceVec.empty()) {
         LOGI("no remote device.");
@@ -1345,7 +1361,8 @@ int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
     return DM_OK;
 }
 
-void DeviceProfileConnector::HandleUserSwitched(const std::vector<AccessControlProfile> &activeProfiles,
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::HandleUserSwitched(
+    const std::vector<AccessControlProfile> &activeProfiles,
     const std::vector<AccessControlProfile> &inActiveProfiles,
     const std::vector<AccessControlProfile> &delActiveProfiles)
 {
@@ -1381,8 +1398,9 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByUserId(
     return profilesTemp;
 }
 
-void DeviceProfileConnector::HandleSyncForegroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
-    const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid)
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::HandleSyncForegroundUserIdEvent(
+    const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
+    const std::vector<int32_t> &localUserIds, std::string &localUdid)
 {
     LOGI("localUdid %{public}s, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(),
         GetAnonyString(remoteUdid).c_str());
@@ -1452,8 +1470,8 @@ std::vector<ProcessInfo> DeviceProfileConnector::GetOfflineProcessInfo(std::stri
     return processInfos;
 }
 
-std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const std::string &localUdid,
-    const std::string &peerUdid)
+__attribute__ ((visibility ("default")))std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(
+    const std::string &localUdid, const std::string &peerUdid)
 {
     LOGI("localUdid %{public}s, peerUdid %{public}s.", GetAnonyString(localUdid).c_str(),
         GetAnonyString(peerUdid).c_str());
@@ -1483,9 +1501,9 @@ std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const s
     return userIdAndBindLevel;
 }
 
-void DeviceProfileConnector::UpdateACL(std::string &localUdid, const std::vector<int32_t> &localUserIds,
-    const std::string &remoteUdid, const std::vector<int32_t> &remoteFrontUserIds,
-    const std::vector<int32_t> &remoteBackUserIds)
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::UpdateACL(std::string &localUdid,
+    const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
+    const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds)
 {
     LOGI("localUdid %{public}s, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(),
         GetAnonyString(remoteUdid).c_str());
@@ -1545,6 +1563,7 @@ void DeviceProfileConnector::UpdatePeerUserId(AccessControlProfile profile, std:
     }
 }
 
+__attribute__ ((visibility ("default")))
 std::multimap<std::string, int32_t> DeviceProfileConnector::GetDevIdAndUserIdByActHash(const std::string &localUdid,
     const std::string &peerUdid, int32_t peerUserId, const std::string &peerAccountHash)
 {
@@ -1587,8 +1606,8 @@ std::multimap<std::string, int32_t> DeviceProfileConnector::GetDevIdAndUserIdByA
     return deviceIdMap;
 }
 
-std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(const std::string &localUdid,
-    int32_t localUserId)
+__attribute__ ((visibility ("default")))std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(
+    const std::string &localUdid, int32_t localUserId)
 {
     LOGI("localUdid %{public}s, userId %{public}d.", GetAnonyString(localUdid).c_str(), localUserId);
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
@@ -1614,8 +1633,9 @@ std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId
     return deviceIdMap;
 }
 
-void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(const std::vector<int32_t> &remoteUserIds,
-    const std::string &remoteUdid, const std::vector<int32_t> &localUserIds, std::string &localUdid)
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(
+    const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
+    const std::vector<int32_t> &localUserIds, std::string &localUdid)
 {
     LOGI("localUdid %{public}s, remoteUdid %{public}s.", GetAnonyString(localUdid).c_str(),
         GetAnonyString(remoteUdid).c_str());
@@ -1649,8 +1669,8 @@ void DeviceProfileConnector::HandleSyncBackgroundUserIdEvent(const std::vector<i
     }
 }
 
-void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
-    const std::string &localUdid, int32_t localUserId, const std::string &localAccountId)
+__attribute__ ((visibility ("default")))void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType,
+    const std::string &peerUdid, const std::string &localUdid, int32_t localUserId, const std::string &localAccountId)
 {
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
@@ -1669,7 +1689,7 @@ void DeviceProfileConnector::HandleDeviceUnBind(int32_t bindType, const std::str
     }
 }
 
-int32_t DeviceProfileConnector::SubscribeDeviceProfileInited(
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::SubscribeDeviceProfileInited(
     sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback)
 {
     LOGI("In");
@@ -1686,7 +1706,7 @@ int32_t DeviceProfileConnector::SubscribeDeviceProfileInited(
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::UnSubscribeDeviceProfileInited()
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::UnSubscribeDeviceProfileInited()
 {
     LOGI("In");
     int32_t ret = DistributedDeviceProfileClient::GetInstance().UnSubscribeDeviceProfileInited(
@@ -1698,7 +1718,7 @@ int32_t DeviceProfileConnector::UnSubscribeDeviceProfileInited()
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::PutAllTrustedDevices(
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::PutAllTrustedDevices(
     const std::vector<DistributedDeviceProfile::TrustedDeviceInfo> &deviceInfos)
 {
     LOGI("In deviceInfos.size:%{public}zu", deviceInfos.size());
@@ -1710,8 +1730,8 @@ int32_t DeviceProfileConnector::PutAllTrustedDevices(
     return DM_OK;
 }
 
-int32_t DeviceProfileConnector::CheckDeviceInfoPermission(const std::string &localUdid,
-    const std::string &peerDeviceId)
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::CheckDeviceInfoPermission(
+    const std::string &localUdid, const std::string &peerDeviceId)
 {
     LOGI("CheckDeviceInfoPermission Start.");
     int32_t localUserId = 0;
@@ -1866,9 +1886,9 @@ bool DeviceProfileConnector::CheckAclStatusAndForegroundNotMatch(const std::stri
     return false;
 }
 
-int32_t DeviceProfileConnector::HandleUserSwitched(const std::string &localUdid,
-    const std::vector<std::string> &deviceVec, const std::vector<int32_t> &foregroundUserIds,
-    const std::vector<int32_t> &backgroundUserIds)
+__attribute__ ((visibility ("default")))int32_t DeviceProfileConnector::HandleUserSwitched(
+    const std::string &localUdid, const std::vector<std::string> &deviceVec,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
 {
     LOGI("OnStart HandleUserSwitched");
     if (deviceVec.empty()) {

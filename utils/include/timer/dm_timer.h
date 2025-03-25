@@ -32,29 +32,30 @@ using TimerCallback = std::function<void (std::string name)>;
 
 class DmTimer {
 public:
-    DmTimer();
-    ~DmTimer();
+    __attribute__ ((visibility ("default")))DmTimer();
+    __attribute__ ((visibility ("default")))~DmTimer();
 
     /**
      * @tc.name: DmTimer::StartTimer
      * @tc.desc: start timer running
      * @tc.type: FUNC
      */
-    int32_t StartTimer(std::string name, int32_t timeOut, TimerCallback callback);
+    __attribute__ ((visibility ("default")))int32_t StartTimer(std::string name, int32_t timeOut,
+        TimerCallback callback);
 
     /**
      * @tc.name: DmTimer::DeleteTimer
      * @tc.desc: delete timer
      * @tc.type: FUNC
      */
-    int32_t DeleteTimer(std::string timerName);
+    __attribute__ ((visibility ("default")))int32_t DeleteTimer(std::string timerName);
 
     /**
      * @tc.name: DmTimer::DeleteAll
      * @tc.desc: delete all timer
      * @tc.type: FUNC
      */
-    int32_t DeleteAll();
+    __attribute__ ((visibility ("default")))int32_t DeleteAll();
 
 private:
     mutable std::mutex timerMutex_;

@@ -20,7 +20,7 @@ namespace OHOS {
 namespace DistributedHardware {
 #define DM_DECLARE_SINGLE_INSTANCE_BASE(className)       \
 public:                                               \
-    static className &GetInstance();                  \
+    __attribute__ ((visibility ("default")))static className &GetInstance();                  \
                                                       \
 private:                                              \
     className(const className &) = delete;            \
@@ -36,7 +36,7 @@ private:                                    \
     ~className() = default;
 
 #define DM_IMPLEMENT_SINGLE_INSTANCE(className)    \
-    className &className::GetInstance()         \
+    __attribute__ ((visibility ("default")))className &className::GetInstance()         \
     {                                           \
         static auto instance = new className(); \
         return *instance;                       \

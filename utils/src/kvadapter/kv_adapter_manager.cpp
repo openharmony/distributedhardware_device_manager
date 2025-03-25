@@ -35,7 +35,7 @@ constexpr int64_t MAX_SUPPORTED_EXIST_TIME = 3 * 24 * 60 * 60; // 3days
 
 DM_IMPLEMENT_SINGLE_INSTANCE(KVAdapterManager);
 
-int32_t KVAdapterManager::Init()
+__attribute__ ((visibility ("default")))int32_t KVAdapterManager::Init()
 {
     LOGI("Init Kv-Adapter manager");
     {
@@ -46,7 +46,7 @@ int32_t KVAdapterManager::Init()
     return kvAdapter_->Init();
 }
 
-void KVAdapterManager::UnInit()
+__attribute__ ((visibility ("default")))void KVAdapterManager::UnInit()
 {
     LOGI("Uninit Kv-Adapter manager");
     CHECK_NULL_VOID(kvAdapter_);
@@ -54,7 +54,7 @@ void KVAdapterManager::UnInit()
     kvAdapter_ = nullptr;
 }
 
-void KVAdapterManager::ReInit()
+__attribute__ ((visibility ("default")))void KVAdapterManager::ReInit()
 {
     LOGI("Re init kv adapter");
     CHECK_NULL_VOID(kvAdapter_);
@@ -88,7 +88,7 @@ int32_t KVAdapterManager::PutByAnoyDeviceId(const std::string &key, const DmKVVa
     return DM_OK;
 }
 
-int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
+__attribute__ ((visibility ("default")))int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
 {
     std::string dmKey = DM_KV_STORE_PREFIX + key;
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);
@@ -110,7 +110,7 @@ int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
     return DM_OK;
 }
 
-int32_t KVAdapterManager::DeleteAgedEntry()
+__attribute__ ((visibility ("default")))int32_t KVAdapterManager::DeleteAgedEntry()
 {
     int64_t nowTime = GetSecondsSince1970ToNow();
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);
@@ -129,7 +129,7 @@ inline bool KVAdapterManager::IsTimeOut(int64_t sourceTime, int64_t targetTime, 
     return targetTime - sourceTime >= timeOut ? true : false;
 }
 
-int32_t KVAdapterManager::AppUnintall(const std::string &appId)
+__attribute__ ((visibility ("default")))int32_t KVAdapterManager::AppUnintall(const std::string &appId)
 {
     LOGI("appId %{public}s.", GetAnonyString(appId).c_str());
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);

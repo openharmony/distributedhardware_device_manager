@@ -60,7 +60,7 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
   sources = [ "ipc_server_client_proxy_fuzzer.cpp" ]
 
   deps = [
-    "${devicemanager_path}/services/service:devicemanagerservice",
+    "${devicemanager_path}/services/service:devicemanagerservicetest",
     "${innerkits_path}/native_cpp:devicemanagersdk",
   ]
 

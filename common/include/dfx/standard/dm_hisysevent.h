@@ -20,7 +20,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void SysEventWrite(const std::string &status, int32_t eventType, const std::string &msg);
+__attribute__ ((visibility ("default")))void SysEventWrite(
+    const std::string &status, int32_t eventType, const std::string &msg);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_DM_HISYSEVENT_H

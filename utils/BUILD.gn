@@ -82,8 +82,101 @@ if (defined(ohos_lite)) {
       "${common_path}/include",
     ]
   }
-
+  config("cflags_config") {
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-fvisibility=hidden",
+      "-Oz",
+      "-flto",
+    ]
+    ldflags = [ "-flto" ]
+  }
   ohos_shared_library("devicemanagerutils") {
+    branch_protector_ret = "pac_ret"
+
+    sanitize = {
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+      integer_overflow = true
+      ubsan = true
+    }
+
+    cflags = [
+      "-fPIC",
+      "-fstack-protector-strong",
+      "-Werror",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
+    configs = [ ":cflags_config" ]
+
+    sources = [
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/json_object.cpp",
+      "src/appInfo/standard/app_manager.cpp",
+      "src/crypto/dm_crypto.cpp",
+      "src/dm_random.cpp",
+      "src/kvadapter/dm_kv_info.cpp",
+      "src/kvadapter/kv_adapter.cpp",
+      "src/kvadapter/kv_adapter_manager.cpp",
+      "src/timer/dm_timer.cpp",
+    ]
+
+    if (support_jsapi) {
+      sources += [ "src/fwkload/standard/dm_distributed_hardware_load.cpp" ]
+    }
+
+    public_configs = [ ":devicemanagerutils_config" ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerutils\"",
+      "LOG_DOMAIN=0xD004110",
+    ]
+
+    external_deps = [
+      "access_token:libaccesstoken_sdk",
+      "access_token:libtokenid_sdk",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
+      "c_utils:utils",
+      "eventhandler:libeventhandler",
+      "ffrt:libffrt",
+      "hilog:libhilog",
+      "ipc:ipc_core",
+      "ipc:ipc_single",
+      "openssl:libcrypto_shared",
+      "os_account:os_account_innerkits",
+      "samgr:samgr_proxy",
+    ]
+
+    public_external_deps = [
+      "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
+      "kv_store:distributeddata_inner",
+    ]
+
+    if (support_jsapi) {
+      external_deps += [ "bundle_framework:appexecfwk_core" ]
+    }
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
+
+  ohos_shared_library("devicemanagerutilstest") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {

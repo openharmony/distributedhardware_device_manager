@@ -78,7 +78,7 @@ ohos_fuzztest("IpcCmdRegisterFuzzTest") {
     "safwk:system_ability_fwk",
   ]
 
-  public_deps = [ "${utils_path}:devicemanagerutils" ]
+  public_deps = [ "${utils_path}:devicemanagerutilstest" ]
 }
 
 ###############################################################################

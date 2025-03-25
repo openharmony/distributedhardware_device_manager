@@ -55,6 +55,10 @@ if (defined(ohos_lite)) {
       "services/implementation:devicemanagerserviceimpl",
       "services/service:devicemanagerservice",
       "services/softbuscache:dmdevicecache",
+      "commondependency:devicemanagerdependencytest",
+      "radar:devicemanagerradartest",
+      "utils:devicemanagerutilstest",
+      "services/service:devicemanagerservicetest",
     ]
     if (product_name != "qemu-arm-linux-min") {
       deps += [ "display/entry:DeviceManager_UI" ]
