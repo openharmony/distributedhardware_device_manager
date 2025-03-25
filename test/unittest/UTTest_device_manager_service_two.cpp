@@ -1721,7 +1721,7 @@ HWTEST_F(DeviceManagerServiceTest, SetRemoteDeviceName_202, testing::ext::TestSi
     std::string deviceId = "d*********9";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
-    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyRemoteDeviceName(_)).WillOnce(Return(false));
@@ -1747,7 +1747,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_201, testing::ext::Tes
     std::string stopEventUdid = "ud*********4";
     std::vector<std::string> acceptEventUdids{"acc**********7"};
     DeviceManagerService::GetInstance().InitDMServiceListener();
-    DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
     DeviceManagerService::GetInstance().HandleUserStop(stopUserId, stopEventUdid, acceptEventUdids);
     DeviceManagerService::GetInstance().HandleUserStop(stopUserId, stopEventUdid);
 
@@ -1779,6 +1778,9 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_202, testing::ext::Tes
     EXPECT_NE(ret, DM_OK);
 
     int32_t stopUserId = 1;
+    std::map<std::string, int32_t> deviceMap;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetDeviceIdAndBindLevel(_, _))
+        .Times(::testing::AtLeast(3)).WillRepeatedly(Return(deviceMap));
     DeviceManagerService::GetInstance().InitDMServiceListener();
     DeviceManagerService::GetInstance().HandleUserStopEvent(stopUserId);
 

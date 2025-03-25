@@ -507,7 +507,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetRemoteDeviceName_301, testing::ext::T
     std::string deviceName = "deviceName";
     std::string deviceId = "d*********3";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyRemoteDeviceName(_)).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
