@@ -66,6 +66,13 @@ if (defined(ohos_lite)) {
     }
     if (product_name != "qemu-arm-linux-min") {
       deps += [ "display/entry:DeviceManager_UI" ]
+    } else if (product_name == "qemu-arm-linux-min") {
+      deps += [
+        "commondependency:devicemanagerdependencytest",
+        "radar:devicemanagerradartest",
+        "services/service:devicemanagerservicetest",
+        "utils:devicemanagerutilstest",
+      ]
     }
   }
   group("device_manager_fwk") {
