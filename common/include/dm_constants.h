@@ -41,6 +41,7 @@ EXPORT extern const char* DM_PIN_HOLDER_SESSION_NAME;
 EXPORT extern const char* DM_SYNC_USERID_SESSION_NAME;
 EXPORT extern const char* DM_CAPABILITY_OSD;
 EXPORT extern const char* DM_CAPABILITY_APPROACH;
+EXPORT extern const char* DM_CAPABILITY_OH_APPROACH;
 EXPORT extern const char* DM_CAPABILITY_TOUCH;
 EXPORT extern const char* DM_CAPABILITY_CASTPLUS;
 EXPORT extern const char* DM_CAPABILITY_VIRTUAL_LINK;
