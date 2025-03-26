@@ -204,6 +204,7 @@ typedef struct DmAuthResponseContext {
 class AuthMessageProcessor;
 
 class DmAuthManager final : public ISoftbusSessionCallback,
+                            public ISoftbusConnectorCallback,
                             public IHiChainConnectorCallback,
                             public IDmDeviceAuthCallback,
                             public std::enable_shared_from_this<DmAuthManager> {
@@ -260,6 +261,13 @@ public:
     void OnDataReceived(const int32_t sessionId, const std::string message);
 
     /**
+     * @tc.name: DmAuthManager::OnSoftbusJoinLNNResult
+     * @tc.desc: OnSoftbus JoinLNN Result of the SoftbusConnector
+     * @tc.type: FUNC
+     */
+    void OnSoftbusJoinLNNResult(const int32_t sessionId, const char *networkId, int32_t result);
+
+     /**
      * @tc.name: DmAuthManager::OnGroupCreated
      * @tc.desc: Created Group of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
@@ -548,6 +556,7 @@ public:
     void RequestReCheckMsg();
     void ResponseReCheckMsg();
     void RequestReCheckMsgDone();
+    void CloseAuthSession(const int32_t sessionId);
 private:
     int32_t ImportCredential(std::string &deviceId, std::string &publicKey);
     void GetAuthParam(const std::string &pkgName, int32_t authType, const std::string &deviceId,
@@ -633,6 +642,7 @@ private:
     std::mutex sessionKeyIdMutex_;
     std::condition_variable sessionKeyIdCondition_;
     std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
+    bool isWaitingJoinLnnCallback_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -83,6 +83,7 @@ const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
 const int32_t MAX_PUT_SESSIONKEY_TIMEOUT = 100; //ms
+const int32_t SESSION_CLOSE_TIMEOUT = 5;
 
 constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
 constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
@@ -93,6 +94,8 @@ constexpr const char* WAIT_NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:waitNego
 constexpr const char* WAIT_REQUEST_TIMEOUT_TASK = "deviceManagerTimer:waitRequest";
 constexpr const char* AUTH_DEVICE_TIMEOUT_TASK = "deviceManagerTimer:authDevice_";
 constexpr const char* SESSION_HEARTBEAT_TIMEOUT_TASK = "deviceManagerTimer:sessionHeartbeat";
+constexpr const char* WAIT_SESSION_CLOSE_TIMEOUT_TASK = "deviceManagerTimer:waitSessionClose";
+constexpr const char* CLOSE_SESSION_TASK_SEPARATOR = "#";
 
 constexpr int32_t PROCESS_NAME_WHITE_LIST_NUM = 1;
 constexpr const static char* PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM] = {
@@ -1476,17 +1479,23 @@ void DmAuthManager::SrcAuthenticateFinish()
         (authResponseContext_->authType == AUTH_TYPE_NFC || authPtr_ != nullptr)) {
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
-
-    int32_t sessionId = authRequestContext_->sessionId;
-    auto taskFunc = [this, sessionId]() {
-        CHECK_NULL_VOID(softbusConnector_);
-        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
-    };
-    const int64_t MICROSECOND_PER_SECOND = 1000000L;
-    int32_t delaySeconds = authRequestContext_->closeSessionDelaySeconds;
-    ffrt::submit(taskFunc, ffrt::task_attr().delay(delaySeconds * MICROSECOND_PER_SECOND));
-
+    if (timer_ == nullptr) {
+        timer_ = std::make_shared<DmTimer>();
+    }
+    int32_t closeSessionDelaySeconds = authRequestContext_->closeSessionDelaySeconds;
+    if (IsHmlSessionType() && closeSessionDelaySeconds == 0 && isWaitingJoinLnnCallback_) {
+        closeSessionDelaySeconds = SESSION_CLOSE_TIMEOUT;
+    }
+    timer_->StartTimer(std::string(WAIT_SESSION_CLOSE_TIMEOUT_TASK) + std::string(CLOSE_SESSION_TASK_SEPARATOR) +
+        std::to_string(authRequestContext_->sessionId),
+        closeSessionDelaySeconds, [this] (std::string name) {
+            int32_t sessionIdIndex = 1;
+            std::string sessionStr = GetSubStr(name, std::string(CLOSE_SESSION_TASK_SEPARATOR), sessionIdIndex);
+            if (!sessionStr.empty()) {
+                int32_t sessionId = std::atoi(sessionStr.c_str());
+                DmAuthManager::CloseAuthSession(sessionId);
+            }
+        });
     listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, authRequestContext_->token,
         authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason,
@@ -1495,6 +1504,7 @@ void DmAuthManager::SrcAuthenticateFinish()
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
     authTimes_ = 0;
+    isWaitingJoinLnnCallback_ = false;
 }
 
 void DmAuthManager::AuthenticateFinish()
@@ -3339,6 +3349,9 @@ void DmAuthManager::JoinLnn(const std::string &deviceId, bool isForceJoin)
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(softbusConnector_);
     if (IsHmlSessionType()) {
+        if (authRequestContext_->closeSessionDelaySeconds == 0) {
+            isWaitingJoinLnnCallback_ = true;
+        }
         authResponseContext_->localSessionKeyId = GetSessionKeyIdSync(authResponseContext_->requestId);
         softbusConnector_->JoinLnnByHml(authRequestContext_->sessionId, authResponseContext_->localSessionKeyId,
             authResponseContext_->remoteSessionKeyId);
@@ -3358,6 +3371,24 @@ int32_t DmAuthManager::GetTokenIdByBundleName(int32_t userId, std::string &bundl
         LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(bundleName).c_str());
     }
     return ret;
+}
+
+void DmAuthManager::OnSoftbusJoinLNNResult(const int32_t sessionId, const char *networkId, int32_t result)
+{
+    (void)networkId;
+    (void)result;
+    CloseAuthSession(sessionId);
+}
+
+void DmAuthManager::CloseAuthSession(const int32_t sessionId)
+{
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(WAIT_SESSION_CLOSE_TIMEOUT_TASK) + std::string(CLOSE_SESSION_TASK_SEPARATOR) +
+            std::to_string(sessionId));
+    }
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+    softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

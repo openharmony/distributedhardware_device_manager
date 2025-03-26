@@ -30,6 +30,7 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "softbus_session.h"
 #endif
+#include "softbus_connector_callback.h"
 #include "softbus_state_callback.h"
 
 namespace OHOS {
@@ -85,6 +86,20 @@ public:
      */
     static void JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId);
 
+    /**
+     * @tc.name: SoftbusConnector::RegisterConnectorCallback
+     * @tc.desc: RegisterConnectorCallback of the Softbus Connector
+     * @tc.type: FUNC
+     */
+    int32_t RegisterConnectorCallback(std::shared_ptr<ISoftbusConnectorCallback> callback);
+
+    /**
+     * @tc.name: SoftbusConnector::UnRegisterConnectorCallback
+     * @tc.desc: UnRegister ConnectorCallback of the Softbus Connector
+     * @tc.type: FUNC
+     */
+    int32_t UnRegisterConnectorCallback();
+
 public:
     SoftbusConnector();
     ~SoftbusConnector();
@@ -129,6 +144,7 @@ private:
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex deviceUdidLocks_;
     static std::mutex processInfoVecMutex_;
+    static std::shared_ptr<ISoftbusConnectorCallback> connectorCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
