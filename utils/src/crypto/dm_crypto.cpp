@@ -64,7 +64,7 @@ void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char 
     SHA256_Final(&outBuf[startIndex], &ctx);
 }
 
-__attribute__ ((visibility ("default")))int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
+EXPORT int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
     const unsigned char *inBuf, uint32_t inLen)
 {
     if ((outBuf == nullptr) || (inBuf == nullptr) || (outBufLen < HexifyLen(inLen))) {
@@ -124,7 +124,7 @@ int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
     return DM_OK;
 }
 
-__attribute__ ((visibility ("default")))int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
+EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
     uint32_t outBufLen, const char *inBuf, uint32_t inLen)
 {
     (void)outBufLen;
@@ -164,7 +164,7 @@ __attribute__ ((visibility ("default")))int32_t Crypto::ConvertHexStringToBytes(
     return DM_OK;
 }
 
-__attribute__ ((visibility ("default")))std::string Crypto::GetGroupIdHash(const std::string &groupId)
+EXPORT std::string Crypto::GetGroupIdHash(const std::string &groupId)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     DmGenerateStrHash(groupId.data(), groupId.size(), hash, SHA256_DIGEST_LENGTH, 0);
@@ -211,7 +211,7 @@ std::string Crypto::GetHashWithSalt(const std::string &text, const std::string &
     return Crypto::Sha256(rawText);
 }
 
-__attribute__ ((visibility ("default")))int32_t Crypto::GetAccountIdHash(const std::string &accountId,
+EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
     unsigned char *accountIdHash)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
@@ -225,7 +225,7 @@ __attribute__ ((visibility ("default")))int32_t Crypto::GetAccountIdHash(const s
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-__attribute__ ((visibility ("default")))int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
+EXPORT int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
     const std::string &udidHash, DmKVValue &kvValue)
 {
     if (GetAnoyDeviceInfo(appId, udidHash, kvValue) == DM_OK) {
@@ -242,7 +242,7 @@ __attribute__ ((visibility ("default")))int32_t Crypto::ConvertUdidHashToAnoyAnd
     return DM_OK;
 }
 
-__attribute__ ((visibility ("default")))int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId,
+EXPORT int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId,
     const std::string &udidHash, DmKVValue &kvValue)
 {
     LOGI("start.");

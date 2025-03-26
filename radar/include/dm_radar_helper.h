@@ -27,9 +27,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-__attribute__ ((visibility ("default")))extern const char* ORGPKGNAME;
-__attribute__ ((visibility ("default")))extern const char* SOFTBUSNAME;
-__attribute__ ((visibility ("default")))extern const char* HICHAINNAME;
+EXPORT extern const char* ORGPKGNAME;
+EXPORT extern const char* SOFTBUSNAME;
+EXPORT extern const char* HICHAINNAME;
 enum class DiscoverScene : int32_t {
     DM_DISCOVER = 0x1,
     DM_GET_TRUST_DEVICE_LIST = 0x2,
@@ -217,8 +217,8 @@ public:
         std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid) override;
     std::string GetDeviceInfoList(std::vector<DmDeviceInfo> &deviceInfoList) override;
     std::string ConvertHexToString(uint16_t hex);
-    __attribute__ ((visibility ("default")))int32_t GetErrCode(int32_t errCode);
-    __attribute__ ((visibility ("default")))std::string GetAnonyLocalUdid();
+    EXPORT int32_t GetErrCode(int32_t errCode);
+    EXPORT std::string GetAnonyLocalUdid();
     int32_t ReportDiscoverRegCallbackStageIdle(struct RadarInfo &info);
     int32_t ReportDiscoverUserResStageCancel(struct RadarInfo &info);
     int32_t ReportDiscoverUserResStageSucc(struct RadarInfo &info);

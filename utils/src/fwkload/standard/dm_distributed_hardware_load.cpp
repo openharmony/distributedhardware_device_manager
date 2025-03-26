@@ -25,7 +25,7 @@ namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DmDistributedHardwareLoad);
 constexpr uint32_t MAX_LOAD_VALUE = 3;
 constexpr int32_t DM_OK = 0;
-__attribute__ ((visibility ("default")))void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
+EXPORT void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 {
     LOGI("enter DmDistributedHardwareLoad::LoadDistributedHardwareFwk");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();

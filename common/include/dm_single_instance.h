@@ -16,11 +16,15 @@
 #ifndef OHOS_DM_SINGLE_INSTANCE_H
 #define OHOS_DM_SINGLE_INSTANCE_H
 
+#ifndef EXPORT
+#define EXPORT __attribute__ ((visibility ("default")))
+#endif // EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
 #define DM_DECLARE_SINGLE_INSTANCE_BASE(className)       \
 public:                                               \
-    __attribute__ ((visibility ("default")))static className &GetInstance();                  \
+    EXPORT static className &GetInstance();                  \
                                                       \
 private:                                              \
     className(const className &) = delete;            \
@@ -36,7 +40,7 @@ private:                                    \
     ~className() = default;
 
 #define DM_IMPLEMENT_SINGLE_INSTANCE(className)    \
-    __attribute__ ((visibility ("default")))className &className::GetInstance()         \
+    EXPORT className &className::GetInstance()         \
     {                                           \
         static auto instance = new className(); \
         return *instance;                       \

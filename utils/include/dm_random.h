@@ -19,12 +19,16 @@
 #include <cstdint>
 #include <set>
 
+#ifndef EXPORT
+#define EXPORT __attribute__ ((visibility ("default")))
+#endif // EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
-__attribute__ ((visibility ("default")))int32_t GenRandInt(int32_t randMin, int32_t randMax);
-__attribute__ ((visibility ("default")))int64_t GenRandLongLong(int64_t randMin, int64_t randMax);
-__attribute__ ((visibility ("default")))uint16_t GenRandUint(uint16_t randMin, uint16_t randMax);
-__attribute__ ((visibility ("default")))uint16_t GenUniqueRandUint(std::set<uint16_t> &randUint16Set);
+EXPORT int32_t GenRandInt(int32_t randMin, int32_t randMax);
+EXPORT int64_t GenRandLongLong(int64_t randMin, int64_t randMax);
+EXPORT uint16_t GenRandUint(uint16_t randMin, uint16_t randMax);
+EXPORT uint16_t GenUniqueRandUint(std::set<uint16_t> &randUint16Set);
 } // namespace DistributedHardware
 } // namespace OHOS
 

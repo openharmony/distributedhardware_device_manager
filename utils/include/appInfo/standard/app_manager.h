@@ -32,17 +32,17 @@ class AppManager {
     DM_DECLARE_SINGLE_INSTANCE(AppManager);
 
 public:
-    __attribute__ ((visibility ("default")))const std::string GetAppId();
-    __attribute__ ((visibility ("default")))void RegisterCallerAppId(const std::string &pkgName);
-    __attribute__ ((visibility ("default")))void UnRegisterCallerAppId(const std::string &pkgName);
-    __attribute__ ((visibility ("default")))int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
-    __attribute__ ((visibility ("default")))bool IsSystemSA();
-    __attribute__ ((visibility ("default")))bool IsSystemApp();
-    __attribute__ ((visibility ("default")))int32_t GetCallerName(bool isSystemSA, std::string &callerName);
-    __attribute__ ((visibility ("default")))int32_t GetNativeTokenIdByName(std::string &processName, int64_t &tokenId);
-    __attribute__ ((visibility ("default")))int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName,
+    EXPORT const std::string GetAppId();
+    EXPORT void RegisterCallerAppId(const std::string &pkgName);
+    EXPORT void UnRegisterCallerAppId(const std::string &pkgName);
+    EXPORT int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
+    EXPORT bool IsSystemSA();
+    EXPORT bool IsSystemApp();
+    EXPORT int32_t GetCallerName(bool isSystemSA, std::string &callerName);
+    EXPORT int32_t GetNativeTokenIdByName(std::string &processName, int64_t &tokenId);
+    EXPORT int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName,
         int32_t instIndex, int64_t &tokenId);
-    __attribute__ ((visibility ("default")))int32_t GetCallerProcessName(std::string &processName);
+    EXPORT int32_t GetCallerProcessName(std::string &processName);
 private:
     bool GetBundleManagerProxy(sptr<AppExecFwk::IBundleMgr> &bundleManager);
     std::mutex appIdMapLock_;

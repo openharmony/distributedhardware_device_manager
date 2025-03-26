@@ -24,6 +24,10 @@
 #define DM_MAX_DEVICE_ID_LEN (97)
 #define DM_MAX_DEVICE_NAME_LEN (129)
 
+#ifndef EXPORT
+#define EXPORT __attribute__ ((visibility ("default")))
+#endif // EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
 /**
@@ -351,16 +355,16 @@ typedef enum {
     MAX = 9,
 } DmCommonNotifyEvent;
 
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_UNKNOWN_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_PHONE_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_PAD_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_TV_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_CAR_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_WATCH_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_WIFICAMERA_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_PC_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_SMART_DISPLAY_STRING;
-__attribute__ ((visibility ("default")))extern const char* DEVICE_TYPE_2IN1_STRING;
+EXPORT extern const char* DEVICE_TYPE_UNKNOWN_STRING;
+EXPORT extern const char* DEVICE_TYPE_PHONE_STRING;
+EXPORT extern const char* DEVICE_TYPE_PAD_STRING;
+EXPORT extern const char* DEVICE_TYPE_TV_STRING;
+EXPORT extern const char* DEVICE_TYPE_CAR_STRING;
+EXPORT extern const char* DEVICE_TYPE_WATCH_STRING;
+EXPORT extern const char* DEVICE_TYPE_WIFICAMERA_STRING;
+EXPORT extern const char* DEVICE_TYPE_PC_STRING;
+EXPORT extern const char* DEVICE_TYPE_SMART_DISPLAY_STRING;
+EXPORT extern const char* DEVICE_TYPE_2IN1_STRING;
 
 typedef struct DmAccessCaller {
     std::string accountId;

@@ -368,7 +368,7 @@ bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent)
     return false;
 }
 
-__attribute__ ((visibility ("default")))std::string SafetyDump(const JsonItemObject &jsonObj)
+EXPORT std::string SafetyDump(const JsonItemObject &jsonObj)
 {
     return jsonObj.Dump();
 }

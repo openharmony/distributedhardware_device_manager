@@ -161,7 +161,7 @@ void DeviceManagerService::SubscribePublishCommonEvent()
     return;
 }
 #endif // SUPPORT_BLUETOOTH SUPPORT_WIFI
-__attribute__ ((visibility ("default")))void DeviceManagerService::SubscribeDataShareCommonEvent()
+EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
 {
     LOGI("DeviceManagerServiceImpl::SubscribeDataShareCommonEvent");
     if (dataShareCommonEventManager_ == nullptr) {
@@ -269,7 +269,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
     return DM_OK;
 }
 
-__attribute__ ((visibility ("default")))void DeviceManagerService::UninitDMServiceListener()
+EXPORT void DeviceManagerService::UninitDMServiceListener()
 {
     listener_ = nullptr;
     advertiseMgr_ = nullptr;
@@ -281,12 +281,12 @@ __attribute__ ((visibility ("default")))void DeviceManagerService::UninitDMServi
     LOGI("Uninit.");
 }
 
-__attribute__ ((visibility ("default")))void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName)
+EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName)
 {
     AppManager::GetInstance().RegisterCallerAppId(pkgName);
 }
 
-__attribute__ ((visibility ("default")))void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName)
+EXPORT void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName)
 {
     AppManager::GetInstance().UnRegisterCallerAppId(pkgName);
 }
@@ -1869,7 +1869,7 @@ void DeviceManagerService::SubscribeScreenLockEvent()
     return;
 }
 
-__attribute__ ((visibility ("default")))void DeviceManagerService::AccountCommonEventCallback(
+EXPORT void DeviceManagerService::AccountCommonEventCallback(
     const std::string commonEventType, int32_t currentUserId, int32_t beforeUserId)
 {
     LOGI("CommonEventType: %{public}s, currentUserId: %{public}d, beforeUserId: %{public}d", commonEventType.c_str(),
@@ -2350,7 +2350,7 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-__attribute__ ((visibility ("default")))void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(
+EXPORT void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(
     DmDeviceInfo &deviceInfo)
 {
     std::string udidHashTemp = "";
@@ -2366,7 +2366,7 @@ __attribute__ ((visibility ("default")))void DeviceManagerService::ConvertUdidHa
     }
 }
 
-__attribute__ ((visibility ("default")))int32_t DeviceManagerService::ConvertUdidHashToAnoyDeviceId(
+EXPORT int32_t DeviceManagerService::ConvertUdidHashToAnoyDeviceId(
     const std::string &udidHash, std::string &result)
 {
     LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
@@ -2384,7 +2384,7 @@ __attribute__ ((visibility ("default")))int32_t DeviceManagerService::ConvertUdi
     return DM_OK;
 }
 
-__attribute__ ((visibility ("default")))int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(
+EXPORT int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(
     const std::string &anoyDeviceId, std::string &udidHash)
 {
     LOGI("anoyDeviceId %{public}s.", GetAnonyString(anoyDeviceId).c_str());

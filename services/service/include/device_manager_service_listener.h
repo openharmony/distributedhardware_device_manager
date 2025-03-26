@@ -59,10 +59,10 @@ public:
 
     void OnCredentialResult(const ProcessInfo &processInfo, int32_t action, const std::string &resultInfo) override;
 
-    __attribute__ ((visibility ("default")))void OnBindResult(const ProcessInfo &processInfo,
+    EXPORT void OnBindResult(const ProcessInfo &processInfo,
         const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override;
 
-    __attribute__ ((visibility ("default")))void OnUnbindResult(const ProcessInfo &processInfo,
+    EXPORT void OnUnbindResult(const ProcessInfo &processInfo,
         const PeerTargetId &targetId, int32_t result, std::string content) override;
 
     void OnPinHolderCreate(const ProcessInfo &processInfo, const std::string &deviceId, DmPinType pinType,
@@ -104,7 +104,7 @@ private:
         const DmDeviceInfo &deviceInfo);
     void RemoveOnlinePkgName(const DmDeviceInfo &info);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    __attribute__ ((visibility ("default")))int32_t ConvertUdidHashToAnoyAndSave(const std::string &pkgName,
+    EXPORT int32_t ConvertUdidHashToAnoyAndSave(const std::string &pkgName,
         DmDeviceInfo &deviceInfo);
     int32_t ConvertUdidHashToAnoyDeviceId(const std::string &pkgName, const std::string &udidHash,
         std::string &anoyDeviceId);
