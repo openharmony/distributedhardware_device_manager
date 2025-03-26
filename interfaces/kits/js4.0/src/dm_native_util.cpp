@@ -810,7 +810,7 @@ bool JsToDmDeviceProfileInfos(const napi_env &env, const napi_value &jsObj, std:
         napi_value element;
         napi_get_element(env, jsObj, i, &element);
         DmDeviceProfileInfo devInfo;
-        if (JsToDmDeviceProfileInfo(env, jsObj, devInfo)) {
+        if (JsToDmDeviceProfileInfo(env, element, devInfo)) {
             devInfos.emplace_back(devInfo);
         }
     }

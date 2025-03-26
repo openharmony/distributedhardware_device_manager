@@ -143,6 +143,7 @@ const char* PARAM_KEY_HML_ACTIONID = "hmlActionId";
 
 const char* CONN_SESSION_TYPE_HML = "HML";
 const char* CONN_SESSION_TYPE_BLE = "BLE";
+const char* UN_BIND_PARAM_UDID_KEY = "udidKey";
 
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {

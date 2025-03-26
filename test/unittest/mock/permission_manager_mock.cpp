@@ -44,5 +44,15 @@ bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &
 {
     return DmPermissionManager::dmPermissionManager->CheckProcessNameValidOnGetDeviceInfo(processName);
 }
+
+bool PermissionManager::CheckProcessNameValidModifyLocalDeviceName(const std::string &processName)
+{
+    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidModifyLocalDeviceName(processName);
+}
+
+bool PermissionManager::CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName)
+{
+    return DmPermissionManager::dmPermissionManager->CheckProcessNameValidModifyRemoteDeviceName(processName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1544,7 +1544,22 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    return dmServiceImplExtResident_->UnbindTargetExt(pkgName, targetId, unbindParam);
+    std::string realDeviceId = targetId.deviceId;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string udidHashTemp = "";
+    if (GetUdidHashByAnoyDeviceId(realDeviceId, udidHashTemp) == DM_OK) {
+        realDeviceId = udidHashTemp;
+    }
+#endif
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    std::string udid = "";
+    if (softbusListener_->GetUdidFromDp(realDeviceId, udid) != DM_OK) {
+        LOGE("Get udid by udidhash failed.");
+        return ERR_DM_FAILED;
+    }
+    std::map<std::string, std::string> unbindParamWithUdid(unbindParam);
+    unbindParamWithUdid.insert(std::pair<std::string, std::string>(UN_BIND_PARAM_UDID_KEY, udid));
+    return dmServiceImplExtResident_->UnbindTargetExt(pkgName, targetId, unbindParamWithUdid);
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -3191,7 +3206,7 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
     }
     if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (!IsDMServiceAdapterResidentLoad()) {
@@ -3215,7 +3230,7 @@ int32_t DeviceManagerService::SetRemoteDeviceName(const std::string &pkgName,
     }
     if (!PermissionManager::GetInstance().CheckProcessNameValidModifyRemoteDeviceName(processName)) {
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (!IsDMServiceAdapterResidentLoad()) {

@@ -31,6 +31,8 @@ public:
     virtual int32_t GetCallerProcessName(std::string &processName) = 0;
     virtual bool CheckProcessNameValidOnSetDnPolicy(const std::string &processName) = 0;
     virtual bool CheckProcessNameValidOnGetDeviceInfo(const std::string &processName) = 0;
+    virtual bool CheckProcessNameValidModifyLocalDeviceName(const std::string &processName) = 0;
+    virtual bool CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName) = 0;
 public:
     static inline std::shared_ptr<DmPermissionManager> dmPermissionManager = nullptr;
 };
@@ -42,6 +44,8 @@ public:
     MOCK_METHOD(int32_t, GetCallerProcessName, (std::string &));
     MOCK_METHOD(bool, CheckProcessNameValidOnSetDnPolicy, (const std::string &));
     MOCK_METHOD(bool, CheckProcessNameValidOnGetDeviceInfo, (const std::string &));
+    MOCK_METHOD(bool, CheckProcessNameValidModifyLocalDeviceName, (const std::string &));
+    MOCK_METHOD(bool, CheckProcessNameValidModifyRemoteDeviceName, (const std::string &));
 };
 }
 }

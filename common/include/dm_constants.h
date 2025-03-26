@@ -154,6 +154,8 @@ EXPORT extern const char* PARAM_KEY_HML_ACTIONID;
 
 EXPORT extern const char* CONN_SESSION_TYPE_HML;
 EXPORT extern const char* CONN_SESSION_TYPE_BLE;
+EXPORT extern const char* UN_BIND_PARAM_UDID_KEY;
+
 // screen state
 enum ScreenState {
     DM_SCREEN_UNKNOWN = -1,
