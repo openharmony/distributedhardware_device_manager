@@ -90,8 +90,8 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
     return aclProfileVec;
 }
 
-EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
-    const std::string &deviceId)
+EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(
+    const std::string &pkgName, const std::string &deviceId)
 {
     int32_t userId = MultipleUserConnector::GetFirstForegroundUserId();
     std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(deviceId, userId);
@@ -1135,8 +1135,7 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(s
     return deviceIdMap;
 }
 
-EXPORT 
-std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(
+EXPORT std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(
     int32_t userId, const std::string &accountId, const std::string &localUdid)
 {
     LOGI("localUdid %{public}s, userId %{public}d, accountId %{public}s.", GetAnonyString(localUdid).c_str(),
@@ -1226,9 +1225,8 @@ EXPORT int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId
     return bindType;
 }
 
-EXPORT 
-OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
-    const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
+EXPORT OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(
+    int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
 {
     LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}d, localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteUdid).c_str(), tokenId, GetAnonyString(localUdid).c_str());
@@ -1263,9 +1261,9 @@ OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEv
     return processInfo;
 }
 
-EXPORT 
-OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
-    const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId)
+EXPORT OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(
+    int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId,
+    const std::string &localUdid, int32_t peerTokenId)
 {
     LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}d, localUdid %{public}s.",
         remoteUserId, GetAnonyString(remoteUdid).c_str(), tokenId, GetAnonyString(localUdid).c_str());
@@ -1302,8 +1300,7 @@ OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEv
     return processInfo;
 }
 
-EXPORT 
-std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
+EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
     if (DistributedDeviceProfileClient::GetInstance().GetAllAccessControlProfile(profiles) != DM_OK) {
@@ -1562,9 +1559,9 @@ void DeviceProfileConnector::UpdatePeerUserId(AccessControlProfile profile, std:
     }
 }
 
-EXPORT 
-std::multimap<std::string, int32_t> DeviceProfileConnector::GetDevIdAndUserIdByActHash(const std::string &localUdid,
-    const std::string &peerUdid, int32_t peerUserId, const std::string &peerAccountHash)
+EXPORT std::multimap<std::string, int32_t> DeviceProfileConnector::GetDevIdAndUserIdByActHash(
+    const std::string &localUdid, const std::string &peerUdid,
+    int32_t peerUserId, const std::string &peerAccountHash)
 {
     LOGI("localUdid %{public}s, peerUdid %{public}s, peerUserId %{public}d, peerAccountHash %{public}s.",
         GetAnonyString(localUdid).c_str(), GetAnonyString(peerUdid).c_str(), peerUserId, peerAccountHash.c_str());
