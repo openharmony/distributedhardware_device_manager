@@ -37,6 +37,7 @@ extern const char* DM_PIN_HOLDER_SESSION_NAME;
 extern const char* DM_SYNC_USERID_SESSION_NAME;
 extern const char* DM_CAPABILITY_OSD;
 extern const char* DM_CAPABILITY_APPROACH;
+extern const char* DM_CAPABILITY_OH_APPROACH;
 extern const char* DM_CAPABILITY_TOUCH;
 extern const char* DM_CAPABILITY_CASTPLUS;
 extern const char* DM_CAPABILITY_VIRTUAL_LINK;
