@@ -44,8 +44,8 @@ constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
-EXPORT 
-std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
+
+EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
     std::map<std::string, std::string> queryParams;
@@ -90,8 +90,7 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
     return aclProfileVec;
 }
 
-EXPORT 
-std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
+EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(const std::string &pkgName,
     const std::string &deviceId)
 {
     int32_t userId = MultipleUserConnector::GetFirstForegroundUserId();
