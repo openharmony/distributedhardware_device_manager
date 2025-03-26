@@ -32,6 +32,7 @@ const char* DM_PIN_HOLDER_SESSION_NAME = "ohos.distributedhardware.devicemanager
 const char* DM_SYNC_USERID_SESSION_NAME = "ohos.distributedhardware.devicemanager.syncuserid";
 const char* DM_CAPABILITY_OSD = "osdCapability";
 const char* DM_CAPABILITY_APPROACH = "approach";
+const char* DM_CAPABILITY_OH_APPROACH = "oh_approach";
 const char* DM_CAPABILITY_TOUCH = "touch";
 const char* DM_CAPABILITY_CASTPLUS = "castPlus";
 const char* DM_CAPABILITY_VIRTUAL_LINK = "virtualLink";
