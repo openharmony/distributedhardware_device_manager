@@ -106,8 +106,6 @@ void DeviceNameManagerFirstFuzzTest(const uint8_t* data, size_t size)
     deviceNameMgr_->MakeUri("", key);
     std::shared_ptr<DataShare::DataShareHelper> helper = nullptr;
     deviceNameMgr_->ReleaseDataShareHelper(helper);
-    helper = std::make_shared<DataShare::DataShareHelper>();
-    deviceNameMgr_->ReleaseDataShareHelper(helper);
 }
 }
 }

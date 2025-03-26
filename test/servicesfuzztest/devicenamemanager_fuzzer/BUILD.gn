@@ -73,6 +73,9 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -80,6 +83,7 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
   ]
 }
 
