@@ -95,7 +95,7 @@ void DeviceNameManagerFirstFuzzTest(const uint8_t* data, size_t size)
     deviceNameMgr_->SetDeviceName("");
     deviceNameMgr_->GetRemoteObj();
     std::string tableName(reinterpret_cast<const char*>(data), size);
-    std::string key(reinterpret_cast<const char*>(data), size); 
+    std::string key(reinterpret_cast<const char*>(data), size);
     std::string value(reinterpret_cast<const char*>(data), size);
     deviceNameMgr_->GetValue(tableName, userId, key, value);
     deviceNameMgr_->SetValue(tableName, userId, key, value);
