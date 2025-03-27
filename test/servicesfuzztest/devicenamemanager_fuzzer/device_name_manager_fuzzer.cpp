@@ -61,8 +61,6 @@ void DeviceNameManagerFuzzTest(const uint8_t* data, size_t size)
     int32_t maxNamelength = fdp.ConsumeIntegral<int32_t>();
     std::string displayName(reinterpret_cast<const char*>(data), size);
     deviceNameMgr_->GetLocalDisplayDeviceName(maxNamelength, displayName);
-    deviceNameMgr_->GetLocalDisplayDeviceName(prefixName, subffixName, maxNamelength);
-    deviceNameMgr_->GetLocalDisplayDeviceName("", subffixName, maxNamelength);
     deviceNameMgr_->ModifyUserDefinedName(displayName);
     deviceNameMgr_->RestoreLocalDeviceName();
     std::string nickName(reinterpret_cast<const char*>(data), size);
