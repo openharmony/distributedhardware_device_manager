@@ -49,6 +49,7 @@ std::vector<ProcessInfo> SoftbusConnector::processInfoVec_ = {};
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
 std::mutex SoftbusConnector::deviceUdidLocks_;
 std::mutex SoftbusConnector::processInfoVecMutex_;
+std::shared_ptr<ISoftbusConnectorCallback> SoftbusConnector::connectorCallback_ = nullptr;
 
 SoftbusConnector::SoftbusConnector()
 {
@@ -61,6 +62,18 @@ SoftbusConnector::SoftbusConnector()
 SoftbusConnector::~SoftbusConnector()
 {
     LOGD("SoftbusConnector destructor.");
+}
+
+int32_t SoftbusConnector::RegisterConnectorCallback(std::shared_ptr<ISoftbusConnectorCallback> callback)
+{
+    connectorCallback_ = callback;
+    return DM_OK;
+}
+
+int32_t SoftbusConnector::UnRegisterConnectorCallback()
+{
+    connectorCallback_ = nullptr;
+    return DM_OK;
 }
 
 int32_t SoftbusConnector::RegisterSoftbusStateCallback(const std::shared_ptr<ISoftbusStateCallback> callback)
@@ -257,9 +270,21 @@ void SoftbusConnector::ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo,
 
 void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *networkId, int32_t result)
 {
-    (void)addr;
     (void)networkId;
-    LOGD("[SOFTBUS]OnSoftbusJoinLNNResult, result: %{public}d.", result);
+    LOGI("[SOFTBUS]OnSoftbusJoinLNNResult, result: %{public}d.", result);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (addr == nullptr) {
+        LOGE("addr is null.");
+        return;
+    }
+    if (addr->type != CONNECTION_ADDR_SESSION_WITH_KEY) {
+        LOGI("addr type is not session.");
+        return;
+    }
+    int32_t sessionId = addr->info.session.sessionId;
+    CHECK_NULL_VOID(connectorCallback_);
+    connectorCallback_->OnSoftbusJoinLNNResult(sessionId, networkId, result);
+#endif
 }
 
 std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidHash)
