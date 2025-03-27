@@ -2076,9 +2076,7 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
 {
     LOGI("UserId: %{public}d, accountId: %{public}s, accountName: %{public}s", userId,
         GetAnonyString(accountId).c_str(), GetAnonyString(accountName).c_str());
-    if (IsDMServiceAdapterResidentLoad()) {
-        dmServiceImplExtResident_->AccountIdLogout(userId, accountId);
-    }
+
     if (!IsDMServiceImplReady()) {
         LOGE("Init impl failed.");
         return;
@@ -2093,6 +2091,10 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
         peerUdids.emplace_back(item.first);
     }
     if (!peerUdids.empty()) {
+        //logout notify cast+
+        if (IsDMServiceAdapterResidentLoad()) {
+            dmServiceImplExtResident_->AccountIdLogout(userId, accountId, peerUdids);
+        }
         char accountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         if (Crypto::GetAccountIdHash(accountId, reinterpret_cast<uint8_t *>(accountIdHash)) != DM_OK) {
             LOGE("GetAccountHash failed.");

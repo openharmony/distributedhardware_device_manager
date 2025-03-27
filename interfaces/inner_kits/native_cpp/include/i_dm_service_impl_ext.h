@@ -73,7 +73,8 @@ public:
      * @tc.desc: AccountIdLogout
      * @tc.type: FUNC
      */
-    virtual int32_t AccountIdLogout(int32_t userId, const std::string &oldAccountId) = 0;
+    virtual int32_t AccountIdLogout(int32_t userId, const std::string &oldAccountId,
+        const std::vector<std::string> &peerUdids) = 0;
     /**
      * @tc.name: IDMServiceImplExt::HandleDeviceNotTrust
      * @tc.desc: HandleDeviceNotTrust
