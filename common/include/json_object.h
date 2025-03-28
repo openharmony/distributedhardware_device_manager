@@ -20,7 +20,6 @@
 #include <vector>
 
 #include "cJSON.h"
-#include "dm_log.h"
 
 #ifndef EXPORT
 #define EXPORT __attribute__ ((visibility ("default")))
@@ -60,7 +59,8 @@ public:
     EXPORT bool Contains(const std::string &key) const;
     EXPORT bool IsDiscarded() const;
     bool PushBack(const std::string &strValue);
-    bool PushBack(const double &strValue);
+    bool PushBack(const double &value);
+    bool PushBack(const int64_t &value);
     bool PushBack(const JsonItemObject &item);
     std::string Key() const;
     void Insert(const std::string &key, const JsonItemObject &object);
@@ -87,7 +87,6 @@ public:
     {
         dataList.clear();
         if (!IsArray()) {
-            LOGE("item is not array");
             return;
         }
         for (auto& item : this->Items()) {
