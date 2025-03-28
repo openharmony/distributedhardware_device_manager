@@ -788,7 +788,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         return;
     }
-
+    CompatiblePutAcl();
     int32_t pinCode = -1;
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
         GetAuthCode(authResponseContext_->hostPkgName, pinCode);
@@ -845,6 +845,10 @@ void DmAuthManager::MemberJoinAuthRequest(int64_t requestId, int32_t status)
     authTimes_++;
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
+    }
+    if (status == DM_OK) {
+        LOGI("join group success.");
+        CompatiblePutAcl();
     }
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
         HandleMemberJoinImportAuthCode(requestId, status);
@@ -1007,10 +1011,6 @@ void DmAuthManager::AbilityNegotiate()
             CompatiblePutAcl();
         }
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
-        if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_3)) &&
-            authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
-            authResponseContext_->importAuthCode = Crypto::Sha256(importAuthCode_);
-        }
     } else {
         authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     }
@@ -1528,9 +1528,6 @@ void DmAuthManager::AuthenticateFinish()
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
     isAuthDevice_ = false;
-    if (authResponseContext_->isFinish) {
-        CompatiblePutAcl();
-    }
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_) && authResponseContext_->isFinish) {
@@ -2648,10 +2645,6 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
         DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(authResponseContext_->hostPkgName,
         authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !authResponseContext_->bindType.empty();
-    if (authResponseContext_->authed && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
-        !importAuthCode_.empty() && !CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_3))) {
-        authResponseContext_->importAuthCode = Crypto::Sha256(importAuthCode_);
-    }
 
     authResponseContext_->isIdenticalAccount = false;
     if (authResponseContext_->localAccountId == authResponseContext_->remoteAccountId &&
