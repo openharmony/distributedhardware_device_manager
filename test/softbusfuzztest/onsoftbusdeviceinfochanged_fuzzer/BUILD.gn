@@ -41,7 +41,7 @@ ohos_fuzztest("OnSoftbusDeviceInfoChangedFuzzTest") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${services_path}:devicemanagerservice",
+    "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 

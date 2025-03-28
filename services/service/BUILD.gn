@@ -156,8 +156,165 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/timer",
     ]
   }
-
+  config("cflags_config") {
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-fvisibility=hidden",
+      "-Oz",
+      "-flto",
+    ]
+    ldflags = [ "-flto" ]
+  }
   ohos_shared_library("devicemanagerservice") {
+    branch_protector_ret = "pac_ret"
+
+    sanitize = {
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+      integer_overflow = true
+      ubsan = true
+    }
+
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
+    configs = [ ":cflags_config" ]
+
+    sources = [
+      "${common_path}/src/dfx/standard/dm_hidumper.cpp",
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
+      "${common_path}/src/ipc/standard/ipc_model_codec.cpp",
+      "src/advertise/advertise_manager.cpp",
+      "src/device_manager_service.cpp",
+      "src/device_manager_service_listener.cpp",
+      "src/devicenamemgr/device_name_change_monitor.cpp",
+      "src/devicenamemgr/device_name_manager.cpp",
+      "src/devicenamemgr/local_device_name_mgr.cpp",
+      "src/devicenamemgr/settings_data_event_monitor.cpp",
+      "src/discovery/discovery_filter.cpp",
+      "src/discovery/discovery_manager.cpp",
+      "src/hichain/hichain_listener.cpp",
+      "src/ipc/standard/ipc_cmd_parser.cpp",
+      "src/ipc/standard/ipc_server_client_proxy.cpp",
+      "src/ipc/standard/ipc_server_listener.cpp",
+      "src/ipc/standard/ipc_server_stub.cpp",
+      "src/notify/device_manager_service_notify.cpp",
+      "src/permission/standard/permission_manager.cpp",
+      "src/pinholder/pin_holder.cpp",
+      "src/pinholder/pin_holder_session.cpp",
+      "src/publishcommonevent/dm_account_common_event.cpp",
+      "src/publishcommonevent/dm_datashare_common_event.cpp",
+      "src/publishcommonevent/dm_package_common_event.cpp",
+      "src/publishcommonevent/dm_screen_common_event.cpp",
+      "src/relationshipsyncmgr/dm_comm_tool.cpp",
+      "src/relationshipsyncmgr/dm_transport.cpp",
+      "src/relationshipsyncmgr/dm_transport_msg.cpp",
+      "src/relationshipsyncmgr/relationship_sync_mgr.cpp",
+      "src/softbus/mine_softbus_listener.cpp",
+      "src/softbus/softbus_listener.cpp",
+    ]
+
+    public_configs = [ ":devicemanagerservice_config" ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerservice\"",
+      "LOG_DOMAIN=0xD004110",
+    ]
+
+    deps = [
+      "${devicemanager_path}/commondependency:devicemanagerdependency",
+      "${devicemanager_path}/radar:devicemanagerradar",
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${softbuscache_parh}:dmdevicecache",
+      "${utils_path}:devicemanagerutils",
+    ]
+
+    external_deps = [
+      "ability_base:want",
+      "access_token:libaccesstoken_sdk",
+      "access_token:libtokenid_sdk",
+      "bundle_framework:appexecfwk_base",
+      "cJSON:cjson",
+      "c_utils:utils",
+      "common_event_service:cesfwk_core",
+      "common_event_service:cesfwk_innerkits",
+      "data_share:datashare_common",
+      "data_share:datashare_consumer",
+      "device_auth:deviceauth_sdk",
+      "device_info_manager:distributed_device_profile_common",
+      "device_info_manager:distributed_device_profile_sdk",
+      "dsoftbus:softbus_client",
+      "eventhandler:libeventhandler",
+      "ffrt:libffrt",
+      "hicollie:libhicollie",
+      "hilog:libhilog",
+      "init:libbeget_proxy",
+      "init:libbegetutil",
+      "ipc:ipc_core",
+      "ipc:ipc_single",
+      "openssl:libcrypto_shared",
+      "os_account:libaccountkits",
+      "os_account:os_account_innerkits",
+      "safwk:system_ability_fwk",
+      "samgr:samgr_proxy",
+    ]
+
+    if ((support_bluetooth || support_wifi) &&
+        device_manager_feature_product == "default") {
+      sources += [
+        "src/publishcommonevent/dm_publish_common_event.cpp",
+        "src/softbus/softbus_publish.cpp",
+      ]
+    }
+
+    if (support_bluetooth && device_manager_feature_product == "default") {
+      defines += [ "SUPPORT_BLUETOOTH" ]
+      external_deps += [ "bluetooth:btframework" ]
+    }
+
+    if (support_wifi && device_manager_feature_product == "default") {
+      defines += [ "SUPPORT_WIFI" ]
+      external_deps += [ "wifi:wifi_sdk" ]
+    }
+
+    if (support_power_manager) {
+      defines += [ "SUPPORT_POWER_MANAGER" ]
+      external_deps += [ "power_manager:powermgr_client" ]
+    }
+
+    if (support_memmgr) {
+      defines += [ "SUPPORT_MEMMGR" ]
+      external_deps += [ "memmgr:memmgrclient" ]
+    }
+
+    if (device_manager_common) {
+      defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
+    }
+
+    public_external_deps = [ "cJSON:cjson" ]
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
+
+  ohos_shared_library("devicemanagerservicetest") {
     branch_protector_ret = "pac_ret"
 
     sanitize = {

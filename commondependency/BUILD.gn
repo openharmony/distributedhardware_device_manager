@@ -13,7 +13,90 @@
 
 import("//build/ohos.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
+config("cflags_config") {
+  cflags = [
+    "-Werror",
+    "-fPIC",
+    "-fstack-protector-strong",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-fvisibility=hidden",
+    "-Oz",
+    "-flto",
+  ]
+  ldflags = [ "-flto" ]
+}
 ohos_shared_library("devicemanagerdependency") {
+  branch_protector_ret = "pac_ret"
+
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
+
+  cflags = [
+    "-Werror",
+    "-fPIC",
+    "-fstack-protector-strong",
+  ]
+
+  ldflags = [
+    "-Wl,-z,relro",
+    "-Wl,-z,now",
+  ]
+
+  configs = [ ":cflags_config" ]
+
+  include_dirs = [
+    "include",
+    "${common_path}/include",
+    "${innerkits_path}/native_cpp/include",
+    "${servicesimpl_path}/include/cryptomgr",
+    "${utils_path}/include/crypto",
+  ]
+
+  sources = [
+    "src/deviceprofile_connector.cpp",
+    "src/multiple_user_connector.cpp",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"devicemanagerdependency\"",
+    "LOG_DOMAIN=0xD004112",
+  ]
+
+  deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${utils_path}:devicemanagerutils",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "c_utils:utils",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "os_account:libaccountkits",
+    "samgr:samgr_proxy",
+  ]
+
+  if (os_account_part_exists) {
+    defines += [ "OS_ACCOUNT_PART_EXISTS" ]
+    external_deps += [ "os_account:os_account_innerkits" ]
+  }
+
+  subsystem_name = "distributedhardware"
+
+  part_name = "device_manager"
+}
+
+ohos_shared_library("devicemanagerdependencytest") {
   branch_protector_ret = "pac_ret"
 
   sanitize = {

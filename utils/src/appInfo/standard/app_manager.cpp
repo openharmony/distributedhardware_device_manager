@@ -70,7 +70,7 @@ const std::string AppManager::GetAppId()
     return appId;
 }
 
-void AppManager::RegisterCallerAppId(const std::string &pkgName)
+EXPORT void AppManager::RegisterCallerAppId(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -86,7 +86,7 @@ void AppManager::RegisterCallerAppId(const std::string &pkgName)
     appIdMap_[pkgName] = appId;
 }
 
-void AppManager::UnRegisterCallerAppId(const std::string &pkgName)
+EXPORT void AppManager::UnRegisterCallerAppId(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
@@ -153,13 +153,13 @@ bool AppManager::IsSystemSA()
     return false;
 }
 
-bool AppManager::IsSystemApp()
+EXPORT bool AppManager::IsSystemApp()
 {
     uint64_t fullTokenId = IPCSkeleton::GetCallingFullTokenID();
     return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
 }
 
-int32_t AppManager::GetCallerName(bool isSystemSA, std::string &callerName)
+EXPORT int32_t AppManager::GetCallerName(bool isSystemSA, std::string &callerName)
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
@@ -191,7 +191,8 @@ int32_t AppManager::GetCallerName(bool isSystemSA, std::string &callerName)
     return DM_OK;
 }
 
-int32_t AppManager::GetNativeTokenIdByName(std::string &processName, int64_t &tokenId)
+EXPORT int32_t AppManager::GetNativeTokenIdByName(std::string &processName,
+    int64_t &tokenId)
 {
     AccessTokenID nativeTokenId = AccessTokenKit::GetNativeTokenId(processName);
     if (nativeTokenId == INVALID_TOKENID) {
@@ -202,7 +203,8 @@ int32_t AppManager::GetNativeTokenIdByName(std::string &processName, int64_t &to
     return DM_OK;
 }
 
-int32_t AppManager::GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex, int64_t &tokenId)
+EXPORT int32_t AppManager::GetHapTokenIdByName(int32_t userId,
+    std::string &bundleName, int32_t instIndex, int64_t &tokenId)
 {
     auto hapTokenId = AccessTokenKit::GetHapTokenID(userId, bundleName, instIndex);
     if (hapTokenId == 0) {
@@ -213,7 +215,7 @@ int32_t AppManager::GetHapTokenIdByName(int32_t userId, std::string &bundleName,
     return DM_OK;
 }
 
-int32_t AppManager::GetCallerProcessName(std::string &processName)
+EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
 {
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {

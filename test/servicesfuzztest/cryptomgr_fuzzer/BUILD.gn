@@ -63,7 +63,7 @@ ohos_fuzztest("CryptoMgrFuzzTest") {
 
   deps = [
     "${devicemanager_path}/services/implementation:devicemanagerserviceimpl",
-    "${utils_path}:devicemanagerutils",
+    "${utils_path}:devicemanagerutilstest",
   ]
 
   defines = [

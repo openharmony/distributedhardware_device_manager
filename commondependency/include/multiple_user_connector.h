@@ -21,6 +21,11 @@
 #include <mutex>
 #include <string>
 #include <vector>
+
+#ifndef EXPORT
+#define EXPORT __attribute__ ((visibility ("default")))
+#endif // EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
 typedef struct DMAccountInfo {
@@ -34,14 +39,14 @@ public:
      * @tc.desc: Get Current Account UserID of the Multiple User Connector
      * @tc.type: FUNC
      */
-    static int32_t GetCurrentAccountUserID(void);
+    EXPORT static int32_t GetCurrentAccountUserID(void);
 
     /**
      * @tc.name: MultipleUserConnector::SetSwitchOldUserId
      * @tc.desc: Set Switch Old UserId of the Multiple User Connector
      * @tc.type: FUNC
      */
-    static void SetSwitchOldUserId(int32_t userId);
+    EXPORT static void SetSwitchOldUserId(int32_t userId);
 
     /**
      * @tc.name: MultipleUserConnector::GetSwitchOldUserId
@@ -55,7 +60,7 @@ public:
      * @tc.desc: Get Current AccountId of current user
      * @tc.type: FUNC
      */
-    static std::string GetOhosAccountId(void);
+    EXPORT static std::string GetOhosAccountId(void);
 
     /**
      * @brief Get the Ohos Account Id By Userid
@@ -63,14 +68,14 @@ public:
      * @param userId the user id in which account login
      * @return std::string the account id
      */
-    static std::string GetOhosAccountIdByUserId(int32_t userId);
+    EXPORT static std::string GetOhosAccountIdByUserId(int32_t userId);
 
     /**
      * @tc.name: MultipleUserConnector::SetSwitchOldAccountId
      * @tc.desc: Set Switch Old UserId of the Multiple User Connector
      * @tc.type: FUNC
      */
-    static void SetSwitchOldAccountId(std::string accountId);
+    EXPORT static void SetSwitchOldAccountId(std::string accountId);
 
     /**
      * @tc.name: MultipleUserConnector::GetSwitchOldAccountId
@@ -91,7 +96,7 @@ public:
      * @tc.desc: Get Current AccountName of the Multiple User Connector
      * @tc.type: FUNC
      */
-    static std::string GetOhosAccountName(void);
+    EXPORT static std::string GetOhosAccountName(void);
 
     /**
      * @tc.name: MultipleUserConnector::GetSwitchOldAccountName
@@ -100,20 +105,22 @@ public:
      */
     static std::string GetSwitchOldAccountName(void);
 
-    static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
-    static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
-    static void DeleteAccountInfoByUserId(int32_t userId);
-    static void GetTokenIdAndForegroundUserId(uint32_t &tokenId, int32_t &userId);
-    static void GetCallerUserId(int32_t &userId);
-    static int32_t GetForegroundUserIds(std::vector<int32_t> &userVec);
-    static int32_t GetFirstForegroundUserId(void);
-    static int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec);
+    EXPORT static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
+    EXPORT static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
+    EXPORT static void DeleteAccountInfoByUserId(int32_t userId);
+    EXPORT static void GetTokenIdAndForegroundUserId(uint32_t &tokenId,
+        int32_t &userId);
+    EXPORT static void GetCallerUserId(int32_t &userId);
+    EXPORT static int32_t GetForegroundUserIds(std::vector<int32_t> &userVec);
+    EXPORT static int32_t GetFirstForegroundUserId(void);
+    EXPORT static int32_t GetBackgroundUserIds(std::vector<int32_t> &userIdVec);
     static int32_t GetAllUserIds(std::vector<int32_t> &userIdVec);
-    static std::string GetAccountNickName(int32_t userId);
-    static bool IsUserUnlocked(int32_t userId);
-    static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec);
-    static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec, std::vector<int32_t> &backgroundUserVec);
-    static DMAccountInfo GetCurrentDMAccountInfo();
+    EXPORT static std::string GetAccountNickName(int32_t userId);
+    EXPORT static bool IsUserUnlocked(int32_t userId);
+    EXPORT static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec);
+    EXPORT static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec,
+        std::vector<int32_t> &backgroundUserVec);
+    EXPORT static DMAccountInfo GetCurrentDMAccountInfo();
 private:
     static int32_t oldUserId_;
     static std::string accountId_;

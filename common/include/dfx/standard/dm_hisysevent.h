@@ -18,9 +18,14 @@
 
 #include <string>
 
+#ifndef EXPORT
+#define EXPORT __attribute__ ((visibility ("default")))
+#endif // EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
-void SysEventWrite(const std::string &status, int32_t eventType, const std::string &msg);
+EXPORT void SysEventWrite(
+    const std::string &status, int32_t eventType, const std::string &msg);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DISTRIBUTED_DM_HISYSEVENT_H

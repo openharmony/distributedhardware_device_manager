@@ -85,7 +85,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
     return DM_OK;
 }
 
-int32_t DmTimer::DeleteAll()
+EXPORT int32_t DmTimer::DeleteAll()
 {
     LOGI("DmTimer DeleteAll start");
     std::lock_guard<std::mutex> locker(timerMutex_);

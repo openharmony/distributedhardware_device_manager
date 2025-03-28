@@ -46,12 +46,85 @@ if (defined(ohos_lite)) {
     }
   }
 } else {
+  config("cflags_config") {
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-fvisibility=hidden",
+      "-Oz",
+      "-flto",
+    ]
+    ldflags = [ "-flto" ]
+  }
+
   ohos_shared_library("devicemanagerradar") {
     include_dirs = [
       "include",
       "${common_path}/include",
       "${innerkits_path}/native_cpp/include",
     ]
+
+    sanitize = {
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+    }
+
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
+    configs = [ ":cflags_config" ]
+
+    sources = [ "src/dm_radar_helper.cpp" ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerradar\"",
+      "LOG_DOMAIN=0xD004110",
+    ]
+
+    deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+
+    external_deps = [
+      "access_token:libaccesstoken_sdk",
+      "access_token:libtokenid_sdk",
+      "cJSON:cjson",
+      "c_utils:utils",
+      "hilog:libhilog",
+      "hisysevent:libhisysevent",
+      "init:libbegetutil",
+      "ipc:ipc_core",
+      "ipc:ipc_single",
+    ]
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
+
+  ohos_shared_library("devicemanagerradartest") {
+    include_dirs = [
+      "include",
+      "${common_path}/include",
+      "${innerkits_path}/native_cpp/include",
+    ]
+
+    sanitize = {
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+    }
 
     cflags = [
       "-Werror",

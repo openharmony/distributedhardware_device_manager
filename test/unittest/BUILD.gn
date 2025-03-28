@@ -557,8 +557,8 @@ ohos_unittest("UTTest_mine_softbus_listener") {
 
   deps = [
     ":device_manager_test_common",
-    "${services_path}:devicemanagerservice",
-    "${utils_path}:devicemanagerutils",
+    "${services_path}:devicemanagerservicetest",
+    "${utils_path}:devicemanagerutilstest",
   ]
 
   external_deps = [
@@ -2043,15 +2043,15 @@ ohos_static_library("device_manager_test_common") {
   public_configs = [ ":device_manager_test_common_public_config" ]
 
   public_deps = [
-    "${devicemanager_path}/commondependency:devicemanagerdependency",
+    "${devicemanager_path}/commondependency:devicemanagerdependencytest",
     "${devicemanager_path}/interfaces/kits/js:devicemanager",
-    "${devicemanager_path}/radar:devicemanagerradar",
+    "${devicemanager_path}/radar:devicemanagerradartest",
     "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${services_path}:devicemanagerservice",
+    "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
-    "${utils_path}:devicemanagerutils",
+    "${utils_path}:devicemanagerutilstest",
   ]
 
   external_deps = [

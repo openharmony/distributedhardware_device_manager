@@ -18,10 +18,14 @@
 
 #include <string>
 
+#ifndef EXPORT
+#define EXPORT __attribute__ ((visibility ("default")))
+#endif // EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
-void DmTraceStart(const std::string &msg);
-void DmTraceEnd();
+EXPORT void DmTraceStart(const std::string &msg);
+EXPORT void DmTraceEnd();
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif

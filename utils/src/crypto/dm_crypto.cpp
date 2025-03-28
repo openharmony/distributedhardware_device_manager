@@ -64,8 +64,8 @@ void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char 
     SHA256_Final(&outBuf[startIndex], &ctx);
 }
 
-int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen, const unsigned char *inBuf,
-    uint32_t inLen)
+EXPORT int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
+    const unsigned char *inBuf, uint32_t inLen)
 {
     if ((outBuf == nullptr) || (inBuf == nullptr) || (outBufLen < HexifyLen(inLen))) {
         return ERR_DM_INPUT_PARA_INVALID;
@@ -124,8 +124,8 @@ int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
     return DM_OK;
 }
 
-int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLen, const char *inBuf,
-    uint32_t inLen)
+EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
+    uint32_t outBufLen, const char *inBuf, uint32_t inLen)
 {
     (void)outBufLen;
     if ((outBuf == NULL) || (inBuf == NULL) || (inLen % HEX_TO_UINT8 != 0)) {
@@ -164,7 +164,7 @@ int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf, uint32_t outBufLe
     return DM_OK;
 }
 
-std::string Crypto::GetGroupIdHash(const std::string &groupId)
+EXPORT std::string Crypto::GetGroupIdHash(const std::string &groupId)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     DmGenerateStrHash(groupId.data(), groupId.size(), hash, SHA256_DIGEST_LENGTH, 0);
@@ -211,7 +211,8 @@ std::string Crypto::GetHashWithSalt(const std::string &text, const std::string &
     return Crypto::Sha256(rawText);
 }
 
-int32_t Crypto::GetAccountIdHash(const std::string &accountId, unsigned char *accountIdHash)
+EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
+    unsigned char *accountIdHash)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     DmGenerateStrHash(accountId.data(), accountId.size(), hash, SHA256_DIGEST_LENGTH, 0);
@@ -224,8 +225,8 @@ int32_t Crypto::GetAccountIdHash(const std::string &accountId, unsigned char *ac
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId, const std::string &udidHash,
-    DmKVValue &kvValue)
+EXPORT int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
+    const std::string &udidHash, DmKVValue &kvValue)
 {
     if (GetAnoyDeviceInfo(appId, udidHash, kvValue) == DM_OK) {
         kvValue.lastModifyTime = GetSecondsSince1970ToNow();
@@ -241,8 +242,8 @@ int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId, const std
     return DM_OK;
 }
 
-int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId, const std::string &udidHash,
-    DmKVValue &kvValue)
+EXPORT int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId,
+    const std::string &udidHash, DmKVValue &kvValue)
 {
     LOGI("start.");
     if (GetAnoyDeviceInfo(appId, udidHash, kvValue) == DM_OK) {

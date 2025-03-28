@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const std::string adapterJsonConfigString =
+    EXPORT const std::string adapterJsonConfigString =
     R"({
     "devicemanager_adapter_components": [
         {
@@ -42,7 +42,7 @@ const std::string adapterJsonConfigString =
     ]
 })";
 
-const std::string authJsonConfigString =
+EXPORT const std::string authJsonConfigString =
     R"({
     "devicemanager_auth_components": [
         {

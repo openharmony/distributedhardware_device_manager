@@ -26,35 +26,40 @@
 
 #include "ffrt.h"
 
+#ifndef EXPORT
+#define EXPORT __attribute__ ((visibility ("default")))
+#endif // EXPORT
+
 namespace OHOS {
 namespace DistributedHardware {
 using TimerCallback = std::function<void (std::string name)>;
 
 class DmTimer {
 public:
-    DmTimer();
-    ~DmTimer();
+    EXPORT DmTimer();
+    EXPORT ~DmTimer();
 
     /**
      * @tc.name: DmTimer::StartTimer
      * @tc.desc: start timer running
      * @tc.type: FUNC
      */
-    int32_t StartTimer(std::string name, int32_t timeOut, TimerCallback callback);
+    EXPORT int32_t StartTimer(std::string name, int32_t timeOut,
+        TimerCallback callback);
 
     /**
      * @tc.name: DmTimer::DeleteTimer
      * @tc.desc: delete timer
      * @tc.type: FUNC
      */
-    int32_t DeleteTimer(std::string timerName);
+    EXPORT int32_t DeleteTimer(std::string timerName);
 
     /**
      * @tc.name: DmTimer::DeleteAll
      * @tc.desc: delete all timer
      * @tc.type: FUNC
      */
-    int32_t DeleteAll();
+    EXPORT int32_t DeleteAll();
 
 private:
     mutable std::mutex timerMutex_;

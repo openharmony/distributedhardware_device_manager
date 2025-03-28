@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-void ToJson(JsonItemObject &itemObject, const std::string &value)
+EXPORT void ToJson(JsonItemObject &itemObject, const std::string &value)
 {
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
@@ -90,7 +90,7 @@ void ToJson(JsonItemObject &itemObject, const uint32_t &value)
     itemObject.item_ = cJSON_CreateNumber(value);
 }
 
-void ToJson(JsonItemObject &itemObject, const int64_t &value)
+EXPORT void ToJson(JsonItemObject &itemObject, const int64_t &value)
 {
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
@@ -106,7 +106,7 @@ void ToJson(JsonItemObject &itemObject, const uint64_t &value)
     itemObject.item_ = cJSON_CreateNumber(value);
 }
 
-void FromJson(const JsonItemObject &itemObject, std::string &value)
+EXPORT void FromJson(const JsonItemObject &itemObject, std::string &value)
 {
     itemObject.GetTo(value);
 }
@@ -154,7 +154,7 @@ void FromJson(const JsonItemObject &itemObject, uint32_t &value)
     value = static_cast<uint32_t>(tmpValue);
 }
 
-void FromJson(const JsonItemObject &itemObject, int64_t &value)
+EXPORT void FromJson(const JsonItemObject &itemObject, int64_t &value)
 {
     itemObject.GetTo(value);
 }
@@ -171,10 +171,10 @@ std::string ToString(const JsonItemObject &jsonItem)
     return jsonItem.Dump();
 }
 
-JsonItemObject::JsonItemObject()
+EXPORT JsonItemObject::JsonItemObject()
 {}
 
-JsonItemObject::JsonItemObject(const JsonItemObject &object)
+EXPORT JsonItemObject::JsonItemObject(const JsonItemObject &object)
 {
     item_ = object.item_;
     parent_ = object.parent_;
@@ -185,7 +185,7 @@ JsonItemObject::JsonItemObject(const JsonItemObject &object)
     }
 }
 
-JsonItemObject::~JsonItemObject()
+EXPORT JsonItemObject::~JsonItemObject()
 {
     Delete();
 }
@@ -198,7 +198,7 @@ void JsonItemObject::Delete()
     item_ = nullptr;
 }
 
-bool JsonItemObject::IsString() const
+EXPORT bool JsonItemObject::IsString() const
 {
     if (item_ == nullptr) {
         return false;
@@ -214,7 +214,7 @@ bool JsonItemObject::IsNumber() const
     return cJSON_IsNumber(item_);
 }
 
-bool JsonItemObject::IsNumberInteger() const
+EXPORT bool JsonItemObject::IsNumberInteger() const
 {
     if (!IsNumber()) {
         return false;
@@ -285,7 +285,7 @@ std::string JsonItemObject::DumpFormated() const
     return Dump(true);
 }
 
-std::string JsonItemObject::Dump() const
+EXPORT std::string JsonItemObject::Dump() const
 {
     return Dump(false);
 }
@@ -305,7 +305,7 @@ std::string JsonItemObject::Dump(bool formatFlag) const
     return out;
 }
 
-JsonItemObject JsonItemObject::operator[](const std::string &key)
+EXPORT JsonItemObject JsonItemObject::operator[](const std::string &key)
 {
     JsonItemObject itemObject = At(key);
     if (itemObject.item_ == nullptr) {
@@ -324,12 +324,12 @@ JsonItemObject JsonItemObject::operator[](const std::string &key)
     return itemObject;
 }
 
-const JsonItemObject JsonItemObject::operator[](const std::string &key) const
+EXPORT const JsonItemObject JsonItemObject::operator[](const std::string &key) const
 {
     return At(key);
 }
 
-bool JsonItemObject::Contains(const std::string &key) const
+EXPORT bool JsonItemObject::Contains(const std::string &key) const
 {
     if (item_ == nullptr) {
         LOGE("item_ is nullptr");
@@ -339,7 +339,7 @@ bool JsonItemObject::Contains(const std::string &key) const
     return (item != nullptr);
 }
 
-bool JsonItemObject::IsDiscarded() const
+EXPORT bool JsonItemObject::IsDiscarded() const
 {
     return (item_ == nullptr);
 }
@@ -505,7 +505,7 @@ std::vector<JsonItemObject> JsonItemObject::Items() const
     return items;
 }
 
-bool JsonItemObject::InitItem(JsonItemObject &item)
+EXPORT bool JsonItemObject::InitItem(JsonItemObject &item)
 {
     if (!beValid_) {
         LOGE("invalid item");
@@ -539,7 +539,7 @@ bool JsonItemObject::InitArray()
     return true;
 }
 
-bool JsonItemObject::ReplaceItem(cJSON *newItem)
+EXPORT bool JsonItemObject::ReplaceItem(cJSON *newItem)
 {
     if (parent_ != nullptr) {
         if (cJSON_IsObject(parent_)) {
@@ -582,14 +582,14 @@ JsonObject::JsonObject(JsonCreateType type)
     }
 }
 
-JsonObject::JsonObject(const std::string &strJson)
+EXPORT JsonObject::JsonObject(const std::string &strJson)
 {
     needDeleteItem_ = true;
     beValid_ = true;
     Parse(strJson);
 }
 
-JsonObject::~JsonObject()
+EXPORT JsonObject::~JsonObject()
 {
     Delete();
 }

@@ -62,8 +62,8 @@ ohos_fuzztest("DmCommToolFuzzTest") {
   sources = [ "dm_comm_tool_fuzzer.cpp" ]
 
   deps = [
-    "${devicemanager_path}/services/service:devicemanagerservice",
-    "${utils_path}:devicemanagerutils",
+    "${devicemanager_path}/services/service:devicemanagerservicetest",
+    "${utils_path}:devicemanagerutilstest",
   ]
 
   defines = [

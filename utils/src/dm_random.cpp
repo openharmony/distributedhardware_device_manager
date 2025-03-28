@@ -44,7 +44,7 @@ int32_t GenRandInt(int32_t randMin, int32_t randMax)
 #endif
 }
 
-int64_t GenRandLongLong(int64_t randMin, int64_t randMax)
+EXPORT int64_t GenRandLongLong(int64_t randMin, int64_t randMax)
 {
     std::random_device randDevice;
     std::mt19937 genRand(randDevice());
