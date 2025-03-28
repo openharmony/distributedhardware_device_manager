@@ -138,11 +138,12 @@ HWTEST_F(JsonObjectTest, SetValue_007, testing::ext::TestSize.Level1)
     JsonObject subObj;
     subObj["TEST"] = "test";
     JsonObject object(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
-    object.PushBack(15);
-    object.PushBack(23);
+    object.PushBack(int64_t(15));
+    object.PushBack(int64_t(23));
+    object.PushBack(17.1);
     object.PushBack("value");
     object.PushBack(subObj);
-    std::string strRet = R"([15,23,"value",{"TEST":"test"}])";
+    std::string strRet = R"([15,23,17.1,"value",{"TEST":"test"}])";
     EXPECT_EQ(strRet, object.Dump());
 }
 
@@ -549,7 +550,7 @@ HWTEST_F(JsonObjectTest, Get_015, testing::ext::TestSize.Level1)
     }
 }
 
-HWTEST_F(JsonObjectTest, SetValue_016, testing::ext::TestSize.Level1)
+HWTEST_F(JsonObjectTest, Get_016, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST1"] = "value1";

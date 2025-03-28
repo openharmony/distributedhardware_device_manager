@@ -15,6 +15,8 @@
 
 #include "json_object.h"
 
+#include "dm_log.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 
@@ -55,7 +57,11 @@ void ToJson(JsonItemObject &itemObject, const uint8_t &value)
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
     }
+#ifdef __CJSON_USE_INT64
+    itemObject.item_ = cJSON_CreateInt64Number(value);
+#else
     itemObject.item_ = cJSON_CreateNumber(value);
+#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const int16_t &value)
@@ -63,7 +69,11 @@ void ToJson(JsonItemObject &itemObject, const int16_t &value)
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
     }
+#ifdef __CJSON_USE_INT64
+    itemObject.item_ = cJSON_CreateInt64Number(value);
+#else
     itemObject.item_ = cJSON_CreateNumber(value);
+#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const uint16_t &value)
@@ -71,7 +81,11 @@ void ToJson(JsonItemObject &itemObject, const uint16_t &value)
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
     }
+#ifdef __CJSON_USE_INT64
+    itemObject.item_ = cJSON_CreateInt64Number(value);
+#else
     itemObject.item_ = cJSON_CreateNumber(value);
+#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const int32_t &value)
@@ -79,7 +93,11 @@ void ToJson(JsonItemObject &itemObject, const int32_t &value)
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
     }
+#ifdef __CJSON_USE_INT64
+    itemObject.item_ = cJSON_CreateInt64Number(value);
+#else
     itemObject.item_ = cJSON_CreateNumber(value);
+#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const uint32_t &value)
@@ -87,7 +105,11 @@ void ToJson(JsonItemObject &itemObject, const uint32_t &value)
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
     }
+#ifdef __CJSON_USE_INT64
+    itemObject.item_ = cJSON_CreateInt64Number(value);
+#else
     itemObject.item_ = cJSON_CreateNumber(value);
+#endif
 }
 
 EXPORT void ToJson(JsonItemObject &itemObject, const int64_t &value)
@@ -95,7 +117,11 @@ EXPORT void ToJson(JsonItemObject &itemObject, const int64_t &value)
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
     }
+#ifdef __CJSON_USE_INT64
+    itemObject.item_ = cJSON_CreateInt64Number(value);
+#else
     itemObject.item_ = cJSON_CreateNumber(value);
+#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const uint64_t &value)
@@ -103,7 +129,11 @@ void ToJson(JsonItemObject &itemObject, const uint64_t &value)
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
     }
+#ifdef __CJSON_USE_INT64
+    itemObject.item_ = cJSON_CreateInt64Number(value);
+#else
     itemObject.item_ = cJSON_CreateNumber(value);
+#endif
 }
 
 EXPORT void FromJson(const JsonItemObject &itemObject, std::string &value)
@@ -214,6 +244,15 @@ bool JsonItemObject::IsNumber() const
     return cJSON_IsNumber(item_);
 }
 
+#ifdef __CJSON_USE_INT64
+EXPORT bool JsonItemObject::IsNumberInteger() const
+{
+    if (item_ == nullptr) {
+        return false;
+    }
+    return cJSON_IsInt64Number(item_);
+}
+#else
 EXPORT bool JsonItemObject::IsNumberInteger() const
 {
     if (!IsNumber()) {
@@ -223,6 +262,7 @@ EXPORT bool JsonItemObject::IsNumberInteger() const
     GetTo(value);
     return ((value - static_cast<int64_t>(value)) == 0);
 }
+#endif
 
 bool JsonItemObject::IsArray() const
 {
@@ -372,6 +412,24 @@ bool JsonItemObject::PushBack(const double &value)
     return AddToArray(newItem);
 }
 
+bool JsonItemObject::PushBack(const int64_t &value)
+{
+    if (item_ == nullptr) {
+        LOGE("item_ is nullptr");
+        return false;
+    }
+    if (item_->type != cJSON_Array) {
+        LOGE("item_ type is not array");
+        return false;
+    }
+#ifdef __CJSON_USE_INT64
+    cJSON *newItem = cJSON_CreateInt64Number(value);
+#else
+    cJSON *newItem = cJSON_CreateNumber(static_cast<double>(value));
+#endif
+    return AddToArray(newItem);
+}
+
 bool JsonItemObject::PushBack(const JsonItemObject &item)
 {
     if (item_ == nullptr) {
@@ -455,23 +513,39 @@ void JsonItemObject::GetTo(double &value) const
 
 void JsonItemObject::GetTo(int32_t &value) const
 {
-    double tmpValue = 0.0;
+    int64_t tmpValue = 0;
     GetTo(tmpValue);
     value = static_cast<int32_t>(tmpValue);
 }
 
 void JsonItemObject::GetTo(uint32_t &value) const
 {
-    double tmpValue = 0.0;
+    int64_t tmpValue = 0;
     GetTo(tmpValue);
     value = static_cast<uint32_t>(tmpValue);
 }
 
 void JsonItemObject::GetTo(int64_t &value) const
 {
-    double tmpValue = 0.0;
-    GetTo(tmpValue);
+    value = 0;
+    if (item_ == nullptr) {
+        LOGE("value item is null");
+        return;
+    }
+    if (!IsNumberInteger()) {
+        return;
+    }
+#ifdef __CJSON_USE_INT64
+    long long *pValue = cJSON_GetInt64NumberValue(item_);
+    if (pValue == nullptr) {
+        LOGE("value is null");
+        return;
+    }
+    value = *pValue;
+#else
+    double tmpValue = cJSON_GetNumberValue(item_);
     value = static_cast<int64_t>(tmpValue);
+#endif
 }
 
 void JsonItemObject::GetTo(bool &value) const
