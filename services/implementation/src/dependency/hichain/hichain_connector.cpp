@@ -566,6 +566,10 @@ int32_t HiChainConnector::GetSyncGroupList(std::vector<GroupInfo> &groupList, st
 bool HiChainConnector::IsDevicesInP2PGroup(const std::string &hostDevice, const std::string &peerDevice)
 {
     LOGI("HiChainConnector::IsDevicesInP2PGroup");
+    if (hostDevice == peerDevice || peerDevice == "" || hostDevice == "") {
+        LOGE("invalid param");
+        return false;
+    }
     std::vector<GroupInfo> hostGroupInfoList;
     GetRelatedGroups(hostDevice, hostGroupInfoList);
     std::vector<GroupInfo> peerGroupInfoList;

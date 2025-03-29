@@ -1002,7 +1002,10 @@ void DmAuthManager::AbilityNegotiate()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
-    GetBinderInfo();
+    if (GetBinderInfo() != DM_OK) {
+        LOGE("GetBinderInfo failed.");
+        return;
+    }
     bool ret = hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
@@ -2636,7 +2639,10 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     remoteDeviceId_ = authResponseContext_->localDeviceId;
     authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
-    GetBinderInfo();
+    if (GetBinderInfo() != DM_OK) {
+        LOGE("GetBinderInfo failed.");
+        return;
+    }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->deviceId = authResponseContext_->localDeviceId;
@@ -3122,9 +3128,12 @@ int32_t DmAuthManager::GetBinderInfo()
     }
     ret = AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
         authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId);
-    if (ret != DM_OK) {
+#ifndef DEVICE_MANAGER_COMMON_FLAG
+    if (ret == DM_OK && authResponseContext_->bindLevel != APP) {
         LOGI("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
+        return ERR_DM_FAILED;
     }
+#endif
     return ret;
 }
 
