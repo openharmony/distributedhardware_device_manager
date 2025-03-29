@@ -142,7 +142,6 @@ private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
     void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
-    void PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,

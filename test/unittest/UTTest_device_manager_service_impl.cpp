@@ -1306,21 +1306,6 @@ HWTEST_F(DeviceManagerServiceImplTest, BindTarget_001, testing::ext::TestSize.Le
 }
 
 /**
- * @tc.name: PutIdenticalAccountToAcl_001
- * @tc.type: FUNC
- */
-HWTEST_F(DeviceManagerServiceImplTest, PutIdenticalAccountToAcl_001, testing::ext::TestSize.Level1)
-{
-    std::string requestDeviceId;
-    std::string trustDeviceId;
-    if (deviceManagerServiceImpl_ == nullptr) {
-        deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
-    }
-    deviceManagerServiceImpl_->PutIdenticalAccountToAcl(requestDeviceId, trustDeviceId);
-    EXPECT_NE(deviceManagerServiceImpl_->hiChainConnector_, nullptr);
-}
-
-/**
  * @tc.name: DpAclAdd_001
  * @tc.type: FUNC
  */
