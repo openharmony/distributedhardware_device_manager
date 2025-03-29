@@ -224,6 +224,7 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
         LOGE("TAG_BIND_LEVEL is not integer string or int32.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("bindlevel = %{public}d.", bindLevel);
     if (static_cast<uint32_t>(bindLevel) > APP || bindLevel < INVALID_TYPE) {
         LOGE("bindlevel error %{public}d.", bindLevel);
         return ERR_DM_INPUT_PARA_INVALID;
