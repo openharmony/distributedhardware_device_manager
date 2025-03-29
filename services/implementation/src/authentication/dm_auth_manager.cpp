@@ -2691,12 +2691,6 @@ void DmAuthManager::ProcRespNegotiate(const int32_t &sessionId)
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
         return;
     }
-    if (IsIdenticalAccount()) {
-        jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
-        if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
-            jsonObject[TAG_IMPORT_AUTH_CODE] = Crypto::Sha256(importAuthCode_);
-        }
-    }
     jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
     if (jsonObject[TAG_CRYPTO_SUPPORT].Get<bool>() == true && authResponseContext_->cryptoSupport) {
