@@ -67,11 +67,11 @@ constexpr const static char* g_setDnPolicyWhiteList[SETDNPOLICY_WHITE_LIST_NUM] 
     "com.ohos.distributedjstest",
 };
 
-constexpr uint32_t GETDEVICEINFO_WHITE_LIST_NUM = 2;
+constexpr uint32_t GETDEVICEINFO_WHITE_LIST_NUM = 3;
 constexpr const static char* g_getDeviceInfoWhiteList[GETDEVICEINFO_WHITE_LIST_NUM] = {
     "gameservice_server",
     "com.huawei.hmos.slassistant",
-    "token_sync_service"
+    "token_sync_service",
 };
 constexpr int32_t MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST_NUM = 1;
 constexpr const static char* g_modifyLocalDeviceNameWhiteList[MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST_NUM] = {
