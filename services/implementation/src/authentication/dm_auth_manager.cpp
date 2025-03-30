@@ -1538,13 +1538,13 @@ void DmAuthManager::AuthenticateFinish()
     }
 
     DeleteAuthCode();
+    if (timer_ != nullptr) {
+        timer_->DeleteAll();
+    }
     if (authResponseState_ != nullptr) {
         SinkAuthenticateFinish();
     } else if (authRequestState_ != nullptr) {
         SrcAuthenticateFinish();
-    }
-    if (timer_ != nullptr) {
-        timer_->DeleteAll();
     }
     isFinishOfLocal_ = true;
     authResponseContext_ = nullptr;
