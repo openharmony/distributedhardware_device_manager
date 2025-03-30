@@ -788,7 +788,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         return;
     }
-
+    CompatiblePutAcl();
     int32_t pinCode = -1;
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
         GetAuthCode(authResponseContext_->hostPkgName, pinCode);
@@ -845,6 +845,10 @@ void DmAuthManager::MemberJoinAuthRequest(int64_t requestId, int32_t status)
     authTimes_++;
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
+    }
+    if (status == DM_OK) {
+        LOGI("join group success.");
+        CompatiblePutAcl();
     }
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
         HandleMemberJoinImportAuthCode(requestId, status);
@@ -998,7 +1002,10 @@ void DmAuthManager::AbilityNegotiate()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
-    GetBinderInfo();
+    if (GetBinderInfo() != DM_OK) {
+        LOGE("GetBinderInfo failed.");
+        return;
+    }
     bool ret = hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
@@ -1007,10 +1014,6 @@ void DmAuthManager::AbilityNegotiate()
             CompatiblePutAcl();
         }
         authResponseContext_->reply = ERR_DM_AUTH_PEER_REJECT;
-        if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_3)) &&
-            authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
-            authResponseContext_->importAuthCode = Crypto::Sha256(importAuthCode_);
-        }
     } else {
         authResponseContext_->reply = ERR_DM_AUTH_REJECT;
     }
@@ -1528,9 +1531,6 @@ void DmAuthManager::AuthenticateFinish()
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
     isAuthDevice_ = false;
-    if (authResponseContext_->isFinish) {
-        CompatiblePutAcl();
-    }
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_) && authResponseContext_->isFinish) {
@@ -2639,7 +2639,10 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     remoteDeviceId_ = authResponseContext_->localDeviceId;
     authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
-    GetBinderInfo();
+    if (GetBinderInfo() != DM_OK) {
+        LOGE("GetBinderInfo failed.");
+        return;
+    }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->deviceId = authResponseContext_->localDeviceId;
@@ -2648,10 +2651,6 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
         DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(authResponseContext_->hostPkgName,
         authResponseContext_->localDeviceId, authResponseContext_->deviceId);
     authResponseContext_->authed = !authResponseContext_->bindType.empty();
-    if (authResponseContext_->authed && authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
-        !importAuthCode_.empty() && !CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_3))) {
-        authResponseContext_->importAuthCode = Crypto::Sha256(importAuthCode_);
-    }
 
     authResponseContext_->isIdenticalAccount = false;
     if (authResponseContext_->localAccountId == authResponseContext_->remoteAccountId &&
@@ -2697,12 +2696,6 @@ void DmAuthManager::ProcRespNegotiate(const int32_t &sessionId)
         LOGE("err json string.");
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
         return;
-    }
-    if (IsIdenticalAccount()) {
-        jsonObject[TAG_IDENTICAL_ACCOUNT] = true;
-        if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
-            jsonObject[TAG_IMPORT_AUTH_CODE] = Crypto::Sha256(importAuthCode_);
-        }
     }
     jsonObject[TAG_ACCOUNT_GROUPID] = GetAccountGroupIdHash();
     authResponseContext_ = authResponseState_->GetAuthContext();
@@ -3135,9 +3128,12 @@ int32_t DmAuthManager::GetBinderInfo()
     }
     ret = AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
         authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId);
-    if (ret != DM_OK) {
+#ifndef DEVICE_MANAGER_COMMON_FLAG
+    if (ret == DM_OK && authResponseContext_->bindLevel != APP) {
         LOGI("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
+        return ERR_DM_FAILED;
     }
+#endif
     return ret;
 }
 

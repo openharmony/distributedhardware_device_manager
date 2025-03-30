@@ -593,28 +593,6 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     return authMgr_->BindTarget(pkgName, targetId, bindParam);
 }
 
-void DeviceManagerServiceImpl::PutIdenticalAccountToAcl(std::string requestDeviceId, std::string trustDeviceId)
-{
-    LOGI("DeviceManagerServiceImpl::PutIdenticalAccountAcl start.");
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    Crypto::GetUdidHash(requestDeviceId, reinterpret_cast<uint8_t *>(localDeviceId));
-    std::string localUdidHash = std::string(localDeviceId);
-    DmAclInfo aclInfo;
-    aclInfo.bindType = IDENTICAL_ACCOUNT;
-    aclInfo.trustDeviceId = trustDeviceId;
-    aclInfo.authenticationType = ALLOW_AUTH_ALWAYS;
-    aclInfo.deviceIdHash = localUdidHash;
-    DmAccesser accesser;
-    accesser.requestUserId = MultipleUserConnector::GetFirstForegroundUserId();
-    accesser.requestAccountId = MultipleUserConnector::GetOhosAccountIdByUserId(accesser.requestUserId);
-    MultipleUserConnector::SetSwitchOldUserId(accesser.requestUserId);
-    MultipleUserConnector::SetSwitchOldAccountId(accesser.requestAccountId);
-    accesser.requestDeviceId = requestDeviceId;
-    DmAccessee accessee;
-    accessee.trustDeviceId = trustDeviceId;
-    DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, accesser, accessee);
-}
-
 int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
 {
     LOGI("DeviceManagerServiceImpl DpAclAdd start.");
