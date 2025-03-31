@@ -19,11 +19,11 @@
 #include <set>
 #include <string>
 
-#include "cJSON.h"
+#include "dm_cJSON.h"
 #include "dm_single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
-
+using namespace DmJson;
 class DmLanguageManager {
     DM_DECLARE_SINGLE_INSTANCE_BASE(DmLanguageManager);
 

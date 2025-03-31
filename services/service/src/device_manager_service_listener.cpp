@@ -14,7 +14,7 @@
  */
 
 #include <set>
-#include "cJSON.h"
+#include "dm_cJSON.h"
 
 #include "device_manager_service_listener.h"
 
@@ -53,6 +53,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace DmJson;
 std::mutex DeviceManagerServiceListener::alreadyNotifyPkgNameLock_;
 std::map<std::string, DmDeviceInfo> DeviceManagerServiceListener::alreadyOnlinePkgName_ = {};
 std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNameSet_ = { "ohos.deviceprofile",

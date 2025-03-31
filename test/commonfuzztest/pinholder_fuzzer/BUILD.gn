@@ -75,6 +75,7 @@ ohos_fuzztest("PinHolderFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"PinHolderFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 
   external_deps = [

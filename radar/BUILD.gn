@@ -25,7 +25,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
         "${innerkits_path}/native_cpp/include",
         "${c_utils_path}/include",
-        "//third_party/cJSON",
+        "${json_path}/include",
       ]
 
       sources = [ "src/lite/dm_radar_helper.cpp" ]
@@ -38,6 +38,7 @@ if (defined(ohos_lite)) {
 
       deps = [
         "${innerkits_path}/native_cpp:devicemanagersdk",
+        "${json_path}:devicemanagerjson",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
         "//base/startup/init/interfaces/innerkits:libbegetutil",
         "//commonlibrary/utils_lite:utils",
@@ -65,6 +66,7 @@ if (defined(ohos_lite)) {
       "include",
       "${common_path}/include",
       "${innerkits_path}/native_cpp/include",
+      "${json_path}/include",
     ]
 
     sanitize = {
@@ -92,14 +94,17 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerradar\"",
       "LOG_DOMAIN=0xD004110",
+      "__CJSON_USE_INT64",
     ]
 
-    deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+    deps = [
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${json_path}:devicemanagerjson",
+    ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "access_token:libtokenid_sdk",
-      "cJSON:cjson",
       "c_utils:utils",
       "hilog:libhilog",
       "hisysevent:libhisysevent",
@@ -118,6 +123,7 @@ if (defined(ohos_lite)) {
       "include",
       "${common_path}/include",
       "${innerkits_path}/native_cpp/include",
+      "${json_path}/include",
     ]
 
     sanitize = {
@@ -143,14 +149,17 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerradar\"",
       "LOG_DOMAIN=0xD004110",
+      "__CJSON_USE_INT64",
     ]
 
-    deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+    deps = [
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${json_path}:devicemanagerjson",
+    ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "access_token:libtokenid_sdk",
-      "cJSON:cjson",
       "c_utils:utils",
       "hilog:libhilog",
       "hisysevent:libhisysevent",

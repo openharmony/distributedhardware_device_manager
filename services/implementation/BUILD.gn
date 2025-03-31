@@ -43,7 +43,7 @@ if (defined(ohos_lite)) {
         "${utils_path}/include/crypto",
         "${utils_path}/include/fwkload/lite",
         "${utils_path}/include/timer/lite",
-        "//third_party/json/include",
+        "${json_path}/include",
         "${services_path}/include",
         "${services_path}/include/ipc/lite",
         "${interfaces_path}/c/ipc/include",
@@ -79,6 +79,7 @@ if (defined(ohos_lite)) {
 
       deps = [
         "${devicemanager_path}/radar:devicemanagerradar",
+        "${json_path}:devicemanagerjson",
         "${softbuscache_parh}:dmdevicecache",
         "${utils_path}:devicemanagerutils",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
@@ -141,6 +142,7 @@ if (defined(ohos_lite)) {
       "${utils_path}/include/fwkload/standard",
       "${utils_path}/include/permission/standard",
       "${utils_path}/include/timer",
+      "${json_path}/include",
       "${services_path}/include",
       "${services_path}/include/ipc/standard",
       "${softbuscache_parh}/include",
@@ -201,12 +203,14 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerserviceimpl\"",
       "LOG_DOMAIN=0xD004110",
+      "__CJSON_USE_INT64",
     ]
 
     deps = [
       "${devicemanager_path}/commondependency:devicemanagerdependency",
       "${devicemanager_path}/radar:devicemanagerradar",
       "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${json_path}:devicemanagerjson",
       "${softbuscache_parh}:dmdevicecache",
       "${utils_path}:devicemanagerutils",
     ]
@@ -217,7 +221,6 @@ if (defined(ohos_lite)) {
       "ability_runtime:ability_connect_callback_stub",
       "ability_runtime:ability_manager",
       "access_token:libaccesstoken_sdk",
-      "cJSON:cjson",
       "c_utils:utils",
       "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
@@ -245,8 +248,6 @@ if (defined(ohos_lite)) {
     if (device_manager_common) {
       defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
     }
-
-    public_external_deps = [ "cJSON:cjson" ]
 
     subsystem_name = "distributedhardware"
 

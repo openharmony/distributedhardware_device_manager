@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "cJSON.h"
+#include "dm_cJSON.h"
 #include "softbus_bus_center.h"
 #include "dm_publish_info.h"
 #include "dm_radar_helper.h"
@@ -37,6 +37,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace DmJson;
 class SoftbusListener {
 public:
     SoftbusListener();

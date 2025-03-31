@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
-#include <cJSON.h>
+#include "dm_cJSON.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "parameter.h"

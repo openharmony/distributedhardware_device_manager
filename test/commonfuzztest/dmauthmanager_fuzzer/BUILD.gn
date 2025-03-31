@@ -66,6 +66,7 @@ ohos_fuzztest("DmAuthManagerFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DmAuthManagerFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 }
 

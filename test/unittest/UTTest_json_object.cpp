@@ -285,7 +285,7 @@ HWTEST_F(JsonObjectTest, Parse_003, testing::ext::TestSize.Level1)
     if (!ret) {
         EXPECT_TRUE(object["TEST1"].IsNumber());
         EXPECT_TRUE(object["TEST2"].IsNumber());
-        EXPECT_TRUE(object["TEST1"].IsNumberInteger());
+        EXPECT_FALSE(object["TEST1"].IsNumberInteger());
         EXPECT_FALSE(object["TEST2"].IsNumberInteger());
     }
 }
@@ -566,6 +566,39 @@ HWTEST_F(JsonObjectTest, Get_016, testing::ext::TestSize.Level1)
         EXPECT_EQ(object1["TEST2"].Get<int64_t>(), 1000000000);
         EXPECT_EQ(object1["TEST3"].Get<double>(), 5589.532);
         EXPECT_EQ(object1["TEST4"].Get<bool>(), true);
+    }
+}
+
+HWTEST_F(JsonObjectTest, Get_017, testing::ext::TestSize.Level1)
+{
+    std::string strJson = R"({"VALUE1":319691941099823986, "VALUE2":-319691941099823986})";
+    JsonObject object(strJson);
+    bool ret = object.IsDiscarded();
+    EXPECT_FALSE(ret);
+    if (!ret) {
+        int64_t value1 = object["VALUE1"].Get<int64_t>();
+        int64_t value2 = object["VALUE2"].Get<int64_t>();
+        int64_t checkValue1 = 319691941099823986;
+        int64_t checkValue2 = -319691941099823986;
+        EXPECT_EQ(value1, checkValue1);
+        EXPECT_EQ(value2, checkValue2);
+    }
+}
+
+HWTEST_F(JsonObjectTest, Get_018, testing::ext::TestSize.Level1)
+{
+    std::string strJson = R"({"Values":[319691941099823986, -319691941099823986, 419691941099823986]})";
+    JsonObject object(strJson);
+    bool ret = object.IsDiscarded();
+    EXPECT_FALSE(ret);
+    if (!ret) {
+        std::vector<int64_t> verValues;
+        object["Values"].Get(verValues);
+        std::vector<int64_t> verCheckValues = {319691941099823986, -319691941099823986, 419691941099823986};
+        EXPECT_EQ(verValues, verCheckValues);
+        for (size_t i = 0; i < verValues.size() && i < verCheckValues.size(); ++i) {
+            EXPECT_EQ(verValues[i], verCheckValues[i]);
+        }
     }
 }
 } // namespace DistributedHardware

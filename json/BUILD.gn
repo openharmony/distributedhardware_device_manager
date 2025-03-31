@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,46 +17,57 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 }
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
 if (defined(ohos_lite)) {
   if (ohos_kernel_type == "linux") {
-    shared_library("dmdevicecache") {
+    shared_library("devicemanagerjson") {
       include_dirs = [
         "include",
         "${common_path}/include",
-        "${innerkits_path}/native_cpp/include",
-        "${utils_path}/include/crypto",
-        "${json_path}/include",
       ]
 
       sources = [
-        "${common_path}/src/dm_anonymous.cpp",
-        "src/dm_softbus_cache.cpp",
+        "src/dm_cJSON.cpp",
+        "src/json_object.cpp",
       ]
 
       defines = [
-        "LITE_DEVICE",
-        "DH_LOG_TAG=\"dmdevicecache\"",
-        "LOG_DOMAIN=0xD004113",
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerjson\"",
+        "LOG_DOMAIN=0xD004110",
+        "CJSON_NESTING_LIMIT=(128)",
       ]
 
-      deps = [
-        "${dsoftbussdk_path}:softbus_client",
-        "${hilog_path}:hilog_shared",
-        "${json_path}:devicemanagerjson",
-        "${third_path}:libsec_shared",
-        "${utils_path}:devicemanagerutils",
-      ]
+      deps = [ "${hilog_path}:hilog_shared" ]
     }
   }
 } else {
-  ohos_shared_library("dmdevicecache") {
+  config("cflags_config") {
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+      "-ffunction-sections",
+      "-fdata-sections",
+      "-fvisibility=hidden",
+      "-Oz",
+      "-flto",
+    ]
+    ldflags = [ "-flto" ]
+  }
+
+  ohos_shared_library("devicemanagerjson") {
+    branch_protector_ret = "pac_ret"
+
+    include_dirs = [
+      "include",
+      "${common_path}/include",
+    ]
+
     sanitize = {
-      boundary_sanitize = true
       cfi = true
       cfi_cross_dso = true
       debug = false
-      integer_overflow = true
-      ubsan = true
     }
 
     cflags = [
@@ -70,32 +81,24 @@ if (defined(ohos_lite)) {
       "-Wl,-z,now",
     ]
 
-    include_dirs = [
-      "include",
-      "${common_path}/include",
-      "${utils_path}/include/crypto",
-    ]
+    configs = [ ":cflags_config" ]
 
-    sources = [ "src/dm_softbus_cache.cpp" ]
+    sources = [
+      "src/dm_cJSON.cpp",
+      "src/json_object.cpp",
+    ]
 
     defines = [
       "HI_LOG_ENABLE",
-      "DH_LOG_TAG=\"dmdevicecache\"",
-      "LOG_DOMAIN=0xD004113",
+      "DH_LOG_TAG=\"devicemanagerjson\"",
+      "LOG_DOMAIN=0xD004110",
+      "CJSON_NESTING_LIMIT=(128)",
       "__CJSON_USE_INT64",
     ]
 
-    deps = [
-      "${innerkits_path}/native_cpp:devicemanagersdk",
-      "${json_path}:devicemanagerjson",
-      "${utils_path}:devicemanagerutils",
-    ]
+    deps = []
 
-    external_deps = [
-      "bounds_checking_function:libsec_shared",
-      "dsoftbus:softbus_client",
-      "hilog:libhilog",
-    ]
+    external_deps = [ "hilog:libhilog" ]
 
     subsystem_name = "distributedhardware"
 
