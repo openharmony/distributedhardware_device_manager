@@ -31,7 +31,7 @@ void DeviceManagerServiceImplTest::SetUp()
     }
     deviceManagerServiceImpl_->Initialize(listener_);
 }
-const std::string testID("111111");
+const std::string TEST_ID("111111");
 
 void DeviceManagerServiceImplTest::TearDown()
 {
@@ -840,7 +840,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_002, testing::ext::TestSize
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
+    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, TEST_ID.c_str());
     devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
@@ -872,7 +872,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_002, testing::ext::TestSize.
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
+    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, TEST_ID.c_str());
     devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
     if (deviceManagerServiceImpl_ == nullptr) {
         deviceManagerServiceImpl_ = std::make_shared<DeviceManagerServiceImpl>();
@@ -1305,7 +1305,7 @@ HWTEST_F(DeviceManagerServiceImplTest, ScreenCommonEventCallback_001, testing::e
 */
 HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceNotTrust_001, testing::ext::TestSize.Level0)
 {
-    std::string udid = testID;
+    std::string udid = TEST_ID;
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
     EXPECT_NE(deviceManagerServiceImpl_->authMgr_, nullptr);
 }
@@ -1611,7 +1611,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_003, testing::ext::TestSize.
     if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
-    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
+    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, TEST_ID.c_str());
     devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(ERR_DM_FAILED));
     deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
@@ -1651,7 +1651,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_003, testing::ext::TestSize
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, testID.c_str());
+    strcpy_s(devInfo.networkId, sizeof(devInfo.networkId) - 1, TEST_ID.c_str());
     devInfo.networkId[sizeof(devInfo.networkId) - 1] = '\0';
     if (deviceManagerServiceImpl_->deviceStateMgr_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);

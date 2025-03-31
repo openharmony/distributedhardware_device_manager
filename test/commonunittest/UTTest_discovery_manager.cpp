@@ -50,7 +50,7 @@ namespace {
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<DiscoveryManager> manager = std::make_shared<DiscoveryManager>(softbusListener, listener);
 
-bool checkSoftbusRes(int32_t ret)
+bool CheckSoftbusRes(int32_t ret)
 {
     return ret == SOFTBUS_INVALID_PARAM || ret == SOFTBUS_NETWORK_NOT_INIT || ret == SOFTBUS_NETWORK_LOOPER_ERR;
 }
@@ -72,7 +72,7 @@ HWTEST_F(DiscoveryManagerTest, EnableDiscoveryListener_002, testing::ext::TestSi
     discoverParam.insert(std::pair<std::string, std::string>("SUBSCRIBE_ID", "ohos.test"));
     std::map<std::string, std::string> filterOptions;
     int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DiscoveryManagerTest, EnableDiscoveryListener_003, testing::ext::TestSize.Level0)
@@ -81,7 +81,7 @@ HWTEST_F(DiscoveryManagerTest, EnableDiscoveryListener_003, testing::ext::TestSi
     std::map<std::string, std::string> discoverParam;
     std::map<std::string, std::string> filterOptions;
     int32_t ret = manager->EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_001, testing::ext::TestSize.Level0)
@@ -99,7 +99,7 @@ HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_002, testing::ext::TestS
     extraParam.insert(std::pair<std::string, std::string>("META_TYPE", "ohos.test"));
     extraParam.insert(std::pair<std::string, std::string>("SUBSCRIBE_ID", "ohos.test"));
     int32_t ret = manager->DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_003, testing::ext::TestSize.Level0)
@@ -107,7 +107,7 @@ HWTEST_F(DiscoveryManagerTest, DisableDiscoveryListener_003, testing::ext::TestS
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     int32_t ret = manager->DisableDiscoveryListener(pkgName, extraParam);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscovering_001, testing::ext::TestSize.Level0)
@@ -129,7 +129,7 @@ HWTEST_F(DiscoveryManagerTest, StartDiscovering_002, testing::ext::TestSize.Leve
     discoverParam.insert(std::pair<std::string, std::string>("FILTER_OPTIONS", "ohos.test"));
     std::map<std::string, std::string> filterOptions;
     int32_t ret = manager->StartDiscovering(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscovering_003, testing::ext::TestSize.Level0)
@@ -245,7 +245,7 @@ HWTEST_F(DiscoveryManagerTest, StopDiscovering_002, testing::ext::TestSize.Level
     DiscoveryContext context;
     manager->discoveryContextMap_.emplace(pkgName, context);
     int32_t ret = manager->StopDiscovering(pkgName, subscribeId);
-    EXPECT_EQ(true, checkSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DiscoveryManagerTest, OnDeviceFound_001, testing::ext::TestSize.Level0)

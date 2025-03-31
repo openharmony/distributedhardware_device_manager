@@ -1146,9 +1146,8 @@ HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_001, testing::ext::TestSize.Le
     std::string localUdid = "localDeviceId";
     std::string udid = "remoteDeviceId";
     uint64_t tokenId = 0;
-    int32_t bindLevel = INVALIED_TYPE;
 
-    bindLevel = DeviceProfileConnector::GetInstance()
+    int32_t bindLevel = DeviceProfileConnector::GetInstance()
         .GetBindLevel(pkgName, localUdid, udid, tokenId);
 
     EXPECT_EQ(bindLevel, INVALIED_TYPE);
@@ -1176,12 +1175,11 @@ HWTEST_F(DeviceProfileConnectorTest, UpdateBindType_002, testing::ext::TestSize.
 HWTEST_F(DeviceProfileConnectorTest, HandleAccountLogoutEvent_001, testing::ext::TestSize.Level0)
 {
     int32_t remoteUserId = 0;
-    int32_t bindType = DM_INVALIED_BINDTYPE;
     std::string remoteAccountHash = "remoteAccountHash";
     std::string remoteUdid = "1";
     std::string localUdid = "localDeviceId";
 
-    bindType = DeviceProfileConnector::GetInstance().HandleAccountLogoutEvent(remoteUserId,
+    int32_t bindType = DeviceProfileConnector::GetInstance().HandleAccountLogoutEvent(remoteUserId,
         remoteAccountHash, remoteUdid, localUdid);
     EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
 }
@@ -1191,9 +1189,8 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_001, testing::ext::Tes
     int32_t remoteUserId = 0;
     std::string remoteUdid = "remoteDeviceId";
     std::string localUdid = "localDeviceId";
-    int32_t bindType = DM_INVALIED_BINDTYPE;
 
-    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
+    int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
     EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
 }
 
@@ -1417,8 +1414,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::Tes
     int32_t remoteUserId = 0;
     std::string remoteUdid;
     std::string localUdid = "localDeviceId";
-    int32_t bindType = DM_INVALIED_BINDTYPE;
-    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
+    int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
     EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
 
     remoteUdid = "123456";

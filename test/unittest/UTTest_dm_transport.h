@@ -36,10 +36,10 @@ protected:
     std::shared_ptr<DMCommTool> dmCommToolPtr = std::make_shared<DMCommTool>();
     std::shared_ptr<DMTransport> dmTransport_ = std::make_shared<DMTransport>(dmCommToolPtr);
 
-    int32_t ERR_DM_FAILED = 96929744;
-    int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
-    uint32_t MAX_SEND_MSG_LENGTH = 4 * 1024 * 1024;
-    int32_t DM_OK = 0;
+    const int32_t ERR_DM_FAILED = 96929744;
+    const int32_t ERR_DM_INPUT_PARA_INVALID = 96929749;
+    const uint32_t MAX_SEND_MSG_LENGTH = 4 * 1024 * 1024;
+    const int32_t DM_OK = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
