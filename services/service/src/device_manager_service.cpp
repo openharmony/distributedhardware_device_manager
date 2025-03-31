@@ -2653,10 +2653,10 @@ void DeviceManagerService::HandleUserIdCheckSumChange(const std::string &msg)
             ret, static_cast<int32_t>(backgroundUserIds.size()));
     }
 
-    if ((discoveryType & USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK) != 0x0) {
-        ProcessCheckSumByWifi(remoteNetworkId, foregroundUserIds, backgroundUserIds);
-    } else {
+    if ((discoveryType & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
         ProcessCheckSumByBT(remoteNetworkId, foregroundUserIds, backgroundUserIds);
+    } else {
+        ProcessCheckSumByWifi(remoteNetworkId, foregroundUserIds, backgroundUserIds);
     }
 }
 #endif
