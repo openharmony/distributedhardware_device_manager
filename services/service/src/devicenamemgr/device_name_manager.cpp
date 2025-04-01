@@ -77,6 +77,7 @@ void DeviceNameManager::DataShareReady()
     if (DependsIsReady()) {
         int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
         InitDeviceName(userId);
+        RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
     }
 }
 
