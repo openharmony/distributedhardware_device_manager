@@ -240,7 +240,7 @@ public:
         const std::string &udid, uint64_t &tokenId) = 0;
     virtual void HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId,
         const std::string &peerUdid, int32_t peerUserId) = 0;
-    virtual void HandleUserRemoved(int32_t preUserId) = 0;
+    virtual void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId) = 0;
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
     virtual void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId) = 0;
@@ -258,7 +258,7 @@ public:
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId) = 0;
     virtual int32_t RegisterAuthenticationType(int32_t authenticationType) = 0;
     virtual void DeleteAlwaysAllowTimeOut() = 0;
-    virtual void CheckDeleteCredential(const std::string &remoteUdid) = 0;
+    virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;
 };
 

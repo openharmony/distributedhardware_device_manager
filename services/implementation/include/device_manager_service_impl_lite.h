@@ -140,7 +140,7 @@ public:
         int32_t tokenId, int32_t peerTokenId);
     void HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId, const std::string &peerUdid,
         int32_t peerUserId);
-    void HandleUserRemoved(int32_t preUserId);
+    void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
         int32_t beforeUserId);
@@ -157,7 +157,7 @@ public:
         int32_t localUserId, const std::string &localAccountId);
     int32_t RegisterAuthenticationType(int32_t authenticationType);
     void DeleteAlwaysAllowTimeOut();
-    void CheckDeleteCredential(const std::string &remoteUdid);
+    void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);

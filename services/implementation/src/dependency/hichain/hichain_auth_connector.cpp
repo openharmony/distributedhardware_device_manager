@@ -185,24 +185,21 @@ int32_t HiChainAuthConnector::GenerateCredential(std::string &localUdid, int32_t
         LOGE("Decode generate return data jsonStr error.");
         return ERR_DM_FAILED;
     }
-    if (!IsInt32(jsonObject, "result") || !IsString(jsonObject, "publicKey") ||
-        jsonObject["result"].Get<int32_t>() != HC_SUCCESS) {
+    if (!IsString(jsonObject, "publicKey")) {
         LOGE("Hichain generate public key jsonObject invalied.");
-        return ERR_DM_FAILED;
-    }
-    if (jsonObject["result"].Get<int32_t>() != 0) {
-        LOGE("Hichain generate public key failed");
         return ERR_DM_FAILED;
     }
     publicKey = jsonObject["publicKey"].Get<std::string>();
     return DM_OK;
 }
 
-bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAccountId)
+bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId)
 {
-    LOGI("HiChainAuthConnector::QueryCredential start.");
+    LOGI("QueryCredential start, deviceId: %{public}s, peerOsAccountId: %{public}d",
+        GetAnonyString(localUdid).c_str(), peerOsAccountId);
     JsonObject jsonObj;
     jsonObj["osAccountId"] = osAccountId;
+    jsonObj["peerOsAccountId"] = peerOsAccountId;
     jsonObj["deviceId"] = localUdid;
     jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["flag"] = 1;
@@ -220,11 +217,7 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
         LOGE("Decode query return data jsonStr error.");
         return false;
     }
-    if (!IsInt32(jsonObject, "result") || jsonObject["result"].Get<int32_t>() == -1) {
-        LOGE("Hichain generate public key failed.");
-        return false;
-    }
-    if (!IsString(jsonObject, "publicKey") || jsonObject["result"].Get<int32_t>() == 1) {
+    if (!IsString(jsonObject, "publicKey")) {
         LOGI("Credential not exist.");
         return false;
     }
@@ -253,11 +246,7 @@ int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAc
         LOGE("Decode query return data jsonStr error.");
         return ERR_DM_FAILED;
     }
-    if (!IsInt32(jsonObject, "result") || jsonObject["result"].Get<int32_t>() == -1) {
-        LOGE("Hichain generate public key failed.");
-        return ERR_DM_FAILED;
-    }
-    if (!IsString(jsonObject, "publicKey") || jsonObject["result"].Get<int32_t>() == 1) {
+    if (!IsString(jsonObject, "publicKey")) {
         LOGI("Credential not exist.");
         return ERR_DM_FAILED;
     }
@@ -265,11 +254,14 @@ int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAc
     return DM_OK;
 }
 
-int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string deviceId, std::string publicKey)
+int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId,
+    std::string publicKey)
 {
-    LOGI("HiChainAuthConnector::ImportCredential");
+    LOGI("ImportCredential start, deviceId: %{public}s, peerOsAccountId: %{public}d",
+        GetAnonyString(deviceId).c_str(), peerOsAccountId);
     JsonObject jsonObj;
     jsonObj["osAccountId"] = osAccountId;
+    jsonObj["peerOsAccountId"] = peerOsAccountId;
     jsonObj["deviceId"] = deviceId;
     jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["publicKey"] = publicKey;
@@ -280,32 +272,19 @@ int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string 
         FreeJsonString(returnData);
         return ERR_DM_FAILED;
     }
-    std::string returnDataStr = static_cast<std::string>(returnData);
     FreeJsonString(returnData);
-    JsonObject jsonObject(returnDataStr);
-    if (jsonObject.IsDiscarded()) {
-        LOGE("Decode import return data jsonStr error.");
-        return ERR_DM_FAILED;
-    }
-    if (!IsInt32(jsonObject, "result")) {
-        LOGI("Hichain import public key jsonObject invalied.");
-        return ERR_DM_FAILED;
-    }
-    int32_t result = jsonObject["result"].Get<int32_t>();
-    if (result != 0) {
-        LOGE("Hichain import public key result is %{public}d.", result);
-        return ERR_DM_FAILED;
-    }
     return DM_OK;
 }
 
-int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int32_t userId)
+int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId)
 {
-    LOGI("DeleteCredential start.");
+    LOGI("DeleteCredential start, deviceId: %{public}s, peerUserId: %{public}d",
+        GetAnonyString(deviceId).c_str(), peerUserId);
     JsonObject jsonObj;
     jsonObj["deviceId"] = deviceId;
     jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["osAccountId"] = userId;
+    jsonObj["peerOsAccountId"] = peerUserId;
     std::string requestParam = SafetyDump(jsonObj);
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_DELETE, requestParam.c_str(), &returnData) != HC_SUCCESS) {
@@ -313,18 +292,8 @@ int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int3
         FreeJsonString(returnData);
         return false;
     }
-    std::string returnDataStr = static_cast<std::string>(returnData);
     FreeJsonString(returnData);
-    JsonObject jsonObject(returnDataStr);
-    if (jsonObject.IsDiscarded()) {
-        LOGE("Decode import return data jsonStr error.");
-        return false;
-    }
-    if (!IsInt32(jsonObject, "result")) {
-        LOGI("Hichain delete credential result json key is invalid.");
-        return ERR_DM_FAILED;
-    }
-    return jsonObject["result"].Get<int32_t>();
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

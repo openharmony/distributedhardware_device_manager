@@ -499,8 +499,9 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &local
     return;
 }
 
-void DeviceManagerServiceImpl::HandleUserRemoved(int32_t preUserId)
+void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId)
 {
+    (void)peerUdids;
     (void)preUserId;
     return;
 }
@@ -599,9 +600,10 @@ void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
     return;
 }
 
-void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUdid)
+void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId)
 {
     (void)remoteUdid;
+    (void)remoteUserId;
     return;
 }
 

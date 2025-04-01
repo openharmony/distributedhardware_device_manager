@@ -2065,9 +2065,6 @@ void DeviceManagerService::UpdateAclAndDeleteGroup(const std::string &localUdid,
     }
     discoveryMgr_->GetCommonDependencyObj()->HandleUserSwitched(localUdid, deviceVec,
         foregroundUserIds, backgroundUserIds);
-    //delete group
-    CHECK_NULL_VOID(hichainListener_);
-    hichainListener_->DeleteAllGroup(localUdid, backgroundUserIds);
 }
 #endif
 
@@ -2159,8 +2156,8 @@ void DeviceManagerService::HandleUserRemoved(int32_t removedUserId)
     if (!peerUdids.empty()) {
         // Send UserId Removed broadcast
         SendUserRemovedBroadCast(peerUdids, removedUserId);
+        dmServiceImpl_->HandleUserRemoved(peerUdids, removedUserId);
     }
-    dmServiceImpl_->HandleUserRemoved(removedUserId);
 }
 
 void DeviceManagerService::SendUserRemovedBroadCast(const std::vector<std::string> &peerUdids, int32_t userId)

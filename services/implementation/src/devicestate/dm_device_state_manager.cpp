@@ -306,10 +306,11 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
             hiChainConnector_->DeleteTimeOutGroup((idIter->second).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
             DeleteGroupByDP(idIter->second);
-            uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(idIter->second);
+            int32_t peerUserId = -1;
+            uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(idIter->second, peerUserId);
             if (res == 0) {
                 hiChainAuthConnector_->DeleteCredential(idIter->second,
-                                                        MultipleUserConnector::GetCurrentAccountUserID());
+                    MultipleUserConnector::GetCurrentAccountUserID(), peerUserId);
             }
 #endif
             stateTimerInfoMap_.erase(iter);

@@ -778,9 +778,9 @@ HWTEST_F(DmAuthManagerTest, ImportCredential001, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "deviceId";
     std::string publicKey = "publicKey";
-    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = authManager_->ImportCredential(deviceId, publicKey);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
+    ASSERT_EQ(ret, ERR_DM_AUTH_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, ResponseCredential001, testing::ext::TestSize.Level1)
@@ -789,13 +789,13 @@ HWTEST_F(DmAuthManagerTest, ResponseCredential001, testing::ext::TestSize.Level1
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 
     authManager_->authResponseContext_->publicKey = "publicKey";
-    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     authManager_->ResponseCredential();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     authManager_->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(DM_OK));
     authManager_->ResponseCredential();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
@@ -1832,7 +1832,7 @@ HWTEST_F(DmAuthManagerTest, RequestCredentialDone_003, testing::ext::TestSize.Le
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 
     authManager_->authResponseContext_->publicKey = "publicKey";
-    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     authManager_->RequestCredentialDone();
     ASSERT_EQ(authManager_->isAuthDevice_, false);
 }

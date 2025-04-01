@@ -225,7 +225,7 @@ void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> 
     }
     RspLocalFrontOrBackUserIds(commMsg->remoteNetworkId, foregroundUserIdsU32, backgroundUserIdsU32,
         commMsg->socketId);
-    
+
     if (userIdsMsg.foregroundUserIds.empty()) {
         LOGE("Parse but get none remote foreground userids");
     } else {

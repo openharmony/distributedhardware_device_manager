@@ -19,9 +19,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAccountId)
+bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId)
 {
-    return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredential(localUdid, osAccountId);
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredential(localUdid, osAccountId, peerOsAccountId);
 }
 
 int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, std::string udid, int64_t requestId)
@@ -29,9 +29,11 @@ int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, s
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthDevice(pinCode, osAccountId, udid, requestId);
 }
 
-int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, std::string deviceId, std::string publicKey)
+int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId,
+    std::string publicKey)
 {
-    return DmHiChainAuthConnector::dmHiChainAuthConnector->ImportCredential(osAccountId, deviceId, publicKey);
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->ImportCredential(osAccountId, peerOsAccountId, deviceId,
+        publicKey);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
