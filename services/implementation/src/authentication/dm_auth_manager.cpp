@@ -83,7 +83,7 @@ const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
 const int32_t MAX_PUT_SESSIONKEY_TIMEOUT = 100; //ms
-const int32_t SESSION_CLOSE_TIMEOUT = 5;
+const int32_t SESSION_CLOSE_TIMEOUT = 2;
 
 constexpr const char* AUTHENTICATE_TIMEOUT_TASK = "deviceManagerTimer:authenticate";
 constexpr const char* NEGOTIATE_TIMEOUT_TASK = "deviceManagerTimer:negotiate";
@@ -3371,9 +3371,9 @@ int32_t DmAuthManager::GetTokenIdByBundleName(int32_t userId, std::string &bundl
 
 void DmAuthManager::OnSoftbusJoinLNNResult(const int32_t sessionId, const char *networkId, int32_t result)
 {
+    (void)sessionId;
     (void)networkId;
     (void)result;
-    CloseAuthSession(sessionId);
 }
 
 void DmAuthManager::CloseAuthSession(const int32_t sessionId)
