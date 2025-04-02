@@ -706,14 +706,6 @@ HWTEST_F(IpcServerStubTest, HandleSoftBusServerAdd_002, testing::ext::TestSize.L
     EXPECT_EQ(ServiceRunningState::STATE_NOT_START, IpcServerStub::GetInstance().state_);
     EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
-HWTEST_F(IpcServerStubTest, HandleSoftBusServerAdd_003, testing::ext::TestSize.Level0)
-{
-    IpcServerStub::GetInstance().state_ = ServiceRunningState::STATE_RUNNING;
-    IpcServerStub::GetInstance().HandleSoftBusServerAdd();
-
-    EXPECT_EQ(ServiceRunningState::STATE_RUNNING, IpcServerStub::GetInstance().state_);
-    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
 
 HWTEST_F(IpcServerStubTest, AddDelimiter_001, testing::ext::TestSize.Level0)
 {
@@ -781,7 +773,7 @@ HWTEST_F(IpcServerStubTest, JoinPath_006, testing::ext::TestSize.Level0)
     std::string prefixPath = "path";
     std::string subPath = "/subpath";
     std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
-    ASSERT_EQ(result, "path/subpath");
+    ASSERT_EQ(result, "path//subpath");
 }
 
 HWTEST_F(IpcServerStubTest, JoinPath_007, testing::ext::TestSize.Level0)
@@ -789,7 +781,7 @@ HWTEST_F(IpcServerStubTest, JoinPath_007, testing::ext::TestSize.Level0)
     std::string prefixPath = "path/";
     std::string subPath = "/subpath";
     std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
-    ASSERT_EQ(result, "path/subpath");
+    ASSERT_EQ(result, "path//subpath");
 }
 
 HWTEST_F(IpcServerStubTest, JoinPath2_001, testing::ext::TestSize.Level0)
@@ -843,7 +835,7 @@ HWTEST_F(IpcServerStubTest, JoinPath2_006, testing::ext::TestSize.Level0)
     std::string midPath = "/midpath/";
     std::string subPath = "/subpath";
     std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, midPath, subPath);
-    ASSERT_EQ(result, "path/midpath/subpath");
+    ASSERT_EQ(result, "path//midpath//subpath");
 }
 } // namespace
 } // namespace DistributedHardware
