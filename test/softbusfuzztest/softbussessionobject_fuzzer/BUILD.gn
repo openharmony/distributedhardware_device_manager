@@ -61,6 +61,7 @@ ohos_fuzztest("SoftbusSessionObjectFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"SoftbusSessionObjectFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 }
 

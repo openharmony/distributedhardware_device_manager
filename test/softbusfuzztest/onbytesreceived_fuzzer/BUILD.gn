@@ -69,6 +69,7 @@ ohos_fuzztest("OnBytesReceivedFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"OnBytesReceivedFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 }
 

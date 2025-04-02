@@ -63,6 +63,7 @@ ohos_fuzztest("DpInitCallbackFuzzTest") {
   deps = [
     "${devicemanager_path}/services/implementation:devicemanagerserviceimpl",
     "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${json_path}:devicemanagerjson",
     "${utils_path}:devicemanagerutilstest",
   ]
 
@@ -70,6 +71,7 @@ ohos_fuzztest("DpInitCallbackFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DpInitCallbackFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 
   external_deps = [

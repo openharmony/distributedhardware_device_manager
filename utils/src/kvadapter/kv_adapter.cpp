@@ -18,7 +18,7 @@
 #include <mutex>
 #include <unistd.h>
 
-#include "cJSON.h"
+#include "dm_cJSON.h"
 #include "datetime_ex.h"
 #include "string_ex.h"
 
@@ -30,6 +30,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::DistributedKv;
+using namespace DmJson;
 namespace {
     const std::string APP_ID = "distributed_device_manager_service";
     const std::string STORE_ID = "dm_kv_store";

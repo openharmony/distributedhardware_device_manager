@@ -47,7 +47,6 @@ ohos_fuzztest("OnSoftbusDeviceOfflineFuzzTest") {
   ]
 
   external_deps = [
-    "cJSON:cjson",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -63,6 +62,7 @@ ohos_fuzztest("OnSoftbusDeviceOfflineFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"OnSoftbusDeviceOfflineFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 }
 

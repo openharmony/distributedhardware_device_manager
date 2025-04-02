@@ -65,6 +65,7 @@ ohos_fuzztest("AuthenticateDeviceServiceFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"AuthenticateDeviceServiceFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 
   external_deps = [
@@ -72,7 +73,6 @@ ohos_fuzztest("AuthenticateDeviceServiceFuzzTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",

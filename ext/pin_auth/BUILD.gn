@@ -74,6 +74,7 @@ ohos_shared_library("devicemanagerext_pin_auth") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${json_path}:devicemanagerjson",
     "${servicesimpl_path}:devicemanagerserviceimpl",
   ]
 
@@ -81,7 +82,6 @@ ohos_shared_library("devicemanagerext_pin_auth") {
     "ability_base:session_info",
     "ability_base:want",
     "ability_runtime:ability_manager",
-    "cJSON:cjson",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -101,6 +101,7 @@ ohos_shared_library("devicemanagerext_pin_auth") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"devicemanagerext\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 
   subsystem_name = "distributedhardware"

@@ -17,10 +17,11 @@
 #define OHOS_DM_TRANSPORT_MSG_H
 
 #include <string>
-#include <cJSON.h>
+#include "dm_cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+using namespace DmJson;
 struct UserIdsMsg {
     std::vector<uint32_t> foregroundUserIds;
     std::vector<uint32_t> backgroundUserIds;

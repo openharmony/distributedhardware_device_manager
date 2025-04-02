@@ -17,10 +17,11 @@
 #define OHOS_RELATIONSHIP_SYNC_MGR_H
 
 #include <string>
-#include "cJSON.h"
+#include "dm_cJSON.h"
 #include "dm_single_instance.h"
 namespace OHOS {
 namespace DistributedHardware {
+using namespace DmJson;
 enum class RelationShipChangeType : uint32_t {
     ACCOUNT_LOGOUT = 0,
     DEVICE_UNBIND = 1,

@@ -113,6 +113,7 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerminikit\"",
       "LOG_DOMAIN=0xD004111",
+      "__CJSON_USE_INT64",
     ]
 
     external_deps = [

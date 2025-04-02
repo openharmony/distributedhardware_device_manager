@@ -70,6 +70,7 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DeviceNameManagerFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+    "__CJSON_USE_INT64",
   ]
 
   external_deps = [
