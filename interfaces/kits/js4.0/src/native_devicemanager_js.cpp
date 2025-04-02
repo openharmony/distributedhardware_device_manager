@@ -2528,7 +2528,6 @@ napi_value DeviceManagerNapi::JsSetLocalDeviceName(napi_env env, napi_callback_i
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_ONE, "Wrong number of arguments, required 1")) {
         return nullptr;
     }
@@ -2542,7 +2541,7 @@ napi_value DeviceManagerNapi::JsSetLocalDeviceName(napi_env env, napi_callback_i
     if (!JsToStringAndCheck(env, argv[0], "deviceName", deviceName)) {
         return nullptr;
     }
-    if (deviceName.size() > DEIVCE_NAME_MAX_BYTES) {
+    if (deviceName.size() > DEVICE_NAME_MAX_BYTES) {
         LOGE("deviceName is too long");
         CreateBusinessError(env, ERR_DM_INIT_FAILED);
         return nullptr;
@@ -2568,7 +2567,6 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
         return nullptr;
     }
     GET_PARAMS(env, info, DM_NAPI_ARGS_TWO);
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, nullptr, &thisVar, nullptr));
     if (!CheckArgsCount(env, argc >= DM_NAPI_ARGS_TWO, "Wrong number of arguments, required 2")) {
         return nullptr;
     }
@@ -2582,13 +2580,13 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     if (!JsToStringAndCheck(env, argv[0], "deviceName", deviceName)) {
         return nullptr;
     }
-    if (deviceName.size() > DEIVCE_NAME_MAX_BYTES) {
+    if (deviceName.size() > DEVICE_NAME_MAX_BYTES) {
         LOGE("deviceName is too long");
         CreateBusinessError(env, ERR_DM_INIT_FAILED);
         return nullptr;
     }
     std::string deviceId = "";
-    if (!JsToStringAndCheck(env, argv[0], "deviceId", deviceName)) {
+    if (!JsToStringAndCheck(env, argv[1], "deviceId", deviceId)) {
         return nullptr;
     }
     auto *jsCallback = new SetRemoteDeviceNameAsyncCallbackInfo();
@@ -2605,7 +2603,7 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     return SetRemoteDeviceNamePromise(env, jsCallback);
 }
 
-napi_value DeviceManagerNapi::JsRestoreLocalDeivceName(napi_env env, napi_callback_info info)
+napi_value DeviceManagerNapi::JsRestoreLocalDeviceName(napi_env env, napi_callback_info info)
 {
     LOGI("In");
     if (!IsSystemApp()) {
@@ -2622,7 +2620,7 @@ napi_value DeviceManagerNapi::JsRestoreLocalDeivceName(napi_env env, napi_callba
         napi_create_uint32(env, ERR_DM_POINT_NULL, &result);
         return result;
     }
-    int32_t ret = DeviceManager::GetInstance().RestoreLocalDeivceName(deviceManagerWrapper->bundleName_);
+    int32_t ret = DeviceManager::GetInstance().RestoreLocalDeviceName(deviceManagerWrapper->bundleName_);
     if (ret != 0) {
         LOGE("bundleName %{public}s failed, ret %{public}d",
             deviceManagerWrapper->bundleName_.c_str(), ret);
@@ -2799,7 +2797,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getLocalDisplayDeviceName", JsGetLocalDisplayDeviceName),
         DECLARE_NAPI_FUNCTION("setLocalDeviceName", JsSetLocalDeviceName),
         DECLARE_NAPI_FUNCTION("setRemoteDeviceName", JsSetRemoteDeviceName),
-        DECLARE_NAPI_FUNCTION("restoreLocalDeivceName", JsRestoreLocalDeivceName),
+        DECLARE_NAPI_FUNCTION("restoreLocalDeivceName", JsRestoreLocalDeviceName),
         DECLARE_NAPI_FUNCTION("getDeviceNetworkIdList", JsGetDeviceNetworkIdList),
         DECLARE_NAPI_FUNCTION("setHeartbeatPolicy", SetHeartbeatPolicy)};
 

@@ -168,7 +168,7 @@ enum ScreenState {
 EXPORT extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
 // wise device
 EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
-const int32_t DEIVCE_NAME_MAX_BYTES = 100;
+const int32_t DEVICE_NAME_MAX_BYTES = 100;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

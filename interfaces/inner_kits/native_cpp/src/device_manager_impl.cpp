@@ -2882,7 +2882,7 @@ int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const
     return DM_OK;
 }
 
-int32_t DeviceManagerImpl::RestoreLocalDeivceName(const std::string &pkgName)
+int32_t DeviceManagerImpl::RestoreLocalDeviceName(const std::string &pkgName)
 {
     if (pkgName.empty()) {
         LOGE("param invalid, pkgName : %{public}s", pkgName.c_str());

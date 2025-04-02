@@ -3161,6 +3161,15 @@ int32_t DeviceManagerService::PutDeviceProfileInfoList(const std::string &pkgNam
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidPutDeviceProfileInfoList(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("GetDeviceProfileInfoList failed, adapter instance not init or init failed.");
