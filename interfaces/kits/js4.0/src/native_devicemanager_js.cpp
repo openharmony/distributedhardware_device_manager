@@ -2797,6 +2797,7 @@ napi_value DeviceManagerNapi::Init(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("getLocalDisplayDeviceName", JsGetLocalDisplayDeviceName),
         DECLARE_NAPI_FUNCTION("setLocalDeviceName", JsSetLocalDeviceName),
         DECLARE_NAPI_FUNCTION("setRemoteDeviceName", JsSetRemoteDeviceName),
+        DECLARE_NAPI_FUNCTION("restoreLocalDeviceName", JsRestoreLocalDeviceName),
         DECLARE_NAPI_FUNCTION("restoreLocalDeivceName", JsRestoreLocalDeviceName),
         DECLARE_NAPI_FUNCTION("getDeviceNetworkIdList", JsGetDeviceNetworkIdList),
         DECLARE_NAPI_FUNCTION("setHeartbeatPolicy", SetHeartbeatPolicy)};
