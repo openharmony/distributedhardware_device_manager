@@ -162,7 +162,6 @@ extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
 // wise device
 extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 
-extern const char* PICKER_PROXY_SPLIT;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

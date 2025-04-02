@@ -321,13 +321,11 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         return DM_OK;
     }
     if (!onlineDeviceList.empty() && IsDMServiceImplReady()) {
-        std::string queryPkgName = GetSubStr(pkgName, PICKER_PROXY_SPLIT, 1);
-        queryPkgName = queryPkgName.empty() ? pkgName : queryPkgName;
         std::unordered_map<std::string, DmAuthForm> udidMap;
-        if (PermissionManager::GetInstance().CheckWhiteListSystemSA(queryPkgName)) {
+        if (PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName)) {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
         } else {
-            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(queryPkgName);
+            udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);
         }
         for (auto item : onlineDeviceList) {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -731,15 +729,13 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
     uint64_t tokenId = 0;
-    std::string unbindPkgName = GetSubStr(pkgName, PICKER_PROXY_SPLIT, 1);
-    unbindPkgName = unbindPkgName.empty() ? pkgName : unbindPkgName;
-    int32_t bindLevel = dmServiceImpl_->GetBindLevel(unbindPkgName, std::string(localUdid), udid, tokenId);
+    int32_t bindLevel = dmServiceImpl_->GetBindLevel(pkgName, std::string(localUdid), udid, tokenId);
     LOGI("UnAuthenticateDevice get bindlevel %{public}d.", bindLevel);
     if (bindLevel == INVALIED_BIND_LEVEL) {
         LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
         return ERR_DM_FAILED;
     }
-    if (dmServiceImpl_->UnBindDevice(unbindPkgName, udid, bindLevel) != DM_OK) {
+    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
         return ERR_DM_FAILED;
     }
