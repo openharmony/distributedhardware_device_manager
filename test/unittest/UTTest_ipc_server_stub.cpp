@@ -686,6 +686,157 @@ HWTEST_F(IpcServerStubTest, Dump_001, testing::ext::TestSize.Level0)
     int32_t ret = IpcServerStub::GetInstance().Dump(fd, args);
     ASSERT_NE(ret, DM_OK);
 }
+
+HWTEST_F(IpcServerStubTest, HandleSoftBusServerAdd_001, testing::ext::TestSize.Level0)
+{
+    IpcServerStub::GetInstance().registerToService_ = true;
+    IpcServerStub::GetInstance().state_ = ServiceRunningState::STATE_NOT_START;
+    IpcServerStub::GetInstance().HandleSoftBusServerAdd();
+
+    EXPECT_EQ(ServiceRunningState::STATE_RUNNING, IpcServerStub::GetInstance().state_);
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
+
+HWTEST_F(IpcServerStubTest, HandleSoftBusServerAdd_002, testing::ext::TestSize.Level0)
+{
+    IpcServerStub::GetInstance().registerToService_ = false;
+    IpcServerStub::GetInstance().state_ = ServiceRunningState::STATE_NOT_START;
+    IpcServerStub::GetInstance().HandleSoftBusServerAdd();
+
+    EXPECT_EQ(ServiceRunningState::STATE_NOT_START, IpcServerStub::GetInstance().state_);
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
+
+HWTEST_F(IpcServerStubTest, AddDelimiter_001, testing::ext::TestSize.Level0)
+{
+    std::string input = "";
+    std::string result = IpcServerStub::GetInstance().AddDelimiter(input);
+    ASSERT_EQ(result, "");
+}
+
+HWTEST_F(IpcServerStubTest, AddDelimiter_002, testing::ext::TestSize.Level0)
+{
+    std::string input = "path/";
+    std::string result = IpcServerStub::GetInstance().AddDelimiter(input);
+    ASSERT_EQ(result, "path/");
+}
+
+HWTEST_F(IpcServerStubTest, AddDelimiter_003, testing::ext::TestSize.Level0)
+{
+    std::string input = "path";
+    std::string result = IpcServerStub::GetInstance().AddDelimiter(input);
+    ASSERT_EQ(result, "path/");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath_001, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path";
+    std::string subPath = "subpath";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
+    ASSERT_EQ(result, "path/subpath");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath_002, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path/";
+    std::string subPath = "subpath";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
+    ASSERT_EQ(result, "path/subpath");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath_003, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "";
+    std::string subPath = "subpath";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
+    ASSERT_EQ(result, "subpath");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath_004, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path";
+    std::string subPath = "";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
+    ASSERT_EQ(result, "path/");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath_005, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "";
+    std::string subPath = "";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
+    ASSERT_EQ(result, "");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath_006, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path";
+    std::string subPath = "/subpath";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
+    ASSERT_EQ(result, "path//subpath");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath_007, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path/";
+    std::string subPath = "/subpath";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, subPath);
+    ASSERT_EQ(result, "path//subpath");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath2_001, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path";
+    std::string midPath = "midpath";
+    std::string subPath = "subpath";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, midPath, subPath);
+    ASSERT_EQ(result, "path/midpath/subpath");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath2_002, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path";
+    std::string midPath = "";
+    std::string subPath = "subpath";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, midPath, subPath);
+    ASSERT_EQ(result, "path/subpath");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath2_003, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path";
+    std::string midPath = "midpath";
+    std::string subPath = "";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, midPath, subPath);
+    ASSERT_EQ(result, "path/midpath/");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath2_004, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "";
+    std::string midPath = "midpath";
+    std::string subPath = "";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, midPath, subPath);
+    ASSERT_EQ(result, "midpath/");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath2_005, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "";
+    std::string midPath = "";
+    std::string subPath = "";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, midPath, subPath);
+    ASSERT_EQ(result, "");
+}
+
+HWTEST_F(IpcServerStubTest, JoinPath2_006, testing::ext::TestSize.Level0)
+{
+    std::string prefixPath = "path/";
+    std::string midPath = "/midpath/";
+    std::string subPath = "/subpath";
+    std::string result = IpcServerStub::GetInstance().JoinPath(prefixPath, midPath, subPath);
+    ASSERT_EQ(result, "path//midpath//subpath");
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
