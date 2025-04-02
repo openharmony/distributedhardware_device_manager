@@ -94,5 +94,11 @@ bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &
     (void)processName;
     return true;
 }
+
+bool PermissionManager::CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName)
+{
+    (void)processName;
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

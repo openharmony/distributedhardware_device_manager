@@ -429,7 +429,7 @@ public:
         std::shared_ptr<SetLocalDeviceNameCallback> callback) override;
     virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
         const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback) override;
-    virtual int32_t RestoreLocalDeivceName(const std::string &pkgName) override;
+    virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) override;
     virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds) override;
 

@@ -1431,7 +1431,7 @@ int32_t DeviceManagerNotify::UnRegisterSetRemoteDeviceNameCallback(const std::st
     }
     iter->second.erase(deviceId);
     if (iter->second.empty()) {
-        getDeviceIconInfoCallback_.erase(pkgName);
+        setRemoteDeviceNameCallback_.erase(pkgName);
     }
     return DM_OK;
 }

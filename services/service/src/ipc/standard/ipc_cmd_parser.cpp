@@ -1859,8 +1859,8 @@ ON_IPC_SET_REQUEST(SET_REMOTE_DEVICE_NAME_RESULT, std::shared_ptr<IpcReq> pBaseR
         return ERR_DM_IPC_WRITE_FAILED;
     }
     std::string deviceId = pReq->GetDeviceId();
-    if (!data.WriteString(pkgName)) {
-        LOGE("write pkgName failed");
+    if (!data.WriteString(deviceId)) {
+        LOGE("write deviceId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     int32_t result = pReq->GetResult();
