@@ -71,6 +71,7 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
     if (authMgr_ == nullptr) {
         authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, hiChainConnector_, listener,
             hiChainAuthConnector_);
+        softbusConnector_->RegisterConnectorCallback(authMgr_);
         softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
         hiChainConnector_->RegisterHiChainCallback(authMgr_);
         hiChainAuthConnector_->RegisterHiChainAuthCallback(authMgr_);
@@ -93,6 +94,7 @@ void DeviceManagerServiceImpl::Release()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     commonEventManager_ = nullptr;
 #endif
+    softbusConnector_->UnRegisterConnectorCallback();
     softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
     hiChainConnector_->UnRegisterHiChainCallback();
     authMgr_ = nullptr;

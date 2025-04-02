@@ -44,7 +44,7 @@ DmTimer::~DmTimer()
 
 int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback callback)
 {
-    if (name.empty() || timeOut <= MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
+    if (name.empty() || timeOut < MIN_TIME_OUT || timeOut > MAX_TIME_OUT || callback == nullptr) {
         LOGE("DmTimer StartTimer input value invalid");
         return ERR_DM_INPUT_PARA_INVALID;
     }
