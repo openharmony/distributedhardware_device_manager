@@ -1553,14 +1553,12 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         realDeviceId = udidHashTemp;
     }
 #endif
+    std::map<std::string, std::string> unbindParamWithUdid(unbindParam);
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     std::string udid = "";
-    if (softbusListener_->GetUdidFromDp(realDeviceId, udid) != DM_OK) {
-        LOGE("Get udid by udidhash failed.");
-        return ERR_DM_FAILED;
+    if (softbusListener_->GetUdidFromDp(realDeviceId, udid) == DM_OK) {
+        unbindParamWithUdid.insert(std::pair<std::string, std::string>(UN_BIND_PARAM_UDID_KEY, udid));
     }
-    std::map<std::string, std::string> unbindParamWithUdid(unbindParam);
-    unbindParamWithUdid.insert(std::pair<std::string, std::string>(UN_BIND_PARAM_UDID_KEY, udid));
     return dmServiceImplExtResident_->UnbindTargetExt(pkgName, targetId, unbindParamWithUdid);
 }
 
