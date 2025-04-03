@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-EXPORT void ToJson(JsonItemObject &itemObject, const std::string &value)
+void ToJson(JsonItemObject &itemObject, const std::string &value)
 {
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
@@ -112,7 +112,7 @@ void ToJson(JsonItemObject &itemObject, const uint32_t &value)
 #endif
 }
 
-EXPORT void ToJson(JsonItemObject &itemObject, const int64_t &value)
+void ToJson(JsonItemObject &itemObject, const int64_t &value)
 {
     if (itemObject.item_ != nullptr) {
         cJSON_Delete(itemObject.item_);
@@ -136,7 +136,7 @@ void ToJson(JsonItemObject &itemObject, const uint64_t &value)
 #endif
 }
 
-EXPORT void FromJson(const JsonItemObject &itemObject, std::string &value)
+void FromJson(const JsonItemObject &itemObject, std::string &value)
 {
     itemObject.GetTo(value);
 }
@@ -184,7 +184,7 @@ void FromJson(const JsonItemObject &itemObject, uint32_t &value)
     value = static_cast<uint32_t>(tmpValue);
 }
 
-EXPORT void FromJson(const JsonItemObject &itemObject, int64_t &value)
+void FromJson(const JsonItemObject &itemObject, int64_t &value)
 {
     itemObject.GetTo(value);
 }
@@ -201,10 +201,10 @@ std::string ToString(const JsonItemObject &jsonItem)
     return jsonItem.Dump();
 }
 
-EXPORT JsonItemObject::JsonItemObject()
+JsonItemObject::JsonItemObject()
 {}
 
-EXPORT JsonItemObject::JsonItemObject(const JsonItemObject &object)
+JsonItemObject::JsonItemObject(const JsonItemObject &object)
 {
     item_ = object.item_;
     parent_ = object.parent_;
@@ -215,7 +215,7 @@ EXPORT JsonItemObject::JsonItemObject(const JsonItemObject &object)
     }
 }
 
-EXPORT JsonItemObject::~JsonItemObject()
+JsonItemObject::~JsonItemObject()
 {
     Delete();
 }
@@ -228,7 +228,7 @@ void JsonItemObject::Delete()
     item_ = nullptr;
 }
 
-EXPORT bool JsonItemObject::IsString() const
+bool JsonItemObject::IsString() const
 {
     if (item_ == nullptr) {
         return false;
@@ -245,7 +245,7 @@ bool JsonItemObject::IsNumber() const
 }
 
 #ifdef __CJSON_USE_INT64
-EXPORT bool JsonItemObject::IsNumberInteger() const
+bool JsonItemObject::IsNumberInteger() const
 {
     if (item_ == nullptr) {
         return false;
@@ -253,7 +253,7 @@ EXPORT bool JsonItemObject::IsNumberInteger() const
     return cJSON_IsInt64Number(item_);
 }
 #else
-EXPORT bool JsonItemObject::IsNumberInteger() const
+bool JsonItemObject::IsNumberInteger() const
 {
     if (!IsNumber()) {
         return false;
@@ -325,7 +325,7 @@ std::string JsonItemObject::DumpFormated() const
     return Dump(true);
 }
 
-EXPORT std::string JsonItemObject::Dump() const
+std::string JsonItemObject::Dump() const
 {
     return Dump(false);
 }
@@ -345,7 +345,7 @@ std::string JsonItemObject::Dump(bool formatFlag) const
     return out;
 }
 
-EXPORT JsonItemObject JsonItemObject::operator[](const std::string &key)
+JsonItemObject JsonItemObject::operator[](const std::string &key)
 {
     JsonItemObject itemObject = At(key);
     if (itemObject.item_ == nullptr) {
@@ -364,12 +364,12 @@ EXPORT JsonItemObject JsonItemObject::operator[](const std::string &key)
     return itemObject;
 }
 
-EXPORT const JsonItemObject JsonItemObject::operator[](const std::string &key) const
+const JsonItemObject JsonItemObject::operator[](const std::string &key) const
 {
     return At(key);
 }
 
-EXPORT bool JsonItemObject::Contains(const std::string &key) const
+bool JsonItemObject::Contains(const std::string &key) const
 {
     if (item_ == nullptr) {
         LOGE("item_ is nullptr");
@@ -379,7 +379,7 @@ EXPORT bool JsonItemObject::Contains(const std::string &key) const
     return (item != nullptr);
 }
 
-EXPORT bool JsonItemObject::IsDiscarded() const
+bool JsonItemObject::IsDiscarded() const
 {
     return (item_ == nullptr);
 }
@@ -579,7 +579,7 @@ std::vector<JsonItemObject> JsonItemObject::Items() const
     return items;
 }
 
-EXPORT bool JsonItemObject::InitItem(JsonItemObject &item)
+bool JsonItemObject::InitItem(JsonItemObject &item)
 {
     if (!beValid_) {
         LOGE("invalid item");
@@ -613,7 +613,7 @@ bool JsonItemObject::InitArray()
     return true;
 }
 
-EXPORT bool JsonItemObject::ReplaceItem(cJSON *newItem)
+bool JsonItemObject::ReplaceItem(cJSON *newItem)
 {
     if (parent_ != nullptr) {
         if (cJSON_IsObject(parent_)) {
@@ -656,14 +656,14 @@ JsonObject::JsonObject(JsonCreateType type)
     }
 }
 
-EXPORT JsonObject::JsonObject(const std::string &strJson)
+JsonObject::JsonObject(const std::string &strJson)
 {
     needDeleteItem_ = true;
     beValid_ = true;
     Parse(strJson);
 }
 
-EXPORT JsonObject::~JsonObject()
+JsonObject::~JsonObject()
 {
     Delete();
 }

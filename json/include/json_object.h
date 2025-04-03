@@ -21,10 +21,6 @@
 
 #include "dm_cJSON.h"
 
-#ifndef EXPORT
-#define EXPORT __attribute__ ((visibility ("default")))
-#endif // EXPORT
-
 namespace OHOS {
 namespace DistributedHardware {
 using namespace DmJson;
@@ -42,23 +38,23 @@ class JsonItemObject {
     friend void ToJson(JsonItemObject &itemObject, const int64_t &value);
     friend void ToJson(JsonItemObject &itemObject, const uint64_t &value);
 public:
-    EXPORT JsonItemObject(const JsonItemObject &object);
+    JsonItemObject(const JsonItemObject &object);
     JsonItemObject(const JsonObject &object) = delete;
-    EXPORT virtual ~JsonItemObject();
-    EXPORT bool IsString() const;
+    virtual ~JsonItemObject();
+    bool IsString() const;
     bool IsNumber() const;
-    EXPORT bool IsNumberInteger() const;
+    bool IsNumberInteger() const;
     bool IsArray() const;
     bool IsBoolean() const;
     bool IsObject() const;
     JsonItemObject& operator=(const JsonItemObject &object);
     JsonItemObject& operator=(const JsonObject &object) = delete;
-    EXPORT JsonItemObject operator[](const std::string &key);
-    EXPORT const JsonItemObject operator[](const std::string &key) const;
+    JsonItemObject operator[](const std::string &key);
+    const JsonItemObject operator[](const std::string &key) const;
     std::string DumpFormated() const;
     std::string Dump() const;
-    EXPORT bool Contains(const std::string &key) const;
-    EXPORT bool IsDiscarded() const;
+    bool Contains(const std::string &key) const;
+    bool IsDiscarded() const;
     bool PushBack(const std::string &strValue);
     bool PushBack(const double &value);
     bool PushBack(const int64_t &value);
@@ -133,13 +129,13 @@ public:
         return *this;
     }
 protected:
-    EXPORT JsonItemObject();
+    JsonItemObject();
     void Delete();
-    EXPORT std::string Dump(bool formatFlag) const;
+    std::string Dump(bool formatFlag) const;
     bool AddToArray(cJSON *newItem);
-    EXPORT bool InitItem(JsonItemObject &item);
+    bool InitItem(JsonItemObject &item);
     bool InitArray();
-    EXPORT bool ReplaceItem(cJSON *newItem);
+    bool ReplaceItem(cJSON *newItem);
 protected:
     cJSON *item_ = nullptr;
     cJSON *parent_ = nullptr;
@@ -158,16 +154,16 @@ class JsonObject : public JsonItemObject {
 public:
     using JsonItemObject::operator=;
     JsonObject(JsonCreateType type = JsonCreateType::JSON_CREATE_TYPE_OBJECT);
-    EXPORT JsonObject(const std::string &strJson);
+    JsonObject(const std::string &strJson);
     JsonObject(const JsonObject &object) = delete;
     JsonObject& operator=(const JsonObject &object) = delete;
     JsonObject& operator=(const JsonItemObject &object) = delete;
-    EXPORT ~JsonObject();
+    ~JsonObject();
     bool Parse(const std::string &strJson);
     void Duplicate(const JsonObject &object);
 };
 
-EXPORT void ToJson(JsonItemObject &itemObject, const std::string &value);
+void ToJson(JsonItemObject &itemObject, const std::string &value);
 void ToJson(JsonItemObject &itemObject, const char *value);
 void ToJson(JsonItemObject &itemObject, const double &value);
 void ToJson(JsonItemObject &itemObject, const bool &value);
@@ -176,9 +172,9 @@ void ToJson(JsonItemObject &itemObject, const int16_t &value);
 void ToJson(JsonItemObject &itemObject, const uint16_t &value);
 void ToJson(JsonItemObject &itemObject, const int32_t &value);
 void ToJson(JsonItemObject &itemObject, const uint32_t &value);
-EXPORT void ToJson(JsonItemObject &itemObject, const int64_t &value);
+void ToJson(JsonItemObject &itemObject, const int64_t &value);
 void ToJson(JsonItemObject &itemObject, const uint64_t &value);
-EXPORT void FromJson(const JsonItemObject &itemObject, std::string &value);
+void FromJson(const JsonItemObject &itemObject, std::string &value);
 void FromJson(const JsonItemObject &itemObject, double &value);
 void FromJson(const JsonItemObject &itemObject, bool &value);
 void FromJson(const JsonItemObject &itemObject, uint8_t &value);
@@ -186,7 +182,7 @@ void FromJson(const JsonItemObject &itemObject, int16_t &value);
 void FromJson(const JsonItemObject &itemObject, uint16_t &value);
 void FromJson(const JsonItemObject &itemObject, int32_t &value);
 void FromJson(const JsonItemObject &itemObject, uint32_t &value);
-EXPORT void FromJson(const JsonItemObject &itemObject, int64_t &value);
+void FromJson(const JsonItemObject &itemObject, int64_t &value);
 void FromJson(const JsonItemObject &itemObject, uint64_t &value);
 std::string ToString(const JsonItemObject &jsonItem);
 } // namespace DistributedHardware
