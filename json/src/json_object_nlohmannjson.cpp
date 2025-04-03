@@ -15,125 +15,91 @@
 
 #include "json_object.h"
 
+#include "nlohmann/json.hpp"
 #include "dm_log.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+static nlohmann::json *GetJsonPointer(void *pointer)
+{
+    return static_cast<nlohmann::json*>(pointer);
+}
 
 void ToJson(JsonItemObject &itemObject, const std::string &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-    itemObject.item_ = cJSON_CreateString(value.c_str());
 }
 
 void ToJson(JsonItemObject &itemObject, const char *value)
 {
-    if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+    if (itemObject.item_ != nullptr && value != nullptr) {
+        *GetJsonPointer(itemObject.item_) = std::string(value);
     }
-    itemObject.item_ = cJSON_CreateString(value);
 }
 
 void ToJson(JsonItemObject &itemObject, const double &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-    itemObject.item_ = cJSON_CreateNumber(value);
 }
 
 void ToJson(JsonItemObject &itemObject, const bool &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-    itemObject.item_ = value ? cJSON_CreateTrue() : cJSON_CreateFalse();
 }
 
 void ToJson(JsonItemObject &itemObject, const uint8_t &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = (int)value;
     }
-#ifdef __CJSON_USE_INT64
-    itemObject.item_ = cJSON_CreateInt64Number(value);
-#else
-    itemObject.item_ = cJSON_CreateNumber(value);
-#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const int16_t &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-#ifdef __CJSON_USE_INT64
-    itemObject.item_ = cJSON_CreateInt64Number(value);
-#else
-    itemObject.item_ = cJSON_CreateNumber(value);
-#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const uint16_t &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-#ifdef __CJSON_USE_INT64
-    itemObject.item_ = cJSON_CreateInt64Number(value);
-#else
-    itemObject.item_ = cJSON_CreateNumber(value);
-#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const int32_t &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-#ifdef __CJSON_USE_INT64
-    itemObject.item_ = cJSON_CreateInt64Number(value);
-#else
-    itemObject.item_ = cJSON_CreateNumber(value);
-#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const uint32_t &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-#ifdef __CJSON_USE_INT64
-    itemObject.item_ = cJSON_CreateInt64Number(value);
-#else
-    itemObject.item_ = cJSON_CreateNumber(value);
-#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const int64_t &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-#ifdef __CJSON_USE_INT64
-    itemObject.item_ = cJSON_CreateInt64Number(value);
-#else
-    itemObject.item_ = cJSON_CreateNumber(value);
-#endif
 }
 
 void ToJson(JsonItemObject &itemObject, const uint64_t &value)
 {
     if (itemObject.item_ != nullptr) {
-        cJSON_Delete(itemObject.item_);
+        *GetJsonPointer(itemObject.item_) = value;
     }
-#ifdef __CJSON_USE_INT64
-    itemObject.item_ = cJSON_CreateInt64Number(value);
-#else
-    itemObject.item_ = cJSON_CreateNumber(value);
-#endif
 }
 
 void FromJson(const JsonItemObject &itemObject, std::string &value)
@@ -206,12 +172,17 @@ JsonItemObject::JsonItemObject()
 
 JsonItemObject::JsonItemObject(const JsonItemObject &object)
 {
-    item_ = object.item_;
     parent_ = object.parent_;
     itemName_ = object.itemName_;
+    itemIndex_ = object.itemIndex_;
     needDeleteItem_ = object.needDeleteItem_;
-    if (object.needDeleteItem_) {
-        item_ = cJSON_Duplicate(object.item_, cJSON_True);
+    if (object.needDeleteItem_ && object.item_ != nullptr) {
+        item_ = new nlohmann::json();
+        if (item_ != nullptr) {
+            *GetJsonPointer(item_) = *GetJsonPointer(object.item_);
+        }
+    } else {
+        item_ = object.item_;
     }
 }
 
@@ -223,7 +194,8 @@ JsonItemObject::~JsonItemObject()
 void JsonItemObject::Delete()
 {
     if (needDeleteItem_ && item_ != nullptr) {
-        cJSON_Delete(item_);
+        nlohmann::json *item = GetJsonPointer(item_);
+        delete item;
     }
     item_ = nullptr;
 }
@@ -233,7 +205,7 @@ bool JsonItemObject::IsString() const
     if (item_ == nullptr) {
         return false;
     }
-    return cJSON_IsString(item_);
+    return GetJsonPointer(item_)->is_string();
 }
 
 bool JsonItemObject::IsNumber() const
@@ -241,35 +213,23 @@ bool JsonItemObject::IsNumber() const
     if (item_ == nullptr) {
         return false;
     }
-    return cJSON_IsNumber(item_);
+    return GetJsonPointer(item_)->is_number();
 }
 
-#ifdef __CJSON_USE_INT64
 bool JsonItemObject::IsNumberInteger() const
 {
     if (item_ == nullptr) {
         return false;
     }
-    return cJSON_IsInt64Number(item_);
+    return GetJsonPointer(item_)->is_number_integer();
 }
-#else
-bool JsonItemObject::IsNumberInteger() const
-{
-    if (!IsNumber()) {
-        return false;
-    }
-    double value = 0.0;
-    GetTo(value);
-    return ((value - static_cast<int64_t>(value)) == 0);
-}
-#endif
 
 bool JsonItemObject::IsArray() const
 {
     if (item_ == nullptr) {
         return false;
     }
-    return cJSON_IsArray(item_);
+    return GetJsonPointer(item_)->is_array();
 }
 
 bool JsonItemObject::IsBoolean() const
@@ -277,7 +237,7 @@ bool JsonItemObject::IsBoolean() const
     if (item_ == nullptr) {
         return false;
     }
-    return cJSON_IsBool(item_);
+    return GetJsonPointer(item_)->is_boolean();
 }
 
 bool JsonItemObject::IsObject() const
@@ -285,7 +245,7 @@ bool JsonItemObject::IsObject() const
     if (item_ == nullptr) {
         return false;
     }
-    return cJSON_IsObject(item_);
+    return GetJsonPointer(item_)->is_object();
 }
 
 void JsonItemObject::Insert(const std::string &key, const JsonItemObject &object)
@@ -294,28 +254,24 @@ void JsonItemObject::Insert(const std::string &key, const JsonItemObject &object
         LOGE("invalid item or object item");
         return;
     }
-    cJSON *newItem = cJSON_Duplicate(object.item_, cJSON_True);
-    if (newItem == nullptr) {
-        LOGE("copy item fail");
-        return;
-    }
-    if (cJSON_GetObjectItemCaseSensitive(item_, key.c_str()) != nullptr) {
-        cJSON_DeleteItemFromObjectCaseSensitive(item_, key.c_str());
-    }
-    if (!cJSON_AddItemToObject(item_, key.c_str(), newItem)) {
-        LOGE("add new item to object fail");
-        cJSON_Delete(newItem);
-    }
+    (*GetJsonPointer(item_))[key] = *GetJsonPointer(object.item_);
 }
 
 JsonItemObject& JsonItemObject::operator=(const JsonItemObject &object)
 {
-    item_ = object.item_;
     parent_ = object.parent_;
     itemName_ = object.itemName_;
+    itemIndex_ = object.itemIndex_;
     needDeleteItem_ = object.needDeleteItem_;
-    if (object.needDeleteItem_) {
-        item_ = cJSON_Duplicate(object.item_, cJSON_True);
+    if (object.needDeleteItem_ && object.item_ != nullptr) {
+        if (item_ == nullptr) {
+            item_ = new nlohmann::json();
+        }
+        if (item_ != nullptr) {
+            *GetJsonPointer(item_) = *GetJsonPointer(object.item_);
+        }
+    } else {
+        item_ = object.item_;
     }
     return *this;
 }
@@ -336,30 +292,19 @@ std::string JsonItemObject::Dump(bool formatFlag) const
         LOGE("item_ is nullptr");
         return "";
     }
-    char* jsonString = formatFlag ? cJSON_Print(item_) : cJSON_PrintUnformatted(item_);
-    if (jsonString == nullptr) {
-        return "";
+    if (formatFlag) {
+        return GetJsonPointer(item_)->dump(1, '\t', false, nlohmann::detail::error_handler_t::ignore);
     }
-    std::string out(jsonString);
-    cJSON_free(jsonString);
-    return out;
+    return GetJsonPointer(item_)->dump();
 }
 
 JsonItemObject JsonItemObject::operator[](const std::string &key)
 {
     JsonItemObject itemObject = At(key);
     if (itemObject.item_ == nullptr) {
-        itemObject.item_ = cJSON_CreateNull();
-        if (itemObject.item_ == nullptr) {
-            return itemObject;
-        }
-        if (!cJSON_AddItemToObject(item_, key.c_str(), itemObject.item_)) {
-            LOGE("add item to object fail");
-            cJSON_Delete(itemObject.item_);
-            itemObject.item_ = nullptr;
-        } else {
-            itemObject.beValid_ = true;
-        }
+        auto& newItem = (*GetJsonPointer(item_))[key];
+        itemObject.item_ = &newItem;
+        itemObject.beValid_ = true;
     }
     return itemObject;
 }
@@ -375,13 +320,16 @@ bool JsonItemObject::Contains(const std::string &key) const
         LOGE("item_ is nullptr");
         return false;
     }
-    cJSON* item = cJSON_GetObjectItemCaseSensitive(item_, key.c_str());
-    return (item != nullptr);
+    return GetJsonPointer(item_)->contains(key);
 }
 
 bool JsonItemObject::IsDiscarded() const
 {
-    return (item_ == nullptr);
+    if (item_ == nullptr) {
+        LOGE("item_ is nullptr");
+        return true;
+    }
+    return GetJsonPointer(item_)->is_discarded();
 }
 
 bool JsonItemObject::PushBack(const std::string &strValue)
@@ -390,12 +338,12 @@ bool JsonItemObject::PushBack(const std::string &strValue)
         LOGE("item_ is nullptr");
         return false;
     }
-    if (item_->type != cJSON_Array) {
+    if (!GetJsonPointer(item_)->is_array()) {
         LOGE("item_ type is not array");
         return false;
     }
-    cJSON *newItem = cJSON_CreateString(strValue.c_str());
-    return AddToArray(newItem);
+    GetJsonPointer(item_)->push_back(strValue);
+    return true;
 }
 
 bool JsonItemObject::PushBack(const double &value)
@@ -404,12 +352,12 @@ bool JsonItemObject::PushBack(const double &value)
         LOGE("item_ is nullptr");
         return false;
     }
-    if (item_->type != cJSON_Array) {
+    if (!GetJsonPointer(item_)->is_array()) {
         LOGE("item_ type is not array");
         return false;
     }
-    cJSON *newItem = cJSON_CreateNumber(value);
-    return AddToArray(newItem);
+    GetJsonPointer(item_)->push_back(value);
+    return true;
 }
 
 bool JsonItemObject::PushBack(const int64_t &value)
@@ -418,62 +366,48 @@ bool JsonItemObject::PushBack(const int64_t &value)
         LOGE("item_ is nullptr");
         return false;
     }
-    if (item_->type != cJSON_Array) {
+    if (!GetJsonPointer(item_)->is_array()) {
         LOGE("item_ type is not array");
         return false;
     }
-#ifdef __CJSON_USE_INT64
-    cJSON *newItem = cJSON_CreateInt64Number(value);
-#else
-    cJSON *newItem = cJSON_CreateNumber(static_cast<double>(value));
-#endif
-    return AddToArray(newItem);
+    GetJsonPointer(item_)->push_back(value);
+    return true;
 }
 
 bool JsonItemObject::PushBack(const JsonItemObject &item)
 {
-    if (item_ == nullptr) {
-        LOGE("item_ is nullptr");
+    if (item_ == nullptr || item.item_ == nullptr) {
+        LOGE("item_ or item.item_ is nullptr");
         return false;
     }
-    if (!item.beValid_ || !beValid_) {
-        return false;
-    }
-    if (item_->type != cJSON_Array) {
+    if (!GetJsonPointer(item_)->is_array()) {
         LOGE("item_ type is not array");
         return false;
     }
-    cJSON* newItem = cJSON_Duplicate(item.item_, cJSON_True);
-    return AddToArray(newItem);
+    GetJsonPointer(item_)->push_back(*GetJsonPointer(item.item_));
+    return true;
 }
 
-bool JsonItemObject::AddToArray(cJSON *newItem)
+void JsonItemObject::AddItemToArray(JsonItemObject &item)
 {
-    if (item_ == nullptr) {
-        LOGE("item_ is nullptr");
-        return false;
-    }
-    if (!cJSON_AddItemToArray(item_, newItem)) {
-        LOGE("add item to array fail");
-        cJSON_Delete(newItem);
-        return false;
-    }
-    return true;
+    PushBack(item);
 }
 
 std::string JsonItemObject::Key() const
 {
-    if (item_ != nullptr) {
-        return std::string(item_->string);
-    }
     return itemName_;
 }
 
 JsonItemObject JsonItemObject::At(const std::string &key) const
 {
     JsonItemObject operationItem;
-    operationItem.item_ = cJSON_GetObjectItemCaseSensitive(item_, key.c_str());
-    if (operationItem.item_ != nullptr) {
+    if (item_ == nullptr) {
+        LOGE("item_ is nullptr");
+        return operationItem;
+    }
+    if (Contains(key)) {
+        auto& findItem = GetJsonPointer(item_)->at(key);
+        operationItem.item_ = &findItem;
         operationItem.beValid_ = true;
     }
     operationItem.parent_ = item_;
@@ -491,11 +425,7 @@ void JsonItemObject::GetTo(std::string &value) const
     if (!IsString()) {
         return;
     }
-    const char* strValue = cJSON_GetStringValue(item_);
-    if (strValue == nullptr) {
-        return;
-    }
-    value = std::string(strValue);
+    GetJsonPointer(item_)->get_to(value);
 }
 
 void JsonItemObject::GetTo(double &value) const
@@ -508,7 +438,7 @@ void JsonItemObject::GetTo(double &value) const
     if (!IsNumber()) {
         return;
     }
-    value = cJSON_GetNumberValue(item_);
+    GetJsonPointer(item_)->get_to(value);
 }
 
 void JsonItemObject::GetTo(int32_t &value) const
@@ -535,17 +465,7 @@ void JsonItemObject::GetTo(int64_t &value) const
     if (!IsNumberInteger()) {
         return;
     }
-#ifdef __CJSON_USE_INT64
-    long long *pValue = cJSON_GetInt64NumberValue(item_);
-    if (pValue == nullptr) {
-        LOGE("value is null");
-        return;
-    }
-    value = *pValue;
-#else
-    double tmpValue = cJSON_GetNumberValue(item_);
-    value = static_cast<int64_t>(tmpValue);
-#endif
+    GetJsonPointer(item_)->get_to(value);
 }
 
 void JsonItemObject::GetTo(bool &value) const
@@ -558,7 +478,7 @@ void JsonItemObject::GetTo(bool &value) const
     if (!IsBoolean()) {
         return;
     }
-    value = cJSON_IsTrue(item_) ? true : false;
+    GetJsonPointer(item_)->get_to(value);
 }
 
 std::vector<JsonItemObject> JsonItemObject::Items() const
@@ -567,14 +487,12 @@ std::vector<JsonItemObject> JsonItemObject::Items() const
     if (item_ == nullptr) {
         return items;
     }
-    cJSON *current = nullptr;
-    if (item_->type == cJSON_Object || item_->type == cJSON_Array) {
-        cJSON_ArrayForEach(current, item_) {
-            JsonItemObject child;
-            child.item_ = current;
-            child.parent_ = item_;
-            items.push_back(child);
-        }
+    for (auto &element : GetJsonPointer(item_)->items()) {
+        JsonItemObject newItem;
+        newItem.itemName_ = element.key();
+        newItem.item_ = &(element.value());
+        newItem.parent_ = item_;
+        items.push_back(newItem);
     }
     return items;
 }
@@ -585,10 +503,13 @@ bool JsonItemObject::InitItem(JsonItemObject &item)
         LOGE("invalid item");
         return false;
     }
-    item.item_ = cJSON_CreateObject();
     if (item.item_ == nullptr) {
-        LOGE("create new object item fail");
-        return false;
+        item.needDeleteItem_ = true;
+        item.item_ = new nlohmann::json();
+        if (item.item_ == nullptr) {
+            LOGE("new item fail");
+            return false;
+        }
     }
     item.parent_ = parent_;
     item.beValid_ = true;
@@ -599,38 +520,28 @@ bool JsonItemObject::InitItem(JsonItemObject &item)
 
 bool JsonItemObject::InitArray()
 {
-    if (!beValid_) {
+    if (!beValid_ || item_ == nullptr) {
         return false;
     }
-    cJSON *newItem = cJSON_CreateArray();
-    if (newItem == nullptr) {
-        return false;
-    }
-    if (!ReplaceItem(newItem)) {
-        cJSON_Delete(newItem);
-        return false;
-    }
+    *GetJsonPointer(item_) = nlohmann::json::array({});
     return true;
 }
 
-bool JsonItemObject::ReplaceItem(cJSON *newItem)
+bool JsonItemObject::ReplaceItem(void *newItem)
 {
-    if (parent_ != nullptr) {
-        if (cJSON_IsObject(parent_)) {
-            if (!cJSON_ReplaceItemInObjectCaseSensitive(parent_, itemName_.c_str(), newItem)) {
-                LOGE("replace item in object fail, itemName:%{public}s", itemName_.c_str());
-                return false;
-            }
-        } else if (cJSON_IsArray(parent_) && itemIndex_ >= 0 && itemIndex_ < cJSON_GetArraySize(parent_)) {
-            if (!cJSON_ReplaceItemInArray(parent_, itemIndex_, newItem)) {
-                LOGE("replace item in array fail, itemIndex:%{public}d", itemIndex_);
-                return false;
-            }
-        }
-    } else {
-        cJSON_Delete(item_);
+    if (newItem == nullptr) {
+        LOGE("newItem is null");
+        return false;
     }
-    item_ = newItem;
+    if (item_ == nullptr) {
+        needDeleteItem_ = true;
+        item_ = new nlohmann::json();
+        if (item_ == nullptr) {
+            LOGE("new item fail");
+            return false;
+        }
+    }
+    *GetJsonPointer(item_) = *GetJsonPointer(newItem);
     return true;
 }
 
@@ -640,7 +551,7 @@ void JsonItemObject::Erase(const std::string &key)
         return;
     }
     if (IsObject()) {
-        cJSON_DeleteItemFromObjectCaseSensitive(item_, key.c_str());
+        GetJsonPointer(item_)->erase(key);
     }
 }
 
@@ -648,19 +559,23 @@ void JsonItemObject::Erase(const std::string &key)
 JsonObject::JsonObject(JsonCreateType type)
 {
     needDeleteItem_ = true;
-    beValid_ = true;
-    if (type == JsonCreateType::JSON_CREATE_TYPE_OBJECT) {
-        item_ = cJSON_CreateObject();
-    } else {
-        item_ = cJSON_CreateArray();
+    item_ = new nlohmann::json();
+    if (item_ != nullptr) {
+        beValid_ = true;
+        if (type == JsonCreateType::JSON_CREATE_TYPE_ARRAY) {
+            *GetJsonPointer(item_) = nlohmann::json::array({});
+        }
     }
 }
 
 JsonObject::JsonObject(const std::string &strJson)
 {
     needDeleteItem_ = true;
-    beValid_ = true;
-    Parse(strJson);
+    item_ = new nlohmann::json();
+    if (item_ != nullptr) {
+        beValid_ = true;
+        Parse(strJson);
+    }
 }
 
 JsonObject::~JsonObject()
@@ -670,19 +585,23 @@ JsonObject::~JsonObject()
 
 bool JsonObject::Parse(const std::string &strJson)
 {
-    Delete();
+    if (item_ == nullptr) {
+        return false;
+    }
     if (!strJson.empty()) {
-        item_ = cJSON_Parse(strJson.c_str());
+        *GetJsonPointer(item_) = nlohmann::json::parse(strJson, nullptr, false);
         return true;
     }
     LOGE("strJson is empty");
+    *GetJsonPointer(item_) = nlohmann::json::parse(strJson, nullptr, false);
     return false;
 }
 
 void JsonObject::Duplicate(const JsonObject &object)
 {
-    Delete();
-    item_ = cJSON_Duplicate(object.item_, cJSON_True);
+    if (item_ != nullptr && object.item_ != nullptr) {
+        *GetJsonPointer(item_) = *GetJsonPointer(object.item_);
+    }
 }
 
 } // namespace DistributedHardware

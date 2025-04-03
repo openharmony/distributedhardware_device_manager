@@ -62,7 +62,6 @@ ohos_shared_library("distributeddevicemanager") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"devicemanagerkit_js\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 
   external_deps = [

@@ -14,12 +14,11 @@
  */
 #include "dm_kv_info.h"
 
-#include "dm_cJSON.h"
+#include "cJSON.h"
 #include "dm_anonymous.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace DmJson;
 constexpr const char* UDID_HASH_KEY = "udidHash";
 constexpr const char* APP_ID_KEY = "appID";
 constexpr const char* ANOY_DEVICE_ID_KEY = "anoyDeviceId";

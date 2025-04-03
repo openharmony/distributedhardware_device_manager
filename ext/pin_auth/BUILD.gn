@@ -101,7 +101,6 @@ ohos_shared_library("devicemanagerext_pin_auth") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"devicemanagerext\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 
   subsystem_name = "distributedhardware"

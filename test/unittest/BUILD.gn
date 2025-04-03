@@ -197,6 +197,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_service") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
@@ -375,6 +376,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -401,6 +403,7 @@ ohos_unittest("UTTest_dm_softbus_cache") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -432,6 +435,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -558,6 +562,7 @@ ohos_unittest("UTTest_mine_softbus_listener") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -588,6 +593,7 @@ ohos_unittest("UTTest_softbus_connector") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -626,6 +632,7 @@ ohos_unittest("UTTest_softbus_listener") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -658,6 +665,7 @@ ohos_unittest("UTTest_softbus_listener_two") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -797,6 +805,7 @@ ohos_unittest("UTTest_dm_transport") {
   sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_transport.cpp" ]
   deps = [ ":device_manager_test_common" ]
   external_deps = [
+    "cJSON:cjson",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "googletest:gmock",
@@ -814,6 +823,7 @@ ohos_unittest("UTTest_dm_transport_msg") {
       [ "${devicemanager_path}/test/unittest/UTTest_dm_transport_msg.cpp" ]
   deps = [ ":device_manager_test_common" ]
   external_deps = [
+    "cJSON:cjson",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -905,6 +915,7 @@ ohos_unittest("UTTest_ipc_server_client_proxy") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
@@ -950,6 +961,7 @@ ohos_unittest("UTTest_ipc_server_stub") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
@@ -1529,6 +1541,7 @@ ohos_unittest("UTTest_discovery_manager") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1637,6 +1650,7 @@ ohos_unittest("UTTest_dm_comm_tool") {
   ]
   deps = [ ":device_manager_test_common" ]
   external_deps = [
+    "cJSON:cjson",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
     "googletest:gmock",
@@ -1735,7 +1749,10 @@ ohos_unittest("UTTest_relationship_sync_mgr") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "cJSON:cjson",
+    "hilog:libhilog",
+  ]
 }
 
 ## UnitTest UTTest_relationship_sync_mgr }}}
@@ -1917,6 +1934,7 @@ ohos_unittest("UTTest_advertise_manager") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -1998,7 +2016,6 @@ config("device_manager_test_common_public_config") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"device_manager_UTtest\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 }
 

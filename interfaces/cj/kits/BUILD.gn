@@ -65,7 +65,6 @@ ohos_shared_library("cj_distributed_device_manager_ffi") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"cj_distrubuted_devicemanager\"",
     "LOG_DOMAIN=0xD004111",
-    "__CJSON_USE_INT64",
   ]
 
   external_deps = [

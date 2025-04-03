@@ -19,11 +19,8 @@
 #include <string>
 #include <vector>
 
-#include "dm_cJSON.h"
-
 namespace OHOS {
 namespace DistributedHardware {
-using namespace DmJson;
 class JsonObject;
 class JsonItemObject {
     friend void ToJson(JsonItemObject &itemObject, const std::string &value);
@@ -119,12 +116,7 @@ public:
             operationItem.parent_ = item_;
             operationItem.beValid_ = true;
             operationItem = value;
-            if (cJSON_AddItemToArray(item_, operationItem.item_)) {
-                operationItem.itemIndex_ = cJSON_GetArraySize(item_) - 1;
-            } else if (operationItem.item_ != nullptr) {
-                // item add fail, need delete
-                operationItem.needDeleteItem_ = true;
-            }
+            AddItemToArray(operationItem);
         }
         return *this;
     }
@@ -132,13 +124,13 @@ protected:
     JsonItemObject();
     void Delete();
     std::string Dump(bool formatFlag) const;
-    bool AddToArray(cJSON *newItem);
+    void AddItemToArray(JsonItemObject &item);
     bool InitItem(JsonItemObject &item);
     bool InitArray();
-    bool ReplaceItem(cJSON *newItem);
+    bool ReplaceItem(void *newItem);
 protected:
-    cJSON *item_ = nullptr;
-    cJSON *parent_ = nullptr;
+    void *item_ = nullptr;
+    void *parent_ = nullptr;
     int32_t itemIndex_ = -1;
     bool needDeleteItem_ = false;
     bool beValid_ = false;

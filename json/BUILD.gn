@@ -26,16 +26,22 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
       ]
 
-      sources = [
-        "src/dm_cJSON.cpp",
-        "src/json_object.cpp",
-      ]
+      if (use_nlohmann_json) {
+        include_dirs += [ "//third_party/json/include" ]
+      } else {
+        include_dirs += [ "//third_party/cJSON" ]
+      }
+
+      if (use_nlohmann_json) {
+        sources = [ "src/json_object_nlohmannjson.cpp" ]
+      } else {
+        sources = [ "src/json_object_cjson.cpp" ]
+      }
 
       defines = [
         "HI_LOG_ENABLE",
         "DH_LOG_TAG=\"devicemanagerjson\"",
         "LOG_DOMAIN=0xD004110",
-        "CJSON_NESTING_LIMIT=(128)",
       ]
 
       deps = [ "${hilog_path}:hilog_shared" ]
@@ -82,22 +88,27 @@ if (defined(ohos_lite)) {
 
     configs = [ ":cflags_config" ]
 
-    sources = [
-      "src/dm_cJSON.cpp",
-      "src/json_object.cpp",
-    ]
+    if (use_nlohmann_json) {
+      sources = [ "src/json_object_nlohmannjson.cpp" ]
+    } else {
+      sources = [ "src/json_object_cjson.cpp" ]
+    }
 
     defines = [
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerjson\"",
       "LOG_DOMAIN=0xD004110",
-      "CJSON_NESTING_LIMIT=(128)",
-      "__CJSON_USE_INT64",
     ]
 
     deps = []
 
     external_deps = [ "hilog:libhilog" ]
+
+    if (use_nlohmann_json) {
+      external_deps += [ "json:nlohmann_json_static" ]
+    } else {
+      external_deps += [ "cJSON:cjson" ]
+    }
 
     subsystem_name = "distributedhardware"
 

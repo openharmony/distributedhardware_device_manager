@@ -15,7 +15,7 @@
 
 #include "dm_language_manager.h"
 
-#include "dm_cJSON.h"
+#include "cJSON.h"
 #include <map>
 
 #include "dm_constants.h"

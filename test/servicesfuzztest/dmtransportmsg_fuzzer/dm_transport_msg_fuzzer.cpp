@@ -23,12 +23,12 @@
 #include "dm_transport_msg.h"
 #include "dm_transport_msg_fuzzer.h"
 #include "dm_comm_tool.h"
-#include "dm_cJSON.h"
+#include "cJSON.h"
 
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace DmJson;
+
 namespace {
     constexpr uint32_t FORUSERID = 10;
     constexpr uint32_t BACKUSERID = 20;

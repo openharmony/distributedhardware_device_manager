@@ -50,6 +50,7 @@ ohos_fuzztest("SoftbusListenerGetLocalDeviceInfoFuzzTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "cJSON:cjson",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
@@ -66,7 +67,6 @@ ohos_fuzztest("SoftbusListenerGetLocalDeviceInfoFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"SoftbusListenerGetLocalDeviceInfoFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 }
 

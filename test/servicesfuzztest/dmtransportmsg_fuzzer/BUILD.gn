@@ -72,10 +72,10 @@ ohos_fuzztest("DmTransPortMsgFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"DmTransPortMsgFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",

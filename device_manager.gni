@@ -36,6 +36,7 @@ dm_ldflags = [ "-lpthread" ]
 declare_args() {
   device_manager_no_interaction_auth = false
   device_manager_feature_product = "default"
+  use_nlohmann_json = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.account_os_account)) {

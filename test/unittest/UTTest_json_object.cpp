@@ -43,6 +43,16 @@ void FromJson(const JsonItemObject &itemObject, TestJsonStru &testObj)
     }
 }
 
+bool CheckJsonString(const std::vector<std::string>& checkJsons, const std::string& strJson)
+{
+    for (const auto& checkStr : checkJsons) {
+        if (checkStr == strJson) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void JsonObjectTest::SetUp()
 {
 }
@@ -129,8 +139,10 @@ HWTEST_F(JsonObjectTest, SetValue_006, testing::ext::TestSize.Level1)
     JsonObject object2;
     object2["TEST2"] = "value2";
     object1.Insert("OBJ", object2);
-    std::string strRet = R"({"TEST1":"value1","OBJ":{"TEST2":"value2"}})";
-    EXPECT_EQ(strRet, object1.Dump());
+    std::vector<std::string> checkJsons;
+    checkJsons.push_back(R"({"TEST1":"value1","OBJ":{"TEST2":"value2"}})");
+    checkJsons.push_back(R"({"OBJ":{"TEST2":"value2"},"TEST1":"value1"})");
+    EXPECT_TRUE(CheckJsonString(checkJsons, object1.Dump()));
 }
 
 HWTEST_F(JsonObjectTest, SetValue_007, testing::ext::TestSize.Level1)
@@ -197,8 +209,10 @@ HWTEST_F(JsonObjectTest, SetValue_011, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST"] = 25;
-    std::string strRet = "{\n\t\"TEST\":\t25\n}";
-    EXPECT_EQ(strRet, object.DumpFormated());
+    std::vector<std::string> checkJsons;
+    checkJsons.push_back("{\n\t\"TEST\":\t25\n}");
+    checkJsons.push_back("{\n\t\"TEST\": 25\n}");
+    EXPECT_TRUE(CheckJsonString(checkJsons, object.DumpFormated()));
 }
 
 HWTEST_F(JsonObjectTest, SetValue_012, testing::ext::TestSize.Level1)
@@ -494,8 +508,10 @@ HWTEST_F(JsonObjectTest, Get_011, testing::ext::TestSize.Level1)
         JsonObject subJsonObj;
         subJsonObj["TEST"] = 13.5;
         object.Insert("SUB", subJsonObj);
-        std::string newStrJson = R"({"value1":124,"value3":true,"SUB":{"TEST":13.5}})";
-        EXPECT_EQ(object.Dump(), newStrJson);
+        std::vector<std::string> checkJsons;
+        checkJsons.push_back(R"({"value1":124,"value3":true,"SUB":{"TEST":13.5}})");
+        checkJsons.push_back(R"({"SUB":{"TEST":13.5},"value1":124,"value3":true})");
+        EXPECT_TRUE(CheckJsonString(checkJsons, object.Dump()));
     }
 }
 
@@ -510,7 +526,10 @@ HWTEST_F(JsonObjectTest, Get_012, testing::ext::TestSize.Level1)
         subJsonObj["TEST"] = 13.5;
         object.Insert("value2", subJsonObj);
         std::string newStrJson = R"({"value1":124,"value3":true,"value2":{"TEST":13.5}})";
-        EXPECT_EQ(object.Dump(), newStrJson);
+        std::vector<std::string> checkJsons;
+        checkJsons.push_back(R"({"value1":124,"value3":true,"value2":{"TEST":13.5}})");
+        checkJsons.push_back(R"({"value1":124,"value2":{"TEST":13.5},"value3":true})");
+        EXPECT_TRUE(CheckJsonString(checkJsons, object.Dump()));
     }
 }
 
