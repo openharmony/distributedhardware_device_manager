@@ -56,21 +56,18 @@ ohos_shared_library("cj_distributed_device_manager_ffi") {
     "src/device_manager_utils.cpp",
   ]
 
-  deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-  ]
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"cj_distrubuted_devicemanager\"",
     "LOG_DOMAIN=0xD004111",
-    "__CJSON_USE_INT64",
   ]
 
   external_deps = [
     "access_token:libtokenid_sdk",
     "bounds_checking_function:libsec_shared",
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",

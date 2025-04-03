@@ -15,7 +15,7 @@
 
 #include "device_manager_service.h"
 
-#include "dm_cJSON.h"
+#include "cJSON.h"
 #include <dlfcn.h>
 #include <functional>
 #include "app_manager.h"
@@ -64,8 +64,6 @@ constexpr const char* LIB_DM_RESIDENT_NAME = "libdevicemanagerresident.z.so";
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace DmJson;
-
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceManagerService);
 namespace {
     const int32_t NORMAL = 0;

@@ -50,6 +50,7 @@ ohos_fuzztest("OnSoftbusDeviceFoundFuzzTest") {
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
     "dsoftbus:softbus_client",
     "safwk:system_ability_fwk",
@@ -59,7 +60,6 @@ ohos_fuzztest("OnSoftbusDeviceFoundFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"OnSoftbusDeviceFoundFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 }
 

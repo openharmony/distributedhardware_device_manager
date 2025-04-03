@@ -51,21 +51,18 @@ ohos_shared_library("devicemanager") {
     "src/native_devicemanager_js.cpp",
   ]
 
-  deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${json_path}:devicemanagerjson",
-  ]
+  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
 
   defines = [
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"devicemanagerkit_js\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 
   external_deps = [
     "access_token:libtokenid_sdk",
     "bounds_checking_function:libsec_shared",
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",

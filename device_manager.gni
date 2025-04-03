@@ -29,7 +29,6 @@ interfaces_path = "//foundation/communication/ipc/interfaces/innerkits"
 utils_lite_path = "//commonlibrary/utils_lite"
 c_utils_path = "//commonlibrary/c_utils/base/"
 fuzz_test_output_path = "device_manager/device_manager"
-json_path = "${devicemanager_path}/json"
 
 #----------------------compilation options--------------------------#
 dm_ldflags = [ "-lpthread" ]

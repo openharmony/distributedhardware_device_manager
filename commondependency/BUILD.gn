@@ -68,7 +68,6 @@ ohos_shared_library("devicemanagerdependency") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"devicemanagerdependency\"",
     "LOG_DOMAIN=0xD004112",
-    "__CJSON_USE_INT64",
   ]
 
   deps = [
@@ -137,7 +136,6 @@ ohos_shared_library("devicemanagerdependencytest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"devicemanagerdependency\"",
     "LOG_DOMAIN=0xD004112",
-    "__CJSON_USE_INT64",
   ]
 
   deps = [

@@ -25,7 +25,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include",
         "${innerkits_path}/native_cpp/include",
         "${utils_path}/include/crypto",
-        "${json_path}/include",
+        "//third_party/cJSON",
       ]
 
       sources = [
@@ -42,7 +42,6 @@ if (defined(ohos_lite)) {
       deps = [
         "${dsoftbussdk_path}:softbus_client",
         "${hilog_path}:hilog_shared",
-        "${json_path}:devicemanagerjson",
         "${third_path}:libsec_shared",
         "${utils_path}:devicemanagerutils",
       ]
@@ -82,12 +81,10 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"dmdevicecache\"",
       "LOG_DOMAIN=0xD004113",
-      "__CJSON_USE_INT64",
     ]
 
     deps = [
       "${innerkits_path}/native_cpp:devicemanagersdk",
-      "${json_path}:devicemanagerjson",
       "${utils_path}:devicemanagerutils",
     ]
 

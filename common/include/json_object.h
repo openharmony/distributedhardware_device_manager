@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 
-#include "dm_cJSON.h"
+#include "cJSON.h"
 
 #ifndef EXPORT
 #define EXPORT __attribute__ ((visibility ("default")))
@@ -27,7 +27,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace DmJson;
 class JsonObject;
 class JsonItemObject {
     friend void ToJson(JsonItemObject &itemObject, const std::string &value);

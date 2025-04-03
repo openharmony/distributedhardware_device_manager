@@ -36,7 +36,7 @@ if (defined(ohos_lite)) {
         "${common_path}/include/ipc/model",
         "${innerkits_path}/native_cpp/include",
         "${interfaces_path}/c/ipc/include",
-        "${json_path}/include",
+        "//third_party/cJSON",
         "//third_party/bounds_checking_function/include",
       ]
 
@@ -47,6 +47,7 @@ if (defined(ohos_lite)) {
         "${common_path}/src/dm_anonymous.cpp",
         "${common_path}/src/dm_error_message.cpp",
         "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
+        "${common_path}/src/json_object.cpp",
         "src/appInfo/lite/app_manager.cpp",
         "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
@@ -61,10 +62,7 @@ if (defined(ohos_lite)) {
         "lOG_DOMAIN=0xD004110",
       ]
 
-      deps = [
-        "${json_path}:devicemanagerjson",
-        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      ]
+      deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
       external_deps = [
         "bounds_checking_function:libsec_shared",
         "openssl:libcrypto_shared",
@@ -82,7 +80,6 @@ if (defined(ohos_lite)) {
       "include/timer",
       "${innerkits_path}/native_cpp/include",
       "${common_path}/include",
-      "${json_path}/include",
     ]
   }
   config("cflags_config") {
@@ -125,6 +122,7 @@ if (defined(ohos_lite)) {
 
     sources = [
       "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/json_object.cpp",
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
@@ -144,16 +142,14 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerutils\"",
       "LOG_DOMAIN=0xD004110",
-      "__CJSON_USE_INT64",
     ]
-
-    deps = [ "${json_path}:devicemanagerjson" ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "c_utils:utils",
       "eventhandler:libeventhandler",
       "ffrt:libffrt",
@@ -167,6 +163,7 @@ if (defined(ohos_lite)) {
 
     public_external_deps = [
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "kv_store:distributeddata_inner",
     ]
 
@@ -204,6 +201,7 @@ if (defined(ohos_lite)) {
 
     sources = [
       "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/json_object.cpp",
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
@@ -223,16 +221,14 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerutils\"",
       "LOG_DOMAIN=0xD004110",
-      "__CJSON_USE_INT64",
     ]
-
-    deps = [ "${json_path}:devicemanagerjson" ]
 
     external_deps = [
       "access_token:libaccesstoken_sdk",
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "c_utils:utils",
       "eventhandler:libeventhandler",
       "ffrt:libffrt",
@@ -246,6 +242,7 @@ if (defined(ohos_lite)) {
 
     public_external_deps = [
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "kv_store:distributeddata_inner",
     ]
 

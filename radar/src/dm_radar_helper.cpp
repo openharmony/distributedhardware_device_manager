@@ -19,7 +19,7 @@
 #include <cmath>
 #include <sstream>
 #include <iomanip>
-#include "dm_cJSON.h"
+#include <cJSON.h>
 #include <errors.h>
 #include "hisysevent.h"
 #include "dm_constants.h"
@@ -34,7 +34,6 @@
 using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
-using namespace DmJson;
 const char* ORGPKGNAME = "deviceManager";
 const char* SOFTBUSNAME = "dsoftbus";
 const char* HICHAINNAME = "hichain";
