@@ -1002,10 +1002,7 @@ void DmAuthManager::AbilityNegotiate()
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
-    if (GetBinderInfo() != DM_OK) {
-        LOGE("GetBinderInfo failed.");
-        return;
-    }
+    GetBinderInfo();
     bool ret = hiChainConnector_->IsDevicesInP2PGroup(authResponseContext_->localDeviceId, localDeviceId);
     if (ret) {
         LOGE("DmAuthManager::EstablishAuthChannel device is in group");
@@ -2639,10 +2636,7 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     remoteDeviceId_ = authResponseContext_->localDeviceId;
     authResponseContext_->remoteAccountId = authResponseContext_->localAccountId;
     authResponseContext_->remoteUserId = authResponseContext_->localUserId;
-    if (GetBinderInfo() != DM_OK) {
-        LOGE("GetBinderInfo failed.");
-        return;
-    }
+    GetBinderInfo();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     authResponseContext_->deviceId = authResponseContext_->localDeviceId;
