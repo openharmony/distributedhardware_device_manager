@@ -1577,7 +1577,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
 
     authManager_->authResponseContext_->isOnline = true;
     EXPECT_CALL(*softbusConnectorMock_, CheckIsOnline(_)).WillOnce(Return(true));
-    EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _)).WillOnce(Return(true));
+    EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _, _)).WillOnce(Return(true));
     authManager_->GetAuthRequestContext();
 
     JsonObject jsonPeerGroupIdObj;
@@ -1644,7 +1644,8 @@ HWTEST_F(DmAuthManagerTest, CheckTrustState_003, testing::ext::TestSize.Level1)
     authManager_->ProcessAuthRequest(sessionId);
 
     authManager_->authResponseContext_->haveCredential = true;
-    EXPECT_CALL(*hiChainAuthConnectorMock_, QueryCredential(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(true));
+    EXPECT_CALL(*hiChainAuthConnectorMock_,
+        QueryCredential(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(true));
     authManager_->GetAuthRequestContext();
 
     authManager_->authResponseContext_->isOnline = true;

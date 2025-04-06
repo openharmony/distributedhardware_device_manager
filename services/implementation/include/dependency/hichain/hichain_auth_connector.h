@@ -52,9 +52,9 @@ public:
     int32_t AuthDevice(int32_t pinCode, int32_t osAccountId, std::string udid, int64_t requestId);
     int32_t ProcessAuthData(int64_t requestId, std::string authData, int32_t osAccountId);
     int32_t GenerateCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
-    bool QueryCredential(std::string &localUdid, int32_t osAccountId);
-    int32_t ImportCredential(int32_t osAccountId, std::string deviceId, std::string publicKey);
-    int32_t DeleteCredential(const std::string &deviceId, int32_t userId);
+    bool QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId);
+    int32_t ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId, std::string publicKey);
+    int32_t DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId);
     int32_t RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback);
     int32_t GetCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
 private:

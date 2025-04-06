@@ -57,7 +57,7 @@ bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localU
         peerUdid, peerUserId);
 }
 
-OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
+DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
     const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid,
@@ -100,7 +100,7 @@ void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(std::string peerUdid,
         userIds);
 }
 
-OHOS::DistributedHardware::ProcessInfo DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
+DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
     const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAppUnBindEvent(remoteUserId, remoteUdid,

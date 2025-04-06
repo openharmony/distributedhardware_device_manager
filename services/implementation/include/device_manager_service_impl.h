@@ -135,7 +135,7 @@ public:
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
     int32_t RegisterAuthenticationType(int32_t authenticationType);
     void DeleteAlwaysAllowTimeOut();
-    void CheckDeleteCredential(const std::string &remoteUdid);
+    void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
@@ -150,7 +150,7 @@ private:
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId);
-    void HandleUserRemoved(int32_t preUserId);
+    void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId);
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
 

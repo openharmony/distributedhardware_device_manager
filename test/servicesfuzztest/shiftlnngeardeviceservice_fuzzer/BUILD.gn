@@ -70,6 +70,7 @@ ohos_fuzztest("ShiftLNNGearDeviceServiceFuzzTest") {
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
   ]

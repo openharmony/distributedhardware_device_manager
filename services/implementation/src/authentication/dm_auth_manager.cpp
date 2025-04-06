@@ -525,7 +525,8 @@ int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &
         if (offlineParam.leftAclNumber == 0) {
             LOGI("The pkgName unbind app-level type leftAclNumber is zero.");
             softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-            hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID());
+            hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID(),
+                offlineParam.peerUserId);
             return DM_OK;
         }
     }
@@ -535,7 +536,8 @@ int32_t DmAuthManager::DeleteAcl(const std::string &pkgName, const std::string &
     }
     if (static_cast<uint32_t>(bindLevel) == DEVICE && offlineParam.leftAclNumber == 0) {
         LOGI("Unbind deivce-level, retain null.");
-        hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID());
+        hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID(),
+            offlineParam.peerUserId);
         return DM_OK;
     }
     return ERR_DM_FAILED;
@@ -2292,9 +2294,26 @@ void DmAuthManager::RequestCredentialDone()
 
 int32_t DmAuthManager::ImportCredential(std::string &deviceId, std::string &publicKey)
 {
-    LOGI("DmAuthManager::ImportCredential");
+    LOGI("DmAuthManager::ImportCredential, deviceId %{public}s", GetAnonyString(deviceId).c_str());
     int32_t osAccountId = MultipleUserConnector::GetCurrentAccountUserID();
-    return hiChainAuthConnector_->ImportCredential(osAccountId, deviceId, publicKey);
+    if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
+        // Source Import Credential
+        LOGI("Source Import Credential remoteUserId: %{public}d", authRequestContext_->remoteUserId);
+        CHECK_NULL_RETURN(authRequestContext_, ERR_DM_POINT_NULL);
+        CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
+        return hiChainAuthConnector_->ImportCredential(osAccountId, authRequestContext_->remoteUserId, deviceId,
+            publicKey);
+    } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
+        // Sink Import Credential
+        LOGI("Source Import Credential remoteUserId: %{public}d", authResponseContext_->remoteUserId);
+        CHECK_NULL_RETURN(authResponseContext_, ERR_DM_POINT_NULL);
+        CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
+        return hiChainAuthConnector_->ImportCredential(osAccountId, authResponseContext_->remoteUserId, deviceId,
+            publicKey);
+    } else {
+        LOGE("DmAuthManager::ImportCredential failed, authRequestState_ or authResponseState_ is invalid.");
+        return ERR_DM_AUTH_FAILED;
+    }
 }
 
 void DmAuthManager::ResponseCredential()
@@ -2655,7 +2674,7 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
     authResponseContext_->isOnline = softbusConnector_->CheckIsOnline(remoteDeviceId_);
     authResponseContext_->haveCredential =
         hiChainAuthConnector_->QueryCredential(authResponseContext_->deviceId,
-            MultipleUserConnector::GetFirstForegroundUserId());
+            MultipleUserConnector::GetFirstForegroundUserId(), authResponseContext_->remoteUserId);
     if (!IsAuthTypeSupported(authResponseContext_->authType)) {
         LOGE("DmAuthManager::AuthenticateDevice authType %{public}d not support.", authResponseContext_->authType);
         authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
@@ -3123,7 +3142,7 @@ int32_t DmAuthManager::GetBinderInfo()
     ret = AppManager::GetInstance().GetHapTokenIdByName(authResponseContext_->localUserId,
         authResponseContext_->peerBundleName, 0, authResponseContext_->tokenId);
 #ifndef DEVICE_MANAGER_COMMON_FLAG
-    if (ret == DM_OK && authResponseContext_->bindLevel != APP) {
+    if (ret == DM_OK && static_cast<uint32_t>(authResponseContext_->bindLevel) != APP) {
         LOGI("get tokenId by bundleName failed %{public}s", GetAnonyString(authResponseContext_->bundleName).c_str());
         return ERR_DM_FAILED;
     }

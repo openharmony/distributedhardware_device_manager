@@ -1295,7 +1295,7 @@ int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, con
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     (void)extra;
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
-        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
     for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
         if (profile.GetBindType() == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
             continue;

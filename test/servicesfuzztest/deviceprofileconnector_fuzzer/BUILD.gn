@@ -44,6 +44,7 @@ ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
   external_deps = [
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "init:libbegetutil",
     "ipc:ipc_single",
   ]
 

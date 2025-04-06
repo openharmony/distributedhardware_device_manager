@@ -22,6 +22,7 @@
 #include "dm_single_instance.h"
 #include "i_dp_inited_callback.h"
 #include "local_service_info.h"
+#include "parameter.h"
 #include "trusted_device_info.h"
 
 enum AllowAuthType {
@@ -90,6 +91,7 @@ typedef struct DmOfflineParam {
     uint32_t bindType;
     std::vector<OHOS::DistributedHardware::ProcessInfo> processVec;
     int32_t leftAclNumber;
+    int32_t peerUserId;
 } DmOfflineParam;
 
 namespace OHOS {
@@ -132,7 +134,8 @@ public:
     int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm);
     EXPORT bool DeleteAclForAccountLogOut(const std::string &localUdid,
         int32_t localUserId, const std::string &peerUdid, int32_t peerUserId);
-    EXPORT void DeleteAclForUserRemoved(std::string localUdid, int32_t userId);
+    EXPORT void DeleteAclForUserRemoved(std::string localUdid, int32_t userId, std::vector<std::string> peerUdids,
+        std::multimap<std::string, int32_t> &peerUserIdMap);
     EXPORT void DeleteAclForRemoteUserRemoved(std::string peerUdid,
         int32_t peerUserId, std::vector<int32_t> &userIds);
     EXPORT DmOfflineParam DeleteAccessControlList(const std::string &pkgName,
@@ -146,7 +149,7 @@ public:
         const std::string &deviceId);
     EXPORT bool CheckSinkDevIdInAclForDevBind(const std::string &pkgName,
         const std::string &deviceId);
-    EXPORT uint32_t DeleteTimeOutAcl(const std::string &deviceId);
+    EXPORT uint32_t DeleteTimeOutAcl(const std::string &deviceId, int32_t &peerUserId);
     EXPORT int32_t GetTrustNumber(const std::string &deviceId);
     bool CheckDevIdInAclForDevBind(const std::string &pkgName, const std::string &deviceId);
     std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
@@ -166,9 +169,9 @@ public:
         const std::string &remoteUdid, const std::string &localUdid);
     EXPORT int32_t HandleDevUnBindEvent(int32_t remoteUserId,
         const std::string &remoteUdid, const std::string &localUdid);
-    EXPORT OHOS::DistributedHardware::ProcessInfo HandleAppUnBindEvent(
+    EXPORT DmOfflineParam HandleAppUnBindEvent(
         int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid);
-    EXPORT OHOS::DistributedHardware::ProcessInfo HandleAppUnBindEvent(
+    EXPORT DmOfflineParam HandleAppUnBindEvent(
         int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid,
         int32_t peerTokenId);
     EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile>
@@ -183,8 +186,7 @@ public:
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     EXPORT void HandleUserSwitched(
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &activeProfiles,
-        const std::vector<DistributedDeviceProfile::AccessControlProfile> &inActiveProfiles,
-        const std::vector<DistributedDeviceProfile::AccessControlProfile> &delActiveProfiles);
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &inActiveProfiles);
     EXPORT void HandleSyncForegroundUserIdEvent(
         const std::vector<int32_t> &remoteUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &localUserIds, std::string &localUdid);
