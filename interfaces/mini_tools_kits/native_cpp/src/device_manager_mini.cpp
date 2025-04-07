@@ -13,31 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_IPC_GET_LOCAL_DISPLAY_DEVICE_NAME_RSP_H
-#define OHOS_DM_IPC_GET_LOCAL_DISPLAY_DEVICE_NAME_RSP_H
+#include "device_manager_mini.h"
 
-#include "ipc_req.h"
+#include "device_manager_impl_mini.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcGetLocalDisplayDeviceNameRsp : public IpcRsp {
-    DECLARE_IPC_MODEL(IpcGetLocalDisplayDeviceNameRsp);
-
-public:
-
-    const std::string GetDisplayName() const
-    {
-        return displayName_;
-    }
-
-    void SetDisplayName(const std::string &displayName)
-    {
-        displayName_ = displayName;
-    }
-
-private:
-    std::string displayName_;
-};
+DeviceManagerMini &DeviceManagerMini::GetInstance()
+{
+    return DeviceManagerImplMini::GetInstance();
+}
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_IPC_GET_LOCAL_DISPLAY_DEVICE_NAME_RSP_H

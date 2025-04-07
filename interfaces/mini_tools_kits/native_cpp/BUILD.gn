@@ -1,0 +1,129 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/component/lite_component.gni")
+} else {
+  import("//build/ohos.gni")
+}
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+if (defined(ohos_lite)) {
+  if (ohos_kernel_type == "liteos_m") {
+    static_library("devicemanagerminisdk") {
+      include_dirs = []
+
+      sources = []
+
+      deps = []
+
+      cflags = [
+        "-Wall",
+        "-O2",
+        "-std=c99",
+        "-Wdate-time",
+        "-Wextra",
+        "-Wfloat-equal",
+      ]
+      cflags_cc = cflags
+    }
+  } else {
+    shared_library("devicemanagerminisdk") {
+      include_dirs = []
+
+      sources = []
+
+      defines = [
+        "LITE_DEVICE",
+        "HI_LOG_ENABLE",
+        "DH_LOG_TAG=\"devicemanagerkit\"",
+        "LOG_DOMAIN=0xD004111",
+      ]
+
+      deps = []
+    }
+  }
+} else {
+  config("devicemanagerminisdk_config") {
+    include_dirs = [
+      "include",
+      "include/ipc",
+      "${common_path}/include",
+      "${common_path}/include/ipc",
+      "${common_path}/include/ipc/model",
+      "${common_path}/include/ipc/standard",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/include",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/include/ipc",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/include/ipc/standard",
+    ]
+  }
+
+  ohos_shared_library("devicemanagerminisdk") {
+    branch_protector_ret = "pac_ret"
+
+    sanitize = {
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+      integer_overflow = true
+      ubsan = true
+    }
+
+    cflags = [
+      "-Werror",
+      "-fPIC",
+      "-fstack-protector-strong",
+    ]
+
+    ldflags = [
+      "-Wl,-z,relro",
+      "-Wl,-z,now",
+    ]
+
+    cflags_cc = cflags
+
+    sources = [
+      "${common_path}/src/dm_constants.cpp",
+      "${common_path}/src/ipc/standard/ipc_cmd_register.cpp",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/ipc_client_proxy.cpp",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/standard/dm_service_load.cpp",
+      "${devicemanager_path}/interfaces/inner_kits/native_cpp/src/ipc/standard/ipc_client_server_proxy.cpp",
+      "src/device_manager_impl_mini.cpp",
+      "src/device_manager_mini.cpp",
+      "src/ipc/ipc_client_manager_mini.cpp",
+      "src/ipc/ipc_cmd_parser.cpp",
+    ]
+
+    public_configs = [ ":devicemanagerminisdk_config" ]
+
+    innerapi_tags = [ "platformsdk" ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagerminikit\"",
+      "LOG_DOMAIN=0xD004111",
+    ]
+
+    external_deps = [
+      "c_utils:utils",
+      "hilog:libhilog",
+      "ipc:ipc_core",
+      "samgr:samgr_proxy",
+    ]
+
+    subsystem_name = "distributedhardware"
+
+    part_name = "device_manager"
+  }
+}
