@@ -16,7 +16,7 @@ import deviceManager from '@ohos.distributedHardware.deviceManager';
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
 import mediaquery from '@ohos.mediaquery';
 import deviceInfo from '@ohos.deviceInfo';
-
+import display from '@ohos.display';
 import inputMethod from '@ohos.inputMethod';
 import Constant from '../common/constant';
 import accessibility from '@ohos.accessibility';
@@ -44,14 +44,16 @@ struct InputCustomDialog {
   @State targetDeviceName: string = '';
   @State model: string = MODEL_PIN;
   @State isPC: boolean = false;
+  @State isPhone: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
+  @State mLocalHeight: number = display.getDefaultDisplaySync().height;
   listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
   controller?: CustomDialogController;
   private scroller: Scroller = new Scroller();
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
     if (mediaQueryResult.matches as boolean) {
-      this.heightNum = 100;
+      this.heightNum = 300;
     } else {
       this.heightNum = 800;
     }
@@ -66,12 +68,18 @@ struct InputCustomDialog {
   aboutToAppear() {
     console.info(TAG + 'InputCustomDialog aboutToAppear');
     this.isPC = Constant.isPC();
+    this.isPhone = Constant.isPhone();
     let ims = inputMethod.getSetting();
     ims.on('imeShow', (info: Array<inputMethod.InputWindowInfo>) => {
       this.scroller.scrollTo({yOffset: 72, xOffset: 0});
     });
-    if (AppStorage.get('mediaQueryResult') != null && AppStorage.get('mediaQueryResult') as boolean) {
-      this.heightNum = 100;
+    if (AppStorage.get('mediaQueryResult') != null && AppStorage.get('mediaQueryResult') as boolean && this.isPhone) {
+        let heightRatio = px2vp(this.mLocalHeight) * 0.2;
+        if (display.isFoldable() && display.getFoldDisplayMode() == display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
+            this.heightNum = heightRatio;
+        } else if (!display.isFoldable()) {
+            this.heightNum = heightRatio;
+        }
     }
     if (AppStorage.get('targetDeviceName') != null) {
       this.targetDeviceName = AppStorage.get('targetDeviceName') as string;
