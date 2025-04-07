@@ -16,6 +16,7 @@ import deviceManager from '@ohos.distributedHardware.deviceManager';
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
 import mediaquery from '@ohos.mediaquery';
 import deviceInfo from '@ohos.deviceInfo';
+
 import inputMethod from '@ohos.inputMethod';
 import Constant from '../common/constant';
 import accessibility from '@ohos.accessibility';
