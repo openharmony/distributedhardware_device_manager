@@ -75,7 +75,7 @@ struct InputCustomDialog {
     });
     if (AppStorage.get('mediaQueryResult') != null && AppStorage.get('mediaQueryResult') as boolean && this.isPhone) {
         let heightRatio = px2vp(this.mLocalHeight) * 0.2;
-        if (display.isFoldable() && display.getFoldDisplayMode() == display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
+        if (display.isFoldable() && display.getFoldDisplayMode() === display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
             this.heightNum = heightRatio;
         } else if (!display.isFoldable()) {
             this.heightNum = heightRatio;
