@@ -636,6 +636,9 @@ public:
     virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
         const DmDeviceProfileInfoFilterOptions &filterOptions,
         std::shared_ptr<GetDeviceProfileInfoListCallback> callback) = 0;
+    virtual int32_t RegisterAuthenticationType(const std::string &pkgName,
+        const std::map<std::string, std::string> &authParam) = 0;
+    
 };
 } // namespace DistributedHardware
 } // namespace OHOS

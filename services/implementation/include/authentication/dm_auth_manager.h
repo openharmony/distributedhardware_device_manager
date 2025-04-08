@@ -130,6 +130,7 @@ typedef struct DmAuthRequestContext {
     int32_t remoteUserId;
     std::string ip;
     std::string hostPkgLabel;
+    int32_t closeSessionDelaySeconds = 0;
 } DmAuthRequestContext;
 
 typedef struct DmAuthResponseContext {
@@ -475,6 +476,9 @@ public:
         const std::map<std::string, std::string> &bindParam);
 
     void HandleSessionHeartbeat(std::string name);
+
+    int32_t RegisterAuthenticationType(int32_t authenticationType);
+
 private:
     int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &extra);
@@ -556,6 +560,7 @@ private:
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
     void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
     void DeleteOffLineTimer(int32_t sessionId);
+    int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -591,6 +596,7 @@ private:
     std::string remoteVersion_ = "";
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
     std::string remoteUdidHash_ = "";
+    int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

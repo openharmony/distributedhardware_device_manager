@@ -1289,6 +1289,43 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterCredentialAuthStatusCallback_002, test
     int32_t ret = DeviceManager::GetInstance().UnRegisterCredentialAuthStatusCallback(packName);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
+
+HWTEST_F(DeviceManagerImplTest, RegisterAuthenticationType_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::map<std::string, std::string> authParam;
+    int32_t ret = DeviceManager::GetInstance().RegisterAuthenticationType(packName, authParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterAuthenticationType_002, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.RegisterAuthenticationType";
+    std::map<std::string, std::string> authParam;
+    int32_t ret = DeviceManager::GetInstance().RegisterAuthenticationType(packName, authParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterAuthenticationType_003, testing::ext::TestSize.Level0)
+{
+    std::string packName = "";
+    std::map<std::string, std::string> authParam;
+    authParam[DM_AUTHENTICATION_TYPE] = "0";
+    int32_t ret = DeviceManager::GetInstance().RegisterAuthenticationType(packName, authParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, RegisterAuthenticationType_004, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.RegisterAuthenticationType";
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    std::map<std::string, std::string> authParam;
+    authParam[DM_AUTHENTICATION_TYPE] = "0";
+    int32_t ret = DeviceManager::GetInstance().RegisterAuthenticationType(packName, authParam);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

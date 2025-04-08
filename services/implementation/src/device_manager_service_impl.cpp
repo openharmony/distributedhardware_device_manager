@@ -830,6 +830,12 @@ void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &pro
     deviceStateMgr_->HandleCredentialAuthStatus(proofInfo, deviceTypeId, errcode);
 }
 
+int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticationType)
+{
+    CHECK_NULL_RETURN(authMgr_, ERR_DM_POINT_NULL);
+    return authMgr_->RegisterAuthenticationType(authenticationType);
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
