@@ -61,7 +61,7 @@
         },
         {
             "name":"dm_confirm_intention",
-            "value":"用以進行數據同步及裝置之間的協同操作",
+            "value":"用於進行數據同步及裝置之間的協同操作",
             "attr":{
                 "priority":"LT"
             }
