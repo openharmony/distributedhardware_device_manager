@@ -1264,7 +1264,6 @@ void DmAuthManager::SrcAuthenticateFinish()
         authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
-
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
     authTimes_ = 0;
