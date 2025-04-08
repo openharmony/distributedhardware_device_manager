@@ -203,7 +203,6 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerserviceimpl\"",
       "LOG_DOMAIN=0xD004110",
-      "__CJSON_USE_INT64",
     ]
 
     deps = [
@@ -221,6 +220,7 @@ if (defined(ohos_lite)) {
       "ability_runtime:ability_connect_callback_stub",
       "ability_runtime:ability_manager",
       "access_token:libaccesstoken_sdk",
+      "cJSON:cjson",
       "c_utils:utils",
       "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",

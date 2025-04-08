@@ -64,6 +64,7 @@ ohos_fuzztest("ShiftLNNGearDeviceServiceFuzzTest") {
 
   external_deps = [
     "ability_base:want",
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -79,7 +80,6 @@ ohos_fuzztest("ShiftLNNGearDeviceServiceFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"ShiftLNNGearDeviceServiceFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 }
 

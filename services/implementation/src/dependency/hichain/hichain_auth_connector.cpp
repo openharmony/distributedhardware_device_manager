@@ -19,7 +19,7 @@
 #include "dm_constants.h"
 #include "hichain_connector_callback.h"
 #include "parameter.h"
-#include "dm_cJSON.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -66,7 +66,6 @@ ohos_fuzztest("IpcServerStubFuzzTest") {
     "HI_LOG_ENABLE",
     "DH_LOG_TAG=\"IpcServerStubFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
-    "__CJSON_USE_INT64",
   ]
 
   external_deps = [

@@ -144,7 +144,6 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerutils\"",
       "LOG_DOMAIN=0xD004110",
-      "__CJSON_USE_INT64",
     ]
 
     deps = [ "${json_path}:devicemanagerjson" ]
@@ -154,6 +153,7 @@ if (defined(ohos_lite)) {
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "c_utils:utils",
       "eventhandler:libeventhandler",
       "ffrt:libffrt",
@@ -223,7 +223,6 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"devicemanagerutils\"",
       "LOG_DOMAIN=0xD004110",
-      "__CJSON_USE_INT64",
     ]
 
     deps = [ "${json_path}:devicemanagerjson" ]
@@ -233,6 +232,7 @@ if (defined(ohos_lite)) {
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "c_utils:utils",
       "eventhandler:libeventhandler",
       "ffrt:libffrt",

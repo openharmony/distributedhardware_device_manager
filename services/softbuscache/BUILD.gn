@@ -82,7 +82,6 @@ if (defined(ohos_lite)) {
       "HI_LOG_ENABLE",
       "DH_LOG_TAG=\"dmdevicecache\"",
       "LOG_DOMAIN=0xD004113",
-      "__CJSON_USE_INT64",
     ]
 
     deps = [
