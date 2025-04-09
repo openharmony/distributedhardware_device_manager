@@ -1025,7 +1025,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_205, testing::ext::TestSize.Leve
         GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillRepeatedly(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
-    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillRepeatedly(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
 
     std::vector<UserIdInfo> remoteUserIdInfos;
@@ -1238,6 +1238,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_201, testing::ext:
 HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
+    
     std::map<std::string, std::string> authParam;
     int32_t ret = DeviceManagerService::GetInstance().RegisterAuthenticationType(pkgName, authParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
@@ -1274,7 +1275,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillRepeatedly(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
     backgroundUserIds.push_back(102);

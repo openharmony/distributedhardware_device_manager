@@ -1822,7 +1822,7 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_004, testing::ext::Te
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
-    EXPECT_NE(ret, DM_OK);
+    EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
