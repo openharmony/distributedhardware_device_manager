@@ -37,6 +37,8 @@
 #include "ipc_get_anony_local_udid_rsp.h"
 #include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
+#include "ipc_get_device_network_id_list_req.h"
+#include "ipc_get_device_network_id_list_rsp.h"
 #include "ipc_get_device_profile_info_list_req.h"
 #include "ipc_get_device_screen_status_req.h"
 #include "ipc_get_device_screen_status_rsp.h"
@@ -2812,6 +2814,28 @@ int32_t DeviceManagerImpl::GetLocalServiceInfoByBundleNameAndPinExchangeType(
         return ret;
     }
     info = rsp->GetLocalServiceInfo();
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetDeviceNetworkIdList(const std::string &bundleName,
+    const NetworkIdQueryFilter &queryFilter, std::vector<std::string> &networkIds)
+{
+    std::shared_ptr<IpcGetDeviceNetworkIdListReq> req = std::make_shared<IpcGetDeviceNetworkIdListReq>();
+    std::shared_ptr<IpcGetDeviceNetworkIdListRsp> rsp = std::make_shared<IpcGetDeviceNetworkIdListRsp>();
+    req->SetPkgName(bundleName);
+    req->SetQueryFilter(queryFilter);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_NETWORK_ID_LIST, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    networkIds = rsp->GetNetworkIds();
     LOGI("Completed");
     return DM_OK;
 }

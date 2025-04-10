@@ -564,6 +564,25 @@ void JsToDmDeviceProfileInfoFilterOptions(const napi_env &env, const napi_value 
     info.deviceIdList = deviceIdList;
 }
 
+void JsToDmDeviceNetworkIdFilterOptions(const napi_env &env, const napi_value &object,
+    NetworkIdQueryFilter &info)
+{
+    napi_valuetype filterOptionsType;
+    napi_typeof(env, object, &filterOptionsType);
+    if (filterOptionsType != napi_object) {
+        LOGE("filterOptions is not object");
+        std::string errMsg = ERR_MESSAGE_INVALID_PARAMS + " The type of filterOptions must be object";
+        napi_throw_error(env, std::to_string(ERR_INVALID_PARAMS).c_str(), errMsg.c_str());
+        return;
+    }
+    char wiseDeviceId[DM_NAPI_BUF_LENGTH] = "";
+    JsObjectToString(env, object, "wiseDeviceId", wiseDeviceId, sizeof(wiseDeviceId));
+    info.wiseDeviceId = wiseDeviceId;
+    int32_t onlineStatus = 0;
+    JsObjectToInt(env, object, "onlineStatus", onlineStatus);
+    info.onlineStatus = onlineStatus;
+}
+
 void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServiceProfileInfo> &svrInfos,
     napi_value &arrayResult)
 {
