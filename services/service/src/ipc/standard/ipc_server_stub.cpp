@@ -56,6 +56,7 @@ IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGE
 
 void IpcServerStub::OnStart()
 {
+    
     LOGI("IpcServerStub::OnStart start");
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         LOGI("IpcServerStub has already started.");

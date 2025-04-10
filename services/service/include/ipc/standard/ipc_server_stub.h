@@ -166,6 +166,7 @@ private:
     std::map<ProcessInfo, sptr<AppDeathRecipient>> appRecipient_;
     std::map<ProcessInfo, sptr<IpcRemoteBroker>> dmListener_;
     std::set<std::string> systemSA_;
+    
 };
 } // namespace DistributedHardware
 } // namespace OHOS
