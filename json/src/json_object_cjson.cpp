@@ -204,7 +204,7 @@ void FromJson(const JsonItemObject &itemObject, uint32_t &value)
     value = static_cast<uint32_t>(tmpValue);
 }
 
-DM_EXPORT void FromJson(const JsonItemObject &itemObject, int64_t &value)
+void FromJson(const JsonItemObject &itemObject, int64_t &value)
 {
     itemObject.GetTo(value);
 }

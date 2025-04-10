@@ -36,7 +36,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class DeviceManagerServiceListener : public IDeviceManagerServiceListener {
+class DM_EXPORT DeviceManagerServiceListener : public IDeviceManagerServiceListener {
 public:
     DeviceManagerServiceListener() {};
     virtual ~DeviceManagerServiceListener() {};
