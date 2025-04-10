@@ -434,8 +434,7 @@ DM_EXPORT std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(
     return bindType;
 }
 
-DM_EXPORT 
-std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConnector::GetProcessInfoFromAclByUserId(
+DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConnector::GetProcessInfoFromAclByUserId(
     const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId)
 {
     std::vector<AccessControlProfile> filterProfiles = GetAclProfileByUserId(localDeviceId,
