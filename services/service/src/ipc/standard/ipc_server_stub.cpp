@@ -15,7 +15,7 @@
 
 #include "ipc_server_stub.h"
 
-#include <stdio.h>
+#include <cstdio.h>
 
 #include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"
