@@ -31,7 +31,7 @@ public:
 class DmDistributedHardwareLoad {
     DM_DECLARE_SINGLE_INSTANCE(DmDistributedHardwareLoad);
 public:
-    EXPORT void LoadDistributedHardwareFwk(void);
+    DM_EXPORT void LoadDistributedHardwareFwk(void);
     void InitDistributedHardwareLoadCount(void);
     uint32_t GetDistributedHardwareLoadCount(void);
 private:

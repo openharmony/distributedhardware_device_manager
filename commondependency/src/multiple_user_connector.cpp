@@ -56,7 +56,7 @@ int32_t MultipleUserConnector::GetCurrentAccountUserID(void)
 #endif
 }
 
-EXPORT std::string MultipleUserConnector::GetOhosAccountId(void)
+DM_EXPORT std::string MultipleUserConnector::GetOhosAccountId(void)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return "";
@@ -73,7 +73,7 @@ EXPORT std::string MultipleUserConnector::GetOhosAccountId(void)
 #endif
 }
 
-EXPORT std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t userId)
+DM_EXPORT std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t userId)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     (void)userId;
@@ -92,7 +92,7 @@ EXPORT std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t userI
 #endif
 }
 
-EXPORT std::string MultipleUserConnector::GetOhosAccountName(void)
+DM_EXPORT std::string MultipleUserConnector::GetOhosAccountName(void)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return "";
@@ -140,7 +140,7 @@ void MultipleUserConnector::GetCallerUserId(int32_t &userId)
 #endif
 }
 
-EXPORT void MultipleUserConnector::SetSwitchOldUserId(int32_t userId)
+DM_EXPORT void MultipleUserConnector::SetSwitchOldUserId(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(lock_);
     oldUserId_ = userId;
@@ -152,7 +152,7 @@ int32_t MultipleUserConnector::GetSwitchOldUserId(void)
     return oldUserId_;
 }
 
-EXPORT void MultipleUserConnector::SetSwitchOldAccountId(std::string accountId)
+DM_EXPORT void MultipleUserConnector::SetSwitchOldAccountId(std::string accountId)
 {
     std::lock_guard<std::mutex> lock(lock_);
     accountId_ = accountId;
@@ -176,14 +176,14 @@ std::string MultipleUserConnector::GetSwitchOldAccountName(void)
     return accountName_;
 }
 
-EXPORT void MultipleUserConnector::SetAccountInfo(int32_t userId,
+DM_EXPORT void MultipleUserConnector::SetAccountInfo(int32_t userId,
     DMAccountInfo dmAccountInfo)
 {
     std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
     dmAccountInfoMap_[userId] = dmAccountInfo;
 }
 
-EXPORT DMAccountInfo MultipleUserConnector::GetAccountInfoByUserId(int32_t userId)
+DM_EXPORT DMAccountInfo MultipleUserConnector::GetAccountInfoByUserId(int32_t userId)
 {
     DMAccountInfo dmAccountInfo;
     {
@@ -197,7 +197,7 @@ EXPORT DMAccountInfo MultipleUserConnector::GetAccountInfoByUserId(int32_t userI
     return dmAccountInfo;
 }
 
-EXPORT void MultipleUserConnector::DeleteAccountInfoByUserId(int32_t userId)
+DM_EXPORT void MultipleUserConnector::DeleteAccountInfoByUserId(int32_t userId)
 {
     std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
     LOGI("userId: %{public}d", userId);
@@ -206,7 +206,7 @@ EXPORT void MultipleUserConnector::DeleteAccountInfoByUserId(int32_t userId)
     }
 }
 
-EXPORT int32_t MultipleUserConnector::GetForegroundUserIds(
+DM_EXPORT int32_t MultipleUserConnector::GetForegroundUserIds(
     std::vector<int32_t> &userVec)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -241,7 +241,7 @@ int32_t MultipleUserConnector::GetFirstForegroundUserId(void)
     return userVec[0];
 }
 
-EXPORT int32_t MultipleUserConnector::GetBackgroundUserIds(
+DM_EXPORT int32_t MultipleUserConnector::GetBackgroundUserIds(
     std::vector<int32_t> &userIdVec)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -304,7 +304,7 @@ int32_t MultipleUserConnector::GetAllUserIds(std::vector<int32_t> &userIdVec)
 #endif
 }
 
-EXPORT std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
+DM_EXPORT std::string MultipleUserConnector::GetAccountNickName(int32_t userId)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return "";
@@ -338,7 +338,7 @@ bool MultipleUserConnector::IsUserUnlocked(int32_t userId)
 #endif
 }
 
-EXPORT void MultipleUserConnector::ClearLockedUser(
+DM_EXPORT void MultipleUserConnector::ClearLockedUser(
     std::vector<int32_t> &foregroundUserVec)
 {
     for (auto iter = foregroundUserVec.begin(); iter != foregroundUserVec.end();) {
@@ -350,7 +350,7 @@ EXPORT void MultipleUserConnector::ClearLockedUser(
     }
 }
 
-EXPORT void MultipleUserConnector::ClearLockedUser(
+DM_EXPORT void MultipleUserConnector::ClearLockedUser(
     std::vector<int32_t> &foregroundUserVec, std::vector<int32_t> &backgroundUserVec)
 {
     for (auto iter = foregroundUserVec.begin(); iter != foregroundUserVec.end();) {

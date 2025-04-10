@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DistributedHardware {
 class DeviceManager {
 public:
-    EXPORT static DeviceManager &GetInstance();
+    DM_EXPORT static DeviceManager &GetInstance();
 
 public:
     /**

@@ -31,13 +31,13 @@ namespace DistributedHardware {
 class KVAdapterManager {
     DM_DECLARE_SINGLE_INSTANCE_BASE(KVAdapterManager);
 public:
-    EXPORT int32_t Init();
-    EXPORT void UnInit();
-    EXPORT void ReInit();
+    DM_EXPORT int32_t Init();
+    DM_EXPORT void UnInit();
+    DM_EXPORT void ReInit();
     int32_t PutByAnoyDeviceId(const std::string &key, const DmKVValue &value);
-    EXPORT int32_t Get(const std::string &key, DmKVValue &value);
-    EXPORT int32_t DeleteAgedEntry();
-    EXPORT int32_t AppUnintall(const std::string &appId);
+    DM_EXPORT int32_t Get(const std::string &key, DmKVValue &value);
+    DM_EXPORT int32_t DeleteAgedEntry();
+    DM_EXPORT int32_t AppUnintall(const std::string &appId);
 
 private:
     KVAdapterManager() = default;

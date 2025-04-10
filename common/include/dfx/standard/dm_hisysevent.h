@@ -18,13 +18,13 @@
 
 #include <string>
 
-#ifndef EXPORT
-#define EXPORT __attribute__ ((visibility ("default")))
-#endif // EXPORT
+#ifndef DM_EXPORT
+#define DM_EXPORT __attribute__ ((visibility ("default")))
+#endif // DM_EXPORT
 
 namespace OHOS {
 namespace DistributedHardware {
-EXPORT void SysEventWrite(
+DM_EXPORT void SysEventWrite(
     const std::string &status, int32_t eventType, const std::string &msg);
 } // namespace DistributedHardware
 } // namespace OHOS
