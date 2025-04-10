@@ -14,6 +14,9 @@
  */
 
 #include "ipc_server_stub.h"
+
+#include <stdio.h>
+
 #include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -24,6 +27,7 @@
 #include "mem_mgr_proxy.h"
 #endif // SUPPORT_MEMMGR
 #include "system_ability_definition.h"
+#include "datetime_ex.h"
 #include "device_manager_service.h"
 #include "device_manager_service_notify.h"
 #include "device_name_manager.h"
@@ -56,7 +60,7 @@ IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGE
 
 void IpcServerStub::OnStart()
 {
-    
+    startBeginTime_ = GetTickCount();
     LOGI("IpcServerStub::OnStart start");
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         LOGI("IpcServerStub has already started.");
@@ -94,17 +98,17 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
         std::string path = JoinPath("/proc/", std::to_string(memmgrPid), "reclaim");
         std::string contentStr = "1";
         LOGI("Start echo 1 to pid : %{public}d, path: %{public}s", memmgrPid, path.c_str());
-        int32_t fd = open(path.c_str(), O_WRONLY);
-        if (fd == -1) {
+        FILE *file = fopen(path.c_str(), "w");
+        if (file == NULL) {
             LOGE("ReclaimMemmgrFileMemForDM open file failed.");
             return;
         }
-        if (write(fd, contentStr.c_str(), strlen(contentStr.c_str())) < 0) {
-            LOGE("ReclaimMemmgrFileMemForDM write file failed.");
-            close(fd);
+        int32_t ret = fwrite(contentStr.c_str(), 1, strlen(contentStr.c_str()), file);
+        if (ret != contentStr.size()) {
+            fclose(file);
             return;
         }
-        close(fd);
+        fclose(file);
     }
     LOGI("ReclaimMemmgrFileMemForDM success.");
 }
@@ -210,6 +214,7 @@ bool IpcServerStub::Init()
     DeviceManagerService::GetInstance().InitDMServiceListener();
     if (!registerToService_) {
         bool ret = Publish(this);
+        LOGI("Publish, cost %{public}" PRId64 " ms", GetTickCount() -  startBeginTime_);
         if (!ret) {
             LOGE("IpcServerStub::Init Publish failed!");
             return false;
