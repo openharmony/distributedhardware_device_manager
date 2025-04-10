@@ -1697,7 +1697,7 @@ HWTEST_F(DmAuthManagerTest, GetBinderInfo_001, testing::ext::TestSize.Level1)
     EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*appManagerMock_, GetHapTokenIdByName(_, _, _, _)).WillOnce(Return(DM_OK));
     ret = authManager_->GetBinderInfo();
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
 
     authManager_->authResponseContext_->bindLevel = DEVICE;
     authManager_->SetProcessInfo();

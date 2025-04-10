@@ -413,7 +413,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetDnPolicy_301, testing::ext::TestSize.
     policy[PARAM_KEY_POLICY_TIME_OUT] = "10";
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))
-        .WillOnce(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<0>(processName), Return(DM_OK)));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnSetDnPolicy(_)).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().SetDnPolicy(packName, policy);
