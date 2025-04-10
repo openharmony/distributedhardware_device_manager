@@ -2,52 +2,53 @@
     "string":[
         {
             "name":"dm_connect_code",
-            "value":"კავშირის კოდი",
+            "value":"Kode koneksi",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_confirm_title_hap",
-            "value":"აპი „%1$s“ მოწყობილობაზე „%2$s“ მოითხოვს წვდომას ამ მოწყობილობაზე. ვენდოთ ამ აპს?",
+            "value":"%1$s yang ada di %2$s ingin mengakses perangkat ini. Percayai aplikasi ini?",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_cancel",
-            "value":"გაუქმება",
+            "value":"Batal",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_enter_peer_connect_code",
-            "value":"შეიყვანეთ კავშირის კოდი",
+            "value":"Masukkan kode koneksi",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_confirm_intention",
-            "value":"ეს საჭიროა მოწყობილობებს შორის მონაცემების სინქრონიზებისა და ერთობლივი მუშაობისთვის.",
+            "value":"Ini diperlukan untuk sinkronisasi data dan kolaborasi lintas perangkat.",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_allow_temp",
-            "value":"ვენდოთ ამჯერად",
+            "value":"Percayai kali ini",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_allow_always",
-            "value":"ყოველთვის ვენდოთ",
+            "value":"Selalu percayai",
             "attr":{
                 "priority":"translate"
             }
         }
+        
     ]
 }
