@@ -81,6 +81,7 @@ group("unittest") {
     ":UTTest_kv_adapter_manager",
     ":UTTest_mine_hichain_connector",
     ":UTTest_mine_softbus_listener",
+    ":UTTest_mini_tools_kit",
     ":UTTest_multiple_user_connector",
     ":UTTest_permission_manager",
     ":UTTest_pin_auth",
@@ -1946,6 +1947,21 @@ ohos_unittest("UTTest_advertise_manager") {
 
 ## UnitTest UTTest_advertise_manager }}}
 
+## UnitTest UTTest_mini_tools_kit
+ohos_unittest("UTTest_mini_tools_kit") {
+  module_out_path = module_out_path
+
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_mini_tools_kit.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+  ]
+}
+
 ## UnitTest UTTest_json_object {{{
 ohos_unittest("UTTest_json_object") {
   module_out_path = module_out_path
@@ -2041,6 +2057,7 @@ ohos_static_library("device_manager_test_common") {
     "${ext_path}/pin_auth:devicemanagerext_pin_auth",
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${json_path}:devicemanagerjson",
+    "${mini_tools_kits_path}/native_cpp:devicemanagerminisdk",
     "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${softbuscache_parh}:dmdevicecache",
