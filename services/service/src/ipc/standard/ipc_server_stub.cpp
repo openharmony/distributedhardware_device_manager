@@ -103,14 +103,13 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
             LOGE("ReclaimMemmgrFileMemForDM open file failed.");
             return;
         }
-        int32_t ret = fwrite(contentStr.c_str(), 1, strlen(contentStr.c_str()), file);
-        if (ret != contentStr.size()) {
-            if (fclose(file) != 0) {
-                LOGE("Close file failed");
-            }
+        size_t strLength = contentStr.length();
+        size_t ret = fwrite(contentStr.c_str(), 1, strLength, file);
+        if (ret != strLength ) {
+            LOGE("fwrite failed");
         }
-        if (fclose(file) != 0) {
-            LOGE("Close file failed");
+        if (fclose(file) != DM_OK) {
+            LOGE("fclose failed");
         }
     }
     LOGI("ReclaimMemmgrFileMemForDM success.");
