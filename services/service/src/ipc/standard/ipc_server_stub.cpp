@@ -105,7 +105,7 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
         }
         size_t strLength = contentStr.length();
         size_t ret = fwrite(contentStr.c_str(), 1, strLength, file);
-        if (ret != strLength ) {
+        if (ret != strLength) {
             LOGE("fwrite failed");
         }
         if (fclose(file) != DM_OK) {
