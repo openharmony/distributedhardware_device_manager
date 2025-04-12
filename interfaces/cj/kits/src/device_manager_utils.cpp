@@ -204,7 +204,7 @@ const std::string &GetDeviceTypeById(DmDeviceType type)
             return item.second;
         }
     }
-    return DEVICE_TYPE_UNKNOWN_STRING;
+    return mapArray[0].second;
 }
 
 char *MallocCStr(const char *in)
