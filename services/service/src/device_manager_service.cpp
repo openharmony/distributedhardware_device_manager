@@ -2095,7 +2095,7 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
             LOGE("GetAccountHash failed.");
             return;
         }
-        SendAccountLogoutBroadCast(peerUdids, std::string(accountIdHash), accountName, userId);
+        NotifyRemoteLocalLogout(peerUdids, std::string(accountIdHash), accountName, userId);
     }
     for (const auto &item : deviceMap) {
         dmServiceImpl_->HandleIdentAccountLogout(localUdid, userId, item.first, item.second);
@@ -3360,6 +3360,57 @@ int32_t DeviceManagerService::GetDeviceNetworkIdList(const std::string &pkgName,
         return ERR_DM_FIND_NETWORKID_LIST_EMPTY;
     }
     return DM_OK;
+}
+
+void DeviceManagerService::NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
+    const std::string &accountIdHash, const std::string &accountName, int32_t userId)
+{
+    LOGI("Start.");
+    std::vector<std::string> bleUdids;
+    std::vector<std::string> wifiDevices;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.push_back(netWorkId);
+        }
+    }
+    if (!bleUdids.empty()) {
+        SendAccountLogoutBroadCast(bleUdids, accountIdHash, accountName, userId);
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    for (const auto &it : wifiDevices) {
+        int32_t ret = DMCommTool::GetInstance()->SendLogoutAccountInfo(it, accountIdHash, userId);
+        if (ret != DM_OK) {
+            LOGE("Send LogoutAccount Info error, ret = %{public}d", ret);
+        }
+    }
+#endif
+}
+
+void DeviceManagerService::ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid,
+    int32_t userId)
+{
+    LOGI("Start. process udid: %{public}s", GetAnonyString(peerUdid).c_str());
+    if (!IsDMServiceImplReady()) {
+        LOGE("Imp instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->HandleAccountLogoutEvent(userId, accountId, peerUdid);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
