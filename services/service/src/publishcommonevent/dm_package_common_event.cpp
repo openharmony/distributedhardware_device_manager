@@ -138,6 +138,10 @@ void DmPackageEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     std::string receiveEvent = data.GetWant().GetAction();
     std::string appId = data.GetWant().GetStringParam(APP_ID);
     int32_t accessTokenId = static_cast<int32_t>(data.GetWant().GetIntParam(ACCESS_TOKEN_ID, 0));
+    if (accessTokenId == -1 || appId == "") {
+        LOGE("Invalid parameters: accessTokenId = %{public}d, appId = %{public}s", accessTokenId, appId.c_str());
+        return;
+    }
     LOGI("Received package event: %{public}s", receiveEvent.c_str());
 
     if (receiveEvent != EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_FULLY_REMOVED &&
