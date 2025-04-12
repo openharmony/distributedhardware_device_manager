@@ -2243,6 +2243,7 @@ std::string DmAuthManager::GenerateBindResultContent()
         Crypto::GetUdidHash(remoteDeviceId_, reinterpret_cast<uint8_t *>(deviceIdHash));
         jsonObj[TAG_DEVICE_ID] = deviceIdHash;
     }
+    jsonObj[TAG_CONFIRM_OPERATION] = authResponseContext_->confirmOperation;
     std::string content = SafetyDump(jsonObj);
     return content;
 }
