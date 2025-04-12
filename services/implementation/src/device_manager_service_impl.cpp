@@ -993,7 +993,7 @@ int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, i
     std::vector<int32_t> userIdVec;
     for (auto &item : profiles) {
         int64_t tokenId = item.GetAccesser().GetAccesserTokenId();
-        if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+        if (accessTokenId != static_cast<int32_t>(tokenId) || item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             continue;
         }
         DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
