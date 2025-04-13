@@ -47,7 +47,7 @@ constexpr const static char* g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM] = {
     "CollaborationFwk",
 };
 
-constexpr int32_t SYSTEM_SA_WHITE_LIST_NUM = 9;
+constexpr int32_t SYSTEM_SA_WHITE_LIST_NUM = 10;
 constexpr const static char* SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM] = {
     "Samgr_Networking",
     "ohos.distributeddata.service",
@@ -58,6 +58,7 @@ constexpr const static char* SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM] = {
     "ohos.security.distributed_access_token",
     "ohos.storage.distributedfile.daemon",
     "audio_manager_service",
+    "hmos.collaborationfwk.deviceDetect",
 };
 
 constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = 4;
