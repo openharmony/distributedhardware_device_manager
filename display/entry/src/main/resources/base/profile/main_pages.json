@@ -4,8 +4,10 @@
     "pages/PinDialog",
     "pages/InputPinDialog",
     "pages/BluetoothDialog",
+
     "pages/ConfirmDialogWearable",
     "pages/PinDialogWearable",
+    
     "pages/InputPinDialogWearable"
   ]
 }
