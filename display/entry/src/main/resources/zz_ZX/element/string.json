@@ -83,6 +83,10 @@
         {
             "name":"dm_password_error",
             "value":"[TS_958913]_Incorrect password. Connection failed."
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"[TS_1054456]_Trust this time only"
         }
     ]
 }

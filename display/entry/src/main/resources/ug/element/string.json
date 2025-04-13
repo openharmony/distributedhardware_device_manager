@@ -63,6 +63,13 @@
         {
             "name":"dm_enter_peer_connect_code",
             "value":"ئۇلاش كودى كىرگۈزۈڭ"
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"بۇ قېتىم ئىشىنىش",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

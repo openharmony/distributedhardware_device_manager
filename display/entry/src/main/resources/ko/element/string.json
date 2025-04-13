@@ -48,6 +48,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"이번 한 번만 신뢰",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }
