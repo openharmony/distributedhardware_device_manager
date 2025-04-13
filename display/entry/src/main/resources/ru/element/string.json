@@ -48,6 +48,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"Доверять только сейчас",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

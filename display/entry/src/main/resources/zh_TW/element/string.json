@@ -84,6 +84,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"僅本次信任",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -2,49 +2,56 @@
     "string":[
         {
             "name":"dm_connect_code",
-            "value":"Kode koneksi",
+            "value":"Code ng pagkonekta",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_confirm_title_hap",
-            "value":"%1$s yang ada di %2$s ingin mengakses perangkat ini. Percayai aplikasi ini?",
+            "value":"Gustong i-access ng %1$s sa %2$s ang device na ito. Pagkatiwalaan ang app na ito?",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_cancel",
-            "value":"Batal",
+            "value":"Kanselahin",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_enter_peer_connect_code",
-            "value":"Masukkan kode koneksi",
+            "value":"Ilagay ang code ng pagkonekta",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_confirm_intention",
-            "value":"Ini diperlukan untuk sinkronisasi data dan kolaborasi lintas perangkat.",
+            "value":"Kinakailangan ito para sa cross-device na pag-sync ng data at collaboration.",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_allow_temp",
-            "value":"Percayai kali ini",
+            "value":"Pagkatiwalaan sa oras na ito",
             "attr":{
                 "priority":"translate"
             }
         },
         {
             "name":"dm_allow_always",
-            "value":"Selalu percayai",
+            "value":"Laging pagkatiwalaan",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"Pagkatiwalaan sa oras na ito lamang",
             "attr":{
                 "priority":"translate"
             }

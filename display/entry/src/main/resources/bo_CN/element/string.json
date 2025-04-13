@@ -63,6 +63,13 @@
         {
             "name":"dm_enter_peer_connect_code",
             "value":"ཕ་རོལ་སྣེའི་སྦྲེལ་མཐུད་ཨང་རྟགས་འཇུག་རོགས།"
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"ཐེངས་འདི་ཁོ་ནར་ཡིད་ཆེས།",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }
