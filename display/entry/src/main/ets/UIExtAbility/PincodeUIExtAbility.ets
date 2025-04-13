@@ -31,7 +31,8 @@ export default class InputUIExtAbility extends UIExtensionAbility {
         let storage: LocalStorage = new LocalStorage(param);
         if (deviceInfo.deviceType === 'wearable') {
             session.loadContent('pages/PinDialogWearable', storage);
-            
+        } else if (deviceInfo.deviceType === 'tv') {
+            session.loadContent('pages/PinDialogTv', storage);
         } else {
             session.loadContent('pages/PinDialog', storage);
         }
