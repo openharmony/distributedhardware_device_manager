@@ -192,6 +192,7 @@ struct PinCustomDialog {
         .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
       }
     }
+    .constraintSize({ maxHeight: '80%' })
   }
 }
 
