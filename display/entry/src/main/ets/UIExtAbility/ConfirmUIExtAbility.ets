@@ -46,6 +46,8 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         let storage: LocalStorage = new LocalStorage(param);
         if (deviceInfo.deviceType === 'wearable') {
             session.loadContent('pages/ConfirmDialogWearable', storage);
+        } else if (deviceInfo.deviceType === 'tv') {
+            session.loadContent('pages/ConfirmDialogTv', storage);
         } else {
             session.loadContent('pages/ConfirmDialog', storage);
         }
