@@ -85,6 +85,10 @@ public:
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override;
     void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
         const DmDeviceIconInfo &dmDeviceIconInfo, int32_t code) override;
+    void OnSetLocalDeviceNameResult(const ProcessInfo &processInfo,
+        const std::string &deviceName, int32_t code) override;
+    void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
+        const std::string &deviceName, int32_t code) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

@@ -37,6 +37,9 @@ public:
     bool CheckSystemSA(const std::string &pkgName);
     bool CheckProcessNameValidOnSetDnPolicy(const std::string &processName);
     bool CheckProcessNameValidOnGetDeviceInfo(const std::string &processName);
+    bool CheckProcessNameValidModifyLocalDeviceName(const std::string &processName);
+    bool CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName);
+    bool CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
