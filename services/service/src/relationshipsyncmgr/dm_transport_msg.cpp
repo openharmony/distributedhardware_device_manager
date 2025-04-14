@@ -28,6 +28,7 @@ const char* const COMM_MSG_MSG_KEY = "msg";
 const char* const DSOFTBUS_NOTIFY_USERIDS_UDIDKEY = "remoteUdid";
 const char* const DSOFTBUS_NOTIFY_USERIDS_USERIDKEY = "foregroundUserIds";
 const char* const DSOFTBUS_NOTIFY_ACCOUNTID_KEY = "accountId";
+const char* const DSOFTBUS_NOTIFY_USERID_KEY = "userId";
 }
 void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
 {
@@ -236,7 +237,7 @@ void ToJson(cJSON *jsonObject, const LogoutAccountMsg &accountInfo)
     }
 
     cJSON_AddStringToObject(jsonObject, DSOFTBUS_NOTIFY_ACCOUNTID_KEY, accountInfo.accountId.c_str());
-    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_USERIDS_USERIDKEY, accountInfo.userId);
+    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY, accountInfo.userId);
 }
 
 void FromJson(const cJSON *jsonObject, LogoutAccountMsg &accountInfo)
@@ -250,7 +251,7 @@ void FromJson(const cJSON *jsonObject, LogoutAccountMsg &accountInfo)
         accountInfo.accountId = accountIdObj->valuestring;
     }
 
-    cJSON *userIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_USERIDS_USERIDKEY);
+    cJSON *userIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY);
     if (cJSON_IsNumber(userIdObj)) {
         accountInfo.userId = userIdObj->valueint;
     }

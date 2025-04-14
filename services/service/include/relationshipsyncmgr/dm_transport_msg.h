@@ -68,7 +68,7 @@ void FromJson(const cJSON *jsonObject, NotifyUserIds &userIds);
 struct LogoutAccountMsg {
     std::string accountId;
     int32_t userId;
-    LogoutAccountMsg() : userId(0) {}
+    LogoutAccountMsg() : userId(-1) {}
     LogoutAccountMsg(const std::string &accountId, int32_t userId)
         : accountId(accountId), userId(userId) {}
 };
