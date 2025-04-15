@@ -113,6 +113,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenSoftBusReady()
     if (DependsIsReady()) {
         int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
         InitDeviceName(userId);
+        RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
     }
     return DM_OK;
 }
@@ -136,7 +137,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenUserSwitch(int32_t curUserId, int32
     LOGI("In");
     if (DependsIsReady()) {
         InitDeviceName(curUserId);
-        RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
+        RegisterDeviceNameChangeMonitor(curUserId, preUserId);
     }
     return DM_OK;
 }
@@ -162,6 +163,16 @@ int32_t DeviceNameManager::InitDeviceNameWhenLogin()
 }
 
 int32_t DeviceNameManager::InitDeviceNameWhenNickChange()
+{
+    LOGI("In");
+    if (DependsIsReady()) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        InitDeviceName(userId);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceNameManager::InitDeviceNameWhenLanguageOrRegionChanged()
 {
     LOGI("In");
     if (DependsIsReady()) {
@@ -480,7 +491,7 @@ std::string DeviceNameManager::GetSystemRegion()
     if (status > 0) {
         return param;
     }
-    LOGE("Failed to get system local");
+    LOGE("Failed to get system region");
     return "";
 }
 
