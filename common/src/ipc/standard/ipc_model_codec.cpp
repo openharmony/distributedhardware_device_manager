@@ -23,6 +23,7 @@ namespace DistributedHardware {
 namespace {
 constexpr const char* UK_SEPARATOR = "#";
 constexpr int32_t MAX_ICON_SIZE = 4 * 1024 * 1024;
+constexpr uint32_t IPC_VECTOR_MAX_SIZE = 1000;
 }
 
 #define READ_HELPER_RET(parcel, type, out, failRet) \
@@ -461,7 +462,7 @@ bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::s
 {
     uint32_t num = 0;
     READ_HELPER_RET(parcel, Uint32, num, false);
-    if (num > MAX_DEVICE_PROFILE_SIZE) {
+    if (num > IPC_VECTOR_MAX_SIZE) {
         LOGE("num is Invalid value, num = %{public}u", num);
         return false;
     }

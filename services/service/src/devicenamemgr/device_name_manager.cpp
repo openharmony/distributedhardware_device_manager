@@ -136,6 +136,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenUserSwitch(int32_t curUserId, int32
     LOGI("In");
     if (DependsIsReady()) {
         InitDeviceName(curUserId);
+        RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
     }
     return DM_OK;
 }
@@ -305,7 +306,7 @@ void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, c
 
 int32_t DeviceNameManager::GetLocalDisplayDeviceName(int32_t maxNamelength, std::string &displayName)
 {
-    int32_t userId = 0;
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     if (maxNamelength < 0 || (maxNamelength > 0 && maxNamelength < NAME_LENGTH_MIN) ||
         maxNamelength > NAME_LENGTH_MAX) {
         LOGE("maxNamelength:%{public}d is invalid", maxNamelength);
@@ -318,7 +319,6 @@ int32_t DeviceNameManager::GetLocalDisplayDeviceName(int32_t maxNamelength, std:
         displayName = GetLocalDisplayDeviceName("", userDefinedDeviceName, maxNamelength);
         return DM_OK;
     }
-    MultipleUserConnector::GetCallerUserId(userId);
     std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
     std::string localMarketName = GetLocalMarketName();
     displayName = GetLocalDisplayDeviceName(nickName, localMarketName, maxNamelength);
@@ -487,16 +487,15 @@ std::string DeviceNameManager::GetSystemRegion()
 std::string DeviceNameManager::GetLocalMarketName()
 {
     std::lock_guard<std::mutex> lock(localMarketNameMtx_);
-    if (!localMarketName_.empty()) {
-        return localMarketName_;
+    if (localMarketName_.empty()) {
+        const char *marketName = GetMarketName();
+        if (marketName == nullptr) {
+            LOGE("get marketName fail!");
+            return "";
+        }
+        localMarketName_ = marketName;
+        free((char *)marketName);
     }
-    const char *marketName = GetMarketName();
-    if (marketName == nullptr) {
-        LOGE("get marketName fail!");
-        return "";
-    }
-    localMarketName_ = marketName;
-    free((char *)marketName);
     std::vector<std::string> prefixs = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
     for (const auto &item : prefixs) {
         localMarketName_ = TrimStr(ReplaceStr(localMarketName_, item, ""));

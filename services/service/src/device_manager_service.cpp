@@ -3283,7 +3283,7 @@ int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
     }
     if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_NO_PERMISSION;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceNameManager::GetInstance().RestoreLocalDeviceName();

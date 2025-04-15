@@ -682,7 +682,7 @@ void JsToDmDeviceIconInfoFilterOptions(const napi_env &env, const napi_value &ob
     JsObjectToString(env, object, "subProductId", subProductId, sizeof(subProductId));
     info.subProductId = subProductId;
     char internalModel[DM_NAPI_BUF_LENGTH] = "";
-    JsObjectToString(env, object, "internalModel", subProductId, sizeof(internalModel));
+    JsObjectToString(env, object, "internalModel", internalModel, sizeof(internalModel));
     info.internalModel = internalModel;
     char imageType[DM_NAPI_BUF_LENGTH] = "";
     JsObjectToString(env, object, "imageType", imageType, sizeof(imageType));

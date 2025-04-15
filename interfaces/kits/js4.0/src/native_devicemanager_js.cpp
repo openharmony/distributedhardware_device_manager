@@ -2543,7 +2543,7 @@ napi_value DeviceManagerNapi::JsSetLocalDeviceName(napi_env env, napi_callback_i
     }
     if (deviceName.size() > DEVICE_NAME_MAX_BYTES) {
         LOGE("deviceName is too long");
-        CreateBusinessError(env, ERR_DM_INIT_FAILED);
+        CreateBusinessError(env, ERR_DM_INPUT_PARA_INVALID);
         return nullptr;
     }
     auto *jsCallback = new SetLocalDeviceNameAsyncCallbackInfo();
@@ -2582,7 +2582,7 @@ napi_value DeviceManagerNapi::JsSetRemoteDeviceName(napi_env env, napi_callback_
     }
     if (deviceName.size() > DEVICE_NAME_MAX_BYTES) {
         LOGE("deviceName is too long");
-        CreateBusinessError(env, ERR_DM_INIT_FAILED);
+        CreateBusinessError(env, ERR_DM_INPUT_PARA_INVALID);
         return nullptr;
     }
     std::string deviceId = "";
