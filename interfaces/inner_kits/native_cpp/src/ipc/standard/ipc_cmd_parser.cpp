@@ -1781,5 +1781,35 @@ ON_IPC_CMD(GET_DEVICE_PROFILE_INFO_LIST_RESULT, MessageParcel &data, MessageParc
     reply.WriteInt32(DM_OK);
     return DM_OK;
 }
+
+ON_IPC_SET_REQUEST(REG_AUTHENTICATION_TYPE, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        LOGE("pBaseReq is null");
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcCommonParamReq> pReq = std::static_pointer_cast<IpcCommonParamReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string authTypeStr = pReq->GetFirstParam();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(authTypeStr)) {
+        LOGE("write authTypeStr parameter failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(REG_AUTHENTICATION_TYPE, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

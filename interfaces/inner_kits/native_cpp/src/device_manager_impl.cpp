@@ -97,7 +97,8 @@ constexpr const char* DM_HITRACE_INIT = "DM_HITRACE_INIT";
 const uint16_t DM_MIN_RANDOM = 1;
 const uint16_t DM_MAX_RANDOM = 65535;
 const uint16_t DM_INVALID_FLAG_ID = 0;
-const uint16_t DM_IMPORT_AUTH_CODE_LENGTH = 6;
+const uint16_t DM_IMPORT_AUTH_CODE_MIN_LENGTH = 6;
+const uint16_t DM_IMPORT_AUTH_CODE_MAX_LENGTH = 1024;
 const int32_t NORMAL = 0;
 const int32_t SYSTEM_BASIC = 1;
 const int32_t SYSTEM_CORE = 2;
@@ -1488,7 +1489,7 @@ int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std:
     }
     LOGI("Start, authCode: %{public}s", GetAnonyString(authCode).c_str());
     int32_t length = static_cast<int32_t>(authCode.length());
-    if (length != DM_IMPORT_AUTH_CODE_LENGTH) {
+    if (length < DM_IMPORT_AUTH_CODE_MIN_LENGTH || length > DM_IMPORT_AUTH_CODE_MAX_LENGTH) {
         LOGE("ImportAuthCode error: Invalid para, authCode size error.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -2332,6 +2333,36 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
         DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
+        return ret;
+    }
+    LOGI("Completed");
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::RegisterAuthenticationType(const std::string &pkgName,
+    const std::map<std::string, std::string> &authParam)
+{
+    const size_t AUTH_TYPE_PARAM_SIZE = 1;
+    if (pkgName.empty() || authParam.size() != AUTH_TYPE_PARAM_SIZE) {
+        LOGE("Para invalid: authParam is less than one or pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+
+    LOGI("Start");
+    std::string authTypeStr = ConvertMapToJsonString(authParam);
+
+    std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetFirstParam(authTypeStr);
+    int32_t ret = ipcClientProxy_->SendRequest(REG_AUTHENTICATION_TYPE, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
         return ret;
     }
     LOGI("Completed");

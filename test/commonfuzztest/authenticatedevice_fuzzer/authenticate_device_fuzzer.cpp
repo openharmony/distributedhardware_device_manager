@@ -25,6 +25,7 @@
 #include "authenticate_device_fuzzer.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
+#include "dm_constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -274,6 +275,9 @@ void AuthenticateDeviceThirdFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStateCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStatusCallback(str);
+    std::map<std::string, std::string> authParam;
+    authParam[DM_AUTHENTICATION_TYPE] = str;
+    DeviceManager::GetInstance().RegisterAuthenticationType(str, authParam);
 }
 
 void AuthenticateDeviceFourthFuzzTest(const uint8_t* data, size_t size)

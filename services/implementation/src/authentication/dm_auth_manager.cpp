@@ -205,8 +205,28 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         if (IsInt32(jsonObject, TAG_BIND_LEVEL)) {
             authRequestContext_->bindLevel = jsonObject[TAG_BIND_LEVEL].get<int32_t>();
         }
+        authRequestContext_->closeSessionDelaySeconds = 0;
+        if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
+            std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].get<std::string>();
+            authRequestContext_->closeSessionDelaySeconds = GetCloseSessionDelaySeconds(delaySecondsStr);
+        }
     }
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
+}
+
+int32_t DmAuthManager::GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
+{
+    if (!IsNumberString(delaySecondsStr)) {
+        LOGE("Invalid parameter, param is not number.");
+        return 0;
+    }
+    const int32_t CLOSE_SESSION_DELAY_SECONDS_MAX = 10;
+    int32_t delaySeconds = std::atoi(delaySecondsStr.c_str());
+    if (delaySeconds < 0 || delaySeconds > CLOSE_SESSION_DELAY_SECONDS_MAX) {
+        LOGE("Invalid parameter, param out of range.");
+        return 0;
+    }
+    return delaySeconds;
 }
 
 void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
@@ -1229,11 +1249,21 @@ void DmAuthManager::SrcAuthenticateFinish()
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
     }
     usleep(USLEEP_TIME_MS); // 500ms
+
+    int32_t sessionId = authRequestContext_->sessionId;
+    auto taskFunc = [this, sessionId]() {
+        CHECK_NULL_VOID(softbusConnector_);
+        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+    };
+    const int64_t MICROSECOND_PER_SECOND = 1000000L;
+    int32_t delaySeconds = authRequestContext_->closeSessionDelaySeconds;
+    ffrt::submit(taskFunc, ffrt::task_attr().delay(delaySeconds * MICROSECOND_PER_SECOND));
+
     listener_->OnAuthResult(authRequestContext_->hostPkgName, peerTargetId_.deviceId,
         authRequestContext_->token, authResponseContext_->state, authRequestContext_->reason);
     listener_->OnBindResult(authRequestContext_->hostPkgName, peerTargetId_, authRequestContext_->reason,
         authResponseContext_->state, GenerateBindResultContent());
-    softbusConnector_->GetSoftbusSession()->CloseAuthSession(authRequestContext_->sessionId);
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
     authTimes_ = 0;
@@ -1274,6 +1304,7 @@ void DmAuthManager::AuthenticateFinish()
     authResponseContext_ = nullptr;
     authMessageProcessor_ = nullptr;
     authPtr_ = nullptr;
+    authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
     LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
@@ -1394,7 +1425,7 @@ void DmAuthManager::ShowConfigDialog()
     }
     if (!authResponseContext_->isShowDialog) {
         LOGI("start auth process");
-        StartAuthProcess(USER_OPERATION_TYPE_ALLOW_AUTH);
+        StartAuthProcess(authenticationType_);
         return;
     }
     LOGI("ShowConfigDialog start");
@@ -2782,6 +2813,17 @@ int32_t DmAuthManager::GetTaskTimeout(const char* taskName, int32_t taskTimeOut)
         }
     }
     return taskTimeOut;
+}
+
+int32_t DmAuthManager::RegisterAuthenticationType(int32_t authenticationType)
+{
+    if (authenticationType != USER_OPERATION_TYPE_ALLOW_AUTH &&
+        authenticationType != USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    authenticationType_ = authenticationType;
+    return DM_OK;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

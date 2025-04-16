@@ -37,11 +37,13 @@ constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permiss
 constexpr int32_t DM_OK = 0;
 constexpr int32_t ERR_DM_FAILED = 96929744;
 constexpr int32_t PKG_NAME_SIZE_MAX = 256;
-#define AUTH_CODE_WHITE_LIST_NUM (3)
+#define AUTH_CODE_WHITE_LIST_NUM (5)
 constexpr const static char g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "com.huawei.msdp.hmringgenerator",
     "com.huawei.msdp.hmringdiscriminator",
     "CollaborationFwk",
+    "wear_link_service",
+    "watch_system_service",
 };
 
 #define PIN_HOLDER_WHITE_LIST_NUM (1)
@@ -60,9 +62,10 @@ constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PKG_NAME
     "ohos.security.distributed_access_token",
 };
 
-constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = 2;
+constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = 3;
 constexpr const static char g_setDnPolicyWhiteList[SETDNPOLICY_WHITE_LIST_NUM][PKG_NAME_SIZE_MAX] = {
     "collaboration_service",
+    "watch_system_service",
     "com.huawei.hmos.walletservice",
 };
 }

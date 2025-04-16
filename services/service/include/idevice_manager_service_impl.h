@@ -289,6 +289,7 @@ public:
     virtual void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo) = 0;
     virtual void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId,
                                             int32_t errcode) = 0;
+    virtual int32_t RegisterAuthenticationType(int32_t authenticationType) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

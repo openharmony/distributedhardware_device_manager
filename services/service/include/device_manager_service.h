@@ -207,6 +207,8 @@ public:
         int32_t &screenStatus);
     void HandleCredentialAuthStatus(const std::string &proofInfo, uint16_t deviceTypeId, int32_t errcode);
     int32_t GetDeviceProfileInfoList(const std::string &pkgName, DmDeviceProfileInfoFilterOptions &filterOptions);
+    int32_t RegisterAuthenticationType(const std::string &pkgName,
+        const std::map<std::string, std::string> &authParam);
 private:
     bool IsDMServiceImplReady();
     bool IsDMServiceAdapterLoad();
