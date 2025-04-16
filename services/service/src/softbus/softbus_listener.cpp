@@ -1349,7 +1349,7 @@ int32_t SoftbusListener::GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &
         return DM_OK;
     }
     cJSON *customData = cJSON_GetObjectItem(extraDataJsonObj, PARAM_KEY_CUSTOM_DATA);
-    if (customData == NULL || customData->valuestring == NULL) {
+    if (customData == NULL) {
         cJSON_Delete(extraDataJsonObj);
         return DM_OK;
     }

@@ -562,7 +562,6 @@ std::string RelationShipChangeMsg::ToJson() const
     if (udidArrayObj == nullptr) {
         LOGE("cJSON_CreateArray failed");
         cJSON_Delete(msg);
-        cJSON_Delete(udidArrayObj);
         return "";
     }
     cJSON *udidStringObj = nullptr;
@@ -581,15 +580,11 @@ std::string RelationShipChangeMsg::ToJson() const
     if (retStr == nullptr) {
         LOGE("to json is nullptr.");
         cJSON_Delete(msg);
-        cJSON_Delete(udidArrayObj);
-        cJSON_Delete(udidStringObj);
         return "";
     }
     std::string ret = std::string(retStr);
     cJSON_Delete(msg);
     cJSON_free(retStr);
-    cJSON_Delete(udidArrayObj);
-    cJSON_Delete(udidStringObj);
     return ret;
 }
 

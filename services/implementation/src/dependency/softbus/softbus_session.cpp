@@ -123,7 +123,7 @@ int32_t SoftbusSession::OpenAuthSessionWithPara(const std::string &deviceId, int
     DmTraceStart(std::string(DM_HITRACE_AUTH_TO_OPPEN_SESSION));
     LinkPara para;
     para.type = PARA_ACTION;
-    para.action.actionId = static_cast<uint32_t>(actionId);
+    para.action.actionId = actionId;
     para.enable160M = isEnable160m;
     para.accountInfo = false;
     int32_t sessionId = ::OpenAuthSessionWithPara(DM_SESSION_NAME, &para);
