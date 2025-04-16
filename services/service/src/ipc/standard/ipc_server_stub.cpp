@@ -166,10 +166,8 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 #endif // SUPPORT_MEMMGR
 
     if (systemAbilityId == SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
-        DMAccountInfo dmAccountInfo;
-        dmAccountInfo.accountId = MultipleUserConnector::GetOhosAccountId();
-        dmAccountInfo.accountName = MultipleUserConnector::GetOhosAccountName();
-        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(), dmAccountInfo);
+        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
+            MultipleUserConnector::GetCurrentDMAccountInfo());
         DeviceManagerService::GetInstance().InitAccountInfo();
         return;
     }

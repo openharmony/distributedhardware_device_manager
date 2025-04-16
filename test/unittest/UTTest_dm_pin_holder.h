@@ -238,6 +238,23 @@ public:
         (void)dmDeviceIconInfo;
         (void)code;
     }
+
+    virtual void OnSetLocalDeviceNameResult(const ProcessInfo &processInfo,
+        const std::string &deviceName, int32_t code) override
+    {
+        (void)processInfo;
+        (void)deviceName;
+        (void)code;
+    }
+
+    virtual void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
+        const std::string &deviceName, int32_t code) override
+    {
+        (void)processInfo;
+        (void)deviceId;
+        (void)deviceName;
+        (void)code;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS
