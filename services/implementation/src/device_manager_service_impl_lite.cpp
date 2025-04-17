@@ -527,6 +527,28 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
     return 0;
 }
 
+int32_t DeviceManagerServiceImpl::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
+{
+    (void)localUdid;
+    (void)localUserId;
+    (void)remoteUdid;
+    (void)remoteUserId;
+    (void)remoteAclList;
+    return 0;
+}
+
+int32_t DeviceManagerServiceImpl::GetAclListHash(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+{
+    (void)localUdid;
+    (void)localUserId;
+    (void)remoteUdid;
+    (void)remoteUserId;
+    (void)aclList;
+    return 0;
+}
+
 void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
     int32_t errcode)
 {
@@ -613,6 +635,15 @@ int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &l
     (void)localUdid;
     (void)peerDeviceId;
     return DM_OK;
+}
+
+void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
+    int32_t remoteTokenId)
+{
+    (void)userId;
+    (void)remoteUdid;
+    (void)remoteTokenId;
+    return;
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

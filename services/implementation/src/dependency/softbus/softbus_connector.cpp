@@ -28,12 +28,16 @@
 #include "json_object.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "deviceprofile_connector.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE = 100;
 const int32_t SOFTBUS_TRUSTDEVICE_UUIDHASH_INFO_MAX_SIZE = 100;
+const int32_t DM_VERSION_INT_5_1_0 = 510;
 
 constexpr const char* WIFI_IP = "WIFI_IP";
 constexpr const char* WIFI_PORT = "WIFI_PORT";
@@ -41,6 +45,10 @@ constexpr const char* BR_MAC = "BR_MAC";
 constexpr const char* BLE_MAC = "BLE_MAC";
 constexpr const char* ETH_IP = "ETH_IP";
 constexpr const char* ETH_PORT = "ETH_PORT";
+namespace {
+    const char* TAG_ACL = "accessControlTable";
+    const char* TAG_DMVERSION = "dmVersion";
+}
 
 std::string SoftbusConnector::remoteUdidHash_ = "";
 std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDeviceInfoMap_ = {};
@@ -55,6 +63,7 @@ SoftbusConnector::SoftbusConnector()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     softbusSession_ = std::make_shared<SoftbusSession>();
+    hiChainAuthConnector_ = std::make_shared<HiChainAuthConnector>();
 #endif
     LOGD("SoftbusConnector constructor.");
 }
@@ -62,6 +71,128 @@ SoftbusConnector::SoftbusConnector()
 SoftbusConnector::~SoftbusConnector()
 {
     LOGD("SoftbusConnector destructor.");
+}
+
+void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
+    int32_t sessionKeyId, int32_t aclId)
+{
+    LOGI("SyncAclList userId:%{public}d, credId:%{public}s, sessionKeyId:%{public}d, aclId:%{public}d",
+        userId, credId.c_str(), sessionKeyId, aclId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    // 根据skid删除sk，删除skid
+    int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
+    if (ret != DM_OK) {
+        LOGE("SyncAclList DeleteSessionKey failed.");
+    }
+    if (hiChainAuthConnector_ != nullptr) {
+        // 根据凭据id 删除sink端多余的凭据
+        ret = hiChainAuthConnector_->DeleteCredential(userId, credId);
+        if (ret != DM_OK) {
+            LOGE("SyncAclList DeleteCredential failed.");
+        }
+    }
+    // 删除本条acl
+    DeviceProfileConnector::GetInstance().DeleteAccessControlById(aclId);
+#endif
+}
+
+int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::vector<std::string> remoteAclList)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::vector<DistributedDeviceProfile::AccessControlProfile> localAclList =
+        DeviceProfileConnector::GetInstance().GetAclList(localUdid, localUserId, remoteUdid, remoteUserId);
+    for (auto &localAcl : localAclList) {
+        bool res = DeviceProfileConnector::GetInstance().ChecksumAcl(localAcl, remoteAclList);
+        if (res) {
+            continue;
+        }
+        if (localAcl.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            localAcl.GetAccessee().GetAccesseeDeviceId() == remoteUdid) {
+            LOGI("SyncLocalAclListProcess Src.");
+            SyncAclList(localAcl.GetAccesser().GetAccesserUserId(),
+                localAcl.GetAccesser().GetAccesserCredentialIdStr(),
+                localAcl.GetAccesser().GetAccesserSessionKeyId(), localAcl.GetAccessControlId());
+        }
+        if (localAcl.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
+            localAcl.GetAccessee().GetAccesseeDeviceId() == localUdid) {
+            LOGI("SyncLocalAclListProcess Sink.");
+            SyncAclList(localAcl.GetAccessee().GetAccesseeUserId(),
+                localAcl.GetAccessee().GetAccesseeCredentialIdStr(),
+                localAcl.GetAccessee().GetAccesseeSessionKeyId(), localAcl.GetAccessControlId());
+        }
+    }
+    return DM_OK;
+#else
+    (void)localUdid;
+    (void)localUserId;
+    (void)remoteUdid;
+    (void)remoteUserId;
+    (void)remoteAclList;
+    return DM_OK;
+#endif
+}
+
+int32_t SoftbusConnector::ParaseAclChecksumList(const std::string &jsonString, std::string &dmVersion,
+    std::vector<std::string> &remoteAclList)
+{
+    JsonObject aclChecksumjson(jsonString);
+    if (aclChecksumjson.IsDiscarded()) {
+        LOGE("ParseSyncMessage aclChecksumjson error");
+        return ERR_DM_FAILED;
+    }
+    if (!aclChecksumjson[TAG_DMVERSION].IsString()) {
+        LOGE("ParseSyncMessage TAG_DMVERSION error");
+        return ERR_DM_FAILED;
+    }
+    dmVersion = aclChecksumjson[TAG_DMVERSION].Get<std::string>();
+    if (!aclChecksumjson[TAG_ACL].IsArray()) {
+        LOGE("ParseSyncMessage TAG_ACL error");
+        return ERR_DM_FAILED;
+    }
+    aclChecksumjson[TAG_ACL].Get(remoteAclList);
+    return DM_OK;
+}
+
+int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
+{
+    std::string dmVersion = "";
+    std::vector<std::string> remoteAclListVec;
+    int32_t ret = ParaseAclChecksumList(remoteAclList, dmVersion, remoteAclListVec);
+    if (ret != DM_OK) {
+        LOGE("ParaseAclChecksumList TAG_ACL and dmversion error");
+        return ret;
+    }
+    int32_t versionNum = 0;
+    if (!GetVersionNumber(dmVersion, versionNum)) {
+        LOGE("ParaseAclChecksumList GetVersionNumber error");
+        return ERR_DM_FAILED;
+    }
+    switch (versionNum) {
+        case DM_VERSION_INT_5_1_0:
+            return SyncLocalAclList5_1_0(localUdid, localUserId, remoteUdid, remoteUserId, remoteAclListVec);
+        default:
+            LOGE("versionNum is invaild");
+            break;
+    }
+    return ERR_DM_FAILED;
+}
+
+int32_t SoftbusConnector::GetAclListHash(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DeviceProfileConnector::GetInstance().GetAclListHashStr(localUdid,
+        localUserId, remoteUdid, remoteUserId, aclList);
+#else
+    (void)localUdid;
+    (void)localUserId;
+    (void)remoteUdid;
+    (void)remoteUserId;
+    (void)aclList;
+    return DM_OK;
+#endif
 }
 
 int32_t SoftbusConnector::RegisterConnectorCallback(std::shared_ptr<ISoftbusConnectorCallback> callback)
@@ -92,7 +223,7 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId, bool isForceJoin)
 {
     std::string connectAddr;
     LOGI("start, deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
-    ConnectionAddr *addrInfo = GetConnectAddr(deviceId, connectAddr);
+    auto addrInfo = GetConnectAddr(deviceId, connectAddr);
     if (addrInfo == nullptr) {
         LOGE("addrInfo is nullptr.");
         return;
@@ -102,11 +233,66 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId, bool isForceJoin)
         LOGE("convert remoteUdid hash failed, remoteUdidHash_: %{public}s.", GetAnonyString(remoteUdidHash_).c_str());
         return;
     }
-    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo, OnSoftbusJoinLNNResult, isForceJoin);
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo.get(), OnSoftbusJoinLNNResult, isForceJoin);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]JoinLNN failed, ret: %{public}d.", ret);
     }
     return;
+}
+
+void SoftbusConnector::JoinLnn(const std::string &deviceId, const std::string &remoteUdidHash)
+{
+    std::string connectAddr;
+    LOGI("start, deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
+    auto addrInfo = GetConnectAddr(deviceId, connectAddr);
+    if (addrInfo == nullptr) {
+        LOGE("addrInfo is nullptr.");
+        return;
+    }
+    if (Crypto::ConvertHexStringToBytes(addrInfo->info.ble.udidHash, UDID_HASH_LEN,
+        remoteUdidHash.c_str(), remoteUdidHash.length()) != DM_OK) {
+        LOGE("convert remoteUdid hash failed, remoteUdidHash_: %{public}s.", GetAnonyString(remoteUdidHash).c_str());
+        return;
+    }
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo.get(), OnSoftbusJoinLNNResult, false);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]JoinLNN failed, ret: %{public}d.", ret);
+    }
+    return;
+}
+
+void SoftbusConnector::JoinLNNBySkId(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId,
+    std::string udid, std::string udidHash)
+{
+    LOGI("start, JoinLNNBySkId sessionId: %{public}d, udid: %{public}s.", sessionId, GetAnonyString(udid).c_str());
+    std::string connectAddr;
+    auto addrInfo = GetConnectAddr(udid, connectAddr);
+    if (addrInfo == nullptr) {
+        LOGE("addrInfo is nullptr.");
+        return;
+    }
+    LOGI("addrInfo->type: %{public}d", addrInfo->type);
+    if (addrInfo->type == CONNECTION_ADDR_BLE) {
+        if (Crypto::ConvertHexStringToBytes(addrInfo->info.ble.udidHash, UDID_HASH_LEN, udidHash.c_str(),
+                                            udidHash.length()) != DM_OK) {
+            LOGE("convert remoteUdid hash failed, udidHash: %{public}s.", GetAnonyString(udidHash).c_str());
+            return;
+        }
+    }
+
+    addrInfo->deviceKeyId.hasDeviceKeyId = true;  // 总线修改后适配
+    if (sessionKeyId > 0 && remoteSessionKeyId > 0) {
+        addrInfo->deviceKeyId.localDeviceKeyId = sessionKeyId; // 总线修改后适配
+        addrInfo->deviceKeyId.remoteDeviceKeyId = remoteSessionKeyId; // 总线修改后适配
+        LOGI("sessionKeyId valid");
+    } else {
+        addrInfo->deviceKeyId.localDeviceKeyId = 0; // 总线修改后适配
+        addrInfo->deviceKeyId.remoteDeviceKeyId = 0; // 总线修改后适配
+    }
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo.get(), OnSoftbusJoinLNNResult, false);
+    if (ret != DM_OK) {
+        LOGE("[SOFTBUS]JoinLNNBySkId failed, ret: %{public}d.", ret);
+    }
 }
 
 void SoftbusConnector::JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId)
@@ -115,13 +301,14 @@ void SoftbusConnector::JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int
     ConnectionAddr addrInfo;
     addrInfo.type = CONNECTION_ADDR_SESSION_WITH_KEY;
     addrInfo.info.session.sessionId = sessionId;
+    addrInfo.deviceKeyId.hasDeviceKeyId = true;
     if (sessionKeyId > 0 && remoteSessionKeyId > 0) {
-        addrInfo.info.session.localDeviceKeyId = sessionKeyId;
-        addrInfo.info.session.remoteDeviceKeyId = remoteSessionKeyId;
+        addrInfo.deviceKeyId.localDeviceKeyId = sessionKeyId;
+        addrInfo.deviceKeyId.remoteDeviceKeyId = remoteSessionKeyId;
         LOGI("sessionKeyId valid");
     } else {
-        addrInfo.info.session.localDeviceKeyId = 0;
-        addrInfo.info.session.remoteDeviceKeyId = 0;
+        addrInfo.deviceKeyId.localDeviceKeyId = 0;
+        addrInfo.deviceKeyId.remoteDeviceKeyId = 0;
     }
     int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult, false);
     if (ret != DM_OK) {
@@ -172,52 +359,59 @@ ConnectionAddr *SoftbusConnector::GetConnectAddrByType(DeviceInfo *deviceInfo, C
     return nullptr;
 }
 
-ConnectionAddr *SoftbusConnector::GetConnectAddr(const std::string &deviceId, std::string &connectAddr)
+std::shared_ptr<DeviceInfo> SoftbusConnector::GetDeviceInfoFromMap(const std::string &deviceId)
 {
-    DeviceInfo *deviceInfo = nullptr;
-    {
-        std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
-        auto iter = discoveryDeviceInfoMap_.find(deviceId);
-        if (iter == discoveryDeviceInfoMap_.end()) {
-            LOGE("deviceInfo not found by deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
-            return nullptr;
-        }
-        deviceInfo = iter->second.get();
+    std::lock_guard<std::mutex> lock(discoveryDeviceInfoMutex_);
+    auto iter = discoveryDeviceInfoMap_.find(deviceId);
+    if (iter == discoveryDeviceInfoMap_.end()) {
+        LOGE("deviceInfo not found by deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
+        return nullptr;
     }
-    if (deviceInfo->addrNum <= 0 || deviceInfo->addrNum >= CONNECTION_ADDR_MAX) {
-        LOGE("deviceInfo addrNum not valid, addrNum: %{public}d.", deviceInfo->addrNum);
+    return iter->second;
+}
+
+std::shared_ptr<ConnectionAddr> SoftbusConnector::GetConnectAddr(const std::string &deviceId, std::string &connectAddr)
+{
+    std::shared_ptr<DeviceInfo> deviceInfo = GetDeviceInfoFromMap(deviceId);
+    if (deviceInfo == nullptr || deviceInfo->addrNum <= 0 || deviceInfo->addrNum >= CONNECTION_ADDR_MAX) {
+        LOGE("deviceInfo addrNum not valid, addrNum: %{public}d.", (deviceInfo != nullptr) ? deviceInfo->addrNum : 0);
         return nullptr;
     }
     JsonObject jsonPara;
-    ConnectionAddr *addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_ETH);
+    std::shared_ptr<ConnectionAddr> connectAddrPtr = std::make_shared<ConnectionAddr>();
+    ConnectionAddr *addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_ETH);
     if (addr != nullptr) {
+        *connectAddrPtr = *addr;
         LOGI("[SOFTBUS]get ETH ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
         jsonPara[ETH_IP] = addr->info.ip.ip;
         jsonPara[ETH_PORT] = addr->info.ip.port;
-        connectAddr = SafetyDump(jsonPara);
-        return addr;
+        connectAddr = jsonPara.Dump();
+        return connectAddrPtr;
     }
-    addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_WLAN);
+    addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_WLAN);
     if (addr != nullptr) {
+        *connectAddrPtr = *addr;
         jsonPara[WIFI_IP] = addr->info.ip.ip;
         jsonPara[WIFI_PORT] = addr->info.ip.port;
         LOGI("[SOFTBUS]get WLAN ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
-        connectAddr = SafetyDump(jsonPara);
-        return addr;
+        connectAddr = jsonPara.Dump();
+        return connectAddrPtr;
     }
-    addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_BR);
+    addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_BR);
     if (addr != nullptr) {
+        *connectAddrPtr = *addr;
         jsonPara[BR_MAC] = addr->info.br.brMac;
         LOGI("[SOFTBUS]get BR ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
-        connectAddr = SafetyDump(jsonPara);
-        return addr;
+        connectAddr = jsonPara.Dump();
+        return connectAddrPtr;
     }
-    addr = GetConnectAddrByType(deviceInfo, ConnectionAddrType::CONNECTION_ADDR_BLE);
+    addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_BLE);
     if (addr != nullptr) {
+        *connectAddrPtr = *addr;
         jsonPara[BLE_MAC] = addr->info.ble.bleMac;
-        connectAddr = SafetyDump(jsonPara);
+        connectAddr = jsonPara.Dump();
         addr->info.ble.priority = BLE_PRIORITY_HIGH;
-        return addr;
+        return connectAddrPtr;
     }
     LOGE("[SOFTBUS]failed to get ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
     return nullptr;
@@ -284,6 +478,10 @@ void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *
     int32_t sessionId = addr->info.session.sessionId;
     CHECK_NULL_VOID(connectorCallback_);
     connectorCallback_->OnSoftbusJoinLNNResult(sessionId, networkId, result);
+#else
+    (void)addr;
+    (void)networkId;
+    (void)result;
 #endif
 }
 
@@ -455,7 +653,8 @@ void SoftbusConnector::DeleteOffLineTimer(std::string &udidHash)
     }
 }
 
-bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
+// isHash：传入的deviceId是否为哈希值
+bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceIdHash, bool isHash)
 {
     LOGI("Check the device is online.");
     int32_t deviceCount = 0;
@@ -472,7 +671,8 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
             LOGE("[SOFTBUS]GetNodeKeyInfo failed.");
         }
         std::string udid = reinterpret_cast<char *>(mUdid);
-        if (udid == targetDeviceId) {
+        if ((isHash == false && udid == targetDeviceIdHash) ||
+            (isHash == true && Crypto::Sha256(udid).find(targetDeviceIdHash) == 0)) {
             LOGI("The device is online.");
             FreeNodeInfo(nodeInfo);
             return true;
@@ -481,6 +681,11 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
     LOGI("The device is not online.");
     FreeNodeInfo(nodeInfo);
     return false;
+}
+
+bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
+{
+    return CheckIsOnline(targetDeviceId, false);
 }
 
 DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId)

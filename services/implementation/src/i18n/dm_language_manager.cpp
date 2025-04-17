@@ -144,5 +144,55 @@ std::string DmLanguageManager::GetTextBySystemLocale(const cJSON *const textObj,
     }
     return "";
 }
+
+std::string DmLanguageManager::GetSystemLanguage()
+{
+    std::string language = GetSystemParam(SYSTEM_LANGUAGE_KEY);
+    if (!language.empty()) {
+        return language;
+    }
+
+    language = GetSystemParam(SYSTEM_LANGUAGE_LOCALE_KEY);
+    if (!language.empty()) {
+        return language;
+    }
+
+    return DEFAULT_LANGUAGE;
+}
+
+std::string DmLanguageManager::GetTextByLanguage(const std::string &text, const std::string &language)
+{
+    if (text.empty()) {
+        return "";
+    }
+    cJSON *textObj = cJSON_Parse(text.c_str());
+    if (textObj == NULL) {
+        LOGE("parse text failed");
+        return text;
+    }
+    std::string resultText = text;
+
+    cJSON *languageJson = cJSON_GetObjectItem(textObj, language.c_str());
+    if (languageJson != NULL && cJSON_IsString(languageJson)) {
+        resultText = std::string(languageJson->valuestring);
+        cJSON_Delete(textObj);
+        return resultText;
+    }
+    cJSON *defaultJson = cJSON_GetObjectItem(textObj, DEFAULT_LANGUAGE.c_str());
+    if (defaultJson != NULL && cJSON_IsString(defaultJson)) {
+        resultText = std::string(defaultJson->valuestring);
+        cJSON_Delete(textObj);
+        return resultText;
+    }
+    cJSON *enJson = cJSON_GetObjectItem(textObj, LANGUAGE_EN.c_str());
+    if (enJson != NULL && cJSON_IsString(enJson)) {
+        resultText = std::string(enJson->valuestring);
+        cJSON_Delete(textObj);
+        return resultText;
+    }
+    cJSON_Delete(textObj);
+    return "";
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

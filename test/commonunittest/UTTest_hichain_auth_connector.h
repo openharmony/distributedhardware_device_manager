@@ -44,8 +44,7 @@ public:
     MOCK_METHOD(void, AuthDeviceError, (int64_t requestId, int32_t errorCode), (override));
     MOCK_METHOD(void, AuthDeviceSessionKey,
                 (int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen), (override));
-    MOCK_METHOD(void, GetRemoteDeviceId, (std::string &deviceId), (override));
-    MOCK_METHOD(int32_t, GetPinCode, (int32_t &code), (override));
+    MOCK_METHOD(char *, AuthDeviceRequest, (int64_t requestId, int operationCode, const char *reqParams), (override));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

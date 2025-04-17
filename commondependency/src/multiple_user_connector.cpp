@@ -122,6 +122,15 @@ void MultipleUserConnector::GetTokenIdAndForegroundUserId(uint32_t &tokenId, int
     userId = GetFirstForegroundUserId();
 }
 
+EXPORT void MultipleUserConnector::GetTokenId(uint32_t &tokenId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+#else
+    (void)tokenId;
+#endif
+}
+
 void MultipleUserConnector::GetCallerUserId(int32_t &userId)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -363,12 +372,40 @@ EXPORT void MultipleUserConnector::ClearLockedUser(
     }
 }
 
-DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
+EXPORT DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
 {
     DMAccountInfo dmAccountInfo;
     dmAccountInfo.accountId = GetOhosAccountId();
     dmAccountInfo.accountName = GetOhosAccountName();
     return dmAccountInfo;
+}
+
+EXPORT void MultipleUserConnector::GetCallingTokenId(uint32_t &tokenId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+#else
+    (void)tokenId;
+#endif
+}
+
+EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(uint64_t displayId)
+{
+    LOGI("displayId %{public}" PRIu64, displayId);
+    int32_t userId = -1;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (displayId == -1) {
+        userId = GetFirstForegroundUserId();
+        return userId;
+    }
+#ifdef OS_ACCOUNT_PART_EXISTS
+    int32_t ret = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(displayId, userId);
+    if (ret != DM_OK) {
+        LOGE("GetForegroundOsAccountLocalId failed ret %{public}d.", ret);
+    }
+#endif // OS_ACCOUNT_PART_EXISTS
+#endif
+    return userId;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

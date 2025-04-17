@@ -34,6 +34,9 @@
 #include "hichain_connector.h"
 #include "hichain_auth_connector.h"
 #include "multiple_user_connector.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "deviceprofile_connector.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -96,6 +99,9 @@ public:
     bool CheckIsOnline(const std::string &udid);
     void DeleteOffLineTimer(std::string udidHash);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    int32_t DeleteSkCredAndAcl(DmOfflineParam offlineParam);
+#endif
 private:
     void StartEventThread();
     void StopEventThread();
@@ -105,9 +111,9 @@ private:
     DmAuthForm GetAuthForm(const std::string &networkId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t DeleteGroupByDP(const std::string &deviceId);
+    void DeleteCredential(DmOfflineParam offlineParam, const std::string &deviceId);
 #endif
     void ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo);
-
 private:
     std::mutex timerMapMutex_;
     std::mutex remoteDeviceInfosMutex_;

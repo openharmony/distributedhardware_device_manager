@@ -24,7 +24,8 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
     return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredential(localUdid, osAccountId, peerOsAccountId);
 }
 
-int32_t HiChainAuthConnector::AuthDevice(int32_t pinCode, int32_t osAccountId, std::string udid, int64_t requestId)
+int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osAccountId, std::string udid,
+    int64_t requestId)
 {
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthDevice(pinCode, osAccountId, udid, requestId);
 }
@@ -35,5 +36,43 @@ int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peer
     return DmHiChainAuthConnector::dmHiChainAuthConnector->ImportCredential(osAccountId, peerOsAccountId, deviceId,
         publicKey);
 }
+
+int32_t HiChainAuthConnector::ProcessCredData(int64_t authReqId, const std::string &data)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->ProcessCredData(authReqId, data);
+}
+
+int32_t HiChainAuthConnector::AddCredential(int32_t osAccountId, const std::string &authParams, std::string &creId)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->AddCredential(osAccountId, authParams, creId);
+}
+
+int32_t HiChainAuthConnector::ExportCredential(int32_t osAccountId, const std::string &credId, std::string &publicKey)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->ExportCredential(osAccountId, credId, publicKey);
+}
+
+int32_t HiChainAuthConnector::AgreeCredential(int32_t osAccountId, const std::string selfCredId,
+    const std::string &authParams, std::string &credId)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->AgreeCredential(osAccountId, selfCredId, authParams, credId);
+}
+
+int32_t HiChainAuthConnector::DeleteCredential(int32_t osAccountId, const std::string &creId)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->DeleteCredential(osAccountId, creId);
+}
+
+int32_t HiChainAuthConnector::AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId,
+    const std::string &pinCode)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthCredential(osAccountId, authReqId, credId, pinCode);
+}
+
+int32_t HiChainAuthConnector::AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthCredentialPinCode(osAccountId, authReqId, pinCode);
+}
+
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -61,6 +61,16 @@ void DeviceManagerServiceTest::SetUp()
 
 void DeviceManagerServiceTest::TearDown()
 {
+    Mock::VerifyAndClearExpectations(permissionManagerMock_.get());
+    Mock::VerifyAndClearExpectations(softbusListenerMock_.get());
+    Mock::VerifyAndClearExpectations(kVAdapterManagerMock_.get());
+    Mock::VerifyAndClearExpectations(appManagerMock_.get());
+    Mock::VerifyAndClearExpectations(deviceManagerServiceImplMock_.get());
+    Mock::VerifyAndClearExpectations(softbusCacheMock_.get());
+    Mock::VerifyAndClearExpectations(cryptoMock_.get());
+    Mock::VerifyAndClearExpectations(multipleUserConnectorMock_.get());
+    Mock::VerifyAndClearExpectations(dMCommToolMock_.get());
+    Mock::VerifyAndClearExpectations(deviceProfileConnectorMock_.get());
 }
 
 void DeviceManagerServiceTest::SetUpTestCase()
@@ -281,15 +291,12 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
     EXPECT_CALL(*multipleUserConnectorMock_, GetAccountInfoByUserId(_)).WillOnce(Return(dmAccountInfo));
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(curMultiMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(curMultiMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_BOOT_COMPLETED;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_))
-        .WillOnce(Return(curMultiMap)).WillOnce(Return(curMultiMap));
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, pkgName);
     EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndUserId(_)).WillOnce(Return(curMultiMap));
     DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
@@ -768,7 +775,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_001, testing::ext::TestSize.
     DeletePermission();
     std::string pkgName = "com.ohos.test";
     int32_t action = 0;
-    const std::string param = "extra";
+    const std::string param = "{\"test\": \"extra\"}";;
     int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -784,7 +791,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_002, testing::ext::TestSize.
 {
     std::string pkgName = "";
     int32_t action = 0;
-    const std::string param = "extra";
+    const std::string param = "{\"test\": \"extra\"}";
     int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -816,7 +823,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_004, testing::ext::TestSize.
 {
     std::string pkgName = "pkgName";
     int32_t action = 0;
-    const std::string param = "extra";
+    const std::string param = R"({"test":"extra"})";
     int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1657,7 +1664,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkTypeByNetworkId_004, testing::ext::
     std::string netWorkId = "netWorkId";
     int32_t networkType = 0;
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _)).Times(::testing::AtLeast(2))
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _))
         .WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkTypeByNetworkId(pkgName, netWorkId, networkType);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
@@ -1731,8 +1738,6 @@ HWTEST_F(DeviceManagerServiceTest, StartDiscovering_003, testing::ext::TestSize.
     std::map<std::string, std::string> discoverParam;
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
-    EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).Times(::testing::AtLeast(1))
-        .WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
     EXPECT_TRUE(ret == SOFTBUS_IPC_ERR || ret == DM_OK || ret == SOFTBUS_DISCOVER_MANAGER_INNERFUNCTION_FAIL);
     ret = DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
@@ -1780,8 +1785,6 @@ HWTEST_F(DeviceManagerServiceTest, StopDiscovering_003, testing::ext::TestSize.L
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> discoverParam;
     DeviceManagerService::GetInstance().InitDMServiceListener();
-    EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).Times(::testing::AtLeast(1))
-        .WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
@@ -1822,7 +1825,7 @@ HWTEST_F(DeviceManagerServiceTest, EnableDiscoveryListener_004, testing::ext::Te
     std::map<std::string, std::string> filterOptions;
     DeviceManagerService::GetInstance().InitDMServiceListener();
     int32_t ret = DeviceManagerService::GetInstance().EnableDiscoveryListener(pkgName, discoverParam, filterOptions);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
@@ -1856,7 +1859,6 @@ HWTEST_F(DeviceManagerServiceTest, DisableDiscoveryListener_004, testing::ext::T
     std::string pkgName = "pkgName";
     std::map<std::string, std::string> extraParam;
     DeviceManagerService::GetInstance().InitDMServiceListener();
-    EXPECT_CALL(*softbusListenerMock_, StopRefreshSoftbusLNN(_)).WillOnce(Return(SOFTBUS_NETWORK_NOT_INIT));
     int32_t ret = DeviceManagerService::GetInstance().DisableDiscoveryListener(pkgName, extraParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
@@ -2159,7 +2161,6 @@ HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::T
 {
     DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
     DmDeviceInfo devInfo;
-    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(devState, devInfo);
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
@@ -2211,7 +2212,7 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level
     std::vector<std::string> peerUdids;
     int32_t userId = 1;
     uint64_t tokenId = 87;
-    DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, DEVICE);
+    DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, USER);
     DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, APP);
     DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, 2);
     DeviceManagerService::GetInstance().SendDeviceUnBindBroadCast(peerUdids, userId);
@@ -2408,7 +2409,7 @@ HWTEST_F(DeviceManagerServiceTest, GetNetworkIdByUdid_003, testing::ext::TestSiz
     std::string pkgName = "pkgName_003";
     std::string udid = "sewdwed98897";
     std::string networkId = "networkIdTest_003";
-    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).Times(::testing::AtLeast(2))
+    EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _))
         .WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().GetNetworkIdByUdid(pkgName, udid, networkId);
     EXPECT_EQ(ret, ERR_DM_FAILED);

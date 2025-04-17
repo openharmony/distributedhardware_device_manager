@@ -21,7 +21,10 @@ group("unittest") {
   deps = [
     ":UTTest_advertise_manager",
     ":UTTest_app_manager",
+    ":UTTest_auth_credential_state",
     ":UTTest_auth_message_processor",
+    ":UTTest_auth_negotiate_state",
+    ":UTTest_auth_pin_auth_state",
     ":UTTest_auth_request_state",
     ":UTTest_auth_response_state",
     ":UTTest_crypto_mgr",
@@ -1137,6 +1140,8 @@ ohos_unittest("UTTest_dm_device_state_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -1163,6 +1168,8 @@ ohos_unittest("UTTest_dm_device_state_manager_two") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -1199,7 +1206,6 @@ ohos_unittest("UTTest_device_manager_service_impl") {
   module_out_path = module_out_path
 
   sources = [
-    "${devicemanager_path}/commondependency/src/multiple_user_connector.cpp",
     "${servicesimpl_path}/src/device_manager_service_impl.cpp",
     "UTTest_device_manager_service_impl.cpp",
     "mock/deviceprofile_connector_mock.cpp",
@@ -1936,6 +1942,7 @@ ohos_unittest("UTTest_advertise_manager") {
 
   external_deps = [
     "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -1981,6 +1988,95 @@ ohos_unittest("UTTest_json_object") {
 }
 
 ## UnitTest UTTest_json_object }}}
+
+## UnitTest UTTest_auth_pin_auth_state {{{
+
+ohos_unittest("UTTest_auth_pin_auth_state") {
+  module_out_path = module_out_path
+
+  include_dirs = []
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_auth_pin_auth_state.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_auth_state_machine_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/hichain_auth_connector_mock.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_auth_pin_auth_state }}}
+
+## UnitTest UTTest_auth_credential_state {{{
+
+ohos_unittest("UTTest_auth_credential_state") {
+  module_out_path = module_out_path
+
+  include_dirs = []
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_auth_credential_state.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_auth_message_processor_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_auth_state_machine_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/hichain_auth_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_auth_credential_state }}}
+
+## UnitTest UTTest_auth_negotiate_state {{{
+
+ohos_unittest("UTTest_auth_negotiate_state") {
+  module_out_path = module_out_path
+
+  include_dirs = []
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_auth_negotiate_state.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_auth_negotiate_state }}}
 
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {

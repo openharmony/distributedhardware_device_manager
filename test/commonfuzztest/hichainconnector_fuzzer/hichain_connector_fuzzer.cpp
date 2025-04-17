@@ -53,7 +53,7 @@ public:
         (void)deviceId;
         return "";
     }
-    int32_t GetPinCode(int32_t &code) override
+    int32_t GetPinCode(std::string &code) override
     {
         (void)code;
         return DM_OK;
@@ -343,10 +343,11 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     std::string credentialInfo = SafetyDump(jsonObjCre);
     hichainConnector->ParseRemoteCredentialExt(credentialInfo, params, groupOwner);
     int32_t groupType = *(reinterpret_cast<const int32_t*>(data));
-    JsonObject jsonDeviceList(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    JsonObject jsonDeviceList;
     int32_t osAccountUserId = 0;
     std::string userId = "user_002";
-    jsonDeviceList[FIELD_DEVICE_LIST] = "deviceList";
+    std::vector<std::string> fieldDeviceList = {"deviceList"};
+    jsonDeviceList[FIELD_DEVICE_LIST] = fieldDeviceList;
     hichainConnector->ParseRemoteCredential(groupType, userId, jsonDeviceList, params, osAccountUserId);
 }
 

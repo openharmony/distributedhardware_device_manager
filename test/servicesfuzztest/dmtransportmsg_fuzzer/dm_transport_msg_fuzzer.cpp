@@ -84,6 +84,7 @@ void DmTransPortMsgFuzzTest(const uint8_t* data, size_t size)
     ToJson(jsonObject, notifyUserIds);
     FromJson(jsonObject, notifyUserIds);
     notifyUserIds.ToString();
+    cJSON_Delete(jsonObject);
 }
 }
 }

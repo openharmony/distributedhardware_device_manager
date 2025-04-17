@@ -16,6 +16,9 @@
 #ifndef OHOS_I_DM_BIND_MANAGER_EXT_RESIDENT_H
 #define OHOS_I_DM_BIND_MANAGER_EXT_RESIDENT_H
 
+#include <cinttypes>
+#include <string>
+
 namespace OHOS {
 namespace DistributedHardware {
 class IDMBindManagerExtResident {

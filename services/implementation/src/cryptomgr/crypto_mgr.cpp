@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <cstdlib>
+#include <string>
 
 #include "mbedtls/base64.h"
 #include "mbedtls/cipher.h"
@@ -306,6 +307,12 @@ int32_t CryptoMgr::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyL
         sessionKey_.keyLen = keyLen;
     }
     return DM_OK;
+}
+
+std::vector<unsigned char> CryptoMgr::GetSessionKey()
+{
+    std::lock_guard<std::mutex> lock(sessionKeyMtx_);
+    return std::vector<unsigned char>(sessionKey_.key, sessionKey_.key + sessionKey_.keyLen);
 }
 
 void CryptoMgr::ClearSessionKey()

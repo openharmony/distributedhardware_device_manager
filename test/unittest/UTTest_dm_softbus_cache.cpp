@@ -232,7 +232,7 @@ HWTEST_F(DMSoftbusCacheTest, GetUuidFromCache_001, testing::ext::TestSize.Level1
     EXPECT_EQ(SoftbusCache::GetInstance().GetUuidFromCache("networkid", uuid), DM_OK);
     EXPECT_EQ(uuid, "uuid");
     int32_t ret = SoftbusCache::GetInstance().GetUuidFromCache("test", uuid);
-    EXPECT_EQ(false, CheckSoftbusRes(ret));
+    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level1)

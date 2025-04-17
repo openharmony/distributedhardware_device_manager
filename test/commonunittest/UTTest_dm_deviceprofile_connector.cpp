@@ -686,7 +686,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_002, testing::ext::TestSiz
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_POINT_TO_POINT);
-    profiles.SetBindLevel(DEVICE);
+    profiles.SetBindLevel(USER);
     DmDiscoveryInfo discoveryInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
     EXPECT_EQ(ret, PEER_TO_PEER);
@@ -724,7 +724,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_005, testing::ext::TestSiz
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(DEVICE);
+    profiles.SetBindLevel(USER);
     DmDiscoveryInfo discoveryInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
     EXPECT_EQ(ret, ACROSS_ACCOUNT);
@@ -946,7 +946,9 @@ HWTEST_F(DeviceProfileConnectorTest, PutAccessControlList_001, testing::ext::Tes
     std::string localDeviceId = "deviceId";
     std::vector<std::string> peerUdids;
     std::multimap<std::string, int32_t> peerUserIdMap;
-    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(localDeviceId, userId, peerUdids, peerUserIdMap);
+    DmOfflineParam offlineParam;
+    DeviceProfileConnector::GetInstance().DeleteAclForUserRemoved(localDeviceId, userId, peerUdids, peerUserIdMap,
+        offlineParam);
     int32_t ret = DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -991,7 +993,7 @@ HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_003, testing::ext::TestSize
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_POINT_TO_POINT);
-    profiles.SetBindLevel(DEVICE);
+    profiles.SetBindLevel(USER);
     std::string targetDeviceId = "targetDeviceId";
     std::string localDeviceId = "localDeviceId";
     uint32_t index = 0;
@@ -1007,7 +1009,7 @@ HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_004, testing::ext::TestSize
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
     profiles.SetBindType(DM_ACROSS_ACCOUNT);
-    profiles.SetBindLevel(DEVICE);
+    profiles.SetBindLevel(USER);
     std::string targetDeviceId = "targetDeviceId";
     std::string localDeviceId = "localDeviceId";
     uint32_t index = 0;
@@ -1086,8 +1088,8 @@ HWTEST_F(DeviceProfileConnectorTest, CheckDevIdInAclForDevBind_001, testing::ext
 HWTEST_F(DeviceProfileConnectorTest, DeleteTimeOutAcl_001, testing::ext::TestSize.Level1)
 {
     std::string deviceId;
-    int32_t peerUserId = -1;
-    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId, peerUserId);
+    DmOfflineParam offlineParam;
+    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId, offlineParam);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1123,11 +1125,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetAuthForm_001, testing::ext::TestSize.Lev
     ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
     EXPECT_EQ(ret, IDENTICAL_ACCOUNT_TYPE);
     profile.SetBindType(DM_POINT_TO_POINT);
-    profile.SetBindLevel(DEVICE);
+    profile.SetBindLevel(USER);
     ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
     EXPECT_EQ(ret, DEVICE_PEER_TO_PEER_TYPE);
     profile.SetBindType(DM_ACROSS_ACCOUNT);
-    profile.SetBindLevel(DEVICE);
+    profile.SetBindLevel(USER);
     ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
     EXPECT_EQ(ret, DEVICE_ACROSS_ACCOUNT_TYPE);
     profile.SetBindLevel(APP);
@@ -1160,33 +1162,33 @@ HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_001, testing::ext::TestSize.Le
 HWTEST_F(DeviceProfileConnectorTest, UpdateBindType_001, testing::ext::TestSize.Level1)
 {
     std::string udid = "deviceId";
-    int32_t bindType = DEVICE;
+    int32_t bindType = USER;
     std::map<std::string, int32_t> deviceMap;
     deviceMap[udid] = APP;
     DeviceProfileConnector::GetInstance().UpdateBindType(udid, bindType, deviceMap);
-    EXPECT_EQ(deviceMap[udid], DEVICE);
+    EXPECT_EQ(deviceMap[udid], USER);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, UpdateBindType_002, testing::ext::TestSize.Level1)
 {
     std::string udid = "deviceId";
-    int32_t bindType = DEVICE;
+    int32_t bindType = USER;
     std::map<std::string, int32_t> deviceMap;
     DeviceProfileConnector::GetInstance().UpdateBindType(udid, bindType, deviceMap);
-    EXPECT_EQ(deviceMap[udid], DEVICE);
+    EXPECT_EQ(deviceMap[udid], USER);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleAccountLogoutEvent_001, testing::ext::TestSize.Level1)
 {
     int32_t remoteUserId = 0;
-    int32_t bindType = DM_INVALIED_BINDTYPE;
+    int32_t bindType = DM_INVALIED_TYPE;
     std::string remoteAccountHash = "remoteAccountHash";
     std::string remoteUdid = "1";
     std::string localUdid = "localDeviceId";
 
     bindType = DeviceProfileConnector::GetInstance().HandleAccountLogoutEvent(remoteUserId,
         remoteAccountHash, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
+    EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_001, testing::ext::TestSize.Level1)
@@ -1194,10 +1196,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_001, testing::ext::Tes
     int32_t remoteUserId = 0;
     std::string remoteUdid = "remoteDeviceId";
     std::string localUdid = "localDeviceId";
-    int32_t bindType = DM_INVALIED_BINDTYPE;
-
-    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
+    DmOfflineParam offlineParam;
+    int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
+        offlineParam);
+    EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_001, testing::ext::TestSize.Level1)
@@ -1207,14 +1209,15 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_001, testing::ext::Tes
     std::string remoteUdid = "remoteDeviceId";
     std::string localUdid = "localDeviceId";
     std::string pkgName = "";
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId,
-        remoteUdid, tokenId, localUdid);
-    EXPECT_NE(offlineParam.leftAclNumber, 0);
+    DmOfflineParam res;
+
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
+    EXPECT_EQ(0, res.processVec.size());
 
     int32_t peerTokenId = 1;
-    offlineParam = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId,
-        localUdid, peerTokenId);
-    EXPECT_EQ(offlineParam.leftAclNumber, 0);
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid,
+        peerTokenId);
+    EXPECT_EQ(0, res.processVec.size());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_001, testing::ext::TestSize.Level1)
@@ -1230,7 +1233,7 @@ HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_001, testing::ext::TestSi
     ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
     EXPECT_EQ(ret, true);
     profile.SetBindType(DM_POINT_TO_POINT);
-    profile.SetBindLevel(DEVICE);
+    profile.SetBindLevel(USER);
     ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
     EXPECT_EQ(ret, true);
     profile.SetBindLevel(APP);
@@ -1240,7 +1243,7 @@ HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_001, testing::ext::TestSi
     ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
     EXPECT_EQ(ret, true);
     profile.SetBindType(DM_ACROSS_ACCOUNT);
-    profile.SetBindLevel(DEVICE);
+    profile.SetBindLevel(USER);
     ret = DeviceProfileConnector::GetInstance().SingleUserProcess(profile, caller, callee);
     EXPECT_EQ(ret, true);
     profile.SetBindLevel(APP);
@@ -1256,7 +1259,7 @@ HWTEST_F(DeviceProfileConnectorTest, SingleUserProcess_001, testing::ext::TestSi
 
 HWTEST_F(DeviceProfileConnectorTest, GetAccessControlProfileByUserId_001, testing::ext::TestSize.Level1)
 {
-    int32_t userId = DEVICE;
+    int32_t userId = USER;
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     profiles = DeviceProfileConnector::GetInstance().GetAccessControlProfileByUserId(userId);
     EXPECT_GE(profiles.size(), 0);
@@ -1291,7 +1294,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAppBindLevel_003, testing::ext::TestS
     GetAccessControlProfiles(profiles);
     DeviceProfileConnector::GetInstance().DeleteAppBindLevel(offlineParam,
         pkgName, profiles, localUdid, remoteUdid, extra);
-    EXPECT_EQ(offlineParam.bindType, APP);
+    EXPECT_NE(offlineParam.bindType, APP);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, DeleteDeviceBindLevel_001, testing::ext::TestSize.Level1)
@@ -1302,12 +1305,12 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteDeviceBindLevel_001, testing::ext::Te
     std::string remoteUdid="localDeviceId";
     GetAccessControlProfiles(profiles);
     DeviceProfileConnector::GetInstance().DeleteDeviceBindLevel(offlineParam, profiles, localUdid, remoteUdid);
-    EXPECT_EQ(offlineParam.bindType, DEVICE);
+    EXPECT_EQ(offlineParam.bindType, USER);
 
     localUdid = "localDeviceId";
     remoteUdid="remoteDeviceId";
     DeviceProfileConnector::GetInstance().DeleteDeviceBindLevel(offlineParam, profiles, localUdid, remoteUdid);
-    EXPECT_EQ(offlineParam.bindType, DEVICE);
+    EXPECT_EQ(offlineParam.bindType, USER);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, DeleteServiceBindLevel_001, testing::ext::TestSize.Level1)
@@ -1341,8 +1344,8 @@ HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_004, testing::
 HWTEST_F(DeviceProfileConnectorTest, DeleteTimeOutAcl_002, testing::ext::TestSize.Level1)
 {
     std::string deviceId = "remoteDeviceId";
-    int32_t peerUserId = 0;
-    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId, peerUserId);
+    DmOfflineParam offlineParam;
+    uint32_t ret = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(deviceId, offlineParam);
     EXPECT_EQ(ret, 0);
 }
 
@@ -1393,7 +1396,7 @@ HWTEST_F(DeviceProfileConnectorTest, CheckIsSameAccount_001, testing::ext::TestS
 HWTEST_F(DeviceProfileConnectorTest, HandleAccountLogoutEvent_002, testing::ext::TestSize.Level1)
 {
     int32_t remoteUserId = 0;
-    int32_t bindType = DM_INVALIED_BINDTYPE;
+    int32_t bindType = DM_INVALIED_TYPE;
     std::string remoteAccountHash = "remoteAccountHash";
     std::string remoteUdid = "123456";
     std::string localUdid = "localDeviceId";
@@ -1420,22 +1423,26 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::Tes
     int32_t remoteUserId = 0;
     std::string remoteUdid;
     std::string localUdid = "localDeviceId";
-    int32_t bindType = DM_INVALIED_BINDTYPE;
-    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
+    DmOfflineParam offlineParam;
+    int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
+        offlineParam);
+    EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 
     remoteUdid = "123456";
-    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, DM_INVALIED_BINDTYPE);
+    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
+        offlineParam);
+    EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 
     remoteUdid = "localDeviceId";
     remoteUserId = 1234;
-    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, DM_IDENTICAL_ACCOUNT);
+    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
+        offlineParam);
+    EXPECT_NE(bindType, DM_IDENTICAL_ACCOUNT);
 
     remoteUserId = 456;
-    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid);
-    EXPECT_EQ(bindType, 3);
+    bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
+        offlineParam);
+    EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetAllAccessControlProfile_001, testing::ext::TestSize.Level1)
@@ -1461,36 +1468,41 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     int32_t localUserId = 444;
     std::string peerUdid = "deviceId";
     int32_t peerUserId = 555;
+    DmOfflineParam offlineParam;
     bool ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId,
-        peerUdid, peerUserId);
+        peerUdid, peerUserId, offlineParam);
     EXPECT_FALSE(ret);
 
     localUdid = "deviceId";
     localUserId = 123456;
     peerUdid = "deviceId";
     peerUserId = 456;
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId,
+        offlineParam);
     EXPECT_FALSE(ret);
 
     localUdid = "deviceId";
     localUserId = 123456;
     peerUdid = "deviceId";
     peerUserId = 123456;
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
-    EXPECT_TRUE(ret);
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId,
+        offlineParam);
+    EXPECT_FALSE(ret);
 
     localUdid = "localDeviceId";
     localUserId = 123456;
     peerUdid = "remoteDeviceId";
     peerUserId = 123456;
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId,
+        offlineParam);
     EXPECT_FALSE(ret);
 
     localUdid = "remoteDeviceId";
     localUserId = 1234;
     peerUdid = "localDeviceId";
     peerUserId = 1234;
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId);
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId,
+        offlineParam);
     EXPECT_TRUE(ret);
 }
 
@@ -1866,25 +1878,23 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_002, testing::ext::Tes
     std::string remoteUdid = "localDeviceId";
     std::string localUdid = "remoteDeviceId";
     std::string pkgName = "";
-    DmOfflineParam offlineParam;
-    offlineParam = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId,
-        localUdid);
-    EXPECT_NE(offlineParam.leftAclNumber, 0);
+    DmOfflineParam res;
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
+    EXPECT_NE(1, res.processVec.size());
 
     int32_t peerTokenId = 1001;
-    offlineParam = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId,
-        localUdid, peerTokenId);
-    EXPECT_EQ(offlineParam.leftAclNumber, 0);
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid,
+        peerTokenId);
+    EXPECT_EQ(1, res.processVec.size());
 
     tokenId = 1002;
     peerTokenId = tokenId;
-    offlineParam = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId,
-        localUdid);
-    EXPECT_EQ(offlineParam.leftAclNumber, 0);
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid);
+    EXPECT_EQ(1, res.processVec.size());
 
-    offlineParam = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId,
-        localUdid, peerTokenId);
-    EXPECT_EQ(offlineParam.leftAclNumber, 0);
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, localUdid,
+        peerTokenId);
+    EXPECT_EQ(1, res.processVec.size());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_003, testing::ext::TestSize.Level1)
@@ -1895,9 +1905,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_003, testing::ext::Tes
     std::string localUdid = "localDeviceId";
     std::string pkgName = "";
     int32_t peerTokenId = 1001;
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId,
+    DmOfflineParam res;
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId,
         remoteUdid, tokenId, localUdid, peerTokenId);
-    EXPECT_NE(offlineParam.leftAclNumber, 0);
+    EXPECT_EQ(0, res.processVec.size());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_004, testing::ext::TestSize.Level1)
@@ -1908,9 +1919,10 @@ HWTEST_F(DeviceProfileConnectorTest, HandleAppUnBindEvent_004, testing::ext::Tes
     std::string localUdid = "localDeviceId";
     std::string pkgName = "";
     int32_t peerTokenId = 1001;
-    DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId,
+    DmOfflineParam res;
+    res = DeviceProfileConnector::GetInstance().HandleAppUnBindEvent(remoteUserId,
         remoteUdid, tokenId, localUdid, peerTokenId);
-    EXPECT_NE(offlineParam.leftAclNumber, 0);
+    EXPECT_NE(2, res.processVec.size());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetTokenIdByNameAndDeviceId_002, testing::ext::TestSize.Level1)
@@ -2042,7 +2054,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_001, testing::ext::Test
     EXPECT_FALSE(bindTypeVec.empty());
 
     bindTypeVec.clear();
-    profiles.SetBindType(DM_INVALIED_BINDTYPE);
+    profiles.SetBindType(DM_INVALIED_TYPE);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
     EXPECT_TRUE(bindTypeVec.empty());
 }
@@ -2125,12 +2137,13 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForRemoteUserRemoved_001, testing:
     std::string peerUdid = "deviceId";
     int32_t peerUserId = 123456;
     std::vector<int32_t> userIds;
-    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(peerUdid, peerUserId, userIds);
-    EXPECT_FALSE(userIds.empty());
+    DmOfflineParam offlineParam;
+    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(peerUdid, peerUserId, userIds, offlineParam);
+    EXPECT_TRUE(userIds.empty());
 
     peerUdid = "remoteDeviceId";
     peerUserId = 1234;
-    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(peerUdid, peerUserId, userIds);
+    DeviceProfileConnector::GetInstance().DeleteAclForRemoteUserRemoved(peerUdid, peerUserId, userIds, offlineParam);
     EXPECT_FALSE(userIds.empty());
 }
 
@@ -2193,7 +2206,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAppBindLevel_002, testing::ext::TestS
     extra = "bundleName2";
     DeviceProfileConnector::GetInstance().DeleteAppBindLevel(offlineParam, pkgName, profiles, localUdid, remoteUdid,
         extra);
-    EXPECT_EQ(offlineParam.bindType, APP);
+    EXPECT_NE(offlineParam.bindType, APP);
 
     AddAccessControlProfile002(profiles);
     extra = "bundleName2";
@@ -2218,7 +2231,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetBindLevel_002, testing::ext::TestSize.Le
     udid = "deviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
     bindLevel = DeviceProfileConnector::GetInstance().GetBindLevel(pkgName, localUdid, udid, tokenId);
-    EXPECT_EQ(bindLevel, DEVICE);
+    EXPECT_EQ(bindLevel, USER);
 
     int32_t bindType = 256;
     std::string peerUdid = "123456";

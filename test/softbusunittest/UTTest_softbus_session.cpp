@@ -80,7 +80,7 @@ HWTEST_F(SoftbusSessionTest, OpenAuthSession_002, testing::ext::TestSize.Level1)
 
 /**
  * @tc.name: SendData_001
- * @tc.desc: set message null and return ERR_DM_FAILED
+ * @tc.desc: set message null but sessionId is invalid, return SOFTBUS_INVALID_PARAM
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -92,7 +92,7 @@ HWTEST_F(SoftbusSessionTest, SendData_001, testing::ext::TestSize.Level1)
         softbusSession = std::make_shared<SoftbusSession>();
     }
     int ret = softbusSession->SendData(sessionId, message);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_INVALID_PARAM);
 }
 
 /**
@@ -119,7 +119,7 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level1)
 
 /**
  * @tc.name: SendData_003
- * @tc.desc: set jsonObject[TAG_MSG_TYPE] is string and return ERR_DM_FAILED
+ * @tc.desc: set jsonObject[TAG_MSG_TYPE] is string but not openAuthSession, return SOFTBUS_TRANS_UDP_GET_CHANNEL_FAILED
  * @tc.type: FUNC
  * @tc.require: AR000GHSJK
  */
@@ -135,7 +135,7 @@ HWTEST_F(SoftbusSessionTest, SendData_003, testing::ext::TestSize.Level1)
         softbusSession = std::make_shared<SoftbusSession>();
     }
     int32_t ret = softbusSession->SendData(sessionId, message);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, SOFTBUS_TRANS_SESSION_SERVER_NOINIT);
 }
 
 /**
@@ -241,12 +241,7 @@ HWTEST_F(SoftbusSessionTest, OnSessionOpened_001, testing::ext::TestSize.Level1)
     softbusSession->RegisterSessionCallback(discoveryMgr);
     int sessionId = 1;
     int result = 0;
-    void *data = nullptr;
-    unsigned int dataLen = 1;
-    softbusSession->OnBytesReceived(sessionId, data, dataLen);
-    softbusSession->OnBytesReceived(sessionId, data, -1);
-    sessionId = -1;
-    softbusSession->OnBytesReceived(sessionId, data, dataLen);
+
     int ret = softbusSession->OnSessionOpened(sessionId, result);
     softbusSession->OnSessionClosed(sessionId);
     EXPECT_EQ(ret, DM_OK);

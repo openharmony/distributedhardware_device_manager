@@ -60,6 +60,10 @@ void DeviceManagerServiceThreeTest::SetUp()
 
 void DeviceManagerServiceThreeTest::TearDown()
 {
+    Mock::VerifyAndClearExpectations(deviceManagerServiceMock_.get());
+    Mock::VerifyAndClearExpectations(permissionManagerMock_.get());
+    Mock::VerifyAndClearExpectations(softbusListenerMock_.get());
+    Mock::VerifyAndClearExpectations(deviceManagerServiceImplMock_.get());
 }
 
 void DeviceManagerServiceThreeTest::SetUpTestCase()
@@ -298,7 +302,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, BindTarget_301, testing::ext::TestSize.L
     EXPECT_EQ(ret, ERR_DM_NOT_INIT);
 
     bindParam.insert(std::make_pair(PARAM_KEY_META_TYPE, pkgName));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
@@ -380,9 +383,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSi
     int32_t userId = 0;
     std::string accountId;
     std::string accountName;
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterSoLoaded()).WillOnce(Return(false));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
 
     int32_t curUserId = 0;
@@ -479,6 +480,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, PutDeviceProfileInfoList_301, testing::e
     std::string pkgName = "pkgName";
     std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidPutDeviceProfileInfoList(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
 }

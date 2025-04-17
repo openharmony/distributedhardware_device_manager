@@ -88,4 +88,11 @@ declare_args() {
   } else {
     device_manager_common = true
   }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.msdp_spatial_awareness)) {
+    support_msdp = true
+  } else {
+    support_msdp = false
+  }
 }
