@@ -58,7 +58,7 @@ struct ConfirmCustomDialog {
     let context = getContext() as common.UIAbilityContext;
 
     if (AppStorage.get('deviceName') != null) {
-      this.peerDeviceName = AppStorage.get('deviceName') as string;
+      this.peerDeviceName = AppStorage.get('deviceName') as string + ' ';
       console.log('peerDeviceName is ' + this.peerDeviceName);
     }
     let customDescriptionStr: string = AppStorage.get('customDescriptionStr') as string;
@@ -286,7 +286,7 @@ struct ConfirmCustomDialog {
                   .backgroundColor('#33F1F3F5')
                 }
               })
-            Button($r('app.string.dm_allow_temp'))
+            Button($r('app.string.dm_allow_this_time'))
               .margin({ bottom: '12vp' })
               .onClick(() => {
                 this.onAllowOnce();
