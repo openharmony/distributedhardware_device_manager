@@ -64,7 +64,7 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutils",
-   ]
+  ]
 
   defines = [
     "HI_LOG_ENABLE",
