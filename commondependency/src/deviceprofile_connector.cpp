@@ -46,109 +46,139 @@ const char* TAG_PEER_BUNDLE_NAME = "peerBundleName";
 const char* TAG_PEER_TOKENID = "peerTokenId";
 const char* TAG_ACL = "accessControlTable";
 const char* TAG_DMVERSION = "dmVersion";
-
-namespace {
-    // Accesser table content is used for ACL synchronization.
-    const char* TAG_ACCESSER_DEVICE_ID = "accesserDeviceId";
-    const char* TAG_ACCESSER_USER_ID = "accesserUserId";
-    const char* TAG_ACCESSER_ACOUNT_ID = "accesserAcountId";
-    const char* TAG_ACCESSER_TOKEN_ID = "accesserTokenId";
-    const char* TAG_ACCESSER_SERVICE_NAME = "accesserServiceName";
-    const char* TAG_ACCESSER_BUNDLE_NAME = "accesserBundleName";
-    const char* TAG_ACCESSER_HAP_SIGNATURE = "accesserHapSignature";
-    const char* TAG_ACCESSER_BIND_LEVEL = "accesserBindLevel";
-    const char* TAG_ACCESSER_CREDENTIAL_ID = "accesserCredetialId";
-    const char* TAG_ACCESSER_STATUS = "accesserStatus";
-    const char* TAG_ACCESSER_SK_TIMESTAMP = "accesserSKTimeStamp";
-
-    // Accessee table content is used for ACL synchronization.
-    const char* TAG_ACCESSEE_DEVICE_ID = "accesseeDeviceId";
-    const char* TAG_ACCESSEE_USER_ID = "accesseeUserId";
-    const char* TAG_ACCESSEE_ACOUNT_ID = "accesseeAcountId";
-    const char* TAG_ACCESSEE_TOKEN_ID = "accesseeTokenId";
-    const char* TAG_ACCESSEE_SERVICE_NAME = "accesseeServiceName";
-    const char* TAG_ACCESSEE_BUNDLE_NAME = "accesseeBundleName";
-    const char* TAG_ACCESSEE_HAP_SIGNATURE = "accesseeHapSignature";
-    const char* TAG_ACCESSEE_BIND_LEVEL = "accesseeBindLevel";
-    const char* TAG_ACCESSEE_CREDENTIAL_ID = "accesseeCredetialId";
-    const char* TAG_ACCESSEE_STATUS = "accesseeStatus";
-    const char* TAG_ACCESSEE_SK_TIMESTAMP = "accesseeSKTimeStamp";
-};
+const char* TAG_ACL_HASH_KEY_VERSION = "aclVersion";
+const char* TAG_ACL_HASH_KEY_ACLHASHLIST = "aclHashList";
 
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
-EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraInfo, std::string &dmVersion)
 {
-    std::string extraInfo = "";
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
-        DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
-    for (auto &item : profiles) {
-        if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
-            item.GetAccesser().GetAccesserUserId() == localUserId &&
-            item.GetAccessee().GetAccesseeDeviceId() == remoteUdid &&
-            item.GetAccessee().GetAccesseeUserId() == remoteUserId) {
-            extraInfo = item.GetAccesser().GetAccesserExtraData();
-            continue;
-        }
-        if (item.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
-            item.GetAccesser().GetAccesserUserId() == remoteUserId &&
-            item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
-            item.GetAccessee().GetAccesseeUserId() == localUserId) {
-            extraInfo = item.GetAccessee().GetAccesseeExtraData();
-            continue;
-        }
-    }
     JsonObject extraInfoJson(extraInfo);
     if (extraInfoJson.IsDiscarded()) {
-        LOGE("GetAclListHashStr extraInfoJson error");
+        LOGE("GetVersionByExtra extraInfoJson error");
         return ERR_DM_FAILED;
     }
     if (!extraInfoJson[TAG_DMVERSION].IsString()) {
-        LOGE("GetAclListHashStr PARAM_KEY_OS_VERSION error");
+        LOGE("GetVersionByExtra PARAM_KEY_OS_VERSION error");
         return ERR_DM_FAILED;
     }
-    std::string dmVersion = extraInfoJson[TAG_DMVERSION].Get<std::string>();
-    return GetAclListHashStr(localUdid, localUserId, remoteUdid, remoteUserId, dmVersion, aclList);
+    dmVersion = extraInfoJson[TAG_DMVERSION].Get<std::string>();
+    return DM_OK;
+}
+
+EXPORT void DeviceProfileConnector::GetAllVerionAclMap(std::string &extraInfo, std::string &dmVersion,
+    DistributedDeviceProfile::AccessControlProfile &acl, std::map<std::string, std::vector<std::string>> &aclMap)
+{
+    if (dmVersion.empty()) {
+        int32_t ret = GetVersionByExtra(extraInfo, dmVersion);
+        if (ret != DM_OK) {
+            LOGE("GetVersionByExtra error");
+            return;
+        }
+    }
+    int32_t versionNum = 0;
+    if (!GetVersionNumber(dmVersion, versionNum)) {
+        LOGE("GetAllVerionAclMap GetVersionNumber error");
+        return;
+    }
+    std::string aclStr = "";
+    switch (versionNum) {
+        case DM_VERSION_INT_5_1_0:
+            aclStr = AccessToStr(acl);
+            break;
+        default:
+            LOGE("versionNum is invaild");
+            break;
+    }
+    auto iter = aclMap.find(dmVersion);
+    if (iter != aclMap.end()) {
+        aclMap[dmVersion].push_back(Crypto::Sha256(aclStr));
+    } else {
+        std::vector<std::string> aclStrVec;
+        aclStrVec.push_back(Crypto::Sha256(aclStr));
+        aclMap[dmVersion] = aclStrVec;
+    }
+    return;
 }
 
 EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string dmVersion, std::string &aclList)
+    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList, std::string dmVersion)
 {
-    JsonObject jsonAclListObj;
-    jsonAclListObj[TAG_DMVERSION] = dmVersion;
-
-    // Query  ACL.
+    std::map<std::string, std::vector<std::string>> aclMap;
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
-    std::vector<std::string> aclStrVec;
-    // Traverse the ACL table to find historical ACL records at both ends.
     for (auto &item : profiles) {
         if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == localUserId &&
             item.GetAccessee().GetAccesseeDeviceId() == remoteUdid &&
             item.GetAccessee().GetAccesseeUserId() == remoteUserId) {
-            std::string aclStr = AccessToStr(item);
-            aclStrVec.push_back(Crypto::Sha256(aclStr));
+            std::string extraInfo = item.GetAccesser().GetAccesserExtraData();
+            GetAllVerionAclMap(extraInfo, dmVersion, item, aclMap);
             continue;
         }
         if (item.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
             item.GetAccesser().GetAccesserUserId() == remoteUserId &&
             item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == localUserId) {
-            std::string aclStr = AccessToStr(item);
-            aclStrVec.push_back(Crypto::Sha256(aclStr));
+            std::string extraInfo = item.GetAccessee().GetAccesseeExtraData();
+            GetAllVerionAclMap(extraInfo, dmVersion, item, aclMap);
             continue;
         }
     }
-    if (aclStrVec.empty()) {
+    if (aclMap.empty()) {
         LOGI("DeviceProfileConnector:: acl list is empty");
     }
-
-    jsonAclListObj[TAG_ACL] = aclStrVec;
-    aclList = jsonAclListObj.Dump();
+    std::vector<AclHashItem> aclStrVec;
+    for (auto &item : aclMap) {
+        aclStrVec.push_back({item.first, item.second});
+    }
+    JsonObject allAclObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    AclHashVecToJson(allAclObj, aclStrVec);
+    aclList = allAclObj.Dump();
     return DM_OK;
+}
+
+EXPORT void DeviceProfileConnector::AclHashItemToJson(JsonItemObject &itemObject, const AclHashItem &value)
+{
+    itemObject[TAG_ACL_HASH_KEY_VERSION] = value.version;
+    JsonObject hashList(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    for (const auto &val : value.aclHashList) {
+        hashList.PushBack(val);
+    }
+    itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST] = hashList.Dump();
+}
+
+EXPORT void DeviceProfileConnector::AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values)
+{
+    for (const auto &val : values) {
+        JsonObject object;
+        AclHashItemToJson(object, val);
+        itemObject.PushBack(object.Dump());
+    }
+}
+
+EXPORT void DeviceProfileConnector::AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value)
+{
+    value.version = itemObject[TAG_ACL_HASH_KEY_VERSION].Get<std::string>();
+    std::string hashListStr = itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST].Get<std::string>();
+    JsonObject hashList;
+    hashList.Parse(hashListStr);
+    for (auto const &item : hashList.Items()) {
+        value.aclHashList.push_back(item.Get<std::string>());
+    }
+}
+
+EXPORT void DeviceProfileConnector::AclHashVecFromJson(const JsonItemObject &itemObject,
+    std::vector<AclHashItem> &values)
+{
+    for (auto const &item : itemObject.Items()) {
+        JsonObject object;
+        AclHashItem aclItem;
+        object.Parse(item.Get<std::string>());
+        AclHashItemFromJson(object, aclItem);
+        values.push_back(aclItem);
+    }
 }
 
 EXPORT bool DeviceProfileConnector::ChecksumAcl(DistributedDeviceProfile::AccessControlProfile &acl,
@@ -159,36 +189,33 @@ EXPORT bool DeviceProfileConnector::ChecksumAcl(DistributedDeviceProfile::Access
     return (aclIter != acLStrList.end());
 }
 
-std::string DeviceProfileConnector::AccessToStr(DistributedDeviceProfile::AccessControlProfile acl)
+EXPORT std::string DeviceProfileConnector::AccessToStr(DistributedDeviceProfile::AccessControlProfile acl)
 {
-    JsonObject jsonAcLObj;
+    std::string aclStr = "";
     DistributedDeviceProfile::Accesser accesser = acl.GetAccesser();
-    jsonAcLObj[TAG_ACCESSER_DEVICE_ID] = accesser.GetAccesserDeviceId();
-    jsonAcLObj[TAG_ACCESSER_USER_ID] = accesser.GetAccesserUserId();
-    jsonAcLObj[TAG_ACCESSER_ACOUNT_ID] = accesser.GetAccesserAccountId();
-    jsonAcLObj[TAG_ACCESSER_TOKEN_ID] = accesser.GetAccesserTokenId();
-    jsonAcLObj[TAG_ACCESSER_SERVICE_NAME] = std::vector<std::string>(); // Reserved field
-    jsonAcLObj[TAG_ACCESSER_BUNDLE_NAME] = accesser.GetAccesserBundleName();
-    jsonAcLObj[TAG_ACCESSER_HAP_SIGNATURE] = accesser.GetAccesserHapSignature();
-    jsonAcLObj[TAG_ACCESSER_BIND_LEVEL] = accesser.GetAccesserBindLevel();
-    jsonAcLObj[TAG_ACCESSER_CREDENTIAL_ID] = accesser.GetAccesserCredentialIdStr();
-    jsonAcLObj[TAG_ACCESSER_STATUS] = accesser.GetAccesserStatus();
-    jsonAcLObj[TAG_ACCESSER_SK_TIMESTAMP] = accesser.GetAccesserSKTimeStamp();
+    aclStr += accesser.GetAccesserDeviceId();
+    aclStr += std::to_string(accesser.GetAccesserUserId());
+    aclStr += accesser.GetAccesserAccountId();
+    aclStr += std::to_string(accesser.GetAccesserTokenId());
+    aclStr += accesser.GetAccesserBundleName();
+    aclStr += accesser.GetAccesserHapSignature();
+    aclStr += std::to_string(accesser.GetAccesserBindLevel());
+    aclStr += accesser.GetAccesserCredentialIdStr();
+    aclStr += std::to_string(accesser.GetAccesserStatus());
+    aclStr += std::to_string(accesser.GetAccesserSKTimeStamp());
 
     DistributedDeviceProfile::Accessee accessee = acl.GetAccessee();
-    jsonAcLObj[TAG_ACCESSEE_DEVICE_ID] = accessee.GetAccesseeDeviceId();
-    jsonAcLObj[TAG_ACCESSEE_USER_ID] = accessee.GetAccesseeUserId();
-    jsonAcLObj[TAG_ACCESSEE_ACOUNT_ID] = accessee.GetAccesseeAccountId();
-    jsonAcLObj[TAG_ACCESSEE_TOKEN_ID] = accessee.GetAccesseeTokenId();
-    jsonAcLObj[TAG_ACCESSEE_SERVICE_NAME] = std::vector<std::string>(); // Reserved field
-    jsonAcLObj[TAG_ACCESSEE_BUNDLE_NAME] = accessee.GetAccesseeBundleName();
-    jsonAcLObj[TAG_ACCESSEE_HAP_SIGNATURE] = accessee.GetAccesseeHapSignature();
-    jsonAcLObj[TAG_ACCESSEE_BIND_LEVEL] = accessee.GetAccesseeBindLevel();
-    jsonAcLObj[TAG_ACCESSEE_CREDENTIAL_ID] = accessee.GetAccesseeCredentialIdStr();
-    jsonAcLObj[TAG_ACCESSEE_STATUS] = accessee.GetAccesseeStatus();
-    jsonAcLObj[TAG_ACCESSEE_SK_TIMESTAMP] = accessee.GetAccesseeSKTimeStamp();
-
-    return jsonAcLObj.Dump();
+    aclStr += accessee.GetAccesseeDeviceId();
+    aclStr += std::to_string(accessee.GetAccesseeUserId());
+    aclStr += accessee.GetAccesseeAccountId();
+    aclStr += std::to_string(accessee.GetAccesseeTokenId());
+    aclStr += accessee.GetAccesseeBundleName();
+    aclStr += accessee.GetAccesseeHapSignature();
+    aclStr += std::to_string(accessee.GetAccesseeBindLevel());
+    aclStr += accessee.GetAccesseeCredentialIdStr();
+    aclStr += std::to_string(accessee.GetAccesseeStatus());
+    aclStr += std::to_string(accessee.GetAccesseeSKTimeStamp());
+    return aclStr;
 }
 
 EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnector::GetAclList(

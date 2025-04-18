@@ -58,6 +58,7 @@ ohos_fuzztest("OnDataReceivedV2FuzzTest") {
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "hilog:libhilog",
+    "init:libbegetutil",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
   ]

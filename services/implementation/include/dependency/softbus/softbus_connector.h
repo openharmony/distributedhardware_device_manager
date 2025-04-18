@@ -28,6 +28,7 @@
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "deviceprofile_connector.h"
 #include "softbus_session.h"
 #endif
 #include "softbus_connector_callback.h"
@@ -144,11 +145,13 @@ private:
     static ConnectionAddr *GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type);
     static void ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
     static std::shared_ptr<DeviceInfo> GetDeviceInfoFromMap(const std::string &deviceId);
-    int32_t ParaseAclChecksumList(const std::string &jsonString, std::string &dmVersion,
-        std::vector<std::string> &remoteAclList);
-    int32_t SyncLocalAclList5_1_0(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::vector<std::string> remoteAclList);
-
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    int32_t ParaseAclChecksumList(const std::string &jsonString, std::vector<AclHashItem> &remoteAllAclList);
+    int32_t SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
+        DistributedDeviceProfile::AccessControlProfile &localAcl, std::vector<std::string> &acLStrList);
+    int32_t GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
+        std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl);
+#endif
 private:
     static std::string remoteUdidHash_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

@@ -24,6 +24,7 @@
 #include "local_service_info.h"
 #include "parameter.h"
 #include "trusted_device_info.h"
+#include "json_object.h"
 
 enum AllowAuthType {
     ALLOW_AUTH_ONCE = 1,
@@ -52,6 +53,7 @@ const uint32_t DM_SHARE = 2;
 const uint32_t DM_LNN = 3;
 const uint32_t DM_POINT_TO_POINT = 256;
 const uint32_t DM_ACROSS_ACCOUNT = 1282;
+const int32_t DM_VERSION_INT_5_1_0 = 510;
 
 enum ProfileState {
     INACTIVE = 0,
@@ -114,6 +116,11 @@ typedef struct DmOfflineParam {
     int64_t accessControlId;
     std::vector<DmAclIdParam> dmAclIdParamVec;
 } DmOfflineParam;
+
+struct AclHashItem {
+    std::string version;
+    std::vector<std::string> aclHashList;
+};
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -264,16 +271,21 @@ public:
         int32_t localUserId, const std::string remoteUdid, int32_t remoteUserId);
     EXPORT bool ChecksumAcl(DistributedDeviceProfile::AccessControlProfile &acl,
         std::vector<std::string> &acLStrList);
-    std::string AccessToStr(DistributedDeviceProfile::AccessControlProfile acl);
+    EXPORT std::string AccessToStr(DistributedDeviceProfile::AccessControlProfile acl);
+    EXPORT int32_t GetVersionByExtra(std::string &extraInfo, std::string &dmVersion);
+    EXPORT void GetAllVerionAclMap(std::string &extraInfo, std::string &dmVersion,
+        DistributedDeviceProfile::AccessControlProfile &acl, std::map<std::string, std::vector<std::string>> &aclMap);
     EXPORT int32_t GetAclListHashStr(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string dmVersion, std::string &aclList);
-    EXPORT int32_t GetAclListHashStr(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string &aclList);
+        const std::string remoteUdid, int32_t remoteUserId, std::string &aclList, std::string dmVersion = "");
     EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);
     EXPORT void CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
         DmOfflineParam &offlineParam);
     EXPORT void CacheAceeAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
         DmOfflineParam &offlineParam);
+    EXPORT void AclHashItemToJson(JsonItemObject &itemObject, const AclHashItem &value);
+    EXPORT void AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values);
+    EXPORT void AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value);
+    EXPORT void AclHashVecFromJson(const JsonItemObject &itemObject, std::vector<AclHashItem> &values);
     void DeleteCacheAcl(std::vector<int64_t> delAclIdVec,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles);
 private:

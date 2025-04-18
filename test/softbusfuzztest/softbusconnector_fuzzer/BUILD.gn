@@ -53,7 +53,11 @@ ohos_fuzztest("SoftbusConnectorFuzzTest") {
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
+    "init:libbegetutil",
+    "ipc:ipc_core",
     "safwk:system_ability_fwk",
   ]
 
