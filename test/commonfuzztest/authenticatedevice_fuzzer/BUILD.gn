@@ -33,7 +33,9 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
     "${innerkits_path}/native_cpp/include/ipc",
     "${innerkits_path}/native_cpp/include/notify",
     "${utils_path}/include",
+    "${utils_path}/include/crypto",
     "${utils_path}/include/ipc/standard",
+    "${utils_path}/include/kvadapter",
     "${servicesimpl_path}/include",
     "${servicesimpl_path}/include/dependency/timer",
     "${servicesimpl_path}/include/discovery",
@@ -59,7 +61,10 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
   ]
   sources = [ "authenticate_device_fuzzer.cpp" ]
 
-  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+  deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${utils_path}:devicemanagerutils",
+   ]
 
   defines = [
     "HI_LOG_ENABLE",
