@@ -743,11 +743,11 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
     }
     accessTmp.transmitSessionKeyId = std::atoi(jsonObject[TAG_TRANSMIT_SK_ID].Get<std::string>().c_str());
 
-    if (!jsonObject[TAG_TRANSMIT_SK_TIMESTAMP].IsString()) {
+    if (!jsonObject[TAG_TRANSMIT_SK_TIMESTAMP].IsNumberInteger()) {
         LOGE("ParseSyncMessage TAG_TRANSMIT_SK_TIMESTAMP error");
         return ERR_DM_FAILED;
     }
-    accessTmp.transmitSkTimeStamp = std::atoi(jsonObject[TAG_TRANSMIT_SK_TIMESTAMP].Get<std::string>().c_str());
+    accessTmp.transmitSkTimeStamp = jsonObject[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
 
     if (!jsonObject[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
         LOGE("ParseSyncMessage TAG_TRANSMIT_CREDENTIAL_ID error");
@@ -759,8 +759,8 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
     if (jsonObject[TAG_LNN_SK_ID].IsString()) {
         accessTmp.lnnSessionKeyId = std::atoi(jsonObject[TAG_LNN_SK_ID].Get<std::string>().c_str());
     }
-    if (jsonObject[TAG_LNN_SK_TIMESTAMP].IsString()) {
-        accessTmp.lnnSkTimeStamp = std::atoi(jsonObject[TAG_LNN_SK_TIMESTAMP].Get<std::string>().c_str());
+    if (jsonObject[TAG_LNN_SK_TIMESTAMP].IsNumberInteger()) {
+        accessTmp.lnnSkTimeStamp = jsonObject[TAG_LNN_SK_TIMESTAMP].Get<int64_t>();
     }
 
     if (jsonObject[TAG_LNN_CREDENTIAL_ID].IsString()) {
@@ -1324,12 +1324,12 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     accessToSync.pkgName = accessSide.pkgName;
     accessToSync.bindLevel = accessSide.bindLevel;
     syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
-    syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = std::to_string(accessSide.transmitSkTimeStamp);
+    syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = accessSide.transmitSkTimeStamp;
     syncMsgJson[TAG_TRANSMIT_CREDENTIAL_ID] = accessSide.transmitCredentialId;
     // First certification
     if (accessSide.isGenerateLnnCredential && accessSide.bindLevel != static_cast<int32_t>(USER)) {
-        syncMsgJson[TAG_LNN_SK_ID]=std::to_string(accessSide.lnnSessionKeyId);
-        syncMsgJson[TAG_LNN_SK_TIMESTAMP]=std::to_string(accessSide.lnnSkTimeStamp);
+        syncMsgJson[TAG_LNN_SK_ID] = std::to_string(accessSide.lnnSessionKeyId);
+        syncMsgJson[TAG_LNN_SK_TIMESTAMP] = accessSide.lnnSkTimeStamp;
         syncMsgJson[TAG_LNN_CREDENTIAL_ID] = accessSide.lnnCredentialId;
     }
     JsonObject accessJsonObj{};
@@ -1344,7 +1344,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     DmAccess &remoteAccess = (context->accesser.deviceId == localUdid) ? context->accessee : context->accesser;
     std::string aclHashList;
     int32_t ret = DeviceProfileConnector::GetInstance().GetAclListHashStr(localUdid, access.userId,
-        remoteAccess.deviceId, remoteAccess.userId, accessSide.dmVersion, aclHashList);
+        remoteAccess.deviceId, remoteAccess.userId, aclHashList, DM_CURRENT_VERSION);
     if (ret != DM_OK) {
         LOGE("DmAuthMessageProcessor::EncryptSyncMessage GetAclListHashStr failed");
         return ERR_DM_FAILED;

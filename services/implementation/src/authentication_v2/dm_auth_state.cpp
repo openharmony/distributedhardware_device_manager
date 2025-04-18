@@ -27,6 +27,7 @@
 #include "screenlock_manager.h"
 #endif
 #include "dm_log.h"
+#include <sys/time.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -43,6 +44,8 @@ const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
 };
 
 constexpr int32_t ONBINDRESULT_MAPPING_NUM = 2;
+constexpr int32_t MS_PER_SECOND = 1000;
+constexpr int32_t US_PER_MSECOND = 1000;
 constexpr const static char* ONBINDRESULT_MAPPING_LIST[ONBINDRESULT_MAPPING_NUM] = {
     "CollaborationFwk",
     "cast_engine_service",
@@ -392,6 +395,18 @@ int32_t DmAuthState::GetOutputReplay(const std::string &processName, int32_t rep
         }
     }
     return replay;
+}
+
+uint64_t DmAuthState::GetSysTimeMs()
+{
+    struct timeval time;
+    time.tv_sec = 0;
+    time.tv_usec = 0;
+    if (gettimeofday(&time, nullptr) != 0) {
+        LOGE("GetSysTimeMs failed.");
+        return 0;
+    }
+    return (uint64_t) time.tv_sec * MS_PER_SECOND + (uint64_t)time.tv_usec / US_PER_MSECOND;
 }
 
 void DmAuthState::DeleteAcl(std::shared_ptr<DmAuthContext> context,
