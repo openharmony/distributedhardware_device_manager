@@ -151,6 +151,7 @@ int32_t SoftbusConnector::GetLocalVersion(const std::string localUdid, const std
 int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
     const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<AclHashItem> remoteAllAclList;
     int32_t ret = ParaseAclChecksumList(remoteAclList, remoteAllAclList);
     if (ret != DM_OK) {
@@ -186,6 +187,14 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, i
         }
     }
     return DM_OK;
+#else
+    (void)localUdid;
+    (void)localUserId;
+    (void)remoteUdid;
+    (void)remoteUserId;
+    (void)remoteAclList;
+    return DM_OK;
+#endif
 }
 
 int32_t SoftbusConnector::GetAclListHash(const std::string localUdid, int32_t localUserId,
