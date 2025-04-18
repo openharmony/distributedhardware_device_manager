@@ -145,12 +145,13 @@ private:
     static ConnectionAddr *GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type);
     static void ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
     static std::shared_ptr<DeviceInfo> GetDeviceInfoFromMap(const std::string &deviceId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t ParaseAclChecksumList(const std::string &jsonString, std::vector<AclHashItem> &remoteAllAclList);
     int32_t SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
         DistributedDeviceProfile::AccessControlProfile &localAcl, std::vector<std::string> &acLStrList);
     int32_t GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
         std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl);
-
+#endif
 private:
     static std::string remoteUdidHash_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

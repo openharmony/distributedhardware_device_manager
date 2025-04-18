@@ -92,10 +92,11 @@ void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
 #endif
 }
 
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
     DistributedDeviceProfile::AccessControlProfile &localAcl, std::vector<std::string> &acLStrList)
 {
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     bool res = DeviceProfileConnector::GetInstance().ChecksumAcl(localAcl, acLStrList);
     if (res) {
         return DM_OK;
@@ -115,14 +116,6 @@ int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, con
             localAcl.GetAccessee().GetAccesseeSessionKeyId(), localAcl.GetAccessControlId());
     }
     return DM_OK;
-#else
-    (void)localUdid;
-    (void)localUserId;
-    (void)remoteUdid;
-    (void)remoteUserId;
-    (void)remoteAclList;
-    return DM_OK;
-#endif
 }
 
 int32_t SoftbusConnector::ParaseAclChecksumList(const std::string &jsonString,
@@ -153,6 +146,7 @@ int32_t SoftbusConnector::GetLocalVersion(const std::string localUdid, const std
     }
     return DM_OK;
 }
+#endif
 
 int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
     const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
