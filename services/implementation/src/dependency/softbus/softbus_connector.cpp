@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,6 +45,8 @@ constexpr const char* BR_MAC = "BR_MAC";
 constexpr const char* BLE_MAC = "BLE_MAC";
 constexpr const char* ETH_IP = "ETH_IP";
 constexpr const char* ETH_PORT = "ETH_PORT";
+constexpr const char* NCM_IP = "NCM_IP";
+constexpr const char* NCM_PORT = "NCM_PORT";
 namespace {
     const char* TAG_ACL = "accessControlTable";
     const char* TAG_DMVERSION = "dmVersion";
@@ -228,7 +230,8 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId, bool isForceJoin)
         LOGE("addrInfo is nullptr.");
         return;
     }
-    if (Crypto::ConvertHexStringToBytes(addrInfo->info.ble.udidHash, UDID_HASH_LEN,
+    if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_BLE &&
+        Crypto::ConvertHexStringToBytes(addrInfo->info.ble.udidHash, UDID_HASH_LEN,
         remoteUdidHash_.c_str(), remoteUdidHash_.length()) != DM_OK) {
         LOGE("convert remoteUdid hash failed, remoteUdidHash_: %{public}s.", GetAnonyString(remoteUdidHash_).c_str());
         return;
@@ -249,7 +252,8 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId, const std::string &r
         LOGE("addrInfo is nullptr.");
         return;
     }
-    if (Crypto::ConvertHexStringToBytes(addrInfo->info.ble.udidHash, UDID_HASH_LEN,
+    if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_BLE &&
+        Crypto::ConvertHexStringToBytes(addrInfo->info.ble.udidHash, UDID_HASH_LEN,
         remoteUdidHash.c_str(), remoteUdidHash.length()) != DM_OK) {
         LOGE("convert remoteUdid hash failed, remoteUdidHash_: %{public}s.", GetAnonyString(remoteUdidHash).c_str());
         return;
@@ -370,6 +374,19 @@ std::shared_ptr<DeviceInfo> SoftbusConnector::GetDeviceInfoFromMap(const std::st
     return iter->second;
 }
 
+std::shared_ptr<ConnectionAddr> SoftbusConnector::SetAddrAndJson(const ConnectionAddr *addr,
+    JsonObject &jsonPara, std::string &connectAddr)
+{
+    if (addr == nullptr) {
+        LOGE("Param  not valid, addr is null.");
+        return nullptr;
+    }
+    std::shared_ptr<ConnectionAddr> connectAddrPtr = std::make_shared<ConnectionAddr>();
+    *connectAddrPtr = *addr;
+    connectAddr = jsonPara.Dump();
+    return connectAddrPtr;
+}
+
 std::shared_ptr<ConnectionAddr> SoftbusConnector::GetConnectAddr(const std::string &deviceId, std::string &connectAddr)
 {
     std::shared_ptr<DeviceInfo> deviceInfo = GetDeviceInfoFromMap(deviceId);
@@ -378,40 +395,38 @@ std::shared_ptr<ConnectionAddr> SoftbusConnector::GetConnectAddr(const std::stri
         return nullptr;
     }
     JsonObject jsonPara;
-    std::shared_ptr<ConnectionAddr> connectAddrPtr = std::make_shared<ConnectionAddr>();
     ConnectionAddr *addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_ETH);
     if (addr != nullptr) {
-        *connectAddrPtr = *addr;
         LOGI("[SOFTBUS]get ETH ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
         jsonPara[ETH_IP] = addr->info.ip.ip;
         jsonPara[ETH_PORT] = addr->info.ip.port;
-        connectAddr = jsonPara.Dump();
-        return connectAddrPtr;
+        return SetAddrAndJson(addr, jsonPara, connectAddr);
     }
     addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_WLAN);
     if (addr != nullptr) {
-        *connectAddrPtr = *addr;
         jsonPara[WIFI_IP] = addr->info.ip.ip;
         jsonPara[WIFI_PORT] = addr->info.ip.port;
         LOGI("[SOFTBUS]get WLAN ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
-        connectAddr = jsonPara.Dump();
-        return connectAddrPtr;
+        return SetAddrAndJson(addr, jsonPara, connectAddr);
     }
     addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_BR);
     if (addr != nullptr) {
-        *connectAddrPtr = *addr;
         jsonPara[BR_MAC] = addr->info.br.brMac;
         LOGI("[SOFTBUS]get BR ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
-        connectAddr = jsonPara.Dump();
-        return connectAddrPtr;
+        return SetAddrAndJson(addr, jsonPara, connectAddr);
     }
     addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_BLE);
     if (addr != nullptr) {
-        *connectAddrPtr = *addr;
         jsonPara[BLE_MAC] = addr->info.ble.bleMac;
-        connectAddr = jsonPara.Dump();
         addr->info.ble.priority = BLE_PRIORITY_HIGH;
-        return connectAddrPtr;
+        return SetAddrAndJson(addr, jsonPara, connectAddr);
+    }
+    addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_NCM);
+    if (addr != nullptr) {
+        LOGI("[SOFTBUS]get NCM ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
+        jsonPara[NCM_IP] = addr->info.ip.ip;
+        jsonPara[NCM_PORT] = addr->info.ip.port;
+        return SetAddrAndJson(addr, jsonPara, connectAddr);
     }
     LOGE("[SOFTBUS]failed to get ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
     return nullptr;

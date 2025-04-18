@@ -90,6 +90,7 @@ const char* CONN_ADDR_TYPE_BLE = "BLE_TYPE";
 const char* CONN_ADDR_TYPE_USB = "USB_TYPE";
 const char* CONN_ADDR_TYPE_WLAN_IP = "WLAN_IP_TYPE";
 const char* CONN_ADDR_TYPE_ETH_IP = "ETH_IP_TYPE";
+const char* CONN_ADDR_TYPE_NCM = "NCM_TYPE";
 
 // Softbus connection address type int
 const int32_t CONNECTION_ADDR_USB = 5;
@@ -103,6 +104,8 @@ const char* PARAM_KEY_WIFI_IP = "WIFI_IP";
 const char* PARAM_KEY_WIFI_PORT = "WIFI_PORT";
 const char* PARAM_KEY_USB_IP = "USB_IP";
 const char* PARAM_KEY_USB_PORT = "USB_PORT";
+const char* PARAM_KEY_NCM_IP = "NCM_IP";
+const char* PARAM_KEY_NCM_PORT = "NCM_PORT";
 const char* PARAM_KEY_AUTH_TOKEN = "AUTH_TOKEN";
 const char* PARAM_KEY_AUTH_TYPE = "AUTH_TYPE";
 const char* PARAM_KEY_PIN_CODE = "PIN_CODE";
