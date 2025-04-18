@@ -56,6 +56,7 @@ ohos_fuzztest("SoftbusConnectorPublishFuzzTest") {
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "init:libbegetutil",
+    "ipc:ipc_core",
     "safwk:system_ability_fwk",
   ]
 
