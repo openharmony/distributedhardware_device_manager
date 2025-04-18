@@ -39,6 +39,7 @@ public:
 
     static inline  std::shared_ptr<DeviceManagerNotifyMock> deviceManagerNotifyMock_ =
         std::make_shared<DeviceManagerNotifyMock>();
+    static inline std::shared_ptr<MockIpcClientProxy> ipcClientProxyMock_ = std::make_shared<MockIpcClientProxy>();
 };
 
 class DeviceDiscoveryCallbackTest : public DiscoveryCallback {

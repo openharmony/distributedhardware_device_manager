@@ -70,7 +70,6 @@ void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
     softbusSession->OnSessionOpened(result, result);
     softbusSession->OpenAuthSession(str);
     softbusSession->CloseAuthSession(sessionId);
-    softbusSession->OnBytesReceived(result, str.c_str(), str.size());
     softbusSession->GetPeerDeviceId(sessionId, str);
     softbusSession->SendData(sessionId, str);
     softbusSession->SendHeartbeatData(sessionId, str);

@@ -27,7 +27,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-extern const char* TAG_REPLY;
 extern const char* TAG_NET_ID;
 extern const char* TAG_TARGET;
 extern const char* TAG_APP_OPERATION;
@@ -37,7 +36,6 @@ extern const char* TAG_GROUPIDS;
 extern const char* TAG_CUSTOM_DESCRIPTION;
 extern const char* TAG_DEVICE_TYPE;
 extern const char* TAG_REQUESTER;
-extern const char* TAG_LOCAL_DEVICE_ID;
 extern const char* TAG_LOCAL_DEVICE_TYPE;
 extern const char* TAG_INDEX;
 extern const char* TAG_SLICE_NUM;
@@ -46,38 +44,19 @@ extern const char* TAG_IS_SHOW_DIALOG;
 extern const char* TAG_TOKEN;
 extern const char* TAG_CRYPTO_NAME;
 extern const char* TAG_CRYPTO_VERSION;
-extern const char* TAG_IDENTICAL_ACCOUNT;
-extern const char* TAG_ACCOUNT_GROUPID;
-extern const char* APP_THUMBNAIL;
 extern const char* QR_CODE_KEY;
 extern const char* TAG_AUTH_TOKEN;
 extern const char* NFC_CODE_KEY;
 extern const char* OLD_VERSION_ACCOUNT;
-extern const char* TAG_AUTH_FINISH;
 
-extern const char* TAG_HAVE_CREDENTIAL;
 extern const char* TAG_PUBLICKEY;
 extern const char* TAG_SESSIONKEY;
-extern const char* TAG_BIND_LEVEL;
-extern const char* TAG_LOCAL_USERID;
 extern const char* TAG_BIND_TYPE_SIZE;
-extern const char* TAG_ISONLINE;
-extern const char* TAG_AUTHED;
-extern const char* TAG_LOCAL_ACCOUNTID;
-extern const char* TAG_DMVERSION;
 extern const char* TAG_HOST_PKGNAME;
-extern const char* TAG_TOKENID;
 extern const char* TAG_HAVECREDENTIAL;
 extern const char* TAG_CONFIRM_OPERATION;
-extern const char* TAG_DATA;
-extern const char* TAG_DATA_LEN;
 extern const char* TAG_IMPORT_AUTH_CODE;
-extern const char* TAG_HOST_PKGLABEL;
-extern const char* TAG_EDITION;
-extern const char* TAG_BUNDLE_NAME;
 extern const char* TAG_CRYPTIC_MSG;
-extern const char* TAG_PEER_BUNDLE_NAME;
-extern const char* TAG_REMOTE_DEVICE_NAME;
 extern const char* TAG_SESSIONKEY_ID;
 
 class DmAuthManager;

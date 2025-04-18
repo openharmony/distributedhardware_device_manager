@@ -16,24 +16,50 @@
 #ifndef OHOS_DM_SERVICE_IMPL_H
 #define OHOS_DM_SERVICE_IMPL_H
 
+#include <map>
+#include <queue>
+#include <semaphore>
+#include <set>
 #include <string>
 #include <vector>
 
 #include "access_control_profile.h"
+#include "auth_manager.h"
 #include "dm_ability_manager.h"
 #include "dm_auth_manager.h"
+#include "dm_auth_manager_base.h"
 #include "dm_common_event_manager.h"
 #include "dm_credential_manager.h"
 #include "dm_device_info.h"
 #include "dm_device_state_manager.h"
+#include "dm_single_instance.h"
 #include "dp_inited_callback.h"
 #include "idevice_manager_service_impl.h"
-#include "dm_single_instance.h"
-#include "softbus_connector.h"
+#include "ipc_skeleton.h"
 #include "mine_hichain_connector.h"
+#include "softbus_connector.h"
+#include "deviceprofile_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+
+class Session {
+public:
+    Session(int sessionId, std::string deviceId);
+    int sessionId_;
+    std::string deviceId_;
+    std::string version_{""};
+    std::atomic<bool> flag_{false}; // Only one session is allowed
+    std::set<uint64_t> logicalSessionSet_;  // Logical Session Set
+    std::atomic<int> logicalSessionCnt_{0};
+};
+
+struct Config {
+    std::string pkgName;
+    std::string authCode;
+    int32_t authenticationType{0};
+};
+
 class DeviceManagerServiceImpl : public IDeviceManagerServiceImpl {
 public:
     DeviceManagerServiceImpl();
@@ -124,6 +150,10 @@ public:
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
+    int32_t SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
+        const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList);
+    int32_t GetAclListHash(const std::string localUdid, int32_t localUserId,
+        const std::string remoteUdid, int32_t remoteUserId, std::string &aclList);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus);
@@ -137,6 +167,17 @@ public:
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
+    int32_t DeleteAcl(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
+        int32_t bindLevel, const std::string &extra);
+    int32_t DeleteAclV2(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
+        int32_t bindLevel, const std::string &extra);
+    static void NotifyCleanEvent(uint64_t logicalSessionId);
+    void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
+        int32_t remoteTokenId);
+    int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
+    int32_t InitAndRegisterAuthMgr(bool isSrcSide, uint64_t tokenId, std::shared_ptr<Session> session,
+        uint64_t logicalSessionId);
+
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
@@ -153,20 +194,86 @@ private:
     void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId);
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
+    std::shared_ptr<AuthManagerBase> GetAuthMgr();
+    std::shared_ptr<AuthManagerBase> GetAuthMgrByTokenId(uint64_t tokenId);
+    std::shared_ptr<AuthManagerBase> GetCurrentAuthMgr();
+    void CreateGlobalClassicalAuthMgr();
+    std::shared_ptr<Session> GetCurSession(int sessionId);
+    std::shared_ptr<Session> GetOrCreateSession(const std::string& deviceId,
+        const std::map<std::string, std::string> &bindParam);
+    int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId,
+        const std::map<std::string, std::string> &bindParam);
+    std::shared_ptr<Config> GetConfigByTokenId();
+    int OpenAuthSession(const std::string& deviceId, const std::map<std::string, std::string> &bindParam);
+    int32_t ChangeUltrasonicTypeToPin(std::map<std::string, std::string> &bindParam);
+    int32_t TransferByAuthType(int32_t authType,
+        std::shared_ptr<Session> curSession, std::shared_ptr<AuthManagerBase> authMgr,
+        std::map<std::string, std::string> bindParam, uint64_t logicalSessionId);
 
+    std::shared_ptr<AuthManagerBase> GetAuthMgrByMessage(int32_t msgType, uint64_t logicalSessionId,
+        const JsonObject &jsonObject, std::shared_ptr<Session> curSession);
+    int32_t TransferOldAuthMgr(int32_t msgType, const JsonObject &jsonObject,
+        std::shared_ptr<Session> curSession);
+    int32_t TransferSrcOldAuthMgr(std::shared_ptr<Session> curSession);
+    int32_t TransferSinkOldAuthMgr(const JsonObject &jsonObject, std::shared_ptr<Session> curSession);
+    int32_t GetDeviceInfo(const PeerTargetId &targetId, std::string &addrType, std::string &deviceId,
+        std::shared_ptr<DeviceInfo> deviceInfo, int32_t &index);
+    bool IsAuthNewVersion(int32_t bindLevel, std::string localUdid, std::string remoteUdid,
+        int32_t tokenId, int32_t userId);
+    void ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId);
+
+    // Resource cleanup thread
+    void CleanWorker();
+    // Stop the thread
+    void Stop();
+    uint64_t FetchCleanEvent();
+    void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId);
+    void CleanSessionMap(int sessionId, std::shared_ptr<Session> session);
+    void CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId);
+    int32_t DeleteAclForProcV2(uint32_t tokenId, const std::string &localUdid, const std::string &remoteUdid,
+        int32_t bindLevel, const std::string &extra, int32_t userId);
+    int32_t DeleteSkCredAndAcl(DmOfflineParam offlineParam);
+    void DeleteAclByTokenId(const int32_t accessTokenId,
+        std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
+        std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
+        std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec);
+    bool CheckLnnAcl(DistributedDeviceProfile::AccessControlProfile delProfile,
+        DistributedDeviceProfile::AccessControlProfile lastprofile);
+    void CheckIsLastLnnAcl(DistributedDeviceProfile::AccessControlProfile profile,
+        DistributedDeviceProfile::AccessControlProfile delProfile, DmOfflineParam &lnnAclParam,
+        bool &isLastLnnAcl, const std::string &localUdid);
 private:
-    std::shared_ptr<DmAuthManager> authMgr_;
+    std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
+    std::mutex authMgrMtx_;
+    std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
+    std::shared_ptr<HiChainConnector> hiChainConnector_;
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
     std::shared_ptr<SoftbusConnector> softbusConnector_;
     std::shared_ptr<DmAbilityManager> abilityMgr_;
-    std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<MineHiChainConnector> mineHiChainConnector_;
     std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::atomic<bool> isCredentialType_ = false;
     sptr<DpInitedCallback> dpInitedCallback_ = nullptr;
+
+    // The session ID corresponding to the device ID, used only on the src side
+    std::map<std::string, int> deviceId2SessionIdMap_;
+    std::map<int, std::shared_ptr<Session>> sessionsMap_;  // sessionId corresponds to the session object
+    std::map<std::string, std::mutex> deviceIdMutexMap_;  // Lock corresponding to the device ID
+    std::mutex mapMutex_;  // sessionsMap_的锁
+    std::map<int, std::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
+    std::map<int, std::mutex> sessionEnableMutexMap_;      // Lock corresponding to the session
+    std::map<uint64_t, uint64_t> logicalSessionId2TokenIdMap_;  // The relationship between logicalSessionId and tokenId
+    std::map<uint64_t, int> logicalSessionId2SessionIdMap_;  // The relationship logicalSessionId and physical sessionId
+    std::map<uint64_t, std::shared_ptr<Config>> configsMap_;    // Import when authMgr is not initialized
+
+    std::thread thread_;
+    std::atomic<bool> running_;
+    static std::condition_variable cleanEventCv_;
+    static std::mutex cleanEventMutex_;
+    static std::queue<uint64_t> cleanEventQueue_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

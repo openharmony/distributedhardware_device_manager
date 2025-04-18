@@ -16,6 +16,7 @@
 #include "dm_comm_tool.h"
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "dm_error_type.h"
 #include "dm_transport.h"
 #include "dm_transport_msg.h"

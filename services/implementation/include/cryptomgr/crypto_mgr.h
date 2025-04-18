@@ -45,6 +45,7 @@ public:
     int32_t SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
     int32_t ProcessSessionKey(const uint8_t *sessionKey, const uint32_t keyLen);
     void ClearSessionKey();
+    std::vector<unsigned char> GetSessionKey();
 
 private:
     int32_t DoEncryptData(AesGcmCipherKey *cipherKey, const unsigned char *input, uint32_t inLen,

@@ -56,6 +56,7 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     dmAccessee.trustBundleName = trustBundleName;
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     std::string accountId(reinterpret_cast<const char*>(data), size);
+    DmOfflineParam offlineParam;
     DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(pkgName, requestDeviceId, trustUdid);
     DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, userId);
@@ -63,7 +64,7 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     DeviceProfileConnector::GetInstance().UpdateAccessControlList(userId, accountId, accountId);
     DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
     DeviceProfileConnector::GetInstance().CheckDevIdInAclForDevBind(pkgName, localDeviceId);
-    DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(localDeviceId, userId);
+    DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(localDeviceId, offlineParam);
     DeviceProfileConnector::GetInstance().GetTrustNumber(localDeviceId);
 }
 }

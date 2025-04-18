@@ -19,6 +19,7 @@
 #include <dlfcn.h>
 #include <functional>
 #include "app_manager.h"
+#include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_hidumper.h"
 #include "dm_softbus_cache.h"
@@ -2414,7 +2415,7 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
     uint64_t tokenId, int32_t bindLevel)
 {
     LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
-    if (static_cast<uint32_t>(bindLevel) == DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) == USER) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
     }
@@ -2431,7 +2432,7 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
 void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, int32_t bindLevel, uint64_t peerTokenId)
 {
-    if (static_cast<uint32_t>(bindLevel) == DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) == USER) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
     }
@@ -2526,6 +2527,10 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
                 dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
                     static_cast<int32_t>(relationShipMsg.tokenId));
             }
+            break;
+        case RelationShipChangeType::SERVICE_UNBIND:
+            dmServiceImpl_->HandleServiceUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+                static_cast<int32_t>(relationShipMsg.tokenId));
             break;
         case RelationShipChangeType::SYNC_USERID:
             HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
@@ -2726,6 +2731,26 @@ void DeviceManagerService::SubscribePackageCommonEvent()
         LOGI("Success");
     }
 #endif
+}
+
+int32_t DeviceManagerService::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
+{
+    if (IsDMServiceImplReady()) {
+        return dmServiceImpl_->SyncLocalAclListProcess(localUdid, localUserId, remoteUdid,
+            remoteUserId, remoteAclList);
+    }
+    return ERR_DM_FAILED;
+}
+
+int32_t DeviceManagerService::GetAclListHash(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+{
+    if (IsDMServiceImplReady()) {
+        return dmServiceImpl_->GetAclListHash(localUdid,
+            localUserId, remoteUdid, remoteUserId, aclList);
+    }
+    return ERR_DM_FAILED;
 }
 
 void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,

@@ -52,6 +52,7 @@ ohos_fuzztest("SoftbusSessionFuzzTest") {
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
+    "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",
     "safwk:system_ability_fwk",
   ]

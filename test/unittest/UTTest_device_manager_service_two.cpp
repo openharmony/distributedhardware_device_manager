@@ -521,12 +521,12 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level1
     std::string value = "186";
     bindParam.insert(std::make_pair(key, value));
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_AUTH_OPEN_SESSION_FAILED);
 
     targetId.wifiIp = "178.168.1.2";
     EXPECT_CALL(*softbusListenerMock_, GetIPAddrTypeFromCache(_, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_AUTH_OPEN_SESSION_FAILED);
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Level1)
@@ -768,16 +768,23 @@ HWTEST_F(DeviceManagerServiceTest, RegDevStateCallbackToService_201, testing::ex
 
     JsonObject msgJsonObj;
     msgJsonObj["networkId"] = "networkId_001";
-    msgJsonObj["discoverType"] = 0;
+    msgJsonObj["discoverType"] = 0b0100;
+    msgJsonObj["ischange"] = true;
     msg = msgJsonObj.Dump();
+    std::vector<int32_t> foregroundUserVec;
+    foregroundUserVec.push_back(101);
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 
-    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)))
-        .WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
+        .WillOnce(DoAll(SetArgReferee<0>(foregroundUserVec), Return(DM_OK)));
+    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>("udid01"), Return(DM_OK)));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
+    Mock::VerifyAndClearExpectations(multipleUserConnectorMock_.get());
 
-    msgJsonObj["discoverType"] = 1;
+    msgJsonObj["discoverType"] = 0;
     msg = msgJsonObj.Dump();
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
@@ -1088,14 +1095,14 @@ HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitch_201, testing::ext
     std::vector<int32_t> backgroundUserIds;
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(curUserId, preUserId, peerUdids, foregroundUserIds,
         backgroundUserIds);
-    
+
     peerUdids.push_back("peerUdid001");
     peerUdids.push_back("peerUdid002");
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(curUserId, preUserId, peerUdids, foregroundUserIds,
         backgroundUserIds);
     EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-    
+
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).Times(::testing::AtLeast(2))
         .WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
@@ -1105,7 +1112,7 @@ HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitch_201, testing::ext
 
     EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).Times(::testing::AtLeast(2))
         .WillOnce(DoAll(SetArgReferee<1>("networkId"), Return(DM_OK)));
-    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _)).Times(::testing::AtLeast(2))
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(0), Return(ERR_DM_FAILED)));
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(curUserId, preUserId, peerUdids, foregroundUserIds,
         backgroundUserIds);
@@ -1115,7 +1122,7 @@ HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitch_201, testing::ext
     EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).Times(::testing::AtLeast(2))
         .WillOnce(DoAll(SetArgReferee<1>("networkId"), Return(DM_OK)));
-    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _)).Times(::testing::AtLeast(2))
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(curUserId, preUserId, peerUdids, foregroundUserIds,
         backgroundUserIds);
@@ -1123,7 +1130,7 @@ HWTEST_F(DeviceManagerServiceTest, NotifyRemoteLocalUserSwitch_201, testing::ext
 
     EXPECT_CALL(*softbusCacheMock_, GetNetworkIdFromCache(_, _)).Times(::testing::AtLeast(2))
         .WillOnce(DoAll(SetArgReferee<1>("networkId"), Return(DM_OK)));
-    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _)).Times(::testing::AtLeast(2))
+    EXPECT_CALL(*softbusListenerMock_, GetNetworkTypeByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>(4), Return(DM_OK)));
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitch(curUserId, preUserId, peerUdids, foregroundUserIds,
         backgroundUserIds);
@@ -1281,11 +1288,11 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
     backgroundUserIds.push_back(102);
     msgJsonObj["discoverType"] = 1;
     msg = msgJsonObj.Dump();
-    EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _)).WillOnce(DoAll(SetArgReferee<1>(""), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(backgroundUserIds), Return(DM_OK)));
+    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
 
@@ -1336,6 +1343,7 @@ HWTEST_F(DeviceManagerServiceTest, PutDeviceProfileInfoList_202, testing::ext::T
 {
     std::string pkgName = "pkgName";
     std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidPutDeviceProfileInfoList(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
     EXPECT_TRUE(ret == ERR_DM_UNSUPPORTED_METHOD || ret == ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1448,8 +1456,9 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnGetDeviceInfo(_)).WillOnce(Return(true));
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).WillOnce(Return(false));
+    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
 
@@ -1491,7 +1500,7 @@ HWTEST_F(DeviceManagerServiceTest, RegisterLocalServiceInfo_201, testing::ext::T
     DeviceManagerService::GetInstance().hichainListener_ = std::make_shared<HichainListener>();
     DeviceManagerService::GetInstance().UpdateAclAndDeleteGroup(localUdid, deviceVec,
         foregroundUserIds, backgroundUserIds);
-    
+
     std::string pkgName = "pkgName";
     DeviceManagerService::GetInstance().ClearPublishIdCache(pkgName);
     DeviceManagerService::GetInstance().hichainListener_ = nullptr;
@@ -1549,7 +1558,7 @@ HWTEST_F(DeviceManagerServiceTest, UpdateLocalServiceInfo_201, testing::ext::Tes
     EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(localUdid, wifiDevices,
         foregroundUserIds, backgroundUserIds);
-    
+
     GTEST_LOG_(INFO) << "NotifyRemoteLocalUserSwitchByWifi SendUserIds is ok" ;
     EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(DM_OK));
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(localUdid, wifiDevices,
@@ -1697,7 +1706,7 @@ HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_202, testing::ext::TestSiz
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(false));
     ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
@@ -1727,7 +1736,7 @@ HWTEST_F(DeviceManagerServiceTest, SetRemoteDeviceName_202, testing::ext::TestSi
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyRemoteDeviceName(_)).WillOnce(Return(false));
     ret = DeviceManagerService::GetInstance().SetRemoteDeviceName(pkgName, deviceId, deviceName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyRemoteDeviceName(_)).WillOnce(Return(true));
@@ -1781,7 +1790,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_202, testing::ext::Tes
     int32_t stopUserId = 1;
     std::map<std::string, int32_t> deviceMap;
     EXPECT_CALL(*deviceProfileConnectorMock_, GetDeviceIdAndBindLevel(_, _))
-        .Times(::testing::AtLeast(3)).WillRepeatedly(Return(deviceMap));
+        .WillOnce(Return(deviceMap));
     DeviceManagerService::GetInstance().InitDMServiceListener();
     DeviceManagerService::GetInstance().HandleUserStopEvent(stopUserId);
 

@@ -16,6 +16,7 @@
 #include "hichain_listener.h"
 
 #include "device_manager_service.h"
+#include "dm_constants.h"
 #include "dm_random.h"
 #include "multiple_user_connector.h"
 

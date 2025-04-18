@@ -62,7 +62,7 @@ const int32_t CHECK_AUTH_ALWAYS_POS = 0;
 const char AUTH_ALWAYS = '1';
 const char AUTH_ONCE = '0';
 const char* TAG_TARGET_DEVICE_NAME = "targetDeviceName";
-const int32_t INVALID_PINCODE = -1;
+const int32_t MIN_PINCODE_SIZE = 6;
 
 // HiChain
 const int32_t SERVICE_INIT_TRY_MAX_NUM = 200;
@@ -157,5 +157,8 @@ const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
 
 // wise device
 const int32_t MAX_DEVICE_PROFILE_SIZE = 500;
+const char* ACL_IS_LNN_ACL_KEY = "IsLnnAcl";
+const char* ACL_IS_LNN_ACL_VAL_TRUE = "true";
+const char* ACL_IS_LNN_ACL_VAL_FALSE = "false";
 } // namespace DistributedHardware
 } // namespace OHOS

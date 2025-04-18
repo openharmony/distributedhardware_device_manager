@@ -23,7 +23,7 @@ public:
     virtual void OnGroupCreated(int64_t requestId, const std::string &groupId) = 0;
     virtual void OnMemberJoin(int64_t requestId, int32_t status) = 0;
     virtual std::string GetConnectAddr(std::string deviceId) = 0;
-    virtual int32_t GetPinCode(int32_t &code) = 0;
+    virtual int32_t GetPinCode(std::string &code) = 0;
 };
 
 class IDmGroupResCallback {
@@ -37,8 +37,7 @@ public:
     virtual void AuthDeviceFinish(int64_t requestId) = 0;
     virtual void AuthDeviceError(int64_t requestId, int32_t errorCode) = 0;
     virtual void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen) = 0;
-    virtual int32_t GetPinCode(int32_t &code) = 0;
-    virtual void GetRemoteDeviceId(std::string &deviceId) = 0;
+    virtual char *AuthDeviceRequest(int64_t requestId, int operationCode, const char *reqParams) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

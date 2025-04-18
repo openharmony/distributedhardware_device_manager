@@ -41,5 +41,10 @@ ErrCode OsAccountManager::GetForegroundOsAccountLocalId(int32_t &localId)
 {
     return IOsAccountManager::GetOrCreateOsAccountManager()->GetForegroundOsAccountLocalId(localId);
 }
+
+ErrCode OsAccountManager::GetForegroundOsAccountLocalId(const uint64_t displayId, int32_t &localId)
+{
+    return IOsAccountManager::GetOrCreateOsAccountManager()->GetForegroundOsAccountLocalId(displayId, localId);
+}
 } // namespace AccountSA
 } // namespace OHOS

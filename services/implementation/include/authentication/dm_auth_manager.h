@@ -28,6 +28,7 @@
 #include "deviceprofile_connector.h"
 #include "dm_ability_manager.h"
 #include "dm_adapter_manager.h"
+#include "dm_auth_manager_base.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_timer.h"
@@ -172,7 +173,7 @@ typedef struct DmAuthResponseContext {
     std::string authToken;
     int32_t pageId;
     int64_t requestId;
-    int32_t code = INVALID_PINCODE;
+    std::string code = "";
     int32_t state;
     std::vector<std::string> syncGroupList;
     std::string accountGroupIdHash;
@@ -203,10 +204,7 @@ typedef struct DmAuthResponseContext {
 
 class AuthMessageProcessor;
 
-class DmAuthManager final : public ISoftbusSessionCallback,
-                            public ISoftbusConnectorCallback,
-                            public IHiChainConnectorCallback,
-                            public IDmDeviceAuthCallback,
+class DmAuthManager final : public AuthManagerBase,
                             public std::enable_shared_from_this<DmAuthManager> {
 public:
     DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
@@ -335,7 +333,7 @@ public:
      * @tc.desc: Process pin code of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t ProcessPincode(int32_t pinCode);
+    int32_t ProcessPincode(const std::string &pinCode);
 
     /**
      * @tc.name: DmAuthManager::GetConnectAddr
@@ -384,7 +382,7 @@ public:
      * @tc.desc: Get Pin Code of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t GetPinCode(int32_t &code);
+    int32_t GetPinCode(std::string &code);
 
     /**
      * @tc.name: DmAuthManager::GenerateGroupName
@@ -405,7 +403,7 @@ public:
      * @tc.desc: Generate Pincode of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    int32_t GeneratePincode();
+    std::string GeneratePincode();
 
     /**
      * @tc.name: DmAuthManager::ShowConfigDialog
@@ -483,7 +481,10 @@ public:
      * @tc.type: FUNC
      */
     int32_t BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
-        const std::map<std::string, std::string> &bindParam);
+        const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId);
+
+    void ClearSoftbusSessionCallback();
+    void PrepareSoftbusSessionCallback();
 
     void HandleSessionHeartbeat(std::string name);
 
@@ -515,11 +516,10 @@ private:
     void AbilityNegotiate();
     void HandleMemberJoinImportAuthCode(const int64_t requestId, const int32_t status);
     int32_t DeleteAuthCode();
-    int32_t GetAuthCode(const std::string &pkgName, int32_t &pinCode);
+    int32_t GetAuthCode(const std::string &pkgName, std::string &pinCode);
     bool IsAuthTypeSupported(const int32_t &authType);
     bool IsAuthCodeReady(const std::string &pkgName);
     int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId, std::string &addrType);
-    int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
     std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindParam);
     std::string GenerateBindResultContent();
     void InitAuthState(const std::string &pkgName, int32_t authType, const std::string &deviceId,
@@ -546,6 +546,7 @@ public:
     void AuthDeviceError(int64_t requestId, int32_t errorCode);
     void GetRemoteDeviceId(std::string &deviceId);
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
+    char *AuthDeviceRequest(int64_t requestId, int operationCode, const char *reqParams);
     int32_t GetSessionKeyIdSync(int64_t requestId);
     void OnAuthDeviceDataReceived(const int32_t sessionId, const std::string message);
     void OnScreenLocked();
@@ -571,14 +572,13 @@ private:
     void ProcessAuthRequest(const int32_t &sessionId);
     int32_t ConfirmProcess(const int32_t &action);
     int32_t ConfirmProcessExt(const int32_t &action);
-    int32_t AddMember(int32_t pinCode);
-    int32_t AuthDevice(int32_t pinCode);
+    int32_t AddMember(const std::string &pinCode);
+    int32_t AuthDevice(const std::string &pinCode);
     void PutAccessControlList();
     void SinkAuthenticateFinish();
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
     bool IsScreenLocked();
-    std::string ConvertSrcVersion(const std::string &version, const std::string &edition);
     std::string ConvertSinkVersion(const std::string &version);
     void NegotiateRespMsg(const std::string &version);
     void SetAuthType(int32_t authType);
@@ -597,6 +597,7 @@ private:
     void ProcessReqPublicKey();
     int32_t GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId);
     bool CheckBindLevel(const JsonItemObject &jsonObj, const std::string &key, int32_t &bindLevel);
+    void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -643,6 +644,7 @@ private:
     std::condition_variable sessionKeyIdCondition_;
     std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
     bool isWaitingJoinLnnCallback_ = false;
+    CleanNotifyCallback cleanNotifyCallback_{nullptr};
 };
 } // namespace DistributedHardware
 } // namespace OHOS

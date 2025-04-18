@@ -194,6 +194,20 @@ void SoftbusListener::CredentialAuthStatusProcess(std::string deviceList, uint16
     DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 
+int32_t SoftbusListener::OnSyncLocalAclList(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
+{
+    return DeviceManagerService::GetInstance().SyncLocalAclListProcess(localUdid,
+        localUserId, remoteUdid, remoteUserId, remoteAclList);
+}
+
+int32_t SoftbusListener::OnGetAclListHash(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+{
+    return DeviceManagerService::GetInstance().GetAclListHash(localUdid,
+        localUserId, remoteUdid, remoteUserId, aclList);
+}
+
 void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t deviceListLen,
                                              uint16_t deviceTypeId, int32_t errcode)
 {

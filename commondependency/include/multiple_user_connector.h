@@ -83,7 +83,7 @@ public:
      * @tc.type: FUNC
      */
     static std::string GetSwitchOldAccountId(void);
-    
+
     /**
      * @tc.name: MultipleUserConnector::SetSwitchOldAccountName
      * @tc.desc: Set Switch Old AccountName of the Multiple User Connector
@@ -108,6 +108,7 @@ public:
     EXPORT static void SetAccountInfo(int32_t userId, DMAccountInfo dmAccountInfo);
     EXPORT static DMAccountInfo GetAccountInfoByUserId(int32_t userId);
     EXPORT static void DeleteAccountInfoByUserId(int32_t userId);
+    EXPORT static void GetTokenId(uint32_t &tokenId);
     EXPORT static void GetTokenIdAndForegroundUserId(uint32_t &tokenId,
         int32_t &userId);
     EXPORT static void GetCallerUserId(int32_t &userId);
@@ -121,6 +122,8 @@ public:
     EXPORT static void ClearLockedUser(std::vector<int32_t> &foregroundUserVec,
         std::vector<int32_t> &backgroundUserVec);
     EXPORT static DMAccountInfo GetCurrentDMAccountInfo();
+    EXPORT static void GetCallingTokenId(uint32_t &tokenId);
+    EXPORT static int32_t GetUserIdByDisplayId(uint64_t displayId);
 private:
     static int32_t oldUserId_;
     static std::string accountId_;

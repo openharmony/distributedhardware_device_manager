@@ -50,7 +50,7 @@ public:
     MOCK_METHOD(void, OnGroupCreated, (int64_t requestId, const std::string &groupId), (override));
     MOCK_METHOD(void, OnMemberJoin, (int64_t requestId, int32_t status), (override));
     MOCK_METHOD(std::string, GetConnectAddr, (std::string deviceId), (override));
-    MOCK_METHOD(int32_t, GetPinCode, (int32_t &code), (override));
+    MOCK_METHOD(int32_t, GetPinCode, (std::string &code), (override));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

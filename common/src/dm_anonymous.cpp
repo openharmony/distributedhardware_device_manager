@@ -156,6 +156,16 @@ bool IsInt64(const JsonItemObject &jsonObj, const std::string &key)
     return res;
 }
 
+bool IsUint64(const JsonItemObject &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<uint64_t>() >= 0 &&
+        jsonObj[key].Get<uint64_t>() <= UINT64_MAX;
+    if (!res) {
+        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
+}
+
 bool IsArray(const JsonItemObject &jsonObj, const std::string &key)
 {
     bool res = jsonObj.Contains(key) && jsonObj[key].IsArray();
@@ -297,6 +307,24 @@ bool CompareVersion(const std::string &remoteVersion, const std::string &oldVers
     VersionSplitToInt(remoteVersion, '.', remoteVersionVec);
     VersionSplitToInt(oldVersion, '.', oldVersionVec);
     return CompareVecNum(remoteVersionVec, oldVersionVec);
+}
+
+bool GetVersionNumber(const std::string dmVersion, int32_t &versionNum)
+{
+    LOGI("dmVersion %{public}s,", dmVersion.c_str());
+    std::string number = "";
+    std::istringstream iss(dmVersion);
+    std::string item = "";
+    while (getline(iss, item, '.')) {
+        number += item;
+    }
+    LOGI("number %{public}s,", number.c_str());
+    versionNum = atoi(number.c_str());
+    if (versionNum <= 0) {
+        LOGE("convert failed, number: %{public}s,", number.c_str());
+        return false;
+    }
+    return true;
 }
 
 std::string ComposeStr(const std::string &pkgName, uint16_t subscribeId)

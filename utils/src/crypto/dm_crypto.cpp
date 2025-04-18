@@ -245,7 +245,7 @@ EXPORT int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
 EXPORT int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId,
     const std::string &udidHash, DmKVValue &kvValue)
 {
-    LOGI("start.");
+    LOGD("start.");
     if (GetAnoyDeviceInfo(appId, udidHash, kvValue) == DM_OK) {
         return DM_OK;
     }
@@ -254,7 +254,7 @@ EXPORT int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId,
 
 int32_t Crypto::GetAnoyDeviceInfo(const std::string &appId, const std::string &udidHash, DmKVValue &kvValue)
 {
-    LOGI("start");
+    LOGD("start");
     std::string udidPrefix = appId + DB_KEY_DELIMITER + udidHash;
     if (KVAdapterManager::GetInstance().Get(udidPrefix, kvValue) != DM_OK) {
         LOGI("Get kv value from DB failed");
@@ -266,7 +266,7 @@ int32_t Crypto::GetAnoyDeviceInfo(const std::string &appId, const std::string &u
 int32_t Crypto::ConvertUdidHashToAnoyGenerate(const std::string &appId, const std::string &udidHash,
     DmKVValue &kvValue)
 {
-    LOGI("start.");
+    LOGD("start.");
     std::string salt = GetSecSalt();
     std::string udidTemp = appId + DB_KEY_DELIMITER + udidHash + DB_KEY_DELIMITER + salt;
     char anoyDeviceId[DM_MAX_DEVICE_ID_LEN] = {0};

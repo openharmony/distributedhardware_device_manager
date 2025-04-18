@@ -31,9 +31,11 @@ public:
     DmLanguageManager() {}
     ~DmLanguageManager() {}
     std::string GetSystemParam(const std::string &key);
+    std::string GetSystemLanguage();
     void GetLocaleByLanguage(const std::string &language, std::set<std::string> &localeSet);
     std::string GetTextBySystemLocale(const cJSON *const textObj, const std::set<std::string> &localeSet);
     std::string GetTextBySystemLanguage(const std::string &text);
+    std::string GetTextByLanguage(const std::string &text, const std::string &language);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

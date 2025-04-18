@@ -33,7 +33,6 @@ class SoftbusSession {
 public:
     static int OnSessionOpened(int sessionId, int result);
     static void OnSessionClosed(int sessionId);
-    static void OnBytesReceived(int sessionId, const void *data, unsigned int dataLen);
 
 public:
     SoftbusSession();
@@ -91,7 +90,6 @@ public:
 
 private:
     static std::shared_ptr<ISoftbusSessionCallback> sessionCallback_;
-    ISocketListener iSocketListener_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

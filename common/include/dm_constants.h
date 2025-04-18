@@ -71,8 +71,7 @@ EXPORT extern const int32_t CHECK_AUTH_ALWAYS_POS;
 EXPORT extern const char AUTH_ALWAYS;
 EXPORT extern const char AUTH_ONCE;
 EXPORT extern const char* TAG_TARGET_DEVICE_NAME;
-EXPORT extern const int32_t INVALID_PINCODE;
-
+EXPORT extern const int32_t MIN_PINCODE_SIZE;
 // HiChain
 EXPORT extern const int32_t SERVICE_INIT_TRY_MAX_NUM;
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
@@ -169,6 +168,10 @@ EXPORT extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
 // wise device
 EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 const int32_t DEVICE_NAME_MAX_BYTES = 100;
+
+EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
+EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
+EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

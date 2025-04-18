@@ -74,6 +74,10 @@ public:
     static int32_t ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
         DmDeviceInfo &devInfo);
     static void UpdateDeviceName(NodeBasicInfo *info);
+    static int32_t OnSyncLocalAclList(const std::string localUdid, int32_t localUserId,
+        const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList);
+    static int32_t OnGetAclListHash(const std::string localUdid, int32_t localUserId,
+        const std::string remoteUdid, int32_t remoteUserId, std::string &aclList);
 
     int32_t InitSoftbusListener();
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);

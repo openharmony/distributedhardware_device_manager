@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const char* TAG_REPLY = "REPLY";
 const char* TAG_NET_ID = "NETID";
 const char* TAG_TARGET = "TARGET";
 const char* TAG_APP_OPERATION = "APPOPERATION";
@@ -32,7 +31,6 @@ const char* TAG_GROUPIDS = "GROUPIDLIST";
 const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
 const char* TAG_DEVICE_TYPE = "DEVICETYPE";
 const char* TAG_REQUESTER = "REQUESTER";
-const char* TAG_LOCAL_DEVICE_ID = "LOCALDEVICEID";
 const char* TAG_LOCAL_DEVICE_TYPE = "LOCALDEVICETYPE";
 const char* TAG_INDEX = "INDEX";
 const char* TAG_SLICE_NUM = "SLICE";
@@ -41,44 +39,24 @@ const char* TAG_IS_SHOW_DIALOG = "IS_SHOW_DIALOG";
 const char* TAG_TOKEN = "TOKEN";
 const char* TAG_CRYPTO_NAME = "CRYPTONAME";
 const char* TAG_CRYPTO_VERSION = "CRYPTOVERSION";
-const char* TAG_IDENTICAL_ACCOUNT = "IDENTICALACCOUNT";
-const char* TAG_ACCOUNT_GROUPID = "ACCOUNTGROUPID";
-const char* APP_THUMBNAIL = "appThumbnail";
 const char* QR_CODE_KEY = "qrCode";
 const char* TAG_AUTH_TOKEN = "authToken";
 const char* NFC_CODE_KEY = "nfcCode";
 const char* OLD_VERSION_ACCOUNT = "oldVersionAccount";
-const char* TAG_AUTH_FINISH = "isFinish";
 
-const char* TAG_HAVE_CREDENTIAL = "haveCredential";
 const char* TAG_PUBLICKEY = "publicKey";
 const char* TAG_SESSIONKEY = "sessionKey";
-const char* TAG_BIND_LEVEL = "bindLevel";
-const char* TAG_LOCAL_USERID = "localUserId";
 const char* TAG_BIND_TYPE_SIZE = "bindTypeSize";
-const char* TAG_ISONLINE = "isOnline";
-const char* TAG_AUTHED = "authed";
-const char* TAG_LOCAL_ACCOUNTID = "localAccountId";
-const char* TAG_DMVERSION = "dmVersion";
 const char* TAG_HOST_PKGNAME = "hostPkgname";
-const char* TAG_TOKENID = "tokenId";
 const char* TAG_HAVECREDENTIAL = "haveCredential";
 const char* TAG_CONFIRM_OPERATION = "confirmOperation";
-const char* TAG_DATA = "data";
-const char* TAG_DATA_LEN = "dataLen";
 const char* TAG_IMPORT_AUTH_CODE = "IMPORT_AUTH_CODE";
-const char* TAG_HOST_PKGLABEL = "hostPkgLabel";
-const char* TAG_EDITION = "edition";
-const char* TAG_BUNDLE_NAME = "bundleName";
 const char* TAG_CRYPTIC_MSG = "encryptMsg";
-const char* TAG_PEER_BUNDLE_NAME = "PEER_BUNDLE_NAME";
-const char* TAG_REMOTE_DEVICE_NAME = "REMOTE_DEVICE_NAME";
 const char* TAG_SESSIONKEY_ID = "sessionKeyId";
 
 const int32_t MSG_MAX_SIZE = 45 * 1024;
 const int32_t GROUP_VISIBILITY_IS_PRIVATE = 0;
 const int32_t MAX_BINDTYPE_SIZE = 1000;
-constexpr const char* TAG_HOST = "HOST";
 constexpr const char* TAG_VISIBILITY = "VISIBILITY";
 constexpr const char* TAG_APP_THUMBNAIL = "APPTHUM";
 constexpr const char* TAG_THUMBNAIL_SIZE = "THUMSIZE";

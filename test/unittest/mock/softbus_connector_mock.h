@@ -30,6 +30,7 @@ public:
     virtual bool CheckIsOnline(const std::string &targetDeviceId) = 0;
     virtual std::vector<ProcessInfo> GetProcessInfo() = 0;
     virtual DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId) = 0;
+    virtual std::shared_ptr<SoftbusSession> GetSoftbusSession();
 public:
     static inline std::shared_ptr<DmSoftbusConnector> dmSoftbusConnector = nullptr;
 };
@@ -40,6 +41,7 @@ public:
     MOCK_METHOD(bool, CheckIsOnline, (const std::string &));
     MOCK_METHOD(std::vector<ProcessInfo>, GetProcessInfo, ());
     MOCK_METHOD(DmDeviceInfo, GetDeviceInfoByDeviceId, (const std::string &deviceId));
+    MOCK_METHOD(std::shared_ptr<SoftbusSession>, GetSoftbusSession, ());
 };
 }
 }

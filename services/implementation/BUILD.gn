@@ -115,6 +115,7 @@ if (defined(ohos_lite)) {
       "include/config",
       "include/adapter",
       "include/authentication",
+      "include/authentication_v2",
       "include/authentication/showconfirm/standard",
       "include/ability",
       "include/credential",
@@ -125,6 +126,7 @@ if (defined(ohos_lite)) {
       "include/dependency/multipleuser",
       "include/dependency/hichain",
       "include/dependency/softbus",
+      "include/dependency/MSDP",
       "include/i18n",
       "${common_path}/include",
       "${common_path}/include/dfx",
@@ -182,6 +184,18 @@ if (defined(ohos_lite)) {
       "src/authentication/auth_ui_state_manager.cpp",
       "src/authentication/dm_auth_manager.cpp",
       "src/authentication/showconfirm/standard/show_confirm.cpp",
+      "src/authentication_v2/auth_manager.cpp",
+      "src/authentication_v2/auth_stages/auth_acl.cpp",
+      "src/authentication_v2/auth_stages/auth_confirm.cpp",
+      "src/authentication_v2/auth_stages/auth_credential.cpp",
+      "src/authentication_v2/auth_stages/auth_negotiate.cpp",
+      "src/authentication_v2/auth_stages/auth_pin_auth.cpp",
+      "src/authentication_v2/dm_auth_context.cpp",
+      "src/authentication_v2/dm_auth_manager_base.cpp",
+      "src/authentication_v2/dm_auth_message_processor.cpp",
+      "src/authentication_v2/dm_auth_state.cpp",
+      "src/authentication_v2/dm_auth_state_machine.cpp",
+      "src/authentication_v2/dm_negotiate_process.cpp",
       "src/config/dm_config_manager.cpp",
       "src/credential/dm_credential_manager.cpp",
       "src/cryptomgr/crypto_mgr.cpp",
@@ -236,8 +250,10 @@ if (defined(ohos_lite)) {
       "mbedtls:mbedtls_shared",
       "openssl:libcrypto_shared",
       "os_account:libaccountkits",
+      "os_account:os_account_innerkits",
       "resource_management:resmgr_napi_core",
       "samgr:samgr_proxy",
+      "zlib:shared_libz",
     ]
 
     if (support_screenlock && device_manager_feature_product == "default") {
@@ -247,6 +263,12 @@ if (defined(ohos_lite)) {
 
     if (device_manager_common) {
       defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
+    }
+
+    if (support_msdp) {
+      sources += [ "src/dependency/MSDP/spatial_location_callback_impl.cpp" ]
+      defines += [ "SUPPORT_MSDP" ]
+      external_deps += [ "spatial_awareness:spatial_awareness_client" ]
     }
 
     subsystem_name = "distributedhardware"

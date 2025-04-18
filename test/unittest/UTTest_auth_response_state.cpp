@@ -402,7 +402,7 @@ HWTEST_F(AuthResponseStateTest, Enter_009, testing::ext::TestSize.Level1)
     authManager->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     std::shared_ptr<AuthResponseState> authResponseState = std::make_shared<AuthResponseShowState>();
     authManager->authPtr_ = authManager->authenticationMap_[1];
-    authManager->authResponseContext_->code = 123456;
+    authManager->authResponseContext_->code = "123456";
     authResponseState->SetAuthManager(authManager);
     int32_t ret = authResponseState->Enter();
     ASSERT_EQ(ret, DM_OK);

@@ -33,48 +33,9 @@ std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = null
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
 constexpr int32_t MAX_DATA_LEN = 65535;
 
-static void OnShutdown(int32_t socket, ShutdownReason reason)
-{
-    LOGI("[SOFTBUS]OnShutdown socket : %{public}d, reason: %{public}d", socket, (int32_t)reason);
-    SoftbusSession::OnSessionClosed(socket);
-}
-
-static void OnBytes(int32_t socket, const void *data, uint32_t dataLen)
-{
-    LOGI("[SOFTBUS]OnBytes socket : %{public}d", socket);
-    SoftbusSession::OnBytesReceived(socket, data, dataLen);
-}
-
-static void OnQos(int32_t socket, QoSEvent eventId, const QosTV *qos, uint32_t qosCount)
-{
-    LOGI("[SOFTBUS]OnQos, socket: %{public}d, QoSEvent: %{public}d, qosCount: %{public}u", socket, (int32_t)eventId,
-        qosCount);
-    if (qosCount > QOS_TYPE_BUTT) {
-        LOGE("OnQos invalid qosCount");
-        return;
-    }
-    for (uint32_t idx = 0; idx < qosCount; idx++) {
-        LOGI("QosTV: type: %{public}d, value: %{public}d", (int32_t)qos[idx].qos, qos[idx].value);
-    }
-}
-
 SoftbusSession::SoftbusSession()
 {
     LOGD("SoftbusSession constructor.");
-    if (memset_s(&iSocketListener_, sizeof(ISocketListener), 0, sizeof(ISocketListener)) != DM_OK) {
-        LOGE("SoftbusSession::SoftbusSession memset_s failed.");
-        return;
-    }
-
-    iSocketListener_.OnShutdown = OnShutdown;
-    iSocketListener_.OnBytes = OnBytes;
-    iSocketListener_.OnQos = OnQos;
-    iSocketListener_.OnFile = nullptr;
-    iSocketListener_.OnMessage = nullptr;
-    iSocketListener_.OnBind = nullptr;
-    iSocketListener_.OnStream = nullptr;
-    iSocketListener_.OnError = nullptr;
-    iSocketListener_.OnNegotiate = nullptr;
 }
 
 SoftbusSession::~SoftbusSession()
@@ -99,12 +60,12 @@ int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
     DmTraceStart(std::string(DM_HITRACE_AUTH_TO_OPPEN_SESSION));
     int32_t sessionId = -1;
     std::string connectAddr;
-    ConnectionAddr *addrInfo = SoftbusConnector::GetConnectAddr(deviceId, connectAddr);
+    auto addrInfo = SoftbusConnector::GetConnectAddr(deviceId, connectAddr);
     if (addrInfo == nullptr) {
         LOGE("[SOFTBUS]addrInfo is nullptr. sessionId: %{public}d.", sessionId);
         return sessionId;
     }
-    sessionId = ::OpenAuthSession(DM_SESSION_NAME, addrInfo, 1, nullptr);
+    sessionId = ::OpenAuthSession(DM_SESSION_NAME, addrInfo.get(), 1, nullptr);
     if (sessionId < 0) {
         LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
         return sessionId;
@@ -161,20 +122,6 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
 
 int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
-    JsonObject jsonObject(message);
-    if (jsonObject.IsDiscarded()) {
-        LOGE("extrasJson error, message: %{public}s.", GetAnonyString(message).c_str());
-        return ERR_DM_FAILED;
-    }
-    if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
-        LOGE("SoftbusSession::SendData err json string.");
-        return ERR_DM_FAILED;
-    }
-    int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
-    LOGI("start, msgType: %{public}d.", msgType);
-    if (sessionCallback_->GetIsCryptoSupport()) {
-        LOGI("SendData Start encryption.");
-    }
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed.");
@@ -195,9 +142,13 @@ int32_t SoftbusSession::SendHeartbeatData(int32_t sessionId, std::string &messag
 
 int SoftbusSession::OnSessionOpened(int sessionId, int result)
 {
+    LOGD("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
+    if (sessionCallback_ == nullptr) {
+        LOGD("Session callback is not registered.");
+        return DM_OK;
+    }
     int32_t sessionSide = GetSessionSide(sessionId);
     sessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
-    LOGD("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
     return DM_OK;
 }
 
@@ -206,36 +157,7 @@ void SoftbusSession::OnSessionClosed(int sessionId)
     LOGI("OnSessionClosed, sessionId: %{public}d.", sessionId);
     CHECK_NULL_VOID(sessionCallback_);
     sessionCallback_->OnSessionClosed(sessionId);
-}
-
-void SoftbusSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
-{
-    if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > MAX_DATA_LEN) {
-        LOGI("[SOFTBUS]fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.", sessionId,
-            dataLen);
-        return;
-    }
-    LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
-    if (sessionCallback_->GetIsCryptoSupport()) {
-        LOGI("Start decryption.");
-    }
-    std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
-    JsonObject jsonObject(message);
-    if (jsonObject.IsDiscarded()) {
-        LOGE("DecodeRequestAuth jsonStr error");
-        return;
-    }
-    if (!IsInt32(jsonObject, TAG_MSG_TYPE)) {
-        LOGE("err json string, first time");
-        return;
-    }
-    if (jsonObject[TAG_MSG_TYPE].Get<int32_t>() == AUTH_DEVICE_REQ_NEGOTIATE ||
-        jsonObject[TAG_MSG_TYPE].Get<int32_t>() == AUTH_DEVICE_RESP_NEGOTIATE) {
-        sessionCallback_->OnAuthDeviceDataReceived(sessionId, message);
-    } else {
-        sessionCallback_->OnDataReceived(sessionId, message);
-    }
-    LOGI("completed.");
+    return;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

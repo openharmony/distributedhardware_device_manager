@@ -16,7 +16,9 @@
 #ifndef OHOS_HICHAIN_AUTH_CONNECTOR_H
 #define OHOS_HICHAIN_AUTH_CONNECTOR_H
 
+#include <map>
 #include <mutex>
+
 #include "device_auth.h"
 #include "device_auth_defines.h"
 #include "hichain_connector_callback.h"
@@ -49,20 +51,37 @@ public:
 public:
     HiChainAuthConnector();
     ~HiChainAuthConnector();
-    int32_t AuthDevice(int32_t pinCode, int32_t osAccountId, std::string udid, int64_t requestId);
+    int32_t AuthDevice(const std::string &pinCode, int32_t osAccountId, std::string udid, int64_t requestId);
     int32_t ProcessAuthData(int64_t requestId, std::string authData, int32_t osAccountId);
     int32_t GenerateCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
     bool QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId);
+    int32_t QueryCredentialInfo(int32_t userId, const JsonObject &queryParams, JsonObject &resultJson);
+    int32_t QueryCredInfoByCredId(int32_t userId, std::string credId, JsonObject &resultJson);
     int32_t ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId, std::string publicKey);
     int32_t DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId);
     int32_t RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback);
+    int32_t RegisterHiChainAuthCallbackById(int64_t id, std::shared_ptr<IDmDeviceAuthCallback> callback);
     int32_t GetCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
+
+    int32_t ProcessCredData(int64_t authReqId, const std::string &data);
+    int32_t AddCredential(int32_t osAccountId, const std::string &authParams, std::string &creId);
+    int32_t ExportCredential(int32_t osAccountId, const std::string &credId, std::string &publicKey);
+    int32_t AgreeCredential(int32_t osAccountId, const std::string selfCredId, const std::string &authParams,
+        std::string &credId);
+    int32_t DeleteCredential(int32_t osAccountId, const std::string &creId);
+    // Credential authentication pinCode Pin code (required for point-to-point temporary credentials)
+    int32_t AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId,
+        const std::string &pinCode);
+    int32_t AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode);
+
 private:
     void FreeJsonString(char *jsonStr);
+    static std::shared_ptr<IDmDeviceAuthCallback> GetDeviceAuthCallback(int64_t id);
 
 private:
     DeviceAuthCallback deviceAuthCallback_;
     static std::shared_ptr<IDmDeviceAuthCallback> dmDeviceAuthCallback_;
+    static std::map<int64_t, std::shared_ptr<IDmDeviceAuthCallback>> dmDeviceAuthCallbackMap_;
     static std::mutex dmDeviceAuthCallbackMutex_;
 };
 } // namespace DistributedHardware

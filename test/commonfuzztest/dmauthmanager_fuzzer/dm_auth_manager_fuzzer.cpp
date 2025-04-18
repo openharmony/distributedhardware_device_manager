@@ -39,13 +39,14 @@ int32_t g_sessionSide = 0;
 int32_t g_result = 1;
 int32_t g_authType = 1;
 int32_t g_status = 1;
-int32_t g_pinCode = 1;
+std::string g_pinCode = "111111";
 int32_t g_action = 1;
 int32_t g_userId = 1;
 int32_t g_pageId = 1;
 int32_t g_reason = 1;
 int32_t g_state = 1;
 int64_t g_requestId = 1;
+int64_t g_localSessionId = 1;
 
 std::map<std::string, std::string> g_bindParam;
 
@@ -80,7 +81,7 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     g_authManager->OnSessionOpened(g_sessionId, g_sessionSide, g_result);
     g_authManager->AuthenticateDevice(str, g_authType, str, str);
     g_authManager->ImportAuthCode(str, str);
-    g_authManager->BindTarget(str, g_targetId, g_bindParam);
+    g_authManager->BindTarget(str, g_targetId, g_bindParam, g_sessionId, g_localSessionId);
     g_authManager->ShowConfigDialog();
     g_authManager->ShowAuthInfoDialog();
     g_authManager->ShowStartAuthDialog();

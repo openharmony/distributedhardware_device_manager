@@ -306,11 +306,11 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
             hiChainConnector_->DeleteTimeOutGroup((idIter->second).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
             DeleteGroupByDP(idIter->second);
-            int32_t peerUserId = -1;
-            uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(idIter->second, peerUserId);
+            DmOfflineParam offlineParam;
+            uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(idIter->second, offlineParam);
             if (res == 0) {
-                hiChainAuthConnector_->DeleteCredential(idIter->second,
-                    MultipleUserConnector::GetCurrentAccountUserID(), peerUserId);
+                DeleteCredential(offlineParam, idIter->second);
+                DeleteSkCredAndAcl(offlineParam);
             }
 #endif
             stateTimerInfoMap_.erase(iter);
@@ -318,6 +318,41 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
         }
     }
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void DmDeviceStateManager::DeleteCredential(DmOfflineParam offlineParam, const std::string &deviceId)
+{
+    if (offlineParam.skIdVec.empty()) {
+        CHECK_NULL_VOID(hiChainAuthConnector_);
+        hiChainAuthConnector_->DeleteCredential(deviceId, MultipleUserConnector::GetCurrentAccountUserID(),
+            offlineParam.peerUserId);
+    }
+}
+
+int32_t DmDeviceStateManager::DeleteSkCredAndAcl(DmOfflineParam offlineParam)
+{
+    LOGI("DeleteSkCredAndAcl start.");
+    int32_t ret = DM_OK;
+    if (offlineParam.dmAclIdParamVec.empty()) {
+        return ret;
+    }
+    CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
+    for (auto item : offlineParam.dmAclIdParamVec) {
+        ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(item.userId, item.skId);
+        if (ret != DM_OK) {
+            LOGE("DeleteSessionKey err, userId:%{public}d, skId:%{public}d, ret:%{public}d", item.userId, item.skId,
+                ret);
+        }
+        ret = hiChainAuthConnector_->DeleteCredential(item.userId, item.credId);
+        if (ret != DM_OK) {
+            LOGE("DeletecredId err, userId:%{public}d, credId:%{public}s, ret:%{public}d", item.userId,
+                item.credId.c_str(), ret);
+        }
+        DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.accessControlId);
+    }
+    return ret;
+}
+#endif
 
 void DmDeviceStateManager::StartEventThread()
 {
