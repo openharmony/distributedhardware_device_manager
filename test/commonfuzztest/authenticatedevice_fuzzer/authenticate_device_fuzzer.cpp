@@ -21,6 +21,7 @@
 #include "device_manager.h"
 #include "device_manager_callback.h"
 #include "device_manager_impl.h"
+#include "dm_crypto.h"
 #include "accesstoken_kit.h"
 #include "authenticate_device_fuzzer.h"
 #include "nativetoken_kit.h"
@@ -258,7 +259,7 @@ void AuthenticateDeviceThirdFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     AddPermission();
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = Crypto::Sha256(data, size);
 
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
