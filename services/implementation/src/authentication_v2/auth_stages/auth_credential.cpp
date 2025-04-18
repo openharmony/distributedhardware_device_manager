@@ -78,8 +78,7 @@ int32_t AuthCredentialTransmitSend(std::shared_ptr<DmAuthContext> context, DmMes
 
 void SetAuthContext(int32_t skId, int64_t &appSkTimeStamp, int32_t &appSessionKeyId)
 {
-    appSkTimeStamp =
-        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    appSkTimeStamp = DmAuthState::GetSysTimeMs();
     appSessionKeyId = skId;
     return;
 }
@@ -220,15 +219,11 @@ int32_t AuthSinkCredentialAuthNegotiateState::Action(std::shared_ptr<DmAuthConte
     // First lnn cred auth, second time receiving 161 message
     if (context->accessee.isGenerateLnnCredential == true && context->accessee.bindLevel != USER &&
         context->isAppCredentialVerified == true) {
-        context->accessee.lnnSkTimeStamp =
-            std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch())
-                .count();
+        context->accessee.lnnSkTimeStamp = GetSysTimeMs();
         context->accessee.lnnSessionKeyId = skId;
     } else {  // Twice transport cred auth
         context->isAppCredentialVerified = true;
-        context->accessee.transmitSkTimeStamp =
-            std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch())
-                .count();
+        context->accessee.transmitSkTimeStamp = GetSysTimeMs();
         context->accessee.transmitSessionKeyId = skId;
     }
     return DM_OK;

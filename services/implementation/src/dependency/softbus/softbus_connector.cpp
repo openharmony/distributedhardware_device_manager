@@ -28,16 +28,12 @@
 #include "json_object.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "deviceprofile_connector.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t SOFTBUS_DISCOVER_DEVICE_INFO_MAX_SIZE = 100;
 const int32_t SOFTBUS_TRUSTDEVICE_UUIDHASH_INFO_MAX_SIZE = 100;
-const int32_t DM_VERSION_INT_5_1_0 = 510;
 
 constexpr const char* WIFI_IP = "WIFI_IP";
 constexpr const char* WIFI_PORT = "WIFI_PORT";
@@ -98,30 +94,98 @@ void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
 #endif
 }
 
-int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::vector<std::string> remoteAclList)
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
+    DistributedDeviceProfile::AccessControlProfile &localAcl, std::vector<std::string> &acLStrList)
+{
+    bool res = DeviceProfileConnector::GetInstance().ChecksumAcl(localAcl, acLStrList);
+    if (res) {
+        return DM_OK;
+    }
+    if (localAcl.GetAccesser().GetAccesserDeviceId() == localUdid &&
+        localAcl.GetAccessee().GetAccesseeDeviceId() == remoteUdid) {
+        LOGI("SyncLocalAclListProcess Src.");
+        SyncAclList(localAcl.GetAccesser().GetAccesserUserId(),
+            localAcl.GetAccesser().GetAccesserCredentialIdStr(),
+            localAcl.GetAccesser().GetAccesserSessionKeyId(), localAcl.GetAccessControlId());
+    }
+    if (localAcl.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
+        localAcl.GetAccessee().GetAccesseeDeviceId() == localUdid) {
+        LOGI("SyncLocalAclListProcess Sink.");
+        SyncAclList(localAcl.GetAccessee().GetAccesseeUserId(),
+            localAcl.GetAccessee().GetAccesseeCredentialIdStr(),
+            localAcl.GetAccessee().GetAccesseeSessionKeyId(), localAcl.GetAccessControlId());
+    }
+    return DM_OK;
+}
+
+int32_t SoftbusConnector::ParaseAclChecksumList(const std::string &jsonString,
+    std::vector<AclHashItem> &remoteAllAclList)
+{
+    JsonObject aclChecksumjson(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    aclChecksumjson.Parse(jsonString);
+    if (aclChecksumjson.IsDiscarded()) {
+        LOGE("ParseSyncMessage aclChecksumjson error");
+        return ERR_DM_FAILED;
+    }
+    DeviceProfileConnector::GetInstance().AclHashVecFromJson(aclChecksumjson, remoteAllAclList);
+    return DM_OK;
+}
+
+int32_t SoftbusConnector::GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
+    std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl)
+{
+    int32_t ret = ERR_DM_FAILED;
+    if (localAcl.GetAccesser().GetAccesserDeviceId() == localUdid &&
+        localAcl.GetAccessee().GetAccesseeDeviceId() == remoteUdid) {
+        std::string extraInfo = localAcl.GetAccesser().GetAccesserExtraData();
+        ret = DeviceProfileConnector::GetInstance().GetVersionByExtra(extraInfo, localVersion);
+    } else if (localAcl.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
+        localAcl.GetAccessee().GetAccesseeDeviceId() == localUdid) {
+            std::string extraInfo = localAcl.GetAccessee().GetAccesseeExtraData();
+        ret = DeviceProfileConnector::GetInstance().GetVersionByExtra(extraInfo, localVersion);
+    }
+    return DM_OK;
+}
+#endif
+
+int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
+    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::vector<AclHashItem> remoteAllAclList;
+    int32_t ret = ParaseAclChecksumList(remoteAclList, remoteAllAclList);
+    if (ret != DM_OK) {
+        LOGE("SyncLocalAclListProcess TAG_ACL error");
+        return ret;
+    }
     std::vector<DistributedDeviceProfile::AccessControlProfile> localAclList =
         DeviceProfileConnector::GetInstance().GetAclList(localUdid, localUserId, remoteUdid, remoteUserId);
+    std::vector<std::string> acLStrList;
     for (auto &localAcl : localAclList) {
-        bool res = DeviceProfileConnector::GetInstance().ChecksumAcl(localAcl, remoteAclList);
-        if (res) {
+        std::string localVersion = "";
+        ret = GetLocalVersion(localUdid, remoteUdid, localVersion, localAcl);
+        if (ret != DM_OK) {
             continue;
         }
-        if (localAcl.GetAccesser().GetAccesserDeviceId() == localUdid &&
-            localAcl.GetAccessee().GetAccesseeDeviceId() == remoteUdid) {
-            LOGI("SyncLocalAclListProcess Src.");
-            SyncAclList(localAcl.GetAccesser().GetAccesserUserId(),
-                localAcl.GetAccesser().GetAccesserCredentialIdStr(),
-                localAcl.GetAccesser().GetAccesserSessionKeyId(), localAcl.GetAccessControlId());
+        for (auto item : remoteAllAclList) {
+            if (item.version == localVersion) {
+                acLStrList = item.aclHashList;
+                break;
+            }
         }
-        if (localAcl.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
-            localAcl.GetAccessee().GetAccesseeDeviceId() == localUdid) {
-            LOGI("SyncLocalAclListProcess Sink.");
-            SyncAclList(localAcl.GetAccessee().GetAccesseeUserId(),
-                localAcl.GetAccessee().GetAccesseeCredentialIdStr(),
-                localAcl.GetAccessee().GetAccesseeSessionKeyId(), localAcl.GetAccessControlId());
+        int32_t versionNum = 0;
+        if (!GetVersionNumber(localVersion, versionNum)) {
+            LOGE("SyncLocalAclList GetVersionNumber error");
+            continue;
+        }
+        switch (versionNum) {
+            case DM_VERSION_INT_5_1_0:
+                ret = SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, acLStrList);
+            default:
+                LOGE("versionNum is invaild");
+                break;
         }
     }
     return DM_OK;
@@ -133,52 +197,6 @@ int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, int
     (void)remoteAclList;
     return DM_OK;
 #endif
-}
-
-int32_t SoftbusConnector::ParaseAclChecksumList(const std::string &jsonString, std::string &dmVersion,
-    std::vector<std::string> &remoteAclList)
-{
-    JsonObject aclChecksumjson(jsonString);
-    if (aclChecksumjson.IsDiscarded()) {
-        LOGE("ParseSyncMessage aclChecksumjson error");
-        return ERR_DM_FAILED;
-    }
-    if (!aclChecksumjson[TAG_DMVERSION].IsString()) {
-        LOGE("ParseSyncMessage TAG_DMVERSION error");
-        return ERR_DM_FAILED;
-    }
-    dmVersion = aclChecksumjson[TAG_DMVERSION].Get<std::string>();
-    if (!aclChecksumjson[TAG_ACL].IsArray()) {
-        LOGE("ParseSyncMessage TAG_ACL error");
-        return ERR_DM_FAILED;
-    }
-    aclChecksumjson[TAG_ACL].Get(remoteAclList);
-    return DM_OK;
-}
-
-int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
-{
-    std::string dmVersion = "";
-    std::vector<std::string> remoteAclListVec;
-    int32_t ret = ParaseAclChecksumList(remoteAclList, dmVersion, remoteAclListVec);
-    if (ret != DM_OK) {
-        LOGE("ParaseAclChecksumList TAG_ACL and dmversion error");
-        return ret;
-    }
-    int32_t versionNum = 0;
-    if (!GetVersionNumber(dmVersion, versionNum)) {
-        LOGE("ParaseAclChecksumList GetVersionNumber error");
-        return ERR_DM_FAILED;
-    }
-    switch (versionNum) {
-        case DM_VERSION_INT_5_1_0:
-            return SyncLocalAclList5_1_0(localUdid, localUserId, remoteUdid, remoteUserId, remoteAclListVec);
-        default:
-            LOGE("versionNum is invaild");
-            break;
-    }
-    return ERR_DM_FAILED;
 }
 
 int32_t SoftbusConnector::GetAclListHash(const std::string localUdid, int32_t localUserId,

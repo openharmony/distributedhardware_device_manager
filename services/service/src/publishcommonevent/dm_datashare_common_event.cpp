@@ -136,7 +136,8 @@ void DmDataShareEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     std::string receiveEvent = data.GetWant().GetAction();
     bool validEvent = false;
 
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
         validEvent = true;
     }
     LOGI("Received datashare event: %{public}s", receiveEvent.c_str());

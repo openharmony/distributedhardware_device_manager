@@ -156,6 +156,7 @@ public:
     static bool CheckProcessNameInWhiteList(const std::string &processName);
     int32_t GetOutputState(const std::string &processName, int32_t state);
     int32_t GetOutputReplay(const std::string &processName, int32_t replay);
+    static uint64_t GetSysTimeMs();
     static void DeleteAcl(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
 protected:
