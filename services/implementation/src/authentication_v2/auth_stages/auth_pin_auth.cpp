@@ -387,11 +387,13 @@ int32_t AuthSrcPinNegotiateStartState::NegotiatePinAuth(std::shared_ptr<DmAuthCo
 int32_t AuthSrcPinNegotiateStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    int32_t ret = NegotiateProcess::GetInstance().HandleNegotiateResult(context);
-    if (ret != DM_OK) {
-        LOGE("HandleNegotiateResult failed ret %{public}d", ret);
-        context->reason = ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
-        return ret;
+    if (!context->pinNegotiateStarted) {
+        int32_t ret = NegotiateProcess::GetInstance().HandleNegotiateResult(context);
+        if (ret != DM_OK) {
+            LOGE("HandleNegotiateResult failed ret %{public}d", ret);
+            context->reason = ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
+            return ret;
+        }
     }
     if (!context->needBind && !context->needAgreeCredential && context->needAuth) {
         return ProcessCredAuth(context);
