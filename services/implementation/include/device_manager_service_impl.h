@@ -208,7 +208,7 @@ private:
     int32_t ChangeUltrasonicTypeToPin(std::map<std::string, std::string> &bindParam);
     int32_t TransferByAuthType(int32_t authType,
         std::shared_ptr<Session> curSession, std::shared_ptr<AuthManagerBase> authMgr,
-        std::map<std::string, std::string> bindParam, uint64_t logicalSessionId);
+        std::map<std::string, std::string> &bindParam, uint64_t logicalSessionId);
 
     std::shared_ptr<AuthManagerBase> GetAuthMgrByMessage(int32_t msgType, uint64_t logicalSessionId,
         const JsonObject &jsonObject, std::shared_ptr<Session> curSession);

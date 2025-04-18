@@ -38,7 +38,8 @@ constexpr const char* UNVALID_CREDTID = "invalidCredId";
 // authType fallback table
 using FallBackKey = std::pair<std::string, DmAuthType>; // accessee.bundleName, authType
 static std::map<FallBackKey, DmAuthType> g_pinAuthTypeFallBackMap = {
-    {{"CastEngineService", DmAuthType::AUTH_TYPE_NFC}, DmAuthType::AUTH_TYPE_PIN},
+    {{"cast_engine_service", DmAuthType::AUTH_TYPE_NFC}, DmAuthType::AUTH_TYPE_PIN},
+    {{"cast_engine_service", DmAuthType::AUTH_TYPE_PIN_ULTRASONIC}, DmAuthType::AUTH_TYPE_PIN},
 };
 // Maximum number of recursive lookups
 constexpr size_t MAX_FALLBACK_LOOPKUP_TIMES = 2;

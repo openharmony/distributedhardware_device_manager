@@ -865,7 +865,7 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
 
 int32_t DeviceManagerServiceImpl::TransferByAuthType(int32_t authType,
     std::shared_ptr<Session> curSession, std::shared_ptr<AuthManagerBase> authMgr,
-    std::map<std::string, std::string> bindParam, uint64_t logicalSessionId)
+    std::map<std::string, std::string> &bindParam, uint64_t logicalSessionId)
 {
     int sessionId = curSession->sessionId_;
     if (authType == DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE) {
@@ -873,12 +873,6 @@ int32_t DeviceManagerServiceImpl::TransferByAuthType(int32_t authType,
         curSession->logicalSessionSet_.insert(0);
         curSession->logicalSessionCnt_.fetch_add(1);
         authMgr->OnSessionDisable();
-    } else if (authType == ULTRASONIC_AUTHTYPE) {
-        int32_t ret = ChangeUltrasonicTypeToPin(bindParam);
-        if (ret != DM_OK) {
-            LOGE("DeviceManagerServiceImpl::TransferSrcOldAuthMgr ChangeUltrasonicTypeToPin failed.");
-            return ret;
-        }
     } else {
         authMgr_->DisableInsensibleSwitching();
         // send stop message
@@ -889,6 +883,13 @@ int32_t DeviceManagerServiceImpl::TransferByAuthType(int32_t authType,
         (void)softbusConnector_->GetSoftbusSession()->SendData(sessionId, endMessage);
         // Close new protocol session
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
+    }
+    if (authType == ULTRASONIC_AUTHTYPE) {
+        int32_t ret = ChangeUltrasonicTypeToPin(bindParam);
+        if (ret != DM_OK) {
+            LOGE("DeviceManagerServiceImpl::TransferSrcOldAuthMgr ChangeUltrasonicTypeToPin failed.");
+            return ret;
+        }
     }
     return DM_OK;
 }
