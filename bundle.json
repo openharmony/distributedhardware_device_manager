@@ -60,8 +60,7 @@
                 "wifi",
                 "screenlock_mgr",
                 "mbedtls",
-                "zlib",
-                "spatial_awareness"
+                "zlib"
             ],
             "third_party": []
         },
