@@ -172,9 +172,13 @@ EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
         if (arg1 == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
             DeviceNameManager::GetInstance().DataShareReady();
         }
+        if (arg1 == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
+            DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
+        }
     };
     std::vector<std::string> commonEventVec;
     commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
     if (dataShareCommonEventManager_->SubscribeDataShareCommonEvent(commonEventVec, callback)) {
         LOGI("subscribe datashare common event success");
     }
@@ -3308,7 +3312,7 @@ int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
     }
     if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_NO_PERMISSION;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceNameManager::GetInstance().RestoreLocalDeviceName();

@@ -2862,10 +2862,11 @@ int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const
         LOGE("Register Callback failed ret: %{public}d", ret);
         return ret;
     }
-    std::shared_ptr<IpcSetLocalDeviceNameReq> req = std::make_shared<IpcSetLocalDeviceNameReq>();
+    std::shared_ptr<IpcSetRemoteDeviceNameReq> req = std::make_shared<IpcSetRemoteDeviceNameReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceName(deviceName);
+    req->SetDeviceId(deviceId);
     ret = ipcClientProxy_->SendRequest(SET_REMOTE_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
