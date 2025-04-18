@@ -407,10 +407,10 @@ std::shared_ptr<ConnectionAddr> SoftbusConnector::GetConnectAddr(const std::stri
     }
     addr = GetConnectAddrByType(deviceInfo.get(), ConnectionAddrType::CONNECTION_ADDR_BLE);
     if (addr != nullptr) {
-        *connectAddrPtr = *addr;
         jsonPara[BLE_MAC] = addr->info.ble.bleMac;
         connectAddr = jsonPara.Dump();
         addr->info.ble.priority = BLE_PRIORITY_HIGH;
+        *connectAddrPtr = *addr;
         return connectAddrPtr;
     }
     LOGE("[SOFTBUS]failed to get ConnectionAddr for deviceId: %{public}s.", GetAnonyString(deviceId).c_str());
