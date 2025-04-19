@@ -162,7 +162,7 @@ void SoftbusConnector::SortAclListDesc(const std::vector<AclHashItem> &remoteAll
 
     std::sort(aclVerDesc.begin(), aclVerDesc.end(), [](const std::string &a, const std::string &b) {
         return CompareVersion(a, b);
-    })
+    });
 }
 
 std::string SoftbusConnector::MatchTargetVersion(const std::string &localVersion,
@@ -198,7 +198,7 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, i
     SortAclListDesc(remoteAllAclList, aclVerDesc, remoteAllAclMap);
     std::string matchVersion = MatchTargetVersion(DM_CURRENT_VERSION, aclVerDesc);
 
-    std::version<std::string> remoteAclHashList = {};
+    std::vector<std::string> remoteAclHashList = {};
     if (remoteAllAclMap.find(matchVersion) != remoteAllAclMap.end()) {
         remoteAclHashList = remoteAllAclMap[matchVersion].aclHashList;
     }
