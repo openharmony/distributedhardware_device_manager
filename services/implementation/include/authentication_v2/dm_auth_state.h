@@ -166,6 +166,7 @@ protected:
     uint32_t GetCredType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo);
     uint32_t GetCredentialType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo);
     bool HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const std::vector<std::string> &tokenList);
+    void SetProcessInfo(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSrcConfirmState : public DmAuthState {

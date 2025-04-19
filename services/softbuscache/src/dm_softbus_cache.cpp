@@ -463,10 +463,11 @@ int32_t SoftbusCache::GetDeviceNameFromCache(const std::string &udid, std::strin
 
 bool SoftbusCache::CheckIsOnline(const std::string &deviceId)
 {
-    LOGI("deviceId %{public}s.", GetAnonyString(deviceId).c_str());
     {
         std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
         for (const auto &item : deviceInfo_) {
+            LOGI("deviceId %{public}s, cache deviceId %{public}s.", GetAnonyString(deviceId).c_str(),
+                GetAnonyString(std::string(item.second.second.deviceId)).c_str());
             if (std::string(item.second.second.deviceId) == deviceId) {
                 LOGI("CheckIsOnline is true.");
                 return true;
