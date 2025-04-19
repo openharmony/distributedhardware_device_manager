@@ -467,7 +467,7 @@ bool SoftbusCache::CheckIsOnline(const std::string &deviceId)
         std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
         for (const auto &item : deviceInfo_) {
             LOGI("deviceId %{public}s, cache deviceId %{public}s.", GetAnonyString(deviceId).c_str(),
-                item.second.second.deviceId);
+                GetAnonyString(std::string(item.second.second.deviceId).c_str()));
             if (std::string(item.second.second.deviceId) == deviceId) {
                 LOGI("CheckIsOnline is true.");
                 return true;
