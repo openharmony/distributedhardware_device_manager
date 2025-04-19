@@ -1343,8 +1343,8 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     DmAccess &access = (context->accesser.deviceId == localUdid) ? context->accesser : context->accessee;
     DmAccess &remoteAccess = (context->accesser.deviceId == localUdid) ? context->accessee : context->accesser;
     std::string aclHashList;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetAclListHashStr(localUdid, access.userId,
-        remoteAccess.deviceId, remoteAccess.userId, aclHashList, DM_CURRENT_VERSION);
+    int32_t ret = DeviceProfileConnector::GetInstance().GetAclListHashStr({localUdid, access.userId},
+        {remoteAccess.deviceId, remoteAccess.userId}, aclHashList, DM_CURRENT_VERSION);
     if (ret != DM_OK) {
         LOGE("DmAuthMessageProcessor::EncryptSyncMessage GetAclListHashStr failed");
         return ERR_DM_FAILED;

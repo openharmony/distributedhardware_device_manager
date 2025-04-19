@@ -35,8 +35,8 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkDataSyncState::Action start");
     // Query the ACL of the sink end. Compare the ACLs at both ends.
-    context->softbusConnector->SyncLocalAclListProcess(context->accessee.deviceId, context->accessee.userId,
-        context->accesser.deviceId, context->accesser.userId, context->accesser.aclStrList);
+    context->softbusConnector->SyncLocalAclListProcess({context->accessee.deviceId, context->accessee.userId},
+        {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList);
 
     // Synchronize the local SP information, the format is uncertain, not done for now
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
@@ -56,8 +56,8 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 
     if (NeedAgreeAcl(context)) {
         // Query the ACL of the sink end. Compare the ACLs at both ends.
-        context->softbusConnector->SyncLocalAclListProcess(context->accesser.deviceId, context->accesser.userId,
-            context->accessee.deviceId, context->accessee.userId, context->accessee.aclStrList);
+        context->softbusConnector->SyncLocalAclListProcess({context->accesser.deviceId, context->accesser.userId},
+            {context->accessee.deviceId, context->accessee.userId}, context->accessee.aclStrList);
 
         // Save this acl
         SetAclInfo(context);

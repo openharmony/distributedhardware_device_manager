@@ -182,8 +182,8 @@ std::string SoftbusConnector::MatchTargetVersion(const std::string &localVersion
 }
 #endif
 
-int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
+int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<AclHashItem> remoteAllAclList;
@@ -203,7 +203,8 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, i
         remoteAclHashList = remoteAllAclMap[matchVersion].aclHashList;
     }
     std::vector<DistributedDeviceProfile::AccessControlProfile> localAclList =
-        DeviceProfileConnector::GetInstance().GetAclList(localUdid, localUserId, remoteUdid, remoteUserId);
+        DeviceProfileConnector::GetInstance().GetAclList(localDevUserInfo.deviceId, localDevUserInfo.userId,
+            remoteDevUserInfo.deviceId, remoteDevUserInfo.userId);
 
     for (auto &localAcl : localAclList) {
         int32_t versionNum = 0;
@@ -213,7 +214,8 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, i
         }
         switch (versionNum) {
             case DM_VERSION_INT_5_1_0:
-                ret = SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, remoteAclHashList);
+                ret = SyncLocalAclList5_1_0(localDevUserInfo.deviceId, remoteDevUserInfo.deviceId, localAcl,
+                    remoteAclHashList);
             default:
                 LOGE("versionNum is invaild, ver: %{public}d", versionNum);
                 break;
@@ -221,26 +223,21 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, i
     }
     return DM_OK;
 #else
-    (void)localUdid;
-    (void)localUserId;
-    (void)remoteUdid;
-    (void)remoteUserId;
+    (void)localDevUserInfo;
+    (void)remoteDevUserInfo;
     (void)remoteAclList;
     return DM_OK;
 #endif
 }
 
-int32_t SoftbusConnector::GetAclListHash(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+int32_t SoftbusConnector::GetAclListHash(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string &aclList)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return DeviceProfileConnector::GetInstance().GetAclListHashStr(localUdid,
-        localUserId, remoteUdid, remoteUserId, aclList);
+    return DeviceProfileConnector::GetInstance().GetAclListHashStr(localDevUserInfo, remoteDevUserInfo, aclList);
 #else
-    (void)localUdid;
-    (void)localUserId;
-    (void)remoteUdid;
-    (void)remoteUserId;
+    (void)localDevUserInfo;
+    (void)remoteDevUserInfo;
     (void)aclList;
     return DM_OK;
 #endif

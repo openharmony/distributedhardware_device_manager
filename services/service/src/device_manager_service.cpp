@@ -2737,22 +2737,20 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 #endif
 }
 
-int32_t DeviceManagerService::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
+int32_t DeviceManagerService::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
 {
     if (IsDMServiceImplReady()) {
-        return dmServiceImpl_->SyncLocalAclListProcess(localUdid, localUserId, remoteUdid,
-            remoteUserId, remoteAclList);
+        return dmServiceImpl_->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo, remoteAclList);
     }
     return ERR_DM_FAILED;
 }
 
-int32_t DeviceManagerService::GetAclListHash(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+int32_t DeviceManagerService::GetAclListHash(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string &aclList)
 {
     if (IsDMServiceImplReady()) {
-        return dmServiceImpl_->GetAclListHash(localUdid,
-            localUserId, remoteUdid, remoteUserId, aclList);
+        return dmServiceImpl_->GetAclListHash(localDevUserInfo, remoteDevUserInfo, aclList);
     }
     return ERR_DM_FAILED;
 }

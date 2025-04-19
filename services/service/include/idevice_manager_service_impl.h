@@ -247,10 +247,10 @@ public:
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
                                             int32_t errcode) = 0;
-    virtual int32_t SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList) = 0;
-    virtual int32_t GetAclListHash(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string &aclList) = 0;
+    virtual int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList) = 0;
+    virtual int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList) = 0;
     virtual int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId) = 0;
     virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus) = 0;
