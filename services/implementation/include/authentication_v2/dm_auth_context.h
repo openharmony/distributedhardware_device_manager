@@ -251,7 +251,6 @@ struct DmAuthContext {
     void SetCredentialId(DmAuthSide side, DmAuthScope authorizedScope, const std::string &credentialId);
     void SetPublicKey(DmAuthSide side, DmAuthScope authorizedScope, const std::string &publicKey);
     std::string GetAccountId(DmAuthSide side);
-    uint32_t GetBindType();
 };
 }  // namespace DistributedHardware
 }  // namespace OHOS

@@ -77,14 +77,5 @@ std::string DmAuthContext::GetAccountId(DmAuthSide side)
     DmAccess &remoteAccess = (direction == DM_AUTH_SOURCE) ? accessee : accesser;
     return (side == DM_AUTH_LOCAL_SIDE) ? localAccess.accountId : remoteAccess.accountId;
 }
-
-uint32_t DmAuthContext::GetBindType()
-{
-    if (accesser.accountId == "ohosAnonymousUid" || accessee.accountId == "ohosAnonymousUid") {
-        return DM_POINT_TO_POINT;
-    } else {
-        return DM_ACROSS_ACCOUNT;
-    }
-}
 }  // namespace DistributedHardware
 }  // namespace OHOS

@@ -126,8 +126,13 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
             context->accesser.transmitSessionKeyId);
     }
     LOGI("SourceFinish notify online");
-    if (SoftbusCache::GetInstance().CheckIsOnline(context->accessee.deviceId)) {
-        context->softbusConnector->HandleDeviceOnline(context->accessee.deviceId, context->GetBindType());
+    char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash))
+    if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
+        SetProcessInfo();
+        int32_t authForm = context->accesser.transmitBindType == DM_POINT_TO_POINT_TYPE ?
+            DmAuthForm::PEER_TO_PEER : context->accesser.transmitBindType;
+        context->softbusConnector->HandleDeviceOnline(context->accessee.deviceId, authForm);
     }
 
     context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
@@ -159,8 +164,13 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
                 context->accessee, context->accesser.deviceId);
         }
         LOGI("SinkFinish notify online");
-        if (SoftbusCache::GetInstance().CheckIsOnline(context->accesser.deviceId)) {
-            context->softbusConnector->HandleDeviceOnline(context->accesser.deviceId, context->GetBindType());
+        char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        Crypto::GetUdidHash(context->accesser.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash))    
+        if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
+            SetProcessInfo();
+            int32_t authForm = context->accessee.transmitBindType == DM_POINT_TO_POINT_TYPE ?
+                DmAuthForm::PEER_TO_PEER : context->accessee.transmitBindType;
+            context->softbusConnector->HandleDeviceOnline(context->accesser.deviceId, authForm);
         }
     }
 
@@ -426,6 +436,25 @@ void DmAuthState::DeleteAcl(std::shared_ptr<DmAuthContext> context,
     context->authMessageProcessor->DeleteSessionKeyToDP(userId, sessionKeyId);
     context->hiChainAuthConnector->DeleteCredential(userId, credId);
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
+}
+
+void DmAuthState::SetProcessInfo()
+{
+    CHECK_NULL_VOID(context);
+    DmAccess localAccess = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+        context->accesser : context->accessee;
+    ProcessInfo processInfo;
+    processInfo.userId = localAccess.userId;
+    uint32_t bindLevel = static_cast<uint32_t>(localAccess.bindLevel);
+    if (bindLevel == APP || bindLevel == SERVICE) {
+        processInfo.pkgName = localAccess.pkgName;
+    } else if (bindLevel == USER) {
+        processInfo.pkgName = std::string(DM_PKG_NAME);
+    } else {
+        LOGE("bindlevel error %{public}d.", bindLevel);
+        return;
+    }
+    softbusConnector_->SetProcessInfo(processInfo);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
