@@ -172,6 +172,15 @@ const int32_t DEVICE_NAME_MAX_BYTES = 100;
 EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
 EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
 EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
+
+extern const char* DM_VERSION_5_0_1;
+extern const char* DM_VERSION_5_0_2;
+extern const char* DM_VERSION_5_0_3;
+extern const char* DM_VERSION_5_0_4;
+extern const char* DM_VERSION_5_0_5;
+extern const char* DM_VERSION_5_1_0;
+extern const char* DM_CURRENT_VERSION;
+extern const char* DM_VERSION_5_0_OLD_MAX;      // Estimated highest version number of the old version
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

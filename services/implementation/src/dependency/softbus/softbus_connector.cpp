@@ -15,6 +15,7 @@
 
 #include "softbus_connector.h"
 
+#include <algorithm>
 #include <securec.h>
 #include <unistd.h>
 
@@ -148,6 +149,39 @@ int32_t SoftbusConnector::GetLocalVersion(const std::string localUdid, const std
 }
 #endif
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void SoftbusConnector::SortAclListDesc(const std::vector<AclHashItem> &remoteAllAclList,
+    std::vector<std::string> &aclVerDesc, std::map<std::string, AclHashItem> &remoteAllAclMap)
+{
+    aclVerDesc.clear();
+    remoteAllAclMap.clear();
+    for (const auto &item : remoteAllAclList) {
+        aclVerDesc.push_back(item.version);
+        remoteAllAclMap[item.version] = item;
+    }
+
+    std::sort(aclVerDesc.begin(), aclVerDesc.end(), [](const std::string &a, const std::string &b) {
+        return CompareVersion(a, b);
+    })
+}
+
+std::string SoftbusConnector::MatchTargetVersion(const std::string &localVersion,
+    const std::vector<std::string> &remoteVerDesc)
+{
+    if (remoteVerDesc.empty()) {
+        return localVersion;
+    }
+
+    // if local version bigger than remote max version, use remote max version to process acl aging.
+    if (CompareVersion(localVersion, remoteVerDesc[0])) {
+        return remoteVerDesc[0];
+    }
+
+    // if local version equal or smaller than remote max version, use local version to process acl aging.
+    return localVersion;
+}
+#endif
+
 int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
     const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
 {
@@ -158,31 +192,30 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const std::string localUdid, i
         LOGE("SyncLocalAclListProcess TAG_ACL error");
         return ret;
     }
+
+    std::vector<std::string> aclVerDesc;
+    std::map<std::string, AclHashItem> remoteAllAclMap;
+    SortAclListDesc(remoteAllAclList, aclVerDesc, remoteAllAclMap);
+    std::string matchVersion = MatchTargetVersion(DM_CURRENT_VERSION, aclVerDesc);
+
+    std::version<std::string> remoteAclHashList = {};
+    if (remoteAllAclMap.find(matchVersion) != remoteAllAclMap.end()) {
+        remoteAclHashList = remoteAllAclMap[matchVersion].aclHashList;
+    }
     std::vector<DistributedDeviceProfile::AccessControlProfile> localAclList =
         DeviceProfileConnector::GetInstance().GetAclList(localUdid, localUserId, remoteUdid, remoteUserId);
-    std::vector<std::string> acLStrList;
+
     for (auto &localAcl : localAclList) {
-        std::string localVersion = "";
-        ret = GetLocalVersion(localUdid, remoteUdid, localVersion, localAcl);
-        if (ret != DM_OK) {
-            continue;
-        }
-        for (auto item : remoteAllAclList) {
-            if (item.version == localVersion) {
-                acLStrList = item.aclHashList;
-                break;
-            }
-        }
         int32_t versionNum = 0;
-        if (!GetVersionNumber(localVersion, versionNum)) {
+        if (!GetVersionNumber(matchVersion, versionNum)) {
             LOGE("SyncLocalAclList GetVersionNumber error");
             continue;
         }
         switch (versionNum) {
             case DM_VERSION_INT_5_1_0:
-                ret = SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, acLStrList);
+                ret = SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, remoteAclHashList);
             default:
-                LOGE("versionNum is invaild");
+                LOGE("versionNum is invaild, ver: %{public}d", versionNum);
                 break;
         }
     }

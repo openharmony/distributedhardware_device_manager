@@ -160,5 +160,14 @@ const int32_t MAX_DEVICE_PROFILE_SIZE = 500;
 const char* ACL_IS_LNN_ACL_KEY = "IsLnnAcl";
 const char* ACL_IS_LNN_ACL_VAL_TRUE = "true";
 const char* ACL_IS_LNN_ACL_VAL_FALSE = "false";
+
+const char* DM_VERSION_5_0_1 = "5.0.1";
+const char* DM_VERSION_5_0_2 = "5.0.2";
+const char* DM_VERSION_5_0_3 = "5.0.3";
+const char* DM_VERSION_5_0_4 = "5.0.4";
+const char* DM_VERSION_5_0_5 = "5.0.5";
+const char* DM_VERSION_5_1_0 = "5.1.0";
+const char* DM_CURRENT_VERSION = DM_VERSION_5_1_0;
+const char* DM_VERSION_5_0_OLD_MAX = "5.0.99";       // Estimated highest version number of the old version
 } // namespace DistributedHardware
 } // namespace OHOS

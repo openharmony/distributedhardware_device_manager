@@ -1547,7 +1547,7 @@ EXPORT int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() == udid && item.GetStatus() == ACTIVE) {
-            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {  // 同账号
+            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
                 LOGI("The udid %{public}s is identical bind.", GetAnonyString(udid).c_str());
                 return DM_OK;
             }
