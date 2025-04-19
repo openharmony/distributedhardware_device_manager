@@ -195,7 +195,7 @@ void SoftbusListener::CredentialAuthStatusProcess(std::string deviceList, uint16
 }
 
 int32_t SoftbusListener::OnSyncLocalAclList(const DevUserInfo &localDevUserInfo,
-        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
 {
     return DeviceManagerService::GetInstance().SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo,
         remoteAclList);
