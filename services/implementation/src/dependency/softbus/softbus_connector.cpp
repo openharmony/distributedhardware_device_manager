@@ -223,10 +223,8 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUse
     }
     return DM_OK;
 #else
-    (void)localUdid;
-    (void)localUserId;
-    (void)remoteUdid;
-    (void)remoteUserId;
+    (void)localDevUserInfo;
+    (void)remoteDevUserInfo;
     (void)remoteAclList;
     return DM_OK;
 #endif
@@ -238,10 +236,8 @@ int32_t SoftbusConnector::GetAclListHash(const DevUserInfo &localDevUserInfo,
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceProfileConnector::GetInstance().GetAclListHashStr(localDevUserInfo, remoteDevUserInfo, aclList);
 #else
-    (void)localUdid;
-    (void)localUserId;
-    (void)remoteUdid;
-    (void)remoteUserId;
+    (void)localDevUserInfo;
+    (void)remoteDevUserInfo;
     (void)aclList;
     return DM_OK;
 #endif

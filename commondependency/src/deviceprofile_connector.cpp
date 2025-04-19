@@ -93,13 +93,17 @@ void DeviceProfileConnector::GenerateAclHash(DistributedDeviceProfile::AccessCon
         LOGE("GetAllVerionAclMap GetVersionNumber error");
         return;
     }
+    std::string aclStr;
     switch (versionNum) {
         case DM_VERSION_INT_5_1_0:
             aclStr = AccessToStr(acl);
             break;
         default:
-            LOGE("versionNum is invaild");
+            LOGE("versionNum is invaild, ver: %{public}d", versionNum);
             break;
+    }
+    if (aclStr.empty()) {
+        return;
     }
     auto iter = aclMap.find(dmVersion);
     if (iter != aclMap.end()) {
