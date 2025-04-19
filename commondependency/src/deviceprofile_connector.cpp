@@ -76,7 +76,7 @@ EXPORT void DeviceProfileConnector::GetAllVerionAclMap(DistributedDeviceProfile:
         needGenVersions.push_back(dmVersion);
     } else {
         for (int32_t idx = 0; idx < DM_SUPPORT_ACL_AGING_VERSION_NUM; idx++) {
-            needGenVersions.push_back(std::to_string(DM_SUPPORT_ACL_AGING_VERSIONS[idx]));
+            needGenVersions.push_back(DM_SUPPORT_ACL_AGING_VERSIONS[idx]);
         }
     }
 
