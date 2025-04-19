@@ -51,6 +51,10 @@ const char* TAG_ACL_HASH_KEY_ACLHASHLIST = "aclHashList";
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+const int32_t DM_SUPPORT_ACL_AGING_VERSION_NUM = 1;
+const char* DM_SUPPORT_ACL_AGING_VERSIONS[DM_SUPPORT_ACL_AGING_VERSION_NUM] = {DM_VERSION_5_1_0};
+}
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraInfo, std::string &dmVersion)
 {
