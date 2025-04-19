@@ -2011,20 +2011,18 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     deviceStateMgr_->HandleDeviceScreenStatusChange(devInfo);
 }
 
-int32_t DeviceManagerServiceImpl::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
+int32_t DeviceManagerServiceImpl::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
 {
     CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
-    return softbusConnector_->SyncLocalAclListProcess(localUdid, localUserId, remoteUdid,
-        remoteUserId, remoteAclList);
+    return softbusConnector_->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo, remoteAclList);
 }
 
-int32_t DeviceManagerServiceImpl::GetAclListHash(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+int32_t DeviceManagerServiceImpl::GetAclListHash(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string &aclList)
 {
     CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
-    return softbusConnector_->GetAclListHash(localUdid,
-        localUserId, remoteUdid, remoteUserId, aclList);
+    return softbusConnector_->GetAclListHash(localDevUserInfo, remoteDevUserInfo, aclList);
 }
 
 void DeviceManagerServiceImpl::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,

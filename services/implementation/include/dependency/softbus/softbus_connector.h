@@ -137,10 +137,10 @@ public:
     DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
     void DeleteOffLineTimer(std::string &udidHash);
     void SyncAclList(int32_t userId, std::string credId, int32_t sessionKeyId, int32_t aclId);
-    int32_t SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList);
-    int32_t GetAclListHash(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string &aclList);
+    int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+    int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList);
 
 private:
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo);

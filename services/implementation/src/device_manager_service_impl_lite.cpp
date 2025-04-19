@@ -527,24 +527,20 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
     return 0;
 }
 
-int32_t DeviceManagerServiceImpl::SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList)
+int32_t DeviceManagerServiceImpl::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
 {
-    (void)localUdid;
-    (void)localUserId;
-    (void)remoteUdid;
-    (void)remoteUserId;
+    (void)localDevUserInfo;
+    (void)remoteDevUserInfo;
     (void)remoteAclList;
     return 0;
 }
 
-int32_t DeviceManagerServiceImpl::GetAclListHash(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList)
+int32_t DeviceManagerServiceImpl::GetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList)
 {
-    (void)localUdid;
-    (void)localUserId;
-    (void)remoteUdid;
-    (void)remoteUserId;
+    (void)localDevUserInfo;
+    (void)remoteDevUserInfo;
     (void)aclList;
     return 0;
 }

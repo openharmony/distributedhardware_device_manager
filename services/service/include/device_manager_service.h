@@ -206,10 +206,10 @@ public:
     void SubscribePackageCommonEvent();
     int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
-    int32_t SyncLocalAclListProcess(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string remoteAclList);
-    int32_t GetAclListHash(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string &aclList);
+    int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+    int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     void ProcessSyncUserIds(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     int32_t SetLocalDisplayNameToSoftbus(const std::string &displayName);

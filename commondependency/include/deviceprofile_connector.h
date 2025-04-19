@@ -273,10 +273,21 @@ public:
         std::vector<std::string> &acLStrList);
     EXPORT std::string AccessToStr(DistributedDeviceProfile::AccessControlProfile acl);
     EXPORT int32_t GetVersionByExtra(std::string &extraInfo, std::string &dmVersion);
-    EXPORT void GetAllVerionAclMap(std::string &extraInfo, std::string &dmVersion,
-        DistributedDeviceProfile::AccessControlProfile &acl, std::map<std::string, std::vector<std::string>> &aclMap);
-    EXPORT int32_t GetAclListHashStr(const std::string localUdid, int32_t localUserId,
-        const std::string remoteUdid, int32_t remoteUserId, std::string &aclList, std::string dmVersion = "");
+    EXPORT void GetAllVerionAclMap(DistributedDeviceProfile::AccessControlProfile &acl,
+        std::map<std::string, std::vector<std::string>> &aclMap, std::string dmVersion = "");
+    void GenerateAclHash(DistributedDeviceProfile::AccessControlProfile &acl,
+        std::map<std::string, std::vector<std::string>> &aclMap, const std::string &dmVersion);
+    /**
+     * @brief Get the Acl List Hash for this dmVersion
+     *
+     * @param localDevUserInfo local device user info
+     * @param remoteDevUserInfo remote device user info
+     * @param aclList output save the acl hash
+     * @param dmVersion target dm version
+     * @return EXPORT 0 for success
+     */
+    EXPORT int32_t GetAclListHashStr(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion = "");
     EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);
     EXPORT void CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
         DmOfflineParam &offlineParam);

@@ -67,22 +67,32 @@ EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraInfo,
     return DM_OK;
 }
 
-EXPORT void DeviceProfileConnector::GetAllVerionAclMap(std::string &extraInfo, std::string &dmVersion,
-    DistributedDeviceProfile::AccessControlProfile &acl, std::map<std::string, std::vector<std::string>> &aclMap)
+EXPORT void DeviceProfileConnector::GetAllVerionAclMap(DistributedDeviceProfile::AccessControlProfile &acl,
+    std::map<std::string, std::vector<std::string>> &aclMap, std::string dmVersion)
 {
-    if (dmVersion.empty()) {
-        int32_t ret = GetVersionByExtra(extraInfo, dmVersion);
-        if (ret != DM_OK) {
-            LOGE("GetVersionByExtra error");
-            return;
+    std::vector<std::string> needGenVersions = {};
+    // if not set version, send all support version acl hash
+    if (!dmVersion.empty()) {
+        needGenVersions.push_back(dmVersion);
+    } else {
+        for (int32_t idx = 0; idx < DM_SUPPORT_ACL_AGING_VERSION_NUM; idx++) {
+            needGenVersions.push_back(std::to_string(DM_SUPPORT_ACL_AGING_VERSIONS[idx]));
         }
     }
+
+    for (auto const &version : needGenVersions) {
+        GenerateAclHash(acl, aclMap, version);
+    }
+}
+
+void DeviceProfileConnector::GenerateAclHash(DistributedDeviceProfile::AccessControlProfile &acl,
+    std::map<std::string, std::vector<std::string>> &aclMap, const std::string &dmVersion)
+{
     int32_t versionNum = 0;
     if (!GetVersionNumber(dmVersion, versionNum)) {
         LOGE("GetAllVerionAclMap GetVersionNumber error");
         return;
     }
-    std::string aclStr = "";
     switch (versionNum) {
         case DM_VERSION_INT_5_1_0:
             aclStr = AccessToStr(acl);
@@ -99,30 +109,27 @@ EXPORT void DeviceProfileConnector::GetAllVerionAclMap(std::string &extraInfo, s
         aclStrVec.push_back(Crypto::Sha256(aclStr));
         aclMap[dmVersion] = aclStrVec;
     }
-    return;
 }
 
-EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const std::string localUdid, int32_t localUserId,
-    const std::string remoteUdid, int32_t remoteUserId, std::string &aclList, std::string dmVersion)
+EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion)
 {
     std::map<std::string, std::vector<std::string>> aclMap;
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
     for (auto &item : profiles) {
-        if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
-            item.GetAccesser().GetAccesserUserId() == localUserId &&
-            item.GetAccessee().GetAccesseeDeviceId() == remoteUdid &&
-            item.GetAccessee().GetAccesseeUserId() == remoteUserId) {
-            std::string extraInfo = item.GetAccesser().GetAccesserExtraData();
-            GetAllVerionAclMap(extraInfo, dmVersion, item, aclMap);
+        if (item.GetAccesser().GetAccesserDeviceId() == localDevUserInfo.deviceId &&
+            item.GetAccesser().GetAccesserUserId() == localDevUserInfo.userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == remoteDevUserInfo.deviceId &&
+            item.GetAccessee().GetAccesseeUserId() == remoteDevUserInfo.userId) {
+            GetAllVerionAclMap(item, aclMap, dmVersion);
             continue;
         }
-        if (item.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
-            item.GetAccesser().GetAccesserUserId() == remoteUserId &&
-            item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
-            item.GetAccessee().GetAccesseeUserId() == localUserId) {
-            std::string extraInfo = item.GetAccessee().GetAccesseeExtraData();
-            GetAllVerionAclMap(extraInfo, dmVersion, item, aclMap);
+        if (item.GetAccesser().GetAccesserDeviceId() == remoteDevUserInfo.deviceId &&
+            item.GetAccesser().GetAccesserUserId() == remoteDevUserInfo.userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == localDevUserInfo.deviceId &&
+            item.GetAccessee().GetAccesseeUserId() == localDevUserInfo.userId) {
+            GetAllVerionAclMap(item, aclMap, dmVersion);
             continue;
         }
     }
@@ -135,7 +142,7 @@ EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const std::string local
     }
     JsonObject allAclObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     AclHashVecToJson(allAclObj, aclStrVec);
-    aclList = allAclObj.Dump();
+    aclListHash = allAclObj.Dump();
     return DM_OK;
 }
 
