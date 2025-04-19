@@ -127,9 +127,9 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
     }
     LOGI("SourceFinish notify online");
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-    Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash))
+    Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
     if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
-        SetProcessInfo();
+        SetProcessInfo(context);
         int32_t authForm = context->accesser.transmitBindType == DM_POINT_TO_POINT_TYPE ?
             DmAuthForm::PEER_TO_PEER : context->accesser.transmitBindType;
         context->softbusConnector->HandleDeviceOnline(context->accessee.deviceId, authForm);
@@ -165,9 +165,9 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
         }
         LOGI("SinkFinish notify online");
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
-        Crypto::GetUdidHash(context->accesser.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash))    
+        Crypto::GetUdidHash(context->accesser.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
         if (SoftbusCache::GetInstance().CheckIsOnline(std::string(deviceIdHash))) {
-            SetProcessInfo();
+            SetProcessInfo(context);
             int32_t authForm = context->accessee.transmitBindType == DM_POINT_TO_POINT_TYPE ?
                 DmAuthForm::PEER_TO_PEER : context->accessee.transmitBindType;
             context->softbusConnector->HandleDeviceOnline(context->accesser.deviceId, authForm);
@@ -438,7 +438,7 @@ void DmAuthState::DeleteAcl(std::shared_ptr<DmAuthContext> context,
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
 }
 
-void DmAuthState::SetProcessInfo()
+void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);
     DmAccess localAccess = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
@@ -454,7 +454,7 @@ void DmAuthState::SetProcessInfo()
         LOGE("bindlevel error %{public}d.", bindLevel);
         return;
     }
-    softbusConnector_->SetProcessInfo(processInfo);
+    context->softbusConnector->SetProcessInfo(processInfo);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
