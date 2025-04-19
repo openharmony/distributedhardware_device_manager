@@ -27,16 +27,6 @@ using namespace OHOS::AccountSA;
 
 namespace OHOS {
 namespace DistributedHardware {
-
-const char* DM_VERSION_5_0_1 = "5.0.1";
-const char* DM_VERSION_5_0_2 = "5.0.2";
-const char* DM_VERSION_5_0_3 = "5.0.3";
-const char* DM_VERSION_5_0_4 = "5.0.4";
-const char* DM_VERSION_5_0_5 = "5.0.5";
-const char* DM_VERSION_5_1_0 = "5.1.0";
-const char* DM_CURRENT_VERSION = DM_VERSION_5_1_0;
-const char* DM_VERSION_5_0_OLD_MAX = "5.0.99";       // Estimated highest version number of the old version
-
 const char* TAG_DMVERSION = "dmVersion";
 const char* TAG_DM_VERSION_V2 = "dmVersionV2";
 const char* TAG_EDITION = "edition";

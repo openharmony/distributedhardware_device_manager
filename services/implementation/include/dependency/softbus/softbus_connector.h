@@ -114,6 +114,9 @@ public:
     int32_t UnRegisterSoftbusStateCallback();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
+    void SortAclListDesc(const std::vector<AclHashItem> &remoteAllAclList, std::vector<std::string> &aclVerDesc,
+        std::map<std::string, AclHashItem> &remoteAllAclMap);
+    std::string MatchTargetVersion(const std::string &localVersion, const std::vector<std::string> &remoteVerDesc);
 #endif
     bool HaveDeviceInMap(std::string deviceId);
     std::string GetDeviceUdidHashByUdid(const std::string &udid);
