@@ -53,7 +53,8 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 const int32_t DM_SUPPORT_ACL_AGING_VERSION_NUM = 1;
-const char* DM_SUPPORT_ACL_AGING_VERSIONS[DM_SUPPORT_ACL_AGING_VERSION_NUM] = {DM_VERSION_5_1_0};
+const std::string DM_VERSION_STR_5_1_0 = DM_VERSION_5_1_0;
+const std::vector<std::string> DM_SUPPORT_ACL_AGING_VERSIONS = {DM_VERSION_STR_5_1_0};
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraInfo, std::string &dmVersion)
@@ -76,12 +77,16 @@ EXPORT void DeviceProfileConnector::GetAllVerionAclMap(DistributedDeviceProfile:
 {
     std::vector<std::string> needGenVersions = {};
     // if not set version, send all support version acl hash
-    if (!dmVersion.empty()) {
-        needGenVersions.push_back(dmVersion);
-    } else {
+    if (dmVersion.empty()) {
         for (int32_t idx = 0; idx < DM_SUPPORT_ACL_AGING_VERSION_NUM; idx++) {
             needGenVersions.push_back(DM_SUPPORT_ACL_AGING_VERSIONS[idx]);
         }
+    } else if (std::find(DM_SUPPORT_ACL_AGING_VERSIONS.begin(), DM_SUPPORT_ACL_AGING_VERSIONS.end(), dmVersion) !=
+        DM_SUPPORT_ACL_AGING_VERSIONS.end()) {
+        needGenVersions.push_back(dmVersion);
+    } else {
+        LOGE("dmVersion invalid, %{public}s", dmVersion.c_str());
+        return;
     }
 
     for (auto const &version : needGenVersions) {
