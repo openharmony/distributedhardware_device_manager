@@ -3365,8 +3365,6 @@ void DmAuthManager::GetCallerInfo(DmBindCallerInfo &callerInfo)
 
 void DmAuthManager::SetCallerInfo(const DmBindCallerInfo &callerInfo)
 {
-    LOGI("yangwei DmAuthManager userId %{public}d, tokenId %{public}d, bundleName %{public}s, hostPkgLabel %{public}s.",
-        callerInfo.userId, callerInfo.tokenId, callerInfo.bundleName.c_str(), callerInfo.hostPkgLabel.c_str());
     std::lock_guard<std::mutex> lock(callerInfoMutex_);
     callerInfo_.userId = callerInfo.userId;
     callerInfo_.tokenId = callerInfo.tokenId;
@@ -3377,7 +3375,6 @@ void DmAuthManager::SetCallerInfo(const DmBindCallerInfo &callerInfo)
 
 void DmAuthManager::GetCallerInfo(const std::string &pkgName, JsonObject &jsonObject)
 {
-    LOGI("yangwei DmAuthManager");
     CHECK_NULL_VOID(authRequestContext_);
     std::lock_guard<std::mutex> lock(callerInfoMutex_);
     if (callerInfoReady_) {
