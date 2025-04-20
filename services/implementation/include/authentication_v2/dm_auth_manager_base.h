@@ -105,7 +105,7 @@ extern const int32_t MAX_PIN_TOKEN;
 typedef struct DmBindCallerInfo {
     int32_t userId = -1;
     int32_t tokenId = -1;
-    std::string bindleName = "";
+    std::string bundleName = "";
     std::string hostPkgLabel = "";
 } DmBindCallerInfo;
 

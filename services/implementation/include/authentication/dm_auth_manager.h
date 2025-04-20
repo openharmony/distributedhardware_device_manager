@@ -537,7 +537,7 @@ private:
     void MemberJoinAuthRequest(int64_t requestId, int32_t status);
     void PutSrcAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
     void PutSinkAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
-    void GetCallerInfo(const std::string &pkgName, const JsonObject &jsonObject);
+    void GetCallerInfo(const std::string &pkgName, JsonObject &jsonObject);
 
 public:
     void RequestCredential();

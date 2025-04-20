@@ -45,7 +45,6 @@
 #include "json_object.h"
 #include "openssl/sha.h"
 #include "parameter.h"
-#include "show_confirm.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
 #endif
@@ -371,6 +370,12 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(shared_from_this());
     authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authRequestContext_ = std::make_shared<DmAuthRequestContext>();
+    JsonObject jsonObject(extra);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("extra string not a json type.");
+        return;
+    }
+    GetCallerInfo(pkgName, jsonObject);
     GetAuthParam(pkgName, authType, deviceId, extra);
     authMessageProcessor_->SetRequestContext(authRequestContext_);
     authRequestState_ = std::make_shared<AuthRequestInitState>();
@@ -398,12 +403,6 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         LOGE("CheckAuthParamVaildExtra failed, param is invaild.");
         return ret;
     }
-    JsonObject jsonObject(extra);
-    if (jsonObject.IsDiscarded()) {
-        LOGE("extra string not a json type.");
-        return ERR_DM_FAILED;
-    }
-    GetCallerInfo(pkgName, jsonObject);
     InitAuthState(pkgName, authType, deviceId, extra);
     isAuthenticateDevice_ = true;
     processInfo_.pkgName = pkgName;
@@ -3376,7 +3375,7 @@ void DmAuthManager::SetCallerInfo(const DmBindCallerInfo &callerInfo)
     callerInfoReady_ = true;
 }
 
-void DmAuthManager::GetCallerInfo(const std::string &pkgName, const JsonObject &jsonObject)
+void DmAuthManager::GetCallerInfo(const std::string &pkgName, JsonObject &jsonObject)
 {
     LOGI("yangwei DmAuthManager");
     CHECK_NULL_VOID(authRequestContext_);
