@@ -296,7 +296,6 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_001, testing::ext::Tes
     }));
     EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
     std::string prefixName = "Mr.诸葛张三";
-    EXPECT_CALL(*multipleUserConnector_, GetCallerUserId(_)).Times(AtLeast(1));
     EXPECT_CALL(*multipleUserConnector_, GetAccountNickName(_)).WillRepeatedly(Return(prefixName));
     for (size_t i = 0; i < 2; ++i) {
         int32_t maxNamelength = 24;
