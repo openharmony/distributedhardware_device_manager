@@ -412,7 +412,7 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
     // Process target match acl which need delete
     if ((acerTokenId == static_cast<int64_t>(localTokenId)) &&
         (acerDeviceId == localUdid) && (aceeDeviceId == remoteUdid) &&
-        (peerTokenId != 0 && aceeTokenId == static_cast<int64_t>(peerTokenId))) {
+        (peerTokenId == 0 || (peerTokenId != 0 && aceeTokenId == static_cast<int64_t>(peerTokenId)))) {
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
         processInfo.userId = acl.GetAccesser().GetAccesserUserId();
@@ -427,7 +427,7 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
 
     if ((aceeTokenId == static_cast<int64_t>(localTokenId)) &&
         (aceeDeviceId == localUdid) && (acerDeviceId == remoteUdid) &&
-        (peerTokenId != 0 && acerTokenId == static_cast<int64_t>(peerTokenId))) {
+        (peerTokenId == 0 || (peerTokenId != 0 && acerTokenId == static_cast<int64_t>(peerTokenId)))) {
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccessee().GetAccesseeBundleName();
         processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
