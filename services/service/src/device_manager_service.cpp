@@ -2076,7 +2076,11 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
 {
     LOGI("UserId: %{public}d, accountId: %{public}s, accountName: %{public}s", userId,
         GetAnonyString(accountId).c_str(), GetAnonyString(accountName).c_str());
-
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->ClearCacheWhenLogout(userId, accountId);
+    } else {
+        LOGW("ClearCacheWhenLogout fail, adapter instance not init or init failed.");
+    }
     if (!IsDMServiceImplReady()) {
         LOGE("Init impl failed.");
         return;
@@ -3311,6 +3315,11 @@ int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
     if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_NO_PERMISSION;
+    }
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->RestoreLocalDeviceName();
+    } else {
+        LOGW("RestoreLocalDeviceName fail, adapter instance not init or init failed.");
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceNameManager::GetInstance().RestoreLocalDeviceName();

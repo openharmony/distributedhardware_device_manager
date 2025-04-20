@@ -108,6 +108,8 @@ public:
         const std::string &deviceName) = 0;
     virtual int32_t GetDeviceProfileInfosFromLocalCache(const NetworkIdQueryFilter &queryFilter,
         std::vector<DmDeviceProfileInfo> &dmDeviceProfileInfos) = 0;
+    virtual int32_t RestoreLocalDeviceName() = 0;
+    virtual void ClearCacheWhenLogout(int32_t userId, const std::string &oldAccountId) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);

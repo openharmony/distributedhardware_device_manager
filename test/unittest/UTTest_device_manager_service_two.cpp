@@ -1678,7 +1678,7 @@ HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_202, testing::ext::Tes
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(false));
     ret = DeviceManagerService::GetInstance().RestoreLocalDeviceName(pkgName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
