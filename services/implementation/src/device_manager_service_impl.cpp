@@ -834,6 +834,8 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
     std::map<std::string, std::string> bindParam;
     auto authMgr = GetAuthMgrByTokenId(tokenId);
     authMgr->GetBindTargetParams(pkgName, peerTargetId, bindParam);
+    DmBindCallerInfo callerInfo;
+    authMgr->GetCallerInfo(callerInfo);
     int32_t authType = -1;
     authMgr->ParseAuthType(bindParam, authType);
     authMgrMap_.erase(tokenId);
@@ -847,7 +849,7 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
         return ret;
     }
     authMgr = nullptr;
-
+    authMgr_->SetCallerInfo(callerInfo);
     if (authMgr_->BindTarget(pkgName, peerTargetId, bindParam, sessionId, 0) != DM_OK) {
         LOGE("DeviceManagerServiceImpl::TransferSrcOldAuthMgr authManager BindTarget failed");
         return ERR_DM_AUTH_FAILED;

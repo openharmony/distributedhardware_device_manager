@@ -1032,5 +1032,21 @@ void AuthManager::ClearSoftbusSessionCallback()
 
 void AuthManager::PrepareSoftbusSessionCallback()
 {}
+
+void AuthManager::GetCallerInfo(DmBindCallerInfo &callerInfo)
+{
+    callerInfo.userId = context_->accesser.userId;
+    callerInfo.tokenId = context_->accesser.tokenId;
+    callerInfo.bundleName = context_->accesser.bundleName;
+    callerInfo.hostPkgLabel = context_->pkgLabel;
+    LOGI("yangwei AuthManager::GetCallerInfo userId %{public}d, tokenId %{public}d, bundleName %{public}s, hostPkgLabel %{public}s.",
+        callerInfo.userId, callerInfo.tokenId, callerInfo.bundleName.c_str(), callerInfo.hostPkgLabel.c_str());
+}
+
+void AuthManager::SetCallerInfo(const DmBindCallerInfo &callerInfo)
+{
+    LOGI("yangwei AuthManager::SetCallerInfo");
+    (void)callerInfo;
+}
 }  // namespace DistributedHardware
 }  // namespace OHOS

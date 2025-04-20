@@ -259,7 +259,6 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     authRequestContext_->hostPkgName = pkgName;
-    authRequestContext_->hostPkgLabel = GetBundleLable(pkgName);
     authRequestContext_->authType = authType;
     authRequestContext_->localDeviceName = softbusConnector_->GetLocalDeviceName();
     authRequestContext_->localDeviceTypeId = softbusConnector_->GetLocalDeviceTypeId();
@@ -267,9 +266,6 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->deviceId = deviceId;
     authRequestContext_->addr = deviceId;
     authRequestContext_->dmVersion = DM_VERSION_5_0_5;
-    uint32_t tokenId = 0 ;
-    MultipleUserConnector::GetTokenIdAndForegroundUserId(tokenId, authRequestContext_->localUserId);
-    authRequestContext_->tokenId = static_cast<int64_t>(tokenId);
     authRequestContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authRequestContext_->localUserId);
     authRequestContext_->isOnline = false;
@@ -318,7 +314,6 @@ void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
         }
         ParseHmlInfoInJsonObject(jsonObject);
     }
-    authRequestContext_->bundleName = GetBundleName(jsonObject);
 }
 
 void DmAuthManager::ParseHmlInfoInJsonObject(JsonObject &jsonObject)
@@ -393,10 +388,6 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
 {
     LOGI("DmAuthManager::AuthenticateDevice start auth type %{public}d.", authType);
     SetAuthType(authType);
-    int32_t userId = -1;
-    MultipleUserConnector::GetCallerUserId(userId);
-    processInfo_.pkgName = pkgName;
-    processInfo_.userId = userId;
     int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
@@ -407,15 +398,22 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         LOGE("CheckAuthParamVaildExtra failed, param is invaild.");
         return ret;
     }
+    JsonObject jsonObject(extra);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("extra string not a json type.");
+        return ERR_DM_FAILED;
+    }
+    GetCallerInfo(pkgName, jsonObject);
+    InitAuthState(pkgName, authType, deviceId, extra);
     isAuthenticateDevice_ = true;
+    processInfo_.pkgName = pkgName;
+    processInfo_.userId = authRequestContext_->localUserId;
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
         softbusConnector_->JoinLnn(deviceId, true);
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(processInfo_, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
-        return DM_OK;
     }
-    InitAuthState(pkgName, authType, deviceId, extra);
     return DM_OK;
 }
 
@@ -1512,6 +1510,7 @@ void DmAuthManager::AuthenticateFinish()
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
     isAuthDevice_ = false;
+    callerInfoReady_ = false;
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_) && authResponseContext_->isFinish) {
@@ -3360,5 +3359,40 @@ void DmAuthManager::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyC
     return;
 }
 
+void DmAuthManager::GetCallerInfo(DmBindCallerInfo &callerInfo)
+{
+    (void)callerInfo;
+}
+
+void DmAuthManager::SetCallerInfo(const DmBindCallerInfo &callerInfo)
+{
+    LOGI("yangwei DmAuthManager userId %{public}d, tokenId %{public}d, bundleName %{public}s, hostPkgLabel %{public}s.",
+        callerInfo.userId, callerInfo.tokenId, callerInfo.bundleName.c_str(), callerInfo.hostPkgLabel.c_str());
+    std::lock_guard<std::mutex> lock(callerInfoMutex_);
+    callerInfo_.userId = callerInfo.userId;
+    callerInfo_.tokenId = callerInfo.tokenId;
+    callerInfo_.bundleName = callerInfo.bundleName;
+    callerInfo_.hostPkgLabel = callerInfo.hostPkgLabel;
+    callerInfoReady_ = true;
+}
+
+void DmAuthManager::GetCallerInfo(const std::string &pkgName, const JsonObject &jsonObject)
+{
+    LOGI("yangwei DmAuthManager");
+    CHECK_NULL_VOID(authRequestContext_);
+    std::lock_guard<std::mutex> lock(callerInfoMutex_);
+    if (callerInfoReady_) {
+        authRequestContext_->localUserId = callerInfo_.userId;
+        authRequestContext_->tokenId = static_cast<int64_t>(callerInfo_.tokenId);
+        authRequestContext_->bundleName = callerInfo_.bundleName;
+        authRequestContext_->hostPkgLabel = callerInfo_.hostPkgLabel;
+    } else {
+        authRequestContext_->hostPkgLabel = GetBundleLable(pkgName);
+        uint32_t tokenId = 0 ;
+        MultipleUserConnector::GetTokenIdAndForegroundUserId(tokenId, authRequestContext_->localUserId);
+        authRequestContext_->tokenId = static_cast<int64_t>(tokenId);
+        authRequestContext_->bundleName = GetBundleName(jsonObject);
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS
