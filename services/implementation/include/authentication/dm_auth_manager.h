@@ -495,6 +495,7 @@ public:
     bool IsSrc();
     void GetCallerInfo(DmBindCallerInfo &callerInfo);
     void SetCallerInfo(const DmBindCallerInfo &callerInfo);
+    void ClearCallerInfo();
 
 private:
     bool IsHmlSessionType();

@@ -1509,7 +1509,7 @@ void DmAuthManager::AuthenticateFinish()
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
     isAuthDevice_ = false;
-    callerInfoReady_ = false;
+    ClearCallerInfo();
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_) && authResponseContext_->isFinish) {
@@ -3389,6 +3389,16 @@ void DmAuthManager::GetCallerInfo(const std::string &pkgName, JsonObject &jsonOb
         authRequestContext_->tokenId = static_cast<int64_t>(tokenId);
         authRequestContext_->bundleName = GetBundleName(jsonObject);
     }
+}
+
+void DmAuthManager::ClearCallerInfo()
+{
+    std::lock_guard<std::mutex> lock(callerInfoMutex_);
+    callerInfo_.userId = -1;
+    callerInfo_.tokenId = "";
+    callerInfo_.bundleName = "";
+    callerInfo_.hostPkgLabel = "";
+    callerInfoReady_ = false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
