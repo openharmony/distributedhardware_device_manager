@@ -246,6 +246,8 @@ void SoftBusListenerThirdFuzzTest(const uint8_t* data, size_t size)
     softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
     addrInfo.type = ConnectionAddrType::CONNECTION_ADDR_WLAN;
     softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
+    addrInfo.type = ConnectionAddrType::CONNECTION_ADDR_NCM;
+    softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
     addrInfo.type = ConnectionAddrType::CONNECTION_ADDR_SESSION;
     softbusListener_->ParseConnAddrInfo(&addrInfo, jsonObj);
     softbusListener_->ParseConnAddrInfo(&addrInfo1, jsonObj);

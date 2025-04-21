@@ -969,6 +969,11 @@ void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObje
         jsonObj[PARAM_KEY_USB_IP] = usbIp;
         jsonObj[PARAM_KEY_USB_PORT] = (addrInfo->info).ip.port;
         jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_USB;
+    } else if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_NCM) {
+        std::string ncmIp((addrInfo->info).ip.ip);
+        jsonObj[PARAM_KEY_NCM_IP] = ncmIp;
+        jsonObj[PARAM_KEY_NCM_PORT] = (addrInfo->info).ip.port;
+        jsonObj[PARAM_KEY_CONN_ADDR_TYPE] = CONN_ADDR_TYPE_NCM;
     } else {
         LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }
@@ -1166,7 +1171,8 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
             continue;
         }
         if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH ||
-            addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN) {
+            addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_WLAN ||
+            addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_NCM) {
             std::string cacheIp((addrInfo->info).ip.ip);
             if (cacheIp == ip) {
                 addrType = addrInfo->type;

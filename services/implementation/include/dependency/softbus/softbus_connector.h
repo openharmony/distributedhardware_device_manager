@@ -143,6 +143,8 @@ public:
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
 
 private:
+    static std::shared_ptr<ConnectionAddr> SetAddrAndJson(const ConnectionAddr *addr,
+        JsonObject &jsonPara, std::string &connectAddr);
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo);
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceBasicInfo &dmDeviceBasicInfo);
     static ConnectionAddr *GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type);
