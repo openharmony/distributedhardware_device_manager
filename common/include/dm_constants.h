@@ -169,9 +169,9 @@ DM_EXPORT extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
 DM_EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 const int32_t DEVICE_NAME_MAX_BYTES = 100;
 
-EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
-EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
-EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
+DM_EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
+DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
+DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
 
 extern const char* DM_VERSION_5_0_1;
 extern const char* DM_VERSION_5_0_2;
