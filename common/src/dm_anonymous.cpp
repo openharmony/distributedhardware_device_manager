@@ -30,12 +30,12 @@ const int32_t LIST_SPLIT_LEN = 2;
 std::string GetAnonyString(const std::string &value)
 {
     const int32_t shortIdLengthInt32 = 20;
-    const int32_t plaintextLengthint32 = 4;
-    const int32_t minIdLengthint32 = 3;
+    const int32_t plaintextLengthInt32 = 4;
+    const int32_t minIdLengthInt32 = 3;
 
     std::string tmpStr("******");
     size_t strLen = value.length();
-    if (strLen < minIdLengthint32) {
+    if (strLen < minIdLengthInt32) {
         return tmpStr;
     }
 
@@ -45,9 +45,9 @@ std::string GetAnonyString(const std::string &value)
         res += tmpStr;
         res += value[strLen - 1];
     } else {
-        res.append(value, 0, plaintextLengthint32 );
+        res.append(value, 0, plaintextLengthInt32);
         res += tmpStr;
-        res.append(value, strLen - plaintextLengthint32 , plaintextLengthint32 );
+        res.append(value, strLen - plaintextLengthInt32, plaintextLengthInt32);
     }
 
     return res;
