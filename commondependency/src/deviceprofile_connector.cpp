@@ -169,7 +169,8 @@ DM_EXPORT void DeviceProfileConnector::AclHashItemToJson(JsonItemObject &itemObj
     itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST] = hashList.Dump();
 }
 
-DM_EXPORT void DeviceProfileConnector::AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values)
+DM_EXPORT void DeviceProfileConnector::AclHashVecToJson(
+    JsonItemObject &itemObject, const std::vector<AclHashItem> &values)
 {
     for (const auto &val : values) {
         JsonObject object;
