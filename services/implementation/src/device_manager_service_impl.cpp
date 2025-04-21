@@ -62,6 +62,7 @@ constexpr const char* DM_TAG_EXTRA_INFO = "extraInfo";
 constexpr const char* CHANGE_PINTYPE = "1";
 // currently, we just support one bind session in one device at same time
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
+const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
 
 static bool IsMessageOldVersion(const JsonObject &jsonObject, std::shared_ptr<Session> session)
 {
@@ -296,6 +297,7 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId, std::shared_ptr<Se
 {
     session->logicalSessionCnt_.fetch_sub(1);
     if (session->logicalSessionCnt_.load(std::memory_order_relaxed) == 0) {
+        usleep(USLEEP_TIME_US_500000);
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
         std::lock_guard<std::mutex> lock(mapMutex_);
         if (sessionsMap_.find(sessionId) != sessionsMap_.end()) {
