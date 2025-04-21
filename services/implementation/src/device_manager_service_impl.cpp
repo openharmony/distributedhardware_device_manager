@@ -2324,7 +2324,7 @@ int32_t DeviceManagerServiceImpl::DeleteSkCredAndAcl(const std::vector<DmAclIdPa
     return ret;
 }
 
-int32_t DeviceManagerServiceImpl::DeleteAclForProcV2(const std::string &localUdid, uint32_t localTokenId, 
+int32_t DeviceManagerServiceImpl::DeleteAclForProcV2(const std::string &localUdid, uint32_t localTokenId,
     const std::string &remoteUdid, int32_t bindLevel, const std::string &extra, int32_t userId)
 {
     DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().FilterNeedDeleteACL(
