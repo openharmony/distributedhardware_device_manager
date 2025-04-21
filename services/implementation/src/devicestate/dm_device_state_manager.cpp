@@ -310,7 +310,7 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
             uint32_t res = DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(idIter->second, offlineParam);
             if (res == 0) {
                 DeleteCredential(offlineParam, idIter->second);
-                DeleteSkCredAndAcl(offlineParam);
+                DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
             }
 #endif
             stateTimerInfoMap_.erase(iter);
@@ -329,15 +329,15 @@ void DmDeviceStateManager::DeleteCredential(DmOfflineParam offlineParam, const s
     }
 }
 
-int32_t DmDeviceStateManager::DeleteSkCredAndAcl(DmOfflineParam offlineParam)
+int32_t DmDeviceStateManager::DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls)
 {
     LOGI("DeleteSkCredAndAcl start.");
     int32_t ret = DM_OK;
-    if (offlineParam.dmAclIdParamVec.empty()) {
+    if (acls.empty()) {
         return ret;
     }
     CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
-    for (auto item : offlineParam.dmAclIdParamVec) {
+    for (auto item : acls) {
         ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(item.userId, item.skId);
         if (ret != DM_OK) {
             LOGE("DeleteSessionKey err, userId:%{public}d, skId:%{public}d, ret:%{public}d", item.userId, item.skId,

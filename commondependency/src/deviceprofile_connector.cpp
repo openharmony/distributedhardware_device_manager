@@ -336,17 +336,12 @@ std::string DeviceProfileConnector::GetDeviceAuthVersionInfo(std::string localUd
     }
     return "";
 }
-DM_EXPORT DmOfflineParam DeviceProfileConnector::FilterNeedDeleteACL(uint32_t tokenId,
-    const std::string &localDeviceId, const std::string &remoteDeviceId, int32_t bindLevel, const std::string &extra)
+DM_EXPORT DmOfflineParam DeviceProfileConnector::FilterNeedDeleteACL(const std::string &localDeviceId,
+    uint32_t localTokenId, const std::string &remoteDeviceId, const std::string &extra)
 {
-    LOGI("localDeviceId %{public}s, remoteDeviceId %{public}s, bindLevel %{public}d.",
-        GetAnonyString(localDeviceId).c_str(), GetAnonyString(remoteDeviceId).c_str(), bindLevel);
+    LOGI("localDeviceId %{public}s, remoteDeviceId %{public}s",
+        GetAnonyString(localDeviceId).c_str(), GetAnonyString(remoteDeviceId).c_str());
     DmOfflineParam offlineParam;
-    offlineParam.bindType = INVALIED_TYPE;
-    if (static_cast<uint32_t>(bindLevel) > APP || static_cast<uint32_t>(bindLevel) < USER) {
-        LOGE("Invalied bindlevel.");
-        return offlineParam;
-    }
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(localDeviceId, userId,
         remoteDeviceId);
@@ -354,25 +349,8 @@ DM_EXPORT DmOfflineParam DeviceProfileConnector::FilterNeedDeleteACL(uint32_t to
         LOGE("Acl is empty.");
         return offlineParam;
     }
-    switch (bindLevel) {
-        case APP:
-            if (extra == "") {
-                FilterNeedDeleteAppBindLevel(offlineParam, tokenId, profiles, localDeviceId, remoteDeviceId);
-            } else {
-                FilterNeedDeleteAppBindLevel(offlineParam, tokenId, profiles, localDeviceId, remoteDeviceId, extra);
-            }
-            break;
-        case SERVICE:
-            FilterNeedDeleteServiceBindLevel(offlineParam, tokenId, profiles, localDeviceId, remoteDeviceId);
-            break;
-        case USER:
-            FilterNeedDeleteDeviceBindLevel(offlineParam, profiles, localDeviceId, remoteDeviceId);
-            break;
-        default:
-            LOGE("FilterNeedDeleteACL: Invalied bindlevel.");
-            break;
-    }
-    CheckLastLnnAcl(localDeviceId, userId, remoteDeviceId, offlineParam, profiles);
+
+    FilterNeedDeleteACLInfos(profiles, localDeviceId, localTokenId, remoteDeviceId, extra, offlineParam);
     return offlineParam;
 }
 
@@ -383,65 +361,13 @@ void DeviceProfileConnector::CheckLastLnnAcl(const std::string &localDeviceId, i
     LOGI("profiles size: %{public}zu", profiles.size());
     if (profiles.size() == 1 && IsLnnAcl(profiles[0])) {
         if (profiles[0].GetAccesser().GetAccesserDeviceId() == localDeviceId) {
-            CacheAcerAclId(profiles[0], offlineParam);
+            CacheAcerAclId(profiles[0], offlineParam.needDelAclInfos);
         }
         if (profiles[0].GetAccessee().GetAccesseeDeviceId() == localDeviceId) {
-            CacheAceeAclId(profiles[0], offlineParam);
+            CacheAceeAclId(profiles[0], offlineParam.needDelAclInfos);
         }
         offlineParam.hasLnnAcl = true;
     }
-}
-
-void DeviceProfileConnector::FilterNeedDeleteAppBindLevel(DmOfflineParam &offlineParam, const uint32_t tokenId,
-    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid,
-    const std::string &remoteUdid)
-{
-    int32_t bindNums = 0;
-    int32_t deleteNums = 0;
-    std::vector<int64_t> delAclIdVec;
-    for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() != remoteUdid || item.GetBindType() == DM_IDENTICAL_ACCOUNT ||
-            item.GetBindLevel() != APP) {
-            continue;
-        }
-        bindNums++;
-        int64_t acerTokenId = item.GetAccesser().GetAccesserTokenId();
-        int64_t aceeTokenId = item.GetAccessee().GetAccesseeTokenId();
-        std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();
-        std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
-        if ((acerTokenId == static_cast<int64_t>(tokenId)) &&
-            acerDeviceId == localUdid && aceeDeviceId == remoteUdid) {
-            delAclIdVec.push_back(item.GetAccessControlId());
-            deleteNums++;
-            offlineParam.bindType = APP;
-            ProcessInfo processInfo;
-            processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
-            processInfo.userId = item.GetAccesser().GetAccesserUserId();
-            offlineParam.processVec.push_back(processInfo);
-            CacheAcerAclId(item, offlineParam);
-            LOGI("Src delete acl bindType %{public}d, localUdid %{public}s, remoteUdid %{public}s",
-                item.GetBindType(), GetAnonyString(localUdid).c_str(),
-                GetAnonyString(remoteUdid).c_str());
-            continue;
-        }
-        if ((aceeTokenId == static_cast<int64_t>(tokenId)) &&
-            aceeDeviceId == localUdid && acerDeviceId == remoteUdid) {
-            delAclIdVec.push_back(item.GetAccessControlId());
-            deleteNums++;
-            offlineParam.bindType = APP;
-            ProcessInfo processInfo;
-            processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
-            processInfo.userId = item.GetAccessee().GetAccesseeUserId();
-            offlineParam.processVec.push_back(processInfo);
-            CacheAceeAclId(item, offlineParam);
-            LOGI("Sink delete acl bindType %{public}u, localUdid %{public}s, remoteUdid %{public}s",
-                item.GetBindType(), GetAnonyString(localUdid).c_str(),
-                GetAnonyString(remoteUdid).c_str());
-            continue;
-        }
-    }
-    DeleteCacheAcl(delAclIdVec, profiles);
-    offlineParam.leftAclNumber = bindNums - deleteNums;
 }
 
 void DeviceProfileConnector::DeleteCacheAcl(std::vector<int64_t> delAclIdVec,
@@ -473,146 +399,165 @@ void DeviceProfileConnector::ParseExtra(const std::string &extra, uint64_t &peer
     peerBundleName = extraInfoJson[TAG_PEER_BUNDLE_NAME].Get<std::string>();
 }
 
-void DeviceProfileConnector::FilterNeedDeleteAppBindLevel(DmOfflineParam &offlineParam, const uint32_t tokenId,
-    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid,
-    const std::string &remoteUdid, const std::string &extra)
+bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+    const std::string &localUdid, const uint32_t localTokenId,
+    const std::string &remoteUdid, const uint32_t peerTokenId,
+    DmOfflineParam &offlineParam)
 {
-    LOGI("DeviceProfileConnector::FilterNeedDeleteAppBindLevel extra %{public}s", extra.c_str());
-    int32_t bindNums = 0;
-    int32_t deleteNums = 0;
+    bool isMatch = false;
+    int64_t acerTokenId = acl.GetAccesser().GetAccesserTokenId();
+    int64_t aceeTokenId = acl.GetAccessee().GetAccesseeTokenId();
+    std::string acerDeviceId = acl.GetAccesser().GetAccesserDeviceId();
+    std::string aceeDeviceId = acl.GetAccessee().GetAccesseeDeviceId();
+    // Process target match acl which need delete
+    if ((acerTokenId == static_cast<int64_t>(localTokenId)) &&
+        (acerDeviceId == localUdid) && (aceeDeviceId == remoteUdid) &&
+        (peerTokenId == 0 || (peerTokenId != 0 && aceeTokenId == static_cast<int64_t>(peerTokenId)))) {
+        ProcessInfo processInfo;
+        processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
+        processInfo.userId = acl.GetAccesser().GetAccesserUserId();
+        offlineParam.processVec.push_back(processInfo);
+        CacheAcerAclId(acl, offlineParam.needDelAclInfos);
+        LOGI("Src del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+             ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+             GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+             acl.GetBindLevel());
+        isMatch = true;
+    }
+
+    if ((aceeTokenId == static_cast<int64_t>(localTokenId)) &&
+        (aceeDeviceId == localUdid) && (acerDeviceId == remoteUdid) &&
+        (peerTokenId == 0 || (peerTokenId != 0 && acerTokenId == static_cast<int64_t>(peerTokenId)))) {
+        ProcessInfo processInfo;
+        processInfo.pkgName = acl.GetAccessee().GetAccesseeBundleName();
+        processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
+        offlineParam.processVec.push_back(processInfo);
+        CacheAceeAclId(acl, offlineParam.needDelAclInfos);
+        LOGI("Sink del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+             ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+             GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+             acl.GetBindLevel());
+        isMatch = true;
+    }
+    return isMatch;
+}
+
+bool DeviceProfileConnector::FindLnnAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+    const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam)
+{
+    bool isMatch = false;
+    std::string acerDeviceId = acl.GetAccesser().GetAccesserDeviceId();
+    std::string aceeDeviceId = acl.GetAccessee().GetAccesseeDeviceId();
+    if (IsLnnAcl(acl) && acl.GetTrustDeviceId() == remoteUdid) {
+        if (acerDeviceId == localUdid && aceeDeviceId == remoteUdid) {
+            LOGI("Src lnn acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+                 ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+                 GetAnonyString(localUdid).c_str(),
+                 GetAnonyString(remoteUdid).c_str(), acl.GetBindType(), acl.GetBindLevel());
+            CacheAcerAclId(acl, offlineParam.allLnnAclInfos);
+        }
+
+        if (aceeDeviceId == localUdid && acerDeviceId == remoteUdid) {
+            LOGI("Sink lnn acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+                 ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+                 GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+                 acl.GetBindLevel());
+            CacheAceeAclId(acl, offlineParam.allLnnAclInfos);
+        }
+        isMatch = true;
+    }
+    return isMatch;
+}
+
+bool DeviceProfileConnector::FindUserAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+    const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam)
+{
+    bool isMatch = false;
+    std::string acerDeviceId = acl.GetAccesser().GetAccesserDeviceId();
+    std::string aceeDeviceId = acl.GetAccessee().GetAccesseeDeviceId();
+    // process User Or SameAccount acl
+    if (acl.GetBindLevel() == USER || acl.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+        if (acerDeviceId == localUdid && aceeDeviceId == remoteUdid) {
+            LOGI("Src User acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+                 ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+                 GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+                 acl.GetBindLevel());
+            CacheAcerAclId(acl, offlineParam.allUserAclInfos);
+        }
+
+        if (aceeDeviceId == localUdid && acerDeviceId == remoteUdid) {
+            LOGI("Sink User acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+                 ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+                 GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+                 acl.GetBindLevel());
+            CacheAceeAclId(acl, offlineParam.allUserAclInfos);
+        }
+        isMatch = true;
+    }
+    return isMatch;
+}
+
+bool DeviceProfileConnector::FindLeftAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+    const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam)
+{
+    bool isMatch = false;
+    std::string acerDeviceId = acl.GetAccesser().GetAccesserDeviceId();
+    std::string aceeDeviceId = acl.GetAccessee().GetAccesseeDeviceId();
+    // process left service/app acl
+    if (acl.GetBindLevel() == SERVICE || acl.GetBindLevel() == APP) {
+        if (acerDeviceId == localUdid && aceeDeviceId == remoteUdid) {
+            LOGI("Src Left acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+                 ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+                 GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+                 acl.GetBindLevel());
+            CacheAcerAclId(acl, offlineParam.allLeftAppOrSvrAclInfos);
+        }
+
+        if (aceeDeviceId == localUdid && acerDeviceId == remoteUdid) {
+            LOGI("Sink Left acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
+                 ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+                 GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
+                 acl.GetBindLevel());
+            CacheAceeAclId(acl, offlineParam.allLeftAppOrSvrAclInfos);
+        }
+        isMatch = true;
+    }
+    return isMatch;
+}
+
+void DeviceProfileConnector::FilterNeedDeleteACLInfos(
+    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
+    const std::string &localUdid, const uint32_t localTokenId,
+    const std::string &remoteUdid, const std::string &extra, DmOfflineParam &offlineParam)
+{
     uint64_t peerTokenId = 0;
-    std::string peerBundleName;
-    std::vector<int64_t> delAclIdVec;
+    std::string peerBundleName = "";
     ParseExtra(extra, peerTokenId, peerBundleName);
     for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() != remoteUdid || item.GetBindType() == DM_IDENTICAL_ACCOUNT ||
-            item.GetBindLevel() != APP) {
+        if (item.GetTrustDeviceId() != remoteUdid) {
             continue;
         }
-        bindNums++;
-        int64_t acerTokenId = item.GetAccesser().GetAccesserTokenId();
-        int64_t aceeTokenId = item.GetAccessee().GetAccesseeTokenId();
-        std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();
-        std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
-        if ((acerTokenId == static_cast<int64_t>(tokenId)) && aceeDeviceId == remoteUdid &&
-            (aceeTokenId == static_cast<int64_t>(peerTokenId)) && acerDeviceId == localUdid) {
-            delAclIdVec.push_back(item.GetAccessControlId());
-            deleteNums++;
-            offlineParam.bindType = APP;
-            ProcessInfo processInfo;
-            processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
-            processInfo.userId = item.GetAccesser().GetAccesserUserId();
-            offlineParam.processVec.push_back(processInfo);
-            CacheAcerAclId(item, offlineParam);
-            LOGI("Src delete acl bindType %{public}d, localUdid %{public}s, remoteUdid %{public}s",
-                item.GetBindType(), GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str());
-            continue;
-        }
-        if ((aceeTokenId == static_cast<int64_t>(tokenId)) && acerDeviceId == remoteUdid &&
-            (acerTokenId == static_cast<int64_t>(peerTokenId)) && aceeDeviceId == localUdid) {
-            delAclIdVec.push_back(item.GetAccessControlId());
-            deleteNums++;
-            offlineParam.bindType = APP;
-            ProcessInfo processInfo;
-            processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
-            processInfo.userId = item.GetAccessee().GetAccesseeUserId();
-            offlineParam.processVec.push_back(processInfo);
-            CacheAceeAclId(item, offlineParam);
-            LOGI("Sink delete acl bindType %{public}u, localUdid %{public}s, remoteUdid %{public}s",
-                item.GetBindType(), GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str());
-            continue;
-        }
-    }
-    DeleteCacheAcl(delAclIdVec, profiles);
-    offlineParam.leftAclNumber = bindNums - deleteNums;
-}
 
-void DeviceProfileConnector::FilterNeedDeleteServiceBindLevel(DmOfflineParam &offlineParam, const uint32_t tokenId,
-    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid,
-    const std::string &remoteUdid)
-{
-    int32_t bindNums = 0;
-    int32_t deleteNums = 0;
-    std::vector<int64_t> delAclIdVec;
-    for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() != remoteUdid || item.GetBindType() == DM_IDENTICAL_ACCOUNT ||
-            item.GetBindLevel() != SERVICE) {
+        // First, find need delete acl
+        if (FindTargetAcl(item, localUdid, localTokenId, remoteUdid, peerTokenId, offlineParam)) {
             continue;
         }
-        bindNums++;
-        int64_t acerTokenId = item.GetAccesser().GetAccesserTokenId();
-        int64_t aceeTokenId = item.GetAccessee().GetAccesseeTokenId();
-        std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();
-        std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
-        if ((acerTokenId == static_cast<int64_t>(tokenId)) &&
-            acerDeviceId == localUdid && aceeDeviceId == remoteUdid) {
-            delAclIdVec.push_back(item.GetAccessControlId());
-            deleteNums++;
-            offlineParam.bindType = SERVICE;
-            ProcessInfo processInfo;
-            processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
-            processInfo.userId = item.GetAccesser().GetAccesserUserId();
-            offlineParam.processVec.push_back(processInfo);
-            CacheAcerAclId(item, offlineParam);
-            LOGI("Src delete acl bindType %{public}d, localUdid %{public}s, remoteUdid %{public}s",
-                item.GetBindType(), GetAnonyString(localUdid).c_str(),
-                GetAnonyString(remoteUdid).c_str());
-            continue;
-        }
-        if ((aceeTokenId == static_cast<int64_t>(tokenId)) &&
-            aceeDeviceId == localUdid && acerDeviceId == remoteUdid) {
-            delAclIdVec.push_back(item.GetAccessControlId());
-            deleteNums++;
-            offlineParam.bindType = SERVICE;
-            ProcessInfo processInfo;
-            processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
-            processInfo.userId = item.GetAccessee().GetAccesseeUserId();
-            offlineParam.processVec.push_back(processInfo);
-            CacheAceeAclId(item, offlineParam);
-            LOGI("Sink delete acl bindType %{public}u, localUdid %{public}s, remoteUdid %{public}s",
-                item.GetBindType(), GetAnonyString(localUdid).c_str(),
-                GetAnonyString(remoteUdid).c_str());
-            continue;
-        }
-    }
-    DeleteCacheAcl(delAclIdVec, profiles);
-    offlineParam.leftAclNumber = bindNums - deleteNums;
-}
 
-void DeviceProfileConnector::FilterNeedDeleteDeviceBindLevel(DmOfflineParam &offlineParam,
-    std::vector<AccessControlProfile> &profiles, const std::string &localUdid, const std::string &remoteUdid)
-{
-    int32_t bindNums = 0;
-    int32_t deleteNums = 0;
-    std::vector<int64_t> delAclIdVec;
-    for (auto &item : profiles) {
-        if (item.GetTrustDeviceId() != remoteUdid || item.GetBindType() == DM_IDENTICAL_ACCOUNT || IsLnnAcl(item)) {
+        // Second, find the LNN acl
+        if (FindLnnAcl(item, localUdid, remoteUdid, offlineParam)) {
             continue;
         }
-        bindNums++;
-        if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
-            item.GetAccessee().GetAccesseeDeviceId() == remoteUdid) {
-            delAclIdVec.push_back(item.GetAccessControlId());
-            deleteNums++;
-            offlineParam.bindType = USER;
-            CacheAcerAclId(item, offlineParam);
-            LOGI("Src delete acl bindType %{public}d, localUdid %{public}s, remoteUdid %{public}s", item.GetBindType(),
-                GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str());
+
+        // Third, find the user or sameaccount acl, dertermine if report offline
+        if (FindUserAcl(item, localUdid, remoteUdid, offlineParam)) {
             continue;
         }
-        if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
-            item.GetAccesser().GetAccesserDeviceId() == remoteUdid) {
-            delAclIdVec.push_back(item.GetAccessControlId());
-            deleteNums++;
-            offlineParam.bindType = USER;
-            CacheAceeAclId(item, offlineParam);
-            LOGI("Sink delete acl bindType %{public}u, localUdid %{public}s, remoteUdid %{public}s", item.GetBindType(),
-                GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str());
+
+        // Fourth, find the left service/app acl, determine if del lnn acl
+        if (FindLeftAcl(item, localUdid, remoteUdid, offlineParam)) {
             continue;
         }
     }
-    DeleteCacheAcl(delAclIdVec, profiles);
-    offlineParam.leftAclNumber = bindNums - deleteNums;
 }
 
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
@@ -1128,7 +1073,7 @@ DM_EXPORT bool DeviceProfileConnector::DeleteAclForAccountLogOut(
             }
             deleteProfiles.push_back(item);
             notifyOffline = (item.GetStatus() == ACTIVE);
-            CacheAcerAclId(item, offlineParam);
+            CacheAcerAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
         if (accesserUdid == peerUdid && accesserUserId == peerUserId &&
@@ -1138,7 +1083,7 @@ DM_EXPORT bool DeviceProfileConnector::DeleteAclForAccountLogOut(
             }
             deleteProfiles.push_back(item);
             notifyOffline = (item.GetStatus() == ACTIVE);
-            CacheAceeAclId(item, offlineParam);
+            CacheAceeAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
     }
@@ -1167,14 +1112,14 @@ DM_EXPORT void DeviceProfileConnector::DeleteAclForUserRemoved(std::string local
             if (!IsValueExist(peerUserIdMap, accesseeUdid, accesseeUserId)) {
                 peerUserIdMap.insert(std::pair<std::string, int32_t>(accesseeUdid, accesseeUserId));
             }
-            CacheAcerAclId(item, offlineParam);
+            CacheAcerAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
         if (accesseeUdid == localUdid && accesseeUserId == userId) {
             if (!IsValueExist(peerUserIdMap, accesserUdid, accesserUserId)) {
                 peerUserIdMap.insert(std::pair<std::string, int32_t>(accesserUdid, accesserUserId));
             }
-            CacheAceeAclId(item, offlineParam);
+            CacheAceeAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
     }
@@ -1195,13 +1140,13 @@ DM_EXPORT void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(
             if (item.GetBindLevel() == USER) {
                 userIds.push_back(accesseeUserId);
             }
-            CacheAceeAclId(item, offlineParam);
+            CacheAceeAclId(item, offlineParam.needDelAclInfos);
         }
         if (accesseeUdid == peerUdid && accesseeUserId == peerUserId) {
             if (item.GetBindLevel() == USER) {
                 userIds.push_back(accesserUserId);
             }
-            CacheAcerAclId(item, offlineParam);
+            CacheAcerAclId(item, offlineParam.needDelAclInfos);
         }
     }
 }
@@ -1516,17 +1461,17 @@ DM_EXPORT uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &d
         if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
             res--;
             if (accesserUserId == currentUserId && accesserUdid == localUdid && accesseeUdid == deviceId) {
-                CacheAcerAclId(item, offlineParam);
+                CacheAcerAclId(item, offlineParam.needDelAclInfos);
                 offlineParam.peerUserId = item.GetAccessee().GetAccesseeUserId();
             }
             if (accesseeUserId == currentUserId && accesseeUdid == localUdid && accesserUdid == deviceId) {
-                CacheAceeAclId(item, offlineParam);
+                CacheAceeAclId(item, offlineParam.needDelAclInfos);
                 offlineParam.peerUserId = item.GetAccesser().GetAccesserUserId();
             }
         }
     }
     if (res == 0) {
-        offlineParam.dmAclIdParamVec.push_back(dmAclIdParam);
+        offlineParam.needDelAclInfos.push_back(dmAclIdParam);
     }
     return res;
 }
@@ -1898,7 +1843,7 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUse
         if (item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeDeviceId() == remoteUdid) {
             offlineParam.bindType = USER;
-            CacheAcerAclId(item, offlineParam);
+            CacheAcerAclId(item, offlineParam.needDelAclInfos);
             LOGI("Src delete acl bindType %{public}d, localUdid %{public}s, remoteUdid %{public}s", item.GetBindType(),
                 GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str());
             bindType = std::min(bindType, static_cast<int32_t>(item.GetBindType()));
@@ -1907,7 +1852,7 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUse
         if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid) {
             offlineParam.bindType = USER;
-            CacheAceeAclId(item, offlineParam);
+            CacheAceeAclId(item, offlineParam.needDelAclInfos);
             LOGI("Sink delete acl bindType %{public}u, localUdid %{public}s, remoteUdid %{public}s", item.GetBindType(),
                 GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str());
             bindType = std::min(bindType, static_cast<int32_t>(item.GetBindType()));
@@ -1946,7 +1891,7 @@ DM_EXPORT DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t re
             processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
             processInfo.userId = item.GetAccessee().GetAccesseeUserId();
             offlineParam.processVec.push_back(processInfo);
-            CacheAceeAclId(item, offlineParam);
+            CacheAceeAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
         if (item.GetAccessee().GetAccesseeUserId() == remoteUserId &&
@@ -1961,7 +1906,7 @@ DM_EXPORT DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t re
             processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
             processInfo.userId = item.GetAccesser().GetAccesserUserId();
             offlineParam.processVec.push_back(processInfo);
-            CacheAcerAclId(item, offlineParam);
+            CacheAcerAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
     }
@@ -2002,7 +1947,7 @@ DM_EXPORT DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t re
             processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
             processInfo.userId = item.GetAccessee().GetAccesseeUserId();
             offlineParam.processVec.push_back(processInfo);
-            CacheAceeAclId(item, offlineParam);
+            CacheAceeAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
         if (item.GetAccessee().GetAccesseeUserId() == remoteUserId && aceeDeviceId == remoteUdid &&
@@ -2015,7 +1960,7 @@ DM_EXPORT DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t re
             processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
             processInfo.userId = item.GetAccesser().GetAccesserUserId();
             offlineParam.processVec.push_back(processInfo);
-            CacheAcerAclId(item, offlineParam);
+            CacheAcerAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
     }
@@ -2049,7 +1994,7 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
             processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
             processInfo.userId = item.GetAccessee().GetAccesseeUserId();
             offlineParam.processVec.push_back(processInfo);
-            CacheAceeAclId(item, offlineParam);
+            CacheAceeAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
         if (item.GetAccessee().GetAccesseeUserId() == remoteUserId &&
@@ -2063,7 +2008,7 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
             processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
             processInfo.userId = item.GetAccesser().GetAccesserUserId();
             offlineParam.processVec.push_back(processInfo);
-            CacheAcerAclId(item, offlineParam);
+            CacheAcerAclId(item, offlineParam.needDelAclInfos);
             continue;
         }
     }
@@ -2769,7 +2714,7 @@ DM_EXPORT bool DeviceProfileConnector::IsLnnAcl(const DistributedDeviceProfile::
 }
 
 DM_EXPORT void DeviceProfileConnector::CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
-    DmOfflineParam &offlineParam)
+    std::vector<DmAclIdParam> &aclInfos)
 {
     DmAclIdParam dmAclIdParam;
     dmAclIdParam.udid = profile.GetAccesser().GetAccesserDeviceId();
@@ -2777,11 +2722,11 @@ DM_EXPORT void DeviceProfileConnector::CacheAcerAclId(const DistributedDevicePro
     dmAclIdParam.skId = profile.GetAccesser().GetAccesserSessionKeyId();
     dmAclIdParam.credId = profile.GetAccesser().GetAccesserCredentialIdStr();
     dmAclIdParam.accessControlId = profile.GetAccessControlId();
-    offlineParam.dmAclIdParamVec.push_back(dmAclIdParam);
+    aclInfos.push_back(dmAclIdParam);
 }
 
 DM_EXPORT void DeviceProfileConnector::CacheAceeAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
-    DmOfflineParam &offlineParam)
+    std::vector<DmAclIdParam> &aclInfos)
 {
     DmAclIdParam dmAclIdParam;
     dmAclIdParam.udid = profile.GetAccessee().GetAccesseeDeviceId();
@@ -2789,7 +2734,7 @@ DM_EXPORT void DeviceProfileConnector::CacheAceeAclId(const DistributedDevicePro
     dmAclIdParam.skId = profile.GetAccessee().GetAccesseeSessionKeyId();
     dmAclIdParam.credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
     dmAclIdParam.accessControlId = profile.GetAccessControlId();
-    offlineParam.dmAclIdParamVec.push_back(dmAclIdParam);
+    aclInfos.push_back(dmAclIdParam);
 }
 
 IDeviceProfileConnector *CreateDpConnectorInstance()

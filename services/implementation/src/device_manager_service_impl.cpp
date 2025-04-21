@@ -1639,7 +1639,7 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &local
     CHECK_NULL_VOID(hiChainAuthConnector_);
     hiChainAuthConnector_->DeleteCredential(peerUdid, localUserId, peerUserId);
     LOGE("DeleteSkCredAndAcl start");
-    DeleteSkCredAndAcl(offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
 void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId)
@@ -1664,7 +1664,7 @@ void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUd
         hiChainAuthConnector_->DeleteCredential(item.first, preUserId, item.second);
     }
     LOGE("DeleteSkCredAndAcl start");
-    DeleteSkCredAndAcl(offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
 void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid)
@@ -1685,7 +1685,7 @@ void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std
     CHECK_NULL_VOID(hiChainConnector_);
     hiChainConnector_->DeleteGroupByACL(delInfoVec, localUserIds);
     LOGE("DeleteSkCredAndAcl start");
-    DeleteSkCredAndAcl(offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
 void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string> &deviceVec,
@@ -1803,7 +1803,7 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
         CHECK_NULL_VOID(hiChainAuthConnector_);
         hiChainAuthConnector_->DeleteCredential(remoteUdid, item.second, remoteUserId);
         LOGE("DeleteSkCredAndAcl start");
-        DeleteSkCredAndAcl(offlineParam);
+        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
     }
 }
 
@@ -1854,7 +1854,7 @@ void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const 
     }
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     DeleteGroup(DM_PKG_NAME, remoteUdid);
-    DeleteSkCredAndAcl(offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
 void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
@@ -1872,7 +1872,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
         softbusConnector_->HandleDeviceOffline(remoteUdid);
-        DeleteSkCredAndAcl(offlineParam);
+        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
         return;
     }
     if (offlineParam.leftAclNumber == 0) {
@@ -1884,7 +1884,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
             hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID(),
                 remoteUserId);
         } else {
-            DeleteSkCredAndAcl(offlineParam);
+            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
         }
         return;
     }
@@ -1906,7 +1906,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
         softbusConnector_->HandleDeviceOffline(remoteUdid);
-        DeleteSkCredAndAcl(offlineParam);
+        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
         return;
     }
     if (offlineParam.leftAclNumber == 0) {
@@ -1918,7 +1918,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
             hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID(),
                 remoteUserId);
         } else {
-            DeleteSkCredAndAcl(offlineParam);
+            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
         }
         return;
     }
@@ -1943,7 +1943,7 @@ void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const st
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
         softbusConnector_->HandleDeviceOffline(remoteUdid);
     }
-    DeleteSkCredAndAcl(offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
@@ -2055,7 +2055,7 @@ int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, i
             CheckIsLastLnnAcl(it, item.second, lnnAclParam, isLastLnnAcl, localUdid);
         }
         if (!isLastLnnAcl) {
-            DeleteSkCredAndAcl(lnnAclParam);
+            DeleteSkCredAndAcl(lnnAclParam.needDelAclInfos);
         }
     }
 
@@ -2076,10 +2076,10 @@ void DeviceManagerServiceImpl::CheckIsLastLnnAcl(DistributedDeviceProfile::Acces
 {
     if (DeviceProfileConnector::GetInstance().IsLnnAcl(profile) && CheckLnnAcl(delProfile, profile)) {
         if (profile.GetAccesser().GetAccesserDeviceId() == localUdid) {
-            DeviceProfileConnector::GetInstance().CacheAcerAclId(profile, lnnAclParam);
+            DeviceProfileConnector::GetInstance().CacheAcerAclId(profile, lnnAclParam.needDelAclInfos);
         }
         if (profile.GetAccessee().GetAccesseeDeviceId() == localUdid) {
-            DeviceProfileConnector::GetInstance().CacheAceeAclId(profile, lnnAclParam);
+            DeviceProfileConnector::GetInstance().CacheAceeAclId(profile, lnnAclParam.needDelAclInfos);
         }
     }
     if (!DeviceProfileConnector::GetInstance().IsLnnAcl(profile) && CheckLnnAcl(delProfile, profile)) {
@@ -2102,8 +2102,8 @@ void DeviceManagerServiceImpl::DeleteAclByTokenId(const int32_t accessTokenId,
         if (accessTokenId == static_cast<int32_t>(accesssertokenId)) {
             DmOfflineParam offlineParam;
             delProfileMap[item.GetAccessControlId()] = item;
-            DeviceProfileConnector::GetInstance().CacheAcerAclId(item, offlineParam);
-            DeleteSkCredAndAcl(offlineParam);
+            DeviceProfileConnector::GetInstance().CacheAcerAclId(item, offlineParam.needDelAclInfos);
+            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
             listener_->OnAppUnintall(item.GetAccesser().GetAccesserBundleName());
             if (item.GetBindLevel() == USER) {
                 userIdVec.push_back(item.GetAccesser().GetAccesserUserId());
@@ -2113,9 +2113,9 @@ void DeviceManagerServiceImpl::DeleteAclByTokenId(const int32_t accessTokenId,
         }
         if (accessTokenId == static_cast<int32_t>(accesssertokenId)) {
             DmOfflineParam offlineParam;
-            DeviceProfileConnector::GetInstance().CacheAceeAclId(item, offlineParam);
+            DeviceProfileConnector::GetInstance().CacheAceeAclId(item, offlineParam.needDelAclInfos);
             delProfileMap[item.GetAccessControlId()] = item;
-            DeleteSkCredAndAcl(offlineParam);
+            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
             listener_->OnAppUnintall(item.GetAccessee().GetAccesseeBundleName());
             if (item.GetBindLevel() == USER) {
                 userIdVec.push_back(item.GetAccessee().GetAccesseeUserId());
@@ -2300,15 +2300,15 @@ int32_t DeviceManagerServiceImpl::DeleteAcl(const std::string &pkgName, const st
     return ERR_DM_FAILED;
 }
 
-int32_t DeviceManagerServiceImpl::DeleteSkCredAndAcl(DmOfflineParam offlineParam)
+int32_t DeviceManagerServiceImpl::DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls)
 {
     LOGI("DeleteSkCredAndAcl start.");
     int32_t ret = DM_OK;
-    if (offlineParam.dmAclIdParamVec.empty()) {
+    if (acls.empty()) {
         return ret;
     }
     CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
-    for (auto item : offlineParam.dmAclIdParamVec) {
+    for (auto item : acls) {
         ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(item.userId, item.skId);
         if (ret != DM_OK) {
             LOGE("DeleteSessionKey err, userId:%{public}d, skId:%{public}d, ret:%{public}d", item.userId, item.skId,
@@ -2324,42 +2324,29 @@ int32_t DeviceManagerServiceImpl::DeleteSkCredAndAcl(DmOfflineParam offlineParam
     return ret;
 }
 
-int32_t DeviceManagerServiceImpl::DeleteAclForProcV2(uint32_t tokenId, const std::string &localUdid,
+int32_t DeviceManagerServiceImpl::DeleteAclForProcV2(const std::string &localUdid, uint32_t localTokenId, 
     const std::string &remoteUdid, int32_t bindLevel, const std::string &extra, int32_t userId)
 {
     DmOfflineParam offlineParam = DeviceProfileConnector::GetInstance().FilterNeedDeleteACL(
-        tokenId, localUdid, remoteUdid, bindLevel, extra);
-    if (offlineParam.bindType == INVALIED_TYPE) {
-        LOGE("Acl not contain the pkgname bind data.");
-        return ERR_DM_FAILED;
+        localUdid, localTokenId, remoteUdid, extra);
+
+    // first, clear the unbind sk/cred/acl
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+
+    // second, determin if need clear lnn acl
+    if (offlineParam.allLeftAppOrSvrAclInfos.empty()) {
+        LOGI("No app or service acl exist, clear lnn acl");
+        DeleteSkCredAndAcl(offlineParam.allLnnAclInfos);
     }
-    if (static_cast<uint32_t>(bindLevel) == APP || static_cast<uint32_t>(bindLevel) == SERVICE) {
-        CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
-        if (offlineParam.leftAclNumber != 0) {
-            LOGI("The tokenId unbind app-level type leftAclNumber not zero.");
-            softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-            softbusConnector_->HandleDeviceOffline(remoteUdid);
-            DeleteSkCredAndAcl(offlineParam);
-            return DM_OK;
-        }
-        if (offlineParam.leftAclNumber == 0 && offlineParam.hasLnnAcl) {
-            LOGI("The tokenId unbind app-level type leftAclNumber is zero.");
-            softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-            DeleteSkCredAndAcl(offlineParam);
-            return DM_OK;
-        }
+
+    // third, determin if need report offline to unbind bundle
+    if (offlineParam.allUserAclInfos.empty()) {
+        LOGI("after clear target acl, No user acl exist, report offline");
+        softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
+        softbusConnector_->HandleDeviceOffline(remoteUdid);
     }
-    if (static_cast<uint32_t>(bindLevel) == USER && offlineParam.leftAclNumber != 0) {
-        LOGI("Unbind deivce-level, retain identical account bind type.");
-        DeleteSkCredAndAcl(offlineParam);
-        return DM_OK;
-    }
-    if (static_cast<uint32_t>(bindLevel) == USER && offlineParam.leftAclNumber == 0 && offlineParam.hasLnnAcl) {
-        LOGI("Unbind deivce-level, retain null.");
-        DeleteSkCredAndAcl(offlineParam);
-        return DM_OK;
-    }
-    return ERR_DM_FAILED;
+
+    return DM_OK;
 }
 
 int32_t DeviceManagerServiceImpl::DeleteAclV2(const std::string &pkgName, const std::string &localUdid,
@@ -2374,7 +2361,7 @@ int32_t DeviceManagerServiceImpl::DeleteAclV2(const std::string &pkgName, const 
     if (!isNewVersion) {
         return DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     }
-    return DeleteAclForProcV2(tokenId, localUdid, remoteUdid, bindLevel, extra, userId);
+    return DeleteAclForProcV2(localUdid, tokenId, remoteUdid, bindLevel, extra, userId);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

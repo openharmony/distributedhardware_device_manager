@@ -99,6 +99,7 @@ DM_EXPORT extern const char* CONN_ADDR_TYPE_BLE;
 DM_EXPORT extern const char* CONN_ADDR_TYPE_USB;
 DM_EXPORT extern const char* CONN_ADDR_TYPE_WLAN_IP;
 DM_EXPORT extern const char* CONN_ADDR_TYPE_ETH_IP;
+DM_EXPORT extern const char* CONN_ADDR_TYPE_NCM;
 
 // Softbus connection address type int
 DM_EXPORT extern const int32_t CONNECTION_ADDR_USB;
@@ -112,6 +113,8 @@ DM_EXPORT extern const char* PARAM_KEY_WIFI_IP;
 DM_EXPORT extern const char* PARAM_KEY_WIFI_PORT;
 DM_EXPORT extern const char* PARAM_KEY_USB_IP;
 DM_EXPORT extern const char* PARAM_KEY_USB_PORT;
+DM_EXPORT extern const char* PARAM_KEY_NCM_IP;
+DM_EXPORT extern const char* PARAM_KEY_NCM_PORT;
 DM_EXPORT extern const char* PARAM_KEY_AUTH_TOKEN;
 DM_EXPORT extern const char* PARAM_KEY_AUTH_TYPE;
 DM_EXPORT extern const char* PARAM_KEY_PIN_CODE;

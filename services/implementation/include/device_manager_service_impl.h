@@ -230,9 +230,9 @@ private:
     void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId);
     void CleanSessionMap(int sessionId, std::shared_ptr<Session> session);
     void CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId);
-    int32_t DeleteAclForProcV2(uint32_t tokenId, const std::string &localUdid, const std::string &remoteUdid,
+    int32_t DeleteAclForProcV2(const std::string &localUdid, uint32_t localTokenId, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra, int32_t userId);
-    int32_t DeleteSkCredAndAcl(DmOfflineParam offlineParam);
+    int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
     void DeleteAclByTokenId(const int32_t accessTokenId,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
