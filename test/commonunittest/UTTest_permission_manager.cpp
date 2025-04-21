@@ -49,7 +49,7 @@ void PermissionManagerTest::SetUp()
 constexpr int32_t PAKAGE_NAME_SIZE_MAX = 256;
 
 #define SYSTEM_SA_WHITE_LIST_NUM (4)
-constexpr const static char systemSaWhiteList[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
+constexpr const static char SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM][PAKAGE_NAME_SIZE_MAX] = {
     "Samgr_Networking",
     "ohos.distributeddata.service",
     "ohos.dslm",
@@ -132,16 +132,16 @@ HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_001, testing::ext::TestSi
 */
 HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_002, testing::ext::TestSize.Level0)
 {
-    std::string pkgName1(systemSaWhiteList[0]);
+    std::string pkgName1(SYSTEM_SA_WHITE_LIST[0]);
     bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName1);
     ASSERT_EQ(ret, true);
-    std::string pkgName2(systemSaWhiteList[1]);
+    std::string pkgName2(SYSTEM_SA_WHITE_LIST[1]);
     ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName2);
     ASSERT_EQ(ret, true);
-    std::string pkgName3(systemSaWhiteList[2]);
+    std::string pkgName3(SYSTEM_SA_WHITE_LIST[2]);
     ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName3);
     ASSERT_EQ(ret, true);
-    std::string pkgName4(systemSaWhiteList[3]);
+    std::string pkgName4(SYSTEM_SA_WHITE_LIST[3]);
     ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName4);
     ASSERT_EQ(ret, true);
 }

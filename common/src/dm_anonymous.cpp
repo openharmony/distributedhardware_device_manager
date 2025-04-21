@@ -29,25 +29,25 @@ const int32_t LIST_SPLIT_LEN = 2;
 
 std::string GetAnonyString(const std::string &value)
 {
-    const int32_t INT32_SHORT_ID_LENGTH = 20;
-    const int32_t INT32_PLAINTEXT_LENGTH = 4;
-    const int32_t INT32_MIN_ID_LENGTH = 3;
+    const size_t shortIdLengthInt32 = 20;
+    const size_t plaintextLengthInt32 = 4;
+    const size_t minIdLengthInt32 = 3;
 
     std::string tmpStr("******");
     size_t strLen = value.length();
-    if (strLen < INT32_MIN_ID_LENGTH) {
+    if (strLen < minIdLengthInt32) {
         return tmpStr;
     }
 
     std::string res;
-    if (strLen <= INT32_SHORT_ID_LENGTH) {
+    if (strLen <= shortIdLengthInt32) {
         res += value[0];
         res += tmpStr;
         res += value[strLen - 1];
     } else {
-        res.append(value, 0, INT32_PLAINTEXT_LENGTH);
+        res.append(value, 0, plaintextLengthInt32);
         res += tmpStr;
-        res.append(value, strLen - INT32_PLAINTEXT_LENGTH, INT32_PLAINTEXT_LENGTH);
+        res.append(value, strLen - plaintextLengthInt32, plaintextLengthInt32);
     }
 
     return res;
@@ -103,11 +103,11 @@ bool IsNumberString(const std::string &inputString)
         LOGE("inputString is Null or inputString length is too long");
         return false;
     }
-    const int32_t MIN_ASCII_NUM = 48;
-    const int32_t MAX_ASCII_NUM = 57;
+    const int32_t minAsciiNum = 48;
+    const int32_t maxAsciiNum = 57;
     for (size_t i = 0; i < inputString.length(); i++) {
         int num = (int)inputString[i];
-        if (num >= MIN_ASCII_NUM && num <= MAX_ASCII_NUM) {
+        if (num >= minAsciiNum && num <= maxAsciiNum) {
             continue;
         } else {
             return false;

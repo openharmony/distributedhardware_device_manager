@@ -395,15 +395,15 @@ HWTEST_F(DmAnonymousTest, IsBool_002, testing::ext::TestSize.Level0)
  */
 HWTEST_F(DmAnonymousTest, ConvertCharArray2String_001, testing::ext::TestSize.Level0)
 {
-    constexpr uint32_t MAX_MESSAGE_LEN = 40 * 1024 * 1024;
+    constexpr uint32_t maxMessageLen = 40 * 1024 * 1024;
     char *srcData = nullptr;
     uint32_t srcLen = 0;
     std::string ret = ConvertCharArray2String(srcData, srcLen);
     EXPECT_EQ(ret, "");
-    ret = ConvertCharArray2String(srcData, MAX_MESSAGE_LEN + 1);
+    ret = ConvertCharArray2String(srcData, maxMessageLen + 1);
     EXPECT_EQ(ret, "");
     char srcData2[20] = {"1234"};
-    ret = ConvertCharArray2String(srcData2, MAX_MESSAGE_LEN + 1);
+    ret = ConvertCharArray2String(srcData2, maxMessageLen + 1);
     EXPECT_EQ(ret, "");
     uint32_t srcLen2 = 20;
     ret = ConvertCharArray2String(srcData2, srcLen);
