@@ -29,9 +29,9 @@ const int32_t LIST_SPLIT_LEN = 2;
 
 std::string GetAnonyString(const std::string &value)
 {
-    const int32_t shortIdLengthInt32 = 20;
-    const int32_t plaintextLengthInt32 = 4;
-    const int32_t minIdLengthInt32 = 3;
+    const size_t shortIdLengthInt32 = 20;
+    const size_t plaintextLengthInt32 = 4;
+    const size_t minIdLengthInt32 = 3;
 
     std::string tmpStr("******");
     size_t strLen = value.length();
