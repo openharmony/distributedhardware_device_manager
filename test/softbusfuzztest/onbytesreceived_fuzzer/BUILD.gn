@@ -62,6 +62,7 @@ ohos_fuzztest("OnBytesReceivedFuzzTest") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
+    "init:libbegetutil",
     "safwk:system_ability_fwk",
   ]
 

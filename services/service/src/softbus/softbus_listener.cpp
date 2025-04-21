@@ -194,6 +194,19 @@ void SoftbusListener::CredentialAuthStatusProcess(std::string deviceList, uint16
     DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 
+int32_t SoftbusListener::OnSyncLocalAclList(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
+{
+    return DeviceManagerService::GetInstance().SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo,
+        remoteAclList);
+}
+
+int32_t SoftbusListener::OnGetAclListHash(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string &aclList)
+{
+    return DeviceManagerService::GetInstance().GetAclListHash(localDevUserInfo, remoteDevUserInfo, aclList);
+}
+
 void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t deviceListLen,
                                              uint16_t deviceTypeId, int32_t errcode)
 {
@@ -1349,7 +1362,7 @@ int32_t SoftbusListener::GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &
         return DM_OK;
     }
     cJSON *customData = cJSON_GetObjectItem(extraDataJsonObj, PARAM_KEY_CUSTOM_DATA);
-    if (customData == NULL) {
+    if (customData == NULL || customData->valuestring == NULL) {
         cJSON_Delete(extraDataJsonObj);
         return DM_OK;
     }

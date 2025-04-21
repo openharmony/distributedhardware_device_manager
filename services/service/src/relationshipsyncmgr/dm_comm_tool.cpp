@@ -16,6 +16,7 @@
 #include "dm_comm_tool.h"
 #include "device_manager_service.h"
 #include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "dm_error_type.h"
 #include "dm_transport.h"
 #include "dm_transport_msg.h"
@@ -33,6 +34,7 @@ constexpr int32_t DM_COMM_SEND_LOCAL_USERIDS = 1;
 constexpr int32_t DM_COMM_RSP_LOCAL_USERIDS = 2;
 constexpr int32_t DM_COMM_SEND_USER_STOP = 3;
 constexpr int32_t DM_COMM_RSP_USER_STOP = 4;
+constexpr int32_t DM_COMM_ACCOUNT_LOGOUT = 5;
 
 const char* const USER_STOP_MSG_KEY = "stopUserId";
 
@@ -177,6 +179,10 @@ void DMCommTool::DMCommToolEventHandler::ProcessEvent(
         }
         case DM_COMM_RSP_USER_STOP: {
             dmCommToolPtr->ProcessResponseUserStopEvent(commMsg);
+            break;
+        }
+        case DM_COMM_ACCOUNT_LOGOUT: {
+            dmCommToolPtr->ProcessReceiveLogoutEvent(commMsg);
             break;
         }
         default:
@@ -417,6 +423,80 @@ void DMCommTool::ProcessResponseUserStopEvent(const std::shared_ptr<InnerCommMsg
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
     DeviceManagerService::GetInstance().HandleUserStop(stopUserId, localUdid, acceptEventUdids);
+}
+
+int32_t DMCommTool::SendLogoutAccountInfo(const std::string &rmtNetworkId,
+    const std::string &accountId, int32_t userId)
+{
+    if (!IsIdLengthValid(rmtNetworkId) || accountId.empty() || dmTransportPtr_ == nullptr) {
+        LOGE("param invalid, networkId: %{public}s, userId: %{public}d",
+            GetAnonyString(rmtNetworkId).c_str(), userId);
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, send networkId: %{public}s", GetAnonyString(rmtNetworkId).c_str());
+    int32_t socketId = 0;
+    if (dmTransportPtr_->StartSocket(rmtNetworkId, socketId) != DM_OK || socketId <= 0) {
+        LOGE("Start socket error");
+        return ERR_DM_FAILED;
+    }
+
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        LOGE("Create cJSON object failed.");
+        return ERR_DM_FAILED;
+    }
+    LogoutAccountMsg LogoutAccountMsg(accountId, userId);
+    ToJson(root, LogoutAccountMsg);
+    char *msg = cJSON_PrintUnformatted(root);
+    if (msg == nullptr) {
+        cJSON_Delete(root);
+        return ERR_DM_FAILED;
+    }
+    std::string msgStr(msg);
+    cJSON_Delete(root);
+    cJSON_free(msg);
+    CommMsg commMsg(DM_COMM_ACCOUNT_LOGOUT, msgStr);
+    std::string payload = GetCommMsgString(commMsg);
+
+    int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
+    if (ret != DM_OK) {
+        LOGE("Send account logout failed, ret: %{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("Send account logout success");
+    return DM_OK;
+}
+
+void DMCommTool::ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    CHECK_NULL_VOID(commMsg);
+    LOGI("Receive remote logout, networkId: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
+        return;
+    }
+
+    CHECK_NULL_VOID(commMsg->commMsg);
+    std::string payload = commMsg->commMsg->msg;
+    cJSON *root = cJSON_Parse(payload.c_str());
+    if (root == NULL) {
+        LOGE("the msg is not json format");
+        return;
+    }
+    LogoutAccountMsg logoutAccountMsg;
+    FromJson(root, logoutAccountMsg);
+    cJSON_Delete(root);
+
+    if (logoutAccountMsg.accountId.empty() || logoutAccountMsg.userId == -1) {
+        LOGE("param invalid, accountId: %{public}s, userId: %{public}d",
+            GetAnonyString(logoutAccountMsg.accountId).c_str(), logoutAccountMsg.userId);
+        return;
+    }
+    DeviceManagerService::GetInstance().ProcessSyncAccountLogout(logoutAccountMsg.accountId,
+        rmtUdid, logoutAccountMsg.userId);
+    LOGI("process remote logout success.");
 }
 } // DistributedHardware
 } // OHOS

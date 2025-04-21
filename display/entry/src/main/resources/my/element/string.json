@@ -1,0 +1,60 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"ချိတ်ဆက်မှုကုဒ်",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%2$s ရှိ %1$s သည် ဤစက်ကို ဝင်ရောက်သုံးစွဲလိုပါသည်။ ဤအက်ပ်ကို ယုံကြည်ပါသလား။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"ပယ်ဖျက်မည်",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"ချိတ်ဆက်မှုကုဒ် ရိုက်ထည့်ပါ",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"စက်များအကြား ‌ဒေတာချိန်ကိုက်မှုနှင့် ပူးတွဲလုပ်ဆောင်မှုအတွက် ဤသည်ကို လိုအပ်ပါသည်။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"ဤတစ်ကြိမ်အတွက် ယုံကြည်သည်",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"အမြဲ ယုံကြည်သည်",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"ဤတစ်ကြိမ်သာ ယုံကြည်သည်",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

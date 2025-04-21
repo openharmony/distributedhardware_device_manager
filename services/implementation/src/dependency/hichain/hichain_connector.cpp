@@ -345,12 +345,12 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string connectInfomation = GetConnectPara(deviceId, jsonObject[TAG_DEVICE_ID].Get<std::string>());
 
-    int32_t pinCode = jsonObject[PIN_CODE_KEY].Get<int32_t>();
+    std::string pinCode = jsonObject[PIN_CODE_KEY].Get<std::string>();
     std::string groupId = jsonObject[TAG_GROUP_ID].Get<std::string>();
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
-    jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode).c_str();
+    jsonObj[FIELD_PIN_CODE] = pinCode;
     jsonObj[FIELD_IS_ADMIN] = false;
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
     jsonObj[FIELD_GROUP_NAME] = jsonObject[TAG_GROUP_NAME].Get<std::string>();
@@ -487,12 +487,12 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
         return nullptr;
     }
     JsonObject jsonObj;
-    int32_t pinCode = INVALID_PINCODE;
-    if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == INVALID_PINCODE) {
+    std::string pinCode = "";
+    if (hiChainConnectorCallback_->GetPinCode(pinCode) == ERR_DM_FAILED || pinCode == "") {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_REJECTED;
     } else {
         jsonObj[FIELD_CONFIRMATION] = REQUEST_ACCEPTED;
-        jsonObj[FIELD_PIN_CODE] = std::to_string(pinCode);
+        jsonObj[FIELD_PIN_CODE] = pinCode;
     }
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);

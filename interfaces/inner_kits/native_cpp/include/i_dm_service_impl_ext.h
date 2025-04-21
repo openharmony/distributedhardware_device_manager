@@ -16,7 +16,11 @@
 #ifndef OHOS_I_DM_SERVICE_IMPL_EXT_H
 #define OHOS_I_DM_SERVICE_IMPL_EXT_H
 
+#include "dm_device_info.h"
+#include "idevice_manager_service_listener.h"
 #include "i_dm_bind_manager_ext_resident.h"
+
+#include <memory>
 
 namespace OHOS {
 namespace DistributedHardware {

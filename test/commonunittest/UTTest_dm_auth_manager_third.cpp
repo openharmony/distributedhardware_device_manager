@@ -344,7 +344,7 @@ HWTEST_F(DmAuthManagerTest, DeleteAccessControlList004, testing::ext::TestSize.L
     std::string pkgName = "pkgName";
     std::string localDeviceId = "localDeviceId";
     std::string remoteDeviceId = "remoteDeviceId";
-    int32_t bindLevel = DEVICE;
+    int32_t bindLevel = USER;
     std::string extra = "";
     auto ret = DeviceProfileConnector::GetInstance().DeleteAccessControlList(pkgName, localDeviceId,
         remoteDeviceId, bindLevel, extra);

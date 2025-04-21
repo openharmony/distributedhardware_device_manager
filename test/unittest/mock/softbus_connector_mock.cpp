@@ -39,5 +39,10 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
 {
     return DmSoftbusConnector::dmSoftbusConnector->GetDeviceInfoByDeviceId(deviceId);
 }
+
+std::shared_ptr<SoftbusSession> SoftbusConnector::GetSoftbusSession()
+{
+    return DmSoftbusConnector::dmSoftbusConnector->GetSoftbusSession();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -71,8 +71,7 @@ DM_EXPORT extern const int32_t CHECK_AUTH_ALWAYS_POS;
 DM_EXPORT extern const char AUTH_ALWAYS;
 DM_EXPORT extern const char AUTH_ONCE;
 DM_EXPORT extern const char* TAG_TARGET_DEVICE_NAME;
-DM_EXPORT extern const int32_t INVALID_PINCODE;
-
+DM_EXPORT extern const int32_t MIN_PINCODE_SIZE;
 // HiChain
 DM_EXPORT extern const int32_t SERVICE_INIT_TRY_MAX_NUM;
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
@@ -169,6 +168,19 @@ DM_EXPORT extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
 // wise device
 DM_EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 const int32_t DEVICE_NAME_MAX_BYTES = 100;
+
+EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
+EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
+EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
+
+extern const char* DM_VERSION_5_0_1;
+extern const char* DM_VERSION_5_0_2;
+extern const char* DM_VERSION_5_0_3;
+extern const char* DM_VERSION_5_0_4;
+extern const char* DM_VERSION_5_0_5;
+extern const char* DM_VERSION_5_1_0;
+extern const char* DM_CURRENT_VERSION;
+extern const char* DM_VERSION_5_0_OLD_MAX;      // Estimated highest version number of the old version
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

@@ -61,10 +61,9 @@ public:
     {
         return "";
     }
-    int32_t GetPinCode(int32_t &code)
+    int32_t GetPinCode(std::string &code)
     {
-        int32_t pinCode = 123456;
-        code = pinCode;
+        code = "123456";
         return DM_OK;
     }
 };

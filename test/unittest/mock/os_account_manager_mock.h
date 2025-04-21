@@ -26,6 +26,7 @@ public:
     virtual ~IOsAccountManager() = default;
 
     virtual ErrCode GetForegroundOsAccountLocalId(int32_t &localId) = 0;
+    virtual ErrCode GetForegroundOsAccountLocalId(const uint64_t displayId, int32_t &localId) = 0;
     static std::shared_ptr<IOsAccountManager> GetOrCreateOsAccountManager();
     static void ReleaseAccountManager();
 private:
@@ -35,6 +36,7 @@ private:
 class OsAccountManagerMock : public IOsAccountManager {
 public:
     MOCK_METHOD(ErrCode, GetForegroundOsAccountLocalId, (int32_t &));
+    MOCK_METHOD(ErrCode, GetForegroundOsAccountLocalId, (const uint64_t, int32_t &));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -56,7 +56,7 @@ public:
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udid,
         int32_t bindLevel, const std::string &extra);
-        
+
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
@@ -146,6 +146,10 @@ public:
         int32_t beforeUserId);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
+    int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+    int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus);
@@ -159,6 +163,8 @@ public:
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
+    void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
+        int32_t remoteTokenId);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

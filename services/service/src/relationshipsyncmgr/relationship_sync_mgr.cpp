@@ -116,6 +116,10 @@ bool RelationShipChangeMsg::ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) con
             ToAppUnbindPayLoad(msg, len);
             ret = true;
             break;
+        case RelationShipChangeType::SERVICE_UNBIND:
+            ToServiceUnbindPayLoad(msg, len);
+            ret = true;
+            break;
         case RelationShipChangeType::SYNC_USERID:
             ret = ToSyncFrontOrBackUserIdPayLoad(msg, len);
             break;
@@ -151,6 +155,9 @@ bool RelationShipChangeMsg::FromBroadcastPayLoad(const cJSON *payloadJson, Relat
             break;
         case RelationShipChangeType::APP_UNBIND:
             ret = FromAppUnbindPayLoad(payloadJson);
+            break;
+        case RelationShipChangeType::SERVICE_UNBIND:
+            ret = FromServiceUnbindPayLoad(payloadJson);
             break;
         case RelationShipChangeType::SYNC_USERID:
             ret = FromSyncFrontOrBackUserIdPayLoad(payloadJson);
@@ -188,6 +195,8 @@ bool RelationShipChangeMsg::IsValid() const
             ret = (userId != UINT32_MAX);
             break;
         case RelationShipChangeType::SERVICE_UNBIND:
+            ret = (userId != UINT32_MAX);
+            break;
         case RelationShipChangeType::APP_UNINSTALL:
             // current NOT support
             ret = false;
@@ -210,7 +219,8 @@ bool RelationShipChangeMsg::IsChangeTypeValid()
 {
     return (type == RelationShipChangeType::ACCOUNT_LOGOUT) || (type == RelationShipChangeType::DEVICE_UNBIND) ||
         (type == RelationShipChangeType::APP_UNBIND) || (type == RelationShipChangeType::SYNC_USERID) ||
-        (type == RelationShipChangeType::DEL_USER) || (type == RelationShipChangeType::STOP_USER);
+        (type == RelationShipChangeType::DEL_USER) || (type == RelationShipChangeType::STOP_USER) ||
+        (type == RelationShipChangeType::SERVICE_UNBIND);
 }
 
 bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
@@ -220,7 +230,8 @@ bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
         (type == (uint32_t)RelationShipChangeType::APP_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::SYNC_USERID) ||
         (type == (uint32_t)RelationShipChangeType::DEL_USER) ||
-        (type == (uint32_t)RelationShipChangeType::STOP_USER);
+        (type == (uint32_t)RelationShipChangeType::STOP_USER) ||
+        (type == (uint32_t)RelationShipChangeType::SERVICE_UNBIND);
 }
 
 void RelationShipChangeMsg::ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const
@@ -261,6 +272,11 @@ void RelationShipChangeMsg::ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) con
     }
 
     len = APP_UNBIND_PAYLOAD_LEN;
+}
+
+void RelationShipChangeMsg::ToServiceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const
+{
+    ToAppUnbindPayLoad(msg, len);
 }
 
 bool RelationShipChangeMsg::ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32_t &len) const
@@ -405,6 +421,11 @@ bool RelationShipChangeMsg::FromAppUnbindPayLoad(const cJSON *payloadJson)
         }
     }
     return true;
+}
+
+bool RelationShipChangeMsg::FromServiceUnbindPayLoad(const cJSON *payloadJson)
+{
+    return FromAppUnbindPayLoad(payloadJson);
 }
 
 bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloadJson)
@@ -567,7 +588,12 @@ std::string RelationShipChangeMsg::ToJson() const
     cJSON *udidStringObj = nullptr;
     for (uint32_t index = 0; index < peerUdids.size(); index++) {
         udidStringObj = cJSON_CreateString(peerUdids[index].c_str());
-        if (udidStringObj == nullptr || !cJSON_AddItemToArray(udidArrayObj, udidStringObj)) {
+        if (udidStringObj == nullptr) {
+            cJSON_Delete(udidArrayObj);
+            cJSON_Delete(msg);
+            return "";
+        }
+        if (!cJSON_AddItemToArray(udidArrayObj, udidStringObj)) {
             cJSON_Delete(udidStringObj);
             cJSON_Delete(udidArrayObj);
             cJSON_Delete(msg);

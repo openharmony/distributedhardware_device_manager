@@ -29,14 +29,14 @@ public:
 public:
     virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAccessControlProfile() = 0;
     virtual int32_t HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-        const std::string &localUdid) = 0;
+        const std::string &localUdid, DmOfflineParam &offlineParam) = 0;
     virtual int32_t HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid, const std::string &localUdid) = 0;
     virtual uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId) = 0;
     virtual std::map<int32_t, int32_t> GetUserIdAndBindLevel(const std::string &localUdid,
         const std::string &peerUdid) = 0;
     virtual bool DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
-        const std::string &peerUdid, int32_t peerUserId) = 0;
+        const std::string &peerUdid, int32_t peerUserId, DmOfflineParam &offlineParam) = 0;
     virtual DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId,
         const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid) = 0;
     virtual std::multimap<std::string, int32_t> GetDevIdAndUserIdByActHash(const std::string &localUdid,
@@ -48,7 +48,7 @@ public:
     virtual DmOfflineParam DeleteAccessControlList(const std::string &pkgName, const std::string &localDeviceId,
         const std::string &remoteDeviceId, int32_t bindLevel, const std::string &extra) = 0;
     virtual void DeleteAclForRemoteUserRemoved(std::string peerUdid, int32_t peerUserId,
-        std::vector<int32_t> &userIds) = 0;
+        std::vector<int32_t> &userIds, DmOfflineParam &offlineParam) = 0;
     virtual DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId,
         const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId) = 0;
     virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceList(const std::string &pkgName,
@@ -56,7 +56,8 @@ public:
     virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;
     virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string& bundleName,
         int32_t pinExchangeType, DistributedDeviceProfile::LocalServiceInfo &serviceInfo) = 0;
-    virtual int32_t PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId) = 0;
+    virtual int32_t PutSessionKey(int32_t userId, const std::vector<unsigned char> &sessionKeyArray,
+        int32_t &sessionKeyId) = 0;
     virtual int32_t PutLocalServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo) = 0;
     virtual int32_t DeleteLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) = 0;
     virtual int32_t UpdateLocalServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &localServiceInfo) = 0;
@@ -64,6 +65,7 @@ public:
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
         const std::string &localUdid) = 0;
+    virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAclIncludeLnnAcl() = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -71,12 +73,13 @@ public:
 class DeviceProfileConnectorMock : public DmDeviceProfileConnector {
 public:
     MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAllAccessControlProfile, ());
-    MOCK_METHOD(int32_t, HandleDevUnBindEvent, (int32_t, const std::string &, const std::string &));
+    MOCK_METHOD(int32_t, HandleDevUnBindEvent, (int32_t, const std::string &, const std::string &, DmOfflineParam &));
     MOCK_METHOD(int32_t, HandleAccountLogoutEvent, (int32_t, const std::string &, const std::string &,
         const std::string &));
     MOCK_METHOD(uint32_t, CheckBindType, (std::string, std::string));
     MOCK_METHOD((std::map<int32_t, int32_t>), GetUserIdAndBindLevel, (const std::string &, const std::string &));
-    MOCK_METHOD(bool, DeleteAclForAccountLogOut, (const std::string &, int32_t, const std::string &, int32_t));
+    MOCK_METHOD(bool, DeleteAclForAccountLogOut, (const std::string &, int32_t, const std::string &, int32_t,
+        DmOfflineParam &));
     MOCK_METHOD((DmOfflineParam), HandleAppUnBindEvent, (int32_t, const std::string &,
         int32_t, const std::string &));
     MOCK_METHOD((std::multimap<std::string, int32_t>), GetDevIdAndUserIdByActHash, (const std::string &,
@@ -86,7 +89,7 @@ public:
     MOCK_METHOD((std::vector<int32_t>), GetBindTypeByPkgName, (std::string, std::string, std::string));
     MOCK_METHOD(DmOfflineParam, DeleteAccessControlList, (const std::string &, const std::string &, const std::string &,
         int32_t, const std::string &));
-    MOCK_METHOD(void, DeleteAclForRemoteUserRemoved, (std::string, int32_t, std::vector<int32_t> &));
+    MOCK_METHOD(void, DeleteAclForRemoteUserRemoved, (std::string, int32_t, std::vector<int32_t> &, DmOfflineParam &));
     MOCK_METHOD((DmOfflineParam), HandleAppUnBindEvent, (int32_t, const std::string &,
         int32_t, const std::string &, int32_t));
     MOCK_METHOD((std::unordered_map<std::string, DmAuthForm>), GetAppTrustDeviceList,
@@ -94,7 +97,7 @@ public:
     MOCK_METHOD(int32_t, CheckDeviceInfoPermission, (const std::string &, const std::string &));
     MOCK_METHOD(int32_t, GetLocalServiceInfoByBundleNameAndPinExchangeType, (const std::string&, int32_t,
         DistributedDeviceProfile::LocalServiceInfo &serviceInfo));
-    MOCK_METHOD(int32_t, PutSessionKey, (const std::vector<unsigned char> &, int32_t&));
+    MOCK_METHOD(int32_t, PutSessionKey, (int32_t, const std::vector<unsigned char> &, int32_t&));
     MOCK_METHOD(int32_t, PutLocalServiceInfo, (const DistributedDeviceProfile::LocalServiceInfo &));
     MOCK_METHOD(int32_t, DeleteLocalServiceInfo, (const std::string &, int32_t));
     MOCK_METHOD(int32_t, UpdateLocalServiceInfo, (const DistributedDeviceProfile::LocalServiceInfo &));
@@ -102,6 +105,7 @@ public:
         (const std::string &, (const std::vector<int32_t> &), (const std::vector<int32_t> &)));
     MOCK_METHOD((std::map<std::string, int32_t>), GetDeviceIdAndBindLevel,
         ((std::vector<int32_t>), const std::string &));
+    MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAllAclIncludeLnnAcl, ());
 };
 }
 }

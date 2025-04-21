@@ -33,9 +33,9 @@
         },
         {
             "name":"dm_allow_this_time",
-            "value":"Allow this time only",
+            "value":"Trust this time only",
             "attr":{
-                "priority":"LT"
+                "priority":"translate"
             }
         },
         {

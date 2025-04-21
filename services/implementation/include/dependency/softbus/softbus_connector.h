@@ -28,10 +28,12 @@
 #include "dm_publish_info.h"
 #include "dm_subscribe_info.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "deviceprofile_connector.h"
 #include "softbus_session.h"
 #endif
 #include "softbus_connector_callback.h"
 #include "softbus_state_callback.h"
+#include "hichain_auth_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -49,7 +51,7 @@ public:
      * @tc.desc: Get Connect Addr of the SoftbusConnector
      * @tc.type: FUNC
      */
-    static ConnectionAddr *GetConnectAddr(const std::string &deviceId, std::string &connectAddr);
+    static std::shared_ptr<ConnectionAddr> GetConnectAddr(const std::string &deviceId, std::string &connectAddr);
 
     /**
      * @tc.name: SoftbusConnector::GetUdidByNetworkId
@@ -86,6 +88,11 @@ public:
      */
     static void JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId);
 
+    static void JoinLnn(const std::string &deviceId, const std::string &remoteUdidHash);
+
+    static void JoinLNNBySkId(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId,
+        std::string udid, std::string udidHash);
+
     /**
      * @tc.name: SoftbusConnector::RegisterConnectorCallback
      * @tc.desc: RegisterConnectorCallback of the Softbus Connector
@@ -107,6 +114,9 @@ public:
     int32_t UnRegisterSoftbusStateCallback();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> GetSoftbusSession();
+    void SortAclListDesc(const std::vector<AclHashItem> &remoteAllAclList, std::vector<std::string> &aclVerDesc,
+        std::map<std::string, AclHashItem> &remoteAllAclMap);
+    std::string MatchTargetVersion(const std::string &localVersion, const std::vector<std::string> &remoteVerDesc);
 #endif
     bool HaveDeviceInMap(std::string deviceId);
     std::string GetDeviceUdidHashByUdid(const std::string &udid);
@@ -120,22 +130,36 @@ public:
     void HandleDeviceOffline(std::string deviceId);
     void SetProcessInfo(ProcessInfo processInfo);
     bool CheckIsOnline(const std::string &targetDeviceId);
+    bool CheckIsOnline(const std::string &targetDeviceIdHash, bool isHash);
     void SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec);
     std::vector<ProcessInfo> GetProcessInfo();
     void ClearProcessInfo();
     DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
     void DeleteOffLineTimer(std::string &udidHash);
+    void SyncAclList(int32_t userId, std::string credId, int32_t sessionKeyId, int32_t aclId);
+    int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+    int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList);
 
 private:
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceInfo &dmDeviceInfo);
     static void ConvertDeviceInfoToDmDevice(const DeviceInfo &deviceInfo, DmDeviceBasicInfo &dmDeviceBasicInfo);
     static ConnectionAddr *GetConnectAddrByType(DeviceInfo *deviceInfo, ConnectionAddrType type);
     static void ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeBasicInfo, DmDeviceInfo &dmDeviceInfo);
-
+    static std::shared_ptr<DeviceInfo> GetDeviceInfoFromMap(const std::string &deviceId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    int32_t ParaseAclChecksumList(const std::string &jsonString, std::vector<AclHashItem> &remoteAllAclList);
+    int32_t SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
+        DistributedDeviceProfile::AccessControlProfile &localAcl, std::vector<std::string> &acLStrList);
+    int32_t GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
+        std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl);
+#endif
 private:
     static std::string remoteUdidHash_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::shared_ptr<SoftbusSession> softbusSession_;
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
 #endif
     static std::map<std::string, std::shared_ptr<DeviceInfo>> discoveryDeviceInfoMap_;
     std::shared_ptr<ISoftbusStateCallback> deviceStateManagerCallback_;

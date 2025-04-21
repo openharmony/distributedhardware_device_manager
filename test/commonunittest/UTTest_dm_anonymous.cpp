@@ -297,6 +297,42 @@ HWTEST_F(DmAnonymousTest, IsInt64_002, testing::ext::TestSize.Level1)
 }
 
 /**
+ * @tc.name: IsUint64_001
+ * @tc.desc: Return true
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsUint64_001, testing::ext::TestSize.Level1)
+{
+    std::string str = R"(
+    {
+        "REQUESTID" : 789
+    }
+    )";
+    JsonObject jsonObj(str);
+    bool ret = IsUint64(jsonObj, TAG_REQUEST_ID);
+    EXPECT_EQ(ret, true);
+}
+
+/**
+ * @tc.name: IsUint64_002
+ * @tc.desc: Return false
+ * @tc.type: FUNC
+ * @tc.require: AR000GHSJK
+ */
+HWTEST_F(DmAnonymousTest, IsUint64_002, testing::ext::TestSize.Level1)
+{
+    std::string str = R"(
+    {
+        "REQUESTID" : "requestidTest"
+    }
+    )";
+    JsonObject jsonObj(str);
+    bool ret = IsUint64(jsonObj, TAG_REQUEST_ID);
+    EXPECT_EQ(ret, false);
+}
+
+/**
  * @tc.name: IsArray_001
  * @tc.desc: Return true
  * @tc.type: FUNC

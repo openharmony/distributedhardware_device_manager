@@ -206,6 +206,10 @@ public:
     void SubscribePackageCommonEvent();
     int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
+    int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+    int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     void ProcessSyncUserIds(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     int32_t SetLocalDisplayNameToSoftbus(const std::string &displayName);
@@ -236,6 +240,7 @@ public:
     bool IsPC();
     int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds);
+    void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
 
 private:
     bool IsDMServiceImplReady();
@@ -344,6 +349,8 @@ private:
     DM_EXPORT void SubscribeDataShareCommonEvent();
 #endif
     void CheckRegisterInfoWithWise(int32_t curUserId);
+    void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
+        const std::string &accountIdHash, const std::string &accountName, int32_t userId);
 
 private:
     bool isImplsoLoaded_ = false;

@@ -68,6 +68,7 @@ struct RelationShipChangeMsg {
     void ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDeviceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
+    void ToServiceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     bool ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToStopUserPayLoad(uint8_t *&msg, uint32_t &len) const;
@@ -76,6 +77,7 @@ struct RelationShipChangeMsg {
     bool FromAccountLogoutPayLoad(const cJSON *payloadJson);
     bool FromDeviceUnbindPayLoad(const cJSON *payloadJson);
     bool FromAppUnbindPayLoad(const cJSON *payloadJson);
+    bool FromServiceUnbindPayLoad(const cJSON *payloadJson);
     bool FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloadJson);
     bool FromDelUserPayLoad(const cJSON *payloadJson);
     bool FromStopUserPayLoad(const cJSON *payloadJson);

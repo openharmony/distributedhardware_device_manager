@@ -220,7 +220,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_001, testing::ext::TestSize.Level1
     std::string deviceId;
     std::string connectAddr;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    std::shared_ptr<ConnectionAddr> ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_EQ(ret, nullptr);
 }
 
@@ -237,7 +237,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_002, testing::ext::TestSize.Level1
     DeviceInfo deviceInfo;
     deviceInfo.addrNum = -1;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    std::shared_ptr<ConnectionAddr> ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_EQ(ret, nullptr);
 }
 
@@ -259,7 +259,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_003, testing::ext::TestSize.Level1
     deviceInfo->addr[0].info.ip.port = 0;
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    std::shared_ptr<ConnectionAddr> ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
 }
@@ -282,7 +282,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_004, testing::ext::TestSize.Level1
     deviceInfo->addr[0].info.ip.port = 0;
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    std::shared_ptr<ConnectionAddr> ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
 }
@@ -304,7 +304,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_005, testing::ext::TestSize.Level1
     (void)strncpy_s(deviceInfo->addr[0].info.br.brMac, IP_STR_MAX_LEN, brMac, strlen(brMac));
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    std::shared_ptr<ConnectionAddr> ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
 }
@@ -326,7 +326,7 @@ HWTEST_F(SoftbusConnectorTest, GetConnectAddr_006, testing::ext::TestSize.Level1
     (void)strncpy_s(deviceInfo->addr[0].info.ble.bleMac, IP_STR_MAX_LEN, bleMac, strlen(bleMac));
     SoftbusConnector::discoveryDeviceInfoMap_[deviceId] = deviceInfo;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-    ConnectionAddr *ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
+    std::shared_ptr<ConnectionAddr> ret = softbusConnector->GetConnectAddr(deviceId, connectAddr);
     EXPECT_NE(ret, nullptr);
     SoftbusConnector::discoveryDeviceInfoMap_.clear();
 }

@@ -340,6 +340,7 @@ typedef enum {
     STATUS_DM_CLOSE_PIN_DISPLAY_UI = 11,
     STATUS_DM_SHOW_PIN_INPUT_UI = 12,
     STATUS_DM_CLOSE_PIN_INPUT_UI = 13,
+    STATUS_DM_SINK_AUTH_FINISH = 25,
 } DmAuthStatus;
 
 typedef enum {
@@ -450,6 +451,11 @@ typedef struct DMLocalServiceInfo {
     std::string description;
     std::string extraInfo;
 } DMLocalServiceInfo;
+
+typedef struct DevUserInfo {
+    std::string deviceId;
+    int32_t userId;
+} DevUserInfo;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

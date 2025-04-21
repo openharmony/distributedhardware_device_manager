@@ -26,10 +26,10 @@ std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnect
 }
 
 int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-    const std::string &localUdid)
+    const std::string &localUdid, DmOfflineParam &offlineParam)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleDevUnBindEvent(remoteUserId, remoteUdid,
-        localUdid);
+        localUdid, offlineParam);
 }
 
 int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
@@ -51,10 +51,10 @@ std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const s
 }
 
 bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
-    const std::string &peerUdid, int32_t peerUserId)
+    const std::string &peerUdid, int32_t peerUserId, DmOfflineParam &offlineParam)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForAccountLogOut(localUdid, localUserId,
-        peerUdid, peerUserId);
+        peerUdid, peerUserId, offlineParam);
 }
 
 DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
@@ -94,10 +94,10 @@ DmOfflineParam DeviceProfileConnector::DeleteAccessControlList(const std::string
 }
 
 void DeviceProfileConnector::DeleteAclForRemoteUserRemoved(std::string peerUdid, int32_t peerUserId,
-    std::vector<int32_t> &userIds)
+    std::vector<int32_t> &userIds, DmOfflineParam &offlineParam)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForRemoteUserRemoved(peerUdid, peerUserId,
-        userIds);
+        userIds, offlineParam);
 }
 
 DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
@@ -125,9 +125,10 @@ int32_t DeviceProfileConnector::GetLocalServiceInfoByBundleNameAndPinExchangeTyp
         bundleName, pinExchangeType, serviceInfo);
 }
 
-int32_t DeviceProfileConnector::PutSessionKey(const std::vector<unsigned char> &sessionKeyArray, int32_t &sessionKeyId)
+int32_t DeviceProfileConnector::PutSessionKey(int32_t userId, const std::vector<unsigned char> &sessionKeyArray,
+    int32_t &sessionKeyId)
 {
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->PutSessionKey(sessionKeyArray, sessionKeyId);
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->PutSessionKey(userId, sessionKeyArray, sessionKeyId);
 }
 
 int32_t DeviceProfileConnector::PutLocalServiceInfo(
@@ -158,6 +159,11 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(s
     const std::string &localUdid)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetDeviceIdAndBindLevel(userIds, localUdid);
+}
+
+std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnector::GetAllAclIncludeLnnAcl()
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAllAclIncludeLnnAcl();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

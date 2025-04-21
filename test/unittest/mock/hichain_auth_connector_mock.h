@@ -27,9 +27,20 @@ public:
     virtual ~DmHiChainAuthConnector() = default;
 public:
     virtual bool QueryCredential(std::string &localUdid, int32_t osAccountId, int32_t peerOsAccountId) = 0;
-    virtual int32_t AuthDevice(int32_t pinCode, int32_t osAccountId, std::string udid, int64_t requestId) = 0;
+    virtual int32_t AuthDevice(const std::string &pinCode, int32_t osAccountId,
+        std::string udid, int64_t requestId) = 0;
     virtual int32_t ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId,
         std::string publicKey) = 0;
+
+    virtual int32_t ProcessCredData(int64_t authReqId, const std::string &data) = 0;
+    virtual int32_t AddCredential(int32_t osAccountId, const std::string &authParams, std::string &creId) = 0;
+    virtual int32_t ExportCredential(int32_t osAccountId, const std::string &credId, std::string &publicKey) = 0;
+    virtual int32_t AgreeCredential(int32_t osAccountId, const std::string selfCredId, const std::string &authParams,
+        std::string &credId) = 0;
+    virtual int32_t DeleteCredential(int32_t osAccountId, const std::string &creId) = 0;
+    virtual int32_t AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId,
+        const std::string &pinCode) = 0;
+    virtual int32_t AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode) = 0;
 public:
     static inline std::shared_ptr<DmHiChainAuthConnector> dmHiChainAuthConnector = nullptr;
 };
@@ -37,8 +48,16 @@ public:
 class HiChainAuthConnectorMock : public DmHiChainAuthConnector {
 public:
     MOCK_METHOD(bool, QueryCredential, (std::string &, int32_t, int32_t));
-    MOCK_METHOD(int32_t, AuthDevice, (int32_t, int32_t, std::string, int64_t));
+    MOCK_METHOD(int32_t, AuthDevice, (const std::string &, int32_t, std::string, int64_t));
     MOCK_METHOD(int32_t, ImportCredential, (int32_t, int32_t, std::string, std::string));
+
+    MOCK_METHOD(int32_t, ProcessCredData, (int64_t, const std::string &));
+    MOCK_METHOD(int32_t, AddCredential, (int32_t, const std::string &, std::string &));
+    MOCK_METHOD(int32_t, ExportCredential, (int32_t, const std::string &, std::string &));
+    MOCK_METHOD(int32_t, AgreeCredential, (int32_t, const std::string, const std::string &, std::string &));
+    MOCK_METHOD(int32_t, DeleteCredential, (int32_t, const std::string &));
+    MOCK_METHOD(int32_t, AuthCredential, (int32_t, int64_t, const std::string &, const std::string &));
+    MOCK_METHOD(int32_t, AuthCredentialPinCode, (int32_t, int64_t, const std::string &));
 };
 }
 }

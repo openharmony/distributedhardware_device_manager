@@ -800,7 +800,7 @@ HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog_004, testing::ext::TestSize.Leve
     authManager_->importPkgName_ = "hostPkgName";
     authManager_->authResponseContext_->hostPkgName = "hostPkgName";
     authManager_->remoteVersion_ = "4.1.5.2";
-    authManager_->authResponseContext_->bindLevel = DEVICE;
+    authManager_->authResponseContext_->bindLevel = USER;
     authManager_->authResponseContext_->targetDeviceName = "ShowStartAuthDialog_004";
     authManager_->ShowStartAuthDialog();
     EXPECT_NE(authManager_->authResponseContext_->targetDeviceName, DmDialogManager::GetInstance().targetDeviceName_);
@@ -822,7 +822,7 @@ HWTEST_F(DmAuthManagerTest, ShowStartAuthDialog_004, testing::ext::TestSize.Leve
 
 HWTEST_F(DmAuthManagerTest, ProcessPincode_001, testing::ext::TestSize.Level1)
 {
-    int32_t pinCode = 123456;
+    std::string pinCode = "123456";
     authManager_->authResponseContext_ = nullptr;
     int32_t ret = authManager_->ProcessPincode(pinCode);
     ASSERT_EQ(ret, ERR_DM_FAILED);
@@ -830,7 +830,7 @@ HWTEST_F(DmAuthManagerTest, ProcessPincode_001, testing::ext::TestSize.Level1)
 
 HWTEST_F(DmAuthManagerTest, ProcessPincode_002, testing::ext::TestSize.Level1)
 {
-    int32_t pinCode = 123456;
+    std::string pinCode = "123456";
     authManager_->authResponseContext_->dmVersion = "dmVersion";
     authManager_->authResponseContext_->bindLevel = 1;
     authManager_->isAuthDevice_ = true;
@@ -840,14 +840,14 @@ HWTEST_F(DmAuthManagerTest, ProcessPincode_002, testing::ext::TestSize.Level1)
 
 HWTEST_F(DmAuthManagerTest, ProcessPincode_003, testing::ext::TestSize.Level1)
 {
-    int32_t pinCode = -1;
+    std::string pinCode = "";
     authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authManager_->authUiStateMgr_ = nullptr;
     authManager_->importAuthCode_ = "123456";
     authManager_->importPkgName_ = "hostPkgName";
     authManager_->authResponseContext_->hostPkgName = "hostPkgName";
     authManager_->remoteVersion_ = "4.1.5.2";
-    authManager_->authResponseContext_->bindLevel = DEVICE;
+    authManager_->authResponseContext_->bindLevel = USER;
     authManager_->authResponseContext_->targetDeviceName = "ShowStartAuthDialog_004";
     EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = authManager_->ProcessPincode(pinCode);
@@ -870,7 +870,7 @@ HWTEST_F(DmAuthManagerTest, ProcessPincode_003, testing::ext::TestSize.Level1)
 
 HWTEST_F(DmAuthManagerTest, AuthDevice_001, testing::ext::TestSize.Level1)
 {
-    int32_t pinCode = 123456;
+    std::string pinCode = "123456";
     authManager_->isAuthDevice_ = true;
     int32_t ret = authManager_->AuthDevice(pinCode);
     ASSERT_EQ(ret, ERR_DM_FAILED);
@@ -878,7 +878,7 @@ HWTEST_F(DmAuthManagerTest, AuthDevice_001, testing::ext::TestSize.Level1)
 
 HWTEST_F(DmAuthManagerTest, AuthDevice_002, testing::ext::TestSize.Level1)
 {
-    int32_t pinCode = 123456;
+    std::string pinCode = "123456";
     authManager_->isAuthDevice_ = false;
     authManager_->authResponseContext_->authType = 5;
     EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
@@ -915,7 +915,9 @@ HWTEST_F(DmAuthManagerTest, BindTarget_001, testing::ext::TestSize.Level1)
     std::string pkgName;
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
-    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam);
+    int sessionId = 1;
+    int64_t logicalSessionId = 888;
+    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -924,7 +926,9 @@ HWTEST_F(DmAuthManagerTest, BindTarget_002, testing::ext::TestSize.Level1)
     std::string pkgName = "pkgName";
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
-    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam);
+    int sessionId = 1;
+    int64_t logicalSessionId = 888;
+    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -936,7 +940,9 @@ HWTEST_F(DmAuthManagerTest, BindTarget_004, testing::ext::TestSize.Level1)
     std::map<std::string, std::string> bindParam;
     bindParam.insert(std::pair<std::string, std::string>("AUTH_TYPE", "1"));
     bindParam.insert(std::pair<std::string, std::string>("CONN_ADDR_TYPE", "3"));
-    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam);
+    int sessionId = 1;
+    int64_t logicalSessionId = 888;
+    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
     ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
 }
 
@@ -948,7 +954,9 @@ HWTEST_F(DmAuthManagerTest, BindTarget_005, testing::ext::TestSize.Level1)
     std::map<std::string, std::string> bindParam;
     bindParam.insert(std::pair<std::string, std::string>("AUTH_TYPE", "2"));
     bindParam.insert(std::pair<std::string, std::string>("CONN_ADDR_TYPE", "3"));
-    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam);
+    int sessionId = 1;
+    int64_t logicalSessionId = 888;
+    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
@@ -1078,7 +1086,7 @@ HWTEST_F(DmAuthManagerTest, DeleteAuthCode_001, testing::ext::TestSize.Level1)
 HWTEST_F(DmAuthManagerTest, GetAuthCode_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
-    int32_t pinCode = 1;
+    std::string pinCode = "1";
     authManager_->importAuthCode_ = "";
     authManager_->importPkgName_ = "importPkgName_";
     int32_t ret = authManager_->GetAuthCode(pkgName, pinCode);
@@ -1088,7 +1096,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthCode_001, testing::ext::TestSize.Level1)
 HWTEST_F(DmAuthManagerTest, GetAuthCode_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
-    int32_t pinCode = 1;
+    std::string pinCode = "1";
     authManager_->importAuthCode_ = "importAuthCode_";
     authManager_->importPkgName_ = "";
     int32_t ret = authManager_->GetAuthCode(pkgName, pinCode);
@@ -1098,7 +1106,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthCode_002, testing::ext::TestSize.Level1)
 HWTEST_F(DmAuthManagerTest, GetAuthCode_003, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
-    int32_t pinCode = 1;
+    std::string pinCode = "1";
     authManager_->importAuthCode_ = "importAuthCode_";
     authManager_->importPkgName_ = "importPkgName_";
     int32_t ret = authManager_->GetAuthCode(pkgName, pinCode);
@@ -1108,7 +1116,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthCode_003, testing::ext::TestSize.Level1)
 HWTEST_F(DmAuthManagerTest, GetAuthCode_004, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos_test";
-    int32_t pinCode = 1;
+    std::string pinCode = "1";
     authManager_->importAuthCode_ = "123456";
     authManager_->importPkgName_ = "ohos_test";
     int32_t ret = authManager_->GetAuthCode(pkgName, pinCode);
@@ -1147,7 +1155,7 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_002, testing::ext::TestSize.Leve
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
     int32_t ret = authManager_->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
-    ASSERT_EQ(ret, ERR_DM_AUTH_FAILED);
+    ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
 }
 
 HWTEST_F(DmAuthManagerTest, CheckAuthParamVaild_003, testing::ext::TestSize.Level1)
@@ -1736,7 +1744,9 @@ HWTEST_F(DmAuthManagerTest, BindTarget_006, testing::ext::TestSize.Level1)
     std::map<std::string, std::string> bindParam;
     bindParam.insert(std::pair<std::string, std::string>("AUTH_TYPE", "2"));
     bindParam.insert(std::pair<std::string, std::string>("CONN_ADDR_TYPE", "3"));
-    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam);
+    int sessionId = 1;
+    int64_t logicalSessionId = 888;
+    int32_t ret = authManager_->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
     ASSERT_EQ(ret, ERR_DM_UNSUPPORTED_AUTH_TYPE);
 }
 } // namespace

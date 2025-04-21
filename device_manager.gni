@@ -19,6 +19,7 @@ services_path = "${devicemanager_path}/services/service"
 servicesimpl_path = "${devicemanager_path}/services/implementation"
 softbuscache_parh = "${devicemanager_path}/services/softbuscache"
 innerkits_path = "${devicemanager_path}/interfaces/inner_kits"
+mini_tools_kits_path = "${devicemanager_path}/interfaces/mini_tools_kits"
 hilog_path = "//base/hiviewdfx/hilog_lite/frameworks/featured"
 third_path = "//third_party/bounds_checking_function"
 dsoftbussdk_path = "//foundation/communication/dsoftbus/sdk"
@@ -86,5 +87,12 @@ declare_args() {
     device_manager_common = false
   } else {
     device_manager_common = true
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.msdp_spatial_awareness)) {
+    support_msdp = true
+  } else {
+    support_msdp = false
   }
 }

@@ -117,7 +117,7 @@ void DMTransport::HandleReceiveMessage(const int32_t socketId, const std::string
         LOGE("payload invalid");
         return;
     }
-    LOGI("Receive msg: %{public}s", payload.c_str());
+    LOGI("Receive msg: %{public}s", GetAnonyString(payload).c_str());
     cJSON *root = cJSON_Parse(payload.c_str());
     if (root == NULL) {
         LOGE("the msg is not json format");

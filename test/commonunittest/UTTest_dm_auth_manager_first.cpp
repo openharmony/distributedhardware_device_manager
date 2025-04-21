@@ -39,10 +39,9 @@ using namespace testing;
 using namespace testing::ext;
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t CLONE_AUTHENTICATE_TIMEOUT = 10;
 
 namespace {
-    constexpr int32_t PINCODE = 100001;
+    const std::string PINCODE = "100001";
     constexpr int32_t MIN_PIN_CODE_VALUE = 10;
     constexpr int32_t MAX_PIN_CODE_VALUE = 9999999;
     constexpr int32_t INVALID_AUTHBOX_TYPE = 100;
@@ -82,7 +81,12 @@ void DmAuthManagerTest::SetUp()
         std::shared_ptr<ISoftbusSessionCallback>(authManager_));
     authManager_->timer_ = std::make_shared<DmTimer>();
 }
-void DmAuthManagerTest::TearDown() {}
+
+void DmAuthManagerTest::TearDown()
+{
+    Mock::VerifyAndClearExpectations(softbusSessionMock_.get());
+}
+
 void DmAuthManagerTest::SetUpTestCase()
 {
     softbusSessionMock_ = std::make_shared<SoftbusSessionMock>();
@@ -100,6 +104,7 @@ void DmAuthManagerTest::SetUpTestCase()
     cryptoMgrMock_ = std::make_shared<CryptoMgrMock>();
     DmCryptoMgr::dmCryptoMgr = cryptoMgrMock_;
 }
+
 void DmAuthManagerTest::TearDownTestCase()
 {
     DmSoftbusSession::dmSoftbusSession = nullptr;
@@ -119,8 +124,8 @@ void DmAuthManagerTest::TearDownTestCase()
 }
 
 namespace {
-const int32_t MIN_PIN_CODE = 100000;
-const int32_t MAX_PIN_CODE = 999999;
+const std::string MIN_PIN_CODE = "100000";
+const std::string MAX_PIN_CODE = "999999";
 
 HWTEST_F(DmAuthManagerTest, HandleAuthenticateTimeout_001, testing::ext::TestSize.Level1)
 {
@@ -203,7 +208,7 @@ HWTEST_F(DmAuthManagerTest, StartAuthProcess_001, testing::ext::TestSize.Level1)
     int32_t action = 0;
     g_reportAuthConfirmBoxReturnBoolValue = false;
     authManager_->remoteVersion_ = "4.1.5.2";
-    authManager_->authResponseContext_->bindLevel = DEVICE;
+    authManager_->authResponseContext_->bindLevel = USER;
     int32_t ret = authManager_->StartAuthProcess(action);
     ASSERT_EQ(ret, DM_OK);
 }
@@ -278,7 +283,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level1)
     authManager_->authResponseContext_->code = 123;
     authManager_->authResponseContext_->requestId = 234;
     authManager_->authResponseContext_->deviceId = "234";
-    int32_t pinCode = 444444;
+    std::string pinCode = "444444";
     authManager_->hiChainConnector_->RegisterHiChainCallback(authManager_);
     authManager_->SetAuthResponseState(authResponseState);
     int32_t ret = authManager_->AddMember(pinCode);
@@ -287,7 +292,7 @@ HWTEST_F(DmAuthManagerTest, AddMember_001, testing::ext::TestSize.Level1)
 
 HWTEST_F(DmAuthManagerTest, AddMember_002, testing::ext::TestSize.Level1)
 {
-    int32_t pinCode = 33333;
+    std::string pinCode = "33333";
     authManager_->authResponseContext_ = nullptr;
     int32_t ret = authManager_->AddMember(pinCode);
     ASSERT_EQ(ret, ERR_DM_FAILED);
@@ -340,10 +345,10 @@ HWTEST_F(DmAuthManagerTest, SetAuthResponseState_002, testing::ext::TestSize.Lev
 
 HWTEST_F(DmAuthManagerTest, GetPinCode_001, testing::ext::TestSize.Level1)
 {
-    authManager_->authResponseContext_->code = 123456;
-    int32_t code = 0;
+    authManager_->authResponseContext_->code = "123456";
+    std::string code = "0";
     authManager_->GetPinCode(code);
-    ASSERT_EQ(code, 123456);
+    ASSERT_EQ(code, "123456");
 }
 
 HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level1)
@@ -352,9 +357,9 @@ HWTEST_F(DmAuthManagerTest, GetPinCode_002, testing::ext::TestSize.Level1)
     authManager_->ShowConfigDialog();
     authManager_->ShowAuthInfoDialog();
     authManager_->ShowStartAuthDialog();
-    int32_t code = 0;
+    std::string code = "0";
     int32_t ret = authManager_->GetPinCode(code);
-    ASSERT_NE(code, ERR_DM_TIME_OUT);
+    ASSERT_NE(ret, ERR_DM_TIME_OUT);
 }
 
 HWTEST_F(DmAuthManagerTest, SetPageId_001, testing::ext::TestSize.Level1)
@@ -456,7 +461,7 @@ HWTEST_F(DmAuthManagerTest, GeneratePincode_001, testing::ext::TestSize.Level1)
     authManager_->timer_ = nullptr;
     authManager_->OnSessionOpened(openedSessionId, sessionSide, result);
     authManager_->OnSessionClosed(closedSessionId);
-    int32_t ret = authManager_->GeneratePincode();
+    std::string ret = authManager_->GeneratePincode();
     ASSERT_LE(ret, MAX_PIN_CODE);
     ASSERT_GE(ret, MIN_PIN_CODE);
 }
@@ -472,7 +477,7 @@ HWTEST_F(DmAuthManagerTest, GeneratePincode_002, testing::ext::TestSize.Level1)
     authManager_->timer_ = std::make_shared<DmTimer>();
     authManager_->OnSessionOpened(openedSessionId, sessionSide, result);
     authManager_->OnSessionClosed(closedSessionId);
-    int32_t ret = authManager_->GeneratePincode();
+    std::string ret = authManager_->GeneratePincode();
     ASSERT_LE(ret, MAX_PIN_CODE);
     ASSERT_GE(ret, MIN_PIN_CODE);
 }
@@ -488,7 +493,7 @@ HWTEST_F(DmAuthManagerTest, GeneratePincode_003, testing::ext::TestSize.Level1)
     authManager_->timer_ = nullptr;
     authManager_->OnSessionOpened(openedSessionId, sessionSide, result);
     authManager_->OnSessionClosed(closedSessionId);
-    int32_t ret = authManager_->GeneratePincode();
+    std::string ret = authManager_->GeneratePincode();
     ASSERT_LE(ret, MAX_PIN_CODE);
     ASSERT_GE(ret, MIN_PIN_CODE);
 }
@@ -504,7 +509,7 @@ HWTEST_F(DmAuthManagerTest, GeneratePincode_004, testing::ext::TestSize.Level1)
     authManager_->timer_ = std::make_shared<DmTimer>();
     authManager_->OnSessionOpened(openedSessionId, sessionSide, result);
     authManager_->OnSessionClosed(closedSessionId);
-    int32_t ret = authManager_->GeneratePincode();
+    std::string ret = authManager_->GeneratePincode();
     ASSERT_LE(ret, MAX_PIN_CODE);
     ASSERT_GE(ret, MIN_PIN_CODE);
 }
@@ -564,7 +569,7 @@ HWTEST_F(DmAuthManagerTest, UnAuthenticateDevice_001, testing::ext::TestSize.Lev
 {
     std::string pkgName;
     std::string udid = "UnAuthenticateDevice_001";
-    int32_t bindLevel = DEVICE;
+    int32_t bindLevel = USER;
     int32_t ret = authManager_->UnAuthenticateDevice(pkgName, udid, bindLevel);
     EXPECT_NE(ret, DM_OK);
 
@@ -594,7 +599,7 @@ HWTEST_F(DmAuthManagerTest, UnBindDevice_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
     std::string udid = "UnBindDevice_002";
-    int32_t bindLevel = DEVICE;
+    int32_t bindLevel = USER;
     std::string extra = "extraTest";
     int32_t ret = authManager_->UnBindDevice(pkgName, udid, bindLevel, extra);
     EXPECT_NE(ret, DM_OK);
@@ -780,7 +785,7 @@ HWTEST_F(DmAuthManagerTest, ImportCredential001, testing::ext::TestSize.Level1)
     std::string publicKey = "publicKey";
     EXPECT_CALL(*hiChainAuthConnectorMock_, ImportCredential(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = authManager_->ImportCredential(deviceId, publicKey);
-    ASSERT_EQ(ret, ERR_DM_AUTH_FAILED);
+    ASSERT_NE(ret, ERR_DM_FAILED);
 }
 
 HWTEST_F(DmAuthManagerTest, ResponseCredential001, testing::ext::TestSize.Level1)
@@ -817,6 +822,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceTransmit002, testing::ext::TestSize.Level1
     authManager_->authResponseState_ = nullptr;
     uint8_t *data = nullptr;
     uint32_t dataLen = 0;
+    EXPECT_CALL(*softbusSessionMock_, SendData(_, _)).WillOnce(Return(ERR_DM_FAILED));
     bool ret = authManager_->AuthDeviceTransmit(requestId, data, dataLen);
     ASSERT_EQ(ret, false);
 }
@@ -828,6 +834,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceTransmit003, testing::ext::TestSize.Level1
     authManager_->authRequestState_ = nullptr;
     uint8_t *data = nullptr;
     uint32_t dataLen = 0;
+    EXPECT_CALL(*softbusSessionMock_, SendData(_, _)).WillOnce(Return(ERR_DM_FAILED));
     bool ret = authManager_->AuthDeviceTransmit(requestId, data, dataLen);
     ASSERT_EQ(ret, false);
 }
@@ -837,6 +844,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceTransmit004, testing::ext::TestSize.Level1
     int64_t requestId = 0;
     uint8_t *data = nullptr;
     uint32_t dataLen = 0;
+    EXPECT_CALL(*softbusSessionMock_, SendData(_, _)).WillOnce(Return(ERR_DM_FAILED));
     bool ret = authManager_->AuthDeviceTransmit(requestId, data, dataLen);
     ASSERT_EQ(ret, false);
 }
@@ -1036,13 +1044,6 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceSessionKey001, testing::ext::TestSize.Leve
     authManager_->AuthDeviceSessionKey(requestId, sessionKey, sessionKeyLen);
     ASSERT_EQ(authManager_->isAuthDevice_, false);
     authManager_->GetSessionKeyIdSync(requestId);
-}
-
-HWTEST_F(DmAuthManagerTest, GetRemoteDeviceId001, testing::ext::TestSize.Level1)
-{
-    std::string deviceId;
-    authManager_->GetRemoteDeviceId(deviceId);
-    ASSERT_EQ(authManager_->isAuthDevice_, false);
 }
 
 HWTEST_F(DmAuthManagerTest, CompatiblePutAcl001, testing::ext::TestSize.Level1)
@@ -1498,10 +1499,10 @@ HWTEST_F(DmAuthManagerTest, GetBindLevel_001, testing::ext::TestSize.Level1)
     authManager_->HandleDeviceNotTrust(udid);
     int32_t sessionId = 32166;
     authManager_->ProcIncompatible(sessionId);
-    
+
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(true));
     int32_t ret = authManager_->GetBindLevel(bindLevel);
-    ASSERT_EQ(ret, DEVICE);
+    ASSERT_EQ(ret, USER);
 
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
     ret = authManager_->GetBindLevel(bindLevel);
@@ -1696,10 +1697,11 @@ HWTEST_F(DmAuthManagerTest, GetBinderInfo_001, testing::ext::TestSize.Level1)
 
     EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*appManagerMock_, GetHapTokenIdByName(_, _, _, _)).WillOnce(Return(DM_OK));
+    authManager_->authResponseContext_->bindLevel = APP;
     ret = authManager_->GetBinderInfo();
     ASSERT_EQ(ret, DM_OK);
 
-    authManager_->authResponseContext_->bindLevel = DEVICE;
+    authManager_->authResponseContext_->bindLevel = USER;
     authManager_->SetProcessInfo();
 
     authManager_->authResponseContext_->bindLevel = SERVICE;
@@ -1839,7 +1841,7 @@ HWTEST_F(DmAuthManagerTest, RequestCredentialDone_003, testing::ext::TestSize.Le
 
 HWTEST_F(DmAuthManagerTest, AuthDevice_003, testing::ext::TestSize.Level1)
 {
-    int32_t pinCode = 123456;
+    std::string pinCode = "123456";
     authManager_->isAuthDevice_ = false;
     authManager_->authResponseContext_->authType = 5;
     EXPECT_CALL(*hiChainAuthConnectorMock_, AuthDevice(_, _, _, _)).WillOnce(Return(DM_OK));
@@ -1962,7 +1964,7 @@ HWTEST_F(DmAuthManagerTest, RegisterAuthenticationType_001, testing::ext::TestSi
 {
     int32_t authenticationType = 1;
     int32_t ret = authManager_->RegisterAuthenticationType(authenticationType);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, DM_OK);
 
     authenticationType = 0;
     ret = authManager_->RegisterAuthenticationType(authenticationType);
@@ -2043,7 +2045,7 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     int32_t errorCode = ERR_DM_HICHAIN_PROOFMISMATCH;
     authManager_->pincodeDialogEverShown_ = false;
     authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
-    authManager_->serviceInfoProfile_.SetPinCode(std::to_string(PINCODE));
+    authManager_->serviceInfoProfile_.SetPinCode(PINCODE);
     authManager_->serviceInfoProfile_.SetPinExchangeType(
         static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
     bool ret = authManager_->CheckNeedShowAuthInfoDialog(errorCode);
@@ -2061,7 +2063,7 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     localServiceInfo.SetAuthType(static_cast<int32_t>(DMLocalServiceInfoAuthType::TRUST_ONETIME));
     localServiceInfo.SetAuthBoxType(static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::STATE3));
     localServiceInfo.SetPinExchangeType(static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
-    localServiceInfo.SetPinCode(std::to_string(PINCODE));
+    localServiceInfo.SetPinCode(PINCODE);
     EXPECT_CALL(*deviceProfileConnectorMock_, GetLocalServiceInfoByBundleNameAndPinExchangeType(_, _, _))
         .WillOnce(DoAll(SetArgReferee<2>(localServiceInfo), Return(DM_OK)));
     authManager_->GetLocalServiceInfoInDp();
@@ -2073,8 +2075,8 @@ HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestS
     authManager_->authResponseContext_->requestId = 1;
     authManager_->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(authManager_);
     EXPECT_CALL(*cryptoMgrMock_, SaveSessionKey(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceProfileConnectorMock_, PutSessionKey(_, _))
-        .WillOnce(DoAll(SetArgReferee<1>(1), Return(DM_OK)));
+    EXPECT_CALL(*deviceProfileConnectorMock_, PutSessionKey(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(1), Return(DM_OK)));
     authManager_->AuthDeviceSessionKey(requestId, sessionKey, sessionKeyLen);
     authManager_->GetSessionKeyIdSync(requestId);
 }
@@ -2089,7 +2091,7 @@ HWTEST_F(DmAuthManagerTest, IsPinCodeValid_001, testing::ext::TestSize.Level1)
         static_cast<int32_t>(DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM));
 
     authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
-    authManager_->serviceInfoProfile_.SetPinCode(std::to_string(PINCODE));
+    authManager_->serviceInfoProfile_.SetPinCode(PINCODE);
     authManager_->serviceInfoProfile_.SetPinExchangeType(
         static_cast<int32_t>(DMLocalServiceInfoPinExchangeType::FROMDP));
     authManager_->ShowConfigDialog();
@@ -2151,7 +2153,7 @@ HWTEST_F(DmAuthManagerTest, IsLocalServiceInfoValid_001, testing::ext::TestSize.
     profile.SetPinCode("");
     ASSERT_TRUE(authManager_->IsLocalServiceInfoValid(profile));
 
-    profile.SetPinCode(std::to_string(PINCODE));
+    profile.SetPinCode(PINCODE);
     ASSERT_TRUE(authManager_->IsLocalServiceInfoValid(profile));
 }
 

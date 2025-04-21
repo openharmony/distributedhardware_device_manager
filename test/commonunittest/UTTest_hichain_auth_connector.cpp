@@ -67,18 +67,12 @@ public:
         (void)sessionKey;
         (void)sessionKeyLen;
     }
-    int32_t GetPinCode(int32_t &code) override
+    char *AuthDeviceRequest(int64_t requestId, int operationCode, const char *reqParams) override
     {
-        if (pinCode == 0) {
-            code = 0;
-            return DM_OK;
-        }
-        code = ERR_DM_AUTH_NOT_START;
-        return ERR_DM_AUTH_NOT_START;
-    }
-    void GetRemoteDeviceId(std::string &deviceId) override
-    {
-        (void)deviceId;
+        (void)requestId;
+        (void)operationCode;
+        (void)reqParams;
+        return nullptr;
     }
 private:
     int32_t pinCode = 0;
@@ -93,7 +87,7 @@ HWTEST_F(HiChainAuthConnectorTest, RegisterHiChainAuthCallback_001, testing::ext
 
 HWTEST_F(HiChainAuthConnectorTest, AuthDevice_001, testing::ext::TestSize.Level1)
 {
-    int32_t pinCode = 0;
+    std::string pinCode = "0";
     int32_t osAccountId = 0;
     std::string udid;
     int64_t requestId = 0;
@@ -160,20 +154,6 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_003, testing::ext::TestSize.Level1)
     hiChain_->dmDeviceAuthCallback_->AuthDeviceError(requestId, errorCode);
     hiChain_->onRequest(requestId, operationCode, reqParams);
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
-}
-
-HWTEST_F(HiChainAuthConnectorTest, onRequest_004, testing::ext::TestSize.Level1)
-{
-    int64_t requestId = 0;
-    int operationCode = 0;
-    char *reqParams = nullptr;
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-    std::shared_ptr<MockIDmDeviceAuthCallback> mockCallback = std::make_shared<MockIDmDeviceAuthCallback>();
-    hiChainAuthConnector->dmDeviceAuthCallback_ = mockCallback;
-    EXPECT_CALL(*mockCallback, GetPinCode(testing::_))
-        .Times(1)
-        .WillOnce(testing::Return(ERR_DM_FAILED));
-    EXPECT_NE(hiChainAuthConnector->onRequest(requestId, operationCode, reqParams), nullptr);
 }
 
 HWTEST_F(HiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level1)
@@ -565,7 +545,7 @@ HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_001, testing::ext::TestSize.
     int32_t userId = 0;
     int32_t peerUserId = 0;
     int32_t ret = hiChain_->DeleteCredential(deviceId, userId, peerUserId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestSize.Level1)
@@ -574,7 +554,7 @@ HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_002, testing::ext::TestSize.
     int32_t userId = 0;
     int32_t peerUserId = 0;
     int32_t ret = hiChain_->DeleteCredential(deviceId, userId, peerUserId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
 }
 
 HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_003, testing::ext::TestSize.Level1)

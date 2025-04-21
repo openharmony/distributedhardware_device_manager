@@ -1,0 +1,60 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"Kode koneksi",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%1$s yang ada di %2$s ingin mengakses perangkat ini. Percayai aplikasi ini?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Batal",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Masukkan kode koneksi",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"Ini diperlukan untuk sinkronisasi data dan kolaborasi lintas perangkat.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Percayai kali ini",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Selalu percayai",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"Percayai kali ini saja",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

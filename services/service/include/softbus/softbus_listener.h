@@ -75,6 +75,27 @@ public:
         DmDeviceInfo &devInfo);
     static void UpdateDeviceName(NodeBasicInfo *info);
 
+    /**
+     * @brief notify the received acl hash info
+     *
+     * @param localDevUserInfo local device udid and userid
+     * @param remoteDevUserInfo remote device udid and userid
+     * @param remoteAclList the received acl hash info
+     * @return int32_t 0 for success
+     */
+    static int32_t OnSyncLocalAclList(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+    /**
+     * @brief create the local acl hash info
+     *
+     * @param localDevUserInfo local device udid and userid
+     * @param remoteDevUserInfo remote device udid and userid
+     * @param aclList the created acl hash info
+     * @return int32_t 0 for success
+     */
+    static int32_t OnGetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList);
+
     int32_t InitSoftbusListener();
     int32_t GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceInfoList);
     int32_t GetLocalDeviceInfo(DmDeviceInfo &deviceInfo);

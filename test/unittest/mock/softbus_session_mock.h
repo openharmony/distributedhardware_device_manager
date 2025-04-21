@@ -27,6 +27,10 @@ public:
     virtual ~DmSoftbusSession() = default;
 public:
     virtual int32_t GetPeerDeviceId(int32_t sessionId, std::string &peerDevId) = 0;
+    virtual int32_t SendData(int32_t sessionId, std::string &message) = 0;
+    virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
+    virtual int32_t OpenAuthSession(const std::string &deviceId) = 0;
+
 public:
     static inline std::shared_ptr<DmSoftbusSession> dmSoftbusSession = nullptr;
 };
@@ -34,6 +38,9 @@ public:
 class SoftbusSessionMock : public DmSoftbusSession {
 public:
     MOCK_METHOD(int32_t, GetPeerDeviceId, (int32_t, std::string &));
+    MOCK_METHOD(int32_t, SendData, (int32_t, std::string &));
+    MOCK_METHOD(int32_t, OpenAuthSessionWithPara, (const std::string &, int32_t, bool));
+    MOCK_METHOD(int32_t, OpenAuthSession, (const std::string &));
 };
 }
 }

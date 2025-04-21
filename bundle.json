@@ -59,7 +59,8 @@
                 "resource_management",
                 "wifi",
                 "screenlock_mgr",
-                "mbedtls"
+                "mbedtls",
+                "zlib"
             ],
             "third_party": []
         },
@@ -98,8 +99,17 @@
                     ],
                     "header_base": "//foundation/distributedhardware/device_manager/interfaces/mini_tools_kits/native_cpp/include"
                 }
-            },{
+            }, {
                 "name": "//foundation/distributedhardware/device_manager/interfaces/cj/kits:cj_distributed_device_manager_ffi"
+            }, {
+                "type": "so",
+                "name": "//foundation/distributedhardware/device_manager/json:devicemanagerjson",
+                "header": {
+                    "header_files": [
+                        "json_object.h"
+                    ],
+                    "header_base": "//foundation/distributedhardware/device_manager/json/include"
+                }
             }],
             "test": [
                 "//foundation/distributedhardware/device_manager:device_manager_test"

@@ -1488,7 +1488,7 @@ void DeviceManagerNotify::OnSetRemoteDeviceNameResult(const std::string &pkgName
         }
     }
     if (tempCbks.empty()) {
-        LOGE("error, registered GetDeviceIconInfoResult callback is nullptr.");
+        LOGE("error, registered SetRemoteDeviceNameResult callback is empty.");
         return;
     }
     for (const auto &[key, callback] : tempCbks) {

@@ -19,6 +19,7 @@
 #include <dlfcn.h>
 #include <functional>
 #include "app_manager.h"
+#include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_hidumper.h"
 #include "dm_softbus_cache.h"
@@ -171,9 +172,13 @@ DM_EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
         if (arg1 == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
             DeviceNameManager::GetInstance().DataShareReady();
         }
+        if (arg1 == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
+            DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
+        }
     };
     std::vector<std::string> commonEventVec;
     commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
     if (dataShareCommonEventManager_->SubscribeDataShareCommonEvent(commonEventVec, callback)) {
         LOGI("subscribe datashare common event success");
     }
@@ -2095,7 +2100,7 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
             LOGE("GetAccountHash failed.");
             return;
         }
-        SendAccountLogoutBroadCast(peerUdids, std::string(accountIdHash), accountName, userId);
+        NotifyRemoteLocalLogout(peerUdids, std::string(accountIdHash), accountName, userId);
     }
     for (const auto &item : deviceMap) {
         dmServiceImpl_->HandleIdentAccountLogout(localUdid, userId, item.first, item.second);
@@ -2414,7 +2419,7 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
     uint64_t tokenId, int32_t bindLevel)
 {
     LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
-    if (static_cast<uint32_t>(bindLevel) == DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) == USER) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
     }
@@ -2431,7 +2436,7 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
 void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, int32_t bindLevel, uint64_t peerTokenId)
 {
-    if (static_cast<uint32_t>(bindLevel) == DEVICE) {
+    if (static_cast<uint32_t>(bindLevel) == USER) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
     }
@@ -2526,6 +2531,10 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
                 dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
                     static_cast<int32_t>(relationShipMsg.tokenId));
             }
+            break;
+        case RelationShipChangeType::SERVICE_UNBIND:
+            dmServiceImpl_->HandleServiceUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+                static_cast<int32_t>(relationShipMsg.tokenId));
             break;
         case RelationShipChangeType::SYNC_USERID:
             HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
@@ -2726,6 +2735,24 @@ void DeviceManagerService::SubscribePackageCommonEvent()
         LOGI("Success");
     }
 #endif
+}
+
+int32_t DeviceManagerService::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
+{
+    if (IsDMServiceImplReady()) {
+        return dmServiceImpl_->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo, remoteAclList);
+    }
+    return ERR_DM_FAILED;
+}
+
+int32_t DeviceManagerService::GetAclListHash(const DevUserInfo &localDevUserInfo,
+    const DevUserInfo &remoteDevUserInfo, std::string &aclList)
+{
+    if (IsDMServiceImplReady()) {
+        return dmServiceImpl_->GetAclListHash(localDevUserInfo, remoteDevUserInfo, aclList);
+    }
+    return ERR_DM_FAILED;
 }
 
 void DeviceManagerService::HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
@@ -3283,7 +3310,7 @@ int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
     }
     if (!PermissionManager::GetInstance().CheckProcessNameValidModifyLocalDeviceName(processName)) {
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_NO_PERMISSION;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceNameManager::GetInstance().RestoreLocalDeviceName();
@@ -3360,6 +3387,57 @@ int32_t DeviceManagerService::GetDeviceNetworkIdList(const std::string &pkgName,
         return ERR_DM_FIND_NETWORKID_LIST_EMPTY;
     }
     return DM_OK;
+}
+
+void DeviceManagerService::NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
+    const std::string &accountIdHash, const std::string &accountName, int32_t userId)
+{
+    LOGI("Start.");
+    std::vector<std::string> bleUdids;
+    std::vector<std::string> wifiDevices;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.push_back(netWorkId);
+        }
+    }
+    if (!bleUdids.empty()) {
+        SendAccountLogoutBroadCast(bleUdids, accountIdHash, accountName, userId);
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    for (const auto &it : wifiDevices) {
+        int32_t ret = DMCommTool::GetInstance()->SendLogoutAccountInfo(it, accountIdHash, userId);
+        if (ret != DM_OK) {
+            LOGE("Send LogoutAccount Info error, ret = %{public}d", ret);
+        }
+    }
+#endif
+}
+
+void DeviceManagerService::ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid,
+    int32_t userId)
+{
+    LOGI("Start. process udid: %{public}s", GetAnonyString(peerUdid).c_str());
+    if (!IsDMServiceImplReady()) {
+        LOGE("Imp instance not init or init failed.");
+        return;
+    }
+    dmServiceImpl_->HandleAccountLogoutEvent(userId, accountId, peerUdid);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

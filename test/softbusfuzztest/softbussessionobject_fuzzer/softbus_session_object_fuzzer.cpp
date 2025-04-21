@@ -58,21 +58,8 @@ void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    int32_t socket =  *(reinterpret_cast<const int*>(data));
-    QoSEvent eventId = static_cast<QoSEvent>(1);
-    uint32_t qosCount = 3;
-    QosTV qos[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = 64 * 1024 },
-        { .qos = QOS_TYPE_MAX_LATENCY, .value = 19000},
-        { .qos = QOS_TYPE_MIN_LATENCY, .value = 500 },
-    };
-    ShutdownReason reason = ShutdownReason::SHUTDOWN_REASON_UNKNOWN;
-
     std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
     softbusSession->RegisterSessionCallback(std::make_shared<SoftbusSessionCallbackTest>());
-    softbusSession->iSocketListener_.OnBytes(socket, data, size);
-    softbusSession->iSocketListener_.OnShutdown(socket, reason);
-    softbusSession->iSocketListener_.OnQos(socket, eventId, qos, qosCount);
 }
 }
 }

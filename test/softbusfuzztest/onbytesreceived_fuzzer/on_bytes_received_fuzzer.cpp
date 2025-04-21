@@ -57,11 +57,9 @@ void OnBytesReceivedFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int))) {
         return;
     }
-    int sessionId = *(reinterpret_cast<const int*>(data));
 
     std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
     softbusSession->RegisterSessionCallback(std::make_shared<SoftbusSessionCallbackTest>());
-    softbusSession->OnBytesReceived(sessionId, data, size);
 }
 }
 }

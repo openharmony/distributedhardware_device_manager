@@ -47,7 +47,7 @@ public:
         (void)deviceId;
         return "";
     }
-    int32_t GetPinCode(int32_t &code) override
+    int32_t GetPinCode(std::string &code) override
     {
         (void)code;
         return DM_OK;

@@ -247,6 +247,10 @@ public:
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
                                             int32_t errcode) = 0;
+    virtual int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList) = 0;
+    virtual int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
+        const DevUserInfo &remoteDevUserInfo, std::string &aclList) = 0;
     virtual int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId) = 0;
     virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus) = 0;
@@ -260,6 +264,8 @@ public:
     virtual void DeleteAlwaysAllowTimeOut() = 0;
     virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;
+    virtual void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
+        int32_t remoteTokenId) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

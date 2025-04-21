@@ -1,0 +1,534 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <cstdlib>
+#include <map>
+
+#include "accesstoken_kit.h"
+#include "access_control_profile.h"
+#include "accesser.h"
+#include "accessee.h"
+#include "auth_manager.h"
+#include "app_manager.h"
+#include "dm_crypto.h"
+#include "dm_log.h"
+#include "dm_timer.h"
+#include "dm_radar_helper.h"
+#include "dm_language_manager.h"
+#include "dm_constants.h"
+#include "dm_anonymous.h"
+#include "dm_random.h"
+#include "dm_auth_context.h"
+#include "dm_auth_state.h"
+#include "deviceprofile_connector.h"
+#include "distributed_device_profile_errors.h"
+#include "device_auth.h"
+#include "hap_token_info.h"
+#include "json_object.h"
+#include "multiple_user_connector.h"
+#include "os_account_manager.h"
+#include "parameter.h"
+
+using namespace OHOS::Security::AccessToken;
+
+namespace OHOS {
+namespace DistributedHardware {
+
+DmAuthStateType AuthSrcStartState::GetStateType()
+{
+    return DmAuthStateType::AUTH_SRC_START_STATE;
+}
+
+int32_t AuthSrcStartState::Action(std::shared_ptr<DmAuthContext> context)
+{
+    return DM_OK;
+}
+
+DmAuthStateType AuthSrcNegotiateStateMachine::GetStateType()
+{
+    return DmAuthStateType::AUTH_SRC_NEGOTIATE_STATE;
+}
+
+std::string AuthSrcNegotiateStateMachine::GetAccountGroupIdHash(std::shared_ptr<DmAuthContext> context)
+{
+    JsonObject jsonObj;
+    jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
+    std::string queryParams = SafetyDump(jsonObj);
+
+    int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (osAccountUserId < 0) {
+        LOGE("get current process account user id failed");
+        return "";
+    }
+    std::vector<GroupInfo> groupList;
+    if (!context->hiChainConnector->GetGroupInfo(osAccountUserId, queryParams, groupList)) {
+        return "";
+    }
+    JsonObject jsonAccountObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    for (auto &groupInfo : groupList) {
+        jsonAccountObj.PushBack(Crypto::GetGroupIdHash(groupInfo.groupId));
+    }
+    return SafetyDump(jsonAccountObj);
+}
+
+int32_t AuthSrcNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
+{
+    LOGI("AuthSrcNegotiateStateMachine::Action sessionId %{public}d.", context->sessionId);
+
+    context->reply = ERR_DM_AUTH_REJECT;
+    context->accessee.dmVersion = "";
+
+    // Calculate the hash value
+    context->accesser.deviceIdHash = Crypto::Sha256(context->accesser.deviceId);
+    context->accesser.accountIdHash = Crypto::Sha256(context->accesser.accountId);
+    context->accesser.tokenIdHash = Crypto::Sha256(std::to_string(context->accesser.tokenId));
+
+    // Create old message for compatible
+    context->accesser.accountGroupIdHash = GetAccountGroupIdHash(context);
+
+    std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_ACL_NEGOTIATE, context);
+    context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
+    if (context->timer != nullptr) {
+        context->timer->StartTimer(std::string(NEGOTIATE_TIMEOUT_TASK),
+            DmAuthState::GetTaskTimeout(context, NEGOTIATE_TIMEOUT_TASK, NEGOTIATE_TIMEOUT),
+            [this, context] (std::string name) {
+                DmAuthState::HandleAuthenticateTimeout(context, name);
+            });
+    }
+
+    return DM_OK;
+}
+
+DmAuthStateType AuthSinkNegotiateStateMachine::GetStateType()
+{
+    return DmAuthStateType::AUTH_SINK_NEGOTIATE_STATE;
+}
+
+int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    // 1. Get deviceId
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    context->accessee.deviceId = std::string(localDeviceId);
+    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
+
+    // 2. Get userId
+    context->accessee.userId = MultipleUserConnector::GetUserIdByDisplayId(
+        static_cast<uint64_t>(context->accessee.displayId));
+    if (context->accessee.userId < 0) {
+        LOGE("get userId failed.");
+        return ERR_DM_GET_LOCAL_USERID_FAILED;
+    }
+
+    // 3. Get accountId
+    context->accessee.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context->accessee.userId);
+    context->accessee.accountIdHash = Crypto::Sha256(context->accessee.accountId);
+
+    // 4. Get tokenId
+    if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
+        context->accessee.tokenId) == DM_OK) {
+        context->accessee.bindLevel = DmRole::DM_ROLE_SA;
+    } else if (AppManager::GetInstance().GetHapTokenIdByName(context->accessee.userId, context->accessee.bundleName, 0,
+        context->accessee.tokenId) == DM_OK) {
+        context->accessee.bindLevel = DmRole::DM_ROLE_FA;
+    } else {
+        LOGE("sink not contain the bundlename %{public}s.", context->accessee.bundleName.c_str());
+        return ERR_DM_GET_TOKENID_FAILED;
+    }
+    if (DmAuthState::CheckProcessNameInWhiteList(context->accessee.bundleName)) {
+        context->accessee.bindLevel = DmRole::DM_ROLE_USER;
+    }
+    context->accessee.tokenIdHash = Crypto::Sha256(std::to_string(context->accessee.tokenId));
+    context->accesser.isOnline = context->softbusConnector->CheckIsOnline(context->accesser.deviceIdHash, true);
+    context->accessee.language = DmLanguageManager::GetInstance().GetSystemLanguage();
+    context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
+    context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
+    return DM_OK;
+}
+
+int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    int32_t ret = RespQueryAcceseeIds(context);
+    if (ret != DM_OK) {
+        LOGE("DmAuthManager::ProcRespNegotiate5_1_0 fail to get all id.");
+        return ret;
+    }
+    JsonObject credInfo;
+    GetSinkCredentialInfo(context, credInfo);
+    JsonObject aclTypeJson;
+    GetSinkAclInfo(context, credInfo, aclTypeJson);
+    context->accessee.aclTypeList = aclTypeJson.Dump();
+    JsonObject credTypeJson;
+    GetSinkCredType(context, credInfo, aclTypeJson, credTypeJson);
+    context->accessee.credTypeList = credTypeJson.Dump();
+    return DM_OK;
+}
+
+int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
+{
+    LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
+
+    // 1. Create an authorization timer
+    if (context->timer != nullptr) {
+        context->timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK),
+            AUTHENTICATE_TIMEOUT,
+            [this, context] (std::string name) {
+                DmAuthState::HandleAuthenticateTimeout(context, name);
+        });
+    }
+
+    // To be compatible with historical versions, use ConvertSrcVersion to get the actual version on the source side.
+    std::string preVersion = std::string(DM_VERSION_5_0_OLD_MAX);
+    LOGI("AuthSinkNegotiateStateMachine::Action start version compare %{public}s to %{public}s",
+        context->accesser.dmVersion.c_str(), preVersion.c_str());
+    if (CompareVersion(context->accesser.dmVersion, preVersion) == false) {
+        LOGE("AuthSinkNegotiateStateMachine::Action incompatible version");
+        context->reason = ERR_DM_VERSION_INCOMPATIBLE;
+        return ERR_DM_VERSION_INCOMPATIBLE;
+    }
+
+    int32_t ret = ProcRespNegotiate5_1_0(context);
+    if (ret != DM_OK) {
+        LOGE("AuthSinkNegotiateStateMachine::Action proc response negotiate failed");
+        context->reason = ret;
+        return ret;
+    }
+    context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_ACL_NEGOTIATE, context);
+    context->timer->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
+        DmAuthState::GetTaskTimeout(context, WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT),
+        [this, context] (std::string name) {
+            DmAuthState::HandleAuthenticateTimeout(context, name);
+        });
+    return DM_OK;
+}
+
+void AuthSinkNegotiateStateMachine::GetSinkCredType(std::shared_ptr<DmAuthContext> context,
+    JsonObject &credInfo, JsonObject &aclInfo, JsonObject &credTypeJson)
+{
+    CHECK_NULL_VOID(context);
+    std::vector<std::string> deleteCredInfo;
+    for (const auto &item : credInfo.Items()) {
+        if (!item.Contains(FILED_CRED_TYPE) || !item[FILED_CRED_TYPE].IsNumberInteger() ||
+            !item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+            deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
+            continue;
+        }
+        int32_t credType = item[FILED_CRED_TYPE].Get<int32_t>();
+        LOGI("credType %{public}d.", credType);
+        switch (credType) {
+            case DM_IDENTICAL_ACCOUNT:
+                credTypeJson["identicalCredType"] = credType;
+                context->accessee.credentialInfos[credType] = item.Dump();
+                break;
+            case DM_SHARE:
+                credTypeJson["shareCredType"] = credType;
+                context->accessee.credentialInfos[credType] = item.Dump();
+                break;
+            case DM_POINT_TO_POINT:
+                GetSinkCredTypeForP2P(context, item, aclInfo, credTypeJson, credType, deleteCredInfo);
+                break;
+            case DM_LNN:
+                if (!aclInfo.Contains("lnnAcl") ||
+                    (context->accessee.aclProfiles[DM_LNN].GetAccessee().GetAccesseeCredentialIdStr() !=
+                    item[FILED_CRED_ID].Get<std::string>() &&
+                    context->accessee.aclProfiles[DM_LNN].GetAccesser().GetAccesserCredentialIdStr() !=
+                    item[FILED_CRED_ID].Get<std::string>())) {
+                    deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
+                } else {
+                    credTypeJson["lnnCredType"] = credType;
+                    context->accessee.credentialInfos[credType] = item.Dump();
+                }
+                break;
+            default:
+                LOGE("invalid credType %{public}d.", credType);
+                break;
+        }
+    }
+        for (const auto &item : deleteCredInfo) {
+            credInfo.Erase(item);
+            context->hiChainAuthConnector->DeleteCredential(context->accessee.userId, item);
+        }
+}
+
+void AuthSinkNegotiateStateMachine::GetSinkCredTypeForP2P(std::shared_ptr<DmAuthContext> context,
+    const JsonItemObject &credObj, JsonObject &aclInfo, JsonObject &credTypeJson,
+    int32_t credType, std::vector<std::string> &deleteCredInfo)
+{
+    CHECK_NULL_VOID(context);
+    if (!aclInfo.Contains("pointTopointAcl") ||
+        (context->accessee.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeCredentialIdStr() !=
+        credObj[FILED_CRED_ID].Get<std::string>() &&
+        context->accessee.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr() !=
+        credObj[FILED_CRED_ID].Get<std::string>())) {
+        deleteCredInfo.push_back(credObj[FILED_CRED_ID].Get<std::string>());
+    } else {
+        credTypeJson["pointTopointCredType"] = credType;
+        context->accessee.credentialInfos[credType] = credObj.Dump();
+    }
+}
+
+void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext> context,
+    JsonObject &credInfo, JsonObject &aclInfo)
+{
+    CHECK_NULL_VOID(context);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    int32_t bindLevel = DM_INVALIED_TYPE;
+    for (const auto &item : profiles) {
+        std::string trustDeviceId = item.GetTrustDeviceId();
+        std::string trustDeviceIdHash = Crypto::Sha256(trustDeviceId);
+        if (trustDeviceIdHash != context->accesser.deviceIdHash &&
+            trustDeviceIdHash != context->accessee.deviceIdHash) {
+            LOGE("devId %{public}s hash %{public}s, er devId %{public}s.", GetAnonyString(trustDeviceId).c_str(),
+                GetAnonyString(trustDeviceIdHash).c_str(), GetAnonyString(context->accesser.deviceIdHash).c_str());
+            continue;
+        }
+        bindLevel = item.GetBindLevel();
+        switch (item.GetBindType()) {
+            case DM_IDENTICAL_ACCOUNT:
+                if (IdenticalAccountAclCompare(context, item.GetAccesser(), item.GetAccessee())) {
+                    aclInfo["identicalAcl"] = DM_IDENTICAL_ACCOUNT;
+                    context->accessee.aclProfiles[DM_IDENTICAL_ACCOUNT] = item;
+                }
+                break;
+            case DM_SHARE:
+                if (ShareAclCompare(context, item.GetAccesser(), item.GetAccessee()) &&
+                    CheckCredIdInAcl(context, item, credInfo, DM_SHARE)) {
+                    aclInfo["shareAcl"] = DM_SHARE;
+                    context->accessee.aclProfiles[DM_SHARE] = item;
+                }
+                break;
+            case DM_POINT_TO_POINT:
+                GetSinkAclInfoForP2P(context, item, credInfo, aclInfo);
+                break;
+            default:
+                LOGE("invalid bindType %{public}d.", item.GetBindType());
+                break;
+        }
+    }
+    if (aclInfo.Contains("pointTopointAcl") && !aclInfo.Contains("lnnAcl") && bindLevel != USER) {
+        aclInfo.Erase("pointTopointAcl");
+        DeleteAcl(context, context->accessee.aclProfiles[DM_POINT_TO_POINT]);
+    }
+}
+
+void AuthSinkNegotiateStateMachine::GetSinkAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
+    const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, JsonObject &aclInfo)
+{
+    CHECK_NULL_VOID(context);
+    if (Point2PointAclCompare(context, profile.GetAccesser(), profile.GetAccessee()) &&
+        CheckCredIdInAcl(context, profile, credInfo, DM_POINT_TO_POINT)) {
+        aclInfo["pointTopointAcl"] = DM_POINT_TO_POINT;
+        context->accessee.aclProfiles[DM_POINT_TO_POINT] = profile;
+    }
+    if (LnnAclCompare(context, profile.GetAccesser(), profile.GetAccessee()) &&
+        CheckCredIdInAcl(context, profile, credInfo, DM_LNN) && profile.GetBindLevel() == USER) {
+        aclInfo["lnnAcl"] = DM_LNN;
+        context->accessee.aclProfiles[DM_LNN] = profile;
+    }
+}
+
+bool AuthSinkNegotiateStateMachine::CheckCredIdInAcl(std::shared_ptr<DmAuthContext> context,
+    const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, uint32_t bindType)
+{
+    std::string credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
+    if (!credInfo.Contains(credId)) {
+        credId = profile.GetAccesser().GetAccesserCredentialIdStr();
+        if (!credInfo.Contains(credId)) {
+            LOGE("credInfoJson not contain credId %{public}s.", credId.c_str());
+            DeleteAcl(context, profile);
+            return false;
+        }
+    }
+    if (credInfo.Contains(credId) && (!credInfo[credId].IsObject() || !credInfo[credId].Contains(FILED_CRED_TYPE) ||
+        !credInfo[credId][FILED_CRED_TYPE].IsNumberInteger())) {
+        LOGE("credId %{public}s contain credInfoJson invalid.", credId.c_str());
+        credInfo.Erase(credId);
+        DeleteAcl(context, profile);
+        return false;
+    }
+    bool checkResult = false;
+    switch (bindType) {
+        LOGI("bindType %{public}d.", bindType);
+        case DM_IDENTICAL_ACCOUNT:
+        case DM_SHARE:
+        case DM_LNN:
+            if (credInfo[credId][FILED_CRED_TYPE].Get<int32_t>() == bindType) {
+                checkResult = true;
+            } else {
+                DeleteAcl(context, profile);
+            }
+            break;
+        case DM_POINT_TO_POINT:
+            CheckCredIdInAclForP2P(context, credId, profile, credInfo, bindType, checkResult);
+            break;
+        default:
+            break;
+    }
+    return checkResult;
+}
+
+void AuthSinkNegotiateStateMachine::CheckCredIdInAclForP2P(std::shared_ptr<DmAuthContext> context,
+    std::string &credId, const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo,
+    uint32_t bindType, bool &checkResult)
+{
+    if (credInfo[credId][FILED_CRED_TYPE].Get<int32_t>() == bindType) {
+        std::vector<std::string> appList;
+        credInfo[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
+        const size_t APP_LIST_SIZE = 2;
+        if (appList.size() >= APP_LIST_SIZE &&
+            ((std::to_string(profile.GetAccesser().GetAccesserTokenId()) == appList[0] &&
+            std::to_string(profile.GetAccessee().GetAccesseeTokenId()) == appList[1]) ||
+            (std::to_string(profile.GetAccessee().GetAccesseeTokenId()) == appList[0] &&
+            std::to_string(profile.GetAccesser().GetAccesserTokenId()) == appList[1]))) {
+            checkResult = true;
+        } else {
+            DeleteAcl(context, profile);
+        }
+    } else {
+        DeleteAcl(context, profile);
+    }
+}
+
+bool AuthSinkNegotiateStateMachine::IdenticalAccountAclCompare(std::shared_ptr<DmAuthContext> context,
+    const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
+{
+    LOGI("start");
+    return accesser.GetAccesserDeviceId() == context->accessee.deviceId &&
+        accesser.GetAccesserUserId() == context->accessee.userId &&
+        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash;
+}
+
+bool AuthSinkNegotiateStateMachine::ShareAclCompare(std::shared_ptr<DmAuthContext> context,
+    const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
+{
+    LOGI("start");
+    return accessee.GetAccesseeDeviceId() == context->accessee.deviceId &&
+        accessee.GetAccesseeUserId() == context->accessee.userId &&
+        Crypto::Sha256(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash;
+}
+
+bool AuthSinkNegotiateStateMachine::Point2PointAclCompare(std::shared_ptr<DmAuthContext> context,
+    const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
+{
+    LOGI("start");
+    return (accessee.GetAccesseeDeviceId() == context->accessee.deviceId &&
+        accessee.GetAccesseeUserId() == context->accessee.userId &&
+        accessee.GetAccesseeTokenId() == context->accessee.tokenId &&
+        Crypto::Sha256(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash &&
+        Crypto::Sha256(std::to_string(accesser.GetAccesserTokenId())) == context->accesser.tokenIdHash) ||
+        (accesser.GetAccesserDeviceId() == context->accessee.deviceId &&
+        accesser.GetAccesserUserId() == context->accessee.userId &&
+        accesser.GetAccesserTokenId() == context->accessee.tokenId &&
+        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash &&
+        Crypto::Sha256(std::to_string(accessee.GetAccesseeTokenId())) == context->accesser.tokenIdHash);
+}
+
+bool AuthSinkNegotiateStateMachine::LnnAclCompare(std::shared_ptr<DmAuthContext> context,
+    const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
+{
+    LOGI("start");
+    return ((accessee.GetAccesseeDeviceId() == context->accessee.deviceId &&
+        accessee.GetAccesseeUserId() == context->accessee.userId) ||
+        (accesser.GetAccesserDeviceId() == context->accessee.deviceId &&
+        accesser.GetAccesserUserId() == context->accessee.userId)) &&
+        accessee.GetAccesseeTokenId() == 0 && accessee.GetAccesseeBundleName() == "" &&
+        (Crypto::Sha256(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash ||
+        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash) &&
+        accesser.GetAccesserTokenId() == 0 && accesser.GetAccesserBundleName() == "";
+}
+
+void AuthSinkNegotiateStateMachine::GetSinkCredentialInfo(std::shared_ptr<DmAuthContext> context,
+    JsonObject &credInfo)
+{
+    CHECK_NULL_VOID(context);
+    // get identical credential
+    if (context->accesser.accountIdHash == context->accessee.accountIdHash) {
+        GetIdenticalCredentialInfo(context, credInfo);
+    }
+    // get share credential
+    if (context->accesser.accountIdHash != context->accessee.accountIdHash &&
+        context->accesser.accountIdHash != Crypto::Sha256("ohosAnonymousUid") &&
+        context->accessee.accountIdHash != Crypto::Sha256("ohosAnonymousUid")) {
+        GetShareCredentialInfo(context, credInfo);
+        GetP2PCredentialInfo(context, credInfo);
+    }
+    // get point_to_point credential
+    if (context->accesser.accountIdHash == Crypto::Sha256("ohosAnonymousUid") ||
+        context->accessee.accountIdHash == Crypto::Sha256("ohosAnonymousUid")) {
+        GetP2PCredentialInfo(context, credInfo);
+    }
+    std::vector<std::string> deleteCredInfo;
+    for (auto& item : credInfo.Items()) { // id1:json1, id2:json2, id3:json3
+        uint32_t credType = DmAuthState::GetCredentialType(context, item);
+        if (credType == DM_INVALIED_TYPE || !item.Contains(FILED_CRED_TYPE) ||
+            !item[FILED_CRED_TYPE].IsNumberInteger() || !item.Contains(FILED_CRED_ID) ||
+            !item[FILED_CRED_ID].IsString()) {
+            deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
+            continue;
+        }
+        item[FILED_CRED_TYPE] = credType;
+    }
+    for (const auto &item : deleteCredInfo) {
+        credInfo.Erase(item);
+    }
+}
+
+void AuthSinkNegotiateStateMachine::GetIdenticalCredentialInfo(std::shared_ptr<DmAuthContext> context,
+    JsonObject &credInfo)
+{
+    CHECK_NULL_VOID(context);
+    JsonObject queryParams;
+    queryParams[FILED_DEVICE_ID] = context->accessee.deviceId;
+    queryParams[FILED_USER_ID] = context->accessee.accountId;
+    queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_RELATED;
+    CHECK_NULL_VOID(context->hiChainAuthConnector);
+    if (context->hiChainAuthConnector->QueryCredentialInfo(context->accessee.userId, queryParams, credInfo) != DM_OK) {
+        LOGE("QueryCredentialInfo failed credInfo %{public}s.", credInfo.Dump().c_str());
+    }
+}
+
+void AuthSinkNegotiateStateMachine::GetShareCredentialInfo(std::shared_ptr<DmAuthContext> context,
+    JsonObject &credInfo)
+{
+    CHECK_NULL_VOID(context);
+    JsonObject queryParams;
+    queryParams[FILED_DEVICE_ID_HASH] = context->accesser.deviceIdHash;
+    queryParams[FILED_PEER_USER_SPACE_ID] = std::to_string(context->accesser.userId);
+    queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_ACROSS;
+    CHECK_NULL_VOID(context->hiChainAuthConnector);
+    if (context->hiChainAuthConnector->QueryCredentialInfo(context->accessee.userId, queryParams, credInfo) != DM_OK) {
+        LOGE("QueryCredentialInfo failed credInfo %{public}s.", credInfo.Dump().c_str());
+    }
+}
+
+void AuthSinkNegotiateStateMachine::GetP2PCredentialInfo(std::shared_ptr<DmAuthContext> context,
+    JsonObject &credInfo)
+{
+    CHECK_NULL_VOID(context);
+    JsonObject queryParams;
+    queryParams[FILED_DEVICE_ID_HASH] = context->accesser.deviceIdHash;
+    queryParams[FILED_PEER_USER_SPACE_ID] = std::to_string(context->accesser.userId);
+    queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_UNRELATED;
+    queryParams[FILED_CRED_OWNER] = "DM";
+    CHECK_NULL_VOID(context->hiChainAuthConnector);
+    if (context->hiChainAuthConnector->QueryCredentialInfo(context->accessee.userId, queryParams, credInfo) != DM_OK) {
+        LOGE("QueryCredentialInfo failed credInfo %{public}s.", credInfo.Dump().c_str());
+    }
+}
+} // namespace DistributedHardware
+} // namespace OHOS

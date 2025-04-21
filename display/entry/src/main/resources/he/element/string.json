@@ -1,0 +1,60 @@
+{
+    "string":[
+        {
+            "name":"dm_connect_code",
+            "value":"קוד חיבור",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%1$s ב-%2$s רוצה לגשת להתקן זה. לתת אמון ביישום זה?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"ביטול",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"הזן קוד חיבור",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"זה נחוץ עבור סנכרון נתונים חוצה התקנים ושיתוף פעולה.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"תן אמון הפעם",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"תן אמון תמיד",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_this_time",
+            "value":"תן אמון רק הפעם",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}
