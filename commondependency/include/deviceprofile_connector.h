@@ -148,7 +148,7 @@ public:
         const std::string &remoteDeviceId, int32_t bindLevel, const std::string &extra);
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile>
         GetAccessControlProfile();
-    EXPORT DmOfflineParam HandleServiceUnBindEvent(int32_t remoteUserId,
+    DM_EXPORT DmOfflineParam HandleServiceUnBindEvent(int32_t remoteUserId,
         const std::string &remoteUdid, const std::string &localUdid, int32_t tokenId);
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfileByUserId(int32_t userId);
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
@@ -269,17 +269,17 @@ public:
     int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
     int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
         const std::vector<std::string> &acceptEventUdids);
-    EXPORT std::string IsAuthNewVersion(int32_t bindLevel, std::string localUdid, std::string remoteUdid,
+    DM_EXPORT std::string IsAuthNewVersion(int32_t bindLevel, std::string localUdid, std::string remoteUdid,
         int32_t tokenId, int32_t userId);
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByDeviceIdAndUserId(
         const std::string &deviceId, int32_t userId, const std::string &remoteDeviceId);
-    EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclList(const std::string localUdid,
+    DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclList(const std::string localUdid,
         int32_t localUserId, const std::string remoteUdid, int32_t remoteUserId);
-    EXPORT bool ChecksumAcl(DistributedDeviceProfile::AccessControlProfile &acl,
+    DM_EXPORT bool ChecksumAcl(DistributedDeviceProfile::AccessControlProfile &acl,
         std::vector<std::string> &acLStrList);
-    EXPORT std::string AccessToStr(DistributedDeviceProfile::AccessControlProfile acl);
-    EXPORT int32_t GetVersionByExtra(std::string &extraInfo, std::string &dmVersion);
-    EXPORT void GetAllVerionAclMap(DistributedDeviceProfile::AccessControlProfile &acl,
+    DM_EXPORT std::string AccessToStr(DistributedDeviceProfile::AccessControlProfile acl);
+    DM_EXPORT int32_t GetVersionByExtra(std::string &extraInfo, std::string &dmVersion);
+    DM_EXPORT void GetAllVerionAclMap(DistributedDeviceProfile::AccessControlProfile &acl,
         std::map<std::string, std::vector<std::string>> &aclMap, std::string dmVersion = "");
     void GenerateAclHash(DistributedDeviceProfile::AccessControlProfile &acl,
         std::map<std::string, std::vector<std::string>> &aclMap, const std::string &dmVersion);
@@ -292,17 +292,17 @@ public:
      * @param dmVersion target dm version
      * @return EXPORT 0 for success
      */
-    EXPORT int32_t GetAclListHashStr(const DevUserInfo &localDevUserInfo,
+    DM_EXPORT int32_t GetAclListHashStr(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion = "");
-    EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);
-    EXPORT void CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
+    DM_EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);
+    DM_EXPORT void CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
         DmOfflineParam &offlineParam);
-    EXPORT void CacheAceeAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
+    DM_EXPORT void CacheAceeAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
         DmOfflineParam &offlineParam);
-    EXPORT void AclHashItemToJson(JsonItemObject &itemObject, const AclHashItem &value);
-    EXPORT void AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values);
-    EXPORT void AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value);
-    EXPORT void AclHashVecFromJson(const JsonItemObject &itemObject, std::vector<AclHashItem> &values);
+    DM_EXPORT void AclHashItemToJson(JsonItemObject &itemObject, const AclHashItem &value);
+    DM_EXPORT void AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values);
+    DM_EXPORT void AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value);
+    DM_EXPORT void AclHashVecFromJson(const JsonItemObject &itemObject, std::vector<AclHashItem> &values);
     void DeleteCacheAcl(std::vector<int64_t> delAclIdVec,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles);
 private:

@@ -122,7 +122,7 @@ void MultipleUserConnector::GetTokenIdAndForegroundUserId(uint32_t &tokenId, int
     userId = GetFirstForegroundUserId();
 }
 
-EXPORT void MultipleUserConnector::GetTokenId(uint32_t &tokenId)
+DM_EXPORT void MultipleUserConnector::GetTokenId(uint32_t &tokenId)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
@@ -372,7 +372,7 @@ DM_EXPORT void MultipleUserConnector::ClearLockedUser(
     }
 }
 
-EXPORT DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
+DM_EXPORT DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
 {
     DMAccountInfo dmAccountInfo;
     dmAccountInfo.accountId = GetOhosAccountId();
@@ -380,7 +380,7 @@ EXPORT DMAccountInfo MultipleUserConnector::GetCurrentDMAccountInfo()
     return dmAccountInfo;
 }
 
-EXPORT void MultipleUserConnector::GetCallingTokenId(uint32_t &tokenId)
+DM_EXPORT void MultipleUserConnector::GetCallingTokenId(uint32_t &tokenId)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
@@ -389,7 +389,7 @@ EXPORT void MultipleUserConnector::GetCallingTokenId(uint32_t &tokenId)
 #endif
 }
 
-EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(uint64_t displayId)
+DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(uint64_t displayId)
 {
     LOGI("displayId %{public}" PRIu64, displayId);
     int32_t userId = -1;

@@ -57,7 +57,7 @@ const std::string DM_VERSION_STR_5_1_0 = DM_VERSION_5_1_0;
 const std::vector<std::string> DM_SUPPORT_ACL_AGING_VERSIONS = {DM_VERSION_STR_5_1_0};
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
-EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraInfo, std::string &dmVersion)
+DM_EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraInfo, std::string &dmVersion)
 {
     JsonObject extraInfoJson(extraInfo);
     if (extraInfoJson.IsDiscarded()) {
@@ -72,7 +72,7 @@ EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraInfo,
     return DM_OK;
 }
 
-EXPORT void DeviceProfileConnector::GetAllVerionAclMap(DistributedDeviceProfile::AccessControlProfile &acl,
+DM_EXPORT void DeviceProfileConnector::GetAllVerionAclMap(DistributedDeviceProfile::AccessControlProfile &acl,
     std::map<std::string, std::vector<std::string>> &aclMap, std::string dmVersion)
 {
     std::vector<std::string> needGenVersions = {};
@@ -124,7 +124,7 @@ void DeviceProfileConnector::GenerateAclHash(DistributedDeviceProfile::AccessCon
     }
 }
 
-EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const DevUserInfo &localDevUserInfo,
+DM_EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const DevUserInfo &localDevUserInfo,
     const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion)
 {
     std::map<std::string, std::vector<std::string>> aclMap;
@@ -159,7 +159,7 @@ EXPORT int32_t DeviceProfileConnector::GetAclListHashStr(const DevUserInfo &loca
     return DM_OK;
 }
 
-EXPORT void DeviceProfileConnector::AclHashItemToJson(JsonItemObject &itemObject, const AclHashItem &value)
+DM_EXPORT void DeviceProfileConnector::AclHashItemToJson(JsonItemObject &itemObject, const AclHashItem &value)
 {
     itemObject[TAG_ACL_HASH_KEY_VERSION] = value.version;
     JsonObject hashList(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
@@ -169,7 +169,7 @@ EXPORT void DeviceProfileConnector::AclHashItemToJson(JsonItemObject &itemObject
     itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST] = hashList.Dump();
 }
 
-EXPORT void DeviceProfileConnector::AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values)
+DM_EXPORT void DeviceProfileConnector::AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values)
 {
     for (const auto &val : values) {
         JsonObject object;
@@ -178,7 +178,7 @@ EXPORT void DeviceProfileConnector::AclHashVecToJson(JsonItemObject &itemObject,
     }
 }
 
-EXPORT void DeviceProfileConnector::AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value)
+DM_EXPORT void DeviceProfileConnector::AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value)
 {
     value.version = itemObject[TAG_ACL_HASH_KEY_VERSION].Get<std::string>();
     std::string hashListStr = itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST].Get<std::string>();
@@ -189,7 +189,7 @@ EXPORT void DeviceProfileConnector::AclHashItemFromJson(const JsonItemObject &it
     }
 }
 
-EXPORT void DeviceProfileConnector::AclHashVecFromJson(const JsonItemObject &itemObject,
+DM_EXPORT void DeviceProfileConnector::AclHashVecFromJson(const JsonItemObject &itemObject,
     std::vector<AclHashItem> &values)
 {
     for (auto const &item : itemObject.Items()) {
@@ -201,7 +201,7 @@ EXPORT void DeviceProfileConnector::AclHashVecFromJson(const JsonItemObject &ite
     }
 }
 
-EXPORT bool DeviceProfileConnector::ChecksumAcl(DistributedDeviceProfile::AccessControlProfile &acl,
+DM_EXPORT bool DeviceProfileConnector::ChecksumAcl(DistributedDeviceProfile::AccessControlProfile &acl,
     std::vector<std::string> &acLStrList)
 {
     std::string aclStr = AccessToStr(acl);
@@ -209,7 +209,7 @@ EXPORT bool DeviceProfileConnector::ChecksumAcl(DistributedDeviceProfile::Access
     return (aclIter != acLStrList.end());
 }
 
-EXPORT std::string DeviceProfileConnector::AccessToStr(DistributedDeviceProfile::AccessControlProfile acl)
+DM_EXPORT std::string DeviceProfileConnector::AccessToStr(DistributedDeviceProfile::AccessControlProfile acl)
 {
     std::string aclStr = "";
     DistributedDeviceProfile::Accesser accesser = acl.GetAccesser();
@@ -238,7 +238,7 @@ EXPORT std::string DeviceProfileConnector::AccessToStr(DistributedDeviceProfile:
     return aclStr;
 }
 
-EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnector::GetAclList(
+DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnector::GetAclList(
     const std::string localUdid, int32_t localUserId, const std::string remoteUdid, int32_t remoteUserId)
 {
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
@@ -266,7 +266,7 @@ EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfile
     return aclList;
 }
 
-EXPORT std::string DeviceProfileConnector::IsAuthNewVersion(int32_t bindLevel, std::string localUdid,
+DM_EXPORT std::string DeviceProfileConnector::IsAuthNewVersion(int32_t bindLevel, std::string localUdid,
     std::string remoteUdid, int32_t tokenId, int32_t userId)
 {
     LOGI("localUdid %{public}s, remoteUdid %{public}s, bindLevel %{public}d.",
@@ -336,7 +336,7 @@ std::string DeviceProfileConnector::GetDeviceAuthVersionInfo(std::string localUd
     }
     return "";
 }
-EXPORT DmOfflineParam DeviceProfileConnector::FilterNeedDeleteACL(uint32_t tokenId,
+DM_EXPORT DmOfflineParam DeviceProfileConnector::FilterNeedDeleteACL(uint32_t tokenId,
     const std::string &localDeviceId, const std::string &remoteDeviceId, int32_t bindLevel, const std::string &extra)
 {
     LOGI("localDeviceId %{public}s, remoteDeviceId %{public}s, bindLevel %{public}d.",
@@ -2751,7 +2751,7 @@ int32_t DeviceProfileConnector::HandleUserStop(int32_t stopUserId, const std::st
     return DM_OK;
 }
 
-EXPORT bool DeviceProfileConnector::IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile)
+DM_EXPORT bool DeviceProfileConnector::IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile)
 {
     std::string extraData = profile.GetExtraData();
     if (extraData.empty()) {
@@ -2768,7 +2768,7 @@ EXPORT bool DeviceProfileConnector::IsLnnAcl(const DistributedDeviceProfile::Acc
     return isLnnAclStr == isLnnAclTrue;
 }
 
-EXPORT void DeviceProfileConnector::CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
+DM_EXPORT void DeviceProfileConnector::CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
     DmOfflineParam &offlineParam)
 {
     DmAclIdParam dmAclIdParam;
@@ -2780,7 +2780,7 @@ EXPORT void DeviceProfileConnector::CacheAcerAclId(const DistributedDeviceProfil
     offlineParam.dmAclIdParamVec.push_back(dmAclIdParam);
 }
 
-EXPORT void DeviceProfileConnector::CacheAceeAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
+DM_EXPORT void DeviceProfileConnector::CacheAceeAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
     DmOfflineParam &offlineParam)
 {
     DmAclIdParam dmAclIdParam;
