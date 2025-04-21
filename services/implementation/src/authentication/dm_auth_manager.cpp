@@ -3395,7 +3395,7 @@ void DmAuthManager::ClearCallerInfo()
 {
     std::lock_guard<std::mutex> lock(callerInfoMutex_);
     callerInfo_.userId = -1;
-    callerInfo_.tokenId = "";
+    callerInfo_.tokenId = -1;
     callerInfo_.bundleName = "";
     callerInfo_.hostPkgLabel = "";
     callerInfoReady_ = false;
