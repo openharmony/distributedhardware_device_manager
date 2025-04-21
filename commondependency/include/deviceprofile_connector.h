@@ -114,7 +114,14 @@ typedef struct DmOfflineParam {
     int32_t peerUserId;
     bool hasLnnAcl = false;
     int64_t accessControlId;
-    std::vector<DmAclIdParam> dmAclIdParamVec;
+    // save the need unbind acl info
+    std::vector<DmAclIdParam> needDelAclInfos;
+    // save all the lnn acl between localdevid/localuserId -> remotedevid
+    std::vector<DmAclIdParam> allLnnAclInfos;
+    // save all the app or service acl between localdevid/localuserId -> remotedevid except the need del ones
+    std::vector<DmAclIdParam> allLeftAppOrSvrAclInfos;
+    // save all the user acl between localdevid/localuserId -> remotedevid
+    std::vector<DmAclIdParam> allUserAclInfos;
 } DmOfflineParam;
 
 struct AclHashItem {
@@ -142,8 +149,8 @@ public:
 class DeviceProfileConnector : public IDeviceProfileConnector {
     DM_DECLARE_SINGLE_INSTANCE(DeviceProfileConnector);
 public:
-    EXPORT DmOfflineParam FilterNeedDeleteACL(uint32_t tokenId, const std::string &localDeviceId,
-        const std::string &remoteDeviceId, int32_t bindLevel, const std::string &extra);
+    EXPORT DmOfflineParam FilterNeedDeleteACL(const std::string &localDeviceId, uint32_t localTokenId,
+        const std::string &remoteDeviceId, const std::string &extra);
     EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile>
         GetAccessControlProfile();
     EXPORT DmOfflineParam HandleServiceUnBindEvent(int32_t remoteUserId,
@@ -290,9 +297,9 @@ public:
         const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion = "");
     EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);
     EXPORT void CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
-        DmOfflineParam &offlineParam);
+        std::vector<DmAclIdParam> &aclInfos);
     EXPORT void CacheAceeAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
-        DmOfflineParam &offlineParam);
+        std::vector<DmAclIdParam> &aclInfos);
     EXPORT void AclHashItemToJson(JsonItemObject &itemObject, const AclHashItem &value);
     EXPORT void AclHashVecToJson(JsonItemObject &itemObject, const std::vector<AclHashItem> &values);
     EXPORT void AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value);
@@ -337,22 +344,26 @@ private:
     bool CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
         const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
         const std::vector<int32_t> &backgroundUserIds);
-    void FilterNeedDeleteAppBindLevel(DmOfflineParam &offlineParam, const uint32_t tokenId,
-        std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid,
-        const std::string &remoteUdid);
-    void FilterNeedDeleteAppBindLevel(DmOfflineParam &offlineParam, const uint32_t tokenId,
-        std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid,
-        const std::string &remoteUdid, const std::string &extra);
-    void FilterNeedDeleteServiceBindLevel(DmOfflineParam &offlineParam, const uint32_t tokenId,
-        std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid,
-        const std::string &remoteUdid);
+
+    void FilterNeedDeleteACLInfos(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
+        const std::string &localUdid, const uint32_t localTokenId,
+        const std::string &remoteUdid, const std::string &extra, DmOfflineParam &offlineParam);
+    bool FindLeftAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam);
+    bool FindUserAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam);
+    bool FindLnnAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const std::string &remoteUdid, DmOfflineParam &offlineParam);
+    bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const uint32_t localTokenId,
+        const std::string &remoteUdid, const uint32_t peerTokenId,
+        DmOfflineParam &offlineParam);
+
     std::string GetAppServiceAuthVersionInfo(std::string localUdid, std::string remoteUdid, int32_t tokenId,
         int32_t userId, std::vector<DistributedDeviceProfile::AccessControlProfile> profiles);
     std::string GetDeviceAuthVersionInfo(std::string localUdid, std::string remoteUdid,
         std::vector<DistributedDeviceProfile::AccessControlProfile> profiles);
-    void FilterNeedDeleteDeviceBindLevel(DmOfflineParam &offlineParam,
-        std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid,
-        const std::string &remoteUdid);
+
     void ParseExtra(const std::string &extra, uint64_t &peerTokenId, std::string &peerBundleName);
     bool CacheLnnAcl(DistributedDeviceProfile::AccessControlProfile profile, const std::string &localUdid,
         DmAclIdParam &dmAclIdParam);

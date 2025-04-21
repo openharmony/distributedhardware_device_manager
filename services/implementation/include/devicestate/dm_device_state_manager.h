@@ -100,7 +100,7 @@ public:
     void DeleteOffLineTimer(std::string udidHash);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    int32_t DeleteSkCredAndAcl(DmOfflineParam offlineParam);
+    int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
 #endif
 private:
     void StartEventThread();
