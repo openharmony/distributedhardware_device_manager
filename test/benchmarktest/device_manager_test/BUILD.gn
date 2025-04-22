@@ -35,7 +35,9 @@ ohos_benchmarktest("DeviceManagerTest") {
     "access_token:libtoken_setproc",
     "benchmark:benchmark",
     "bounds_checking_function:libsec_shared",
+    "cJSON:cjson_static",
     "dsoftbus:softbus_client",
+    "selinux_adapter:librestorecon",
   ]
 }
 

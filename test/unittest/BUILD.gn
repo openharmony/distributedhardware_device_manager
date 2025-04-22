@@ -260,11 +260,13 @@ ohos_unittest("UTTest_dm_pin_holder") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 
@@ -345,11 +347,13 @@ ohos_unittest("UTTest_dm_credential_manager") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson_static",
     "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 
@@ -390,6 +394,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 
@@ -416,6 +421,7 @@ ohos_unittest("UTTest_dm_softbus_cache") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 
@@ -448,6 +454,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 
@@ -998,12 +1005,14 @@ ohos_unittest("UTTest_device_manager_impl") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson_static",
     "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 
   cflags = [
@@ -1029,10 +1038,12 @@ ohos_unittest("UTTest_dm_import_auth_code") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson_static",
     "device_auth:deviceauth_sdk",
     "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 
@@ -1080,10 +1091,12 @@ ohos_unittest("UTTest_permission_manager") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "selinux_adapter:librestorecon",
   ]
 }
 

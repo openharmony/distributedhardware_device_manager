@@ -82,6 +82,7 @@ ohos_fuzztest("AuthenticateDeviceServiceFuzzTest") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
+    "selinux_adapter:librestorecon",
   ]
 }
 
