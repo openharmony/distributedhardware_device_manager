@@ -46,6 +46,7 @@ ohos_fuzztest("DeviceProfileConnectorFuzzTest") {
     "device_info_manager:distributed_device_profile_sdk",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "c_utils:utils"
   ]
 
   defines = [
