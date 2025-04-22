@@ -239,7 +239,7 @@ public:
         (void)code;
     }
 
-    virtual void OnSetLocalDeviceNameResult(const ProcessInfo &processInfo,
+    void OnSetLocalDeviceNameResult(const ProcessInfo &processInfo,
         const std::string &deviceName, int32_t code) override
     {
         (void)processInfo;
@@ -247,7 +247,7 @@ public:
         (void)code;
     }
 
-    virtual void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
+    void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) override
     {
         (void)processInfo;
