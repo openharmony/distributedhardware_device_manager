@@ -1,0 +1,136 @@
+diff --git a/test/benchmarktest/device_manager_fa_test/BUILD.gn b/test/benchmarktest/device_manager_fa_test/BUILD.gn
+index 39b5a3ef..c571780d 100644
+--- a/test/benchmarktest/device_manager_fa_test/BUILD.gn
++++ b/test/benchmarktest/device_manager_fa_test/BUILD.gn
+@@ -36,6 +36,8 @@ ohos_benchmarktest("DeviceManagerFaTest") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "cJSON:cjson_static",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "bounds_checking_function:libsec_shared",
+     "dsoftbus:softbus_client",
+diff --git a/test/benchmarktest/device_manager_test/BUILD.gn b/test/benchmarktest/device_manager_test/BUILD.gn
+index d6d35d51..17514da3 100644
+--- a/test/benchmarktest/device_manager_test/BUILD.gn
++++ b/test/benchmarktest/device_manager_test/BUILD.gn
+@@ -32,6 +32,8 @@ ohos_benchmarktest("DeviceManagerTest") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "cJSON:cjson_static",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "benchmark:benchmark",
+     "bounds_checking_function:libsec_shared",
+diff --git a/test/commonfuzztest/authenticatedevice_fuzzer/BUILD.gn b/test/commonfuzztest/authenticatedevice_fuzzer/BUILD.gn
+index 80b79330..be93c2e5 100644
+--- a/test/commonfuzztest/authenticatedevice_fuzzer/BUILD.gn
++++ b/test/commonfuzztest/authenticatedevice_fuzzer/BUILD.gn
+@@ -70,6 +70,8 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "cJSON:cjson_static",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "c_utils:utils",
+     "device_auth:deviceauth_sdk",
+diff --git a/test/commonfuzztest/authenticatedeviceservice_fuzzer/BUILD.gn b/test/commonfuzztest/authenticatedeviceservice_fuzzer/BUILD.gn
+index 0a3087fc..ce3a84b8 100644
+--- a/test/commonfuzztest/authenticatedeviceservice_fuzzer/BUILD.gn
++++ b/test/commonfuzztest/authenticatedeviceservice_fuzzer/BUILD.gn
+@@ -73,6 +73,7 @@ ohos_fuzztest("AuthenticateDeviceServiceFuzzTest") {
+     "access_token:libnativetoken",
+     "access_token:libtoken_setproc",
+     "cJSON:cjson",
++    "selinux_adapter:librestorecon",
+     "device_auth:deviceauth_sdk",
+     "device_info_manager:distributed_device_profile_common",
+     "device_info_manager:distributed_device_profile_sdk",
+diff --git a/test/commonfuzztest/authenticatedeviceserviceimpl_fuzzer/BUILD.gn b/test/commonfuzztest/authenticatedeviceserviceimpl_fuzzer/BUILD.gn
+index e0278c80..a1a0e132 100644
+--- a/test/commonfuzztest/authenticatedeviceserviceimpl_fuzzer/BUILD.gn
++++ b/test/commonfuzztest/authenticatedeviceserviceimpl_fuzzer/BUILD.gn
+@@ -74,6 +74,7 @@ ohos_fuzztest("AuthenticateDeviceServiceImplFuzzTest") {
+     "access_token:libnativetoken",
+     "access_token:libtoken_setproc",
+     "cJSON:cjson",
++    "selinux_adapter:librestorecon",
+     "device_auth:deviceauth_sdk",
+     "device_info_manager:distributed_device_profile_common",
+     "device_info_manager:distributed_device_profile_sdk",
+diff --git a/test/unittest/BUILD.gn b/test/unittest/BUILD.gn
+index 1626875a..37801035 100644
+--- a/test/unittest/BUILD.gn
++++ b/test/unittest/BUILD.gn
+@@ -255,6 +255,8 @@ ohos_unittest("UTTest_dm_pin_holder") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "cJSON:cjson",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "device_auth:deviceauth_sdk",
+     "dsoftbus:softbus_client",
+@@ -340,6 +342,8 @@ ohos_unittest("UTTest_dm_credential_manager") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "cJSON:cjson_static",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "device_auth:deviceauth_sdk",
+     "dsoftbus:softbus_client",
+@@ -377,6 +381,7 @@ ohos_unittest("UTTest_device_manager_service") {
+     "access_token:libnativetoken",
+     "access_token:libtoken_setproc",
+     "cJSON:cjson",
++    "selinux_adapter:librestorecon",
+     "device_auth:deviceauth_sdk",
+     "device_info_manager:distributed_device_profile_common",
+     "device_info_manager:distributed_device_profile_sdk",
+@@ -404,6 +409,7 @@ ohos_unittest("UTTest_dm_softbus_cache") {
+     "access_token:libnativetoken",
+     "access_token:libtoken_setproc",
+     "cJSON:cjson",
++    "selinux_adapter:librestorecon",
+     "device_auth:deviceauth_sdk",
+     "device_info_manager:distributed_device_profile_common",
+     "device_info_manager:distributed_device_profile_sdk",
+@@ -434,6 +440,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "cJSON:cjson",
+     "device_auth:deviceauth_sdk",
+@@ -993,6 +1000,8 @@ ohos_unittest("UTTest_device_manager_impl") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "cJSON:cjson_static",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "device_auth:deviceauth_sdk",
+     "dsoftbus:softbus_client",
+@@ -1024,6 +1033,8 @@ ohos_unittest("UTTest_dm_import_auth_code") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "cJSON:cjson_static",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "device_auth:deviceauth_sdk",
+     "ffrt:libffrt",
+@@ -1075,6 +1086,8 @@ ohos_unittest("UTTest_permission_manager") {
+   external_deps = [
+     "access_token:libaccesstoken_sdk",
+     "access_token:libnativetoken",
++    "cJSON:cjson",
++    "selinux_adapter:librestorecon",
+     "access_token:libtoken_setproc",
+     "device_auth:deviceauth_sdk",
+     "googletest:gmock",

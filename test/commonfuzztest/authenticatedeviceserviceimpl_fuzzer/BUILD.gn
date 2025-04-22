@@ -74,6 +74,7 @@ ohos_fuzztest("AuthenticateDeviceServiceImplFuzzTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "selinux_adapter:librestorecon",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
