@@ -102,6 +102,13 @@ extern const int32_t DM_AUTH_TYPE_MIN;
 extern const int32_t MIN_PIN_TOKEN;
 extern const int32_t MAX_PIN_TOKEN;
 
+typedef struct DmBindCallerInfo {
+    int32_t userId = -1;
+    int32_t tokenId = -1;
+    std::string bundleName = "";
+    std::string hostPkgLabel = "";
+} DmBindCallerInfo;
+
 using CleanNotifyCallback = std::function<void(uint64_t)>;
 
 class AuthManagerBase : public ISoftbusSessionCallback,
@@ -234,6 +241,8 @@ public:
     void EnableInsensibleSwitching();
     void DisableInsensibleSwitching();
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
+    virtual void GetCallerInfo(DmBindCallerInfo &callerInfo) = 0;
+    virtual void SetCallerInfo(const DmBindCallerInfo &callerInfo) = 0;
 protected:
     bool NeedInsensibleSwitching();
     bool isTransferReady_{true};

@@ -493,6 +493,9 @@ public:
     static bool IsPinCodeValid(int32_t numpin);
     bool IsImportedAuthCodeValid();
     bool IsSrc();
+    void GetCallerInfo(DmBindCallerInfo &callerInfo);
+    void SetCallerInfo(const DmBindCallerInfo &callerInfo);
+    void ClearCallerInfo();
 
 private:
     bool IsHmlSessionType();
@@ -535,6 +538,7 @@ private:
     void MemberJoinAuthRequest(int64_t requestId, int32_t status);
     void PutSrcAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
     void PutSinkAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
+    void GetCallerInfo(const std::string &pkgName, JsonObject &jsonObject);
 
 public:
     void RequestCredential();
@@ -645,6 +649,9 @@ private:
     std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
     bool isWaitingJoinLnnCallback_ = false;
     CleanNotifyCallback cleanNotifyCallback_{nullptr};
+    std::mutex callerInfoMutex_;
+    DmBindCallerInfo callerInfo_;
+    bool callerInfoReady_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

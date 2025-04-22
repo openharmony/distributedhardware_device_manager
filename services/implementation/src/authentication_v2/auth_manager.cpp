@@ -1032,5 +1032,18 @@ void AuthManager::ClearSoftbusSessionCallback()
 
 void AuthManager::PrepareSoftbusSessionCallback()
 {}
+
+void AuthManager::GetCallerInfo(DmBindCallerInfo &callerInfo)
+{
+    callerInfo.userId = context_->accesser.userId;
+    callerInfo.tokenId = context_->accesser.tokenId;
+    callerInfo.bundleName = context_->accesser.bundleName;
+    callerInfo.hostPkgLabel = context_->pkgLabel;
+}
+
+void AuthManager::SetCallerInfo(const DmBindCallerInfo &callerInfo)
+{
+    (void)callerInfo;
+}
 }  // namespace DistributedHardware
 }  // namespace OHOS

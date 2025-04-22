@@ -120,6 +120,9 @@ public:
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
     void ClearSoftbusSessionCallback();
     void PrepareSoftbusSessionCallback();
+    void GetCallerInfo(DmBindCallerInfo &callerInfo);
+    void SetCallerInfo(const DmBindCallerInfo &callerInfo);
+
 protected:
     std::shared_ptr<DmAuthContext> context_;
     std::map<std::string, std::string> bindParam_;
