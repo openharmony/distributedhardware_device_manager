@@ -75,15 +75,15 @@ ohos_fuzztest("AuthenticateDeviceFuzzTest") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
-    "cJSON:cjson_static",
-    "selinux_adapter:librestorecon",
     "access_token:libtoken_setproc",
+    "cJSON:cjson_static",
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "selinux_adapter:librestorecon",
   ]
 }
 
