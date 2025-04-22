@@ -56,6 +56,8 @@ public:
 
     void ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg);
     void ProcessResponseUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg);
+    int32_t SendLogoutAccountInfo(const std::string &rmtNetworkId, const std::string &accountId, int32_t userId);
+    void ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> commMsg);
 private:
     std::shared_ptr<DMTransport> dmTransportPtr_;
     std::shared_ptr<DMCommTool::DMCommToolEventHandler> eventHandler_;

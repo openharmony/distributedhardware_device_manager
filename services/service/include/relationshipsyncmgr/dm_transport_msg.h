@@ -64,6 +64,17 @@ struct NotifyUserIds {
 
 void ToJson(cJSON *jsonObject, const NotifyUserIds &userIds);
 void FromJson(const cJSON *jsonObject, NotifyUserIds &userIds);
+
+struct LogoutAccountMsg {
+    std::string accountId;
+    int32_t userId;
+    LogoutAccountMsg() : userId(-1) {}
+    LogoutAccountMsg(const std::string &accountId, int32_t userId)
+        : accountId(accountId), userId(userId) {}
+};
+
+void ToJson(cJSON *jsonObject, const LogoutAccountMsg &accountInfo);
+void FromJson(const cJSON *jsonObject, LogoutAccountMsg &accountInfo);
 } // DistributedHardware
 } // OHOS
 #endif

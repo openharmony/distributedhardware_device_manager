@@ -808,6 +808,7 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
     SoftbusCache::GetInstance().GetUuidByUdid(remoteUdid, uuid);
     listener_->OnDeviceTrustChange(remoteUdid, uuid, DmAuthForm::IDENTICAL_ACCOUNT);
     for (const auto &item : devIdAndUserMap) {
+        LOGI("remoteUdid %{public}s.", GetAnonyString(remoteUdid).c_str());
         bool notifyOffline = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(item.first, item.second,
             remoteUdid, remoteUserId);
         if (notifyOffline) {
