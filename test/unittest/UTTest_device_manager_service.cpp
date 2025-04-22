@@ -2380,6 +2380,65 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
         "peerUdid" : "110",
         "accountName" : "account_wang"
     })";
+    msg =  R"(
+        {
+            "type" : 3,
+            "userId" : 130,
+            "accountId" : "28880",
+            "tokenId" : 19,
+            "peerUdid" : "111",
+            "accountName" : "account_liang"
+        })";
+    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
+    msg =  R"(
+        {
+            "type" : 4,
+            "userId" : 131,
+            "accountId" : "28881",
+            "tokenId" : 20,
+            "peerUdid" : "112",
+            "accountName" : "account_deng"
+        })";
+    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
+    msg =  R"(
+        {
+            "type" : 5,
+            "userId" : 131,
+            "accountId" : "28882",
+            "tokenId" : 20,
+            "peerUdid" : "112",
+            "accountName" : "account_deng"
+        })";
+    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
+    msg =  R"(
+        {
+            "type" : 6,
+            "userId" : 132,
+            "accountId" : "28883",
+            "tokenId" : 21,
+            "peerUdid" : "113",
+            "accountName" : "account_zhang"
+        })";
+    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
+    msg =  R"(
+        {
+            "type" : 7,
+            "userId" : 133,
+            "accountId" : "28884",
+            "tokenId" : 22,
+            "peerUdid" : "114",
+            "accountName" : "account_hu"
+        })";
+    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
+    msg =  R"(
+        {
+            "type" : 8,
+            "userId" : 134,
+            "accountId" : "28885",
+            "tokenId" : 23,
+            "peerUdid" : "115",
+            "accountName" : "account_liu"
+        })";
     DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);

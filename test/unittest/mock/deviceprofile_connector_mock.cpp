@@ -161,6 +161,23 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(s
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetDeviceIdAndBindLevel(userIds, localUdid);
 }
 
+void DeviceProfileConnector::DeleteAccessControlById(int64_t accessControlId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAccessControlById(accessControlId);
+} 
+
+std::vector<ProcessInfo> DeviceProfileConnector::GetProcessInfoFromAclByUserId(
+    const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetProcessInfoFromAclByUserId(localDeviceId,
+        targetDeviceId, userId);
+}
+
+std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAccessControlProfile();
+}
+
 std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnector::GetAllAclIncludeLnnAcl()
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAllAclIncludeLnnAcl();

@@ -30,11 +30,12 @@ using namespace OHOS::DistributedDeviceProfile;
 const uint32_t INVALIED_TYPE = 0;
 const uint32_t APP_PEER_TO_PEER_TYPE = 1;
 const uint32_t APP_ACROSS_ACCOUNT_TYPE = 2;
-const uint32_t DEVICE_PEER_TO_PEER_TYPE = 3;
-const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 4;
-const uint32_t IDENTICAL_ACCOUNT_TYPE = 5;
-const uint32_t SERVICE_PEER_TO_PEER_TYPE = 6;
-const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 7;
+const uint32_t SHARE_TYPE = 3;
+const uint32_t DEVICE_PEER_TO_PEER_TYPE = 4;
+const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 5;
+const uint32_t IDENTICAL_ACCOUNT_TYPE = 6;
+const uint32_t SERVICE_PEER_TO_PEER_TYPE = 7;
+const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 8;
 
 const uint32_t DM_INVALIED_TYPE = 2048;
 const uint32_t SERVICE = 2;
@@ -637,6 +638,13 @@ EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAp
             profilesFilter.push_back(item);
         }
     }
+    return GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);
+}
+
+std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormMap(const std::string &pkgName,
+    const std::string &deviceId, std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter,
+    const int32_t &userId)
+{
     std::unordered_map<std::string, DmAuthForm> deviceIdMap;
     for (auto &item : profilesFilter) {
         std::string trustDeviceId = item.GetTrustDeviceId();
@@ -650,6 +658,10 @@ EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAp
             continue;
         }
         if (deviceIdMap.find(trustDeviceId) == deviceIdMap.end()) {
+            if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, bindType)) {
+                LOGI("GetAuthFormMap CheckSinkShareType true.");
+                continue;
+            }
             deviceIdMap[trustDeviceId] = static_cast<DmAuthForm>(bindType);
             continue;
         }
@@ -661,12 +673,34 @@ EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAp
             deviceIdMap[trustDeviceId] = DmAuthForm::IDENTICAL_ACCOUNT;
             continue;
         }
+        if (bindType == DmAuthForm::ACROSS_ACCOUNT) {
+            if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, bindType)) {
+                LOGI("GetAuthFormMap CheckSinkShareType true.");
+                continue;
+            }
+            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
+            continue;
+        }
         if (bindType == DmAuthForm::PEER_TO_PEER && authForm == DmAuthForm::ACROSS_ACCOUNT) {
             deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
             continue;
         }
     }
     return deviceIdMap;
+}
+
+bool DeviceProfileConnector::CheckSinkShareType(DistributedDeviceProfile::AccessControlProfile profile,
+    const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType)
+{
+    if ((profile.GetAccessee().GetAccesseeUserId() == userId ||
+        profile.GetAccessee().GetAccesseeUserId() == 0 ||
+        profile.GetAccessee().GetAccesseeUserId() == -1) &&
+        profile.GetAccessee().GetAccesseeDeviceId() == deviceId &&
+        profile.GetAccesser().GetAccesserDeviceId() == trustDeviceId &&
+        bindType == DmAuthForm::ACROSS_ACCOUNT) {
+        return true;
+    }
+    return false;
 }
 
 int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm)
@@ -748,6 +782,9 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
     if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
         return CheckAuthForm(DmAuthForm::ACROSS_ACCOUNT, profiles, discoveryInfo);
     }
+    if (profiles.GetBindType() == DM_SHARE) {
+        return CheckAuthForm(DmAuthForm::ACROSS_ACCOUNT, profiles, discoveryInfo);
+    }
     return DmAuthForm::INVALID_TYPE;
 }
 
@@ -781,6 +818,9 @@ int32_t DeviceProfileConnector::GetAuthForm(DistributedDeviceProfile::AccessCont
     switch (bindType) {
         case DM_IDENTICAL_ACCOUNT:
             priority = IDENTICAL_ACCOUNT_TYPE;
+            break;
+        case DM_SHARE:
+            priority = SHARE_TYPE;
             break;
         case DM_POINT_TO_POINT:
             if (profiles.GetBindLevel() == USER) {

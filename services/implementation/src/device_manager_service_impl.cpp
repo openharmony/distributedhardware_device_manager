@@ -45,6 +45,7 @@ namespace {
 
 // One year 365 * 24 * 60 * 60
 constexpr int32_t MAX_ALWAYS_ALLOW_SECONDS = 31536000;
+constexpr int32_t ACL_CREDID_LENGTH = 6;
 constexpr int32_t MIN_PIN_CODE = 100000;
 constexpr int32_t MAX_PIN_CODE = 999999;
 // New protocol field definition. To avoid dependency on the new protocol header file,
@@ -582,17 +583,17 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
     }
     std::string udisHash = softbusConnector_->GetDeviceUdidHashByUdid(trustDeviceId);
     if (memcpy_s(devInfo.deviceId, DM_MAX_DEVICE_ID_LEN, udisHash.c_str(), udisHash.length()) != 0) {
-        LOGE("get deviceId: %{public}s failed", GetAnonyString(udisHash).c_str());
         return;
     }
     char localUdid[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
     std::string requestDeviceId = std::string(localUdid);
-    std::map<int32_t, int32_t> userIdAndBindLevel =
-        DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(requestDeviceId, trustDeviceId);
     ProcessInfo processInfo;
     processInfo.pkgName = std::string(DM_PKG_NAME);
     processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
+    uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
+    std::map<int32_t, int32_t> userIdAndBindLevel =
+        DeviceProfileConnector::GetInstance().GetUserIdAndBindLevel(requestDeviceId, trustDeviceId);
     if (userIdAndBindLevel.empty() || userIdAndBindLevel.find(processInfo.userId) == userIdAndBindLevel.end()) {
         userIdAndBindLevel[processInfo.userId] = INVALIED_TYPE;
     }
@@ -602,7 +603,12 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
             devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
             processInfo.userId = item.first;
             softbusConnector_->SetProcessInfo(processInfo);
-        } else if (static_cast<uint32_t>(item.second) == USER) {
+        } else if (static_cast<uint32_t>(item.second) == USER && bindType == SHARE_TYPE) {
+            LOGI("The offline device is device bind level and share bind type.");
+            devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+            processInfo.userId = item.first;
+            softbusConnector_->SetProcessInfo(processInfo);
+        } else if (static_cast<uint32_t>(item.second) == USER && bindType != SHARE_TYPE) {
             LOGI("The offline device is device bind type.");
             devInfo.authForm = DmAuthForm::PEER_TO_PEER;
             processInfo.userId = item.first;
@@ -640,6 +646,12 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     ProcessInfo processInfo;
     processInfo.pkgName = std::string(DM_PKG_NAME);
     processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
+    SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+}
+
+void DeviceManagerServiceImpl::SetOnlineProcessInfo(uint32_t bindType, ProcessInfo &processInfo, DmDeviceInfo &devInfo,
+    const std::string &requestDeviceId, const std::string &trustDeviceId, DmDeviceState devState)
+{
     if (bindType == IDENTICAL_ACCOUNT_TYPE) {
         devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
         softbusConnector_->SetProcessInfo(processInfo);
@@ -661,9 +673,36 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
                 MultipleUserConnector::GetFirstForegroundUserId());
         softbusConnector_->SetProcessInfoVec(processInfoVec);
         devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+    } else if (bindType == SHARE_TYPE) {
+        if (CheckSharePeerSrc(trustDeviceId, requestDeviceId)) {
+            LOGI("ProcessDeviceStateChange authForm is share, peer is src.");
+            return;
+        }
+        devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+        softbusConnector_->SetProcessInfo(processInfo);
     }
-    LOGI("DeviceManagerServiceImpl::HandleOnline success devInfo auform %{public}d.", devInfo.authForm);
+    LOGI("DeviceManagerServiceImpl::HandleOnline success devInfo authForm is %{public}d.", devInfo.authForm);
     deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    return;
+}
+
+bool DeviceManagerServiceImpl::CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    for (auto &aclItem : profiles) {
+        if (aclItem.GetBindType() == DM_SHARE && aclItem.GetTrustDeviceId() == peerUdid) {
+            if (aclItem.GetAccesser().GetAccesserDeviceId() == peerUdid &&
+                aclItem.GetAccessee().GetAccesseeDeviceId() == localUdid) {
+                return true;
+            }
+            if (aclItem.GetAccesser().GetAccesserDeviceId() == localUdid &&
+                aclItem.GetAccessee().GetAccesseeDeviceId() == peerUdid) {
+                return false;
+            }
+        }
+    }
+    return false;
 }
 
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
@@ -2243,6 +2282,69 @@ void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUd
         LOGI("CheckDeleteCredential delete credential");
         hiChainAuthConnector_->DeleteCredential(remoteUdid, MultipleUserConnector::GetCurrentAccountUserID(),
             remoteUserId);
+    }
+}
+
+void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
+    const std::string &localUdid, std::string &remoteUdid)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    JsonObject jsonObject;
+    jsonObject.Parse(std::string(credInfo));
+    if (jsonObject.IsDiscarded()) {
+        LOGE("credInfo prase error.");
+        return;
+    }
+    std::string deviceIdTag = "deviceId";
+    std::string userIdTag = "userId";
+    int32_t userId = 0;
+    if (IsString(jsonObject, deviceIdTag)) {
+        remoteUdid = jsonObject[deviceIdTag].Get<std::string>();
+    }
+    if (IsInt32(jsonObject, userIdTag)) {
+        userId = jsonObject[userIdTag].Get<int32_t>();
+    }
+    for (const auto &item : profiles) {
+        if (item.GetBindType() != DM_SHARE) {
+            continue;
+        }
+        if ((item.GetAccesser().GetAccesserCredentialId() == atoi(credId) &&
+            item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == userId &&
+            item.GetAccessee().GetAccesseeDeviceId() == remoteUdid) ||
+            (item.GetAccessee().GetAccesseeCredentialId() == atoi(credId) &&
+            item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == userId &&
+            item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+        }
+    }
+}
+
+void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
+    const std::string &localUdid)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    for (const auto &item : profiles) {
+        if (item.GetBindType() != DM_SHARE) {
+            continue;
+        }
+        std::string accesserCredId = "";
+        std::string accesseeCredId = "";
+        for (int32_t i = 0; i < ACL_CREDID_LENGTH; i++) {
+            accesserCredId[i] = std::to_string(item.GetAccesser().GetAccesserCredentialId())[i];
+            accesseeCredId[i] = std::to_string(item.GetAccessee().GetAccesseeCredentialId())[i];
+        }
+        if (accesserCredId == credId && item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == userId) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+        }
+        if (accesseeCredId == credId && item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == userId) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+        }
     }
 }
 

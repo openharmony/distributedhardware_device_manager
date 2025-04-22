@@ -138,12 +138,34 @@ using DataChangeListener = struct DataChangeListener {
     void (*onTrustedDeviceNumChanged)(int curTrustedDeviceNum);
 };
 
+using CredChangeListener = struct CredChangeListener {
+    void (*onCredAdd)(const char *credId, const char *credInfo);
+    void (*onCredDelete)(const char *credId, const char *credInfo);
+    void (*onCredUpdate)(const char *credId, const char *credInfo);
+};
+
 using DeviceAuthCallback = struct DeviceAuthCallback {
     bool (*onTransmit)(int64_t requestId, const uint8_t *data, uint32_t dataLen);
     void (*onSessionKeyReturned)(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
     void (*onFinish)(int64_t requestId, int operationCode, const char *returnData);
     void (*onError)(int64_t requestId, int operationCode, int errorCode, const char *errorReturn);
     char *(*onRequest)(int64_t requestId, int operationCode, const char *reqParams);
+};
+
+using CredManager = struct CredManager {
+    int32_t (*addCredential)(int32_t osAccountId, const char *requestParams, char **returnData);
+    int32_t (*exportCredential)(int32_t osAccountId, const char *credId, char **returnData);
+    int32_t (*queryCredentialByParams)(int32_t osAccountId, const char *requestParams, char **returnData);
+    int32_t (*queryCredInfoByCredId)(int32_t osAccountId, const char *credId, char **returnData);
+    int32_t (*deleteCredential)(int32_t osAccountId, const char *credId);
+    int32_t (*updateCredInfo)(int32_t osAccountId, const char *credId, const char *requestParams);
+    int32_t (*agreeCredential)(int32_t osAccountId, const char *selfCredId, const char *requestParams,
+        char **returnData);
+    int32_t (*registerChangeListener)(const char *appId, CredChangeListener *listener);
+    int32_t (*unregisterChangeListener)(const char *appId);
+    int32_t (*deleteCredByParams)(int32_t osAccountId, const char *requestParams, char **returnData);
+    int32_t (*batchUpdateCredentials)(int32_t osAccountId, const char *requestParams, char **returnData);
+    void (*destroyInfo)(char **returnData);
 };
 
 using GroupAuthManager = struct GroupAuthManager {
@@ -214,6 +236,7 @@ DEVICE_AUTH_API_PUBLIC int InitDeviceAuthService(void);
 DEVICE_AUTH_API_PUBLIC void DestroyDeviceAuthService(void);
 DEVICE_AUTH_API_PUBLIC const GroupAuthManager *GetGaInstance(void);
 DEVICE_AUTH_API_PUBLIC const DeviceGroupManager *GetGmInstance(void);
+DEVICE_AUTH_API_PUBLIC const CredManager *GetCredMgrInstance(void);
 #ifdef __cplusplus
 }
 #endif

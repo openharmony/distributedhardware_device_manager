@@ -65,6 +65,10 @@ public:
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds,
         const std::string &localUdid) = 0;
+    virtual void DeleteAccessControlById(int64_t& accessControlId) = 0;
+    virtual std::vector<ProcessInfo> GetProcessInfoFromAclByUserId(const std::string &localDeviceId,
+        const std::string &targetDeviceId, int32_t userId) = 0;
+    virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfile() = 0;
     virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAclIncludeLnnAcl() = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
@@ -105,6 +109,10 @@ public:
         (const std::string &, (const std::vector<int32_t> &), (const std::vector<int32_t> &)));
     MOCK_METHOD((std::map<std::string, int32_t>), GetDeviceIdAndBindLevel,
         ((std::vector<int32_t>), const std::string &));
+    MOCK_METHOD(void, DeleteAccessControlById, (int64_t& accessControlId));
+    MOCK_METHOD(std::vector<ProcessInfo>, GetProcessInfoFromAclByUserId,
+        (const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId));
+    MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAccessControlProfile, ());
     MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAllAclIncludeLnnAcl, ());
 };
 }

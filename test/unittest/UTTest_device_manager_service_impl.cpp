@@ -1737,6 +1737,10 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOnline_003, testing::ext::TestSize.
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(DEVICE_ACROSS_ACCOUNT_TYPE));
     deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
 
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(SHARE_TYPE));
+    deviceManagerServiceImpl_->HandleOnline(devState, devInfo);
+
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(APP_PEER_TO_PEER_TYPE));
@@ -1768,6 +1772,7 @@ HWTEST_F(DeviceManagerServiceImplTest, HandleOffline_003, testing::ext::TestSize
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     EXPECT_CALL(*dmDeviceStateManagerMock_, GetUdidByNetWorkId(_)).WillOnce(Return("123456"));
     EXPECT_CALL(*deviceProfileConnectorMock_, GetUserIdAndBindLevel(_, _)).WillOnce(Return(userIdAndBindLevel));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CheckBindType(_, _)).WillOnce(Return(SHARE_TYPE));
     deviceManagerServiceImpl_->HandleOffline(devState, devInfo);
     EXPECT_NE(deviceManagerServiceImpl_->deviceStateMgr_, nullptr);
 }

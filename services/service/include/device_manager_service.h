@@ -192,6 +192,7 @@ public:
     bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     void HandleDeviceNotTrust(const std::string &msg);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    void HandleCredentialDeleted(const char *credId, const char *credInfo);
     void HandleDeviceTrustedChange(const std::string &msg);
     void HandleUserIdCheckSumChange(const std::string &msg);
     void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
@@ -247,6 +248,7 @@ private:
     bool IsDMImplSoLoaded();
     bool IsDMServiceAdapterSoLoaded();
     bool IsDMServiceAdapterResidentLoad();
+    bool IsMsgEmptyAndDMServiceImplReady(const std::string &msg);
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapterResident();
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
@@ -288,6 +290,8 @@ private:
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void SubscribeAccountCommonEvent();
+    void SendShareTypeUnBindBroadCast(const char *credId, const int32_t localUserId,
+        const std::vector<std::string> &peerUdids);
     EXPORT void AccountCommonEventCallback(const std::string commonEventType,
         int32_t currentUserId, int32_t beforeUserId);
     void SubscribeScreenLockEvent();
@@ -308,6 +312,7 @@ private:
     void HandleUserSwitched(int32_t curUserId, int32_t preUserId);
     void HandleUserIdsBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
         const std::string &remoteUdid, bool isNeedResponse);
+    void HandleShareUnbindBroadCast(const int32_t userId, const std::string &credId);
     void NotifyRemoteLocalUserSwitch(int32_t curUserId, int32_t preUserId, const std::vector<std::string> &peerUdids,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     void NotifyRemoteLocalUserSwitchByWifi(int32_t curUserId, int32_t preUserId,

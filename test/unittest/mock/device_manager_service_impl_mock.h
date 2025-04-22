@@ -37,6 +37,11 @@ public:
     virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &udid,
         int32_t bindLevel, const std::string &extra) = 0;
+    virtual bool CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid) = 0;
+    virtual void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
+        std::string &remoteUdid) = 0;
+    virtual void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, 
+           const std::string &localUdid) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
 };
@@ -52,6 +57,9 @@ public:
     MOCK_METHOD((std::unordered_map<std::string, DmAuthForm>), GetAppTrustDeviceIdList, (std::string));
     MOCK_METHOD(int32_t, UnAuthenticateDevice, (const std::string &, const std::string &, int32_t));
     MOCK_METHOD(int32_t, UnBindDevice, (const std::string &, const std::string &, int32_t, const std::string &));
+    MOCK_METHOD(bool, CheckSharePeerSrc, (const std::string &peerUdid, const std::string &localUdid));
+    MOCK_METHOD(void, HandleCredentialDeleted, (const char *, const char *, const std::string &, std::string &));
+    MOCK_METHOD(void, HandleShareUnbindBroadCast, (const std::string &, const int32_t &, const std::string &));
 };
 }
 }

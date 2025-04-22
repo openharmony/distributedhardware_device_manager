@@ -30,7 +30,8 @@ enum class RelationShipChangeType : uint32_t {
     APP_UNINSTALL = 5,
     SYNC_USERID = 6,
     STOP_USER = 7,
-    TYPE_MAX = 8
+    SHARE_UNBIND = 8,
+    TYPE_MAX = 9
 };
 
 struct UserIdInfo {
@@ -58,6 +59,7 @@ struct RelationShipChangeMsg {
     bool syncUserIdFlag;
     // The foreground and background user id infos
     std::vector<UserIdInfo> userIdInfos;
+    std::string credId;
 
     explicit RelationShipChangeMsg();
     bool ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) const;
@@ -72,6 +74,7 @@ struct RelationShipChangeMsg {
     bool ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToStopUserPayLoad(uint8_t *&msg, uint32_t &len) const;
+    void ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     cJSON *ToPayLoadJson() const;
 
     bool FromAccountLogoutPayLoad(const cJSON *payloadJson);
@@ -81,6 +84,7 @@ struct RelationShipChangeMsg {
     bool FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloadJson);
     bool FromDelUserPayLoad(const cJSON *payloadJson);
     bool FromStopUserPayLoad(const cJSON *payloadJson);
+    bool FromShareUnbindPayLoad(const cJSON *payloadJson);
 
     std::string ToJson() const;
     bool FromJson(const std::string &msgJson);

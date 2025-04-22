@@ -29,5 +29,9 @@ int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::
 {
     return DmDmDeviceStateManager::dmDeviceStateManager->ProcNotifyEvent(eventId, deviceId);
 }
+void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
+{
+    DmDmDeviceStateManager::dmDeviceStateManager->HandleDeviceStatusChange(devState, devInfo);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
