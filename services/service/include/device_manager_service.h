@@ -236,6 +236,7 @@ public:
     bool IsPC();
     int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds);
+    void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
 
 private:
     bool IsDMServiceImplReady();
@@ -341,6 +342,8 @@ private:
     void SubscribeDataShareCommonEvent();
 #endif
     void CheckRegisterInfoWithWise(int32_t curUserId);
+    void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
+        const std::string &accountIdHash, const std::string &accountName, int32_t userId);
 
 private:
     bool isImplsoLoaded_ = false;
