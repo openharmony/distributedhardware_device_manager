@@ -2053,6 +2053,21 @@ HWTEST_F(DeviceManagerServiceImplTest, DeleteCredential_010, testing::ext::TestS
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(profiles));
     deviceManagerServiceImpl_->CheckDeleteCredential(remoteUdid, remoteUserId);
 }
+
+HWTEST_F(DeviceManagerServiceImplTest, ChangeUltrasonicTypeToPin_001, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> bindParam;
+    int32_t ret = deviceManagerServiceImpl_->ChangeUltrasonicTypeToPin(bindParam);
+    EXPECT_EQ(ret, ERR_DM_AUTH_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, ChangeUltrasonicTypeToPin_002, testing::ext::TestSize.Level1)
+{
+    std::map<std::string, std::string> bindParam;
+    bindParam["AUTH_TYPE"] = "1";
+    int32_t ret = deviceManagerServiceImpl_->ChangeUltrasonicTypeToPin(bindParam);
+    EXPECT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

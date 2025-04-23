@@ -589,6 +589,88 @@ HWTEST_F(HiChainAuthConnectorTest, DeleteCredential_005, testing::ext::TestSize.
     int32_t ret = hiChain_->DeleteCredential(deviceId, userId, peerUserId);
     EXPECT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(HiChainAuthConnectorTest, ProcessCredData_001, testing::ext::TestSize.Level1)
+{
+    int64_t authReqId = 0;
+    std::string data;
+    int32_t ret = hiChain_->ProcessCredData(authReqId, data);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, AddCredential_001, testing::ext::TestSize.Level1)
+{
+    int32_t osAccountId = 0;
+    std::string authParams = "authParamsTest";
+    std::string credId;
+    int32_t ret = hiChain_->AddCredential(osAccountId, authParams, credId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, ExportCredential_001, testing::ext::TestSize.Level1)
+{
+    int32_t osAccountId = 0;
+    std::string credId = "credIdTest";
+    std::string publicKey;
+    int32_t ret = hiChain_->ExportCredential(osAccountId, credId, publicKey);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, AgreeCredential_001, testing::ext::TestSize.Level1)
+{
+    int32_t osAccountId = 0;
+    std::string selfCredId = "selfCredIdTest";
+    std::string authParams;
+    std::string credId;
+    int32_t ret = hiChain_->AgreeCredential(osAccountId, selfCredId, authParams, credId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, AuthCredential_001, testing::ext::TestSize.Level1)
+{
+    int32_t osAccountId = 0;
+    int64_t authReqId = 1;
+    std::string credId = "credIdTest";
+    std::string pinCode = "146894";
+    int32_t ret = hiChain_->AuthCredential(osAccountId, authReqId, credId, pinCode);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, AuthCredentialPinCode_001, testing::ext::TestSize.Level1)
+{
+    int32_t osAccountId = 0;
+    int64_t authReqId = 1;
+    std::string pinCode = "233";
+    int32_t ret = hiChain_->AuthCredentialPinCode(osAccountId, authReqId, pinCode);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, AuthCredentialPinCode_002, testing::ext::TestSize.Level1)
+{
+    int32_t osAccountId = 0;
+    int64_t authReqId = 1;
+    std::string pinCode = "369528";
+    int32_t ret = hiChain_->AuthCredentialPinCode(osAccountId, authReqId, pinCode);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, QueryCredentialInfo_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 0;
+    JsonObject queryParam;
+    JsonObject resultJson;
+    int32_t ret = hiChain_->QueryCredentialInfo(userId, queryParam, resultJson);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(HiChainAuthConnectorTest, QueryCredInfoByCredId_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 0;
+    std::string credId;
+    JsonObject resultJson;
+    int32_t ret = hiChain_->QueryCredInfoByCredId(userId, credId, resultJson);
+    EXPECT_NE(ret, DM_OK);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
 

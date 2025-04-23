@@ -911,14 +911,9 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_004, testing:
     context->authTypeList.push_back(DmAuthType::AUTH_TYPE_PIN_ULTRASONIC);
     context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
     context->ultrasonicInfo = DM_Ultrasonic_Reverse;
-    context->direction = DmAuthDirection::DM_AUTH_SINK;
     EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
         .WillOnce(Return(DmEventType::ON_FAIL));
     EXPECT_EQ(authState->Action(context), STOP_BIND);
-}
-
-HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_001, testing::ext::TestSize.Level1)
-{
     std::shared_ptr<AuthSinkReverseUltrasonicDoneState> authState =
         std::make_shared<AuthSinkReverseUltrasonicDoneState>();
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_REVERSE_ULTRASONIC_DONE_STATE);
