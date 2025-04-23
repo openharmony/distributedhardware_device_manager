@@ -176,7 +176,6 @@ HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson02_Invaild, testing::ext::TestSize
     EXPECT_EQ(jsonObject, nullptr);
     EXPECT_EQ(newNotifyUserIds.remoteUdid, "");
     EXPECT_EQ(newNotifyUserIds.userIds.size(), 0);
-
 }
 
 /**
