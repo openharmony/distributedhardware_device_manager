@@ -27,6 +27,7 @@ void AuthAclTest::SetUpTestCase()
 {
     LOGI("AuthAclTest::SetUpTestCase start.");
     DmSoftbusConnector::dmSoftbusConnector = dmSoftbusConnectorMock;
+    DmSoftbusSession::dmSoftbusSession = dmSoftbusSessionMock;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = std::make_shared<DmAuthMessageProcessorMock>();
 }
 
@@ -35,6 +36,8 @@ void AuthAclTest::TearDownTestCase()
     LOGI("AuthAclTest::TearDownTestCase start.");
     DmSoftbusConnector::dmSoftbusConnector = nullptr;
     dmSoftbusConnectorMock = nullptr;
+    DmSoftbusSession::dmSoftbusSession = nullptr;
+    dmSoftbusSessionMock = nullptr;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = nullptr;
 }
 
@@ -55,6 +58,7 @@ void AuthAclTest::TearDown()
 
     Mock::VerifyAndClearExpectations(&*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock);
     Mock::VerifyAndClearExpectations(&*DmSoftbusConnector::dmSoftbusConnector);
+    Mock::VerifyAndClearExpectations(&*DmSoftbusSession::dmSoftbusSession);
 }
 
 HWTEST_F(AuthAclTest, AuthSinkAcl_001, testing::ext::TestSize.Level1)
@@ -64,13 +68,12 @@ HWTEST_F(AuthAclTest, AuthSinkAcl_001, testing::ext::TestSize.Level1)
     context = authManager->GetAuthContext();
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
     context->accessee.deviceId = "accessee_deviceId";
-    context->accessee.userId = "accessee_userId";
     context->accesser.deviceId = "accesser_deviceId";
-    context->accesser.userId = "accesser_userId";
     context->accesser.aclStrList = "aclList";
     EXPECT_CALL(*dmSoftbusConnectorMock, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
         .WillOnce(Return(TEST_NONE_EMPTY_STRING));
+    EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(DM_OK));
 
     EXPECT_EQ(authState->Action(context), DM_OK);
 }
@@ -96,6 +99,7 @@ HWTEST_F(AuthAclTest, AuthSrcAcl_001, testing::ext::TestSize.Level1)
     context->accesser.isOnline = true; // no need to join network
     EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
         .WillOnce(Return(TEST_NONE_EMPTY_STRING));
+    EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(DM_OK));
     EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
@@ -117,8 +121,6 @@ HWTEST_F(AuthAclTest, AuthSrcFinish_001, testing::ext::TestSize.Level1)
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcFinishState>();
     context->reason = DM_OK;
     context->connDelayCloseTime = 10;
-    EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
-        .WillOnce(Return(TEST_NONE_EMPTY_STRING));
     EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
