@@ -417,5 +417,255 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthDoneState_002, testing::ext::TestS
 
     EXPECT_EQ(authState->Action(context), DM_OK);
 }
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcReverseUltrasonicStartState> authState =
+        std::make_shared<AuthSrcReverseUltrasonicStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicStartState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcReverseUltrasonicStartState>();
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcReverseUltrasonicDoneState> authState =
+        std::make_shared<AuthSrcReverseUltrasonicDoneState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_DONE_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcReverseUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcReverseUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_TRANSMIT));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcReverseUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_SESSION_KEY_RETURNED));
+    EXPECT_EQ(authState->Action(context), STOP_BIND);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcForwardUltrasonicStartState> authState =
+        std::make_shared<AuthSrcForwardUltrasonicStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_FORWARD_ULTRASONIC_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicStartState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicStartState>();
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcForwardUltrasonicDoneState> authState =
+        std::make_shared<AuthSrcForwardUltrasonicDoneState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_FORWARD_ULTRASONIC_DONE_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicDoneState>();
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_ULTRASONIC_PIN_CHANGED));
+    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_EQ(authState->Action(context), STOP_BIND);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicDoneState>();
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_ULTRASONIC_PIN_CHANGED))
+        .WillOnce(Return(ON_TRANSMIT));
+    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicDoneState>();
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_ULTRASONIC_PIN_CHANGED))
+        .WillOnce(Return(ON_ERROR));
+    EXPECT_CALL(*hiChainAuthConnectorMock, AuthCredentialPinCode(_, _, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_005, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicDoneState>();
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_ULTRASONIC_PIN_TIMEOUT));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_006, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcForwardUltrasonicDoneState>();
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_SESSION_KEY_RETURNED));
+    EXPECT_EQ(authState->Action(context), STOP_BIND);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkReverseUltrasonicStartState> authState =
+        std::make_shared<AuthSinkReverseUltrasonicStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_REVERSE_ULTRASONIC_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicStartState>();
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_ULTRASONIC_PIN_CHANGED));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicStartState>();
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_ULTRASONIC_PIN_TIMEOUT));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicStartState>();
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_SESSION_KEY_RETURNED));
+    EXPECT_EQ(authState->Action(context), STOP_BIND);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkReverseUltrasonicDoneState> authState =
+        std::make_shared<AuthSinkReverseUltrasonicDoneState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_REVERSE_ULTRASONIC_DONE_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_TRANSMIT));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_ERROR));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_005, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkReverseUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_SESSION_KEY_RETURNED));
+    EXPECT_EQ(authState->Action(context), STOP_BIND);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkForwardUltrasonicStartState> authState =
+        std::make_shared<AuthSinkForwardUltrasonicStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_FORWARD_ULTRASONIC_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicStartState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicStartState>();
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkForwardUltrasonicDoneState> authState =
+        std::make_shared<AuthSinkForwardUltrasonicDoneState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_FORWARD_ULTRASONIC_DONE_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
+        .WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_TRANSMIT));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_ERROR));
+    EXPECT_EQ(authState->Action(context), DM_OK);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_005, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkForwardUltrasonicDoneState>();
+    EXPECT_CALL(*hiChainAuthConnectorMock, ProcessCredData(_, _))
+        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_))
+        .WillOnce(Return(ON_SESSION_KEY_RETURNED));
+    EXPECT_EQ(authState->Action(context), STOP_BIND);
+}
 }
 }
