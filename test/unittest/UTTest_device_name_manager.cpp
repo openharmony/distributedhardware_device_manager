@@ -585,5 +585,87 @@ HWTEST_F(DeviceNameManagerTest, SetUserDefinedDeviceName_001, testing::ext::Test
     EXPECT_EQ(result, 1);
 }
 
+HWTEST_F(DeviceNameManagerTest, SubstrByBytes_001, testing::ext::TestSize.Level1)
+{
+    std::string str = "str";
+    int32_t maxNumBytes = 12;
+    auto result = DeviceNameManager::GetInstance().SubstrByBytes(str, maxNumBytes);
+    EXPECT_EQ(result, str);
+}
+
+HWTEST_F(DeviceNameManagerTest, SubstrByBytes_002, testing::ext::TestSize.Level1)
+{
+    std::string str = "HelloWorld";
+    int32_t maxNumBytes = 5;
+    auto result = DeviceNameManager::GetInstance().SubstrByBytes(str, maxNumBytes);
+    EXPECT_EQ(result, "Hello");
+}
+
+HWTEST_F(DeviceNameManagerTest, GetUserDefinedDeviceName_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+    std::string deviceName = "deviceName";
+    int32_t userId = 12;
+    std::shared_ptr<DataShareResultSet> resultSet = nullptr;
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+    auto result = DeviceNameManager::GetInstance().GetUserDefinedDeviceName(userId, deviceName);
+    EXPECT_EQ(result, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_003, testing::ext::TestSize.Level1)
+{
+    std::string prefixName = "My";
+    std::string subffixName = "Device";
+    int32_t maxNameLength = 20;
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    EXPECT_EQ(result, "My的Device");
+}
+
+HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_004, testing::ext::TestSize.Level1)
+{
+    std::string prefixName = "MyVeryLong";
+    std::string subffixName = "DeviceName";
+    int32_t maxNameLength = 15;
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    EXPECT_EQ(result, "My...DeviceName");
+}
+
+HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_005, testing::ext::TestSize.Level1)
+{
+    std::string prefixName = "My";
+    std::string subffixName = "Device";
+    int32_t maxNameLength = 0;
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    EXPECT_EQ(result, "My的Device");
+}
+
+HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_006, testing::ext::TestSize.Level1)
+{
+    std::string prefixName = "My";
+    std::string subffixName = "VeryLongDeviceNameThatExceedsLimit";
+    int32_t maxNameLength = 30;
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    EXPECT_EQ(result, "My的VeryLongDevi...");
+}
+
+HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_007, testing::ext::TestSize.Level1)
+{
+    std::string prefixName = "";
+    std::string subffixName = "Device";
+    int32_t maxNameLength = 10;
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    EXPECT_EQ(result, "Device");
+}
+
+HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_008, testing::ext::TestSize.Level1)
+{
+    std::string prefixName = "";
+    std::string subffixName = "VeryLongDeviceName";
+    int32_t maxNameLength = 10;
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    EXPECT_EQ(result, "VeryLon...");
+}
+
 } // DistributedHardware
 } // OHOS
