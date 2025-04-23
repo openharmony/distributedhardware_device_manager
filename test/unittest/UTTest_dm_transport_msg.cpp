@@ -63,6 +63,24 @@ HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson, testing::ext::TestSize.Level1)
 }
 
 /**
+ * @tc.name: ToJsonAndFromJson_Invaild
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson_Invaild, testing::ext::TestSize.Level1)
+{
+    UserIdsMsg userIdsMsg;
+    userIdsMsg.foregroundUserIds = {1, 2, 3};
+
+    cJSON *jsonObject = nullptr;
+    ToJson(jsonObject, userIdsMsg);
+    
+    UserIdsMsg newUserIdsMsg;
+    FromJson(jsonObject, newUserIdsMsg);
+    EXPECT_EQ(jsonObject, nullptr);
+    EXPECT_TRUE(newUserIdsMsg.foregroundUserIds.empty());
+}
+
+/**
  * @tc.name: ToJsonAndFromJson01
  * @tc.type: FUNC
  */
@@ -90,6 +108,115 @@ HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson01, testing::ext::TestSize.Level1)
     EXPECT_EQ(emptyCommMsg.code, -1);
     EXPECT_EQ(emptyCommMsg.msg, "");
     cJSON_Delete(emptyCommJsonObject);
+}
+
+/**
+ * @tc.name: ToJsonAndFromJson01_Invaild
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson01_Invaild, testing::ext::TestSize.Level1)
+{
+    CommMsg commMsg;
+    commMsg.code = 200;
+    commMsg.msg = "Success";
+
+    cJSON *jsonObject = nullptr;
+    ToJson(jsonObject, commMsg);
+
+    CommMsg newCommMsg;
+    FromJson(jsonObject, newCommMsg);
+    
+    EXPECT_EQ(jsonObject, nullptr);
+    EXPECT_TRUE(newCommMsg.msg.empty());
+}
+
+/**
+ * @tc.name: ToJsonAndFromJson02
+ * @tc.type: FUNC
+ */
+
+HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson02, testing::ext::TestSize.Level1)
+{
+    std::string remoteUdid = "test_udid";
+    std::vector<uint32_t> userIds = {10, 20, 30};
+    NotifyUserIds notifyUserIds(remoteUdid, userIds);
+    cJSON *jsonObject = cJSON_CreateObject();
+    ToJson(jsonObject, notifyUserIds);
+
+    NotifyUserIds newNotifyUserIds;
+    FromJson(jsonObject, newNotifyUserIds);
+    EXPECT_EQ(newNotifyUserIds.remoteUdid, remoteUdid);
+    EXPECT_EQ(newNotifyUserIds.userIds.size(), 3);
+    EXPECT_EQ(newNotifyUserIds.userIds[0], 10);
+    EXPECT_EQ(newNotifyUserIds.userIds[1], 20);
+    EXPECT_EQ(newNotifyUserIds.userIds[2], 30);
+    cJSON_Delete(jsonObject);
+
+    cJSON *emptyCommJsonObject = cJSON_CreateObject();
+    NotifyUserIds emptyNotifyUserIds;
+    FromJson(emptyCommJsonObject, emptyNotifyUserIds);
+    EXPECT_EQ(emptyNotifyUserIds.userIds.size(), 0);
+    EXPECT_EQ(emptyNotifyUserIds.remoteUdid, "");
+    cJSON_Delete(emptyCommJsonObject);
+}
+
+/**
+ * @tc.name: ToJsonAndFromJson02_Invaild
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson02_Invaild, testing::ext::TestSize.Level1)
+{
+    std::string remoteUdid = "test_udid";
+    std::vector<uint32_t> userIds = {10, 20, 30};
+    NotifyUserIds notifyUserIds(remoteUdid, userIds);
+    cJSON *jsonObject = nullptr;
+    ToJson(jsonObject, notifyUserIds);
+    NotifyUserIds newNotifyUserIds;
+    FromJson(jsonObject, newNotifyUserIds);
+    EXPECT_EQ(jsonObject, nullptr);
+    EXPECT_EQ(newNotifyUserIds.remoteUdid, "");
+    EXPECT_EQ(newNotifyUserIds.userIds.size(), 0);
+
+}
+
+/**
+ * @tc.name: ToJsonAndFromJson03
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson03, testing::ext::TestSize.Level1)
+{
+    LogoutAccountMsg logoutAccountMsg;
+    logoutAccountMsg.accountId = "test_account_id";
+    logoutAccountMsg.userId = 123;
+    cJSON *jsonObject = cJSON_CreateObject();
+    ToJson(jsonObject, logoutAccountMsg);
+    LogoutAccountMsg newLogoutAccountMsg;
+    FromJson(jsonObject, newLogoutAccountMsg);
+    EXPECT_EQ(newLogoutAccountMsg.accountId, "test_account_id");
+    EXPECT_EQ(newLogoutAccountMsg.userId, 123);
+    cJSON_Delete(jsonObject);
+
+    cJSON *emptyJsonObject = cJSON_CreateObject();
+    LogoutAccountMsg emptyLogoutAccountMsg;
+    FromJson(emptyJsonObject, emptyLogoutAccountMsg);
+    EXPECT_EQ(emptyLogoutAccountMsg.userId, -1);
+}
+
+/**
+ * @tc.name: ToJsonAndFromJson03_Invaild
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, ToJsonAndFromJson03_Invaild, testing::ext::TestSize.Level1)
+{
+    LogoutAccountMsg logoutAccountMsg;
+    logoutAccountMsg.accountId = "test_account_id";
+    logoutAccountMsg.userId = 123;
+    cJSON *jsonObject = nullptr;
+    ToJson(jsonObject, logoutAccountMsg);
+    LogoutAccountMsg newLogoutAccountMsg;
+    FromJson(jsonObject, newLogoutAccountMsg);
+    EXPECT_EQ(jsonObject, nullptr);
+    EXPECT_EQ(newLogoutAccountMsg.userId, -1);
 }
 
 /**
@@ -202,6 +329,34 @@ HWTEST_F(DMTransportMsgTest, ToJson_UserIdsMsg, testing::ext::TestSize.Level1)
     ToJson(jsonObject, userIdsMsg);
     cJSON_Delete(jsonObject);
     EXPECT_FALSE(userIdsMsg.foregroundUserIds.empty());
+}
+
+/**
+ * @tc.name: GetCommMsgString_01
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, GetCommMsgString_01, testing::ext::TestSize.Level1)
+{
+    const char* jsonstr = R"({"code":123,"msg":"messageinfo"})";
+    std::string jsonObj(jsonstr);
+    CommMsg commMsg(123, "messageinfo");
+    auto CommMsgString = GetCommMsgString(commMsg);
+    EXPECT_EQ(CommMsgString, jsonObj);
+}
+
+/**
+ * @tc.name: ToString_01
+ * @tc.type: FUNC
+ */
+HWTEST_F(DMTransportMsgTest, ToString_01, testing::ext::TestSize.Level1)
+{
+    const char* jsonstr = R"({"remoteUdid":"test_udid","foregroundUserIds":[10,20,30]})";
+    std::string jsonObj(jsonstr);
+    std::string remoteUdid = "test_udid";
+    std::vector<uint32_t> userIds = {10, 20, 30};
+    NotifyUserIds notifyUserIds(remoteUdid, userIds);
+    auto notifyUserIdsString = notifyUserIds.ToString();
+    EXPECT_EQ(notifyUserIdsString, jsonObj);
 }
 } // DistributedHardware
 } // OHOS
