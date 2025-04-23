@@ -31,6 +31,9 @@ public:
     virtual std::vector<ProcessInfo> GetProcessInfo() = 0;
     virtual DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId) = 0;
     virtual std::shared_ptr<SoftbusSession> GetSoftbusSession();
+    virtual int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo, const DevUserInfo &remoteDevUserInfo,
+                                            std::string remoteAclList) = 0;
+
 public:
     static inline std::shared_ptr<DmSoftbusConnector> dmSoftbusConnector = nullptr;
 };
@@ -42,6 +45,7 @@ public:
     MOCK_METHOD(std::vector<ProcessInfo>, GetProcessInfo, ());
     MOCK_METHOD(DmDeviceInfo, GetDeviceInfoByDeviceId, (const std::string &deviceId));
     MOCK_METHOD(std::shared_ptr<SoftbusSession>, GetSoftbusSession, ());
+    MOCK_METHOD(int32_t, SyncLocalAclListProcess, (const DevUserInfo &, const DevUserInfo &, std::string));
 };
 }
 }
