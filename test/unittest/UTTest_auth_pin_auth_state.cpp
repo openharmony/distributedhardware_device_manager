@@ -550,7 +550,7 @@ HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_007, testing::ext::
     context->direction = DmAuthDirection::DM_AUTH_SOURCE;
     context->pinNegotiateStarted = true;
     context->needBind = true;
-    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
+    EXPECT_EQ(authState->Action(context), ERR_DM_AUTH_REJECT);
 }
 
 HWTEST_F(AuthPinAuthStateTest, AuthSrcPinInputState_001, testing::ext::TestSize.Level1)
