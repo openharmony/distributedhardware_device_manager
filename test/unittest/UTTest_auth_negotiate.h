@@ -18,13 +18,14 @@
 
 #include "gtest/gtest.h"
 #include "auth_manager.h"
+#include "accesstoken_kit_mock.h"
 #include "softbus_connector_mock.h"
 #include "softbus_session_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 
-class AuthNegotiateStateTest : public testing::Test {
+class AuthNegotiateTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -35,6 +36,7 @@ private:
         std::make_shared<SoftbusConnectorMock>();
     static inline std::shared_ptr<SoftbusSessionMock> softbusSessionMock =
         std::make_shared<SoftbusSessionMock>();
+    static inline std::shared_ptr<AccessTokenKitMock> tokenMock = nullptr;
     std::shared_ptr<SoftbusConnector> softbusConnector;
     std::shared_ptr<IDeviceManagerServiceListener> listener;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector;

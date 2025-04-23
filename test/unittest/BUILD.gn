@@ -23,7 +23,7 @@ group("unittest") {
     ":UTTest_app_manager",
     ":UTTest_auth_credential_state",
     ":UTTest_auth_message_processor",
-    ":UTTest_auth_negotiate_state",
+    ":UTTest_auth_negotiate",
     ":UTTest_auth_pin_auth_state",
     ":UTTest_auth_request_state",
     ":UTTest_auth_response_state",
@@ -2062,22 +2062,26 @@ ohos_unittest("UTTest_auth_credential_state") {
 
 ## UnitTest UTTest_auth_credential_state }}}
 
-## UnitTest UTTest_auth_negotiate_state {{{
+## UnitTest UTTest_auth_negotiate {{{
 
-ohos_unittest("UTTest_auth_negotiate_state") {
+ohos_unittest("UTTest_auth_negotiate") {
   module_out_path = module_out_path
 
   include_dirs = []
 
   sources = [
-    "${devicemanager_path}/test/unittest/UTTest_auth_negotiate_state.cpp",
+    "${devicemanager_path}/test/unittest/UTTest_auth_negotiate.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/accesstoken_kit_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -2089,7 +2093,7 @@ ohos_unittest("UTTest_auth_negotiate_state") {
   ]
 }
 
-## UnitTest UTTest_auth_negotiate_state }}}
+## UnitTest UTTest_auth_negotiate }}}
 
 ## Build device_manager_test_common.a {{{
 config("device_manager_test_common_public_config") {
