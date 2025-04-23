@@ -20,6 +20,7 @@ group("unittest") {
 
   deps = [
     ":UTTest_advertise_manager",
+    ":UTTest_auth_acl",
     ":UTTest_app_manager",
     ":UTTest_auth_credential_state",
     ":UTTest_auth_message_processor",
@@ -2061,6 +2062,38 @@ ohos_unittest("UTTest_auth_credential_state") {
 }
 
 ## UnitTest UTTest_auth_credential_state }}}
+## UnitTest UTTest_auth_acl {{{
+
+ohos_unittest("UTTest_auth_acl") {
+  module_out_path = module_out_path
+
+  include_dirs = []
+
+  sources = [
+    "${devicemanager_path}/test/unittest/UTTest_auth_acl.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_auth_message_processor_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/dm_auth_state_machine_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/hichain_auth_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
+  ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_auth_acl }}}
+
 
 ## UnitTest UTTest_auth_negotiate_state {{{
 
