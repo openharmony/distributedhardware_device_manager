@@ -36,7 +36,7 @@ int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId, c
     const std::string &remoteUdid, const std::string &localUdid)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash,
-        remoteUdid, localUdid);s
+        remoteUdid, localUdid);
 }
 
 uint32_t DeviceProfileConnector::CheckBindType(std::string trustDeviceId, std::string requestDeviceId)
