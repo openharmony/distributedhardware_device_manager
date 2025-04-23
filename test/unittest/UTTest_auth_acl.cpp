@@ -26,14 +26,14 @@ constexpr const char *TEST_NONE_EMPTY_STRING = "test";
 void AuthAclTest::SetUpTestCase()
 {
     LOGI("AuthAclTest::SetUpTestCase start.");
-    SoftbusConnectorMock::softbusConnector = dmSoftbusConnectorMock;
+    DmSoftbusConnector::dmSoftbusConnector = dmSoftbusConnectorMock;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = std::make_shared<DmAuthMessageProcessorMock>();
 }
 
 void AuthAclTest::TearDownTestCase()
 {
     LOGI("AuthAclTest::TearDownTestCase start.");
-    SoftbusConnectorMock::softbusConnector = nullptr;
+    DmSoftbusConnector::dmSoftbusConnector = nullptr;
     dmSoftbusConnectorMock = nullptr;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = nullptr;
 }
@@ -50,7 +50,7 @@ void AuthAclTest::TearDown()
     context = nullptr;
 
     Mock::VerifyAndClearExpectations(&*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock);
-    Mock::VerifyAndClearExpectations(&*SoftbusConnectorMock::softbusConnector);
+    Mock::VerifyAndClearExpectations(&*DmSoftbusConnector::dmSoftbusConnector);
 }
 
 HWTEST_F(AuthAclTest, AuthSinkAcl_001, testing::ext::TestSize.Level1)
