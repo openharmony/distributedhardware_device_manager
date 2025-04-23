@@ -184,7 +184,7 @@ public:
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
-    void SetOnlineProcessInfo(uint32_t bindType, ProcessInfo &processInfo, DmDeviceInfo &devInfo,
+    void SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo, DmDeviceInfo &devInfo,
         const std::string &requestDeviceId, const std::string &trustDeviceId, DmDeviceState devState);
     void HandleDeletedAclOffline(const std::string &trustDeviceId,
         const std::string &requestDeviceId, DmDeviceInfo &devInfo, ProcessInfo &processInfo, DmDeviceState &devState);

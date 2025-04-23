@@ -642,7 +642,7 @@ EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAp
 }
 
 std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormMap(const std::string &pkgName,
-    const std::string &deviceId, std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter,
+    const std::string &deviceId, const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter,
     const int32_t &userId)
 {
     std::unordered_map<std::string, DmAuthForm> deviceIdMap;
@@ -669,27 +669,30 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
         if (bindType == authForm) {
             continue;
         }
-        if (bindType == DmAuthForm::IDENTICAL_ACCOUNT) {
+        uint32_t highestBindType = CheckBindType(trustDeviceId, deviceId);
+        if (highestBindType == IDENTICAL_ACCOUNT_TYPE) {
             deviceIdMap[trustDeviceId] = DmAuthForm::IDENTICAL_ACCOUNT;
             continue;
-        }
-        if (bindType == DmAuthForm::ACROSS_ACCOUNT) {
-            if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, bindType)) {
+        } else if (highestBindType == SHARE_TYPE) {
+            if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, DmAuthForm::ACROSS_ACCOUNT)) {
                 LOGI("GetAuthFormMap CheckSinkShareType true.");
                 continue;
             }
             deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
             continue;
-        }
-        if (bindType == DmAuthForm::PEER_TO_PEER && authForm == DmAuthForm::ACROSS_ACCOUNT) {
+        } else if (highestBindType == DEVICE_PEER_TO_PEER_TYPE || highestBindType == APP_PEER_TO_PEER_TYPE ||
+            SERVICE_PEER_TO_PEER_TYPE) {
             deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
+            continue;
+        } else {
+            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
             continue;
         }
     }
     return deviceIdMap;
 }
 
-bool DeviceProfileConnector::CheckSinkShareType(DistributedDeviceProfile::AccessControlProfile profile,
+bool DeviceProfileConnector::CheckSinkShareType(const DistributedDeviceProfile::AccessControlProfile &profile,
     const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType)
 {
     if ((profile.GetAccessee().GetAccesseeUserId() == userId ||

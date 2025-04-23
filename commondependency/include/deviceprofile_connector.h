@@ -316,10 +316,10 @@ private:
         uint32_t index, std::string targetDeviceId);
     bool CheckAppLevelAccess(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const DmAccessCallee &callee);
-    bool CheckSinkShareType(DistributedDeviceProfile::AccessControlProfile profile,
+    bool CheckSinkShareType(const DistributedDeviceProfile::AccessControlProfile &profile,
         const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType);
     std::unordered_map<std::string, DmAuthForm> GetAuthFormMap(const std::string &pkgName, const std::string &deviceId,
-        std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter, const int32_t &userId);
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
     int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,

@@ -276,7 +276,7 @@ int32_t DmAuthState::GetAclBindType(std::shared_ptr<DmAuthContext> context, std:
         return DM_POINT_TO_POINT_TYPE;
     }
     if (credType == DM_AUTH_CREDENTIAL_ACCOUNT_ACROSS) {
-        return DM_SHARE_TYPE;
+        return DM_SHARE;
     }
     return DM_UNKNOWN_TYPE;
 }
