@@ -920,6 +920,8 @@ int32_t DeviceManagerServiceImpl::TransferSinkOldAuthMgr(const JsonObject &jsonO
         bundleName = jsonObject[TAG_BUNDLE_NAME].Get<std::string>();
     } else if (jsonObject[TAG_PEER_BUNDLE_NAME].IsString()) {
         bundleName = jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>();
+    } else if (jsonObject[TAG_HOST_PKGLABEL].IsString()) {
+        bundleName = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
     } else {
         LOGE("DeviceManagerServiceImpl::TransferSinkOldAuthMgr can not find bundleName.");
         return ERR_DM_AUTH_FAILED;
