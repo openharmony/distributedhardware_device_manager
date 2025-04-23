@@ -970,7 +970,6 @@ HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize
     msg.type = RelationShipChangeType::SHARE_UNBIND;
     ret = msg.IsChangeTypeValid();
     EXPECT_TRUE(ret);
-
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, IsValid_010, testing::ext::TestSize.Level1)

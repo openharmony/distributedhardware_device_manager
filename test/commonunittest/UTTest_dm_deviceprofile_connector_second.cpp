@@ -637,7 +637,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_001, testing::ext:
     accesser.SetAccesserDeviceId(trustDeviceId);
     profile.SetAccesser(accesser);
 
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId, bindType);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
     EXPECT_TRUE(ret);
 }
 
@@ -658,7 +659,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_002, testing::ext:
     accesser.SetAccesserDeviceId(trustDeviceId);
     profile.SetAccesser(accesser);
 
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId, bindType);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
     EXPECT_TRUE(ret);
 }
 
@@ -678,9 +680,10 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_003, testing::ext:
     DistributedDeviceProfile::Accesser accesser;
     accesser.SetAccesserDeviceId(trustDeviceId);
     profile.SetAccesser(accesser);
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId, bindType);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
     EXPECT_TRUE(ret);
-}    
+}
 
 HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_004, testing::ext::TestSize.Level1)
 {
@@ -699,7 +702,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_004, testing::ext:
     accesser.SetAccesserDeviceId(trustDeviceId);
     profile.SetAccesser(accesser);
 
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId, bindType);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
     EXPECT_FALSE(ret);
 }
 
@@ -720,7 +724,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_005, testing::ext:
     accesser.SetAccesserDeviceId("wrongTrustDeviceId");
     profile.SetAccesser(accesser);
 
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId, bindType);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
     EXPECT_FALSE(ret);
 }
 
@@ -741,7 +746,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_006, testing::ext:
     accesser.SetAccesserDeviceId(trustDeviceId);
     profile.SetAccesser(accesser);
 
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId, bindType);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
     EXPECT_FALSE(ret);
 }
 
@@ -761,7 +767,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_007, testing::ext:
     DistributedDeviceProfile::Accesser accesser;
     accesser.SetAccesserDeviceId(trustDeviceId);
     profile.SetAccesser(accesser);
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId, bindType);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
     EXPECT_FALSE(ret);
 }
 
@@ -774,7 +781,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_008, testing::ext:
     int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
 
     // Empty profile (no accessee/accesser set)
-    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(profile, userId, deviceId, trustDeviceId, bindType);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
     EXPECT_FALSE(ret);
 }
 
@@ -818,7 +826,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_003, testing::ext::Tes
     std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter;
     DistributedDeviceProfile::AccessControlProfile profile;
     profile.SetTrustDeviceId(trustDeviceId);
-    profile.SetStatus(INACTIVE); 
+    profile.SetStatus(INACTIVE);
     profilesFilter.push_back(profile);
     
     auto ret = DeviceProfileConnector::GetInstance().GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);

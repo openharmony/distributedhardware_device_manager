@@ -164,7 +164,7 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(s
 void DeviceProfileConnector::DeleteAccessControlById(int64_t accessControlId)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAccessControlById(accessControlId);
-} 
+}
 
 std::vector<ProcessInfo> DeviceProfileConnector::GetProcessInfoFromAclByUserId(
     const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId)

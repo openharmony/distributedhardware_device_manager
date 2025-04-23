@@ -213,8 +213,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_001, testing
     std::string localUdid = "localUdid";
     std::string remoteUdid;
 
-     // Empty profiles
-     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    // Empty profiles
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
 
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
         .WillOnce(Return(profiles));
@@ -324,7 +324,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_002, test
     // Setup mock profile with non-share type
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_IDENTICAL_ACCOUNT); // Different bind type   
+    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
     profiles.push_back(profile);
     
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
@@ -377,7 +377,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_004, test
     
     Accesser accesser;
     accesser.SetAccesserDeviceId(localUdid);
-    profile.SetAccesser(accesser);  
+    profile.SetAccesser(accesser);
     Accessee accessee;
     accessee.SetAccesseeCredentialId(atoi(credId.c_str()));
     accessee.SetAccesseeUserId(userId);
@@ -532,7 +532,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_006, testing::e
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
     EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
 
-    deviceManagerServiceImpl_->SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
 }

@@ -1329,19 +1329,6 @@ HWTEST_F(DeviceManagerServiceTest, OnSessionOpened_001, testing::ext::TestSize.L
     EXPECT_NE(ret, ERR_DM_NOT_INIT);
 }
 
-HWTEST_F(DeviceManagerServiceTest, OnPinHolderSessionOpened_001, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    int sessionId = 0;
-    int result = 0;
-    void *data = nullptr;
-    unsigned int dataLen = 0;
-    int ret = DeviceManagerService::GetInstance().OnPinHolderSessionOpened(sessionId, result);
-    DeviceManagerService::GetInstance().OnPinHolderBytesReceived(sessionId, data, dataLen);
-    DeviceManagerService::GetInstance().OnPinHolderSessionClosed(sessionId);
-    EXPECT_NE(ret, DM_OK);
-}
-
 HWTEST_F(DeviceManagerServiceTest, MineRequestCredential_001, testing::ext::TestSize.Level1)
 {
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
@@ -1465,22 +1452,6 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterUiStateCallback_003, testing::ext::
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-
-HWTEST_F(DeviceManagerServiceTest, IsDMImplSoLoaded_001, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    bool ret = DeviceManagerService::GetInstance().IsDMImplSoLoaded();
-    EXPECT_FALSE(ret);
-}
-
-HWTEST_F(DeviceManagerServiceTest, DmHiDumper_001, testing::ext::TestSize.Level1)
-{
-    std::vector<std::string> args;
-    std::string result;
-    int32_t ret = DeviceManagerService::GetInstance().DmHiDumper(args, result);
-    EXPECT_EQ(ret, DM_OK);
-}
-
 HWTEST_F(DeviceManagerServiceTest, NotifyEvent_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
@@ -1569,26 +1540,6 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_003, testing::ext
     int32_t ret = DeviceManagerService::GetInstance().GetEncryptedUuidByNetworkId(pkgName, networkId, uuid);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     EXPECT_EQ(ret, ERR_DM_FAILED);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_001, testing::ext::TestSize.Level1)
-{
-    std::string pkgName;
-    std::string uuid;
-    std::string appId;
-    std::string encryptedUuid;
-    int32_t ret = DeviceManagerService::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceTest, GenerateEncryptedUuid_002, testing::ext::TestSize.Level1)
-{
-    std::string pkgName = "pkgName";
-    std::string uuid;
-    std::string appId;
-    std::string encryptedUuid;
-    int32_t ret = DeviceManagerService::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
-    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_002, testing::ext::TestSize.Level1)
@@ -2157,14 +2108,6 @@ HWTEST_F(DeviceManagerServiceTest, IsSameAccount_003, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
-HWTEST_F(DeviceManagerServiceTest, HandleDeviceStatusChange_001, testing::ext::TestSize.Level1)
-{
-    DmDeviceState devState = DmDeviceState::DEVICE_INFO_READY;
-    DmDeviceInfo devInfo;
-    DeviceManagerService::GetInstance().HandleDeviceStatusChange(devState, devInfo);
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-}
-
 HWTEST_F(DeviceManagerServiceTest, CheckIsSameAccount_001, testing::ext::TestSize.Level1)
 {
     DmAccessCaller caller;
@@ -2237,50 +2180,6 @@ HWTEST_F(DeviceManagerServiceTest, DestroyPinHolder_003, testing::ext::TestSize.
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnPinHolder(_)).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().DestroyPinHolder(pkgName, targetId, pinType, payload);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
-}
-
-HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_001, testing::ext::TestSize.Level1)
-{
-    std::vector<std::string> peerUdids;
-    int32_t userId = 12;
-    uint64_t tokenId = 23;
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    DeviceManagerService::GetInstance().SendAppUnBindBroadCast(peerUdids, userId, tokenId);
-    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
-HWTEST_F(DeviceManagerServiceTest, SendAppUnBindBroadCast_002, testing::ext::TestSize.Level1)
-{
-    std::vector<std::string> peerUdids;
-    int32_t userId = 12;
-    uint64_t peerTokenId = 3;
-    uint64_t tokenId = 23;
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    DeviceManagerService::GetInstance().SendAppUnBindBroadCast(peerUdids, userId, tokenId, peerTokenId);
-    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
-HWTEST_F(DeviceManagerServiceTest, SendServiceUnBindBroadCast_001, testing::ext::TestSize.Level1)
-{
-    std::vector<std::string> peerUdids;
-    int32_t userId = 12;
-    uint64_t tokenId = 23;
-    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    DeviceManagerService::GetInstance().SendServiceUnBindBroadCast(peerUdids, userId, tokenId);
-    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
-    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
-}
-
-HWTEST_F(DeviceManagerServiceTest, ClearDiscoveryCache_001, testing::ext::TestSize.Level1)
-{
-    ProcessInfo processInfo;
-    processInfo.pkgName = "pkgName001";
-    DeviceManagerService::GetInstance().InitDMServiceListener();
-    DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
-    EXPECT_NE(DeviceManagerService::GetInstance().discoveryMgr_, nullptr);
-    DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
 HWTEST_F(DeviceManagerServiceTest, GetDeviceScreenStatus_001, testing::ext::TestSize.Level1)
@@ -2380,66 +2279,6 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceInfo_002, testing::ext::TestSiz
         "peerUdid" : "110",
         "accountName" : "account_wang"
     })";
-    msg =  R"(
-        {
-            "type" : 3,
-            "userId" : 130,
-            "accountId" : "28880",
-            "tokenId" : 19,
-            "peerUdid" : "111",
-            "accountName" : "account_liang"
-        })";
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
-    msg =  R"(
-        {
-            "type" : 4,
-            "userId" : 131,
-            "accountId" : "28881",
-            "tokenId" : 20,
-            "peerUdid" : "112",
-            "accountName" : "account_deng"
-        })";
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
-    msg =  R"(
-        {
-            "type" : 5,
-            "userId" : 131,
-            "accountId" : "28882",
-            "tokenId" : 20,
-            "peerUdid" : "112",
-            "accountName" : "account_deng"
-        })";
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
-    msg =  R"(
-        {
-            "type" : 6,
-            "userId" : 132,
-            "accountId" : "28883",
-            "tokenId" : 21,
-            "peerUdid" : "113",
-            "accountName" : "account_zhang"
-        })";
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
-    msg =  R"(
-        {
-            "type" : 7,
-            "userId" : 133,
-            "accountId" : "28884",
-            "tokenId" : 22,
-            "peerUdid" : "114",
-            "accountName" : "account_hu"
-        })";
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
-    msg =  R"(
-        {
-            "type" : 8,
-            "userId" : 134,
-            "accountId" : "28885",
-            "tokenId" : 23,
-            "peerUdid" : "115",
-            "accountName" : "account_liu"
-        })";
-    DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceInfo(info);
     EXPECT_EQ(ret, ERR_DM_POINT_NULL);
 }
