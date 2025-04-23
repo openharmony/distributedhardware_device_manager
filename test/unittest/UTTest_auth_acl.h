@@ -13,17 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_REQUEST_STATE_TEST_H
-#define OHOS_DM_AUTH_REQUEST_STATE_TEST_H
+#ifndef OHOS_DM_AUTH_ACL_TEST_H
+#define OHOS_DM_AUTH_ACL_TEST_H
+
 
 #include <gtest/gtest.h>
-
-#include <cstdint>
-#include <memory>
-#include <sstream>
-
-#include "auth_request_state.h"
-#include "dm_log.h"
+#include "hichain_auth_connector_mock.h"
+#include "softbus_connector_mock.h"
+#include "auth_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -34,17 +31,9 @@ public:
     void SetUp();
     void TearDown();
 private:
-    static inline std::shared_ptr<HiChainAuthConnectorMock> dmHiChainAuthConnectorMock =
-        std::make_shared<HiChainAuthConnectorMock>();
-    static inline std::shared_ptr<SoftbusSessionMock> dmSoftbusSessionMock =
-        std::make_shared<SoftbusSessionMock>();
-    static inline std::shared_ptr<DmAuthStateMachineMock> dmAuthStateMachineMock =
-        std::make_shared<DmAuthStateMachineMock>();
     static inline std::shared_ptr<SoftbusConnectorMock> dmSoftbusConnectorMock =
         std::make_shared<SoftbusConnectorMock>();
-    std::shared_ptr<IDeviceManagerServiceListener> listener;
-    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector;
-    std::shared_ptr<HiChainConnector> hiChainConnector;
+
     std::shared_ptr<AuthManager> authManager;
     std::shared_ptr<DmAuthContext> context;
 };

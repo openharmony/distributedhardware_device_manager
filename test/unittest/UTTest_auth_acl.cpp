@@ -14,7 +14,7 @@
  */
 
  #include "dm_auth_state.h"
-#include "UTTest_auth_credential_state.h"
+#include "UTTest_auth_acl.h"
 #include "dm_auth_message_processor_mock.h"
 #include "device_manager_service_listener.h"
 
@@ -26,9 +26,6 @@ constexpr const char *TEST_NONE_EMPTY_STRING = "test";
 void AuthAclTest::SetUpTestCase()
 {
     LOGI("AuthAclTest::SetUpTestCase start.");
-    DmHiChainAuthConnector::dmHiChainAuthConnector = dmHiChainAuthConnectorMock;
-    DmSoftbusSession::dmSoftbusSession = dmSoftbusSessionMock;
-    DmAuthStateMachineMock::dmAuthStateMachineMock = dmAuthStateMachineMock;
     SoftbusConnectorMock::softbusConnector = dmSoftbusConnectorMock;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = std::make_shared<DmAuthMessageProcessorMock>();
 }
@@ -36,12 +33,6 @@ void AuthAclTest::SetUpTestCase()
 void AuthAclTest::TearDownTestCase()
 {
     LOGI("AuthAclTest::TearDownTestCase start.");
-    DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
-    dmHiChainAuthConnectorMock = nullptr;
-    DmSoftbusSession::dmSoftbusSession = nullptr;
-    dmSoftbusSessionMock = nullptr;
-    DmAuthStateMachineMock::dmAuthStateMachineMock = nullptr;
-    dmAuthStateMachineMock = nullptr;
     SoftbusConnectorMock::softbusConnector = nullptr;
     dmSoftbusConnectorMock = nullptr;
     DmAuthMessageProcessorMock::dmAuthMessageProcessorMock = nullptr;
@@ -50,21 +41,14 @@ void AuthAclTest::TearDownTestCase()
 void AuthAclTest::SetUp()
 {
     LOGI("AuthAclTest::SetUp start.");
-    listener = std::make_shared<DeviceManagerServiceListener>();
-    hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-    hiChainConnector = std::make_shared<HiChainConnector>();
 }
 
 void AuthAclTest::TearDown()
 {
     LOGI("AuthAclTest::TearDown start.");
-    listener = nullptr;
-    hiChainAuthConnector = nullptr;
     authManager = nullptr;
     context = nullptr;
-    Mock::VerifyAndClearExpectations(&*DmHiChainAuthConnector::dmHiChainAuthConnector);
-    Mock::VerifyAndClearExpectations(&*DmSoftbusSession::dmSoftbusSession);
-    Mock::VerifyAndClearExpectations(&*DmAuthStateMachineMock::dmAuthStateMachineMock);
+
     Mock::VerifyAndClearExpectations(&*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock);
     Mock::VerifyAndClearExpectations(&*SoftbusConnectorMock::softbusConnector);
 }
@@ -76,7 +60,7 @@ HWTEST_F(AuthAclTest, AuthSinkAcl_001, testing::ext::TestSize.Level1)
     context = authManager->GetAuthContext();
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
 
-    EXPECT_CALL(*SoftbusConnectorMock, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*SoftbusConnectorMock::softbusConnector, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
         .WillOnce(Return(TEST_NONE_EMPTY_STRING));
 
