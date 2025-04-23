@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 #include "hichain_auth_connector_mock.h"
 #include "softbus_connector_mock.h"
+#include "softbus_session_mock.h"
 #include "auth_manager.h"
 
 namespace OHOS {
