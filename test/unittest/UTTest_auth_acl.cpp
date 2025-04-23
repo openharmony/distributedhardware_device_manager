@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
- #include "dm_auth_state.h"
+#include "dm_auth_state.h"
 #include "UTTest_auth_acl.h"
 #include "dm_auth_message_processor_mock.h"
 #include "device_manager_service_listener.h"
@@ -64,7 +64,7 @@ HWTEST_F(AuthAclTest, AuthSinkAcl_001, testing::ext::TestSize.Level1)
     context = authManager->GetAuthContext();
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
 
-    EXPECT_CALL(*DmSoftbusConnector::dmSoftbusConnector, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*dmSoftbusConnectorMock, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
         .WillOnce(Return(TEST_NONE_EMPTY_STRING));
 
@@ -78,7 +78,8 @@ HWTEST_F(AuthAclTest, AuthSinkAcl_002, testing::ext::TestSize.Level1)
     context = authManager->GetAuthContext();
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
 
-    EXPECT_EQ(authState->GetStateType(), DM_OK);
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE);
+}
 }
 
 HWTEST_F(AuthAclTest, AuthSrcAcl_001, testing::ext::TestSize.Level1)
@@ -102,7 +103,7 @@ HWTEST_F(AuthAclTest, AuthSrcAcl_002, testing::ext::TestSize.Level1)
     context = authManager->GetAuthContext();
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcDataSyncState>();
 
-    EXPECT_EQ(authState->GetStateType(), DM_OK);
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE);
 }
 
 HWTEST_F(AuthAclTest, AuthSrcFinish_001, testing::ext::TestSize.Level1)
@@ -125,7 +126,7 @@ HWTEST_F(AuthAclTest, AuthSrcFinish_002, testing::ext::TestSize.Level1)
     context = authManager->GetAuthContext();
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcFinishState>();
 
-    EXPECT_EQ(authState->GetStateType(), DM_OK);
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_FINISH_STATE);
 }
 }
 }
