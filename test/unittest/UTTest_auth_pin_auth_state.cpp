@@ -62,6 +62,11 @@ void AuthPinAuthStateTest::TearDown()
     context = nullptr;
 }
 
+bool DmAuthState::IsScreenLocked()
+{
+    return false;
+}
+
 HWTEST_F(AuthPinAuthStateTest, AuthSrcPinAuthStartState_001, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthSrcPinAuthStartState> authState = std::make_shared<AuthSrcPinAuthStartState>();
