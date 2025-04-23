@@ -20,8 +20,8 @@ group("unittest") {
 
   deps = [
     ":UTTest_advertise_manager",
-    ":UTTest_auth_acl",
     ":UTTest_app_manager",
+    ":UTTest_auth_acl",
     ":UTTest_auth_confirm",
     ":UTTest_auth_credential_state",
     ":UTTest_auth_message_processor",
@@ -2103,8 +2103,8 @@ ohos_unittest("UTTest_auth_acl") {
     "${devicemanager_path}/test/unittest/mock/dm_auth_message_processor_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/dm_auth_state_machine_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/hichain_auth_connector_mock.cpp",
-    "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -2123,7 +2123,6 @@ ohos_unittest("UTTest_auth_acl") {
 
 ## UnitTest UTTest_auth_acl }}}
 
-
 ## UnitTest UTTest_auth_negotiate {{{
 
 ohos_unittest("UTTest_auth_negotiate") {
@@ -2133,9 +2132,9 @@ ohos_unittest("UTTest_auth_negotiate") {
 
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_auth_negotiate.cpp",
+    "${devicemanager_path}/test/unittest/mock/accesstoken_kit_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
-    "${devicemanager_path}/test/unittest/mock/accesstoken_kit_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]

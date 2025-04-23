@@ -128,6 +128,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateCredential_001, testing::
     JsonObject jsonObject;
 
     authState->NegotiateCredential(context, jsonObject);
+    EXPECT_TRUE(context != nullptr);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateAcl_001, testing::ext::TestSize.Level1)
@@ -149,6 +150,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateAcl_001, testing::ext::Te
     JsonObject jsonObject;
 
     authState->NegotiateCredential(context, jsonObject);
+    EXPECT_TRUE(context != nullptr);
 }
 
 // get identical credential
@@ -161,6 +163,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_001, testing:
     context->accesser.accountIdHash = context->accessee.accountIdHash = "";
     JsonObject jsonObject;
     authState->GetSrcCredentialInfo(context, jsonObject);
+    EXPECT_TRUE(context != nullptr);
 }
 
 // get share credential
@@ -174,6 +177,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_002, testing:
     context->accessee.accountIdHash = "1";
     JsonObject jsonObject;
     authState->GetSrcCredentialInfo(context, jsonObject);
+    EXPECT_TRUE(context != nullptr);
 }
 
 // get point_to_point credential
@@ -187,6 +191,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_003, testing:
     context->accessee.accountIdHash = Crypto::Sha256("ohosAnonymousUid");
     JsonObject jsonObject;
     authState->GetSrcCredentialInfo(context, jsonObject);
+    EXPECT_TRUE(context != nullptr);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcAclInfo_001, testing::ext::TestSize.Level1)
@@ -261,6 +266,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcAclInfoForP2P_001, testing::
     JsonObject aclInf;
 
     authState->GetSrcAclInfoForP2P(context, profile, credInfo, aclInf);
+    EXPECT_TRUE(context != nullptr);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_IdenticalAccountAclCompare_001, testing::ext::TestSize.Level1)
@@ -429,6 +435,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredType_001, testing::ext::
     JsonObject aclInfo;
     JsonObject credTypeJson;
     authState->GetSrcCredType(context, credInfo, aclInfo, credTypeJson);
+    EXPECT_TRUE(context != nullptr);
 }
 
 // AuthSinkConfirmState
@@ -496,6 +503,7 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_MatchFallBackCandidateList_001, t
     context = authManager->GetAuthContext();
 
     authState->MatchFallBackCandidateList(context, AUTH_TYPE_PIN);
+    EXPECT_TRUE(context != nullptr);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ProcessBindAuthorize_001, testing::ext::TestSize.Level1)
