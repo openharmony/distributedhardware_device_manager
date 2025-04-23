@@ -63,7 +63,11 @@ HWTEST_F(AuthAclTest, AuthSinkAcl_001, testing::ext::TestSize.Level1)
         hiChainAuthConnector);
     context = authManager->GetAuthContext();
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
-
+    context->accessee.deviceId = "accessee_deviceId";
+    context->accessee.userId = "accessee_userId";
+    context->accesser.deviceId = "accesser_deviceId";
+    context->accesser.userId = "accesser_userId";
+    context->accesser.aclStrList = "aclList";
     EXPECT_CALL(*dmSoftbusConnectorMock, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
         .WillOnce(Return(TEST_NONE_EMPTY_STRING));
@@ -79,7 +83,6 @@ HWTEST_F(AuthAclTest, AuthSinkAcl_002, testing::ext::TestSize.Level1)
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
 
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE);
-}
 }
 
 HWTEST_F(AuthAclTest, AuthSrcAcl_001, testing::ext::TestSize.Level1)
