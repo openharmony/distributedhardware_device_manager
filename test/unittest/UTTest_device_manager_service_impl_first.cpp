@@ -437,7 +437,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_001, testing::e
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
     EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
 
-    deviceManagerServiceImpl_->SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::IDENTICAL_ACCOUNT);
 }
@@ -454,7 +455,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_002, testing::e
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
     EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
 
-    deviceManagerServiceImpl_->SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::PEER_TO_PEER);
 }
@@ -471,7 +473,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_003, testing::e
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
     EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
 
-    deviceManagerServiceImpl_->SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
 }
@@ -491,7 +494,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_004, testing::e
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfoVec(_)).Times(1);
     EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
 
-    deviceManagerServiceImpl_->SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::PEER_TO_PEER);
 }
@@ -511,7 +515,8 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_005, testing::e
     EXPECT_CALL(*softbusConnectorMock_, SetProcessInfoVec(_)).Times(1);
     EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
 
-    deviceManagerServiceImpl_->SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
 }

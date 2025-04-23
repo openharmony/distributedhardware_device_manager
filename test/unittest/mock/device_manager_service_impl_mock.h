@@ -40,7 +40,7 @@ public:
     virtual bool CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid) = 0;
     virtual void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
         std::string &remoteUdid) = 0;
-    virtual void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, 
+    virtual void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
         const std::string &localUdid) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;

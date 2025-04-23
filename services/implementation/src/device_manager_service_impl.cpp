@@ -649,7 +649,7 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
     SetOnlineProcessInfo(bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 }
 
-void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo, 
+void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo,
     DmDeviceInfo &devInfo, const std::string &requestDeviceId, const std::string &trustDeviceId, DmDeviceState devState)
 {
     if (bindType == IDENTICAL_ACCOUNT_TYPE) {
