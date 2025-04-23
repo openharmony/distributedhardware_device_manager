@@ -417,5 +417,86 @@ HWTEST_F(AuthPinAuthStateTest, AuthSinkPinAuthDoneState_002, testing::ext::TestS
 
     EXPECT_EQ(authState->Action(context), DM_OK);
 }
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcPinNegotiateStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcPinNegotiateStartState> authState = std::make_shared<AuthSrcPinNegotiateStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_PIN_NEGOTIATE_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcPinInputState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcPinInputState> authState = std::make_shared<AuthSrcPinInputState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_PIN_INPUT_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkPinNegotiateStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkPinNegotiateStartState> authState = std::make_shared<AuthSinkPinNegotiateStartState>();
+    EXPECT_EQ(authStat(), DmAuthStateType::AUTH_SINK_PIN_NEGOTIATE_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkPinDisplayState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkPinDisplayState> authState = std::make_shared<AuthSinkPinDisplayState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_PIN_DISPLAY_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcReverseUltrasonicStartState> authState =
+        std::make_shared<AuthSrcReverseUltrasonicStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcReverseUltrasonicDoneState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcReverseUltrasonicDoneState> authState =
+        std::make_shared<AuthSrcReverseUltrasonicDoneState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_DONE_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcForwardUltrasonicStartState> authState =
+        std::make_shared<AuthSrcForwardUltrasonicStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_FORWARD_ULTRASONIC_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSrcForwardUltrasonicDoneState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcForwardUltrasonicDoneState> authState =
+        std::make_shared<AuthSrcForwardUltrasonicDoneState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SRC_FORWARD_ULTRASONIC_DONE_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkReverseUltrasonicStartState> authState =
+        std::make_shared<AuthSinkReverseUltrasonicStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_REVERSE_ULTRASONIC_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkReverseUltrasonicDoneState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkReverseUltrasonicDoneState> authState =
+        std::make_shared<AuthSinkReverseUltrasonicDoneState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_REVERSE_ULTRASONIC_DONE_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicStartState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkForwardUltrasonicStartState> authState =
+        std::make_shared<AuthSinkForwardUltrasonicStartState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_FORWARD_ULTRASONIC_START_STATE);
+}
+
+HWTEST_F(AuthPinAuthStateTest, AuthSinkForwardUltrasonicDoneState_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkForwardUltrasonicDoneState> authState =
+        std::make_shared<AuthSinkForwardUltrasonicDoneState>();
+    EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_FORWARD_ULTRASONIC_DONE_STATE);
+}
+
 }
 }
