@@ -465,7 +465,7 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_007, testing::
 
     EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_)).WillOnce(Return(ON_FINISH));
 
-    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
+    EXPECT_EQ(authState->Action(context), ERR_DM_AUTH_REJECT);
 }
 
 HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_008, testing::ext::TestSize.Level1)
