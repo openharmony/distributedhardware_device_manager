@@ -324,5 +324,266 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_002, testing::ext::Tes
     result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(maxNamelength, output);
     EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
+
+HWTEST_F(DeviceNameManagerTest, ReleaseDataShareHelper_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DataShareHelperMock> helper = nullptr;
+    bool ret = DeviceNameManager::GetInstance().ReleaseDataShareHelper(helper);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DeviceNameManagerTest, ReleaseDataShareHelper_002, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(false));
+    bool ret = DeviceNameManager::GetInstance().ReleaseDataShareHelper(helper_);
+    EXPECT_EQ(ret, false);
+}
+
+HWTEST_F(DeviceNameManagerTest, ReleaseDataShareHelper_003, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+    bool ret = DeviceNameManager::GetInstance().ReleaseDataShareHelper(helper_);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DeviceNameManagerTest, MakeUri_001, testing::ext::TestSize.Level1)
+{
+    std::string proxyUri = "";
+    std::string key = "key";
+    auto ret = DeviceNameManager::GetInstance().MakeUri(proxyUri, key);
+    EXPECT_EQ(ret, Uri(proxyUri + "&key=" + key));
+}
+
+HWTEST_F(DeviceNameManagerTest, GetProxyUriStr_001, testing::ext::TestSize.Level1)
+{
+    std::string tableName = "SETTINGSDATA";
+    int32_t userId = 12;
+    auto ret = DeviceNameManager::GetInstance().GetProxyUriStr(tableName, userId);
+    EXPECT_EQ(ret, "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
+}
+
+HWTEST_F(DeviceNameManagerTest, GetProxyUriStr_002, testing::ext::TestSize.Level1)
+{
+    std::string tableName = "tableName";
+    int32_t userId = 12;
+    auto ret = DeviceNameManager::GetInstance().GetProxyUriStr(tableName, userId);
+    EXPECT_EQ(ret, "datashare:///com.ohos.settingsdata/entry/settingsdata/tableName100?Proxy=true");
+}
+
+HWTEST_F(DeviceNameManagerTest, SetValue_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+
+    std::string tableName = "tableName";
+    int32_t userId = 12;
+    std::string key = "key";
+    std::string value = "value";
+    int32_t ret = -1;
+    EXPECT_CALL(*helper_, Update(_, _, _)).WillRepeatedly(Return(ret));
+    EXPECT_CALL(*helper_, Insert(_, _)).WillRepeatedly(Return(ret));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    auto result = DeviceNameManager::GetInstance().SetValue(tableName, userId, key, value);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(DeviceNameManagerTest, SetValue_002, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+
+    std::string tableName = "tableName";
+    int32_t userId = 12;
+    std::string key = "key";
+    std::string value = "value";
+    int32_t ret = 1;
+    EXPECT_CALL(*helper_, Update(_, _, _)).WillRepeatedly(Return(ret));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    auto result = DeviceNameManager::GetInstance().SetValue(tableName, userId, key, value);
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(DeviceNameManagerTest, GetValue_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+
+    std::string tableName = "tableName";
+    int32_t userId = 12;
+    std::string key = "key";
+    std::string value = "value";
+    std::shared_ptr<DataShareResultSet> resultSet = nullptr;
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    auto result = DeviceNameManager::GetInstance().GetValue(tableName, userId, key, value);
+    EXPECT_EQ(result, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceNameManagerTest, GetValue_002, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+
+    std::string tableName = "tableName";
+    int32_t userId = 12;
+    std::string key = "key";
+    std::string value = "value";
+    auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
+    EXPECT_CALL(*resultSet, GoToRow(_)).Times(AtLeast(1));
+    EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(Return(DataShare::E_OK));
+    EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
+    auto result = DeviceNameManager::GetInstance().GetValue(tableName, userId, key, value);
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(DeviceNameManagerTest, GetValue_003, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+
+    std::string tableName = "tableName";
+    int32_t userId = 12;
+    std::string key = "key";
+    std::string value = "value";
+    auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
+    EXPECT_CALL(*resultSet, GoToRow(_)).Times(AtLeast(1));
+    EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(Return(6666));
+    EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
+    auto result = DeviceNameManager::GetInstance().GetValue(tableName, userId, key, value);
+    EXPECT_EQ(result, 6666);
+}
+
+HWTEST_F(DeviceNameManagerTest, GetValue_004, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+
+    std::string tableName = "tableName";
+    int32_t userId = 12;
+    std::string key = "key";
+    std::string value = "value";
+    auto resultSet = std::make_shared<DataShareResultSetMock>(nullptr);
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(0), Return(DataShare::E_OK)));
+    EXPECT_CALL(*resultSet, Close()).Times(AtLeast(1));
+    auto result = DeviceNameManager::GetInstance().GetValue(tableName, userId, key, value);
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(DeviceNameManagerTest, GetRemoteObj_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(client_ != nullptr);
+    auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
+    auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
+    EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_))
+        .WillRepeatedly(Return(bundleMgr));
+    EXPECT_CALL(*client_, GetSystemAbilityManager())
+        .WillRepeatedly(Return(systemAbilityManager));
+    auto ret = DeviceNameManager::GetInstance().GetRemoteObj();
+    EXPECT_NE(ret, nullptr);
+}
+
+HWTEST_F(DeviceNameManagerTest, SetDeviceName_001, testing::ext::TestSize.Level1)
+{
+    std::string deviceName = "";
+    auto ret = DeviceNameManager::GetInstance().SetDeviceName(deviceName);
+    EXPECT_EQ(ret, ERR_DM_NAME_EMPTY);
+}
+
+HWTEST_F(DeviceNameManagerTest, SetDeviceName_002, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+    std::string deviceName = "deviceName";
+    int32_t ret = 1;
+    EXPECT_CALL(*helper_, Update(_, _, _)).WillRepeatedly(Return(ret));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+    auto result = DeviceNameManager::GetInstance().SetDeviceName(deviceName);
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(DeviceNameManagerTest, GetDeviceName_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+
+    std::string deviceName = "deviceName";
+    std::shared_ptr<DataShareResultSet> resultSet = nullptr;
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    auto result = DeviceNameManager::GetInstance().GetDeviceName(deviceName);
+    EXPECT_EQ(result, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceNameManagerTest, SetDisplayDeviceName_001, testing::ext::TestSize.Level1)
+{
+    std::string deviceName = "";
+    int32_t userId = 12;
+    auto result = DeviceNameManager::GetInstance().SetDisplayDeviceName(deviceName, userId);
+    EXPECT_EQ(result, ERR_DM_NAME_EMPTY);
+}
+
+HWTEST_F(DeviceNameManagerTest, SetDisplayDeviceName_002, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+    std::string deviceName = "deviceName";
+    int32_t userId = 12;
+    int32_t ret = 1;
+    EXPECT_CALL(*helper_, Update(_, _, _)).WillRepeatedly(Return(ret));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    auto result = DeviceNameManager::GetInstance().SetDisplayDeviceName(deviceName, userId);
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(DeviceNameManagerTest, SetDisplayDeviceNameState_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+    std::string state = "state";
+    int32_t userId = 12;
+    int32_t ret = 1;
+    EXPECT_CALL(*helper_, Update(_, _, _)).WillRepeatedly(Return(ret));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    auto result = DeviceNameManager::GetInstance().SetDisplayDeviceNameState(state, userId);
+    EXPECT_EQ(result, 1);
+}
+
+HWTEST_F(DeviceNameManagerTest, GetDisplayDeviceName_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+    std::string deviceName = "deviceName";
+    int32_t userId = 12;
+    
+    std::shared_ptr<DataShareResultSet> resultSet = nullptr;
+    EXPECT_CALL(*helper_, Query(_, _, _, _)).WillRepeatedly(Return(resultSet));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    auto result = DeviceNameManager::GetInstance().GetDisplayDeviceName(userId, deviceName);
+    EXPECT_EQ(result, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceNameManagerTest, SetUserDefinedDeviceName_001, testing::ext::TestSize.Level1)
+{
+    ASSERT_TRUE(helper_ != nullptr);
+    std::string deviceName = "deviceName";
+    int32_t userId = 12;
+    
+    int32_t ret = 1;
+    EXPECT_CALL(*helper_, Update(_, _, _)).WillRepeatedly(Return(ret));
+    EXPECT_CALL(*helper_, Release()).WillRepeatedly(Return(true));
+
+    auto result = DeviceNameManager::GetInstance().SetUserDefinedDeviceName(deviceName, userId);
+    EXPECT_EQ(result, 1);
+}
+
 } // DistributedHardware
 } // OHOS

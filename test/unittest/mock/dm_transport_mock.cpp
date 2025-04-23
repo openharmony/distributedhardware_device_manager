@@ -28,5 +28,9 @@ int32_t DMTransport::Send(const std::string &rmtNetworkId, const std::string &pa
 {
     return DmDMTransport::dMTransport_->Send(rmtNetworkId, payload, socketId);
 }
+int32_t DMTransport::UnInit()
+{
+    return DmDMTransport::dMTransport_->UnInit();
+}
 } // namespace DistributedHardware
 } // namespace OHOS
