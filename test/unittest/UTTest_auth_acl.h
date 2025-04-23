@@ -33,7 +33,10 @@ public:
 private:
     static inline std::shared_ptr<SoftbusConnectorMock> dmSoftbusConnectorMock =
         std::make_shared<SoftbusConnectorMock>();
-
+    std::shared_ptr<SoftbusConnector> softbusConnector;
+    std::shared_ptr<IDeviceManagerServiceListener> listener;
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector;
+    std::shared_ptr<HiChainConnector> hiChainConnector;
     std::shared_ptr<AuthManager> authManager;
     std::shared_ptr<DmAuthContext> context;
 };

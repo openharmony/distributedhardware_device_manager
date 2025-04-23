@@ -41,6 +41,10 @@ void AuthAclTest::TearDownTestCase()
 void AuthAclTest::SetUp()
 {
     LOGI("AuthAclTest::SetUp start.");
+    softbusConnector = std::make_shared<SoftbusConnector>();
+    listener = std::make_shared<DeviceManagerServiceListener>();
+    hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
+    hiChainConnector = std::make_shared<HiChainConnector>();
 }
 
 void AuthAclTest::TearDown()
@@ -60,7 +64,7 @@ HWTEST_F(AuthAclTest, AuthSinkAcl_001, testing::ext::TestSize.Level1)
     context = authManager->GetAuthContext();
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
 
-    EXPECT_CALL(*SoftbusConnectorMock::softbusConnector, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*DmSoftbusConnector::dmSoftbusConnector, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
         .WillOnce(Return(TEST_NONE_EMPTY_STRING));
 
