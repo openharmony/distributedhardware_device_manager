@@ -29,6 +29,7 @@ public:
     virtual int32_t SendUserIds(const std::string rmtNetworkId,
         const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds) = 0;
     virtual int32_t SendUserStop(const std::string rmtNetworkId, int32_t stopUserId) = 0;
+    virtual int32_t CreateUserStopMessage(int32_t stopUserId, std::string &msgStr) = 0;
 public:
     static inline std::shared_ptr<DmDMCommTool> dmDMCommTool = nullptr;
 };
@@ -38,6 +39,7 @@ public:
     MOCK_METHOD(int32_t, SendUserIds, (const std::string, const std::vector<uint32_t> &,
         const std::vector<uint32_t> &));
     MOCK_METHOD(int32_t, SendUserStop, (const std::string, int32_t));
+    MOCK_METHOD(int32_t, CreateUserStopMessage, (int32_t stopUserId, std::string &msgStr));
 };
 }
 }
