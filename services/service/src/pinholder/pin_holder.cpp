@@ -96,6 +96,23 @@ int32_t PinHolder::RegisterPinHolderCallback(const std::string &pkgName)
     return DM_OK;
 }
 
+int32_t PinHolder::UnRegisterPinHolderCallback(const std::string &pkgName)
+{
+    if (session_ == nullptr) {
+        LOGE("session is nullptr.");
+        return ERR_DM_FAILED;
+    }
+    int32_t userId = -1;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    MultipleUserConnector::GetCallerUserId(userId);
+#endif
+    processInfo_.userId = userId;
+    processInfo_.pkgName = pkgName;
+    session_->UnRegisterSessionCallback();
+    LOGI("success.");
+    return DM_OK;
+}
+
 int32_t PinHolder::CreatePinHolder(const std::string &pkgName,
     const PeerTargetId &targetId, DmPinType pinType, const std::string &payload)
 {

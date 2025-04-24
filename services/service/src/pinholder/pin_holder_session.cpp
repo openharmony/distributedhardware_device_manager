@@ -19,6 +19,9 @@
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ffrt.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -35,12 +38,14 @@ PinHolderSession::~PinHolderSession()
 
 int32_t PinHolderSession::RegisterSessionCallback(std::shared_ptr<IPinholderSessionCallback> callback)
 {
+    std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     pinholderSessionCallback_ = callback;
     return DM_OK;
 }
 
 int32_t PinHolderSession::UnRegisterSessionCallback()
 {
+    std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     pinholderSessionCallback_ = nullptr;
     return DM_OK;
 }
@@ -72,12 +77,21 @@ int32_t PinHolderSession::CloseSessionServer(int32_t sessionId)
 
 int PinHolderSession::OnSessionOpened(int sessionId, int result)
 {
+    int32_t sessionSide = GetSessionSide(sessionId);
+    std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     if (pinholderSessionCallback_ == nullptr) {
         LOGE("OnSessionOpened error, pinholderSessionCallback_ is nullptr.");
         return ERR_DM_FAILED;
     }
-    int32_t sessionSide = GetSessionSide(sessionId);
-    pinholderSessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
+    auto asyncTaskFunc = [=]() {
+        pinholderSessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
+    };
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit(asyncTaskFunc);
+#else
+    std::thread dealThread(asyncTaskFunc);
+    dealThread.detach();
+#endif
     LOGI("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
     return DM_OK;
 }
@@ -85,11 +99,20 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
 void PinHolderSession::OnSessionClosed(int sessionId)
 {
     LOGI("[SOFTBUS]OnSessionClosed sessionId: %{public}d", sessionId);
+    std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     if (pinholderSessionCallback_ == nullptr) {
         LOGE("OnSessionClosed error, pinholderSessionCallback_ is nullptr.");
         return;
     }
-    pinholderSessionCallback_->OnSessionClosed(sessionId);
+    auto asyncTaskFunc = [=]() {
+        pinholderSessionCallback_->OnSessionClosed(sessionId);
+    };
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit(asyncTaskFunc);
+#else
+    std::thread dealThread(asyncTaskFunc);
+    dealThread.detach();
+#endif
     return;
 }
 
@@ -100,13 +123,22 @@ void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned
             dataLen);
         return;
     }
+    std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     if (pinholderSessionCallback_ == nullptr) {
         LOGE("OnBytesReceived error, pinholderSessionCallback_ is nullptr.");
         return;
     }
     LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
-    pinholderSessionCallback_->OnDataReceived(sessionId, message);
+    auto asyncTaskFunc = [=]() {
+        pinholderSessionCallback_->OnDataReceived(sessionId, message);
+    };
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit(asyncTaskFunc);
+#else
+    std::thread dealThread(asyncTaskFunc);
+    dealThread.detach();
+#endif
     return;
 }
 

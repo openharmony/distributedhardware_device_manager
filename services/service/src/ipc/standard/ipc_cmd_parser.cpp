@@ -1909,5 +1909,16 @@ ON_IPC_CMD(GET_DEVICE_NETWORK_ID_LIST, MessageParcel &data, MessageParcel &reply
     }
     return DM_OK;
 }
+
+ON_IPC_CMD(UNREGISTER_PIN_HOLDER_CALLBACK, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().UnRegisterPinHolderCallback(pkgName);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -659,6 +659,12 @@ public:
     virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) = 0;
     virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds) = 0;
+    /**
+     * @brief UnRegister Pin Code Holder Callback
+     * @param pkgName  package name.
+     * @return Returns 0 if success.
+     */
+    virtual int32_t UnRegisterPinHolderCallback(const std::string &pkgName) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
