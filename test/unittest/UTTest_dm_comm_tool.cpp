@@ -247,7 +247,6 @@ HWTEST_F(DMCommToolTest, SendUserStop_001, testing::ext::TestSize.Level1)
 
     EXPECT_CALL(*dmTransportMock_, StartSocket(rmtNetworkId, _))
         .Times(1).WillOnce(Return(DM_OK));
-    // 模拟 CreateUserStopMessage 返回错误
     EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).Times(0);
 
     int32_t ret = dmCommTool->SendUserStop(rmtNetworkId, stopUserId);
@@ -377,7 +376,7 @@ HWTEST_F(DMCommToolTest, ProcessReceiveUserStopEvent_004, testing::ext::TestSize
 
     EXPECT_CALL(*softbusCacheMock_, GetUdidFromCache(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("validUdid"), Return(DM_OK)));
-    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).Times(1); // 限制 Send 函数不被调用
+    EXPECT_CALL(*dmTransportMock_, Send(_, _, _)).Times(1);
 
     EXPECT_NO_THROW(dmCommTool->ProcessReceiveUserStopEvent(commMsg));
 }

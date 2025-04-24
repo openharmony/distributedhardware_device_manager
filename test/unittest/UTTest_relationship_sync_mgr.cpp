@@ -970,6 +970,140 @@ HWTEST_F(ReleationShipSyncMgrTest, IsValid_010, testing::ext::TestSize.Level1)
     ret = msg.IsValid();
     EXPECT_FALSE(ret);
 }
+
+/**
+ * @tc.name: ToBroadcastPayLoad_001
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::ACCOUNT_LOGOUT;
+    msg.userId = 0;
+    msg.accountId = "test_01";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(len, 8);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_002
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_002, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::DEVICE_UNBIND;
+    msg.userId = 1;
+    msg.accountId = "test";
+    uint8_t *load= nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_003
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_003, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNBIND;
+    msg.userId = 2;
+    msg.accountId = "test";
+    msg.tokenId = 100;
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_004
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_004, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SERVICE_UNBIND;
+    msg.userId = 4;
+    msg.accountId = "test";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_005
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_005, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    UserIdInfo foregroundUser(true, 1);
+    UserIdInfo backgroundUser(false, 2);
+    msg.type = RelationShipChangeType::SYNC_USERID;
+    msg.userId = 5;
+    msg.accountId = "test";
+    msg.userIdInfos.push_back(foregroundUser);
+    msg.userIdInfos.push_back(backgroundUser);
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_006
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_006, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::DEL_USER;
+    msg.userId = 7;
+    msg.accountId = "test";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_007
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_007, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::STOP_USER;
+    msg.userId = 8;
+    msg.accountId = "test";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_008
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_008, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::TYPE_MAX;
+    msg.userId = 9;
+    msg.accountId = "test";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, false);
+}
 }
 } // namespace DistributedHardware
 } // namespace OHOS
