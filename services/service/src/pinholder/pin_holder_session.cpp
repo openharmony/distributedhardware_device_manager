@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 std::shared_ptr<IPinholderSessionCallback> PinHolderSession::pinholderSessionCallback_ = nullptr;
+std::mutex PinHolderSession::pinHolderSessionLock_;
 PinHolderSession::PinHolderSession()
 {
     LOGD("PinHolderSession constructor.");

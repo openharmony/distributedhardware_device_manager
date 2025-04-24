@@ -76,7 +76,7 @@ private:
 
 private:
     static std::shared_ptr<IPinholderSessionCallback> pinholderSessionCallback_;
-    std::mutex pinHolderSessionLock_;
+    static std::mutex pinHolderSessionLock_;
 };
 }
 }
