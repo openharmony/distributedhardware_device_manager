@@ -332,12 +332,13 @@ void SoftbusConnector::JoinLNNBySkId(int32_t sessionId, int32_t sessionKeyId, in
         }
     }
 
-    addrInfo->deviceKeyId.hasDeviceKeyId = true;  // 总线修改后适配
     if (sessionKeyId > 0 && remoteSessionKeyId > 0) {
+        addrInfo->deviceKeyId.hasDeviceKeyId = true;  // 总线修改后适配
         addrInfo->deviceKeyId.localDeviceKeyId = sessionKeyId; // 总线修改后适配
         addrInfo->deviceKeyId.remoteDeviceKeyId = remoteSessionKeyId; // 总线修改后适配
         LOGI("sessionKeyId valid");
     } else {
+        addrInfo->deviceKeyId.hasDeviceKeyId = false;  // 总线修改后适配
         addrInfo->deviceKeyId.localDeviceKeyId = 0; // 总线修改后适配
         addrInfo->deviceKeyId.remoteDeviceKeyId = 0; // 总线修改后适配
     }

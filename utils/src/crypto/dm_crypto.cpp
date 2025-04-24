@@ -64,7 +64,7 @@ void Crypto::DmGenerateStrHash(const void *data, size_t dataSize, unsigned char 
     SHA256_Final(&outBuf[startIndex], &ctx);
 }
 
-EXPORT int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
+DM_EXPORT int32_t Crypto::ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
     const unsigned char *inBuf, uint32_t inLen)
 {
     if ((outBuf == nullptr) || (inBuf == nullptr) || (outBufLen < HexifyLen(inLen))) {
@@ -124,7 +124,7 @@ int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
     return DM_OK;
 }
 
-EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
+DM_EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
     uint32_t outBufLen, const char *inBuf, uint32_t inLen)
 {
     (void)outBufLen;
@@ -164,7 +164,7 @@ EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
     return DM_OK;
 }
 
-EXPORT std::string Crypto::GetGroupIdHash(const std::string &groupId)
+DM_EXPORT std::string Crypto::GetGroupIdHash(const std::string &groupId)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
     DmGenerateStrHash(groupId.data(), groupId.size(), hash, SHA256_DIGEST_LENGTH, 0);
@@ -211,7 +211,7 @@ std::string Crypto::GetHashWithSalt(const std::string &text, const std::string &
     return Crypto::Sha256(rawText);
 }
 
-EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
+DM_EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
     unsigned char *accountIdHash)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH] = "";
@@ -225,7 +225,7 @@ EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-EXPORT int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
+DM_EXPORT int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
     const std::string &udidHash, DmKVValue &kvValue)
 {
     if (GetAnoyDeviceInfo(appId, udidHash, kvValue) == DM_OK) {
@@ -242,7 +242,7 @@ EXPORT int32_t Crypto::ConvertUdidHashToAnoyAndSave(const std::string &appId,
     return DM_OK;
 }
 
-EXPORT int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId,
+DM_EXPORT int32_t Crypto::ConvertUdidHashToAnoyDeviceId(const std::string &appId,
     const std::string &udidHash, DmKVValue &kvValue)
 {
     LOGD("start.");

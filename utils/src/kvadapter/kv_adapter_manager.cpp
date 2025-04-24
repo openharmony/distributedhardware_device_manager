@@ -35,7 +35,7 @@ constexpr int64_t MAX_SUPPORTED_EXIST_TIME = 3 * 24 * 60 * 60; // 3days
 
 DM_IMPLEMENT_SINGLE_INSTANCE(KVAdapterManager);
 
-EXPORT int32_t KVAdapterManager::Init()
+DM_EXPORT int32_t KVAdapterManager::Init()
 {
     LOGI("Init Kv-Adapter manager");
     {
@@ -46,7 +46,7 @@ EXPORT int32_t KVAdapterManager::Init()
     return kvAdapter_->Init();
 }
 
-EXPORT void KVAdapterManager::UnInit()
+DM_EXPORT void KVAdapterManager::UnInit()
 {
     LOGI("Uninit Kv-Adapter manager");
     CHECK_NULL_VOID(kvAdapter_);
@@ -54,7 +54,7 @@ EXPORT void KVAdapterManager::UnInit()
     kvAdapter_ = nullptr;
 }
 
-EXPORT void KVAdapterManager::ReInit()
+DM_EXPORT void KVAdapterManager::ReInit()
 {
     LOGI("Re init kv adapter");
     CHECK_NULL_VOID(kvAdapter_);
@@ -88,7 +88,7 @@ int32_t KVAdapterManager::PutByAnoyDeviceId(const std::string &key, const DmKVVa
     return DM_OK;
 }
 
-EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
+DM_EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
 {
     std::string dmKey = DM_KV_STORE_PREFIX + key;
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);
@@ -110,7 +110,7 @@ EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value)
     return DM_OK;
 }
 
-EXPORT int32_t KVAdapterManager::DeleteAgedEntry()
+DM_EXPORT int32_t KVAdapterManager::DeleteAgedEntry()
 {
     int64_t nowTime = GetSecondsSince1970ToNow();
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);
@@ -129,7 +129,7 @@ inline bool KVAdapterManager::IsTimeOut(int64_t sourceTime, int64_t targetTime, 
     return targetTime - sourceTime >= timeOut ? true : false;
 }
 
-EXPORT int32_t KVAdapterManager::AppUnintall(const std::string &appId)
+DM_EXPORT int32_t KVAdapterManager::AppUnintall(const std::string &appId)
 {
     LOGI("appId %{public}s.", GetAnonyString(appId).c_str());
     std::lock_guard<std::mutex> lock(idCacheMapMtx_);

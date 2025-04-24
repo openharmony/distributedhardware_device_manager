@@ -43,12 +43,14 @@ void DmDeviceStateManagerTestTwo::TearDown()
 void DmDeviceStateManagerTestTwo::SetUpTestCase()
 {
     DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock_;
+    DmCrypto::dmCrypto = cryptoMock_;
 }
 
 void DmDeviceStateManagerTestTwo::TearDownTestCase()
 {
     DmSoftbusConnector::dmSoftbusConnector = nullptr;
     softbusConnectorMock_ = nullptr;
+    DmCrypto::dmCrypto = nullptr;
 }
 namespace {
 std::shared_ptr<HiChainConnector> hiChainConnector_ = std::make_shared<HiChainConnector>();
@@ -115,6 +117,7 @@ HWTEST_F(DmDeviceStateManagerTestTwo, OnDeviceOffline_002, testing::ext::TestSiz
     dmDeviceStateManager->stateDeviceInfos_["123"] = info;
     dmDeviceStateManager->OnDeviceOffline(deviceId);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+    dmDeviceStateManager->stateDeviceInfos_.clear();
 }
 
 HWTEST_F(DmDeviceStateManagerTestTwo, HandleDeviceStatusChange_001, testing::ext::TestSize.Level0)
@@ -157,17 +160,24 @@ HWTEST_F(DmDeviceStateManagerTestTwo, OnDeviceOnline_001, testing::ext::TestSize
     dmDeviceStateManager->OnDeviceOnline("123", 0);
     EXPECT_CALL(*softbusConnectorMock_, GetDeviceInfoByDeviceId("123")).WillOnce(Return(info));
     EXPECT_CALL(*softbusConnectorMock_, GetProcessInfo()).WillOnce(Return(processInfoVec));
+    dmDeviceStateManager->stateDeviceInfos_["123"] = info;
     dmDeviceStateManager->OnDeviceOnline("123", 0);
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+    dmDeviceStateManager->stateDeviceInfos_.clear();
 }
 
 HWTEST_F(DmDeviceStateManagerTestTwo, OnDbReady_001, testing::ext::TestSize.Level0)
 {
-    std::string pkgName = "123";
-    std::string deviceId = "123";
-    DmDeviceInfo info;
-    strcpy_s(info.deviceId, DM_MAX_DEVICE_ID_LEN, "123");
+    std::string pkgName;
+    std::string deviceId;
     dmDeviceStateManager->OnDbReady(pkgName, deviceId);
+
+    pkgName = "123";
+    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
+
+    deviceId = "123";
+    dmDeviceStateManager->OnDbReady(pkgName, deviceId);
+
     DmDeviceInfo deviceInfo = {
         .deviceId = "123",
         .deviceName = "asda",
@@ -183,7 +193,46 @@ HWTEST_F(DmDeviceStateManagerTestTwo, OnDbReady_001, testing::ext::TestSize.Leve
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 
-HWTEST_F(DmDeviceStateManagerTestTwo, RegisterOffLineTimer_001, testing::ext::TestSize.Level0)
+HWTEST_F(DmDeviceStateManagerTestTwo, RegisterOffLineTimer_002, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo info = {
+        .deviceId = "123",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+    };
+    StateTimerInfo stateTimerInfo = {
+        .isStart = true,
+    };
+    dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    dmDeviceStateManager->RegisterOffLineTimer(info);
+    EXPECT_EQ(dmDeviceStateManager->stateTimerInfoMap_["123"].isStart, true);
+    dmDeviceStateManager->stateTimerInfoMap_.clear();
+}
+
+HWTEST_F(DmDeviceStateManagerTestTwo, RegisterOffLineTimer_003, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo info = {
+        .deviceId = "123",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+    };
+    StateTimerInfo stateTimerInfo = {
+        .isStart = true,
+    };
+    dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
+    EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(DoAll(WithArgs<1>(Invoke([](unsigned char* udidHash) {
+            memcpy_s(udidHash, DM_MAX_DEVICE_ID_LEN, "123", 3);
+        })), Return(DM_OK)));
+    dmDeviceStateManager->timer_ = std::make_shared<DmTimer>();
+    dmDeviceStateManager->RegisterOffLineTimer(info);
+    EXPECT_EQ(dmDeviceStateManager->stateTimerInfoMap_["123"].isStart, false);
+    dmDeviceStateManager->stateTimerInfoMap_.clear();
+}
+
+HWTEST_F(DmDeviceStateManagerTestTwo, RegisterOffLineTimer_004, testing::ext::TestSize.Level0)
 {
     DmDeviceInfo info = {
         .deviceId = "123",
@@ -192,8 +241,16 @@ HWTEST_F(DmDeviceStateManagerTestTwo, RegisterOffLineTimer_001, testing::ext::Te
     };
     StateTimerInfo stateTimerInfo;
     dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
+    dmDeviceStateManager->udidhash2udidMap_["123"] = "test";
     EXPECT_CALL(*softbusConnectorMock_, GetUdidByNetworkId(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(DoAll(WithArgs<1>(Invoke([](unsigned char* udidHash) {
+            memcpy_s(udidHash, DM_MAX_DEVICE_ID_LEN, "123", 3);
+        })), Return(DM_OK)));
+    dmDeviceStateManager->timer_ = std::make_shared<DmTimer>();
     dmDeviceStateManager->RegisterOffLineTimer(info);
+    EXPECT_NE(dmDeviceStateManager->udidhash2udidMap_["123"], "test");
+    dmDeviceStateManager->stateTimerInfoMap_.clear();
+    dmDeviceStateManager->udidhash2udidMap_.clear();
 }
 
 HWTEST_F(DmDeviceStateManagerTestTwo, StartOffLineTimer_001, testing::ext::TestSize.Level0)
@@ -204,13 +261,37 @@ HWTEST_F(DmDeviceStateManagerTestTwo, StartOffLineTimer_001, testing::ext::TestS
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
 }
 
+HWTEST_F(DmDeviceStateManagerTestTwo, StartOffLineTimer_002, testing::ext::TestSize.Level0)
+{
+    DmDeviceInfo info = {
+        .deviceId = "123",
+        .deviceName = "asda",
+        .deviceTypeId = 1,
+        .networkId = "aabbcc",
+    };
+    StateTimerInfo stateTimerInfo = {
+        .timerName = "123",
+        .networkId = "aabbcc",
+        .isStart = false,
+    };
+    dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
+    dmDeviceStateManager->StartOffLineTimer(info);
+    EXPECT_EQ(dmDeviceStateManager->stateTimerInfoMap_["123"].isStart, true);
+    dmDeviceStateManager->stateTimerInfoMap_.clear();
+    dmDeviceStateManager->udidhash2udidMap_.clear();
+}
+
 HWTEST_F(DmDeviceStateManagerTestTwo, DeleteOffLineTimer_001, testing::ext::TestSize.Level0)
 {
+    StateTimerInfo stateTimerInfo;
+    dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
     dmDeviceStateManager->timer_ = nullptr;
     dmDeviceStateManager->DeleteOffLineTimer("123");
+    EXPECT_NE(dmDeviceStateManager->stateTimerInfoMap_.size(), 0);
     dmDeviceStateManager->timer_ = std::make_shared<DmTimer>();
     dmDeviceStateManager->DeleteOffLineTimer("");
-    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+    EXPECT_NE(dmDeviceStateManager->stateTimerInfoMap_.size(), 0);
+    dmDeviceStateManager->stateTimerInfoMap_.clear();
 }
 
 HWTEST_F(DmDeviceStateManagerTestTwo, DeleteOffLineTimer_002, testing::ext::TestSize.Level0)
@@ -224,8 +305,10 @@ HWTEST_F(DmDeviceStateManagerTestTwo, DeleteOffLineTimer_002, testing::ext::Test
     StateTimerInfo stateTimerInfo;
     dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
     dmDeviceStateManager->DeleteOffLineTimer("deviceInfo");
+    EXPECT_NE(dmDeviceStateManager->stateTimerInfoMap_.size(), 0);
     dmDeviceStateManager->DeleteOffLineTimer("123");
-    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+    EXPECT_EQ(dmDeviceStateManager->stateTimerInfoMap_.size(), 0);
+    dmDeviceStateManager->stateTimerInfoMap_.clear();
 }
 
 HWTEST_F(DmDeviceStateManagerTestTwo, DeleteOffLineTimer_003, testing::ext::TestSize.Level0)
@@ -238,25 +321,15 @@ HWTEST_F(DmDeviceStateManagerTestTwo, DeleteOffLineTimer_003, testing::ext::Test
     };
     StateTimerInfo stateTimerInfo;
     dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
+    dmDeviceStateManager->udidhash2udidMap_["deviceInfo"] = "test";
     dmDeviceStateManager->DeleteOffLineTimer("123");
-    dmDeviceStateManager->udidhash2udidMap_["123"] = "test";
-    dmDeviceStateManager->DeleteOffLineTimer("123");
-    EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
-}
+    EXPECT_NE(dmDeviceStateManager->udidhash2udidMap_.size(), 0);
 
-HWTEST_F(DmDeviceStateManagerTestTwo, DeleteOffLineTimer_004, testing::ext::TestSize.Level0)
-{
-    dmDeviceStateManager->timer_ = std::make_shared<DmTimer>();
-    DmDeviceInfo info = {
-        .deviceId = "123",
-        .deviceName = "asda",
-        .deviceTypeId = 1,
-    };
-    StateTimerInfo stateTimerInfo;
-    dmDeviceStateManager->stateTimerInfoMap_["123"] = stateTimerInfo;
     dmDeviceStateManager->udidhash2udidMap_["123"] = "test";
     dmDeviceStateManager->DeleteOffLineTimer("123");
     EXPECT_NE(dmDeviceStateManager->softbusConnector_, nullptr);
+    dmDeviceStateManager->stateTimerInfoMap_.clear();
+    dmDeviceStateManager->udidhash2udidMap_.clear();
 }
 
 HWTEST_F(DmDeviceStateManagerTestTwo, DeleteTimeOutGroup_001, testing::ext::TestSize.Level0)

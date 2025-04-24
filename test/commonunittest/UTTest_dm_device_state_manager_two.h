@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_UTTEST_DM_DEVICE_STATE_MANAGER_H
-#define OHOS_UTTEST_DM_DEVICE_STATE_MANAGER_H
+#ifndef OHOS_UTTEST_DM_DEVICE_STATE_MANAGER_TWO_H
+#define OHOS_UTTEST_DM_DEVICE_STATE_MANAGER_TWO_H
 
 #include <gtest/gtest.h>
 #include <refbase.h>
@@ -22,6 +22,7 @@
 #include "softbus_connector_mock.h"
 #include "device_manager_service_listener.h"
 #include "softbus_session_callback.h"
+#include "dm_crypto_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -33,6 +34,8 @@ public:
     void TearDown() override;
     static inline std::shared_ptr<SoftbusConnectorMock> softbusConnectorMock_ =
         std::make_shared<SoftbusConnectorMock>();
+    static inline std::shared_ptr<CryptoMock> cryptoMock_ =
+        std::make_shared<CryptoMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

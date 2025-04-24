@@ -1177,6 +1177,7 @@ ohos_unittest("UTTest_dm_device_state_manager_two") {
 
   sources = [
     "${devicemanager_path}/test/commonunittest/UTTest_dm_device_state_manager_two.cpp",
+    "mock/dm_crypto_mock.cpp",
     "mock/softbus_connector_mock.cpp",
   ]
 

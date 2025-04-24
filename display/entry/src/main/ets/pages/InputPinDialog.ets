@@ -182,7 +182,7 @@ struct InputCustomDialog {
   }
 
   setUserOperation(operation: number, extra: string) {
-    console.log('setUserOperation: ' + operation + 'password' + extra);
+    console.log('setUserOperation: ' + operation);
     if (dmClass == null) {
       console.log('setUserOperation: ' + 'dmClass null');
       return;

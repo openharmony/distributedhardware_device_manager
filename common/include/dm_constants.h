@@ -20,144 +20,144 @@
 
 #include "dm_error_type.h"
 
-#ifndef EXPORT
-#define EXPORT __attribute__ ((visibility ("default")))
-#endif // EXPORT
+#ifndef DM_EXPORT
+#define DM_EXPORT __attribute__ ((visibility ("default")))
+#endif // DM_EXPORT
 
 namespace OHOS {
 namespace DistributedHardware {
-EXPORT extern const char* TAG_GROUP_ID;
-EXPORT extern const char* TAG_GROUP_NAME;
-EXPORT extern const char* TAG_REQUEST_ID;
-EXPORT extern const char* TAG_DEVICE_ID;
-EXPORT extern const char* TAG_AUTH_TYPE;
-EXPORT extern const char* TAG_CRYPTO_SUPPORT;
-EXPORT extern const char* TAG_VER;
-EXPORT extern const char* TAG_MSG_TYPE;
-EXPORT extern const char* DM_ITF_VER;
-EXPORT extern const char* DM_PKG_NAME;
-EXPORT extern const char* DM_SESSION_NAME;
-EXPORT extern const char* DM_PIN_HOLDER_SESSION_NAME;
-EXPORT extern const char* DM_SYNC_USERID_SESSION_NAME;
-EXPORT extern const char* DM_CAPABILITY_OSD;
-EXPORT extern const char* DM_CAPABILITY_APPROACH;
-EXPORT extern const char* DM_CAPABILITY_OH_APPROACH;
-EXPORT extern const char* DM_CAPABILITY_TOUCH;
-EXPORT extern const char* DM_CAPABILITY_CASTPLUS;
-EXPORT extern const char* DM_CAPABILITY_VIRTUAL_LINK;
-EXPORT extern const char* DM_CAPABILITY_SHARE;
-EXPORT extern const char* DM_CAPABILITY_WEAR;
-EXPORT extern const char* DM_CAPABILITY_OOP;
-EXPORT extern const char* DM_CREDENTIAL_TYPE;
-EXPORT extern const char* DM_CREDENTIAL_REQJSONSTR;
-EXPORT extern const char* DM_CREDENTIAL_RETURNJSONSTR;
-EXPORT extern const char* DEVICE_MANAGER_GROUPNAME;
-EXPORT extern const char* FIELD_CREDENTIAL_EXISTS;
-EXPORT extern const char* DM_TYPE_MINE;
-EXPORT extern const char* DM_TYPE_OH;
-EXPORT extern const char* TAG_SESSION_HEARTBEAT;
+DM_EXPORT extern const char* TAG_GROUP_ID;
+DM_EXPORT extern const char* TAG_GROUP_NAME;
+DM_EXPORT extern const char* TAG_REQUEST_ID;
+DM_EXPORT extern const char* TAG_DEVICE_ID;
+DM_EXPORT extern const char* TAG_AUTH_TYPE;
+DM_EXPORT extern const char* TAG_CRYPTO_SUPPORT;
+DM_EXPORT extern const char* TAG_VER;
+DM_EXPORT extern const char* TAG_MSG_TYPE;
+DM_EXPORT extern const char* DM_ITF_VER;
+DM_EXPORT extern const char* DM_PKG_NAME;
+DM_EXPORT extern const char* DM_SESSION_NAME;
+DM_EXPORT extern const char* DM_PIN_HOLDER_SESSION_NAME;
+DM_EXPORT extern const char* DM_SYNC_USERID_SESSION_NAME;
+DM_EXPORT extern const char* DM_CAPABILITY_OSD;
+DM_EXPORT extern const char* DM_CAPABILITY_APPROACH;
+DM_EXPORT extern const char* DM_CAPABILITY_OH_APPROACH;
+DM_EXPORT extern const char* DM_CAPABILITY_TOUCH;
+DM_EXPORT extern const char* DM_CAPABILITY_CASTPLUS;
+DM_EXPORT extern const char* DM_CAPABILITY_VIRTUAL_LINK;
+DM_EXPORT extern const char* DM_CAPABILITY_SHARE;
+DM_EXPORT extern const char* DM_CAPABILITY_WEAR;
+DM_EXPORT extern const char* DM_CAPABILITY_OOP;
+DM_EXPORT extern const char* DM_CREDENTIAL_TYPE;
+DM_EXPORT extern const char* DM_CREDENTIAL_REQJSONSTR;
+DM_EXPORT extern const char* DM_CREDENTIAL_RETURNJSONSTR;
+DM_EXPORT extern const char* DEVICE_MANAGER_GROUPNAME;
+DM_EXPORT extern const char* FIELD_CREDENTIAL_EXISTS;
+DM_EXPORT extern const char* DM_TYPE_MINE;
+DM_EXPORT extern const char* DM_TYPE_OH;
+DM_EXPORT extern const char* TAG_SESSION_HEARTBEAT;
 
 //The following constant are provided only for HiLink.
-EXPORT extern const char *EXT_PART;
+DM_EXPORT extern const char *EXT_PART;
 
 // Auth
-EXPORT extern const char* AUTH_TYPE;
-EXPORT extern const char* APP_OPERATION;
-EXPORT extern const char* CUSTOM_DESCRIPTION;
-EXPORT extern const char* TOKEN;
-EXPORT extern const char* PIN_TOKEN;
-EXPORT extern const char* PIN_CODE_KEY;
-EXPORT extern const int32_t CHECK_AUTH_ALWAYS_POS;
-EXPORT extern const char AUTH_ALWAYS;
-EXPORT extern const char AUTH_ONCE;
-EXPORT extern const char* TAG_TARGET_DEVICE_NAME;
-EXPORT extern const int32_t MIN_PINCODE_SIZE;
+DM_EXPORT extern const char* AUTH_TYPE;
+DM_EXPORT extern const char* APP_OPERATION;
+DM_EXPORT extern const char* CUSTOM_DESCRIPTION;
+DM_EXPORT extern const char* TOKEN;
+DM_EXPORT extern const char* PIN_TOKEN;
+DM_EXPORT extern const char* PIN_CODE_KEY;
+DM_EXPORT extern const int32_t CHECK_AUTH_ALWAYS_POS;
+DM_EXPORT extern const char AUTH_ALWAYS;
+DM_EXPORT extern const char AUTH_ONCE;
+DM_EXPORT extern const char* TAG_TARGET_DEVICE_NAME;
+DM_EXPORT extern const int32_t MIN_PINCODE_SIZE;
 // HiChain
-EXPORT extern const int32_t SERVICE_INIT_TRY_MAX_NUM;
+DM_EXPORT extern const int32_t SERVICE_INIT_TRY_MAX_NUM;
 constexpr int32_t DEVICE_UUID_LENGTH = 65;
-EXPORT extern const int32_t DEVICE_NETWORKID_LENGTH;
-EXPORT extern const int32_t GROUP_TYPE_INVALID_GROUP;
-EXPORT extern const int32_t GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
-EXPORT extern const int32_t GROUP_TYPE_PEER_TO_PEER_GROUP;
-EXPORT extern const int32_t GROUP_TYPE_ACROSS_ACCOUNT_GROUP;
-EXPORT extern const int32_t GROUP_VISIBILITY_PUBLIC;
-EXPORT extern const int64_t MIN_REQUEST_ID;
-EXPORT extern const int64_t MAX_REQUEST_ID;
-EXPORT extern const int32_t AUTH_DEVICE_REQ_NEGOTIATE;
-EXPORT extern const int32_t AUTH_DEVICE_RESP_NEGOTIATE;
-EXPORT extern const int32_t DEVICEID_LEN;
+DM_EXPORT extern const int32_t DEVICE_NETWORKID_LENGTH;
+DM_EXPORT extern const int32_t GROUP_TYPE_INVALID_GROUP;
+DM_EXPORT extern const int32_t GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
+DM_EXPORT extern const int32_t GROUP_TYPE_PEER_TO_PEER_GROUP;
+DM_EXPORT extern const int32_t GROUP_TYPE_ACROSS_ACCOUNT_GROUP;
+DM_EXPORT extern const int32_t GROUP_VISIBILITY_PUBLIC;
+DM_EXPORT extern const int64_t MIN_REQUEST_ID;
+DM_EXPORT extern const int64_t MAX_REQUEST_ID;
+DM_EXPORT extern const int32_t AUTH_DEVICE_REQ_NEGOTIATE;
+DM_EXPORT extern const int32_t AUTH_DEVICE_RESP_NEGOTIATE;
+DM_EXPORT extern const int32_t DEVICEID_LEN;
 
 // Key of filter parameter
-EXPORT extern const char* FILTER_PARA_RANGE;
-EXPORT extern const char* FILTER_PARA_DEVICE_TYPE;
-EXPORT extern const char* FILTER_PARA_INCLUDE_TRUST;
+DM_EXPORT extern const char* FILTER_PARA_RANGE;
+DM_EXPORT extern const char* FILTER_PARA_DEVICE_TYPE;
+DM_EXPORT extern const char* FILTER_PARA_INCLUDE_TRUST;
 
 // Connection address type
-EXPORT extern const char* CONN_ADDR_TYPE_ID;
-EXPORT extern const char* CONN_ADDR_TYPE_BR;
-EXPORT extern const char* CONN_ADDR_TYPE_BLE;
-EXPORT extern const char* CONN_ADDR_TYPE_USB;
-EXPORT extern const char* CONN_ADDR_TYPE_WLAN_IP;
-EXPORT extern const char* CONN_ADDR_TYPE_ETH_IP;
-EXPORT extern const char* CONN_ADDR_TYPE_NCM;
+DM_EXPORT extern const char* CONN_ADDR_TYPE_ID;
+DM_EXPORT extern const char* CONN_ADDR_TYPE_BR;
+DM_EXPORT extern const char* CONN_ADDR_TYPE_BLE;
+DM_EXPORT extern const char* CONN_ADDR_TYPE_USB;
+DM_EXPORT extern const char* CONN_ADDR_TYPE_WLAN_IP;
+DM_EXPORT extern const char* CONN_ADDR_TYPE_ETH_IP;
+DM_EXPORT extern const char* CONN_ADDR_TYPE_NCM;
 
 // Softbus connection address type int
-EXPORT extern const int32_t CONNECTION_ADDR_USB;
+DM_EXPORT extern const int32_t CONNECTION_ADDR_USB;
 
 // Parameter Key
-EXPORT extern const char* PARAM_KEY_META_TYPE;
-EXPORT extern const char* PARAM_KEY_TARGET_ID;
-EXPORT extern const char* PARAM_KEY_BR_MAC;
-EXPORT extern const char* PARAM_KEY_BLE_MAC;
-EXPORT extern const char* PARAM_KEY_WIFI_IP;
-EXPORT extern const char* PARAM_KEY_WIFI_PORT;
-EXPORT extern const char* PARAM_KEY_USB_IP;
-EXPORT extern const char* PARAM_KEY_USB_PORT;
-EXPORT extern const char* PARAM_KEY_NCM_IP;
-EXPORT extern const char* PARAM_KEY_NCM_PORT;
-EXPORT extern const char* PARAM_KEY_AUTH_TOKEN;
-EXPORT extern const char* PARAM_KEY_AUTH_TYPE;
-EXPORT extern const char* PARAM_KEY_PIN_CODE;
-EXPORT extern const char* PARAM_KEY_APP_OPER;
-EXPORT extern const char* PARAM_KEY_APP_DESC;
-EXPORT extern const char* PARAM_KEY_BLE_UDID_HASH;
+DM_EXPORT extern const char* PARAM_KEY_META_TYPE;
+DM_EXPORT extern const char* PARAM_KEY_TARGET_ID;
+DM_EXPORT extern const char* PARAM_KEY_BR_MAC;
+DM_EXPORT extern const char* PARAM_KEY_BLE_MAC;
+DM_EXPORT extern const char* PARAM_KEY_WIFI_IP;
+DM_EXPORT extern const char* PARAM_KEY_WIFI_PORT;
+DM_EXPORT extern const char* PARAM_KEY_USB_IP;
+DM_EXPORT extern const char* PARAM_KEY_USB_PORT;
+DM_EXPORT extern const char* PARAM_KEY_NCM_IP;
+DM_EXPORT extern const char* PARAM_KEY_NCM_PORT;
+DM_EXPORT extern const char* PARAM_KEY_AUTH_TOKEN;
+DM_EXPORT extern const char* PARAM_KEY_AUTH_TYPE;
+DM_EXPORT extern const char* PARAM_KEY_PIN_CODE;
+DM_EXPORT extern const char* PARAM_KEY_APP_OPER;
+DM_EXPORT extern const char* PARAM_KEY_APP_DESC;
+DM_EXPORT extern const char* PARAM_KEY_BLE_UDID_HASH;
 constexpr const char* PARAM_KEY_CUSTOM_DATA = "CUSTOM_DATA";
-EXPORT extern const char* PARAM_KEY_CONN_ADDR_TYPE;
-EXPORT extern const char* PARAM_KEY_PUBLISH_ID;
-EXPORT extern const char* PARAM_KEY_SUBSCRIBE_ID;
-EXPORT extern const char* PARAM_KEY_TARGET_PKG_NAME;
-EXPORT extern const char* PARAM_KEY_PEER_BUNDLE_NAME;
-EXPORT extern const char* PARAM_KEY_DISC_FREQ;
-EXPORT extern const char* PARAM_KEY_DISC_MEDIUM;
-EXPORT extern const char* PARAM_KEY_DISC_CAPABILITY;
-EXPORT extern const char* PARAM_KEY_DISC_MODE;
-EXPORT extern const char* PARAM_KEY_AUTO_STOP_ADVERTISE;
-EXPORT extern const char* PARAM_KEY_FILTER_OPTIONS;
-EXPORT extern const char* PARAM_KEY_BIND_EXTRA_DATA;
-EXPORT extern const char* PARAM_KEY_OS_TYPE;
-EXPORT extern const char* PARAM_KEY_OS_VERSION;
-EXPORT extern const char* PARAM_KEY_IS_SHOW_TRUST_DIALOG;
-EXPORT extern const char* PARAM_KEY_UDID;
-EXPORT extern const char* PARAM_KEY_UUID;
-EXPORT extern const char* DM_CONNECTION_DISCONNECTED;
-EXPORT extern const char* BIND_LEVEL;
-EXPORT extern const char* TOKENID;
-EXPORT extern const char* DM_BIND_RESULT_NETWORK_ID;
-EXPORT extern const char* PARAM_KEY_POLICY_STRATEGY_FOR_BLE;
-EXPORT extern const char* PARAM_KEY_POLICY_TIME_OUT;
-EXPORT extern const char* DEVICE_SCREEN_STATUS;
-EXPORT extern const char* PROCESS_NAME;
-EXPORT extern const char* PARAM_CLOSE_SESSION_DELAY_SECONDS;
-EXPORT extern const char* DM_AUTHENTICATION_TYPE;
+DM_EXPORT extern const char* PARAM_KEY_CONN_ADDR_TYPE;
+DM_EXPORT extern const char* PARAM_KEY_PUBLISH_ID;
+DM_EXPORT extern const char* PARAM_KEY_SUBSCRIBE_ID;
+DM_EXPORT extern const char* PARAM_KEY_TARGET_PKG_NAME;
+DM_EXPORT extern const char* PARAM_KEY_PEER_BUNDLE_NAME;
+DM_EXPORT extern const char* PARAM_KEY_DISC_FREQ;
+DM_EXPORT extern const char* PARAM_KEY_DISC_MEDIUM;
+DM_EXPORT extern const char* PARAM_KEY_DISC_CAPABILITY;
+DM_EXPORT extern const char* PARAM_KEY_DISC_MODE;
+DM_EXPORT extern const char* PARAM_KEY_AUTO_STOP_ADVERTISE;
+DM_EXPORT extern const char* PARAM_KEY_FILTER_OPTIONS;
+DM_EXPORT extern const char* PARAM_KEY_BIND_EXTRA_DATA;
+DM_EXPORT extern const char* PARAM_KEY_OS_TYPE;
+DM_EXPORT extern const char* PARAM_KEY_OS_VERSION;
+DM_EXPORT extern const char* PARAM_KEY_IS_SHOW_TRUST_DIALOG;
+DM_EXPORT extern const char* PARAM_KEY_UDID;
+DM_EXPORT extern const char* PARAM_KEY_UUID;
+DM_EXPORT extern const char* DM_CONNECTION_DISCONNECTED;
+DM_EXPORT extern const char* BIND_LEVEL;
+DM_EXPORT extern const char* TOKENID;
+DM_EXPORT extern const char* DM_BIND_RESULT_NETWORK_ID;
+DM_EXPORT extern const char* PARAM_KEY_POLICY_STRATEGY_FOR_BLE;
+DM_EXPORT extern const char* PARAM_KEY_POLICY_TIME_OUT;
+DM_EXPORT extern const char* DEVICE_SCREEN_STATUS;
+DM_EXPORT extern const char* PROCESS_NAME;
+DM_EXPORT extern const char* PARAM_CLOSE_SESSION_DELAY_SECONDS;
+DM_EXPORT extern const char* DM_AUTHENTICATION_TYPE;
 
-EXPORT extern const char* PARAM_KEY_CONN_SESSIONTYPE;
-EXPORT extern const char* PARAM_KEY_HML_RELEASETIME;
-EXPORT extern const char* PARAM_KEY_HML_ENABLE_160M;
-EXPORT extern const char* PARAM_KEY_HML_ACTIONID;
+DM_EXPORT extern const char* PARAM_KEY_CONN_SESSIONTYPE;
+DM_EXPORT extern const char* PARAM_KEY_HML_RELEASETIME;
+DM_EXPORT extern const char* PARAM_KEY_HML_ENABLE_160M;
+DM_EXPORT extern const char* PARAM_KEY_HML_ACTIONID;
 
-EXPORT extern const char* CONN_SESSION_TYPE_HML;
-EXPORT extern const char* CONN_SESSION_TYPE_BLE;
-EXPORT extern const char* UN_BIND_PARAM_UDID_KEY;
+DM_EXPORT extern const char* CONN_SESSION_TYPE_HML;
+DM_EXPORT extern const char* CONN_SESSION_TYPE_BLE;
+DM_EXPORT extern const char* UN_BIND_PARAM_UDID_KEY;
 
 // screen state
 enum ScreenState {
@@ -167,14 +167,14 @@ enum ScreenState {
 };
 
 // errCode map
-EXPORT extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
+DM_EXPORT extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
 // wise device
-EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
+DM_EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 const int32_t DEVICE_NAME_MAX_BYTES = 100;
 
-EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
-EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
-EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
+DM_EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
+DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
+DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
 
 extern const char* DM_VERSION_5_0_1;
 extern const char* DM_VERSION_5_0_2;
