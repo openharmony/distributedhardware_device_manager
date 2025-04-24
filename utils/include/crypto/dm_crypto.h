@@ -20,36 +20,36 @@
 #include "dm_kv_info.h"
 #endif
 
-#ifndef EXPORT
-#define EXPORT __attribute__ ((visibility ("default")))
-#endif // EXPORT
+#ifndef DM_EXPORT
+#define DM_EXPORT __attribute__ ((visibility ("default")))
+#endif // DM_EXPORT
 
 
 namespace OHOS {
 namespace DistributedHardware {
 class Crypto {
 public:
-    EXPORT static void DmGenerateStrHash(const void *data, size_t dataSize,
+    DM_EXPORT static void DmGenerateStrHash(const void *data, size_t dataSize,
         unsigned char *outBuf, uint32_t outBufLen, uint32_t startIndex);
-    EXPORT static std::string Sha256(const std::string &text, bool isUpper = false);
-    EXPORT static std::string Sha256(const void *data, size_t size,
+    DM_EXPORT static std::string Sha256(const std::string &text, bool isUpper = false);
+    DM_EXPORT static std::string Sha256(const void *data, size_t size,
         bool isUpper = false);
-    EXPORT static int32_t ConvertHexStringToBytes(unsigned char *outBuf,
+    DM_EXPORT static int32_t ConvertHexStringToBytes(unsigned char *outBuf,
         uint32_t outBufLen, const char *inBuf, uint32_t inLen);
-    EXPORT static int32_t GetUdidHash(const std::string &udid,
+    DM_EXPORT static int32_t GetUdidHash(const std::string &udid,
         unsigned char *udidHash);
-    EXPORT static std::string GetGroupIdHash(const std::string &groupId);
+    DM_EXPORT static std::string GetGroupIdHash(const std::string &groupId);
     static int32_t GetSecRandom(uint8_t *out, size_t outLen);
     static std::string GetSecSalt();
     static std::string GetHashWithSalt(const std::string &text, const std::string &salt);
-    EXPORT static int32_t GetAccountIdHash(const std::string &accountId,
+    DM_EXPORT static int32_t GetAccountIdHash(const std::string &accountId,
         unsigned char *accountIdHash);
-    EXPORT static int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
+    DM_EXPORT static int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
         const unsigned char *inBuf, uint32_t inLen);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    EXPORT static int32_t ConvertUdidHashToAnoyAndSave(const std::string &appId,
+    DM_EXPORT static int32_t ConvertUdidHashToAnoyAndSave(const std::string &appId,
         const std::string &udidHash, DmKVValue &kvValue);
-    EXPORT static int32_t ConvertUdidHashToAnoyDeviceId(const std::string &appId,
+    DM_EXPORT static int32_t ConvertUdidHashToAnoyDeviceId(const std::string &appId,
         const std::string &udidHash, DmKVValue &kvValue);
     static int32_t GetAnoyDeviceInfo(const std::string &appId, const std::string &udidHash, DmKVValue &kvValue);
     static int32_t ConvertUdidHashToAnoyGenerate(const std::string &appId, const std::string &udidHash,

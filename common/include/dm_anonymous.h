@@ -27,13 +27,13 @@ namespace DistributedHardware {
 extern const char* PRINT_LIST_SPLIT;
 extern const int32_t LIST_SPLIT_LEN;
 
-EXPORT std::string GetAnonyString(const std::string &value);
+DM_EXPORT std::string GetAnonyString(const std::string &value);
 std::string GetAnonyStringList(const std::vector<std::string> &values);
 std::string GetAnonyInt32(const int32_t value);
 std::string GetAnonyInt32List(const std::vector<int32_t> &values);
 bool IsNumberString(const std::string &inputString);
 bool IsString(const JsonItemObject &jsonObj, const std::string &key);
-EXPORT bool IsInt32(const JsonItemObject &jsonObj, const std::string &key);
+DM_EXPORT bool IsInt32(const JsonItemObject &jsonObj, const std::string &key);
 bool IsUint32(const JsonItemObject &jsonObj, const std::string &key);
 bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
 bool IsUint64(const JsonItemObject &jsonObj, const std::string &key);
@@ -103,7 +103,7 @@ bool IsIdLengthValid(const std::string &inputID);
 bool IsMessageLengthValid(const std::string &inputMessage);
 bool IsValueExist(const std::multimap<std::string, int32_t> unorderedmap, const std::string &udid, int32_t userId);
 bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent);
-EXPORT std::string SafetyDump(const JsonItemObject &jsonObj);
+DM_EXPORT std::string SafetyDump(const JsonItemObject &jsonObj);
 std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index);
 bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &key);
 } // namespace DistributedHardware
