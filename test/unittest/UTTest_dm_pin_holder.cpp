@@ -1066,8 +1066,8 @@ HWTEST_F(DmPinHolderTest, OnSessionOpened_104, testing::ext::TestSize.Level1)
     int sessionId = 1;
     int result = 1;
     int ret = pinHolderSession->OnSessionOpened(sessionId, result);
-    int sessionId = 2;
-    int result = 2;
+    sessionId = 2;
+    result = 2;
     ret = pinHolderSession->OnSessionOpened(sessionId, result);
     int closeSessionId = 2;
     pinHolderSession->OnSessionClosed(closeSessionId);
@@ -1105,7 +1105,6 @@ HWTEST_F(DmPinHolderTest, OnSessionOpened_105, testing::ext::TestSize.Level1)
     data = reinterpret_cast<void *>(dataStr.data());
     dataLen = static_cast<uint32_t>(dataStr.length());
     pinHolderSession->OnBytesReceived(sessionId, data, dataLen);
-    int closeSessionId = 2;
     pinHolderSession->UnRegisterSessionCallback();
     std::string dataStr2 = "a**************3";
     data = reinterpret_cast<void *>(dataStr2.data());
