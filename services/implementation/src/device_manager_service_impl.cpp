@@ -345,7 +345,7 @@ void DeviceManagerServiceImpl::CleanAuthMgrByLogicalSessionId(uint64_t logicalSe
         authMgr_->SetTransferReady(true);
         authMgr_->ClearSoftbusSessionCallback();
     }
-
+    hiChainAuthConnector_->UnRegisterHiChainAuthCallbackById(logicalSessionId);
     if (authMgrMap_.find(tokenId) != authMgrMap_.end()) {
         authMgrMap_[tokenId] = nullptr;
         authMgrMap_.erase(tokenId);
@@ -455,6 +455,7 @@ void DeviceManagerServiceImpl::Release()
     softbusConnector_->UnRegisterSoftbusStateCallback();
     softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
     hiChainConnector_->UnRegisterHiChainCallback();
+    hiChainAuthConnector_->UnRegisterHiChainAuthCallback();
     authMgr_ = nullptr;
     for (auto& pair : authMgrMap_) {
         pair.second = nullptr;
@@ -711,6 +712,12 @@ int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
 {
     {
         std::lock_guard<std::mutex> lock(sessionEnableMutexMap_[sessionId]);
+        if (result == 0) {
+            sessionEnableCvReadyMap_[sessionId] = true;
+            LOGE("OnSessionOpened successful, sessionId: %{public}d", sessionId);
+        } else {
+            LOGE("OnSessionOpened failed, sessionId: %{public}d, res: %{public}d", sessionId, result);
+        }
         sessionEnableCvMap_[sessionId].notify_all();
     }
     std::string peerUdid = "";
@@ -777,38 +784,34 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgrByMessage(i
 {
     uint64_t tokenId = 0;
     if (msgType == MSG_TYPE_REQ_ACL_NEGOTIATE) {
-        if (logicalSessionId != 0) {
-            curSession->logicalSessionSet_.insert(logicalSessionId);
-            std::string bundleName;
-            int32_t displayId = 0;
-            if (jsonObject[TAG_PEER_BUNDLE_NAME_V2].IsString()) {
-                bundleName = jsonObject[TAG_PEER_BUNDLE_NAME_V2].Get<std::string>();
-            }
-            if (jsonObject[DM_TAG_PEER_DISPLAY_ID].IsNumberInteger()) {
-                displayId = jsonObject[DM_TAG_PEER_DISPLAY_ID].Get<int32_t>();
-            }
-            tokenId = GetTokenId(false, displayId, bundleName);
-            if (tokenId == 0) {
-                LOGE("GetAuthMgrByMessage, Get tokenId failed.");
-                return nullptr;
-            }
-            if (logicalSessionId2TokenIdMap_.find(logicalSessionId) != logicalSessionId2TokenIdMap_.end()) {
-                LOGE("GetAuthMgrByMessage, logicalSessionId exists in logicalSessionId2TokenIdMap_.");
-                return nullptr;
-            }
-            logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+        std::string bundleName;
+        int32_t displayId = 0;
+        if (jsonObject[TAG_PEER_BUNDLE_NAME_V2].IsString()) {
+            bundleName = jsonObject[TAG_PEER_BUNDLE_NAME_V2].Get<std::string>();
+        }
+        if (jsonObject[DM_TAG_PEER_DISPLAY_ID].IsNumberInteger()) {
+            displayId = jsonObject[DM_TAG_PEER_DISPLAY_ID].Get<int32_t>();
+        }
+        tokenId = GetTokenId(false, displayId, bundleName);
+        if (tokenId == 0) {
+            LOGE("GetAuthMgrByMessage, Get tokenId failed.");
+            return nullptr;
         }
         if (InitAndRegisterAuthMgr(false, tokenId, curSession, logicalSessionId) != DM_OK) {
             return nullptr;
         }
-    } else {
-        if (logicalSessionId != 0) {
-            if (curSession->logicalSessionSet_.find(logicalSessionId) == curSession->logicalSessionSet_.end()) {
-                LOGE("GetAuthMgrByMessage, The logical session ID does not exist in the physical session.");
-                return nullptr;
-            }
-            tokenId = logicalSessionId2TokenIdMap_[logicalSessionId];
+        curSession->logicalSessionSet_.insert(logicalSessionId);
+        if (logicalSessionId2TokenIdMap_.find(logicalSessionId) != logicalSessionId2TokenIdMap_.end()) {
+            LOGE("GetAuthMgrByMessage, logicalSessionId exists in logicalSessionId2TokenIdMap_.");
+            return nullptr;
         }
+        logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
+    } else {
+        if (curSession->logicalSessionSet_.find(logicalSessionId) == curSession->logicalSessionSet_.end()) {
+            LOGE("GetAuthMgrByMessage, The logical session ID does not exist in the physical session.");
+            return nullptr;
+        }
+        tokenId = logicalSessionId2TokenIdMap_[logicalSessionId];
     }
 
     return GetAuthMgrByTokenId(tokenId);
@@ -876,6 +879,7 @@ int32_t DeviceManagerServiceImpl::TransferByAuthType(int32_t authType,
         authMgr_->EnableInsensibleSwitching();
         curSession->logicalSessionSet_.insert(0);
         curSession->logicalSessionCnt_.fetch_add(1);
+        logicalSessionId2SessionIdMap_[0] = sessionId;
         authMgr->OnSessionDisable();
     } else {
         authMgr_->DisableInsensibleSwitching();
@@ -1000,9 +1004,13 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
         2. Old-to-new: When the sink side receives an 80 message and detects a version mismatch, it receives the 80
         message, directly creates a new old protocol authMgr, and re-OnSessionOpened and OnBytesReceived.
         */
-        if (TransferOldAuthMgr(msgType, jsonObject, curSession) != DM_OK) {
-            LOGE("DeviceManagerServiceImpl::OnBytesReceived TransferOldAuthMgr failed");
-            return;
+        if (curSession->version_ == "" || CompareVersion(curSession->version_, DM_VERSION_5_0_OLD_MAX)) {
+            if (TransferOldAuthMgr(msgType, jsonObject, curSession) != DM_OK) {
+                LOGE("DeviceManagerServiceImpl::OnBytesReceived TransferOldAuthMgr failed");
+                return;
+            }
+        } else {
+            LOGI("DeviceManagerServiceImpl::OnBytesReceived Reuse Old AuthMgr, sessionId: %{public}d.", sessionId);
         }
         authMgr = authMgr_;
     }
@@ -1402,8 +1410,14 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
         }
 
         std::unique_lock<std::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
-        sessionEnableCvMap_[sessionId].wait(cvLock);
-
+        sessionEnableCvReadyMap_[sessionId] = false;
+        if (sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::seconds(WAIT_TIMEOUT),
+            [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
+            LOGI("session enable, sessionId: %{public}d.", sessionId);
+        } else {
+            LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
+            goto error;
+        }
         instance = std::make_shared<Session>(sessionId, deviceId);
         deviceId2SessionIdMap_[deviceId] = sessionId;
         sessionsMap_[sessionId] = instance;
@@ -1535,10 +1549,13 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
 
     // Logical session random number
     int sessionId = curSession->sessionId_;
-    uint64_t logicalSessionId = GenerateRandNum(sessionId);
-    if (curSession->logicalSessionSet_.find(logicalSessionId) != curSession->logicalSessionSet_.end()) {
-        LOGE("Failed to create the logical session.");
-        return ERR_DM_LOGIC_SESSION_CREATE_FAILED;
+    uint64_t logicalSessionId = 0;
+    if (curSession->version_ == "" || CompareVersion(curSession->version_, DM_VERSION_5_0_OLD_MAX)) {
+        logicalSessionId = GenerateRandNum(sessionId);
+        if (curSession->logicalSessionSet_.find(logicalSessionId) != curSession->logicalSessionSet_.end()) {
+            LOGE("Failed to create the logical session.");
+            return ERR_DM_LOGIC_SESSION_CREATE_FAILED;
+        }
     }
 
     // Create on the src end.
@@ -1555,7 +1572,6 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
 
     auto authMgr = GetAuthMgrByTokenId(tokenId);
     if (authMgr == nullptr) {
-        LOGE("authMgr is nullptr");
         return ERR_DM_POINT_NULL;
     }
     authMgr->SetBindTargetParams(targetId);

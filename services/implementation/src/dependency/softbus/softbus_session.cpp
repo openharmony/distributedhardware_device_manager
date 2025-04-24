@@ -142,9 +142,9 @@ int32_t SoftbusSession::SendHeartbeatData(int32_t sessionId, std::string &messag
 
 int SoftbusSession::OnSessionOpened(int sessionId, int result)
 {
-    LOGD("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
+    LOGI("OnSessionOpened, success, sessionId: %{public}d, result: %{public}d.", sessionId, result);
     if (sessionCallback_ == nullptr) {
-        LOGD("Session callback is not registered.");
+        LOGI("Session callback is not registered.");
         return DM_OK;
     }
     int32_t sessionSide = GetSessionSide(sessionId);

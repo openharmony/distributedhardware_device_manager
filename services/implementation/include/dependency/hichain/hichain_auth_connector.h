@@ -60,7 +60,9 @@ public:
     int32_t ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId, std::string publicKey);
     int32_t DeleteCredential(const std::string &deviceId, int32_t userId, int32_t peerUserId);
     int32_t RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback);
+    int32_t UnRegisterHiChainAuthCallback();
     int32_t RegisterHiChainAuthCallbackById(int64_t id, std::shared_ptr<IDmDeviceAuthCallback> callback);
+    int32_t UnRegisterHiChainAuthCallbackById(int64_t id);
     int32_t GetCredential(std::string &localUdid, int32_t osAccountId, std::string &publicKey);
 
     int32_t ProcessCredData(int64_t authReqId, const std::string &data);
