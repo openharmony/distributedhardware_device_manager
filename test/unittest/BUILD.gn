@@ -45,7 +45,6 @@ group("unittest") {
     ":UTTest_dm_auth_manager_first",
     ":UTTest_dm_auth_manager_second",
     ":UTTest_dm_auth_manager_third",
-    ":UTTest_dm_auth_state",
     ":UTTest_dm_auth_message_processor",
     ":UTTest_dm_comm_tool",
     ":UTTest_dm_common_event_manager",
@@ -1500,29 +1499,6 @@ ohos_unittest("UTTest_dm_auth_manager_third") {
 }
 
 ## UTTest_dm_auth_manager_third }}}
-
-## UnitTest UTTest_dm_auth_state {{{
-ohos_unittest("UTTest_dm_auth_state") {
-  module_out_path = module_out_path
-
-  include_dirs = [ "${devicemanager_path}/test/unittest" ]
-
-  sources = [ "${devicemanager_path}/test/unittest/UTTest_dm_auth_state.cpp" ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hilog:libhilog",
-  ]
-}
-
-## UTTest_dm_auth_state }}}
 
 ###############################
 ## UnitTest UTTest_dm_radar_helper_test {{{
