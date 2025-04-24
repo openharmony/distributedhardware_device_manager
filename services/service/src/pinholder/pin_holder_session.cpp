@@ -79,6 +79,7 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
 {
     int32_t sessionSide = GetSessionSide(sessionId);
     std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
+    LOGI("[SOFTBUS]OnBytesReceived sessionId: %{public}d", sessionId);
     if (pinholderSessionCallback_ == nullptr) {
         LOGE("OnSessionOpened error, pinholderSessionCallback_ is nullptr.");
         return ERR_DM_FAILED;
@@ -98,8 +99,8 @@ int PinHolderSession::OnSessionOpened(int sessionId, int result)
 
 void PinHolderSession::OnSessionClosed(int sessionId)
 {
-    LOGI("[SOFTBUS]OnSessionClosed sessionId: %{public}d", sessionId);
     std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
+    LOGI("[SOFTBUS]OnSessionClosed sessionId: %{public}d", sessionId);
     if (pinholderSessionCallback_ == nullptr) {
         LOGE("OnSessionClosed error, pinholderSessionCallback_ is nullptr.");
         return;
@@ -113,6 +114,7 @@ void PinHolderSession::OnSessionClosed(int sessionId)
     std::thread dealThread(asyncTaskFunc);
     dealThread.detach();
 #endif
+    LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
     return;
 }
 
@@ -124,6 +126,7 @@ void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned
         return;
     }
     std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
+    LOGI("[SOFTBUS]OnBytesReceived sessionId: %{public}d", sessionId);
     if (pinholderSessionCallback_ == nullptr) {
         LOGE("OnBytesReceived error, pinholderSessionCallback_ is nullptr.");
         return;
@@ -139,6 +142,7 @@ void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned
     std::thread dealThread(asyncTaskFunc);
     dealThread.detach();
 #endif
+    LOGI("OnBytesReceived, success, sessionId: %{public}d.", sessionId);
     return;
 }
 
