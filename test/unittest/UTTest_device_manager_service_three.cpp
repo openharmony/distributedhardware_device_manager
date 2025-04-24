@@ -480,7 +480,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, PutDeviceProfileInfoList_301, testing::e
     std::vector<DmDeviceProfileInfo> deviceProfileInfoList;
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().PutDeviceProfileInfoList(pkgName, deviceProfileInfoList);
-    EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, GetDeviceNamePrefixs_301, testing::ext::TestSize.Level0)

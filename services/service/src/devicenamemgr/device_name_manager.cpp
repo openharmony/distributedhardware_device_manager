@@ -113,6 +113,7 @@ int32_t DeviceNameManager::InitDeviceNameWhenSoftBusReady()
     if (DependsIsReady()) {
         int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
         InitDeviceName(userId);
+        RegisterDeviceNameChangeMonitor(userId, DEFAULT_USER_ID);
     }
     return DM_OK;
 }
@@ -162,6 +163,16 @@ int32_t DeviceNameManager::InitDeviceNameWhenLogin()
 }
 
 int32_t DeviceNameManager::InitDeviceNameWhenNickChange()
+{
+    LOGI("In");
+    if (DependsIsReady()) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        InitDeviceName(userId);
+    }
+    return DM_OK;
+}
+
+int32_t DeviceNameManager::InitDeviceNameWhenLanguageOrRegionChanged()
 {
     LOGI("In");
     if (DependsIsReady()) {

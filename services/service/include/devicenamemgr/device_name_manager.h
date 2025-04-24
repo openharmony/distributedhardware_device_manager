@@ -43,6 +43,7 @@ public:
     int32_t InitDeviceNameWhenNameChange(int32_t userId);
     int32_t ModifyUserDefinedName(const std::string &deviceName);
     int32_t RestoreLocalDeviceName();
+    int32_t InitDeviceNameWhenLanguageOrRegionChanged();
 
 private:
     DeviceNameManager() = default;
