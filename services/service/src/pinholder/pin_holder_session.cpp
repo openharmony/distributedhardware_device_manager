@@ -19,9 +19,6 @@
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "ffrt.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
