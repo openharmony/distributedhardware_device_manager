@@ -618,7 +618,8 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_003, testing::ext::Tes
     std::string prefixName = "My";
     std::string subffixName = "Device";
     int32_t maxNameLength = 20;
-    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
+        subffixName, maxNameLength);
     EXPECT_EQ(result, "My的Device");
 }
 
@@ -627,7 +628,8 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_004, testing::ext::Tes
     std::string prefixName = "MyVeryLong";
     std::string subffixName = "DeviceName";
     int32_t maxNameLength = 15;
-    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
+        subffixName, maxNameLength);
     EXPECT_EQ(result, "My...DeviceName");
 }
 
@@ -636,7 +638,8 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_005, testing::ext::Tes
     std::string prefixName = "My";
     std::string subffixName = "Device";
     int32_t maxNameLength = 0;
-    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
+        subffixName, maxNameLength);
     EXPECT_EQ(result, "My的Device");
 }
 
@@ -645,7 +648,8 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_006, testing::ext::Tes
     std::string prefixName = "My";
     std::string subffixName = "VeryLongDeviceNameThatExceedsLimit";
     int32_t maxNameLength = 30;
-    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
+        subffixName, maxNameLength);
     EXPECT_EQ(result, "My的VeryLongDevi...");
 }
 
@@ -654,7 +658,8 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_007, testing::ext::Tes
     std::string prefixName = "";
     std::string subffixName = "Device";
     int32_t maxNameLength = 10;
-    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
+        subffixName, maxNameLength);
     EXPECT_EQ(result, "Device");
 }
 
@@ -663,7 +668,8 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_008, testing::ext::Tes
     std::string prefixName = "";
     std::string subffixName = "VeryLongDeviceName";
     int32_t maxNameLength = 10;
-    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName, subffixName, maxNameLength);
+    std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
+        subffixName, maxNameLength);
     EXPECT_EQ(result, "VeryLon...");
 }
 
