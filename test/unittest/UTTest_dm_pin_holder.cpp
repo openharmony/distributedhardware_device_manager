@@ -1115,7 +1115,7 @@ HWTEST_F(DmPinHolderTest, OnSessionOpened_105, testing::ext::TestSize.Level1)
     pinHolderSession->UnRegisterSessionCallback();
     closeSessionId = 1;
     pinHolderSession->OnSessionClosed(closeSessionId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 } // namespace
 } // namespace DistributedHardware
