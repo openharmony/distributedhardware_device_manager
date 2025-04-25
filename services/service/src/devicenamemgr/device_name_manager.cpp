@@ -416,6 +416,10 @@ int32_t DeviceNameManager::InitDisplayDeviceNameToSettingsData(const std::string
     if (oldDisplayName != newDisplayName) {
         SetDisplayDeviceName(newDisplayName, userId);
     }
+#else
+    (void) nickName;
+    (void) deviceName;
+    (void) userId;
 #endif // SUPPORT_WISEDEVICE
     return DM_OK;
 }
