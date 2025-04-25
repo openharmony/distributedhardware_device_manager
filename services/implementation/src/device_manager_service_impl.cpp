@@ -1282,7 +1282,7 @@ int32_t DeviceManagerServiceImpl::ImportAuthCode(const std::string &pkgName, con
     }
 
     LOGI("DeviceManagerServiceImpl::ImportAuthCode pkgName is %{public}s, authCode is %{public}s",
-        pkgName.c_str(), authCode.c_str());
+        pkgName.c_str(), GetAnonyString(authCode).c_str());
     auto authMgr = GetAuthMgr();
     if (authMgr == nullptr) {
         auto config = GetConfigByTokenId();
