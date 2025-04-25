@@ -102,7 +102,6 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_001, testing::ext:
 {
     std::string peerUdid = "peerUdid";
     std::string localUdid = "localUdid";
-    // Setup empty profiles
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
@@ -117,10 +116,9 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_002, testing::ext:
     std::string peerUdid = "peerUdid";
     std::string localUdid = "localUdid";
     
-    // Setup mock profile where peer is the source
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE_TYPE);
+    profile.SetBindType(DM_SHARE);
     profile.SetTrustDeviceId(peerUdid);
     Accesser accesser;
     accesser.SetAccesserDeviceId(peerUdid);
@@ -143,10 +141,9 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_003, testing::ext:
     std::string peerUdid = "peerUdid";
     std::string localUdid = "localUdid";
     
-    // Setup mock profile where local is the source
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE_TYPE);
+    profile.SetBindType(DM_SHARE);
     profile.SetTrustDeviceId(peerUdid);
     Accesser accesser;
     accesser.SetAccesserDeviceId(localUdid);
@@ -166,10 +163,9 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_004, testing::ext:
     std::string peerUdid = "peerUdid";
     std::string localUdid = "localUdid";
     
-    // Setup mock profile with no matching sharing relationship
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_IDENTICAL_ACCOUNT);  // Different bind type
+    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
     profile.SetTrustDeviceId(peerUdid);
     Accesser accesser;
     accesser.SetAccesserDeviceId(peerUdid);
@@ -192,11 +188,10 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_005, testing::ext:
     std::string localUdid = "localUdid";
     std::string trustDevideId = "trustDevideId";
 
-    // 模拟 profiles 中的 TrustDeviceId 不等于 peerUdid
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE_TYPE);
-    profile.SetTrustDeviceId(trustDevideId); // 不匹配的 TrustDeviceId
+    profile.SetBindType(DM_SHARE);
+    profile.SetTrustDeviceId(trustDevideId);
     profiles.push_back(profile);
    
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
@@ -213,7 +208,6 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_001, testing
     std::string localUdid = "localUdid";
     std::string remoteUdid;
 
-    // Empty profiles
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
 
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
@@ -231,10 +225,9 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_002, testing
     std::string localUdid = "localUdid";
     std::string remoteUdid;
 
-    // 模拟 profiles 中的 BindType 不等于 DM_SHARE_TYPE
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_POINT_TO_POINT); // 非 DM_SHARE_TYPE
+    profile.SetBindType(DM_POINT_TO_POINT);
     profiles.push_back(profile);
 
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
@@ -251,10 +244,9 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_003, testing
     std::string localUdid = "localUdid";
     std::string remoteUdid;
 
-    // 模拟 Accesser 的 CredentialId 匹配的情况
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE_TYPE);
+    profile.SetBindType(DM_SHARE);
 
     profile.GetAccesser().SetAccesserCredentialId(atoi(credId));
     profile.GetAccesser().SetAccesserDeviceId(localUdid);
@@ -278,10 +270,9 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_004, testing
     std::string localUdid = "localUdid";
     std::string remoteUdid;
 
-    // 模拟 Accessee 的 CredentialId 匹配的情况
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE_TYPE);
+    profile.SetBindType(DM_SHARE);
 
     profile.GetAccessee().SetAccesseeCredentialId(atoi(credId));
     profile.GetAccessee().SetAccesseeDeviceId(localUdid);
@@ -304,7 +295,6 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_001, test
     std::string localUdid = "localId";
     int32_t userId = 123456;
     
-    // Setup empty profiles
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
@@ -321,7 +311,6 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_002, test
     std::string localUdid = "localId";
     int32_t userId = 123456;
     
-    // Setup mock profile with non-share type
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
     profile.SetBindType(DM_IDENTICAL_ACCOUNT);
@@ -341,10 +330,9 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_003, test
     std::string localUdid = "localId";
     int32_t userId = 123456;
     
-    // 模拟 AccesserCredId 匹配的情况
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE_TYPE);
+    profile.SetBindType(DM_SHARE);
     
     Accesser accesser;
     accesser.SetAccesserCredentialId(atoi(credId.c_str()));
@@ -370,10 +358,9 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_004, test
     std::string localUdid = "localUdid";
     int32_t userId = 123456;
 
-    // 模拟 AccesseeCredId 匹配的情况
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE_TYPE);
+    profile.SetBindType(DM_SHARE);
     
     Accesser accesser;
     accesser.SetAccesserDeviceId(localUdid);
@@ -399,19 +386,18 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_005, test
     std::string localUdid = "localUdid";
     int32_t userId = 123456;
     
-    // Setup mock profile with non-matching credentials
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
-    profile.SetBindType(DM_SHARE_TYPE);
+    profile.SetBindType(DM_SHARE);
     
     Accesser accesser;
-    accesser.SetAccesserCredentialId(9999); // Different credential
+    accesser.SetAccesserCredentialId(9999);
     accesser.SetAccesserDeviceId("peer123");
-    accesser.SetAccesserUserId(1002); // Different user
+    accesser.SetAccesserUserId(1002);
     profile.SetAccesser(accesser);
     
     Accessee accessee;
-    accessee.SetAccesseeDeviceId("peer456"); // Different device
+    accessee.SetAccesseeDeviceId("peer456");
     accessee.SetAccesseeUserId(1003);
     profile.SetAccessee(accessee);
     
