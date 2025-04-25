@@ -1082,7 +1082,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_003, testing::ext::TestSiz
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_004, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::SYNC_US ERID;
+    msg.type = RelationShipChangeType::SYNC_USERID;
     msg.userIdInfos.push_back({12345, true});
     msg.userIdInfos.push_back({67890, false});
     
