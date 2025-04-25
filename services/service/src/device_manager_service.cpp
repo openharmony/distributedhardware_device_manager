@@ -78,6 +78,8 @@ namespace {
     const std::string USERID_CHECKSUM_DISCOVER_TYPE_KEY = "discoverType";
     constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
     constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BLE_MASK = 0b0100;
+    constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BR_MASK = 0b1000;
+    constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_NCM_MASK = 0b10000000;
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
     const std::string USERID_CHECKSUM_ISCHANGE_KEY = "ischange";
     constexpr const char* USER_SWITCH_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userSwitchByWifi";
