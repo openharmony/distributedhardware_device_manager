@@ -992,12 +992,16 @@ HWTEST_F(ReleationShipSyncMgrTest, IsValid_011, testing::ext::TestSize.Level1)
     msg.type = RelationShipChangeType::SHARE_UNBIND;
     msg.userId = 12345;
 
-    ASSERT_TRUE(msg.IsValid()); // 验证 SHARE_UNBIND 类型有效
+    ASSERT_TRUE(msg.IsValid());
 
-    msg.userId = UINT32_MAX; // userId 无效
-    ASSERT_FALSE(msg.IsValid()); // 验证无效情况
+    msg.userId = UINT32_MAX;
+    ASSERT_FALSE(msg.IsValid());
 }
 
+/**
+ * @tc.name: ToBroadcastPayLoad_001
+ * @tc.type: FUNC
+ */
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
@@ -1014,8 +1018,20 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_001, testing::ext::TestSiz
     ASSERT_GT(len, 0);
     
     delete[] msgPtr;
+
+    msg.userId = 0;
+    msg.accountId = "test_01";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(len, 8);
+    EXPECT_EQ(result, true);
 }
 
+/**
+ * @tc.name: ToBroadcastPayLoad_002
+ * @tc.type: FUNC
+ */
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_002, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
@@ -1032,8 +1048,19 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_002, testing::ext::TestSiz
     ASSERT_GT(len, 0);
 
     delete[] msgPtr;
+
+    msg.userId = 1;
+    msg.accountId = "test";
+    uint8_t *load= nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
 }
 
+/**
+ * @tc.name: ToBroadcastPayLoad_003
+ * @tc.type: FUNC
+ */
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_003, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
@@ -1055,7 +1082,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_003, testing::ext::TestSiz
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_004, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::SYNC_USERID;
+    msg.type = RelationShipChangeType::SYNC_US ERID;
     msg.userIdInfos.push_back({12345, true});
     msg.userIdInfos.push_back({67890, false});
     
@@ -1084,9 +1111,57 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_005, testing::ext::TestSiz
     bool result = msg.ToBroadcastPayLoad(msgPtr, len);
     ASSERT_FALSE(result);
     ASSERT_EQ(msgPtr, nullptr);
+
+    msg.userId = 2;
+    msg.accountId = "test";
+    msg.tokenId = 100;
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
 }
 
+/**
+ * @tc.name: ToBroadcastPayLoad_006
+ * @tc.type: FUNC
+ */
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_006, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SERVICE_UNBIND;
+    msg.userId = 4;
+    msg.accountId = "test";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_007
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_007, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    UserIdInfo foregroundUser(true, 1);
+    UserIdInfo backgroundUser(false, 2);
+    msg.type = RelationShipChangeType::SYNC_USERID;
+    msg.userId = 5;
+    msg.accountId = "test";
+    msg.userIdInfos.push_back(foregroundUser);
+    msg.userIdInfos.push_back(backgroundUser);
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_008
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_008, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::DEL_USER;
@@ -1101,9 +1176,20 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_006, testing::ext::TestSiz
     ASSERT_GT(len, 0);
     
     delete[] msgPtr;
+
+    msg.userId = 7;
+    msg.accountId = "test";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_007, testing::ext::TestSize.Level1)
+/**
+ * @tc.name: ToBroadcastPayLoad_009
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_009, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::STOP_USER;
@@ -1120,7 +1206,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_007, testing::ext::TestSiz
     delete[] msgPtr;
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_008, testing::ext::TestSize.Level1)
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_010, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::SHARE_UNBIND;
@@ -1138,10 +1224,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_008, testing::ext::TestSiz
     delete[] msgPtr;
 }
 
-HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_009, testing::ext::TestSize.Level1)
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_011, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
-    msg.type = static_cast<RelationShipChangeType>(99); // Invalid type
+    msg.type = static_cast<RelationShipChangeType>(99);
     
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
@@ -1150,84 +1236,101 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_009, testing::ext::TestSiz
     ASSERT_FALSE(result);
     ASSERT_EQ(msgPtr, nullptr);
     ASSERT_EQ(len, 0);
+
+    msg.userId = 8;
+    msg.accountId = "test";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, true);
+}
+
+/**
+ * @tc.name: ToBroadcastPayLoad_012
+ * @tc.type: FUNC
+ */
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_012, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::TYPE_MAX;
+    msg.userId = 9;
+    msg.accountId = "test";
+    uint8_t *load = nullptr;
+    uint32_t len = 0;
+    bool result = msg.ToBroadcastPayLoad(load, len);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
-    msg.userId = 12345; // 设置有效的 userId
-    msg.credId = "cred123"; // 设置有效的 credId
+    msg.userId = 12345;
+    msg.credId = "cred123";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
 
     msg.ToShareUnbindPayLoad(msgPtr, len);
 
-    ASSERT_EQ(len, 8); // 验证长度是否正确
-    ASSERT_NE(msgPtr, nullptr); // 验证指针是否有效
+    ASSERT_EQ(len, 8);
+    ASSERT_NE(msgPtr, nullptr);
 
-    // 验证 userId 部分是否正确
     ASSERT_EQ(msgPtr[0], static_cast<uint8_t>(msg.userId & 0xFF));
     ASSERT_EQ(msgPtr[1], static_cast<uint8_t>((msg.userId >> 8) & 0xFF));
 
-    // 验证 credId 部分是否正确
     for (int i = 0; i < CREDID_PAYLOAD_LEN - USERID_PAYLOAD_LEN; i++) {
         ASSERT_EQ(msgPtr[USERID_PAYLOAD_LEN + i], msg.credId[i]);
     }
 
-    delete[] msgPtr; // 释放动态分配的内存
+    delete[] msgPtr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_002, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
-    msg.userId = 12345; // 设置有效的 userId
-    msg.credId = ""; // 设置空的 credId
+    msg.userId = 12345;
+    msg.credId = "";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
 
     msg.ToShareUnbindPayLoad(msgPtr, len);
 
-    ASSERT_EQ(len, SHARE_UNBIND_PAYLOAD_LEN); // 验证长度是否正确
-    ASSERT_NE(msgPtr, nullptr); // 验证指针是否有效
+    ASSERT_EQ(len, SHARE_UNBIND_PAYLOAD_LEN);
+    ASSERT_NE(msgPtr, nullptr);
 
-    // 验证 userId 部分是否正确
     ASSERT_EQ(msgPtr[0], static_cast<uint8_t>(msg.userId & 0xFF));
     ASSERT_EQ(msgPtr[1], static_cast<uint8_t>((msg.userId >> 8) & 0xFF));
 
-    // 验证 credId 部分是否为空
     for (int i = USERID_PAYLOAD_LEN; i < SHARE_UNBIND_PAYLOAD_LEN; i++) {
         ASSERT_EQ(msgPtr[i], 0);
     }
 
-    delete[] msgPtr; // 释放动态分配的内存
+    delete[] msgPtr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_003, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
-    msg.userId = UINT16_MAX; // 设置最大值的 userId
-    msg.credId = "cred123"; // 设置有效的 credId
+    msg.userId = UINT16_MAX;
+    msg.credId = "cred123";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
 
     msg.ToShareUnbindPayLoad(msgPtr, len);
 
-    ASSERT_EQ(len, SHARE_UNBIND_PAYLOAD_LEN); // 验证长度是否正确
-    ASSERT_NE(msgPtr, nullptr); // 验证指针是否有效
+    ASSERT_EQ(len, SHARE_UNBIND_PAYLOAD_LEN);
+    ASSERT_NE(msgPtr, nullptr);
 
-    // 验证 userId 部分是否正确
     ASSERT_EQ(msgPtr[0], static_cast<uint8_t>(msg.userId & 0xFF));
     ASSERT_EQ(msgPtr[1], static_cast<uint8_t>((msg.userId >> 8) & 0xFF));
 
-    // 验证 credId 部分是否正确
     for (int i = 0; i < CREDID_PAYLOAD_LEN - USERID_PAYLOAD_LEN; i++) {
         ASSERT_EQ(msgPtr[USERID_PAYLOAD_LEN + i], msg.credId[i]);
     }
 
-    delete[] msgPtr; // 释放动态分配的内存
+    delete[] msgPtr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_001, testing::ext::TestSize.Level1)
@@ -1237,7 +1340,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_001, testing::ext::Tes
 
     bool result = msg.FromShareUnbindPayLoad(payloadJson);
 
-    ASSERT_FALSE(result); // 验证当 payloadJson 为 null 时返回 false
+    ASSERT_FALSE(result);
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_002, testing::ext::TestSize.Level1)
@@ -1245,12 +1348,11 @@ HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_002, testing::ext::Tes
     RelationShipChangeMsg msg;
     cJSON *payloadJson = cJSON_CreateArray();
 
-    // 添加少于 SHARE_UNBIND_PAYLOAD_LEN 的元素
     cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(1));
 
     bool result = msg.FromShareUnbindPayLoad(payloadJson);
 
-    ASSERT_FALSE(result); // 验证当数组大小小于 SHARE_UNBIND_PAYLOAD_LEN 时返回 false
+    ASSERT_FALSE(result);
 
     cJSON_Delete(payloadJson);
 }
@@ -1260,21 +1362,20 @@ HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_003, testing::ext::Tes
     RelationShipChangeMsg msg;
     cJSON *payloadJson = cJSON_CreateArray();
 
-    // 添加有效的 userId 和 credId 数据
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x12)); // userId 第 1 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x34)); // userId 第 2 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('c'));  // credId 第 1 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('r'));  // credId 第 2 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('e'));  // credId 第 3 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('d'));  // credId 第 4 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('1'));  // credId 第 5 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('2'));  // credId 第 6 字节
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x12));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x34));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('c'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('r'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('e'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('d'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('1'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('2'));
 
     bool result = msg.FromShareUnbindPayLoad(payloadJson);
 
-    ASSERT_TRUE(result); // 验证当 payloadJson 有效时返回 true
-    ASSERT_EQ(msg.userId, 0x3412); // 验证 userId 是否正确解析
-    ASSERT_EQ(msg.credId, "cred12"); // 验证 credId 是否正确解析
+    ASSERT_TRUE(result);
+    ASSERT_EQ(msg.userId, 0x3412);
+    ASSERT_EQ(msg.credId, "cred12");
 
     cJSON_Delete(payloadJson);
 }
@@ -1284,12 +1385,11 @@ HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_004, testing::ext::Tes
     RelationShipChangeMsg msg;
     cJSON *payloadJson = cJSON_CreateArray();
 
-    // 添加无效的元素（非数字类型）
     cJSON_AddItemToArray(payloadJson, cJSON_CreateString("invalid"));
 
     bool result = msg.FromShareUnbindPayLoad(payloadJson);
 
-    ASSERT_FALSE(result); // 验证当 payloadJson 包含无效元素时返回 false
+    ASSERT_FALSE(result);
 
     cJSON_Delete(payloadJson);
 }
@@ -1299,25 +1399,24 @@ HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_005, testing::ext::Tes
     RelationShipChangeMsg msg;
     cJSON *payloadJson = cJSON_CreateArray();
 
-    // 添加有效的 userId 和 credId 数据
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x12)); // userId 第 1 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x34)); // userId 第 2 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('c'));  // credId 第 1 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('r'));  // credId 第 2 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('e'));  // credId 第 3 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('d'));  // credId 第 4 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('1'));  // credId 第 5 字节
-    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('2'));  // credId 第 6 字节
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x12));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x34));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('c'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('r'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('e'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('d'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('1'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('2'));
 
-    // 添加额外的无效元素
     cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber(0x56));
 
     bool result = msg.FromShareUnbindPayLoad(payloadJson);
 
-    ASSERT_FALSE(result); // 验证当 payloadJson 包含额外元素时返回 false
+    ASSERT_FALSE(result);
 
     cJSON_Delete(payloadJson);
 }
+
 }
 } // namespace DistributedHardware
 } // namespace OHOS

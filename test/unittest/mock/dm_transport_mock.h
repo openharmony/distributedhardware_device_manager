@@ -28,6 +28,7 @@ public:
 public:
     virtual int32_t StartSocket(const std::string &rmtNetworkId, int32_t &socketId) = 0;
     virtual int32_t Send(const std::string &rmtNetworkId, const std::string &payload, int32_t socketId) = 0;
+    virtual int32_t UnInit() = 0;
 public:
     static inline std::shared_ptr<DmDMTransport> dMTransport_ = nullptr;
 };
@@ -36,6 +37,7 @@ class DMTransportMock : public DmDMTransport {
 public:
     MOCK_METHOD(int32_t, StartSocket, (const std::string &, int32_t &));
     MOCK_METHOD(int32_t, Send, (const std::string &, const std::string &, int32_t));
+    MOCK_METHOD(int32_t, UnInit, ());
 };
 }
 }
