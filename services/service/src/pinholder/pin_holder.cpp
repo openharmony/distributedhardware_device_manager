@@ -70,10 +70,6 @@ PinHolder::PinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener): l
 
 PinHolder::~PinHolder()
 {
-    if (session_ != nullptr) {
-        session_->UnRegisterSessionCallback();
-        session_ = nullptr;
-    }
     if (timer_ != nullptr) {
         timer_->DeleteAll();
         timer_ = nullptr;
@@ -102,12 +98,6 @@ int32_t PinHolder::UnRegisterPinHolderCallback(const std::string &pkgName)
         LOGE("session is nullptr.");
         return ERR_DM_FAILED;
     }
-    int32_t userId = -1;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    MultipleUserConnector::GetCallerUserId(userId);
-#endif
-    processInfo_.userId = userId;
-    processInfo_.pkgName = pkgName;
     session_->UnRegisterSessionCallback();
     LOGI("success.");
     return DM_OK;

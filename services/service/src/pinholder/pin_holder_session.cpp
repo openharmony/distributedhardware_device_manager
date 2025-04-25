@@ -38,6 +38,7 @@ int32_t PinHolderSession::RegisterSessionCallback(std::shared_ptr<IPinholderSess
 {
     std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     pinholderSessionCallback_ = callback;
+    LOGI("end.");
     return DM_OK;
 }
 
@@ -45,6 +46,7 @@ int32_t PinHolderSession::UnRegisterSessionCallback()
 {
     std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     pinholderSessionCallback_ = nullptr;
+    LOGI("end.");
     return DM_OK;
 }
 
