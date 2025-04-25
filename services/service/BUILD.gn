@@ -310,6 +310,10 @@ if (defined(ohos_lite)) {
       defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
     }
 
+    if (device_manager_feature_product == "default") {
+      defines += [ "SUPPORT_WISEDEVICE" ]
+    }
+
     subsystem_name = "distributedhardware"
 
     part_name = "device_manager"
@@ -435,6 +439,10 @@ if (defined(ohos_lite)) {
     if (support_wifi && device_manager_feature_product == "default") {
       defines += [ "SUPPORT_WIFI" ]
       external_deps += [ "wifi:wifi_sdk" ]
+    }
+
+    if (device_manager_feature_product == "default") {
+      defines += [ "SUPPORT_WISEDEVICE" ]
     }
 
     if (support_power_manager) {
