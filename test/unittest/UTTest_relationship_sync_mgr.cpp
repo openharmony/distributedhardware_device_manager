@@ -1022,7 +1022,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_001, testing::ext::TestSiz
     msg.userId = 0;
     msg.accountId = "test_01";
     uint8_t *load = nullptr;
-    uint32_t len = 0;
+    len = 0;
     bool result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(len, 8);
     EXPECT_EQ(result, true);
@@ -1052,7 +1052,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_002, testing::ext::TestSiz
     msg.userId = 1;
     msg.accountId = "test";
     uint8_t *load= nullptr;
-    uint32_t len = 0;
+    len = 0;
     bool result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, true);
 }
@@ -1116,7 +1116,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_005, testing::ext::TestSiz
     msg.accountId = "test";
     msg.tokenId = 100;
     uint8_t *load = nullptr;
-    uint32_t len = 0;
+    len = 0;
     bool result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, true);
 }
@@ -1180,7 +1180,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_008, testing::ext::TestSiz
     msg.userId = 7;
     msg.accountId = "test";
     uint8_t *load = nullptr;
-    uint32_t len = 0;
+    len = 0;
     bool result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, true);
 }
@@ -1240,7 +1240,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_011, testing::ext::TestSiz
     msg.userId = 8;
     msg.accountId = "test";
     uint8_t *load = nullptr;
-    uint32_t len = 0;
+    len = 0;
     bool result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, true);
 }
