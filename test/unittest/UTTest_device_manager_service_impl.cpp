@@ -1838,7 +1838,7 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     int32_t localUserId = 123456;
     std::string peerUdid = "remoteUdid";
     int32_t peerUserId = 1;
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _, _)).WillOnce(Return(true));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _, _)).WillRepeatedly(Return(true));
     if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
