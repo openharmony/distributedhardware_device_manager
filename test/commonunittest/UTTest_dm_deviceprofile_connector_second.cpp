@@ -585,8 +585,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetLocalServiceInfoByBundleNameAndPin
 HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_009, testing::ext::TestSize.Level1)
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_SHARE_TYPE);
-    profiles.SetBindLevel(DEVICE);
+    profiles.SetBindType(DM_SHARE);
+    profiles.SetBindLevel(USER);
     DmDiscoveryInfo discoveryInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
     EXPECT_EQ(ret, ACROSS_ACCOUNT);
@@ -595,7 +595,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_009, testing::ext::T
 HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_010, testing::ext::TestSize.Level1)
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_SHARE_TYPE);
+    profiles.SetBindType(DM_SHARE);
     profiles.SetBindLevel(APP);
     profiles.accesser_.SetAccesserBundleName("ohos_test");
     profiles.accesser_.SetAccesserDeviceId("localDeviceId");
@@ -609,7 +609,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_010, testing::ext::T
 HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_011, testing::ext::TestSize.Level1)
 {
     DistributedDeviceProfile::AccessControlProfile profiles;
-    profiles.SetBindType(DM_SHARE_TYPE);
+    profiles.SetBindType(DM_SHARE);
     profiles.SetBindLevel(APP);
     profiles.accessee_.SetAccesseeBundleName("pkgName");
     profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
