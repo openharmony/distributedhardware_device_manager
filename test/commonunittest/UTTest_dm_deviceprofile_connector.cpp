@@ -1124,7 +1124,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetAuthForm_001, testing::ext::TestSize.Lev
     profile.SetBindType(DM_IDENTICAL_ACCOUNT);
     ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
     EXPECT_EQ(ret, IDENTICAL_ACCOUNT_TYPE);
-    profile.SetBindType(DM_SHARE_TYPE);
+    profile.SetBindType(SHARE_TYPE);
     profile.SetBindLevel(DEVICE);
     ret = DeviceProfileConnector::GetInstance().GetAuthForm(profile, trustDev, reqDev);
     EXPECT_EQ(ret, SHARE_TYPE);
