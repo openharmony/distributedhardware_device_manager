@@ -129,6 +129,7 @@ public:
     void HandleDeviceOnline(std::string deviceId, int32_t authForm);
     void HandleDeviceOffline(std::string deviceId);
     void SetProcessInfo(ProcessInfo processInfo);
+    bool CheckIsNeedJoinLnn(const std::string &udid, const std::string &deviceId);
     bool CheckIsOnline(const std::string &targetDeviceId);
     bool CheckIsOnline(const std::string &targetDeviceIdHash, bool isHash);
     void SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec);

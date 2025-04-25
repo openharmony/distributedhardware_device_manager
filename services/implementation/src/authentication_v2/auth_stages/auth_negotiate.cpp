@@ -494,7 +494,7 @@ void AuthSinkNegotiateStateMachine::GetIdenticalCredentialInfo(std::shared_ptr<D
     CHECK_NULL_VOID(context);
     JsonObject queryParams;
     queryParams[FILED_DEVICE_ID] = context->accessee.deviceId;
-    queryParams[FILED_USER_ID] = context->accessee.accountId;
+    queryParams[FILED_USER_ID] = MultipleUserConnector::GetOhosAccountNameByUserId(context->accessee.userId);
     queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_RELATED;
     CHECK_NULL_VOID(context->hiChainAuthConnector);
     if (context->hiChainAuthConnector->QueryCredentialInfo(context->accessee.userId, queryParams, credInfo) != DM_OK) {

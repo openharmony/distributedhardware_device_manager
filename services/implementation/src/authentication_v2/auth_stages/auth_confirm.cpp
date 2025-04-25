@@ -26,6 +26,7 @@
 #include "dm_log.h"
 #include "dm_negotiate_process.h"
 #include "dm_softbus_cache.h"
+#include "multiple_user_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -394,7 +395,7 @@ void AuthSrcConfirmState::GetIdenticalCredentialInfo(std::shared_ptr<DmAuthConte
     CHECK_NULL_VOID(context);
     JsonObject queryParams;
     queryParams[FILED_DEVICE_ID] = context->accesser.deviceId;
-    queryParams[FILED_USER_ID] = context->accesser.accountId;
+    queryParams[FILED_USER_ID] = MultipleUserConnector::GetOhosAccountNameByUserId(context->accesser.userId);
     queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_RELATED;
     CHECK_NULL_VOID(context->hiChainAuthConnector);
     if (context->hiChainAuthConnector->QueryCredentialInfo(context->accesser.userId, queryParams, credInfo) != DM_OK) {

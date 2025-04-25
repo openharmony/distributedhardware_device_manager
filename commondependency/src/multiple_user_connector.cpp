@@ -92,6 +92,25 @@ DM_EXPORT std::string MultipleUserConnector::GetOhosAccountIdByUserId(int32_t us
 #endif
 }
 
+DM_EXPORT std::string MultipleUserConnector::GetOhosAccountNameByUserId(int32_t userId)
+{
+#if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    (void)userId;
+    return "";
+#elif OS_ACCOUNT_PART_EXISTS
+    OhosAccountInfo accountInfo;
+    ErrCode ret = OhosAccountKits::GetInstance().GetOsAccountDistributedInfo(userId, accountInfo);
+    if (ret != 0 || accountInfo.name_ == "") {
+        LOGE("error ret: %{public}d", ret);
+        return "";
+    }
+    return accountInfo.name_;
+#else
+    (void)userId;
+    return "";
+#endif
+}
+
 DM_EXPORT std::string MultipleUserConnector::GetOhosAccountName(void)
 {
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
