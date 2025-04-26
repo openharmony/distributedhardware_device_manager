@@ -52,10 +52,21 @@ struct InputCustomDialog {
   private scroller: Scroller = new Scroller();
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
+    this.mLocalHeight = display.getDefaultDisplaySync().height;
+    let heightRatio = px2vp(this.mLocalHeight) * 0.2;
     if (mediaQueryResult.matches as boolean) {
-      this.heightNum = 300;
+        if (this.isPhone) {
+            if (display.isFoldable() &&
+                display.getFoldDisplayMode() === display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
+                this.heightNum = heightRatio;
+            } else if (!display.isFoldable()) {
+                this.heightNum = heightRatio;
+            }
+        } else {
+            this.heightNum = 300;
+        }
     } else {
-      this.heightNum = 800;
+        this.heightNum = 800;
     }
   }
 
