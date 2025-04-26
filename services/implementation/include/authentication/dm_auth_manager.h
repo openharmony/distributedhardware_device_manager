@@ -15,6 +15,7 @@
 
 #ifndef OHOS_DM_AUTH_MANAGER_H
 #define OHOS_DM_AUTH_MANAGER_H
+#define TYPE_TV_ID 0x9C
 
 #include <map>
 #include <mutex>
@@ -583,6 +584,8 @@ private:
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
     bool IsScreenLocked();
+    int32_t EndDream();
+    void CheckTvStatus();
     std::string ConvertSinkVersion(const std::string &version);
     void NegotiateRespMsg(const std::string &version);
     void SetAuthType(int32_t authType);

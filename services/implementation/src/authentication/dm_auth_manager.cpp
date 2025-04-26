@@ -45,6 +45,7 @@
 #include "json_object.h"
 #include "openssl/sha.h"
 #include "parameter.h"
+#include "power_mgr_client.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
 #endif
@@ -1714,6 +1715,45 @@ int32_t DmAuthManager::GetPinCode(std::string &code)
     return DM_OK;
 }
 
+int32_t DmAuthManager::EndDream()
+{
+    auto &powerMgrClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
+    if (!powerMgrClient.IsScreenOn()) {
+        LOGW("screen not on");
+        return ERR_DM_FAILED;
+    }
+    if (!IsScreenLocked()) {
+        LOGI("screen not locked");
+        return DM_OK;
+    }
+    PowerMgr::PowerErrors ret =
+        powerMgrClient.WakeupDevice(PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_END_DREAM, "end_dream");
+    if (ret != OHOS::PowerMgr::PowerErrors::ERR_OK) {
+        LOGE("fail to end dream, err:%{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("end dream success");
+    return DM_OK;
+}
+ 
+void DmAuthManager::CheckTvStatus()
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t result = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (result != SOFTBUS_OK) {
+        LOGE("GetLocalNodeDeviceInfo from dsofbus fail, result=%{public}d", result);
+        return;
+    }
+ 
+    if (nodeBasicInfo.deviceTypeId == TYPE_TV_ID) {
+        int32_t ret = EndDream();
+        if (ret != DM_OK) {
+            LOGE("fail to end dream, err:%{public}d", ret);
+            return;
+        }
+    }
+}
+
 void DmAuthManager::ShowConfigDialog()
 {
     if (authResponseContext_ == nullptr) {
@@ -1731,6 +1771,7 @@ void DmAuthManager::ShowConfigDialog()
         StartAuthProcess(authenticationType_);
         return;
     }
+    CheckTVStatus();
     LOGI("ShowConfigDialog start");
     JsonObject jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;

@@ -15,6 +15,7 @@
 
 #ifndef OHOS_DM_AUTH_STATE_V2_H
 #define OHOS_DM_AUTH_STATE_V2_H
+#define TYPE_TV_ID 0x9C
 
 #include <memory>
 
@@ -223,6 +224,7 @@ private:
     void NegotiateCredential(std::shared_ptr<DmAuthContext> context, JsonObject &credTypeNegoRsult);
     void NegotiateAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclNegoRsult);
     int32_t ShowConfigDialog(std::shared_ptr<DmAuthContext> context);
+    int32_t EndDream();
     void ReadServiceInfo(std::shared_ptr<DmAuthContext> context);
     void MatchFallBackCandidateList(std::shared_ptr<DmAuthContext> context, DmAuthType authType);
     int32_t ProcessBindAuthorize(std::shared_ptr<DmAuthContext> context);

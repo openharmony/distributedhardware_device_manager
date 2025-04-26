@@ -249,6 +249,7 @@ if (defined(ohos_lite)) {
       "openssl:libcrypto_shared",
       "os_account:libaccountkits",
       "os_account:os_account_innerkits",
+      "power_manager:powermgr_client",
       "resource_management:resmgr_napi_core",
       "samgr:samgr_proxy",
       "zlib:shared_libz",
