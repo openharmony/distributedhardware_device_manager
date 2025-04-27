@@ -234,7 +234,6 @@ if (defined(ohos_lite)) {
       "access_token:libaccesstoken_sdk",
       "cJSON:cjson",
       "c_utils:utils",
-      "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
       "device_auth:deviceauth_sdk",
       "device_info_manager:distributed_device_profile_common",

@@ -80,12 +80,12 @@ ohos_fuzztest("PinAuthUiFuzzTest") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
-    "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "resource_management:resmgr_napi_core",

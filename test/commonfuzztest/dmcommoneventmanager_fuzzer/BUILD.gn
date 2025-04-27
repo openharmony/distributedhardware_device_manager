@@ -62,7 +62,6 @@ ohos_fuzztest("DmCommonEventManagerFuzzTest") {
     "ability_base:want",
     "ability_runtime:ability_manager",
     "c_utils:utils",
-    "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "dsoftbus:softbus_client",
     "hilog:libhilog",
