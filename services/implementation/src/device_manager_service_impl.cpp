@@ -1017,7 +1017,7 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
         2. Old-to-new: When the sink side receives an 80 message and detects a version mismatch, it receives the 80
         message, directly creates a new old protocol authMgr, and re-OnSessionOpened and OnBytesReceived.
         */
-        if (curSession->version_ == "" || CompareVersion(curSession->version_, DM_VERSION_5_0_OLD_MAX)) {
+        if (curSession->version_ == "") {
             if (TransferOldAuthMgr(msgType, jsonObject, curSession) != DM_OK) {
                 LOGE("DeviceManagerServiceImpl::OnBytesReceived TransferOldAuthMgr failed");
                 return;
