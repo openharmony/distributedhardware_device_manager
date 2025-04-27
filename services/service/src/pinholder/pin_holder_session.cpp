@@ -23,6 +23,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 std::shared_ptr<IPinholderSessionCallback> PinHolderSession::pinholderSessionCallback_ = nullptr;
+std::mutex PinHolderSession::pinHolderSessionLock_;
 PinHolderSession::PinHolderSession()
 {
     LOGD("PinHolderSession constructor.");
@@ -35,13 +36,17 @@ PinHolderSession::~PinHolderSession()
 
 int32_t PinHolderSession::RegisterSessionCallback(std::shared_ptr<IPinholderSessionCallback> callback)
 {
+    std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     pinholderSessionCallback_ = callback;
+    LOGI("end.");
     return DM_OK;
 }
 
 int32_t PinHolderSession::UnRegisterSessionCallback()
 {
+    std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
     pinholderSessionCallback_ = nullptr;
+    LOGI("end.");
     return DM_OK;
 }
 
@@ -72,24 +77,36 @@ int32_t PinHolderSession::CloseSessionServer(int32_t sessionId)
 
 int PinHolderSession::OnSessionOpened(int sessionId, int result)
 {
-    if (pinholderSessionCallback_ == nullptr) {
+    std::shared_ptr<IPinholderSessionCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
+        tempCbk = pinholderSessionCallback_;
+    }
+    LOGI("[SOFTBUS]OnBytesReceived sessionId: %{public}d", sessionId);
+    if (tempCbk == nullptr) {
         LOGE("OnSessionOpened error, pinholderSessionCallback_ is nullptr.");
         return ERR_DM_FAILED;
     }
     int32_t sessionSide = GetSessionSide(sessionId);
-    pinholderSessionCallback_->OnSessionOpened(sessionId, sessionSide, result);
+    tempCbk->OnSessionOpened(sessionId, sessionSide, result);
     LOGI("OnSessionOpened, success, sessionId: %{public}d.", sessionId);
     return DM_OK;
 }
 
 void PinHolderSession::OnSessionClosed(int sessionId)
 {
+    std::shared_ptr<IPinholderSessionCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
+        tempCbk = pinholderSessionCallback_;
+    }
     LOGI("[SOFTBUS]OnSessionClosed sessionId: %{public}d", sessionId);
-    if (pinholderSessionCallback_ == nullptr) {
+    if (tempCbk == nullptr) {
         LOGE("OnSessionClosed error, pinholderSessionCallback_ is nullptr.");
         return;
     }
-    pinholderSessionCallback_->OnSessionClosed(sessionId);
+    tempCbk->OnSessionClosed(sessionId);
+    LOGI("OnSessionClosed, success, sessionId: %{public}d.", sessionId);
     return;
 }
 
@@ -100,13 +117,19 @@ void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned
             dataLen);
         return;
     }
-    if (pinholderSessionCallback_ == nullptr) {
+    std::shared_ptr<IPinholderSessionCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(pinHolderSessionLock_);
+        tempCbk = pinholderSessionCallback_;
+    }
+    if (tempCbk == nullptr) {
         LOGE("OnBytesReceived error, pinholderSessionCallback_ is nullptr.");
         return;
     }
     LOGI("start, sessionId: %{public}d, dataLen: %{public}d.", sessionId, dataLen);
     std::string message = std::string(reinterpret_cast<const char *>(data), dataLen);
-    pinholderSessionCallback_->OnDataReceived(sessionId, message);
+    tempCbk->OnDataReceived(sessionId, message);
+    LOGI("OnBytesReceived, success, sessionId: %{public}d.", sessionId);
     return;
 }
 

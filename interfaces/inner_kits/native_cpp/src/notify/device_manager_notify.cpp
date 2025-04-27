@@ -1497,5 +1497,15 @@ void DeviceManagerNotify::OnSetRemoteDeviceNameResult(const std::string &pkgName
         }
     }
 }
+
+void DeviceManagerNotify::UnRegisterPinHolderCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    pinHolderCallback_.erase(pkgName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -241,6 +241,7 @@ public:
     int32_t GetDeviceNetworkIdList(const std::string &pkgName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds);
     void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
+    int32_t UnRegisterPinHolderCallback(const std::string &pkgName);
 
 private:
     bool IsDMServiceImplReady();

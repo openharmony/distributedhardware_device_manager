@@ -1396,6 +1396,16 @@ HWTEST_F(DeviceManagerImplTest, RegisterAuthenticationType_004, testing::ext::Te
     ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
+
+HWTEST_F(DeviceManagerImplTest, UnRegisterPinHolderCallback_001, testing::ext::TestSize.Level0)
+{
+    std::string packName = "com.ohos.UnRegisterPinHolderCallback";
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    int32_t ret = DeviceManager::GetInstance().UnRegisterPinHolderCallback(packName);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

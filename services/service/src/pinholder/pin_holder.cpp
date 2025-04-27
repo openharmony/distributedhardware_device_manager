@@ -70,10 +70,6 @@ PinHolder::PinHolder(std::shared_ptr<IDeviceManagerServiceListener> listener): l
 
 PinHolder::~PinHolder()
 {
-    if (session_ != nullptr) {
-        session_->UnRegisterSessionCallback();
-        session_ = nullptr;
-    }
     if (timer_ != nullptr) {
         timer_->DeleteAll();
         timer_ = nullptr;
@@ -93,6 +89,17 @@ int32_t PinHolder::RegisterPinHolderCallback(const std::string &pkgName)
     processInfo_.userId = userId;
     processInfo_.pkgName = pkgName;
     session_->RegisterSessionCallback(shared_from_this());
+    return DM_OK;
+}
+
+int32_t PinHolder::UnRegisterPinHolderCallback(const std::string &pkgName)
+{
+    if (session_ == nullptr) {
+        LOGE("session is nullptr.");
+        return ERR_DM_FAILED;
+    }
+    session_->UnRegisterSessionCallback();
+    LOGI("success.");
     return DM_OK;
 }
 

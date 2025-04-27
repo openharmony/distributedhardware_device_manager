@@ -432,6 +432,7 @@ public:
     virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) override;
     virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds) override;
+    virtual int32_t UnRegisterPinHolderCallback(const std::string &pkgName) override;
 
 private:
     DeviceManagerImpl() = default;

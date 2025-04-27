@@ -3450,5 +3450,29 @@ void DeviceManagerService::ProcessSyncAccountLogout(const std::string &accountId
     }
     dmServiceImpl_->HandleAccountLogoutEvent(userId, accountId, peerUdid);
 }
+
+int32_t DeviceManagerService::UnRegisterPinHolderCallback(const std::string &pkgName)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call UnRegisterPinHolderCallback.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("begin.");
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
+    return pinHolder_->UnRegisterPinHolderCallback(pkgName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

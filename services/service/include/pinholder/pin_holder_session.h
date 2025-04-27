@@ -16,6 +16,8 @@
 #ifndef OHOS_PIN_HOLDER_SESSION_H
 #define OHOS_PIN_HOLDER_SESSION_H
 
+#include <mutex>
+
 #include "dm_device_info.h"
 #include "pinholder_session_callback.h"
 
@@ -74,6 +76,7 @@ private:
 
 private:
     static std::shared_ptr<IPinholderSessionCallback> pinholderSessionCallback_;
+    static std::mutex pinHolderSessionLock_;
 };
 }
 }
