@@ -949,6 +949,19 @@ void DeviceManagerServiceListener::OnGetDeviceProfileInfoListResult(const Proces
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetDeviceProfileInfoList(deviceProfileInfos);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string userDefinedDeviceName = DeviceNameManager::GetInstance().GetUserDefinedDeviceName();
+    if (code == DM_OK && !userDefinedDeviceName.empty()) {
+        std::vector<DmDeviceProfileInfo> temVec = deviceProfileInfos;
+        for (auto &item : temVec) {
+            if (item.isLocalDevice) {
+                item.deviceName = userDefinedDeviceName;
+                break;
+            }
+        }
+        pReq->SetDeviceProfileInfoList(temVec);
+    }
+#endif
     pReq->SetResult(code);
     pReq->SetProcessInfo(processInfo);
     ipcServerListener_.SendRequest(GET_DEVICE_PROFILE_INFO_LIST_RESULT, pReq, pRsp);
@@ -980,6 +993,8 @@ void DeviceManagerServiceListener::OnSetLocalDeviceNameResult(const ProcessInfo 
     if (code == DM_OK) {
         DeviceNameManager::GetInstance().ModifyUserDefinedName(deviceName);
     }
+#else
+    (void) deviceName;
 #endif
     ipcServerListener_.SendRequest(SET_LOCAL_DEVICE_NAME_RESULT, pReq, pRsp);
 }
@@ -994,6 +1009,7 @@ void DeviceManagerServiceListener::OnSetRemoteDeviceNameResult(const ProcessInfo
     pReq->SetDeviceId(deviceId);
     pReq->SetResult(code);
     pReq->SetProcessInfo(processInfo);
+    (void) deviceName;
     ipcServerListener_.SendRequest(SET_REMOTE_DEVICE_NAME_RESULT, pReq, pRsp);
 }
 } // namespace DistributedHardware
