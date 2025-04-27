@@ -1012,5 +1012,14 @@ void DeviceManagerServiceListener::OnSetRemoteDeviceNameResult(const ProcessInfo
     (void) deviceName;
     ipcServerListener_.SendRequest(SET_REMOTE_DEVICE_NAME_RESULT, pReq, pRsp);
 }
+
+std::string DeviceManagerServiceListener::GetLocalDisplayDeviceNameForPrivacy()
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DeviceNameManager::GetInstance().GetLocalDisplayDeviceNameForPrivacy();
+#else
+    return "";
+#endif
+}
 } // namespace DistributedHardware
 } // namespace OHOS

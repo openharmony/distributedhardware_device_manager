@@ -12,26 +12,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "dm_auth_message_processor.h"
+
 #include <zlib.h>
 #include <iostream>
 #include <sstream>
+
 #include <mbedtls/base64.h>
-#include "dm_anonymous.h"
-#include "dm_auth_context.h"
-#include "dm_auth_message_processor.h"
+#include "parameter.h"
+
+#include "access_control_profile.h"
 #include "distributed_device_profile_client.h"
-#include "deviceprofile_connector.h"
 #include "service_info_profile.h"
 #include "service_info_unique_key.h"
+
+#include "deviceprofile_connector.h"
 #include "dm_log.h"
 #include "dm_constants.h"
 #include "dm_anonymous.h"
-#include "access_control_profile.h"
 #include "dm_auth_manager_base.h"
 #include "dm_auth_context.h"
 #include "dm_auth_state_machine.h"
 #include "dm_crypto.h"
-#include "parameter.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -63,6 +65,7 @@ const char* TAG_ACL = "accessControlTable";
 const char* TAG_ACCESSER = "dmAccesser";
 const char* TAG_ACCESSEE = "dmAccessee";
 const char* TAG_SERVICEINFO = "serviceInfo";
+const char* TAG_USER_CONFIRM_OPT = "userConfirmOpt";
 // The local SK information is synchronized to the remote end to construct acl-accesser/accessee.
 const char* TAG_TRANSMIT_SK_ID = "accessAppSKId";
 const char* TAG_LNN_SK_ID = "accessUserSKId";
@@ -103,11 +106,11 @@ const char* TAG_DEVICE_TYPE = "DEVICETYPE";
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
 
-void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access)
+void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access, bool isUseDeviceFullName)
 {
     JsonObject accessjson(jsonString);
     DmAccessToSync srcAccessToSync = accessjson.Get<DmAccessToSync>();
-    access.deviceName = srcAccessToSync.deviceName;
+    access.deviceName = (isUseDeviceFullName ? srcAccessToSync.deviceNameFull : srcAccessToSync.deviceName);
     access.deviceId = srcAccessToSync.deviceId;
     access.userId = srcAccessToSync.userId;
     access.accountId = srcAccessToSync.accountId;
@@ -118,6 +121,48 @@ void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access)
     access.sessionKeyId = srcAccessToSync.sessionKeyId;
     access.skTimeStamp = srcAccessToSync.skTimeStamp;
     return;
+}
+
+int32_t ParseInfoToDmAccess(const JsonObject &jsonObject, DmAccess &access)
+{
+    // transmit session key is mandatory
+    if (!IsString(jsonObject, TAG_TRANSMIT_SK_ID)) {
+        LOGE("ParseSyncMessage TAG_TRANSMIT_SK_ID error");
+        return ERR_DM_FAILED;
+    }
+    access.transmitSessionKeyId = std::atoi(jsonObject[TAG_TRANSMIT_SK_ID].Get<std::string>().c_str());
+
+    if (!IsInt64(jsonObject, TAG_TRANSMIT_SK_TIMESTAMP)) {
+        LOGE("ParseSyncMessage TAG_TRANSMIT_SK_TIMESTAMP error");
+        return ERR_DM_FAILED;
+    }
+    access.transmitSkTimeStamp = jsonObject[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
+
+    if (!IsString(jsonObject, TAG_TRANSMIT_CREDENTIAL_ID)) {
+        LOGE("ParseSyncMessage TAG_TRANSMIT_CREDENTIAL_ID error");
+        return ERR_DM_FAILED;
+    }
+    access.transmitCredentialId = jsonObject[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>().c_str();
+
+    if (!IsString(jsonObject, TAG_DMVERSION)) {
+        LOGE("ParseSyncMessage TAG_DMVERSION error");
+        return ERR_DM_FAILED;
+    }
+    access.dmVersion = jsonObject[TAG_DMVERSION].Get<std::string>();
+
+    // lnn session key is optional
+    if (IsString(jsonObject, TAG_LNN_SK_ID)) {
+        access.lnnSessionKeyId = std::atoi(jsonObject[TAG_LNN_SK_ID].Get<std::string>().c_str());
+    }
+    if (IsInt64(jsonObject, TAG_LNN_SK_TIMESTAMP)) {
+        access.lnnSkTimeStamp = jsonObject[TAG_LNN_SK_TIMESTAMP].Get<int64_t>();
+    }
+
+    if (IsString(jsonObject, TAG_LNN_CREDENTIAL_ID)) {
+        access.lnnCredentialId = jsonObject[TAG_LNN_CREDENTIAL_ID].Get<std::string>().c_str();
+    }
+
+    return DM_OK;
 }
 
 bool IsMessageValid(const JsonItemObject &jsonObject)
@@ -714,10 +759,10 @@ bool DmAuthMessageProcessor::CheckAccessValidityAndAssign(std::shared_ptr<DmAuth
 
     bool isSame = accessTmp.dmVersion == access.dmVersion &&
         accessTmp.deviceName == access.deviceName &&
-        Crypto::Sha256(accessTmp.deviceId) == access.deviceIdHash &&
+        Crypto::GetUdidHash(accessTmp.deviceId) == access.deviceIdHash &&
         accessTmp.userId == access.userId &&
-        Crypto::Sha256(accessTmp.accountId) == access.accountIdHash &&
-        Crypto::Sha256(std::to_string(accessTmp.tokenId)) == access.tokenIdHash &&
+        Crypto::GetAccountIdHash16(accessTmp.accountId) == access.accountIdHash &&
+        Crypto::GetTokenIdHash(std::to_string(accessTmp.tokenId)) == access.tokenIdHash &&
         accessTmp.bundleName == access.bundleName &&
         accessTmp.pkgName == access.pkgName &&
         accessTmp.bindLevel == selfAccess.bindLevel;
@@ -736,61 +781,42 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
     DmAccess &access, JsonObject &jsonObject)
 {
     DmAccess accessTmp;
-    // transmit session key is mandatory
-    if (!jsonObject[TAG_TRANSMIT_SK_ID].IsString()) {
-        LOGE("ParseSyncMessage TAG_TRANSMIT_SK_ID error");
-        return ERR_DM_FAILED;
-    }
-    accessTmp.transmitSessionKeyId = std::atoi(jsonObject[TAG_TRANSMIT_SK_ID].Get<std::string>().c_str());
-
-    if (!jsonObject[TAG_TRANSMIT_SK_TIMESTAMP].IsNumberInteger()) {
-        LOGE("ParseSyncMessage TAG_TRANSMIT_SK_TIMESTAMP error");
-        return ERR_DM_FAILED;
-    }
-    accessTmp.transmitSkTimeStamp = jsonObject[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
-
-    if (!jsonObject[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
-        LOGE("ParseSyncMessage TAG_TRANSMIT_CREDENTIAL_ID error");
-        return ERR_DM_FAILED;
-    }
-    accessTmp.transmitCredentialId = jsonObject[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>().c_str();
-
-    // lnn session key is optional
-    if (jsonObject[TAG_LNN_SK_ID].IsString()) {
-        accessTmp.lnnSessionKeyId = std::atoi(jsonObject[TAG_LNN_SK_ID].Get<std::string>().c_str());
-    }
-    if (jsonObject[TAG_LNN_SK_TIMESTAMP].IsNumberInteger()) {
-        accessTmp.lnnSkTimeStamp = jsonObject[TAG_LNN_SK_TIMESTAMP].Get<int64_t>();
-    }
-
-    if (jsonObject[TAG_LNN_CREDENTIAL_ID].IsString()) {
-        accessTmp.lnnCredentialId = jsonObject[TAG_LNN_CREDENTIAL_ID].Get<std::string>().c_str();
-    }
-
-    if (!jsonObject[TAG_DMVERSION].IsString()) {
-        LOGE("ParseSyncMessage TAG_DMVERSION error");
+    if (ParseInfoToDmAccess(jsonObject, accessTmp) != DM_OK) {
+        LOGE("Parse DataSync prarm err");
         return ERR_DM_FAILED;
     }
 
-    accessTmp.dmVersion = jsonObject[TAG_DMVERSION].Get<std::string>();
-    if (!jsonObject[TAG_ACCESS].IsString()) {
+    if (!IsString(jsonObject, TAG_ACCESS)) {
         LOGE("ParseSyncMessage TAG_ACCESS error");
         return ERR_DM_FAILED;
     }
     std::string srcAccessStr = jsonObject[TAG_ACCESS].Get<std::string>();
     // Parse into access
-    ParseDmAccessToSync(srcAccessStr, accessTmp);
+    ParseDmAccessToSync(srcAccessStr, accessTmp, false);
     // check access validity
     if (!CheckAccessValidityAndAssign(context, access, accessTmp)) {
         LOGE("ParseSyncMessage CheckAccessValidityAndAssign error, data between two stages different, stop auth.");
         return ERR_DM_FAILED;
     }
-    ParseDmAccessToSync(srcAccessStr, access);
-    if (!jsonObject[TAG_ACL_CHECKSUM].IsString()) { // Re-parse the acl
+    ParseDmAccessToSync(srcAccessStr, access, true);
+    if (!IsString(jsonObject, TAG_ACL_CHECKSUM)) { // Re-parse the acl
         LOGE("ParseSyncMessage TAG_ACL_CHECKSUM error");
         return ERR_DM_FAILED;
     }
     access.aclStrList = jsonObject[TAG_ACL_CHECKSUM].Get<std::string>();
+
+    if (context->direction == DmAuthDirection::DM_AUTH_SOURCE) {
+        LOGI("Source parse sink user confirm opt");
+        int32_t userConfirmOpt = static_cast<int32_t>(USER_OPERATION_TYPE_CANCEL_AUTH);
+        if (IsInt32(jsonObject, TAG_USER_CONFIRM_OPT)) {
+            userConfirmOpt = jsonObject[TAG_USER_CONFIRM_OPT].Get<int32_t>();
+        }
+        if (userConfirmOpt == static_cast<int32_t>(USER_OPERATION_TYPE_ALLOW_AUTH) ||
+            userConfirmOpt == static_cast<int32_t>(USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS)) {
+            context->confirmOperation = static_cast<UiAction>(userConfirmOpt);
+        }
+    }
+
     return DM_OK;
 }
 
@@ -1073,10 +1099,6 @@ int32_t DmAuthMessageProcessor::ParseMessageReqUserConfirm(const JsonObject &jso
 int32_t DmAuthMessageProcessor::ParseMessageRespUserConfirm(const JsonObject &json,
     std::shared_ptr<DmAuthContext> context)
 {
-    if (json[TAG_CONFIRM_OPERATION_V2].IsNumberInteger()) {
-        context->confirmOperation = static_cast<UiAction>(json[TAG_CONFIRM_OPERATION_V2].Get<int32_t>());
-    }
-
     if (json[TAG_AUTH_TYPE_LIST].IsString()) {
         auto strList = json[TAG_AUTH_TYPE_LIST].Get<std::string>();
         context->authTypeList = stringToVectorAuthType(strList);
@@ -1171,7 +1193,6 @@ int32_t DmAuthMessageProcessor::CreateMessageReqUserConfirm(std::shared_ptr<DmAu
 
 int32_t DmAuthMessageProcessor::CreateMessageRespUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json)
 {
-    json[TAG_CONFIRM_OPERATION_V2] = context->confirmOperation;
     json[TAG_AUTH_TYPE_LIST] = vectorAuthTypeToString(context->authTypeList);
     json[TAG_EXTRA_INFO] = context->accessee.extraInfo;
     return DM_OK;
@@ -1316,6 +1337,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     JsonObject syncMsgJson;
     DmAccessToSync accessToSync;
     accessToSync.deviceName = accessSide.deviceName;
+    accessToSync.deviceNameFull = context->softbusConnector->GetLocalDeviceName();
     accessToSync.deviceId = accessSide.deviceId;
     accessToSync.userId = accessSide.userId;
     accessToSync.accountId = accessSide.accountId;
@@ -1323,6 +1345,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     accessToSync.bundleName = accessSide.bundleName;
     accessToSync.pkgName = accessSide.pkgName;
     accessToSync.bindLevel = accessSide.bindLevel;
+
     syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
     syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = accessSide.transmitSkTimeStamp;
     syncMsgJson[TAG_TRANSMIT_CREDENTIAL_ID] = accessSide.transmitCredentialId;
@@ -1351,8 +1374,12 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     }
 
     syncMsgJson[TAG_ACL_CHECKSUM] = aclHashList;
-    std::string syncMsg = syncMsgJson.Dump();
+    if (context->direction == DmAuthDirection::DM_AUTH_SINK) {
+        LOGI("Sink Send user confirm opt");
+        syncMsgJson[TAG_USER_CONFIRM_OPT] = context->confirmOperation;
+    }
 
+    std::string syncMsg = syncMsgJson.Dump();
     std::string compressMsg = CompressSyncMsg(syncMsg);
     if (compressMsg.empty()) {
         LOGE("DmAuthMessageProcessor::EncryptSyncMessage compress failed");
@@ -1460,6 +1487,7 @@ void FromJson(const JsonItemObject &itemObject, DmAccessControlTable &table)
 void ToJson(JsonItemObject &itemObject, const DmAccessToSync &table)
 {
     itemObject["deviceName"] = table.deviceName;
+    itemObject["deviceNameFull"] = table.deviceNameFull;
     itemObject["deviceId"] = table.deviceId;
     itemObject["userId"] = table.userId;
     itemObject["accountId"] = table.accountId;
@@ -1474,6 +1502,7 @@ void ToJson(JsonItemObject &itemObject, const DmAccessToSync &table)
 void FromJson(const JsonItemObject &itemObject, DmAccessToSync &table)
 {
     SetValueFromJson(itemObject, "deviceName", &JsonItemObject::IsString, table.deviceName);
+    SetValueFromJson(itemObject, "deviceNameFull", &JsonItemObject::IsString, table.deviceNameFull);
     SetValueFromJson(itemObject, "deviceId", &JsonItemObject::IsString, table.deviceId);
     SetValueFromJson(itemObject, "userId", &JsonItemObject::IsNumberInteger, table.userId);
     SetValueFromJson(itemObject, "accountId", &JsonItemObject::IsString, table.accountId);
