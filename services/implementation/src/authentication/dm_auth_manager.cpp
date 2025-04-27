@@ -1771,7 +1771,7 @@ void DmAuthManager::ShowConfigDialog()
         StartAuthProcess(authenticationType_);
         return;
     }
-    CheckTVStatus();
+    CheckTvStatus();
     LOGI("ShowConfigDialog start");
     JsonObject jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
