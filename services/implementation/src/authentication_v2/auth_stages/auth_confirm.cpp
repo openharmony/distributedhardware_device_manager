@@ -489,7 +489,20 @@ int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> co
         return STOP_BIND;
     }
 
-    if (IsScreenLocked()) {
+    NodeBasicInfo nodeBasicInfo;
+    int32_t result = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (result != SOFTBUS_OK) {
+        LOGE("GetLocalNodeDeviceInfo from dsofbus fail, result=%{public}d", result);
+        return STOP_BIND;
+    }
+ 
+    if (nodeBasicInfo.deviceTypeId == TYPE_TV_ID) {
+        int32_t ret = AuthManagerBase::EndDream();
+        if (ret != DM_OK) {
+            LOGE("fail to end dream, err:%{public}d", ret);
+            return STOP_BIND;
+        }
+    } else if (IsScreenLocked()) {
         LOGE("AuthSinkConfirmState::ShowStartAuthDialog screen is locked.");
         context->reason = ERR_DM_BIND_USER_CANCEL;
         context->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);

@@ -1716,6 +1716,24 @@ int32_t DmAuthManager::GetPinCode(std::string &code)
     return DM_OK;
 }
 
+void DmAuthManager::CheckAndEndTvDream()
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t result = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (result != SOFTBUS_OK) {
+        LOGE("GetLocalNodeDeviceInfo from dsofbus fail, result=%{public}d", result);
+        return;
+    }
+ 
+    if (nodeBasicInfo.deviceTypeId == TYPE_TV_ID) {
+        int32_t ret = AuthManagerBase::EndDream();
+        if (ret != DM_OK) {
+            LOGE("fail to end dream, err:%{public}d", ret);
+            return;
+        }
+    }
+}
+
 void DmAuthManager::ShowConfigDialog()
 {
     if (authResponseContext_ == nullptr) {
@@ -1733,6 +1751,7 @@ void DmAuthManager::ShowConfigDialog()
         StartAuthProcess(authenticationType_);
         return;
     }
+    CheckAndEndTvDream();
     LOGI("ShowConfigDialog start");
     JsonObject jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;

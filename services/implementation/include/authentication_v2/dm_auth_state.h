@@ -15,6 +15,7 @@
 
 #ifndef OHOS_DM_AUTH_STATE_V2_H
 #define OHOS_DM_AUTH_STATE_V2_H
+#define TYPE_TV_ID 0x9C
 
 #include <memory>
 

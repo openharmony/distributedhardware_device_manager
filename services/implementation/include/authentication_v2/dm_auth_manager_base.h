@@ -237,6 +237,7 @@ public:
     // Public functions
     static std::string ConvertSrcVersion(const std::string &version, const std::string &edition);
     static int32_t DmGetUserId(int32_t displayId);
+    static int32_t EndDream();
     bool IsTransferReady();
     void SetTransferReady(bool version);
     void EnableInsensibleSwitching();
