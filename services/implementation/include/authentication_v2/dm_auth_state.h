@@ -224,7 +224,6 @@ private:
     void NegotiateCredential(std::shared_ptr<DmAuthContext> context, JsonObject &credTypeNegoRsult);
     void NegotiateAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclNegoRsult);
     int32_t ShowConfigDialog(std::shared_ptr<DmAuthContext> context);
-    int32_t EndDream();
     void ReadServiceInfo(std::shared_ptr<DmAuthContext> context);
     void MatchFallBackCandidateList(std::shared_ptr<DmAuthContext> context, DmAuthType authType);
     int32_t ProcessBindAuthorize(std::shared_ptr<DmAuthContext> context);

@@ -19,6 +19,10 @@
 #include "dm_constants.h"
 #include "dm_error_type.h"
 #include "dm_auth_manager_base.h"
+#include "power_mgr_client.h"
+#if defined(SUPPORT_SCREENLOCK)
+#include "screenlock_manager.h"
+#endif
 
 #ifdef OS_ACCOUNT_PART_EXISTS
 #include "os_account_manager.h"
@@ -484,5 +488,27 @@ void AuthManagerBase::OnAuthDeviceDataReceived(int32_t sessionId, std::string me
     LOGE("OnAuthDeviceDataReceived is not used in the new protocol");
 }
 
+int32_t AuthManagerBase::EndDream()
+{
+    auto &powerMgrClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
+    if (!powerMgrClient.IsScreenOn()) {
+        LOGW("screen not on");
+        return ERR_DM_FAILED;
+    }
+#if defined(SUPPORT_SCREENLOCK)
+    if (!OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked()) {
+        LOGI("screen not locked");
+        return DM_OK;
+    }
+#endif
+    PowerMgr::PowerErrors ret =
+        powerMgrClient.WakeupDevice(PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_END_DREAM, "end_dream");
+    if (ret != OHOS::PowerMgr::PowerErrors::ERR_OK) {
+        LOGE("fail to end dream, err:%{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("end dream success");
+    return DM_OK;
+}
 }  // namespace DistributedHardware
 }  // namespace OHOS

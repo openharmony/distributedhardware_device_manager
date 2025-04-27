@@ -27,7 +27,6 @@
 #include "dm_negotiate_process.h"
 #include "dm_softbus_cache.h"
 #include "multiple_user_connector.h"
-#include "power_mgr_client.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -480,27 +479,6 @@ DmAuthStateType AuthSinkConfirmState::GetStateType()
     return DmAuthStateType::AUTH_SINK_CONFIRM_STATE;
 }
 
-int32_t AuthSinkConfirmState::EndDream()
-{
-    auto &powerMgrClient = PowerMgr::PowerMgrClient::GetInstance();
-    if (!powerMgrClient.IsScreenOn()) {
-        LOGW("screen not on");
-        return ERR_DM_FAILED;
-    }
-    if (!IsScreenLocked()) {
-        LOGI("screen not locked");
-        return DM_OK;
-    }
-    PowerMgr::PowerErrors ret =
-        powerMgrClient.WakeupDevice(PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_END_DREAM, "end_dream");
-    if (ret != PowerMgr::PowerErrors::ERR_OK) {
-        LOGE("fail to end dream, err:%{public}d", ret);
-        return ERR_DM_FAILED;
-    }
-    LOGI("end dream success");
-    return DM_OK;
-}
-
 int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkConfirmState::ShowConfigDialog start");
@@ -519,7 +497,7 @@ int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> co
     }
  
     if (nodeBasicInfo.deviceTypeId == TYPE_TV_ID) {
-        int32_t ret = EndDream();
+        int32_t ret = AuthManagerBase::EndDream();
         if (ret != DM_OK) {
             LOGE("fail to end dream, err:%{public}d", ret);
             return STOP_BIND;

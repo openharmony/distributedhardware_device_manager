@@ -584,8 +584,7 @@ private:
     void SrcAuthenticateFinish();
     std::string GetBundleLable(const std::string &bundleName);
     bool IsScreenLocked();
-    int32_t EndDream();
-    void CheckTvStatus();
+    void CheckAndEndTvDream();
     std::string ConvertSinkVersion(const std::string &version);
     void NegotiateRespMsg(const std::string &version);
     void SetAuthType(int32_t authType);
