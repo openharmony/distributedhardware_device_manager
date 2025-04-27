@@ -74,5 +74,9 @@ int32_t HiChainAuthConnector::AuthCredentialPinCode(int32_t osAccountId, int64_t
     return DmHiChainAuthConnector::dmHiChainAuthConnector->AuthCredentialPinCode(osAccountId, authReqId, pinCode);
 }
 
+int32_t HiChainAuthConnector::QueryCredentialInfo(int32_t userId, const JsonObject &queryParams, JsonObject &resultJson)
+{
+    return DmHiChainAuthConnector::dmHiChainAuthConnector->QueryCredentialInfo(userId, queryParams, resultJson);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -265,6 +265,7 @@ private:
     std::mutex mapMutex_;  // sessionsMap_的锁
     std::map<int, std::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
     std::map<int, std::mutex> sessionEnableMutexMap_;      // Lock corresponding to the session
+    std::map<int, bool> sessionEnableCvReadyMap_;  // Condition variable ready flag
     std::map<uint64_t, uint64_t> logicalSessionId2TokenIdMap_;  // The relationship between logicalSessionId and tokenId
     std::map<uint64_t, int> logicalSessionId2SessionIdMap_;  // The relationship logicalSessionId and physical sessionId
     std::map<uint64_t, std::shared_ptr<Config>> configsMap_;    // Import when authMgr is not initialized

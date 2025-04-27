@@ -149,8 +149,10 @@ AuthManager::~AuthManager()
         context_->successFinished = true;
         context_->authStateMachine->Stop();  // Stop statemMachine thread
         context_->timer->DeleteAll();
+        LOGI("AuthManager context variables destroy successful.");
     }
     bindParam_.clear();
+    LOGI("DmAuthManager destructor");
 }
 
 void AuthManager::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback)

@@ -65,12 +65,26 @@ int32_t HiChainAuthConnector::RegisterHiChainAuthCallback(std::shared_ptr<IDmDev
     return DM_OK;
 }
 
+int32_t HiChainAuthConnector::UnRegisterHiChainAuthCallback()
+{
+    std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
+    dmDeviceAuthCallback_ = nullptr;
+    return DM_OK;
+}
+
 // 当前id为tokenId对应生成的requestId
 int32_t HiChainAuthConnector::RegisterHiChainAuthCallbackById(int64_t id,
     std::shared_ptr<IDmDeviceAuthCallback> callback)
 {
     std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
     dmDeviceAuthCallbackMap_[id] = callback;
+    return DM_OK;
+}
+
+int32_t HiChainAuthConnector::UnRegisterHiChainAuthCallbackById(int64_t id)
+{
+    std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
+    dmDeviceAuthCallbackMap_[id] = nullptr;
     return DM_OK;
 }
 

@@ -93,6 +93,7 @@ const int32_t HML_SESSION_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t PIN_AUTH_TIMEOUT = 60;
 const int32_t EVENT_TIMEOUT = 5000; // 5000 ms
+const int32_t WAIT_TIMEOUT = 2000; // 2000 ms
 
 
 int32_t AuthManagerBase::AuthenticateDevice(const std::string &pkgName, int32_t authType,

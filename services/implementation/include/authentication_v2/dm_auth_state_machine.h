@@ -25,6 +25,7 @@
 #include <queue>
 #include <set>
 #include <thread>
+#include <chrono>
 
 #include "dm_auth_state.h"
 
@@ -113,6 +114,7 @@ private:
     std::condition_variable stateCv_;
     std::mutex eventMutex_;
     std::condition_variable eventCv_;
+    bool eventCvReady_{false};
 
     // Direction of authentication
     DmAuthDirection direction_;
