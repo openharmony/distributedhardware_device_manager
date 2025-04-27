@@ -123,7 +123,8 @@ void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access, bool i
     return;
 }
 
-void SaveToDmAccessSync(DmAccessToSync &accessToSync, const DmAccess &accessSide)
+void SaveToDmAccessSync(DmAccessToSync &accessToSync, const std::shared_ptr<DmAuthContext> context,
+    const DmAccess &accessSide)
 {
     accessToSync.deviceName = accessSide.deviceName;
     accessToSync.deviceNameFull = context->softbusConnector->GetLocalDeviceName();
@@ -1349,7 +1350,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
 {
     JsonObject syncMsgJson;
     DmAccessToSync accessToSync;
-    SaveToDmAccessSync(accessToSync, accessSide);
+    SaveToDmAccessSync(accessToSync, context, accessSide);
 
     syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
     syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = accessSide.transmitSkTimeStamp;
