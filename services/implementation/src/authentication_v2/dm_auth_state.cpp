@@ -329,8 +329,8 @@ bool DmAuthState::HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const 
     }
 
     // tokenIdList = [srcTokenId, sinkTokenId]
-    std::string srcTokenIdHash = Crypto::Sha256(tokenList[0]);
-    std::string sinkTokenIdHash = Crypto::Sha256(tokenList[1]);
+    std::string srcTokenIdHash = Crypto::GetTokenIdHash(tokenList[0]);
+    std::string sinkTokenIdHash = Crypto::GetTokenIdHash(tokenList[1]);
 
     return ((srcTokenIdHash == context->accesser.tokenIdHash) &&
         (sinkTokenIdHash == context->accessee.tokenIdHash)) ||

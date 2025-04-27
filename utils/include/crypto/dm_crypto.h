@@ -36,14 +36,25 @@ public:
         bool isUpper = false);
     DM_EXPORT static int32_t ConvertHexStringToBytes(unsigned char *outBuf,
         uint32_t outBufLen, const char *inBuf, uint32_t inLen);
+    // follow the dsoftbus udid hash policy, use the first 8 bytes of full udid hash,
+    // after convert to string, it it 16 bytes.
     DM_EXPORT static int32_t GetUdidHash(const std::string &udid,
         unsigned char *udidHash);
+    DM_EXPORT static std::string GetUdidHash(const std::string &udid);
+    // use the first 16 bytes of full tokenId hash
+    // after convert to string, it it 32 bytes.
+    DM_EXPORT static std::string GetTokenIdHash(const std::string &tokenId);
     DM_EXPORT static std::string GetGroupIdHash(const std::string &groupId);
     static int32_t GetSecRandom(uint8_t *out, size_t outLen);
     static std::string GetSecSalt();
     static std::string GetHashWithSalt(const std::string &text, const std::string &salt);
+    // follow the dsoftbus accountid hash policy, use the first 3 bytes of full accountid hash,
+    // after convert to string, it it 6 bytes.
     DM_EXPORT static int32_t GetAccountIdHash(const std::string &accountId,
         unsigned char *accountIdHash);
+    // use the first 16 bytes of full accountId hash
+    // after convert to string, it it 32 bytes.
+    DM_EXPORT static std::string GetAccountIdHash16(const std::string &accountId);
     DM_EXPORT static int32_t ConvertBytesToHexString(char *outBuf, uint32_t outBufLen,
         const unsigned char *inBuf, uint32_t inLen);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

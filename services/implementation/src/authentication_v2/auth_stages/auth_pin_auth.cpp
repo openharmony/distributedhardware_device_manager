@@ -463,12 +463,6 @@ int32_t AuthSrcPinNegotiateStartState::ProcessPinBind(std::shared_ptr<DmAuthCont
         context->pinNegotiateStarted = true;
         CHECK_NULL_RETURN(context->timer, ERR_DM_POINT_NULL);
         context->timer->DeleteTimer(std::string(CONFIRM_TIMEOUT_TASK));
-        if (context->confirmOperation != UiAction::USER_OPERATION_TYPE_ALLOW_AUTH &&
-            context->confirmOperation != UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
-            LOGE("confirmOperation not allow");
-            context->reason = ERR_DM_BIND_USER_CANCEL;
-            return ERR_DM_BIND_USER_CANCEL;
-        }
         // import pin code auth always excute
         if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
             (!context->authTypeList.empty()) &&
