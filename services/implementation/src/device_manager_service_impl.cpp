@@ -1406,7 +1406,8 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
 
         sessionId = OpenAuthSession(deviceId, bindParam);
         if (sessionId < 0) {
-            goto error;
+            LOGE("OpenAuthSession failed, stop the authentication");
+            return nullptr;
         }
 
         std::unique_lock<std::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
@@ -1416,16 +1417,13 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
             LOGI("session enable, sessionId: %{public}d.", sessionId);
         } else {
             LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
-            goto error;
+            return nullptr;
         }
         instance = std::make_shared<Session>(sessionId, deviceId);
         deviceId2SessionIdMap_[deviceId] = sessionId;
         sessionsMap_[sessionId] = instance;
     }
     return instance;
-error:
-    LOGE("OpenAuthSession failed, stop the authentication");
-    return nullptr;
 }
 
 int32_t DeviceManagerServiceImpl::GetDeviceInfo(const PeerTargetId &targetId, std::string &addrType,
