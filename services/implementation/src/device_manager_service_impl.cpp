@@ -64,6 +64,10 @@ constexpr const char* CHANGE_PINTYPE = "1";
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
 const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
 
+const std::map<std::string, std::string> BUNDLENAME_MAPPING = {
+    { "wear_link_service", "watch_system_service" }
+};
+
 static bool IsMessageOldVersion(const JsonObject &jsonObject, std::shared_ptr<Session> session)
 {
     std::string dmVersion = "";
@@ -925,6 +929,15 @@ int32_t DeviceManagerServiceImpl::TransferSinkOldAuthMgr(const JsonObject &jsonO
     } else {
         LOGE("DeviceManagerServiceImpl::TransferSinkOldAuthMgr can not find bundleName.");
         return ERR_DM_AUTH_FAILED;
+    }
+    if (softbusConnector_ == nullptr) {
+        LOGE("softbusConnector_ is nullpter!");
+        return ERR_DM_AUTH_FAILED;
+    }
+    int32_t deviceType = softbusConnector_->GetLocalDeviceTypeId();
+    if (deviceType == DmDeviceType::DEVICE_TYPE_WATCH &&
+        BUNDLENAME_MAPPING.find(bundleName) != BUNDLENAME_MAPPING.end()) {
+        bundleName = BUNDLENAME_MAPPING.find(bundleName)->second;
     }
     uint64_t tokenId = GetTokenId(false, -1, bundleName);
     if (InitAndRegisterAuthMgr(false, tokenId, curSession, 0) != DM_OK) {
