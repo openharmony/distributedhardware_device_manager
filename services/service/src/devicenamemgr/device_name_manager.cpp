@@ -182,6 +182,14 @@ int32_t DeviceNameManager::InitDeviceNameWhenLanguageOrRegionChanged()
     return DM_OK;
 }
 
+std::string DeviceNameManager::GetUserDefinedDeviceName()
+{
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::string userDefinedDeviceName = "";
+    GetUserDefinedDeviceName(userId, userDefinedDeviceName);
+    return userDefinedDeviceName;
+}
+
 int32_t DeviceNameManager::InitDeviceNameWhenNameChange(int32_t userId)
 {
     LOGI("In");

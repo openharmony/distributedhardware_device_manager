@@ -37,6 +37,7 @@ public:
     virtual int32_t UnAuthenticateDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel) = 0;
     virtual int32_t UnBindDevice(const std::string &pkgName, const std::string &udid,
         int32_t bindLevel, const std::string &extra) = 0;
+    virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
 };
@@ -52,6 +53,7 @@ public:
     MOCK_METHOD((std::unordered_map<std::string, DmAuthForm>), GetAppTrustDeviceIdList, (std::string));
     MOCK_METHOD(int32_t, UnAuthenticateDevice, (const std::string &, const std::string &, int32_t));
     MOCK_METHOD(int32_t, UnBindDevice, (const std::string &, const std::string &, int32_t, const std::string &));
+    MOCK_METHOD(int32_t, CheckDeviceInfoPermission, (const std::string &, const std::string &));
 };
 }
 }
