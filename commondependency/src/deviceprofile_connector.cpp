@@ -683,7 +683,7 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
             deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
             continue;
         } else if (highestBindType == DEVICE_PEER_TO_PEER_TYPE || highestBindType == APP_PEER_TO_PEER_TYPE ||
-            SERVICE_PEER_TO_PEER_TYPE) {
+            highestBindType == SERVICE_PEER_TO_PEER_TYPE) {
             deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
             continue;
         } else {
