@@ -293,6 +293,10 @@ if (defined(ohos_lite)) {
       defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
     }
 
+    if (device_manager_feature_product == "default") {
+      defines += [ "SUPPORT_WISEDEVICE" ]
+    }
+
     public_external_deps = [ "cJSON:cjson" ]
 
     subsystem_name = "distributedhardware"
