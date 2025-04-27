@@ -123,6 +123,19 @@ void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access, bool i
     return;
 }
 
+void SaveToDmAccessSync(DmAccessToSync &accessToSync, const DmAccess &accessSide)
+{
+    accessToSync.deviceName = accessSide.deviceName;
+    accessToSync.deviceNameFull = context->softbusConnector->GetLocalDeviceName();
+    accessToSync.deviceId = accessSide.deviceId;
+    accessToSync.userId = accessSide.userId;
+    accessToSync.accountId = accessSide.accountId;
+    accessToSync.tokenId = accessSide.tokenId;
+    accessToSync.bundleName = accessSide.bundleName;
+    accessToSync.pkgName = accessSide.pkgName;
+    accessToSync.bindLevel = accessSide.bindLevel;
+}
+
 int32_t ParseInfoToDmAccess(const JsonObject &jsonObject, DmAccess &access)
 {
     // transmit session key is mandatory
@@ -1336,15 +1349,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
 {
     JsonObject syncMsgJson;
     DmAccessToSync accessToSync;
-    accessToSync.deviceName = accessSide.deviceName;
-    accessToSync.deviceNameFull = context->softbusConnector->GetLocalDeviceName();
-    accessToSync.deviceId = accessSide.deviceId;
-    accessToSync.userId = accessSide.userId;
-    accessToSync.accountId = accessSide.accountId;
-    accessToSync.tokenId = accessSide.tokenId;
-    accessToSync.bundleName = accessSide.bundleName;
-    accessToSync.pkgName = accessSide.pkgName;
-    accessToSync.bindLevel = accessSide.bindLevel;
+    SaveToDmAccessSync(accessToSync, accessSide);
 
     syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
     syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = accessSide.transmitSkTimeStamp;
