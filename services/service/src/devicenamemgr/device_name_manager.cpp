@@ -409,12 +409,18 @@ int32_t DeviceNameManager::RestoreLocalDeviceName()
 int32_t DeviceNameManager::InitDisplayDeviceNameToSettingsData(const std::string &nickName,
     const std::string &deviceName, int32_t userId)
 {
+#if defined(SUPPORT_WISEDEVICE)
     std::string newDisplayName = GetLocalDisplayDeviceName(nickName, deviceName, 0);
     std::string oldDisplayName = "";
     GetDisplayDeviceName(userId, oldDisplayName);
     if (oldDisplayName != newDisplayName) {
         SetDisplayDeviceName(newDisplayName, userId);
     }
+#else
+    (void) nickName;
+    (void) deviceName;
+    (void) userId;
+#endif // SUPPORT_WISEDEVICE
     return DM_OK;
 }
 
