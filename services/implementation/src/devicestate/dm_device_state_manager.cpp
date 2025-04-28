@@ -240,7 +240,8 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         }
     }
     if (stateTimerInfoMap_.find(std::string(udidHash)) == stateTimerInfoMap_.end()) {
-        std::string timerName = std::string(STATE_TIMER_PREFIX) + GetAnonyString(std::string(udidHash));
+        std::string sha256UdidHash = Crypto::Sha256(std::string(udidHash));
+        std::string timerName = std::string(STATE_TIMER_PREFIX) + sha256UdidHash.substr(0, sha256UdidHash.size() / 2);
         StateTimerInfo stateTimer = {
             .timerName = timerName,
             .networkId = deviceInfo.networkId,
