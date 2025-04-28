@@ -85,6 +85,7 @@ namespace {
     const std::string USERID_CHECKSUM_ISCHANGE_KEY = "ischange";
     constexpr const char* USER_SWITCH_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userSwitchByWifi";
     constexpr const char* USER_STOP_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userStopByWifi";
+    constexpr const char* ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:accountCommonEventByWifi";
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
 }
 
@@ -271,6 +272,13 @@ int32_t DeviceManagerService::InitDMServiceListener()
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DMCommTool::GetInstance()->Init();
+    int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec_);
+    int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec_);
+    MultipleUserConnector::ClearLockedUser(foregroundUserVec_, backgroundUserVec_);
+    if (retFront != DM_OK || retBack != DM_OK) {
+        LOGE("retFront: %{public}d, retBack: %{public}d, frontuserids: %{public}s, backuserids: %{public}s",
+            retFront, retBack, GetIntegerList(foregroundUserVec_).c_str(), GetIntegerList(backgroundUserVec_).c_str());
+    }
     int32_t currentUserId = MultipleUserConnector::GetFirstForegroundUserId();
     if (IsPC() && !MultipleUserConnector::IsUserUnlocked(currentUserId)) {
         HandleUserStopEvent(currentUserId);
@@ -1899,7 +1907,12 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     LOGI("CommonEventType: %{public}s, currentUserId: %{public}d, beforeUserId: %{public}d", commonEventType.c_str(),
         currentUserId, beforeUserId);
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-        HandleUserSwitchedEvent(currentUserId, beforeUserId);
+        DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
+        MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
+        DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
+            [this, commonEventType] () {
+                DeviceManagerService::HandleAccountCommonEvent(commonEventType);
+            });
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
         MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
@@ -1921,20 +1934,92 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED && IsPC()) {
-        HandleUserStopEvent(beforeUserId);
+        DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
+            [this, commonEventType] () {
+                DeviceManagerService::HandleAccountCommonEvent(commonEventType);
+            });
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
         DeviceNameManager::GetInstance().AccountSysReady(beforeUserId);
-        if (IsPC()) {
-            HandleUserSwitched();
-            if (IsDMServiceAdapterResidentLoad()) {
-                dmServiceImplExtResident_->AccountUserSwitched(currentUserId,
-                    MultipleUserConnector::GetOhosAccountId());
-            }
-        }
+        DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
+            [this, commonEventType] () {
+                DeviceManagerService::HandleAccountCommonEvent(commonEventType);
+            });
     } else {
         LOGE("Invalied account common event.");
     }
     return;
+}
+
+bool DeviceManagerService::IsUserStatusChanged(std::vector<int32_t> foregroundUserVec,
+    std::vector<int32_t> backgroundUserVec)
+{
+    LOGI("foregroundUserVec: %{public}s, backgroundUserVec: %{public}s",
+        GetIntegerList(foregroundUserVec).c_str(), GetIntegerList(backgroundUserVec).c_str());
+    std::lock_guard<std::mutex> lock(userVecLock_);
+    std::sort(foregroundUserVec.begin(), foregroundUserVec.end());
+    std::sort(backgroundUserVec.begin(), backgroundUserVec.end());
+    std::sort(foregroundUserVec_.begin(), foregroundUserVec_.end());
+    std::sort(backgroundUserVec_.begin(), backgroundUserVec_.end());
+    if (foregroundUserVec == foregroundUserVec_ && backgroundUserVec == backgroundUserVec_) {
+        LOGI("User status has not changed.");
+        return true;
+    }
+    LOGI("User status has changed, foregroundUserVec_: %{public}s, backgroundUserVec_: %{public}s",
+        GetIntegerList(foregroundUserVec_).c_str(), GetIntegerList(backgroundUserVec_).c_str());
+    foregroundUserVec_.clear();
+    backgroundUserVec_.clear();
+    foregroundUserVec_ = foregroundUserVec;
+    backgroundUserVec_ = backgroundUserVec;
+    return false;
+}
+
+void DeviceManagerService::HandleAccountCommonEvent(const std::string commonEventType)
+{
+    LOGI("HandleAccountCommonEvent commonEventType: %{public}s.", commonEventType.c_str());
+    std::vector<int32_t> foregroundUserVec;
+    int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
+    std::vector<int32_t> backgroundUserVec;
+    int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
+    MultipleUserConnector::ClearLockedUser(foregroundUserVec, backgroundUserVec);
+    if (retFront != DM_OK || retBack != DM_OK) {
+        LOGE("retFront: %{public}d, retBack: %{public}d, frontuserids: %{public}s, backuserids: %{public}s",
+            retFront, retBack, GetIntegerList(foregroundUserVec).c_str(), GetIntegerList(backgroundUserVec).c_str());
+        return;
+    }
+    if (IsUserStatusChanged(foregroundUserVec, backgroundUserVec)) {
+        LOGI("User status has not changed.");
+        return;
+    }
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    if (!discoveryMgr_->GetCommonDependencyObj()->CheckAclStatusAndForegroundNotMatch(localUdid, foregroundUserVec,
+        backgroundUserVec)) {
+        LOGI("no unreasonable data.");
+        return;
+    }
+    std::map<std::string, int32_t> curUserDeviceMap =
+        discoveryMgr_->GetCommonDependencyObj()->GetDeviceIdAndBindLevel(foregroundUserVec, localUdid);
+    std::map<std::string, int32_t> preUserDeviceMap =
+        discoveryMgr_->GetCommonDependencyObj()->GetDeviceIdAndBindLevel(backgroundUserVec, localUdid);
+    std::vector<std::string> peerUdids;
+    for (const auto &item : curUserDeviceMap) {
+        peerUdids.push_back(item.first);
+    }
+    for (const auto &item : preUserDeviceMap) {
+        if (find(peerUdids.begin(), peerUdids.end(), item.first) == peerUdids.end()) {
+            peerUdids.push_back(item.first);
+        }
+    }
+    if (peerUdids.empty()) {
+        return;
+    }
+    NotifyRemoteAccountCommonEvent(commonEventType, localUdid, peerUdids, foregroundUserVec, backgroundUserVec);
 }
 
 void DeviceManagerService::HandleUserSwitched()
@@ -1982,6 +2067,123 @@ void DeviceManagerService::HandleUserSwitched()
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void DeviceManagerService::NotifyRemoteAccountCommonEvent(const std::string commonEventType,
+    const std::string &localUdid, const std::vector<std::string> &peerUdids,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
+{
+    LOGI("NotifyRemoteAccountCommonEvent, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
+        GetIntegerList<int32_t>(foregroundUserIds).c_str(), GetIntegerList<int32_t>(backgroundUserIds).c_str());
+    if (peerUdids.empty()) {
+        return;
+    }
+    if (softbusListener_ == nullptr) {
+        UpdateAcl(localUdid, peerUdids, foregroundUserIds, backgroundUserIds);
+        LOGE("softbusListener_ is null");
+        return;
+    }
+    std::vector<std::string> bleUdids;
+    std::map<std::string, std::string> wifiDevices;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+    if (!bleUdids.empty()) {
+        UpdateAcl(localUdid, peerUdids, foregroundUserIds, backgroundUserIds);
+        if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED ||
+            commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+            SendCommonEventBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, true);
+        } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED) {
+            SendCommonEventBroadCast(bleUdids, foregroundUserIds, backgroundUserIds, false);
+        } else {
+            LOGE("commonEventType not match");
+            return;
+        }
+    }
+    if (!wifiDevices.empty()) {
+        NotifyRemoteAccountCommonEventByWifi(localUdid, wifiDevices, foregroundUserIds, backgroundUserIds);
+    }
+}
+
+void DeviceManagerService::NotifyRemoteAccountCommonEventByWifi(const std::string &localUdid,
+    const std::map<std::string, std::string> &wifiDevices, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    for (const auto &it : wifiDevices) {
+        int32_t result = SendAccountCommonEventByWifi(it.second, foregroundUserIds, backgroundUserIds);
+        if (result != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            std::vector<std::string> updateUdids;
+            updateUdids.push_back(it.first);
+            UpdateAcl(localUdid, updateUdids, foregroundUserIds, backgroundUserIds);
+            continue;
+        }
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        timer_->StartTimer(std::string(ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S,
+            [this, localUdid, foregroundUserIds, backgroundUserIds, udid] (std::string name) {
+                DeviceManagerService::HandleCommonEventTimeout(localUdid, foregroundUserIds, backgroundUserIds, udid);
+            });
+    }
+}
+
+int32_t DeviceManagerService::SendAccountCommonEventByWifi(const std::string &networkId,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
+{
+    LOGI("Try open softbus session to exchange foreground/background userid");
+    std::vector<uint32_t> foregroundUserIdsUInt;
+    for (auto const &u : foregroundUserIds) {
+        foregroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
+    }
+    std::vector<uint32_t> backgroundUserIdsUInt;
+    for (auto const &u : backgroundUserIds) {
+        backgroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
+    }
+    return DMCommTool::GetInstance()->SendUserIds(networkId, foregroundUserIdsUInt, backgroundUserIdsUInt);
+}
+
+void DeviceManagerService::HandleCommonEventTimeout(const std::string &localUdid,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+    const std::string &udid)
+{
+    LOGI("start udid: %{public}s", GetAnonyString(udid).c_str());
+    std::vector<std::string> updateUdids;
+    updateUdids.push_back(udid);
+    UpdateAcl(localUdid, updateUdids, foregroundUserIds, backgroundUserIds);
+}
+
+void DeviceManagerService::UpdateAcl(const std::string &localUdid,
+    const std::vector<std::string> &peerUdids, const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
+{
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    discoveryMgr_->GetCommonDependencyObj()->HandleAccountCommonEvent(localUdid, peerUdids, foregroundUserIds,
+        backgroundUserIds);
+}
+
 void DeviceManagerService::NotifyRemoteLocalUserSwitch(const std::string &localUdid,
     const std::vector<std::string> &peerUdids, const std::vector<int32_t> &foregroundUserIds,
     const std::vector<int32_t> &backgroundUserIds)
@@ -2288,6 +2490,85 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
     }
 }
 
+void DeviceManagerService::SendCommonEventBroadCast(const std::vector<std::string> &peerUdids,
+    const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds, bool isNeedResponse)
+{
+    LOGI("peerUdids: %{public}s, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s, isNeedRsp: %{public}s",
+        GetAnonyStringList(peerUdids).c_str(), GetIntegerList<int32_t>(foregroundUserIds).c_str(),
+        GetIntegerList<int32_t>(backgroundUserIds).c_str(), isNeedResponse ? "true" : "false");
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SYNC_USERID;
+    msg.peerUdids = peerUdids;
+    msg.syncUserIdFlag = isNeedResponse;
+    msg.isNewEvent = true;
+    for (const auto &userId : foregroundUserIds) {
+        msg.userIdInfos.push_back({ true, static_cast<uint16_t>(userId) });
+    }
+    for (auto const &userId : backgroundUserIds) {
+        msg.userIdInfos.push_back({ false, static_cast<uint16_t>(userId) });
+    }
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+
+void DeviceManagerService::HandleCommonEventBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
+    const std::string &remoteUdid, bool isNeedResponse)
+{
+    LOGI("rmtUdid: %{public}s, rmtUserIds: %{public}s, isNeedResponse: %{public}s,",
+        GetAnonyString(remoteUdid).c_str(), GetUserIdInfoList(remoteUserIdInfos).c_str(),
+        isNeedResponse ? "true" : "false");
+    if (isNeedResponse) {
+        std::vector<int32_t> foregroundUserVec;
+        int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
+        std::vector<int32_t> backgroundUserVec;
+        int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
+        MultipleUserConnector::ClearLockedUser(foregroundUserVec, backgroundUserVec);
+        if (retFront != DM_OK || retBack!= DM_OK) {
+            LOGE("retFront: %{public}d, retBack: %{public}d, frontuserids: %{public}s, backuserids: %{public}s",
+                retFront, retBack, GetIntegerList(foregroundUserVec).c_str(),
+                GetIntegerList(backgroundUserVec).c_str());
+        } else {
+            LOGE("Send back local frontuserids: %{public}s, backuserids: %{public}s",
+                GetIntegerList(foregroundUserVec).c_str(), GetIntegerList(backgroundUserVec).c_str());
+            std::vector<std::string> remoteUdids = { remoteUdid };
+            SendCommonEventBroadCast(remoteUdids, foregroundUserVec, backgroundUserVec, false);
+        }
+    }
+
+    std::vector<UserIdInfo> foregroundUserIdInfos;
+    std::vector<UserIdInfo> backgroundUserIdInfos;
+    GetFrontAndBackUserIdInfos(remoteUserIdInfos, foregroundUserIdInfos, backgroundUserIdInfos);
+    LOGI("process foreground and background userids");
+    // Notify received remote foreground userids to dsoftbus
+    std::vector<uint32_t> foregroundUserIds;
+    for (const auto &u : foregroundUserIdInfos) {
+        foregroundUserIds.push_back(static_cast<uint32_t>(u.userId));
+    }
+    std::vector<uint32_t> backgroundUserIds;
+    for (const auto &u : backgroundUserIdInfos) {
+        backgroundUserIds.push_back(static_cast<uint32_t>(u.userId));
+    }
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleCommonEventBroadCast(foregroundUserIds, backgroundUserIds, remoteUdid);
+    }
+}
+
+void DeviceManagerService::ProcessCommonUserStatusEvent(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
+{
+    LOGI("foregroundUserIds: %{public}s, backgroundUserIds: %{public}s, remoteUdid: %{public}s",
+        GetIntegerList<uint32_t>(foregroundUserIds).c_str(), GetIntegerList<uint32_t>(backgroundUserIds).c_str(),
+        GetAnonyString(remoteUdid).c_str());
+
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleCommonEventBroadCast(foregroundUserIds, backgroundUserIds, remoteUdid);
+    }
+}
+
 void DeviceManagerService::ScreenCommonEventCallback(std::string commonEventType)
 {
     if (!IsDMImplSoLoaded()) {
@@ -2513,17 +2794,12 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
 
 void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
 {
-    if (msg.empty()) {
-        LOGE("Msg is empty.");
+    if (msg.empty() || !IsDMServiceImplReady()) {
+        LOGE("Msg is empty or impl instance init failed.");
         return;
     }
-    RelationShipChangeMsg relationShipMsg =
-        ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
+    RelationShipChangeMsg relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
     LOGI("Receive trust change msg: %{public}s", relationShipMsg.ToString().c_str());
-    if (!IsDMServiceImplReady()) {
-        LOGE("Imp instance not init or init failed.");
-        return;
-    }
     switch (relationShipMsg.type) {
         case RelationShipChangeType::ACCOUNT_LOGOUT:
             dmServiceImpl_->HandleAccountLogoutEvent(relationShipMsg.userId, relationShipMsg.accountId,
@@ -2547,8 +2823,13 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
                 static_cast<int32_t>(relationShipMsg.tokenId));
             break;
         case RelationShipChangeType::SYNC_USERID:
-            HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
-                relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
+            if (relationShipMsg.isNewEvent) {
+                HandleCommonEventBroadCast(relationShipMsg.userIdInfos,
+                    relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
+            } else {
+                HandleUserIdsBroadCast(relationShipMsg.userIdInfos,
+                    relationShipMsg.peerUdid, relationShipMsg.syncUserIdFlag);
+            }
             break;
         case RelationShipChangeType::DEL_USER:
             dmServiceImpl_->HandleRemoteUserRemoved(relationShipMsg.userId, relationShipMsg.peerUdid);
@@ -2970,9 +3251,6 @@ void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_
     }
     if (beforeUserId != -1 && currentUserId != -1) {
         HandleUserSwitched(currentUserId, beforeUserId);
-    }
-    if (IsDMServiceAdapterResidentLoad()) {
-        dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
     }
 }
 

@@ -822,6 +822,7 @@ ohos_unittest("UTTest_dm_transport") {
     "cJSON:cjson",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -838,6 +839,7 @@ ohos_unittest("UTTest_dm_transport_msg") {
   deps = [ ":device_manager_test_common" ]
   external_deps = [
     "cJSON:cjson",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -1677,6 +1679,7 @@ ohos_unittest("UTTest_dm_comm_tool") {
     "cJSON:cjson",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",

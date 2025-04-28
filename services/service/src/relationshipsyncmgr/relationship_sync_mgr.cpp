@@ -67,6 +67,7 @@ namespace {
 
     // The need response mask offset, the 8th bit.
     const int32_t NEED_RSP_MASK_OFFSET = 7;
+    const int32_t IS_NEW_USER_SYNC_MASK_OFFSET = 6;
     /**
      * @brief The userid cost 2 byte, the heigher part set on the 2th byte.
      *        The Max user id is just above 10000+, cost 15bits. We use the first bit
@@ -91,7 +92,7 @@ namespace {
 
 RelationShipChangeMsg::RelationShipChangeMsg() : type(RelationShipChangeType::TYPE_MAX),
     userId(UINT32_MAX), accountId(""), tokenId(UINT64_MAX), peerUdids({}), peerUdid(""), accountName(""),
-    syncUserIdFlag(false), userIdInfos({})
+    syncUserIdFlag(false), userIdInfos({}), isNewEvent(false)
 {
 }
 
@@ -299,6 +300,9 @@ bool RelationShipChangeMsg::ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32
     } else {
         msg[0] |= 0x0 << NEED_RSP_MASK_OFFSET;
     }
+    if (isNewEvent) {
+        msg[0] |= 0x1 << IS_NEW_USER_SYNC_MASK_OFFSET;
+    }
 
     msg[0] |= userIdNum;
     int32_t userIdIdx = 0;
@@ -448,6 +452,7 @@ bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloa
     if (cJSON_IsNumber(payloadItem)) {
         uint8_t val = static_cast<uint8_t>(payloadItem->valueint);
         this->syncUserIdFlag = (((val >> NEED_RSP_MASK_OFFSET) & 0x1) == 0x1);
+        this->isNewEvent = (((val >> IS_NEW_USER_SYNC_MASK_OFFSET) & 0x1) == 0x1);
         userIdNum = ((static_cast<uint8_t>(payloadItem->valueint)) & FOREGROUND_USERID_LEN_MASK);
     }
 
@@ -670,7 +675,9 @@ RelationShipChangeMsg ReleationShipSyncMgr::ParseTrustRelationShipChange(const s
 const std::string RelationShipChangeMsg::ToString() const
 {
     std::string ret;
+    std::string isNewEventStr = isNewEvent ? "true" : "false";
     ret += "{ MsgType: " + std::to_string(static_cast<uint32_t>(type));
+    ret += "{ isNewEvent: " + isNewEventStr;
     ret += ", userId: " + std::to_string(userId);
     ret += ", accountId: " + GetAnonyString(accountId);
     ret += ", tokenId: " + std::to_string(tokenId);

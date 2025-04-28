@@ -63,7 +63,7 @@ void DmTransPortMsgFuzzTest(const uint8_t* data, size_t size)
     foregroundUserIds.push_back(FORUSERID);
     std::vector<uint32_t> backgroundUserIds;
     backgroundUserIds.push_back(BACKUSERID);
-    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds);
+    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
     CommMsg commMsg(code, msg);
     std::vector<uint32_t> userIds;
     userIds.push_back(USERID);

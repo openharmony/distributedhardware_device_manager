@@ -1999,8 +1999,10 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     if (isCheckUserStatus) {
         MultipleUserConnector::ClearLockedUser(localUserIds);
     }
+    DmOfflineParam offlineParam;
     DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
-        rmtFrontUserIdsTemp, rmtBackUserIdsTemp);
+        rmtFrontUserIdsTemp, rmtBackUserIdsTemp, offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
     DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(rmtBackUserIdsTemp, remoteUdid,
         localUserIds, localUdid);
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
@@ -2395,6 +2397,34 @@ int32_t DeviceManagerServiceImpl::DeleteAclV2(const std::string &pkgName, const 
         return DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);
     }
     return DeleteAclForProcV2(localUdid, tokenId, remoteUdid, bindLevel, extra, userId);
+}
+
+void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
+{
+    LOGI("remote udid: %{public}s, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
+        GetAnonyString(remoteUdid).c_str(), GetIntegerList<uint32_t>(foregroundUserIds).c_str(),
+        GetIntegerList<uint32_t>(backgroundUserIds).c_str());
+    std::vector<int32_t> rmtFrontUserIdsTemp(foregroundUserIds.begin(), foregroundUserIds.end());
+    std::vector<int32_t> rmtBackUserIdsTemp(backgroundUserIds.begin(), backgroundUserIds.end());
+    std::vector<int32_t> localUserIds;
+    int32_t ret = MultipleUserConnector::GetForegroundUserIds(localUserIds);
+    if (ret != DM_OK) {
+        LOGE("Get foreground userids failed, ret: %{public}d", ret);
+        return;
+    }
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    MultipleUserConnector::ClearLockedUser(localUserIds);
+    DmOfflineParam offlineParam;
+    DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid,
+        rmtFrontUserIdsTemp, rmtBackUserIdsTemp, offlineParam);
+    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    DeviceProfileConnector::GetInstance().HandleSyncBackgroundUserIdEvent(rmtBackUserIdsTemp, remoteUdid,
+        localUserIds, localUdid);
+    DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
+        localUserIds, localUdid);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

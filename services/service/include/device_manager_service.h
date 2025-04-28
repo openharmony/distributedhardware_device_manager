@@ -242,7 +242,8 @@ public:
         std::vector<std::string> &networkIds);
     void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
     int32_t UnRegisterPinHolderCallback(const std::string &pkgName);
-
+    void ProcessCommonUserStatusEvent(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
@@ -343,6 +344,27 @@ private:
     void HandleUserStopBroadCast(int32_t stopUserId, const std::string &remoteUdid);
     void NotifyRemoteLocalUserStopByWifi(const std::string &localUdid,
         const std::map<std::string, std::string> &wifiDevices, int32_t stopUserId);
+
+    void HandleAccountCommonEvent(const std::string commonEventType);
+    bool IsUserStatusChanged(std::vector<int32_t> foregroundUserVec, std::vector<int32_t> backgroundUserVec);
+    void NotifyRemoteAccountCommonEvent(const std::string commonEventType, const std::string &localUdid,
+        const std::vector<std::string> &peerUdids, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds);
+    void NotifyRemoteAccountCommonEventByWifi(const std::string &localUdid,
+        const std::map<std::string, std::string> &wifiDevices, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds);
+    int32_t SendAccountCommonEventByWifi(const std::string &networkId,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void HandleCommonEventTimeout(const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
+        const std::vector<int32_t> &backgroundUserIds, const std::string &udid);
+    void UpdateAcl(const std::string &localUdid, const std::vector<std::string> &peerUdids,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void HandleCommonEventBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
+        const std::string &remoteUdid, bool isNeedResponse);
+    void SendCommonEventBroadCast(const std::vector<std::string> &peerUdids,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
+        bool isNeedResponse);
+
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();
@@ -360,6 +382,7 @@ private:
     std::mutex isImplLoadLock_;
     std::mutex isAdapterResidentLoadLock_;
     std::mutex hichainListenerLock_;
+    std::mutex userVecLock_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;
@@ -373,6 +396,8 @@ private:
     std::shared_ptr<DmAccountCommonEventManager> accountCommonEventManager_;
     std::shared_ptr<DmPackageCommonEventManager> packageCommonEventManager_;
     std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager_;
+    std::vector<int32_t> foregroundUserVec_;
+    std::vector<int32_t> backgroundUserVec_;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
