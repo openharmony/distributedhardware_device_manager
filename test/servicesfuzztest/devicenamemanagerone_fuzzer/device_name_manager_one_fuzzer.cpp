@@ -39,8 +39,6 @@ void DeviceNameManagerOnePrivateFuzzTest(FuzzedDataProvider &fdp)
     DeviceNameManager::GetInstance().UnRegisterDeviceNameChangeMonitor(userId);
     DeviceNameManager::GetInstance().InitDeviceName(userId);
     DeviceNameManager::GetInstance().InitDeviceNameToSoftBus(prefix, suffix);
-    DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(
-        prefix, suffix, maxNamelength);
     DeviceNameManager::GetInstance().SubstrByBytes(fdp.ConsumeRandomLengthString(),
         fdp.ConsumeIntegral<int32_t>());
     DeviceNameManager::GetInstance().GetSystemLanguage();
