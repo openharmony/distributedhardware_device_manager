@@ -22,6 +22,7 @@ group("fuzztest") {
     "devicemanagernotify_fuzzer:fuzztest",
     "devicemanagerservice_fuzzer:fuzztest",
     "devicenamemanager_fuzzer:fuzztest",
+    "devicenamemanagerone_fuzzer:fuzztest",
     "deviceprofileconnector_fuzzer:fuzztest",
     "devicepublish_fuzzer:fuzztest",
     "dmcommtool_fuzzer:fuzztest",
