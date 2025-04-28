@@ -55,7 +55,7 @@ void DeviceNameManagerOnePrivateFuzzTest(FuzzedDataProvider &fdp)
     DeviceNameManager::GetInstance().SetDisplayDeviceNameState(state, userId);
     DeviceNameManager::GetInstance().GetDeviceName(deviceName);
     DeviceNameManager::GetInstance().SetDeviceName(fdp.ConsumeRandomLengthString());
-    DeviceNameManager::GetInstance().GetValue(tableName, userId, key,value);
+    DeviceNameManager::GetInstance().GetValue(tableName, userId, key, value);
     DeviceNameManager::GetInstance().SetValue(tableName, userId, key, fdp.ConsumeRandomLengthString());
     DeviceNameManager::GetInstance().GetProxyUriStr(tableName, userId);
     auto helper = DeviceNameManager::GetInstance().CreateDataShareHelper(proxyUri);
