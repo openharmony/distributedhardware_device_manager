@@ -2128,7 +2128,7 @@ void DeviceManagerServiceImpl::DeleteAclByTokenId(const int32_t accessTokenId,
     for (auto &item : profiles) {
         int64_t accesssertokenId = item.GetAccesser().GetAccesserTokenId();
         int64_t accessseetokenId = item.GetAccessee().GetAccesseeTokenId();
-        if (accessTokenId != static_cast<int32_t>(accesssertokenId) ||
+        if (accessTokenId != static_cast<int32_t>(accesssertokenId) &&
             accessTokenId != static_cast<int32_t>(accessseetokenId)) {
             continue;
         }
@@ -2144,7 +2144,7 @@ void DeviceManagerServiceImpl::DeleteAclByTokenId(const int32_t accessTokenId,
                     item.GetAccessee().GetAccesseeDeviceId()));
             }
         }
-        if (accessTokenId == static_cast<int32_t>(accesssertokenId)) {
+        if (accessTokenId == static_cast<int32_t>(accessseetokenId)) {
             DmOfflineParam offlineParam;
             DeviceProfileConnector::GetInstance().CacheAceeAclId(item, offlineParam.needDelAclInfos);
             delProfileMap[item.GetAccessControlId()] = item;
