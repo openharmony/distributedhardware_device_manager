@@ -642,6 +642,15 @@ void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const st
     return;
 }
 
+void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
+    const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid)
+{
+    (void)foregroundUserIds;
+    (void)backgroundUserIds;
+    (void)remoteUdid;
+    return;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

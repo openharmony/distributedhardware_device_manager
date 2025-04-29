@@ -314,7 +314,7 @@ HWTEST_F(DMTransportMsgTest, ToJson_UserIdsMsg, testing::ext::TestSize.Level1)
 {
     std::vector<uint32_t> foregroundUserIds{1, 2, 3};
     std::vector<uint32_t> backgroundUserIds{4, 5, 6};
-    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds);
+    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
     const char* jsonStr = R"({
         "MsgType": "0",
         "msg": "messgaeinfo",

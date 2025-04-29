@@ -177,7 +177,8 @@ public:
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     int32_t InitAndRegisterAuthMgr(bool isSrcSide, uint64_t tokenId, std::shared_ptr<Session> session,
         uint64_t logicalSessionId);
-
+    void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

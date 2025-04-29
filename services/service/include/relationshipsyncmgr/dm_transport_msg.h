@@ -24,9 +24,10 @@ namespace DistributedHardware {
 struct UserIdsMsg {
     std::vector<uint32_t> foregroundUserIds;
     std::vector<uint32_t> backgroundUserIds;
-    UserIdsMsg() : foregroundUserIds({}), backgroundUserIds({}) {}
-    UserIdsMsg(std::vector<uint32_t> foregroundUserIds, std::vector<uint32_t> backgroundUserIds)
-        : foregroundUserIds(foregroundUserIds), backgroundUserIds(backgroundUserIds) {}
+    bool isNewEvent;
+    UserIdsMsg() : foregroundUserIds({}), backgroundUserIds({}), isNewEvent(false) {}
+    UserIdsMsg(std::vector<uint32_t> foregroundUserIds, std::vector<uint32_t> backgroundUserIds, bool isNewEvent)
+        : foregroundUserIds(foregroundUserIds), backgroundUserIds(backgroundUserIds), isNewEvent(isNewEvent) {}
 };
 
 void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg);

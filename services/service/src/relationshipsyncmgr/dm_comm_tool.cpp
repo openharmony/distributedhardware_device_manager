@@ -35,7 +35,7 @@ constexpr int32_t DM_COMM_RSP_LOCAL_USERIDS = 2;
 constexpr int32_t DM_COMM_SEND_USER_STOP = 3;
 constexpr int32_t DM_COMM_RSP_USER_STOP = 4;
 constexpr int32_t DM_COMM_ACCOUNT_LOGOUT = 5;
-
+constexpr const char* EVENT_TASK = "EventTask";
 const char* const USER_STOP_MSG_KEY = "stopUserId";
 
 DMCommTool::DMCommTool() : dmTransportPtr_(nullptr)
@@ -46,6 +46,7 @@ DMCommTool::DMCommTool() : dmTransportPtr_(nullptr)
 void DMCommTool::Init()
 {
     LOGI("Init DMCommTool");
+    eventQueue_ = std::make_shared<ffrt::queue>(EVENT_TASK);
     dmTransportPtr_ = std::make_shared<DMTransport>(shared_from_this());
     std::shared_ptr<AppExecFwk::EventRunner> runner = AppExecFwk::EventRunner::Create(true);
     eventHandler_ = std::make_shared<DMCommTool::DMCommToolEventHandler>(runner, shared_from_this());
@@ -82,7 +83,7 @@ int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
         return ERR_DM_FAILED;
     }
 
-    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds);
+    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
     cJSON *root = cJSON_CreateObject();
     if (root == nullptr) {
         LOGE("Create cJSON object failed.");
@@ -112,7 +113,7 @@ int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
 void DMCommTool::RspLocalFrontOrBackUserIds(const std::string rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds, int32_t socketId)
 {
-    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds);
+    UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
     cJSON *root = cJSON_CreateObject();
     if (root == nullptr) {
         LOGE("Create cJSON object failed.");
@@ -144,33 +145,51 @@ DMCommTool::DMCommToolEventHandler::DMCommToolEventHandler(const std::shared_ptr
     LOGI("Ctor DMCommToolEventHandler");
 }
 
-void DMCommTool::DMCommToolEventHandler::ProcessEvent(
-    const AppExecFwk::InnerEvent::Pointer &event)
+void DMCommTool::DMCommToolEventHandler::ParseUserIdsMsg(std::shared_ptr<InnerCommMsg> commMsg, UserIdsMsg &userIdsMsg)
+{
+    CHECK_NULL_VOID(commMsg);
+    std::string payload = commMsg->commMsg->msg;
+    cJSON *root = cJSON_Parse(payload.c_str());
+    if (root == NULL) {
+        LOGE("the msg is not json format");
+        return;
+    }
+    FromJson(root, userIdsMsg);
+    cJSON_Delete(root);
+}
+
+void DMCommTool::DMCommToolEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     uint32_t eventId = event->GetInnerEventId();
     std::shared_ptr<InnerCommMsg> commMsg = event->GetSharedObject<InnerCommMsg>();
-    if (commMsg == nullptr) {
-        LOGE("ProcessEvent commMsg is null");
-        return;
-    }
+    CHECK_NULL_VOID(commMsg);
+    UserIdsMsg userIdsMsg;
+    ParseUserIdsMsg(commMsg, userIdsMsg);
+
     if (dmCommToolWPtr_.expired()) {
         LOGE("dmCommToolWPtr_ is expired");
         return;
     }
     std::shared_ptr<DMCommTool> dmCommToolPtr = dmCommToolWPtr_.lock();
-    if (dmCommToolPtr == nullptr) {
-        LOGE("dmCommToolPtr is null");
-        return;
-    }
+    CHECK_NULL_VOID(dmCommToolPtr);
     switch (eventId) {
         case DM_COMM_SEND_LOCAL_USERIDS: {
-            // Process remote foreground userids and send back local user ids
-            dmCommToolPtr->ProcessReceiveUserIdsEvent(commMsg);
+            if (userIdsMsg.isNewEvent) {
+                dmCommToolPtr->ProcessReceiveCommonEvent(commMsg);
+            } else {
+                // Process remote foreground userids and send back local user ids
+                dmCommToolPtr->ProcessReceiveUserIdsEvent(commMsg);
+            }
             break;
         }
         case DM_COMM_RSP_LOCAL_USERIDS: {
-            // Process remote foreground userids and close session
-            dmCommToolPtr->ProcessResponseUserIdsEvent(commMsg);
+            if (userIdsMsg.isNewEvent) {
+                // Process remote foreground userids and close session
+                dmCommToolPtr->ProcessResponseCommonEvent(commMsg);
+            } else {
+                // Process remote foreground userids and close session
+                dmCommToolPtr->ProcessResponseUserIdsEvent(commMsg);
+            }
             break;
         }
         case DM_COMM_SEND_USER_STOP: {
@@ -189,6 +208,75 @@ void DMCommTool::DMCommToolEventHandler::ProcessEvent(
             LOGE("event is undefined, id is %{public}d", eventId);
             break;
     }
+}
+
+void DMCommTool::ProcessReceiveCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    LOGI("ProcessReceiveCommonEvent, process and rsp local userid");
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid: %{public}s", commMsg->remoteNetworkId.c_str());
+        return;
+    }
+
+    std::string payload = commMsg->commMsg->msg;
+    cJSON *root = cJSON_Parse(payload.c_str());
+    if (root == NULL) {
+        LOGE("the msg is not json format");
+        return;
+    }
+    UserIdsMsg userIdsMsg;
+    FromJson(root, userIdsMsg);
+    cJSON_Delete(root);
+    uint32_t totalUserNum = static_cast<uint32_t>(userIdsMsg.foregroundUserIds.size()) +
+        static_cast<uint32_t>(userIdsMsg.backgroundUserIds.size());
+
+    // step1: send back local userids
+    std::vector<int32_t> foregroundUserIds;
+    MultipleUserConnector::GetForegroundUserIds(foregroundUserIds);
+    std::vector<int32_t> backgroundUserIds;
+    MultipleUserConnector::GetBackgroundUserIds(backgroundUserIds);
+    MultipleUserConnector::ClearLockedUser(foregroundUserIds, backgroundUserIds);
+    std::vector<uint32_t> foregroundUserIdsU32;
+    std::vector<uint32_t> backgroundUserIdsU32;
+    for (auto const &u : foregroundUserIds) {
+        foregroundUserIdsU32.push_back(static_cast<uint32_t>(u));
+    }
+    for (auto const &u : backgroundUserIds) {
+        backgroundUserIdsU32.push_back(static_cast<uint32_t>(u));
+    }
+    RspLocalFrontOrBackUserIds(commMsg->remoteNetworkId, foregroundUserIdsU32, backgroundUserIdsU32,
+        commMsg->socketId);
+
+    DeviceManagerService::GetInstance().ProcessCommonUserStatusEvent(userIdsMsg.foregroundUserIds,
+        userIdsMsg.backgroundUserIds, rmtUdid);
+}
+
+void DMCommTool::ProcessResponseCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+{
+    LOGI("process receive remote userids response");
+    // step1: close socket
+    this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
+
+    std::string rmtUdid = "";
+    SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
+    if (rmtUdid.empty()) {
+        LOGE("Can not find remote udid by networkid: %{public}s", commMsg->remoteNetworkId.c_str());
+        return;
+    }
+
+    std::string payload = commMsg->commMsg->msg;
+    cJSON *root = cJSON_Parse(payload.c_str());
+    if (root == NULL) {
+        LOGE("the msg is not json format");
+        return;
+    }
+    UserIdsMsg userIdsMsg;
+    FromJson(root, userIdsMsg);
+    cJSON_Delete(root);
+    DeviceManagerService::GetInstance().ProcessCommonUserStatusEvent(userIdsMsg.foregroundUserIds,
+        userIdsMsg.backgroundUserIds, rmtUdid);
 }
 
 void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg)
@@ -497,6 +585,20 @@ void DMCommTool::ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> c
     DeviceManagerService::GetInstance().ProcessSyncAccountLogout(logoutAccountMsg.accountId,
         rmtUdid, logoutAccountMsg.userId);
     LOGI("process remote logout success.");
+}
+
+int32_t DMCommTool::StartCommonEvent(std::string commonEventType, EventCallback eventCallback)
+{
+    if (commonEventType.empty() || eventCallback == nullptr) {
+        LOGE("StartCommonEvent input value invalid");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    CHECK_NULL_RETURN(eventQueue_, ERR_DM_POINT_NULL);
+    LOGI("StartCommonEvent start eventType: %{public}s", commonEventType.c_str());
+    std::lock_guard<std::mutex> locker(eventMutex_);
+    auto taskFunc = [eventCallback] () { eventCallback(); };
+    eventQueue_->submit(taskFunc);
+    return DM_OK;
 }
 } // DistributedHardware
 } // OHOS

@@ -1633,8 +1633,9 @@ HWTEST_F(DeviceProfileConnectorTest, GetUserIdAndBindLevel_001, testing::ext::Te
     remoteFrontUserIds.push_back(userId);
     std::vector<int32_t> remoteBackUserIds;
     remoteBackUserIds.push_back(userId);
+    DmOfflineParam offlineParam;
     DeviceProfileConnector::GetInstance().UpdateACL(localUdid, localUserIds, remoteUdid, remoteFrontUserIds,
-        remoteBackUserIds);
+        remoteBackUserIds, offlineParam);
 
     localUdid = "remoteDeviceId";
     remoteUdid = "localDeviceId";
@@ -1810,13 +1811,14 @@ HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_005, testing::
     std::vector<int32_t> remoteFrontUserIds;
     std::vector<int32_t> remoteBackUserIds;
     AddAccessControlProfileFirst(profiles);
+    DmOfflineParam offlineParam;
     DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profiles, remoteUdid,
-        remoteFrontUserIds, remoteBackUserIds);
+        remoteFrontUserIds, remoteBackUserIds, offlineParam);
 
     remoteUdid = "localDeviceId";
     AddAccessControlProfileSeven(profiles);
     DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profiles, remoteUdid,
-        remoteFrontUserIds, remoteBackUserIds);
+        remoteFrontUserIds, remoteBackUserIds, offlineParam);
 
     AddAccessControlProfileEight(profiles);
     std::string localUdid = "localDeviceId";

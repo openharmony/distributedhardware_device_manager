@@ -165,6 +165,8 @@ public:
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
         int32_t remoteTokenId);
+    void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
+        const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

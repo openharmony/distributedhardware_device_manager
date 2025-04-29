@@ -56,6 +56,7 @@
                 "power_manager",
                 "safwk",
                 "samgr",
+                "selinux_adapter",
                 "resource_management",
                 "wifi",
                 "screenlock_mgr",
