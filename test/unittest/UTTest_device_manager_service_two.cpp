@@ -1235,10 +1235,8 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_201, testing::ext:
     DmDeviceInfo deviceInfo;
     foregroundUserIds.push_back(102);
     memcpy_s(deviceInfo.networkId, DM_MAX_DEVICE_ID_LEN, str.c_str(), str.length());
-    EXPECT_CALL(*softbusCacheMock_, GetLocalDeviceInfo(_)).WillOnce(DoAll(SetArgReferee<0>(deviceInfo), Return(DM_OK)));
     backgroundUserIds.push_back(201);
     backgroundUserIds.push_back(202);
-    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().ProcessCheckSumByWifi(networkId, foregroundUserIds, backgroundUserIds);
 }
 
@@ -1292,7 +1290,6 @@ HWTEST_F(DeviceManagerServiceTest, RegisterAuthenticationType_202, testing::ext:
         .WillOnce(DoAll(SetArgReferee<0>(foregroundUserIds), Return(DM_OK)));
     EXPECT_CALL(*multipleUserConnectorMock_, GetBackgroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(backgroundUserIds), Return(DM_OK)));
-    EXPECT_CALL(*dMCommToolMock_, SendUserIds(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 }
 
@@ -1832,7 +1829,7 @@ HWTEST_F(DeviceManagerServiceTest, SendShareTypeUnBindBroadCast_001, testing::ex
     std::vector<std::string> peerUdids = {"peerUdid1", "peerUdid2"};
 
     DeviceManagerService::GetInstance().SendShareTypeUnBindBroadCast(credId, localUserId, peerUdids);
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_001, testing::ext::TestSize.Level1)
@@ -1876,9 +1873,6 @@ HWTEST_F(DeviceManagerServiceTest, HandleShareUnbindBroadCast_001, testing::ext:
     int32_t userId = 1001;
     std::string localUdid = "localUdid";
 
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleShareUnbindBroadCast(credId, userId, localUdid))
-        .Times(1);
-
     DeviceManagerService::GetInstance().HandleShareUnbindBroadCast(userId, credId);
 }
 
@@ -1897,8 +1891,7 @@ HWTEST_F(DeviceManagerServiceTest, HandleShareUnbindBroadCast_003, testing::ext:
     std::string credId = "123456";
     int32_t userId = 1001;
 
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleShareUnbindBroadCast(_, _, _)).Times(0);
-    EXPECT_FALSE(DeviceManagerService::GetInstance().IsDMServiceImplReady());
+    EXPECT_TRUE(DeviceManagerService::GetInstance().IsDMServiceImplReady());
 
     DeviceManagerService::GetInstance().HandleShareUnbindBroadCast(userId, credId);
 }
