@@ -1425,7 +1425,7 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
 
         std::unique_lock<std::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
         sessionEnableCvReadyMap_[sessionId] = false;
-        if (sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::seconds(WAIT_TIMEOUT),
+        if (sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(WAIT_TIMEOUT),
             [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
             LOGI("session enable, sessionId: %{public}d.", sessionId);
         } else {

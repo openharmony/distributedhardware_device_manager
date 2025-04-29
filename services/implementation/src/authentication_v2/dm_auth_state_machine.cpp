@@ -262,7 +262,7 @@ DmEventType DmAuthStateMachine::WaitExpectEvent(DmEventType eventType)
     std::unique_lock lock(eventMutex_);
     auto startTime = std::chrono::high_resolution_clock::now();
     while (running_.load()) {
-        if (eventCv_.wait_for(lock, std::chrono::seconds(WAIT_TIMEOUT), [&] {
+        if (eventCv_.wait_for(lock, std::chrono::milliseconds(WAIT_TIMEOUT), [&] {
             return !running_.load() || !eventQueue_.empty() || eventCvReady_;
         })) {
             eventCvReady_ = false;
