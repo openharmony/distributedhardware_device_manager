@@ -21,6 +21,7 @@
 #include "access_control_profile.h"
 #include "crypto_mgr.h"
 #include "deviceprofile_connector.h"
+#include "dm_ability_manager.h"
 #include "json_object.h"
 
 namespace OHOS {
@@ -55,6 +56,7 @@ extern const char* TAG_ACL;
 extern const char* TAG_ACCESSER;
 extern const char* TAG_ACCESSEE;
 extern const char* TAG_SERVICEINFO;
+extern const char* TAG_USER_CONFIRM_OPT;
 // The local SK information is synchronized to the remote end to construct acl-accesser/accessee.
 extern const char* TAG_TRANSMIT_SK_ID;
 extern const char* TAG_LNN_SK_ID;
@@ -139,7 +141,10 @@ struct DmAccessControlTable {
 // Structure used for synchronizing ACL access
 // Attention: Modifying this structure requires updating the From/ToJson functions in dm_auth_message_processor.cpp.
 struct DmAccessToSync {
+    // the deviceName translate in 80/90 messages, cleaned the privacy info
     std::string deviceName;
+    // the device display name, which need save in DB
+    std::string deviceNameFull;
     // For A->B communication, whether it's the A end or B end, the Accesser object stores
     // the A end's deviceId, and the Accessee object stores the B end's deviceId
     std::string deviceId;
@@ -151,6 +156,8 @@ struct DmAccessToSync {
     int32_t bindLevel;            // Passed through for business purposes, no custom definition required
     int32_t sessionKeyId;         // User credential ID
     int64_t skTimeStamp;          // Used for aging, time is 2 days, user-level credential timestamp
+    // the user confirm operation result for the confirm dialog, means allow or allow always.
+    int32_t userConfirmOperation = UiAction::USER_OPERATION_TYPE_CANCEL_AUTH;
 };
 
 // json and struct conversion functions

@@ -41,13 +41,16 @@ const std::string SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME = "settings.general.
 const std::string SETTINGS_GENERAL_DISPLAY_DEVICE_NAME_STATE = "settings.general.display_device_name_state";
 const std::string SETTING_COLUMN_VALUE = "VALUE";
 const std::string SETTING_COLUMN_KEYWORD = "KEYWORD";
+constexpr int32_t NUM0 = 0;
 constexpr int32_t NUM1 = 1;
 constexpr int32_t NUM2 = 2;
 constexpr int32_t NUM3 = 3;
 constexpr int32_t NUM4 = 4;
+constexpr int32_t NUM6 = 6;
 constexpr int32_t NUM18 = 18;
 constexpr int32_t NUM21 = 21;
 constexpr int32_t NUM24 = 24;
+const std::string ANOY_STRING = "***";
 constexpr int32_t DEFAULT_DEVICE_NAME_MAX_LENGTH = 12;
 constexpr int32_t NAME_LENGTH_MIN = 18;
 constexpr int32_t NAME_LENGTH_MAX = 100;
@@ -180,6 +183,14 @@ int32_t DeviceNameManager::InitDeviceNameWhenLanguageOrRegionChanged()
         InitDeviceName(userId);
     }
     return DM_OK;
+}
+
+std::string DeviceNameManager::GetUserDefinedDeviceName()
+{
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::string userDefinedDeviceName = "";
+    GetUserDefinedDeviceName(userId, userDefinedDeviceName);
+    return userDefinedDeviceName;
 }
 
 int32_t DeviceNameManager::InitDeviceNameWhenNameChange(int32_t userId)
@@ -336,6 +347,36 @@ int32_t DeviceNameManager::GetLocalDisplayDeviceName(int32_t maxNamelength, std:
     return DM_OK;
 }
 
+std::string DeviceNameManager::GenLocalAnoyDeviceNameWithNickAndMarketName(const std::string &nickName,
+    const std::string &marketName)
+{
+    if (nickName.empty()) {
+        return marketName;
+    }
+
+    std::string anoyNickName = AnoyPrivacyString(nickName);
+    std::string nameSeparator = NAME_SEPARATOR_ZH;
+    if (GetSystemLanguage() != LANGUAGE_ZH_HANS || GetSystemRegion() != LOCAL_ZH_HANS_CN) {
+        nameSeparator = NAME_SEPARATOR_OTHER;
+    }
+
+    return anoyNickName + nameSeparator + marketName;
+}
+
+std::string DeviceNameManager::GetLocalDisplayDeviceNameForPrivacy()
+{
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::string userDefinedDeviceName = "";
+    GetUserDefinedDeviceName(userId, userDefinedDeviceName);
+    if (!userDefinedDeviceName.empty()) {
+        return AnoyPrivacyString(userDefinedDeviceName);
+    }
+
+    std::string nickName = MultipleUserConnector::GetAccountNickName(userId);
+    std::string localMarketName = GetLocalMarketName();
+    return GenLocalAnoyDeviceNameWithNickAndMarketName(nickName, localMarketName);
+}
+
 std::string DeviceNameManager::GetLocalDisplayDeviceName(const std::string &prefixName, const std::string &subffixName,
     int32_t maxNameLength)
 {
@@ -409,18 +450,83 @@ int32_t DeviceNameManager::RestoreLocalDeviceName()
 int32_t DeviceNameManager::InitDisplayDeviceNameToSettingsData(const std::string &nickName,
     const std::string &deviceName, int32_t userId)
 {
+#if defined(SUPPORT_WISEDEVICE)
     std::string newDisplayName = GetLocalDisplayDeviceName(nickName, deviceName, 0);
     std::string oldDisplayName = "";
     GetDisplayDeviceName(userId, oldDisplayName);
     if (oldDisplayName != newDisplayName) {
         SetDisplayDeviceName(newDisplayName, userId);
     }
+#else
+    (void) nickName;
+    (void) deviceName;
+    (void) userId;
+#endif // SUPPORT_WISEDEVICE
     return DM_OK;
 }
 
 int32_t DeviceNameManager::GetUserDefinedDeviceName(int32_t userId, std::string &deviceName)
 {
     return GetValue(SETTINGSDATA_SECURE, userId, SETTINGS_GENERAL_USER_DEFINED_DEVICE_NAME, deviceName);
+}
+
+std::string DeviceNameManager::AnoyPrivacyString(const std::string &str)
+{
+    std::vector<std::string> wholeCharVec = ConvertToWholeCharacter(str);
+    if (wholeCharVec.size() == NUM0) {
+        return "";
+    }
+    if (wholeCharVec.size() == NUM1) {
+        return wholeCharVec[0];
+    }
+
+    std::string res;
+    if (wholeCharVec.size() > NUM1 && wholeCharVec.size() <= NUM6) {
+        uint32_t leftLen = wholeCharVec.size() / 2;
+        for (uint32_t i = 0; i < leftLen; i++) {
+            res += wholeCharVec[i];
+        }
+        res += ANOY_STRING;
+        return res;
+    }
+
+    for (int32_t i = 0; i < NUM3; i++) {
+        res += wholeCharVec[i];
+    }
+    res += ANOY_STRING;
+    for (int32_t j = wholeCharVec.size() - NUM3; j < wholeCharVec.size(); j++) {
+        res += wholeCharVec[j];
+    }
+    return res;
+}
+
+std::vector<std::string> DeviceNameManager::ConvertToWholeCharacter(const std::string &str)
+{
+    std::vector<std::string> wholeCharacterVec;
+    int32_t length = static_cast<int32_t>(str.size());
+    for (int32_t i = 0; i < length;) {
+        unsigned char c = static_cast<unsigned char>(str[i]);
+        int numBytes = NUM1;
+        if ((c & 0x80) == 0) {
+            numBytes = NUM1;
+        } else if ((c & 0xE0) == 0xC0) {
+            numBytes = NUM2;
+        } else if ((c & 0xF0) == 0xE0) {
+            numBytes = NUM3;
+        } else if ((c & 0xF8) == 0xF0) {
+            numBytes = NUM4;
+        } else {
+            LOGE("Invalid characters");
+            return {};
+        }
+        if (i + numBytes > length) {
+            break;
+        }
+        std::string substr(str.begin() + i, str.begin() + i + numBytes);
+        wholeCharacterVec.emplace_back(substr);
+        i += numBytes;
+    }
+    return wholeCharacterVec;
 }
 
 std::string DeviceNameManager::SubstrByBytes(const std::string &str, int32_t maxNumBytes)

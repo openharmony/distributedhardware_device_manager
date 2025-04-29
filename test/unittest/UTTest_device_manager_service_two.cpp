@@ -1662,10 +1662,7 @@ HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_201, testing::ext::Tes
     int32_t ret = DeviceManagerService::GetInstance().RestoreLocalDeviceName(pkgName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 
-    int32_t curUserId = -1;
-    DeviceManagerService::GetInstance().CheckRegisterInfoWithWise(curUserId);
-    curUserId = 1;
-    DeviceManagerService::GetInstance().CheckRegisterInfoWithWise(curUserId);
+    DeviceManagerService::GetInstance().CheckRegisterInfoWithWise();
 }
 
 HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_202, testing::ext::TestSize.Level1)

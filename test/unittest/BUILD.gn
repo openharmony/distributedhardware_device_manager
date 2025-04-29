@@ -2167,6 +2167,7 @@ ohos_unittest("UTTest_auth_confirm") {
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_auth_confirm.cpp",
     "${devicemanager_path}/test/unittest/mock/deviceprofile_connector_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/hichain_auth_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -2273,7 +2274,6 @@ ohos_static_library("device_manager_test_common") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
-    "common_event_service:cesfwk_core",
     "common_event_service:cesfwk_innerkits",
     "data_share:datashare_common",
     "data_share:datashare_consumer",

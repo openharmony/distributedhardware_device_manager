@@ -109,7 +109,7 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
         GetOutputState(context->accesser.bundleName, context->state), context->reason);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
-        GetOutputReplay(context->accesser.bundleName, context->reply),
+        GetOutputReplay(context->accesser.bundleName, context->reason),
         GetOutputState(context->accesser.bundleName, context->state), GenerateBindResultContent(context));
     context->successFinished = true;
 
@@ -143,7 +143,7 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("SinkFinish reason:%{public}d", context->reason);
     context->listener->OnSinkBindResult(context->processInfo, context->peerTargetId,
-        GetOutputReplay(context->accessee.bundleName, context->reply),
+        GetOutputReplay(context->accessee.bundleName, context->reason),
         GetOutputState(context->accessee.bundleName, context->state), GenerateBindResultContent(context));
     context->successFinished = true;
     if (context->reason != DM_OK) {
@@ -329,8 +329,8 @@ bool DmAuthState::HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const 
     }
 
     // tokenIdList = [srcTokenId, sinkTokenId]
-    std::string srcTokenIdHash = Crypto::Sha256(tokenList[0]);
-    std::string sinkTokenIdHash = Crypto::Sha256(tokenList[1]);
+    std::string srcTokenIdHash = Crypto::GetTokenIdHash(tokenList[0]);
+    std::string sinkTokenIdHash = Crypto::GetTokenIdHash(tokenList[1]);
 
     return ((srcTokenIdHash == context->accesser.tokenIdHash) &&
         (sinkTokenIdHash == context->accessee.tokenIdHash)) ||

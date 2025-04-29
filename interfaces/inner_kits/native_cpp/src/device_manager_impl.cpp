@@ -2927,5 +2927,29 @@ int32_t DeviceManagerImpl::GetDeviceNetworkIdList(const std::string &bundleName,
     LOGI("Completed");
     return DM_OK;
 }
+
+int32_t DeviceManagerImpl::UnRegisterPinHolderCallback(const std::string &pkgName)
+{
+    if (pkgName.empty()) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().UnRegisterPinHolderCallback(pkgName);
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    req->SetPkgName(pkgName);
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+
+    int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_PIN_HOLDER_CALLBACK, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

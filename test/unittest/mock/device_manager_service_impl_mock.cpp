@@ -82,6 +82,11 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
     const int32_t &userId, const std::string &localUdid)
 {
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleShareUnbindBroadCast(credId, userId, localUdid);
+
+int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &localUdid,
+    const std::string &peerDeviceId)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckDeviceInfoPermission(localUdid, peerDeviceId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

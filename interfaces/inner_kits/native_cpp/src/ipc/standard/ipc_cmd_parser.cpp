@@ -2123,5 +2123,24 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_NETWORK_ID_LIST, MessageParcel &reply, std::shar
     }
     return DM_OK;
 }
+
+ON_IPC_SET_REQUEST(UNREGISTER_PIN_HOLDER_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(UNREGISTER_PIN_HOLDER_CALLBACK, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

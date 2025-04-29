@@ -19,6 +19,10 @@
 #include "dm_constants.h"
 #include "dm_error_type.h"
 #include "dm_auth_manager_base.h"
+#include "power_mgr_client.h"
+#if defined(SUPPORT_SCREENLOCK)
+#include "screenlock_manager.h"
+#endif
 
 #ifdef OS_ACCOUNT_PART_EXISTS
 #include "os_account_manager.h"
@@ -93,6 +97,7 @@ const int32_t HML_SESSION_TIMEOUT = 10;
 const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t PIN_AUTH_TIMEOUT = 60;
 const int32_t EVENT_TIMEOUT = 5000; // 5000 ms
+const int32_t WAIT_TIMEOUT = 2000; // 2000 ms
 
 
 int32_t AuthManagerBase::AuthenticateDevice(const std::string &pkgName, int32_t authType,
@@ -484,5 +489,27 @@ void AuthManagerBase::OnAuthDeviceDataReceived(int32_t sessionId, std::string me
     LOGE("OnAuthDeviceDataReceived is not used in the new protocol");
 }
 
+int32_t AuthManagerBase::EndDream()
+{
+    auto &powerMgrClient = OHOS::PowerMgr::PowerMgrClient::GetInstance();
+    if (!powerMgrClient.IsScreenOn()) {
+        LOGW("screen not on");
+        return ERR_DM_FAILED;
+    }
+#if defined(SUPPORT_SCREENLOCK)
+    if (!OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked()) {
+        LOGI("screen not locked");
+        return DM_OK;
+    }
+#endif
+    PowerMgr::PowerErrors ret =
+        powerMgrClient.WakeupDevice(PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_END_DREAM, "end_dream");
+    if (ret != OHOS::PowerMgr::PowerErrors::ERR_OK) {
+        LOGE("fail to end dream, err:%{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    LOGI("end dream success");
+    return DM_OK;
+}
 }  // namespace DistributedHardware
 }  // namespace OHOS

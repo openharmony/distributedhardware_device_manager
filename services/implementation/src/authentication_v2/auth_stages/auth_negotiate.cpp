@@ -91,9 +91,9 @@ int32_t AuthSrcNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> cont
     context->accessee.dmVersion = "";
 
     // Calculate the hash value
-    context->accesser.deviceIdHash = Crypto::Sha256(context->accesser.deviceId);
-    context->accesser.accountIdHash = Crypto::Sha256(context->accesser.accountId);
-    context->accesser.tokenIdHash = Crypto::Sha256(std::to_string(context->accesser.tokenId));
+    context->accesser.deviceIdHash = Crypto::GetUdidHash(context->accesser.deviceId);
+    context->accesser.accountIdHash = Crypto::GetAccountIdHash16(context->accesser.accountId);
+    context->accesser.tokenIdHash = Crypto::GetTokenIdHash(std::to_string(context->accesser.tokenId));
 
     // Create old message for compatible
     context->accesser.accountGroupIdHash = GetAccountGroupIdHash(context);
@@ -123,7 +123,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     context->accessee.deviceId = std::string(localDeviceId);
-    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
+    context->accessee.deviceIdHash = Crypto::GetUdidHash(context->accessee.deviceId);
 
     // 2. Get userId
     context->accessee.userId = MultipleUserConnector::GetUserIdByDisplayId(
@@ -135,7 +135,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
 
     // 3. Get accountId
     context->accessee.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context->accessee.userId);
-    context->accessee.accountIdHash = Crypto::Sha256(context->accessee.accountId);
+    context->accessee.accountIdHash = Crypto::GetAccountIdHash16(context->accessee.accountId);
 
     // 4. Get tokenId
     if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
@@ -151,10 +151,10 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     if (DmAuthState::CheckProcessNameInWhiteList(context->accessee.bundleName)) {
         context->accessee.bindLevel = DmRole::DM_ROLE_USER;
     }
-    context->accessee.tokenIdHash = Crypto::Sha256(std::to_string(context->accessee.tokenId));
+    context->accessee.tokenIdHash = Crypto::GetTokenIdHash(std::to_string(context->accessee.tokenId));
     context->accesser.isOnline = context->softbusConnector->CheckIsOnline(context->accesser.deviceIdHash, true);
     context->accessee.language = DmLanguageManager::GetInstance().GetSystemLanguage();
-    context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
+    context->accessee.deviceName = context->listener->GetLocalDisplayDeviceNameForPrivacy();
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
     return DM_OK;
 }
@@ -290,7 +290,7 @@ void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext
     int32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
-        std::string trustDeviceIdHash = Crypto::Sha256(trustDeviceId);
+        std::string trustDeviceIdHash = Crypto::GetUdidHash(trustDeviceId);
         if (trustDeviceIdHash != context->accesser.deviceIdHash &&
             trustDeviceIdHash != context->accessee.deviceIdHash) {
             LOGE("devId %{public}s hash %{public}s, er devId %{public}s.", GetAnonyString(trustDeviceId).c_str(),
@@ -410,7 +410,7 @@ bool AuthSinkNegotiateStateMachine::IdenticalAccountAclCompare(std::shared_ptr<D
     LOGI("start");
     return accesser.GetAccesserDeviceId() == context->accessee.deviceId &&
         accesser.GetAccesserUserId() == context->accessee.userId &&
-        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash;
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash;
 }
 
 bool AuthSinkNegotiateStateMachine::ShareAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -419,7 +419,7 @@ bool AuthSinkNegotiateStateMachine::ShareAclCompare(std::shared_ptr<DmAuthContex
     LOGI("start");
     return accessee.GetAccesseeDeviceId() == context->accessee.deviceId &&
         accessee.GetAccesseeUserId() == context->accessee.userId &&
-        Crypto::Sha256(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash;
+        Crypto::GetUdidHash(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash;
 }
 
 bool AuthSinkNegotiateStateMachine::Point2PointAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -429,13 +429,13 @@ bool AuthSinkNegotiateStateMachine::Point2PointAclCompare(std::shared_ptr<DmAuth
     return (accessee.GetAccesseeDeviceId() == context->accessee.deviceId &&
         accessee.GetAccesseeUserId() == context->accessee.userId &&
         accessee.GetAccesseeTokenId() == context->accessee.tokenId &&
-        Crypto::Sha256(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash &&
-        Crypto::Sha256(std::to_string(accesser.GetAccesserTokenId())) == context->accesser.tokenIdHash) ||
+        Crypto::GetUdidHash(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash &&
+        Crypto::GetTokenIdHash(std::to_string(accesser.GetAccesserTokenId())) == context->accesser.tokenIdHash) ||
         (accesser.GetAccesserDeviceId() == context->accessee.deviceId &&
         accesser.GetAccesserUserId() == context->accessee.userId &&
         accesser.GetAccesserTokenId() == context->accessee.tokenId &&
-        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash &&
-        Crypto::Sha256(std::to_string(accessee.GetAccesseeTokenId())) == context->accesser.tokenIdHash);
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash &&
+        Crypto::GetTokenIdHash(std::to_string(accessee.GetAccesseeTokenId())) == context->accesser.tokenIdHash);
 }
 
 bool AuthSinkNegotiateStateMachine::LnnAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -447,8 +447,8 @@ bool AuthSinkNegotiateStateMachine::LnnAclCompare(std::shared_ptr<DmAuthContext>
         (accesser.GetAccesserDeviceId() == context->accessee.deviceId &&
         accesser.GetAccesserUserId() == context->accessee.userId)) &&
         accessee.GetAccesseeTokenId() == 0 && accessee.GetAccesseeBundleName() == "" &&
-        (Crypto::Sha256(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash ||
-        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash) &&
+        (Crypto::GetUdidHash(accesser.GetAccesserDeviceId()) == context->accesser.deviceIdHash ||
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accesser.deviceIdHash) &&
         accesser.GetAccesserTokenId() == 0 && accesser.GetAccesserBundleName() == "";
 }
 
@@ -462,14 +462,14 @@ void AuthSinkNegotiateStateMachine::GetSinkCredentialInfo(std::shared_ptr<DmAuth
     }
     // get share credential
     if (context->accesser.accountIdHash != context->accessee.accountIdHash &&
-        context->accesser.accountIdHash != Crypto::Sha256("ohosAnonymousUid") &&
-        context->accessee.accountIdHash != Crypto::Sha256("ohosAnonymousUid")) {
+        context->accesser.accountIdHash != Crypto::GetAccountIdHash16("ohosAnonymousUid") &&
+        context->accessee.accountIdHash != Crypto::GetAccountIdHash16("ohosAnonymousUid")) {
         GetShareCredentialInfo(context, credInfo);
         GetP2PCredentialInfo(context, credInfo);
     }
     // get point_to_point credential
-    if (context->accesser.accountIdHash == Crypto::Sha256("ohosAnonymousUid") ||
-        context->accessee.accountIdHash == Crypto::Sha256("ohosAnonymousUid")) {
+    if (context->accesser.accountIdHash == Crypto::GetAccountIdHash16("ohosAnonymousUid") ||
+        context->accessee.accountIdHash == Crypto::GetAccountIdHash16("ohosAnonymousUid")) {
         GetP2PCredentialInfo(context, credInfo);
     }
     std::vector<std::string> deleteCredInfo;
@@ -494,7 +494,7 @@ void AuthSinkNegotiateStateMachine::GetIdenticalCredentialInfo(std::shared_ptr<D
     CHECK_NULL_VOID(context);
     JsonObject queryParams;
     queryParams[FILED_DEVICE_ID] = context->accessee.deviceId;
-    queryParams[FILED_USER_ID] = context->accessee.accountId;
+    queryParams[FILED_USER_ID] = MultipleUserConnector::GetOhosAccountNameByUserId(context->accessee.userId);
     queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_RELATED;
     CHECK_NULL_VOID(context->hiChainAuthConnector);
     if (context->hiChainAuthConnector->QueryCredentialInfo(context->accessee.userId, queryParams, credInfo) != DM_OK) {

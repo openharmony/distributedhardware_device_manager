@@ -23,23 +23,70 @@ namespace DistributedHardware {
 
 using namespace testing;
 
+namespace {
 constexpr const char *TEST_DEVICE_ID = "deviceId";
 constexpr const int32_t TEST_USER_ID = 0;
 constexpr const int64_t TEST_TOKEN_ID = 0;
 constexpr const char *TEST_CREDENTIAL_ID = "credentialId";
+constexpr const char *TEST_IDENTIAL_CRED_ID = "identialCredId";
+constexpr const char *TEST_SHARE_CRED_ID = "shareCredId";
+constexpr const char *TEST_POINT_TO_POINT_CRED_ID = "p2pCredId";
+constexpr const char *TEST_LNN_CRED_ID = "lnnCredId";
+
+DistributedDeviceProfile::AccessControlProfile TestCreateAcl(const std::string credIdStr, int32_t bindType)
+{
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(TEST_DEVICE_ID);
+    accesser.SetAccesserUserId(TEST_USER_ID);
+    accesser.SetAccesserTokenId(TEST_TOKEN_ID);
+    accesser.SetAccesserCredentialIdStr(credIdStr);
+
+    DistributedDeviceProfile::Accessee accesee;
+    accesee.SetAccesseeDeviceId(TEST_DEVICE_ID);
+    accesee.SetAccesseeUserId(TEST_USER_ID);
+    accesee.SetAccesseeTokenId(TEST_TOKEN_ID);
+    accesee.SetAccesseeCredentialIdStr(credIdStr);
+
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetAccesser(accesser);
+    profile.SetAccessee(accesee);
+    profile.SetTrustDeviceId(TEST_DEVICE_ID);
+    profile.SetBindType(bindType);
+    return profile;
+}
+
+void TestSetContext(std::shared_ptr<DmAuthContext> context)
+{
+    context->accesser.deviceId = TEST_DEVICE_ID;
+    context->accesser.userId = TEST_USER_ID;
+    context->accesser.tokenId = TEST_TOKEN_ID;
+    context->accesser.deviceIdHash = Crypto::Sha256(context->accesser.deviceId);
+    context->accesser.tokenIdHash = Crypto::Sha256(std::to_string(context->accesser.tokenId));
+    context->accessee.deviceId = TEST_DEVICE_ID;
+    context->accessee.userId = TEST_USER_ID;
+    context->accessee.tokenId = TEST_TOKEN_ID;
+    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
+    context->accessee.tokenIdHash = Crypto::Sha256(std::to_string(context->accessee.tokenId));
+}
+}
 
 std::shared_ptr<DeviceProfileConnectorMock> AuthConfirmTest::deviceProfileConnectorMock = nullptr;
+std::shared_ptr<HiChainAuthConnectorMock> AuthConfirmTest::dmHiChainAuthConnectorMock = nullptr;
 
 void AuthConfirmTest::SetUpTestCase()
 {
     deviceProfileConnectorMock = std::make_shared<DeviceProfileConnectorMock>();
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock;
+    dmHiChainAuthConnectorMock = std::make_shared<HiChainAuthConnectorMock>();
+    DmHiChainAuthConnector::dmHiChainAuthConnector = dmHiChainAuthConnectorMock;
 }
 
 void AuthConfirmTest::TearDownTestCase()
 {
     deviceProfileConnectorMock = nullptr;
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
+    dmHiChainAuthConnectorMock = nullptr;
+    DmHiChainAuthConnector::dmHiChainAuthConnector = nullptr;
 }
 
 void AuthConfirmTest::SetUp()
@@ -61,6 +108,7 @@ void AuthConfirmTest::TearDown()
     authManager = nullptr;
     context = nullptr;
     Mock::VerifyAndClearExpectations(deviceProfileConnectorMock.get());
+    Mock::VerifyAndClearExpectations(dmHiChainAuthConnectorMock.get());
 }
 
 bool DmAuthState::IsScreenLocked()
@@ -68,7 +116,6 @@ bool DmAuthState::IsScreenLocked()
     return false;
 }
 
-// AuthSrcConfirmState
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetStateType_001, testing::ext::TestSize.Level1)
 {
     authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
@@ -114,21 +161,16 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateCredential_001, testing::
     authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
         hiChainAuthConnector);
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    std::string jsonStr = R"(
-        {
-            "identicalCredType": true,
-            "shareCredType": true,
-            "pointTopointCredType": true,
-            "lnnCredType": true
-        }
-    )";
+    std::string jsonStr = R"({"identicalCredType":1,"shareCredType":2,"pointTopointCredType":256,"lnnCredType":3})";
     context = authManager->GetAuthContext();
     context->accessee.credTypeList = jsonStr;
     context->accesser.credTypeList = jsonStr;
     JsonObject jsonObject;
-
     authState->NegotiateCredential(context, jsonObject);
-    EXPECT_TRUE(context != nullptr);
+    EXPECT_TRUE(jsonObject["identicalCredType"].Get<int32_t>() == 1);
+    EXPECT_TRUE(jsonObject["shareCredType"].Get<int32_t>() == 2);
+    EXPECT_TRUE(jsonObject["pointTopointCredType"].Get<int32_t>() == 256);
+    EXPECT_TRUE(jsonObject["lnnCredType"].Get<int32_t>() == 3);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateAcl_001, testing::ext::TestSize.Level1)
@@ -136,62 +178,40 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_NegotiateAcl_001, testing::ext::Te
     authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
         hiChainAuthConnector);
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    std::string jsonStr = R"(
-        {
-            "identicalAcl": true,
-            "shareAcl": true,
-            "pointTopointAcl": true,
-            "lnnAcl": true
-        }
-    )";
+    std::string jsonStr = R"({"identicalAcl":1,"shareAcl":2,"pointTopointAcl":256,"lnnAcl":3})";
     context = authManager->GetAuthContext();
     context->accessee.aclTypeList = jsonStr;
     context->accesser.aclTypeList = jsonStr;
     JsonObject jsonObject;
-
-    authState->NegotiateCredential(context, jsonObject);
-    EXPECT_TRUE(context != nullptr);
+    authState->NegotiateAcl(context, jsonObject);
+    EXPECT_TRUE(jsonObject["identicalAcl"].Get<int32_t>() == 1);
+    EXPECT_TRUE(jsonObject["shareAcl"].Get<int32_t>() == 2);
+    EXPECT_TRUE(jsonObject["pointTopointAcl"].Get<int32_t>() == 256);
+    EXPECT_TRUE(jsonObject["lnnAcl"].Get<int32_t>() == 3);
 }
 
-// get identical credential
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_001, testing::ext::TestSize.Level1)
 {
     authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
         hiChainAuthConnector);
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context = authManager->GetAuthContext();
-    context->accesser.accountIdHash = context->accessee.accountIdHash = "";
     JsonObject jsonObject;
-    authState->GetSrcCredentialInfo(context, jsonObject);
-    EXPECT_TRUE(context != nullptr);
-}
 
-// get share credential
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_002, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    context = authManager->GetAuthContext();
+    context->accesser.accountIdHash = context->accessee.accountIdHash = "";
+    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _)).WillOnce(Return(DM_OK));
+    authState->GetSrcCredentialInfo(context, jsonObject);
+
     context->accesser.accountIdHash = "0";
     context->accessee.accountIdHash = "1";
-    JsonObject jsonObject;
+    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _))
+        .WillOnce(Return(DM_OK))
+        .WillOnce(Return(DM_OK));
     authState->GetSrcCredentialInfo(context, jsonObject);
-    EXPECT_TRUE(context != nullptr);
-}
 
-// get point_to_point credential
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_003, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    context = authManager->GetAuthContext();
     context->accesser.accountIdHash = Crypto::Sha256("ohosAnonymousUid");
-    context->accessee.accountIdHash = Crypto::Sha256("ohosAnonymousUid");
-    JsonObject jsonObject;
+    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _)).WillOnce(Return(DM_OK));
     authState->GetSrcCredentialInfo(context, jsonObject);
-    EXPECT_TRUE(context != nullptr);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcAclInfo_001, testing::ext::TestSize.Level1)
@@ -201,72 +221,25 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcAclInfo_001, testing::ext::T
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
 
     context = authManager->GetAuthContext();
-    context->accesser.deviceId = TEST_DEVICE_ID;
-    context->accessee.deviceId = TEST_DEVICE_ID;
-    context->accesser.deviceIdHash = Crypto::Sha256(context->accesser.deviceId);
-    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
+    TestSetContext(context);
 
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfiles;
-    DistributedDeviceProfile::AccessControlProfile profile;
-    profile.SetTrustDeviceId(context->accesser.deviceId);
-    profile.SetBindType(0);
+    DistributedDeviceProfile::AccessControlProfile profile = TestCreateAcl(TEST_IDENTIAL_CRED_ID, DM_IDENTICAL_ACCOUNT);
     allProfiles.push_back(profile);
-    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
+    profile = TestCreateAcl(TEST_SHARE_CRED_ID, DM_SHARE);
     allProfiles.push_back(profile);
-    profile.SetBindType(DM_SHARE);
-    allProfiles.push_back(profile);
-    profile.SetBindType(DM_POINT_TO_POINT);
-    allProfiles.push_back(profile);
+
+    std::string jsonStr = R"({
+        "identialCredId": {"credType": 1},
+        "shareCredId": {"credType": 2}
+    })";
+    JsonObject credInfo(jsonStr);
+    std::string jsonAclStr = R"({"identicalAcl":1,"shareAcl":2})";
 
     EXPECT_CALL(*deviceProfileConnectorMock, GetAllAclIncludeLnnAcl()).WillOnce(Return(allProfiles));
-    JsonObject credInfo;
     JsonObject aclInf;
     authState->GetSrcAclInfo(context, credInfo, aclInf);
-}
-
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcAclInfoForP2P_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-    context = authManager->GetAuthContext();
-    context->accesser.deviceId = TEST_DEVICE_ID;
-    context->accesser.userId = TEST_USER_ID;
-    context->accesser.tokenId = TEST_TOKEN_ID;
-    context->accessee.deviceId = TEST_DEVICE_ID;
-    context->accessee.userId = TEST_USER_ID;
-    context->accessee.tokenId = TEST_TOKEN_ID;
-    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
-    context->accessee.tokenIdHash = Crypto::Sha256(std::to_string(context->accessee.tokenId));
-
-    DistributedDeviceProfile::AccessControlProfile profile;
-    DistributedDeviceProfile::Accesser accesser;
-    accesser.SetAccesserDeviceId(TEST_DEVICE_ID);
-    accesser.SetAccesserUserId(TEST_USER_ID);
-    accesser.SetAccesserTokenId(TEST_TOKEN_ID);
-    accesser.SetAccesserCredentialIdStr(TEST_CREDENTIAL_ID);
-    profile.SetAccesser(accesser);
-
-    DistributedDeviceProfile::Accessee accesee;
-    accesee.SetAccesseeDeviceId(TEST_DEVICE_ID);
-    accesee.SetAccesseeUserId(TEST_USER_ID);
-    accesee.SetAccesseeTokenId(TEST_TOKEN_ID);
-    accesee.SetAccesseeCredentialIdStr(TEST_CREDENTIAL_ID);
-    profile.SetAccessee(accesee);
-
-    std::string jsonStr = R"(
-        {
-            "credentialId": {
-                "credType": 256,
-                "authorizedAppList": [0, 0]
-            }
-        }
-    )";
-    JsonObject credInfo(jsonStr);
-    JsonObject aclInf;
-
-    authState->GetSrcAclInfoForP2P(context, profile, credInfo, aclInf);
-    EXPECT_TRUE(context != nullptr);
+    EXPECT_TRUE(aclInf.Dump() == jsonAclStr);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_IdenticalAccountAclCompare_001, testing::ext::TestSize.Level1)
@@ -275,10 +248,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_IdenticalAccountAclCompare_001, te
         hiChainAuthConnector);
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context = authManager->GetAuthContext();
-    context->accesser.deviceId = TEST_DEVICE_ID;
-    context->accesser.userId = TEST_USER_ID;
-    context->accessee.deviceId = TEST_DEVICE_ID;
-    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
+    TestSetContext(context);
 
     DistributedDeviceProfile::Accesser accesser;
     accesser.SetAccesserDeviceId(TEST_DEVICE_ID);
@@ -294,11 +264,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_ShareAclCompare_001, testing::ext:
         hiChainAuthConnector);
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context = authManager->GetAuthContext();
-
-    context->accesser.deviceId = TEST_DEVICE_ID;
-    context->accesser.userId = TEST_USER_ID;
-    context->accessee.deviceId = TEST_DEVICE_ID;
-    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
+    TestSetContext(context);
 
     DistributedDeviceProfile::Accesser accesser;
     accesser.SetAccesserDeviceId(TEST_DEVICE_ID);
@@ -315,15 +281,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Point2PointAclCompare_001, testing
         hiChainAuthConnector);
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context = authManager->GetAuthContext();
-
-    context->accesser.deviceId = TEST_DEVICE_ID;
-    context->accesser.userId = TEST_USER_ID;
-    context->accesser.tokenId = TEST_TOKEN_ID;
-
-    context->accessee.deviceId = TEST_DEVICE_ID;
-    context->accessee.tokenId = TEST_TOKEN_ID;
-    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
-    context->accessee.tokenIdHash = Crypto::Sha256(std::to_string(context->accessee.tokenId));
+    TestSetContext(context);
 
     DistributedDeviceProfile::Accesser accesser;
     accesser.SetAccesserDeviceId(TEST_DEVICE_ID);
@@ -344,15 +302,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_LnnAclCompare_001, testing::ext::T
         hiChainAuthConnector);
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context = authManager->GetAuthContext();
-
-    context->accesser.deviceId = TEST_DEVICE_ID;
-    context->accesser.userId = TEST_USER_ID;
-    context->accesser.tokenId = TEST_TOKEN_ID;
-
-    context->accessee.deviceId = TEST_DEVICE_ID;
-    context->accessee.tokenId = TEST_TOKEN_ID;
-    context->accessee.deviceIdHash = Crypto::Sha256(context->accessee.deviceId);
-    context->accessee.tokenIdHash = Crypto::Sha256(std::to_string(context->accessee.tokenId));
+    TestSetContext(context);
 
     DistributedDeviceProfile::Accesser accesser;
     accesser.SetAccesserDeviceId(TEST_DEVICE_ID);
@@ -374,34 +324,18 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_CheckCredIdInAcl_001, testing::ext
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context = authManager->GetAuthContext();
 
-    DistributedDeviceProfile::AccessControlProfile profile;
-    DistributedDeviceProfile::Accesser accesser;
-    accesser.SetAccesserDeviceId(TEST_DEVICE_ID);
-    accesser.SetAccesserUserId(TEST_USER_ID);
-    accesser.SetAccesserTokenId(TEST_TOKEN_ID);
-    accesser.SetAccesserCredentialIdStr(TEST_CREDENTIAL_ID);
-    profile.SetAccesser(accesser);
 
-    DistributedDeviceProfile::Accessee accessee;
-    accessee.SetAccesseeDeviceId(TEST_DEVICE_ID);
-    accessee.SetAccesseeUserId(TEST_USER_ID);
-    accessee.SetAccesseeTokenId(TEST_TOKEN_ID);
-    accessee.SetAccesseeCredentialIdStr(TEST_CREDENTIAL_ID);
-    profile.SetAccessee(accessee);
+    DistributedDeviceProfile::AccessControlProfile profile = TestCreateAcl(TEST_CREDENTIAL_ID, DM_LNN);
 
-    std::string jsonStr = R"(
-        {
-            "credentialId": {
-                "credType": 3,
-                "authorizedAppList": [0, 0]
-            }
+    std::string jsonStr = R"({
+        "credentialId": {
+            "credType": 3,
+            "authorizedAppList": [0, 0]
         }
-    )";
+    })";
     JsonObject credInfo(jsonStr);
 
-    uint32_t bindType = 3;
-
-    EXPECT_TRUE(authState->CheckCredIdInAcl(context, profile, credInfo, bindType));
+    EXPECT_TRUE(authState->CheckCredIdInAcl(context, profile, credInfo, DM_LNN));
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredType_001, testing::ext::TestSize.Level1)
@@ -411,34 +345,21 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredType_001, testing::ext::
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context = authManager->GetAuthContext();
 
-    std::string jsonStr = R"(
-        [
-            {
-                "credType": 1,
-                "credId": "credId1"
-            },
-            {
-                "credType": 2,
-                "credId": "credId2"
-            },
-            {
-                "credType": "invalid",
-                "credId": "credId3"
-            },
-            {
-                "credType": 4,
-                "credId": 12345
-            }
-        ]
-    )";
-    JsonObject credInfo(jsonStr);
-    JsonObject aclInfo;
+    std::string jsonCredStr = R"([
+        {"credType": 1, "credId": "0"},
+        {"credType": 2, "credId": "0"}
+    ])";
+    JsonObject credInfo(jsonCredStr);
+
+    std::string aclJsonStr = R"({"lnnAcl":3,"pointTopointAcl":256})";
+    JsonObject aclInfo(aclJsonStr);
+
+    std::string credTypeJsonStr = R"({"identicalCredType":1,"shareCredType":2})";
     JsonObject credTypeJson;
     authState->GetSrcCredType(context, credInfo, aclInfo, credTypeJson);
-    EXPECT_TRUE(context != nullptr);
+    EXPECT_TRUE(credTypeJson.Dump() == credTypeJsonStr);
 }
 
-// AuthSinkConfirmState
 HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_GetStateType_001, testing::ext::TestSize.Level1)
 {
     authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
@@ -502,8 +423,12 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_MatchFallBackCandidateList_001, t
     std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
     context = authManager->GetAuthContext();
 
-    authState->MatchFallBackCandidateList(context, AUTH_TYPE_PIN);
-    EXPECT_TRUE(context != nullptr);
+    authState->MatchFallBackCandidateList(context, DmAuthType::AUTH_TYPE_NFC);
+    EXPECT_TRUE(context->authTypeList.empty());
+
+    context->accessee.bundleName = "cast_engine_service";
+    authState->MatchFallBackCandidateList(context, DmAuthType::AUTH_TYPE_NFC);
+    EXPECT_EQ(context->authTypeList[0], DmAuthType::AUTH_TYPE_PIN);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ProcessBindAuthorize_001, testing::ext::TestSize.Level1)
@@ -549,6 +474,5 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ProcessNoBindAuthorize_001, testi
     context->accessee.credTypeList = R"({"lnnCredType": true})";
     EXPECT_EQ(authState->ProcessNoBindAuthorize(context), DM_OK);
 }
-
 }  // end namespace DistributedHardware
 }  // end namespace OHOS

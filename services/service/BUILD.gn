@@ -206,8 +206,6 @@ if (defined(ohos_lite)) {
       "src/device_manager_service_listener.cpp",
       "src/devicenamemgr/device_name_change_monitor.cpp",
       "src/devicenamemgr/device_name_manager.cpp",
-      "src/devicenamemgr/local_device_name_mgr.cpp",
-      "src/devicenamemgr/settings_data_event_monitor.cpp",
       "src/discovery/discovery_filter.cpp",
       "src/discovery/discovery_manager.cpp",
       "src/hichain/hichain_listener.cpp",
@@ -254,8 +252,6 @@ if (defined(ohos_lite)) {
       "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
       "cJSON:cjson",
-      "c_utils:utils",
-      "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
@@ -310,6 +306,10 @@ if (defined(ohos_lite)) {
       defines += [ "DEVICE_MANAGER_COMMON_FLAG" ]
     }
 
+    if (device_manager_feature_product == "default") {
+      defines += [ "SUPPORT_WISEDEVICE" ]
+    }
+
     subsystem_name = "distributedhardware"
 
     part_name = "device_manager"
@@ -348,8 +348,6 @@ if (defined(ohos_lite)) {
       "src/device_manager_service_listener.cpp",
       "src/devicenamemgr/device_name_change_monitor.cpp",
       "src/devicenamemgr/device_name_manager.cpp",
-      "src/devicenamemgr/local_device_name_mgr.cpp",
-      "src/devicenamemgr/settings_data_event_monitor.cpp",
       "src/discovery/discovery_filter.cpp",
       "src/discovery/discovery_manager.cpp",
       "src/hichain/hichain_listener.cpp",
@@ -396,7 +394,6 @@ if (defined(ohos_lite)) {
       "access_token:libtokenid_sdk",
       "cJSON:cjson",
       "c_utils:utils",
-      "common_event_service:cesfwk_core",
       "common_event_service:cesfwk_innerkits",
       "data_share:datashare_common",
       "data_share:datashare_consumer",
@@ -435,6 +432,10 @@ if (defined(ohos_lite)) {
     if (support_wifi && device_manager_feature_product == "default") {
       defines += [ "SUPPORT_WIFI" ]
       external_deps += [ "wifi:wifi_sdk" ]
+    }
+
+    if (device_manager_feature_product == "default") {
+      defines += [ "SUPPORT_WISEDEVICE" ]
     }
 
     if (support_power_manager) {

@@ -23,6 +23,7 @@
 #include "deviceprofile_connector.h"
 #include "multiple_user_connector.h"
 
+#include "auth_manager.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_random.h"
@@ -34,7 +35,6 @@
 #include "dm_auth_state_machine.h"
 #include "dm_auth_context.h"
 #include "dm_auth_message_processor.h"
-#include "auth_manager.h"
 #include "dm_auth_state.h"
 
 namespace OHOS {
@@ -149,8 +149,10 @@ AuthManager::~AuthManager()
         context_->successFinished = true;
         context_->authStateMachine->Stop();  // Stop statemMachine thread
         context_->timer->DeleteAll();
+        LOGI("AuthManager context variables destroy successful.");
     }
     bindParam_.clear();
+    LOGI("DmAuthManager destructor");
 }
 
 void AuthManager::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback)
@@ -548,7 +550,7 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     context_->pkgName = pkgName;
     context_->pkgLabel = GetBundleLabel(pkgName);
     context_->authType = (DmAuthType)authType;
-    context_->accesser.deviceName = context_->softbusConnector->GetLocalDeviceName();
+    context_->accesser.deviceName = context_->listener->GetLocalDisplayDeviceNameForPrivacy();
     context_->accesser.deviceType = context_->softbusConnector->GetLocalDeviceTypeId();
     context_->accesser.isOnline = false;
     uint32_t callingTokenId = 0;

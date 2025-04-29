@@ -134,21 +134,23 @@ bool DmDataShareCommonEventManager::UnsubscribeDataShareCommonEvent()
 void DmDataShareEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
+    int32_t eventState = data.GetCode();
     bool validEvent = false;
 
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY ||
-        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE) {
         validEvent = true;
     }
-    LOGI("Received datashare event: %{public}s", receiveEvent.c_str());
+    LOGI("Received datashare event: %{public}s, eventState: %{public}d", receiveEvent.c_str(), eventState);
     if (!validEvent) {
         LOGE("Invalied datashare type event.");
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { callback_(receiveEvent); });
+    ffrt::submit([=]() { callback_(receiveEvent, eventState); });
 #else
-    std::thread dealThread([=]() { callback_(receiveEvent); });
+    std::thread dealThread([=]() { callback_(receiveEvent, eventState); });
     int32_t ret = pthread_setname_np(dealThread.native_handle(), DEAL_THREAD);
     if (ret != DM_OK) {
         LOGE("dealThread setname failed.");

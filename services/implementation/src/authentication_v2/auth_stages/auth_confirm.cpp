@@ -26,6 +26,7 @@
 #include "dm_log.h"
 #include "dm_negotiate_process.h"
 #include "dm_softbus_cache.h"
+#include "multiple_user_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -190,7 +191,7 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
     uint32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
-        std::string trustDeviceIdHash = Crypto::Sha256(trustDeviceId);
+        std::string trustDeviceIdHash = Crypto::GetUdidHash(trustDeviceId);
         if ((trustDeviceIdHash != context->accessee.deviceIdHash &&
             trustDeviceIdHash != context->accesser.deviceIdHash)) {
             LOGE("devId %{public}s hash %{public}s, accesser devId %{public}s.", GetAnonyString(trustDeviceId).c_str(),
@@ -309,7 +310,7 @@ bool AuthSrcConfirmState::IdenticalAccountAclCompare(std::shared_ptr<DmAuthConte
     LOGI("start.");
     return accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
-        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash;
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash;
 }
 
 bool AuthSrcConfirmState::ShareAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -318,7 +319,7 @@ bool AuthSrcConfirmState::ShareAclCompare(std::shared_ptr<DmAuthContext> context
     LOGI("start.");
     return accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
-        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash;
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash;
 }
 
 bool AuthSrcConfirmState::Point2PointAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -328,13 +329,13 @@ bool AuthSrcConfirmState::Point2PointAclCompare(std::shared_ptr<DmAuthContext> c
     return (accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
         accesser.GetAccesserTokenId() == context->accesser.tokenId &&
-        Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash &&
-        Crypto::Sha256(std::to_string(accessee.GetAccesseeTokenId())) == context->accessee.tokenIdHash) ||
+        Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash &&
+        Crypto::GetTokenIdHash(std::to_string(accessee.GetAccesseeTokenId())) == context->accessee.tokenIdHash) ||
         (accessee.GetAccesseeDeviceId() == context->accesser.deviceId &&
         accessee.GetAccesseeUserId() == context->accesser.userId &&
         accessee.GetAccesseeTokenId() == context->accesser.tokenId &&
-        Crypto::Sha256(accesser.GetAccesserDeviceId()) == context->accessee.deviceIdHash &&
-        Crypto::Sha256(std::to_string(accesser.GetAccesserTokenId())) == context->accessee.tokenIdHash);
+        Crypto::GetUdidHash(accesser.GetAccesserDeviceId()) == context->accessee.deviceIdHash &&
+        Crypto::GetTokenIdHash(std::to_string(accesser.GetAccesserTokenId())) == context->accessee.tokenIdHash);
 }
 
 bool AuthSrcConfirmState::LnnAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -346,8 +347,8 @@ bool AuthSrcConfirmState::LnnAclCompare(std::shared_ptr<DmAuthContext> context,
         (accessee.GetAccesseeDeviceId() == context->accesser.deviceId &&
         accessee.GetAccesseeUserId() == context->accesser.userId)) &&
         accesser.GetAccesserTokenId() == 0 && accesser.GetAccesserBundleName() == "" &&
-        (Crypto::Sha256(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash ||
-        Crypto::Sha256(accesser.GetAccesserDeviceId()) == context->accessee.deviceIdHash) &&
+        (Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash ||
+        Crypto::GetUdidHash(accesser.GetAccesserDeviceId()) == context->accessee.deviceIdHash) &&
         accessee.GetAccesseeTokenId() == 0 && accessee.GetAccesseeBundleName() == "";
 }
 
@@ -361,14 +362,14 @@ void AuthSrcConfirmState::GetSrcCredentialInfo(std::shared_ptr<DmAuthContext> co
     }
     // get share credential
     if (context->accesser.accountIdHash != context->accessee.accountIdHash &&
-        context->accesser.accountIdHash != Crypto::Sha256("ohosAnonymousUid") &&
-        context->accessee.accountIdHash != Crypto::Sha256("ohosAnonymousUid")) {
+        context->accesser.accountIdHash != Crypto::GetAccountIdHash16("ohosAnonymousUid") &&
+        context->accessee.accountIdHash != Crypto::GetAccountIdHash16("ohosAnonymousUid")) {
         GetShareCredentialInfo(context, credInfo);
         GetP2PCredentialInfo(context, credInfo);
     }
     // get point_to_point credential
-    if (context->accesser.accountIdHash == Crypto::Sha256("ohosAnonymousUid") ||
-        context->accessee.accountIdHash == Crypto::Sha256("ohosAnonymousUid")) {
+    if (context->accesser.accountIdHash == Crypto::GetAccountIdHash16("ohosAnonymousUid") ||
+        context->accessee.accountIdHash == Crypto::GetAccountIdHash16("ohosAnonymousUid")) {
         GetP2PCredentialInfo(context, credInfo);
     }
     std::vector<std::string> deleteCredInfo;
@@ -394,7 +395,7 @@ void AuthSrcConfirmState::GetIdenticalCredentialInfo(std::shared_ptr<DmAuthConte
     CHECK_NULL_VOID(context);
     JsonObject queryParams;
     queryParams[FILED_DEVICE_ID] = context->accesser.deviceId;
-    queryParams[FILED_USER_ID] = context->accesser.accountId;
+    queryParams[FILED_USER_ID] = MultipleUserConnector::GetOhosAccountNameByUserId(context->accesser.userId);
     queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_RELATED;
     CHECK_NULL_VOID(context->hiChainAuthConnector);
     if (context->hiChainAuthConnector->QueryCredentialInfo(context->accesser.userId, queryParams, credInfo) != DM_OK) {
@@ -488,7 +489,20 @@ int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> co
         return STOP_BIND;
     }
 
-    if (IsScreenLocked()) {
+    NodeBasicInfo nodeBasicInfo;
+    int32_t result = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (result != SOFTBUS_OK) {
+        LOGE("GetLocalNodeDeviceInfo from dsofbus fail, result=%{public}d", result);
+        return STOP_BIND;
+    }
+ 
+    if (nodeBasicInfo.deviceTypeId == TYPE_TV_ID) {
+        int32_t ret = AuthManagerBase::EndDream();
+        if (ret != DM_OK) {
+            LOGE("fail to end dream, err:%{public}d", ret);
+            return STOP_BIND;
+        }
+    } else if (IsScreenLocked()) {
         LOGE("AuthSinkConfirmState::ShowStartAuthDialog screen is locked.");
         context->reason = ERR_DM_BIND_USER_CANCEL;
         context->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);

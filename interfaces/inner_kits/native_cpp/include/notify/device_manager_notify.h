@@ -90,6 +90,7 @@ public:
         std::shared_ptr<SetRemoteDeviceNameCallback> callback);
     int32_t UnRegisterSetRemoteDeviceNameCallback(const std::string &pkgName, const std::string &deviceId);
     void OnSetRemoteDeviceNameResult(const std::string &pkgName, const std::string &deviceId, int32_t code);
+    void UnRegisterPinHolderCallback(const std::string &pkgName);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);

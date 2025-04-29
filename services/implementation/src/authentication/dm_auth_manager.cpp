@@ -405,8 +405,10 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     }
     InitAuthState(pkgName, authType, deviceId, extra);
     isAuthenticateDevice_ = true;
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
     processInfo_.pkgName = pkgName;
-    processInfo_.userId = authRequestContext_->localUserId;
+    processInfo_.userId = userId;
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
         softbusConnector_->JoinLnn(deviceId, true);
@@ -1714,6 +1716,24 @@ int32_t DmAuthManager::GetPinCode(std::string &code)
     return DM_OK;
 }
 
+void DmAuthManager::CheckAndEndTvDream()
+{
+    NodeBasicInfo nodeBasicInfo;
+    int32_t result = GetLocalNodeDeviceInfo(DM_PKG_NAME, &nodeBasicInfo);
+    if (result != SOFTBUS_OK) {
+        LOGE("GetLocalNodeDeviceInfo from dsofbus fail, result=%{public}d", result);
+        return;
+    }
+ 
+    if (nodeBasicInfo.deviceTypeId == TYPE_TV_ID) {
+        int32_t ret = AuthManagerBase::EndDream();
+        if (ret != DM_OK) {
+            LOGE("fail to end dream, err:%{public}d", ret);
+            return;
+        }
+    }
+}
+
 void DmAuthManager::ShowConfigDialog()
 {
     if (authResponseContext_ == nullptr) {
@@ -1731,6 +1751,7 @@ void DmAuthManager::ShowConfigDialog()
         StartAuthProcess(authenticationType_);
         return;
     }
+    CheckAndEndTvDream();
     LOGI("ShowConfigDialog start");
     JsonObject jsonObj;
     jsonObj[TAG_AUTH_TYPE] = AUTH_TYPE_PIN;
@@ -2149,7 +2170,7 @@ int32_t DmAuthManager::GetAuthCode(const std::string &pkgName, std::string &pinC
         LOGE("GetAuthCode failed, pkgName not supported.");
         return ERR_DM_FAILED;
     }
-    pinCode = importAuthCode_;
+    pinCode = std::to_string(std::atoi(importAuthCode_.c_str()));
     return DM_OK;
 }
 

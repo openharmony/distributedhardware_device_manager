@@ -1056,6 +1056,67 @@ HWTEST_F(DmPinHolderTest, CloseSessionMsgScene_101, testing::ext::TestSize.Level
     pinHolder->OnSessionClosed(SESSION_ID);
     EXPECT_EQ(pinHolder->sessionId_, SESSION_ID_INVALID);
 }
+
+HWTEST_F(DmPinHolderTest, OnSessionOpened_104, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    pinHolderSession->RegisterSessionCallback(pinHolder);
+    int sessionId = 1;
+    int result = 1;
+    int ret = pinHolderSession->OnSessionOpened(sessionId, result);
+    sessionId = 2;
+    result = 2;
+    ret = pinHolderSession->OnSessionOpened(sessionId, result);
+    int closeSessionId = 2;
+    pinHolderSession->OnSessionClosed(closeSessionId);
+    closeSessionId = 1;
+    pinHolderSession->OnSessionClosed(closeSessionId);
+    std::string dataStr = "a**************2";
+    void *data = nullptr;
+    uint32_t dataLen = 0;
+    data = reinterpret_cast<void *>(dataStr.data());
+    dataLen = static_cast<uint32_t>(dataStr.length());
+    pinHolderSession->OnBytesReceived(sessionId, data, dataLen);
+    std::string dataStr2 = "a**************3";
+    data = reinterpret_cast<void *>(dataStr2.data());
+    dataLen = static_cast<uint32_t>(dataStr2.length());
+    pinHolderSession->OnBytesReceived(sessionId, data, dataLen);
+    pinHolderSession->UnRegisterSessionCallback();
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DmPinHolderTest, OnSessionOpened_105, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
+    std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
+    std::shared_ptr<PinHolderSession> pinHolderSession = std::make_shared<PinHolderSession>();
+    pinHolderSession->RegisterSessionCallback(pinHolder);
+    int sessionId = 1;
+    int result = 1;
+    int ret = pinHolderSession->OnSessionOpened(sessionId, result);
+    pinHolderSession->UnRegisterSessionCallback();
+    ret = pinHolderSession->OnSessionOpened(sessionId, result);
+    pinHolderSession->RegisterSessionCallback(pinHolder);
+    std::string dataStr = "a**************2";
+    void *data = nullptr;
+    uint32_t dataLen = 0;
+    data = reinterpret_cast<void *>(dataStr.data());
+    dataLen = static_cast<uint32_t>(dataStr.length());
+    pinHolderSession->OnBytesReceived(sessionId, data, dataLen);
+    pinHolderSession->UnRegisterSessionCallback();
+    std::string dataStr2 = "a**************3";
+    data = reinterpret_cast<void *>(dataStr2.data());
+    dataLen = static_cast<uint32_t>(dataStr2.length());
+    pinHolderSession->OnBytesReceived(sessionId, data, dataLen);
+    int closeSessionId = 2;
+    pinHolderSession->OnSessionClosed(closeSessionId);
+    pinHolderSession->UnRegisterSessionCallback();
+    closeSessionId = 1;
+    pinHolderSession->OnSessionClosed(closeSessionId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

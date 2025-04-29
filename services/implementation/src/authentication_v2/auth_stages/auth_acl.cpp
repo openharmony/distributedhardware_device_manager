@@ -40,6 +40,7 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 
     // Synchronize the local SP information, the format is uncertain, not done for now
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
+    context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
     LOGI("AuthSinkDataSyncState::Action ok");
     return DM_OK;
 }
@@ -58,15 +59,24 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
         // Query the ACL of the sink end. Compare the ACLs at both ends.
         context->softbusConnector->SyncLocalAclListProcess({context->accesser.deviceId, context->accesser.userId},
             {context->accessee.deviceId, context->accessee.userId}, context->accessee.aclStrList);
-
+        context->accesser.deviceName = context->softbusConnector->GetLocalDeviceName();
         // Save this acl
         SetAclInfo(context);
         context->authMessageProcessor->PutAccessControlList(context, context->accesser, context->accessee.deviceId);
         // Synchronize the local SP information, the format is uncertain, not done for now
     }
 
+    std::string peerDeviceId = "";
+    peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
+    if (peerDeviceId.empty()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
+    }
+    if (peerDeviceId.empty()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
+    }
+    bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
     // Trigger networking
-    if (!context->accesser.isOnline) {
+    if (!context->accesser.isOnline || isNeedJoinLnn) {
         if (context->connSessionType == CONN_SESSION_TYPE_HML) {
             context->softbusConnector->JoinLnnByHml(context->sessionId, context->accesser.transmitSessionKeyId,
                 context->accessee.transmitSessionKeyId);

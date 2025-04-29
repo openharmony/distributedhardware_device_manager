@@ -20,6 +20,7 @@
 
 #include "auth_manager.h"
 #include "deviceprofile_connector_mock.h"
+#include "hichain_auth_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -38,6 +39,7 @@ private:
     std::shared_ptr<AuthManager> authManager;
     std::shared_ptr<DmAuthContext> context;
     static std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock;
+    static std::shared_ptr<HiChainAuthConnectorMock> dmHiChainAuthConnectorMock;
 };
 
 }  // end namespace DistributedHardware

@@ -44,6 +44,11 @@ constexpr const char* ETH_IP = "ETH_IP";
 constexpr const char* ETH_PORT = "ETH_PORT";
 constexpr const char* NCM_IP = "NCM_IP";
 constexpr const char* NCM_PORT = "NCM_PORT";
+
+constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
+constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BLE_MASK = 0b0100;
+constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BR_MASK = 0b1000;
+constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_NCM_MASK = 0b10000000;
 namespace {
     const char* TAG_ACL = "accessControlTable";
     const char* TAG_DMVERSION = "dmVersion";
@@ -715,6 +720,55 @@ void SoftbusConnector::DeleteOffLineTimer(std::string &udidHash)
     if (deviceStateManagerCallback_ != nullptr) {
         deviceStateManagerCallback_->DeleteOffLineTimer(udidHash);
     }
+}
+
+bool SoftbusConnector::CheckIsNeedJoinLnn(const std::string &udid, const std::string &deviceId)
+{
+    if (udid.empty() || deviceId.empty()) {
+        return false;
+    }
+    std::string connectAddr;
+    auto addrInfo = GetConnectAddr(deviceId, connectAddr);
+    if (addrInfo == nullptr) {
+        LOGE("addrInfo is nullptr.");
+        return false;
+    }
+    std::string networkId = "";
+    SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, networkId);
+    if (networkId.empty()) {
+        LOGI("networkId is empty: %{public}s", GetAnonyString(udid).c_str());
+        return true;
+    }
+    int32_t networkType = -1;
+    int32_t ret = GetNodeKeyInfo(DM_PKG_NAME, networkId.c_str(), NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
+        reinterpret_cast<uint8_t *>(&networkType), LNN_COMMON_LEN);
+    if (ret != DM_OK || networkType < 0) {
+        LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed, ret:%{public}d.", ret);
+        return false;
+    }
+    LOGI("GetNetworkTypeByNetworkId networkType %{public}d.", networkType);
+    uint32_t addrTypeMask = 0;
+    switch (addrInfo->type) {
+        case CONNECTION_ADDR_WLAN:
+            addrTypeMask = USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK;
+            break;
+        case CONNECTION_ADDR_BR:
+            addrTypeMask = USERID_SYNC_DISCOVERY_TYPE_BR_MASK;
+            break;
+        case CONNECTION_ADDR_BLE:
+            addrTypeMask = USERID_SYNC_DISCOVERY_TYPE_BLE_MASK;
+            break;
+        case CONNECTION_ADDR_NCM:
+            addrTypeMask = USERID_SYNC_DISCOVERY_TYPE_NCM_MASK;
+            break;
+        default:
+            LOGE("Unknown addr type.");
+            return false;
+    }
+    if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
+        return false;
+    }
+    return true;
 }
 
 // isHash：传入的deviceId是否为哈希值

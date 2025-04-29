@@ -42,9 +42,7 @@ constexpr int32_t SALT_LENGTH = 8;
 const std::string SALT_DEFAULT = "salt_defsalt_def";
 constexpr int SHORT_ACCOUNTID_ID_HASH_LENGTH = 6;
 constexpr const char* DB_KEY_DELIMITER = "###";
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #define DM_MAX_DEVICE_ID_LEN (97)
-#endif
 
 uint32_t HexifyLen(uint32_t len)
 {
@@ -122,6 +120,34 @@ int32_t Crypto::GetUdidHash(const std::string &udid, unsigned char *udidHash)
         return ERR_DM_FAILED;
     }
     return DM_OK;
+}
+
+DM_EXPORT std::string Crypto::GetUdidHash(const std::string &udid)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH] = "";
+    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    DmGenerateStrHash(udid.data(), udid.size(), hash, SHA256_DIGEST_LENGTH, 0);
+    if (ConvertBytesToHexString(reinterpret_cast<char *>(udidHash), SHORT_DEVICE_ID_HASH_LENGTH + 1,
+        reinterpret_cast<const uint8_t *>(hash), SHORT_DEVICE_ID_HASH_LENGTH / HEX_TO_UINT8) != DM_OK) {
+        LOGE("ConvertBytesToHexString failed.");
+        return "";
+    }
+    std::string udidHashStr = std::string(udidHash);
+    return udidHashStr;
+}
+
+DM_EXPORT std::string Crypto::GetTokenIdHash(const std::string &tokenId)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH] = "";
+    char idHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    DmGenerateStrHash(tokenId.data(), tokenId.size(), hash, SHA256_DIGEST_LENGTH, 0);
+    if (ConvertBytesToHexString(reinterpret_cast<char *>(idHash), SHA256_DIGEST_LENGTH + 1,
+        reinterpret_cast<const uint8_t *>(hash), SHA256_DIGEST_LENGTH / HEX_TO_UINT8) != DM_OK) {
+        LOGE("ConvertBytesToHexString failed.");
+        return "";
+    }
+    std::string tokenIdHash = std::string(idHash);
+    return tokenIdHash;
 }
 
 DM_EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
@@ -222,6 +248,20 @@ DM_EXPORT int32_t Crypto::GetAccountIdHash(const std::string &accountId,
         return ERR_DM_FAILED;
     }
     return DM_OK;
+}
+
+DM_EXPORT std::string Crypto::GetAccountIdHash16(const std::string &accountId)
+{
+    unsigned char hash[SHA256_DIGEST_LENGTH] = "";
+    char accountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    DmGenerateStrHash(accountId.data(), accountId.size(), hash, SHA256_DIGEST_LENGTH, 0);
+    if (ConvertBytesToHexString(reinterpret_cast<char *>(accountIdHash), SHA256_DIGEST_LENGTH + 1,
+        reinterpret_cast<const uint8_t *>(hash), SHA256_DIGEST_LENGTH / HEX_TO_UINT8) != DM_OK) {
+        LOGE("ConvertBytesToHexString failed.");
+        return "";
+    }
+    std::string accountHashStr = std::string(accountIdHash);
+    return accountHashStr;
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

@@ -71,6 +71,14 @@ public:
     DM_EXPORT static std::string GetOhosAccountIdByUserId(int32_t userId);
 
     /**
+     * @brief Get the Ohos Account Name By Userid
+     *
+     * @param userId the user id in which account login
+     * @return std::string the account name
+     */
+    DM_EXPORT static std::string GetOhosAccountNameByUserId(int32_t userId);
+
+    /**
      * @tc.name: MultipleUserConnector::SetSwitchOldAccountId
      * @tc.desc: Set Switch Old UserId of the Multiple User Connector
      * @tc.type: FUNC

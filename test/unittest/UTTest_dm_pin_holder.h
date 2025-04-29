@@ -255,6 +255,11 @@ public:
         (void)deviceName;
         (void)code;
     }
+
+    virtual std::string GetLocalDisplayDeviceNameForPrivacy()
+    {
+        return "";
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

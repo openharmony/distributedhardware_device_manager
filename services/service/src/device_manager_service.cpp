@@ -70,6 +70,7 @@ namespace {
     const int32_t NORMAL = 0;
     const int32_t SYSTEM_BASIC = 1;
     const int32_t SYSTEM_CORE = 2;
+    constexpr int32_t NETWORK_AVAILABLE = 3;
     constexpr const char *ALL_PKGNAME = "";
     constexpr const char *NETWORKID = "NETWORK_ID";
     constexpr uint32_t INVALIED_BIND_LEVEL = 0;
@@ -79,6 +80,8 @@ namespace {
     const std::string USERID_CHECKSUM_DISCOVER_TYPE_KEY = "discoverType";
     constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
     constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BLE_MASK = 0b0100;
+    constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BR_MASK = 0b1000;
+    constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_NCM_MASK = 0b10000000;
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
     const std::string USERID_CHECKSUM_ISCHANGE_KEY = "ischange";
     constexpr const char* USER_SWITCH_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userSwitchByWifi";
@@ -170,12 +173,15 @@ DM_EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
     if (dataShareCommonEventManager_ == nullptr) {
         dataShareCommonEventManager_ = std::make_shared<DmDataShareCommonEventManager>();
     }
-    DataShareEventCallback callback = [=](const auto &arg1) {
+    DataShareEventCallback callback = [=](const auto &arg1, const auto &arg2) {
         if (arg1 == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
             DeviceNameManager::GetInstance().DataShareReady();
         }
         if (arg1 == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
             DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
+        }
+        if (arg1 == CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE && arg2 == NETWORK_AVAILABLE) {
+            this->CheckRegisterInfoWithWise();
         }
     };
     std::vector<std::string> commonEventVec;
@@ -3024,7 +3030,6 @@ void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t pr
 void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId)
 {
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
-    CheckRegisterInfoWithWise(currentUserId);
     MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     if (IsPC()) {
         return;
@@ -3357,12 +3362,9 @@ std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
     return dmServiceImplExtResident_->GetDeviceNamePrefixs();
 }
 
-void DeviceManagerService::CheckRegisterInfoWithWise(int32_t curUserId)
+void DeviceManagerService::CheckRegisterInfoWithWise()
 {
-    LOGI("In curUserId:%{public}d", curUserId);
-    if (curUserId == -1) {
-        return;
-    }
+    LOGI("In");
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("CheckRegisterInfoWithWise failed, adapter instance not init or init failed.");
         return;
@@ -3517,6 +3519,30 @@ void DeviceManagerService::ProcessSyncAccountLogout(const std::string &accountId
         return;
     }
     dmServiceImpl_->HandleAccountLogoutEvent(userId, accountId, peerUdid);
+}
+
+int32_t DeviceManagerService::UnRegisterPinHolderCallback(const std::string &pkgName)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call UnRegisterPinHolderCallback.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed, pkgname: %{public}s.", pkgName.c_str());
+        return ERR_DM_FAILED;
+    }
+    if (!PermissionManager::GetInstance().CheckProcessNameValidOnPinHolder(processName)) {
+        LOGE("The caller: %{public}s is not in white list.", processName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("begin.");
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
+    return pinHolder_->UnRegisterPinHolderCallback(pkgName);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

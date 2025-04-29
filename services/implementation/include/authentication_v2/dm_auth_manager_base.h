@@ -96,6 +96,7 @@ extern const int32_t HML_SESSION_TIMEOUT;
 extern const int32_t SESSION_HEARTBEAT_TIMEOUT;
 extern const int32_t PIN_AUTH_TIMEOUT;
 extern const int32_t EVENT_TIMEOUT;
+extern const int32_t WAIT_TIMEOUT;
 
 extern const int32_t DM_AUTH_TYPE_MAX;
 extern const int32_t DM_AUTH_TYPE_MIN;
@@ -236,6 +237,7 @@ public:
     // Public functions
     static std::string ConvertSrcVersion(const std::string &version, const std::string &edition);
     static int32_t DmGetUserId(int32_t displayId);
+    static int32_t EndDream();
     bool IsTransferReady();
     void SetTransferReady(bool version);
     void EnableInsensibleSwitching();
