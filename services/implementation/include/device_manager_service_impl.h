@@ -263,7 +263,7 @@ private:
     std::map<std::string, int> deviceId2SessionIdMap_;
     std::map<int, std::shared_ptr<Session>> sessionsMap_;  // sessionId corresponds to the session object
     std::map<std::string, std::mutex> deviceIdMutexMap_;  // Lock corresponding to the device ID
-    std::mutex mapMutex_;  // sessionsMap_的锁
+    std::mutex mapMutex_;  // sessionsMap_ lock
     std::map<int, std::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
     std::map<int, std::mutex> sessionEnableMutexMap_;      // Lock corresponding to the session
     std::map<int, bool> sessionEnableCvReadyMap_;  // Condition variable ready flag

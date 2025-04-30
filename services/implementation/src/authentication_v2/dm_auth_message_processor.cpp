@@ -1000,7 +1000,7 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     if (jsonObject[TAG_BUNDLE_NAME_V2].IsString()) {
         context->accesser.bundleName = jsonObject[TAG_BUNDLE_NAME_V2].Get<std::string>();
     }
-    
+
     if (jsonObject[TAG_EXTRA_INFO].IsString()) {
         context->accesser.extraInfo = jsonObject[TAG_EXTRA_INFO].Get<std::string>();
     }
@@ -1269,7 +1269,14 @@ int32_t DmAuthMessageProcessor::CreateMessageForwardUltrasonicNegotiate(std::sha
 void DmAuthMessageProcessor::CreateAndSendMsg(DmMessageType msgType, std::shared_ptr<DmAuthContext> context)
 {
     auto message = CreateMessage(msgType, context);
-    context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
+    int32_t ret = context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
+    if (ret != DM_OK) {
+        if (context->direction == DM_AUTH_SOURCE) {
+            context->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
+        } else {
+            context->authStateMachine->TransitionTo(std::make_shared<AuthSinkFinishState>());
+        }
+    }
 }
 
 std::string DmAuthMessageProcessor::CompressSyncMsg(std::string &inputStr)

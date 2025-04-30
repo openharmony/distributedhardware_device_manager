@@ -96,7 +96,6 @@ extern const int32_t HML_SESSION_TIMEOUT;
 extern const int32_t SESSION_HEARTBEAT_TIMEOUT;
 extern const int32_t PIN_AUTH_TIMEOUT;
 extern const int32_t EVENT_TIMEOUT;
-extern const int32_t WAIT_TIMEOUT;
 
 extern const int32_t DM_AUTH_TYPE_MAX;
 extern const int32_t DM_AUTH_TYPE_MIN;

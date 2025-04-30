@@ -262,18 +262,9 @@ DmEventType DmAuthStateMachine::WaitExpectEvent(DmEventType eventType)
     std::unique_lock lock(eventMutex_);
     auto startTime = std::chrono::high_resolution_clock::now();
     while (running_.load()) {
-        if (eventCv_.wait_for(lock, std::chrono::milliseconds(WAIT_TIMEOUT), [&] {
-            return !running_.load() || !eventQueue_.empty() || eventCvReady_;
-        })) {
-            eventCvReady_ = false;
-            LOGI("DmAuthStateMachine: WaitExpectEvent wait successful.");
-        } else {
-            if (!eventCvReady_) {
-                LOGE("DmAuthStateMachine: WaitExpectEvent wait timeout.");
-                return DmEventType::ON_TIMEOUT;
-            }
-            eventCvReady_ = false;
-        }
+        eventCv_.wait(lock, [&] {
+            return !running_.load() || !eventQueue_.empty();
+        });
         if (!running_.load()) {
             return DmEventType::ON_FAIL;
         }
@@ -305,7 +296,6 @@ void DmAuthStateMachine::NotifyEventFinish(DmEventType eventType)
     {
         std::unique_lock lock(eventMutex_);
         eventQueue_.push(eventType);
-        eventCvReady_ = true;
     }
     eventCv_.notify_one();
     if (eventType == DmEventType::ON_FAIL) {
