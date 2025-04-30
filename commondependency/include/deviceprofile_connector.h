@@ -145,6 +145,8 @@ public:
     virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid) = 0;
     virtual int32_t HandleUserStop(int32_t stopUserId, const std::string &localUdid,
         const std::vector<std::string> &acceptEventUdids) = 0;
+    virtual int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
@@ -237,9 +239,9 @@ public:
         const std::string &remoteUdid, const std::vector<int32_t> &remoteUserIds);
     DM_EXPORT std::map<int32_t, int32_t> GetUserIdAndBindLevel(
         const std::string &localUdid, const std::string &peerUdid);
-    DM_EXPORT void UpdateACL(std::string &localUdid,
-        const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
-        const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds);
+    DM_EXPORT void UpdateACL(std::string &localUdid, const std::vector<int32_t> &localUserIds,
+        const std::string &remoteUdid, const std::vector<int32_t> &remoteFrontUserIds,
+        const std::vector<int32_t> &remoteBackUserIds, DmOfflineParam &offlineParam);
     DM_EXPORT std::multimap<std::string, int32_t> GetDevIdAndUserIdByActHash(
         const std::string &localUdid, const std::string &peerUdid, int32_t peerUserId,
         const std::string &peerAccountHash);
@@ -311,6 +313,8 @@ public:
     DM_EXPORT void AclHashVecFromJson(const JsonItemObject &itemObject, std::vector<AclHashItem> &values);
     void DeleteCacheAcl(std::vector<int64_t> delAclIdVec,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles);
+    DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
+        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -346,7 +350,8 @@ private:
     std::vector<DistributedDeviceProfile::AccessControlProfile> GetAclProfileByUserId(const std::string &localUdid,
         int32_t userId, const std::string &remoteUdid);
     void DeleteSigTrustACL(DistributedDeviceProfile::AccessControlProfile profile, const std::string &remoteUdid,
-        const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds);
+        const std::vector<int32_t> &remoteFrontUserIds, const std::vector<int32_t> &remoteBackUserIds,
+        DmOfflineParam &offlineParam);
     void UpdatePeerUserId(DistributedDeviceProfile::AccessControlProfile profile, std::string &localUdid,
         const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &remoteFrontUserIds);

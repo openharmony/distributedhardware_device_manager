@@ -57,6 +57,8 @@ void DmCommToolFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<InnerCommMsg> innerCommMsg = std::make_shared<InnerCommMsg>(remoteNetworkId, commMsg, socketId);
     dmCommToolPtr_->ProcessReceiveUserIdsEvent(innerCommMsg);
     dmCommToolPtr_->ProcessResponseUserIdsEvent(innerCommMsg);
+    dmCommToolPtr_->ProcessReceiveCommonEvent(innerCommMsg);
+    dmCommToolPtr_->ProcessResponseCommonEvent(innerCommMsg);
     dmCommToolPtr_->GetDMTransportPtr();
     dmCommToolPtr_->GetEventHandler();
 }

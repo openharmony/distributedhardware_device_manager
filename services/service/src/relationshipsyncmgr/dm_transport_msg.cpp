@@ -23,6 +23,7 @@ const int32_t MAX_USER_ID_NUM = 5;
 const int32_t MAX_BACKGROUND_USER_ID_NUM = 5;
 const char* const FOREGROUND_USERIDS_MSG_USERIDS_KEY = "foregroundUserIds";
 const char* const BACKGROUND_USERIDS_MSG_USERIDS_KEY = "backgroundUserIds";
+const char* const IS_NEW_EVENT_KEY = "isNewEvent";
 const char* const COMM_MSG_CODE_KEY = "code";
 const char* const COMM_MSG_MSG_KEY = "msg";
 const char* const DSOFTBUS_NOTIFY_USERIDS_UDIDKEY = "remoteUdid";
@@ -65,6 +66,7 @@ void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
         }
     }
     cJSON_AddItemToObject(jsonObject, BACKGROUND_USERIDS_MSG_USERIDS_KEY, backgroundUserIdArr);
+    cJSON_AddBoolToObject(jsonObject, IS_NEW_EVENT_KEY, userIdsMsg.isNewEvent);
 }
 
 void FromJson(const cJSON *jsonObject, UserIdsMsg &userIdsMsg)
@@ -103,6 +105,10 @@ void FromJson(const cJSON *jsonObject, UserIdsMsg &userIdsMsg)
                 userIdsMsg.backgroundUserIds.push_back(userId);
             }
         }
+    }
+    cJSON *isNewEventJson = cJSON_GetObjectItem(jsonObject, IS_NEW_EVENT_KEY);
+    if (cJSON_IsBool(isNewEventJson)) {
+        userIdsMsg.isNewEvent = (isNewEventJson->valueint != 0);
     }
 }
 

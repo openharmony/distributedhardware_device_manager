@@ -77,6 +77,7 @@ ohos_fuzztest("DmTransPortFuzzTest") {
     "device_auth:deviceauth_sdk",
     "dsoftbus:softbus_client",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",

@@ -60,6 +60,7 @@ struct RelationShipChangeMsg {
     // The foreground and background user id infos
     std::vector<UserIdInfo> userIdInfos;
     std::string credId;
+    bool isNewEvent;
 
     explicit RelationShipChangeMsg();
     bool ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) const;

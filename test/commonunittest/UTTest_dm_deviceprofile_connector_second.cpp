@@ -197,10 +197,13 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::e
     remoteFrontUserIds.push_back(userIds);
     std::vector<int32_t> remoteBackUserIds;
     remoteBackUserIds.push_back(userIds);
-    DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profile, remoteUdid, remoteFrontUserIds, remoteBackUserIds);
+    DmOfflineParam offlineParam;
+    DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profile, remoteUdid, remoteFrontUserIds, remoteBackUserIds,
+        offlineParam);
 
     remoteUdid = "deviceIdEe";
-    DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profile, remoteUdid, remoteFrontUserIds, remoteBackUserIds);
+    DeviceProfileConnector::GetInstance().DeleteSigTrustACL(profile, remoteUdid, remoteFrontUserIds, remoteBackUserIds,
+        offlineParam);
 
     int32_t userIdee = 0;
     accessee.SetAccesseeUserId(userIdee);

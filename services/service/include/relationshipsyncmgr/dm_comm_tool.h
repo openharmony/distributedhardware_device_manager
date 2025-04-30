@@ -16,12 +16,16 @@
 #ifndef OHOS_DM_COMM_TOOL_H
 #define OHOS_DM_COMM_TOOL_H
 
+#include <mutex>
+#include <queue>
 #include "dm_transport.h"
 #include "dm_transport_msg.h"
 
+#include "ffrt.h"
+
 namespace OHOS {
 namespace DistributedHardware {
-
+using EventCallback = std::function<void ()>;
 class DMCommTool : public std::enable_shared_from_this<DMCommTool> {
 public:
     DMCommTool();
@@ -49,6 +53,7 @@ public:
         ~DMCommToolEventHandler() override = default;
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     private:
+        void ParseUserIdsMsg(std::shared_ptr<InnerCommMsg> commMsg, UserIdsMsg &userIdsMsg);
         std::weak_ptr<DMCommTool> dmCommToolWPtr_;
     };
     std::shared_ptr<DMCommTool::DMCommToolEventHandler> GetEventHandler();
@@ -58,9 +63,14 @@ public:
     void ProcessResponseUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg);
     int32_t SendLogoutAccountInfo(const std::string &rmtNetworkId, const std::string &accountId, int32_t userId);
     void ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> commMsg);
+    int32_t StartCommonEvent(std::string commonEventType, EventCallback eventCallback);
+    void ProcessReceiveCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg);
+    void ProcessResponseCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg);
 private:
     std::shared_ptr<DMTransport> dmTransportPtr_;
     std::shared_ptr<DMCommTool::DMCommToolEventHandler> eventHandler_;
+    mutable std::mutex eventMutex_;
+    std::shared_ptr<ffrt::queue> eventQueue_;
 };
 } // DistributedHardware
 } // OHOS
