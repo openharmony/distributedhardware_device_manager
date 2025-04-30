@@ -1872,6 +1872,7 @@ HWTEST_F(DeviceManagerServiceTest, HandleShareUnbindBroadCast_001, testing::ext:
     std::string credId = "123456";
     int32_t userId = 1001;
     std::string localUdid = "localUdid";
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleShareUnbindBroadCast(_, _, _)).Times(0);
 
     DeviceManagerService::GetInstance().HandleShareUnbindBroadCast(userId, credId);
 }
