@@ -717,11 +717,11 @@ int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
     {
         std::lock_guard<std::mutex> lock(sessionEnableMutexMap_[sessionId]);
         if (result == 0) {
-            sessionEnableCvReadyMap_[sessionId] = true;
             LOGE("OnSessionOpened successful, sessionId: %{public}d", sessionId);
         } else {
             LOGE("OnSessionOpened failed, sessionId: %{public}d, res: %{public}d", sessionId, result);
         }
+        sessionEnableCvReadyMap_[sessionId] = true;
         sessionEnableCvMap_[sessionId].notify_all();
     }
     std::string peerUdid = "";
@@ -1008,6 +1008,9 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
         authMgr = GetAuthMgrByMessage(msgType, logicalSessionId, jsonObject, curSession);
         if (authMgr == nullptr) {
             return;
+        }
+        if (msgType == MSG_TYPE_REQ_ACL_NEGOTIATE || msgType == MSG_TYPE_RESP_ACL_NEGOTIATE) {
+            curSession->version_ = DM_CURRENT_VERSION;
         }
     } else {
         /**
@@ -1424,8 +1427,7 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
         }
 
         std::unique_lock<std::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
-        sessionEnableCvReadyMap_[sessionId] = false;
-        if (sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(WAIT_TIMEOUT),
+        if (sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(EVENT_TIMEOUT),
             [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
             LOGI("session enable, sessionId: %{public}d.", sessionId);
         } else {
