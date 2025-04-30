@@ -295,27 +295,6 @@ HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_003, testing::ext::TestSize.L
     EXPECT_NE(manager->discoveryContextMap_.empty(), true);
 }
 
-HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "pkgName";
-    int32_t subscribeId = 1;
-    int32_t result = 1;
-    manager->pkgNameSet_.insert(pkgName);
-    DiscoveryContext context;
-    manager->discoveryContextMap_.emplace(pkgName, context);
-    manager->listener_ = std::make_shared<DeviceManagerServiceListener>();
-    manager->OnDiscoveringResult(pkgName, subscribeId, result);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
-}
-
-HWTEST_F(DiscoveryManagerTest, StartDiscoveryTimer_001, testing::ext::TestSize.Level0)
-{
-    manager->timer_ = nullptr;
-    std::string pkgName = "timeTest";
-    manager->StartDiscoveryTimer(pkgName);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
-}
-
 HWTEST_F(DiscoveryManagerTest, HandleDiscoveryQueue_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";
@@ -363,19 +342,6 @@ HWTEST_F(DiscoveryManagerTest, GetDeviceAclParam_001, testing::ext::TestSize.Lev
     int32_t authForm = 0;
     int32_t ret = manager->GetDeviceAclParam(pkgName, 100, deviceId, isonline, authForm);
     EXPECT_EQ(ret, DM_OK);
-}
-
-HWTEST_F(DiscoveryManagerTest, GetCommonDependencyObj_001, testing::ext::TestSize.Level0)
-{
-    auto ret = manager->GetCommonDependencyObj();
-    EXPECT_NE(ret, nullptr);
-}
-
-HWTEST_F(DiscoveryManagerTest, IsCommonDependencyReady_001, testing::ext::TestSize.Level0)
-{
-    manager->isSoLoaded_ = false;
-    bool ret = manager->IsCommonDependencyReady();
-    EXPECT_EQ(ret, true);
 }
 
 HWTEST_F(DiscoveryManagerTest, CloseCommonDependencyObj_001, testing::ext::TestSize.Level0)

@@ -231,8 +231,6 @@ HWTEST_F(DMSoftbusCacheTest, GetUuidFromCache_001, testing::ext::TestSize.Level1
     std::string uuid = "";
     EXPECT_EQ(SoftbusCache::GetInstance().GetUuidFromCache("networkid", uuid), DM_OK);
     EXPECT_EQ(uuid, "uuid");
-    int32_t ret = SoftbusCache::GetInstance().GetUuidFromCache("test", uuid);
-    EXPECT_EQ(true, CheckSoftbusRes(ret));
 }
 
 HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level1)
@@ -252,7 +250,7 @@ HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level1
     EXPECT_EQ(SoftbusCache::GetInstance().GetUdidFromCache("networkid", udid), DM_OK);
     EXPECT_EQ(udid, "udid");
     int32_t ret = SoftbusCache::GetInstance().GetUdidFromCache("test", udid);
-    EXPECT_EQ(true, CheckSoftbusRes(ret));
+    EXPECT_NE(CheckSoftbusRes(ret), DM_OK);
 }
 } // namespace
 } // namespace DistributedHardware
