@@ -1434,6 +1434,7 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
             LOGE("wait session enable timeout or enable fail, sessionId: %{public}d.", sessionId);
             return nullptr;
         }
+        sessionEnableCvReadyMap_.erase(sessionId);
         instance = std::make_shared<Session>(sessionId, deviceId);
         deviceId2SessionIdMap_[deviceId] = sessionId;
         sessionsMap_[sessionId] = instance;
