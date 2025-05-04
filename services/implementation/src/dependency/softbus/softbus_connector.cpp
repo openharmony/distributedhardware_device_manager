@@ -45,10 +45,6 @@ constexpr const char* ETH_PORT = "ETH_PORT";
 constexpr const char* NCM_IP = "NCM_IP";
 constexpr const char* NCM_PORT = "NCM_PORT";
 
-constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
-constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BLE_MASK = 0b0100;
-constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BR_MASK = 0b1000;
-constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_NCM_MASK = 0b10000000;
 namespace {
     const char* TAG_ACL = "accessControlTable";
     const char* TAG_DMVERSION = "dmVersion";
@@ -746,25 +742,25 @@ bool SoftbusConnector::CheckIsNeedJoinLnn(const std::string &udid, const std::st
         LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed, ret:%{public}d.", ret);
         return false;
     }
-    LOGI("GetNetworkTypeByNetworkId networkType %{public}d.", networkType);
     uint32_t addrTypeMask = 0;
     switch (addrInfo->type) {
         case CONNECTION_ADDR_WLAN:
-            addrTypeMask = USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK;
+            addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_WIFI;
             break;
         case CONNECTION_ADDR_BR:
-            addrTypeMask = USERID_SYNC_DISCOVERY_TYPE_BR_MASK;
+            addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BR;
             break;
         case CONNECTION_ADDR_BLE:
-            addrTypeMask = USERID_SYNC_DISCOVERY_TYPE_BLE_MASK;
+            addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
             break;
         case CONNECTION_ADDR_NCM:
-            addrTypeMask = USERID_SYNC_DISCOVERY_TYPE_NCM_MASK;
+            addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_USB;
             break;
         default:
             LOGE("Unknown addr type.");
             return false;
     }
+    LOGI("GetNetworkTypeByNetworkId networkType %{public}d, addrTypeMask %{public}d.", networkType, addrTypeMask);
     if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
         return false;
     }
