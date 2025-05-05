@@ -653,6 +653,7 @@ void DeviceManagerServiceListener::OnAppUnintall(const std::string &pkgName)
 void DeviceManagerServiceListener::OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId,
     int32_t result, int32_t status, std::string content)
 {
+    LOGI("pkgName %{public}s, userId %{public}d.", processInfo.pkgName.c_str(), processInfo.userId);
     std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     if (status < STATUS_DM_AUTH_FINISH && status > STATUS_DM_AUTH_DEFAULT) {

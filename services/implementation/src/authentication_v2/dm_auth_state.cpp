@@ -142,6 +142,7 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("SinkFinish reason:%{public}d", context->reason);
+    context->processInfo.pkgName = context->accessee.pkgName;
     context->listener->OnSinkBindResult(context->processInfo, context->peerTargetId,
         GetOutputReplay(context->accessee.bundleName, context->reason),
         GetOutputState(context->accessee.bundleName, context->state), GenerateBindResultContent(context));
