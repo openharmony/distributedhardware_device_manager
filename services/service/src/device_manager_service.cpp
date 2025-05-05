@@ -77,10 +77,6 @@ namespace {
     constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
     const std::string USERID_CHECKSUM_NETWORKID_KEY = "networkId";
     const std::string USERID_CHECKSUM_DISCOVER_TYPE_KEY = "discoverType";
-    constexpr uint32_t USERID_CHECKSUM_DISCOVERY_TYPE_WIFI_MASK = 0b0010;
-    constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BLE_MASK = 0b0100;
-    constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_BR_MASK = 0b1000;
-    constexpr uint32_t USERID_SYNC_DISCOVERY_TYPE_NCM_MASK = 0b10000000;
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
     const std::string USERID_CHECKSUM_ISCHANGE_KEY = "ischange";
     constexpr const char* USER_SWITCH_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userSwitchByWifi";
@@ -2092,13 +2088,13 @@ void DeviceManagerService::NotifyRemoteAccountCommonEvent(const std::string comm
             continue;
         }
         int32_t networkType = 0;
-        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
-        if (ret != DM_OK || networkType <= 0) {
+        if (softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType) != DM_OK || networkType <= 0) {
             LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
             bleUdids.push_back(udid);
             continue;
         }
-        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
             bleUdids.push_back(udid);
         } else {
             wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
@@ -2215,7 +2211,8 @@ void DeviceManagerService::NotifyRemoteLocalUserSwitch(const std::string &localU
             bleUdids.push_back(udid);
             continue;
         }
-        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
             bleUdids.push_back(udid);
         } else {
             wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
@@ -2947,8 +2944,8 @@ void DeviceManagerService::HandleUserIdCheckSumChange(const std::string &msg)
         LOGI("Can not get background userids, ret: %{public}d, background userid num: %{public}d",
             ret, static_cast<int32_t>(backgroundUserIds.size()));
     }
-
-    if ((discoveryType & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+    uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+    if ((discoveryType & addrTypeMask) != 0x0) {
         ProcessCheckSumByBT(remoteNetworkId, foregroundUserIds, backgroundUserIds);
     } else {
         ProcessCheckSumByWifi(remoteNetworkId, foregroundUserIds, backgroundUserIds);
@@ -3176,7 +3173,8 @@ void DeviceManagerService::NotifyRemoteLocalUserSwitch(int32_t curUserId, int32_
             bleUdids.push_back(udid);
             continue;
         }
-        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
             bleUdids.push_back(udid);
         } else {
             wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
@@ -3307,7 +3305,8 @@ void DeviceManagerService::DivideNotifyMethod(const std::vector<std::string> &pe
             bleUdids.push_back(udid);
             continue;
         }
-        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
             bleUdids.push_back(udid);
         } else {
             wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
@@ -3699,7 +3698,8 @@ void DeviceManagerService::NotifyRemoteLocalLogout(const std::vector<std::string
             bleUdids.push_back(udid);
             continue;
         }
-        if ((static_cast<uint32_t>(networkType) & USERID_SYNC_DISCOVERY_TYPE_BLE_MASK) != 0x0) {
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
             bleUdids.push_back(udid);
         } else {
             wifiDevices.push_back(netWorkId);
