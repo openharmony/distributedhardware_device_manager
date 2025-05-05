@@ -928,6 +928,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
 
     JsonObject jsonObj;
     std::string customData = ConvertCharArray2String(device.custData, DISC_MAX_CUST_DATA_LEN);
+    LOGI("customData: %{public}s", customData.c_str());
     jsonObj[PARAM_KEY_CUSTOM_DATA] = customData;
 
     const ConnectionAddr *addrInfo = &(device.addr)[0];
