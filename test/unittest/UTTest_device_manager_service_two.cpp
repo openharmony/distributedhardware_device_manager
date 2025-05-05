@@ -1661,8 +1661,6 @@ HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_201, testing::ext::Tes
     DeletePermission();
     int32_t ret = DeviceManagerService::GetInstance().RestoreLocalDeviceName(pkgName);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
-
-    DeviceManagerService::GetInstance().CheckRegisterInfoWithWise();
 }
 
 HWTEST_F(DeviceManagerServiceTest, RestoreLocalDeviceName_202, testing::ext::TestSize.Level1)

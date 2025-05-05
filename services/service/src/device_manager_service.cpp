@@ -180,12 +180,13 @@ DM_EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
             DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
         }
         if (arg1 == CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE && arg2 == NETWORK_AVAILABLE) {
-            this->CheckRegisterInfoWithWise();
+            this->HandleNetworkConnected();
         }
     };
     std::vector<std::string> commonEventVec;
     commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
     commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+    commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE);
     if (dataShareCommonEventManager_->SubscribeDataShareCommonEvent(commonEventVec, callback)) {
         LOGI("subscribe datashare common event success");
     }
@@ -3240,6 +3241,7 @@ void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t pr
 
 void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId)
 {
+    LOGI("In");
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
     MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     if (IsPC()) {
@@ -3570,14 +3572,14 @@ std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
     return dmServiceImplExtResident_->GetDeviceNamePrefixs();
 }
 
-void DeviceManagerService::CheckRegisterInfoWithWise()
+void DeviceManagerService::HandleNetworkConnected()
 {
     LOGI("In");
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("CheckRegisterInfoWithWise failed, adapter instance not init or init failed.");
+        LOGE("HandleNetworkConnected failed, adapter instance not init or init failed.");
         return;
     }
-    dmServiceImplExtResident_->CheckRegisterInfoWithWise();
+    dmServiceImplExtResident_->HandleNetworkConnected();
 }
 
 int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)

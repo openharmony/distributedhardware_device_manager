@@ -102,7 +102,7 @@ public:
     virtual int32_t PutDeviceProfileInfoList(const std::string &pkgName,
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
     virtual std::vector<std::string> GetDeviceNamePrefixs() = 0;
-    virtual void CheckRegisterInfoWithWise() = 0;
+    virtual void HandleNetworkConnected() = 0;
     virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName) = 0;
     virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
         const std::string &deviceName) = 0;
