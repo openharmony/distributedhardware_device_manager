@@ -1283,6 +1283,10 @@ std::string DmAuthMessageProcessor::CompressSyncMsg(std::string &inputStr)
 {
     uint32_t srcLen = inputStr.size();
     uint32_t boundSize = compressBound(srcLen);  // Maximum compression length
+    if (boundSize <= 0) {
+        LOGE("DmAuthMessageProcessor::CompressSyncMsg zlib compressBound failed");
+        return "";
+    }
     std::string compressed(boundSize, '\0');
 
     // Compress to reserved space
@@ -1299,6 +1303,10 @@ std::string DmAuthMessageProcessor::CompressSyncMsg(std::string &inputStr)
 
 std::string DmAuthMessageProcessor::DecompressSyncMsg(std::string& compressed, uint32_t oriLen)
 {
+    if (oriLen <= 0) {
+        LOGE("DmAuthMessageProcessor::DecompressSyncMsg decompress oriLen param error");
+        return "";
+    }
     std::string decompressed;
     decompressed.resize(oriLen);
     unsigned long destLen = oriLen; // Actual usage length
