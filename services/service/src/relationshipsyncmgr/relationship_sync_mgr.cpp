@@ -147,10 +147,6 @@ bool RelationShipChangeMsg::ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) con
 
 void RelationShipChangeMsg::ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) const
 {
-    if (msg == nullptr) {
-        LOGE("RelationShipChangeMsg::ToShareUnbindPayLoad msg is null.");
-        return;
-    }
     msg = new uint8_t[SHARE_UNBIND_PAYLOAD_LEN]();
     for (int i = 0; i < USERID_PAYLOAD_LEN; i++) {
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;

@@ -1710,36 +1710,36 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
-        .WillOnce(Return(1234))
-        .Times(::testing::AtLeast(1));
+        .Times(::testing::AtLeast(1))
+        .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_EQ(ret.empty(), false);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
-        .WillOnce(Return(1234))
-        .Times(::testing::AtLeast(1));
+        .Times(::testing::AtLeast(1))
+        .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_EQ(ret.empty(), false);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
-        .WillOnce(Return(1234))
-        .Times(::testing::AtLeast(1));
+        .Times(::testing::AtLeast(1))
+        .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_EQ(ret.empty(), false);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
-        .WillOnce(Return(12345))
-        .Times(::testing::AtLeast(1));
+        .Times(::testing::AtLeast(1))
+        .WillOnce(Return(12345));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_EQ(ret.empty(), false);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
-        .WillOnce(Return(12345))
-        .Times(::testing::AtLeast(1));
+        .Times(::testing::AtLeast(1))
+        .WillOnce(Return(12345));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
     EXPECT_EQ(ret.empty(), false);
 
