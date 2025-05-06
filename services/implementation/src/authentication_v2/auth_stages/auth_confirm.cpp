@@ -23,6 +23,7 @@
 #include "dm_auth_state_machine.h"
 #include "dm_crypto.h"
 #include "dm_dialog_manager.h"
+#include "dm_language_manager.h"
 #include "dm_log.h"
 #include "dm_negotiate_process.h"
 #include "dm_softbus_cache.h"
@@ -446,7 +447,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
         context->reason = ERR_DM_VERSION_INCOMPATIBLE;
         return ERR_DM_VERSION_INCOMPATIBLE;
     }
-
+    GetCustomDescBySinkLanguage(context);
     context->accessee.isOnline = SoftbusCache::GetInstance().CheckIsOnline(context->accessee.deviceIdHash);
     JsonObject credInfo;
     GetSrcCredentialInfo(context, credInfo);
@@ -472,6 +473,16 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
             HandleAuthenticateTimeout(context, name);
         });
     return DM_OK;
+}
+
+void AuthSrcConfirmState::GetCustomDescBySinkLanguage(std::shared_ptr<DmAuthContext> context)
+{
+    if (context == nullptr || context->customData.empty()) {
+        LOGI("customDesc is empty.");
+        return;
+    }
+    context->customData = DmLanguageManager::GetInstance().GetTextBySystemLanguage(context->customData,
+        context->accessee.language);
 }
 
 DmAuthStateType AuthSinkConfirmState::GetStateType()
@@ -514,7 +525,7 @@ int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> co
     jsonObj[TAG_LOCAL_DEVICE_TYPE] = context->accesser.deviceType;
     jsonObj[TAG_REQUESTER] = context->accesser.deviceName;
     jsonObj[TAG_USER_ID] = context->accessee.userId;    // Reserved
-    jsonObj[TAG_HOST_PKGLABEL] = context->pkgName;
+    jsonObj[TAG_HOST_PKGLABEL] = context->pkgLabel;
 
     const std::string params = jsonObj.Dump();
     DmDialogManager::GetInstance().ShowConfirmDialog(params);
