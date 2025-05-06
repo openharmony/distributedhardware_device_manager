@@ -883,7 +883,8 @@ int DeviceManagerService::OnPinHolderSessionOpened(int sessionId, int result)
 void DeviceManagerService::OnPinHolderSessionClosed(int sessionId)
 {
     LOGI("In");
-    PinHolderSession::OnSessionClosed(sessionId);
+    CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
+    pinHolder_->OnSessionClosed(sessionId);
 }
 
 void DeviceManagerService::OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
