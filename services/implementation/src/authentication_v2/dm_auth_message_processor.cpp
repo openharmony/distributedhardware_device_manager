@@ -114,7 +114,7 @@ void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access, bool i
     access.deviceId = srcAccessToSync.deviceId;
     access.userId = srcAccessToSync.userId;
     access.accountId = srcAccessToSync.accountId;
-    access.tokenId = srcAccessToSync.tokenId;
+    access.tokenId = static_cast<int64_t>(srcAccessToSync.tokenId);
     access.bundleName = srcAccessToSync.bundleName;
     access.pkgName = srcAccessToSync.pkgName;
     access.bindLevel = srcAccessToSync.bindLevel;
@@ -1412,7 +1412,7 @@ int32_t DmAuthMessageProcessor::ACLToStr(DistributedDeviceProfile::AccessControl
     dmAcl.accesseeId = acl.GetAccesseeId();
     dmAcl.deviceId = acl.GetTrustDeviceId();
     dmAcl.sessionKey = acl.GetSessionKey();
-    dmAcl.bindType = acl.GetBindType();
+    dmAcl.bindType = static_cast<int32_t>(acl.GetBindType());
     dmAcl.authType = acl.GetAuthenticationType();
     dmAcl.deviceType = acl.GetDeviceIdType();
     dmAcl.deviceIdHash = acl.GetDeviceIdHash();
