@@ -110,7 +110,7 @@ bool AuthSinkStatePinAuthComm::IsAuthCodeReady(std::shared_ptr<DmAuthContext> co
 {
     if (context->importAuthCode.empty() || context->importPkgName.empty()) {
         LOGE("AuthSinkStatePinAuthComm::IsAuthCodeReady, auth code not ready with authCode %{public}s and "
-            "pkgName %{public}s.", context->importAuthCode.c_str(), context->importPkgName.c_str());
+            "pkgName %{public}s.", GetAnonyString(context->importAuthCode).c_str(), context->importPkgName.c_str());
         return false;
     }
     if (context->pkgName != context->importPkgName) {
