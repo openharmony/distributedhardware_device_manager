@@ -524,7 +524,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
     context->accesser.transmitPublicKey = jsonData[TAG_TRANSMIT_PUBLIC_KEY].Get<std::string>();
     context->accesser.deviceId = jsonData[TAG_DEVICE_ID].Get<std::string>();
     context->accesser.userId = jsonData[TAG_PEER_USER_SPACE_ID].Get<int32_t>();
-    context->accesser.tokenId = jsonData[TAG_TOKEN_ID].Get<uint64_t>();
+    context->accesser.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkCredentialExchangeState>());
     return DM_OK;
 }
@@ -570,7 +570,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
     context->accessee.transmitPublicKey = jsonData[TAG_TRANSMIT_PUBLIC_KEY].Get<std::string>();
     context->accessee.deviceId = jsonData[TAG_DEVICE_ID].Get<std::string>();
     context->accessee.userId = jsonData[TAG_PEER_USER_SPACE_ID].Get<int32_t>();
-    context->accessee.tokenId = jsonData[TAG_TOKEN_ID].Get<uint64_t>();
+    context->accessee.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
 
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthStartState>());
     return DM_OK;
