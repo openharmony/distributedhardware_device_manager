@@ -59,7 +59,8 @@
                 "resource_management",
                 "wifi",
                 "screenlock_mgr",
-                "mbedtls"
+                "mbedtls",
+                "runtime_core"
             ],
             "third_party": []
         },
@@ -67,7 +68,8 @@
             "group_type": {
                 "base_group": [],
                 "fwk_group": [
-                    "//foundation/distributedhardware/device_manager:device_manager_fwk"
+                    "//foundation/distributedhardware/device_manager:device_manager_fwk",
+                    "//foundation/distributedhardware/device_manager/interfaces/kits/taihe:devicemanager_ani"
                 ],
                 "service_group": [
                     "//foundation/distributedhardware/device_manager:device_manager",

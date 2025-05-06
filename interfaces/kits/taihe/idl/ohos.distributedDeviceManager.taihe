@@ -1,0 +1,84 @@
+@!namespace("@ohos.distributedDeviceManager", "distributedDeviceManager")
+
+@!sts_inject("""
+static { loadLibrary("device_manager_ani_taihe");}
+""")
+
+struct  DeviceBasicInfo {
+  deviceId: String;
+  deviceName: String;
+  deviceType: String;
+  networkId : String;
+  }
+
+struct  ServiceProfileInfo {
+  deviceId: String;
+  }
+
+struct  DeviceProfileInfo {
+  deviceId: String;
+  deviceName: String;
+  deviceType: String;
+  }
+
+enum DeviceStateChange: i32 {
+    UNKNOWN = 0,
+    AVAILABLE = 1,
+    UNAVAILABLE = 2,
+}
+
+struct DeviceStatusStructer {
+  DeviceStateChange: i32;
+  DeviceBasicInfo: DeviceBasicInfo;   
+}
+
+interface DeviceManager {
+  getLocalDeviceId(): String;
+  unbindTarget(deviceId: String): void;
+  getDeviceType(networkId: String): f64;
+  getDeviceName(networkId: String): String;
+  getLocalDeviceNetworkId(): String;
+
+  
+  @on_off("deviceNameChange")
+  ondeviceNameChange(f: (a: String) => String): void;
+
+  @on_off("discoverFailure")
+  ondiscoverFailure(f: (reason: i32) => void): void;
+
+  @on_off("replyResult")
+  onreplyResult(f: (a: String) => String): void;
+
+ // @on_off("serviceDie")
+  onserviceDie(f: (a: String) => String): void;
+
+  @on_off("discoverSuccess")
+  ondiscoverSuccess(f: (data: DeviceBasicInfo) => DeviceBasicInfo): void;
+
+  @on_off("deviceStateChange")
+  ondeviceStateChange(f: (data: DeviceStatusStructer) => DeviceStatusStructer): void;
+
+
+
+  @on_off("deviceNameChange")
+  offdeviceNameChange(f: (a: String) => String): void;
+
+  @on_off("discoverFailure")
+  offdiscoverFailure(f: (reason: i32) => void): void;
+
+  @on_off("replyResult")
+  offreplyResult(f: (a: String) => String): void;
+
+ // @on_off("serviceDie")
+  offserviceDie(f: (a: String) => String): void;
+
+  @on_off("discoverSuccess")
+  offdiscoverSuccess(f: (data: DeviceBasicInfo) => DeviceBasicInfo): void;
+
+   @on_off("deviceStateChange")
+  offdeviceStateChange(f: (data: DeviceStatusStructer) => DeviceStatusStructer): void;
+
+
+}
+
+function createDeviceManager(bundleName: String): DeviceManager;
