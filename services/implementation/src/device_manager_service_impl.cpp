@@ -2328,7 +2328,7 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
         return;
     }
     std::string deviceIdTag = "deviceId";
-    std::string userIdTag = "userId";
+    std::string userIdTag = "osAccountId";
     int32_t userId = 0;
     if (IsString(jsonObject, deviceIdTag)) {
         remoteUdid = jsonObject[deviceIdTag].Get<std::string>();
