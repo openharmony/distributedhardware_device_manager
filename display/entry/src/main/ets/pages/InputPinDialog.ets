@@ -46,21 +46,35 @@ struct InputCustomDialog {
   @State isPC: boolean = false;
   @State isPhone: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
-  @State mLocalHeight: number = display.getDefaultDisplaySync().height;
+  @State mLocalHeight: number;
   listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
   controller?: CustomDialogController;
   private scroller: Scroller = new Scroller();
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
-    this.mLocalHeight = display.getDefaultDisplaySync().height;
+    try {
+        this.mLocalHeight = display.getDefaultDisplaySync().height;
+    } catch (error) {
+        console.info("Get mLocalHeight failed:", error);
+        this.mLocalHeight = 0;
+    }
     let heightRatio = px2vp(this.mLocalHeight) * 0.2;
     if (mediaQueryResult.matches as boolean) {
         if (this.isPhone) {
-            if (display.isFoldable() &&
-                display.getFoldDisplayMode() === display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
-                this.heightNum = heightRatio;
-            } else if (!display.isFoldable()) {
-                this.heightNum = heightRatio;
+            try {
+                if (display.isFoldable() && 
+                    isplay.getFoldDisplayMode() === display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
+                    this.heightNum = heightRatio;
+                }
+            } catch (error) {
+                console.info("Is Foldable:", error);
+            }
+            try {
+                if (!display.isFoldable()) {
+                    this.heightNum = heightRatio;
+                }
+            } catch (error) {
+                console.info("Is not Foldable:", error);
             }
         } else {
             this.heightNum = 300;
