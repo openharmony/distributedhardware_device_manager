@@ -2340,11 +2340,11 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
         if (item.GetBindType() != DM_SHARE) {
             continue;
         }
-        if ((item.GetAccesser().GetAccesserCredentialId() == atoi(credId) &&
+        if ((item.GetAccesser().GetAccesserCredentialIdStr() == credId &&
             item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == userId &&
             item.GetAccessee().GetAccesseeDeviceId() == remoteUdid) ||
-            (item.GetAccessee().GetAccesseeCredentialId() == atoi(credId) &&
+            (item.GetAccessee().GetAccesseeCredentialIdStr() == credId &&
             item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
@@ -2365,8 +2365,8 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
         std::string accesserCredId = "";
         std::string accesseeCredId = "";
         for (int32_t i = 0; i < ACL_CREDID_LENGTH; i++) {
-            accesserCredId[i] = std::to_string(item.GetAccesser().GetAccesserCredentialId())[i];
-            accesseeCredId[i] = std::to_string(item.GetAccessee().GetAccesseeCredentialId())[i];
+            accesserCredId[i] = item.GetAccesser().GetAccesserCredentialIdStr()[i];
+            accesseeCredId[i] = item.GetAccessee().GetAccesseeCredentialIdStr()[i];
         }
         if (accesserCredId == credId && item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == userId) {
