@@ -543,6 +543,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
         LOGE("DmAuthMessageProcessor::ParseMessageRspCredExchange error, decrypt data failed.");
         return ERR_DM_FAILED;
     }
+
     LOGI("DmAuthMessageProcessor::ParseMessageRspCredExchange plainText=%{public}s", plainText.c_str());
 
     JsonObject jsonData(plainText);
