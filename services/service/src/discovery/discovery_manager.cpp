@@ -332,7 +332,7 @@ int32_t DiscoveryManager::StopDiscoveringByInnerSubId(const std::string &pkgName
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    uint16_t innerSubId = GetAndRemoveInnerSubId(pkgName, subscribeId);
+    uint16_t innerSubId = static_cast<uint16_t>(GetAndRemoveInnerSubId(pkgName, subscribeId));
     if (innerSubId == DM_INVALID_FLAG_ID) {
         LOGE("Invalid parameter, cannot find subscribeId in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -670,7 +670,7 @@ void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
 {
     LOGI("PkgName: %{public}s, userId: %{public}d", processInfo.pkgName.c_str(), processInfo.userId);
     std::string pkgName = processInfo.pkgName + "#";
-    std::set<uint16_t> subscribeIdSet = ClearDiscoveryPkgName(pkgName);
+    std::set<uint16_t> subscribeIdSet = static_cast<uint16_t>(ClearDiscoveryPkgName(pkgName));
 
     CHECK_NULL_VOID(softbusListener_);
     for (auto it : subscribeIdSet) {
