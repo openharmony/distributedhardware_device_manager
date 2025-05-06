@@ -62,13 +62,14 @@ const std::map<int32_t, int32_t> NEW_AND_OLD_REPLAY_MAPPING = {
 };
 
 constexpr int32_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = 1;
-constexpr int32_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = 2;
+constexpr int32_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = 3;
 constexpr const static char* OPEN_PROCESS_NAME_WHITE_LIST[OPEN_PROCESS_NAME_WHITE_LIST_NUM] = {
     "com.example.myapplication"
 };
 constexpr const static char* CLOSE_PROCESS_NAME_WHITE_LIST[CLOSE_PROCESS_NAME_WHITE_LIST_NUM] = {
     "CollaborationFwk",
-    "gameservice_server"
+    "gameservice_server",
+    "wear_link_service"
 };
 
 
