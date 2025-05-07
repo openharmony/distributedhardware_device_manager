@@ -49,7 +49,7 @@ DeviceManager createDeviceManager(string_view bundleName);
 
 class DmAniInitCallback : public OHOS::DistributedHardware::DmInitCallback {
     public:
-        explicit DmAniInitCallback( string_view bundleName) : bundleName_(std::string(bundleName))
+        explicit DmAniInitCallback(string_view bundleName) : bundleName_(std::string(bundleName))
         {
         }
         ~DmAniInitCallback() override {}

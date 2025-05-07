@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "ohos.distributedDeviceManager.proj.hpp"
 #include "ohos.distributedDeviceManager.impl.hpp"
 #include "taihe/runtime.hpp"
@@ -20,10 +34,12 @@ std::mutex g_initCallbackMapMutex_;
 std::map<std::string, std::shared_ptr<DmAniInitCallback>> g_initCallbackMap_;
 
 
-DeviceManagerImpl::DeviceManagerImpl(const std::string& bundleName) : bundleName_(bundleName) {
+DeviceManagerImpl::DeviceManagerImpl(const std::string& bundleName) : bundleName_(bundleName)
+{
     LOGI("ohos.distributedDeviceManager.cpp DeviceManagerImpl constructed with bundleName: %s", bundleName.c_str());
 }
-DeviceManagerImpl::DeviceManagerImpl(std::shared_ptr<DeviceManagerImpl> impl) {
+DeviceManagerImpl::DeviceManagerImpl(std::shared_ptr<DeviceManagerImpl> impl)
+{
     LOGI("ohos.distributedDeviceManager.cpp DeviceManagerImpl copy constructed");
     bundleName_ = impl->bundleName_;
 }
@@ -41,15 +57,13 @@ string DeviceManagerImpl::getLocalDeviceId()
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetLocalDeviceId for failed2");
         return "error deviceId";
     }
-
     return string(deviceId);
-
 }
 
 void DeviceManagerImpl::unbindTarget(string_view deviceId)
 {
     LOGI("ohos.distributedDeviceManager.cpp UnBindDevice");
-    int32_t ret =OHOS::DistributedHardware:: DeviceManager::GetInstance().UnBindDevice(
+    int32_t ret = OHOS::DistributedHardware:: DeviceManager::GetInstance().UnBindDevice(
         bundleName_, std::string(deviceId));
     if (ret != 0) {
         LOGE("UnBindDevice for bundleName %{public}s failed, ret %{public}d",
@@ -57,15 +71,14 @@ void DeviceManagerImpl::unbindTarget(string_view deviceId)
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "unbindTarget for failed");
         return;
     }
-
 }
 
 double DeviceManagerImpl::getDeviceType(string_view networkId)
 {
     LOGI("ohos.distributedDeviceManager.cpp GetDeviceType in");
     int32_t deviceType;
-    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetDeviceType(bundleName_,
-                                                                 std::string(networkId), deviceType);
+    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetDeviceType(
+        bundleName_, std::string(networkId), deviceType);
     if (ret != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetDeviceType for failed");
         return -1.0;
@@ -90,18 +103,18 @@ string DeviceManagerImpl::getLocalDeviceNetworkId()
 {
     LOGI("ohos.distributedDeviceManager.cpp GetLocalDeviceNetworkId in");
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "getLocalDeviceNetworkId for failed1");
+        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "getLocalDeviceNetworkId failed");
         return "";
     }
     std::string networkId;
-    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceNetWorkId(bundleName_, networkId);
+    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceNetWorkId(
+        bundleName_, networkId);
     if (ret != 0) {
         LOGE("GetLocalDeviceNetworkId for failed, ret %{public}d", ret);
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetLocalDeviceNetworkId for failed2");
+        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetLocalDeviceNetworkId failed");
         return "error networkId";
     }
     return string(networkId);
-
 }
 
 void DeviceManagerImpl::ondeviceNameChange(callback_view<string(string_view)> f)
@@ -174,7 +187,7 @@ DeviceManager createDeviceManager(string_view bundleName)
         LOGE("CreateDeviceManager for bundleName %{public}s failed, ret %{public}d.", bundleName.c_str(), ret);
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "CreateDeviceManager for failed");
         return make_holder<DeviceManagerImpl, DeviceManager>();
-    } 
+    }
     {
         std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex_);
         g_initCallbackMap_[std::string(bundleName)] = initCallback;
