@@ -32,6 +32,8 @@
 #include "dm_radar_helper.h"
 #include "dm_softbus_cache.h"
 #include "multiple_user_connector.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
 #include "parameter.h"
@@ -39,8 +41,6 @@
 #include "common_event_support.h"
 using namespace OHOS::EventFwk;
 #endif
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DistributedHardware {

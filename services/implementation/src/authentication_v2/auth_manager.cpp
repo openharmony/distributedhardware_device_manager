@@ -1005,7 +1005,6 @@ void AuthManager::GetBindTargetParams(std::string &pkgName, PeerTargetId &target
     {
         std::lock_guard<std::mutex> lock(bindParamMutex_);
         bindParam = bindParam_;
-
     }
     LOGI("AuthManager::GetBindTargetParams get pkgName %{public}s to reuse", pkgName.c_str());
     return;
