@@ -783,7 +783,7 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
         return CheckAuthForm(DmAuthForm::PEER_TO_PEER, profiles, discoveryInfo);
     }
     if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
-        return CheckAuthForm(DmAuthForm::ACROSS_ACCOUNT, profiles, discoveryInfo);
+        return CheckAuthForm(DmAuthForm::PEER_TO_PEER, profiles, discoveryInfo);
     }
     if (profiles.GetBindType() == DM_SHARE) {
         return CheckAuthForm(DmAuthForm::ACROSS_ACCOUNT, profiles, discoveryInfo);

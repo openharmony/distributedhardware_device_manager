@@ -2329,6 +2329,7 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
     }
     std::string deviceIdTag = "deviceId";
     std::string userIdTag = "osAccountId";
+    int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
     int32_t userId = 0;
     if (IsString(jsonObject, deviceIdTag)) {
         remoteUdid = jsonObject[deviceIdTag].Get<std::string>();
@@ -2336,16 +2337,19 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
     if (IsInt32(jsonObject, userIdTag)) {
         userId = jsonObject[userIdTag].Get<int32_t>();
     }
+
     for (const auto &item : profiles) {
         if (item.GetBindType() != DM_SHARE) {
             continue;
         }
         if ((item.GetAccesser().GetAccesserCredentialIdStr() == credId &&
             item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == localUserId &&
             item.GetAccessee().GetAccesseeUserId() == userId &&
             item.GetAccessee().GetAccesseeDeviceId() == remoteUdid) ||
             (item.GetAccessee().GetAccesseeCredentialIdStr() == credId &&
             item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == localUserId &&
             item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
@@ -2358,6 +2362,7 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
 {
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
     for (const auto &item : profiles) {
         if (item.GetBindType() != DM_SHARE) {
             continue;
@@ -2369,10 +2374,12 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
             accesseeCredId += item.GetAccessee().GetAccesseeCredentialIdStr()[i];
         }
         if (accesserCredId == credId && item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
+            item.GetAccessee().GetAccesseeUserId() == localUserId &&
             item.GetAccesser().GetAccesserUserId() == userId) {
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
         if (accesseeCredId == credId && item.GetAccesser().GetAccesserDeviceId() == localUdid &&
+            item.GetAccesser().GetAccesserUserId() == localUserId &&
             item.GetAccessee().GetAccesseeUserId() == userId) {
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
