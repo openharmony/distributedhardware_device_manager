@@ -697,9 +697,7 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
 bool DeviceProfileConnector::CheckSinkShareType(const DistributedDeviceProfile::AccessControlProfile &profile,
     const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType)
 {
-    if ((profile.GetAccessee().GetAccesseeUserId() == userId ||
-        profile.GetAccessee().GetAccesseeUserId() == 0 ||
-        profile.GetAccessee().GetAccesseeUserId() == -1) &&
+    if (profile.GetAccessee().GetAccesseeUserId() == userId &&
         profile.GetAccessee().GetAccesseeDeviceId() == deviceId &&
         profile.GetAccesser().GetAccesserDeviceId() == trustDeviceId &&
         bindType == DmAuthForm::ACROSS_ACCOUNT) {

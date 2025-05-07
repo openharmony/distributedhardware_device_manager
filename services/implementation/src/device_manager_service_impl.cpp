@@ -45,7 +45,7 @@ namespace {
 
 // One year 365 * 24 * 60 * 60
 constexpr int32_t MAX_ALWAYS_ALLOW_SECONDS = 31536000;
-constexpr int32_t ACL_CREDID_LENGTH = 6;
+constexpr int32_t BROADCAST_CREDID_LENGTH = 6;
 constexpr int32_t MIN_PIN_CODE = 100000;
 constexpr int32_t MAX_PIN_CODE = 999999;
 // New protocol field definition. To avoid dependency on the new protocol header file,
@@ -2364,7 +2364,7 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
         }
         std::string accesserCredId = "";
         std::string accesseeCredId = "";
-        for (int32_t i = 0; i < ACL_CREDID_LENGTH; i++) {
+        for (int32_t i = 0; i < BROADCAST_CREDID_LENGTH; i++) {
             accesserCredId += item.GetAccesser().GetAccesserCredentialIdStr()[i];
             accesseeCredId += item.GetAccessee().GetAccesseeCredentialIdStr()[i];
         }
