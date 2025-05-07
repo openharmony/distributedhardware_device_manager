@@ -287,7 +287,7 @@ void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext
     CHECK_NULL_VOID(context);
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
-    int32_t bindLevel = DM_INVALIED_TYPE;
+    uint32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         std::string trustDeviceIdHash = Crypto::GetUdidHash(trustDeviceId);

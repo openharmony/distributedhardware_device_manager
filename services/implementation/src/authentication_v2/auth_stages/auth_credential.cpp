@@ -78,7 +78,7 @@ int32_t AuthCredentialTransmitSend(std::shared_ptr<DmAuthContext> context, DmMes
 
 void SetAuthContext(int32_t skId, int64_t &appSkTimeStamp, int32_t &appSessionKeyId)
 {
-    appSkTimeStamp = DmAuthState::GetSysTimeMs();
+    appSkTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
     appSessionKeyId = skId;
     return;
 }
