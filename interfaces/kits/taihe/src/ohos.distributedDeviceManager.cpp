@@ -25,14 +25,10 @@
 #include <iostream>
 
 #define DH_LOG_TAG "DeviceManager"
-
-using namespace ANI::distributedDeviceManager;
-using namespace taihe;
 namespace ANI::distributedDeviceManager {
 
 std::mutex g_initCallbackMapMutex_;
 std::map<std::string, std::shared_ptr<DmAniInitCallback>> g_initCallbackMap_;
-
 
 DeviceManagerImpl::DeviceManagerImpl(const std::string& bundleName) : bundleName_(bundleName)
 {
@@ -44,7 +40,7 @@ DeviceManagerImpl::DeviceManagerImpl(std::shared_ptr<DeviceManagerImpl> impl)
     bundleName_ = impl->bundleName_;
 }
 
-string DeviceManagerImpl::getLocalDeviceId()
+std::string DeviceManagerImpl::getLocalDeviceId()
 {
     LOGI("ohos.distributedDeviceManager.cpp GetLocalDeviceId in");
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
@@ -57,10 +53,10 @@ string DeviceManagerImpl::getLocalDeviceId()
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetLocalDeviceId for failed2");
         return "error deviceId";
     }
-    return string(deviceId);
+    return std::string(deviceId);
 }
 
-void DeviceManagerImpl::unbindTarget(string_view deviceId)
+void DeviceManagerImpl::unbindTarget(taihe::string_view deviceId)
 {
     LOGI("ohos.distributedDeviceManager.cpp UnBindDevice");
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnBindDevice(
@@ -73,7 +69,7 @@ void DeviceManagerImpl::unbindTarget(string_view deviceId)
     }
 }
 
-double DeviceManagerImpl::getDeviceType(string_view networkId)
+double DeviceManagerImpl::getDeviceType(taihe::string_view networkId)
 {
     LOGI("ohos.distributedDeviceManager.cpp GetDeviceType in");
     int32_t deviceType;
@@ -86,7 +82,7 @@ double DeviceManagerImpl::getDeviceType(string_view networkId)
     return static_cast<double>(deviceType);
 }
 
-string DeviceManagerImpl::getDeviceName(string_view networkId)
+std::string DeviceManagerImpl::getDeviceName(taihe::string_view networkId)
 {
     LOGI("ohos.distributedDeviceManager.cpp GetDeviceName in");
     std::string deviceName;
@@ -96,10 +92,10 @@ string DeviceManagerImpl::getDeviceName(string_view networkId)
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetDeviceName for failed");
         return "";
     }
-    return string(deviceName);
+    return std::string(deviceName);
 }
 
-string DeviceManagerImpl::getLocalDeviceNetworkId()
+std::string DeviceManagerImpl::getLocalDeviceNetworkId()
 {
     LOGI("ohos.distributedDeviceManager.cpp GetLocalDeviceNetworkId in");
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
@@ -114,70 +110,74 @@ string DeviceManagerImpl::getLocalDeviceNetworkId()
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetLocalDeviceNetworkId failed");
         return "error networkId";
     }
-    return string(networkId);
+    return std::string(networkId);
 }
 
-void DeviceManagerImpl::ondeviceNameChange(callback_view<string(string_view)> f)
+void DeviceManagerImpl::ondeviceNameChange(taihe::callback_view<taihe::string(taihe::string_view)> f)
 {
     TH_THROW(std::runtime_error, "ondeviceNameChange not implemented");
 }
 
-void DeviceManagerImpl::ondiscoverFailure(callback_view<void(int32_t)> f)
+void DeviceManagerImpl::ondiscoverFailure(taihe::callback_view<void(int32_t)> f)
 {
     TH_THROW(std::runtime_error, "ondiscoverFailure not implemented");
 }
 
-void DeviceManagerImpl::onreplyResult(callback_view<string(string_view)> f)
+void DeviceManagerImpl::onreplyResult(taihe::callback_view<taihe::string(taihe::string_view)> f)
 {
     TH_THROW(std::runtime_error, "onreplyResult not implemented");
 }
 
-void DeviceManagerImpl::DeviceManagerImpl::onserviceDie(callback_view<string(string_view)> f)
+void DeviceManagerImpl::DeviceManagerImpl::onserviceDie(taihe::callback_view<taihe::string(taihe::string_view)> f)
 {
     TH_THROW(std::runtime_error, "onserviceDie not implemented");
 }
 
-void DeviceManagerImpl::ondiscoverSuccess(callback_view<DeviceBasicInfo(DeviceBasicInfo const&)> f)
+void DeviceManagerImpl::ondiscoverSuccess(taihe::callback_view<ohos::distributedDeviceManager::DeviceBasicInfo(
+    ohos::distributedDeviceManager::DeviceBasicInfo const&)> f)
 {
     TH_THROW(std::runtime_error, "ondiscoverSuccess not implemented");
 }
 
-void DeviceManagerImpl::ondeviceStateChange(callback_view<DeviceStatusStructer(DeviceStatusStructer const&)> f)
+void DeviceManagerImpl::ondeviceStateChange(taihe::callback_view<ohos::distributedDeviceManager::DeviceStatusStructer(
+    ohos::distributedDeviceManager::DeviceStatusStructer const&)> f)
 {
     TH_THROW(std::runtime_error, "ondeviceStateChange not implemented");
 }
 
-void DeviceManagerImpl::offdeviceNameChange(callback_view<string(string_view)> f)
+void DeviceManagerImpl::offdeviceNameChange(taihe::callback_view<taihe::string(taihe::string_view)> f)
 {
     TH_THROW(std::runtime_error, "offdeviceNameChange not implemented");
 }
 
-void DeviceManagerImpl::offdiscoverFailure(callback_view<void(int32_t)> f)
+void DeviceManagerImpl::offdiscoverFailure(taihe::callback_view<void(int32_t)> f)
 {
     TH_THROW(std::runtime_error, "offdiscoverFailure not implemented");
 }
 
-void DeviceManagerImpl::offreplyResult(callback_view<string(string_view)> f)
+void DeviceManagerImpl::offreplyResult(taihe::callback_view<taihe::string(taihe::string_view)> f)
 {
     TH_THROW(std::runtime_error, "offreplyResult not implemented");
 }
 
-void DeviceManagerImpl::offserviceDie(callback_view<string(string_view)> f)
+void DeviceManagerImpl::offserviceDie(taihe::callback_view<taihe::string(taihe::string_view)> f)
 {
     TH_THROW(std::runtime_error, "offserviceDie not implemented");
 }
 
-void DeviceManagerImpl::offdiscoverSuccess(callback_view<DeviceBasicInfo(DeviceBasicInfo const&)> f)
+void DeviceManagerImpl::offdiscoverSuccess(taihe::callback_view<ohos::distributedDeviceManager::DeviceBasicInfo(
+    ohos::distributedDeviceManager::DeviceBasicInfo const &)> f)
 {
     TH_THROW(std::runtime_error, "offdiscoverSuccess not implemented");
 }
 
-void DeviceManagerImpl::offdeviceStateChange(callback_view<DeviceStatusStructer(DeviceStatusStructer const&)> f)
+void DeviceManagerImpl::offdeviceStateChange(taihe::callback_view<ohos::distributedDeviceManager::DeviceStatusStructer(
+    ohos::distributedDeviceManager::DeviceStatusStructer const&)> f)
 {
     TH_THROW(std::runtime_error, "offdeviceStateChange not implemented");
 }
 
-DeviceManager createDeviceManager(string_view bundleName)
+ohos::distributedDeviceManager::DeviceManager createDeviceManager(taihe::string_view bundleName)
 {
     auto impl = std::make_shared<DeviceManagerImpl>(std::string(bundleName));
     std::shared_ptr<DmAniInitCallback> initCallback = std::make_shared<DmAniInitCallback>(bundleName);
@@ -186,23 +186,22 @@ DeviceManager createDeviceManager(string_view bundleName)
     if (ret != 0) {
         LOGE("CreateDeviceManager for bundleName %{public}s failed, ret %{public}d.", bundleName.c_str(), ret);
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "CreateDeviceManager for failed");
-        return make_holder<DeviceManagerImpl, DeviceManager>();
+        return taihe::make_holder<DeviceManagerImpl, ohos::distributedDeviceManager::DeviceManager>();
     }
     {
         std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex_);
         g_initCallbackMap_[std::string(bundleName)] = initCallback;
     }
-    return make_holder<DeviceManagerImpl, DeviceManager>(impl);
+    return taihe::make_holder<DeviceManagerImpl, ohos::distributedDeviceManager::DeviceManager>(impl);
+}
 }
 
-}
-void DmAniInitCallback::OnRemoteDied()
+void ANI::distributedDeviceManager::DmAniInitCallback::OnRemoteDied()
 {
     LOGI("ohos.distributedDeviceManager.cpp DmAniInitCallback::OnRemoteDied called.");
-
     auto& deviceManager = static_cast<OHOS::DistributedHardware::DeviceManager&>(
         OHOS::DistributedHardware::DeviceManager::GetInstance());
     deviceManager.UnInitDeviceManager(bundleName_);
 }
 
-TH_EXPORT_CPP_API_createDeviceManager(createDeviceManager);
+TH_EXPORT_CPP_API_createDeviceManager(ANI::distributedDeviceManager::createDeviceManager);
