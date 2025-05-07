@@ -60,9 +60,6 @@ HiChainAuthConnector::~HiChainAuthConnector()
 
 int32_t HiChainAuthConnector::RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback)
 {
-    if (dmDeviceAuthCallbackMap_.find(id) == dmDeviceAuthCallbackMap_.end()) {
-        return ERR_DM_FAILED;
-    }
     std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
     dmDeviceAuthCallback_ = callback;
     return DM_OK;

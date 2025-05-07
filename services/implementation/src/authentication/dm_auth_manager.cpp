@@ -2545,9 +2545,6 @@ void DmAuthManager::PutSessionKeyAsync(int64_t requestId, std::vector<unsigned c
             LOGI("PutSessionKey failed.");
             sessionKeyId = 0;
         }
-        if (sessionKeyIdAsyncResult_.find(requestId) == sessionKeyIdAsyncResult_.end()) {
-            return ;
-        }
         sessionKeyIdAsyncResult_[requestId] = sessionKeyId;
     }
     sessionKeyIdCondition_.notify_one();
