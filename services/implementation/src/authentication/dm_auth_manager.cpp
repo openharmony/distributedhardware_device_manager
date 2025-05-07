@@ -3107,8 +3107,8 @@ void DmAuthManager::RequestReCheckMsgDone()
 
 bool DmAuthManager::IsSinkMsgValid()
 {
-    LOGI("sink remoteVersion %{public}s, remoteDeviceId %{public}s, remoteUserId %{public}d,
-        remoteHostPkgName %{public}s, remoteBindLevel %{public}d", remoteVersion_.c_str(),
+    LOGI("sink remoteVersion %{public}s, remoteDeviceId %{public}s, remoteUserId %{public}d,"
+        "remoteHostPkgName %{public}s, remoteBindLevel %{public}d", remoteVersion_.c_str(),
         GetAnonyString(remoteDeviceId_).c_str(), authResponseContext_->remoteUserId,
         authResponseContext_->hostPkgName.c_str(), authResponseContext_->bindLevel);
     LOGI("src version %{public}s, deviceId %{public}s, userId %{public}d, hostPkgName %{public}s, bindLevel %{public}d",

@@ -2482,8 +2482,8 @@ void DeviceManagerServiceImpl::GetBindCallerInfo(DmBindCallerInfo &bindCallerInf
     bindCallerInfo.hostPkgLabel  = hostPkgLabel;
     bindCallerInfo.processName = processName;
     bindCallerInfo.isSystemSA = isSystemSA;
-    LOGI("userId %{public}d, tokenId %{public}d, bindLevel %{public}d, bundleName %{public}s, hostPkgLabel  %{public}s,
-        processName %{public}s, isSystemSA %{public}d", userId, callingTokenId, bindLevel,
+    LOGI("userId %{public}d, tokenId %{public}d, bindLevel %{public}d, bundleName %{public}s, hostPkgLabel  %{public}s,"
+        "processName %{public}s, isSystemSA %{public}d", userId, callingTokenId, bindLevel,
         GetAnonyString(bundleName).c_str(), GetAnonyString(hostPkgLabel).c_str(), GetAnonyString(processName).c_str(),
         isSystemSA);
 }
