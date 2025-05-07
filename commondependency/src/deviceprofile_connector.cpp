@@ -2543,7 +2543,8 @@ int32_t DeviceProfileConnector::UpdateLocalServiceInfo(
 int32_t DeviceProfileConnector::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
     int32_t pinExchangeType, DistributedDeviceProfile::LocalServiceInfo &localServiceInfo)
 {
-    LOGI("getLocalServiceInfo bundleName = %{public}s, pinExchangeType = %{public}d", bundleName.c_str(), pinExchangeType);
+    LOGI("getLocalServiceInfo bundleName = %{public}s, pinExchangeType = %{public}d",
+        bundleName.c_str(), pinExchangeType);
     int32_t ret = DistributedDeviceProfileClient::GetInstance().GetLocalServiceInfoByBundleAndPinType(bundleName,
         pinExchangeType, localServiceInfo);
     if (ret != DM_OK) {
