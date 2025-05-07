@@ -67,5 +67,11 @@ int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->UnBindDevice(pkgName, udid, bindLevel, extra);
 }
+
+int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &localUdid,
+    const std::string &peerDeviceId)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckDeviceInfoPermission(localUdid, peerDeviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
