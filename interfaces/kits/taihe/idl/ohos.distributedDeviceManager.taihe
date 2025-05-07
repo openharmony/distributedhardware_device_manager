@@ -18,18 +18,18 @@
 static { loadLibrary("device_manager_ani_taihe");}
 """)
 
-struct  DeviceBasicInfo {
+struct DeviceBasicInfo {
     deviceId: String;
     deviceName: String;
     deviceType: String;
     networkId : String;
 }
 
-struct  ServiceProfileInfo {
+struct ServiceProfileInfo {
     deviceId: String;
 }
 
-struct  DeviceProfileInfo {
+struct DeviceProfileInfo {
     deviceId: String;
     deviceName: String;
     deviceType: String;
@@ -43,7 +43,7 @@ enum DeviceStateChange: i32 {
 
 struct DeviceStatusStructer {
     DeviceStateChange: i32;
-    DeviceBasicInfo: DeviceBasicInfo;   
+    DeviceBasicInfo: DeviceBasicInfo;
 }
 
 interface DeviceManager {

@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "ohos.distributedDeviceManager.proj.hpp"
 #include "ohos.distributedDeviceManager.impl.hpp"
 #include "taihe/runtime.hpp"
@@ -25,6 +26,7 @@
 #include <iostream>
 
 #define DH_LOG_TAG "DeviceManager"
+
 namespace ANI::distributedDeviceManager {
 
 std::mutex g_initCallbackMapMutex_;
@@ -34,6 +36,7 @@ DeviceManagerImpl::DeviceManagerImpl(const std::string& bundleName) : bundleName
 {
     LOGI("ohos.distributedDeviceManager.cpp DeviceManagerImpl constructed with bundleName: %s", bundleName.c_str());
 }
+
 DeviceManagerImpl::DeviceManagerImpl(std::shared_ptr<DeviceManagerImpl> impl)
 {
     LOGI("ohos.distributedDeviceManager.cpp DeviceManagerImpl copy constructed");
@@ -194,7 +197,7 @@ ohos::distributedDeviceManager::DeviceManager createDeviceManager(taihe::string_
     }
     return taihe::make_holder<DeviceManagerImpl, ohos::distributedDeviceManager::DeviceManager>(impl);
 }
-}
+} // namespace ANI::distributedDeviceManager
 
 void ANI::distributedDeviceManager::DmAniInitCallback::OnRemoteDied()
 {
