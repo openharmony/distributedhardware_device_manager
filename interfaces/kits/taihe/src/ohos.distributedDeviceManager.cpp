@@ -63,7 +63,7 @@ string DeviceManagerImpl::getLocalDeviceId()
 void DeviceManagerImpl::unbindTarget(string_view deviceId)
 {
     LOGI("ohos.distributedDeviceManager.cpp UnBindDevice");
-    int32_t ret = OHOS::DistributedHardware:: DeviceManager::GetInstance().UnBindDevice(
+    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().UnBindDevice(
         bundleName_, std::string(deviceId));
     if (ret != 0) {
         LOGE("UnBindDevice for bundleName %{public}s failed, ret %{public}d",
