@@ -608,10 +608,10 @@ void AuthSinkConfirmState::MatchFallBackCandidateList(
 
 void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> context)
 {
-    // query ServiceInfo by accessee.bundleName and authType from client
+    // query ServiceInfo by accessee.pkgName and authType from client
     OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
     auto ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
-        context->accessee.bundleName, context->authType, srvInfo);
+        context->accessee.pkgName, context->authType, srvInfo);
     if (ret == OHOS::DistributedDeviceProfile::DP_SUCCESS) {
         LOGI("AuthSinkConfirmState::ReadServiceInfo found");
         // ServiceInfo found
