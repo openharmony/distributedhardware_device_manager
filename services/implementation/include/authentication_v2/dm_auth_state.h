@@ -154,7 +154,6 @@ public:
     void SetAclExtraInfo(std::shared_ptr<DmAuthContext> context);
     void SetAclInfo(std::shared_ptr<DmAuthContext> context);
     int32_t GetAclBindType(std::shared_ptr<DmAuthContext> context, std::string credId);
-    static bool CheckProcessNameInWhiteList(const std::string &processName);
     int32_t GetOutputState(const std::string &processName, int32_t state);
     int32_t GetOutputReplay(const std::string &processName, int32_t replay);
     static uint64_t GetSysTimeMs();

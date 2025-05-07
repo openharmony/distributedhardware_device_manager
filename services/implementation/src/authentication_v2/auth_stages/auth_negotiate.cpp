@@ -148,7 +148,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
         LOGE("sink not contain the bundlename %{public}s.", context->accessee.bundleName.c_str());
         return ERR_DM_GET_TOKENID_FAILED;
     }
-    if (DmAuthState::CheckProcessNameInWhiteList(context->accessee.bundleName)) {
+    if (AuthManagerBase::CheckProcessNameInWhiteList(context->accessee.bundleName)) {
         context->accessee.bindLevel = DmRole::DM_ROLE_USER;
     }
     context->accessee.tokenIdHash = Crypto::GetTokenIdHash(std::to_string(context->accessee.tokenId));

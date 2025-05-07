@@ -61,19 +61,6 @@ const std::map<int32_t, int32_t> NEW_AND_OLD_REPLAY_MAPPING = {
     { SOFTBUS_OK, SOFTBUS_OK }
 };
 
-constexpr int32_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = 1;
-constexpr int32_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = 4;
-constexpr const static char* OPEN_PROCESS_NAME_WHITE_LIST[OPEN_PROCESS_NAME_WHITE_LIST_NUM] = {
-    "com.example.myapplication"
-};
-constexpr const static char* CLOSE_PROCESS_NAME_WHITE_LIST[CLOSE_PROCESS_NAME_WHITE_LIST_NUM] = {
-    "CollaborationFwk",
-    "gameservice_server",
-    "wear_link_service",
-    "watch_system_service"
-};
-
-
 int32_t DmAuthState::GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut)
 {
     LOGI("GetTaskTimeout, taskName: %{public}s, authType_: %{public}d", taskName, context->authType);
@@ -339,35 +326,6 @@ bool DmAuthState::HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const 
         (sinkTokenIdHash == context->accessee.tokenIdHash)) ||
         ((sinkTokenIdHash == context->accesser.tokenIdHash) &&
         (srcTokenIdHash == context->accessee.tokenIdHash));
-}
-
-bool DmAuthState::CheckProcessNameInWhiteList(const std::string &processName)
-{
-    LOGI("DmAuthState::CheckProcessNameInWhiteList start");
-    if (processName.empty()) {
-        LOGE("processName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-#ifdef DEVICE_MANAGER_COMMON_FLAG
-    for (; index < OPEN_PROCESS_NAME_WHITE_LIST_NUM; ++index) {
-        std::string whitePkgName(OPEN_PROCESS_NAME_WHITE_LIST[index]);
-        if (processName == whitePkgName) {
-            LOGI("processName = %{public}s in whiteList.", processName.c_str());
-            return true;
-        }
-    }
-#else
-    for (; index < CLOSE_PROCESS_NAME_WHITE_LIST_NUM; ++index) {
-        std::string whitePkgName(CLOSE_PROCESS_NAME_WHITE_LIST[index]);
-        if (processName == whitePkgName) {
-            LOGI("processName = %{public}s in whiteList.", processName.c_str());
-            return true;
-        }
-    }
-#endif
-    LOGI("CheckProcessNameInWhiteList: %{public}s invalid.", processName.c_str());
-    return false;
 }
 
 int32_t DmAuthState::GetOutputState(const std::string &processName, int32_t state)

@@ -494,9 +494,6 @@ public:
     static bool IsPinCodeValid(int32_t numpin);
     bool IsImportedAuthCodeValid();
     bool IsSrc();
-    void GetCallerInfo(DmBindCallerInfo &callerInfo);
-    void SetCallerInfo(const DmBindCallerInfo &callerInfo);
-    void ClearCallerInfo();
 
 private:
     bool IsHmlSessionType();
@@ -513,7 +510,6 @@ private:
         const std::string &extra);
     int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
     bool CheckHmlParamValid(JsonObject &jsonObject);
-    bool CheckProcessNameInWhiteList(const std::string &processName);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
     std::string GetAccountGroupIdHash();
@@ -539,7 +535,6 @@ private:
     void MemberJoinAuthRequest(int64_t requestId, int32_t status);
     void PutSrcAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
     void PutSinkAccessControlList(DmAccesser &accesser, DmAccessee &accessee, const std::string &localUdid);
-    void GetCallerInfo(const std::string &pkgName, JsonObject &jsonObject);
 
 public:
     void RequestCredential();
@@ -582,7 +577,6 @@ private:
     void PutAccessControlList();
     void SinkAuthenticateFinish();
     void SrcAuthenticateFinish();
-    std::string GetBundleLable(const std::string &bundleName);
     bool IsScreenLocked();
     void CheckAndEndTvDream();
     std::string ConvertSinkVersion(const std::string &version);
@@ -591,9 +585,6 @@ private:
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
     void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
     void DeleteOffLineTimer(int32_t sessionId);
-    bool IsAllowDeviceBind();
-    int32_t GetBindLevel(int32_t bindLevel);
-    std::string GetBundleName(JsonObject &jsonObject);
     int32_t GetBinderInfo();
     void SetProcessInfo();
     int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
@@ -602,8 +593,8 @@ private:
     bool IsSourceMsgValid();
     void ProcessReqPublicKey();
     int32_t GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId);
-    bool CheckBindLevel(const JsonItemObject &jsonObj, const std::string &key, int32_t &bindLevel);
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
+    void GetBindCallerInfo();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -651,9 +642,8 @@ private:
     std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
     bool isWaitingJoinLnnCallback_ = false;
     CleanNotifyCallback cleanNotifyCallback_{nullptr};
-    std::mutex callerInfoMutex_;
-    DmBindCallerInfo callerInfo_;
-    bool callerInfoReady_ = false;
+    std::mutex bindParamMutex_;
+    std::map<std::string, std::string> bindParam_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -60,6 +60,16 @@ struct Config {
     int32_t authenticationType{0};
 };
 
+typedef struct DmBindCallerInfo {
+    int32_t userId = -1;
+    int32_t tokenId = -1;
+    int32_t bindLevel = -1;
+    bool isSystemSA = false;
+    std::string bundleName = "";
+    std::string hostPkgLabel = "";
+    std::string processName = "";
+} DmBindCallerInfo;
+
 class DeviceManagerServiceImpl : public IDeviceManagerServiceImpl {
 public:
     DeviceManagerServiceImpl();
@@ -243,6 +253,12 @@ private:
     void CheckIsLastLnnAcl(DistributedDeviceProfile::AccessControlProfile profile,
         DistributedDeviceProfile::AccessControlProfile delProfile, DmOfflineParam &lnnAclParam,
         bool &isLastLnnAcl, const std::string &localUdid);
+    void BindTargetImpl(uint64_t tokenId, const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam);
+    void GetBindCallerInfo(DmBindCallerInfo &bindCallerInfo);
+    void SetBindCallerInfoToBindParam(const std::map<std::string, std::string> &bindParam,
+        std::map<std::string, std::string> &bindParamTmp, const DmBindCallerInfo &bindCallerInfo);
+    std::string GetBundleLable(const std::string &bundleName);
 private:
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
     std::mutex authMgrMtx_;

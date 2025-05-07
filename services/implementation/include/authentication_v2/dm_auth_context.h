@@ -76,13 +76,6 @@ enum DmAuthScope {
     DM_AUTH_SCOPE_APP,
 };
 
-enum DmRole {
-    DM_ROLE_UNKNOWN = 0,
-    DM_ROLE_USER = 1,
-    DM_ROLE_SA,
-    DM_ROLE_FA,
-};
-
 enum {
     DM_UNKNOWN_TYPE = 0,
     DM_SAME_ACCOUNT_TYPE = 1,

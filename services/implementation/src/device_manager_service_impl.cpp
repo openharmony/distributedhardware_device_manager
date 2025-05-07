@@ -21,6 +21,8 @@
 #include <functional>
 
 #include "app_manager.h"
+#include "bundle_mgr_interface.h"
+#include "bundle_mgr_proxy.h"
 #include "dm_error_type.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -37,6 +39,8 @@
 #include "common_event_support.h"
 using namespace OHOS::EventFwk;
 #endif
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -843,8 +847,6 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
     std::map<std::string, std::string> bindParam;
     auto authMgr = GetAuthMgrByTokenId(tokenId);
     authMgr->GetBindTargetParams(pkgName, peerTargetId, bindParam);
-    DmBindCallerInfo callerInfo;
-    authMgr->GetCallerInfo(callerInfo);
     int32_t authType = -1;
     authMgr->ParseAuthType(bindParam, authType);
     authMgrMap_.erase(tokenId);
@@ -858,7 +860,6 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
         return ret;
     }
     authMgr = nullptr;
-    authMgr_->SetCallerInfo(callerInfo);
     if (authMgr_->BindTarget(pkgName, peerTargetId, bindParam, sessionId, 0) != DM_OK) {
         LOGE("DeviceManagerServiceImpl::TransferSrcOldAuthMgr authManager BindTarget failed");
         return ERR_DM_AUTH_FAILED;
@@ -1536,14 +1537,9 @@ int32_t DeviceManagerServiceImpl::ParseConnectAddr(const PeerTargetId &targetId,
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
-    const std::map<std::string, std::string> &bindParam)
+void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::string &pkgName,
+    const PeerTargetId &targetId, const std::map<std::string, std::string> &bindParam)
 {
-    if (pkgName.empty()) {
-        LOGE("BindTarget failed, pkgName is empty.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-
     std::string deviceId = "";
     PeerTargetId targetIdTmp = const_cast<PeerTargetId&>(targetId);
     if (ParseConnectAddr(targetId, deviceId, bindParam) == DM_OK) {
@@ -1551,14 +1547,14 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     } else {
         if (targetId.deviceId.empty()) {
             LOGE("DeviceManagerServiceImpl::BindTarget failed, ParseConnectAddr failed.");
-            return ERR_DM_INPUT_PARA_INVALID;
+            return;
         }
     }
     // Created only at the source end. The same target device will not be created repeatedly with the new protocol.
     std::shared_ptr<Session> curSession = GetOrCreateSession(targetIdTmp.deviceId, bindParam);
     if (curSession == nullptr) {
         LOGE("Failed to create the session. Target deviceId: %{public}s.", targetIdTmp.deviceId.c_str());
-        return ERR_DM_AUTH_OPEN_SESSION_FAILED;
+        return;
     }
 
     // Logical session random number
@@ -1568,7 +1564,8 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
         logicalSessionId = GenerateRandNum(sessionId);
         if (curSession->logicalSessionSet_.find(logicalSessionId) != curSession->logicalSessionSet_.end()) {
             LOGE("Failed to create the logical session.");
-            return ERR_DM_LOGIC_SESSION_CREATE_FAILED;
+            softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+            return;
         }
     }
 
@@ -1577,7 +1574,8 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     int32_t ret = InitAndRegisterAuthMgr(true, tokenId, curSession, logicalSessionId);
     if (ret != DM_OK) {
         LOGE("InitAndRegisterAuthMgr failed, ret %{public}d.", ret);
-        return ret;
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+        return;
     }
     curSession->logicalSessionSet_.insert(logicalSessionId);
     curSession->logicalSessionCnt_.fetch_add(1);
@@ -1586,14 +1584,39 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
 
     auto authMgr = GetAuthMgrByTokenId(tokenId);
     if (authMgr == nullptr) {
-        return ERR_DM_POINT_NULL;
+        CleanAuthMgrByLogicalSessionId(logicalSessionId);
+        return;
     }
     authMgr->SetBindTargetParams(targetId);
     if ((ret = authMgr->BindTarget(pkgName, targetIdTmp, bindParam, sessionId, logicalSessionId)) != DM_OK) {
         LOGE("authMgr BindTarget failed, ret %{public}d.", ret);
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
     }
-    return ret;
+    LOGI("DeviceManagerServiceImpl BindTargetImpl thread end, tokenId %{public}" PRId64".", tokenId);
+    return;
+}
+
+int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    if (pkgName.empty()) {
+        LOGE("BindTarget failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DmBindCallerInfo bindCallerInfo;
+    GetBindCallerInfo(bindCallerInfo);
+    std::map<std::string, std::string> bindParamTmp;
+    SetBindCallerInfoToBindParam(bindParam, bindParamTmp, bindCallerInfo);
+    uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
+    if (authMgrMap_.find(tokenId) == authMgrMap_.end()) {
+        std::thread newThread(&DeviceManagerServiceImpl::BindTargetImpl, this, tokenId, pkgName,
+            targetId, bindParamTmp);
+        newThread.detach();
+    } else {
+        LOGE("BindTarget failed, this device is being bound. please try again later.");
+        return ERR_DM_AUTH_BUSINESS_BUSY;
+    }
+    return DM_OK;
 }
 
 int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
@@ -2428,6 +2451,92 @@ void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint
         localUserIds, localUdid);
     DeviceProfileConnector::GetInstance().HandleSyncForegroundUserIdEvent(rmtFrontUserIdsTemp, remoteUdid,
         localUserIds, localUdid);
+}
+
+void DeviceManagerServiceImpl::GetBindCallerInfo(DmBindCallerInfo &bindCallerInfo)
+{
+    LOGI("start.");
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+    uint32_t callingTokenId = 0;
+    MultipleUserConnector::GetCallingTokenId(callingTokenId);
+    bool isSystemSA = false;
+    std::string bundleName = "";
+    AppManager::GetInstance().GetCallerName(isSystemSA, bundleName);
+    std::string processName = "";
+    AppManager::GetInstance().GetCallerProcessName(processName);
+    int32_t bindLevel = static_cast<int32_t>(DmRole::DM_ROLE_FA);
+    if (AppManager::GetInstance().IsSystemApp()) {
+        bindLevel = static_cast<int32_t>(DmRole::DM_ROLE_FA);
+    }
+    if (AppManager::GetInstance().IsSystemSA()) {
+        bindLevel = static_cast<int32_t>(DmRole::DM_ROLE_SA);
+    }
+    if (AuthManagerBase::CheckProcessNameInWhiteList(bundleName)) {
+        bindLevel = static_cast<int32_t>(DmRole::DM_ROLE_USER);
+    }
+    std::string hostPkgLabel = GetBundleLable(bundleName);
+    bindCallerInfo.userId = userId;
+    bindCallerInfo.tokenId = callingTokenId;
+    bindCallerInfo.bindLevel = bindLevel;
+    bindCallerInfo.bundleName = bundleName;
+    bindCallerInfo.hostPkgLabel  = hostPkgLabel;
+    bindCallerInfo.processName = processName;
+    bindCallerInfo.isSystemSA = isSystemSA;
+    LOGI("userId %{public}d, tokenId %{public}d, bindLevel %{public}d, bundleName %{public}s, hostPkgLabel  %{public}s,
+        processName %{public}s, isSystemSA %{public}d", userId, callingTokenId, bindLevel,
+        GetAnonyString(bundleName).c_str(), GetAnonyString(hostPkgLabel).c_str(), GetAnonyString(processName).c_str(),
+        isSystemSA);
+}
+
+std::string DeviceManagerServiceImpl::GetBundleLable(const std::string &bundleName)
+{
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        LOGE("Get ability manager failed");
+        return bundleName;
+    }
+
+    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (object == nullptr) {
+        LOGE("object is NULL.");
+        return bundleName;
+    }
+
+    sptr<OHOS::AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
+    if (bms == nullptr) {
+        LOGE("bundle manager service is NULL.");
+        return bundleName;
+    }
+
+    auto bundleResourceProxy = bms->GetBundleResourceProxy();
+    if (bundleResourceProxy == nullptr) {
+        LOGE("GetBundleResourceProxy fail");
+        return bundleName;
+    }
+    AppExecFwk::BundleResourceInfo resourceInfo;
+    auto result = bundleResourceProxy->GetBundleResourceInfo(bundleName,
+        static_cast<uint32_t>(OHOS::AppExecFwk::ResourceFlag::GET_RESOURCE_INFO_ALL), resourceInfo);
+    if (result != ERR_OK) {
+        LOGE("GetBundleResourceInfo failed");
+        return bundleName;
+    }
+    LOGI("bundle resource label is %{public}s ", (resourceInfo.label).c_str());
+    return resourceInfo.label;
+}
+
+void DeviceManagerServiceImpl::SetBindCallerInfoToBindParam(const std::map<std::string, std::string> &bindParam,
+    std::map<std::string, std::string> &bindParamTmp, const DmBindCallerInfo &bindCallerInfo)
+{
+    LOGI("start.");
+    bindParamTmp = const_cast<std::map<std::string, std::string> &>(bindParam);
+    bindParamTmp["bindCallerUserId"] = std::to_string(bindCallerInfo.userId);
+    bindParamTmp["bindCallerTokenId"] = std::to_string(bindCallerInfo.tokenId);
+    bindParamTmp["bindCallerBindLevel"] = std::to_string(bindCallerInfo.bindLevel);
+    bindParamTmp["bindCallerBundleName"] = bindCallerInfo.bundleName;
+    bindParamTmp["bindCallerHostPkgLabel"] = bindCallerInfo.hostPkgLabel;
+    bindParamTmp["bindCallerProcessName"] = bindCallerInfo.processName;
+    bindParamTmp["bindCallerIsSystemSA"] = bindCallerInfo.isSystemSA;
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
