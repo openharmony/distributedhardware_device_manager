@@ -38,6 +38,15 @@ taihe_shared_library("device_manager_ani_taihe") {
   subsystem_name = "$subsystem_name"
   part_name = "$part_name"
 
+  sanitize = {
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    integer_overflow = true
+    ubsan = true
+  }
+
   include_dirs = [
     "include",
     "${innerkits_path}/native_cpp/include",
@@ -67,7 +76,6 @@ generate_static_abc("ohos_distributedDeviceManager_abc") {
   device_dst_file = "/system/framework/ohos_distributedDeviceManager_abc.abc"
   dependencies = [ ":run_taihe" ]
 }
-
 
 ohos_prebuilt_etc("ohos_distributedDeviceManager_etc") {
   source = "$target_out_dir/ohos_distributedDeviceManager_abc.abc"
