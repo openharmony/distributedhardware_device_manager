@@ -1570,7 +1570,6 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
     }
 
     // Create on the src end.
-    uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
     int32_t ret = InitAndRegisterAuthMgr(true, tokenId, curSession, logicalSessionId);
     if (ret != DM_OK) {
         LOGE("InitAndRegisterAuthMgr failed, ret %{public}d.", ret);
