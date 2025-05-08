@@ -147,6 +147,11 @@ bool RelationShipChangeMsg::ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) con
 
 void RelationShipChangeMsg::ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) const
 {
+    if (credId.length() != (CREDID_PAYLOAD_LEN - USERID_PAYLOAD_LEN)) {
+        LOGE("ToShareUnbindPayLoad credId length is invalid.");
+        len = 0;
+        return;
+    }
     msg = new uint8_t[SHARE_UNBIND_PAYLOAD_LEN]();
     for (int i = 0; i < USERID_PAYLOAD_LEN; i++) {
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
@@ -596,6 +601,10 @@ cJSON *RelationShipChangeMsg::ToPayLoadJson() const
     uint32_t len = 0;
     if (!this->ToBroadcastPayLoad(payload, len)) {
         LOGE("Get broadcast payload failed");
+        return nullptr;
+    }
+    if (payload == nullptr || len == 0) {
+        LOGE("payload is null or len is 0.");
         return nullptr;
     }
     cJSON *arrayObj = cJSON_CreateArray();
