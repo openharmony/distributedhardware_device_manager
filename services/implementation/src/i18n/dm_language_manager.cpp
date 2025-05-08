@@ -18,8 +18,10 @@
 #include "cJSON.h"
 #include <map>
 
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
+#include "json_object.h"
 #include "parameter.h"
 
 namespace OHOS {
@@ -125,6 +127,28 @@ std::string DmLanguageManager::GetTextBySystemLanguage(const std::string &text)
     return "";
 }
 
+std::string DmLanguageManager::GetTextBySystemLanguage(const std::string &text, const std::string &language)
+{
+    if (text.empty()) {
+        return "";
+    }
+    JsonObject jsonObject(text);
+    if (jsonObject.IsDiscarded()) {
+        LOGI("the text is not a jsonStr");
+        return text;
+    }
+    if (IsString(jsonObject, language)) {
+        return jsonObject[language].Get<std::string>();
+    }
+    if (IsString(jsonObject, DEFAULT_LANGUAGE)) {
+        return jsonObject[DEFAULT_LANGUAGE].Get<std::string>();
+    }
+    if (IsString(jsonObject, LANGUAGE_EN)) {
+        return jsonObject[LANGUAGE_EN].Get<std::string>();
+    }
+    return "";
+}
+
 std::string DmLanguageManager::GetTextBySystemLocale(const cJSON *const textObj,
     const std::set<std::string> &localeSet)
 {
@@ -148,16 +172,17 @@ std::string DmLanguageManager::GetTextBySystemLocale(const cJSON *const textObj,
 std::string DmLanguageManager::GetSystemLanguage()
 {
     std::string language = GetSystemParam(SYSTEM_LANGUAGE_KEY);
-    if (!language.empty()) {
-        return language;
+    language = language.empty() ? DEFAULT_LANGUAGE : language;
+    std::set<std::string> localeSet;
+    GetLocaleByLanguage(language, localeSet);
+    if (localeSet.size() > 0) {
+        std::string languageLocale = GetSystemParam(SYSTEM_LANGUAGE_LOCALE_KEY);
+        if (localeSet.find(languageLocale) != localeSet.end()) {
+            return languageLocale;
+        }
+        return *localeSet.begin();
     }
-
-    language = GetSystemParam(SYSTEM_LANGUAGE_LOCALE_KEY);
-    if (!language.empty()) {
-        return language;
-    }
-
-    return DEFAULT_LANGUAGE;
+    return language;
 }
 
 std::string DmLanguageManager::GetTextByLanguage(const std::string &text, const std::string &language)

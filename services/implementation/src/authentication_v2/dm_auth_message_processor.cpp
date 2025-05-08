@@ -98,6 +98,7 @@ const char* TAG_CREDENTIAL_INFO = "credentialInfo";
 const char* TAG_CERT_INFO = "certInfo";
 const char* TAG_LANGUAGE = "language";
 const char* TAG_ULTRASONIC_SIDE = "ultrasonicSide";
+constexpr const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
 
 namespace {
 
@@ -618,7 +619,6 @@ int32_t DmAuthMessageProcessor::CreateNegotiateOldMessage(std::shared_ptr<DmAuth
     jsonObject[TAG_TOKENID] = context->accesser.tokenId;
     jsonObject[TAG_IDENTICAL_ACCOUNT] = false;
     jsonObject[TAG_HAVE_CREDENTIAL] = false;
-    jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
     jsonObject[TAG_REMOTE_DEVICE_NAME] = context->accesser.deviceName;
 
     return DM_OK;
@@ -651,7 +651,7 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_ULTRASONIC_SIDE] = static_cast<int32_t>(context->ultrasonicInfo);
     jsonObject[TAG_PEER_DISPLAY_ID] = context->accessee.displayId;
     jsonObject[TAG_PEER_PKG_NAME] = context->accessee.pkgName;
-
+    jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
     return DM_OK;
 }
 
@@ -1011,7 +1011,9 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     if (jsonObject[TAG_PEER_DISPLAY_ID].IsNumberInteger()) {
         context->accessee.displayId = jsonObject[TAG_PEER_DISPLAY_ID].Get<int32_t>();
     }
-
+    if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
+        context->pkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
+    }
     ParseUltrasonicSide(jsonObject, context);
 
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
@@ -1105,6 +1107,9 @@ int32_t DmAuthMessageProcessor::ParseMessageReqUserConfirm(const JsonObject &jso
     }
     if (json[TAG_EXTRA_INFO].IsString()) {
         context->accesser.extraInfo = json[TAG_EXTRA_INFO].Get<std::string>();
+    }
+    if (IsString(json, TAG_CUSTOM_DESCRIPTION)) {
+        context->customData = json[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
     }
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkConfirmState>());
     return DM_OK;
@@ -1201,6 +1206,7 @@ int32_t DmAuthMessageProcessor::CreateMessageReqUserConfirm(std::shared_ptr<DmAu
     json[TAG_DEVICE_TYPE] = context->accesser.deviceType;
     json[TAG_DEVICE_NAME] = context->accesser.deviceName;
     json[TAG_EXTRA_INFO] = context->accesser.extraInfo;
+    json[TAG_CUSTOM_DESCRIPTION] = context->customData;
 
     return DM_OK;
 }

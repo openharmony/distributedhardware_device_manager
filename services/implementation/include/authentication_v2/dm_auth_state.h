@@ -201,6 +201,7 @@ private:
         JsonObject &credTypeJson);
     void GetSrcCredTypeForP2P(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credObj,
         JsonObject &aclInfo, JsonObject &credTypeJson, int32_t credType, std::vector<std::string> &deleteCredInfo);
+    void GetCustomDescBySinkLanguage(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkStatePinAuthComm {
