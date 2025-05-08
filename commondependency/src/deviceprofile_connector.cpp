@@ -672,31 +672,36 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
             continue;
         }
         uint32_t highestBindType = CheckBindType(trustDeviceId, deviceId);
-        if (highestBindType == IDENTICAL_ACCOUNT_TYPE) {
-            deviceIdMap[trustDeviceId] = DmAuthForm::IDENTICAL_ACCOUNT;
-            continue;
-        } else if (highestBindType == SHARE_TYPE) {
-            if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, DmAuthForm::ACROSS_ACCOUNT)) {
-                LOGI("GetAuthFormMap CheckSinkShareType true.");
-                continue;
-            }
-            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
-            continue;
-        } else if (highestBindType == DEVICE_PEER_TO_PEER_TYPE || highestBindType == APP_PEER_TO_PEER_TYPE ||
-            highestBindType == SERVICE_PEER_TO_PEER_TYPE) {
-            deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
-            continue;
-        } else if (highestBindType == APP_ACROSS_ACCOUNT_TYPE ||
-            highestBindType == DEVICE_ACROSS_ACCOUNT_TYPE || highestBindType == SERVICE_ACROSS_ACCOUNT_TYPE) {
-            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
-            continue;
-        } else {
-            LOGI("GetAuthFormMap highestBindType match failed.");
-            deviceIdMap[trustDeviceId] = DmAuthForm::INVALID_TYPE;
-            continue;
-        }
+        HighestBindTypeMatch(highestBindType);
     }
     return deviceIdMap;
+}
+
+void DeviceProfileConnector::HighestBindTypeMatch(uint32_t highestBindType)
+{
+    if (highestBindType == IDENTICAL_ACCOUNT_TYPE) {
+        deviceIdMap[trustDeviceId] = DmAuthForm::IDENTICAL_ACCOUNT;
+        continue;
+    } else if (highestBindType == SHARE_TYPE) {
+        if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, DmAuthForm::ACROSS_ACCOUNT)) {
+            LOGI("GetAuthFormMap CheckSinkShareType true.");
+            continue;
+        }
+        deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
+        continue;
+    } else if (highestBindType == DEVICE_PEER_TO_PEER_TYPE || highestBindType == APP_PEER_TO_PEER_TYPE ||
+        highestBindType == SERVICE_PEER_TO_PEER_TYPE) {
+        deviceIdMap[trustDeviceId] = DmAuthForm::PEER_TO_PEER;
+        continue;
+    } else if (highestBindType == APP_ACROSS_ACCOUNT_TYPE ||
+        highestBindType == DEVICE_ACROSS_ACCOUNT_TYPE || highestBindType == SERVICE_ACROSS_ACCOUNT_TYPE) {
+        deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
+        continue;
+    } else {
+        LOGI("GetAuthFormMap highestBindType match failed.");
+        deviceIdMap[trustDeviceId] = DmAuthForm::INVALID_TYPE;
+        continue;
+    }
 }
 
 bool DeviceProfileConnector::CheckSinkShareType(const DistributedDeviceProfile::AccessControlProfile &profile,

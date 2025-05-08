@@ -326,6 +326,7 @@ private:
         const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkShareType(const DistributedDeviceProfile::AccessControlProfile &profile,
         const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType);
+    void HighestBindTypeMatch(uint32_t highestBindType);
     std::unordered_map<std::string, DmAuthForm> GetAuthFormMap(const std::string &pkgName, const std::string &deviceId,
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
