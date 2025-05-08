@@ -51,6 +51,7 @@ constexpr int32_t DM_IPC_THREAD_NUM = 32;
 constexpr int32_t MAX_CALLBACK_NUM = 5000;
 constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000; // 5 minutes
 constexpr int32_t ECHO_COUNT = 2;
+constexpr int32_t PATH_MAX = 4096;
 
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
@@ -98,7 +99,8 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
         std::string path = JoinPath("/proc/", std::to_string(memmgrPid), "reclaim");
         std::string contentStr = "1";
         LOGI("Start echo 1 to pid : %{public}d, path: %{public}s", memmgrPid, path.c_str());
-        char *tmp = realpath(path.c_str(), nullptr);
+        char *resolvedPath = new char[PATH_MAX];
+        realpath(path.c_str(), resolvedPath);
         if (tmp == nullptr) {
             LOGE("path failed");
         }
