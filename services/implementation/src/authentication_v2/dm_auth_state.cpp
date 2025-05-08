@@ -175,6 +175,7 @@ std::string DmAuthState::GenerateBindResultContent(std::shared_ptr<DmAuthContext
     DmAccess access = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
         context->accessee : context->accesser;
     JsonObject jsonObj;
+    LOGE("networkId: %{public}s", GetAnonyString(access.networkId).c_str());
     jsonObj[DM_BIND_RESULT_NETWORK_ID] = access.networkId;
     if (access.deviceId.empty()) {
         jsonObj[TAG_DEVICE_ID] = "";

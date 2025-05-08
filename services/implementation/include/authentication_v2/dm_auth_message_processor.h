@@ -64,6 +64,7 @@ extern const char* TAG_TRANSMIT_SK_TIMESTAMP;
 extern const char* TAG_LNN_SK_TIMESTAMP;
 extern const char* TAG_USER_ID;
 extern const char* TAG_TOKEN_ID;
+extern const char* TAG_NETWORKID_ID;
 extern const char* TAG_ISSUER;
 
 extern const char* TAG_DEVICE_VERSION;
