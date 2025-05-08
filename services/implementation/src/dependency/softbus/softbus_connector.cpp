@@ -683,17 +683,39 @@ void SoftbusConnector::SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec
 
 std::vector<ProcessInfo> SoftbusConnector::GetProcessInfo()
 {
-    LOGI("In");
+    LOGI("SoftbusConnector::GetProcessInfo");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     return processInfoVec_;
 }
 
 void SoftbusConnector::ClearProcessInfo()
 {
-    LOGI("In");
+    LOGI("SoftbusConnector::ClearProcessInfo");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_.clear();
 }
+
+void SoftbusConnector::SetChangeProcessInfo(ProcessInfo processInfo)
+{
+    LOGI("SoftbusConnector::SetChangeProcessInfo");
+    std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
+    processChangeInfoVec_.push_back(processInfo);
+}
+
+std::vector<ProcessInfo> SoftbusConnector::GetChangeProcessInfo()
+{
+    LOGI("SoftbusConnector::GetChangeProcessInfo");
+    std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
+    return processChangeInfoVec_;
+}
+
+void SoftbusConnector::ClearChangeProcessInfo()
+{
+    LOGI("SoftbusConnector::ClearChangeProcessInfo");
+    std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
+    processChangeInfoVec_.clear();
+}
+
 
 void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm)
 {
