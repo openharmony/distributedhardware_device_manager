@@ -20,13 +20,10 @@
 #include <string>
 #include <unistd.h>
 
-#include "bundle_mgr_interface.h"
-#include "bundle_mgr_proxy.h"
 #include "iservice_registry.h"
 #if defined(SUPPORT_SCREENLOCK)
 #include "screenlock_manager.h"
 #endif
-#include "system_ability_definition.h"
 
 #include "app_manager.h"
 #include "auth_message_processor.h"
@@ -182,34 +179,7 @@ int32_t DmAuthManager::CheckAuthParamVaildExtra(const std::string &extra, const 
     if (jsonObject.IsDiscarded() || !jsonObject.Contains(TAG_BIND_LEVEL)) {
         return DM_OK;
     }
-    int32_t bindLevel = INVALID_TYPE;
-    if (!CheckBindLevel(jsonObject, TAG_BIND_LEVEL, bindLevel)) {
-        LOGE("TAG_BIND_LEVEL is not integer string or int32.");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (static_cast<uint32_t>(bindLevel) > APP || bindLevel < INVALID_TYPE) {
-        LOGE("bindlevel error %{public}d.", bindLevel);
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-
-    if (static_cast<uint32_t>(bindLevel) == USER && !IsAllowDeviceBind()) {
-        LOGE("not allowd user level bind bindlevel: %{public}d.", bindLevel);
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     return DM_OK;
-}
-
-bool DmAuthManager::CheckBindLevel(const JsonItemObject &jsonObj, const std::string &key, int32_t &bindLevel)
-{
-    if (IsJsonValIntegerString(jsonObj, TAG_BIND_LEVEL)) {
-        bindLevel = std::atoi(jsonObj[TAG_BIND_LEVEL].Get<std::string>().c_str());
-        return true;
-    }
-    if (IsInt32(jsonObj, TAG_BIND_LEVEL)) {
-        bindLevel = jsonObj[TAG_BIND_LEVEL].Get<int32_t>();
-        return true;
-    }
-    return false;
 }
 
 bool DmAuthManager::CheckHmlParamValid(JsonObject &jsonObject)
@@ -231,25 +201,6 @@ bool DmAuthManager::CheckHmlParamValid(JsonObject &jsonObject)
     return true;
 }
 
-bool DmAuthManager::CheckProcessNameInWhiteList(const std::string &processName)
-{
-    LOGI("DmAuthManager::CheckProcessNameInWhiteList start");
-    if (processName.empty()) {
-        LOGE("processName is empty");
-        return false;
-    }
-    uint16_t index = 0;
-    for (; index < PROCESS_NAME_WHITE_LIST_NUM; ++index) {
-        std::string whitePkgName(PROCESS_NAME_WHITE_LIST[index]);
-        if (processName == whitePkgName) {
-            LOGI("processName = %{public}s in whiteList.", processName.c_str());
-            return true;
-        }
-    }
-    LOGI("CheckProcessNameInWhiteList: %{public}s invalid.", processName.c_str());
-    return false;
-}
-
 void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
@@ -265,6 +216,7 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     authRequestContext_->deviceId = deviceId;
     authRequestContext_->addr = deviceId;
     authRequestContext_->dmVersion = DM_VERSION_5_0_5;
+    authRequestContext_->localUserId = MultipleUserConnector::GetFirstForegroundUserId();
     authRequestContext_->localAccountId =
         MultipleUserConnector::GetOhosAccountIdByUserId(authRequestContext_->localUserId);
     authRequestContext_->isOnline = false;
@@ -277,7 +229,6 @@ void DmAuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     }
     ParseJsonObject(jsonObject);
     authRequestContext_->token = std::to_string(GenRandInt(MIN_PIN_TOKEN, MAX_PIN_TOKEN));
-    authRequestContext_->bindLevel = GetBindLevel(authRequestContext_->bindLevel);
 }
 
 void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
@@ -296,7 +247,6 @@ void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
         if (IsString(jsonObject, TAG_APP_THUMBNAIL2)) {
             authRequestContext_->appThumbnail = jsonObject[TAG_APP_THUMBNAIL2].Get<std::string>();
         }
-        CheckBindLevel(jsonObject, TAG_BIND_LEVEL, authRequestContext_->bindLevel);
         authRequestContext_->closeSessionDelaySeconds = 0;
         if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
             std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
@@ -375,7 +325,7 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
         LOGE("extra string not a json type.");
         return;
     }
-    GetCallerInfo(pkgName, jsonObject);
+    
     GetAuthParam(pkgName, authType, deviceId, extra);
     authMessageProcessor_->SetRequestContext(authRequestContext_);
     authRequestState_ = std::make_shared<AuthRequestInitState>();
@@ -384,6 +334,7 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     if (!DmRadarHelper::GetInstance().ReportAuthStart(peerTargetId_.deviceId, pkgName)) {
         LOGE("ReportAuthStart failed");
     }
+    GetBindCallerInfo();
     authRequestState_->Enter();
     LOGI("DmAuthManager::AuthenticateDevice complete");
 }
@@ -392,29 +343,34 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     const std::string &deviceId, const std::string &extra)
 {
     LOGI("DmAuthManager::AuthenticateDevice start auth type %{public}d.", authType);
+    processInfo_.pkgName = pkgName;
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
+            processInfo_.userId = std::atoi(bindParam_["bindCallerUserId"].c_str());
+        }
+    }
     SetAuthType(authType);
     int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
+        listener_->OnBindResult(processInfo_, peerTargetId_, ret, STATUS_DM_AUTH_DEFAULT, "");
         return ret;
     }
     ret = CheckAuthParamVaildExtra(extra, deviceId);
     if (ret != DM_OK) {
         LOGE("CheckAuthParamVaildExtra failed, param is invaild.");
+        listener_->OnBindResult(processInfo_, peerTargetId_, ret, STATUS_DM_AUTH_DEFAULT, "");
         return ret;
     }
-    InitAuthState(pkgName, authType, deviceId, extra);
     isAuthenticateDevice_ = true;
-    int32_t userId = -1;
-    MultipleUserConnector::GetCallerUserId(userId);
-    processInfo_.pkgName = pkgName;
-    processInfo_.userId = userId;
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
         softbusConnector_->JoinLnn(deviceId, true);
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(processInfo_, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
     }
+    InitAuthState(pkgName, authType, deviceId, extra);
     return DM_OK;
 }
 
@@ -1511,7 +1467,6 @@ void DmAuthManager::AuthenticateFinish()
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
     isAuthDevice_ = false;
-    ClearCallerInfo();
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_) && authResponseContext_->isFinish) {
@@ -2071,6 +2026,10 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     std::string addrType;
     if (bindParam.count(PARAM_KEY_CONN_ADDR_TYPE) != 0) {
         addrType = bindParam.at(PARAM_KEY_CONN_ADDR_TYPE);
+    }
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        bindParam_ = bindParam;
     }
     if (ParseConnectAddr(targetId, deviceId, addrType) == DM_OK) {
         return AuthenticateDevice(pkgName, authType, deviceId, ParseExtraFromMap(bindParam));
@@ -2933,42 +2892,6 @@ int32_t DmAuthManager::CheckTrustState()
     return DM_OK;
 }
 
-std::string DmAuthManager::GetBundleLable(const std::string &bundleName)
-{
-    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        LOGE("Get ability manager failed");
-        return bundleName;
-    }
-
-    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (object == nullptr) {
-        LOGE("object is NULL.");
-        return bundleName;
-    }
-
-    sptr<OHOS::AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
-    if (bms == nullptr) {
-        LOGE("bundle manager service is NULL.");
-        return bundleName;
-    }
-
-    auto bundleResourceProxy = bms->GetBundleResourceProxy();
-    if (bundleResourceProxy == nullptr) {
-        LOGE("GetBundleResourceProxy fail");
-        return bundleName;
-    }
-    AppExecFwk::BundleResourceInfo resourceInfo;
-    auto result = bundleResourceProxy->GetBundleResourceInfo(bundleName,
-        static_cast<uint32_t>(OHOS::AppExecFwk::ResourceFlag::GET_RESOURCE_INFO_ALL), resourceInfo);
-    if (result != ERR_OK) {
-        LOGE("GetBundleResourceInfo failed");
-        return bundleName;
-    }
-    LOGI("bundle resource label is %{public}s ", (resourceInfo.label).c_str());
-    return resourceInfo.label;
-}
-
 bool DmAuthManager::IsScreenLocked()
 {
     bool isLocked = false;
@@ -3048,50 +2971,6 @@ int32_t DmAuthManager::GetTaskTimeout(const char* taskName, int32_t taskTimeOut)
         }
     }
     return taskTimeOut;
-}
-
-bool DmAuthManager::IsAllowDeviceBind()
-{
-    if (AppManager::GetInstance().IsSystemSA()) {
-        return true;
-    }
-    return false;
-}
-
-int32_t DmAuthManager::GetBindLevel(int32_t bindLevel)
-{
-#ifdef DEVICE_MANAGER_COMMON_FLAG
-    LOGI("device_manager_common is true!");
-    std::string processName = "";
-    int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
-    LOGI("GetBindLevel processName = %{public}s", GetAnonyString(processName).c_str());
-    if (ret == DM_OK && CheckProcessNameInWhiteList(processName)) {
-        return USER;
-    }
-#endif
-    if (IsAllowDeviceBind()) {
-        if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || static_cast<uint32_t>(bindLevel) > APP ||
-            static_cast<uint32_t>(bindLevel) < USER) {
-            return USER;
-        }
-        return bindLevel;
-    }
-    if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || (static_cast<uint32_t>(bindLevel) != APP &&
-        static_cast<uint32_t>(bindLevel) != SERVICE)) {
-        return APP;
-    }
-    return bindLevel;
-}
-
-std::string DmAuthManager::GetBundleName(JsonObject &jsonObject)
-{
-    if (!jsonObject.IsDiscarded() && IsString(jsonObject, BUNDLE_NAME_KEY)) {
-        return jsonObject[BUNDLE_NAME_KEY].Get<std::string>();
-    }
-    bool isSystemSA = false;
-    std::string bundleName;
-    AppManager::GetInstance().GetCallerName(isSystemSA, bundleName);
-    return bundleName;
 }
 
 int32_t DmAuthManager::GetBinderInfo()
@@ -3236,6 +3115,14 @@ void DmAuthManager::RequestReCheckMsgDone()
 
 bool DmAuthManager::IsSinkMsgValid()
 {
+    LOGI("sink remoteVersion %{public}s, remoteDeviceId %{public}s, remoteUserId %{public}d,"
+        "remoteHostPkgName %{public}s, remoteBindLevel %{public}d", remoteVersion_.c_str(),
+        GetAnonyString(remoteDeviceId_).c_str(), authResponseContext_->remoteUserId,
+        authResponseContext_->hostPkgName.c_str(), authResponseContext_->bindLevel);
+    LOGI("src version %{public}s, deviceId %{public}s, userId %{public}d, hostPkgName %{public}s, bindLevel %{public}d",
+        authResponseContext_->edition.c_str(), GetAnonyString(authResponseContext_->localDeviceId).c_str(),
+        authResponseContext_->localUserId, authResponseContext_->bundleName.c_str(),
+        authResponseContext_->localBindLevel);
     if (authResponseContext_->edition != remoteVersion_ ||
         authResponseContext_->localDeviceId != remoteDeviceId_ ||
         authResponseContext_->localUserId != authResponseContext_->remoteUserId ||
@@ -3379,47 +3266,25 @@ void DmAuthManager::RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyC
     return;
 }
 
-void DmAuthManager::GetCallerInfo(DmBindCallerInfo &callerInfo)
+void DmAuthManager::GetBindCallerInfo()
 {
-    (void)callerInfo;
-}
-
-void DmAuthManager::SetCallerInfo(const DmBindCallerInfo &callerInfo)
-{
-    std::lock_guard<std::mutex> lock(callerInfoMutex_);
-    callerInfo_.userId = callerInfo.userId;
-    callerInfo_.tokenId = callerInfo.tokenId;
-    callerInfo_.bundleName = callerInfo.bundleName;
-    callerInfo_.hostPkgLabel = callerInfo.hostPkgLabel;
-    callerInfoReady_ = true;
-}
-
-void DmAuthManager::GetCallerInfo(const std::string &pkgName, JsonObject &jsonObject)
-{
+    LOGI("start.");
     CHECK_NULL_VOID(authRequestContext_);
-    std::lock_guard<std::mutex> lock(callerInfoMutex_);
-    if (callerInfoReady_) {
-        authRequestContext_->localUserId = callerInfo_.userId;
-        authRequestContext_->tokenId = static_cast<int64_t>(callerInfo_.tokenId);
-        authRequestContext_->bundleName = callerInfo_.bundleName;
-        authRequestContext_->hostPkgLabel = callerInfo_.hostPkgLabel;
-    } else {
-        authRequestContext_->hostPkgLabel = GetBundleLable(pkgName);
-        uint32_t tokenId = 0 ;
-        MultipleUserConnector::GetTokenIdAndForegroundUserId(tokenId, authRequestContext_->localUserId);
-        authRequestContext_->tokenId = static_cast<int64_t>(tokenId);
-        authRequestContext_->bundleName = GetBundleName(jsonObject);
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        if (bindParam_.find("bindCallerTokenId") != bindParam_.end()) {
+            authRequestContext_->tokenId = std::atoi(bindParam_["bindCallerTokenId"].c_str());
+        }
+        if (bindParam_.find("bindCallerOldBindLevel") != bindParam_.end()) {
+            authRequestContext_->bindLevel = std::atoi(bindParam_["bindCallerOldBindLevel"].c_str());
+        }
+        if (bindParam_.find("bindCallerBundleName") != bindParam_.end()) {
+            authRequestContext_->bundleName = bindParam_["bindCallerBundleName"];
+        }
+        if (bindParam_.find("bindCallerHostPkgLabel") != bindParam_.end()) {
+            authRequestContext_->hostPkgLabel = bindParam_["bindCallerHostPkgLabel"];
+        }
     }
-}
-
-void DmAuthManager::ClearCallerInfo()
-{
-    std::lock_guard<std::mutex> lock(callerInfoMutex_);
-    callerInfo_.userId = -1;
-    callerInfo_.tokenId = -1;
-    callerInfo_.bundleName = "";
-    callerInfo_.hostPkgLabel = "";
-    callerInfoReady_ = false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

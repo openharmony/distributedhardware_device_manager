@@ -98,6 +98,17 @@ const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t PIN_AUTH_TIMEOUT = 60;
 const int32_t EVENT_TIMEOUT = 5000; // 5000 ms
 
+constexpr int32_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = 1;
+constexpr int32_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = 4;
+constexpr const static char* OPEN_PROCESS_NAME_WHITE_LIST[OPEN_PROCESS_NAME_WHITE_LIST_NUM] = {
+    "com.example.myapplication"
+};
+constexpr const static char* CLOSE_PROCESS_NAME_WHITE_LIST[CLOSE_PROCESS_NAME_WHITE_LIST_NUM] = {
+    "CollaborationFwk",
+    "gameservice_server",
+    "wear_link_service",
+    "watch_system_service"
+};
 
 int32_t AuthManagerBase::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
@@ -510,5 +521,37 @@ int32_t AuthManagerBase::EndDream()
     LOGI("end dream success");
     return DM_OK;
 }
+
+bool AuthManagerBase::CheckProcessNameInWhiteList(const std::string &processName)
+{
+    LOGI("AuthManagerBase::CheckProcessNameInWhiteList start");
+    if (processName.empty()) {
+        LOGE("processName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    for (; index < OPEN_PROCESS_NAME_WHITE_LIST_NUM; ++index) {
+        std::string whitePkgName(OPEN_PROCESS_NAME_WHITE_LIST[index]);
+        if (processName == whitePkgName) {
+            LOGI("processName = %{public}s in whiteList.", processName.c_str());
+            return true;
+        }
+    }
+#else
+    for (; index < CLOSE_PROCESS_NAME_WHITE_LIST_NUM; ++index) {
+        std::string whitePkgName(CLOSE_PROCESS_NAME_WHITE_LIST[index]);
+        if (processName == whitePkgName) {
+            LOGI("processName = %{public}s in whiteList.", processName.c_str());
+            return true;
+        }
+    }
+#endif
+    LOGI("CheckProcessNameInWhiteList: %{public}s invalid.", processName.c_str());
+    return false;
+}
+
+void AuthManagerBase::DeleteTimer()
+{}
 }  // namespace DistributedHardware
 }  // namespace OHOS

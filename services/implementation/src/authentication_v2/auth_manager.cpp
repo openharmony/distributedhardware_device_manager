@@ -106,14 +106,6 @@ std::string ParseExtraFromMap(const std::map<std::string, std::string> &bindPara
     return ConvertMapToJsonString(bindParam);
 }
 
-bool IsAllowDeviceBind()
-{
-    if (AppManager::GetInstance().IsSystemSA()) {
-        return true;
-    }
-    return false;
-}
-
 }  // namespace
 
 bool AuthManager::IsHmlSessionType(const std::string &sessionType)
@@ -151,7 +143,10 @@ AuthManager::~AuthManager()
         context_->timer->DeleteAll();
         LOGI("AuthManager context variables destroy successful.");
     }
-    bindParam_.clear();
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        bindParam_.clear();
+    }
     LOGI("DmAuthManager destructor");
 }
 
@@ -418,10 +413,6 @@ std::string AuthManager::GetBundleName(const JsonObject &jsonObject)
 
 void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
 {
-    if (jsonObject.IsDiscarded()) {
-        return;
-    }
-
     if (jsonObject[APP_OPERATION_KEY].IsString()) {
         context_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
     }
@@ -437,10 +428,7 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
         context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
     }
 
-    context_->accesser.bundleName = GetBundleName(jsonObject);
-    bindParam_[BUNDLE_NAME_KEY] = context_->accesser.bundleName;
     context_->accessee.bundleName = context_->accesser.bundleName;
-
     if (jsonObject[TAG_PEER_BUNDLE_NAME].IsString() && !jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>().empty()) {
         context_->accessee.bundleName = jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>();
         context_->accessee.oldBundleName = context_->accessee.bundleName;
@@ -515,18 +503,25 @@ bool CheckBindLevel(const JsonItemObject &jsonObj, const std::string &key, int32
     return false;
 }
 
-int32_t GetBindLevel(int32_t bindLevel)
+int32_t AuthManager::GetBindLevel(int32_t bindLevel)
 {
-#ifdef DEVICE_MANAGER_COMMON_FLAG
-    LOGI("device_manager_common is true!");
+    LOGI("start.");
     std::string processName = "";
-    int32_t ret = AppManager::GetInstance().GetCallerProcessName(processName);
-    LOGI("GetBindLevel processName = %{public}s", GetAnonyString(processName).c_str());
-    if (ret == DM_OK && DmAuthState::CheckProcessNameInWhiteList(processName)) {
+    bool isSystemSA = false;
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        if (bindParam_.find("bindCallerProcessName") != bindParam_.end()) {
+            processName = bindParam_["bindCallerProcessName"];
+        }
+        if (bindParam_.find("bindCallerIsSystemSA") != bindParam_.end()) {
+            isSystemSA = static_cast<bool>(std::atoi(bindParam_["bindCallerIsSystemSA"].c_str()));
+        }
+    }
+    LOGI("processName = %{public}s, isSystemSA %{public}d.", GetAnonyString(processName).c_str(), isSystemSA);
+    if (processName != "" && AuthManagerBase::CheckProcessNameInWhiteList(processName)) {
         return USER;
     }
-#endif
-    if (IsAllowDeviceBind()) {
+    if (isSystemSA) {
         if (static_cast<uint32_t>(bindLevel) == INVALIED_TYPE || static_cast<uint32_t>(bindLevel) > APP ||
             static_cast<uint32_t>(bindLevel) < USER) {
             return USER;
@@ -548,14 +543,10 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     context_->accesser.deviceId = std::string(localDeviceId);
     context_->pkgName = pkgName;
-    context_->pkgLabel = GetBundleLabel(pkgName);
     context_->authType = (DmAuthType)authType;
     context_->accesser.deviceName = context_->listener->GetLocalDisplayDeviceNameForPrivacy();
     context_->accesser.deviceType = context_->softbusConnector->GetLocalDeviceTypeId();
     context_->accesser.isOnline = false;
-    uint32_t callingTokenId = 0;
-    MultipleUserConnector::GetCallingTokenId(callingTokenId);
-    context_->accesser.tokenId = static_cast<uint64_t>(callingTokenId);
 
     context_->accessee.deviceId = deviceId;
     context_->accessee.addr = deviceId;
@@ -571,17 +562,11 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     context_->accesser.oldBindLevel = INVALIED_TYPE;
     CheckBindLevel(jsonObject, TAG_BIND_LEVEL, context_->accesser.oldBindLevel);
     context_->accesser.oldBindLevel = GetBindLevel(context_->accesser.oldBindLevel);
-
-    context_->accesser.bindLevel = DmRole::DM_ROLE_FA;
-    if (AppManager::GetInstance().IsSystemApp()) {
-        context_->accesser.bindLevel = DmRole::DM_ROLE_FA;
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        bindParam_["bindCallerOldBindLevel"] = std::to_string(context_->accesser.oldBindLevel);
     }
-    if (AppManager::GetInstance().IsSystemSA()) {
-        context_->accesser.bindLevel = DmRole::DM_ROLE_SA;
-    }
-    if (DmAuthState::CheckProcessNameInWhiteList(context_->accesser.bundleName)) {
-        context_->accesser.bindLevel = DmRole::DM_ROLE_USER;
-    }
+    LOGI("bindCallerOldBindLevel %{public}d.", context_->accesser.oldBindLevel);
 }
 
 void AuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
@@ -607,12 +592,10 @@ void AuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
 int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("AuthManager::AuthenticateDevice start auth type %{public}d.", authType);
+    LOGI("AuthManager::AuthenticateDevice start auth type %{public}d, extra %{public}s.", authType, extra.c_str());
     SetAuthType(authType);
-    int32_t userId = -1;
-    MultipleUserConnector::GetCallerUserId(userId);
     context_->processInfo.pkgName = pkgName;
-    context_->processInfo.userId = userId;
+    GetBindCallerInfo();
     int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
         LOGE("AuthManager::AuthenticateDevice failed, param is invaild.");
@@ -662,7 +645,10 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
         return ERR_DM_INPUT_PARA_INVALID;
     }
     context_->peerTargetId = targetId_;
-    bindParam_ = bindParam;
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        bindParam_ = bindParam;
+    }
     if (!targetId.deviceId.empty()) {
         ret = AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
         if (ret != DM_OK) {
@@ -1016,8 +1002,10 @@ void AuthManager::GetBindTargetParams(std::string &pkgName, PeerTargetId &target
 {
     pkgName = context_->pkgName;
     targetId = targetId_;
-    bindParam = bindParam_;
-
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        bindParam = bindParam_;
+    }
     LOGI("AuthManager::GetBindTargetParams get pkgName %{public}s to reuse", pkgName.c_str());
     return;
 }
@@ -1035,17 +1023,42 @@ void AuthManager::ClearSoftbusSessionCallback()
 void AuthManager::PrepareSoftbusSessionCallback()
 {}
 
-void AuthManager::GetCallerInfo(DmBindCallerInfo &callerInfo)
+void AuthManager::GetBindCallerInfo()
 {
-    callerInfo.userId = context_->accesser.userId;
-    callerInfo.tokenId = context_->accesser.tokenId;
-    callerInfo.bundleName = context_->accesser.bundleName;
-    callerInfo.hostPkgLabel = context_->pkgLabel;
+    LOGI("start.");
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
+            context_->processInfo.userId = std::atoi(bindParam_["bindCallerUserId"].c_str());
+        }
+        if (bindParam_.find("bindCallerTokenId") != bindParam_.end()) {
+            context_->accesser.tokenId = std::atoi(bindParam_["bindCallerTokenId"].c_str());
+        }
+        if (bindParam_.find("bindCallerBindLevel") != bindParam_.end()) {
+            context_->accesser.bindLevel = std::atoi(bindParam_["bindCallerBindLevel"].c_str());
+        }
+        if (bindParam_.find("bindCallerBundleName") != bindParam_.end()) {
+            context_->accesser.bundleName = bindParam_["bindCallerBundleName"];
+        }
+        if (bindParam_.find("bindCallerHostPkgLabel") != bindParam_.end()) {
+            context_->pkgLabel = bindParam_["bindCallerHostPkgLabel"];
+        }
+    }
 }
 
-void AuthManager::SetCallerInfo(const DmBindCallerInfo &callerInfo)
+void AuthManager::DeleteTimer()
 {
-    (void)callerInfo;
+    if (context_ != nullptr) {
+        context_->successFinished = true;
+        context_->authStateMachine->Stop();  // Stop statemMachine thread
+        context_->timer->DeleteAll();
+        LOGI("AuthManager context deleteTimer successful.");
+    }
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        bindParam_.clear();
+    }
+    LOGI("end.");
 }
 }  // namespace DistributedHardware
 }  // namespace OHOS

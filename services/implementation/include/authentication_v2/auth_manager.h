@@ -120,11 +120,11 @@ public:
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
     void ClearSoftbusSessionCallback();
     void PrepareSoftbusSessionCallback();
-    void GetCallerInfo(DmBindCallerInfo &callerInfo);
-    void SetCallerInfo(const DmBindCallerInfo &callerInfo);
+    void DeleteTimer();
 
 protected:
     std::shared_ptr<DmAuthContext> context_;
+    std::mutex bindParamMutex_;
     std::map<std::string, std::string> bindParam_;
     PeerTargetId targetId_;
 
@@ -146,6 +146,8 @@ private:
     int32_t AuthenticateDevice(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
     void ParseUltrasonicSide(const JsonObject &jsonObject);
+    void GetBindCallerInfo();
+    int32_t GetBindLevel(int32_t bindLevel);
 };
 
 class AuthSrcManager : public AuthManager {
