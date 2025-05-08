@@ -859,6 +859,7 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
         LOGE("DeviceManagerServiceImpl::TransferByAuthType TransferByAuthType failed.");
         return ret;
     }
+    authMgr->DeleteTimer();
     authMgr = nullptr;
     if (authMgr_->BindTarget(pkgName, peerTargetId, bindParam, sessionId, 0) != DM_OK) {
         LOGE("DeviceManagerServiceImpl::TransferSrcOldAuthMgr authManager BindTarget failed");
@@ -883,7 +884,6 @@ int32_t DeviceManagerServiceImpl::TransferByAuthType(int32_t authType,
     if (authType == DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE) {
         authMgr_->EnableInsensibleSwitching();
         curSession->logicalSessionSet_.insert(0);
-        curSession->logicalSessionCnt_.fetch_add(1);
         logicalSessionId2SessionIdMap_[0] = sessionId;
         authMgr->OnSessionDisable();
     } else {

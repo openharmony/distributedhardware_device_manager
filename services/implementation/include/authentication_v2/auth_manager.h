@@ -120,6 +120,7 @@ public:
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
     void ClearSoftbusSessionCallback();
     void PrepareSoftbusSessionCallback();
+    void DeleteTimer();
 
 protected:
     std::shared_ptr<DmAuthContext> context_;

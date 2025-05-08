@@ -232,6 +232,7 @@ public:
      * @brief Classical authMgr is global, if we use classical logic, we need prepare the callback.
      */
     virtual void PrepareSoftbusSessionCallback();
+    virtual void DeleteTimer();
 
     // Public functions
     static std::string ConvertSrcVersion(const std::string &version, const std::string &edition);

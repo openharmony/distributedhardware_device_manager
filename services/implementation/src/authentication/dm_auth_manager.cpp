@@ -334,6 +334,7 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     if (!DmRadarHelper::GetInstance().ReportAuthStart(peerTargetId_.deviceId, pkgName)) {
         LOGE("ReportAuthStart failed");
     }
+    GetBindCallerInfo();
     authRequestState_->Enter();
     LOGI("DmAuthManager::AuthenticateDevice complete");
 }
@@ -342,20 +343,26 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     const std::string &deviceId, const std::string &extra)
 {
     LOGI("DmAuthManager::AuthenticateDevice start auth type %{public}d.", authType);
+    processInfo_.pkgName = pkgName;
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
+            processInfo_.userId = std::atoi(bindParam_["bindCallerUserId"].c_str());
+        }
+    }
     SetAuthType(authType);
     int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
+        listener_->OnBindResult(processInfo_, peerTargetId_, ret, STATUS_DM_AUTH_DEFAULT, "");
         return ret;
     }
     ret = CheckAuthParamVaildExtra(extra, deviceId);
     if (ret != DM_OK) {
         LOGE("CheckAuthParamVaildExtra failed, param is invaild.");
+        listener_->OnBindResult(processInfo_, peerTargetId_, ret, STATUS_DM_AUTH_DEFAULT, "");
         return ret;
     }
-    processInfo_.pkgName = pkgName;
-    InitAuthState(pkgName, authType, deviceId, extra);
-    GetBindCallerInfo();
     isAuthenticateDevice_ = true;
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
@@ -363,6 +370,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(processInfo_, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
     }
+    InitAuthState(pkgName, authType, deviceId, extra);
     return DM_OK;
 }
 
@@ -3264,9 +3272,6 @@ void DmAuthManager::GetBindCallerInfo()
     CHECK_NULL_VOID(authRequestContext_);
     {
         std::lock_guard<std::mutex> lock(bindParamMutex_);
-        if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
-            processInfo_.userId = std::atoi(bindParam_["bindCallerUserId"].c_str());
-        }
         if (bindParam_.find("bindCallerTokenId") != bindParam_.end()) {
             authRequestContext_->tokenId = std::atoi(bindParam_["bindCallerTokenId"].c_str());
         }

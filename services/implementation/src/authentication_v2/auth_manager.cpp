@@ -1045,5 +1045,20 @@ void AuthManager::GetBindCallerInfo()
         }
     }
 }
+
+void AuthManager::DeleteTimer()
+{
+    if (context_ != nullptr) {
+        context_->successFinished = true;
+        context_->authStateMachine->Stop();  // Stop statemMachine thread
+        context_->timer->DeleteAll();
+        LOGI("AuthManager context deleteTimer successful.");
+    }
+    {
+        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        bindParam_.clear();
+    }
+    LOGI("end.");
+}
 }  // namespace DistributedHardware
 }  // namespace OHOS

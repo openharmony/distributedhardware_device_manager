@@ -550,5 +550,8 @@ bool AuthManagerBase::CheckProcessNameInWhiteList(const std::string &processName
     LOGI("CheckProcessNameInWhiteList: %{public}s invalid.", processName.c_str());
     return false;
 }
+
+void AuthManagerBase::DeleteTimer()
+{}
 }  // namespace DistributedHardware
 }  // namespace OHOS
