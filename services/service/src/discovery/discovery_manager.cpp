@@ -672,7 +672,7 @@ void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
 {
     LOGI("PkgName: %{public}s, userId: %{public}d", processInfo.pkgName.c_str(), processInfo.userId);
     std::string pkgName = processInfo.pkgName + "#";
-    std::set<uint16_t> subscribeIdSet = static_cast<uint16_t>(ClearDiscoveryPkgName(pkgName));
+    std::set<uint16_t> subscribeIdSet = ClearDiscoveryPkgName(pkgName);
 
     CHECK_NULL_VOID(softbusListener_);
     for (auto it : subscribeIdSet) {
@@ -681,7 +681,7 @@ void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
         uint16_t innerSubId = DM_INVALID_FLAG_ID;
         {
             std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-            innerSubId = pkgName2SubIdMap_[pkgNameTemp][it];
+            innerSubId = static_cast<uint16_t>(pkgName2SubIdMap_[pkgNameTemp][it]);
             randSubIdSet_.erase(innerSubId);
             pkgName2SubIdMap_.erase(pkgNameTemp);
         }
