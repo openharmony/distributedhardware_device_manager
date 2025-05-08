@@ -685,7 +685,7 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
     ReadServiceInfo(context);
     context->authTypeList.clear();
     context->authTypeList.push_back(context->authType);
-    if (context->authType == AUTH AUTH_TYPE_PIN_ULTRASONIC) {
+    if (context->authType == AUTH_TYPE_PIN_ULTRASONIC) {
         context->authTypeList.push_back(AUTH_TYPE_PIN);
     } else {
         MatchFallBackCandidateList(context, context->authType);
