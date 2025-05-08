@@ -40,7 +40,6 @@ constexpr const char* UNVALID_CREDTID = "invalidCredId";
 using FallBackKey = std::pair<std::string, DmAuthType>; // accessee.bundleName, authType
 static std::map<FallBackKey, DmAuthType> g_pinAuthTypeFallBackMap = {
     {{"cast_engine_service", DmAuthType::AUTH_TYPE_NFC}, DmAuthType::AUTH_TYPE_PIN},
-    {{"cast_engine_service", DmAuthType::AUTH_TYPE_PIN_ULTRASONIC}, DmAuthType::AUTH_TYPE_PIN},
 };
 // Maximum number of recursive lookups
 constexpr size_t MAX_FALLBACK_LOOPKUP_TIMES = 2;
@@ -686,7 +685,11 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
     ReadServiceInfo(context);
     context->authTypeList.clear();
     context->authTypeList.push_back(context->authType);
-    MatchFallBackCandidateList(context, context->authType);
+    if (context->authType == AUTH AUTH_TYPE_PIN_ULTRASONIC) {
+        context->authTypeList.push_back(AUTH_TYPE_PIN);
+    } else {
+        MatchFallBackCandidateList(context, context->authType);
+    }
     if (DmAuthState::IsImportAuthCodeCompatibility(context->authType) &&
         (context->serviceInfoFound || AuthSinkStatePinAuthComm::IsAuthCodeReady(context)) &&
         context->authBoxType == DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
