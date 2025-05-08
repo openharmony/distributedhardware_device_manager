@@ -31,10 +31,10 @@ enum AllowAuthType {
     ALLOW_AUTH_ALWAYS = 2
 };
 
-
 DM_EXPORT extern const uint32_t INVALIED_TYPE;
 DM_EXPORT extern const uint32_t APP_PEER_TO_PEER_TYPE;
 DM_EXPORT extern const uint32_t APP_ACROSS_ACCOUNT_TYPE;
+DM_EXPORT extern const uint32_t SHARE_TYPE;
 DM_EXPORT extern const uint32_t DEVICE_PEER_TO_PEER_TYPE;
 DM_EXPORT extern const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE;
 DM_EXPORT extern const uint32_t IDENTICAL_ACCOUNT_TYPE;
@@ -324,6 +324,10 @@ private:
         uint32_t index, std::string targetDeviceId);
     bool CheckAppLevelAccess(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const DmAccessCallee &callee);
+    bool CheckSinkShareType(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const int32_t &userId, const std::string &deviceId, const std::string &trustDeviceId, const int32_t &bindType);
+    std::unordered_map<std::string, DmAuthForm> GetAuthFormMap(const std::string &pkgName, const std::string &deviceId,
+        const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
     int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,

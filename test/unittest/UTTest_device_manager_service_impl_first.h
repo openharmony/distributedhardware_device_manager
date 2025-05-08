@@ -26,6 +26,9 @@
 #include "device_manager_service_listener.h"
 #include "deviceprofile_connector_mock.h"
 #include "multiple_user_connector_mock.h"
+#include "softbus_connector_mock.h"
+#include "dm_device_state_manager_mock.h"
+#include "device_manager_service_impl_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -42,6 +45,12 @@ public:
         std::make_shared<DeviceProfileConnectorMock>();
     static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
         std::make_shared<MultipleUserConnectorMock>();
+    static inline std::shared_ptr<SoftbusConnectorMock> softbusConnectorMock_ =
+        std::make_shared<SoftbusConnectorMock>();
+    static inline std::shared_ptr<DmDeviceStateManagerMock> dmDeviceStateManagerMock_ =
+        std::make_shared<DmDeviceStateManagerMock>();
+    static inline std::shared_ptr<DeviceManagerServiceImplMock> deviceManagerServiceImplMock_ =
+        std::make_shared<DeviceManagerServiceImplMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

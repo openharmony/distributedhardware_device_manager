@@ -96,5 +96,9 @@ int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 {
     return DmSoftbusListener::dmSoftbusListener->StopRefreshSoftbusLNN(subscribeId);
 }
+void SoftbusListener::SendAclChangedBroadcast(const std::string &msg)
+{
+    DmSoftbusListener::dmSoftbusListener->SendAclChangedBroadcast(msg);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

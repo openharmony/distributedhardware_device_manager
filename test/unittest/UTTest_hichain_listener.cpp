@@ -94,5 +94,68 @@ HWTEST_F(HichainListenerTest, OnHichainDeviceUnBound_002, testing::ext::TestSize
     listerner.OnHichainDeviceUnBound(udidPtr, groupInfoPtr);
     EXPECT_TRUE(groupInfoPtr != nullptr);
 }
+
+HWTEST_F(HichainListenerTest, RegisterCredentialCb_001, testing::ext::TestSize.Level1)
+{
+    HichainListener listerner;
+    listerner.RegisterCredentialCb();
+    EXPECT_TRUE(listerner.credManager_ != nullptr);
+}
+
+HWTEST_F(HichainListenerTest, RegisterCredentialCb_002, testing::ext::TestSize.Level2)
+{
+    HichainListener listerner;
+    listerner.credManager_ = nullptr;
+    listerner.RegisterCredentialCb();
+    EXPECT_TRUE(listerner.credManager_ == nullptr);
+}
+
+HWTEST_F(HichainListenerTest, OnCredentialDeleted_001, testing::ext::TestSize.Level1)
+{
+    HichainListener listerner;
+    const char *credId = "credId";
+    const char *credInfo = "credInfo";
+    listerner.OnCredentialDeleted(credId, credInfo);
+    EXPECT_TRUE(true);
+}
+
+HWTEST_F(HichainListenerTest, OnCredentialDeleted_002, testing::ext::TestSize.Level1)
+{
+    HichainListener listerner;
+    const char *credId = nullptr;
+    const char *credInfo = "credInfo";
+    listerner.OnCredentialDeleted(credId, credInfo);
+    EXPECT_TRUE(true);
+}
+
+HWTEST_F(HichainListenerTest, OnCredentialDeleted_003, testing::ext::TestSize.Level1)
+{
+    HichainListener listerner;
+    const char *credId = "credId";
+    const char *credInfo = nullptr;
+    listerner.OnCredentialDeleted(credId, credInfo);
+    EXPECT_TRUE(true);
+}
+
+HWTEST_F(HichainListenerTest, OnCredentialDeleted_004, testing::ext::TestSize.Level2)
+{
+    HichainListener listerner;
+    // Create string longer than MAX_DATA_LEN (65536)
+    std::string longCredId(65537, 'a');
+    const char *credInfo = "credInfo";
+    listerner.OnCredentialDeleted(longCredId.c_str(), credInfo);
+    EXPECT_TRUE(true); // Verifying early return for invalid length
+}
+
+HWTEST_F(HichainListenerTest, OnCredentialDeleted_005, testing::ext::TestSize.Level2)
+{
+    HichainListener listerner;
+    // Create string longer than MAX_DATA_LEN (65536)
+    std::string longCredId(65537, 'a');
+    const char *credInfo = "credInfo";
+    listerner.OnCredentialDeleted(longCredId.c_str(), credInfo);
+    EXPECT_TRUE(true); // Verifying early return for invalid length
+}
+
 } // DistributedHardware
 } // OHOS

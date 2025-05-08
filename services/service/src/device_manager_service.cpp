@@ -75,6 +75,7 @@ namespace {
     constexpr const char *NETWORKID = "NETWORK_ID";
     constexpr uint32_t INVALIED_BIND_LEVEL = 0;
     constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
+    constexpr uint32_t DM_SHARE = 2;
     const std::string USERID_CHECKSUM_NETWORKID_KEY = "networkId";
     const std::string USERID_CHECKSUM_DISCOVER_TYPE_KEY = "discoverType";
     const std::string DHARD_WARE_PKG_NAME = "ohos.dhardware";
@@ -133,6 +134,7 @@ void DeviceManagerService::InitHichainListener()
         hichainListener_ = std::make_shared<HichainListener>();
     }
     hichainListener_->RegisterDataChangeCb();
+    hichainListener_->RegisterCredentialCb();
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -1883,6 +1885,21 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     return;
 }
 
+void DeviceManagerService::SendShareTypeUnBindBroadCast(const char *credId, const int32_t localUserId,
+    const std::vector<std::string> &peerUdids)
+{
+    LOGI("SendShareTypeUnBindBroadCast Start.");
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::SHARE_UNBIND;
+    msg.userId = static_cast<uint32_t>(localUserId);
+    msg.credId = credId;
+    msg.peerUdids = peerUdids;
+    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+    LOGI("SendShareTypeUnBindBroadCast broadCastMsg = %{public}s.", broadCastMsg.c_str());
+    CHECK_NULL_VOID(softbusListener_);
+    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+}
+
 void DeviceManagerService::SubscribeScreenLockEvent()
 {
     LOGI("Start");
@@ -2790,14 +2807,49 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
 
+void DeviceManagerService::HandleCredentialDeleted(const char *credId, const char *credInfo)
+{
+    LOGI("HandleCredentialDeleted start.");
+    if (credId == nullptr || credInfo == nullptr) {
+        LOGE("HandleCredentialDeleted credId or credInfo is nullptr.");
+        return;
+    }
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    if (!IsDMServiceImplReady()) {
+        LOGE("HandleCredentialDeleted failed, instance not init or init failed.");
+        return;
+    }
+    std::string remoteUdid = "";
+    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+    if (remoteUdid.empty()) {
+        LOGE("HandleCredentialDeleted failed, remoteUdid is empty.");
+        return;
+    }
+    std::vector<std::string> peerUdids;
+    peerUdids.emplace_back(remoteUdid);
+    SendShareTypeUnBindBroadCast(credId, MultipleUserConnector::GetCurrentAccountUserID(), peerUdids);
+    return;
+}
+
 void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
 {
-    if (msg.empty() || !IsDMServiceImplReady()) {
-        LOGE("Msg is empty or impl instance init failed.");
+    if (!IsMsgEmptyAndDMServiceImplReady(msg)) {
         return;
     }
     RelationShipChangeMsg relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
     LOGI("Receive trust change msg: %{public}s", relationShipMsg.ToString().c_str());
+    bool ret = ParseRelationShipChangeType(relationShipMsg);
+    if (!ret) {
+        LOGI("ParseRelationShipChangeType failed");
+        return;
+    }
+    return;
+}
+
+bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeMsg &relationShipMsg)
+{
     switch (relationShipMsg.type) {
         case RelationShipChangeType::ACCOUNT_LOGOUT:
             dmServiceImpl_->HandleAccountLogoutEvent(relationShipMsg.userId, relationShipMsg.accountId,
@@ -2835,9 +2887,41 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
         case RelationShipChangeType::STOP_USER:
             HandleUserStopBroadCast(relationShipMsg.userId, relationShipMsg.peerUdid);
             break;
+        case RelationShipChangeType::SHARE_UNBIND:
+            HandleShareUnbindBroadCast(relationShipMsg.userId, relationShipMsg.credId);
+            break;
         default:
             LOGI("Dm have not this event type.");
-            break;
+            return false;
+    }
+    return true;
+}
+
+bool DeviceManagerService::IsMsgEmptyAndDMServiceImplReady(const std::string &msg)
+{
+    if (msg.empty()) {
+        LOGE("Msg is empty.");
+        return false;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("Imp instance not init or init failed.");
+        return false;
+    }
+    return true;
+}
+
+void DeviceManagerService::HandleShareUnbindBroadCast(const int32_t userId, const std::string &credId)
+{
+    LOGI("HandleShareUnbindBroadCast start.");
+    if (credId == "") {
+        LOGE("HandleShareUnbindBroadCast credId is null.");
+        return;
+    }
+    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localUdidTemp);
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->HandleShareUnbindBroadCast(credId, userId, localUdid);
     }
     return;
 }

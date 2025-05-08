@@ -46,6 +46,7 @@ namespace {
      */
     const int32_t DEL_USER_PAYLOAD_LEN = 2;
     const int32_t STOP_USER_PAYLOAD_LEN = 2;
+    const int32_t SHARE_UNBIND_PAYLOAD_LEN = 8;
     /**
      * @brief the userid payload cost 2 bytes.
      *
@@ -58,6 +59,7 @@ namespace {
     const int32_t USERID_BYTES = 2;
     const int32_t BITS_PER_BYTE = 8;
     const int32_t INVALIED_PAYLOAD_SIZE = 12;
+    const int32_t CREDID_PAYLOAD_LEN = 8;
 
     const char * const MSG_TYPE = "TYPE";
     const char * const MSG_VALUE = "VALUE";
@@ -132,11 +134,33 @@ bool RelationShipChangeMsg::ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) con
             ToStopUserPayLoad(msg, len);
             ret = true;
             break;
+        case RelationShipChangeType::SHARE_UNBIND:
+            ToShareUnbindPayLoad(msg, len);
+            ret = true;
+            break;
         default:
             LOGE("RelationShipChange type invalid");
             break;
     }
     return ret;
+}
+
+void RelationShipChangeMsg::ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) const
+{
+    if (credId.length() != (CREDID_PAYLOAD_LEN - USERID_PAYLOAD_LEN)) {
+        LOGE("ToShareUnbindPayLoad credId length is invalid.");
+        len = 0;
+        return;
+    }
+    msg = new uint8_t[SHARE_UNBIND_PAYLOAD_LEN]();
+    for (int i = 0; i < USERID_PAYLOAD_LEN; i++) {
+        msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
+    }
+
+    for (int i = USERID_PAYLOAD_LEN; i < CREDID_PAYLOAD_LEN; i++) {
+        msg[i] = credId[i - USERID_PAYLOAD_LEN];
+    }
+    len = SHARE_UNBIND_PAYLOAD_LEN;
 }
 
 bool RelationShipChangeMsg::FromBroadcastPayLoad(const cJSON *payloadJson, RelationShipChangeType type)
@@ -169,11 +193,44 @@ bool RelationShipChangeMsg::FromBroadcastPayLoad(const cJSON *payloadJson, Relat
         case RelationShipChangeType::STOP_USER:
             ret = FromStopUserPayLoad(payloadJson);
             break;
+        case RelationShipChangeType::SHARE_UNBIND:
+            ret = FromShareUnbindPayLoad(payloadJson);
+            break;
         default:
             LOGE("RelationShipChange type invalid");
             break;
     }
     return ret;
+}
+
+bool RelationShipChangeMsg::FromShareUnbindPayLoad(const cJSON *payloadJson)
+{
+    if (payloadJson == NULL) {
+        LOGE("Share unbind payloadJson is null.");
+        return false;
+    }
+    int32_t arraySize = cJSON_GetArraySize(payloadJson);
+    if (arraySize < SHARE_UNBIND_PAYLOAD_LEN || arraySize >= INVALIED_PAYLOAD_SIZE) {
+        LOGE("Payload invalied,the size is %{public}d.", arraySize);
+        return false;
+    }
+    userId = 0;
+    for (uint32_t i = 0; i < USERID_PAYLOAD_LEN; i++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, i);
+        CHECK_NULL_RETURN(payloadItem, false);
+        if (cJSON_IsNumber(payloadItem)) {
+            userId |= (static_cast<uint8_t>(payloadItem->valueint)) << (i * BITS_PER_BYTE);
+        }
+    }
+    credId = "";
+    for (uint32_t j = USERID_PAYLOAD_LEN; j < CREDID_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, false);
+        if (cJSON_IsNumber(payloadItem)) {
+            credId += static_cast<char>(payloadItem->valueint);
+        }
+    }
+    return true;
 }
 
 bool RelationShipChangeMsg::IsValid() const
@@ -193,6 +250,9 @@ bool RelationShipChangeMsg::IsValid() const
             ret = (userId != UINT32_MAX);
             break;
         case RelationShipChangeType::STOP_USER:
+            ret = (userId != UINT32_MAX);
+            break;
+        case RelationShipChangeType::SHARE_UNBIND:
             ret = (userId != UINT32_MAX);
             break;
         case RelationShipChangeType::SERVICE_UNBIND:
@@ -232,6 +292,7 @@ bool RelationShipChangeMsg::IsChangeTypeValid(uint32_t type)
         (type == (uint32_t)RelationShipChangeType::SYNC_USERID) ||
         (type == (uint32_t)RelationShipChangeType::DEL_USER) ||
         (type == (uint32_t)RelationShipChangeType::STOP_USER) ||
+        (type == (uint32_t)RelationShipChangeType::SHARE_UNBIND) ||
         (type == (uint32_t)RelationShipChangeType::SERVICE_UNBIND);
 }
 
@@ -540,6 +601,10 @@ cJSON *RelationShipChangeMsg::ToPayLoadJson() const
     uint32_t len = 0;
     if (!this->ToBroadcastPayLoad(payload, len)) {
         LOGE("Get broadcast payload failed");
+        return nullptr;
+    }
+    if (payload == nullptr || len == 0) {
+        LOGE("payload is null or len is 0.");
         return nullptr;
     }
     cJSON *arrayObj = cJSON_CreateArray();

@@ -39,6 +39,14 @@ DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &device
 {
     return DmSoftbusConnector::dmSoftbusConnector->GetDeviceInfoByDeviceId(deviceId);
 }
+void SoftbusConnector::SetProcessInfo(ProcessInfo processInfo)
+{
+    DmSoftbusConnector::dmSoftbusConnector->SetProcessInfo(processInfo);
+}
+void SoftbusConnector::SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec)
+{
+    DmSoftbusConnector::dmSoftbusConnector->SetProcessInfoVec(processInfoVec);
+}
 
 std::shared_ptr<SoftbusSession> SoftbusConnector::GetSoftbusSession()
 {

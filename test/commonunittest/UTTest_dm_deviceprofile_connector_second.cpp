@@ -584,5 +584,358 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetLocalServiceInfoByBundleNameAndPin
         pinExchangeType, localServiceInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
+
+HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_009, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profiles;
+    profiles.SetBindType(DM_SHARE);
+    profiles.SetBindLevel(USER);
+    DmDiscoveryInfo discoveryInfo;
+    int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
+    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_010, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profiles;
+    profiles.SetBindType(DM_SHARE);
+    profiles.SetBindLevel(APP);
+    profiles.accesser_.SetAccesserBundleName("ohos_test");
+    profiles.accesser_.SetAccesserDeviceId("localDeviceId");
+    DmDiscoveryInfo discoveryInfo;
+    discoveryInfo.pkgname = "ohos_test";
+    discoveryInfo.localDeviceId = "localDeviceId";
+    int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
+    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_011, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profiles;
+    profiles.SetBindType(DM_SHARE);
+    profiles.SetBindLevel(APP);
+    profiles.accessee_.SetAccesseeBundleName("pkgName");
+    profiles.accessee_.SetAccesseeDeviceId("localDeviceId");
+    DmDiscoveryInfo discoveryInfo;
+    discoveryInfo.pkgname = "pkgName";
+    discoveryInfo.localDeviceId = "localDeviceId";
+    int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
+    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_001, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t userId = 123456;
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    profile.SetAccessee(accessee);
+    
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(trustDeviceId);
+    profile.SetAccesser(accesser);
+
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_002, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t userId = 123456;
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeUserId(0);
+    accessee.SetAccesseeDeviceId(deviceId);
+    profile.SetAccessee(accessee);
+    
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(trustDeviceId);
+    profile.SetAccesser(accesser);
+
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_003, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t userId = 123456;
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeUserId(-1);
+    accessee.SetAccesseeDeviceId(deviceId);
+    profile.SetAccessee(accessee);
+    
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(trustDeviceId);
+    profile.SetAccesser(accesser);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
+    EXPECT_TRUE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_004, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t userId = 123456;
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeDeviceId("wrongDeviceId");
+    profile.SetAccessee(accessee);
+    
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(trustDeviceId);
+    profile.SetAccesser(accesser);
+
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_005, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t userId = 123456;
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    profile.SetAccessee(accessee);
+    
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId("wrongTrustDeviceId");
+    profile.SetAccesser(accesser);
+
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_006, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t userId = 123456;
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    int32_t bindType = DmAuthForm::PEER_TO_PEER; // Wrong bind type
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    profile.SetAccessee(accessee);
+    
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(trustDeviceId);
+    profile.SetAccesser(accesser);
+
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_007, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t userId = 123456;
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeUserId(999999); // Different user ID
+    accessee.SetAccesseeDeviceId(deviceId);
+    profile.SetAccessee(accessee);
+    
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(trustDeviceId);
+    profile.SetAccesser(accesser);
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_008, testing::ext::TestSize.Level1)
+{
+    DistributedDeviceProfile::AccessControlProfile profile;
+    int32_t userId = 123456;
+    std::string deviceId = "deviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+
+    // Empty profile (no accessee/accesser set)
+    bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
+        profile, userId, deviceId, trustDeviceId, bindType);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_001, testing::ext::TestSize.Level1)
+{
+    // Test case 1: Empty input - should return empty map
+    std::string pkgName = "testPkg";;
+    std::string deviceId = "deviceId1";
+    int32_t userId = 123456;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter;
+    
+    auto ret = DeviceProfileConnector::GetInstance().GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);
+    EXPECT_EQ(ret.size(), 0);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_002, testing::ext::TestSize.Level1)
+{
+    // Test case 2: Profile with trustDeviceId matching input deviceId - should be skipped
+    std::string pkgName = "testPkg";
+    std::string deviceId = "deviceId1";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetTrustDeviceId(deviceId); // Matching deviceId
+    profile.SetStatus(ACTIVE);
+    profilesFilter.push_back(profile);
+    
+    auto ret = DeviceProfileConnector::GetInstance().GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);
+    EXPECT_EQ(ret.size(), 0);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_003, testing::ext::TestSize.Level1)
+{
+    // Test case 3: Profile with INACTIVE status - should be skipped
+    std::string pkgName = "testPkg";
+    std::string deviceId = "deviceId1";
+    std::string trustDeviceId = "trustDeviceId1";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetTrustDeviceId(trustDeviceId);
+    profile.SetStatus(INACTIVE);
+    profilesFilter.push_back(profile);
+    
+    auto ret = DeviceProfileConnector::GetInstance().GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);
+    EXPECT_EQ(ret.size(), 0);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_004, testing::ext::TestSize.Level1)
+{
+    // Test case 4: Profile with INVALID_TYPE auth form - should be skipped
+    std::string pkgName = "testPkg";
+    std::string deviceId = "deviceId1";
+    std::string trustDeviceId = "trustDeviceId1";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetTrustDeviceId(trustDeviceId);
+    profile.SetStatus(ACTIVE);
+    profile.SetBindType(DmAuthForm::INVALID_TYPE);
+    profilesFilter.push_back(profile);
+
+    auto ret = DeviceProfileConnector::GetInstance().GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);
+    EXPECT_EQ(ret.size(), 0);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_005, testing::ext::TestSize.Level1)
+{
+    // Test case 5: Single valid profile with IDENTICAL_ACCOUNT type
+    std::string pkgName = "testPkg";
+    std::string deviceId = "deviceId1";
+    std::string trustDeviceId = "trustDeviceId1";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetTrustDeviceId(trustDeviceId);
+    profile.SetStatus(ACTIVE);
+    profile.SetBindType(DmAuthForm::IDENTICAL_ACCOUNT);
+    profilesFilter.push_back(profile);
+    
+    auto ret = DeviceProfileConnector::GetInstance().GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);
+    EXPECT_EQ(ret.size(), 1);
+    EXPECT_EQ(ret[trustDeviceId], DmAuthForm::IDENTICAL_ACCOUNT);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_006, testing::ext::TestSize.Level1)
+{
+    // Test case 6: CheckSinkShareType returns true - should skip adding to map
+    std::string pkgName = "testPkg";
+    std::string deviceId = "deviceId1";
+    std::string trustDeviceId = "trustDeviceId1";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetTrustDeviceId(trustDeviceId);
+    profile.SetStatus(ACTIVE);
+    // Set up accessee/accesser to make CheckSinkShareType return true
+    DistributedDeviceProfile::Accessee accessee;
+    accessee.SetAccesseeUserId(userId);
+    accessee.SetAccesseeDeviceId(deviceId);
+    profile.SetAccessee(accessee);
+    DistributedDeviceProfile::Accesser accesser;
+    accesser.SetAccesserDeviceId(trustDeviceId);
+    profile.SetAccesser(accesser);
+    profile.SetBindType(DmAuthForm::ACROSS_ACCOUNT);
+    
+    profilesFilter.push_back(profile);
+    
+    auto ret = DeviceProfileConnector::GetInstance().GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);
+    EXPECT_EQ(ret.size(), 0);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_007, testing::ext::TestSize.Level1)
+{
+    // Test case 7: Multiple profiles with different auth forms - should keep highest priority
+    std::string pkgName = "testPkg";
+    std::string deviceId = "deviceId1";
+    std::string trustDeviceId = "trustDeviceId1";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profilesFilter;
+    // First profile - PEER_TO_PEER
+    DistributedDeviceProfile::AccessControlProfile profile1;
+    profile1.SetTrustDeviceId(trustDeviceId);
+    profile1.SetStatus(ACTIVE);
+    profile1.SetBindType(DmAuthForm::PEER_TO_PEER);
+    profilesFilter.push_back(profile1);
+    
+    // Second profile - ACROSS_ACCOUNT (should override PEER_TO_PEER)
+    DistributedDeviceProfile::AccessControlProfile profile2;
+    profile2.SetTrustDeviceId(trustDeviceId);
+    profile2.SetStatus(ACTIVE);
+    profile2.SetBindType(DmAuthForm::ACROSS_ACCOUNT);
+    profilesFilter.push_back(profile2);
+
+    // Third profile - IDENTICAL_ACCOUNT (should override everything)
+    DistributedDeviceProfile::AccessControlProfile profile3;
+    profile3.SetTrustDeviceId(trustDeviceId);
+    profile3.SetStatus(ACTIVE);
+    profile3.SetBindType(DmAuthForm::IDENTICAL_ACCOUNT);
+    profilesFilter.push_back(profile3);
+    
+    auto ret = DeviceProfileConnector::GetInstance().GetAuthFormMap(pkgName, deviceId, profilesFilter, userId);
+    EXPECT_EQ(ret.size(), 1);
+    EXPECT_EQ(ret[trustDeviceId], DmAuthForm::IDENTICAL_ACCOUNT);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

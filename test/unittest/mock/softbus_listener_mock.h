@@ -44,6 +44,7 @@ public:
     virtual int32_t GetAllTrustedDeviceList(const std::string &pkgName, const std::string &extra,
         std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual int32_t StopRefreshSoftbusLNN(uint16_t subscribeId) = 0;
+    virtual void SendAclChangedBroadcast(const std::string &msg) = 0;
 public:
     static inline std::shared_ptr<DmSoftbusListener> dmSoftbusListener = nullptr;
 };
@@ -66,6 +67,7 @@ public:
     MOCK_METHOD(int32_t, GetAllTrustedDeviceList, (const std::string &, const std::string &,
         std::vector<DmDeviceInfo> &));
     MOCK_METHOD(int32_t, StopRefreshSoftbusLNN, (uint16_t));
+    MOCK_METHOD(void, SendAclChangedBroadcast, (const std::string &msg));
 };
 }
 }

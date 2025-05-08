@@ -58,6 +58,7 @@ public:
     HichainListener();
     ~HichainListener();
     void RegisterDataChangeCb();
+    void RegisterCredentialCb();
     void DeleteAllGroup(const std::string &localUdid, const std::vector<int32_t> &backgroundUserIds);
     int32_t GetRelatedGroups(int32_t userId, const std::string &deviceId,
         std::vector<GroupsInfo> &groupList);
@@ -69,9 +70,11 @@ public:
     int64_t GenRequestId();
 
     static void OnHichainDeviceUnBound(const char *peerUdid, const char *groupInfo);
+    static void OnCredentialDeleted(const char *credId, const char *credInfo);
 
 private:
     const DeviceGroupManager *deviceGroupManager_ = nullptr;
+    const CredManager *credManager_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

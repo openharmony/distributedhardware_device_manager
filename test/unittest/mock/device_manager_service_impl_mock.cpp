@@ -67,6 +67,22 @@ int32_t DeviceManagerServiceImpl::UnBindDevice(const std::string &pkgName, const
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->UnBindDevice(pkgName, udid, bindLevel, extra);
 }
+bool DeviceManagerServiceImpl::CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckSharePeerSrc(peerUdid, localUdid);
+}
+
+void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId,
+    const char *credInfo, const std::string &localUdid, std::string &remoteUdid)
+{
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleCredentialDeleted(credId,
+        credInfo, localUdid, remoteUdid);
+}
+void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &credId,
+    const int32_t &userId, const std::string &localUdid)
+{
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleShareUnbindBroadCast(credId, userId, localUdid);
+}
 
 int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &localUdid,
     const std::string &peerDeviceId)

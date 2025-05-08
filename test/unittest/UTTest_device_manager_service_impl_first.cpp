@@ -40,6 +40,9 @@ void DeviceManagerServiceImplFirstTest::SetUpTestCase()
 {
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock_;
+    DmDmDeviceStateManager::dmDeviceStateManager = dmDeviceStateManagerMock_;
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = deviceManagerServiceImplMock_;
 }
 
 void DeviceManagerServiceImplFirstTest::TearDownTestCase()
@@ -48,6 +51,12 @@ void DeviceManagerServiceImplFirstTest::TearDownTestCase()
     deviceProfileConnectorMock_ = nullptr;
     DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
     multipleUserConnectorMock_ = nullptr;
+    DmSoftbusConnector::dmSoftbusConnector = nullptr;
+    softbusConnectorMock_ = nullptr;
+    DmDmDeviceStateManager::dmDeviceStateManager = nullptr;
+    dmDeviceStateManagerMock_ = nullptr;
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = nullptr;
+    deviceManagerServiceImplMock_ = nullptr;
 }
 
 namespace {
@@ -87,6 +96,437 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdAndUserId_101, testing::e
     EXPECT_CALL(*multipleUserConnectorMock_, GetForegroundUserIds(_))
         .WillOnce(DoAll(SetArgReferee<0>(localUserIds), Return(DM_OK)));
     deviceManagerServiceImpl_->HandleSyncUserIdEvent(foregroundUserIds, backgroundUserIds, remoteUdid, false);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_001, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    std::string localUdid = "localUdid";
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+
+    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_002, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    std::string localUdid = "localUdid";
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+    profile.SetTrustDeviceId(peerUdid);
+    Accesser accesser;
+    accesser.SetAccesserDeviceId(peerUdid);
+    profile.SetAccesser(accesser);
+
+    Accessee accessee;
+    accessee.SetAccesseeDeviceId(localUdid);
+    profile.SetAccessee(accessee);
+    profiles.push_back(profile);
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    
+    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_003, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    std::string localUdid = "localUdid";
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+    profile.SetTrustDeviceId(peerUdid);
+    Accesser accesser;
+    accesser.SetAccesserDeviceId(localUdid);
+    profile.SetAccesser(accesser);
+    profile.GetAccessee().SetAccesseeDeviceId(peerUdid);
+    profiles.push_back(profile);
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    
+    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_004, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    std::string localUdid = "localUdid";
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
+    profile.SetTrustDeviceId(peerUdid);
+    Accesser accesser;
+    accesser.SetAccesserDeviceId(peerUdid);
+    profile.SetAccesser(accesser);
+    Accessee accessee;
+    accessee.SetAccesseeDeviceId(localUdid);
+    profile.SetAccessee(accessee);
+    profiles.push_back(profile);
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    
+    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, CheckSharePeerSrc_005, testing::ext::TestSize.Level1)
+{
+    std::string peerUdid = "peerUdid";
+    std::string localUdid = "localUdid";
+    std::string trustDevideId = "trustDevideId";
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+    profile.SetTrustDeviceId(trustDevideId);
+    profiles.push_back(profile);
+   
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+
+    bool result = deviceManagerServiceImpl_->CheckSharePeerSrc(peerUdid, localUdid);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_001, testing::ext::TestSize.Level1)
+{
+    const char *credId = "123456";
+    const char *credInfo = "invalid_json";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
+        .Times(0);
+    
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_002, testing::ext::TestSize.Level1)
+{
+    const char *credId = "123456";
+    const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_POINT_TO_POINT);
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_)).Times(0);
+
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_003, testing::ext::TestSize.Level1)
+{
+    const char *credId = "123456";
+    const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+
+    profile.GetAccesser().SetAccesserCredentialId(atoi(credId));
+    profile.GetAccesser().SetAccesserDeviceId(localUdid);
+    profile.GetAccessee().SetAccesseeDeviceId("remoteUdid");
+    profile.GetAccessee().SetAccesseeUserId(1);
+
+    profiles.push_back(profile);
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
+        .Times(1);
+
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_004, testing::ext::TestSize.Level1)
+{
+    const char *credId = "123456";
+    const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+
+    profile.GetAccessee().SetAccesseeCredentialId(atoi(credId));
+    profile.GetAccessee().SetAccesseeDeviceId(localUdid);
+    profile.GetAccesser().SetAccesserDeviceId("remoteUdid");
+    profile.GetAccesser().SetAccesserUserId(1);
+
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
+        .Times(1);
+    
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_001, testing::ext::TestSize.Level1)
+{
+    std::string credId = "12345";
+    std::string localUdid = "localId";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
+        .Times(0);
+    
+    deviceManagerServiceImpl_->HandleShareUnbindBroadCast(credId, userId, localUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_002, testing::ext::TestSize.Level1)
+{
+    std::string credId = "12345";
+    std::string localUdid = "localId";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_IDENTICAL_ACCOUNT);
+    profiles.push_back(profile);
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
+        .Times(0);
+    
+    deviceManagerServiceImpl_->HandleShareUnbindBroadCast(credId, userId, localUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_003, testing::ext::TestSize.Level1)
+{
+    std::string credId = "12345";
+    std::string localUdid = "localId";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+    
+    Accesser accesser;
+    accesser.SetAccesserCredentialId(atoi(credId.c_str()));
+    accesser.SetAccesserUserId(userId);
+    profile.SetAccesser(accesser);
+    Accessee accessee;
+    accessee.SetAccesseeDeviceId(localUdid);
+    profile.SetAccessee(accessee);
+    
+    profiles.push_back(profile);
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
+        .Times(1);
+    
+    deviceManagerServiceImpl_->HandleShareUnbindBroadCast(credId, userId, localUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_004, testing::ext::TestSize.Level1)
+{
+    std::string credId = "12345";
+    std::string localUdid = "localUdid";
+    int32_t userId = 123456;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+    
+    Accesser accesser;
+    accesser.SetAccesserDeviceId(localUdid);
+    profile.SetAccesser(accesser);
+    Accessee accessee;
+    accessee.SetAccesseeCredentialId(atoi(credId.c_str()));
+    accessee.SetAccesseeUserId(userId);
+    profile.SetAccessee(accessee);
+    
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
+        .Times(1);
+
+    deviceManagerServiceImpl_->HandleShareUnbindBroadCast(credId, userId, localUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_005, testing::ext::TestSize.Level1)
+{
+    std::string credId = "12345";
+    std::string localUdid = "localUdid";
+    int32_t userId = 123456;
+    
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+    
+    Accesser accesser;
+    accesser.SetAccesserCredentialId(9999);
+    accesser.SetAccesserDeviceId("peer123");
+    accesser.SetAccesserUserId(1002);
+    profile.SetAccesser(accesser);
+    
+    Accessee accessee;
+    accessee.SetAccesseeDeviceId("peer456");
+    accessee.SetAccesseeUserId(1003);
+    profile.SetAccessee(accessee);
+    
+    profiles.push_back(profile);
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
+        .Times(0);
+    
+    deviceManagerServiceImpl_->HandleShareUnbindBroadCast(credId, userId, localUdid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_001, testing::ext::TestSize.Level1)
+{
+    uint32_t bindType = IDENTICAL_ACCOUNT_TYPE;
+    ProcessInfo processInfo;
+    DmDeviceInfo devInfo;
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    DmDeviceState devState = DEVICE_STATE_ONLINE;
+
+    EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
+
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+
+    EXPECT_EQ(devInfo.authForm, DmAuthForm::IDENTICAL_ACCOUNT);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_002, testing::ext::TestSize.Level1)
+{
+    uint32_t bindType = DEVICE_PEER_TO_PEER_TYPE;
+    ProcessInfo processInfo;
+    DmDeviceInfo devInfo;
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    DmDeviceState devState = DEVICE_STATE_ONLINE;
+
+    EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
+
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+
+    EXPECT_EQ(devInfo.authForm, DmAuthForm::PEER_TO_PEER);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_003, testing::ext::TestSize.Level1)
+{
+    uint32_t bindType = DEVICE_ACROSS_ACCOUNT_TYPE;
+    ProcessInfo processInfo;
+    DmDeviceInfo devInfo;
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    DmDeviceState devState = DEVICE_STATE_ONLINE;
+
+    EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
+
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+
+    EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_004, testing::ext::TestSize.Level1)
+{
+    uint32_t bindType = APP_PEER_TO_PEER_TYPE;
+    ProcessInfo processInfo;
+    DmDeviceInfo devInfo;
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    DmDeviceState devState = DEVICE_STATE_ONLINE;
+
+    std::vector<ProcessInfo> processInfoVec = {processInfo};
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetProcessInfoFromAclByUserId(_, _, _))
+        .WillOnce(Return(processInfoVec));
+    EXPECT_CALL(*softbusConnectorMock_, SetProcessInfoVec(_)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
+
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+
+    EXPECT_EQ(devInfo.authForm, DmAuthForm::PEER_TO_PEER);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_005, testing::ext::TestSize.Level1)
+{
+    uint32_t bindType = APP_ACROSS_ACCOUNT_TYPE;
+    ProcessInfo processInfo;
+    DmDeviceInfo devInfo;
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    DmDeviceState devState = DEVICE_STATE_ONLINE;
+
+    std::vector<ProcessInfo> processInfoVec = {processInfo};
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetProcessInfoFromAclByUserId(_, _, _))
+        .WillOnce(Return(processInfoVec));
+    EXPECT_CALL(*softbusConnectorMock_, SetProcessInfoVec(_)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
+
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+
+    EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_006, testing::ext::TestSize.Level1)
+{
+    uint32_t bindType = SHARE_TYPE;
+    ProcessInfo processInfo;
+    DmDeviceInfo devInfo;
+    std::string requestDeviceId = "requestDeviceId";
+    std::string trustDeviceId = "trustDeviceId";
+    DmDeviceState devState = DEVICE_STATE_ONLINE;
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile())
+    .Times(1).WillOnce(Return(std::vector<DistributedDeviceProfile::AccessControlProfile>()));
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, CheckSharePeerSrc(_, _)).WillOnce(Return(false));
+    EXPECT_CALL(*softbusConnectorMock_, SetProcessInfo(_)).Times(1);
+    EXPECT_CALL(*dmDeviceStateManagerMock_, HandleDeviceStatusChange(_, _)).Times(1);
+
+    deviceManagerServiceImpl_->SetOnlineProcessInfo(
+        bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
+
+    EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
 }
 } // namespace
 } // namespace DistributedHardware

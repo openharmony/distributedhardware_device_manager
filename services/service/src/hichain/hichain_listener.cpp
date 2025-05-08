@@ -33,6 +33,10 @@ static DataChangeListener dataChangeListener_ = {
     .onDeviceUnBound = HichainListener::OnHichainDeviceUnBound,
 };
 
+static CredChangeListener credChangeListener_ = {
+    .onCredDelete = HichainListener::OnCredentialDeleted,
+};
+
 void FromJson(const JsonItemObject &jsonObject, GroupInformation &groupInfo)
 {
     if (jsonObject.Contains(FIELD_GROUP_TYPE) && jsonObject.At(FIELD_GROUP_TYPE).IsNumberInteger()) {
@@ -82,8 +86,13 @@ HichainListener::HichainListener()
     LOGI("HichainListener constructor start.");
     InitDeviceAuthService();
     deviceGroupManager_ = GetGmInstance();
+    credManager_ = GetCredMgrInstance();
     if (deviceGroupManager_ == nullptr) {
         LOGE("[HICHAIN]failed to init group manager.");
+        return;
+    }
+    if (credManager_ == nullptr) {
+        LOGE("[HICHAIN]failed to init cred manager.");
         return;
     }
     LOGI("HichainListener::constructor success.");
@@ -108,6 +117,21 @@ void HichainListener::RegisterDataChangeCb()
         return;
     }
     LOGI("RegisterDataChangeCb success!");
+}
+
+void HichainListener::RegisterCredentialCb()
+{
+    LOGI("HichainListener::RegisterCredentialCb start");
+    if (credManager_ == nullptr) {
+        LOGE("credManager_ is null!");
+        return;
+    }
+    int32_t ret = credManager_->registerChangeListener(DM_PKG_NAME, &credChangeListener_);
+    if (ret != DM_OK) {
+        LOGE("[HICHAIN]registerChangeListener failed with ret: %{public}d.", ret);
+        return;
+    }
+    LOGI("RegisterCredentialCb success!");
 }
 
 void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *groupInfo)
@@ -139,6 +163,21 @@ void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *g
         DeviceManagerService::GetInstance().HandleDeviceUnBind(peerUdid, hichainGroupInfo);
         return;
     }
+}
+
+void HichainListener::OnCredentialDeleted(const char *credId, const char *credInfo)
+{
+    LOGI("HichainListener::OnCredentialDeleted start");
+    if (credId == nullptr || credInfo == nullptr) {
+        LOGE("credId or credInfo is null!");
+        return;
+    }
+    if (strlen(credId) > MAX_DATA_LEN || strlen(credInfo) > MAX_DATA_LEN) {
+        LOGE("credId or credInfo is invalid");
+        return;
+    }
+    DeviceManagerService::GetInstance().HandleCredentialDeleted(credId, credInfo);
+    return;
 }
 
 void HichainListener::DeleteAllGroup(const std::string &localUdid, const std::vector<int32_t> &backgroundUserIds)

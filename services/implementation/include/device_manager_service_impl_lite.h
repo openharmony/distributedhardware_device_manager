@@ -162,6 +162,9 @@ public:
     int32_t RegisterAuthenticationType(int32_t authenticationType);
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
+    void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
+        std::string &remoteUdid);
+    void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, const std::string &localUdid);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
         int32_t remoteTokenId);

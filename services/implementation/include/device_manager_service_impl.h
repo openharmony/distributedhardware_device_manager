@@ -176,6 +176,9 @@ public:
     int32_t RegisterAuthenticationType(int32_t authenticationType);
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
+    void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
+        std::string &remoteUdid);
+    void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, const std::string &localUdid);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     int32_t DeleteAcl(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
@@ -192,8 +195,13 @@ public:
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
+    void SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo, DmDeviceInfo &devInfo,
+        const std::string &requestDeviceId, const std::string &trustDeviceId, DmDeviceState devState);
+    void HandleDeletedAclOffline(const std::string &trustDeviceId,
+        const std::string &requestDeviceId, DmDeviceInfo &devInfo, ProcessInfo &processInfo, DmDeviceState &devState);
     void HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo);
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
+    bool CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,

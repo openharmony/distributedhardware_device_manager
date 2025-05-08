@@ -330,6 +330,16 @@ int32_t DeviceManagerServiceImpl::ImportAuthCode(const std::string &pkgName, con
     return DM_OK;
 }
 
+void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
+    const std::string &localUdid, std::string &remoteUdid)
+{
+    (void)credId;
+    (void)credInfo;
+    (void)localUdid;
+    (void)remoteUdid;
+    return;
+}
+
 int32_t DeviceManagerServiceImpl::ExportAuthCode(std::string &authCode)
 {
     (void)authCode;
@@ -568,6 +578,15 @@ void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t>
     (void)backgroundUserIds;
     (void)remoteUdid;
     (void)isCheckUserStatus;
+    return;
+}
+
+void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
+    const std::string &localUdid)
+{
+    (void)credId;
+    (void)userId;
+    (void)localUdid;
     return;
 }
 
