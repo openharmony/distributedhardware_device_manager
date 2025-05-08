@@ -228,19 +228,50 @@ void DeviceManagerServiceImpl::NotifyCleanEvent(uint64_t logicalSessionId)
     cleanEventCv_.notify_one();
 }
 
-void DeviceManagerServiceImpl::ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId)
+void DeviceManagerServiceImpl::ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId,
+    const std::string &pkgName)
 {
     // Import configuration
     if (configsMap_.find(tokenId) != configsMap_.end()) {
         authMgr->ImportAuthCode(configsMap_[tokenId]->pkgName, configsMap_[tokenId]->authCode);
         authMgr->RegisterAuthenticationType(configsMap_[tokenId]->authenticationType);
+        configsMap_[tokenId] = nullptr;
+        configsMap_.erase(tokenId);
         LOGI("DeviceManagerServiceImpl::ImportConfig import authCode Successful.");
+        return;
     }
-    return;
+    for (auto it = configsMap_.begin(); it != configsMap_.end();) {
+        if (it->second != nullptr && pkgName == it->second->pkgName) {
+            authMgr->ImportAuthCode(it->second->pkgName, it->second->authCode);
+            authMgr->RegisterAuthenticationType(it->second->authenticationType);
+            LOGI("DeviceManagerServiceImpl::ImportConfig import authCode by pkgName Successful.");
+            it->second = nullptr;
+            it = configsMap_.erase(it);
+            return;
+        } else {
+            ++it;
+        }
+    }
+}
+
+void DeviceManagerServiceImpl::ImportAuthCodeToConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId)
+{
+    if (authMgr == nullptr) {
+        LOGE("authMgr is null.");
+        return;
+    }
+    std::string pkgName;
+    std::string authCode;
+    authMgr->GetAuthCodeAndPkgName(pkgName, authCode);
+    if (configsMap_.find(tokenId) == configsMap_.end()) {
+        configsMap_[tokenId] = std::make_shared<Config>();
+    }
+    configsMap_[tokenId]->pkgName = pkgName;
+    configsMap_[tokenId]->authCode = authCode;
 }
 
 int32_t DeviceManagerServiceImpl::InitAndRegisterAuthMgr(bool isSrcSide, uint64_t tokenId,
-    std::shared_ptr<Session> session, uint64_t logicalSessionId)
+    std::shared_ptr<Session> session, uint64_t logicalSessionId, const std::string &pkgName)
 {
     if (session == nullptr) {
         LOGE("InitAndRegisterAuthMgr, The physical link is not created.");
@@ -280,7 +311,7 @@ int32_t DeviceManagerServiceImpl::InitAndRegisterAuthMgr(bool isSrcSide, uint64_
             authMgrMap_[tokenId]->RegisterCleanNotifyCallback(&DeviceManagerServiceImpl::NotifyCleanEvent);
             hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgrMap_[tokenId]);
             LOGI("DeviceManagerServiceImpl::Initialize authMgrMap_ token: %{public}" PRId64 ".", tokenId);
-            ImportConfig(authMgrMap_[tokenId], tokenId);
+            ImportConfig(authMgrMap_[tokenId], tokenId, pkgName);
             return DM_OK;
         } else {
             LOGI("DeviceManagerServiceImpl::InitAndRegisterAuthMgr old authMgr.");
@@ -289,7 +320,7 @@ int32_t DeviceManagerServiceImpl::InitAndRegisterAuthMgr(bool isSrcSide, uint64_
             }
             authMgr_->PrepareSoftbusSessionCallback();
             authMgrMap_[tokenId] = authMgr_;
-            ImportConfig(authMgr_, tokenId);
+            ImportConfig(authMgr_, tokenId, pkgName);
             // The value of logicalSessionId in the old protocol is always 0.
             logicalSessionId2TokenIdMap_[0] = tokenId;
             return DM_OK;
@@ -341,11 +372,6 @@ void DeviceManagerServiceImpl::CleanAuthMgrByLogicalSessionId(uint64_t logicalSe
     } else {
         LOGE("logicalSessionId(%{public}" PRIu64 ") can not find the tokenId.", logicalSessionId);
         return;
-    }
-
-    if (configsMap_.find(tokenId) != configsMap_.end()) {
-        configsMap_[tokenId] = nullptr;
-        configsMap_.erase(tokenId);
     }
 
     CleanSessionMapByLogicalSessionId(logicalSessionId);
@@ -805,7 +831,7 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgrByMessage(i
             LOGE("GetAuthMgrByMessage, Get tokenId failed.");
             return nullptr;
         }
-        if (InitAndRegisterAuthMgr(false, tokenId, curSession, logicalSessionId) != DM_OK) {
+        if (InitAndRegisterAuthMgr(false, tokenId, curSession, logicalSessionId, "") != DM_OK) {
             return nullptr;
         }
         curSession->logicalSessionSet_.insert(logicalSessionId);
@@ -849,8 +875,9 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
     authMgr->GetBindTargetParams(pkgName, peerTargetId, bindParam);
     int32_t authType = -1;
     authMgr->ParseAuthType(bindParam, authType);
+    ImportAuthCodeToConfig(authMgr, tokenId);
     authMgrMap_.erase(tokenId);
-    if (InitAndRegisterAuthMgr(true, tokenId, curSession, logicalSessionId) != DM_OK) {
+    if (InitAndRegisterAuthMgr(true, tokenId, curSession, logicalSessionId, "") != DM_OK) {
         return ERR_DM_AUTH_FAILED;
     }
 
@@ -945,7 +972,7 @@ int32_t DeviceManagerServiceImpl::TransferSinkOldAuthMgr(const JsonObject &jsonO
         bundleName = BUNDLENAME_MAPPING.find(bundleName)->second;
     }
     uint64_t tokenId = GetTokenId(false, -1, bundleName);
-    if (InitAndRegisterAuthMgr(false, tokenId, curSession, 0) != DM_OK) {
+    if (InitAndRegisterAuthMgr(false, tokenId, curSession, 0, bundleName) != DM_OK) {
         // Internal error log printing completed
         return ERR_DM_AUTH_FAILED;
     }
@@ -1301,14 +1328,13 @@ int32_t DeviceManagerServiceImpl::ImportAuthCode(const std::string &pkgName, con
     LOGI("DeviceManagerServiceImpl::ImportAuthCode pkgName is %{public}s, authCode is %{public}s",
         pkgName.c_str(), GetAnonyString(authCode).c_str());
     auto authMgr = GetAuthMgr();
-    if (authMgr == nullptr) {
-        auto config = GetConfigByTokenId();
-        config->pkgName = pkgName;
-        config->authCode = authCode;   // If registered multiple times, only the last one is kept
-        return DM_OK;
+    if (authMgr != nullptr) {
+        authMgr->ImportAuthCode(pkgName, authCode);
     }
-
-    return authMgr->ImportAuthCode(pkgName, authCode);
+    auto config = GetConfigByTokenId();
+    config->pkgName = pkgName;
+    config->authCode = authCode;   // If registered multiple times, only the last one is kept
+    return DM_OK;
 }
 
 int32_t DeviceManagerServiceImpl::ExportAuthCode(std::string &authCode)
@@ -1570,7 +1596,7 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
     }
 
     // Create on the src end.
-    int32_t ret = InitAndRegisterAuthMgr(true, tokenId, curSession, logicalSessionId);
+    int32_t ret = InitAndRegisterAuthMgr(true, tokenId, curSession, logicalSessionId, "");
     if (ret != DM_OK) {
         LOGE("InitAndRegisterAuthMgr failed, ret %{public}d.", ret);
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);

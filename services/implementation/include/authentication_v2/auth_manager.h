@@ -113,6 +113,7 @@ public:
     int32_t GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId);
     void GetBindTargetParams(std::string &pkgName, PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam);
+    void GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode);
     void SetBindTargetParams(const PeerTargetId &targetId);
     int32_t GetReason();
 
