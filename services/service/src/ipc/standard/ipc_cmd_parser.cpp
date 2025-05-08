@@ -45,12 +45,36 @@
 #include "ipc_server_client_proxy.h"
 #include "ipc_server_stub.h"
 #include "multiple_user_connector.h"
+#include "app_manager.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "multiple_user_connector.h"
 #endif
 namespace OHOS {
 namespace DistributedHardware {
 const unsigned int XCOLLIE_TIMEOUT_S = 5;
+constexpr const char* SCENEBOARD_PROCESS = "com.ohos.sceneboard";
+
+int32_t SetXcollieTimer()
+{
+    std::string processName = "";
+    AppManager::GetInstance().GetCallerProcessName(processName);
+    if (processName != SCENEBOARD_PROCESS) {
+        return DM_OK;
+    }
+    return OHOS::HiviewDFX::XCollie::GetInstance().SetTimer("RegisterDeviceManagerListener", XCOLLIE_TIMEOUT_S,
+        nullptr, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+}
+
+void CancelXcollieTimer(int32_t id)
+{
+    std::string processName = "";
+    AppManager::GetInstance().GetCallerProcessName(processName);
+    if (processName != SCENEBOARD_PROCESS) {
+        return;
+    }
+    OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+}
+
 bool EncodeDmDeviceInfo(const DmDeviceInfo &devInfo, MessageParcel &parcel)
 {
     bool bRet = true;
@@ -394,19 +418,18 @@ ON_IPC_CMD(GET_ALL_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
-    int32_t id = OHOS::HiviewDFX::XCollie::GetInstance().SetTimer("RegisterDeviceManagerListener", XCOLLIE_TIMEOUT_S,
-        nullptr, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
+    int32_t timerId = SetXcollieTimer();
     std::string pkgName = data.ReadString();
     sptr<IRemoteObject> listener = data.ReadRemoteObject();
     if (listener == nullptr) {
         LOGE("read remote object failed.");
-        OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+        CancelXcollieTimer(timerId);
         return ERR_DM_POINT_NULL;
     }
     sptr<IpcServerClientProxy> callback(new IpcServerClientProxy(listener));
     if (callback == nullptr) {
         LOGE("create ipc server client proxy failed.");
-        OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+        CancelXcollieTimer(timerId);
         return ERR_DM_POINT_NULL;
     }
     ProcessInfo processInfo;
@@ -416,10 +439,10 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
     int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, callback);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
-        OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+        CancelXcollieTimer(timerId);
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+    CancelXcollieTimer(timerId);
     return DM_OK;
 }
 
