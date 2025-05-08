@@ -844,7 +844,6 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
     auto authMgr = GetAuthMgrByTokenId(tokenId);
     if (authMgr == nullptr) {
         LOGE("DeviceManagerServiceImpl::TransferSrcOldAuthMgr authManager is nullptr");
-        return ERR_DM_POINT_NULL;
     }
     authMgr->GetBindTargetParams(pkgName, peerTargetId, bindParam);
     DmBindCallerInfo callerInfo;
