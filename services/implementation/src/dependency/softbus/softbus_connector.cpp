@@ -54,9 +54,11 @@ std::string SoftbusConnector::remoteUdidHash_ = "";
 std::map<std::string, std::shared_ptr<DeviceInfo>> SoftbusConnector::discoveryDeviceInfoMap_ = {};
 std::unordered_map<std::string, std::string> SoftbusConnector::deviceUdidMap_ = {};
 std::vector<ProcessInfo> SoftbusConnector::processInfoVec_ = {};
+std::vector<ProcessInfo> SoftbusConnector::processChangeInfoVec_ = {};
 std::mutex SoftbusConnector::discoveryDeviceInfoMutex_;
 std::mutex SoftbusConnector::deviceUdidLocks_;
 std::mutex SoftbusConnector::processInfoVecMutex_;
+std::mutex SoftbusConnector::processChangeInfoVecMutex_;
 std::shared_ptr<ISoftbusConnectorCallback> SoftbusConnector::connectorCallback_ = nullptr;
 
 SoftbusConnector::SoftbusConnector()
@@ -715,7 +717,6 @@ void SoftbusConnector::ClearChangeProcessInfo()
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     processChangeInfoVec_.clear();
 }
-
 
 void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm)
 {
