@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_DATASAHRE_COMMON_EVENT_H
-#define OHOS_DM_DATASAHRE_COMMON_EVENT_H
+#ifndef OHOS_DM_DATASHARE_COMMON_EVENT_H
+#define OHOS_DM_DATASHARE_COMMON_EVENT_H
 
 #include "common_event_manager.h"
 #include "system_ability_status_change_stub.h"
@@ -24,7 +24,7 @@ namespace DistributedHardware {
 using OHOS::EventFwk::CommonEventData;
 using OHOS::EventFwk::CommonEventSubscriber;
 using OHOS::EventFwk::CommonEventSubscribeInfo;
-using DataShareEventCallback = std::function<void(std::string)>;
+using DataShareEventCallback = std::function<void(std::string, int32_t)>;
 
 class DmDataShareEventSubscriber : public CommonEventSubscriber {
 public:
@@ -71,4 +71,4 @@ private:
 };
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_DATASAHRE_COMMON_EVENT_H
+#endif // OHOS_DM_DATASHARE_COMMON_EVENT_H

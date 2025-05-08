@@ -69,6 +69,7 @@ namespace {
     const int32_t NORMAL = 0;
     const int32_t SYSTEM_BASIC = 1;
     const int32_t SYSTEM_CORE = 2;
+    constexpr int32_t NETWORK_AVAILABLE = 3;
     constexpr const char *ALL_PKGNAME = "";
     constexpr const char *NETWORKID = "NETWORK_ID";
     constexpr uint32_t INVALIED_BIND_LEVEL = 0;
@@ -167,17 +168,21 @@ void DeviceManagerService::SubscribeDataShareCommonEvent()
     if (dataShareCommonEventManager_ == nullptr) {
         dataShareCommonEventManager_ = std::make_shared<DmDataShareCommonEventManager>();
     }
-    DataShareEventCallback callback = [=](const auto &arg1) {
+    DataShareEventCallback callback = [=](const auto &arg1, const auto &arg2) {
         if (arg1 == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
             DeviceNameManager::GetInstance().DataShareReady();
         }
         if (arg1 == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
             DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
         }
+        if (arg1 == CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE && arg2 == NETWORK_AVAILABLE) {
+            this->CheckRegisterInfoWithWise();
+        }
     };
     std::vector<std::string> commonEventVec;
     commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
     commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED);
+    commonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE);
     if (dataShareCommonEventManager_->SubscribeDataShareCommonEvent(commonEventVec, callback)) {
         LOGI("subscribe datashare common event success");
     }
@@ -2902,7 +2907,6 @@ void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t pr
 void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId)
 {
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
-    CheckRegisterInfoWithWise(currentUserId);
     if (IsPC()) {
         return;
     }
@@ -3235,12 +3239,9 @@ std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
     return dmServiceImplExtResident_->GetDeviceNamePrefixs();
 }
 
-void DeviceManagerService::CheckRegisterInfoWithWise(int32_t curUserId)
+void DeviceManagerService::CheckRegisterInfoWithWise()
 {
-    LOGI("In curUserId:%{public}d", curUserId);
-    if (curUserId == -1) {
-        return;
-    }
+    LOGI("In");
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("CheckRegisterInfoWithWise failed, adapter instance not init or init failed.");
         return;
