@@ -73,6 +73,7 @@ const char* TAG_TRANSMIT_SK_TIMESTAMP = "accessAppSKTimeStamp";
 const char* TAG_LNN_SK_TIMESTAMP = "accessUserSKTimeStamp";
 const char* TAG_USER_ID = "userId";
 const char* TAG_TOKEN_ID = "tokenId";
+const char* TAG_NETWORKID_ID = "networkId";
 const char* TAG_ISSUER = "issuer";
 
 const char* TAG_DEVICE_VERSION = "deviceVersion";
@@ -670,6 +671,8 @@ int32_t DmAuthMessageProcessor::CreateRespNegotiateMessage(std::shared_ptr<DmAut
     jsonObject[TAG_CERT_TYPE_LIST] = context->accessee.credTypeList;
     jsonObject[TAG_LANGUAGE] = context->accessee.language;
     jsonObject[TAG_EXTRA_INFO] = context->accessee.extraInfo;
+    jsonObject[TAG_NETWORKID_ID] = context->accessee.networkId;
+
     jsonObject[TAG_IS_ONLINE] = context->accesser.isOnline;
 
     return DM_OK;
@@ -1062,6 +1065,10 @@ int32_t DmAuthMessageProcessor::ParseMessageRespAclNegotiate(const JsonObject &j
 
     if (jsonObject[TAG_TOKEN_ID_HASH].IsString()) {
         context->accessee.tokenIdHash = jsonObject[TAG_TOKEN_ID_HASH].Get<std::string>();
+    }
+
+    if (jsonObject[TAG_NETWORKID_ID].IsString()) {
+        context->accessee.networkId = jsonObject[TAG_NETWORKID_ID].Get<std::string>();
     }
 
     if (jsonObject[TAG_IS_ONLINE].IsBoolean()) {
