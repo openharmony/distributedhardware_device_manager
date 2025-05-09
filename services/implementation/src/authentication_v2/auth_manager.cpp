@@ -129,6 +129,7 @@ AuthManager::AuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     context_->authenticationMap[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
     context_->authenticationMap[AUTH_TYPE_PIN_ULTRASONIC] = nullptr;
     context_->authenticationMap[AUTH_TYPE_NFC] = nullptr;
+    context_->authenticationMap[AUTH_TYPE_CRE] = nullptr;
     context_->accesser.dmVersion = DM_VERSION_5_1_0;
     context_->accessee.dmVersion = DM_VERSION_5_1_0;
     context_->timer = std::make_shared<DmTimer>();
