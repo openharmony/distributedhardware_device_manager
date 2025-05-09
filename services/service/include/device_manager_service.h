@@ -30,6 +30,7 @@
 #include "device_manager_service_listener.h"
 #include "idevice_manager_service_impl.h"
 #include "hichain_listener.h"
+#include "i_dm_check_api_white_list.h"
 #include "i_dm_service_impl_ext_resident.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
@@ -380,6 +381,10 @@ private:
     void HandleNetworkConnected();
     void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
         const std::string &accountIdHash, const std::string &accountName, int32_t userId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+    bool IsCallerInWhiteList();
+    bool IsDMAdapterCheckApiWhiteListLoaded();
+#endif
 
 private:
     bool isImplsoLoaded_ = false;
@@ -411,6 +416,12 @@ private:
 #endif
     std::string localNetWorkId_ = "";
     std::shared_ptr<DmTimer> timer_;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+    bool isAdapterCheckApiWhiteListSoLoaded_ = false;
+    void *checkApiWhiteListSoHandle_ = nullptr;
+    std::mutex isAdapterCheckApiWhiteListLoadedLock_;
+    std::shared_ptr<IDMCheckApiWhiteList> dmCheckApiWhiteList_;
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

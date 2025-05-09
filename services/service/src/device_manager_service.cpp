@@ -62,6 +62,9 @@ constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.so";
 #endif
 constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
 constexpr const char* LIB_DM_RESIDENT_NAME = "libdevicemanagerresident.z.so";
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+constexpr const char* LIB_DM_CHECK_API_WHITE_LIST_NAME = "libdm_check_api_whitelist.z.so";
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -84,6 +87,9 @@ namespace {
     constexpr const char* USER_STOP_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userStopByWifi";
     constexpr const char* ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:accountCommonEventByWifi";
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+    const std::string GET_LOCAL_DEVICE_NAME_API_NAME = "GetLocalDeviceName";
+#endif
 }
 
 DeviceManagerService::~DeviceManagerService()
@@ -461,10 +467,17 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
     LOGD("Begin.");
     bool isOnlyShowNetworkId = false;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+    if (!PermissionManager::GetInstance().CheckNewPermission() && !IsCallerInWhiteList()) {
+        LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
+        isOnlyShowNetworkId = true;
+    }
+#else
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
         isOnlyShowNetworkId = true;
     }
+#endif
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
     if (ret != DM_OK) {
@@ -508,6 +521,56 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
     }
     return DM_OK;
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+bool DeviceManagerService::IsCallerInWhiteList()
+{
+    if (!IsDMAdapterCheckApiWhiteListLoaded()) {
+        LOGE("DMAdapterCheckApiWhiteListLoad failed.");
+        return false;
+    }
+    std::string callerName;
+    if (AppManager::GetInstance().GetCallerProcessName(callerName) != DM_OK) {
+        LOGE("GetCallerProcessName failed.");
+        return false;
+    }
+    return dmCheckApiWhiteList_->IsCallerInWhiteList(callerName, GET_LOCAL_DEVICE_NAME_API_NAME);
+}
+
+bool DeviceManagerService::IsDMAdapterCheckApiWhiteListLoaded()
+{
+    LOGI("Start.");
+    std::lock_guard<std::mutex> lock(isAdapterCheckApiWhiteListLoadedLock_);
+    if (isAdapterCheckApiWhiteListSoLoaded_ && (dmCheckApiWhiteList_ != nullptr)) {
+        return true;
+    }
+    checkApiWhiteListSoHandle_ = dlopen(LIB_DM_CHECK_API_WHITE_LIST_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (checkApiWhiteListSoHandle_ == nullptr) {
+        checkApiWhiteListSoHandle_ = dlopen(LIB_DM_CHECK_API_WHITE_LIST_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
+    if (checkApiWhiteListSoHandle_ == nullptr) {
+        LOGE("load dm check api white list so failed.");
+        return false;
+    }
+    if (dlerror() != nullptr) {
+        dlclose(checkApiWhiteListSoHandle_);
+        checkApiWhiteListSoHandle_ = nullptr;
+        LOGE("open dm check api white list so failed. err: %{public}s", dlerror());
+        return false;
+    }
+    auto func = (CreateDMCheckApiWhiteListFuncPtr)dlsym(checkApiWhiteListSoHandle_, "CreateDMCheckApiWhiteListObject");
+    if (func == nullptr || dlerror() != nullptr) {
+        dlclose(checkApiWhiteListSoHandle_);
+        checkApiWhiteListSoHandle_ = nullptr;
+        LOGE("Create object function is not exist. err: %{public}s", (dlerror() == nullptr ? "null" : dlerror()));
+        return false;
+    }
+    dmCheckApiWhiteList_ = std::shared_ptr<IDMCheckApiWhiteList>(func());
+    isAdapterCheckApiWhiteListSoLoaded_ = true;
+    LOGI("Success.");
+    return true;
+}
+#endif
 
 int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &udid)
