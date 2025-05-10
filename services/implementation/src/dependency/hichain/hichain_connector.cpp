@@ -911,7 +911,10 @@ int32_t HiChainConnector::ParseRemoteCredential(const int32_t groupType, const s
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_GROUP_TYPE] = groupType;
-    jsonObj[FIELD_DEVICE_LIST] = jsonDeviceList[FIELD_DEVICE_LIST];
+    std::string jsonStr = jsonDeviceList[FIELD_DEVICE_LIST].Dump();
+    JsonObject jsonArray(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    jsonArray.Parse(jsonStr);
+    jsonObj.Insert(FIELD_DEVICE_LIST, jsonArray);
     params = SafetyDump(jsonObj);
     osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (osAccountUserId < 0) {
@@ -1019,7 +1022,10 @@ int32_t HiChainConnector::ParseRemoteCredentialExt(const std::string &credential
         LOGE("Credentaildata or authType string key not exist!");
         return ERR_DM_FAILED;
     }
-    jsonObj[FIELD_DEVICE_LIST] = jsonObject[FIELD_DEVICE_LIST];
+    std::string jsonStr = jsonObject[FIELD_DEVICE_LIST].Dump();
+    JsonObject jsonArray(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    jsonArray.Parse(jsonStr);
+    jsonObj.Insert(FIELD_DEVICE_LIST, jsonArray);
     params = SafetyDump(jsonObj);
     return DM_OK;
 }
