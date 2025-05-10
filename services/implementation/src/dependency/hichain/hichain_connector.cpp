@@ -1022,7 +1022,7 @@ int32_t HiChainConnector::ParseRemoteCredentialExt(const std::string &credential
         LOGE("Credentaildata or authType string key not exist!");
         return ERR_DM_FAILED;
     }
-    std::string jsonStr = jsonDeviceList[FIELD_DEVICE_LIST].Dump();
+    std::string jsonStr = jsonObject[FIELD_DEVICE_LIST].Dump();
     JsonObject jsonArray(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     jsonArray.Parse(jsonStr);
     jsonObj.Insert(FIELD_DEVICE_LIST, jsonArray);
