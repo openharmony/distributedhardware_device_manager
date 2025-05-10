@@ -1401,10 +1401,6 @@ napi_value DeviceManagerNapi::GetLocalDeviceId(napi_env env, napi_callback_info 
 napi_value DeviceManagerNapi::GetLocalDeviceName(napi_env env, napi_callback_info info)
 {
     LOGI("GetLocalDeviceName in");
-    if (DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        CreateBusinessError(env, ERR_DM_NO_PERMISSION);
-        return nullptr;
-    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     std::string deviceName;
@@ -1431,6 +1427,10 @@ napi_value DeviceManagerNapi::GetLocalDeviceName(napi_env env, napi_callback_inf
 napi_value DeviceManagerNapi::GetLocalDeviceType(napi_env env, napi_callback_info info)
 {
     LOGI("GetLocalDeviceType in");
+    if (DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
+        CreateBusinessError(env, ERR_DM_NO_PERMISSION);
+        return nullptr;
+    }
     napi_value result = nullptr;
     napi_value thisVar = nullptr;
     int32_t deviceType = 0;

@@ -381,6 +381,7 @@ private:
     void HandleNetworkConnected();
     void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
         const std::string &accountIdHash, const std::string &accountName, int32_t userId);
+    void CheckPermission(bool &isOnlyShowNetworkId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     bool IsCallerInWhiteList();
     bool IsDMAdapterCheckApiWhiteListLoaded();

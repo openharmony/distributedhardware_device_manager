@@ -467,17 +467,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
     LOGD("Begin.");
     bool isOnlyShowNetworkId = false;
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
-    if (!PermissionManager::GetInstance().CheckNewPermission() && !IsCallerInWhiteList()) {
-        LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
-        isOnlyShowNetworkId = true;
-    }
-#else
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
-        isOnlyShowNetworkId = true;
-    }
-#endif
+    CheckPermission(isOnlyShowNetworkId);
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetLocalDeviceInfo(info);
     if (ret != DM_OK) {
@@ -520,6 +510,21 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
         return ERR_DM_FAILED;
     }
     return DM_OK;
+}
+
+void DeviceManagerService::CheckPermission(bool &isOnlyShowNetworkId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+    if (!PermissionManager::GetInstance().CheckNewPermission() && !IsCallerInWhiteList()) {
+        LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
+        isOnlyShowNetworkId = true;
+    }
+#else
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
+        isOnlyShowNetworkId = true;
+    }
+#endif
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
