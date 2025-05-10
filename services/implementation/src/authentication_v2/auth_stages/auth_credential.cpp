@@ -233,9 +233,10 @@ int32_t AuthSinkCredentialAuthNegotiateState::Action(std::shared_ptr<DmAuthConte
 std::string AuthCredentialAgreeState::CreateAuthParamsString(DmAuthScope authorizedScope,
     DmAuthCredentialAddMethod method, const std::shared_ptr<DmAuthContext> &authContext)
 {
-    LOGI("AuthCredentialAgreeState::CreateAuthParamsString start.");
+    LOGI("AuthCredentialAgreeState::CreateAuthParamsString start, authorizedScope: %{public}d.",
+        static_cast<int32_t>(authorizedScope));
 
-    if ((authorizedScope != DM_AUTH_SCOPE_USER && authorizedScope != DM_AUTH_SCOPE_APP) ||
+    if ((authorizedScope <= DM_AUTH_SCOPE_INVALID || authorizedScope >= DM_AUTH_SCOPE_MAX) ||
         (method != DM_AUTH_CREDENTIAL_ADD_METHOD_GENERATE && method != DM_AUTH_CREDENTIAL_ADD_METHOD_IMPORT)) {
         return std::string("");
     }
@@ -261,8 +262,12 @@ std::string AuthCredentialAgreeState::CreateAuthParamsString(DmAuthScope authori
     if (method == DM_AUTH_CREDENTIAL_ADD_METHOD_IMPORT) {
         jsonObj[TAG_KEY_VALUE] = authContext->GetPublicKey(DM_AUTH_REMOTE_SIDE, authorizedScope);
     }
-    jsonObj[TAG_AUTHORIZED_SCOPE] = authorizedScope;
-    if (authorizedScope == DM_AUTH_SCOPE_APP) {
+    if (authorizedScope == DM_AUTH_SCOPE_LNN || authorizedScope == DM_AUTH_SCOPE_USER) {
+        jsonObj[TAG_AUTHORIZED_SCOPE] = DM_AUTH_SCOPE_USER;
+    } else {
+        jsonObj[TAG_AUTHORIZED_SCOPE] = authorizedScope;
+    }
+    if (authorizedScope == DM_AUTH_SCOPE_APP || authorizedScope == DM_AUTH_SCOPE_USER) {
         std::vector<std::string> tokenIds = {std::to_string(authContext->accesser.tokenId),
             std::to_string(authContext->accessee.tokenId)};
         jsonObj[TAG_AUTHORIZED_APP_LIST] = tokenIds;
@@ -278,7 +283,7 @@ int32_t AuthCredentialAgreeState::GenerateCredIdAndPublicKey(DmAuthScope authori
     std::shared_ptr<DmAuthContext> &authContext)
 {
     LOGI("authorizedScope %{public}d.", static_cast<int32_t>(authorizedScope));
-    if ((authorizedScope != DM_AUTH_SCOPE_USER && authorizedScope != DM_AUTH_SCOPE_APP) ||
+    if ((authorizedScope <= DM_AUTH_SCOPE_INVALID || authorizedScope >= DM_AUTH_SCOPE_MAX) ||
         authContext == nullptr || authContext->hiChainAuthConnector == nullptr) {
         return ERR_DM_FAILED;
     }
@@ -320,8 +325,9 @@ int32_t AuthCredentialAgreeState::GenerateCredIdAndPublicKey(DmAuthScope authori
 int32_t AuthCredentialAgreeState::AgreeCredential(DmAuthScope authorizedScope,
     std::shared_ptr<DmAuthContext> &authContext)
 {
-    LOGI("AuthCredentialAgreeState::AgreeCredential start.");
-    if ((authorizedScope != DM_AUTH_SCOPE_USER && authorizedScope != DM_AUTH_SCOPE_APP) || authContext == nullptr) {
+    LOGI("AuthCredentialAgreeState::AgreeCredential start, authorizedScope: %{public}d.",
+        static_cast<int32_t>(authorizedScope));
+    if ((authorizedScope <= DM_AUTH_SCOPE_INVALID || authorizedScope >= DM_AUTH_SCOPE_MAX) || authContext == nullptr) {
         return ERR_DM_FAILED;
     }
 
@@ -373,15 +379,22 @@ int32_t AuthSrcCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> co
 
     // First authentication, generate LNN credentials and public key
     if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
-        ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_USER, context);
+        ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_LNN, context);
         if (ret != DM_OK) {
             LOGE("AuthSrcCredentialExchangeState::Action() error, generate user credId and publicKey failed.");
             return ret;
         }
     }
 
+    DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
+    if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
+        authorizedScope = DM_AUTH_SCOPE_APP;
+    } else if (context->accesser.bindLevel == USER) {
+        authorizedScope = DM_AUTH_SCOPE_USER;
+    }
+
     // Generate transmit credentials and public key
-    ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_APP, context);
+    ret = GenerateCredIdAndPublicKey(authorizedScope, context);
     if (ret != DM_OK) {
         LOGE("AuthSrcCredentialExchangeState::Action() error, generate app credId and publicKey failed.");
         return ret;
@@ -413,7 +426,7 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
     // First authentication lnn cred
     if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != USER) {
         // Generate credentials and public key
-        ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_USER, context);
+        ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_LNN, context);
         if (ret != DM_OK) {
             LOGE("AuthSinkCredentialExchangeState::Action failed, generate user cred and publicKey failed.");
             return ret;
@@ -421,10 +434,10 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
 
         // Agree credentials
         tmpCredId = context->accessee.lnnCredentialId;
-        ret = AgreeCredential(DM_AUTH_SCOPE_USER, context);
+        ret = AgreeCredential(DM_AUTH_SCOPE_LNN, context);
         if (ret != DM_OK) {
             context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
-            context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_USER, "");
+            context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN, "");
             LOGE("AuthSinkCredentialExchangeState::Action failed, agree user cred failed.");
             return ret;
         }
@@ -433,8 +446,15 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
         context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
     }
 
+    //
+    DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
+    if (context->accessee.bindLevel == APP || context->accessee.bindLevel == SERVICE) {
+        authorizedScope = DM_AUTH_SCOPE_APP;
+    } else if (context->accessee.bindLevel == USER) {
+        authorizedScope = DM_AUTH_SCOPE_USER;
+    }
     // Generate transport credentials and public key
-    ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_APP, context);
+    ret = GenerateCredIdAndPublicKey(authorizedScope, context);
     if (ret != DM_OK) {
         LOGE("AuthSinkCredentialExchangeState::Action failed, generate app cred and publicKey failed.");
         return ret;
@@ -442,10 +462,10 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
 
     // Agree transport credentials and public key
     tmpCredId = context->accessee.transmitCredentialId;
-    ret = AgreeCredential(DM_AUTH_SCOPE_APP, context);
+    ret = AgreeCredential(authorizedScope, context);
     if (ret != DM_OK) {
         context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
-        context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_APP, "");
+        context->SetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope, "");
         LOGE("AuthSinkCredentialExchangeState::Action failed, agree app cred failed.");
         return ret;
     }
@@ -465,7 +485,7 @@ DmAuthStateType AuthSrcCredentialAuthStartState::GetStateType()
 
 int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI(" AuthSrcCredentialAuthStartState::Action start.");
+    LOGI("AuthSrcCredentialAuthStartState::Action start.");
     int32_t ret = ERR_DM_FAILED;
     std::string tmpCredId = "";
     int32_t osAccountId = context->accesser.userId;
@@ -480,11 +500,10 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
             // Agree lnn credentials and public key
             tmpCredId = context->accesser.lnnCredentialId;
-            ret = AgreeCredential(DM_AUTH_SCOPE_USER, context);
+            ret = AgreeCredential(DM_AUTH_SCOPE_LNN, context);
             if (ret != DM_OK) {
                 context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
-                context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_USER, "");
-                LOGE("AuthSrcCredentialAuthStartState::Action failed, agree user cred failed.");
+                context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN, "");
                 return ret;
             }
 
@@ -492,12 +511,19 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
             context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
         }
 
+        DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
+        if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
+            authorizedScope = DM_AUTH_SCOPE_APP;
+        } else if (context->accesser.bindLevel == USER) {
+            authorizedScope = DM_AUTH_SCOPE_USER;
+        }
+
         // Agree transport credentials and public key
         tmpCredId = context->accesser.transmitCredentialId;
-        ret = AgreeCredential(DM_AUTH_SCOPE_APP, context);
+        ret = AgreeCredential(authorizedScope, context);
         if (ret != DM_OK) {
             context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
-            context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_APP, "");
+            context->SetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope, "");
             LOGE("AuthSrcCredentialAuthStartState::Action failed, agree app cred failed.");
             return ret;
         }

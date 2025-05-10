@@ -300,7 +300,8 @@ uint32_t DmAuthState::GetCredType(std::shared_ptr<DmAuthContext> context, const 
         context->direction == DM_AUTH_SINK && subject == SUBJECT_SECONDARY) {
         return DM_SHARE;
     }
-    if (credType == ACCOUNT_UNRELATED && authorizedScope == SCOPE_APP && HaveSameTokenId(context, appList)) {
+    if (credType == ACCOUNT_UNRELATED && (authorizedScope == SCOPE_APP || authorizedScope == SCOPE_USER) &&
+        HaveSameTokenId(context, appList)) {
         return DM_POINT_TO_POINT;
     }
     if (credType == ACCOUNT_UNRELATED && authorizedScope == SCOPE_USER && appList.empty()) {

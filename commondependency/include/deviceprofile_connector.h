@@ -169,8 +169,7 @@ public:
         const std::string &pkgName, const std::string &deviceId);
     DM_EXPORT std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName,
         std::string requestDeviceId, std::string trustUdid);
-    DM_EXPORT uint64_t GetTokenIdByNameAndDeviceId(std::string pkgName,
-        std::string requestDeviceId);
+    DM_EXPORT uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId);
     DM_EXPORT std::vector<int32_t> SyncAclByBindType(std::string pkgName,
         std::vector<int32_t> bindTypeVec, std::string localDeviceId, std::string targetDeviceId);
     int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm);
@@ -368,6 +367,12 @@ private:
         const std::string &localUdid, const uint32_t localTokenId,
         const std::string &remoteUdid, const uint32_t peerTokenId,
         DmOfflineParam &offlineParam);
+    bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const int32_t remoteUserId, const std::string &remoteUdid,
+        const int32_t tokenId, const int32_t peerTokenId, DmOfflineParam &offlineParam);
+    bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const int32_t remoteUserId, const std::string &remoteUdid,
+        const int32_t remoteTokenId, DmOfflineParam &offlineParam);
 
     std::string GetAppServiceAuthVersionInfo(std::string localUdid, std::string remoteUdid, int32_t tokenId,
         int32_t userId, std::vector<DistributedDeviceProfile::AccessControlProfile> profiles);

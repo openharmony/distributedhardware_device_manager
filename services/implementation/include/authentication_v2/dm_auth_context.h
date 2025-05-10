@@ -71,9 +71,12 @@ enum DmAuthSide {
 };
 
 enum DmAuthScope {
-    DM_AUTH_SCOPE_DEVICE = 1,
+    DM_AUTH_SCOPE_INVALID = 0,
+    DM_AUTH_SCOPE_DEVICE,
     DM_AUTH_SCOPE_USER,
     DM_AUTH_SCOPE_APP,
+    DM_AUTH_SCOPE_LNN,
+    DM_AUTH_SCOPE_MAX,
 };
 
 enum DmRole {

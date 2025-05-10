@@ -396,10 +396,9 @@ int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
     return DM_OK;
 }
 
-uint64_t DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId(std::string pkgName,
-    std::string requestDeviceId)
+uint64_t DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId)
 {
-    (void)pkgName;
+    (void)extra;
     (void)requestDeviceId;
     return 0;
 }
