@@ -161,7 +161,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
         case DEVICE_INFO_CHANGED:
             ChangeDeviceInfo(devInfo);
             ProcessDeviceStateChange(devState, devInfo);
-            softbusConnector_->ClearProcessInfo();
+            softbusConnector_->ClearChangeProcessInfo();
             break;
         default:
             LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
