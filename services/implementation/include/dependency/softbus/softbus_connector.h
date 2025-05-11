@@ -135,6 +135,9 @@ public:
     void SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec);
     std::vector<ProcessInfo> GetProcessInfo();
     void ClearProcessInfo();
+    void SetChangeProcessInfo(ProcessInfo processInfo);
+    std::vector<ProcessInfo> GetChangeProcessInfo();
+    void ClearChangeProcessInfo();
     DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
     void DeleteOffLineTimer(std::string &udidHash);
     void SyncAclList(int32_t userId, std::string credId, int32_t sessionKeyId, int32_t aclId);
@@ -168,9 +171,11 @@ private:
     std::shared_ptr<ISoftbusStateCallback> deviceStateManagerCallback_;
     static std::unordered_map<std::string, std::string> deviceUdidMap_;
     static std::vector<ProcessInfo> processInfoVec_;
+    static std::vector<ProcessInfo> processChangeInfoVec_;
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex deviceUdidLocks_;
     static std::mutex processInfoVecMutex_;
+    static std::mutex processChangeInfoVecMutex_;
     static std::shared_ptr<ISoftbusConnectorCallback> connectorCallback_;
 };
 } // namespace DistributedHardware

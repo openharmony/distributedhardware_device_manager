@@ -761,7 +761,7 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
         ProcessInfo processInfo;
         processInfo.pkgName = std::string(DM_PKG_NAME);
         processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
-        softbusConnector_->SetProcessInfo(processInfo);
+        softbusConnector_->SetChangeProcessInfo(processInfo);
         deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
     }
 }

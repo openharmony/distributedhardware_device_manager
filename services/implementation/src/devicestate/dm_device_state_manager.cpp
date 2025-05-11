@@ -161,7 +161,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
         case DEVICE_INFO_CHANGED:
             ChangeDeviceInfo(devInfo);
             ProcessDeviceStateChange(devState, devInfo);
-            softbusConnector_->ClearProcessInfo();
+            softbusConnector_->ClearChangeProcessInfo();
             break;
         default:
             LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
@@ -175,7 +175,12 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
         GetAnonyString(devInfo.networkId).c_str());
     CHECK_NULL_VOID(softbusConnector_);
     CHECK_NULL_VOID(listener_);
-    std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
+    std::vector<ProcessInfo> processInfoVec;
+    if (devState == DEVICE_INFO_CHANGED) {
+        processInfoVec = softbusConnector_->GetChangeProcessInfo();
+    } else {
+        processInfoVec = softbusConnector_->GetProcessInfo();
+    }
     for (const auto &item : processInfoVec) {
         if (!item.pkgName.empty()) {
             LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
