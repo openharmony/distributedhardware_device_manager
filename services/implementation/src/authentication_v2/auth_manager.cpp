@@ -1011,6 +1011,16 @@ void AuthManager::GetBindTargetParams(std::string &pkgName, PeerTargetId &target
     return;
 }
 
+void AuthManager::GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode)
+{
+    if (context_ == nullptr || context_->importAuthCode.empty() || context_->importPkgName.empty()) {
+        LOGE("GetAuthCodeAndPkgName failed, authCode or pkgName is empty");
+        return;
+    }
+    authCode = context_->importAuthCode;
+    pkgName = context_->importPkgName;
+}
+
 void AuthManager::SetBindTargetParams(const PeerTargetId &targetId)
 {
     targetId_ = targetId;

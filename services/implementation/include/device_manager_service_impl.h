@@ -189,7 +189,7 @@ public:
         int32_t remoteTokenId);
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
     int32_t InitAndRegisterAuthMgr(bool isSrcSide, uint64_t tokenId, std::shared_ptr<Session> session,
-        uint64_t logicalSessionId);
+        uint64_t logicalSessionId, const std::string &pkgName);
     void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
 private:
@@ -239,7 +239,8 @@ private:
         std::shared_ptr<DeviceInfo> deviceInfo, int32_t &index);
     bool IsAuthNewVersion(int32_t bindLevel, std::string localUdid, std::string remoteUdid,
         int32_t tokenId, int32_t userId);
-    void ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId);
+    void ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId, const std::string &pkgName);
+    void ImportAuthCodeToConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId);
 
     // Resource cleanup thread
     void CleanWorker();

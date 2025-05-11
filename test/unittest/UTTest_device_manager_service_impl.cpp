@@ -33,7 +33,7 @@ void DeviceManagerServiceImplTest::SetUp()
     auto session = std::make_shared<Session>(0, "");
     session->version_ = DM_VERSION_5_0_OLD_MAX;
     uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
-    deviceManagerServiceImpl_->InitAndRegisterAuthMgr(true, tokenId, session, 0);
+    deviceManagerServiceImpl_->InitAndRegisterAuthMgr(true, tokenId, session, 0, "com.test");
 }
 const std::string testID("111111");
 

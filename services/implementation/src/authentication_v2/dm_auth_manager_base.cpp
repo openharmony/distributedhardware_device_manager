@@ -362,6 +362,12 @@ void AuthManagerBase::GetBindTargetParams(std::string &pkgName, PeerTargetId &ta
     return;
 }
 
+void AuthManagerBase::GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode)
+{
+    LOGE("GetAuthCodeAndPkgName is not implemented in the current version");
+    return;
+}
+
 void AuthManagerBase::SetBindTargetParams(const PeerTargetId &targetId)
 {
     LOGE("SetBindTargetParams is not implemented in the current version");

@@ -708,7 +708,9 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
         context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
         return DM_OK;
     }
-    if (context->authBoxType == DMLocalServiceInfoAuthBoxType::STATE3) {
+    if ((context->authType == DmAuthType::AUTH_TYPE_PIN || context->authType == DmAuthType::AUTH_TYPE_NFC ||
+        context->authType == DmAuthType::AUTH_TYPE_PIN_ULTRASONIC) &&
+        context->authBoxType == DMLocalServiceInfoAuthBoxType::STATE3) {
         context->timer->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
         if (ShowConfigDialog(context) != DM_OK) {
             LOGE("ShowConfigDialog failed");

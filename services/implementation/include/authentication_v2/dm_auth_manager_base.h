@@ -215,6 +215,7 @@ public:
     // need to be obtained for use by the old protocol
     virtual void GetBindTargetParams(std::string &pkgName, PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam);
+    virtual void GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode);
 
     virtual void SetBindTargetParams(const PeerTargetId &targetId);
     // Register the notification function when the auth_mgr event is complete.
