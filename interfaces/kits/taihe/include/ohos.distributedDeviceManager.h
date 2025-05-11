@@ -23,6 +23,11 @@
 
 namespace ANI::distributedDeviceManager {
 
+enum DMBussinessErrorCode {
+    ERR_NO_PERMISSION = 201,
+    DM_ERR_FAILED = 11600101,
+};
+
 class DeviceManagerImpl {
 public:
     DeviceManagerImpl() = default;
