@@ -51,7 +51,6 @@ constexpr int32_t DM_IPC_THREAD_NUM = 32;
 constexpr int32_t MAX_CALLBACK_NUM = 5000;
 constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000; // 5 minutes
 constexpr int32_t ECHO_COUNT = 2;
-constexpr int32_t PATH_MAX = 4096;
 
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
