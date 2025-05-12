@@ -104,7 +104,7 @@ std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::GetDeviceAuthCallba
 int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osAccountId, std::string udid,
     int64_t requestId)
 {
-    LOGI("HiChainAuthConnector::AuthDevice start.");
+    LOGI("HiChainAuthConnector::AuthDevice start, pinCode: %{public}s", GetAnonyString(pinCode).c_str());
     JsonObject authParamJson;
     authParamJson["osAccountId"] = osAccountId;
     authParamJson["pinCode"] = pinCode;
@@ -255,7 +255,7 @@ int32_t HiChainAuthConnector::AuthCredential(int32_t osAccountId, int64_t authRe
 
 int32_t HiChainAuthConnector::AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode)
 {
-    LOGI("HiChainAuthConnector::AuthCredential start.");
+    LOGI("HiChainAuthConnector::AuthCredential start, pinCode: %{public}s", GetAnonyString(pinCode).c_str());
     if (pinCode.size() < MIN_PINCODE_SIZE) {
         LOGE("HiChainAuthConnector::AuthCredentialPinCode failed, pinCode size is %{public}zu.", pinCode.size());
         return ERR_DM_FAILED;

@@ -968,6 +968,7 @@ char *AuthSinkManager::AuthDeviceRequest(int64_t requestId, int operationCode, c
             jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
             jsonObj[FIELD_PIN_CODE] = pinCode;
         }
+        LOGI("pinCode: %{public}s", GetAnonyString(pinCode).c_str());
     } else if (curState == DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_START_STATE) {
         if (context_->isOnline) { // Non-first time certification
             jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
