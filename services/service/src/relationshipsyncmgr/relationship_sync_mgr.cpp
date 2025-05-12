@@ -147,7 +147,7 @@ bool RelationShipChangeMsg::ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) con
 
 void RelationShipChangeMsg::ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) const
 {
-    if (credId.length() != (CREDID_PAYLOAD_LEN - USERID_PAYLOAD_LEN)) {
+    if (credId.length() <= (CREDID_PAYLOAD_LEN - USERID_PAYLOAD_LEN)) {
         LOGE("ToShareUnbindPayLoad credId length is invalid.");
         len = 0;
         return;
