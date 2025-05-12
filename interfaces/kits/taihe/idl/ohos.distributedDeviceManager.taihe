@@ -12,27 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 @!namespace("@ohos.distributedDeviceManager", "distributedDeviceManager")
 
 @!sts_inject("""
 static { loadLibrary("device_manager_ani_taihe");}
 """)
 
-struct DeviceBasicInfo {
+struct  DeviceBasicInfo {
     deviceId: String;
     deviceName: String;
     deviceType: String;
-    networkId : String;
+    networkId: String;
+    extraData: String;
 }
+function MakeDeviceBasicInfo(deviceId:String, deviceName:String, deviceType:String,
+                             networkId:String, extraData: String): DeviceBasicInfo;
 
 struct ServiceProfileInfo {
     deviceId: String;
-}
-
-struct DeviceProfileInfo {
-    deviceId: String;
-    deviceName: String;
-    deviceType: String;
 }
 
 enum DeviceStateChange: i32 {
@@ -41,52 +39,67 @@ enum DeviceStateChange: i32 {
   UNAVAILABLE = 2,
 }
 
-struct DeviceStatusStructer {
-    DeviceStateChange: i32;
-    DeviceBasicInfo: DeviceBasicInfo;
+struct DeviceStateChangeData {
+    deviceStateChange: DeviceStateChange;
+    deviceBasicInfo: DeviceBasicInfo;
 }
+function MakeDeviceStateChangeData(deviceStateChange : DeviceStateChange,
+                                   deviceBasicInfo : DeviceBasicInfo): DeviceStateChangeData;
 
 interface DeviceManager {
-    getLocalDeviceId(): String;
-    unbindTarget(deviceId: String): void;
-    getDeviceType(networkId: String): f64;
-    getDeviceName(networkId: String): String;
-    getLocalDeviceNetworkId(): String;
+    GetLocalDeviceId(): String;
+    UnbindTarget(deviceId: String): void;
+    GetDeviceType(networkId: String): f64;
+    GetDeviceName(networkId: String): String;
+    GetLocalDeviceNetworkId(): String;
 
-    @on_off("deviceNameChange")
-    ondeviceNameChange(f: (a: String) => String): void;
+    @!sts_inject_into_interface("on(type: string, callback: (data: object)=> void): void;")
+    @!sts_inject_into_class("""on(type: string, callback: object): void {
+        if (type === "discoverSuccess") {
+            this.OnDiscoverSuccess_inner(callback as (data: DeviceBasicInfo)=> void);
+        } else if (type === "deviceStateChange") {
+            this.OnDeviceStateChange_inner(callback as (data: DeviceStateChangeData)=> void);
+        } else if (type === "replyResult") {
+            this.OnreplyResult_inner(callback as (data: string)=> void);
+        } else if (type === "deviceNameChange") {
+            this.OnDeviceNameChange_inner(callback as (data: string)=> void);
+        } else if (type === "discoverFailure") {
+            this.OnDiscoverFailure_inner(callback as (data: int)=> void);
+        } else {
+            throw new Error(`Unknown type: ${type}`);
+        }
+    }
+    """)
 
-    @on_off("discoverFailure")
-    ondiscoverFailure(f: (reason: i32) => void): void;
+    @!sts_inject_into_interface("off(type: string, callback?: (data: object)=> void): void;")
+    @!sts_inject_into_class("""off(type: string, callback?: object): void {
+        if (type === "discoverSuccess") {
+            this.OffDiscoverSuccess_inner(callback as (((data: DeviceBasicInfo)=> void) | undefined));
+        } else if (type === "deviceStateChange") {
+            this.OffDeviceStateChange_inner(callback as (((data: DeviceStateChangeData)=> void) | undefined));
+        } else if (type === "replyResult") {
+            this.OffreplyResult_inner(callback as (((data: string)=> void) | undefined));
+        } else if (type === "deviceNameChange") {
+            this.OffDeviceNameChange_inner(callback as (((data: string)=> void) | undefined));
+        } else if (type === "discoverFailure"){
+            this.OffDiscoverFailure_inner(callback as (((data: int)=> void) | undefined));
+        } else {
+            throw new Error(`Unknown type: ${type}`);
+        }
+    }
+    """)
 
-    @on_off("replyResult")
-    onreplyResult(f: (a: String) => String): void;
-
-    // @on_off("serviceDie")
-    onserviceDie(f: (a: String) => String): void;
-
-    @on_off("discoverSuccess")
-    ondiscoverSuccess(f: (data: DeviceBasicInfo) => DeviceBasicInfo): void;
-
-    @on_off("deviceStateChange")
-    ondeviceStateChange(f: (data: DeviceStatusStructer) => DeviceStatusStructer): void;
-
-    @on_off("deviceNameChange")
-    offdeviceNameChange(f: (a: String) => String): void;
-
-    @on_off("discoverFailure")
-    offdiscoverFailure(f: (reason: i32) => void): void;
-
-    @on_off("replyResult")
-    offreplyResult(f: (a: String) => String): void;
-
-    // @on_off("serviceDie")
-    offserviceDie(f: (a: String) => String): void;
-
-    @on_off("discoverSuccess")
-    offdiscoverSuccess(f: (data: DeviceBasicInfo) => DeviceBasicInfo): void;
-
-    @on_off("deviceStateChange")
-    offdeviceStateChange(f: (data: DeviceStatusStructer) => DeviceStatusStructer): void;
+    OnDiscoverSuccess(onDiscoverSuccesscb: (device: DeviceBasicInfo) => void): void;
+    OffDiscoverSuccess(offDiscoverSuccesscb: Optional<(device: DeviceBasicInfo) => void>): void;
+    OnDeviceStateChange(onDeviceStateChangecb: (deviceStateChangeData: DeviceStateChangeData) => void): void;
+    OffDeviceStateChange(offDeviceStateChangecb:
+                         Optional<(deviceStateChangeData: DeviceStateChangeData) => void>): void;
+    OnreplyResult(onreplyResultcb: (data: String)=> void): void;
+    OffreplyResult(offreplyResultcb:  Optional<(data: String)=> void>): void;
+    OnDeviceNameChange(onDeviceNameChangecb: (deviceName: String) => void): void;
+    OffDeviceNameChange(offDeviceNameChangecb: Optional<(deviceName: String) => void>): void;
+    OnDiscoverFailure(onDiscoverFailurecb: (reason: i32) => void): void;
+    OffDiscoverFailure(offDiscoverFailurecb: Optional<(reason: i32) => void>): void;
 }
-function createDeviceManager(bundleName: String): DeviceManager;
+
+function CreateDeviceManager(bundleName: String): DeviceManager;

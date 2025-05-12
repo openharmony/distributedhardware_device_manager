@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#ifndef OHOS_DISTRIBUTED_DEVICE_MANAGER_ANI_CONSTRUCTOR_H
+#define OHOS_DISTRIBUTED_DEVICE_MANAGER_ANI_CONSTRUCTOR_H
+
 #include "ohos.distributedDeviceManager.ani.hpp"
-ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
-{
+ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result) {
     ani_env *env;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
         return ANI_ERROR;
@@ -26,3 +29,5 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     *result = ANI_VERSION_1;
     return ANI_OK;
 }
+
+#endif

@@ -15,11 +15,14 @@
 #ifndef OHOS_DISTRIBUTED_DEVICE_MANAGER_H
 #define OHOS_DISTRIBUTED_DEVICE_MANAGER_H
 
-#include <string>
 #include <functional>
-#include "taihe/callback.hpp"
-#include "dm_device_info.h"
+#include <string>
 #include "device_manager_callback.h"
+#include "dm_device_info.h"
+#include "ohos.distributedDeviceManager.proj.hpp"
+#include "ohos.distributedDeviceManager.impl.hpp"
+#include "taihe/callback.hpp"
+#include "taihe/runtime.hpp"
 
 namespace ANI::distributedDeviceManager {
 
@@ -34,50 +37,41 @@ public:
     explicit DeviceManagerImpl(std::shared_ptr<DeviceManagerImpl> impl);
     explicit DeviceManagerImpl(const std::string& bundleName) ;
     ~DeviceManagerImpl() = default;
-    std::string getLocalDeviceId();
-    void unbindTarget(taihe::string_view deviceId);
-    double getDeviceType(taihe::string_view networkId);
-    std::string getDeviceName(taihe::string_view networkId);
-    std::string getLocalDeviceNetworkId();
+    std::string GetLocalDeviceId();
+    void UnbindTarget(taihe::string_view deviceId);
+    double GetDeviceType(taihe::string_view networkId);
+    std::string GetDeviceName(taihe::string_view networkId);
+    std::string GetLocalDeviceNetworkId();
 
-    void ondeviceNameChange(taihe::callback_view<taihe::string(taihe::string_view)> f);
-    void ondiscoverFailure(taihe::callback_view<void(int32_t)> f);
-    void onreplyResult(taihe::callback_view<taihe::string(taihe::string_view)> f);
-    void onserviceDie(taihe::callback_view<taihe::string(taihe::string_view)> f);
-    void ondiscoverSuccess(taihe::callback_view<ohos::distributedDeviceManager::DeviceBasicInfo(
-        ohos::distributedDeviceManager::DeviceBasicInfo const&)> f);
-    void ondeviceStateChange(taihe::callback_view<ohos::distributedDeviceManager::DeviceStatusStructer(
-        ohos::distributedDeviceManager::DeviceStatusStructer const&)> f);
+    void OnDeviceNameChange(taihe::callback_view<void(taihe::string_view)> onDeviceNameChangecb);
+    void OnDiscoverFailure(taihe::callback_view<void(int32_t)> onDiscoverFailurecb);
+    void OnreplyResult(taihe::callback_view<void(taihe::string_view)> onreplyResultcb);
+    void OnDiscoverSuccess(taihe::callback_view<void(
+        ohos::distributedDeviceManager::DeviceBasicInfo const &)> onDiscoverSuccesscb);
+    void OnDeviceStateChange(taihe::callback_view<void(
+        ohos::distributedDeviceManager::DeviceStateChangeData const&)> onDeviceStateChangecb);
 
-    void offdeviceNameChange(taihe::callback_view<taihe::string(taihe::string_view)> f);
-    void offdiscoverFailure(taihe::callback_view<void(int32_t)> f);
-    void offreplyResult(taihe::callback_view<taihe::string(taihe::string_view)> f);
-    void offserviceDie(taihe::callback_view<taihe::string(taihe::string_view)> f);
-    void offdiscoverSuccess(taihe::callback_view<ohos::distributedDeviceManager::DeviceBasicInfo(
-        ohos::distributedDeviceManager::DeviceBasicInfo const&)> f);
-    void offdeviceStateChange(taihe::callback_view<ohos::distributedDeviceManager::DeviceStatusStructer(
-        ohos::distributedDeviceManager::DeviceStatusStructer const&)> f);
+    void OffDeviceNameChange(taihe::optional_view<taihe::callback<void(taihe::string_view)>> offDeviceNameChangecb);
+    void OffDiscoverFailure(taihe::optional_view<taihe::callback<void(int32_t)>> offDiscoverFailurecb);
+    void OffreplyResult(taihe::optional_view<taihe::callback<void(taihe::string_view)>> offreplyResultcb);
+    void OffDiscoverSuccess(taihe::optional_view<taihe::callback<void(
+        ohos::distributedDeviceManager::DeviceBasicInfo const&)>> offDiscoverSuccesscb);
+    void OffDeviceStateChange(taihe::optional_view<taihe::callback<void(
+        ohos::distributedDeviceManager::DeviceStateChangeData const&)>> offDeviceStateChangecb);
 
-    friend ohos::distributedDeviceManager::DeviceManager createDeviceManager(taihe::string_view bundleName);
-
-private:
-    std::shared_ptr<ohos::distributedDeviceManager::DeviceManager> deviceManager_;
-    std::string bundleName_;
-};
-
-ohos::distributedDeviceManager::DeviceManager createDeviceManager(taihe::string_view bundleName);
-
-class DmAniInitCallback : public OHOS::DistributedHardware::DmInitCallback {
-public:
-    explicit DmAniInitCallback(taihe::string_view bundleName) : bundleName_(std::string(bundleName))
-    {
-    }
-    ~DmAniInitCallback() override {}
-    void OnRemoteDied() override;
+    friend ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_view bundleName);
 
 private:
     std::string bundleName_;
 };
-}
+
+ohos::distributedDeviceManager::DeviceBasicInfo MakeDeviceBasicInfo(taihe::string_view deviceId,
+    taihe::string_view deviceName, taihe::string_view deviceType,
+    taihe::string_view networkId, taihe::string_view extraData);
+ohos::distributedDeviceManager::DeviceStateChangeData MakeDeviceStateChangeData(
+    ohos::distributedDeviceManager::DeviceStateChange deviceStateChange,
+    ohos::distributedDeviceManager::DeviceBasicInfo const &deviceBasicInfo);
+ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_view bundleName);
+}// namespace ANI::distributedDeviceManager
 
 #endif
