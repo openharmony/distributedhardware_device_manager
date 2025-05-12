@@ -99,12 +99,6 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
         std::string path = JoinPath("/proc/", std::to_string(memmgrPid), "reclaim");
         std::string contentStr = "1";
         LOGI("Start echo 1 to pid : %{public}d, path: %{public}s", memmgrPid, path.c_str());
-        char *resolvedPath = new char[PATH_MAX];
-        realpath(path.c_str(), resolvedPath);
-        if (tmp == nullptr) {
-            LOGE("path failed");
-        }
-        free(resolvedPath);
         FILE *file = fopen(path.c_str(), "w");
         if (file == NULL) {
             LOGE("ReclaimMemmgrFileMemForDM open file failed.");
