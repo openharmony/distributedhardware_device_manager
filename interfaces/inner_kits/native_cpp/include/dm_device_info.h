@@ -152,7 +152,7 @@ typedef enum DmAuthForm {
     /**
      * Share
      */
-    SHARE = 3;
+    SHARE = 3,
 } DmAuthForm;
 
 /**
