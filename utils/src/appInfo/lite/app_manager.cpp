@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,6 +71,12 @@ int32_t AppManager::GetHapTokenIdByName(int32_t userId, std::string &bundleName,
     (void)bundleName;
     (void)instIndex;
     (void)tokenId;
+    return DM_OK;
+}
+
+int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)
+{
+    (void)bundleName;
     return DM_OK;
 }
 } // namespace DistributedHardware

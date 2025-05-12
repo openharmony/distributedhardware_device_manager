@@ -44,5 +44,10 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
 {
     return DmAppManager::dmAppManager->GetAppIdByPkgName(pkgName, appId);
 }
+
+int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)
+{
+    return DmAppManager::dmAppManager->GetBundleNameForSelf(bundleName);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

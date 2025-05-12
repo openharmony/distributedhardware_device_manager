@@ -3907,5 +3907,14 @@ int32_t DeviceManagerService::UnRegisterPinHolderCallback(const std::string &pkg
     CHECK_NULL_RETURN(pinHolder_, ERR_DM_POINT_NULL);
     return pinHolder_->UnRegisterPinHolderCallback(pkgName);
 }
+
+int32_t DeviceManagerService::GetLocalDeviceName(std::string &deviceName)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(0, deviceName);
+#endif
+    (void) deviceName;
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

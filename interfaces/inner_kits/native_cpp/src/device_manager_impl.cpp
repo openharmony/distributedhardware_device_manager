@@ -46,6 +46,7 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_local_device_name_rsp.h"
 #include "ipc_get_local_display_device_name_req.h"
 #include "ipc_get_local_display_device_name_rsp.h"
 #include "ipc_get_localserviceinfo_rsp.h"
@@ -1452,6 +1453,24 @@ int32_t DeviceManagerImpl::GetLocalDeviceName(const std::string &pkgName, std::s
     deviceName = std::string(info.deviceName);
     LOGI("End, deviceName : %{public}s", GetAnonyString(deviceName).c_str());
     DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceName", info, DM_OK, anonyLocalUdid_);
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetLocalDeviceName(std::string &deviceName)
+{
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetLocalDeviceNameRsp> rsp = std::make_shared<IpcGetLocalDeviceNameRsp>();
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_NAME, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGI("Get local device name failed ret: %{public}d", ret);
+        return ret;
+    }
+    deviceName = rsp->GetLocalDeviceName();
     return DM_OK;
 }
 
