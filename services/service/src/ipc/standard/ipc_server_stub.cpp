@@ -104,7 +104,7 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
         if (tmp == nullptr) {
             LOGE("path failed");
         }
-        free(tmp);
+        free(resolvedPath);
         FILE *file = fopen(path.c_str(), "w");
         if (file == NULL) {
             LOGE("ReclaimMemmgrFileMemForDM open file failed.");
