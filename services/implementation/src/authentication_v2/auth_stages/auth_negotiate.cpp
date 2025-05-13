@@ -287,7 +287,7 @@ void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext
     CHECK_NULL_VOID(context);
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
-    int32_t bindLevel = DM_INVALIED_TYPE;
+    uint32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         std::string trustDeviceIdHash = Crypto::GetUdidHash(trustDeviceId);
@@ -367,7 +367,7 @@ bool AuthSinkNegotiateStateMachine::CheckCredIdInAcl(std::shared_ptr<DmAuthConte
         case DM_IDENTICAL_ACCOUNT:
         case DM_SHARE:
         case DM_LNN:
-            if (credInfo[credId][FILED_CRED_TYPE].Get<int32_t>() == bindType) {
+            if (credInfo[credId][FILED_CRED_TYPE].Get<uint32_t>() == bindType) {
                 checkResult = true;
             } else {
                 DeleteAcl(context, profile);
@@ -386,7 +386,7 @@ void AuthSinkNegotiateStateMachine::CheckCredIdInAclForP2P(std::shared_ptr<DmAut
     std::string &credId, const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo,
     uint32_t bindType, bool &checkResult)
 {
-    if (credInfo[credId][FILED_CRED_TYPE].Get<int32_t>() == bindType) {
+    if (credInfo[credId][FILED_CRED_TYPE].Get<uint32_t>() == bindType) {
         std::vector<std::string> appList;
         credInfo[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
         const size_t APP_LIST_SIZE = 2;

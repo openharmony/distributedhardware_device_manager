@@ -378,6 +378,9 @@ bool IpcModelCodec::EncodeLocalServiceInfos(const std::vector<DMLocalServiceInfo
         return false;
     }
     bool bRet = true;
+    if (num > IPC_VECTOR_MAX_SIZE) {
+        LOGE("num is Invalid value, num = %{public}u", num);
+    }
     for (uint32_t k = 0; k < num; k++) {
         DMLocalServiceInfo serviceInfo = serviceInfos[k];
         bRet = EncodeLocalServiceInfo(serviceInfo, parcel);

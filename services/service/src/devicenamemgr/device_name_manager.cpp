@@ -494,7 +494,7 @@ std::string DeviceNameManager::AnoyPrivacyString(const std::string &str)
         res += wholeCharVec[i];
     }
     res += ANOY_STRING;
-    for (int32_t j = wholeCharVec.size() - NUM3; j < wholeCharVec.size(); j++) {
+    for (size_t j = wholeCharVec.size() - NUM3; j < wholeCharVec.size(); j++) {
         res += wholeCharVec[j];
     }
     return res;

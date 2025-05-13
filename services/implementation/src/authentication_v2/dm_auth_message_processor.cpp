@@ -116,7 +116,7 @@ void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access, bool i
     access.deviceId = srcAccessToSync.deviceId;
     access.userId = srcAccessToSync.userId;
     access.accountId = srcAccessToSync.accountId;
-    access.tokenId = srcAccessToSync.tokenId;
+    access.tokenId = static_cast<int64_t>(srcAccessToSync.tokenId);
     access.bundleName = srcAccessToSync.bundleName;
     access.pkgName = srcAccessToSync.pkgName;
     access.bindLevel = srcAccessToSync.bindLevel;
@@ -526,7 +526,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
     context->accesser.transmitPublicKey = jsonData[TAG_TRANSMIT_PUBLIC_KEY].Get<std::string>();
     context->accesser.deviceId = jsonData[TAG_DEVICE_ID].Get<std::string>();
     context->accesser.userId = jsonData[TAG_PEER_USER_SPACE_ID].Get<int32_t>();
-    context->accesser.tokenId = jsonData[TAG_TOKEN_ID].Get<uint64_t>();
+    context->accesser.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkCredentialExchangeState>());
     return DM_OK;
 }
@@ -572,7 +572,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
     context->accessee.transmitPublicKey = jsonData[TAG_TRANSMIT_PUBLIC_KEY].Get<std::string>();
     context->accessee.deviceId = jsonData[TAG_DEVICE_ID].Get<std::string>();
     context->accessee.userId = jsonData[TAG_PEER_USER_SPACE_ID].Get<int32_t>();
-    context->accessee.tokenId = jsonData[TAG_TOKEN_ID].Get<uint64_t>();
+    context->accessee.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
 
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthStartState>());
     return DM_OK;
@@ -1433,7 +1433,7 @@ int32_t DmAuthMessageProcessor::ACLToStr(DistributedDeviceProfile::AccessControl
     dmAcl.accesseeId = acl.GetAccesseeId();
     dmAcl.deviceId = acl.GetTrustDeviceId();
     dmAcl.sessionKey = acl.GetSessionKey();
-    dmAcl.bindType = acl.GetBindType();
+    dmAcl.bindType = static_cast<int32_t>(acl.GetBindType());
     dmAcl.authType = acl.GetAuthenticationType();
     dmAcl.deviceType = acl.GetDeviceIdType();
     dmAcl.deviceIdHash = acl.GetDeviceIdHash();

@@ -434,7 +434,7 @@ static uint64_t GenerateRandNum(int sessionId)
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> rand_dis(1, 0xFFFFFFFF);
-    uint32_t randomNumber = rand_dis(gen);
+    uint32_t randomNumber = static_cast<uint32_t>(rand_dis(gen));
 
     // Combination of random numbers
     uint64_t randNum = (static_cast<uint64_t>(timestamp) << 32) |
@@ -911,6 +911,9 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
     PeerTargetId peerTargetId;
     std::map<std::string, std::string> bindParam;
     auto authMgr = GetAuthMgrByTokenId(tokenId);
+    if (authMgr == nullptr) {
+        LOGE("DeviceManagerServiceImpl::TransferSrcOldAuthMgr authManager is nullptr");
+    }
     authMgr->GetBindTargetParams(pkgName, peerTargetId, bindParam);
     int32_t authType = -1;
     authMgr->ParseAuthType(bindParam, authType);

@@ -82,7 +82,8 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     }
     if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end() &&
         IsNumberString((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second))) {
-            uint16_t externalSubId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+            uint16_t externalSubId =
+                static_cast<uint16_t>(std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str()));
             dmSubInfo.subscribeId = GenInnerSubId(pkgNameTemp, externalSubId);
     }
     if (discoverParam.find(PARAM_KEY_DISC_CAPABILITY) != discoverParam.end()) {
@@ -123,7 +124,8 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     uint16_t innerSubId = DM_INVALID_FLAG_ID;
     if (extraParam.find(PARAM_KEY_SUBSCRIBE_ID) != extraParam.end() &&
         IsNumberString(extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second)) {
-        uint16_t externalSubId = std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+        uint16_t externalSubId =
+            static_cast<uint16_t>(std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str()));
         innerSubId = GetAndRemoveInnerSubId(pkgNameTemp, externalSubId);
     }
     {
@@ -332,7 +334,7 @@ int32_t DiscoveryManager::StopDiscoveringByInnerSubId(const std::string &pkgName
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    uint16_t innerSubId = GetAndRemoveInnerSubId(pkgName, subscribeId);
+    uint16_t innerSubId = static_cast<uint16_t>(GetAndRemoveInnerSubId(pkgName, subscribeId));
     if (innerSubId == DM_INVALID_FLAG_ID) {
         LOGE("Invalid parameter, cannot find subscribeId in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -679,7 +681,7 @@ void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
         uint16_t innerSubId = DM_INVALID_FLAG_ID;
         {
             std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-            innerSubId = pkgName2SubIdMap_[pkgNameTemp][it];
+            innerSubId = static_cast<uint16_t>(pkgName2SubIdMap_[pkgNameTemp][it]);
             randSubIdSet_.erase(innerSubId);
             pkgName2SubIdMap_.erase(pkgNameTemp);
         }
