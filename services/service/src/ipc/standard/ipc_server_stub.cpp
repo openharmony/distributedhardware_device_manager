@@ -289,7 +289,10 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
         return ERR_DM_POINT_NULL;
     }
-
+#ifdef SUPPORT_MEMMGR
+    int pid = getpid();
+    Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+#endif // SUPPORT_MEMMGR
     LOGI("Register device manager listener for package name: %{public}s", processInfo.pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(processInfo);
@@ -349,6 +352,12 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &proces
     listener->AsObject()->RemoveDeathRecipient(appRecipient);
     appRecipient_.erase(processInfo);
     dmListener_.erase(processInfo);
+#ifdef SUPPORT_MEMMGR
+    if (dmListener_.size() == 0) {
+        int pid = getpid();
+        Memory::MemMgrClient::GetInstance().SetCritical(pid, false, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
+    }
+#endif // SUPPORT_MEMMGR
     RemoveSystemSA(processInfo.pkgName);
     DeviceManagerService::GetInstance().RemoveNotifyRecord(processInfo);
     return DM_OK;
