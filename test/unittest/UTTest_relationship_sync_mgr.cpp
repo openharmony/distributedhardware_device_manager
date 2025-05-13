@@ -1260,7 +1260,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_001, testing::ext::TestS
 {
     RelationShipChangeMsg msg;
     msg.userId = 12345;
-    msg.credId = "123456";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
@@ -1284,7 +1284,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_002, testing::ext::TestS
 {
     RelationShipChangeMsg msg;
     msg.userId = 12345;
-    msg.credId = "123456";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
@@ -1308,7 +1308,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_003, testing::ext::TestS
 {
     RelationShipChangeMsg msg;
     msg.userId = UINT16_MAX;
-    msg.credId = "123456";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
