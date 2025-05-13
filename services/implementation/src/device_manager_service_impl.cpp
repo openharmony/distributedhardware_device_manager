@@ -68,6 +68,7 @@ constexpr const char* CHANGE_PINTYPE = "1";
 // currently, we just support one bind session in one device at same time
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
 const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
+const int32_t OPEN_AUTH_SESSION_TIMEOUT = 15000; // 15000ms
 
 const std::map<std::string, std::string> BUNDLENAME_MAPPING = {
     { "wear_link_service", "watch_system_service" }
@@ -1496,7 +1497,7 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
         }
 
         std::unique_lock<std::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
-        if (sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(EVENT_TIMEOUT),
+        if (sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(OPEN_AUTH_SESSION_TIMEOUT),
             [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
             LOGI("session enable, sessionId: %{public}d.", sessionId);
         } else {
