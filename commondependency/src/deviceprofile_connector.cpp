@@ -607,7 +607,6 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
     return aclProfileVec;
 }
 
-
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(const std::string &deviceId,
     int32_t userId, const std::string &remoteDeviceId)
 {
@@ -629,8 +628,9 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
 DM_EXPORT std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAppTrustDeviceList(
     const std::string &pkgName, const std::string &deviceId)
 {
-    int32_t userId = MultipleUserConnector::GetFirstForegroundUserId();
-    std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(deviceId, userId);
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    LOGI("localDeviceId: %{public}s, userId: %{public}d", GetAnonyString(deviceId).c_str(), userId);
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
     std::vector<AccessControlProfile> profilesFilter = {};
     for (auto &item : profiles) {
         if (!IsLnnAcl(item) && ((item.GetAccesser().GetAccesserUserId() == userId &&
@@ -650,6 +650,9 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
     std::unordered_map<std::string, DmAuthForm> deviceIdMap;
     for (auto &item : profilesFilter) {
         std::string trustDeviceId = item.GetTrustDeviceId();
+        LOGI("trustDeviceId: %{public}s, status: %{public}d, acerUserId: %{public}d, aceeUserId: %{public}d",
+            GetAnonyString(trustDeviceId).c_str(), item.GetStatus(), item.GetAccesser().GetAccesserUserId(),
+            item.GetAccessee().GetAccesseeUserId());
         if (trustDeviceId == deviceId || item.GetStatus() != ACTIVE) {
             continue;
         }
