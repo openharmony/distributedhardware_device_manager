@@ -165,6 +165,7 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
     }
 
     context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
+    context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_CANCEL_CONFIRM_SHOW);
     context->timer->DeleteAll();
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_RESP_FINISH, context); // 发送201给source侧
 }
