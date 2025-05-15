@@ -37,7 +37,7 @@ std::string DmAuthContext::GetCredentialId(DmAuthSide side, DmAuthScope authoriz
     const DmAccess &localAccess = (direction == DM_AUTH_SOURCE) ? accesser : accessee;
     const DmAccess &remoteAccess = (direction == DM_AUTH_SOURCE) ? accessee : accesser;
     const DmAccess &access = (side == DM_AUTH_LOCAL_SIDE) ? localAccess : remoteAccess;
-    return (authorizedScope == DM_AUTH_SCOPE_USER) ? access.lnnCredentialId : access.transmitCredentialId;
+    return (authorizedScope == DM_AUTH_SCOPE_LNN) ? access.lnnCredentialId : access.transmitCredentialId;
 }
 
 std::string DmAuthContext::GetPublicKey(DmAuthSide side, DmAuthScope authorizedScope)
@@ -45,7 +45,7 @@ std::string DmAuthContext::GetPublicKey(DmAuthSide side, DmAuthScope authorizedS
     const DmAccess &localAccess = (direction == DM_AUTH_SOURCE) ? accesser : accessee;
     const DmAccess &remoteAccess = (direction == DM_AUTH_SOURCE) ? accessee : accesser;
     const DmAccess &access = (side == DM_AUTH_LOCAL_SIDE) ? localAccess : remoteAccess;
-    return (authorizedScope == DM_AUTH_SCOPE_USER) ? access.lnnPublicKey : access.transmitPublicKey;
+    return (authorizedScope == DM_AUTH_SCOPE_LNN) ? access.lnnPublicKey : access.transmitPublicKey;
 }
 
 void DmAuthContext::SetCredentialId(DmAuthSide side, DmAuthScope authorizedScope, const std::string &credentialId)
@@ -53,7 +53,7 @@ void DmAuthContext::SetCredentialId(DmAuthSide side, DmAuthScope authorizedScope
     DmAccess &localAccess = (direction == DM_AUTH_SOURCE) ? accesser : accessee;
     DmAccess &remoteAccess = (direction == DM_AUTH_SOURCE) ? accessee : accesser;
     DmAccess &access = (side == DM_AUTH_LOCAL_SIDE) ? localAccess : remoteAccess;
-    std::string &credId = (authorizedScope == DM_AUTH_SCOPE_USER) ?
+    std::string &credId = (authorizedScope == DM_AUTH_SCOPE_LNN) ?
         access.lnnCredentialId : access.transmitCredentialId;
     credId = credentialId;
     return;
@@ -64,7 +64,7 @@ void DmAuthContext::SetPublicKey(DmAuthSide side, DmAuthScope authorizedScope, c
     DmAccess &localAccess = (direction == DM_AUTH_SOURCE) ? accesser : accessee;
     DmAccess &remoteAccess = (direction == DM_AUTH_SOURCE) ? accessee : accesser;
     DmAccess &access = (side == DM_AUTH_LOCAL_SIDE) ? localAccess : remoteAccess;
-    std::string &key = (authorizedScope == DM_AUTH_SCOPE_USER) ?
+    std::string &key = (authorizedScope == DM_AUTH_SCOPE_LNN) ?
         access.lnnPublicKey : access.transmitPublicKey;
     key = publicKey;
 

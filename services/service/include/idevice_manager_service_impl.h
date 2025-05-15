@@ -221,7 +221,7 @@ public:
     virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
     virtual int32_t IsSameAccount(const std::string &udid) = 0;
-    virtual uint64_t GetTokenIdByNameAndDeviceId(std::string pkgName, std::string requestDeviceId) = 0;
+    virtual uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId) = 0;
     virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
     virtual int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;

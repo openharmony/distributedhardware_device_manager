@@ -122,7 +122,7 @@ public:
 
     int32_t DpAclAdd(const std::string &udid);
     int32_t IsSameAccount(const std::string &udid);
-    uint64_t GetTokenIdByNameAndDeviceId(std::string pkgName, std::string requestDeviceId);
+    uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId);
     void ScreenCommonEventCallback(std::string commonEventType);
     int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
