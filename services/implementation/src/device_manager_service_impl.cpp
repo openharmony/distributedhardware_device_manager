@@ -1673,7 +1673,7 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
         return ERR_DM_INPUT_PARA_INVALID;
     }
     DmBindCallerInfo bindCallerInfo;
-    GetBindCallerInfo(bindCallerInfo);
+    GetBindCallerInfo(bindCallerInfo, pkgName);
     std::map<std::string, std::string> bindParamTmp;
     SetBindCallerInfoToBindParam(bindParam, bindParamTmp, bindCallerInfo);
     uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
@@ -2592,7 +2592,7 @@ void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint
         localUserIds, localUdid);
 }
 
-void DeviceManagerServiceImpl::GetBindCallerInfo(DmBindCallerInfo &bindCallerInfo)
+void DeviceManagerServiceImpl::GetBindCallerInfo(DmBindCallerInfo &bindCallerInfo, const std::string &pkgName)
 {
     LOGI("start.");
     int32_t userId = -1;
@@ -2614,7 +2614,7 @@ void DeviceManagerServiceImpl::GetBindCallerInfo(DmBindCallerInfo &bindCallerInf
     if (AuthManagerBase::CheckProcessNameInWhiteList(bundleName)) {
         bindLevel = static_cast<int32_t>(DmRole::DM_ROLE_USER);
     }
-    std::string hostPkgLabel = GetBundleLable(bundleName);
+    std::string hostPkgLabel = GetBundleLable(pkgName);
     bindCallerInfo.userId = userId;
     bindCallerInfo.tokenId = callingTokenId;
     bindCallerInfo.bindLevel = bindLevel;
