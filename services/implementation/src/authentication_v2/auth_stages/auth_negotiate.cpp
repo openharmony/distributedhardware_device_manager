@@ -281,12 +281,36 @@ void AuthSinkNegotiateStateMachine::GetSinkCredTypeForP2P(std::shared_ptr<DmAuth
     }
 }
 
+void AuthSinkNegotiateStateMachine::FilterProfilesByContext(
+    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> aclProfilesVec;
+    for (const auto &item : profiles) {
+        std::string accesserDeviceIdHash = Crypto::GetUdidHash(item.GetAccesser().GetAccesserDeviceId());
+        std::string accesseeDeviceIdHash = Crypto::GetUdidHash(item.GetAccessee().GetAccesseeDeviceId());
+        if ((context->accesser.deviceIdHash == accesserDeviceIdHash &&
+            context->accessee.deviceIdHash == accesseeDeviceIdHash &&
+            context->accesser.userId == item.GetAccesser().GetAccesserUserId() &&
+            context->accessee.userId == item.GetAccessee().GetAccesseeUserId()) ||
+            (context->accessee.deviceIdHash == accesserDeviceIdHash &&
+            context->accesser.deviceIdHash == accesseeDeviceIdHash &&
+            context->accessee.userId == item.GetAccesser().GetAccesserUserId() &&
+            context->accesser.userId == item.GetAccessee().GetAccesseeUserId())) {
+            aclProfilesVec.push_back(item);
+        }
+    }
+    profiles.clear();
+    profiles.assign(aclProfilesVec.begin(), aclProfilesVec.end());
+}
+
 void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext> context,
     JsonObject &credInfo, JsonObject &aclInfo)
 {
     CHECK_NULL_VOID(context);
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    FilterProfilesByContext(profiles, context);
     uint32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
