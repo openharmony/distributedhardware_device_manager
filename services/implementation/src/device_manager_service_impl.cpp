@@ -339,6 +339,7 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId, std::shared_ptr<Se
     session->logicalSessionCnt_.fetch_sub(1);
     if (session->logicalSessionCnt_.load(std::memory_order_relaxed) == 0) {
         usleep(USLEEP_TIME_US_500000);
+        CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
         std::lock_guard<std::mutex> lock(mapMutex_);
         if (sessionsMap_.find(sessionId) != sessionsMap_.end()) {
@@ -487,11 +488,19 @@ void DeviceManagerServiceImpl::Release()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     commonEventManager_ = nullptr;
 #endif
-    softbusConnector_->UnRegisterConnectorCallback();
-    softbusConnector_->UnRegisterSoftbusStateCallback();
-    softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
-    hiChainConnector_->UnRegisterHiChainCallback();
-    hiChainAuthConnector_->UnRegisterHiChainAuthCallback();
+    if (softbusConnector_ != nullptr) {
+        softbusConnector_->UnRegisterConnectorCallback();
+        softbusConnector_->UnRegisterSoftbusStateCallback();
+        if (softbusConnector_->GetSoftbusSession() != nullptr) {
+            softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
+        }
+    }
+    if (hiChainConnector_ != nullptr) {
+        hiChainConnector_->UnRegisterHiChainCallback();
+    }
+    if (hiChainAuthConnector_ != nullptr) {
+        hiChainAuthConnector_->UnRegisterHiChainAuthCallback();
+    }
     authMgr_ = nullptr;
     for (auto& pair : authMgrMap_) {
         pair.second = nullptr;
@@ -598,6 +607,9 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
 void DeviceManagerServiceImpl::CreateGlobalClassicalAuthMgr()
 {
     LOGI("global classical authMgr_ not exit, create one");
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(hiChainConnector_);
+    CHECK_NULL_VOID(hiChainAuthConnector_);
     // Create old auth_mar, only create an independent one
     authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, hiChainConnector_, listener_,
         hiChainAuthConnector_);
@@ -964,6 +976,7 @@ int32_t DeviceManagerServiceImpl::TransferByAuthType(int32_t authType,
         // There will be a delay, causing new objects to be created before the stop is complete.
         // Then the timeout mechanism of the new protocol will stop SoftBus again.
         std::string endMessage = CreateTerminateMessage();
+        CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
         (void)softbusConnector_->GetSoftbusSession()->SendData(sessionId, endMessage);
         // Close new protocol session
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
@@ -1441,10 +1454,14 @@ int DeviceManagerServiceImpl::OpenAuthSession(const std::string& deviceId,
 {
     bool hmlEnable160M = false;
     int32_t hmlActionId = 0;
+    int invalidSessionId = -1;
     JsonObject jsonObject = GetExtraJsonObject(bindParam);
     if (jsonObject.IsDiscarded()) {
         LOGE("extra string not a json type.");
-        return -1;
+        return invalidSessionId;
+    }
+    if (softbusConnector_ == nullptr) {
+        return invalidSessionId;
     }
     if (IsHmlSessionType(jsonObject)) {
         auto ret = GetHmlInfo(jsonObject, hmlEnable160M, hmlActionId);
@@ -1498,6 +1515,7 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
         }
 
         std::unique_lock<std::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
+        sessionEnableCvReadyMap_[sessionId] = false;
         if (sessionEnableCvMap_[sessionId].wait_for(cvLock, std::chrono::milliseconds(OPEN_AUTH_SESSION_TIMEOUT),
             [&] { return sessionEnableCvReadyMap_[sessionId]; })) {
             LOGI("session enable, sessionId: %{public}d.", sessionId);
