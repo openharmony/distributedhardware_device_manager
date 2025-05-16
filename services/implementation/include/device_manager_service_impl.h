@@ -264,7 +264,7 @@ private:
         bool &isLastLnnAcl, const std::string &localUdid);
     void BindTargetImpl(uint64_t tokenId, const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
-    void GetBindCallerInfo(DmBindCallerInfo &bindCallerInfo);
+    void GetBindCallerInfo(DmBindCallerInfo &bindCallerInfo, const std::string &pkgName);
     void SetBindCallerInfoToBindParam(const std::map<std::string, std::string> &bindParam,
         std::map<std::string, std::string> &bindParamTmp, const DmBindCallerInfo &bindCallerInfo);
     std::string GetBundleLable(const std::string &bundleName);
