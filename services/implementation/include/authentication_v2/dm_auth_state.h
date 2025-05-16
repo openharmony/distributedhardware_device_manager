@@ -475,6 +475,8 @@ private:
         JsonObject &credTypeJson);
     void GetSinkCredTypeForP2P(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credObj,
         JsonObject &aclInfo, JsonObject &credTypeJson, int32_t credType, std::vector<std::string> &deleteCredInfo);
+    void FilterProfilesByContext(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
+        std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkDataSyncState : public DmAuthState {
