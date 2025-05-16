@@ -13,19 +13,42 @@
  * limitations under the License.
  */
 
-#include "device_manager.h"
 #include "dm_ani_callback.h"
+#include "device_manager.h"
 #include "dm_log.h"
+#include "event_handler.h"
 
 #define DH_LOG_TAG "DeviceManager"
 
+DmAniInitCallback::DmAniInitCallback(taihe::string_view bundleName)
+    : bundleName_(std::string(bundleName))
+{
+    serviceDieCallback_ = nullptr;
+}
+
 void DmAniInitCallback::OnRemoteDied()
 {
-    LOGI("ohos.distributedDeviceManager.cpp DmAniInitCallback::OnRemoteDied called.");
-
+    LOGI("DmAniInitCallback::OnRemoteDied called.");
     auto &deviceManager = static_cast<OHOS::DistributedHardware::DeviceManager &>(
         OHOS::DistributedHardware::DeviceManager::GetInstance());
     deviceManager.UnInitDeviceManager(bundleName_);
+}
+
+void DmAniInitCallback::SetServiceDieCallback(std::shared_ptr<taihe::callback_view<void()>> callback)
+{
+    serviceDieCallback_ = callback;
+}
+
+void DmAniInitCallback::ReleaseServiceDieCallback()
+{
+    serviceDieCallback_ = nullptr;
+}
+
+DmAniDiscoveryFailedCallback::DmAniDiscoveryFailedCallback(std::string &bundleName,
+    taihe::callback_view<void(int)> discoverFailedCallback)
+    : refCount_(0), bundleName_(bundleName),
+    discoverFailedCallback_(std::make_shared<taihe::callback_view<void(int)>>(discoverFailedCallback))
+{
 }
 
 void DmAniDiscoveryFailedCallback::IncreaseRefCount()
@@ -43,6 +66,14 @@ int32_t DmAniDiscoveryFailedCallback::GetRefCount()
     return refCount_;
 }
 
+DmAniDiscoverySuccessCallback::DmAniDiscoverySuccessCallback(std::string &bundleName,
+    taihe::callback_view<void(ohos::distributedDeviceManager::DeviceBasicInfo const &)> discoverSuccessCallback)
+    : refCount_(0), bundleName_(bundleName),
+    discoverSuccessCallback_(std::make_shared<taihe::callback_view<void(
+    ohos::distributedDeviceManager::DeviceBasicInfo const &)>>(discoverSuccessCallback))
+{
+}
+
 void DmAniDiscoverySuccessCallback::IncreaseRefCount()
 {
     refCount_++;
@@ -56,4 +87,45 @@ void DmAniDiscoverySuccessCallback::DecreaseRefCount()
 int32_t DmAniDiscoverySuccessCallback::GetRefCount()
 {
     return refCount_;
+}
+
+DmAniDeviceNameChangeCallback::DmAniDeviceNameChangeCallback(std::string &bundleName,
+    taihe::callback_view<void(taihe::string_view)> deviceNameChangeCallback)
+    : bundleName_(bundleName), deviceNameChangeCallback_(
+    std::make_shared<taihe::callback_view<void(taihe::string_view)>>(deviceNameChangeCallback))
+{
+}
+
+void DmAniDeviceNameChangeCallback::OnDeviceChanged(
+    const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
+{
+    LOGI("DmAniDeviceNameChangeCallback::OnDeviceChanged called.");
+}
+
+DmAniDeviceStateChangeDataCallback::DmAniDeviceStateChangeDataCallback(std::string &bundleName,
+    taihe::callback_view<void(ohos::distributedDeviceManager::DeviceStateChangeData const &)>
+    deviceStateChangeDataCallback)
+    : bundleName_(bundleName),
+    deviceStateChangeDataCallback_(std::make_shared<taihe::callback_view<void(
+    ohos::distributedDeviceManager::DeviceStateChangeData const &)>>(deviceStateChangeDataCallback))
+{
+}
+
+void DmAniDeviceStateChangeDataCallback::OnDeviceChanged(
+    const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
+{
+    LOGI("DmAniDeviceStateChangeDataCallback::OnDeviceChanged called.");
+}
+
+DmAniDeviceManagerUiCallback::DmAniDeviceManagerUiCallback(
+    taihe::callback_view<void(taihe::string_view)> replyResultCallback,
+    std::string &bundleName)
+    : bundleName_(bundleName),
+    replyResultCallback_(std::make_shared<taihe::callback_view<void(taihe::string_view)>>(replyResultCallback))
+{
+}
+
+void DmAniDeviceManagerUiCallback::OnCall(const std::string &paramJson)
+{
+    LOGI("DmAniDeviceManagerUiCallback::OnCall called.");
 }

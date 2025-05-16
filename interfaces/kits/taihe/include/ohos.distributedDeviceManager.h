@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_DISTRIBUTED_DEVICE_MANAGER_H
-#define OHOS_DISTRIBUTED_DEVICE_MANAGER_H
+#ifndef OHOS_DISTRIBUTEDDEVICEMANAGER_H
+#define OHOS_DISTRIBUTEDDEVICEMANAGER_H
 
 #include <functional>
 #include <string>
@@ -35,7 +35,7 @@ class DeviceManagerImpl {
 public:
     DeviceManagerImpl() = default;
     explicit DeviceManagerImpl(std::shared_ptr<DeviceManagerImpl> impl);
-    explicit DeviceManagerImpl(const std::string& bundleName) ;
+    explicit DeviceManagerImpl(const std::string& bundleName);
     ~DeviceManagerImpl() = default;
     std::string GetLocalDeviceId();
     void UnbindTarget(taihe::string_view deviceId);
@@ -50,6 +50,7 @@ public:
         ohos::distributedDeviceManager::DeviceBasicInfo const &)> onDiscoverSuccesscb);
     void OnDeviceStateChange(taihe::callback_view<void(
         ohos::distributedDeviceManager::DeviceStateChangeData const&)> onDeviceStateChangecb);
+    void OnServiceDie(taihe::callback_view<void()> onServiceDiecb);
 
     void OffDeviceNameChange(taihe::optional_view<taihe::callback<void(taihe::string_view)>> offDeviceNameChangecb);
     void OffDiscoverFailure(taihe::optional_view<taihe::callback<void(int32_t)>> offDiscoverFailurecb);
@@ -58,6 +59,7 @@ public:
         ohos::distributedDeviceManager::DeviceBasicInfo const&)>> offDiscoverSuccesscb);
     void OffDeviceStateChange(taihe::optional_view<taihe::callback<void(
         ohos::distributedDeviceManager::DeviceStateChangeData const&)>> offDeviceStateChangecb);
+    void OffServiceDie(taihe::optional_view<taihe::callback<void()>> offServiceDiecb);
 
     friend ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_view bundleName);
 
@@ -72,6 +74,6 @@ ohos::distributedDeviceManager::DeviceStateChangeData MakeDeviceStateChangeData(
     ohos::distributedDeviceManager::DeviceStateChange deviceStateChange,
     ohos::distributedDeviceManager::DeviceBasicInfo const &deviceBasicInfo);
 ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_view bundleName);
-}// namespace ANI::distributedDeviceManager
+} // namespace ANI::distributedDeviceManager
 
-#endif
+#endif //OHOS_DISTRIBUTEDDEVICEMANAGER_H

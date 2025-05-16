@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DISTRIBUTED_DEVICE_MANAGER_ANI_CALLBACK_H
-#define OHOS_DISTRIBUTED_DEVICE_MANAGER_ANI_CALLBACK_H
+#ifndef OHOS_DM_ANI_CALLBACK_H
+#define OHOS_DM_ANI_CALLBACK_H
 
 #include <atomic>
 #include <string>
@@ -28,26 +28,22 @@
 class DmAniInitCallback : public OHOS::DistributedHardware::DmInitCallback
 {
 public:
-    explicit DmAniInitCallback(taihe::string_view bundleName) : bundleName_(std::string(bundleName))
-    {
-    }
+    explicit DmAniInitCallback(taihe::string_view bundleName);
     ~DmAniInitCallback() override {}
     void OnRemoteDied() override;
+    void SetServiceDieCallback(std::shared_ptr<taihe::callback_view<void()>> callback);
+    void ReleaseServiceDieCallback();
 
 private:
     std::string bundleName_;
+    std::shared_ptr<taihe::callback_view<void()>> serviceDieCallback_;
 };
 
 class DmAniDiscoverySuccessCallback : public OHOS::DistributedHardware::DiscoveryCallback
 {
 public:
     explicit DmAniDiscoverySuccessCallback(std::string &bundleName,
-        taihe::callback_view<void(ohos::distributedDeviceManager::DeviceBasicInfo const &)> discoverSuccessCallback)
-    : refCount_(0), bundleName_(bundleName),
-        discoverSuccessCallback_(std::make_shared<taihe::callback<void(
-            ohos::distributedDeviceManager::DeviceBasicInfo const &)>>(discoverSuccessCallback))
-    {
-    }
+        taihe::callback_view<void(ohos::distributedDeviceManager::DeviceBasicInfo const &)> discoverSuccessCallback);
     ~DmAniDiscoverySuccessCallback() override {};
     void OnDeviceFound(uint16_t subscribeId,
         const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override{}
@@ -68,11 +64,7 @@ class DmAniDiscoveryFailedCallback : public OHOS::DistributedHardware::Discovery
 {
 public:
     explicit DmAniDiscoveryFailedCallback(std::string &bundleName,
-        taihe::callback_view<void(int)> discoverFailedCallback)
-    : refCount_(0), bundleName_(bundleName),
-        discoverFailedCallback_(std::make_shared<taihe::callback<void(int)>>(discoverFailedCallback))
-    {
-    }
+        taihe::callback_view<void(int)> discoverFailedCallback);
     ~DmAniDiscoveryFailedCallback() override {};
     void OnDeviceFound(uint16_t subscribeId,
         const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override{}
@@ -85,48 +77,36 @@ public:
 private:
     std::atomic<int32_t> refCount_;
     std::string bundleName_;
-    std::shared_ptr<taihe::callback<void(int)>> discoverFailedCallback_;
+    std::shared_ptr<taihe::callback_view<void(int)>> discoverFailedCallback_;
 };
 
 class DmAniDeviceNameChangeCallback : public OHOS::DistributedHardware::DeviceStatusCallback
 {
 public:
     explicit DmAniDeviceNameChangeCallback(std::string &bundleName,
-        taihe::callback_view<void(taihe::string_view)> deviceNameChangeCallback)
-    : bundleName_(bundleName),
-        deviceNameChangeCallback_(
-            std::make_shared<taihe::callback<void(taihe::string_view)>>(deviceNameChangeCallback))
-    {
-    }
-    ~DmAniDeviceNameChangeCallback() override {};
+        taihe::callback_view<void(taihe::string_view)> deviceNameChangeCallback);
+    ~DmAniDeviceNameChangeCallback() override {}
     void OnDeviceOnline(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
     void OnDeviceReady(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
     void OnDeviceOffline(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
-    void OnDeviceChanged(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceChanged(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override;
 
 private:
     std::string bundleName_;
-    std::shared_ptr<taihe::callback<void(taihe::string_view)>> deviceNameChangeCallback_;
+    std::shared_ptr<taihe::callback_view<void(taihe::string_view)>> deviceNameChangeCallback_;
 };
 
 class DmAniDeviceStateChangeDataCallback : public OHOS::DistributedHardware::DeviceStatusCallback
 {
 public:
     explicit DmAniDeviceStateChangeDataCallback(std::string &bundleName,
-        taihe::callback_view<void(
-            ohos::distributedDeviceManager::DeviceStateChangeData const &)> deviceStateChangeDataCallback)
-    : bundleName_(bundleName),
-        deviceStateChangeDataCallback_(
-            std::make_shared<taihe::callback_view<void(
-                ohos::distributedDeviceManager::DeviceStateChangeData const &)>>(
-                    deviceStateChangeDataCallback))
-    {
-    }
-    ~DmAniDeviceStateChangeDataCallback() override {};
+        taihe::callback_view<void(ohos::distributedDeviceManager::DeviceStateChangeData const &)>
+        deviceStateChangeDataCallback);
+    ~DmAniDeviceStateChangeDataCallback() override {}
     void OnDeviceOnline(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
     void OnDeviceReady(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
     void OnDeviceOffline(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
-    void OnDeviceChanged(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDeviceChanged(const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override;
 
 private:
     std::string bundleName_;
@@ -139,17 +119,13 @@ class DmAniDeviceManagerUiCallback : public OHOS::DistributedHardware::DeviceMan
 {
 public:
     explicit DmAniDeviceManagerUiCallback(taihe::callback_view<void(taihe::string_view)> replyResultCallback,
-    std::string &bundleName)
-    : bundleName_(bundleName),
-        replyResultCallback_(std::make_shared<taihe::callback<void(taihe::string_view)>>(replyResultCallback))
-    {
-    }
-    ~DmAniDeviceManagerUiCallback() override {};
-    void OnCall(const std::string &paramJson) override {}
+    std::string &bundleName);
+    ~DmAniDeviceManagerUiCallback() override {}
+    void OnCall(const std::string &paramJson) override;
 
 private:
     std::string bundleName_;
-    std::shared_ptr<taihe::callback<void(taihe::string_view)>> replyResultCallback_;
+    std::shared_ptr<taihe::callback_view<void(taihe::string_view)>> replyResultCallback_;
 };
 
-#endif
+#endif //OHOS_DM_ANI_CALLBACK_H

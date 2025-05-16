@@ -1,7 +1,7 @@
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
-import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 subsystem_name = "distributedhardware"
 part_name = "device_manager"
@@ -21,10 +21,6 @@ ohos_taihe("run_taihe") {
 }
 
 taihe_shared_library("device_manager_ani_taihe") {
-  taihe_generated_file_path = "$taihe_generated_file_path"
-  subsystem_name = "$subsystem_name"
-  part_name = "$part_name"
-
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -33,6 +29,10 @@ taihe_shared_library("device_manager_ani_taihe") {
     cfi_cross_dso = true
     debug = false
   }
+
+  taihe_generated_file_path = "$taihe_generated_file_path"
+  subsystem_name = "$subsystem_name"
+  part_name = "$part_name"
 
   include_dirs = [
     "include",
@@ -43,16 +43,21 @@ taihe_shared_library("device_manager_ani_taihe") {
   sources = get_target_outputs(":run_taihe")
   sources += [
     "src/ani_constructor.cpp",
-    "src/dm_ani_callback.cpp",
     "src/ohos.distributedDeviceManager.cpp",
+    "src/dm_ani_callback.cpp"
   ]
 
   deps = [
     ":run_taihe",
-    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${innerkits_path}/native_cpp:devicemanagersdk"
   ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "hilog:libhilog",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "eventhandler:libeventhandler",
+  ]
 }
 
 generate_static_abc("ohos_distributedDeviceManager_abc") {
@@ -68,7 +73,9 @@ ohos_prebuilt_etc("ohos_distributedDeviceManager_etc") {
   module_install_dir = "framework"
   part_name = "$part_name"
   subsystem_name = "$subsystem_name"
-  deps = [ ":ohos_distributedDeviceManager_abc" ]
+  deps = [
+    ":ohos_distributedDeviceManager_abc"
+  ]
 }
 
 group("devicemanager_ani") {

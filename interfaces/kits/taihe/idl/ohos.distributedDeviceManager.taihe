@@ -26,6 +26,7 @@ struct  DeviceBasicInfo {
     networkId: String;
     extraData: String;
 }
+
 function MakeDeviceBasicInfo(deviceId:String, deviceName:String, deviceType:String,
                              networkId:String, extraData: String): DeviceBasicInfo;
 
@@ -34,15 +35,16 @@ struct ServiceProfileInfo {
 }
 
 enum DeviceStateChange: i32 {
-  UNKNOWN = 0,
-  AVAILABLE = 1,
-  UNAVAILABLE = 2,
+    UNKNOWN = 0,
+    AVAILABLE = 1,
+    UNAVAILABLE = 2,
 }
 
 struct DeviceStateChangeData {
     deviceStateChange: DeviceStateChange;
     deviceBasicInfo: DeviceBasicInfo;
 }
+
 function MakeDeviceStateChangeData(deviceStateChange : DeviceStateChange,
                                    deviceBasicInfo : DeviceBasicInfo): DeviceStateChangeData;
 
@@ -65,6 +67,8 @@ interface DeviceManager {
             this.OnDeviceNameChange_inner(callback as (data: string)=> void);
         } else if (type === "discoverFailure") {
             this.OnDiscoverFailure_inner(callback as (data: int)=> void);
+        } else if (type ==="serviceDie") {
+            this.OnServiceDie_inner(callback as ()=> void);
         } else {
             throw new Error(`Unknown type: ${type}`);
         }
@@ -83,7 +87,9 @@ interface DeviceManager {
             this.OffDeviceNameChange_inner(callback as (((data: string)=> void) | undefined));
         } else if (type === "discoverFailure"){
             this.OffDiscoverFailure_inner(callback as (((data: int)=> void) | undefined));
-        } else {
+        } else if (type ==="serviceDie") {
+            this.OffServiceDie_inner(callback as ()=> void);
+        }else {
             throw new Error(`Unknown type: ${type}`);
         }
     }
@@ -100,6 +106,8 @@ interface DeviceManager {
     OffDeviceNameChange(offDeviceNameChangecb: Optional<(deviceName: String) => void>): void;
     OnDiscoverFailure(onDiscoverFailurecb: (reason: i32) => void): void;
     OffDiscoverFailure(offDiscoverFailurecb: Optional<(reason: i32) => void>): void;
+    OnServiceDie(onServiceDiecb: () => void): void;
+    OffServiceDie(offServiceDiecb: Optional<() => void>): void;
 }
 
 function CreateDeviceManager(bundleName: String): DeviceManager;
