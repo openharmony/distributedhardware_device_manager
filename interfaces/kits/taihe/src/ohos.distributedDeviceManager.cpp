@@ -439,7 +439,8 @@ void DeviceManagerImpl::OffDeviceStateChange(taihe::optional_view<taihe::callbac
     return;
 }
 
-void DeviceManagerImpl::OffServiceDie(taihe::optional_view<taihe::callback<void()>> offServiceDiecb){
+void DeviceManagerImpl::OffServiceDie(taihe::optional_view<taihe::callback<void()>> offServiceDiecb)
+{
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
             "offdiscoverFailure check permission failed.");

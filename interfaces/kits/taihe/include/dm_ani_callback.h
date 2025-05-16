@@ -119,7 +119,7 @@ class DmAniDeviceManagerUiCallback : public OHOS::DistributedHardware::DeviceMan
 {
 public:
     explicit DmAniDeviceManagerUiCallback(taihe::callback_view<void(taihe::string_view)> replyResultCallback,
-    std::string &bundleName);
+        std::string &bundleName);
     ~DmAniDeviceManagerUiCallback() override {}
     void OnCall(const std::string &paramJson) override;
 
