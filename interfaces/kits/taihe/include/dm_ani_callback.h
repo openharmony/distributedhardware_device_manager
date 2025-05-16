@@ -25,8 +25,7 @@
 #include "taihe/runtime.hpp"
 #include "taihe/callback.hpp"
 
-class DmAniInitCallback : public OHOS::DistributedHardware::DmInitCallback
-{
+class DmAniInitCallback : public OHOS::DistributedHardware::DmInitCallback {
 public:
     explicit DmAniInitCallback(taihe::string_view bundleName);
     ~DmAniInitCallback() override {}
@@ -39,16 +38,15 @@ private:
     std::shared_ptr<taihe::callback_view<void()>> serviceDieCallback_;
 };
 
-class DmAniDiscoverySuccessCallback : public OHOS::DistributedHardware::DiscoveryCallback
-{
+class DmAniDiscoverySuccessCallback : public OHOS::DistributedHardware::DiscoveryCallback {
 public:
     explicit DmAniDiscoverySuccessCallback(std::string &bundleName,
         taihe::callback_view<void(ohos::distributedDeviceManager::DeviceBasicInfo const &)> discoverSuccessCallback);
     ~DmAniDiscoverySuccessCallback() override {};
     void OnDeviceFound(uint16_t subscribeId,
-        const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override{}
-    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override{}
-    void OnDiscoverySuccess(uint16_t subscribeId) override{}
+        const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
+    void OnDiscoverySuccess(uint16_t subscribeId) override {}
     void IncreaseRefCount();
     void DecreaseRefCount();
     int32_t GetRefCount();
@@ -60,16 +58,15 @@ private:
         ohos::distributedDeviceManager::DeviceBasicInfo const &)>> discoverSuccessCallback_;
 };
 
-class DmAniDiscoveryFailedCallback : public OHOS::DistributedHardware::DiscoveryCallback
-{
+class DmAniDiscoveryFailedCallback : public OHOS::DistributedHardware::DiscoveryCallback {
 public:
     explicit DmAniDiscoveryFailedCallback(std::string &bundleName,
         taihe::callback_view<void(int)> discoverFailedCallback);
     ~DmAniDiscoveryFailedCallback() override {};
     void OnDeviceFound(uint16_t subscribeId,
-        const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override{}
-    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override{}
-    void OnDiscoverySuccess(uint16_t subscribeId) override{}
+        const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo) override {}
+    void OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason) override {}
+    void OnDiscoverySuccess(uint16_t subscribeId) override {}
     void IncreaseRefCount();
     void DecreaseRefCount();
     int32_t GetRefCount();
@@ -80,8 +77,7 @@ private:
     std::shared_ptr<taihe::callback_view<void(int)>> discoverFailedCallback_;
 };
 
-class DmAniDeviceNameChangeCallback : public OHOS::DistributedHardware::DeviceStatusCallback
-{
+class DmAniDeviceNameChangeCallback : public OHOS::DistributedHardware::DeviceStatusCallback {
 public:
     explicit DmAniDeviceNameChangeCallback(std::string &bundleName,
         taihe::callback_view<void(taihe::string_view)> deviceNameChangeCallback);
@@ -96,8 +92,7 @@ private:
     std::shared_ptr<taihe::callback_view<void(taihe::string_view)>> deviceNameChangeCallback_;
 };
 
-class DmAniDeviceStateChangeDataCallback : public OHOS::DistributedHardware::DeviceStatusCallback
-{
+class DmAniDeviceStateChangeDataCallback : public OHOS::DistributedHardware::DeviceStatusCallback {
 public:
     explicit DmAniDeviceStateChangeDataCallback(std::string &bundleName,
         taihe::callback_view<void(ohos::distributedDeviceManager::DeviceStateChangeData const &)>
@@ -115,8 +110,7 @@ private:
         deviceStateChangeDataCallback_;
 };
 
-class DmAniDeviceManagerUiCallback : public OHOS::DistributedHardware::DeviceManagerUiCallback
-{
+class DmAniDeviceManagerUiCallback : public OHOS::DistributedHardware::DeviceManagerUiCallback {
 public:
     explicit DmAniDeviceManagerUiCallback(taihe::callback_view<void(taihe::string_view)> replyResultCallback,
         std::string &bundleName);
