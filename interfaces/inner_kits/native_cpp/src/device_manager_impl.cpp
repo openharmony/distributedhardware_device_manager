@@ -1467,7 +1467,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceName(std::string &deviceName)
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
-        LOGI("Get local device name failed ret: %{public}d", ret);
+        LOGE("Get local device name failed ret: %{public}d", ret);
         return ret;
     }
     deviceName = rsp->GetLocalDeviceName();

@@ -22,7 +22,7 @@
 #include "dm_log.h"
 #include "oh_device_manager_err_code.h"
 
-int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int &len);
+int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int &len)
 {
     std::string deviceName = "";
     int32_t ret = OHOS::DistributedHardware::DmClient::GetInstance().GetLocalDeviceName(deviceName);
@@ -31,14 +31,14 @@ int32_t OH_DeviceManager_GetLocalDeviceName(char **localDeviceName, unsigned int
         return ret;
     }
     len = static_cast<unsigned int>(deviceName.size());
-    *localDeviceName = new char[len + 1] {0};
-    if (localDeviceName == nullptr) {
+    *localDeviceName = new (std::nothrow) char[len + 1] {0};
+    if (*localDeviceName == nullptr) {
         LOGE("create localDeviceName fail");
         return DM_ERR_FAILED;
     }
     if (strcpy_s(*localDeviceName, len + 1, deviceName.c_str()) != EOK) {
         LOGE("copy string fail");
-        delete [] localDeviceName;
+        delete [] *localDeviceName;
         return DM_ERR_FAILED;
     }
     return ERR_OK;

@@ -20,8 +20,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class IpcGetLocalDeviceDeviceNameRsp : public IpcRsp {
-    DECLARE_IPC_MODEL(IpcGetLocalDeviceDeviceNameRsp);
+class IpcGetLocalDeviceNameRsp : public IpcRsp {
+    DECLARE_IPC_MODEL(IpcGetLocalDeviceNameRsp);
 
 public:
 
