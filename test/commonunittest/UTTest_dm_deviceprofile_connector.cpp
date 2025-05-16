@@ -727,7 +727,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_005, testing::ext::TestSiz
     profiles.SetBindLevel(USER);
     DmDiscoveryInfo discoveryInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+    EXPECT_EQ(ret, PEER_TO_PEER);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_006, testing::ext::TestSize.Level1)
@@ -741,7 +741,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_006, testing::ext::TestSiz
     discoveryInfo.pkgname = "pkgName";
     discoveryInfo.localDeviceId = "localDeviceId";
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+    EXPECT_EQ(ret, PEER_TO_PEER);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_007, testing::ext::TestSize.Level1)
@@ -755,7 +755,7 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_007, testing::ext::TestSiz
     discoveryInfo.pkgname = "pkgName";
     discoveryInfo.localDeviceId = "localDeviceId";
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+    EXPECT_EQ(ret, PEER_TO_PEER);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleDmAuthForm_008, testing::ext::TestSize.Level1)

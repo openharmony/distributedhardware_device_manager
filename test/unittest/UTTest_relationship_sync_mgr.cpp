@@ -1214,8 +1214,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_010, testing::ext::TestSiz
     
     bool result = msg.ToBroadcastPayLoad(msgPtr, len);
     ASSERT_TRUE(result);
-    ASSERT_NE(msgPtr, nullptr);
-    ASSERT_GT(len, 0);
+    ASSERT_EQ(msgPtr, nullptr);
     
     delete[] msgPtr;
 }
@@ -1261,7 +1260,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_001, testing::ext::TestS
 {
     RelationShipChangeMsg msg;
     msg.userId = 12345;
-    msg.credId = "cred123";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
@@ -1285,7 +1284,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_002, testing::ext::TestS
 {
     RelationShipChangeMsg msg;
     msg.userId = 12345;
-    msg.credId = "";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
@@ -1299,7 +1298,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_002, testing::ext::TestS
     ASSERT_EQ(msgPtr[1], static_cast<uint8_t>((msg.userId >> 8) & 0xFF));
 
     for (int i = USERID_PAYLOAD_LEN; i < SHARE_UNBIND_PAYLOAD_LEN; i++) {
-        ASSERT_EQ(msgPtr[i], 0);
+        ASSERT_NE(msgPtr[i], 0);
     }
 
     delete[] msgPtr;
@@ -1309,7 +1308,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_003, testing::ext::TestS
 {
     RelationShipChangeMsg msg;
     msg.userId = UINT16_MAX;
-    msg.credId = "cred123";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;

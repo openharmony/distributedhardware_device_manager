@@ -653,7 +653,7 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
             softbusConnector_->SetProcessInfo(processInfo);
         } else if (static_cast<uint32_t>(item.second) == USER && bindType == SHARE_TYPE) {
             LOGI("The offline device is device bind level and share bind type.");
-            devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+            devInfo.authForm = DmAuthForm::SHARE;
             processInfo.userId = item.first;
             softbusConnector_->SetProcessInfo(processInfo);
         } else if (static_cast<uint32_t>(item.second) == USER && bindType != SHARE_TYPE) {
@@ -726,7 +726,7 @@ void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, Pr
             LOGI("ProcessDeviceStateChange authForm is share, peer is src.");
             return;
         }
-        devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
+        devInfo.authForm = DmAuthForm::SHARE;
         softbusConnector_->SetProcessInfo(processInfo);
     }
     LOGI("DeviceManagerServiceImpl::HandleOnline success devInfo authForm is %{public}d.", devInfo.authForm);

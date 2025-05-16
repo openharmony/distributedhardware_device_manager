@@ -526,7 +526,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_006, testing::e
     deviceManagerServiceImpl_->SetOnlineProcessInfo(
         bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 
-    EXPECT_EQ(devInfo.authForm, DmAuthForm::ACROSS_ACCOUNT);
+    EXPECT_EQ(devInfo.authForm, DmAuthForm::SHARE);
 }
 } // namespace
 } // namespace DistributedHardware

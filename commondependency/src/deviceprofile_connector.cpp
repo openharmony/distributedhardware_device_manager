@@ -676,10 +676,10 @@ std::unordered_map<std::string, DmAuthForm> DeviceProfileConnector::GetAuthFormM
             deviceIdMap[trustDeviceId] = DmAuthForm::IDENTICAL_ACCOUNT;
             continue;
         } else if (highestBindType == SHARE_TYPE) {
-            if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, DmAuthForm::ACROSS_ACCOUNT)) {
+            if (CheckSinkShareType(item, userId, deviceId, trustDeviceId, DmAuthForm::SHARE)) {
                 continue;
             }
-            deviceIdMap[trustDeviceId] = DmAuthForm::ACROSS_ACCOUNT;
+            deviceIdMap[trustDeviceId] = DmAuthForm::SHARE;
             continue;
         } else if (highestBindType == DEVICE_PEER_TO_PEER_TYPE || highestBindType == APP_PEER_TO_PEER_TYPE ||
             highestBindType == SERVICE_PEER_TO_PEER_TYPE) {
@@ -703,7 +703,7 @@ bool DeviceProfileConnector::CheckSinkShareType(const DistributedDeviceProfile::
     if (profile.GetAccessee().GetAccesseeUserId() == userId &&
         profile.GetAccessee().GetAccesseeDeviceId() == deviceId &&
         profile.GetAccesser().GetAccesserDeviceId() == trustDeviceId &&
-        bindType == DmAuthForm::ACROSS_ACCOUNT) {
+        bindType == DmAuthForm::SHARE) {
         return true;
     }
     return false;
@@ -789,7 +789,7 @@ int32_t DeviceProfileConnector::HandleDmAuthForm(AccessControlProfile profiles, 
         return CheckAuthForm(DmAuthForm::PEER_TO_PEER, profiles, discoveryInfo);
     }
     if (profiles.GetBindType() == DM_SHARE) {
-        return CheckAuthForm(DmAuthForm::ACROSS_ACCOUNT, profiles, discoveryInfo);
+        return CheckAuthForm(DmAuthForm::SHARE, profiles, discoveryInfo);
     }
     return DmAuthForm::INVALID_TYPE;
 }

@@ -149,6 +149,10 @@ typedef enum DmAuthForm {
      * Across Account Device auth.
      */
     ACROSS_ACCOUNT = 2,
+    /**
+     * Share
+     */
+    SHARE = 3,
 } DmAuthForm;
 
 /**
