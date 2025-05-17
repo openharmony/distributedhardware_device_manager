@@ -42,12 +42,11 @@ void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 
 int32_t IpcClientManager::ClientInit()
 {
-    LOGI("Start");
     if (dmInterface_ != nullptr) {
-        LOGI("DeviceManagerService Already Init");
+        LOGD("Already Init");
         return DM_OK;
     }
-
+    LOGI("Start");
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         LOGE("Get SystemAbilityManager Failed");
@@ -68,7 +67,7 @@ int32_t IpcClientManager::ClientInit()
         LOGE("InitDeviceManagerService: AddDeathRecipient Failed");
     }
     dmInterface_ = iface_cast<IpcRemoteBroker>(object);
-    LOGI("Completed");
+    LOGD("Completed");
     return DM_OK;
 }
 
@@ -111,7 +110,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("UnInit in, pkgName %{public}s", pkgName.c_str());
+    LOGI("pkgName %{public}s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
@@ -136,7 +135,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         }
         dmInterface_ = nullptr;
     }
-    LOGI("completed, pkgName: %{public}s", pkgName.c_str());
+    LOGD("completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
 
@@ -161,7 +160,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 
 int32_t IpcClientManager::OnDmServiceDied()
 {
-    LOGI("IpcClientManager::OnDmServiceDied begin");
+    LOGI("begin");
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (dmInterface_ == nullptr) {
@@ -174,7 +173,7 @@ int32_t IpcClientManager::OnDmServiceDied()
         }
         dmInterface_ = nullptr;
     }
-    LOGI("IpcClientManager::OnDmServiceDied complete");
+    LOGD("complete");
     return DM_OK;
 }
 

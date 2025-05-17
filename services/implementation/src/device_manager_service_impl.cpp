@@ -202,7 +202,7 @@ void DeviceManagerServiceImpl::CleanWorker()
 {
     while (running_.load()) {
         auto logicalSessionId = FetchCleanEvent();
-        LOGI("DeviceManagerServiceImpl::CleanWorker clean auth_mgr, its logicalSessionId: %{public}" PRIu64 "",
+        LOGI("clean auth_mgr, its logicalSessionId: %{public}" PRIu64 "",
             logicalSessionId);
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
     }
@@ -211,7 +211,7 @@ void DeviceManagerServiceImpl::CleanWorker()
         cleanEventQueue_.pop();
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
     }
-    LOGI("DeviceManagerServiceImpl::CleanWorker end");
+    LOGI("end");
 }
 
 void DeviceManagerServiceImpl::Stop()
@@ -223,7 +223,7 @@ void DeviceManagerServiceImpl::Stop()
 
 void DeviceManagerServiceImpl::NotifyCleanEvent(uint64_t logicalSessionId)
 {
-    LOGI("DeviceManagerServiceImpl::NotifyCleanEvent logicalSessionId: %{public}" PRIu64 ".", logicalSessionId);
+    LOGI("logicalSessionId: %{public}" PRIu64 ".", logicalSessionId);
     std::lock_guard lock(cleanEventMutex_);
     // Store into the queue
     cleanEventQueue_.push(logicalSessionId);
@@ -237,16 +237,17 @@ void DeviceManagerServiceImpl::ImportConfig(std::shared_ptr<AuthManagerBase> aut
     if (configsMap_.find(tokenId) != configsMap_.end()) {
         authMgr->ImportAuthCode(configsMap_[tokenId]->pkgName, configsMap_[tokenId]->authCode);
         authMgr->RegisterAuthenticationType(configsMap_[tokenId]->authenticationType);
+        LOGI("import authCode Successful tokenId %{public}s, pkgName %{public}s, authCode %{public}s.",
+            GetAnonyInt32(tokenId).c_str(), pkgName.c_str(), GetAnonyString(configsMap_[tokenId]->authCode).c_str());
         configsMap_[tokenId] = nullptr;
         configsMap_.erase(tokenId);
-        LOGI("DeviceManagerServiceImpl::ImportConfig import authCode Successful.");
         return;
     }
     for (auto it = configsMap_.begin(); it != configsMap_.end();) {
         if (it->second != nullptr && pkgName == it->second->pkgName) {
             authMgr->ImportAuthCode(it->second->pkgName, it->second->authCode);
             authMgr->RegisterAuthenticationType(it->second->authenticationType);
-            LOGI("DeviceManagerServiceImpl::ImportConfig import authCode by pkgName Successful.");
+            LOGI("import authCode by pkgName Successful.");
             it->second = nullptr;
             it = configsMap_.erase(it);
             return;
@@ -312,11 +313,11 @@ int32_t DeviceManagerServiceImpl::InitAndRegisterAuthMgr(bool isSrcSide, uint64_
             // Register resource destruction notification function
             authMgrMap_[tokenId]->RegisterCleanNotifyCallback(&DeviceManagerServiceImpl::NotifyCleanEvent);
             hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgrMap_[tokenId]);
-            LOGI("DeviceManagerServiceImpl::Initialize authMgrMap_ token: %{public}" PRId64 ".", tokenId);
+            LOGI("Initialize authMgrMap_ token: %{public}" PRId64 ".", tokenId);
             ImportConfig(authMgrMap_[tokenId], tokenId, pkgName);
             return DM_OK;
         } else {
-            LOGI("DeviceManagerServiceImpl::InitAndRegisterAuthMgr old authMgr.");
+            LOGI("InitAndRegisterAuthMgr old authMgr.");
             if (authMgr_ == nullptr) {
                 CreateGlobalClassicalAuthMgr();
             }
@@ -394,10 +395,10 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgr()
 {
     uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
     if (authMgrMap_.find(tokenId) != authMgrMap_.end()) {
-        LOGI("DeviceManagerServiceImpl::GetAuthMgr authMgrMap_ token: %{public}" PRId64 ".", tokenId);
+        LOGI("authMgrMap_ token: %{public}" PRId64 ".", tokenId);
         return authMgrMap_[tokenId];
     }
-    LOGE("DeviceManagerServiceImpl::GetAuthMgr authMgrMap_ not found, token: %{public}" PRId64 ".", tokenId);
+    LOGE("authMgrMap_ not found, token: %{public}" PRId64 ".", tokenId);
     return nullptr;
 }
 
@@ -405,10 +406,10 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgr()
 std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgrByTokenId(uint64_t tokenId)
 {
     if (authMgrMap_.find(tokenId) != authMgrMap_.end()) {
-        LOGI("DeviceManagerServiceImpl::GetAuthMgrByTokenId authMgrMap_ token: %{public}" PRId64 ".", tokenId);
+        LOGI("authMgrMap_ token: %{public}" PRId64 ".", tokenId);
         return authMgrMap_[tokenId];
     }
-    LOGE("DeviceManagerServiceImpl::GetAuthMgrByTokenId authMgrMap_ not found, token: %{public}" PRId64 ".", tokenId);
+    LOGE("authMgrMap_ not found, token: %{public}" PRId64 ".", tokenId);
     return nullptr;
 }
 
@@ -448,7 +449,7 @@ static uint64_t GenerateRandNum(int sessionId)
 
 int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManagerServiceListener> &listener)
 {
-    LOGI("DeviceManagerServiceImpl Initialize");
+    LOGI("Initialize");
     if (softbusConnector_ == nullptr) {
         softbusConnector_ = std::make_shared<SoftbusConnector>();
     }
@@ -484,7 +485,7 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
 
 void DeviceManagerServiceImpl::Release()
 {
-    LOGI("DeviceManagerServiceImpl Release");
+    LOGI("Release");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     commonEventManager_ = nullptr;
 #endif
@@ -622,7 +623,6 @@ void DeviceManagerServiceImpl::CreateGlobalClassicalAuthMgr()
 
 void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("DeviceManagerServiceImpl::HandleOffline");
     std::string trustDeviceId = deviceStateMgr_->GetUdidByNetWorkId(std::string(devInfo.networkId));
     LOGI("deviceStateMgr Udid: %{public}s", GetAnonyString(trustDeviceId).c_str());
     if (trustDeviceId == "") {
@@ -674,8 +674,7 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
 
 void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("DeviceManagerServiceImpl::HandleOnline networkId: %{public}s.",
-        GetAnonyString(devInfo.networkId).c_str());
+    LOGI("networkId: %{public}s.", GetAnonyString(devInfo.networkId).c_str());
     std::string trustDeviceId = "";
     if (softbusConnector_->GetUdidByNetworkId(devInfo.networkId, trustDeviceId) != DM_OK) {
         LOGE("HandleOnline get udid failed.");
@@ -729,7 +728,7 @@ void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, Pr
         devInfo.authForm = DmAuthForm::SHARE;
         softbusConnector_->SetProcessInfo(processInfo);
     }
-    LOGI("DeviceManagerServiceImpl::HandleOnline success devInfo authForm is %{public}d.", devInfo.authForm);
+    LOGI("HandleOnline success devInfo authForm is %{public}d.", devInfo.authForm);
     deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
     return;
 }
@@ -755,7 +754,7 @@ bool DeviceManagerServiceImpl::CheckSharePeerSrc(const std::string &peerUdid, co
 
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("DeviceManagerServiceImpl::HandleDeviceStatusChange start, devState = %{public}d, networkId: %{public}s.",
+    LOGI("start, devState = %{public}d, networkId: %{public}s.",
         devState, GetAnonyString(devInfo.networkId).c_str());
     if (deviceStateMgr_ == nullptr) {
         LOGE("deviceStateMgr_ is nullpter!");
@@ -954,7 +953,7 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
         authMgr_->OnSessionOpened(curSession->sessionId_, sessionSide, 0);
     }
 
-    LOGI("DeviceManagerServiceImpl::TransferSrcOldAuthMgr src transfer to old version success");
+    LOGI("src transfer to old version success");
     authMgr_->SetTransferReady(false);
     return DM_OK;
 }
@@ -1000,7 +999,7 @@ int32_t DeviceManagerServiceImpl::ChangeUltrasonicTypeToPin(std::map<std::string
         return ERR_DM_AUTH_FAILED;
     }
     iter->second = CHANGE_PINTYPE;
-    LOGI("DeviceManagerServiceImpl::ChangeUltrasonicTypeToPin bindParam:%{public}s PINTYPE.", PARAM_KEY_AUTH_TYPE);
+    LOGI("bindParam:%{public}s PINTYPE.", PARAM_KEY_AUTH_TYPE);
     return DM_OK;
 }
 
@@ -1037,7 +1036,7 @@ int32_t DeviceManagerServiceImpl::TransferSinkOldAuthMgr(const JsonObject &jsonO
     // Parameter 2 sessionSide is 0, authMgr_ is empty, it must be the sink end.
     // The src end will create the protocol object when BindTarget.
     authMgr_->OnSessionOpened(curSession->sessionId_, 0, 0);
-    LOGI("DeviceManagerServiceImpl::TransferSinkOldAuthMgr sink transfer to old version success");
+    LOGI("sink transfer to old version success");
     authMgr_->SetTransferReady(false);
     return DM_OK;
 }
@@ -1111,7 +1110,7 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
                 return;
             }
         } else {
-            LOGI("DeviceManagerServiceImpl::OnBytesReceived Reuse Old AuthMgr, sessionId: %{public}d.", sessionId);
+            LOGI("Reuse Old AuthMgr, sessionId: %{public}d.", sessionId);
         }
         authMgr = authMgr_;
     }
@@ -1327,7 +1326,7 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
 
 int32_t DeviceManagerServiceImpl::GetGroupType(std::vector<DmDeviceInfo> &deviceList)
 {
-    LOGI("GetGroupType begin");
+    LOGI("begin");
     if (softbusConnector_ == nullptr || hiChainConnector_ == nullptr) {
         LOGE("softbusConnector_ or hiChainConnector_ is nullptr");
         return ERR_DM_POINT_NULL;
@@ -1382,7 +1381,7 @@ int32_t DeviceManagerServiceImpl::ImportAuthCode(const std::string &pkgName, con
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    LOGI("DeviceManagerServiceImpl::ImportAuthCode pkgName is %{public}s, authCode is %{public}s",
+    LOGI("pkgName is %{public}s, authCode is %{public}s",
         pkgName.c_str(), GetAnonyString(authCode).c_str());
     auto authMgr = GetAuthMgr();
     if (authMgr != nullptr) {
@@ -1679,7 +1678,7 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
         LOGE("authMgr BindTarget failed, ret %{public}d.", ret);
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
     }
-    LOGI("DeviceManagerServiceImpl BindTargetImpl thread end, tokenId %{public}" PRId64".", tokenId);
+    LOGI("end, tokenId %{public}" PRId64".", tokenId);
     return;
 }
 
@@ -1708,7 +1707,7 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
 
 int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
 {
-    LOGI("DeviceManagerServiceImpl DpAclAdd start.");
+    LOGI("start udid %{public}s.", GetAnonyString(udid).c_str());
     MultipleUserConnector::SetSwitchOldUserId(MultipleUserConnector::GetCurrentAccountUserID());
     MultipleUserConnector::SetSwitchOldAccountId(MultipleUserConnector::GetOhosAccountId());
     if (deviceStateMgr_->CheckIsOnline(udid)) {
@@ -1719,7 +1718,6 @@ int32_t DeviceManagerServiceImpl::DpAclAdd(const std::string &udid)
         softbusConnector_->SetProcessInfo(processInfo);
         deviceStateMgr_->OnDeviceOnline(udid, DmAuthForm::IDENTICAL_ACCOUNT);
     }
-    LOGI("DeviceManagerServiceImpl::DpAclAdd completed");
     return DM_OK;
 }
 
@@ -1783,7 +1781,6 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &local
     hiChainConnector_->DeleteAllGroup(localUserId);
     CHECK_NULL_VOID(hiChainAuthConnector_);
     hiChainAuthConnector_->DeleteCredential(peerUdid, localUserId, peerUserId);
-    LOGE("DeleteSkCredAndAcl start");
     DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
@@ -1808,7 +1805,6 @@ void DeviceManagerServiceImpl::HandleUserRemoved(std::vector<std::string> peerUd
     for (const auto &item : peerUserIdMap) {
         hiChainAuthConnector_->DeleteCredential(item.first, preUserId, item.second);
     }
-    LOGE("DeleteSkCredAndAcl start");
     DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
@@ -1829,7 +1825,6 @@ void DeviceManagerServiceImpl::HandleRemoteUserRemoved(int32_t userId, const std
     }
     CHECK_NULL_VOID(hiChainConnector_);
     hiChainConnector_->DeleteGroupByACL(delInfoVec, localUserIds);
-    LOGE("DeleteSkCredAndAcl start");
     DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
 }
 
@@ -1847,16 +1842,16 @@ void DeviceManagerServiceImpl::HandleUserSwitched(const std::vector<std::string>
 void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEventType)
 {
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
-        LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback on screen locked.");
+        LOGI("on screen locked.");
         for (auto& pair : authMgrMap_) {
             if (pair.second != nullptr) {
-                LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback tokenId: %{public}" PRId64 ".", pair.first);
+                LOGI("tokenId: %{public}" PRId64 ".", pair.first);
                 pair.second->OnScreenLocked();
             }
         }
         return;
     }
-    LOGI("DeviceManagerServiceImpl::ScreenCommonEventCallback error.");
+    LOGI("error.");
 }
 
 int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
@@ -1881,7 +1876,7 @@ int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &calle
 
 void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
 {
-    LOGI("DeviceManagerServiceImpl::HandleDeviceNotTrust udid: %{public}s.", GetAnonyString(udid).c_str());
+    LOGI("udid: %{public}s.", GetAnonyString(udid).c_str());
     if (udid.empty()) {
         LOGE("HandleDeviceNotTrust udid is empty.");
         return;
@@ -1947,7 +1942,6 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
         hiChainConnector_->DeleteAllGroup(item.second);
         CHECK_NULL_VOID(hiChainAuthConnector_);
         hiChainAuthConnector_->DeleteCredential(remoteUdid, item.second, remoteUserId);
-        LOGE("DeleteSkCredAndAcl start");
         DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
     }
 }
@@ -1970,7 +1964,7 @@ DmAuthForm DeviceManagerServiceImpl::ConvertBindTypeToAuthForm(int32_t bindType)
 
 int32_t DeviceManagerServiceImpl::DeleteGroup(const std::string &pkgName, const std::string &deviceId)
 {
-    LOGI("DeviceManagerServiceImpl::DeleteGroup");
+    LOGI("start");
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_FAILED;
@@ -2004,7 +1998,7 @@ void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const 
 void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
     int32_t tokenId)
 {
-    LOGI("HandleAppUnBindEvent tokenId = %{public}d.", tokenId);
+    LOGI("tokenId = %{public}d.", tokenId);
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
@@ -2039,7 +2033,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
 void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
     int32_t tokenId, int32_t peerTokenId)
 {
-    LOGI("HandleAppUnBindEvent peerTokenId = %{public}d.", peerTokenId);
+    LOGI("peerTokenId = %{public}d.", peerTokenId);
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
@@ -2074,7 +2068,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
 void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
     int32_t remoteTokenId)
 {
-    LOGI("HandleServiceUnBindEvent remoteTokenId = %{public}d, userId: %{public}d, remoteUdid: %{public}s.",
+    LOGI("remoteTokenId = %{public}d, userId: %{public}d, remoteUdid: %{public}s.",
         remoteTokenId, userId, GetAnonyString(remoteUdid).c_str());
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
@@ -2349,7 +2343,7 @@ int32_t DeviceManagerServiceImpl::RegisterAuthenticationType(int32_t authenticat
 
 void DeviceManagerServiceImpl::DeleteAlwaysAllowTimeOut()
 {
-    LOGI("Start DeleteAlwaysAllowTimeOut");
+    LOGI("Start");
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     std::string remoteUdid = "";
@@ -2481,7 +2475,7 @@ int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &l
 int32_t DeviceManagerServiceImpl::DeleteAcl(const std::string &pkgName, const std::string &localUdid,
     const std::string &remoteUdid, int32_t bindLevel, const std::string &extra)
 {
-    LOGI("DeleteAcl pkgName %{public}s, localUdid %{public}s, remoteUdid %{public}s, bindLevel %{public}d.",
+    LOGI("pkgName %{public}s, localUdid %{public}s, remoteUdid %{public}s, bindLevel %{public}d.",
         pkgName.c_str(), GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), bindLevel);
     if (static_cast<uint32_t>(bindLevel) == USER) {
         DeleteGroup(pkgName, remoteUdid);
@@ -2527,7 +2521,7 @@ int32_t DeviceManagerServiceImpl::DeleteAcl(const std::string &pkgName, const st
 
 int32_t DeviceManagerServiceImpl::DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls)
 {
-    LOGI("DeleteSkCredAndAcl start.");
+    LOGI("start.");
     int32_t ret = DM_OK;
     if (acls.empty()) {
         return ret;
@@ -2577,7 +2571,7 @@ int32_t DeviceManagerServiceImpl::DeleteAclForProcV2(const std::string &localUdi
 int32_t DeviceManagerServiceImpl::DeleteAclV2(const std::string &pkgName, const std::string &localUdid,
     const std::string &remoteUdid, int32_t bindLevel, const std::string &extra)
 {
-    LOGI("DeleteAclV2 pkgName %{public}s, localUdid %{public}s, remoteUdid %{public}s, bindLevel %{public}d.",
+    LOGI("pkgName %{public}s, localUdid %{public}s, remoteUdid %{public}s, bindLevel %{public}d.",
         pkgName.c_str(), GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), bindLevel);
     uint32_t tokenId = 0;
     MultipleUserConnector::GetTokenId(tokenId);
@@ -2619,7 +2613,6 @@ void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint
 
 void DeviceManagerServiceImpl::GetBindCallerInfo(DmBindCallerInfo &bindCallerInfo, const std::string &pkgName)
 {
-    LOGI("start.");
     int32_t userId = -1;
     MultipleUserConnector::GetCallerUserId(userId);
     uint32_t callingTokenId = 0;
@@ -2692,7 +2685,6 @@ std::string DeviceManagerServiceImpl::GetBundleLable(const std::string &bundleNa
 void DeviceManagerServiceImpl::SetBindCallerInfoToBindParam(const std::map<std::string, std::string> &bindParam,
     std::map<std::string, std::string> &bindParamTmp, const DmBindCallerInfo &bindCallerInfo)
 {
-    LOGI("start.");
     bindParamTmp = const_cast<std::map<std::string, std::string> &>(bindParam);
     bindParamTmp["bindCallerUserId"] = std::to_string(bindCallerInfo.userId);
     bindParamTmp["bindCallerTokenId"] = std::to_string(bindCallerInfo.tokenId);

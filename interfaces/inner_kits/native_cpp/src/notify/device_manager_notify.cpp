@@ -263,10 +263,10 @@ void DeviceManagerNotify::RegisterPinHolderCallback(const std::string &pkgName,
 
 void DeviceManagerNotify::OnRemoteDied()
 {
-    LOGW("DeviceManagerNotify::OnRemoteDied");
+    LOGW("OnRemoteDied");
     std::map<std::string, std::shared_ptr<DmInitCallback>> dmInitCallback = GetDmInitCallback();
     for (auto iter : dmInitCallback) {
-        LOGI("DeviceManagerNotify::OnRemoteDied, pkgName:%{public}s", iter.first.c_str());
+        LOGI("OnRemoteDied, pkgName:%{public}s", iter.first.c_str());
         if (iter.second != nullptr) {
             iter.second->OnRemoteDied();
         }
@@ -279,13 +279,14 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("Online with DmDeviceInfo, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<DeviceStateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStateCallback_.find(pkgName);
         if (iter == deviceStateCallback_.end()) {
-            LOGE("OnDeviceOnline error, device state callback not register.");
+            if (deviceStatusCallback_.find(pkgName) == deviceStatusCallback_.end()) {
+                LOGE("OnDeviceOnline error, device state callback not register.");
+            }
             return;
         }
         tempCbk = iter->second;
@@ -311,13 +312,14 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("Online with DmDeviceBasicInfo, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            LOGE("Error, device status callback not register.");
+            if (deviceStateCallback_.find(pkgName) == deviceStateCallback_.end()) {
+                LOGE("Error, device status callback not register.");
+            }
             return;
         }
         tempCbk = iter->second;
@@ -343,13 +345,14 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("Offline with DmDeviceInfo, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<DeviceStateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStateCallback_.find(pkgName);
         if (iter == deviceStateCallback_.end()) {
-            LOGE("Error, device state callback not register.");
+            if (deviceStatusCallback_.find(pkgName) == deviceStatusCallback_.end()) {
+                LOGE("Error, device state callback not register.");
+            }
             return;
         }
         tempCbk = iter->second;
@@ -376,13 +379,14 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("Offline with DmDeviceBasicInfo, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            LOGE("Error, device status callback not register.");
+            if (deviceStateCallback_.find(pkgName) == deviceStateCallback_.end()) {
+                LOGE("Error, device status callback not register.");
+            }
             return;
         }
         tempCbk = iter->second;
@@ -414,7 +418,9 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStateCallback_.find(pkgName);
         if (iter == deviceStateCallback_.end()) {
-            LOGE("OnDeviceChanged error, device state callback not register, pkgName:%{public}s", pkgName.c_str());
+            if (deviceStatusCallback_.find(pkgName) == deviceStatusCallback_.end()) {
+                LOGE("error, device state callback not register, pkgName:%{public}s",pkgName.c_str());
+            }
             return;
         }
         tempCbk = iter->second;
@@ -446,7 +452,9 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            LOGE("OnDeviceChanged error, device state callback not register, pkgName:%{public}s", pkgName.c_str());
+            if (deviceStateCallback_.find(pkgName) == deviceStateCallback_.end()) {
+                LOGE("error, device state callback not register, pkgName:%{public}s", pkgName.c_str());
+            }
             return;
         }
         tempCbk = iter->second;
@@ -478,7 +486,9 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStateCallback_.find(pkgName);
         if (iter == deviceStateCallback_.end()) {
-            LOGE("OnDeviceReady error, device state callback not register, pkgName:%{public}s", pkgName.c_str());
+            if (deviceStatusCallback_.find(pkgName) == deviceStatusCallback_.end()) {
+                LOGE("error, device state callback not register, pkgName:%{public}s", pkgName.c_str());
+            }
             return;
         }
         tempCbk = iter->second;
@@ -487,8 +497,6 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("OnDeviceReady error, registered device state callback is nullptr, pkgName:%{public}s", pkgName.c_str());
         return;
     }
-    LOGE("OnDeviceReady in, pkgName:%{public}s, networkId: %{public}s.",
-        pkgName.c_str(), GetAnonyString(deviceInfo.networkId).c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceInfoReady(deviceInfo, tempCbk); });
 #else
@@ -506,13 +514,14 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDeviceReady with DmDeviceBasicInfo, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<DeviceStatusCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            LOGE("OnDeviceReady error, device status callback not register, pkgName:%{public}s", pkgName.c_str());
+            if (deviceStateCallback_.find(pkgName) != deviceStateCallback_.end()) {
+                LOGE("error, device status callback not register, pkgName:%{public}s", pkgName.c_str());
+            }
             return;
         }
         tempCbk = iter->second;
@@ -535,8 +544,6 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
 void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
                                         const DmDeviceInfo &deviceInfo)
 {
-    LOGD("pkgName:%{public}s, subscribeId:%{public}d.",
-         GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
@@ -552,8 +559,6 @@ void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t sub
 void DeviceManagerNotify::OnDeviceFound(const std::string &pkgName, uint16_t subscribeId,
                                         const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGD("pkgName:%{public}s, subscribeId:%{public}d.",
-         GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
@@ -572,7 +577,7 @@ void DeviceManagerNotify::OnDiscoveryFailed(const std::string &pkgName, uint16_t
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDiscoveryFailed in, pkgName:%{public}s, subscribeId %{public}d, failed"
+    LOGE("in, pkgName:%{public}s, subscribeId %{public}d, failed"
         "reason %{public}d", pkgName.c_str(), (int32_t)subscribeId, failedReason);
     std::shared_ptr<DiscoveryCallback> tempCbk = GetDiscoveryCallback(pkgName, subscribeId);
     if (tempCbk == nullptr) {
@@ -603,7 +608,7 @@ void DeviceManagerNotify::OnPublishResult(const std::string &pkgName, int32_t pu
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnPublishResult in, pkgName:%{public}s, publishId %{public}d, publishResult %{public}d",
+    LOGI("in, pkgName:%{public}s, publishId %{public}d, publishResult %{public}d",
         pkgName.c_str(), publishId, publishResult);
     std::shared_ptr<PublishCallback> tempCbk;
     {
@@ -635,8 +640,7 @@ void DeviceManagerNotify::OnAuthResult(const std::string &pkgName, const std::st
         LOGE("Invalid para, pkgName: %{public}s, token: %{public}s", pkgName.c_str(), GetAnonyString(token).c_str());
         return;
     }
-    LOGI("DeviceManagerNotify::OnAuthResult in, pkgName:%{public}s, status:%{public}d, reason:%{public}d",
-        pkgName.c_str(), status, reason);
+    LOGI("in, pkgName:%{public}s, status:%{public}d, reason:%{public}d", pkgName.c_str(), status, reason);
     std::shared_ptr<AuthenticateCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -677,7 +681,7 @@ void DeviceManagerNotify::OnUiCall(std::string &pkgName, std::string &paramJson)
         LOGE("DeviceManagerNotify::OnUiCall error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return;
     }
-    LOGI("DeviceManagerNotify::OnUiCall in, pkgName:%{public}s", pkgName.c_str());
+    LOGI("in, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<DeviceManagerUiCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -701,7 +705,7 @@ void DeviceManagerNotify::OnCredentialResult(const std::string &pkgName, int32_t
         LOGE("DeviceManagerNotify::OnCredentialResult error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return;
     }
-    LOGI("DeviceManagerNotify::OnCredentialResult in, pkgName:%{public}s, action:%{public}d", pkgName.c_str(), action);
+    LOGI("in, pkgName:%{public}s, action:%{public}d", pkgName.c_str(), action);
     std::shared_ptr<CredentialCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -756,7 +760,7 @@ void DeviceManagerNotify::OnBindResult(const std::string &pkgName, const PeerTar
         LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
         return;
     }
-    LOGI("DeviceManagerNotify::OnBindResult in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
+    LOGI("in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
     std::shared_ptr<BindTargetCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(bindLock_);
@@ -794,7 +798,7 @@ void DeviceManagerNotify::OnUnbindResult(const std::string &pkgName, const PeerT
         LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
         return;
     }
-    LOGI("DeviceManagerNotify::OnUnbindResult in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
+    LOGI("in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
     std::shared_ptr<UnbindTargetCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -832,7 +836,7 @@ void DeviceManagerNotify::OnPinHolderCreate(const std::string &pkgName, const st
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnPinHolderCreate in, pkgName:%{public}s", pkgName.c_str());
+    LOGI("in, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<PinHolderCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -856,7 +860,7 @@ void DeviceManagerNotify::OnPinHolderDestroy(const std::string &pkgName, DmPinTy
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnPinHolderDestroy in, pkgName:%{public}s", pkgName.c_str());
+    LOGI("in, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<PinHolderCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -879,7 +883,7 @@ void DeviceManagerNotify::OnCreateResult(const std::string &pkgName, int32_t res
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnCreateResult in, pkgName:%{public}s", pkgName.c_str());
+    LOGI("in, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<PinHolderCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -902,7 +906,7 @@ void DeviceManagerNotify::OnDestroyResult(const std::string &pkgName, int32_t re
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnDestroyResult in, pkgName:%{public}s", pkgName.c_str());
+    LOGI("in, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<PinHolderCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -926,7 +930,7 @@ void DeviceManagerNotify::OnPinHolderEvent(const std::string &pkgName, DmPinHold
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("DeviceManagerNotify::OnPinHolderEvent in, pkgName:%{public}s", pkgName.c_str());
+    LOGI("in, pkgName:%{public}s", pkgName.c_str());
     std::shared_ptr<PinHolderCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);
@@ -1028,7 +1032,7 @@ void DeviceManagerNotify::OnDeviceTrustChange(const std::string &pkgName, const 
         tempCbk = iter->second;
     }
     if (tempCbk == nullptr) {
-        LOGE("OnDeviceReady error, registered device status callback is nullptr.");
+        LOGE("error, registered device status callback is nullptr.");
         return;
     }
     DmAuthForm dmAuthForm = static_cast<DmAuthForm>(authForm);
@@ -1170,7 +1174,7 @@ void DeviceManagerNotify::OnSinkBindResult(const std::string &pkgName, const Pee
         LOGE("Invalid para, pkgName: %{public}s.", pkgName.c_str());
         return;
     }
-    LOGI("DeviceManagerNotify::OnSinkBindResult in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
+    LOGI("in, pkgName:%{public}s, result:%{public}d", pkgName.c_str(), result);
     std::shared_ptr<BindTargetCallback> tempCbk;
     {
         std::lock_guard<std::mutex> autoLock(lock_);

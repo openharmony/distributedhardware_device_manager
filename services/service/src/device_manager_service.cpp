@@ -201,7 +201,6 @@ DM_EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 void DeviceManagerService::QueryDependsSwitchState()
 {
-    LOGI("DeviceManagerService::QueryDependsSwitchState start.");
     std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = publshCommonEventManager_->GetSubscriber();
     CHECK_NULL_VOID(publishSubScriber);
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -319,7 +318,6 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
                                                    std::vector<DmDeviceInfo> &deviceList)
 {
     (void)extra;
-    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -370,7 +368,6 @@ int32_t DeviceManagerService::GetAllTrustedDeviceList(const std::string &pkgName
                                                       std::vector<DmDeviceInfo> &deviceList)
 {
     (void)extra;
-    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName or extra is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -544,7 +541,7 @@ bool DeviceManagerService::IsCallerInWhiteList()
 
 bool DeviceManagerService::IsDMAdapterCheckApiWhiteListLoaded()
 {
-    LOGI("Start.");
+    LOGD("Start.");
     std::lock_guard<std::mutex> lock(isAdapterCheckApiWhiteListLoadedLock_);
     if (isAdapterCheckApiWhiteListSoLoaded_ && (dmCheckApiWhiteList_ != nullptr)) {
         return true;
@@ -909,7 +906,7 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
 
 void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    LOGI("DeviceManagerService::HandleDeviceStatusChange start, devState = %{public}d", devState);
+    LOGD("start, devState = %{public}d", devState);
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
     }
@@ -947,20 +944,17 @@ void DeviceManagerService::OnBytesReceived(int sessionId, const void *data, unsi
 
 int DeviceManagerService::OnPinHolderSessionOpened(int sessionId, int result)
 {
-    LOGI("In");
     return PinHolderSession::OnSessionOpened(sessionId, result);
 }
 
 void DeviceManagerService::OnPinHolderSessionClosed(int sessionId)
 {
-    LOGI("In");
     CHECK_NULL_VOID(pinHolder_);
     pinHolder_->OnSessionClosed(sessionId);
 }
 
 void DeviceManagerService::OnPinHolderBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
-    LOGI("In");
     PinHolderSession::OnBytesReceived(sessionId, data, dataLen);
 }
 
@@ -1166,14 +1160,12 @@ bool DeviceManagerService::IsDMServiceImplReady()
 
 bool DeviceManagerService::IsDMImplSoLoaded()
 {
-    LOGI("In");
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
     return isImplsoLoaded_;
 }
 
 bool DeviceManagerService::IsDMServiceAdapterSoLoaded()
 {
-    LOGI("In");
     std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
     if (!isAdapterResidentSoLoaded_ || (dmServiceImplExtResident_ == nullptr)) {
         return false;
@@ -1253,7 +1245,6 @@ int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkg
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("PkgName = %{public}s", pkgName.c_str());
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetUuidByNetworkId(networkId.c_str(), uuid);
     if (ret != DM_OK) {
@@ -1262,9 +1253,9 @@ int32_t DeviceManagerService::GetEncryptedUuidByNetworkId(const std::string &pkg
     }
 
     std::string appId = Crypto::Sha256(AppManager::GetInstance().GetAppId());
-    LOGI("appId = %{public}s, uuid = %{public}s.", GetAnonyString(appId).c_str(), GetAnonyString(uuid).c_str());
     uuid = Crypto::Sha256(appId + "_" + uuid);
-    LOGI("encryptedUuid = %{public}s.", GetAnonyString(uuid).c_str());
+    LOGI("appId = %{public}s, uuid = %{public}s, encryptedUuid = %{public}s.", GetAnonyString(appId).c_str(),
+        GetAnonyString(uuid).c_str(), GetAnonyString(uuid).c_str());
     return DM_OK;
 }
 
@@ -1317,7 +1308,6 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
         LOGE("The caller: %{public}s does not have permission to call GetNetworkTypeByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Begin for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty() || netWorkId.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s, netWorkId: %{public}s", pkgName.c_str(),
             GetAnonyString(netWorkId).c_str());
@@ -1342,7 +1332,6 @@ int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const s
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerService::ImportAuthCode begin.");
     if (authCode.empty() || pkgName.empty()) {
         LOGE("Invalid parameter, authCode: %{public}s.", GetAnonyString(authCode).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1373,7 +1362,6 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
         LOGE("ExportAuthCode failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
-    LOGI("DeviceManagerService::ExportAuthCode begin.");
     return dmServiceImpl_->ExportAuthCode(authCode);
 }
 
@@ -1393,7 +1381,6 @@ void DeviceManagerService::UnloadDMServiceImplSo()
 
 bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
 {
-    LOGI("Start.");
     if (listener_ == nullptr) {
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
@@ -1455,7 +1442,6 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1475,7 +1461,6 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1498,7 +1483,6 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1515,7 +1499,6 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1531,7 +1514,6 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1547,7 +1529,6 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1787,7 +1768,6 @@ int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const 
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerService::CreatePinHolder begin.");
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1812,7 +1792,6 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Begin.");
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName: %{public}s.", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1827,13 +1806,11 @@ int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
         LOGE("The caller does not have permission to call DpAclAdd.");
         return ERR_DM_NO_PERMISSION;
     }
-    LOGI("Start.");
     if (!IsDMServiceImplReady()) {
         LOGE("DpAclAdd failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     dmServiceImpl_->DpAclAdd(udid);
-    LOGI("DeviceManagerService::DpAclAdd completed");
     return DM_OK;
 }
 
@@ -1957,14 +1934,14 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
 void DeviceManagerService::SendShareTypeUnBindBroadCast(const char *credId, const int32_t localUserId,
     const std::vector<std::string> &peerUdids)
 {
-    LOGI("SendShareTypeUnBindBroadCast Start.");
+    LOGI("Start.");
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::SHARE_UNBIND;
     msg.userId = static_cast<uint32_t>(localUserId);
     msg.credId = credId;
     msg.peerUdids = peerUdids;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
-    LOGI("SendShareTypeUnBindBroadCast broadCastMsg = %{public}s.", broadCastMsg.c_str());
+    LOGI("broadCastMsg = %{public}s.", broadCastMsg.c_str());
     CHECK_NULL_VOID(softbusListener_);
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
@@ -1987,8 +1964,6 @@ void DeviceManagerService::SubscribeScreenLockEvent()
 DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     const std::string commonEventType, int32_t currentUserId, int32_t beforeUserId)
 {
-    LOGI("CommonEventType: %{public}s, currentUserId: %{public}d, beforeUserId: %{public}d", commonEventType.c_str(),
-        currentUserId, beforeUserId);
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
         MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
@@ -2047,8 +2022,7 @@ bool DeviceManagerService::IsUserStatusChanged(std::vector<int32_t> foregroundUs
         LOGI("User status has not changed.");
         return true;
     }
-    LOGI("User status has changed, foregroundUserVec_: %{public}s, backgroundUserVec_: %{public}s",
-        GetIntegerList(foregroundUserVec_).c_str(), GetIntegerList(backgroundUserVec_).c_str());
+    LOGD("User status has changed");
     foregroundUserVec_.clear();
     backgroundUserVec_.clear();
     foregroundUserVec_ = foregroundUserVec;
@@ -2058,7 +2032,7 @@ bool DeviceManagerService::IsUserStatusChanged(std::vector<int32_t> foregroundUs
 
 void DeviceManagerService::HandleAccountCommonEvent(const std::string commonEventType)
 {
-    LOGI("HandleAccountCommonEvent commonEventType: %{public}s.", commonEventType.c_str());
+    LOGI("commonEventType: %{public}s.", commonEventType.c_str());
     std::vector<int32_t> foregroundUserVec;
     int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
     std::vector<int32_t> backgroundUserVec;
@@ -2107,7 +2081,7 @@ void DeviceManagerService::HandleAccountCommonEvent(const std::string commonEven
 
 void DeviceManagerService::HandleUserSwitched()
 {
-    LOGI("onStart, HandleUserSwitched.");
+    LOGI("start.");
     std::vector<int32_t> foregroundUserVec;
     int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
     std::vector<int32_t> backgroundUserVec;
@@ -2154,7 +2128,7 @@ void DeviceManagerService::NotifyRemoteAccountCommonEvent(const std::string comm
     const std::string &localUdid, const std::vector<std::string> &peerUdids,
     const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
 {
-    LOGI("NotifyRemoteAccountCommonEvent, foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
+    LOGI("foregroundUserIds: %{public}s, backgroundUserIds: %{public}s",
         GetIntegerList<int32_t>(foregroundUserIds).c_str(), GetIntegerList<int32_t>(backgroundUserIds).c_str());
     if (peerUdids.empty()) {
         return;
@@ -2232,7 +2206,7 @@ void DeviceManagerService::NotifyRemoteAccountCommonEventByWifi(const std::strin
 int32_t DeviceManagerService::SendAccountCommonEventByWifi(const std::string &networkId,
     const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds)
 {
-    LOGI("Try open softbus session to exchange foreground/background userid");
+    LOGI("start");
     std::vector<uint32_t> foregroundUserIdsUInt;
     for (auto const &u : foregroundUserIds) {
         foregroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
@@ -2537,7 +2511,6 @@ void DeviceManagerService::HandleUserIdsBroadCast(const std::vector<UserIdInfo> 
     std::vector<UserIdInfo> foregroundUserIdInfos;
     std::vector<UserIdInfo> backgroundUserIdInfos;
     GetFrontAndBackUserIdInfos(remoteUserIdInfos, foregroundUserIdInfos, backgroundUserIdInfos);
-    LOGI("process foreground and background userids");
     // Notify received remote foreground userids to dsoftbus
     std::vector<uint32_t> foregroundUserIds;
     for (const auto &u : foregroundUserIdInfos) {
@@ -2623,7 +2596,6 @@ void DeviceManagerService::HandleCommonEventBroadCast(const std::vector<UserIdIn
     std::vector<UserIdInfo> foregroundUserIdInfos;
     std::vector<UserIdInfo> backgroundUserIdInfos;
     GetFrontAndBackUserIdInfos(remoteUserIdInfos, foregroundUserIdInfos, backgroundUserIdInfos);
-    LOGI("process foreground and background userids");
     // Notify received remote foreground userids to dsoftbus
     std::vector<uint32_t> foregroundUserIds;
     for (const auto &u : foregroundUserIdInfos) {
@@ -2708,7 +2680,6 @@ int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<s
         LOGE("The caller: %{public}s is not in white list.", processName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2761,7 +2732,6 @@ DM_EXPORT void DeviceManagerService::ConvertUdidHashToAnoyDeviceId(
 DM_EXPORT int32_t DeviceManagerService::ConvertUdidHashToAnoyDeviceId(
     const std::string &udidHash, std::string &result)
 {
-    LOGI("udidHash %{public}s.", GetAnonyString(udidHash).c_str());
     std::string appId = AppManager::GetInstance().GetAppId();
     if (appId.empty()) {
         LOGD("GetAppId failed");
@@ -2878,7 +2848,7 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
 
 void DeviceManagerService::HandleCredentialDeleted(const char *credId, const char *credInfo)
 {
-    LOGI("HandleCredentialDeleted start.");
+    LOGI("start.");
     if (credId == nullptr || credInfo == nullptr) {
         LOGE("HandleCredentialDeleted credId or credInfo is nullptr.");
         return;
@@ -2981,7 +2951,7 @@ bool DeviceManagerService::IsMsgEmptyAndDMServiceImplReady(const std::string &ms
 
 void DeviceManagerService::HandleShareUnbindBroadCast(const int32_t userId, const std::string &credId)
 {
-    LOGI("HandleShareUnbindBroadCast start.");
+    LOGI("start.");
     if (credId == "") {
         LOGE("HandleShareUnbindBroadCast credId is null.");
         return;
@@ -3034,7 +3004,6 @@ void DeviceManagerService::ProcessCheckSumByWifi(std::string networkId, std::vec
         return;
     }
     // use connection to exchange foreground/background userid
-    LOGI("Try open softbus session to exchange foreground/background userid");
     std::vector<uint32_t> foregroundUserIdsUInt;
     for (auto const &u : foregroundUserIds) {
         foregroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
@@ -3409,7 +3378,7 @@ void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_
 
 void DeviceManagerService::HandleUserStopEvent(int32_t stopUserId)
 {
-    LOGI("onStart, HandleUserStopEvent %{public}s.", GetAnonyInt32(stopUserId).c_str());
+    LOGI("stopUserId %{public}s.", GetAnonyInt32(stopUserId).c_str());
     std::vector<int32_t> stopUserVec;
     stopUserVec.push_back(stopUserId);
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};

@@ -153,7 +153,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         LOGE("GetCallerProcessName GetCallingTokenID error.");
         return ERR_DM_FAILED;
     }
-    LOGI("GetCallerProcessName::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
+    LOGI("tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
         HapTokenInfo tokenInfo;
@@ -185,12 +185,10 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
 
 bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &processName)
 {
-    LOGI("Enter PermissionManager::CheckProcessNameValidOnAuthCode");
     if (processName.empty()) {
         LOGE("ProcessName is empty");
         return false;
     }
-
     uint16_t index = 0;
     for (; index < AUTH_CODE_WHITE_LIST_NUM; ++index) {
         std::string tmp(g_authCodeWhiteList[index]);
@@ -198,14 +196,11 @@ bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &proce
             return true;
         }
     }
-
-    LOGE("CheckProcessNameValidOnAuthCode process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 
 bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)
 {
-    LOGI("Enter PermissionManager::CheckProcessNameValidOnPinHolder");
     if (processName.empty()) {
         LOGE("ProcessName is empty");
         return false;
@@ -218,8 +213,6 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
             return true;
         }
     }
-
-    LOGE("CheckProcessNameValidOnPinHolder process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 
@@ -246,13 +239,11 @@ std::unordered_set<std::string> PermissionManager::GetWhiteListSystemSA()
 
 bool PermissionManager::CheckSystemSA(const std::string &pkgName)
 {
-    LOGI("Get calling tokenID.");
     AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
     if (tokenCaller == 0) {
         LOGE("CheckMonitorPermission GetCallingTokenID error.");
         return false;
     }
-    LOGI("Get token type flag.");
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
         return true;
@@ -273,8 +264,6 @@ bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &pr
             return true;
         }
     }
-
-    LOGE("Process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 
@@ -291,8 +280,6 @@ bool PermissionManager::CheckProcessNameValidOnGetDeviceInfo(const std::string &
             return true;
         }
     }
-
-    LOGE("Process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 
@@ -309,8 +296,6 @@ bool PermissionManager::CheckProcessNameValidModifyLocalDeviceName(const std::st
             return true;
         }
     }
-
-    LOGE("Process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 
@@ -327,8 +312,6 @@ bool PermissionManager::CheckProcessNameValidModifyRemoteDeviceName(const std::s
             return true;
         }
     }
-
-    LOGE("Process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 
@@ -345,8 +328,6 @@ bool PermissionManager::CheckProcessNameValidPutDeviceProfileInfoList(const std:
             return true;
         }
     }
-
-    LOGE("Process name: %{public}s invalid.", processName.c_str());
     return false;
 }
 } // namespace DistributedHardware

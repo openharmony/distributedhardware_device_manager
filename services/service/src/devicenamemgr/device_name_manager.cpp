@@ -277,7 +277,7 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
 {
     LOGI("In userId:%{public}d", userId);
     if (userId == -1) {
-        LOGI("userId:%{public}d is invalid", userId);
+        LOGE("userId:%{public}d is invalid", userId);
         return;
     }
     std::string userDefinedDeviceName = "";
