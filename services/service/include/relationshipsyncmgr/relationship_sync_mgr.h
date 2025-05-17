@@ -17,8 +17,11 @@
 #define OHOS_RELATIONSHIP_SYNC_MGR_H
 
 #include <string>
+#include <map>
+#include <mutex>
 #include "cJSON.h"
 #include "dm_single_instance.h"
+#include "dm_timer.h"
 namespace OHOS {
 namespace DistributedHardware {
 enum class RelationShipChangeType : uint32_t {
@@ -61,6 +64,7 @@ struct RelationShipChangeMsg {
     std::vector<UserIdInfo> userIdInfos;
     std::string credId;
     bool isNewEvent;
+    uint8_t broadCastId;
 
     explicit RelationShipChangeMsg();
     bool ToBroadcastPayLoad(uint8_t *&msg, uint32_t &len) const;
@@ -86,18 +90,27 @@ struct RelationShipChangeMsg {
     bool FromDelUserPayLoad(const cJSON *payloadJson);
     bool FromStopUserPayLoad(const cJSON *payloadJson);
     bool FromShareUnbindPayLoad(const cJSON *payloadJson);
+    void GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum);
 
     std::string ToJson() const;
     bool FromJson(const std::string &msgJson);
 
     const std::string ToString() const;
+    const std::string ToMapKey() const;
 };
 
 class ReleationShipSyncMgr {
 DM_DECLARE_SINGLE_INSTANCE(ReleationShipSyncMgr);
 public:
-    std::string SyncTrustRelationShip(const RelationShipChangeMsg &msg);
+    std::string SyncTrustRelationShip(RelationShipChangeMsg &msg);
     RelationShipChangeMsg ParseTrustRelationShipChange(const std::string &msgJson);
+    bool IsNewBroadCastId(const RelationShipChangeMsg &msg);
+private:
+    void HandleRecvBroadCastTimeout(const std::string &key);
+    bool GetCurrentTimeSec(int32_t &sec);
+    std::map<std::string, int32_t> recvBroadCastIdMap_;
+    std::shared_ptr<DmTimer> timer_;
+    std::mutex lock_;
 };
 
 const std::string GetUserIdInfoList(const std::vector<UserIdInfo> &list);
