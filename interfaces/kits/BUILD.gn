@@ -19,6 +19,7 @@ group("devicemanager_native_js") {
     deps += [
       "./js:devicemanager",
       "./js4.0:distributeddevicemanager",
+      "./ndk:devicemanager_ndk",
     ]
   }
 }

@@ -247,6 +247,7 @@ public:
     int32_t UnRegisterPinHolderCallback(const std::string &pkgName);
     void ProcessCommonUserStatusEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
+    int32_t GetLocalDeviceName(std::string &deviceName);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();

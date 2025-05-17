@@ -111,6 +111,16 @@
                     ],
                     "header_base": "//foundation/distributedhardware/device_manager/json/include"
                 }
+            }, {
+                "type": "so",
+                "name": "//foundation/distributedhardware/device_manager/interfaces/kits/ndk:devicemanager_ndk",
+                "header": {
+                    "header_files": [
+                        "oh_device_manager_err_code.h",
+                        "oh_device_manager.h"
+                    ],
+                    "header_base": "//foundation/distributedhardware/device_manager/interfaces/kits/ndk/include"
+                }
             }],
             "test": [
                 "//foundation/distributedhardware/device_manager:device_manager_test"

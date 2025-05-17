@@ -32,6 +32,7 @@ public:
     virtual int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex,
         int64_t &tokenId) = 0;
     virtual int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId) = 0;
+    virtual int32_t GetBundleNameForSelf(std::string &bundleName) = 0;
 public:
     static inline std::shared_ptr<DmAppManager> dmAppManager = nullptr;
 };
@@ -43,6 +44,7 @@ public:
     MOCK_METHOD(int32_t, GetNativeTokenIdByName, (std::string &, int64_t &));
     MOCK_METHOD(int32_t, GetHapTokenIdByName, (int32_t, std::string &, int32_t, int64_t &));
     MOCK_METHOD(int32_t, GetAppIdByPkgName, (const std::string &, std::string &));
+    MOCK_METHOD(int32_t, GetBundleNameForSelf, (std::string &));
 };
 }
 }

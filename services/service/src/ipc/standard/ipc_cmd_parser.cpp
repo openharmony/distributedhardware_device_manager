@@ -1943,5 +1943,20 @@ ON_IPC_CMD(UNREGISTER_PIN_HOLDER_CALLBACK, MessageParcel &data, MessageParcel &r
     }
     return DM_OK;
 }
+
+ON_IPC_CMD(GET_LOCAL_DEVICE_NAME, MessageParcel &data, MessageParcel &reply)
+{
+    std::string deviceName = "";
+    int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceName(deviceName);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteString(deviceName)) {
+        LOGE("write displayName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

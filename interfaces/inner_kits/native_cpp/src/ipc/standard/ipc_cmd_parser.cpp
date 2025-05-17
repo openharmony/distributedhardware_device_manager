@@ -44,6 +44,7 @@
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_local_device_name_rsp.h"
 #include "ipc_get_local_display_device_name_req.h"
 #include "ipc_get_local_display_device_name_rsp.h"
 #include "ipc_get_localserviceinfo_rsp.h"
@@ -2145,6 +2146,22 @@ ON_IPC_READ_RESPONSE(UNREGISTER_PIN_HOLDER_CALLBACK, MessageParcel &reply, std::
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
     std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
     pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NAME, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NAME, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetLocalDeviceNameRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceNameRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetLocalDeviceName(reply.ReadString());
     return DM_OK;
 }
 } // namespace DistributedHardware

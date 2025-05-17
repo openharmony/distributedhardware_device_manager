@@ -343,6 +343,12 @@ public:
     virtual int32_t GetLocalDeviceName(const std::string &pkgName, std::string &deviceName) = 0;
 
     /**
+     * @brief Get local device name.
+     * @return Returns device name.
+     */
+    virtual int32_t GetLocalDeviceName(std::string &deviceName) = 0;
+
+    /**
      * @brief Get local device type.
      * @param pkgName package name.
      * @return Returns device type.

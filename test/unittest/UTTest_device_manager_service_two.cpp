@@ -1894,6 +1894,13 @@ HWTEST_F(DeviceManagerServiceTest, HandleShareUnbindBroadCast_003, testing::ext:
 
     DeviceManagerService::GetInstance().HandleShareUnbindBroadCast(userId, credId);
 }
+
+HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceName_201, testing::ext::TestSize.Level1)
+{
+    std::string deviceName = "";
+    int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceName(deviceName);
+    EXPECT_EQ(ret, DM_OK);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

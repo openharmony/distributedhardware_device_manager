@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -248,6 +248,28 @@ DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
     }
 
     LOGI("Get process name: %{public}s success.", processName.c_str());
+    return DM_OK;
+}
+
+int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)
+{
+    sptr<AppExecFwk::IBundleMgr> bundleManager = nullptr;
+    if (!GetBundleManagerProxy(bundleManager)) {
+        LOGE("get bundleManager failed.");
+        return ERR_DM_GET_BMS_FAILED;
+    }
+    if (bundleManager == nullptr) {
+        LOGE("bundleManager is nullptr.");
+        return ERR_DM_GET_BMS_FAILED;
+    }
+    AppExecFwk::BundleInfo bundleInfo;
+    int32_t flags = static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION);
+    int32_t ret = static_cast<int32_t>(bundleManager->GetBundleInfoForSelf(flags, bundleInfo));
+    if (ret != ERR_OK) {
+        LOGE("failed, ret=%{public}d.", ret);
+        return ERR_DM_GET_BUNDLE_NAME_FAILED;
+    }
+    bundleName = bundleInfo.name;
     return DM_OK;
 }
 } // namespace DistributedHardware
