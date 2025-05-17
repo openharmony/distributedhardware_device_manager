@@ -2879,6 +2879,10 @@ void DeviceManagerService::HandleDeviceTrustedChange(const std::string &msg)
     }
     RelationShipChangeMsg relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
     LOGI("Receive trust change msg: %{public}s", relationShipMsg.ToString().c_str());
+    if (!ReleationShipSyncMgr::GetInstance().IsNewBroadCastId(relationShipMsg)) {
+        LOGI("is not new broadcast");
+        return;
+    }
     bool ret = ParseRelationShipChangeType(relationShipMsg);
     if (!ret) {
         LOGI("ParseRelationShipChangeType failed");

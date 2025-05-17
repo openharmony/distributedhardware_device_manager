@@ -14,6 +14,9 @@
  */
 
 #include "relationship_sync_mgr.h"
+
+#include <ctime>
+
 #include "dm_anonymous.h"
 #include "dm_log.h"
 
@@ -22,31 +25,32 @@ namespace DistributedHardware {
     DM_IMPLEMENT_SINGLE_INSTANCE(ReleationShipSyncMgr);
 namespace {
     /**
-     * @brief account logout payload length 8 bytes
-     * |      2 bytes         |         6 bytes          |
-     * | userid lower 2 bytes | account id first 6 bytes |
+     * @brief account logout payload length 9 bytes
+     * |      2 bytes         |         6 bytes          | 1 bytes     |
+     * | userid lower 2 bytes | account id first 6 bytes | broadcastId |
      */
-    const int32_t ACCOUNT_LOGOUT_PAYLOAD_LEN = 8;
+    const int32_t ACCOUNT_LOGOUT_PAYLOAD_LEN = 9;
     /**
      * @brief device unbind payload length 2 bytes
-     * |      2 bytes         |
-     * | userid lower 2 bytes |
+     * |      2 bytes         | 1 bytes     |
+     * | userid lower 2 bytes | broadcastId |
      */
-    const int32_t DEVICE_UNBIND_PAYLOAD_LEN = 2;
+    const int32_t DEVICE_UNBIND_PAYLOAD_LEN = 3;
     /**
      * @brief app unbind payload length 6 bytes
-     * |      2 bytes         |         4 bytes          |
-     * | userid lower 2 bytes |  token id lower 4 bytes  |
+     * |      2 bytes         |         4 bytes          | 1 bytes     |
+     * | userid lower 2 bytes |  token id lower 4 bytes  | broadcastId |
      */
-    const int32_t APP_UNBIND_PAYLOAD_LEN = 10;
+    const int32_t APP_UNBIND_PAYLOAD_LEN = 11;
     /**
      * @brief delete user payload length 2 bytes
-     * |      2 bytes         |
-     * | userid lower 2 bytes |
+     * |      2 bytes         | 1 bytes     |
+     * | userid lower 2 bytes | broadcastId |
      */
-    const int32_t DEL_USER_PAYLOAD_LEN = 2;
-    const int32_t STOP_USER_PAYLOAD_LEN = 2;
-    const int32_t SHARE_UNBIND_PAYLOAD_LEN = 8;
+    const int32_t DEL_USER_PAYLOAD_LEN = 3;
+    const int32_t STOP_USER_PAYLOAD_LEN = 3;
+    const int32_t SHARE_UNBIND_PAYLOAD_LEN = 9;
+    const int32_t SHARE_UNBIND_BROADCAST_LEN = 8;
     /**
      * @brief the userid payload cost 2 bytes.
      *
@@ -60,6 +64,10 @@ namespace {
     const int32_t BITS_PER_BYTE = 8;
     const int32_t INVALIED_PAYLOAD_SIZE = 12;
     const int32_t CREDID_PAYLOAD_LEN = 8;
+    const int32_t ACCOUNT_LOGOUT_BROADCAST_LEN = 8;
+    const int32_t BROADCAST_PAYLOAD_LEN = 10;
+    const int32_t BROADCAST_TIMEOUT_S = 5;
+    const int32_t CURRENT_TIME_SEC_FLAG = 10;
 
     const char * const MSG_TYPE = "TYPE";
     const char * const MSG_VALUE = "VALUE";
@@ -89,7 +97,7 @@ namespace {
     const uint16_t FOREGROUND_USERID_LEN_MASK = 0b00000111;
     const uint16_t ALL_USERID_NUM_MASK = 0b00111000;
     const uint32_t MAX_MEM_MALLOC_SIZE = 4 * 1024;
-    const uint32_t MAX_USER_ID_NUM = 5;
+    const uint32_t MAX_USER_ID_NUM = 4;
 }
 
 RelationShipChangeMsg::RelationShipChangeMsg() : type(RelationShipChangeType::TYPE_MAX),
@@ -160,6 +168,9 @@ void RelationShipChangeMsg::ToShareUnbindPayLoad(uint8_t *&msg, uint32_t &len) c
     for (int i = USERID_PAYLOAD_LEN; i < CREDID_PAYLOAD_LEN; i++) {
         msg[i] = credId[i - USERID_PAYLOAD_LEN];
     }
+    for (int i = CREDID_PAYLOAD_LEN; i < SHARE_UNBIND_PAYLOAD_LEN; i++) {
+        msg[i] |= (broadCastId >> ((i - CREDID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
+    }
     len = SHARE_UNBIND_PAYLOAD_LEN;
 }
 
@@ -228,6 +239,15 @@ bool RelationShipChangeMsg::FromShareUnbindPayLoad(const cJSON *payloadJson)
         CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             credId += static_cast<char>(payloadItem->valueint);
+        }
+    }
+    this->broadCastId = 0;
+    for (uint32_t j = CREDID_PAYLOAD_LEN; j < SHARE_UNBIND_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, true);
+        if (cJSON_IsNumber(payloadItem)) {
+            this->broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
+                ((j - CREDID_PAYLOAD_LEN) * BITS_PER_BYTE);
         }
     }
     return true;
@@ -303,8 +323,12 @@ void RelationShipChangeMsg::ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len)
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
     }
 
-    for (int j = USERID_PAYLOAD_LEN; j < ACCOUNT_LOGOUT_PAYLOAD_LEN; j++) {
+    for (int j = USERID_PAYLOAD_LEN; j < ACCOUNT_LOGOUT_BROADCAST_LEN; j++) {
         msg[j] = accountId[j - USERID_PAYLOAD_LEN];
+    }
+
+    for (int j = ACCOUNT_LOGOUT_BROADCAST_LEN; j < ACCOUNT_LOGOUT_PAYLOAD_LEN; j++) {
+        msg[j] |= (broadCastId >> ((j - ACCOUNT_LOGOUT_BROADCAST_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
     len = ACCOUNT_LOGOUT_PAYLOAD_LEN;
 }
@@ -314,6 +338,9 @@ void RelationShipChangeMsg::ToDeviceUnbindPayLoad(uint8_t *&msg, uint32_t &len) 
     msg = new uint8_t[DEVICE_UNBIND_PAYLOAD_LEN]();
     for (int i = 0; i < USERID_PAYLOAD_LEN; i++) {
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
+    }
+    for (int i = USERID_PAYLOAD_LEN; i < DEVICE_UNBIND_PAYLOAD_LEN; i++) {
+        msg[i] |= (broadCastId >> ((i - USERID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
     len = DEVICE_UNBIND_PAYLOAD_LEN;
 }
@@ -329,8 +356,12 @@ void RelationShipChangeMsg::ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) con
         msg[i] |= (tokenId >> ((i - USERID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
 
-    for (int i = TOKENID_PAYLOAD_LEN; i < APP_UNBIND_PAYLOAD_LEN; i++) {
+    for (int i = TOKENID_PAYLOAD_LEN; i < BROADCAST_PAYLOAD_LEN; i++) {
         msg[i] |= (peerTokenId >> ((i - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
+    }
+
+    for (int i = BROADCAST_PAYLOAD_LEN; i < APP_UNBIND_PAYLOAD_LEN; i++) {
+        msg[i] |= (broadCastId >> ((i - BROADCAST_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
 
     len = APP_UNBIND_PAYLOAD_LEN;
@@ -349,9 +380,9 @@ bool RelationShipChangeMsg::ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32
         return false;
     }
 
-    len = userIdNum * USERID_BYTES + 1;
+    len = (userIdNum + 1) * USERID_BYTES;
 
-    if (len > MAX_MEM_MALLOC_SIZE) {
+    if (len > INVALIED_PAYLOAD_SIZE) {
         LOGE("len too long");
         return false;
     }
@@ -376,6 +407,7 @@ bool RelationShipChangeMsg::ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32
         idx += USERID_BYTES;
         userIdIdx++;
     }
+    msg[userIdNum * USERID_BYTES + 1] |= broadCastId & 0xFF;
     return true;
 }
 
@@ -383,8 +415,11 @@ void RelationShipChangeMsg::ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const
 {
     len = DEL_USER_PAYLOAD_LEN;
     msg = new uint8_t[DEL_USER_PAYLOAD_LEN]();
-    for (int i = 0; i < DEL_USER_PAYLOAD_LEN; i++) {
+    for (int i = 0; i < USERID_PAYLOAD_LEN; i++) {
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
+    }
+    for (int i = USERID_PAYLOAD_LEN; i < DEL_USER_PAYLOAD_LEN; i++) {
+        msg[i] |= (broadCastId >> ((i - USERID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
 }
 
@@ -392,8 +427,11 @@ void RelationShipChangeMsg::ToStopUserPayLoad(uint8_t *&msg, uint32_t &len) cons
 {
     len = STOP_USER_PAYLOAD_LEN;
     msg = new uint8_t[STOP_USER_PAYLOAD_LEN]();
-    for (int i = 0; i < STOP_USER_PAYLOAD_LEN; i++) {
+    for (int i = 0; i < USERID_PAYLOAD_LEN; i++) {
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
+    }
+    for (int i = USERID_PAYLOAD_LEN; i < STOP_USER_PAYLOAD_LEN; i++) {
+        msg[i] |= (broadCastId >> ((i - USERID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
 }
 
@@ -417,11 +455,20 @@ bool RelationShipChangeMsg::FromAccountLogoutPayLoad(const cJSON *payloadJson)
         }
     }
     accountId = "";
-    for (uint32_t j = USERID_PAYLOAD_LEN; j < ACCOUNT_LOGOUT_PAYLOAD_LEN; j++) {
+    for (uint32_t j = USERID_PAYLOAD_LEN; j < ACCOUNT_LOGOUT_BROADCAST_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
         CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             accountId += static_cast<char>(payloadItem->valueint);
+        }
+    }
+    broadCastId = 0;
+    for (uint32_t j = ACCOUNT_LOGOUT_BROADCAST_LEN; j < ACCOUNT_LOGOUT_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, true);
+        if (cJSON_IsNumber(payloadItem)) {
+            broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
+                ((j - ACCOUNT_LOGOUT_BROADCAST_LEN) * BITS_PER_BYTE);
         }
     }
     return true;
@@ -434,7 +481,7 @@ bool RelationShipChangeMsg::FromDeviceUnbindPayLoad(const cJSON *payloadJson)
         return false;
     }
     int32_t arraySize = cJSON_GetArraySize(payloadJson);
-    if (arraySize < ACCOUNT_LOGOUT_PAYLOAD_LEN || arraySize >= INVALIED_PAYLOAD_SIZE) {
+    if (arraySize < DEVICE_UNBIND_PAYLOAD_LEN || arraySize >= INVALIED_PAYLOAD_SIZE) {
         LOGE("Payload invalied,the size is %{public}d.", arraySize);
         return false;
     }
@@ -444,6 +491,15 @@ bool RelationShipChangeMsg::FromDeviceUnbindPayLoad(const cJSON *payloadJson)
         CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             userId |= (static_cast<uint8_t>(payloadItem->valueint)) << (i * BITS_PER_BYTE);
+        }
+    }
+    broadCastId = 0;
+    for (uint32_t j = USERID_PAYLOAD_LEN; j < DEVICE_UNBIND_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, true);
+        if (cJSON_IsNumber(payloadItem)) {
+            broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
+                ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
         }
     }
     return true;
@@ -477,12 +533,21 @@ bool RelationShipChangeMsg::FromAppUnbindPayLoad(const cJSON *payloadJson)
         }
     }
     peerTokenId = 0;
-    for (uint32_t j = TOKENID_PAYLOAD_LEN; j < APP_UNBIND_PAYLOAD_LEN; j++) {
+    for (uint32_t j = TOKENID_PAYLOAD_LEN; j < BROADCAST_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
         CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             peerTokenId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE);
+        }
+    }
+    broadCastId = 0;
+    for (uint32_t j = BROADCAST_PAYLOAD_LEN; j < APP_UNBIND_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, true);
+        if (cJSON_IsNumber(payloadItem)) {
+            broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
+                ((j - BROADCAST_PAYLOAD_LEN) * BITS_PER_BYTE);
         }
     }
     return true;
@@ -491,6 +556,16 @@ bool RelationShipChangeMsg::FromAppUnbindPayLoad(const cJSON *payloadJson)
 bool RelationShipChangeMsg::FromServiceUnbindPayLoad(const cJSON *payloadJson)
 {
     return FromAppUnbindPayLoad(payloadJson);
+}
+
+void RelationShipChangeMsg::GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum)
+{
+    broadCastId = 0;
+    cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, userIdNum * USERID_BYTES + 1);
+    CHECK_NULL_VOID(payloadItem);
+    if (cJSON_IsNumber(payloadItem)) {
+        broadCastId |= static_cast<uint8_t>(payloadItem->valueint);
+    }
 }
 
 bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloadJson)
@@ -517,7 +592,7 @@ bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloa
         userIdNum = ((static_cast<uint8_t>(payloadItem->valueint)) & FOREGROUND_USERID_LEN_MASK);
     }
 
-    int32_t effectiveLen = static_cast<int32_t>(userIdNum * USERID_BYTES + 1);
+    int32_t effectiveLen = static_cast<int32_t>((userIdNum + 1) * USERID_BYTES);
     if (effectiveLen > arraySize) {
         LOGE("payload userIdNum invalid, userIdNum: %{public}u, arraySize: %{public}d", userIdNum, arraySize);
         return false;
@@ -546,6 +621,7 @@ bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloa
             isForegroundUser = false;
         }
     }
+    GetBroadCastId(payloadJson, userIdNum);
     return true;
 }
 
@@ -569,6 +645,15 @@ bool RelationShipChangeMsg::FromDelUserPayLoad(const cJSON *payloadJson)
             this->userId |= (static_cast<uint8_t>(payloadItem->valueint)) << (i * BITS_PER_BYTE);
         }
     }
+    this->broadCastId = 0;
+    for (uint32_t j = USERID_PAYLOAD_LEN; j < DEL_USER_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, true);
+        if (cJSON_IsNumber(payloadItem)) {
+            this->broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
+                ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
+        }
+    }
     return true;
 }
 
@@ -590,6 +675,15 @@ bool RelationShipChangeMsg::FromStopUserPayLoad(const cJSON *payloadJson)
         CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             this->userId |= (static_cast<uint8_t>(payloadItem->valueint)) << (i * BITS_PER_BYTE);
+        }
+    }
+    this->broadCastId = 0;
+    for (uint32_t j = USERID_PAYLOAD_LEN; j < STOP_USER_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, true);
+        if (cJSON_IsNumber(payloadItem)) {
+            this->broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
+                ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
         }
     }
     return true;
@@ -723,8 +817,53 @@ bool RelationShipChangeMsg::FromJson(const std::string &msgJson)
     return true;
 }
 
-std::string ReleationShipSyncMgr::SyncTrustRelationShip(const RelationShipChangeMsg &msg)
+const std::string RelationShipChangeMsg::ToMapKey() const
 {
+    std::string ret;
+    std::string isNewEventStr = isNewEvent ? "true" : "false";
+    ret += "_" + std::to_string(static_cast<uint32_t>(type));
+    ret += "_" + isNewEventStr;
+    ret += "_" + std::to_string(userId);
+    ret += "_" + GetAnonyString(accountId);
+    ret += "_" + GetAnonyString(peerUdid);
+    ret += "_" + std::to_string(tokenId);
+    ret += "_" + std::to_string(peerTokenId);
+    ret += "_" + GetUserIdInfoList(userIdInfos);
+    ret += "_" + std::to_string(syncUserIdFlag);
+    ret += "_" + credId;
+    return ret;
+}
+
+void ReleationShipSyncMgr::HandleRecvBroadCastTimeout(const std::string &key)
+{
+    std::lock_guard<std::mutex> autoLock(lock_);
+    auto iter = recvBroadCastIdMap_.find(key);
+    if (iter != recvBroadCastIdMap_.end()) {
+        recvBroadCastIdMap_.erase(iter);
+    }
+}
+
+bool ReleationShipSyncMgr::GetCurrentTimeSec(int32_t &sec)
+{
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    if (ltm == nullptr) {
+        LOGE("get current time failed.");
+        return false;
+    }
+    sec = ltm->tm_sec % CURRENT_TIME_SEC_FLAG;
+    return true;
+}
+
+std::string ReleationShipSyncMgr::SyncTrustRelationShip(RelationShipChangeMsg &msg)
+{
+    int32_t currentTimeSec = 0;
+    msg.broadCastId = static_cast<uint8_t>(CURRENT_TIME_SEC_FLAG);
+    if (!GetCurrentTimeSec(currentTimeSec)) {
+        LOGE("get current time failed, use default value");
+        return msg.ToJson();
+    }
+    msg.broadCastId = static_cast<uint8_t>(currentTimeSec);
     return msg.ToJson();
 }
 
@@ -735,6 +874,31 @@ RelationShipChangeMsg ReleationShipSyncMgr::ParseTrustRelationShipChange(const s
         LOGE("Parse json failed");
     }
     return msgObj;
+}
+
+bool ReleationShipSyncMgr::IsNewBroadCastId(const RelationShipChangeMsg &msg)
+{
+    if (timer_ == nullptr) {
+        timer_ = std::make_shared<DmTimer>();
+    }
+    std::string key = msg.ToMapKey();
+    std::lock_guard<std::mutex> autoLock(lock_);
+    auto iter = recvBroadCastIdMap_.find(key);
+    if (iter == recvBroadCastIdMap_.end()) {
+        recvBroadCastIdMap_[key] = msg.broadCastId;
+        timer_->StartTimer(key, BROADCAST_TIMEOUT_S, [this](std::string key) {
+            ReleationShipSyncMgr::HandleRecvBroadCastTimeout(key);
+        });
+        return true;
+    } else if (iter != recvBroadCastIdMap_.end() && recvBroadCastIdMap_[key] != msg.broadCastId) {
+        timer_->DeleteTimer(key);
+        recvBroadCastIdMap_[key] = msg.broadCastId;
+        timer_->StartTimer(key, BROADCAST_TIMEOUT_S, [this](std::string key) {
+            ReleationShipSyncMgr::HandleRecvBroadCastTimeout(key);
+        });
+        return true;
+    }
+    return false;
 }
 
 const std::string RelationShipChangeMsg::ToString() const
@@ -750,7 +914,8 @@ const std::string RelationShipChangeMsg::ToString() const
     ret += ", peerUdid: " + GetAnonyString(peerUdid);
     ret += ", accountName: " + GetAnonyString(accountName);
     ret += ", syncUserIdFlag: " + std::to_string(syncUserIdFlag);
-    ret += ", userIds: " + GetUserIdInfoList(userIdInfos) + " }";
+    ret += ", userIds: " + GetUserIdInfoList(userIdInfos);
+    ret += ", broadCastId: " + std::to_string(broadCastId) + " }";
     return ret;
 }
 
