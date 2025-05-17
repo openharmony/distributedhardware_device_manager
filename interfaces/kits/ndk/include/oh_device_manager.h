@@ -49,10 +49,10 @@ extern "C" {
  * @param localDeviceName This is an output parameter. It indicates the address pointer of the localDeviceName.
  *                        You need to manually release space resources after using.
  * @param len This is an output parameter. Length of the localDeviceName.
- * @return Returns teh status code of the execution. For detail, see {@link DeviceManager_ErrorCode}.
+ * @return Returns the status code of the execution. For detail, see {@link DeviceManager_ErrorCode}.
  *         Returns {@link ERR_OK}, The operation is successful.
  *         Returns {@link DM_ERR_FAILED}, Failed to execute the function.
- *         Returns {@link DM_ERR_OBTAIN_SERVICE}, Failed to obtain the service.
+ *         Returns {@link DM_ERR_OBTAIN_SERVICE}, Failed to obtain devicemanager service.
  *         Returns {@link DM_ERR_OBTAIN_BUNDLE_NAME}, Failed to obtain the bundleName.
  * @since 20
  */
