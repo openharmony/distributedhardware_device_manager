@@ -1010,7 +1010,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
             "%{public}s", pkgName.c_str(), GetAnonyString(reqJsonStr).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("start to RequestCredential.");
+    LOGI("start.");
     std::map<std::string, std::string> requestParam;
     requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
     requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, reqJsonStr);
@@ -1032,7 +1032,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
         return ret;
     }
     returnJsonStr = rsp->GetCredentialResult();
-    LOGI("request device credential completed.");
+    LOGI("completed.");
     return DM_OK;
 }
 
@@ -1043,7 +1043,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
             pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("start to ImportCredential.");
+    LOGI("start.");
     std::map<std::string, std::string> requestParam;
     requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
     requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, credentialInfo);
@@ -1064,7 +1064,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
         LOGE("failed to get return errcode while import credential.");
         return ret;
     }
-    LOGI("import credential to device completed.");
+    LOGI("completed.");
     return DM_OK;
 }
 
@@ -1075,7 +1075,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
             pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("start to DeleteCredential.");
+    LOGI("start.");
     std::map<std::string, std::string> requestParam;
     requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
     requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, deleteInfo);
@@ -1096,7 +1096,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
         LOGE("failed to get return errcode while import credential.");
         return ret;
     }
-    LOGI("delete credential from device completed.");
+    LOGI("completed.");
     return DM_OK;
 }
 
@@ -1125,7 +1125,7 @@ int32_t DeviceManagerImpl::RegisterCredentialCallback(const std::string &pkgName
         LOGE("RegisterCredentialCallback error: Failed with ret %{public}d", ret);
         return ret;
     }
-    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    LOGI("Completed");
     return DM_OK;
 }
 
@@ -1511,7 +1511,7 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
         LOGE("BindDevice error: Invalid para. pkgName : %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("BindDevice start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("start, pkgName: %{public}s", pkgName.c_str());
     JsonObject paramJson(bindParam);
     if (paramJson.IsDiscarded()) {
         LOGE("BindDevice bindParam %{public}s.", bindParam.c_str());
@@ -1584,7 +1584,6 @@ int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::s
     req->SetPkgName(pkgName);
     req->SetDeviceId(deviceId);
     req->SetExtraInfo(extra);
-    LOGI("DeviceManagerImpl::UnBindDevice extra: %{public}s.", extra.c_str());
     int32_t ret = ipcClientProxy_->SendRequest(UNBIND_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnBindDevice error: Send Request failed ret: %{public}d", ret);
@@ -1857,7 +1856,7 @@ int32_t DeviceManagerImpl::BindTarget(const std::string &pkgName, const PeerTarg
         LOGE("DeviceManagerImpl::BindTarget failed: input pkgName or targetId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerImpl::BindTarget start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("start, pkgName: %{public}s", pkgName.c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     bindParam[TOKENID] = std::to_string(OHOS::IPCSkeleton::GetSelfTokenID());
 #endif
@@ -1947,7 +1946,7 @@ int32_t DeviceManagerImpl::CheckAccessToTarget(uint64_t tokenId, const std::stri
 {
     (void)tokenId;
     (void)targetId;
-    LOGI("Start");
+    LOGI("unsupport");
     return ERR_DM_UNSUPPORTED_METHOD;
 }
 
@@ -2122,11 +2121,11 @@ int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const Pe
 
 int32_t DeviceManagerImpl::DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType)
 {
-    LOGI("Start.");
     if (bindType != IDENTICAL_ACCOUNT) {
-        LOGI("DeviceManagerImpl::DpAclAdd is not identical account");
+        LOGI("not identical account");
         return DM_OK;
     }
+    LOGI("Start.");
     std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetStr(udid);
@@ -2296,7 +2295,6 @@ int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
         LOGE("ShiftLNNGear error: Failed with ret %{public}d", ret);
         return ret;
     }
-    LOGI("Completed");
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "ShiftLNNGear", DM_OK, anonyLocalUdid_);
     return DM_OK;
 }

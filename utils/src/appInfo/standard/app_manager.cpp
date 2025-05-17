@@ -78,7 +78,7 @@ DM_EXPORT void AppManager::RegisterCallerAppId(const std::string &pkgName)
     }
     std::string appId = GetAppId();
     if (appId.empty()) {
-        LOGE("PkgName %{public}s get appid failed.", pkgName.c_str());
+        LOGD("PkgName %{public}s get appid failed.", pkgName.c_str());
         return;
     }
     LOGI("PkgName %{public}s, appId %{public}s.", pkgName.c_str(), GetAnonyString(appId).c_str());
@@ -222,7 +222,6 @@ DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
         LOGE("GetCallerProcessName GetCallingTokenID error.");
         return ERR_DM_FAILED;
     }
-    LOGI("GetCallerProcessName::tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
         HapTokenInfo tokenInfo;

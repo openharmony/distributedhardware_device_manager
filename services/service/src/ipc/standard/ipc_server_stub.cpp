@@ -284,16 +284,15 @@ ServiceRunningState IpcServerStub::QueryServiceState() const
 
 int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener)
 {
-    LOGI("RegisterDeviceManagerListener start");
     if (processInfo.pkgName.empty() || listener == nullptr) {
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
         return ERR_DM_POINT_NULL;
     }
+    LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
 #ifdef SUPPORT_MEMMGR
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 #endif // SUPPORT_MEMMGR
-    LOGI("Register device manager listener for package name: %{public}s", processInfo.pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(processInfo);
     if (iter != dmListener_.end()) {
@@ -315,16 +314,14 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
     if (!listener->AsObject()->AddDeathRecipient(appRecipient)) {
         LOGE("AddDeathRecipient Failed");
     }
-    LOGI("Checking the number of listeners.");
     if (dmListener_.size() > MAX_CALLBACK_NUM || appRecipient_.size() > MAX_CALLBACK_NUM) {
         LOGE("dmListener_ or appRecipient_ size exceed the limit!");
         return ERR_DM_FAILED;
     }
     dmListener_[processInfo] = listener;
     appRecipient_[processInfo] = appRecipient;
-    LOGI("Add system sa.");
     AddSystemSA(processInfo.pkgName);
-    LOGI("Register listener complete.");
+    LOGI("complete.");
     return DM_OK;
 }
 
@@ -334,7 +331,7 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &proces
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("IpcServerStub::UnRegisterDeviceManagerListener In, pkgName: %{public}s", processInfo.pkgName.c_str());
+    LOGI("In, pkgName: %{public}s", processInfo.pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto listenerIter = dmListener_.find(processInfo);
     if (listenerIter == dmListener_.end()) {
@@ -402,7 +399,7 @@ const ProcessInfo IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> 
 
 int32_t IpcServerStub::Dump(int32_t fd, const std::vector<std::u16string>& args)
 {
-    LOGI("DistributedHardwareService Dump.");
+    LOGI("start.");
     std::vector<std::string> argsStr {};
     for (auto item : args) {
         argsStr.emplace_back(Str16ToStr8(item));

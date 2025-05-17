@@ -437,10 +437,12 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
     IpcModelCodec::DecodeDmDeviceBasicInfo(data, dmDeviceBasicInfo);
     switch (deviceState) {
         case DEVICE_STATE_ONLINE:
+            LOGI("Online pkgName:%{public}s", pkgName.c_str());
             DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, dmDeviceInfo);
             DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, dmDeviceBasicInfo);
             break;
         case DEVICE_STATE_OFFLINE:
+            LOGI("Offline pkgName:%{public}s", pkgName.c_str());
             DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, dmDeviceInfo);
             DeviceManagerNotify::GetInstance().OnDeviceOffline(pkgName, dmDeviceBasicInfo);
             break;
@@ -449,6 +451,8 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, MessageParcel &data, MessageParcel &reply
             DeviceManagerNotify::GetInstance().OnDeviceChanged(pkgName, dmDeviceBasicInfo);
             break;
         case DEVICE_INFO_READY:
+            LOGI("OnDeviceReady in, pkgName:%{public}s, networkId: %{public}s.",
+                pkgName.c_str(), GetAnonyString(dmDeviceInfo.networkId).c_str());
             DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, dmDeviceInfo);
             DeviceManagerNotify::GetInstance().OnDeviceReady(pkgName, dmDeviceBasicInfo);
             break;
@@ -468,6 +472,7 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, MessageParcel &data, MessageParcel &reply)
     IpcModelCodec::DecodeDmDeviceInfo(data, dmDeviceInfo);
     DmDeviceBasicInfo devBasicInfo;
     IpcModelCodec::DecodeDmDeviceBasicInfo(data, devBasicInfo);
+    LOGD("pkgName:%{public}s, subscribeId:%{public}d.", GetAnonyString(pkgName).c_str(), (int32_t)subscribeId);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, dmDeviceInfo);
     DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, subscribeId, devBasicInfo);
     reply.WriteInt32(DM_OK);

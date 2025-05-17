@@ -114,7 +114,7 @@ bool DmAuthManager::IsHmlSessionType()
 int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("DmAuthManager::CheckAuthParamVaild start.");
+    LOGI("start.");
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
         LOGE("CheckAuthParamVaild failed, authType is illegal.");
         return ERR_DM_AUTH_FAILED;
@@ -342,7 +342,7 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("DmAuthManager::AuthenticateDevice start auth type %{public}d.", authType);
+    LOGI("start auth type %{public}d.", authType);
     processInfo_.pkgName = pkgName;
     {
         std::lock_guard<std::mutex> lock(bindParamMutex_);
