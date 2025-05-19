@@ -438,14 +438,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("start.");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    // check version compatibility
     context->timer->DeleteTimer(std::string(NEGOTIATE_TIMEOUT_TASK));
-    if (CompareVersion(context->accessee.dmVersion, std::string(DM_VERSION_5_1_0))) {
-        LOGE("incompatible version %{public}s compare to 5.1.0",
-            context->accessee.dmVersion.c_str());
-        context->reason = ERR_DM_VERSION_INCOMPATIBLE;
-        return ERR_DM_VERSION_INCOMPATIBLE;
-    }
     GetCustomDescBySinkLanguage(context);
     context->accessee.isOnline = SoftbusCache::GetInstance().CheckIsOnline(context->accessee.deviceIdHash);
     JsonObject credInfo;
