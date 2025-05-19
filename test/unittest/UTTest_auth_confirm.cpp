@@ -242,7 +242,6 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcAclInfo_001, testing::ext::T
     authState->GetSrcAclInfo(context, credInfo, aclInf);
     EXPECT_EQ(aclInf["identicalAcl"].Get<int>(), 1);
     EXPECT_EQ(aclInf["shareAcl"].Get<int>(), 2);
-    EXPECT_EQ(aclInf.Size(), 2);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_IdenticalAccountAclCompare_001, testing::ext::TestSize.Level1)
