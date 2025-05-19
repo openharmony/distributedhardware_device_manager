@@ -158,7 +158,7 @@ int32_t HiChainAuthConnector::AddCredential(int32_t osAccountId, const std::stri
         LOGE("Hichain addCredential failed ret %{public}d.", ret);
         return ERR_DM_FAILED;
     }
-    LOGI("success ret=%{public}d, returnData=%{public}s.", ret, returnData);
+    LOGI("success ret=%{public}d, returnData=%{public}s.", ret, GetAnonyString(returnData).c_str());
     credId = std::string(returnData);
     credManager->destroyInfo(&returnData);
     return DM_OK;
@@ -166,7 +166,7 @@ int32_t HiChainAuthConnector::AddCredential(int32_t osAccountId, const std::stri
 
 int32_t HiChainAuthConnector::ExportCredential(int32_t osAccountId, const std::string &credId, std::string &publicKey)
 {
-    LOGI("start. osAccountId=%{public}d, credId=%{public}s", osAccountId, credId.c_str());
+    LOGI("start. osAccountId=%{public}d, credId=%{public}s", osAccountId, GetAnonyString(credId).c_str());
     char *returnData = NULL;
     const CredManager *credManager = GetCredMgrInstance();
     int32_t ret = credManager->exportCredential(osAccountId, credId.c_str(), &returnData);
@@ -200,7 +200,7 @@ int32_t HiChainAuthConnector::AgreeCredential(int32_t osAccountId, const std::st
     }
     credId = returnData;
     credManager->destroyInfo(&returnData);
-    LOGI("leave agreeCredId=%{public}s.", credId.c_str());
+    LOGI("leave agreeCredId=%{public}s.", GetAnonyString(credId).c_str());
     return DM_OK;
 }
 

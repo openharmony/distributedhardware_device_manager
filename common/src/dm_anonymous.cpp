@@ -16,6 +16,8 @@
 #include "dm_anonymous.h"
 #include "dm_log.h"
 #include <sstream>
+#include <set>
+
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
@@ -436,6 +438,26 @@ bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &ke
         return false;
     }
     return true;
+}
+
+std::string GetAnonyJsonString(const std::string &value)
+{
+    if (value.empty()) {
+        return "";
+    }
+    JsonObject paramJson(value);
+    if (paramJson.IsDiscarded()) {
+        return "";
+    }
+    const std::set<std::string> Sensitive_Key = { "LOCALDEVICEID", "localAccountId", "networkId", "lnnPublicKey",
+        "transmitPublicKey", "DEVICEID", "deviceId", "keyValue", "deviceName", "REMOTE_DEVICE_NAME", "data" };
+
+    for (auto &element : paramJson.Items()) {
+        if (element.IsString() && Sensitive_Key.find(element.Key()) != Sensitive_Key.end()) {
+            paramJson[element.Key()] = GetAnonyString(element.Get<std::string>());
+        }
+    }
+    return paramJson.Dump();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

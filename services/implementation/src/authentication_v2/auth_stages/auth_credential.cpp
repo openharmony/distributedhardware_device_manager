@@ -315,8 +315,8 @@ int32_t AuthCredentialAgreeState::GenerateCredIdAndPublicKey(DmAuthScope authori
     (void)authContext->SetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope, credId);
     (void)authContext->SetPublicKey(DM_AUTH_LOCAL_SIDE, authorizedScope, publicKey);
     LOGI("AuthCredentialAgreeState::GenerateCredIdAndPublicKey credId=%{public}s, publicKey=%{public}s.\n",
-        authContext->GetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope).c_str(),
-        authContext->GetPublicKey(DM_AUTH_LOCAL_SIDE, authorizedScope).c_str());
+        GetAnonyString(authContext->GetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope)).c_str(),
+        GetAnonyString(authContext->GetPublicKey(DM_AUTH_LOCAL_SIDE, authorizedScope)).c_str());
     LOGI("AuthCredentialAgreeState::GenerateCredIdAndPublicKey leave.");
     return DM_OK;
 }
@@ -343,7 +343,7 @@ int32_t AuthCredentialAgreeState::AgreeCredential(DmAuthScope authorizedScope,
     std::string selfCredId = authContext->GetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope);
     std::string credId;
     LOGI("AuthCredentialAgreeState::AgreeCredential agree with accountId %{public}d and param %{public}s.",
-        osAccountId, authParamsString.c_str());
+        osAccountId, GetAnonyJsonString(authParamsString).c_str());
     int32_t ret = authContext->hiChainAuthConnector->AgreeCredential(osAccountId, selfCredId,
         authParamsString, credId);
     if (ret != DM_OK) {
