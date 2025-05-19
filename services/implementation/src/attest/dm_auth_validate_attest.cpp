@@ -51,21 +51,17 @@ int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const ch
     HksBlob *blob = &outputParam->params[cnt].blob;
     if (memcpy_s(&randNum, sizeof(uint64_t), blob->data, blob->size) != EOK) {
         LOGE("memcpy randNum failed");
-        return ERR_DM_FAILED;
+        return ERR_DM_GET_PARAM_FAILED;
     }
-    LOGI("randNum = %{public}lu", randNum);
     blob = &outputParam->params[++cnt].blob;
     if (memcpy_s(udidStr, UDID_BUF_LEN, blob->data, blob->size) != EOK) {
         LOGE("memcpy udidStr failed");
-        return ERR_DM_FAILED;
+        return ERR_DM_GET_PARAM_FAILED;
     }
-    LOGI("zhengshu de udid Str = %{public}s", udidStr);
     std::string certDeviceIdHash = Crypto::GetUdidHash(std::string(udidStr));
-    LOGI("zhengshu de certDeviceIdHash = %{public}s", certDeviceIdHash.c_str());
-    LOGI("baowen chuanguolai deviceIdHash = %{public}s", deviceIdHash);
     if (strcmp(deviceIdHash, certDeviceIdHash.c_str()) != 0) {
         LOGE("verifyCertificate fail");
-        return ERR_DM_FAILED;
+        return ERR_DM_VERIFY_CERT_FAILED;
     }
     return DM_OK;
 }

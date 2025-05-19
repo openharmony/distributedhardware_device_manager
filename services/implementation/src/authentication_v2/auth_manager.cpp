@@ -627,45 +627,12 @@ std::string GenerateCertificate()
     return "";
 #else
     DmCertChain dmCertChain;
-    LOGI("generate cert start");
     int32_t certRet = AuthGenerateAttest::GetInstance().GenerateCertificate(dmCertChain);
-    LOGI("generate cert end");
     if (certRet != DM_OK) {
         LOGE("generate cert fail, certRet = %{public}d", certRet);
         return "";
     }
-    LOGI("dmCertChain certCount=%{public}d, blob.size=%{public}d, blod.data=%{public}s", dmCertChain.certCount,
-        (*dmCertChain.cert).size, (*dmCertChain.cert).data);
-    // 序列化
     std::string cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
-    LOGI("SerializeDmCertChain cert = %{public}s", cert.c_str());
-    // 反序列化
-    DmCertChain dmCertChainDeserialize{nullptr, 0};
-    AuthAttestCommon::GetInstance().DeserializeDmCertChain(cert, &dmCertChainDeserialize);
-    LOGI("dmCertChainDeserialize certCount=%{public}d, blob.size=%{public}d, blod.data=%{public}s",
-        dmCertChainDeserialize.certCount, (*dmCertChainDeserialize.cert).size, (*dmCertChainDeserialize.cert).data);
-    // 校验数据
-    bool valid = true;
-    if (dmCertChainDeserialize.certCount != dmCertChain.certCount) {
-        LOGI("verify error 1!");
-        valid = false;
-    } else {
-        for (uint32_t i = 0; i < dmCertChainDeserialize.certCount; ++i) {
-            if (dmCertChainDeserialize.cert[i].size != dmCertChain.cert[i].size) {
-                LOGI("verify error 2!");
-                valid = false;
-            } else {
-                for (uint32_t j = 0; j < dmCertChainDeserialize.cert[i].size; ++j) {
-                    if (dmCertChainDeserialize.cert[i].data[j] != dmCertChain.cert[i].data[j]) {
-                        LOGI("verify error 3!");
-                        valid = false;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    LOGI("valid = %{public}d", valid);
     return cert;
 #endif
 }
@@ -711,7 +678,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    context_->cert = GenerateCertificate(); // 证书生成
+    context_->cert = GenerateCertificate();
     context_->sessionId = sessionId;
     context_->logicalSessionId = logicalSessionId;
     context_->requestId = static_cast<int64_t>(logicalSessionId);
