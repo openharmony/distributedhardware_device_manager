@@ -1958,7 +1958,7 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
     int32_t acerTokenId = static_cast<int32_t>(acl.GetAccesser().GetAccesserTokenId());
     int32_t aceeTokenId = static_cast<int32_t>(acl.GetAccessee().GetAccesseeTokenId());
     if (acl.GetAccesser().GetAccesserUserId() == remoteUserId && acerDeviceId == remoteUdid &&
-        aceeDeviceId == localUdid && (acerTokenId == tokenId) && (aceeTokenId == peerTokenId)) {
+        aceeDeviceId == localUdid && (acerTokenId == peerTokenId) && (aceeTokenId == tokenId)) {
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccessee().GetAccesseeBundleName();
         processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
@@ -1971,7 +1971,7 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
         isMatch = true;
     }
     if (acl.GetAccessee().GetAccesseeUserId() == remoteUserId && aceeDeviceId == remoteUdid &&
-        acerDeviceId == localUdid && (aceeTokenId == tokenId) && (acerTokenId == peerTokenId)) {
+        acerDeviceId == localUdid && (aceeTokenId == peerTokenId) && (acerTokenId == tokenId)) {
         ProcessInfo processInfo;
         processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
         processInfo.userId = acl.GetAccesser().GetAccesserUserId();
