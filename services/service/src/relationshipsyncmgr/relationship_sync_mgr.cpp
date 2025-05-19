@@ -16,6 +16,7 @@
 #include "relationship_sync_mgr.h"
 
 #include <ctime>
+#include <sstream>
 
 #include "dm_anonymous.h"
 #include "dm_log.h"
@@ -38,8 +39,8 @@ namespace {
     const int32_t DEVICE_UNBIND_PAYLOAD_LEN = 3;
     /**
      * @brief app unbind payload length 6 bytes
-     * |      2 bytes         |         4 bytes          | 1 bytes     |
-     * | userid lower 2 bytes |  token id lower 4 bytes  | broadcastId |
+     * |      2 bytes         |         4 bytes          |         4 bytes              | 1 bytes     |
+     * | userid lower 2 bytes |  token id lower 4 bytes  |  peertoken id lower 4 bytes  | broadcastId |
      */
     const int32_t APP_UNBIND_PAYLOAD_LEN = 11;
     /**
@@ -558,14 +559,15 @@ bool RelationShipChangeMsg::FromServiceUnbindPayLoad(const cJSON *payloadJson)
     return FromAppUnbindPayLoad(payloadJson);
 }
 
-void RelationShipChangeMsg::GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum)
+bool RelationShipChangeMsg::GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum)
 {
     broadCastId = 0;
     cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, userIdNum * USERID_BYTES + 1);
-    CHECK_NULL_VOID(payloadItem);
+    CHECK_NULL_RETURN(payloadItem, true);
     if (cJSON_IsNumber(payloadItem)) {
         broadCastId |= static_cast<uint8_t>(payloadItem->valueint);
     }
+    return true;
 }
 
 bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloadJson)
@@ -621,8 +623,7 @@ bool RelationShipChangeMsg::FromSyncFrontOrBackUserIdPayLoad(const cJSON *payloa
             isForegroundUser = false;
         }
     }
-    GetBroadCastId(payloadJson, userIdNum);
-    return true;
+    return GetBroadCastId(payloadJson, userIdNum);
 }
 
 bool RelationShipChangeMsg::FromDelUserPayLoad(const cJSON *payloadJson)
@@ -819,19 +820,19 @@ bool RelationShipChangeMsg::FromJson(const std::string &msgJson)
 
 const std::string RelationShipChangeMsg::ToMapKey() const
 {
-    std::string ret;
+    std::ostringstream ret;
     std::string isNewEventStr = isNewEvent ? "true" : "false";
-    ret += "_" + std::to_string(static_cast<uint32_t>(type));
-    ret += "_" + isNewEventStr;
-    ret += "_" + std::to_string(userId);
-    ret += "_" + GetAnonyString(accountId);
-    ret += "_" + GetAnonyString(peerUdid);
-    ret += "_" + std::to_string(tokenId);
-    ret += "_" + std::to_string(peerTokenId);
-    ret += "_" + GetUserIdInfoList(userIdInfos);
-    ret += "_" + std::to_string(syncUserIdFlag);
-    ret += "_" + credId;
-    return ret;
+    ret << "_" << std::to_string(static_cast<uint32_t>(type));
+    ret << "_" << isNewEventStr;
+    ret << "_" << std::to_string(userId);
+    ret << "_" << GetAnonyString(accountId);
+    ret << "_" << GetAnonyString(peerUdid);
+    ret << "_" << std::to_string(tokenId);
+    ret << "_" << std::to_string(peerTokenId);
+    ret << "_" << GetUserIdInfoList(userIdInfos);
+    ret << "_" << std::to_string(syncUserIdFlag);
+    ret << "_" << credId;
+    return ret.str();
 }
 
 void ReleationShipSyncMgr::HandleRecvBroadCastTimeout(const std::string &key)
@@ -845,13 +846,15 @@ void ReleationShipSyncMgr::HandleRecvBroadCastTimeout(const std::string &key)
 
 bool ReleationShipSyncMgr::GetCurrentTimeSec(int32_t &sec)
 {
-    time_t now = time(0);
-    tm *ltm = localtime(&now);
-    if (ltm == nullptr) {
+    time_t now;
+    time(&now);
+    struct tm ltm;
+    struct tm *res = localtime_r(&now, &ltm);
+    if (res == nullptr) {
         LOGE("get current time failed.");
         return false;
     }
-    sec = ltm->tm_sec % CURRENT_TIME_SEC_FLAG;
+    sec = ltm.tm_sec % CURRENT_TIME_SEC_FLAG;
     return true;
 }
 
@@ -897,34 +900,36 @@ bool ReleationShipSyncMgr::IsNewBroadCastId(const RelationShipChangeMsg &msg)
             ReleationShipSyncMgr::HandleRecvBroadCastTimeout(key);
         });
         return true;
+    } else {
+        return false;
     }
     return false;
 }
 
 const std::string RelationShipChangeMsg::ToString() const
 {
-    std::string ret;
+    std::ostringstream ret;
     std::string isNewEventStr = isNewEvent ? "true" : "false";
-    ret += "{ MsgType: " + std::to_string(static_cast<uint32_t>(type));
-    ret += "{ isNewEvent: " + isNewEventStr;
-    ret += ", userId: " + std::to_string(userId);
-    ret += ", accountId: " + GetAnonyString(accountId);
-    ret += ", tokenId: " + std::to_string(tokenId);
-    ret += ", peerUdids: " + GetAnonyStringList(peerUdids);
-    ret += ", peerUdid: " + GetAnonyString(peerUdid);
-    ret += ", accountName: " + GetAnonyString(accountName);
-    ret += ", syncUserIdFlag: " + std::to_string(syncUserIdFlag);
-    ret += ", userIds: " + GetUserIdInfoList(userIdInfos);
-    ret += ", broadCastId: " + std::to_string(broadCastId) + " }";
-    return ret;
+    ret << "{ MsgType: " << std::to_string(static_cast<uint32_t>(type));
+    ret << "{ isNewEvent: " << isNewEventStr;
+    ret << ", userId: " << std::to_string(userId);
+    ret << ", accountId: " << GetAnonyString(accountId);
+    ret << ", tokenId: " << std::to_string(tokenId);
+    ret << ", peerUdids: " << GetAnonyStringList(peerUdids);
+    ret << ", peerUdid: " << GetAnonyString(peerUdid);
+    ret << ", accountName: " << GetAnonyString(accountName);
+    ret << ", syncUserIdFlag: " << std::to_string(syncUserIdFlag);
+    ret << ", userIds: " << GetUserIdInfoList(userIdInfos);
+    ret << ", broadCastId: " << std::to_string(broadCastId) << " }";
+    return ret.str();
 }
 
 const std::string UserIdInfo::ToString() const
 {
-    std::string ret;
-    ret += "{ " + std::to_string(this->isForeground);
-    ret += ", userId: " + std::to_string(this->userId) + " }";
-    return ret;
+    std::ostringstream ret;
+    ret << "{ " << std::to_string(this->isForeground);
+    ret << ", userId: " << std::to_string(this->userId) << " }";
+    return ret.str();
 }
 
 const std::string GetUserIdInfoList(const std::vector<UserIdInfo> &list)
