@@ -1,0 +1,60 @@
+{
+    "string":[
+        {
+            "name":"dm_allow_this_time",
+            "value":"Тек осы жолы сену",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_code",
+            "value":"Байланыс коды",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%1$s (%2$s дегенде) осы құрылғыға қатынасқысы келіп жатыр. Осы қолданбаға сенесіз бе?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Бас тарту",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Қосылым кодын енгізіңіз",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"Бұл құрылғылар арасында деректерді синхрондау және бірлесіп жұмыс істеу үшін қажет.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Бұл жолы сену",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Әрқашан сену",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}
