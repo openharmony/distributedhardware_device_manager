@@ -390,6 +390,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
+    "device_certificate_manager:device_cert_mgr_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -398,6 +399,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "huks:libhukssdk",
     "selinux_adapter:librestorecon",
   ]
 }
@@ -418,6 +420,7 @@ ohos_unittest("UTTest_dm_softbus_cache") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
+    "device_certificate_manager:device_cert_mgr_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -425,6 +428,7 @@ ohos_unittest("UTTest_dm_softbus_cache") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "huks:libhukssdk",
     "selinux_adapter:librestorecon",
   ]
 }
@@ -451,6 +455,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
+    "device_certificate_manager:device_cert_mgr_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -458,6 +463,7 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "huks:libhukssdk",
     "selinux_adapter:librestorecon",
   ]
 }
@@ -1239,6 +1245,7 @@ ohos_unittest("UTTest_device_manager_service_impl") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_certificate_manager:device_cert_mgr_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -1247,6 +1254,7 @@ ohos_unittest("UTTest_device_manager_service_impl") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "huks:libhukssdk",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
@@ -1269,6 +1277,7 @@ ohos_unittest("UTTest_device_manager_service_impl_first") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_certificate_manager:device_cert_mgr_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -1277,6 +1286,7 @@ ohos_unittest("UTTest_device_manager_service_impl_first") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "huks:libhukssdk",
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
@@ -2029,6 +2039,7 @@ ohos_unittest("UTTest_auth_pin_auth_state") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -2036,6 +2047,7 @@ ohos_unittest("UTTest_auth_pin_auth_state") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "huks:libhukssdk",
   ]
 }
 
@@ -2087,6 +2099,7 @@ ohos_unittest("UTTest_auth_credential_state") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_certificate_manager:device_cert_mgr_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -2094,6 +2107,7 @@ ohos_unittest("UTTest_auth_credential_state") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "huks:libhukssdk",
   ]
 }
 
@@ -2118,6 +2132,7 @@ ohos_unittest("UTTest_auth_acl") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "device_certificate_manager:device_cert_mgr_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
@@ -2125,6 +2140,7 @@ ohos_unittest("UTTest_auth_acl") {
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "huks:libhukssdk",
   ]
 }
 

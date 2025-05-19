@@ -653,6 +653,9 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_PEER_DISPLAY_ID] = context->accessee.displayId;
     jsonObject[TAG_PEER_PKG_NAME] = context->accessee.pkgName;
     jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
+    LOGI("DmAuthMessageProcessor::CreateNegotiateMessage cert = %{public}s", context->cert.c_str());
+    jsonObject[TAG_DM_CERT_CHAIN] = context->cert;
+    jsonObject[TAG_IS_BLUE_FLAG] = context->isBlueFlag;
     return DM_OK;
 }
 
@@ -1037,6 +1040,14 @@ void DmAuthMessageProcessor::ParseUltrasonicSide(
         context->ultrasonicInfo = DmUltrasonicInfo::DM_Ultrasonic_Forward;
     } else {
         context->ultrasonicInfo = DmUltrasonicInfo::DM_Ultrasonic_Invalid;
+    }
+    LOGI("ParseNegotiateMessage TAG_DM_CERT_CHAIN START!");
+    if (IsString(jsonObject, TAG_DM_CERT_CHAIN)) {
+        context->cert = jsonObject[TAG_DM_CERT_CHAIN].Get<std::string>();
+        LOGI("ParseNegotiateMessage context->cert = %{public}s", context->cert.c_str());
+    }
+    if (jsonObject[TAG_IS_BLUE_FLAG].IsBoolean()) {
+        context->isBlueFlag = jsonObject[TAG_IS_BLUE_FLAG].Get<bool>();
     }
 }
 

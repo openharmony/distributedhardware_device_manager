@@ -1,0 +1,126 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "dm_auth_validate_attest.h"
+
+#include "dm_error_type.h"
+#include "dm_log.h"
+
+namespace OHOS {
+namespace DistributedHardware {
+
+int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const char* deviceIdHash)
+{
+    LOGI("VerifyCertificate start!");
+    char udidStr[UDID_BUF_LEN] = {0};
+    uint64_t randNum = 0;
+    HksCertChain hksCertChain;
+    int32_t ret = ConvertDmCertChainToHksCertChain(dmCertChain, hksCertChain);
+    if (ret != DM_OK) {
+        LOGE("ConvertDmCertChainToHksCertChain fail, ret=%{public}d", ret);
+        return ret;
+    }
+    HksParamSet *outputParam = NULL;
+    HksParam outputData[] = {
+        {.tag = HKS_TAG_ATTESTATION_CHALLENGE, .blob = {sizeof(uint64_t), (uint8_t *)&randNum}},
+        {.tag = HKS_TAG_ATTESTATION_ID_UDID, .blob = {UDID_BUF_LEN, (uint8_t *)udidStr}},
+    };
+    ret = FillHksParamSet(&outputParam, outputData, sizeof(outputData) / sizeof(outputData[0]));
+    if (ret != DM_OK) {
+        LOGE("FillHksParamSet failed, ret=%{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    ret = HksValidateCertChain(&hksCertChain, outputParam);
+    if (ret != HKS_SUCCESS) {
+        LOGE("HksValidateCertChain fail, ret=%{public}d", ret);
+        return ret;
+    }
+    uint32_t cnt = 0;
+    HksBlob *blob = &outputParam->params[cnt].blob;
+    if (memcpy_s(&randNum, sizeof(uint64_t), blob->data, blob->size) != EOK) {
+        LOGE("memcpy randNum failed");
+        return ERR_DM_FAILED;
+    }
+    LOGI("randNum = %{public}lu", randNum);
+    blob = &outputParam->params[++cnt].blob;
+    if (memcpy_s(udidStr, UDID_BUF_LEN, blob->data, blob->size) != EOK) {
+        LOGE("memcpy udidStr failed");
+        return ERR_DM_FAILED;
+    }
+    LOGI("zhengshu de udid Str = %{public}s", udidStr);
+    std::string certDeviceIdHash = Crypto::GetUdidHash(std::string(udidStr));
+    LOGI("zhengshu de certDeviceIdHash = %{public}s", certDeviceIdHash.c_str());
+    LOGI("baowen chuanguolai deviceIdHash = %{public}s", deviceIdHash);
+    if (strcmp(deviceIdHash, certDeviceIdHash.c_str()) != 0) {
+        LOGE("verifyCertificate fail");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t AuthValidateAttest::FillHksParamSet(HksParamSet **paramSet, HksParam *param, int32_t paramNums)
+{
+    if (param == NULL) {
+        LOGE("param is null");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t ret = HksInitParamSet(paramSet);
+    if (ret != HKS_SUCCESS) {
+        LOGE("HksInitParamSet failed, hks ret = %{public}d", ret);
+        return ERR_DM_FAILED;
+    }
+    ret = HksAddParams(*paramSet, param, paramNums);
+    if (ret != HKS_SUCCESS) {
+        LOGE("HksAddParams failed, hks ret = %{public}d", ret);
+        HksFreeParamSet(paramSet);
+        return ERR_DM_FAILED;
+    }
+    ret = HksBuildParamSet(paramSet);
+    if (ret != HKS_SUCCESS) {
+        LOGE("HksBuildParamSet failed, hks ret = %{public}d", ret);
+        HksFreeParamSet(paramSet);
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t AuthValidateAttest::ConvertDmCertChainToHksCertChain(DmCertChain &dmCertChain, HksCertChain &hksCertChain)
+{
+    if (dmCertChain.certCount == 0 || dmCertChain.cert == nullptr) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    hksCertChain.certsCount = dmCertChain.certCount;
+    hksCertChain.certs = new HksBlob[hksCertChain.certsCount];
+    const size_t totalSize = sizeof(HksBlob) * hksCertChain.certsCount;
+    memset_s(hksCertChain.certs, totalSize, 0, totalSize);
+    for (uint32_t i = 0; i < hksCertChain.certsCount; ++i) {
+        if (dmCertChain.cert[i].data == nullptr || dmCertChain.cert[i].size == 0) {
+            return ERR_DM_FAILED;
+        }
+        hksCertChain.certs[i].size = dmCertChain.cert[i].size;
+        hksCertChain.certs[i].data = new uint8_t[hksCertChain.certs[i].size];
+        if (hksCertChain.certs[i].data == nullptr) {
+            return ERR_DM_MALLOC_FAILED;
+        }
+        if (memcpy_s(hksCertChain.certs[i].data, hksCertChain.certs[i].size,
+            dmCertChain.cert[i].data, dmCertChain.cert[i].size) != 0) {
+            LOGE("memcpy cert data failed");
+            return ERR_DM_FAILED;
+        }
+    }
+    return DM_OK;
+}
+}  // namespace DistributedHardware
+}  // namespace OHOS

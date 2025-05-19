@@ -130,8 +130,8 @@ AuthManager::AuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     context_->authenticationMap[AUTH_TYPE_PIN_ULTRASONIC] = nullptr;
     context_->authenticationMap[AUTH_TYPE_NFC] = nullptr;
     context_->authenticationMap[AUTH_TYPE_CRE] = nullptr;
-    context_->accesser.dmVersion = DM_VERSION_5_1_0;
-    context_->accessee.dmVersion = DM_VERSION_5_1_0;
+    context_->accesser.dmVersion = DM_VERSION_5_1_1;
+    context_->accessee.dmVersion = DM_VERSION_5_1_1;
     context_->timer = std::make_shared<DmTimer>();
     context_->authMessageProcessor = std::make_shared<DmAuthMessageProcessor>();
 }
@@ -619,6 +619,57 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     return DM_OK;
 }
 
+std::string GenerateCertificate()
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    context_->isBlueFlag = true;
+    LOGI("Blue device do not generate cert!");
+    return "";
+#else
+    DmCertChain dmCertChain;
+    LOGI("generate cert start");
+    int32_t certRet = AuthGenerateAttest::GetInstance().GenerateCertificate(dmCertChain);
+    LOGI("generate cert end");
+    if (certRet != DM_OK) {
+        LOGE("generate cert fail, certRet = %{public}d", certRet);
+        return "";
+    }
+    LOGI("dmCertChain certCount=%{public}d, blob.size=%{public}d, blod.data=%{public}s", dmCertChain.certCount,
+        (*dmCertChain.cert).size, (*dmCertChain.cert).data);
+    // 序列化
+    std::string cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+    LOGI("SerializeDmCertChain cert = %{public}s", cert.c_str());
+    // 反序列化
+    DmCertChain dmCertChainDeserialize{nullptr, 0};
+    AuthAttestCommon::GetInstance().DeserializeDmCertChain(cert, &dmCertChainDeserialize);
+    LOGI("dmCertChainDeserialize certCount=%{public}d, blob.size=%{public}d, blod.data=%{public}s",
+        dmCertChainDeserialize.certCount, (*dmCertChainDeserialize.cert).size, (*dmCertChainDeserialize.cert).data);
+    // 校验数据
+    bool valid = true;
+    if (dmCertChainDeserialize.certCount != dmCertChain.certCount) {
+        LOGI("verify error 1!");
+        valid = false;
+    } else {
+        for (uint32_t i = 0; i < dmCertChainDeserialize.certCount; ++i) {
+            if (dmCertChainDeserialize.cert[i].size != dmCertChain.cert[i].size) {
+                LOGI("verify error 2!");
+                valid = false;
+            } else {
+                for (uint32_t j = 0; j < dmCertChainDeserialize.cert[i].size; ++j) {
+                    if (dmCertChainDeserialize.cert[i].data[j] != dmCertChain.cert[i].data[j]) {
+                        LOGI("verify error 3!");
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    LOGI("valid = %{public}d", valid);
+    return cert;
+#endif
+}
+
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId)
 {
@@ -660,6 +711,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
+    context_->cert = GenerateCertificate(); // 证书生成
     context_->sessionId = sessionId;
     context_->logicalSessionId = logicalSessionId;
     context_->requestId = static_cast<int64_t>(logicalSessionId);

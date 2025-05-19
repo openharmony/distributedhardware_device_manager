@@ -114,6 +114,7 @@ if (defined(ohos_lite)) {
       "include",
       "include/config",
       "include/adapter",
+      "include/attest",
       "include/authentication",
       "include/authentication_v2",
       "include/ability",
@@ -236,12 +237,14 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "device_auth:deviceauth_sdk",
+      "device_certificate_manager:device_cert_mgr_sdk",
       "device_info_manager:distributed_device_profile_common",
       "device_info_manager:distributed_device_profile_sdk",
       "dsoftbus:softbus_client",
       "eventhandler:libeventhandler",
       "ffrt:libffrt",
       "hilog:libhilog",
+      "huks:libhukssdk",
       "init:libbegetutil",
       "ipc:ipc_core",
       "mbedtls:mbedtls_shared",
@@ -267,6 +270,14 @@ if (defined(ohos_lite)) {
       sources += [ "src/dependency/MSDP/spatial_location_callback_impl.cpp" ]
       defines += [ "SUPPORT_MSDP" ]
       external_deps += [ "spatial_awareness:spatial_awareness_client" ]
+    }
+
+    if (!device_manager_common) {
+      sources += [
+        "src/attest/dm_auth_attest_common.cpp",
+        "src/attest/dm_auth_generate_attest.cpp",
+        "src/attest/dm_auth_validate_attest.cpp",
+      ]
     }
 
     subsystem_name = "distributedhardware"

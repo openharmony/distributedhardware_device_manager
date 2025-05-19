@@ -178,6 +178,35 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
     return DM_OK;
 }
 
+int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("Blue device do not verify cert!");
+    return DM_OK;
+#else
+    // verify cert， 任何一端低于5.1.1都不校验证书
+    if (!CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)
+        || !CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_0) || context->isBlueFlag) {
+            LOGI("cert verify is not supported");
+            return DM_OK;
+    }
+    LOGI("AuthSinkNegotiateStateMachine::Action cert = %{public}s", context->cert.c_str());
+    DmCertChain dmCertChain{nullptr, 0};
+    AuthAttestCommon::GetInstance().DeserializeDmCertChain(context->cert, &dmCertChain);
+    LOGI("validate cert start");
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    // context->accesser.deviceIdHash 对端udidHash
+    int32_t certRet = AuthValidateAttest::GetInstance()
+        .VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
+    LOGI("validate cert end");
+    if (certRet != DM_OK) {
+        LOGE("validate cert fail, certRet = %{public}d", certRet);
+    }
+    return certRet;
+#endif
+}
+
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
@@ -204,6 +233,12 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
     int32_t ret = ProcRespNegotiate5_1_0(context);
     if (ret != DM_OK) {
         LOGE("AuthSinkNegotiateStateMachine::Action proc response negotiate failed");
+        context->reason = ret;
+        return ret;
+    }
+    ret = VerifyCertificate(context); // 证书校验，失败则返回
+    if (ret != DM_OK) {
+        LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
         context->reason = ret;
         return ret;
     }
