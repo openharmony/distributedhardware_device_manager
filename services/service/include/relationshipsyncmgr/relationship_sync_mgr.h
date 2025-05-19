@@ -90,7 +90,7 @@ struct RelationShipChangeMsg {
     bool FromDelUserPayLoad(const cJSON *payloadJson);
     bool FromStopUserPayLoad(const cJSON *payloadJson);
     bool FromShareUnbindPayLoad(const cJSON *payloadJson);
-    void GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum);
+    bool GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum);
 
     std::string ToJson() const;
     bool FromJson(const std::string &msgJson);
