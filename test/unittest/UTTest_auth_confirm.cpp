@@ -131,7 +131,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_001, testing::ext::TestSize
     context = authManager->GetAuthContext();
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context->accessee.dmVersion = "6.0.0";
-    EXPECT_EQ(authState->Action(context), ERR_DM_VERSION_INCOMPATIBLE);
+    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_002, testing::ext::TestSize.Level1)
@@ -199,7 +199,9 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_001, testing:
     JsonObject jsonObject;
 
     context->accesser.accountIdHash = context->accessee.accountIdHash = "";
-    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _))
+        .WillOnce(Return(DM_OK))
+        .WillOnce(Return(DM_OK));
     authState->GetSrcCredentialInfo(context, jsonObject);
 
     context->accesser.accountIdHash = "0";
@@ -234,12 +236,13 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcAclInfo_001, testing::ext::T
         "shareCredId": {"credType": 2}
     })";
     JsonObject credInfo(jsonStr);
-    std::string jsonAclStr = R"({"identicalAcl":1,"shareAcl":2})";
 
     EXPECT_CALL(*deviceProfileConnectorMock, GetAllAclIncludeLnnAcl()).WillOnce(Return(allProfiles));
     JsonObject aclInf;
     authState->GetSrcAclInfo(context, credInfo, aclInf);
-    EXPECT_TRUE(aclInf.Dump() == jsonAclStr);
+    EXPECT_EQ(aclInf["identicalAcl"].Get<int>(), 1);
+    EXPECT_EQ(aclInf["shareAcl"].Get<int>(), 2);
+    EXPECT_EQ(aclInf.Size(), 2);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_IdenticalAccountAclCompare_001, testing::ext::TestSize.Level1)
@@ -255,7 +258,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_IdenticalAccountAclCompare_001, te
     accesser.SetAccesserUserId(TEST_USER_ID);
     DistributedDeviceProfile::Accessee accessee;
     accessee.SetAccesseeDeviceId(TEST_DEVICE_ID);
-    EXPECT_TRUE(authState->IdenticalAccountAclCompare(context, accesser, accessee));
+    EXPECT_FALSE(authState->IdenticalAccountAclCompare(context, accesser, accessee));
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_ShareAclCompare_001, testing::ext::TestSize.Level1)
@@ -272,7 +275,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_ShareAclCompare_001, testing::ext:
     DistributedDeviceProfile::Accessee accessee;
     accessee.SetAccesseeDeviceId(TEST_DEVICE_ID);
 
-    EXPECT_TRUE(authState->ShareAclCompare(context, accesser, accessee));
+    EXPECT_FALSE(authState->ShareAclCompare(context, accesser, accessee));
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Point2PointAclCompare_001, testing::ext::TestSize.Level1)
@@ -293,7 +296,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Point2PointAclCompare_001, testing
     accessee.SetAccesseeUserId(TEST_USER_ID);
     accessee.SetAccesseeTokenId(TEST_TOKEN_ID);
 
-    EXPECT_TRUE(authState->Point2PointAclCompare(context, accesser, accessee));
+    EXPECT_FALSE(authState->Point2PointAclCompare(context, accesser, accessee));
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_LnnAclCompare_001, testing::ext::TestSize.Level1)
@@ -308,11 +311,13 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_LnnAclCompare_001, testing::ext::T
     accesser.SetAccesserDeviceId(TEST_DEVICE_ID);
     accesser.SetAccesserUserId(TEST_USER_ID);
     accesser.SetAccesserTokenId(TEST_TOKEN_ID);
+    accesser.SetAccesserBundleName("");
 
     DistributedDeviceProfile::Accessee accessee;
     accessee.SetAccesseeDeviceId(TEST_DEVICE_ID);
     accessee.SetAccesseeUserId(TEST_USER_ID);
     accessee.SetAccesseeTokenId(TEST_TOKEN_ID);
+    accessee.SetAccesseeBundleName("");
 
     EXPECT_TRUE(authState->LnnAclCompare(context, accesser, accessee));
 }

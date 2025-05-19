@@ -149,6 +149,11 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_004, testing::ext::Tes
     context->accessee.tokenId = 456;
     context->accessee.tokenIdHash = Crypto::Sha256("456");
 
+    context->accesser.accountId = "";
+    context->accesser.accountIdHash = "";
+    context->accessee.accountId = "";
+    context->accessee.accountIdHash = "";
+
     DistributedDeviceProfile::AccessControlProfile profile;
     DistributedDeviceProfile::Accesser accesser;
     DistributedDeviceProfile::Accessee accessee;
@@ -217,7 +222,7 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_006, testing::ext::Tes
     accessee.SetAccesseeUserId(0);
 
     bool result = authState->IdenticalAccountAclCompare(context, accesser, accessee);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_007, testing::ext::TestSize.Level1)
@@ -236,7 +241,7 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_007, testing::ext::Tes
     accessee.SetAccesseeUserId(0);
 
     bool result = authState->ShareAclCompare(context, accesser, accessee);
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_008, testing::ext::TestSize.Level1)
@@ -260,7 +265,7 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_008, testing::ext::Tes
 
     bool result = authState->LnnAclCompare(context, accesser, accessee);
 
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 }

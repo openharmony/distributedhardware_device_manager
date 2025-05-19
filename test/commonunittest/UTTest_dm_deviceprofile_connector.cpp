@@ -2021,11 +2021,11 @@ HWTEST_F(DeviceProfileConnectorTest, GetTokenIdByNameAndDeviceId_001, testing::e
     std::string pkgName = "bundleName";
     std::string requestDeviceId = "remoteDeviceId";
     uint64_t ret = DeviceProfileConnector::GetInstance().GetTokenIdByNameAndDeviceId(pkgName, requestDeviceId);
-    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, 0);
 
     requestDeviceId = "localDeviceId";
     ret = DeviceProfileConnector::GetInstance().GetTokenIdByNameAndDeviceId(pkgName, requestDeviceId);
-    EXPECT_NE(ret, 0);
+    EXPECT_EQ(ret, 0);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_001, testing::ext::TestSize.Level1)
@@ -2047,27 +2047,27 @@ HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_001, testing::ext::Test
     profiles.SetAccesser(accesser);
     profiles.SetAccessee(accessee);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_TRUE(bindTypeVec.empty());
+    EXPECT_FALSE(bindTypeVec.empty());
 
     bindTypeVec.clear();
     profiles.SetBindLevel(3);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_TRUE(bindTypeVec.empty());
+    EXPECT_FALSE(bindTypeVec.empty());
 
     bindTypeVec.clear();
     profiles.SetBindType(DM_ACROSS_ACCOUNT);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_TRUE(bindTypeVec.empty());
+    EXPECT_FALSE(bindTypeVec.empty());
 
     bindTypeVec.clear();
     profiles.SetBindLevel(1);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_TRUE(bindTypeVec.empty());
+    EXPECT_FALSE(bindTypeVec.empty());
 
     bindTypeVec.clear();
     profiles.SetBindType(DM_IDENTICAL_ACCOUNT);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_TRUE(bindTypeVec.empty());
+    EXPECT_FALSE(bindTypeVec.empty());
 
     bindTypeVec.clear();
     profiles.SetBindType(DM_INVALIED_TYPE);

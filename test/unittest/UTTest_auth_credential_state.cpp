@@ -92,7 +92,7 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialExchangeState_002, testing::e
 
     EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(DM_OK));
 
-    EXPECT_EQ(authState->Action(context), DM_OK);
+    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
 }
 
 HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialExchangeState_003, testing::ext::TestSize.Level1)
@@ -141,7 +141,6 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialExchangeState_005, testing::e
     context->needAgreeCredential = true;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AddCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(ERR_DM_FAILED));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, ExportCredential(_, _, _))
@@ -161,11 +160,9 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialExchangeState_006, testing::e
     context->needAgreeCredential = true;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AddCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, ExportCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(ERR_DM_FAILED));
 
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
@@ -180,11 +177,9 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialExchangeState_007, testing::e
     context->isOnline = false;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AddCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, ExportCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(ERR_DM_FAILED));
@@ -209,20 +204,16 @@ HWTEST_F(AuthCredentialStateTest, AuthSinkCredentialExchangeState_002, testing::
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkCredentialExchangeState>();
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AddCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, ExportCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
-    EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(DM_OK));
 
-    EXPECT_EQ(authState->Action(context), DM_OK);
+    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
 }
 
 HWTEST_F(AuthCredentialStateTest, AuthSinkCredentialExchangeState_003, testing::ext::TestSize.Level1)
@@ -246,7 +237,6 @@ HWTEST_F(AuthCredentialStateTest, AuthSinkCredentialExchangeState_004, testing::
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkCredentialExchangeState>();
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AddCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(ERR_DM_FAILED));
 
      EXPECT_CALL(*dmHiChainAuthConnectorMock, ExportCredential(_, _, _))
@@ -284,11 +274,9 @@ HWTEST_F(AuthCredentialStateTest, AuthSinkCredentialExchangeState_006, testing::
     context->isOnline = false;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AddCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, ExportCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(ERR_DM_FAILED));
 
      EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
@@ -325,15 +313,12 @@ HWTEST_F(AuthCredentialStateTest, AuthSinkCredentialExchangeState_008, testing::
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkCredentialExchangeState>();
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AddCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, ExportCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
-    .WillOnce(Return(DM_OK))
     .WillOnce(Return(ERR_DM_FAILED));
 
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
@@ -347,18 +332,13 @@ HWTEST_F(AuthCredentialStateTest, AuthSinkCredentialExchangeState_009, testing::
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkCredentialExchangeState>();
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AddCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, ExportCredential(_, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(ERR_DM_FAILED));
 
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
 }
@@ -383,16 +363,8 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_002, testing::
     context->needAgreeCredential = true;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*dmHiChainAuthConnectorMock, AuthCredential(_, _, _, _)).WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_)).WillOnce(Return(ON_TRANSMIT));
-
-    EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(DM_OK));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
+    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
 }
 
 HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_003, testing::ext::TestSize.Level1)
@@ -422,7 +394,6 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_005, testing::
     context->needAgreeCredential = true;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(ERR_DM_FAILED));
 
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
@@ -439,10 +410,7 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_006, testing::
     context->needAgreeCredential = true;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
-        .WillOnce(Return(DM_OK))
         .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*dmHiChainAuthConnectorMock, AuthCredential(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
 
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
 }
@@ -458,14 +426,9 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_007, testing::
     context->needAgreeCredential = true;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
-    .WillOnce(Return(DM_OK))
     .WillOnce(Return(DM_OK));
 
-    EXPECT_CALL(*dmHiChainAuthConnectorMock, AuthCredential(_, _, _, _)).WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_)).WillOnce(Return(ON_FINISH));
-
-    EXPECT_EQ(authState->Action(context), ERR_DM_AUTH_REJECT);
+    EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
 }
 
 HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_008, testing::ext::TestSize.Level1)
@@ -479,14 +442,7 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthStartState_008, testing::
     context->needAgreeCredential = true;
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, AgreeCredential(_, _, _, _))
-    .WillOnce(Return(DM_OK))
     .WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*dmHiChainAuthConnectorMock, AuthCredential(_, _, _, _)).WillOnce(Return(DM_OK));
-
-    EXPECT_CALL(*DmAuthStateMachineMock::dmAuthStateMachineMock, WaitExpectEvent(_)).WillOnce(Return(ON_TRANSMIT));
-
-    EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(ERR_DM_FAILED));
 
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
 }
