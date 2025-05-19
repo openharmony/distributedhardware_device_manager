@@ -449,11 +449,11 @@ std::string GetAnonyJsonString(const std::string &value)
     if (paramJson.IsDiscarded()) {
         return "";
     }
-    const std::set<std::string> Sensitive_Key = { "LOCALDEVICEID", "localAccountId", "networkId", "lnnPublicKey",
+    const std::set<std::string> sensitiveKey = { "LOCALDEVICEID", "localAccountId", "networkId", "lnnPublicKey",
         "transmitPublicKey", "DEVICEID", "deviceId", "keyValue", "deviceName", "REMOTE_DEVICE_NAME", "data" };
 
     for (auto &element : paramJson.Items()) {
-        if (element.IsString() && Sensitive_Key.find(element.Key()) != Sensitive_Key.end()) {
+        if (element.IsString() && sensitiveKey.find(element.Key()) != sensitiveKey.end()) {
             paramJson[element.Key()] = GetAnonyString(element.Get<std::string>());
         }
     }
