@@ -35,13 +35,16 @@ int32_t AuthGenerateAttest::GenerateCertificate(DmCertChain &dmCertChain)
     int32_t ret = DcmAttestIdsEx(ids, sizeof(ids)/sizeof(ids[0]), &challengeBlob, DCM_CERT_TYPE_ROOT_V2, dcmCertChain);
     if (ret != DCM_SUCCESS) {
         LOGE("DcmAttestIdsEx fail, ret=%{public}d", ret);
+        FreeCertChain(dcmCertChain);
         return ret;
     }
     ret = ConvertDcmCertChainToDmCertChain(*dcmCertChain, dmCertChain);
     if (ret != DM_OK) {
         LOGE("covertToSoftbusCertChain fail. ret=%{public}d", ret);
+        FreeCertChain(dcmCertChain);
         return ret;
     }
+    FreeCertChain(dcmCertChain);
     return DM_OK;
 }
 
@@ -56,7 +59,7 @@ int32_t AuthGenerateAttest::InitCertChain(DcmCertChain *certChain)
     return DM_OK;
 }
 
-void FreeCertChain(DcmCertChain* chain)
+void AuthGenerateAttest::FreeCertChain(DcmCertChain* chain)
 {
     if (!chain) {
         return;
