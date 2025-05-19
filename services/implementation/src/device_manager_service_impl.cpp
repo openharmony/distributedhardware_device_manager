@@ -1854,23 +1854,20 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
     LOGI("error.");
 }
 
-int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+bool DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     return DeviceProfileConnector::GetInstance().CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
-int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+bool DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     CHECK_NULL_RETURN(hiChainConnector_, ERR_DM_POINT_NULL);
-    bool ret = hiChainConnector_->IsDevicesInP2PGroup(srcUdid, sinkUdid);
-    if (!ret) {
-        int32_t checkRet = DeviceProfileConnector::GetInstance().CheckAccessControl(caller,
-            srcUdid, callee, sinkUdid);
-        return checkRet;
+    if (!hiChainConnector_->IsDevicesInP2PGroup(srcUdid, sinkUdid)) {
+        return DeviceProfileConnector::GetInstance().CheckAccessControl(caller, srcUdid, callee, sinkUdid);
     } else {
-        return DM_OK;
+        return true;
     }
 }
 
@@ -2693,6 +2690,30 @@ void DeviceManagerServiceImpl::SetBindCallerInfoToBindParam(const std::map<std::
     bindParamTmp["bindCallerHostPkgLabel"] = bindCallerInfo.hostPkgLabel;
     bindParamTmp["bindCallerProcessName"] = bindCallerInfo.processName;
     bindParamTmp["bindCallerIsSystemSA"] = bindCallerInfo.isSystemSA;
+}
+
+bool DeviceManagerServiceImpl::CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    return DeviceProfileConnector::GetInstance().CheckSrcAccessControl(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerServiceImpl::CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    return DeviceProfileConnector::GetInstance().CheckSinkAccessControl(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerServiceImpl::CheckSrcIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    return DeviceProfileConnector::GetInstance().CheckSrcIsSameAccount(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerServiceImpl::CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    return DeviceProfileConnector::GetInstance().CheckSinkIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

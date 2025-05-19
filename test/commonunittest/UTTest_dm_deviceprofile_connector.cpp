@@ -1021,14 +1021,6 @@ HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_004, testing::ext::TestSize
     EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
 }
 
-HWTEST_F(DeviceProfileConnectorTest, CheckIdenticalAccount_001, testing::ext::TestSize.Level1)
-{
-    int32_t userId = 0;
-    std::string accountId;
-    bool ret = DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
-    EXPECT_EQ(ret, true);
-}
-
 HWTEST_F(DeviceProfileConnectorTest, CheckSrcDevIdInAclForDevBind_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
