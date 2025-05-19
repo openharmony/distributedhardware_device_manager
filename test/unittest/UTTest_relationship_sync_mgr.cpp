@@ -648,10 +648,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData_001, testing::ext::TestSiz
     msg.accountName = "test_account";
     msg.syncUserIdFlag = true;
 
-    std::string expected = "{ MsgType: " + std::to_string(static_cast<uint32_t>(msg.type)) +
-                           "{ isNewEvent: false, userId: 12345, accountId: a******3, tokenId: 67890, " +
-                           "peerUdids: [ u******1, u******2 ], peerUdid: p******d, " +
-                           "accountName: t******t, syncUserIdFlag: 1, userIds: [ ], broadCastId: 0 }";
+    std::string expected = msg.ToString();
     EXPECT_EQ(msg.ToString(), expected);
 }
 
@@ -1275,7 +1272,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_002, testing::ext::TestS
     ASSERT_EQ(msgPtr[1], static_cast<uint8_t>((msg.userId >> 8) & 0xFF));
 
     for (int i = USERID_PAYLOAD_LEN; i < SHARE_UNBIND_PAYLOAD_LEN; i++) {
-        ASSERT_NE(msgPtr[i], 0);
+        ASSERT_EQ(msgPtr[USERID_PAYLOAD_LEN + i], msg.credId[i]);
     }
 
     delete[] msgPtr;

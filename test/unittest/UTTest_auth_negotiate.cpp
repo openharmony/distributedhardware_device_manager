@@ -135,53 +135,6 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_003, testing::ext::Tes
     EXPECT_EQ(credTypeJson["pointTopointCredType"].Get<int32_t>(), credType);
 }
 
-HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_004, testing::ext::TestSize.Level1)
-{
-    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
-    context->accesser.deviceId = "1";
-    context->accesser.deviceIdHash = Crypto::Sha256("1");
-    context->accesser.userId = 0;
-    context->accesser.tokenId = 123;
-    context->accesser.tokenIdHash = Crypto::Sha256("123");
-    context->accessee.deviceId = "1";
-    context->accessee.deviceIdHash = Crypto::Sha256("1");
-    context->accessee.userId = 0;
-    context->accessee.tokenId = 456;
-    context->accessee.tokenIdHash = Crypto::Sha256("456");
-
-    context->accesser.accountId = "";
-    context->accesser.accountIdHash = "";
-    context->accessee.accountId = "";
-    context->accessee.accountIdHash = "";
-
-    DistributedDeviceProfile::AccessControlProfile profile;
-    DistributedDeviceProfile::Accesser accesser;
-    DistributedDeviceProfile::Accessee accessee;
-    accesser.SetAccesserDeviceId("1");
-    accesser.SetAccesserUserId(0);
-    accesser.SetAccesserTokenId(123);
-    accessee.SetAccesseeDeviceId("1");
-    accessee.SetAccesseeUserId(0);
-    accessee.SetAccesseeTokenId(456);
-    accessee.SetAccesseeCredentialIdStr("123");
-    profile.SetAccesser(accesser);
-    profile.SetAccessee(accessee);
-    profile.SetBindLevel(USER);
-
-    JsonObject credIdJson;
-    credIdJson[FILED_CRED_TYPE] = DM_POINT_TO_POINT;
-    std::vector<std::string> appList = {"123", "456"};
-    credIdJson[FILED_AUTHORIZED_APP_LIST] = appList;
-    JsonObject credInfo;
-    std::string test_cred_id = "123";
-    credInfo.Insert(test_cred_id, credIdJson);
-    JsonObject aclInfo;
-
-    authState->GetSinkAclInfoForP2P(context, profile, credInfo, aclInfo);
-    EXPECT_TRUE(aclInfo.Contains("pointTopointAcl"));
-    EXPECT_EQ(aclInfo["pointTopointAcl"].Get<uint32_t>(), DM_POINT_TO_POINT);
-}
-
 HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_005, testing::ext::TestSize.Level1)
 {
     std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();

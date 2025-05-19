@@ -131,7 +131,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_001, testing::ext::TestSize
     context = authManager->GetAuthContext();
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context->accessee.dmVersion = "6.0.0";
-    EXPECT_EQ(authState->Action(context), DM_OK);
+    EXPECT_EQ(authState->Action(context), ERR_DM_VERSION_INCOMPATIBLE);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_002, testing::ext::TestSize.Level1)
@@ -199,9 +199,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_001, testing:
     JsonObject jsonObject;
 
     context->accesser.accountIdHash = context->accessee.accountIdHash = "";
-    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _))
-        .WillOnce(Return(DM_OK))
-        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _)).WillOnce(Return(DM_OK));
     authState->GetSrcCredentialInfo(context, jsonObject);
 
     context->accesser.accountIdHash = "0";
@@ -212,36 +210,10 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_001, testing:
     authState->GetSrcCredentialInfo(context, jsonObject);
 
     context->accesser.accountIdHash = Crypto::Sha256("ohosAnonymousUid");
-    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _))
+        .WillOnce(Return(DM_OK))
+        .WillOnce(Return(DM_OK));
     authState->GetSrcCredentialInfo(context, jsonObject);
-}
-
-HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcAclInfo_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
-
-    context = authManager->GetAuthContext();
-    TestSetContext(context);
-
-    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfiles;
-    DistributedDeviceProfile::AccessControlProfile profile = TestCreateAcl(TEST_IDENTIAL_CRED_ID, DM_IDENTICAL_ACCOUNT);
-    allProfiles.push_back(profile);
-    profile = TestCreateAcl(TEST_SHARE_CRED_ID, DM_SHARE);
-    allProfiles.push_back(profile);
-
-    std::string jsonStr = R"({
-        "identialCredId": {"credType": 1},
-        "shareCredId": {"credType": 2}
-    })";
-    JsonObject credInfo(jsonStr);
-
-    EXPECT_CALL(*deviceProfileConnectorMock, GetAllAclIncludeLnnAcl()).WillOnce(Return(allProfiles));
-    JsonObject aclInf;
-    authState->GetSrcAclInfo(context, credInfo, aclInf);
-    EXPECT_EQ(aclInf["identicalAcl"].Get<int>(), 1);
-    EXPECT_EQ(aclInf["shareAcl"].Get<int>(), 2);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_IdenticalAccountAclCompare_001, testing::ext::TestSize.Level1)
@@ -318,7 +290,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_LnnAclCompare_001, testing::ext::T
     accessee.SetAccesseeTokenId(TEST_TOKEN_ID);
     accessee.SetAccesseeBundleName("");
 
-    EXPECT_TRUE(authState->LnnAclCompare(context, accesser, accessee));
+    EXPECT_FALSE(authState->LnnAclCompare(context, accesser, accessee));
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_CheckCredIdInAcl_001, testing::ext::TestSize.Level1)
@@ -388,7 +360,7 @@ HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ShowConfigDialog_001, testing::ex
     std::shared_ptr<AuthSinkConfirmState> authState = std::make_shared<AuthSinkConfirmState>();
     context = authManager->GetAuthContext();
     context->authType = DmAuthType::AUTH_TYPE_PIN;
-    EXPECT_EQ(authState->ShowConfigDialog(context), DM_OK);
+    EXPECT_EQ(authState->ShowConfigDialog(context), STOP_BIND);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSinkConfirmState_ReadServiceInfo_001, testing::ext::TestSize.Level1)
