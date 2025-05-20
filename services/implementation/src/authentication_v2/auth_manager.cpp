@@ -619,7 +619,7 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     return DM_OK;
 }
 
-std::string GenerateCertificate()
+std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context_)
 {
 #ifdef DEVICE_MANAGER_COMMON_FLAG
     context_->isBlueFlag = true;
@@ -678,7 +678,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    context_->cert = GenerateCertificate();
+    context_->cert = GenerateCertificate(context_);
     context_->sessionId = sessionId;
     context_->logicalSessionId = logicalSessionId;
     context_->requestId = static_cast<int64_t>(logicalSessionId);
