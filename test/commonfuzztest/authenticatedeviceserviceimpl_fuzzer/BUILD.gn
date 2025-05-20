@@ -75,18 +75,23 @@ ohos_fuzztest("AuthenticateDeviceServiceImplFuzzTest") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
-    "device_certificate_manager:device_cert_mgr_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
     "ffrt:libffrt",
     "hilog:libhilog",
-    "huks:libhukssdk",
     "init:libbegetutil",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "selinux_adapter:librestorecon",
   ]
+
+  if (!device_manager_common) {
+    external_deps += [
+      "device_certificate_manager:device_cert_mgr_sdk",
+      "huks:libhukssdk",
+    ]
+  }
 }
 
 ###############################################################################
