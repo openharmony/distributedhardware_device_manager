@@ -36,6 +36,10 @@
 #include "dm_auth_context.h"
 #include "dm_auth_message_processor.h"
 #include "dm_auth_state.h"
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
+#include "dm_auth_generate_attest.h"
+#include "dm_auth_validate_attest.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {

@@ -40,6 +40,10 @@
 #include "multiple_user_connector.h"
 #include "os_account_manager.h"
 #include "parameter.h"
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
+#include "dm_auth_generate_attest.h"
+#include "dm_auth_validate_attest.h"
+#endif
 
 using namespace OHOS::Security::AccessToken;
 
