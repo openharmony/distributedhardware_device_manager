@@ -420,5 +420,28 @@ void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
     }
     context->softbusConnector->SetProcessInfo(processInfo);
 }
+
+void DmAuthState::FilterProfilesByContext(
+    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> aclProfilesVec;
+    for (const auto &item : profiles) {
+        std::string accesserDeviceIdHash = Crypto::GetUdidHash(item.GetAccesser().GetAccesserDeviceId());
+        std::string accesseeDeviceIdHash = Crypto::GetUdidHash(item.GetAccessee().GetAccesseeDeviceId());
+        if ((context->accesser.deviceIdHash == accesserDeviceIdHash &&
+            context->accessee.deviceIdHash == accesseeDeviceIdHash &&
+            context->accesser.userId == item.GetAccesser().GetAccesserUserId() &&
+            context->accessee.userId == item.GetAccessee().GetAccesseeUserId()) ||
+            (context->accessee.deviceIdHash == accesserDeviceIdHash &&
+            context->accesser.deviceIdHash == accesseeDeviceIdHash &&
+            context->accessee.userId == item.GetAccesser().GetAccesserUserId() &&
+            context->accesser.userId == item.GetAccessee().GetAccesseeUserId())) {
+            aclProfilesVec.push_back(item);
+        }
+    }
+    profiles.clear();
+    profiles.assign(aclProfilesVec.begin(), aclProfilesVec.end());
+}
 } // namespace DistributedHardware
 } // namespace OHOS
