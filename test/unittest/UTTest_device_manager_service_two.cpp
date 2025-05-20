@@ -1429,9 +1429,7 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
-    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _))
-        .WillOnce(Return(DM_OK))
-        .WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
@@ -1446,7 +1444,9 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     EXPECT_EQ(ret, DM_OK);
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
-    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _))
+        .WillOnce(return (DM_OK))
+        .WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))

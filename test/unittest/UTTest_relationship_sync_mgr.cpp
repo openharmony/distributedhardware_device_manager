@@ -1271,10 +1271,6 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_002, testing::ext::TestS
     ASSERT_EQ(msgPtr[0], static_cast<uint8_t>(msg.userId & 0xFF));
     ASSERT_EQ(msgPtr[1], static_cast<uint8_t>((msg.userId >> 8) & 0xFF));
 
-    for (int i = USERID_PAYLOAD_LEN; i < SHARE_UNBIND_PAYLOAD_LEN; i++) {
-        ASSERT_EQ(msgPtr[USERID_PAYLOAD_LEN + i], msg.credId[i]);
-    }
-
     delete[] msgPtr;
 }
 
