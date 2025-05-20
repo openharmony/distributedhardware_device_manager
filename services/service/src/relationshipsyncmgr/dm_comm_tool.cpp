@@ -72,7 +72,7 @@ std::shared_ptr<DMCommTool> DMCommTool::GetInstance()
 int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds)
 {
-    if (!IsIdLengthValid(rmtNetworkId) || foregroundUserIds.empty() || dmTransportPtr_ == nullptr) {
+    if (!IsIdLengthValid(rmtNetworkId) || dmTransportPtr_ == nullptr) {
         LOGE("param invalid, networkId: %{public}s, foreground userids size: %{public}d",
             GetAnonyString(rmtNetworkId).c_str(), static_cast<int32_t>(foregroundUserIds.size()));
         return ERR_DM_INPUT_PARA_INVALID;
