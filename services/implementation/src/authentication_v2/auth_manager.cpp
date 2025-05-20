@@ -839,6 +839,11 @@ int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &param
 void AuthSrcManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
 {
     LOGI("AuthSrcManager::AuthDeviceError start.");
+    CHECK_NULL_VOID(context_);
+    if (requestId != context_->requestId) {
+        LOGE("requestId: %{public}" PRId64", context_->requestId: %{public}" PRId64".", requestId, context_->requestId);
+        return;
+    }
     auto curState = context_->authStateMachine->GetCurState();
     if (curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE ||
         curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_MSG_NEGOTIATE_STATE ||

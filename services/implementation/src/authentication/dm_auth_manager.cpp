@@ -1176,6 +1176,8 @@ bool DmAuthManager::IsAuthFinish()
 int32_t DmAuthManager::ConfirmProcess(const int32_t &action)
 {
     LOGI("ConfirmProcess start.");
+    CHECK_NULL_RETURN(authResponseContext_, ERR_DM_POINT_NULL);
+    authResponseContext_->confirmOperation = action;
     if (action_ == USER_OPERATION_TYPE_ALLOW_AUTH || action_ == USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS) {
         authResponseContext_->reply = USER_OPERATION_TYPE_ALLOW_AUTH;
     } else {
@@ -2409,6 +2411,11 @@ void DmAuthManager::AuthDeviceFinish(int64_t requestId)
 void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
 {
     LOGI("AuthDeviceError start.");
+    CHECK_NULL_VOID(authResponseContext_);
+    if (requestId != authResponseContext_->requestId) {
+        LOGE("reqId: %{public}" PRId64", RespReqId: %{public}" PRId64".", requestId, authResponseContext_->requestId);
+        return;
+    }
     isAuthDevice_ = false;
     if (authRequestState_ == nullptr || authResponseState_ != nullptr) {
         if (CheckNeedShowAuthInfoDialog(errorCode)) {
@@ -2425,10 +2432,6 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
         return;
     }
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
-        if (requestId != authResponseContext_->requestId) {
-            LOGE("DmAuthManager::AuthDeviceError requestId %{public}" PRId64 "is error.", requestId);
-            return;
-        }
         authResponseContext_->state = AuthState::AUTH_REQUEST_JOIN;
         authRequestContext_->reason = ERR_DM_AUTH_CODE_INCORRECT;
         authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;

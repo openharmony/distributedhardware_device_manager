@@ -37,6 +37,9 @@ const uint32_t IDENTICAL_ACCOUNT_TYPE = 6;
 const uint32_t SERVICE_PEER_TO_PEER_TYPE = 7;
 const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 8;
 
+const int32_t USLEEP_TIME_US_120000 = 120000; // 120ms
+constexpr uint32_t RETRY_TIMES = 3;
+
 const uint32_t DM_INVALIED_TYPE = 2048;
 const uint32_t SERVICE = 2;
 const uint32_t APP = 3;
@@ -2109,18 +2112,34 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
-    if (DistributedDeviceProfileClient::GetInstance().GetAllAccessControlProfile(profiles) != DM_OK) {
-        LOGE("DP failed.");
-    }
+    int32_t ret;
+    uint32_t retryTimes = 0;
+    do {
+        ret = DistributedDeviceProfileClient::GetInstance().GetAllAccessControlProfile(profiles);
+        if (ret != DM_OK) {
+            ++retryTimes;
+            LOGE("DP failed.");
+            usleep(USLEEP_TIME_US_120000);
+        }
+    } while (ret != DM_OK && retryTimes < RETRY_TIMES);
+
     return profiles;
 }
 
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAclIncludeLnnAcl()
 {
     std::vector<AccessControlProfile> profiles;
-    if (DistributedDeviceProfileClient::GetInstance().GetAllAclIncludeLnnAcl(profiles) != DM_OK) {
-        LOGE("DP failed.");
-    }
+    int32_t ret;
+    uint32_t retryTimes = 0;
+    do {
+        ret = DistributedDeviceProfileClient::GetInstance().GetAllAclIncludeLnnAcl(profiles);
+        if (ret != DM_OK) {
+            ++retryTimes;
+            LOGE("DP failed.");
+            usleep(USLEEP_TIME_US_120000);
+        }
+    } while (ret != DM_OK && retryTimes < RETRY_TIMES);
+
     return profiles;
 }
 
