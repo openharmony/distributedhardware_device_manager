@@ -80,7 +80,7 @@ int32_t OnIpcCmd(const DMIpcCmdInterfaceCode &ipcCode, MessageParcel &data, Mess
     DmAccessCallee callee;
     DecodeDmAccessCaller(data, caller);
     DecodeDmAccessCallee(data, callee);
-    int32_t result = DM_OK;
+    bool result = false;
     switch (ipcCode) {
         case CHECK_ACCESS_CONTROL:
             result = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
@@ -102,10 +102,9 @@ int32_t OnIpcCmd(const DMIpcCmdInterfaceCode &ipcCode, MessageParcel &data, Mess
             break;
         default:
             LOGE("invalid ipccode");
-            result = ERR_DM_FAILED;
             break;
     }
-    if (!reply.WriteInt32(result)) {
+    if (!reply.WriteBool(result)) {
         LOGE("write result failed.");
         return ERR_DM_IPC_WRITE_FAILED;
     }

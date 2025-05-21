@@ -2973,14 +2973,10 @@ bool DeviceManagerImpl::CheckAclByIpcCode(const DmAccessCaller &caller, const Dm
         LOGE("CheckIsSameAccount Send Request failed ret: %{public}d", ret);
         return false;
     }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", ret, anonyLocalUdid_);
-        LOGE("CheckIsSameAccount Failed with ret: %{public}d", ret);
-        return false;
-    }
-    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", DM_OK, anonyLocalUdid_);
-    return true;
+    bool result = rsp->GetErrCode();
+    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", static_cast<int32_t>(result),
+        anonyLocalUdid_);
+    return result;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

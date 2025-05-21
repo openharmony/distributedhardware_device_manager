@@ -99,7 +99,7 @@ int32_t ReadResponse(const DMIpcCmdInterfaceCode &ipcCode, MessageParcel &reply,
 {
     LOGI("start ipcCode %{public}d.", static_cast<int32_t>(ipcCode));
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    pBaseRsp->SetErrCode(reply.ReadInt32());
+    pBaseRsp->SetErrCode(reply.ReadBool());
     return DM_OK;
 }
 

@@ -3049,7 +3049,7 @@ bool DeviceProfileConnector::CheckSinkAcuntAccessControl(const DistributedDevice
         sinkUdid == aceeDeviceId && callee.userId == aceeUserId && callee.accountId == aceeAccountId) ||
         (srcUdid == aceeDeviceId && caller.userId == aceeUserId && caller.accountId == aceeAccountId &&
         sinkUdid == acerDeviceId && callee.userId == acerUserId && callee.accountId == acerAccountId)) &&
-        bindLevel == USER) {
+        bindLevel == USER && caller.accountId == callee.accountId) {
         return true;
     }
     return false;
@@ -3137,7 +3137,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCalle
         if (((srcUdid == acerUdid && caller.userId == acerUserId && caller.accountId == acerAccountId &&
             sinkUdid == aceeUdid && callee.accountId == aceeAccountId) || (srcUdid == aceeUdid &&
             caller.userId == aceeUserId && sinkUdid == acerUdid && callee.accountId == acerAccountId)) &&
-            bindLevel == USER) {
+            bindLevel == USER && callee.accountId == caller.accountId) {
             return true;
         }
     }
