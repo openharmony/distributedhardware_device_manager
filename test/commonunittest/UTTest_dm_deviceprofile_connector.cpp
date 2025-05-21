@@ -2047,27 +2047,27 @@ HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_001, testing::ext::Test
     profiles.SetAccesser(accesser);
     profiles.SetAccessee(accessee);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_FALSE(bindTypeVec.empty());
+    EXPECT_TRUE(bindTypeVec.size() == 1);
 
     bindTypeVec.clear();
     profiles.SetBindLevel(3);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_FALSE(bindTypeVec.empty());
+    EXPECT_TRUE(bindTypeVec.size() == 1);
 
     bindTypeVec.clear();
     profiles.SetBindType(DM_ACROSS_ACCOUNT);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_FALSE(bindTypeVec.empty());
+    EXPECT_TRUE(bindTypeVec.size() == 1);
 
     bindTypeVec.clear();
     profiles.SetBindLevel(1);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_FALSE(bindTypeVec.empty());
+    EXPECT_TRUE(bindTypeVec.size() == 1);
 
     bindTypeVec.clear();
     profiles.SetBindType(DM_IDENTICAL_ACCOUNT);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_FALSE(bindTypeVec.empty());
+    EXPECT_TRUE(bindTypeVec.size() == 1);
 
     bindTypeVec.clear();
     profiles.SetBindType(DM_INVALIED_TYPE);
