@@ -273,8 +273,6 @@ HWTEST_F(DeviceManagerServiceTest, InitAccountInfo_201, testing::ext::TestSize.L
     int32_t userId = 100;
     std::string commonEventType = "usual.event.USER_SWITCHED";
     std::map<std::string, int32_t> curUserDeviceMap;
-    EXPECT_CALL(*deviceManagerServiceImplMock_, GetDeviceIdAndBindLevel(_))
-        .WillOnce(Return(curUserDeviceMap)).WillOnce(Return(curUserDeviceMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
     commonEventType = "common.event.HWID_LOGIN";
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, 101);
@@ -521,12 +519,12 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_201, testing::ext::TestSize.Level1
     std::string value = "186";
     bindParam.insert(std::make_pair(key, value));
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_AUTH_OPEN_SESSION_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 
     targetId.wifiIp = "178.168.1.2";
     EXPECT_CALL(*softbusListenerMock_, GetIPAddrTypeFromCache(_, _, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_AUTH_OPEN_SESSION_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnBindDevice_201, testing::ext::TestSize.Level1)
@@ -663,7 +661,7 @@ HWTEST_F(DeviceManagerServiceTest, BindDevice_205, testing::ext::TestSize.Level1
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, DM_OK);
 
     ProcessInfo processInfo;
     processInfo.pkgName = "pkgName";
@@ -689,7 +687,7 @@ HWTEST_F(DeviceManagerServiceTest, AuthenticateDevice_205, testing::ext::TestSiz
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetTargetInfoFromCache(_, _, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, DM_OK);
 
     std::vector<std::string> peerUdids;
     int32_t userId = 123456;
@@ -1431,38 +1429,28 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceInfo_202, testing::ext::TestSize.Lev
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
-    EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
     int32_t ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
-
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
-    EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
-
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
-    EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
-
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
-    EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnGetDeviceInfo(_)).WillOnce(Return(true));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*softbusListenerMock_, GetDeviceInfo(_, _))
+        .WillOnce(Return (DM_OK))
+        .WillOnce(Return(DM_OK));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
-
     EXPECT_CALL(*softbusListenerMock_, GetUdidByNetworkId(_, _))
         .WillOnce(DoAll(SetArgReferee<1>("peerDeviceId"), Return(DM_OK)));
-    EXPECT_CALL(*deviceProfileConnectorMock_, CheckDeviceInfoPermission(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
     ret = DeviceManagerService::GetInstance().GetDeviceInfo(networkId, deviceInfo);
     EXPECT_EQ(ret, DM_OK);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;

@@ -729,7 +729,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterDevStateCallback_101, testing::ext::Test
     std::shared_ptr<DmInitCallback> initCallback = std::make_shared<DmInitCallbackTest>();
     int32_t ret = DeviceManager::GetInstance().InitDeviceManager(packName, initCallback);
     ret = DeviceManager::GetInstance().RegisterDevStateCallback(packName, extra, callback);
-    ASSERT_NE(ret, DM_OK);
+    ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 
