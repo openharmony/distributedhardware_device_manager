@@ -23,6 +23,7 @@
 DmAniInitCallback::DmAniInitCallback(taihe::string_view bundleName)
     : bundleName_(std::string(bundleName))
 {
+    std::lock_guard<std::mutex> autoLock(g_dmInitMutex);
     serviceDieCallback_ = nullptr;
 }
 
@@ -34,30 +35,34 @@ void DmAniInitCallback::OnRemoteDied()
     deviceManager.UnInitDeviceManager(bundleName_);
 }
 
-void DmAniInitCallback::SetServiceDieCallback(std::shared_ptr<taihe::callback_view<void()>> callback)
+void DmAniInitCallback::SetServiceDieCallback(std::shared_ptr<taihe::callback<void()>> callback)
 {
+    std::lock_guard<std::mutex> autoLock(g_dmInitMutex);
     serviceDieCallback_ = callback;
 }
 
 void DmAniInitCallback::ReleaseServiceDieCallback()
 {
+    std::lock_guard<std::mutex> autoLock(g_dmInitMutex);
     serviceDieCallback_ = nullptr;
 }
 
 DmAniDiscoveryFailedCallback::DmAniDiscoveryFailedCallback(std::string &bundleName,
-    taihe::callback_view<void(int)> discoverFailedCallback)
+    taihe::callback<void(int)> discoverFailedCallback)
     : refCount_(0), bundleName_(bundleName),
-    discoverFailedCallback_(std::make_shared<taihe::callback_view<void(int)>>(discoverFailedCallback))
+    discoverFailedCallback_(std::make_shared<taihe::callback<void(int)>>(discoverFailedCallback))
 {
 }
 
 void DmAniDiscoveryFailedCallback::IncreaseRefCount()
 {
+    std::lock_guard<std::mutex> autoLock(g_dmDiscoveryMutex);
     refCount_++;
 }
 
 void DmAniDiscoveryFailedCallback::DecreaseRefCount()
 {
+    std::lock_guard<std::mutex> autoLock(g_dmDiscoveryMutex);
     refCount_--;
 }
 
@@ -67,20 +72,22 @@ int32_t DmAniDiscoveryFailedCallback::GetRefCount()
 }
 
 DmAniDiscoverySuccessCallback::DmAniDiscoverySuccessCallback(std::string &bundleName,
-    taihe::callback_view<void(ohos::distributedDeviceManager::DeviceBasicInfo const &)> discoverSuccessCallback)
+    taihe::callback<void(ohos::distributedDeviceManager::DeviceBasicInfo const &)> discoverSuccessCallback)
     : refCount_(0), bundleName_(bundleName),
-    discoverSuccessCallback_(std::make_shared<taihe::callback_view<void(
+    discoverSuccessCallback_(std::make_shared<taihe::callback<void(
     ohos::distributedDeviceManager::DeviceBasicInfo const &)>>(discoverSuccessCallback))
 {
 }
 
 void DmAniDiscoverySuccessCallback::IncreaseRefCount()
 {
+    std::lock_guard<std::mutex> autoLock(g_dmDiscoveryMutex);
     refCount_++;
 }
 
 void DmAniDiscoverySuccessCallback::DecreaseRefCount()
 {
+    std::lock_guard<std::mutex> autoLock(g_dmDiscoveryMutex);
     refCount_--;
 }
 
@@ -90,9 +97,9 @@ int32_t DmAniDiscoverySuccessCallback::GetRefCount()
 }
 
 DmAniDeviceNameChangeCallback::DmAniDeviceNameChangeCallback(std::string &bundleName,
-    taihe::callback_view<void(taihe::string_view)> deviceNameChangeCallback)
+    taihe::callback<void(taihe::string_view)> deviceNameChangeCallback)
     : bundleName_(bundleName), deviceNameChangeCallback_(
-    std::make_shared<taihe::callback_view<void(taihe::string_view)>>(deviceNameChangeCallback))
+    std::make_shared<taihe::callback<void(taihe::string_view)>>(deviceNameChangeCallback))
 {
 }
 
@@ -103,10 +110,10 @@ void DmAniDeviceNameChangeCallback::OnDeviceChanged(
 }
 
 DmAniDeviceStateChangeDataCallback::DmAniDeviceStateChangeDataCallback(std::string &bundleName,
-    taihe::callback_view<void(ohos::distributedDeviceManager::DeviceStateChangeData const &)>
+    taihe::callback<void(ohos::distributedDeviceManager::DeviceStateChangeData const &)>
     deviceStateChangeDataCallback)
     : bundleName_(bundleName),
-    deviceStateChangeDataCallback_(std::make_shared<taihe::callback_view<void(
+    deviceStateChangeDataCallback_(std::make_shared<taihe::callback<void(
     ohos::distributedDeviceManager::DeviceStateChangeData const &)>>(deviceStateChangeDataCallback))
 {
 }
@@ -118,10 +125,10 @@ void DmAniDeviceStateChangeDataCallback::OnDeviceChanged(
 }
 
 DmAniDeviceManagerUiCallback::DmAniDeviceManagerUiCallback(
-    taihe::callback_view<void(taihe::string_view)> replyResultCallback,
+    taihe::callback<void(taihe::string_view)> replyResultCallback,
     std::string &bundleName)
     : bundleName_(bundleName),
-    replyResultCallback_(std::make_shared<taihe::callback_view<void(taihe::string_view)>>(replyResultCallback))
+    replyResultCallback_(std::make_shared<taihe::callback<void(taihe::string_view)>>(replyResultCallback))
 {
 }
 

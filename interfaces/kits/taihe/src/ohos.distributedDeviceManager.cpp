@@ -52,7 +52,12 @@ DeviceManagerImpl::DeviceManagerImpl(const std::string& bundleName)
 
 DeviceManagerImpl::DeviceManagerImpl(std::shared_ptr<DeviceManagerImpl> impl)
 {
-    bundleName_ = impl->bundleName_;
+    std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
+    if(impl == nullptr) {
+        LOGE("Create DeviceManagerImpl for shared_ptr failed.");
+    } else {
+        bundleName_ = impl->bundleName_;
+    }
 }
 
 ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_view bundleName)
@@ -332,18 +337,18 @@ void DeviceManagerImpl::OffDiscoverFailure(taihe::optional_view<taihe::callback<
         return;
     }
 
-    std::shared_ptr<DmAniDiscoveryFailedCallback> DiscoveryCallback = nullptr;
+    std::shared_ptr<DmAniDiscoveryFailedCallback> discoveryCallback = nullptr;
     {
         std::lock_guard<std::mutex> autoLock(g_discoveryFailedCallbackMapMutex);
         auto iter = g_discoveryFailedCallbackMap.find(bundleName_);
         if (iter == g_discoveryFailedCallbackMap.end()) {
             return;
         }
-        DiscoveryCallback = iter->second;
+        discoveryCallback = iter->second;
     }
 
-    DiscoveryCallback->DecreaseRefCount();
-    if (DiscoveryCallback->GetRefCount() == 0) {
+    discoveryCallback->DecreaseRefCount();
+    if (discoveryCallback->GetRefCount() == 0) {
         std::lock_guard<std::mutex> autoLock(g_discoveryFailedCallbackMapMutex);
         g_discoveryFailedCallbackMap.erase(bundleName_);
     }
@@ -450,12 +455,11 @@ void DeviceManagerImpl::OffServiceDie(taihe::optional_view<taihe::callback<void(
     {
         std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
         auto iter = g_initCallbackMap.find(bundleName_);
-        if (iter == g_initCallbackMap.end()) {
+        if (iter == g_initCallbackMap.end() || !iter->second) {
             LOGE("Cannot find ServiceDieCallback for bundleName %{public}s", bundleName_.c_str());
             return;
-        } else {
-            iter->second->ReleaseServiceDieCallback();
         }
+        iter->second->ReleaseServiceDieCallback();
     }
 }
 } // namespace ANI::distributedDeviceManager
