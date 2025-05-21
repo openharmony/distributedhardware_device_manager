@@ -53,7 +53,7 @@ DeviceManagerImpl::DeviceManagerImpl(const std::string& bundleName)
 DeviceManagerImpl::DeviceManagerImpl(std::shared_ptr<DeviceManagerImpl> impl)
 {
     std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
-    if(impl == nullptr) {
+    if (impl == nullptr) {
         LOGE("Create DeviceManagerImpl for shared_ptr failed.");
     } else {
         bundleName_ = impl->bundleName_;
