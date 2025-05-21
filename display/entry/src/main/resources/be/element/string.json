@@ -1,0 +1,60 @@
+{
+    "string":[
+        {
+            "name":"dm_allow_this_time",
+            "value":"Давяраць толькі гэтым разам",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_code",
+            "value":"Код падключэння",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"Праграма «%1$s» на прыладзе %2$s запытвае доступ да гэтай прылады. Давяраць гэтай праграме?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Адмяніць",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Увядзіце код падключэння",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"Гэта неабходна для сінхранізацыі даных і ўзаемадзеяння паміж прыладамі.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Гэтым разам давяраць",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Заўсёды давяраць",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}
