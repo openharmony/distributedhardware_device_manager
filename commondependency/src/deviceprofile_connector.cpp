@@ -3150,22 +3150,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCalle
             item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
             continue;
         }
-        std::string acerUdid = item.GetAccesser().GetAccesserDeviceId();
-        int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
-        std::string acerAccountId = item.GetAccesser().GetAccesserAccountId();
-
-        std::string aceeUdid = item.GetAccessee().GetAccesseeDeviceId();
-        int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
-        std::string aceeAccountId = item.GetAccessee().GetAccesseeAccountId();
-
-        //bind type is identical account, accesser is caller, accessee is callee
-        if (srcUdid == acerUdid && caller.userId == acerUserId && caller.accountId == acerAccountId &&
-            sinkUdid == aceeUdid && acerAccountId == aceeAccountId) {
-            return true;
-        }
-        //bind type is identical account, accessee is caller, accesser is callee
-        if (srcUdid == aceeUdid && caller.userId == aceeUserId && caller.accountId == aceeAccountId &&
-            sinkUdid == acerUdid && acerAccountId == aceeAccountId) {
+        if (CheckSrcAcuntAccessControl(item, caller, srcUdid, callee, sinkUdid)) {
             return true;
         }
     }
@@ -3192,24 +3177,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
             item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
             continue;
         }
-        std::string acerUdid = item.GetAccesser().GetAccesserDeviceId();
-        int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
-        std::string acerAccountId = item.GetAccesser().GetAccesserAccountId();
-
-        std::string aceeUdid = item.GetAccessee().GetAccesseeDeviceId();
-        int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
-        std::string aceeAccountId = item.GetAccessee().GetAccesseeAccountId();
-
-        //bind type is identical account, accesser is caller, accessee is callee
-        if (srcUdid == acerUdid && caller.userId == acerUserId && caller.accountId == acerAccountId &&
-            sinkUdid == aceeUdid && callee.userId == aceeUserId && callee.accountId == aceeAccountId &&
-            callee.accountId == caller.accountId) {
-            return true;
-        }
-        //bind type is identical account, accessee is caller, accesser is callee
-        if (srcUdid == aceeUdid && caller.userId == aceeUserId && caller.accountId == aceeAccountId &&
-            sinkUdid == acerUdid && callee.userId == acerUserId && callee.accountId == acerAccountId &&
-            callee.accountId == caller.accountId) {
+        if (CheckSinkAcuntAccessControl(item, caller, srcUdid, callee, sinkUdid)) {
             return true;
         }
     }
