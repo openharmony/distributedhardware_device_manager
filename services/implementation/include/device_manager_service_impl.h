@@ -165,6 +165,8 @@ public:
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
+    int32_t ProcessAppUninstall(int32_t userId, int32_t accessTokenId);
+    void ProcessUnBindApp(int32_t userId, int32_t accessTokenId, std::string extra, std::string udid);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus);
     void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,
@@ -177,7 +179,7 @@ public:
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
-        std::string &remoteUdid);
+        std::string &remoteUdid, bool &isShareType);
     void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, const std::string &localUdid);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     int32_t DeleteAcl(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
@@ -203,6 +205,8 @@ private:
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
     bool CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
+    std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId,
+        int32_t tokenId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid);
@@ -257,6 +261,13 @@ private:
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
         std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec);
+
+    void DeleteAclByTokenId(const int32_t &accessTokenId,
+        std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
+        std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
+        std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec,
+        uint32_t userId, std::string localUdid);
+
     bool CheckLnnAcl(DistributedDeviceProfile::AccessControlProfile delProfile,
         DistributedDeviceProfile::AccessControlProfile lastprofile);
     void CheckIsLastLnnAcl(DistributedDeviceProfile::AccessControlProfile profile,

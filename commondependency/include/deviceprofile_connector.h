@@ -206,6 +206,8 @@ public:
     DM_EXPORT int32_t GetBindLevel(const std::string &pkgName,
         const std::string &localUdid, const std::string &udid, uint64_t &tokenId);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds, const std::string &localUdid);
+    std::vector<std::string> GetDeviceIdAndUdidListByTokenId(std::vector<int32_t> userIds,
+        const std::string &localUdid, int32_t tokenId);
     DM_EXPORT std::multimap<std::string, int32_t> GetDeviceIdAndUserId(
         int32_t userId, const std::string &accountId, const std::string &localUdid);
     int32_t HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,

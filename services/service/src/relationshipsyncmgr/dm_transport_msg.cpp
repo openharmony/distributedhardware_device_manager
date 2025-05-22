@@ -30,6 +30,9 @@ const char* const DSOFTBUS_NOTIFY_USERIDS_UDIDKEY = "remoteUdid";
 const char* const DSOFTBUS_NOTIFY_USERIDS_USERIDKEY = "foregroundUserIds";
 const char* const DSOFTBUS_NOTIFY_ACCOUNTID_KEY = "accountId";
 const char* const DSOFTBUS_NOTIFY_USERID_KEY = "userId";
+const char* const DSOFTBUS_NOTIFY_TOKENID_KEY = "tokenId";
+const char* const DSOFTBUS_NOTIFY_EXTRA_KEY = "extra";
+const char* const DSOFTBUS_NOTIFY_UDID_KEY = "udid";
 }
 void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
 {
@@ -260,6 +263,72 @@ void FromJson(const cJSON *jsonObject, LogoutAccountMsg &accountInfo)
     cJSON *userIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY);
     if (cJSON_IsNumber(userIdObj)) {
         accountInfo.userId = userIdObj->valueint;
+    }
+}
+
+void ToJson(cJSON *jsonObject, const UninstAppMsg &uninstAppMsg)
+{
+    if (jsonObject == nullptr) {
+        LOGE("Json pointer is nullptr!");
+        return;
+    }
+
+    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY, uninstAppMsg.userId_);
+    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_TOKENID_KEY, uninstAppMsg.tokenId_);
+}
+
+void FromJson(const cJSON *jsonObject, UninstAppMsg &uninstAppMsg)
+{
+    if (jsonObject == nullptr) {
+        LOGE("Json pointer is nullptr!");
+        return;
+    }
+
+    cJSON *userIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY);
+    if (cJSON_IsNumber(userIdObj)) {
+        uninstAppMsg.userId_ = userIdObj->valueint;
+    }
+    cJSON *tokenIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_TOKENID_KEY);
+    if (cJSON_IsNumber(tokenIdObj)) {
+        uninstAppMsg.tokenId_ = tokenIdObj->valueint;
+    }
+}
+
+void ToJson(cJSON *jsonObject, const UnBindAppMsg &unBindAppMsg)
+{
+    if (jsonObject == nullptr) {
+        LOGE("Json pointer is nullptr!");
+        return;
+    }
+
+    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY, unBindAppMsg.userId_);
+    cJSON_AddNumberToObject(jsonObject, DSOFTBUS_NOTIFY_TOKENID_KEY, unBindAppMsg.tokenId_);
+    cJSON_AddStringToObject(jsonObject, DSOFTBUS_NOTIFY_EXTRA_KEY, unBindAppMsg.extra_.c_str());
+    cJSON_AddStringToObject(jsonObject, DSOFTBUS_NOTIFY_UDID_KEY, unBindAppMsg.udid_.c_str());
+}
+
+void FromJson(const cJSON *jsonObject, UnBindAppMsg &unBindAppMsg)
+{
+    if (jsonObject == nullptr) {
+        LOGE("Json pointer is nullptr!");
+        return;
+    }
+
+    cJSON *userIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_USERID_KEY);
+    if (cJSON_IsNumber(userIdObj)) {
+        unBindAppMsg.userId_ = userIdObj->valueint;
+    }
+    cJSON *tokenIdObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_TOKENID_KEY);
+    if (cJSON_IsNumber(tokenIdObj)) {
+        unBindAppMsg.tokenId_ = tokenIdObj->valueint;
+    }
+    cJSON *extraObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_EXTRA_KEY);
+    if (cJSON_IsNumber(extraObj)) {
+        unBindAppMsg.extra_ = extraObj->valuestring;
+    }
+    cJSON *udidObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_UDID_KEY);
+    if (cJSON_IsNumber(udidObj)) {
+        unBindAppMsg.udid_ = udidObj->valuestring;
     }
 }
 } // DistributedHardware
