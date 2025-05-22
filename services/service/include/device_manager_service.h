@@ -100,6 +100,10 @@ public:
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash, const std::string &extra);
 
+    int32_t ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash);
+
+    int32_t ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash, const std::string &extra);
+
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
@@ -217,7 +221,7 @@ public:
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
 
     void ProcessUninstApp(int32_t userId, int32_t tokenId);
-    void ProcessUnBindApp(int32_t userId, int32_t tokenId, std::string extra, std::string udid);
+    void ProcessUnBindApp(int32_t userId, int32_t tokenId, const std::string &extra, const std::string &udid);
 
     int32_t SetLocalDisplayNameToSoftbus(const std::string &displayName);
     void RemoveNotifyRecord(const ProcessInfo &processInfo);

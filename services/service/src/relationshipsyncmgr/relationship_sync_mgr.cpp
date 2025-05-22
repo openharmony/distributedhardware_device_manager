@@ -609,7 +609,7 @@ bool RelationShipChangeMsg::FromAppUninstallPayLoad(const cJSON *payloadJson)
     this->broadCastId = 0;
     for (uint32_t j = TOKENID_PAYLOAD_LEN; j < APP_UNINSTALL_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, true);
+        CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             this->broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - TOKENID_PAYLOAD_LEN) * BITS_PER_BYTE);

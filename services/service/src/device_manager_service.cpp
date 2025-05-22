@@ -91,6 +91,7 @@ namespace {
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
     const int32_t SEND_DELAY_MAX_TIME = 5;
     const int32_t SEND_DELAY_MIN_TIME = 0;
+    const int32_t DELAY_TIME_SEC_CONVERSION (1000 * 1000);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     const std::string GET_LOCAL_DEVICE_NAME_API_NAME = "GetLocalDeviceName";
 #endif
@@ -789,20 +790,9 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
 
 int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
 {
-    LOGE("DeviceManagerService::UnBindDevice pkgName: %{public}s, udidHash: %{public}s",
-          pkgName.c_str(), GetAnonyString(udidHash).c_str());
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call UnBindDevice.");
-        return ERR_DM_NO_PERMISSION;
-    }
-    LOGI("Begin for pkgName = %{public}s, udidHash = %{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str());
-    if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("UnBindDevice failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+    int32_t result = ValidateUnBindDeviceParams(pkgName, udidHash);
+    if (result != DM_OK) {
+        return result;
     }
     std::string realDeviceId = udidHash;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -850,20 +840,9 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
 int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash,
     const std::string &extra)
 {
-    LOGE("DeviceManagerService::UnBindDevice pkgName: %{public}s, udidHash: %{public}s, extra: %{public}s",
-          GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str(), GetAnonyString(extra).c_str());
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call UnBindDevice.");
-        return ERR_DM_NO_PERMISSION;
-    }
-    LOGI("Begin for pkgName = %{public}s, udidHash = %{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str());
-    if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("UnBindDevice failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+    int32_t result = ValidateUnBindDeviceParams(pkgName, udidHash, extra);
+    if (result != DM_OK) {
+        return result;
     }
     std::string realDeviceId = udidHash;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -888,11 +867,9 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         return ERR_DM_FAILED;
     }
     [[maybe_unused]] uint64_t peerTokenId = dmServiceImpl_->GetTokenIdByNameAndDeviceId(extra, udid);
-
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<std::string> peerUdids;
     peerUdids.emplace_back(udid);
-
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     std::map<std::string, std::string> wifiDevices;
     bool isBleActive = false;
@@ -907,6 +884,46 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
     if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
         return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash)
+{
+    LOGE("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s",
+        GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str());
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call UnBindDevice.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnBindDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash,
+    const std::string &extra)
+{
+    LOGE("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s, "
+        "extra: %{public}s", GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str(),
+        GetAnonyString(extra).c_str());
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call UnBindDevice.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnBindDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
     }
     return DM_OK;
 }
@@ -2576,16 +2593,17 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
 void DeviceManagerService::ProcessUninstApp(int32_t userId, int32_t tokenId)
 {
     LOGE("DeviceManagerService::ProcessUninstApp userId: %{public}s, tokenId: %{public}s",
-            GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->ProcessAppUninstall(userId, tokenId);
     }
 }
 
-void DeviceManagerService::ProcessUnBindApp(int32_t userId, int32_t tokenId, std::string extra, std::string udid)
+void DeviceManagerService::ProcessUnBindApp(int32_t userId, int32_t tokenId, const std::string &extra,
+    const std::string &udid)
 {
     LOGE("DeviceManagerService::ProcessUnBindApp userId: %{public}s, tokenId: %{public}s, udid: %{public}s",
-            GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(udid).c_str());
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(udid).c_str());
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->ProcessUnBindApp(userId, tokenId, extra, udid);
     }
@@ -2863,8 +2881,6 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
     if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
         delayTime = SEND_DELAY_MIN_TIME;
     }
-    LOGI("SendAppUnBindBroadCast delayTime: %{public}d, currentTime = %{public}lld, SendLastBroadCastTime_ = %{public}lld.",
-            delayTime, currentTime, SendLastBroadCastTime_);
     std::function<void()> task = [=]() {
         LOGI("SendAppUnBindBroadCast Start.");
         RelationShipChangeMsg msg;
@@ -2876,7 +2892,7 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         CHECK_NULL_VOID(softbusListener_);
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
-    ffrt::submit(task, ffrt::task_attr().delay(delayTime * 1000 * 1000));
+    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
     SendLastBroadCastTime_ = currentTime;
 }
 
@@ -2893,8 +2909,6 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
     if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
         delayTime = SEND_DELAY_MIN_TIME;
     }
-    LOGI("SendAppUnBindBroadCast delayTime: %{public}d, currentTime = %{public}lld, SendLastBroadCastTime_ = %{public}lld.",
-            delayTime, currentTime, SendLastBroadCastTime_);
     std::function<void()> task = [=]() {
         LOGI("SendAppUnBindBroadCast Start.");
         RelationShipChangeMsg msg;
@@ -2907,7 +2921,7 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         CHECK_NULL_VOID(softbusListener_);
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
-    ffrt::submit(task, ffrt::task_attr().delay(delayTime * 1000 * 1000));
+    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
     SendLastBroadCastTime_ = currentTime;
 }
 
@@ -2924,7 +2938,6 @@ void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::stri
     if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
         delayTime = SEND_DELAY_MIN_TIME;
     }
-    LOGI("SendAppUnInstallBroadCast delayTime: %{public}d, currentTime = %{public}lld, SendLastBroadCastTime_ = %{public}lld.", delayTime, currentTime, SendLastBroadCastTime_);
     std::function<void()> task = [=]() {
         LOGI("SendAppUnInstallBroadCast Start.");
         RelationShipChangeMsg msg;
@@ -2936,7 +2949,7 @@ void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::stri
         CHECK_NULL_VOID(softbusListener_);
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
-    ffrt::submit(task, ffrt::task_attr().delay(delayTime * 1000 * 1000));
+    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
     SendLastBroadCastTime_ = currentTime;
 }
 
@@ -3277,7 +3290,6 @@ void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t toke
     std::vector<std::string> peerUdids;
     int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
     peerUdids = dmServiceImpl_->GetDeviceIdByUserIdAndTokenId(currentUserId, tokenId);
-
     if (peerUdids.empty()) {
         LOGE("peerUdids is empty");
         return;
@@ -3342,7 +3354,7 @@ void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_
 }
 
 void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
-        const std::map<std::string, std::string> &wifiDevices)
+     const std::map<std::string, std::string> &wifiDevices)
 {
     LOGE("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str());
@@ -3438,8 +3450,7 @@ void DeviceManagerService::GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t t
     
     if (!bleUdids.empty()) {
         isBleWay = true;
-    }
-    if (!wifiDevices.empty()) {
+    } else {
         isBleWay = false;
     }
 }

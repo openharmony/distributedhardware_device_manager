@@ -1903,7 +1903,7 @@ std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindLevel
 }
 
 std::vector<std::string> DeviceManagerServiceImpl::GetDeviceIdByUserIdAndTokenId(int32_t userId,
-        int32_t tokenId)
+    int32_t tokenId)
 {
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
@@ -2044,8 +2044,8 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
 void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
     int32_t tokenId, int32_t peerTokenId)
 {
-    LOGI("DeviceManagerServiceImpl::HandleAppUnBindEvent remoteUserId: %{public}s, remoteUdid: %{public}s, "
-        "tokenId = %{public}s, peerTokenId = %{public}s.",GetAnonyInt32(remoteUserId).c_str(),
+    LOGI("DeviceManagerServiceImpl::HandleAppUnBindEvent remoteUserId: %{public}s, remoteUdid: %{public}s,"
+        "tokenId = %{public}s, peerTokenId = %{public}s.", GetAnonyInt32(remoteUserId).c_str(),
         GetAnonyString(remoteUdid).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyInt32(peerTokenId).c_str());
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
@@ -2273,7 +2273,7 @@ int32_t DeviceManagerServiceImpl::ProcessAppUninstall(int32_t userId, int32_t ac
 }
 
 void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTokenId,
-    std::string extra, std::string udid)
+    const std::string &extra, const std::string &udid)
 {
     LOGE("DeviceManagerServiceImpl::ProcessUnBindApp userId = %{public}s, accessTokenId = %{public}s,"
         "extra = %{public}s.", GetAnonyInt32(userId).c_str(), GetAnonyInt32(accessTokenId).c_str(),
@@ -2284,12 +2284,12 @@ void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTo
         LOGE("ParseExtra extraInfoJson error");
         return;
     }
-    if (!extraInfoJson[TAG_PEER_TOKENID].IsNumberInteger()) {
+    if (extraInfoJson.Contains(TAG_PEER_TOKENID) && extraInfoJson[TAG_PEER_TOKENID].IsNumberInteger()) {
+        uint64_t peerTokenId = extraInfoJson[TAG_PEER_TOKENID].Get<uint64_t>();
+        HandleAppUnBindEvent(userId, udid, accessTokenId, static_cast<int32_t>(peerTokenId));
+    } else {
         HandleAppUnBindEvent(userId, udid, accessTokenId);
-        return;
     }
-    uint64_t peerTokenId = extraInfoJson[TAG_PEER_TOKENID].Get<uint64_t>();
-    HandleAppUnBindEvent(userId, udid, accessTokenId, static_cast<int32_t>(peerTokenId));
 }
 
 void DeviceManagerServiceImpl::CheckIsLastLnnAcl(DistributedDeviceProfile::AccessControlProfile profile,
@@ -2361,7 +2361,7 @@ void DeviceManagerServiceImpl::DeleteAclByTokenId(const int32_t &accessTokenId,
     std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
     std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
     std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec,
-    uint32_t userId, std::string localUdid)
+    const uint32_t &userId, const std::string &localUdid)
 {
     for (auto &item : profiles) {
         int64_t accesssertokenId = item.GetAccesser().GetAccesserTokenId();

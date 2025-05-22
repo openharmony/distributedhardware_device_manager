@@ -81,7 +81,7 @@ struct UninstAppMsg {
     int32_t userId_;
     int32_t tokenId_;
     UninstAppMsg() : userId_(-1), tokenId_(-1) {}
-    UninstAppMsg(const int32_t &userId,const int32_t &tokenId)
+    UninstAppMsg(const int32_t &userId, const int32_t &tokenId)
         : userId_(userId), tokenId_(tokenId) {}
 };
 

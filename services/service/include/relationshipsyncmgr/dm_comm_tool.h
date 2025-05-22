@@ -39,7 +39,8 @@ public:
 
     int32_t SendUninstAppObj(int32_t userId, int32_t tokenId, const std::string &networkId);
 
-    int32_t SendUnBindAppObj(int32_t userId, int32_t tokenId, std::string extra, const std::string &networkId, const std::string &udid);
+    int32_t SendUnBindAppObj(int32_t userId, int32_t tokenId, const std::string &extra, const std::string &networkId,
+        const std::string &udid);
 
     void RspLocalFrontOrBackUserIds(const std::string rmtNetworkId, const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, int32_t socketId);
@@ -53,8 +54,8 @@ public:
     int32_t RspAppUninstall(const std::string rmtNetworkId, int32_t socketId);
     int32_t RspAppUnbind(const std::string rmtNetworkId, int32_t socketId);
     void StopSocket(const std::string &networkId);
-    void ProcessReceiveRspAppUninstallEvent(const std::shared_ptr<InnerCommMsg> &commMsg);
-    void ProcessReceiveRspAppUnbindEvent(const std::shared_ptr<InnerCommMsg> &commMsg);
+    void ProcessReceiveRspAppUninstallEvent(const std::shared_ptr<InnerCommMsg> commMsg);
+    void ProcessReceiveRspAppUnbindEvent(const std::shared_ptr<InnerCommMsg> commMsg);
 
     class DMCommToolEventHandler : public AppExecFwk::EventHandler {
     public:
@@ -62,6 +63,8 @@ public:
             std::shared_ptr<DMCommTool> dmCommToolPtr);
         ~DMCommToolEventHandler() override = default;
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
+        void HandleEvent(const std::shared_ptr<DMCommTool> &dmCommToolPtr, uint32_t eventId,
+        const std::shared_ptr<InnerCommMsg> &commMsg, const UserIdsMsg &userIdsMsg);
     private:
         void ParseUserIdsMsg(std::shared_ptr<InnerCommMsg> commMsg, UserIdsMsg &userIdsMsg);
         std::weak_ptr<DMCommTool> dmCommToolWPtr_;
@@ -76,8 +79,8 @@ public:
     int32_t StartCommonEvent(std::string commonEventType, EventCallback eventCallback);
     void ProcessReceiveCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg);
     void ProcessResponseCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg);
-    void ProcessReceiveUninstAppEvent(const std::shared_ptr<InnerCommMsg> &commMsg);
-    void ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg> &commMsg);
+    void ProcessReceiveUninstAppEvent(const std::shared_ptr<InnerCommMsg> commMsg);
+    void ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg> commMsg);
 private:
     std::shared_ptr<DMTransport> dmTransportPtr_;
     std::shared_ptr<DMCommTool::DMCommToolEventHandler> eventHandler_;

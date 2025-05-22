@@ -578,7 +578,8 @@ int32_t DeviceManagerServiceImpl::ProcessAppUninstall(int32_t userId, int32_t ac
     return 0;
 }
 
-void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTokenId, std::string extra, std::string udid)
+void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra,
+    const std::string &udid)
 {
     (void)userId;
     (void)accessTokenId;

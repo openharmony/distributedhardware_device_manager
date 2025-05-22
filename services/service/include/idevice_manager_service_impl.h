@@ -253,8 +253,8 @@ public:
         const DevUserInfo &remoteDevUserInfo, std::string &aclList) = 0;
     virtual int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId) = 0;
     virtual int32_t ProcessAppUninstall(int32_t userId, int32_t accessTokenId) = 0;
-    virtual void ProcessUnBindApp(int32_t userId, int32_t accessTokenId,
-        std::string extra, std::string udid) = 0;
+    virtual void ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra,
+        const std::string &udid) = 0;
 
     virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus) = 0;

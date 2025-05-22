@@ -152,7 +152,7 @@ public:
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
     int32_t ProcessAppUninstall(int32_t userId, int32_t accessTokenId);
-    void ProcessUnBindApp(int32_t userId, int32_t accessTokenId, std::string extra, std::string udid);
+    void ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra, const std::string &udid);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus);
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);

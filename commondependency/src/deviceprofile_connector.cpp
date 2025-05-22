@@ -1808,7 +1808,7 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(s
 }
 
 std::vector<std::string> DeviceProfileConnector::GetDeviceIdAndUdidListByTokenId(std::vector<int32_t> userIds,
-        const std::string &localUdid, int32_t tokenId)
+    const std::string &localUdid, int32_t tokenId)
 {
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::map<std::string, int32_t> deviceIdMap;
