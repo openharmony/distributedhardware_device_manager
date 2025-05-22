@@ -3283,131 +3283,6 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 #endif
 }
 
-void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
-    const std::map<std::string, std::string> &wifiDevices)
-{
-    LOGE("DeviceManagerService::NotifyRemoteUninstallAppByWifi userId: %{public}s, tokenId: %{public}s",
-        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
-    for (const auto &it : wifiDevices) {
-        int32_t result = SendUninstAppByWifi(userId, tokenId, it.second);
-        if (result != DM_OK) {
-            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
-            continue;
-        }
-        if (timer_ == nullptr) {
-            timer_ = std::make_shared<DmTimer>();
-        }
-        std::string udid = it.first;
-        std::string networkId = it.second;
-        timer_->StartTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
-            USER_SWITCH_BY_WIFI_TIMEOUT_S, [this, networkId] (std::string name) {
-                DMCommTool::GetInstance()->StopSocket(networkId);
-            });
-    }
-}
-
-void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
-    const std::map<std::string, std::string> &wifiDevices)
-{
-    LOGE("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
-        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str());
-    for (const auto &it : wifiDevices) {
-        int32_t result = SendUnBindAppByWifi(userId, tokenId, extra, it.second, it.first);
-        if (result != DM_OK) {
-            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
-            continue;
-        }
-        if (timer_ == nullptr) {
-            timer_ = std::make_shared<DmTimer>();
-        }
-        std::string udid = it.first;
-        std::string networkId = it.second;
-        timer_->StartTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
-            USER_SWITCH_BY_WIFI_TIMEOUT_S, [this, networkId] (std::string name) {
-                DMCommTool::GetInstance()->StopSocket(networkId);
-            });
-    }
-}
-
-void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remoteUdid)
-{
-    LOGI("ProcessReceiveRspAppUninstall remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
-    if (timer_ != nullptr) {
-        timer_->DeleteTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
-    }
-}
-
-void DeviceManagerService::ProcessReceiveRspAppUnbind(const std::string &remoteUdid)
-{
-    LOGI("ProcessReceiveRspAppUnbind remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
-    if (timer_ != nullptr) {
-        timer_->DeleteTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
-    }
-}
-
-int32_t DeviceManagerService::SendUninstAppByWifi(int32_t userId, int32_t tokenId, const std::string &networkId)
-{
-    LOGE("DeviceManagerService::SendUninstAppByWifi userId: %{public}s, tokenId: %{public}s",
-        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
-    return DMCommTool::GetInstance()->SendUninstAppObj(userId, tokenId, networkId);
-}
-
-int32_t DeviceManagerService::SendUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
-    const std::string &networkId, const std::string &udid)
-{
-    LOGE("DeviceManagerService::SendUnBindAppByWifi");
-    return DMCommTool::GetInstance()->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
-}
-
-void DeviceManagerService::GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t tokenId,
-    std::map<std::string, std::string> &wifiDevices, bool &isBleWay)
-{
-    std::vector<std::string> peerUdids;
-    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
-    std::map<std::string, int32_t> deviceMap = dmServiceImpl_->GetDeviceIdAndBindLevel(currentUserId);
-    for (const auto &item : deviceMap) {
-        peerUdids.push_back(item.first);
-    }
-    if (peerUdids.empty()) {
-        LOGE("peerUdids is empty");
-        return;
-    }
-    if (softbusListener_ == nullptr) {
-        LOGE("softbusListener_ is null");
-        return;
-    }
-
-    std::vector<std::string> bleUdids;
-    for (const auto &udid : peerUdids) {
-        std::string netWorkId = "";
-        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
-        if (netWorkId.empty()) {
-            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
-            bleUdids.push_back(udid);
-            continue;
-        }
-        int32_t networkType = 0;
-        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
-        if (ret != DM_OK || networkType <= 0) {
-            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
-            bleUdids.push_back(udid);
-            continue;
-        }
-        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
-        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
-            bleUdids.push_back(udid);
-        } else {
-            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
-        }
-    }
-    
-    if (!bleUdids.empty()) {
-        isBleWay = true;
-    } else {
-        isBleWay = false;
-    }
-}
-
 int32_t DeviceManagerService::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
     const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
 {
@@ -3616,6 +3491,132 @@ void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t toke
     }
     if (!wifiDevices.empty()) {
         NotifyRemoteUninstallAppByWifi(userId, tokenId, wifiDevices);
+    }
+}
+
+
+void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
+    const std::map<std::string, std::string> &wifiDevices)
+{
+    LOGE("DeviceManagerService::NotifyRemoteUninstallAppByWifi userId: %{public}s, tokenId: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+    for (const auto &it : wifiDevices) {
+        int32_t result = SendUninstAppByWifi(userId, tokenId, it.second);
+        if (result != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            continue;
+        }
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        std::string networkId = it.second;
+        timer_->StartTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S, [this, networkId] (std::string name) {
+                DMCommTool::GetInstance()->StopSocket(networkId);
+            });
+    }
+}
+
+void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
+    const std::map<std::string, std::string> &wifiDevices)
+{
+    LOGE("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str());
+    for (const auto &it : wifiDevices) {
+        int32_t result = SendUnBindAppByWifi(userId, tokenId, extra, it.second, it.first);
+        if (result != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            continue;
+        }
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        std::string networkId = it.second;
+        timer_->StartTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S, [this, networkId] (std::string name) {
+                DMCommTool::GetInstance()->StopSocket(networkId);
+            });
+    }
+}
+
+void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remoteUdid)
+{
+    LOGI("ProcessReceiveRspAppUninstall remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
+}
+
+void DeviceManagerService::ProcessReceiveRspAppUnbind(const std::string &remoteUdid)
+{
+    LOGI("ProcessReceiveRspAppUnbind remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    if (timer_ != nullptr) {
+        timer_->DeleteTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
+}
+
+int32_t DeviceManagerService::SendUninstAppByWifi(int32_t userId, int32_t tokenId, const std::string &networkId)
+{
+    LOGE("DeviceManagerService::SendUninstAppByWifi userId: %{public}s, tokenId: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+    return DMCommTool::GetInstance()->SendUninstAppObj(userId, tokenId, networkId);
+}
+
+int32_t DeviceManagerService::SendUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
+    const std::string &networkId, const std::string &udid)
+{
+    LOGE("DeviceManagerService::SendUnBindAppByWifi");
+    return DMCommTool::GetInstance()->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
+}
+
+void DeviceManagerService::GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t tokenId,
+    std::map<std::string, std::string> &wifiDevices, bool &isBleWay)
+{
+    std::vector<std::string> peerUdids;
+    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::map<std::string, int32_t> deviceMap = dmServiceImpl_->GetDeviceIdAndBindLevel(currentUserId);
+    for (const auto &item : deviceMap) {
+        peerUdids.push_back(item.first);
+    }
+    if (peerUdids.empty()) {
+        LOGE("peerUdids is empty");
+        return;
+    }
+    if (softbusListener_ == nullptr) {
+        LOGE("softbusListener_ is null");
+        return;
+    }
+
+    std::vector<std::string> bleUdids;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+    
+    if (!bleUdids.empty()) {
+        isBleWay = true;
+    } else {
+        isBleWay = false;
     }
 }
 
