@@ -65,6 +65,8 @@ public:
         void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
         void HandleEvent(const std::shared_ptr<DMCommTool> &dmCommToolPtr, uint32_t eventId,
         const std::shared_ptr<InnerCommMsg> &commMsg, const UserIdsMsg &userIdsMsg);
+        void HandleLocalUserIdEvent(const std::shared_ptr<DMCommTool> &dmCommToolPtr, uint32_t eventId,
+        const std::shared_ptr<InnerCommMsg> &commMsg, const UserIdsMsg &userIdsMsg)
     private:
         void ParseUserIdsMsg(std::shared_ptr<InnerCommMsg> commMsg, UserIdsMsg &userIdsMsg);
         std::weak_ptr<DMCommTool> dmCommToolWPtr_;

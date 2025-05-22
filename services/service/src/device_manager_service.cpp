@@ -3354,7 +3354,7 @@ void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_
 }
 
 void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
-     const std::map<std::string, std::string> &wifiDevices)
+    const std::map<std::string, std::string> &wifiDevices)
 {
     LOGE("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str());

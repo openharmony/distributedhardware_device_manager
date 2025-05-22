@@ -300,24 +300,8 @@ void DMCommTool::DMCommToolEventHandler::HandleEvent(const std::shared_ptr<DMCom
     const std::shared_ptr<InnerCommMsg> &commMsg, const UserIdsMsg &userIdsMsg)
 {
     CHECK_NULL_VOID(dmCommToolPtr);
-
+    HandleLocalUserIdEvent(dmCommToolPtr, eventId, commMsg, userIdsMsg);
     switch (eventId) {
-        case DM_COMM_SEND_LOCAL_USERIDS: {
-            if (userIdsMsg.isNewEvent) {
-                dmCommToolPtr->ProcessReceiveCommonEvent(commMsg);
-            } else {
-                dmCommToolPtr->ProcessReceiveUserIdsEvent(commMsg);
-            }
-            break;
-        }
-        case DM_COMM_RSP_LOCAL_USERIDS: {
-            if (userIdsMsg.isNewEvent) {
-                dmCommToolPtr->ProcessResponseCommonEvent(commMsg);
-            } else {
-                dmCommToolPtr->ProcessResponseUserIdsEvent(commMsg);
-            }
-            break;
-        }
         case DM_COMM_SEND_USER_STOP: {
             dmCommToolPtr->ProcessReceiveUserStopEvent(commMsg);
             break;
@@ -348,6 +332,32 @@ void DMCommTool::DMCommToolEventHandler::HandleEvent(const std::shared_ptr<DMCom
         }
         default:
             LOGE("event is undefined, id is %{public}d", eventId);
+            break;
+    }
+}
+
+void DMCommTool::DMCommToolEventHandler::HandleLocalUserIdEvent(const std::shared_ptr<DMCommTool> &dmCommToolPtr,
+    uint32_t eventId, const std::shared_ptr<InnerCommMsg> &commMsg, const UserIdsMsg &userIdsMsg)
+{
+    CHECK_NULL_VOID(dmCommToolPtr);
+    switch (eventId) {
+        case DM_COMM_SEND_LOCAL_USERIDS: {
+            if (userIdsMsg.isNewEvent) {
+                dmCommToolPtr->ProcessReceiveCommonEvent(commMsg);
+            } else {
+                dmCommToolPtr->ProcessReceiveUserIdsEvent(commMsg);
+            }
+            break;
+        }
+        case DM_COMM_RSP_LOCAL_USERIDS: {
+            if (userIdsMsg.isNewEvent) {
+                dmCommToolPtr->ProcessResponseCommonEvent(commMsg);
+            } else {
+                dmCommToolPtr->ProcessResponseUserIdsEvent(commMsg);
+            }
+            break;
+        }
+        default:
             break;
     }
 }
