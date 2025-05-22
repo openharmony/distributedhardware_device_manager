@@ -29,8 +29,13 @@ int32_t AuthGenerateAttest::GenerateCertificate(DmCertChain &dmCertChain)
     LOGI("GenerateCertificate Start");
     DcmIdType ids[] = { DCM_ID_TYPE_UDID };
     uint64_t randomNum = GenRandLongLong(MIN_DCM_RANDOM, MAX_DCM_RANDOM);
+    LOGI("GenerateCertificate randomNum=%{public}lu", randomNum);
     DcmBlob challengeBlob = {sizeof(randomNum), (uint8_t *)& randomNum};
     DcmCertChain* dcmCertChain = new DcmCertChain();
+    if (dcmCertChain == nullptr) {
+        LOGE("new dcmCertChain fail!");
+        return ERR_DM_MALLOC_FAILED;
+    }
     InitCertChain(dcmCertChain);
     int32_t ret = DcmAttestIdsEx(ids, sizeof(ids)/sizeof(ids[0]), &challengeBlob, DCM_CERT_TYPE_ROOT_V2, dcmCertChain);
     if (ret != DCM_SUCCESS) {
@@ -50,18 +55,37 @@ int32_t AuthGenerateAttest::GenerateCertificate(DmCertChain &dmCertChain)
 
 int32_t AuthGenerateAttest::InitCertChain(DcmCertChain *certChain)
 {
+    LOGI("InitCertChain Start");
     certChain->certCount = DM_CERTS_COUNT;
-    certChain->cert = new DcmBlob[certChain->certCount];
+    certChain->cert = new (std::nothrow) DcmBlob[certChain->certCount];
+    if (certChain->cert == nullptr) {
+        certChain->certCount = 0;
+        LOGE("new dcmCertChain.cert fail!");
+        return ERR_DM_MALLOC_FAILED;
+    }
     for (uint32_t i = 0; i < certChain->certCount; ++i) {
+        certChain->cert[i].data = new (std::nothrow) uint8_t[DM_CERTIFICATE_SIZE];
+        if (certChain->cert[i].data == nullptr) {
+            certChain->cert[i].size = 0;
+            for (uint32_t j = 0; j < i; ++j) {
+                delete[] certChain->cert[j].data;
+                certChain->cert[j].data = nullptr;
+                certChain->cert[j].size = 0;
+            }
+            delete[] certChain->cert;
+            certChain->cert = nullptr;
+            certChain->certCount = 0;
+            LOGE("new dcmCertChain.cert.data fail!");
+            return ERR_DM_MALLOC_FAILED;
+        }
         certChain->cert[i].size = DM_CERTIFICATE_SIZE;
-        certChain->cert[i].data = new uint8_t[DM_CERTIFICATE_SIZE];
     }
     return DM_OK;
 }
 
 void AuthGenerateAttest::FreeCertChain(DcmCertChain* chain)
 {
-    if (!chain) {
+    if (chain == nullptr) {
         return;
     }
     for (uint32_t i = 0; i < chain->certCount; ++i) {
@@ -73,25 +97,68 @@ void AuthGenerateAttest::FreeCertChain(DcmCertChain* chain)
     delete chain;
 }
 
+int32_t ValidateInput(DcmCertChain &dcmCertChain)
+{
+    if (dcmCertChain.certCount > 0 && dcmCertChain.cert == nullptr) {
+        LOGE("Invalid cert chain: certCount>0 but cert array is null!");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return DM_OK;
+}
+
+int32_t CopyCertificates(DcmCertChain& dcmCertChain, DmBlob* newCertArray, uint32_t& allocatedCerts)
+{
+    for (uint32_t i = 0; i < dcmCertChain.certCount; ++i) {
+        const auto& src = dcmCertChain.cert[i];
+        auto& dest = newCertArray[i];
+        dest.size = src.size;
+        dest.data = nullptr;
+        if (src.size == 0 || src.data == nullptr) continue;
+        dest.data = new (std::nothrow) uint8_t[src.size];
+        if (dest.data == nullptr) {
+            allocatedCerts = i;
+            return ERR_DM_MALLOC_FAILED;
+        }
+
+        if (memcpy_s(dest.data, src.size, src.data, src.size) != DM_OK) {
+            delete[] dest.data;
+            dest.data = nullptr;
+            allocatedCerts = i;
+            return ERR_DM_FAILED;
+        }
+        allocatedCerts = i + 1;
+    }
+    return DM_OK;
+}
+
 int32_t AuthGenerateAttest::ConvertDcmCertChainToDmCertChain(DcmCertChain &dcmCertChain, DmCertChain &dmCertChain)
 {
     LOGI("ConvertDcmCertChainToDmCertChain start!");
-    dmCertChain.certCount = dcmCertChain.certCount;
-    if (dcmCertChain.certCount > 0) {
-        dmCertChain.cert = new DmBlob[dcmCertChain.certCount];
-        for (uint32_t i = 0; i < dcmCertChain.certCount; ++i) {
-            dmCertChain.cert[i].size = dcmCertChain.cert[i].size;
-            if (dcmCertChain.cert[i].size > 0 && dcmCertChain.cert[i].data != nullptr) {
-                dmCertChain.cert[i].data = new uint8_t[dcmCertChain.cert[i].size];
-                memcpy_s(dmCertChain.cert[i].data, dmCertChain.cert[i].size,
-                    dcmCertChain.cert[i].data, dcmCertChain.cert[i].size);
-            } else {
-                dmCertChain.cert[i].data = nullptr;
-            }
-        }
-    } else {
-        dmCertChain.cert = nullptr;
+    int32_t ret = ValidateInput(dcmCertChain);
+    if (ret != DM_OK) {
+        return ret;
     }
+    if (dcmCertChain.certCount == 0) {
+        dmCertChain.cert = nullptr;
+        dmCertChain.certCount = 0;
+        return DM_OK;
+    }
+    DmBlob* newCertArray = new (std::nothrow) DmBlob[dcmCertChain.certCount];
+    if (newCertArray == nullptr) {
+        LOGE("Failed to allocate cert array!");
+        return ERR_DM_MALLOC_FAILED;
+    }
+    uint32_t allocatedCerts = 0;
+    ret = CopyCertificates(dcmCertChain, newCertArray, allocatedCerts);
+    if (ret != DM_OK) {
+        for (uint32_t j = 0; j < allocatedCerts; ++j) {
+            delete[] newCertArray[j].data;
+        }
+        delete[] newCertArray;
+        return ret;
+    }
+    dmCertChain.cert = newCertArray;
+    dmCertChain.certCount = dcmCertChain.certCount;
     return DM_OK;
 }
 } // namespace DistributedHardware

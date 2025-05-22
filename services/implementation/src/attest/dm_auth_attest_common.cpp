@@ -26,7 +26,7 @@ constexpr int32_t HEX_TO_UINT8 = 2;
 
 std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain* chain)
 {
-    if (!chain || !chain->cert || chain->certCount == 0) {
+    if (chain == nullptr || !chain->cert || chain->certCount == 0) {
         return "{}";
     }
     JsonObject jsonObject;
@@ -102,7 +102,7 @@ bool ValidateInputJson(const std::string& data)
 
 bool AuthAttestCommon::DeserializeDmCertChain(const std::string& data, DmCertChain* outChain)
 {
-    if (!outChain || data.empty() || !ValidateInputJson(data)) {
+    if (outChain == nullptr || data.empty() || !ValidateInputJson(data)) {
         LOGE("Invalid input");
         return false;
     }

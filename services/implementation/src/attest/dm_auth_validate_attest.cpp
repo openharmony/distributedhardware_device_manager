@@ -21,6 +21,27 @@
 namespace OHOS {
 namespace DistributedHardware {
 
+int32_t ProcessValidationResult(const char* deviceIdHash, char* udidStr, uint64_t randNum, HksParamSet *outputParam)
+{
+    uint32_t cnt = 0;
+    HksBlob *blob = &outputParam->params[cnt].blob;
+    if (memcpy_s(&randNum, sizeof(uint64_t), blob->data, blob->size) != EOK) {
+        LOGE("memcpy randNum failed");
+        return ERR_DM_GET_PARAM_FAILED;
+    }
+    blob = &outputParam->params[++cnt].blob;
+    if (memcpy_s(udidStr, UDID_BUF_LEN, blob->data, blob->size) != EOK) {
+        LOGE("memcpy udidStr failed");
+        return ERR_DM_GET_PARAM_FAILED;
+    }
+    std::string certDeviceIdHash = Crypto::GetUdidHash(std::string(udidStr));
+    if (strcmp(deviceIdHash, certDeviceIdHash.c_str()) != 0) {
+        LOGE("verifyCertificate fail");
+        return ERR_DM_DESERIAL_CERT_FAILED;
+    }
+    return DM_OK;
+}
+
 int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const char* deviceIdHash)
 {
     LOGI("VerifyCertificate start!");
@@ -40,35 +61,28 @@ int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const ch
     ret = FillHksParamSet(&outputParam, outputData, sizeof(outputData) / sizeof(outputData[0]));
     if (ret != DM_OK) {
         LOGE("FillHksParamSet failed, ret=%{public}d", ret);
+        FreeHksCertChain(hksCertChain);
         return ERR_DM_FAILED;
     }
     ret = HksValidateCertChain(&hksCertChain, outputParam);
     if (ret != HKS_SUCCESS) {
         LOGE("HksValidateCertChain fail, ret=%{public}d", ret);
+        FreeHksCertChain(hksCertChain);
         return ret;
     }
-    uint32_t cnt = 0;
-    HksBlob *blob = &outputParam->params[cnt].blob;
-    if (memcpy_s(&randNum, sizeof(uint64_t), blob->data, blob->size) != EOK) {
-        LOGE("memcpy randNum failed");
-        return ERR_DM_GET_PARAM_FAILED;
+    ret = ProcessValidationResult(deviceIdHash, udidStr, randNum, outputParam);
+    if (ret != DM_OK) {
+        LOGE("ProcessValidationResult fail, ret=%{public}d", ret);
+        FreeHksCertChain(hksCertChain);
+        return ret;
     }
-    blob = &outputParam->params[++cnt].blob;
-    if (memcpy_s(udidStr, UDID_BUF_LEN, blob->data, blob->size) != EOK) {
-        LOGE("memcpy udidStr failed");
-        return ERR_DM_GET_PARAM_FAILED;
-    }
-    std::string certDeviceIdHash = Crypto::GetUdidHash(std::string(udidStr));
-    if (strcmp(deviceIdHash, certDeviceIdHash.c_str()) != 0) {
-        LOGE("verifyCertificate fail");
-        return ERR_DM_VERIFY_CERT_FAILED;
-    }
+    FreeHksCertChain(hksCertChain);
     return DM_OK;
 }
 
 int32_t AuthValidateAttest::FillHksParamSet(HksParamSet **paramSet, HksParam *param, int32_t paramNums)
 {
-    if (param == NULL) {
+    if (param == nullptr) {
         LOGE("param is null");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -92,30 +106,78 @@ int32_t AuthValidateAttest::FillHksParamSet(HksParamSet **paramSet, HksParam *pa
     return DM_OK;
 }
 
+void AuthValidateAttest::FreeHksCertChain(HksCertChain& chain)
+{
+    if (chain.certs != nullptr) {
+        for (uint32_t i = 0; i < chain.certsCount; ++i) {
+            delete[] chain.certs[i].data;
+        }
+        delete[] chain.certs;
+        chain.certs = nullptr;
+    }
+    chain.certsCount = 0;
+}
+
+int32_t AllocateHksBlobArray(uint32_t count, HksBlob** outArray)
+{
+    HksBlob* arr = new (std::nothrow) HksBlob[count];
+    if (arr == nullptr) {
+        LOGE("Alloc failed for certs");
+        return ERR_DM_MALLOC_FAILED;
+    }
+
+    const size_t totalSize = sizeof(HksBlob) * count;
+    if (memset_s(arr, totalSize, 0, totalSize) != 0) {
+        LOGE("memset_s failed");
+        delete[] arr;
+        return ERR_DM_FAILED;
+    }
+
+    *outArray = arr;
+    return DM_OK;
+}
+
+int32_t CopySingleCert(const DmBlob& src, HksBlob& dest)
+{
+    if (src.data == nullptr || src.size == 0) {
+        LOGE("Invalid src cert");
+        return ERR_DM_FAILED;
+    }
+    dest.data = new (std::nothrow) uint8_t[src.size];
+    if (dest.data == nullptr) {
+        LOGE("Alloc failed for size");
+        return ERR_DM_MALLOC_FAILED;
+    }
+    dest.size = src.size;
+    if (memcpy_s(dest.data, src.size, src.data, src.size) != 0) {
+        LOGE("memcpy_s failed size");
+        delete[] dest.data;
+        dest.data = nullptr;
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
 int32_t AuthValidateAttest::ConvertDmCertChainToHksCertChain(DmCertChain &dmCertChain, HksCertChain &hksCertChain)
 {
     if (dmCertChain.certCount == 0 || dmCertChain.cert == nullptr) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    hksCertChain.certsCount = dmCertChain.certCount;
-    hksCertChain.certs = new HksBlob[hksCertChain.certsCount];
-    const size_t totalSize = sizeof(HksBlob) * hksCertChain.certsCount;
-    memset_s(hksCertChain.certs, totalSize, 0, totalSize);
-    for (uint32_t i = 0; i < hksCertChain.certsCount; ++i) {
-        if (dmCertChain.cert[i].data == nullptr || dmCertChain.cert[i].size == 0) {
-            return ERR_DM_FAILED;
-        }
-        hksCertChain.certs[i].size = dmCertChain.cert[i].size;
-        hksCertChain.certs[i].data = new uint8_t[hksCertChain.certs[i].size];
-        if (hksCertChain.certs[i].data == nullptr) {
-            return ERR_DM_MALLOC_FAILED;
-        }
-        if (memcpy_s(hksCertChain.certs[i].data, hksCertChain.certs[i].size,
-            dmCertChain.cert[i].data, dmCertChain.cert[i].size) != 0) {
-            LOGE("memcpy cert data failed");
-            return ERR_DM_FAILED;
+    HksBlob* newCerts = nullptr;
+    int32_t ret = AllocateHksBlobArray(dmCertChain.certCount, &newCerts);
+    if (ret != DM_OK) {
+        LOGE("AllocateHksBlobArray fail, ret = %{public}d", ret);
+        return ret;
+    }
+    for (uint32_t i = 0; i < dmCertChain.certCount; ++i) {
+        if ((ret = CopySingleCert(dmCertChain.cert[i], newCerts[i])) != DM_OK) {
+            FreeHksCertChain(hksCertChain);
+            delete[] newCerts;
+            return ret;
         }
     }
+    hksCertChain.certs = newCerts;
+    hksCertChain.certsCount = dmCertChain.certCount;
     return DM_OK;
 }
 }  // namespace DistributedHardware
