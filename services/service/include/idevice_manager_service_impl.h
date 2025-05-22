@@ -260,8 +260,7 @@ public:
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus) = 0;
     virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId) = 0;
-    virtual std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId,
-        int32_t tokenId) = 0;
+    virtual std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId) = 0;
     virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId) = 0;
     virtual int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,

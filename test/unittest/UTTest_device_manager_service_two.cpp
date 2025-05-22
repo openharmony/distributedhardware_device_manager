@@ -1821,7 +1821,7 @@ HWTEST_F(DeviceManagerServiceTest, SendShareTypeUnBindBroadCast_001, testing::ex
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_001, testing::ext::TestSize.Level1)
 {
     std::string remoteUdid = "remoteUdid";
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _))
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _, _))
         .WillOnce(SetArgReferee<3>(remoteUdid));
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(1001));
     EXPECT_CALL(*softbusListenerMock_, SendAclChangedBroadcast(_)).Times(::testing::AtLeast(1));
@@ -1831,21 +1831,21 @@ HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_001, testing::ext::Te
 
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_002, testing::ext::TestSize.Level1)
 {
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _)).Times(0);
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _, _)).Times(0);
 
     DeviceManagerService::GetInstance().HandleCredentialDeleted(nullptr, "credInfo");
 }
 
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_003, testing::ext::TestSize.Level1)
 {
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _)).Times(0);
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _, _)).Times(0);
 
     DeviceManagerService::GetInstance().HandleCredentialDeleted("credId", nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_004, testing::ext::TestSize.Level1)
 {
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _))
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _, _))
         .WillOnce(SetArgReferee<3>(""));
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).Times(0);
     EXPECT_CALL(*softbusListenerMock_, SendAclChangedBroadcast(_)).Times(0);

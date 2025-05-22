@@ -172,6 +172,7 @@ public:
         int32_t remoteTokenId);
     void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
+    std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

@@ -194,6 +194,7 @@ public:
         uint64_t logicalSessionId, const std::string &pkgName);
     void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
+    std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
@@ -205,7 +206,6 @@ private:
     void HandleOnline(DmDeviceState devState, DmDeviceInfo &devInfo);
     bool CheckSharePeerSrc(const std::string &peerUdid, const std::string &localUdid);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId);
-    std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId);
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid);
