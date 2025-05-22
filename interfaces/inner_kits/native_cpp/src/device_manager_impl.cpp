@@ -2973,7 +2973,7 @@ bool DeviceManagerImpl::CheckAclByIpcCode(const DmAccessCaller &caller, const Dm
         LOGE("CheckIsSameAccount Send Request failed ret: %{public}d", ret);
         return false;
     }
-    bool result = rsp->GetErrCode();
+    bool result = static_cast<bool>(rsp->GetErrCode());
     DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", static_cast<int32_t>(result),
         anonyLocalUdid_);
     return result;
