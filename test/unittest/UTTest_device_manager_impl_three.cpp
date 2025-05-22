@@ -1406,6 +1406,36 @@ HWTEST_F(DeviceManagerImplTest, UnRegisterPinHolderCallback_001, testing::ext::T
     ASSERT_EQ(ret, DM_OK);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
+
+HWTEST_F(DeviceManagerImplTest, ImportAuthCode_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string authCode;
+    authCode.append(1025, 'a');
+    int32_t ret = DeviceManager::GetInstance().ImportAuthCode(pkgName, authCode);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, ImportAuthCode_302, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.ImportAuthCode";
+    std::string authCode = "950800";
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(DM_OK));
+    int32_t ret = DeviceManager::GetInstance().ImportAuthCode(pkgName, authCode);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, ExportAuthCode_301, testing::ext::TestSize.Level0)
+{
+    std::string authCode;
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret = DeviceManager::GetInstance().ExportAuthCode(authCode);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
