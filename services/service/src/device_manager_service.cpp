@@ -3283,53 +3283,6 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 #endif
 }
 
-void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId)
-{
-    LOGE("DeviceManagerService::NotifyRemoteUninstallApp userId: %{public}s, tokenId: %{public}s",
-        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
-    std::vector<std::string> peerUdids;
-    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
-    peerUdids = dmServiceImpl_->GetDeviceIdByUserIdAndTokenId(currentUserId, tokenId);
-    if (peerUdids.empty()) {
-        LOGE("peerUdids is empty");
-        return;
-    }
-    if (softbusListener_ == nullptr) {
-        LOGE("softbusListener_ is null");
-        return;
-    }
-    std::vector<std::string> bleUdids;
-    std::map<std::string, std::string> wifiDevices;
-    for (const auto &udid : peerUdids) {
-        std::string netWorkId = "";
-        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
-        if (netWorkId.empty()) {
-            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
-            bleUdids.push_back(udid);
-            continue;
-        }
-        int32_t networkType = 0;
-        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
-        if (ret != DM_OK || networkType <= 0) {
-            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
-            bleUdids.push_back(udid);
-            continue;
-        }
-        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
-        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
-            bleUdids.push_back(udid);
-        } else {
-            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
-        }
-    }
-    if (!bleUdids.empty()) {
-        SendAppUnInstallBroadCast(peerUdids, userId, tokenId);
-    }
-    if (!wifiDevices.empty()) {
-        NotifyRemoteUninstallAppByWifi(userId, tokenId, wifiDevices);
-    }
-}
-
 void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
     const std::map<std::string, std::string> &wifiDevices)
 {
@@ -3616,6 +3569,53 @@ void DeviceManagerService::NotifyRemoteLocalUserSwitch(int32_t curUserId, int32_
     }
     if (!wifiDevices.empty()) {
         NotifyRemoteLocalUserSwitchByWifi(curUserId, preUserId, wifiDevices, foregroundUserIds, backgroundUserIds);
+    }
+}
+
+void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId)
+{
+    LOGE("DeviceManagerService::NotifyRemoteUninstallApp userId: %{public}s, tokenId: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+    std::vector<std::string> peerUdids;
+    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    peerUdids = dmServiceImpl_->GetDeviceIdByUserIdAndTokenId(currentUserId, tokenId);
+    if (peerUdids.empty()) {
+        LOGE("peerUdids is empty");
+        return;
+    }
+    if (softbusListener_ == nullptr) {
+        LOGE("softbusListener_ is null");
+        return;
+    }
+    std::vector<std::string> bleUdids;
+    std::map<std::string, std::string> wifiDevices;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+    if (!bleUdids.empty()) {
+        SendAppUnInstallBroadCast(peerUdids, userId, tokenId);
+    }
+    if (!wifiDevices.empty()) {
+        NotifyRemoteUninstallAppByWifi(userId, tokenId, wifiDevices);
     }
 }
 
