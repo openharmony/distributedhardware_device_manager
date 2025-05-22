@@ -85,6 +85,22 @@ ohos::distributedDeviceManager::DeviceBasicInfo MakeDeviceBasicInfo(taihe::strin
     return {deviceId, deviceName, deviceType, networkId, extraData};
 }
 
+ohos::distributedDeviceManager::DeviceResult MakeDeviceResult(taihe::string_view deviceId)
+{
+    return {deviceId};
+}
+
+ohos::distributedDeviceManager::DeviceResultNumber MakeDeviceResultNumber(int32_t reason)
+{
+    return {reason};
+}
+
+ohos::distributedDeviceManager::DeviceStateChangeAction MakeDeviceStateChangeAction(
+    ohos::distributedDeviceManager::DeviceBasicInfo const& device)
+{
+    return {device};
+}
+
 ohos::distributedDeviceManager::DeviceStateChangeData MakeDeviceStateChangeData(
     ohos::distributedDeviceManager::DeviceStateChange deviceStateChange,
     ohos::distributedDeviceManager::DeviceBasicInfo const& deviceBasicInfo)
@@ -160,7 +176,8 @@ std::string DeviceManagerImpl::GetLocalDeviceNetworkId()
     return std::string(networkId);
 }
 
-void DeviceManagerImpl::OnDeviceNameChange(taihe::callback_view<void(taihe::string_view)> onDeviceNameChangecb)
+void DeviceManagerImpl::OnDeviceNameChange(taihe::callback_view<void(
+    ohos::distributedDeviceManager::DeviceResult const&)> onDeviceNameChangecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
@@ -190,7 +207,8 @@ void DeviceManagerImpl::OnDeviceNameChange(taihe::callback_view<void(taihe::stri
     return;
 }
 
-void DeviceManagerImpl::OnDiscoverFailure(taihe::callback_view<void(int32_t)> onDiscoverFailurecb)
+void DeviceManagerImpl::OnDiscoverFailure(taihe::callback_view<void(
+    ohos::distributedDeviceManager::DeviceResultNumber const&)> onDiscoverFailurecb)
 {
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission();
     if (ret != 0) {
@@ -209,7 +227,8 @@ void DeviceManagerImpl::OnDiscoverFailure(taihe::callback_view<void(int32_t)> on
     return;
 }
 
-void DeviceManagerImpl::OnreplyResult(taihe::callback_view<void(taihe::string_view)> onreplyResultcb)
+void DeviceManagerImpl::OnreplyResult(taihe::callback_view<void(
+    ohos::distributedDeviceManager::DeviceResult const&)> onreplyResultcb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
@@ -232,7 +251,7 @@ void DeviceManagerImpl::OnreplyResult(taihe::callback_view<void(taihe::string_vi
 }
 
 void DeviceManagerImpl::OnDiscoverSuccess(taihe::callback_view<void(
-    ohos::distributedDeviceManager::DeviceBasicInfo const&)> onDiscoverSuccesscb)
+    ohos::distributedDeviceManager::DeviceStateChangeAction const&)> onDiscoverSuccesscb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
@@ -250,8 +269,8 @@ void DeviceManagerImpl::OnDiscoverSuccess(taihe::callback_view<void(
     return ;
 }
 
-void DeviceManagerImpl::OnDeviceStateChange(
-    taihe::callback_view<void(ohos::distributedDeviceManager::DeviceStateChangeData const&)> onDeviceStateChangecb)
+void DeviceManagerImpl::OnDeviceStateChange(taihe::callback_view<void(
+    ohos::distributedDeviceManager::DeviceStateChangeData const&)> onDeviceStateChangecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
@@ -298,8 +317,8 @@ void DeviceManagerImpl::OnServiceDie(taihe::callback_view<void()> onServiceDiecb
     return;
 }
 
-void DeviceManagerImpl::OffDeviceNameChange(
-    taihe::optional_view<taihe::callback<void(taihe::string_view)>> offDeviceNameChangecb)
+void DeviceManagerImpl::OffDeviceNameChange(taihe::optional_view<taihe::callback<void(
+    ohos::distributedDeviceManager::DeviceResult const&)>> offDeviceNameChangecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
@@ -329,7 +348,8 @@ void DeviceManagerImpl::OffDeviceNameChange(
     return;
 }
 
-void DeviceManagerImpl::OffDiscoverFailure(taihe::optional_view<taihe::callback<void(int32_t)>> offDiscoverFailurecb)
+void DeviceManagerImpl::OffDiscoverFailure(taihe::optional_view<taihe::callback<void(
+    ohos::distributedDeviceManager::DeviceResultNumber const&)>> offDiscoverFailurecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
@@ -355,8 +375,8 @@ void DeviceManagerImpl::OffDiscoverFailure(taihe::optional_view<taihe::callback<
     return;
 }
 
-void DeviceManagerImpl::OffreplyResult(
-    taihe::optional_view<taihe::callback<void(taihe::string_view)>> offreplyResultcb)
+void DeviceManagerImpl::OffreplyResult(taihe::optional_view<taihe::callback<void(
+    ohos::distributedDeviceManager::DeviceResult const&)>> offreplyResultcb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
@@ -387,7 +407,7 @@ void DeviceManagerImpl::OffreplyResult(
 }
 
 void DeviceManagerImpl::OffDiscoverSuccess(taihe::optional_view<taihe::callback<void(
-    ohos::distributedDeviceManager::DeviceBasicInfo const&)>> offDiscoverSuccesscb)
+    ohos::distributedDeviceManager::DeviceStateChangeAction const&)>> offDiscoverSuccesscb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
         taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
@@ -466,4 +486,7 @@ void DeviceManagerImpl::OffServiceDie(taihe::optional_view<taihe::callback<void(
 
 TH_EXPORT_CPP_API_CreateDeviceManager(ANI::distributedDeviceManager::CreateDeviceManager);
 TH_EXPORT_CPP_API_MakeDeviceBasicInfo(ANI::distributedDeviceManager::MakeDeviceBasicInfo);
+TH_EXPORT_CPP_API_MakeDeviceResult(ANI::distributedDeviceManager::MakeDeviceResult);
+TH_EXPORT_CPP_API_MakeDeviceResultNumber(ANI::distributedDeviceManager::MakeDeviceResultNumber);
+TH_EXPORT_CPP_API_MakeDeviceStateChangeAction(ANI::distributedDeviceManager::MakeDeviceStateChangeAction);
 TH_EXPORT_CPP_API_MakeDeviceStateChangeData(ANI::distributedDeviceManager::MakeDeviceStateChangeData);

@@ -43,20 +43,26 @@ public:
     std::string GetDeviceName(taihe::string_view networkId);
     std::string GetLocalDeviceNetworkId();
 
-    void OnDeviceNameChange(taihe::callback_view<void(taihe::string_view)> onDeviceNameChangecb);
-    void OnDiscoverFailure(taihe::callback_view<void(int32_t)> onDiscoverFailurecb);
-    void OnreplyResult(taihe::callback_view<void(taihe::string_view)> onreplyResultcb);
+    void OnDeviceNameChange(taihe::callback_view<void(
+        ohos::distributedDeviceManager::DeviceResult const&)> onDeviceNameChangecb);
+    void OnDiscoverFailure(taihe::callback_view<void(
+        ohos::distributedDeviceManager::DeviceResultNumber const&)> onDiscoverFailurecb);
+    void OnreplyResult(taihe::callback_view<void(
+        ohos::distributedDeviceManager::DeviceResult const&)> onreplyResultcb);
     void OnDiscoverSuccess(taihe::callback_view<void(
-        ohos::distributedDeviceManager::DeviceBasicInfo const &)> onDiscoverSuccesscb);
+        ohos::distributedDeviceManager::DeviceStateChangeAction const&)> onDiscoverSuccesscb);
     void OnDeviceStateChange(taihe::callback_view<void(
         ohos::distributedDeviceManager::DeviceStateChangeData const&)> onDeviceStateChangecb);
     void OnServiceDie(taihe::callback_view<void()> onServiceDiecb);
 
-    void OffDeviceNameChange(taihe::optional_view<taihe::callback<void(taihe::string_view)>> offDeviceNameChangecb);
-    void OffDiscoverFailure(taihe::optional_view<taihe::callback<void(int32_t)>> offDiscoverFailurecb);
-    void OffreplyResult(taihe::optional_view<taihe::callback<void(taihe::string_view)>> offreplyResultcb);
+    void OffDeviceNameChange(taihe::optional_view<taihe::callback<void(
+        ohos::distributedDeviceManager::DeviceResult const&)>> offDeviceNameChangecb);
+    void OffDiscoverFailure(taihe::optional_view<taihe::callback<void(
+        ohos::distributedDeviceManager::DeviceResultNumber const&)>> offDiscoverFailurecb);
+    void OffreplyResult(taihe::optional_view<taihe::callback<void(
+        ohos::distributedDeviceManager::DeviceResult const&)>> offreplyResultcb);
     void OffDiscoverSuccess(taihe::optional_view<taihe::callback<void(
-        ohos::distributedDeviceManager::DeviceBasicInfo const&)>> offDiscoverSuccesscb);
+        ohos::distributedDeviceManager::DeviceStateChangeAction const&)>> offDiscoverSuccesscb);
     void OffDeviceStateChange(taihe::optional_view<taihe::callback<void(
         ohos::distributedDeviceManager::DeviceStateChangeData const&)>> offDeviceStateChangecb);
     void OffServiceDie(taihe::optional_view<taihe::callback<void()>> offServiceDiecb);
@@ -70,9 +76,14 @@ private:
 ohos::distributedDeviceManager::DeviceBasicInfo MakeDeviceBasicInfo(taihe::string_view deviceId,
     taihe::string_view deviceName, taihe::string_view deviceType,
     taihe::string_view networkId, taihe::string_view extraData);
+
+ohos::distributedDeviceManager::DeviceResult MakeDeviceResult(taihe::string_view deviceId);
+ohos::distributedDeviceManager::DeviceResultNumber MakeDeviceResultNumber(int32_t reason);
+ohos::distributedDeviceManager::DeviceStateChangeAction MakeDeviceStateChangeAction(
+    ohos::distributedDeviceManager::DeviceBasicInfo const& device);
 ohos::distributedDeviceManager::DeviceStateChangeData MakeDeviceStateChangeData(
     ohos::distributedDeviceManager::DeviceStateChange deviceStateChange,
-    ohos::distributedDeviceManager::DeviceBasicInfo const &deviceBasicInfo);
+    ohos::distributedDeviceManager::DeviceBasicInfo const& deviceBasicInfo);
 ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_view bundleName);
 } // namespace ANI::distributedDeviceManager
 
