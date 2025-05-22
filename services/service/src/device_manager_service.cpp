@@ -816,10 +816,6 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
         return ERR_DM_FAILED;
     }
-    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
-        LOGE("dmServiceImpl_ UnBindDevice failed.");
-        return ERR_DM_FAILED;
-    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<std::string> peerUdids;
     peerUdids.emplace_back(udid);
@@ -834,6 +830,10 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         NotifyRemoteUnBindAppByWifi(userId, tokenId, "", wifiDevices);
     }
 #endif
+    if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
+        LOGE("dmServiceImpl_ UnBindDevice failed.");
+        return ERR_DM_FAILED;
+    }
     return DM_OK;
 }
 
