@@ -389,6 +389,9 @@ private:
     bool CheckSrcAcuntAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
+    bool CheckSinkAcuntAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+        const std::string &sinkUdid);
     bool CheckSrcShareAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
@@ -396,9 +399,6 @@ private:
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
     bool CheckSrcP2PAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
-        const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
-        const std::string &sinkUdid);
-    bool CheckSinkAcuntAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
     bool CheckSinkP2PAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
