@@ -354,7 +354,7 @@ int32_t DmAuthState::GetOutputState(int32_t state)
     if (it != NEW_AND_OLD_STATE_MAPPING.end()) {
         return static_cast<int32_t>(it->second);
     }
-    return STATUS_DM_AUTH_DEFAULT;
+    return static_cast<int32_t>(STATUS_DM_AUTH_DEFAULT);
 }
 
 int32_t DmAuthState::GetOutputReplay(const std::string &processName, int32_t replay)
