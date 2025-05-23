@@ -75,6 +75,21 @@ const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
     { std::string(WAIT_REQUEST_TIMEOUT_TASK), CLONE_WAIT_REQUEST_TIMEOUT },
     { std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), CLONE_SESSION_HEARTBEAT_TIMEOUT }
 };
+const std::map<AuthState, DmAuthStatus> OLD_STATE_MAPPING = {
+    { AuthState::AUTH_REQUEST_INIT, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_NEGOTIATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_NEGOTIATE_DONE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_REPLY, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_JOIN, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_NETWORK, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_FINISH, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_CREDENTIAL, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_CREDENTIAL_DONE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_AUTH_FINISH, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_RECHECK_MSG, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_REQUEST_RECHECK_MSG_DONE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { AuthState::AUTH_RESPONSE_FINISH, DmAuthStatus::STATUS_DM_SINK_AUTH_FINISH }
+};
 constexpr int32_t PROCESS_NAME_WHITE_LIST_NUM = 1;
 constexpr const static char* PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM] = {
     "com.example.myapplication"
@@ -1405,6 +1420,16 @@ void DmAuthManager::SinkAuthenticateFinish()
     authTimes_ = 0;
 }
 
+int32_t DmAuthManager::GetOutputState(int32_t state)
+{
+    LOGI("state %{public}d.", state);
+    auto it = OLD_STATE_MAPPING.find(static_cast<AuthState>(state));
+    if (it != OLD_STATE_MAPPING.end()) {
+        return static_cast<int32_t>(it->second);
+    }
+    return STATUS_DM_AUTH_DEFAULT;
+}
+
 void DmAuthManager::SrcAuthenticateFinish()
 {
     LOGI("DmAuthManager::SrcAuthenticateFinish, isFinishOfLocal: %{public}d", isFinishOfLocal_);
@@ -1437,10 +1462,11 @@ void DmAuthManager::SrcAuthenticateFinish()
                 DmAuthManager::CloseAuthSession(sessionId);
             }
         });
-    listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, authRequestContext_->token,
-        authResponseContext_->state, authRequestContext_->reason);
-    listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason,
-        authResponseContext_->state, GenerateBindResultContent());
+    int32_t status = GetOutputState(authResponseContext_->state);
+    listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, authRequestContext_->token, status,
+        authRequestContext_->reason);
+    listener_->OnBindResult(processInfo_, peerTargetId_, authRequestContext_->reason, status,
+        GenerateBindResultContent());
 
     authRequestContext_ = nullptr;
     authRequestState_ = nullptr;
