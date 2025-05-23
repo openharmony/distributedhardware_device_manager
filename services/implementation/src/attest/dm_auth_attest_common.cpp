@@ -26,7 +26,7 @@ constexpr int32_t HEX_TO_UINT8 = 2;
 
 std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain* chain)
 {
-    if (chain == nullptr || !chain->cert || chain->certCount == 0) {
+    if (chain == nullptr || chain->cert == nullptr || chain->certCount == 0) {
         return "{}";
     }
     JsonObject jsonObject;
