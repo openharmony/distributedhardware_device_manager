@@ -267,7 +267,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIsSameAccount_001, testing::ext:
     DmAccessCallee callee;
     std::string sinkUdid = "non_identical_udid";
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
-    EXPECT_EQ(connector.CheckIsSameAccount(caller, srcUdid, callee, sinkUdid), ERR_DM_FAILED);
+    EXPECT_EQ(connector.CheckIsSameAccount(caller, srcUdid, callee, sinkUdid), false);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndBindLevel_001, testing::ext::TestSize.Level1)
