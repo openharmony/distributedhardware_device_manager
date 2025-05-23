@@ -223,9 +223,9 @@ public:
     virtual int32_t IsSameAccount(const std::string &udid) = 0;
     virtual uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId) = 0;
     virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
-    virtual int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
-    virtual int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    virtual bool CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual void HandleDeviceNotTrust(const std::string &udid) = 0;
     virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId,
@@ -272,6 +272,14 @@ public:
         int32_t remoteTokenId) = 0;
     virtual void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid) = 0;
+    virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
+    virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
+    virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
+    virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

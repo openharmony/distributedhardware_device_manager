@@ -419,24 +419,24 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
     return;
 }
 
-int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+bool DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     (void)caller;
     (void)srcUdid;
     (void)callee;
     (void)sinkUdid;
-    return DM_OK;
+    return true;
 }
 
-int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+bool DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     (void)caller;
     (void)srcUdid;
     (void)callee;
     (void)sinkUdid;
-    return DM_OK;
+    return true;
 }
 
 void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
@@ -667,6 +667,46 @@ void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint
     (void)backgroundUserIds;
     (void)remoteUdid;
     return;
+}
+
+bool DeviceManagerServiceImpl::CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return true;
+}
+
+bool DeviceManagerServiceImpl::CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return true;
+}
+
+bool DeviceManagerServiceImpl::CheckSrcIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return true;
+}
+
+bool DeviceManagerServiceImpl::CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return true;
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
