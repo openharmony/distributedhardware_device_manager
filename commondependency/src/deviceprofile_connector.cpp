@@ -1827,7 +1827,7 @@ std::vector<std::string> DeviceProfileConnector::GetDeviceIdAndUdidListByTokenId
             item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             static_cast<int32_t>(item.GetAccesser().GetAccesserTokenId()) == tokenId) {
             LOGI("Get Device Bind type localUdid %{public}s is src, tokenId %{public}s.",
-                GetAnonyString(localUdid).c_str(), GetAnonyInt32(tokenId).c_str();
+                GetAnonyString(localUdid).c_str(), GetAnonyInt32(tokenId).c_str());
             UpdateBindType(item.GetTrustDeviceId(), item.GetBindLevel(), deviceIdMap);
             continue;
         }
