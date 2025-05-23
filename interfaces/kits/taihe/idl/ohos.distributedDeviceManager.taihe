@@ -73,40 +73,40 @@ interface DeviceManager {
     GetDeviceName(networkId: String): String;
     GetLocalDeviceNetworkId(): String;
 
-    @!sts_inject_into_interface("on(type: string, callback: (data: object)=> void): void;")
+    @!sts_inject_into_interface("on(type: string, callback: (data: object) => void): void;")
     @!sts_inject_into_class("""on(type: string, callback: object): void {
         if (type === "discoverSuccess") {
-            this.OnDiscoverSuccess_inner(callback as (data: DeviceStateChangeAction)=> void);
+            this.OnDiscoverSuccess_inner(callback as (data: DeviceStateChangeAction) => void);
         } else if (type === "deviceStateChange") {
-            this.OnDeviceStateChange_inner(callback as (data: DeviceStateChangeData)=> void);
+            this.OnDeviceStateChange_inner(callback as (data: DeviceStateChangeData) => void);
         } else if (type === "replyResult") {
-            this.OnreplyResult_inner(callback as (data: DeviceResult)=> void);
+            this.OnreplyResult_inner(callback as (data: DeviceResult) => void);
         } else if (type === "deviceNameChange") {
-            this.OnDeviceNameChange_inner(callback as (data: DeviceResult)=> void);
+            this.OnDeviceNameChange_inner(callback as (data: DeviceResult) => void);
         } else if (type === "discoverFailure") {
-            this.OnDiscoverFailure_inner(callback as (data: DeviceResultNumber)=> void);
+            this.OnDiscoverFailure_inner(callback as (data: DeviceResultNumber) => void);
         } else if (type ==="serviceDie") {
-            this.OnServiceDie_inner(callback as ()=> void);
+            this.OnServiceDie_inner(callback as () => void);
         } else {
             throw new Error(`Unknown type: ${type}`);
         }
     }
     """)
 
-    @!sts_inject_into_interface("off(type: string, callback?: (data: object)=> void): void;")
+    @!sts_inject_into_interface("off(type: string, callback?: (data: object) => void): void;")
     @!sts_inject_into_class("""off(type: string, callback?: object): void {
         if (type === "discoverSuccess") {
-            this.OffDiscoverSuccess_inner(callback as (((data: DeviceStateChangeAction)=> void) | undefined));
+            this.OffDiscoverSuccess_inner(callback as (((data: DeviceStateChangeAction) => void) | undefined));
         } else if (type === "deviceStateChange") {
-            this.OffDeviceStateChange_inner(callback as (((data: DeviceStateChangeData)=> void) | undefined));
+            this.OffDeviceStateChange_inner(callback as (((data: DeviceStateChangeData) => void) | undefined));
         } else if (type === "replyResult") {
-            this.OffreplyResult_inner(callback as (((data: DeviceResult)=> void) | undefined));
+            this.OffreplyResult_inner(callback as (((data: DeviceResult) => void) | undefined));
         } else if (type === "deviceNameChange") {
-            this.OffDeviceNameChange_inner(callback as (((data: DeviceResult)=> void) | undefined));
+            this.OffDeviceNameChange_inner(callback as (((data: DeviceResult) => void) | undefined));
         } else if (type === "discoverFailure"){
-            this.OffDiscoverFailure_inner(callback as (((data: DeviceResultNumber)=> void) | undefined));
+            this.OffDiscoverFailure_inner(callback as (((data: DeviceResultNumber) => void) | undefined));
         } else if (type ==="serviceDie") {
-            this.OffServiceDie_inner(callback as ()=> void);
+            this.OffServiceDie_inner(callback as () => void);
         }else {
             throw new Error(`Unknown type: ${type}`);
         }
@@ -118,8 +118,8 @@ interface DeviceManager {
     OnDeviceStateChange(onDeviceStateChangecb: (deviceStateChangeData: DeviceStateChangeData) => void): void;
     OffDeviceStateChange(offDeviceStateChangecb:
                          Optional<(deviceStateChangeData: DeviceStateChangeData) => void>): void;
-    OnreplyResult(onreplyResultcb: (data: DeviceResult)=> void): void;
-    OffreplyResult(offreplyResultcb:  Optional<(data: DeviceResult)=> void>): void;
+    OnreplyResult(onreplyResultcb: (data: DeviceResult) => void): void;
+    OffreplyResult(offreplyResultcb:  Optional<(data: DeviceResult) => void>): void;
     OnDeviceNameChange(onDeviceNameChangecb: (deviceName: DeviceResult) => void): void;
     OffDeviceNameChange(offDeviceNameChangecb: Optional<(deviceName: DeviceResult) => void>): void;
     OnDiscoverFailure(onDiscoverFailurecb: (reason: DeviceResultNumber) => void): void;
