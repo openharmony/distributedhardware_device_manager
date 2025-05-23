@@ -2891,9 +2891,9 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcAccessControl(const DmAccessCalle
     LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
         "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), static_cast<int32_t>(caller.accountId),
+        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
-        static_cast<int32_t>(callee.accountId));
+        GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -3008,9 +3008,9 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkAccessControl(const DmAccessCall
     LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
         "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), static_cast<int32_t>(caller.accountId),
+        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
-        static_cast<int32_t>(callee.accountId));
+        GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -3136,9 +3136,9 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCalle
     LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
         "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), static_cast<int32_t>(caller.accountId),
+        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
-        static_cast<int32_t>(callee.accountId));
+        GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -3163,9 +3163,9 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
     LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
         "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), static_cast<int32_t>(caller.accountId),
+        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
-        static_cast<int32_t>(callee.accountId));
+        GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
