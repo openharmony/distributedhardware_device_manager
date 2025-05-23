@@ -460,7 +460,6 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     context->accesser.aclTypeList = aclNegoResult.Dump();
 
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_USER_CONFIRM, context);
-
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
         STATUS_DM_SHOW_AUTHORIZE_UI, DM_OK);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
