@@ -67,7 +67,6 @@ void DecodeDmAccessCallee(MessageParcel &parcel, DmAccessCallee &callee)
 {
     callee.accountId = parcel.ReadString();
     callee.networkId = parcel.ReadString();
-    callee.peerId = parcel.ReadString();
     callee.pkgName = parcel.ReadString();
     callee.userId = parcel.ReadInt32();
     callee.extra = parcel.ReadString();

@@ -89,6 +89,13 @@ void PrintProfile(const AccessControlProfile &profile)
         aceePkgName.c_str(), GetAnonyString(aceeCredId).c_str(), aceeSkId);
 }
 
+std::string GetLocalDeviceId()
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    return std::string(localDeviceId);
+}
+
 DM_EXPORT int32_t DeviceProfileConnector::GetVersionByExtra(std::string &extraInfo, std::string &dmVersion)
 {
     JsonObject extraInfoJson(extraInfo);
@@ -1519,9 +1526,7 @@ DM_EXPORT uint32_t DeviceProfileConnector::DeleteTimeOutAcl(const std::string &d
     LOGI("AccessControlProfile size is %{public}zu", profiles.size());
     uint32_t res = 0;
     int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = std::string(localDeviceId);
+    std::string localUdid = GetLocalDeviceId();
     DmAclIdParam dmAclIdParam;
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != deviceId || item.GetStatus() != ACTIVE) {
@@ -2895,10 +2900,8 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcAccessControl(const DmAccessCalle
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = std::string(localDeviceId);
-    std::string trustUdid = localUdid == srcUdid ? sinkUdid : srcUdid;
+    std::string localUdid = GetLocalDeviceId();
+    std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
     for (const auto &item : profiles) {
         PrintProfile(item);
         if (item.GetTrustDeviceId() != trustUdid || item.GetStatus() != ACTIVE) {
@@ -3012,10 +3015,8 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkAccessControl(const DmAccessCall
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = std::string(localDeviceId);
-    std::string trustUdid = localUdid == srcUdid ? sinkUdid : srcUdid;
+    std::string localUdid = GetLocalDeviceId();
+    std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
     for (const auto &item : profiles) {
         PrintProfile(item);
         if (item.GetTrustDeviceId() != trustUdid || item.GetStatus() != ACTIVE) {
@@ -3140,10 +3141,8 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCalle
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = std::string(localDeviceId);
-    std::string trustUdid = localUdid == srcUdid ? sinkUdid : srcUdid;
+    std::string localUdid = GetLocalDeviceId();
+    std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
     for (const auto &item : profiles) {
         PrintProfile(item);
         if (item.GetTrustDeviceId() != trustUdid || item.GetStatus() != ACTIVE ||
@@ -3167,10 +3166,8 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = std::string(localDeviceId);
-    std::string trustUdid = localUdid == srcUdid ? sinkUdid : srcUdid;
+    std::string localUdid = GetLocalDeviceId();
+    std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
     for (const auto &item : profiles) {
         PrintProfile(item);
         if (item.GetTrustDeviceId() != trustUdid || item.GetStatus() != ACTIVE ||
