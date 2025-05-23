@@ -384,6 +384,7 @@ typedef struct DmAccessCaller {
 typedef struct DmAccessCallee {
     std::string accountId;
     std::string networkId;
+    std::string peerId;
     std::string pkgName;
     int32_t userId;
     uint64_t tokenId = 0;
