@@ -1427,7 +1427,7 @@ int32_t DmAuthManager::GetOutputState(int32_t state)
     if (it != OLD_STATE_MAPPING.end()) {
         return static_cast<int32_t>(it->second);
     }
-    return STATUS_DM_AUTH_DEFAULT;
+    return static_cast<int32_t>(STATUS_DM_AUTH_DEFAULT);
 }
 
 void DmAuthManager::SrcAuthenticateFinish()

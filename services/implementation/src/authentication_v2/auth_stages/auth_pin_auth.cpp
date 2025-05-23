@@ -494,9 +494,9 @@ int32_t AuthSrcPinInputState::ShowStartAuthDialog(std::shared_ptr<DmAuthContext>
     }
 
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
-        STATUS_DM_SHOW_PIN_INPUT_UI, DM_OK);
+        static_cast<int32_t>(STATUS_DM_SHOW_PIN_INPUT_UI), DM_OK);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
-        DM_OK, STATUS_DM_SHOW_PIN_INPUT_UI, "");
+        DM_OK, static_cast<int32_t>(STATUS_DM_SHOW_PIN_INPUT_UI), "");
     DmDialogManager::GetInstance().ShowInputDialog(context->accessee.deviceName);
     LOGI("AuthSrcPinInputState::ShowStartAuthDialog end.");
     return DM_OK;
