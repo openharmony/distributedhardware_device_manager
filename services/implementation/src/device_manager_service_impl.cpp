@@ -2261,12 +2261,10 @@ int32_t DeviceManagerServiceImpl::ProcessAppUninstall(int32_t userId, int32_t ac
         }
     }
 
-    if (delACLInfoVec.size() == 0) {
+    if (delACLInfoVec.size() == 0 || userIdVec.size() == 0) {
         return DM_OK;
     }
-    if (userIdVec.size() == 0) {
-        return DM_OK;
-    }
+
     CHECK_NULL_RETURN(hiChainConnector_, ERR_DM_POINT_NULL);
     hiChainConnector_->DeleteGroupByACL(delACLInfoVec, userIdVec);
     return DM_OK;
@@ -2275,7 +2273,7 @@ int32_t DeviceManagerServiceImpl::ProcessAppUninstall(int32_t userId, int32_t ac
 void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTokenId,
     const std::string &extra, const std::string &udid)
 {
-    LOGE("DeviceManagerServiceImpl::ProcessUnBindApp userId = %{public}s, accessTokenId = %{public}s,"
+    LOGI("DeviceManagerServiceImpl::ProcessUnBindApp userId = %{public}s, accessTokenId = %{public}s,"
         "extra = %{public}s.", GetAnonyInt32(userId).c_str(), GetAnonyInt32(accessTokenId).c_str(),
         GetAnonyString(extra).c_str());
 

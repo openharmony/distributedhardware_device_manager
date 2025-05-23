@@ -116,11 +116,15 @@ int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
 
 int32_t DMCommTool::SendUninstAppObj(int32_t userId, int32_t tokenId, const std::string &networkId)
 {
-    LOGE("SendUninstAppObj, userId: %{public}s, tokenId: %{public}s", GetAnonyInt32(userId).c_str(),
+    LOGI("SendUninstAppObj, userId: %{public}s, tokenId: %{public}s", GetAnonyInt32(userId).c_str(),
         GetAnonyInt32(tokenId).c_str());
     if (!IsIdLengthValid(networkId)) {
         LOGE("param invalid, networkId: %{public}s", GetAnonyString(networkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
     }
     int32_t socketId = 0;
     if (dmTransportPtr_->StartSocket(networkId, socketId) != DM_OK || socketId <= 0) {
@@ -162,6 +166,10 @@ int32_t DMCommTool::RspAppUninstall(const std::string rmtNetworkId, int32_t sock
     CommMsg commMsg(DM_COMM_RSP_APP_UNINSTALL, msgStr);
     std::string payload = GetCommMsgString(commMsg);
 
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
+    }
     int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
     if (ret != DM_OK) {
         LOGE("RspAppUninstall failed, ret: %{public}d", ret);
@@ -179,6 +187,10 @@ int32_t DMCommTool::RspAppUnbind(const std::string rmtNetworkId, int32_t socketI
     CommMsg commMsg(DM_COMM_RSP_APP_UNBIND, msgStr);
     std::string payload = GetCommMsgString(commMsg);
 
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
+    }
     int32_t ret = dmTransportPtr_->Send(rmtNetworkId, payload, socketId);
     if (ret != DM_OK) {
         LOGE("RspAppUnbind failed, ret: %{public}d", ret);
@@ -192,12 +204,17 @@ int32_t DMCommTool::RspAppUnbind(const std::string rmtNetworkId, int32_t socketI
 int32_t DMCommTool::SendUnBindAppObj(int32_t userId, int32_t tokenId, const std::string &extra,
     const std::string &networkId, const std::string &udid)
 {
-    LOGE("DMCommTool::SendUnBindAppObj, userId: %{public}s, tokenId: %{public}s, extra: %{public}s, udid: %{public}s",
+    LOGI("DMCommTool::SendUnBindAppObj, userId: %{public}s, tokenId: %{public}s, extra: %{public}s, udid: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str(),
         GetAnonyString(udid).c_str());
     if (!IsIdLengthValid(networkId)) {
         LOGE("param invalid, networkId: %{public}s", GetAnonyString(networkId).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
+    }
+    
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
     }
     int32_t socketId;
     if (dmTransportPtr_->StartSocket(networkId, socketId) != DM_OK || socketId <= 0) {
@@ -555,6 +572,10 @@ void DMCommTool::ProcessReceiveRspAppUninstallEvent(const std::shared_ptr<InnerC
         return;
     }
     LOGI("DMCommTool::ProcessReceiveRspAppUninstallEvent Start.");
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return;
+    }
     this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
@@ -571,12 +592,16 @@ void DMCommTool::ProcessReceiveRspAppUnbindEvent(const std::shared_ptr<InnerComm
         LOGE("commMsg or commMsg->remoteNetworkId is null");
         return;
     }
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return;
+    }
     LOGI("DMCommTool::ProcessReceiveRspAppUnbindEvent Start.");
     this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
     if (rmtUdid.empty()) {
-        LOGE("Can not find remote udid by networkid: %{public}s", commMsg->remoteNetworkId.c_str());
+        LOGE("Can not find remote udid by networkid.");
         return;
     }
     DeviceManagerService::GetInstance().ProcessReceiveRspAppUnbind(rmtUdid);
@@ -591,7 +616,7 @@ void DMCommTool::ProcessResponseUserIdsEvent(const std::shared_ptr<InnerCommMsg>
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
     if (rmtUdid.empty()) {
-        LOGE("Can not find remote udid by networkid: %{public}s", commMsg->remoteNetworkId.c_str());
+        LOGE("Can not find remote udid by networkid.");
         return;
     }
 

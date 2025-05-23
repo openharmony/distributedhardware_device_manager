@@ -438,6 +438,7 @@ private:
     std::vector<int32_t> foregroundUserVec_;
     std::vector<int32_t> backgroundUserVec_;
     std::mutex unInstallLock_;
+    std::mutex unBindLock_;
     int64_t SendLastBroadCastTime_ = 0;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;

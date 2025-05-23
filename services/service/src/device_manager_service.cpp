@@ -91,7 +91,7 @@ namespace {
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
     const int32_t SEND_DELAY_MAX_TIME = 5;
     const int32_t SEND_DELAY_MIN_TIME = 0;
-    const int32_t DELAY_TIME_SEC_CONVERSION (1000 * 1000);
+    const int32_t DELAY_TIME_SEC_CONVERSION = 1000000;      // 1000*1000
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     const std::string GET_LOCAL_DEVICE_NAME_API_NAME = "GetLocalDeviceName";
 #endif
@@ -2592,7 +2592,7 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
 
 void DeviceManagerService::ProcessUninstApp(int32_t userId, int32_t tokenId)
 {
-    LOGE("DeviceManagerService::ProcessUninstApp userId: %{public}s, tokenId: %{public}s",
+    LOGI("DeviceManagerService::ProcessUninstApp userId: %{public}s, tokenId: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->ProcessAppUninstall(userId, tokenId);
@@ -2602,7 +2602,7 @@ void DeviceManagerService::ProcessUninstApp(int32_t userId, int32_t tokenId)
 void DeviceManagerService::ProcessUnBindApp(int32_t userId, int32_t tokenId, const std::string &extra,
     const std::string &udid)
 {
-    LOGE("DeviceManagerService::ProcessUnBindApp userId: %{public}s, tokenId: %{public}s, udid: %{public}s",
+    LOGI("DeviceManagerService::ProcessUnBindApp userId: %{public}s, tokenId: %{public}s, udid: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(udid).c_str());
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->ProcessUnBindApp(userId, tokenId, extra, udid);
@@ -2871,6 +2871,7 @@ void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::stri
 void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId)
 {
+    std::lock_guard<std::mutex> lock(unBindLock_);
     int64_t currentTime =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     if (SendLastBroadCastTime_ == 0) {
@@ -2899,6 +2900,7 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
 void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, uint64_t peerTokenId)
 {
+    std::lock_guard<std::mutex> lock(unBindLock_);
     int64_t currentTime =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     if (SendLastBroadCastTime_ == 0) {
@@ -2988,7 +2990,7 @@ void DeviceManagerService::HandleCredentialDeleted(const char *credId, const cha
         return;
     }
     if (!isShareType) {
-        LOGI("HandleCredentialDeleted not share type.");
+        LOGE("HandleCredentialDeleted not share type.");
         return;
     }
     std::vector<std::string> peerUdids;
@@ -3449,11 +3451,13 @@ void DeviceManagerService::NotifyRemoteLocalUserSwitch(int32_t curUserId, int32_
 
 void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId)
 {
-    LOGE("DeviceManagerService::NotifyRemoteUninstallApp userId: %{public}s, tokenId: %{public}s",
+    LOGI("DeviceManagerService::NotifyRemoteUninstallApp userId: %{public}s, tokenId: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
     std::vector<std::string> peerUdids;
     int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
-    peerUdids = dmServiceImpl_->GetDeviceIdByUserIdAndTokenId(currentUserId, tokenId);
+    if (IsDMServiceImplReady()) {
+        peerUdids = dmServiceImpl_->GetDeviceIdByUserIdAndTokenId(currentUserId, tokenId);
+    }
     if (peerUdids.empty()) {
         LOGE("peerUdids is empty");
         return;
@@ -3468,14 +3472,14 @@ void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t toke
         std::string netWorkId = "";
         SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
         if (netWorkId.empty()) {
-            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            LOGE("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
             bleUdids.push_back(udid);
             continue;
         }
         int32_t networkType = 0;
         int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
         if (ret != DM_OK || networkType <= 0) {
-            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            LOGE("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
             bleUdids.push_back(udid);
             continue;
         }
@@ -3498,7 +3502,7 @@ void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t toke
 void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
     const std::map<std::string, std::string> &wifiDevices)
 {
-    LOGE("DeviceManagerService::NotifyRemoteUninstallAppByWifi userId: %{public}s, tokenId: %{public}s",
+    LOGI("DeviceManagerService::NotifyRemoteUninstallAppByWifi userId: %{public}s, tokenId: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
     for (const auto &it : wifiDevices) {
         int32_t result = SendUninstAppByWifi(userId, tokenId, it.second);
@@ -3521,7 +3525,7 @@ void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_
 void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
     const std::map<std::string, std::string> &wifiDevices)
 {
-    LOGE("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
+    LOGI("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str());
     for (const auto &it : wifiDevices) {
         int32_t result = SendUnBindAppByWifi(userId, tokenId, extra, it.second, it.first);
@@ -3544,7 +3548,7 @@ void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t t
 void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remoteUdid)
 {
     LOGI("ProcessReceiveRspAppUninstall remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
-    if (timer_ != nullptr) {
+    if (timer_ != nullptr && remoteUdid != "") {
         timer_->DeleteTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
     }
 }
@@ -3552,7 +3556,7 @@ void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remo
 void DeviceManagerService::ProcessReceiveRspAppUnbind(const std::string &remoteUdid)
 {
     LOGI("ProcessReceiveRspAppUnbind remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
-    if (timer_ != nullptr) {
+    if (timer_ != nullptr && remoteUdid != "") {
         timer_->DeleteTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
     }
 }
@@ -3594,14 +3598,14 @@ void DeviceManagerService::GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t t
         std::string netWorkId = "";
         SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
         if (netWorkId.empty()) {
-            LOGI("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            LOGE("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
             bleUdids.push_back(udid);
             continue;
         }
         int32_t networkType = 0;
         int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
         if (ret != DM_OK || networkType <= 0) {
-            LOGI("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            LOGE("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
             bleUdids.push_back(udid);
             continue;
         }
