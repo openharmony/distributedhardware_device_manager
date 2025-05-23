@@ -73,11 +73,11 @@ int32_t DmAniDiscoveryFailedCallback::GetRefCount()
 }
 
 DmAniDiscoverySuccessCallback::DmAniDiscoverySuccessCallback(std::string &bundleName,
-    taihe::callback<void(ohos::distributedDeviceManager::DeviceStateChangeAction const &)>
+    taihe::callback<void(ohos::distributedDeviceManager::DeviceStateChangeAction const&)>
     discoverSuccessCallback)
     : refCount_(0), bundleName_(bundleName),
     discoverSuccessCallback_(std::make_shared<taihe::callback<void(
-    ohos::distributedDeviceManager::DeviceStateChangeAction const &)>>(discoverSuccessCallback))
+    ohos::distributedDeviceManager::DeviceStateChangeAction const&)>>(discoverSuccessCallback))
 {
 }
 
@@ -113,11 +113,11 @@ void DmAniDeviceNameChangeCallback::OnDeviceChanged(
 }
 
 DmAniDeviceStateChangeDataCallback::DmAniDeviceStateChangeDataCallback(std::string &bundleName,
-    taihe::callback<void(ohos::distributedDeviceManager::DeviceStateChangeData const &)>
+    taihe::callback<void(ohos::distributedDeviceManager::DeviceStateChangeData const&)>
     deviceStateChangeDataCallback)
     : bundleName_(bundleName),
     deviceStateChangeDataCallback_(std::make_shared<taihe::callback<void(
-    ohos::distributedDeviceManager::DeviceStateChangeData const &)>>(deviceStateChangeDataCallback))
+    ohos::distributedDeviceManager::DeviceStateChangeData const&)>>(deviceStateChangeDataCallback))
 {
 }
 
