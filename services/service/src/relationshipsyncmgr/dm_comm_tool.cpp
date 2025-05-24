@@ -263,7 +263,7 @@ void DMCommTool::RspLocalFrontOrBackUserIds(const std::string rmtNetworkId,
 {
     UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
     cJSON *root = cJSON_CreateObject();
-    if (root == nullptr) {
+    if (root == nullptr || dmTransportPtr_ == nullptr) {
         LOGE("Create cJSON object failed.");
         return;
     }
@@ -580,7 +580,7 @@ void DMCommTool::ProcessReceiveRspAppUninstallEvent(const std::shared_ptr<InnerC
         return;
     }
     LOGI("DMCommTool::ProcessReceiveRspAppUninstallEvent Start.");
-    if (this->dmTransportPtr_ == nullptr) {
+    if (dmTransportPtr_ == nullptr) {
         LOGE("dmTransportPtr_ is null");
         return;
     }
@@ -600,7 +600,7 @@ void DMCommTool::ProcessReceiveRspAppUnbindEvent(const std::shared_ptr<InnerComm
         LOGE("commMsg or commMsg->remoteNetworkId is null");
         return;
     }
-    if (this->dmTransportPtr_ == nullptr) {
+    if (dmTransportPtr_ == nullptr) {
         LOGE("dmTransportPtr_ is null");
         return;
     }

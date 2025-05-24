@@ -2280,14 +2280,14 @@ void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTo
     JsonObject extraInfoJson(extra);
     if (extraInfoJson.IsDiscarded()) {
         LOGE("ParseExtra extraInfoJson error");
+        HandleAppUnBindEvent(userId, udid, accessTokenId);
         return;
     }
     if (extraInfoJson.Contains(TAG_PEER_TOKENID) && extraInfoJson[TAG_PEER_TOKENID].IsNumberInteger()) {
         uint64_t peerTokenId = extraInfoJson[TAG_PEER_TOKENID].Get<uint64_t>();
         HandleAppUnBindEvent(userId, udid, accessTokenId, static_cast<int32_t>(peerTokenId));
-    } else {
-        HandleAppUnBindEvent(userId, udid, accessTokenId);
     }
+    return;
 }
 
 void DeviceManagerServiceImpl::CheckIsLastLnnAcl(DistributedDeviceProfile::AccessControlProfile profile,

@@ -323,11 +323,11 @@ void FromJson(const cJSON *jsonObject, UnBindAppMsg &unBindAppMsg)
         unBindAppMsg.tokenId_ = tokenIdObj->valueint;
     }
     cJSON *extraObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_EXTRA_KEY);
-    if (cJSON_IsNumber(extraObj)) {
+    if (cJSON_IsString(extraObj)) {
         unBindAppMsg.extra_ = extraObj->valuestring;
     }
     cJSON *udidObj = cJSON_GetObjectItem(jsonObject, DSOFTBUS_NOTIFY_UDID_KEY);
-    if (cJSON_IsNumber(udidObj)) {
+    if (cJSON_IsString(udidObj)) {
         unBindAppMsg.udid_ = udidObj->valuestring;
     }
 }

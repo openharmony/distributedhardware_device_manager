@@ -440,6 +440,7 @@ private:
     std::mutex unInstallLock_;
     std::mutex unBindLock_;
     int64_t SendLastBroadCastTime_ = 0;
+    int64_t lastDelayTime_ = 0;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI

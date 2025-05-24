@@ -2871,16 +2871,24 @@ void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::stri
 void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId)
 {
-    std::lock_guard<std::mutex> lock(unBindLock_);
+    int64_t timeDiff = 0;
+    int32_t delayTime = 0;
+    
     int64_t currentTime =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    if (SendLastBroadCastTime_ == 0) {
+    {
+        std::lock_guard<std::mutex> lock(unBindLock_);
+        if (SendLastBroadCastTime_ == 0) {
+            SendLastBroadCastTime_ = currentTime;
+        }
+        timeDiff = currentTime - SendLastBroadCastTime_;
+        delayTime = SEND_DELAY_MAX_TIME - timeDiff + lastDelayTime_;
+        if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
+            delayTime = SEND_DELAY_MIN_TIME;
+        }
         SendLastBroadCastTime_ = currentTime;
-    }
-    int64_t timeDiff = currentTime - SendLastBroadCastTime_;
-    int32_t delayTime = SEND_DELAY_MAX_TIME - timeDiff;
-    if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
-        delayTime = SEND_DELAY_MIN_TIME;
+        lastDelayTime_ = delayTime;
+
     }
     std::function<void()> task = [=]() {
         LOGI("SendAppUnBindBroadCast Start.");
@@ -2900,16 +2908,24 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
 void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, uint64_t peerTokenId)
 {
-    std::lock_guard<std::mutex> lock(unBindLock_);
+    int64_t timeDiff = 0;
+    int32_t delayTime = 0;
+    
     int64_t currentTime =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    if (SendLastBroadCastTime_ == 0) {
+    {
+        std::lock_guard<std::mutex> lock(unBindLock_);
+        if (SendLastBroadCastTime_ == 0) {
+            SendLastBroadCastTime_ = currentTime;
+        }
+        timeDiff = currentTime - SendLastBroadCastTime_;
+        delayTime = SEND_DELAY_MAX_TIME - timeDiff + lastDelayTime_;
+        if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
+            delayTime = SEND_DELAY_MIN_TIME;
+        }
         SendLastBroadCastTime_ = currentTime;
-    }
-    int64_t timeDiff = currentTime - SendLastBroadCastTime_;
-    int32_t delayTime = SEND_DELAY_MAX_TIME - timeDiff;
-    if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
-        delayTime = SEND_DELAY_MIN_TIME;
+        lastDelayTime_ = delayTime;
+
     }
     std::function<void()> task = [=]() {
         LOGI("SendAppUnBindBroadCast Start.");
@@ -2924,7 +2940,6 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
     ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
-    SendLastBroadCastTime_ = currentTime;
 }
 
 void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
@@ -2936,10 +2951,12 @@ void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::stri
         SendLastBroadCastTime_ = currentTime;
     }
     int64_t timeDiff = currentTime - SendLastBroadCastTime_;
-    int32_t delayTime = SEND_DELAY_MAX_TIME - timeDiff;
+    int32_t delayTime = SEND_DELAY_MAX_TIME - timeDiff + lastDelayTime_;
     if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
         delayTime = SEND_DELAY_MIN_TIME;
     }
+    SendLastBroadCastTime_ = currentTime;
+    lastDelayTime_ = delayTime;
     std::function<void()> task = [=]() {
         LOGI("SendAppUnInstallBroadCast Start.");
         RelationShipChangeMsg msg;
@@ -2952,7 +2969,6 @@ void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::stri
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
     ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
-    SendLastBroadCastTime_ = currentTime;
 }
 
 void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
@@ -2971,7 +2987,7 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
 void DeviceManagerService::HandleCredentialDeleted(const char *credId, const char *credInfo)
 {
     LOGI("start.");
-    if (credId == nullptr || credInfo == nullptr) {
+    if (credId == nullptr || credInfo == nullptr ||dmServiceImpl_ == nullptr) {
         LOGE("HandleCredentialDeleted credId or credInfo is nullptr.");
         return;
     }
@@ -3528,7 +3544,10 @@ void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t t
     LOGI("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str());
     for (const auto &it : wifiDevices) {
-        int32_t result = SendUnBindAppByWifi(userId, tokenId, extra, it.second, it.first);
+        char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+        GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+        std::string localUdid = std::string(localUdidTemp);
+        int32_t result = SendUnBindAppByWifi(userId, tokenId, extra, it.second, localUdid);
         if (result != DM_OK) {
             LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
             continue;
