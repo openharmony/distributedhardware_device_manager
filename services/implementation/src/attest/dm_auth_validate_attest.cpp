@@ -122,19 +122,11 @@ void AuthValidateAttest::FreeHksCertChain(HksCertChain &chain)
 
 int32_t AllocateHksBlobArray(uint32_t count, HksBlob **outArray)
 {
-    HksBlob *arr = new HksBlob[count];
+    HksBlob *arr = new HksBlob[count]{0};
     if (arr == nullptr) {
         LOGE("Alloc failed for certs");
         return ERR_DM_MALLOC_FAILED;
     }
-
-    const size_t totalSize = sizeof(HksBlob) *count;
-    if (memset_s(arr, totalSize, 0, totalSize) != 0) {
-        LOGE("memset_s failed");
-        delete[] arr;
-        return ERR_DM_FAILED;
-    }
-
     *outArray = arr;
     return DM_OK;
 }

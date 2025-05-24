@@ -29,7 +29,6 @@ int32_t AuthGenerateAttest::GenerateCertificate(DmCertChain &dmCertChain)
     LOGI("GenerateCertificate Start");
     DcmIdType ids[] = { DCM_ID_TYPE_UDID };
     uint64_t randomNum = GenRandLongLong(MIN_DCM_RANDOM, MAX_DCM_RANDOM);
-    LOGI("GenerateCertificate randomNum=%{public}lu", randomNum);
     DcmBlob challengeBlob = {sizeof(randomNum), (uint8_t *) &randomNum};
     DcmCertChain *dcmCertChain = new DcmCertChain();
     if (dcmCertChain == nullptr) {
