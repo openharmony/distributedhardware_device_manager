@@ -544,6 +544,7 @@ public:
     bool AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen);
     void AuthDeviceFinish(int64_t requestId);
     void AuthDeviceError(int64_t requestId, int32_t errorCode);
+    int32_t GetOutputState(int32_t state);
     void GetRemoteDeviceId(std::string &deviceId);
     void AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
     char *AuthDeviceRequest(int64_t requestId, int operationCode, const char *reqParams);
