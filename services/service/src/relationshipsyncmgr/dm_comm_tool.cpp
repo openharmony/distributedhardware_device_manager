@@ -162,6 +162,10 @@ int32_t DMCommTool::SendUninstAppObj(int32_t userId, int32_t tokenId, const std:
 int32_t DMCommTool::RspAppUninstall(const std::string rmtNetworkId, int32_t socketId)
 {
     LOGI("RspAppUninstall Start.");
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
+    }
     std::string msgStr("");
     CommMsg commMsg(DM_COMM_RSP_APP_UNINSTALL, msgStr);
     std::string payload = GetCommMsgString(commMsg);
@@ -183,6 +187,10 @@ int32_t DMCommTool::RspAppUninstall(const std::string rmtNetworkId, int32_t sock
 int32_t DMCommTool::RspAppUnbind(const std::string rmtNetworkId, int32_t socketId)
 {
     LOGI("RspAppUnbind Start.");
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null");
+        return ERR_DM_FAILED;
+    }
     std::string msgStr("");
     CommMsg commMsg(DM_COMM_RSP_APP_UNBIND, msgStr);
     std::string payload = GetCommMsgString(commMsg);
@@ -572,7 +580,7 @@ void DMCommTool::ProcessReceiveRspAppUninstallEvent(const std::shared_ptr<InnerC
         return;
     }
     LOGI("DMCommTool::ProcessReceiveRspAppUninstallEvent Start.");
-    if (dmTransportPtr_ == nullptr) {
+    if (this->dmTransportPtr_ == nullptr) {
         LOGE("dmTransportPtr_ is null");
         return;
     }
@@ -580,7 +588,7 @@ void DMCommTool::ProcessReceiveRspAppUninstallEvent(const std::shared_ptr<InnerC
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
     if (rmtUdid.empty()) {
-        LOGE("Can not find remote udid by networkid: %{public}s", commMsg->remoteNetworkId.c_str());
+        LOGE("Can not find remote udid by networkid.");
         return;
     }
     DeviceManagerService::GetInstance().ProcessReceiveRspAppUninstall(rmtUdid);
@@ -592,7 +600,7 @@ void DMCommTool::ProcessReceiveRspAppUnbindEvent(const std::shared_ptr<InnerComm
         LOGE("commMsg or commMsg->remoteNetworkId is null");
         return;
     }
-    if (dmTransportPtr_ == nullptr) {
+    if (this->dmTransportPtr_ == nullptr) {
         LOGE("dmTransportPtr_ is null");
         return;
     }
