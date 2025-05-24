@@ -31,6 +31,7 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_transport_msg.h"
 #include "ffrt.h"
+#include "multiple_user_connector.h"
 #endif
 #include "ipc_skeleton.h"
 #include "parameter.h"
@@ -1309,21 +1310,27 @@ int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, con
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     (void)extra;
+    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = std::string(localDeviceId);
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
-        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
         if (profile.GetBindType() == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
             continue;
         }
         DistributedDeviceProfile::Accesser acer = profile.GetAccesser();
-        if (pkgName == acer.GetAccesserBundleName()) {
+        if (pkgName == acer.GetAccesserBundleName() && currentUserId == acer.GetAccesserUserId() &&
+            localUdid == acer.GetAccesserDeviceId()) {
             DmDeviceInfo deviceinfo;
             ConvertAclToDeviceInfo(profile, deviceinfo);
             deviceList.push_back(deviceinfo);
             continue;
         }
         DistributedDeviceProfile::Accessee acee = profile.GetAccessee();
-        if (pkgName == acee.GetAccesseeBundleName()) {
+        if (pkgName == acee.GetAccesseeBundleName() && currentUserId == acee.GetAccesseeUserId() &&
+            localUdid == acee.GetAccesseeDeviceId()) {
             DmDeviceInfo deviceinfo;
             ConvertAclToDeviceInfo(profile, deviceinfo);
             deviceList.push_back(deviceinfo);

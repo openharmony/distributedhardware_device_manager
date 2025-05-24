@@ -53,6 +53,64 @@ namespace OHOS {
 namespace DistributedHardware {
 const unsigned int XCOLLIE_TIMEOUT_S = 5;
 constexpr const char* SCENEBOARD_PROCESS = "com.ohos.sceneboard";
+void DecodeDmAccessCaller(MessageParcel &parcel, DmAccessCaller &caller)
+{
+    caller.accountId = parcel.ReadString();
+    caller.pkgName = parcel.ReadString();
+    caller.networkId = parcel.ReadString();
+    caller.userId = parcel.ReadInt32();
+    caller.tokenId = parcel.ReadUint64();
+    caller.extra = parcel.ReadString();
+}
+
+void DecodeDmAccessCallee(MessageParcel &parcel, DmAccessCallee &callee)
+{
+    callee.accountId = parcel.ReadString();
+    callee.networkId = parcel.ReadString();
+    callee.peerId = parcel.ReadString();
+    callee.pkgName = parcel.ReadString();
+    callee.userId = parcel.ReadInt32();
+    callee.extra = parcel.ReadString();
+    callee.tokenId = parcel.ReadUint64();
+}
+
+int32_t OnIpcCmd(const DMIpcCmdInterfaceCode &ipcCode, MessageParcel &data, MessageParcel &reply)
+{
+    LOGI("start ipcCode %{public}d.", static_cast<int32_t>(ipcCode));
+    DmAccessCaller caller;
+    DmAccessCallee callee;
+    DecodeDmAccessCaller(data, caller);
+    DecodeDmAccessCallee(data, callee);
+    bool result = false;
+    switch (ipcCode) {
+        case CHECK_ACCESS_CONTROL:
+            result = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
+            break;
+        case CHECK_SAME_ACCOUNT:
+            result = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
+            break;
+        case CHECK_SRC_ACCESS_CONTROL:
+            result = DeviceManagerService::GetInstance().CheckSrcAccessControl(caller, callee);
+            break;
+        case CHECK_SINK_ACCESS_CONTROL:
+            result = DeviceManagerService::GetInstance().CheckSinkAccessControl(caller, callee);
+            break;
+        case CHECK_SRC_SAME_ACCOUNT:
+            result = DeviceManagerService::GetInstance().CheckSrcIsSameAccount(caller, callee);
+            break;
+        case CHECK_SINK_SAME_ACCOUNT:
+            result = DeviceManagerService::GetInstance().CheckSinkIsSameAccount(caller, callee);
+            break;
+        default:
+            LOGE("invalid ipccode");
+            break;
+    }
+    if (!reply.WriteBool(result)) {
+        LOGE("write result failed.");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 
 int32_t SetXcollieTimer()
 {
@@ -124,26 +182,6 @@ void DecodePeerTargetId(MessageParcel &parcel, PeerTargetId &targetId)
     targetId.bleMac = parcel.ReadString();
     targetId.wifiIp = parcel.ReadString();
     targetId.wifiPort = parcel.ReadUint16();
-}
-
-void DecodeDmAccessCaller(MessageParcel &parcel, DmAccessCaller &caller)
-{
-    caller.accountId = parcel.ReadString();
-    caller.pkgName = parcel.ReadString();
-    caller.networkId = parcel.ReadString();
-    caller.userId = parcel.ReadInt32();
-    caller.tokenId = parcel.ReadUint64();
-    caller.extra = parcel.ReadString();
-}
-
-void DecodeDmAccessCallee(MessageParcel &parcel, DmAccessCallee &callee)
-{
-    callee.accountId = parcel.ReadString();
-    callee.networkId = parcel.ReadString();
-    callee.peerId = parcel.ReadString();
-    callee.userId = parcel.ReadInt32();
-    callee.extra = parcel.ReadString();
-    callee.tokenId = parcel.ReadUint64();
 }
 
 ON_IPC_SET_REQUEST(SERVER_DEVICE_STATE_NOTIFY, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
@@ -1391,32 +1429,13 @@ ON_IPC_CMD(CHECK_API_PERMISSION, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(CHECK_ACCESS_CONTROL, MessageParcel &data, MessageParcel &reply)
 {
-    DmAccessCaller caller;
-    DmAccessCallee callee;
-    DecodeDmAccessCaller(data, caller);
-    DecodeDmAccessCallee(data, callee);
-    int32_t result = DeviceManagerService::GetInstance().CheckAccessControl(caller, callee);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed.");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
+    return OnIpcCmd(CHECK_ACCESS_CONTROL, data, reply);
 }
 
 ON_IPC_CMD(CHECK_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
 {
-    DmAccessCaller caller;
-    DmAccessCallee callee;
-    DecodeDmAccessCaller(data, caller);
-    DecodeDmAccessCallee(data, callee);
-    int32_t result = DeviceManagerService::GetInstance().CheckIsSameAccount(caller, callee);
-    if (!reply.WriteInt32(result)) {
-        LOGE("write result failed.");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
+    return OnIpcCmd(CHECK_SAME_ACCOUNT, data, reply);
 }
-
 
 ON_IPC_CMD(SHIFT_LNN_GEAR, MessageParcel &data, MessageParcel &reply)
 {
@@ -1957,6 +1976,26 @@ ON_IPC_CMD(GET_LOCAL_DEVICE_NAME, MessageParcel &data, MessageParcel &reply)
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;
+}
+
+ON_IPC_CMD(CHECK_SRC_ACCESS_CONTROL, MessageParcel &data, MessageParcel &reply)
+{
+    return OnIpcCmd(CHECK_SRC_ACCESS_CONTROL, data, reply);
+}
+
+ON_IPC_CMD(CHECK_SINK_ACCESS_CONTROL, MessageParcel &data, MessageParcel &reply)
+{
+    return OnIpcCmd(CHECK_SINK_ACCESS_CONTROL, data, reply);
+}
+
+ON_IPC_CMD(CHECK_SRC_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
+{
+    return OnIpcCmd(CHECK_SRC_SAME_ACCOUNT, data, reply);
+}
+
+ON_IPC_CMD(CHECK_SINK_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
+{
+    return OnIpcCmd(CHECK_SINK_SAME_ACCOUNT, data, reply);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

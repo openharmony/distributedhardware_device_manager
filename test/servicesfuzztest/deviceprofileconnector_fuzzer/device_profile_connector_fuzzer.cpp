@@ -62,7 +62,6 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(localDeviceId, targetDeviceId, userId);
     DeviceProfileConnector::GetInstance().PutAccessControlList(aclInfo, dmAccesser, dmAccessee);
     DeviceProfileConnector::GetInstance().UpdateAccessControlList(userId, accountId, accountId);
-    DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
     DeviceProfileConnector::GetInstance().CheckDevIdInAclForDevBind(pkgName, localDeviceId);
     DeviceProfileConnector::GetInstance().DeleteTimeOutAcl(localDeviceId, offlineParam);
     DeviceProfileConnector::GetInstance().GetTrustNumber(localDeviceId);

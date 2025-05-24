@@ -1251,9 +1251,15 @@ void DmRadarHelper::ReportGetLocalDevInfo(std::string hostName,
     std::string funcName, DmDeviceInfo &info, int32_t errCode, std::string localUdid)
 {
     int32_t res = DM_OK;
-    static std::string localCallerName = "";
-    if (localCallerName != hostName) {
-        localCallerName = hostName;
+    bool compare = false;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        if (localCallerName_ != hostName) {
+            compare = true;
+            localCallerName_ = hostName;
+        }
+    }
+    if (compare) {
         if (errCode == DM_OK) {
             res = ReportGetLocalDevInfoResultSucc(hostName, funcName, info, errCode, localUdid);
         } else {
