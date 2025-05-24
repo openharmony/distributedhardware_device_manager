@@ -890,7 +890,7 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
 
 int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash)
 {
-    LOGE("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s",
+    LOGI("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s",
         GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str());
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call UnBindDevice.");
@@ -910,7 +910,7 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
 int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash,
     const std::string &extra)
 {
-    LOGE("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s, "
+    LOGI("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s, "
         "extra: %{public}s", GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str(),
         GetAnonyString(extra).c_str());
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
