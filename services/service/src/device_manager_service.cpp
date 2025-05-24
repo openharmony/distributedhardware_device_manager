@@ -1901,35 +1901,23 @@ int32_t DeviceManagerService::IsSameAccount(const std::string &networkId)
 
 bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckAccessControl.", caller.pkgName.c_str());
-        return false;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("CheckAccessControl failed, instance not init or init failed.");
-        return false;
-    }
     std::string srcUdid = "";
-    SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
     std::string sinkUdid = "";
-    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), sinkUdid);
-    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("GetAccessUdidByNetworkId failed.");
+        return false;
+    }
+    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid); 
 }
 
 bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckIsSameAccount.", caller.pkgName.c_str());
-        return false;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("CheckIsSameAccount failed, instance not init or init failed.");
-        return false;
-    }
     std::string srcUdid = "";
-    SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
     std::string sinkUdid = "";
-    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), sinkUdid);
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("GetAccessUdidByNetworkId failed.");
+        return false;
+    }
     return dmServiceImpl_->CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
@@ -4215,6 +4203,68 @@ int32_t DeviceManagerService::GetLocalDeviceName(std::string &deviceName)
 #endif
     (void) deviceName;
     return DM_OK;
+}
+
+bool DeviceManagerService::GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
+    const std::string &sinkNetWorkId, std::string &sinkUdid)
+{
+    LOGI("start srcNetWorkId %{public}s, sinkNetWorkId %{public}s.", GetAnonyString(srcNetWorkId).c_str(),
+        GetAnonyString(sinkNetWorkId).c_str());
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller not have permission to call GetAccessUdidByNetworkId.");
+        return false;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("GetAccessUdidByNetworkId failed, instance not init or init failed.");
+        return false;
+    }
+    SoftbusListener::GetUdidByNetworkId(srcNetWorkId.c_str(), srcUdid);
+    SoftbusListener::GetUdidByNetworkId(sinkNetWorkId.c_str(), sinkUdid);
+    return true;
+}
+
+bool DeviceManagerService::CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    std::string srcUdid = "";
+    std::string sinkUdid = "";
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("The caller %{public}s GetAccessUdidByNetworkId failed.", caller.pkgName.c_str());
+        return false;
+    }
+    return dmServiceImpl_->CheckSrcAccessControl(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerService::CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    std::string srcUdid = "";
+    std::string sinkUdid = "";
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("The caller %{public}s GetAccessUdidByNetworkId failed.", caller.pkgName.c_str());
+        return false;
+    }
+    return dmServiceImpl_->CheckSinkAccessControl(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerService::CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    std::string srcUdid = "";
+    std::string sinkUdid = "";
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("The caller %{public}s GetAccessUdidByNetworkId failed.", caller.pkgName.c_str());
+        return false;
+    }
+    return dmServiceImpl_->CheckSrcIsSameAccount(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    std::string srcUdid = "";
+    std::string sinkUdid = "";
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("The caller %{public}s GetAccessUdidByNetworkId failed.", caller.pkgName.c_str());
+        return false;
+    }
+    return dmServiceImpl_->CheckSinkIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -148,9 +148,9 @@ public:
     int32_t IsSameAccount(const std::string &udid);
     uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId);
     void ScreenCommonEventCallback(std::string commonEventType);
-    int32_t CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    bool CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
-    int32_t CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    bool CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void HandleDeviceNotTrust(const std::string &udid);
     int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
@@ -195,6 +195,14 @@ public:
     void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId);
+    bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    bool CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

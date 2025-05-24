@@ -77,6 +77,31 @@ namespace DistributedHardware {
 namespace {
 const int32_t DM_MAX_TRUST_DEVICE_NUM = 200;
 }
+int32_t SetRequest(const DMIpcCmdInterfaceCode &ipcCode, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    LOGI("start ipcCode %{public}d.", static_cast<int32_t>(ipcCode));
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcCheckAcl> pReq = std::static_pointer_cast<IpcCheckAcl>(pBaseReq);
+    DmAccessCaller caller = pReq->GetAccessCaller();
+    DmAccessCallee callee = pReq->GetAccessCallee();
+    if (!IpcModelCodec::EncodeDmAccessCaller(caller, data)) {
+        LOGE("write caller failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!IpcModelCodec::EncodeDmAccessCallee(callee, data)) {
+        LOGE("write caller failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t ReadResponse(const DMIpcCmdInterfaceCode &ipcCode, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    LOGI("start ipcCode %{public}d.", static_cast<int32_t>(ipcCode));
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    pBaseRsp->SetErrCode(static_cast<int32_t>(reply.ReadBool()));
+    return DM_OK;
+}
 
 ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
@@ -1483,50 +1508,22 @@ ON_IPC_READ_RESPONSE(CHECK_API_PERMISSION, MessageParcel &reply, std::shared_ptr
 
 ON_IPC_SET_REQUEST(CHECK_ACCESS_CONTROL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
-    std::shared_ptr<IpcCheckAcl> pReq = std::static_pointer_cast<IpcCheckAcl>(pBaseReq);
-    DmAccessCaller caller = pReq->GetAccessCaller();
-    DmAccessCallee callee = pReq->GetAccessCallee();
-    if (!IpcModelCodec::EncodeDmAccessCaller(caller, data)) {
-        LOGE("write caller failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!IpcModelCodec::EncodeDmAccessCallee(callee, data)) {
-        LOGE("write caller failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
+    return SetRequest(CHECK_ACCESS_CONTROL, pBaseReq, data);
 }
 
 ON_IPC_READ_RESPONSE(CHECK_ACCESS_CONTROL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
+    return ReadResponse(CHECK_ACCESS_CONTROL, reply, pBaseRsp);
 }
 
 ON_IPC_SET_REQUEST(CHECK_SAME_ACCOUNT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
-    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
-    std::shared_ptr<IpcCheckAcl> pReq = std::static_pointer_cast<IpcCheckAcl>(pBaseReq);
-    DmAccessCaller caller = pReq->GetAccessCaller();
-    DmAccessCallee callee = pReq->GetAccessCallee();
-    if (!IpcModelCodec::EncodeDmAccessCaller(caller, data)) {
-        LOGE("write caller failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    if (!IpcModelCodec::EncodeDmAccessCallee(callee, data)) {
-        LOGE("write caller failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    return DM_OK;
+    return SetRequest(CHECK_SAME_ACCOUNT, pBaseReq, data);
 }
 
 ON_IPC_READ_RESPONSE(CHECK_SAME_ACCOUNT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
-    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
-    pBaseRsp->SetErrCode(reply.ReadInt32());
-    return DM_OK;
+    return ReadResponse(CHECK_SAME_ACCOUNT, reply, pBaseRsp);
 }
 
 ON_IPC_SET_REQUEST(SHIFT_LNN_GEAR, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
@@ -2163,6 +2160,46 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NAME, MessageParcel &reply, std::shared_pt
     pRsp->SetErrCode(reply.ReadInt32());
     pRsp->SetLocalDeviceName(reply.ReadString());
     return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(CHECK_SRC_ACCESS_CONTROL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    return SetRequest(CHECK_SRC_ACCESS_CONTROL, pBaseReq, data);
+}
+
+ON_IPC_READ_RESPONSE(CHECK_SRC_ACCESS_CONTROL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    return ReadResponse(CHECK_SRC_ACCESS_CONTROL, reply, pBaseRsp);
+}
+
+ON_IPC_SET_REQUEST(CHECK_SINK_ACCESS_CONTROL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    return SetRequest(CHECK_SINK_ACCESS_CONTROL, pBaseReq, data);
+}
+
+ON_IPC_READ_RESPONSE(CHECK_SINK_ACCESS_CONTROL, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    return ReadResponse(CHECK_SINK_ACCESS_CONTROL, reply, pBaseRsp);
+}
+
+ON_IPC_SET_REQUEST(CHECK_SRC_SAME_ACCOUNT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    return SetRequest(CHECK_SRC_SAME_ACCOUNT, pBaseReq, data);
+}
+
+ON_IPC_READ_RESPONSE(CHECK_SRC_SAME_ACCOUNT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    return ReadResponse(CHECK_SRC_SAME_ACCOUNT, reply, pBaseRsp);
+}
+
+ON_IPC_SET_REQUEST(CHECK_SINK_SAME_ACCOUNT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    return SetRequest(CHECK_SINK_SAME_ACCOUNT, pBaseReq, data);
+}
+
+ON_IPC_READ_RESPONSE(CHECK_SINK_SAME_ACCOUNT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    return ReadResponse(CHECK_SINK_SAME_ACCOUNT, reply, pBaseRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

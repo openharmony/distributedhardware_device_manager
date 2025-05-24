@@ -259,6 +259,10 @@ public:
     void ProcessCommonUserStatusEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     int32_t GetLocalDeviceName(std::string &deviceName);
+    bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
@@ -413,6 +417,8 @@ private:
     bool IsCallerInWhiteList();
     bool IsDMAdapterCheckApiWhiteListLoaded();
 #endif
+    bool GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
+        const std::string &sinkNetWorkId, std::string &sinkUdid);
 
 private:
     bool isImplsoLoaded_ = false;
