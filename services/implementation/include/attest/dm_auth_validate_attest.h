@@ -32,10 +32,10 @@ public:
         return instance;
     }
 
-    int32_t VerifyCertificate(DmCertChain &dmCertChain, const char* deviceUdid);
+    int32_t VerifyCertificate(DmCertChain &dmCertChain, const char *deviceUdid);
     int32_t ConvertDmCertChainToHksCertChain(DmCertChain &dmCertChain, HksCertChain &hksCertChain);
     int32_t FillHksParamSet(struct HksParamSet **paramSet, struct HksParam *param, int32_t paramNums);
-    void FreeHksCertChain(HksCertChain& chain);
+    void FreeHksCertChain(HksCertChain &chain);
 };
 }  // namespace DistributedHardware
 }  // namespace OHOS

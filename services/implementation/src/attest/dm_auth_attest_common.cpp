@@ -24,23 +24,22 @@ namespace DistributedHardware {
 const int32_t MAX_CERT_COUNT = 1024;
 constexpr int32_t HEX_TO_UINT8 = 2;
 
-std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain* chain)
+std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
 {
     if (chain == nullptr || chain->cert == nullptr || chain->certCount == 0) {
         return "{}";
     }
     JsonObject jsonObject;
     jsonObject[TAG_CERT_COUNT] = chain->certCount;
-    std::vector<std::string> certStrings;
     JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     for (uint32_t i = 0; i < chain->certCount; ++i) {
         const DmBlob& blob = chain->cert[i];
-        if (!blob.data || blob.size == 0) {
+        if (blob.data == nullptr || blob.size == 0) {
             return "{}";
         }
         const uint32_t hexLen = blob.size * HEX_TO_UINT8 + 1; // 2*blob.size + 1
-        char* hexBuffer = new char[hexLen];
-        if (!hexBuffer) {
+        char* hexBuffer = new char[hexLen]{0};
+        if (hexBuffer == nullptr) {
             return "{}";
         }
         int32_t ret = Crypto::ConvertBytesToHexString(hexBuffer, hexLen, blob.data, blob.size);
@@ -48,8 +47,6 @@ std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain* chain)
             delete[] hexBuffer;
             return "{}";
         }
-        hexBuffer[blob.size * HEX_TO_UINT8] = '\0';
-        certStrings.emplace_back(hexBuffer, hexLen);
         jsonArrayObj.PushBack(std::string(hexBuffer));
         delete[] hexBuffer;
     }
@@ -57,11 +54,11 @@ std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain* chain)
     return jsonObject.Dump();
 }
 
-bool ValidateInputJson(const std::string& data)
+bool ValidateInputJson(const std::string &data)
 {
     JsonObject jsonObject;
     jsonObject.Parse(data);
-    if (!jsonObject.Contains(TAG_CERT_COUNT) || !jsonObject.Contains(TAG_CERT)) {
+    if (!IsUint32(jsonObject, TAG_CERT_COUNT) || !jsonObject.Contains(TAG_CERT)) {
         LOGE("DeserializeDmCertChain: Missing required fields 'certCount' or 'cert'");
         return false;
     }
@@ -73,10 +70,9 @@ bool ValidateInputJson(const std::string& data)
     return true;
 }
 
- bool ProcessCertItem(const JsonItemObject& item, DmBlob& cert, uint32_t processedIndex)
+ bool ProcessCertItem(const JsonItemObject &item, DmBlob &cert, uint32_t processedIndex)
  {
     std::string hexStr = item.Get<std::string>();
-    LOGI("DeserializeDmCertChain hexStr=%{public}s.", hexStr.c_str());
     const size_t hexLen = hexStr.length();
     if (hexLen == 0 || hexLen % HEX_TO_UINT8 != 0) {
         LOGE("DeserializeDmCertChain: Invalid HEX length %{public}zu at index %{public}u", hexLen, processedIndex);
@@ -100,7 +96,7 @@ bool ValidateInputJson(const std::string& data)
     return true;
 }
 
-bool AuthAttestCommon::DeserializeDmCertChain(const std::string& data, DmCertChain* outChain)
+bool AuthAttestCommon::DeserializeDmCertChain(const std::string &data, DmCertChain *outChain)
 {
     if (outChain == nullptr || data.empty() || !ValidateInputJson(data)) {
         LOGE("Invalid input");
@@ -111,12 +107,11 @@ bool AuthAttestCommon::DeserializeDmCertChain(const std::string& data, DmCertCha
     const uint32_t certCount = jsonObject[TAG_CERT_COUNT].Get<uint32_t>();
     JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     jsonArrayObj.Parse(jsonObject[TAG_CERT].Dump());
-    DmBlob* certs = new DmBlob[certCount];
+    DmBlob* certs = new DmBlob[certCount]{0};
     if (certs == nullptr) {
         LOGE("DeserializeDmCertChain: Memory allocation failed for certs array");
         return false;
     }
-    memset_s(certs, sizeof(DmBlob) * certCount, 0, sizeof(DmBlob) * certCount);
     bool success = true;
     uint32_t processedIndex = 0;
     for (const auto& item : jsonArrayObj.Items()) {

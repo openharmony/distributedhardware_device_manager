@@ -626,7 +626,7 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
 std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context_)
 {
 #ifdef DEVICE_MANAGER_COMMON_FLAG
-    context_->isBlueFlag = true;
+    context_->isCommonFlag = true;
     LOGI("Blue device do not generate cert!");
     return "";
 #else

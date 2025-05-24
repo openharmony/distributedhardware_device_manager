@@ -31,7 +31,7 @@ int32_t AuthGenerateAttest::GenerateCertificate(DmCertChain &dmCertChain)
     uint64_t randomNum = GenRandLongLong(MIN_DCM_RANDOM, MAX_DCM_RANDOM);
     LOGI("GenerateCertificate randomNum=%{public}lu", randomNum);
     DcmBlob challengeBlob = {sizeof(randomNum), (uint8_t *)& randomNum};
-    DcmCertChain* dcmCertChain = new DcmCertChain();
+    DcmCertChain *dcmCertChain = new DcmCertChain();
     if (dcmCertChain == nullptr) {
         LOGE("new dcmCertChain fail!");
         return ERR_DM_MALLOC_FAILED;
@@ -57,14 +57,14 @@ int32_t AuthGenerateAttest::InitCertChain(DcmCertChain *certChain)
 {
     LOGI("InitCertChain Start");
     certChain->certCount = DM_CERTS_COUNT;
-    certChain->cert = new (std::nothrow) DcmBlob[certChain->certCount];
+    certChain->cert = new DcmBlob[certChain->certCount];
     if (certChain->cert == nullptr) {
         certChain->certCount = 0;
         LOGE("new dcmCertChain.cert fail!");
         return ERR_DM_MALLOC_FAILED;
     }
     for (uint32_t i = 0; i < certChain->certCount; ++i) {
-        certChain->cert[i].data = new (std::nothrow) uint8_t[DM_CERTIFICATE_SIZE];
+        certChain->cert[i].data = new uint8_t[DM_CERTIFICATE_SIZE];
         if (certChain->cert[i].data == nullptr) {
             certChain->cert[i].size = 0;
             for (uint32_t j = 0; j < i; ++j) {
@@ -83,7 +83,7 @@ int32_t AuthGenerateAttest::InitCertChain(DcmCertChain *certChain)
     return DM_OK;
 }
 
-void AuthGenerateAttest::FreeCertChain(DcmCertChain* chain)
+void AuthGenerateAttest::FreeCertChain(DcmCertChain *chain)
 {
     if (chain == nullptr) {
         return;
@@ -91,9 +91,11 @@ void AuthGenerateAttest::FreeCertChain(DcmCertChain* chain)
     for (uint32_t i = 0; i < chain->certCount; ++i) {
         delete[] chain->cert[i].data;
         chain->cert[i].data = nullptr;
+        chain->cert[i].size = 0;
     }
     delete[] chain->cert;
     chain->cert = nullptr;
+    chain->certCount = 0;
     delete chain;
 }
 
@@ -114,7 +116,7 @@ int32_t CopyCertificates(DcmCertChain& dcmCertChain, DmBlob* newCertArray, uint3
         dest.size = src.size;
         dest.data = nullptr;
         if (src.size == 0 || src.data == nullptr) continue;
-        dest.data = new (std::nothrow) uint8_t[src.size];
+        dest.data = new uint8_t[src.size];
         if (dest.data == nullptr) {
             allocatedCerts = i;
             return ERR_DM_MALLOC_FAILED;
@@ -143,7 +145,7 @@ int32_t AuthGenerateAttest::ConvertDcmCertChainToDmCertChain(DcmCertChain &dcmCe
         dmCertChain.certCount = 0;
         return DM_OK;
     }
-    DmBlob* newCertArray = new (std::nothrow) DmBlob[dcmCertChain.certCount];
+    DmBlob* newCertArray = new DmBlob[dcmCertChain.certCount];
     if (newCertArray == nullptr) {
         LOGE("Failed to allocate cert array!");
         return ERR_DM_MALLOC_FAILED;

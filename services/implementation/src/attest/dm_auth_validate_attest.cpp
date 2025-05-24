@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-int32_t ProcessValidationResult(const char* deviceIdHash, char* udidStr, uint64_t randNum, HksParamSet *outputParam)
+int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_t randNum, HksParamSet *outputParam)
 {
     uint32_t cnt = 0;
     HksBlob *blob = &outputParam->params[cnt].blob;
@@ -42,7 +42,7 @@ int32_t ProcessValidationResult(const char* deviceIdHash, char* udidStr, uint64_
     return DM_OK;
 }
 
-int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const char* deviceIdHash)
+int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const char *deviceIdHash)
 {
     LOGI("VerifyCertificate start!");
     char udidStr[UDID_BUF_LEN] = {0};
@@ -106,11 +106,13 @@ int32_t AuthValidateAttest::FillHksParamSet(HksParamSet **paramSet, HksParam *pa
     return DM_OK;
 }
 
-void AuthValidateAttest::FreeHksCertChain(HksCertChain& chain)
+void AuthValidateAttest::FreeHksCertChain(HksCertChain &chain)
 {
     if (chain.certs != nullptr) {
         for (uint32_t i = 0; i < chain.certsCount; ++i) {
+            chain.certs[i].size = 0;
             delete[] chain.certs[i].data;
+            chain.certs[i].data = nullptr;
         }
         delete[] chain.certs;
         chain.certs = nullptr;
@@ -118,9 +120,9 @@ void AuthValidateAttest::FreeHksCertChain(HksCertChain& chain)
     chain.certsCount = 0;
 }
 
-int32_t AllocateHksBlobArray(uint32_t count, HksBlob** outArray)
+int32_t AllocateHksBlobArray(uint32_t count, HksBlob **outArray)
 {
-    HksBlob* arr = new (std::nothrow) HksBlob[count];
+    HksBlob* arr = new HksBlob[count];
     if (arr == nullptr) {
         LOGE("Alloc failed for certs");
         return ERR_DM_MALLOC_FAILED;
@@ -137,13 +139,13 @@ int32_t AllocateHksBlobArray(uint32_t count, HksBlob** outArray)
     return DM_OK;
 }
 
-int32_t CopySingleCert(const DmBlob& src, HksBlob& dest)
+int32_t CopySingleCert(const DmBlob &src, HksBlob &dest)
 {
     if (src.data == nullptr || src.size == 0) {
         LOGE("Invalid src cert");
         return ERR_DM_FAILED;
     }
-    dest.data = new (std::nothrow) uint8_t[src.size];
+    dest.data = new uint8_t[src.size];
     if (dest.data == nullptr) {
         LOGE("Alloc failed for size");
         return ERR_DM_MALLOC_FAILED;

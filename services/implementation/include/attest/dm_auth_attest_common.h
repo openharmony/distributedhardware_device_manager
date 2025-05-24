@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <string>
 
+#include "dm_anonymous.h"
 #include "dm_auth_manager_base.h"
 #include "dm_crypto.h"
 #include "dm_random.h"
@@ -49,8 +50,8 @@ public:
         return instance;
     }
 
-    std::string SerializeDmCertChain(const DmCertChain* chain);
-    bool DeserializeDmCertChain(const std::string& data, DmCertChain* outChain);
+    std::string SerializeDmCertChain(const DmCertChain *chain);
+    bool DeserializeDmCertChain(const std::string &data, DmCertChain *outChain);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

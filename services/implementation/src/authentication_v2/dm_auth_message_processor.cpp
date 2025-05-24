@@ -654,7 +654,7 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_PEER_PKG_NAME] = context->accessee.pkgName;
     jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
     jsonObject[TAG_DM_CERT_CHAIN] = context->cert;
-    jsonObject[TAG_IS_BLUE_FLAG] = context->isBlueFlag;
+    jsonObject[TAG_IS_COMMON_FLAG] = context->isCommonFlag;
     return DM_OK;
 }
 
@@ -1043,8 +1043,8 @@ void DmAuthMessageProcessor::ParseUltrasonicSide(
     if (IsString(jsonObject, TAG_DM_CERT_CHAIN)) {
         context->cert = jsonObject[TAG_DM_CERT_CHAIN].Get<std::string>();
     }
-    if (jsonObject[TAG_IS_BLUE_FLAG].IsBoolean()) {
-        context->isBlueFlag = jsonObject[TAG_IS_BLUE_FLAG].Get<bool>();
+    if (jsonObject[TAG_IS_COMMON_FLAG].IsBoolean()) {
+        context->isCommonFlag = jsonObject[TAG_IS_COMMON_FLAG].Get<bool>();
     }
 }
 

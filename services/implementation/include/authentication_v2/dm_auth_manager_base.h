@@ -78,7 +78,7 @@ extern const char* CLOSE_SESSION_TASK_SEPARATOR;
 extern const char* TAG_DM_CERT_CHAIN;
 extern const char* TAG_CERT_COUNT;
 extern const char* TAG_CERT;
-extern const char* TAG_IS_BLUE_FLAG;
+extern const char* TAG_IS_COMMON_FLAG;
 
 extern const int32_t AUTHENTICATE_TIMEOUT;
 extern const int32_t CONFIRM_TIMEOUT;

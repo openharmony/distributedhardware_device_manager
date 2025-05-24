@@ -189,7 +189,7 @@ int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
     return DM_OK;
 #else
     if (!CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)
-        || !CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_0) || context->isBlueFlag) {
+        || !CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_0) || context->isCommonFlag) {
             LOGI("cert verify is not supported");
             return DM_OK;
     }
