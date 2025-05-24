@@ -2856,16 +2856,14 @@ void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::stri
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
 
-void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
-    uint64_t tokenId)
+int32_t DeviceManagerService::CalculateBroadCastDelayTime()
 {
     int64_t timeDiff = 0;
     int32_t delayTime = 0;
-    
     int64_t currentTime =
         std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     {
-        std::lock_guard<std::mutex> lock(unBindLock_);
+        std::lock_guard<std::mutex> lock(broadCastLock_);
         if (SendLastBroadCastTime_ == 0) {
             SendLastBroadCastTime_ = currentTime;
         }
@@ -2876,8 +2874,14 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         }
         SendLastBroadCastTime_ = currentTime;
         lastDelayTime_ = delayTime;
-
     }
+    return delayTime;
+}
+
+void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+    uint64_t tokenId)
+{
+    int32_t delayTime = CalculateBroadCastDelayTime();
     std::function<void()> task = [=]() {
         LOGI("SendAppUnBindBroadCast Start.");
         RelationShipChangeMsg msg;
@@ -2890,31 +2894,12 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
         softbusListener_->SendAclChangedBroadcast(broadCastMsg);
     };
     ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
-    SendLastBroadCastTime_ = currentTime;
 }
 
 void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, uint64_t peerTokenId)
 {
-    int64_t timeDiff = 0;
-    int32_t delayTime = 0;
-    
-    int64_t currentTime =
-        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    {
-        std::lock_guard<std::mutex> lock(unBindLock_);
-        if (SendLastBroadCastTime_ == 0) {
-            SendLastBroadCastTime_ = currentTime;
-        }
-        timeDiff = currentTime - SendLastBroadCastTime_;
-        delayTime = SEND_DELAY_MAX_TIME - timeDiff + lastDelayTime_;
-        if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
-            delayTime = SEND_DELAY_MIN_TIME;
-        }
-        SendLastBroadCastTime_ = currentTime;
-        lastDelayTime_ = delayTime;
-
-    }
+    int32_t delayTime = CalculateBroadCastDelayTime();
     std::function<void()> task = [=]() {
         LOGI("SendAppUnBindBroadCast Start.");
         RelationShipChangeMsg msg;
@@ -2933,18 +2918,7 @@ void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string>
 void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId)
 {
-    int64_t currentTime =
-        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    if (SendLastBroadCastTime_ == 0) {
-        SendLastBroadCastTime_ = currentTime;
-    }
-    int64_t timeDiff = currentTime - SendLastBroadCastTime_;
-    int32_t delayTime = SEND_DELAY_MAX_TIME - timeDiff + lastDelayTime_;
-    if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
-        delayTime = SEND_DELAY_MIN_TIME;
-    }
-    SendLastBroadCastTime_ = currentTime;
-    lastDelayTime_ = delayTime;
+    int32_t delayTime = CalculateBroadCastDelayTime();
     std::function<void()> task = [=]() {
         LOGI("SendAppUnInstallBroadCast Start.");
         RelationShipChangeMsg msg;
@@ -3272,7 +3246,6 @@ void DeviceManagerService::SubscribePackageCommonEvent()
         packageCommonEventManager_ = std::make_shared<DmPackageCommonEventManager>();
     }
     PackageEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
-        std::lock_guard<std::mutex> lock(unInstallLock_);
         int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
         NotifyRemoteUninstallApp(userId, arg3);
         if (IsDMServiceImplReady()) {
