@@ -38,6 +38,9 @@ public:
     DM_EXPORT int32_t Get(const std::string &key, DmKVValue &value);
     DM_EXPORT int32_t DeleteAgedEntry();
     DM_EXPORT int32_t AppUnintall(const std::string &appId);
+    DM_EXPORT int32_t GetFreezeData(const std::string &key, std::string &value);
+    DM_EXPORT int32_t PutFreezeData(const std::string &key, std::string &value);
+    DM_EXPORT int32_t DeleteFreezeData(const std::string &key);
 
 private:
     KVAdapterManager() = default;

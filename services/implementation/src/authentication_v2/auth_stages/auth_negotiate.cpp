@@ -32,6 +32,7 @@
 #include "dm_random.h"
 #include "dm_auth_context.h"
 #include "dm_auth_state.h"
+#include "dm_freeze_process.h"
 #include "deviceprofile_connector.h"
 #include "distributed_device_profile_errors.h"
 #include "device_auth.h"
@@ -156,6 +157,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.language = DmLanguageManager::GetInstance().GetSystemLanguage();
     context->accessee.deviceName = context->listener->GetLocalDisplayDeviceNameForPrivacy();
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
+    context->accessee.deviceType = context->softbusConnector->GetLocalDeviceTypeId();
     return DM_OK;
 }
 
@@ -181,7 +183,10 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
-
+    if (FreezeProcess::GetInstance().IsFreezed(context->accessee.bundleName, context->accessee.deviceType)) {
+        LOGE("Device is Freezed");
+        return ERR_DM_DEVICE_FREEZED;
+    }
     // 1. Create an authorization timer
     if (context->timer != nullptr) {
         context->timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK),
@@ -190,7 +195,6 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
                 DmAuthState::HandleAuthenticateTimeout(context, name);
         });
     }
-
     // To be compatible with historical versions, use ConvertSrcVersion to get the actual version on the source side.
     std::string preVersion = std::string(DM_VERSION_5_0_OLD_MAX);
     LOGI("AuthSinkNegotiateStateMachine::Action start version compare %{public}s to %{public}s",
@@ -200,8 +204,14 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
         context->reason = ERR_DM_VERSION_INCOMPATIBLE;
         return ERR_DM_VERSION_INCOMPATIBLE;
     }
-
-    int32_t ret = ProcRespNegotiate5_1_0(context);
+    // verify cert
+    int32_t ret = VerifyCertificate(context);
+    if (ret != DM_OK) {
+        LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
+        context->reason = ret;
+        return ret;
+    }
+    ret = ProcRespNegotiate5_1_0(context);
     if (ret != DM_OK) {
         LOGE("AuthSinkNegotiateStateMachine::Action proc response negotiate failed");
         context->reason = ret;
