@@ -30,7 +30,7 @@ int32_t AuthGenerateAttest::GenerateCertificate(DmCertChain &dmCertChain)
     DcmIdType ids[] = { DCM_ID_TYPE_UDID };
     uint64_t randomNum = GenRandLongLong(MIN_DCM_RANDOM, MAX_DCM_RANDOM);
     LOGI("GenerateCertificate randomNum=%{public}lu", randomNum);
-    DcmBlob challengeBlob = {sizeof(randomNum), (uint8_t *)& randomNum};
+    DcmBlob challengeBlob = {sizeof(randomNum), (uint8_t *) &randomNum};
     DcmCertChain *dcmCertChain = new DcmCertChain();
     if (dcmCertChain == nullptr) {
         LOGE("new dcmCertChain fail!");
@@ -108,11 +108,11 @@ int32_t ValidateInput(DcmCertChain &dcmCertChain)
     return DM_OK;
 }
 
-int32_t CopyCertificates(DcmCertChain& dcmCertChain, DmBlob* newCertArray, uint32_t& allocatedCerts)
+int32_t CopyCertificates(DcmCertChain &dcmCertChain, DmBlob *newCertArray, uint32_t &allocatedCerts)
 {
     for (uint32_t i = 0; i < dcmCertChain.certCount; ++i) {
-        const auto& src = dcmCertChain.cert[i];
-        auto& dest = newCertArray[i];
+        const auto &src = dcmCertChain.cert[i];
+        auto &dest = newCertArray[i];
         dest.size = src.size;
         dest.data = nullptr;
         if (src.size == 0 || src.data == nullptr) continue;
@@ -145,7 +145,7 @@ int32_t AuthGenerateAttest::ConvertDcmCertChainToDmCertChain(DcmCertChain &dcmCe
         dmCertChain.certCount = 0;
         return DM_OK;
     }
-    DmBlob* newCertArray = new DmBlob[dcmCertChain.certCount];
+    DmBlob *newCertArray = new DmBlob[dcmCertChain.certCount];
     if (newCertArray == nullptr) {
         LOGE("Failed to allocate cert array!");
         return ERR_DM_MALLOC_FAILED;

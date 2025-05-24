@@ -55,7 +55,7 @@ int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const ch
     }
     HksParamSet *outputParam = NULL;
     HksParam outputData[] = {
-        {.tag = HKS_TAG_ATTESTATION_CHALLENGE, .blob = {sizeof(uint64_t), (uint8_t *)&randNum}},
+        {.tag = HKS_TAG_ATTESTATION_CHALLENGE, .blob = {sizeof(uint64_t), (uint8_t *) &randNum}},
         {.tag = HKS_TAG_ATTESTATION_ID_UDID, .blob = {UDID_BUF_LEN, (uint8_t *)udidStr}},
     };
     ret = FillHksParamSet(&outputParam, outputData, sizeof(outputData) / sizeof(outputData[0]));
@@ -122,13 +122,13 @@ void AuthValidateAttest::FreeHksCertChain(HksCertChain &chain)
 
 int32_t AllocateHksBlobArray(uint32_t count, HksBlob **outArray)
 {
-    HksBlob* arr = new HksBlob[count];
+    HksBlob *arr = new HksBlob[count];
     if (arr == nullptr) {
         LOGE("Alloc failed for certs");
         return ERR_DM_MALLOC_FAILED;
     }
 
-    const size_t totalSize = sizeof(HksBlob) * count;
+    const size_t totalSize = sizeof(HksBlob) *count;
     if (memset_s(arr, totalSize, 0, totalSize) != 0) {
         LOGE("memset_s failed");
         delete[] arr;
@@ -165,7 +165,7 @@ int32_t AuthValidateAttest::ConvertDmCertChainToHksCertChain(DmCertChain &dmCert
     if (dmCertChain.certCount == 0 || dmCertChain.cert == nullptr) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    HksBlob* newCerts = nullptr;
+    HksBlob *newCerts = nullptr;
     int32_t ret = AllocateHksBlobArray(dmCertChain.certCount, &newCerts);
     if (ret != DM_OK) {
         LOGE("AllocateHksBlobArray fail, ret = %{public}d", ret);

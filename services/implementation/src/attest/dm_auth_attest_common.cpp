@@ -33,12 +33,12 @@ std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
     jsonObject[TAG_CERT_COUNT] = chain->certCount;
     JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     for (uint32_t i = 0; i < chain->certCount; ++i) {
-        const DmBlob& blob = chain->cert[i];
+        const DmBlob &blob = chain->cert[i];
         if (blob.data == nullptr || blob.size == 0) {
             return "{}";
         }
         const uint32_t hexLen = blob.size * HEX_TO_UINT8 + 1; // 2*blob.size + 1
-        char* hexBuffer = new char[hexLen]{0};
+        char *hexBuffer = new char[hexLen]{0};
         if (hexBuffer == nullptr) {
             return "{}";
         }
@@ -107,14 +107,14 @@ bool AuthAttestCommon::DeserializeDmCertChain(const std::string &data, DmCertCha
     const uint32_t certCount = jsonObject[TAG_CERT_COUNT].Get<uint32_t>();
     JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     jsonArrayObj.Parse(jsonObject[TAG_CERT].Dump());
-    DmBlob* certs = new DmBlob[certCount]{0};
+    DmBlob *certs = new DmBlob[certCount]{0};
     if (certs == nullptr) {
         LOGE("DeserializeDmCertChain: Memory allocation failed for certs array");
         return false;
     }
     bool success = true;
     uint32_t processedIndex = 0;
-    for (const auto& item : jsonArrayObj.Items()) {
+    for (const auto &item : jsonArrayObj.Items()) {
         if (!ProcessCertItem(item, certs[processedIndex], processedIndex)) {
             success = false;
             break;
