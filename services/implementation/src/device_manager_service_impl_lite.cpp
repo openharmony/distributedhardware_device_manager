@@ -331,12 +331,13 @@ int32_t DeviceManagerServiceImpl::ImportAuthCode(const std::string &pkgName, con
 }
 
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
-    const std::string &localUdid, std::string &remoteUdid)
+    const std::string &localUdid, std::string &remoteUdid, bool &isShareType)
 {
     (void)credId;
     (void)credInfo;
     (void)localUdid;
     (void)remoteUdid;
+    (void)isShareType;
     return;
 }
 
@@ -404,6 +405,14 @@ int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
 {
     (void)udid;
     return DM_OK;
+}
+
+std::vector<std::string> DeviceManagerServiceImpl::GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId)
+{
+    (void)userId;
+    (void)tokenId;
+    std::vector<std::string> tmp;
+    return tmp;
 }
 
 uint64_t DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId)
@@ -568,6 +577,23 @@ int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, i
     (void)appId;
     (void)accessTokenId;
     return 0;
+}
+
+int32_t DeviceManagerServiceImpl::ProcessAppUninstall(int32_t userId, int32_t accessTokenId)
+{
+    (void)userId;
+    (void)accessTokenId;
+    return 0;
+}
+
+void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra,
+    const std::string &udid)
+{
+    (void)userId;
+    (void)accessTokenId;
+    (void)extra;
+    (void)udid;
+    return;
 }
 
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
