@@ -2975,7 +2975,7 @@ void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::str
 void DeviceManagerService::HandleCredentialDeleted(const char *credId, const char *credInfo)
 {
     LOGI("start.");
-    if (credId == nullptr || credInfo == nullptr ||dmServiceImpl_ == nullptr) {
+    if (credId == nullptr || credInfo == nullptr) {
         LOGE("HandleCredentialDeleted credId or credInfo is nullptr.");
         return;
     }
