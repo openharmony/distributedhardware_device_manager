@@ -1955,6 +1955,10 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
         MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
+        if (beforeUserId != -1 && currentUserId != -1 && IsDMServiceAdapterResidentLoad()) {
+            dmServiceImplExtResident_->AccountUserSwitched(
+                currentUserId, MultipleUserConnector::GetOhosAccountId());
+        }
         DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
             [this, commonEventType] () {
                 DeviceManagerService::HandleAccountCommonEvent(commonEventType);
