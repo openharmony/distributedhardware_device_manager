@@ -628,7 +628,7 @@ std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context_)
 #ifdef DEVICE_MANAGER_COMMON_FLAG
     if (context_ == nullptr) {
         LOGE("context_ is nullptr!");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return "";
     }
     context_->accesser.isCommonFlag = true;
     LOGI("Blue device do not generate cert!");
