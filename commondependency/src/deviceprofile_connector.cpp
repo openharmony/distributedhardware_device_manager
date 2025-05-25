@@ -1677,8 +1677,12 @@ DM_EXPORT bool DeviceProfileConnector::CheckAccessControl(
     const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("PkgName = %{public}s, srcUdid = %{public}s, sinkUdid = %{public}s",
-        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
+        "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
+        "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
+        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
+        GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter =
         GetACLByDeviceIdAndUserId(profiles, caller, srcUdid, callee, sinkUdid);
@@ -1751,8 +1755,12 @@ DM_EXPORT bool DeviceProfileConnector::CheckIsSameAccount(
     const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("DeviceProfileConnector::CheckIsSameAccount pkgName %{public}s, srcUdid %{public}s, sinkUdid %{public}s",
-        caller.pkgName.c_str(), GetAnonyString(srcUdid).c_str(), GetAnonyString(sinkUdid).c_str());
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
+        "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
+        "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
+        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
+        GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter
         = GetACLByDeviceIdAndUserId(profiles, caller, srcUdid, callee, sinkUdid);
@@ -3047,23 +3055,33 @@ bool DeviceProfileConnector::CheckSrcP2PAccessControl(const DistributedDevicePro
     std::string aceePkgName = profile.GetAccessee().GetAccesseeBundleName();
 
     uint32_t bindLevel = profile.GetBindLevel();
-    //bind level is user, accesser is caller, accessee is callee
-    if (bindLevel == USER && srcUdid == acerDeviceId && caller.userId == acerUserId && sinkUdid == aceeDeviceId) {
-        return true;
-    }
-    //bind level is user, accessee is caller, accesser is callee
-    if (bindLevel == USER && srcUdid == aceeDeviceId && caller.userId == aceeUserId && sinkUdid == acerDeviceId) {
-        return true;
-    }
-    //bind level is app or service, accesser is caller, accessee is callee
-    if ((bindLevel == SERVICE || bindLevel == APP) && srcUdid == acerDeviceId && caller.userId == acerUserId &&
-        static_cast<int32_t>(caller.tokenId) == acerTokenId && sinkUdid == aceeDeviceId) {
-        return true;
-    }
-    //bind level is app or service, accessee is caller, accesser is callee
-    if ((bindLevel == SERVICE || bindLevel == APP) && srcUdid == aceeDeviceId && caller.userId == aceeUserId &&
-        static_cast<int32_t>(caller.tokenId) == aceeTokenId && sinkUdid == acerDeviceId) {
-        return true;
+    switch (bindLevel) {
+        case USER:
+            //bind level is user, accesser is caller, accessee is callee
+            if (srcUdid == acerDeviceId && caller.userId == acerUserId && sinkUdid == aceeDeviceId) {
+                return true;
+            }
+            //bind level is user, accessee is caller, accesser is callee
+            if (srcUdid == aceeDeviceId && caller.userId == aceeUserId && sinkUdid == acerDeviceId) {
+                return true;
+            }
+            break;
+        case SERVICE:
+        case APP:
+            //bind level is user, accesser is caller, accessee is callee
+            if (srcUdid == acerDeviceId && caller.userId == acerUserId &&
+                static_cast<int32_t>(caller.tokenId) == acerTokenId && sinkUdid == aceeDeviceId) {
+                return true;
+            }
+            //bind level is user, accessee is caller, accesser is callee
+            if (srcUdid == aceeDeviceId && caller.userId == aceeUserId &&
+                static_cast<int32_t>(caller.tokenId) == aceeTokenId && sinkUdid == acerDeviceId) {
+                return true;
+            }
+            break;
+        default:
+            LOGE("invalid bindLevel %{public}d.", bindLevel);
+            break;
     }
     return false;
 }
@@ -3157,36 +3175,67 @@ bool DeviceProfileConnector::CheckSinkShareAccessControl(const DistributedDevice
 bool DeviceProfileConnector::CheckSinkP2PAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
     const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
 {
+    uint32_t bindLevel = profile.GetBindLevel();
+    switch (bindLevel) {
+        case USER:
+            if (CheckSinkUserAcl(profile, caller, srcUdid, callee, sinkUdid)) {
+                return true;
+            }
+            break;
+        case SERVICE:
+        case APP:
+            if (CheckSinkAppOrServiceAcl(profile, caller, srcUdid, callee, sinkUdid)) {
+                return true;
+            }
+            break;
+        default:
+            LOGE("invalid bindLevel %{public}d.", bindLevel);
+            break;
+    }
+    return false;
+}
+
+bool DeviceProfileConnector::CheckSinkUserAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
+    const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+    const std::string &sinkUdid)
+{
     std::string acerDeviceId = profile.GetAccesser().GetAccesserDeviceId();
     int32_t acerUserId = profile.GetAccesser().GetAccesserUserId();
-    int32_t acerTokenId = static_cast<int32_t>(profile.GetAccesser().GetAccesserTokenId());
-    std::string acerPkgName = profile.GetAccesser().GetAccesserBundleName();
 
     std::string aceeDeviceId = profile.GetAccessee().GetAccesseeDeviceId();
     int32_t aceeUserId = profile.GetAccessee().GetAccesseeUserId();
-    int32_t aceeTokenId = static_cast<int32_t>(profile.GetAccessee().GetAccesseeTokenId());
-    std::string aceePkgName = profile.GetAccessee().GetAccesseeBundleName();
-
-    uint32_t bindLevel = profile.GetBindLevel();
-
     //bind level is user, accesser is caller, accessee is callee
-    if (bindLevel == USER && srcUdid == acerDeviceId && caller.userId == acerUserId && sinkUdid == aceeDeviceId &&
+    if (srcUdid == acerDeviceId && caller.userId == acerUserId && sinkUdid == aceeDeviceId &&
         callee.userId == aceeUserId) {
         return true;
     }
     //bind level is user, accessee is caller, accesser is callee
-    if (bindLevel == USER && srcUdid == aceeDeviceId && caller.userId == aceeUserId && sinkUdid == acerDeviceId &&
+    if (srcUdid == aceeDeviceId && caller.userId == aceeUserId && sinkUdid == acerDeviceId &&
         callee.userId == acerUserId) {
         return true;
     }
+    return false;
+}
+
+bool DeviceProfileConnector::CheckSinkAppOrServiceAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
+    const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+    const std::string &sinkUdid)
+{
+    std::string acerDeviceId = profile.GetAccesser().GetAccesserDeviceId();
+    int32_t acerUserId = profile.GetAccesser().GetAccesserUserId();
+    int32_t acerTokenId = static_cast<int32_t>(profile.GetAccesser().GetAccesserTokenId());
+
+    std::string aceeDeviceId = profile.GetAccessee().GetAccesseeDeviceId();
+    int32_t aceeUserId = profile.GetAccessee().GetAccesseeUserId();
+    int32_t aceeTokenId = static_cast<int32_t>(profile.GetAccessee().GetAccesseeTokenId());
     //bind level is app or service, accesser is caller, accessee is callee
-    if ((bindLevel == SERVICE || bindLevel == APP) && srcUdid == acerDeviceId && caller.userId == acerUserId &&
+    if (srcUdid == acerDeviceId && caller.userId == acerUserId &&
         static_cast<int32_t>(caller.tokenId) == acerTokenId && sinkUdid == aceeDeviceId &&
         callee.userId == aceeUserId && static_cast<int32_t>(callee.tokenId) == aceeTokenId) {
         return true;
     }
     //bind level is app or service, accessee is caller, accesser is callee
-    if ((bindLevel == SERVICE || bindLevel == APP) && srcUdid == aceeDeviceId && caller.userId == aceeUserId &&
+    if (srcUdid == aceeDeviceId && caller.userId == aceeUserId &&
         static_cast<int32_t>(caller.tokenId) == aceeTokenId && sinkUdid == acerDeviceId &&
         callee.userId == acerUserId && static_cast<int32_t>(callee.tokenId) == acerTokenId) {
         return true;
