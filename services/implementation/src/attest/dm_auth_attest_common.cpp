@@ -59,12 +59,12 @@ bool ValidateInputJson(const std::string &data)
     JsonObject jsonObject;
     jsonObject.Parse(data);
     if (!IsUint32(jsonObject, TAG_CERT_COUNT) || !jsonObject.Contains(TAG_CERT)) {
-        LOGE("DeserializeDmCertChain: Missing required fields 'certCount' or 'cert'");
+        LOGE("Missing required fields 'certCount' or 'cert'");
         return false;
     }
     const uint32_t certCount = jsonObject[TAG_CERT_COUNT].Get<uint32_t>();
     if (certCount == 0 || certCount > MAX_CERT_COUNT) {
-        LOGE("DeserializeDmCertChain: Invalid certCount value %{public}u", certCount);
+        LOGE("Invalid certCount value %{public}u", certCount);
         return false;
     }
     return true;
@@ -75,18 +75,18 @@ bool ValidateInputJson(const std::string &data)
     std::string hexStr = item.Get<std::string>();
     const size_t hexLen = hexStr.length();
     if (hexLen == 0 || hexLen % HEX_TO_UINT8 != 0) {
-        LOGE("DeserializeDmCertChain: Invalid HEX length %{public}zu at index %{public}u", hexLen, processedIndex);
+        LOGE("Invalid HEX length %{public}zu at index %{public}u", hexLen, processedIndex);
         return false;
     }
     const uint32_t binSize = hexLen / HEX_TO_UINT8;
     cert.data = new uint8_t[binSize];
     if (cert.data == nullptr) {
-        LOGE("DeserializeDmCertChain: Data allocation failed at index %{public}u", processedIndex);
+        LOGE("Data allocation failed at index %{public}u", processedIndex);
         return false;
     }
     int32_t ret = Crypto::ConvertHexStringToBytes(cert.data, binSize, hexStr.c_str(), hexLen);
     if (ret != DM_OK) {
-        LOGE("DeserializeDmCertChain: HEX conversion failed at index %{public}u, ret = %{public}d",
+        LOGE("HEX conversion failed at index %{public}u, ret = %{public}d",
             processedIndex, ret);
         delete[] cert.data;
         cert.data = nullptr;
@@ -109,7 +109,7 @@ bool AuthAttestCommon::DeserializeDmCertChain(const std::string &data, DmCertCha
     jsonArrayObj.Parse(jsonObject[TAG_CERT].Dump());
     DmBlob *certs = new DmBlob[certCount]{0};
     if (certs == nullptr) {
-        LOGE("DeserializeDmCertChain: Memory allocation failed for certs array");
+        LOGE("Memory allocation failed for certs array");
         return false;
     }
     bool success = true;

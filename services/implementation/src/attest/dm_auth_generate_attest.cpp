@@ -54,6 +54,10 @@ int32_t AuthGenerateAttest::GenerateCertificate(DmCertChain &dmCertChain)
 
 int32_t AuthGenerateAttest::InitCertChain(DcmCertChain *certChain)
 {
+    if (certChain == nullptr) {
+        LOGE("certChain is nullptr.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     LOGI("InitCertChain Start");
     certChain->certCount = DM_CERTS_COUNT;
     certChain->cert = new DcmBlob[certChain->certCount];
@@ -63,7 +67,7 @@ int32_t AuthGenerateAttest::InitCertChain(DcmCertChain *certChain)
         return ERR_DM_MALLOC_FAILED;
     }
     for (uint32_t i = 0; i < certChain->certCount; ++i) {
-        certChain->cert[i].data = new uint8_t[DM_CERTIFICATE_SIZE];
+        certChain->cert[i].data = new uint8_t[DM_CERTIFICATE_SIZE]{0};
         if (certChain->cert[i].data == nullptr) {
             certChain->cert[i].size = 0;
             for (uint32_t j = 0; j < i; ++j) {
@@ -85,6 +89,7 @@ int32_t AuthGenerateAttest::InitCertChain(DcmCertChain *certChain)
 void AuthGenerateAttest::FreeCertChain(DcmCertChain *chain)
 {
     if (chain == nullptr) {
+        LOGI("chain is nullptr!");
         return;
     }
     for (uint32_t i = 0; i < chain->certCount; ++i) {
@@ -109,13 +114,17 @@ int32_t ValidateInput(DcmCertChain &dcmCertChain)
 
 int32_t CopyCertificates(DcmCertChain &dcmCertChain, DmBlob *newCertArray, uint32_t &allocatedCerts)
 {
+    if (newCertArray == nullptr || newCertArray->length != dcmCertChain.certCount) {
+        LOGE("newCertArray is invalid param.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     for (uint32_t i = 0; i < dcmCertChain.certCount; ++i) {
         const auto &src = dcmCertChain.cert[i];
         auto &dest = newCertArray[i];
         dest.size = src.size;
         dest.data = nullptr;
         if (src.size == 0 || src.data == nullptr) continue;
-        dest.data = new uint8_t[src.size];
+        dest.data = new uint8_t[src.size]{0};
         if (dest.data == nullptr) {
             allocatedCerts = i;
             return ERR_DM_MALLOC_FAILED;

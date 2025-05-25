@@ -23,6 +23,10 @@ namespace DistributedHardware {
 
 int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_t randNum, HksParamSet *outputParam)
 {
+    if (deviceIdHash == nullptr || udidStr == nullptr || outputParam == nullptr) {
+        LOGE("input param is nullptr.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     uint32_t cnt = 0;
     HksBlob *blob = &outputParam->params[cnt].blob;
     if (memcpy_s(&randNum, sizeof(uint64_t), blob->data, blob->size) != EOK) {
@@ -44,6 +48,10 @@ int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_
 
 int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const char *deviceIdHash)
 {
+    if (deviceIdHash == nullptr) {
+        LOGE("deviceIdHash is nullptr.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
     LOGI("VerifyCertificate start!");
     char udidStr[UDID_BUF_LEN] = {0};
     uint64_t randNum = 0;
@@ -137,7 +145,7 @@ int32_t CopySingleCert(const DmBlob &src, HksBlob &dest)
         LOGE("Invalid src cert");
         return ERR_DM_FAILED;
     }
-    dest.data = new uint8_t[src.size];
+    dest.data = new uint8_t[src.size]{0};
     if (dest.data == nullptr) {
         LOGE("Alloc failed for size");
         return ERR_DM_MALLOC_FAILED;
