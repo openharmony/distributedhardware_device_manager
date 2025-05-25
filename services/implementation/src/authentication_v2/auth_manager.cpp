@@ -630,7 +630,7 @@ std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context_)
         LOGE("context_ is nullptr!");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    context_->isCommonFlag = true;
+    context_->accesser.isCommonFlag = true;
     LOGI("Blue device do not generate cert!");
     return "";
 #else
@@ -686,7 +686,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    context_->cert = GenerateCertificate(context_);
+    context_->accesser.cert = GenerateCertificate(context_);
     context_->sessionId = sessionId;
     context_->logicalSessionId = logicalSessionId;
     context_->requestId = static_cast<int64_t>(logicalSessionId);

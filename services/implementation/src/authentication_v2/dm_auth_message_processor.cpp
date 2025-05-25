@@ -647,14 +647,15 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_TOKEN_ID_HASH] = context->accesser.tokenIdHash;
     jsonObject[TAG_BUNDLE_NAME_V2] = context->accesser.bundleName;
     jsonObject[TAG_EXTRA_INFO] = context->accesser.extraInfo;
+    jsonObject[TAG_IS_COMMON_FLAG] = context->accesser.isCommonFlag;
+    jsonObject[TAG_DM_CERT_CHAIN] = context->accesser.cert;
 
     jsonObject[TAG_PEER_BUNDLE_NAME_V2] = context->accessee.bundleName;
     jsonObject[TAG_ULTRASONIC_SIDE] = static_cast<int32_t>(context->ultrasonicInfo);
     jsonObject[TAG_PEER_DISPLAY_ID] = context->accessee.displayId;
     jsonObject[TAG_PEER_PKG_NAME] = context->accessee.pkgName;
     jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
-    jsonObject[TAG_DM_CERT_CHAIN] = context->cert;
-    jsonObject[TAG_IS_COMMON_FLAG] = context->isCommonFlag;
+
     return DM_OK;
 }
 
@@ -976,17 +977,14 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
         context->logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<uint64_t>();
         context->requestId = static_cast<int64_t>(context->logicalSessionId);
     }
-
     if (jsonObject[TAG_PKG_NAME].IsString()) {
         context->pkgName = jsonObject[TAG_PKG_NAME].Get<std::string>();
         context->accesser.pkgName = context->pkgName;
         context->accessee.pkgName = context->accesser.pkgName;
     }
-
     if (jsonObject[TAG_PEER_PKG_NAME].IsString()) {
         context->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
     }
-
     if (jsonObject[TAG_DM_VERSION_V2].IsString()) {
         context->accesser.dmVersion = jsonObject[TAG_DM_VERSION_V2].Get<std::string>();
     }
@@ -1005,7 +1003,6 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     if (jsonObject[TAG_BUNDLE_NAME_V2].IsString()) {
         context->accesser.bundleName = jsonObject[TAG_BUNDLE_NAME_V2].Get<std::string>();
     }
-
     if (jsonObject[TAG_EXTRA_INFO].IsString()) {
         context->accesser.extraInfo = jsonObject[TAG_EXTRA_INFO].Get<std::string>();
     }
@@ -1020,9 +1017,20 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
         context->pkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
     }
     ParseUltrasonicSide(jsonObject, context);
-
+    ParseCert(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
     return DM_OK;
+}
+
+void DmAuthMessageProcessor::ParseCert(const JsonObject &jsonObject,
+    std::shared_ptr<DmAuthContext> context)
+{
+    if (jsonObject[TAG_DM_CERT_CHAIN].IsString()) {
+        context->accesser.cert = jsonObject[TAG_DM_CERT_CHAIN].Get<std::string>();
+    }
+    if (jsonObject[TAG_IS_COMMON_FLAG].IsBoolean()) {
+        context->accesser.isCommonFlag = jsonObject[TAG_IS_COMMON_FLAG].Get<bool>();
+    }
 }
 
 void DmAuthMessageProcessor::ParseUltrasonicSide(
@@ -1039,12 +1047,6 @@ void DmAuthMessageProcessor::ParseUltrasonicSide(
         context->ultrasonicInfo = DmUltrasonicInfo::DM_Ultrasonic_Forward;
     } else {
         context->ultrasonicInfo = DmUltrasonicInfo::DM_Ultrasonic_Invalid;
-    }
-    if (IsString(jsonObject, TAG_DM_CERT_CHAIN)) {
-        context->cert = jsonObject[TAG_DM_CERT_CHAIN].Get<std::string>();
-    }
-    if (jsonObject[TAG_IS_COMMON_FLAG].IsBoolean()) {
-        context->isCommonFlag = jsonObject[TAG_IS_COMMON_FLAG].Get<bool>();
     }
 }
 

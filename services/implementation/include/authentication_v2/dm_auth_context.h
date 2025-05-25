@@ -171,6 +171,8 @@ struct DmAccess {
     std::string oldBundleName;
     // construct for old version compatible end
     std::string extraInfo;      // Expandable field, JSON format, KV structure
+    std::string cert;
+    bool isCommonFlag{false};
 };
 
 struct DmAuthContext {
@@ -217,8 +219,6 @@ struct DmAuthContext {
     DmAccess accesser;
     DmAccess accessee;
     std::multimap<DmAccess, DmAccess> proxy;    // Multimap where the key is the accessor and the value is the accesssee
-    std::string cert;
-    bool isCommonFlag{false};
 
     std::shared_ptr<DmAuthStateMachine> authStateMachine;
     std::shared_ptr<AuthUiStateManager> authUiStateMgr;

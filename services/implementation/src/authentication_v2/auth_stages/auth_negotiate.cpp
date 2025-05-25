@@ -188,13 +188,19 @@ int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
     LOGI("Blue device do not verify cert!");
     return DM_OK;
 #else
-    if (!CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)
-        || !CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_0) || context->isCommonFlag) {
-            LOGI("cert verify is not supported");
-            return DM_OK;
+    if (!CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)) {
+        LOGI("cert verify is not supported");
+        return DM_OK;
+    }
+    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)
+        && context->accesser.isCommonFlag == true) {
+        LOGI("src is common device.");
+        // 不校验证书，设置对端设备安全等级为0
+        return DM_OK;
     }
     DmCertChain dmCertChain{nullptr, 0};
-    if (!AuthAttestCommon::GetInstance().DeserializeDmCertChain(context->cert, &dmCertChain)) {
+    if (!AuthAttestCommon::GetInstance()
+        .DeserializeDmCertChain(context->accesser.cert, &dmCertChain)) {
         LOGE("cert deserialize fail!");
         return ERR_DM_DESERIAL_CERT_FAILED;
     }
@@ -211,7 +217,6 @@ int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
-
     // 1. Create an authorization timer
     if (context->timer != nullptr) {
         context->timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK),
@@ -220,7 +225,6 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
                 DmAuthState::HandleAuthenticateTimeout(context, name);
         });
     }
-
     // To be compatible with historical versions, use ConvertSrcVersion to get the actual version on the source side.
     std::string preVersion = std::string(DM_VERSION_5_0_OLD_MAX);
     LOGI("AuthSinkNegotiateStateMachine::Action start version compare %{public}s to %{public}s",
@@ -230,16 +234,16 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
         context->reason = ERR_DM_VERSION_INCOMPATIBLE;
         return ERR_DM_VERSION_INCOMPATIBLE;
     }
-
-    int32_t ret = ProcRespNegotiate5_1_0(context);
+    // verify cert
+    int32_t ret = VerifyCertificate(context);
     if (ret != DM_OK) {
-        LOGE("AuthSinkNegotiateStateMachine::Action proc response negotiate failed");
+        LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
         context->reason = ret;
         return ret;
     }
-    ret = VerifyCertificate(context);
+    ret = ProcRespNegotiate5_1_0(context);
     if (ret != DM_OK) {
-        LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
+        LOGE("AuthSinkNegotiateStateMachine::Action proc response negotiate failed");
         context->reason = ret;
         return ret;
     }
