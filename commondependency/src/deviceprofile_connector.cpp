@@ -1615,7 +1615,7 @@ DM_EXPORT int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
     return ERR_DM_FAILED;
 }
 
-int32_t checkIsSameAccountByUdidHash(const std::string udidHash)
+DM_EXPORT int32_t DeviceProfileConnector::checkIsSameAccountByUdidHash(const std::string udidHash)
 {
     if (udidHash.empty()) {
         LOGE("udidHash is empty!");
