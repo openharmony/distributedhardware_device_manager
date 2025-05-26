@@ -168,7 +168,7 @@ DM_EXPORT int32_t KVAdapterManager::PutFreezeData(const std::string &key, std::s
         LOGE("Insert freeze data failed, k:%{public}s, v:%{public}s", dmKey.c_str(), value.c_str());
         return ERR_DM_FAILED;
     }
-    LOGE("Insert freeze data success, k:%{public}s, v:%{public}s", dmKey.c_str(), value.c_str());
+    LOGI("Insert freeze data success, k:%{public}s, v:%{public}s", dmKey.c_str(), value.c_str());
     return DM_OK;
 }
 

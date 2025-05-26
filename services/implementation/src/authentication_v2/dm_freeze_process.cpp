@@ -62,7 +62,7 @@ int32_t FreezeProcess::SyncFreezeData()
     ret = KVAdapterManager::GetInstance().GetFreezeData(BIND_FAILED_EVENTS_KEY, bindFailedEventsValue);
     if (ret != DM_OK) {
         LOGE("Get bind failed events data failed, ret: %{public}d", ret);
-        return ERR_DM_FAILED;
+        return ret;
     }
     BindFailedEvents bindFailedEventsObj;
     ConvertJsonToBindFailedEvents(bindFailedEventsValue, bindFailedEventsObj);
@@ -126,7 +126,7 @@ void FreezeProcess::ConvertJsonToBindFailedEvents(const std::string &result, Bin
     cJSON_Delete(root);
 }
 
-bool FreezeProcess::IsFreezed(const std::string &bundleName, const int32_t &deviceType)
+bool FreezeProcess::IsFreezed(const std::string &bundleName, int32_t deviceType)
 {
     if (bundleName == CAST_BUNDLE_NAME && deviceType == DEVICE_TYPE_TV) {
         LOGI("device is TV, business is cast+, no need freeze");
@@ -142,7 +142,7 @@ bool FreezeProcess::IsFreezed(const std::string &bundleName, const int32_t &devi
     return nowTime > stopFreezeTimeStamp ? false : true;
 }
 
-int32_t FreezeProcess::CleanFreezeRecord(const std::string &bundleName, const int32_t &deviceType)
+int32_t FreezeProcess::CleanFreezeRecord(const std::string &bundleName, int32_t deviceType)
 {
     if (bundleName == CAST_BUNDLE_NAME && deviceType == DEVICE_TYPE_TV) {
         LOGI("device is TV, business is cast+, no need clean");
@@ -161,7 +161,7 @@ int32_t FreezeProcess::CleanFreezeRecord(const std::string &bundleName, const in
     return DM_OK;
 }
 
-int32_t FreezeProcess::CleanBindFailedEvents(const int64_t &reservedDataTimeStamp)
+int32_t FreezeProcess::CleanBindFailedEvents(int64_t reservedDataTimeStamp)
 {
     std::lock_guard<std::mutex> lock(bindFailedEventsCacheMtx_);
     if (bindFailedEventsCache_.IsEmpty()) {
@@ -197,7 +197,7 @@ int32_t FreezeProcess::CleanBindFailedEvents(const int64_t &reservedDataTimeStam
     return DM_OK;
 }
 
-int32_t FreezeProcess::CleanFreezeState(const int64_t &reservedDataTimeStamp)
+int32_t FreezeProcess::CleanFreezeState(int64_t reservedDataTimeStamp)
 {
     std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
     if (freezeStateCache_.IsEmpty()) {
@@ -233,7 +233,7 @@ void FreezeProcess::ConvertDeviceFreezeStateToJson(const DeviceFreezeState &valu
     result = SafetyDump(jsonObj);
 }
 
-int32_t FreezeProcess::DeleteFreezeRecord(const std::string &bundleName, const int32_t &deviceType)
+int32_t FreezeProcess::DeleteFreezeRecord(const std::string &bundleName, int32_t deviceType)
 {
     if (bundleName == CAST_BUNDLE_NAME && deviceType == DEVICE_TYPE_TV) {
         LOGI("device is TV, business is cast+, no need delete");
@@ -243,16 +243,20 @@ int32_t FreezeProcess::DeleteFreezeRecord(const std::string &bundleName, const i
         LOGE("delete freezeStates data failed");
         return ERR_DM_FAILED;
     }
-    freezeStateCache_.Reset();
+    {
+        std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
+        freezeStateCache_.Reset();
+    }
     if (KVAdapterManager::GetInstance().DeleteFreezeData(BIND_FAILED_EVENTS_KEY) != DM_OK) {
         LOGE("delete bindFailedEvents data failed");
         return ERR_DM_FAILED;
     }
+    std::lock_guard<std::mutex> lock(bindFailedEventsCacheMtx_);
     bindFailedEventsCache_.Reset();
     return DM_OK;
 }
 
-int32_t FreezeProcess::UpdateFreezeRecord(const std::string &bundleName, const int32_t &deviceType)
+int32_t FreezeProcess::UpdateFreezeRecord(const std::string &bundleName, int32_t deviceType)
 {
     if (bundleName == CAST_BUNDLE_NAME && deviceType == DEVICE_TYPE_TV) {
         LOGI("device is TV, business is cast+, no need update");
@@ -292,7 +296,7 @@ int32_t FreezeProcess::UpdateFreezeRecord(const std::string &bundleName, const i
     return UpdateFreezeState(nowTime);
 }
 
-int32_t FreezeProcess::UpdateFreezeState(const int64_t &nowTime)
+int32_t FreezeProcess::UpdateFreezeState(int64_t nowTime)
 {
     std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
     DeviceFreezeState freezeStateTmp = freezeStateCache_;
@@ -310,7 +314,7 @@ int32_t FreezeProcess::UpdateFreezeState(const int64_t &nowTime)
     return DM_OK;
 }
 
-void FreezeProcess::CalculateNextFreezeTime(const int64_t &nowFreezeTime, int64_t &nextFreezeTime)
+void FreezeProcess::CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t nextFreezeTime)
 {
     switch (nowFreezeTime) {
         case NOT_FREEZE_TIME:

@@ -76,6 +76,30 @@ struct LogoutAccountMsg {
 
 void ToJson(cJSON *jsonObject, const LogoutAccountMsg &accountInfo);
 void FromJson(const cJSON *jsonObject, LogoutAccountMsg &accountInfo);
+
+struct UninstAppMsg {
+    int32_t userId_;
+    int32_t tokenId_;
+    UninstAppMsg() : userId_(-1), tokenId_(-1) {}
+    UninstAppMsg(const int32_t &userId, const int32_t &tokenId)
+        : userId_(userId), tokenId_(tokenId) {}
+};
+
+void ToJson(cJSON *jsonObject, const UninstAppMsg &uninstAppMsg);
+void FromJson(const cJSON *jsonObject, UninstAppMsg &uninstAppMsg);
+
+struct UnBindAppMsg {
+    int32_t userId_;
+    int32_t tokenId_;
+    std::string extra_;
+    std::string udid_;
+    UnBindAppMsg() : userId_(-1), tokenId_(-1), extra_(""), udid_("") {}
+    UnBindAppMsg(const int32_t &userId, const int32_t &tokenId, const std::string &extra, const std::string &udid)
+        : userId_(userId), tokenId_(tokenId), extra_(extra), udid_(udid) {}
+};
+
+void ToJson(cJSON *jsonObject, const UnBindAppMsg &unBindAppMsg);
+void FromJson(const cJSON *jsonObject, UnBindAppMsg &unBindAppMsg);
 } // DistributedHardware
 } // OHOS
 #endif

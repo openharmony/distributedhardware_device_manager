@@ -41,6 +41,10 @@
 #include "multiple_user_connector.h"
 #include "os_account_manager.h"
 #include "parameter.h"
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
+#include "dm_auth_generate_attest.h"
+#include "dm_auth_validate_attest.h"
+#endif
 
 using namespace OHOS::Security::AccessToken;
 
@@ -178,6 +182,44 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
     GetSinkCredType(context, credInfo, aclTypeJson, credTypeJson);
     context->accessee.credTypeList = credTypeJson.Dump();
     return DM_OK;
+}
+
+int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("Blue device do not verify cert!");
+    return DM_OK;
+#else
+    // Compatible with 5.1.0 and earlier
+    if (!CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)) {
+        LOGI("cert verify is not supported");
+        return DM_OK;
+    }
+    // Compatible common device
+    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)
+        && context->accesser.isCommonFlag == true) {
+        LOGI("src is common device.");
+        if (DeviceProfileConnector::GetInstance()
+            .checkIsSameAccountByUdidHash(context->accesser.deviceIdHash) == DM_OK) {
+            LOGE("src is common device, but the udidHash is identical in acl!");
+            return ERR_DM_VERIFY_CERT_FAILED;
+        }
+        return DM_OK;
+    }
+    DmCertChain dmCertChain{nullptr, 0};
+    if (!AuthAttestCommon::GetInstance()
+        .DeserializeDmCertChain(context->accesser.cert, &dmCertChain)) {
+        LOGE("cert deserialize fail!");
+        return ERR_DM_DESERIAL_CERT_FAILED;
+    }
+    int32_t certRet = AuthValidateAttest::GetInstance()
+        .VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
+    if (certRet != DM_OK) {
+        LOGE("validate cert fail, certRet = %{public}d", certRet);
+        return ERR_DM_VERIFY_CERT_FAILED;
+    }
+    return DM_OK;
+#endif
 }
 
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)

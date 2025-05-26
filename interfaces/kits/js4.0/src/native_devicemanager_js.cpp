@@ -2002,7 +2002,11 @@ napi_value DeviceManagerNapi::GetDeviceProfileInfoListPromise(napi_env env,
                 reinterpret_cast<DeviceProfileInfosAsyncCallbackInfo *>(data);
             if (jsCallback->code != DM_OK) {
                 napi_value error = CreateBusinessError(env, jsCallback->code, false);
-                napi_reject_deferred(env, jsCallback->deferred, error);
+                if (jsCallback->deferred != nullptr) {
+                    napi_reject_deferred(env, jsCallback->deferred, error);
+                } else {
+                    LOGE("jsCallback->deferred is nullptr");
+                }
             }
             napi_delete_async_work(env, jsCallback->asyncWork);
             delete jsCallback;

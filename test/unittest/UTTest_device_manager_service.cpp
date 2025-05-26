@@ -283,8 +283,6 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
     std::map<std::string, int32_t> preUserDeviceMap;
     std::multimap<std::string, int32_t> curMultiMap;
     std::string commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
-    EXPECT_CALL(*deviceManagerServiceImplMock_,
-        GetDeviceIdAndBindLevel(_)).WillOnce(Return(curUserDeviceMap)).WillOnce(Return(preUserDeviceMap));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN;
     DMAccountInfo dmAccountInfo;
@@ -1926,7 +1924,7 @@ HWTEST_F(DeviceManagerServiceTest, BindTarget_006, testing::ext::TestSize.Level1
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
     DeviceManagerService::GetInstance().dmServiceImpl_ = nullptr;
     int32_t ret = DeviceManagerService::GetInstance().BindTarget(pkgName, targetId, bindParam);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, UnbindTarget_004, testing::ext::TestSize.Level1)

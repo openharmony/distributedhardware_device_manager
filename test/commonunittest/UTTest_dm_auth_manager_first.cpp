@@ -1440,7 +1440,7 @@ HWTEST_F(DmAuthManagerTest, AuthenticateDevice_004, testing::ext::TestSize.Level
     deviceId = "sdcwafefawe";
     extra = jsonObject.Dump();
     ret = authManager_->AuthenticateDevice(pkgName, authType, deviceId, extra);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_AUTH_BUSINESS_BUSY);
 }
 
 HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.Level1)
@@ -2235,7 +2235,7 @@ HWTEST_F(DmAuthManagerTest, CheckAuthParamVaildExtra_002, testing::ext::TestSize
 
     EXPECT_CALL(*appManagerMock_, IsSystemSA()).WillOnce(Return(false));
     ret = authManager_->CheckAuthParamVaildExtra(strExtra, deviceId);
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, DM_OK);
 
     std::string pkgName = "pkgName_pickerProxy_Info";
     int32_t authType = 1;

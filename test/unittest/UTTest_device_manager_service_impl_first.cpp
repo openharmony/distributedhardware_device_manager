@@ -207,6 +207,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_001, testing
     const char *credInfo = "invalid_json";
     std::string localUdid = "localUdid";
     std::string remoteUdid;
+    bool isShareType = false;
 
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
 
@@ -215,7 +216,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_001, testing
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
         .Times(0);
     
-    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isShareType);
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_002, testing::ext::TestSize.Level1)
@@ -224,6 +225,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_002, testing
     const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
     std::string localUdid = "localUdid";
     std::string remoteUdid;
+    bool isShareType = false;
 
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
@@ -234,7 +236,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_002, testing
         .WillOnce(Return(profiles));
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_)).Times(0);
 
-    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isShareType);
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_003, testing::ext::TestSize.Level1)
@@ -243,6 +245,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_003, testing
     const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
     std::string localUdid = "localUdid";
     std::string remoteUdid;
+    bool isShareType = false;
 
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
@@ -260,7 +263,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_003, testing
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
         .Times(1);
 
-    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isShareType);
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_004, testing::ext::TestSize.Level1)
@@ -269,6 +272,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_004, testing
     const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
     std::string localUdid = "localUdid";
     std::string remoteUdid;
+    bool isShareType = false;
 
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
@@ -286,7 +290,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_004, testing
     EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_))
         .Times(1);
     
-    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isShareType);
 }
 
 HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_001, testing::ext::TestSize.Level1)

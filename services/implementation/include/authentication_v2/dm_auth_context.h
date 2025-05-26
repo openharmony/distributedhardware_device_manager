@@ -171,6 +171,8 @@ struct DmAccess {
     std::string oldBundleName;
     // construct for old version compatible end
     std::string extraInfo;      // Expandable field, JSON format, KV structure
+    std::string cert;
+    bool isCommonFlag{false};
 };
 
 struct DmAuthContext {

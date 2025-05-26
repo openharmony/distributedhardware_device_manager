@@ -15,7 +15,6 @@
 
 #include "device_manager_impl.h"
 #include <random>
-#include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -2241,52 +2240,6 @@ bool DeviceManagerImpl::IsSameAccount(const std::string &netWorkId)
     return true;
 }
 
-bool DeviceManagerImpl::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
-{
-    LOGI("Start");
-    std::shared_ptr<IpcCheckAcl> req = std::make_shared<IpcCheckAcl>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetAccessCaller(caller);
-    req->SetAccessCallee(callee);
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_ACCESS_CONTROL, req, rsp);
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", ret, anonyLocalUdid_);
-        LOGE("CheckAccessControl Send Request failed ret: %{public}d", ret);
-        return false;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", ret, anonyLocalUdid_);
-        LOGE("CheckAccessControl Failed with ret: %{public}d", ret);
-        return false;
-    }
-    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", DM_OK, anonyLocalUdid_);
-    return true;
-}
-
-bool DeviceManagerImpl::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
-{
-    LOGI("Start");
-    std::shared_ptr<IpcCheckAcl> req = std::make_shared<IpcCheckAcl>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetAccessCaller(caller);
-    req->SetAccessCallee(callee);
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_SAME_ACCOUNT, req, rsp);
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", ret, anonyLocalUdid_);
-        LOGE("CheckIsSameAccount Send Request failed ret: %{public}d", ret);
-        return false;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", ret, anonyLocalUdid_);
-        LOGE("CheckIsSameAccount Failed with ret: %{public}d", ret);
-        return false;
-    }
-    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", DM_OK, anonyLocalUdid_);
-    return true;
-}
-
 int32_t DeviceManagerImpl::GetErrCode(int32_t errCode)
 {
     auto flag = MAP_ERROR_CODE.find(errCode);
@@ -2967,6 +2920,63 @@ int32_t DeviceManagerImpl::UnRegisterPinHolderCallback(const std::string &pkgNam
         return ret;
     }
     return DM_OK;
+}
+
+bool DeviceManagerImpl::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_ACCESS_CONTROL);
+}
+
+bool DeviceManagerImpl::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SAME_ACCOUNT);
+}
+
+
+bool DeviceManagerImpl::CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SRC_ACCESS_CONTROL);
+}
+
+bool DeviceManagerImpl::CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SINK_ACCESS_CONTROL);
+}
+
+bool DeviceManagerImpl::CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SRC_SAME_ACCOUNT);
+}
+
+bool DeviceManagerImpl::CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SINK_SAME_ACCOUNT);
+}
+
+bool DeviceManagerImpl::CheckAclByIpcCode(const DmAccessCaller &caller, const DmAccessCallee &callee,
+        const DMIpcCmdInterfaceCode &ipcCode)
+{
+    LOGI("start, ipcCode %{public}d.", static_cast<int32_t>(ipcCode));
+    std::shared_ptr<IpcCheckAcl> req = std::make_shared<IpcCheckAcl>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetAccessCaller(caller);
+    req->SetAccessCallee(callee);
+    int32_t ret = ipcClientProxy_->SendRequest(ipcCode, req, rsp);
+    if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", ret, anonyLocalUdid_);
+        LOGE("CheckIsSameAccount Send Request failed ret: %{public}d", ret);
+        return false;
+    }
+    bool result = static_cast<bool>(rsp->GetErrCode());
+    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", static_cast<int32_t>(result),
+        anonyLocalUdid_);
+    return result;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

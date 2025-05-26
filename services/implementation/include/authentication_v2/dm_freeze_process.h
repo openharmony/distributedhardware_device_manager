@@ -57,10 +57,10 @@ class FreezeProcess {
 DM_DECLARE_SINGLE_INSTANCE_BASE(FreezeProcess);
 public:
     int32_t SyncFreezeData();
-    bool IsFreezed(const std::string &bundleName, const int32_t &deviceType);
-    int32_t CleanFreezeRecord(const std::string &bundleName, const int32_t &deviceType);
-    int32_t DeleteFreezeRecord(const std::string &bundleName, const int32_t &deviceType);
-    int32_t UpdateFreezeRecord(const std::string &bundleName, const int32_t &deviceType);
+    bool IsFreezed(const std::string &bundleName, int32_t deviceType);
+    int32_t CleanFreezeRecord(const std::string &bundleName, int32_t deviceType);
+    int32_t DeleteFreezeRecord(const std::string &bundleName, int32_t deviceType);
+    int32_t UpdateFreezeRecord(const std::string &bundleName, int32_t deviceType);
 private:
     FreezeProcess() = default;
     ~FreezeProcess() = default;
@@ -68,10 +68,10 @@ private:
     void ConvertJsonToBindFailedEvents(const std::string &result, BindFailedEvents &bindFailedEvents);
     void ConvertBindFailedEventsToJson(const BindFailedEvents &value, std::string &result);
     void ConvertDeviceFreezeStateToJson(const DeviceFreezeState &value, std::string &result);
-    int32_t CleanBindFailedEvents(const int64_t &reservedDataTimeStamp);
-    int32_t CleanFreezeState(const int64_t &reservedDataTimeStamp);
-    int32_t UpdateFreezeState(const int64_t &nowTime);
-    void CalculateNextFreezeTime(const int64_t &nowFreezeTime, int64_t &nextFreezeTime);
+    int32_t CleanBindFailedEvents(int64_t reservedDataTimeStamp);
+    int32_t CleanFreezeState(int64_t reservedDataTimeStamp);
+    int32_t UpdateFreezeState(int64_t nowTime);
+    void CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t nextFreezeTime);
 
 private:
     DeviceFreezeState freezeStateCache_;
