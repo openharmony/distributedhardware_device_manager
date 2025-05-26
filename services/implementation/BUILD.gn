@@ -114,6 +114,7 @@ if (defined(ohos_lite)) {
       "include",
       "include/config",
       "include/adapter",
+      "include/attest",
       "include/authentication",
       "include/authentication_v2",
       "include/ability",
@@ -267,6 +268,18 @@ if (defined(ohos_lite)) {
       sources += [ "src/dependency/MSDP/spatial_location_callback_impl.cpp" ]
       defines += [ "SUPPORT_MSDP" ]
       external_deps += [ "spatial_awareness:spatial_awareness_client" ]
+    }
+
+    if (!device_manager_common) {
+      sources += [
+        "src/attest/dm_auth_attest_common.cpp",
+        "src/attest/dm_auth_generate_attest.cpp",
+        "src/attest/dm_auth_validate_attest.cpp",
+      ]
+      external_deps += [
+        "device_certificate_manager:device_cert_mgr_sdk",
+        "huks:libhukssdk",
+      ]
     }
 
     subsystem_name = "distributedhardware"

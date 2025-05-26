@@ -85,6 +85,13 @@ ohos_fuzztest("AuthenticateDeviceServiceImplFuzzTest") {
     "safwk:system_ability_fwk",
     "selinux_adapter:librestorecon",
   ]
+
+  if (!device_manager_common) {
+    external_deps += [
+      "device_certificate_manager:device_cert_mgr_sdk",
+      "huks:libhukssdk",
+    ]
+  }
 }
 
 ###############################################################################

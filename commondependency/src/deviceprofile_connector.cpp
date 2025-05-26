@@ -1615,6 +1615,24 @@ DM_EXPORT int32_t DeviceProfileConnector::IsSameAccount(const std::string &udid)
     return ERR_DM_FAILED;
 }
 
+DM_EXPORT int32_t DeviceProfileConnector::checkIsSameAccountByUdidHash(const std::string &udidHash)
+{
+    if (udidHash.empty()) {
+        LOGE("udidHash is empty!");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
+    for (auto &item : profiles) {
+        if (Crypto::GetUdidHash(item.GetTrustDeviceId()) == udidHash) {
+            if (item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+                LOGI("The udidHash %{public}s is identical bind.", GetAnonyString(udidHash).c_str());
+                return DM_OK;
+            }
+        }
+    }
+    return ERR_DM_VERIFY_SAME_ACCOUNT_FAILED;
+}
+
 bool checkAccesserACL(AccessControlProfile& profile, const DmAccessCaller &caller,
     const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid)
 {

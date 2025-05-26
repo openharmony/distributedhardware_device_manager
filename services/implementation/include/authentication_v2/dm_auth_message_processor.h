@@ -321,6 +321,7 @@ private:
     bool CheckAccessValidityAndAssign(std::shared_ptr<DmAuthContext> &context, DmAccess &access,
         DmAccess &accessTmp);
     void ParseUltrasonicSide(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
+    void ParseCert(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
     std::unordered_map<DmMessageType, CreateMessageFuncPtr> createMessageFuncMap_;
     std::unordered_map<DmMessageType, ParaseMessageFuncPtr> paraseMessageFuncMap_;

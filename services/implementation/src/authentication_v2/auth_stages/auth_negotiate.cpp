@@ -40,6 +40,10 @@
 #include "multiple_user_connector.h"
 #include "os_account_manager.h"
 #include "parameter.h"
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
+#include "dm_auth_generate_attest.h"
+#include "dm_auth_validate_attest.h"
+#endif
 
 using namespace OHOS::Security::AccessToken;
 
@@ -178,10 +182,47 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
     return DM_OK;
 }
 
+int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("Blue device do not verify cert!");
+    return DM_OK;
+#else
+    // Compatible with 5.1.0 and earlier
+    if (!CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)) {
+        LOGI("cert verify is not supported");
+        return DM_OK;
+    }
+    // Compatible common device
+    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)
+        && context->accesser.isCommonFlag == true) {
+        LOGI("src is common device.");
+        if (DeviceProfileConnector::GetInstance()
+            .checkIsSameAccountByUdidHash(context->accesser.deviceIdHash) == DM_OK) {
+            LOGE("src is common device, but the udidHash is identical in acl!");
+            return ERR_DM_VERIFY_CERT_FAILED;
+        }
+        return DM_OK;
+    }
+    DmCertChain dmCertChain{nullptr, 0};
+    if (!AuthAttestCommon::GetInstance()
+        .DeserializeDmCertChain(context->accesser.cert, &dmCertChain)) {
+        LOGE("cert deserialize fail!");
+        return ERR_DM_DESERIAL_CERT_FAILED;
+    }
+    int32_t certRet = AuthValidateAttest::GetInstance()
+        .VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
+    if (certRet != DM_OK) {
+        LOGE("validate cert fail, certRet = %{public}d", certRet);
+        return ERR_DM_VERIFY_CERT_FAILED;
+    }
+    return DM_OK;
+#endif
+}
+
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
-
     // 1. Create an authorization timer
     if (context->timer != nullptr) {
         context->timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK),
@@ -190,7 +231,6 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
                 DmAuthState::HandleAuthenticateTimeout(context, name);
         });
     }
-
     // To be compatible with historical versions, use ConvertSrcVersion to get the actual version on the source side.
     std::string preVersion = std::string(DM_VERSION_5_0_OLD_MAX);
     LOGI("AuthSinkNegotiateStateMachine::Action start version compare %{public}s to %{public}s",
@@ -200,8 +240,14 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
         context->reason = ERR_DM_VERSION_INCOMPATIBLE;
         return ERR_DM_VERSION_INCOMPATIBLE;
     }
-
-    int32_t ret = ProcRespNegotiate5_1_0(context);
+    // verify cert
+    int32_t ret = VerifyCertificate(context);
+    if (ret != DM_OK) {
+        LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
+        context->reason = ret;
+        return ret;
+    }
+    ret = ProcRespNegotiate5_1_0(context);
     if (ret != DM_OK) {
         LOGE("AuthSinkNegotiateStateMachine::Action proc response negotiate failed");
         context->reason = ret;

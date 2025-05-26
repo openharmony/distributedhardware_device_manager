@@ -77,6 +77,10 @@ const char* GET_ULTRASONIC_PIN_TIMEOUT_TASK = "deviceManagerTimer:getUltrasonicP
 const char* ADD_TIMEOUT_TASK = "deviceManagerTimer:add";
 const char* WAIT_SESSION_CLOSE_TIMEOUT_TASK = "deviceManagerTimer:waitSessionClose";
 const char* CLOSE_SESSION_TASK_SEPARATOR = "#";
+const char* TAG_DM_CERT_CHAIN = "dmCertChain";
+const char* TAG_CERT_COUNT = "certCount";
+const char* TAG_CERT = "cert";
+const char* TAG_IS_COMMON_FLAG = "isCommonFlag";
 
 const int32_t AUTHENTICATE_TIMEOUT = 120;
 const int32_t CONFIRM_TIMEOUT = 60;
