@@ -151,8 +151,6 @@ public:
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);
-    int32_t ProcessAppUninstall(int32_t userId, int32_t accessTokenId);
-    void ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra, const std::string &udid);
     void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus);
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
@@ -165,14 +163,13 @@ public:
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
-        std::string &remoteUdid, bool &isShareType);
+        std::string &remoteUdid);
     void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, const std::string &localUdid);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
         int32_t remoteTokenId);
     void HandleCommonEventBroadCast(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
-    std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId);
     bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
     bool CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,

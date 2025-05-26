@@ -252,15 +252,10 @@ public:
     virtual int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList) = 0;
     virtual int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId) = 0;
-    virtual int32_t ProcessAppUninstall(int32_t userId, int32_t accessTokenId) = 0;
-    virtual void ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra,
-        const std::string &udid) = 0;
-
     virtual void HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus) = 0;
     virtual void HandleRemoteUserRemoved(int32_t userId, const std::string &remoteUdid) = 0;
     virtual std::map<std::string, int32_t> GetDeviceIdAndBindLevel(int32_t userId) = 0;
-    virtual std::vector<std::string> GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId) = 0;
     virtual std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t localUserId) = 0;
     virtual int32_t SaveOnlineDeviceInfo(const std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
@@ -269,7 +264,7 @@ public:
     virtual void DeleteAlwaysAllowTimeOut() = 0;
     virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
-        std::string &remoteUdid, bool &isShareType) = 0;
+        std::string &remoteUdid) = 0;
     virtual void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
         const std::string &localUdid) = 0;
     virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;

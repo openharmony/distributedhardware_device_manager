@@ -1899,17 +1899,6 @@ std::map<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndBindLevel
     return DeviceProfileConnector::GetInstance().GetDeviceIdAndBindLevel(userIds, localUdid);
 }
 
-std::vector<std::string> DeviceManagerServiceImpl::GetDeviceIdByUserIdAndTokenId(int32_t userId,
-    int32_t tokenId)
-{
-    char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
-    std::string localUdid = std::string(localUdidTemp);
-    std::vector<int32_t> userIds;
-    userIds.push_back(userId);
-    return DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(userIds, localUdid, tokenId);
-}
-
 std::multimap<std::string, int32_t> DeviceManagerServiceImpl::GetDeviceIdAndUserId(int32_t userId,
     const std::string &accountId)
 {
@@ -2041,9 +2030,7 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
 void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
     int32_t tokenId, int32_t peerTokenId)
 {
-    LOGI("DeviceManagerServiceImpl::HandleAppUnBindEvent remoteUserId: %{public}s, remoteUdid: %{public}s,"
-        "tokenId = %{public}s, peerTokenId = %{public}s.", GetAnonyInt32(remoteUserId).c_str(),
-        GetAnonyString(remoteUdid).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyInt32(peerTokenId).c_str());
+    LOGI("peerTokenId = %{public}d.", peerTokenId);
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
@@ -2229,64 +2216,6 @@ int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, i
     return DM_OK;
 }
 
-int32_t DeviceManagerServiceImpl::ProcessAppUninstall(int32_t userId, int32_t accessTokenId)
-{
-    LOGE("DeviceManagerServiceImpl::ProcessAppUninstall userId = %{public}s, accessTokenId = %{public}s.",
-        GetAnonyInt32(userId).c_str(), GetAnonyInt32(accessTokenId).c_str());
-    CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
-        DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
-    LOGI("delete ACL size is %{public}zu", profiles.size());
-    if (profiles.size() == 0) {
-        return DM_OK;
-    }
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid = std::string(localDeviceId);
-    std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
-    std::vector<int32_t> userIdVec;
-    std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> delProfileMap;
-    DeleteAclByTokenId(accessTokenId, profiles, delProfileMap, delACLInfoVec, userIdVec, userId, localUdid);
-    for (auto item : delProfileMap) {
-        DmOfflineParam lnnAclParam;
-        bool isLastLnnAcl = false;
-        for (auto it : profiles) {
-            CheckIsLastLnnAcl(it, item.second, lnnAclParam, isLastLnnAcl, localUdid);
-        }
-        if (!isLastLnnAcl) {
-            DeleteSkCredAndAcl(lnnAclParam.needDelAclInfos);
-        }
-    }
-
-    if (delACLInfoVec.size() == 0 || userIdVec.size() == 0) {
-        return DM_OK;
-    }
-
-    CHECK_NULL_RETURN(hiChainConnector_, ERR_DM_POINT_NULL);
-    hiChainConnector_->DeleteGroupByACL(delACLInfoVec, userIdVec);
-    return DM_OK;
-}
-
-void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTokenId,
-    const std::string &extra, const std::string &udid)
-{
-    LOGI("DeviceManagerServiceImpl::ProcessUnBindApp userId = %{public}s, accessTokenId = %{public}s,"
-        "extra = %{public}s.", GetAnonyInt32(userId).c_str(), GetAnonyInt32(accessTokenId).c_str(),
-        GetAnonyString(extra).c_str());
-
-    JsonObject extraInfoJson(extra);
-    if (extraInfoJson.IsDiscarded()) {
-        LOGE("ParseExtra extraInfoJson error");
-        HandleAppUnBindEvent(userId, udid, accessTokenId);
-        return;
-    }
-    if (extraInfoJson.Contains(TAG_PEER_TOKENID) && extraInfoJson[TAG_PEER_TOKENID].IsNumberInteger()) {
-        uint64_t peerTokenId = extraInfoJson[TAG_PEER_TOKENID].Get<uint64_t>();
-        HandleAppUnBindEvent(userId, udid, accessTokenId, static_cast<int32_t>(peerTokenId));
-    }
-    return;
-}
-
 void DeviceManagerServiceImpl::CheckIsLastLnnAcl(DistributedDeviceProfile::AccessControlProfile profile,
     DistributedDeviceProfile::AccessControlProfile delProfile, DmOfflineParam &lnnAclParam, bool &isLastLnnAcl,
     const std::string &localUdid)
@@ -2329,59 +2258,6 @@ void DeviceManagerServiceImpl::DeleteAclByTokenId(const int32_t accessTokenId,
             }
         }
         if (accessTokenId == static_cast<int32_t>(accessseetokenId)) {
-            DmOfflineParam offlineParam;
-            DeviceProfileConnector::GetInstance().CacheAceeAclId(item, offlineParam.needDelAclInfos);
-            delProfileMap[item.GetAccessControlId()] = item;
-            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
-            listener_->OnAppUnintall(item.GetAccessee().GetAccesseeBundleName());
-            if (item.GetBindLevel() == USER) {
-                userIdVec.push_back(item.GetAccessee().GetAccesseeUserId());
-                delACLInfoVec.push_back(std::pair<int32_t, std::string>(item.GetAccessee().GetAccesseeUserId(),
-                    item.GetAccesser().GetAccesserDeviceId()));
-            }
-        }
-    }
-    for (auto item : delProfileMap) {
-        for (auto it = profiles.begin(); it != profiles.end();) {
-            if (item.first == it->GetAccessControlId()) {
-                it = profiles.erase(it);
-            } else {
-                it++;
-            }
-        }
-    }
-}
-
-void DeviceManagerServiceImpl::DeleteAclByTokenId(const int32_t &accessTokenId,
-    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
-    std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
-    std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec,
-    const uint32_t &userId, const std::string &localUdid)
-{
-    for (auto &item : profiles) {
-        int64_t accesssertokenId = item.GetAccesser().GetAccesserTokenId();
-        int64_t accessseetokenId = item.GetAccessee().GetAccesseeTokenId();
-        if (accessTokenId != static_cast<int32_t>(accesssertokenId) &&
-            accessTokenId != static_cast<int32_t>(accessseetokenId)) {
-            continue;
-        }
-        if (accessTokenId == static_cast<int32_t>(accesssertokenId) &&
-            userId == item.GetAccesser().GetAccesserUserId() &&
-            localUdid == item.GetAccessee().GetAccesseeDeviceId()) {
-            DmOfflineParam offlineParam;
-            delProfileMap[item.GetAccessControlId()] = item;
-            DeviceProfileConnector::GetInstance().CacheAcerAclId(item, offlineParam.needDelAclInfos);
-            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
-            listener_->OnAppUnintall(item.GetAccesser().GetAccesserBundleName());
-            if (item.GetBindLevel() == USER) {
-                userIdVec.push_back(item.GetAccesser().GetAccesserUserId());
-                delACLInfoVec.push_back(std::pair<int32_t, std::string>(item.GetAccesser().GetAccesserUserId(),
-                    item.GetAccessee().GetAccesseeDeviceId()));
-            }
-        }
-        if (accessTokenId == static_cast<int32_t>(accessseetokenId) &&
-            userId == item.GetAccessee().GetAccesseeUserId() &&
-            localUdid == item.GetAccesser().GetAccesserDeviceId()) {
             DmOfflineParam offlineParam;
             DeviceProfileConnector::GetInstance().CacheAceeAclId(item, offlineParam.needDelAclInfos);
             delProfileMap[item.GetAccessControlId()] = item;
@@ -2513,7 +2389,7 @@ void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUd
 }
 
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
-    const std::string &localUdid, std::string &remoteUdid, bool &isShareType)
+    const std::string &localUdid, std::string &remoteUdid)
 {
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAccessControlProfile();
@@ -2548,7 +2424,6 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
             item.GetAccessee().GetAccesseeUserId() == localUserId &&
             item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
-            isShareType = true;
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }

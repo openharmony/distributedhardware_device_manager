@@ -1826,47 +1826,6 @@ std::map<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndBindLevel(s
     return deviceIdMap;
 }
 
-std::vector<std::string> DeviceProfileConnector::GetDeviceIdAndUdidListByTokenId(const std::vector<int32_t> &userIds,
-    const std::string &localUdid, int32_t tokenId)
-{
-    if (userIds.empty() || localUdid.empty()) {
-        LOGE("userIds or localUdid is empty.");
-        return {};
-    }
-    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
-    std::map<std::string, int32_t> deviceIdMap;
-    std::vector<std::string> udidList;
-
-    for (const auto &item : profiles) {
-        if (IsLnnAcl(item)) {
-            continue;
-        }
-
-        if (find(userIds.begin(), userIds.end(), item.GetAccesser().GetAccesserUserId()) != userIds.end() &&
-            item.GetAccesser().GetAccesserDeviceId() == localUdid &&
-            static_cast<int32_t>(item.GetAccesser().GetAccesserTokenId()) == tokenId) {
-            LOGI("Get Device Bind type localUdid %{public}s is src, tokenId %{public}s.",
-                GetAnonyString(localUdid).c_str(), GetAnonyInt32(tokenId).c_str());
-            UpdateBindType(item.GetTrustDeviceId(), item.GetBindLevel(), deviceIdMap);
-            continue;
-        }
-
-        if (find(userIds.begin(), userIds.end(), item.GetAccessee().GetAccesseeUserId()) != userIds.end() &&
-            item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
-            static_cast<int32_t>(item.GetAccessee().GetAccesseeTokenId()) == tokenId) {
-            LOGI("Get Device Bind type localUdid %{public}s is sink, tokenId %{public}s.",
-                GetAnonyString(localUdid).c_str(), GetAnonyInt32(tokenId).c_str());
-            UpdateBindType(item.GetTrustDeviceId(), item.GetBindLevel(), deviceIdMap);
-            continue;
-        }
-    }
-
-    for (const auto &item : deviceIdMap) {
-        udidList.push_back(item.first);
-    }
-    return udidList;
-}
-
 DM_EXPORT std::multimap<std::string, int32_t> DeviceProfileConnector::GetDeviceIdAndUserId(
     int32_t userId, const std::string &accountId, const std::string &localUdid)
 {
