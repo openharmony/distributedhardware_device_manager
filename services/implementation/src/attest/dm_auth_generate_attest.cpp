@@ -103,7 +103,7 @@ void AuthGenerateAttest::FreeCertChain(DcmCertChain *chain)
     delete chain;
 }
 
-int32_t ValidateInput(DcmCertChain &dcmCertChain)
+int32_t ValidateInput(const DcmCertChain &dcmCertChain)
 {
     if (dcmCertChain.certCount > 0 && dcmCertChain.cert == nullptr) {
         LOGE("Invalid cert chain: certCount>0 but cert array is null!");
@@ -112,7 +112,7 @@ int32_t ValidateInput(DcmCertChain &dcmCertChain)
     return DM_OK;
 }
 
-int32_t CopyCertificates(DcmCertChain &dcmCertChain, DmBlob *newCertArray, uint32_t &allocatedCerts)
+int32_t CopyCertificates(const DcmCertChain &dcmCertChain, DmBlob *newCertArray, uint32_t &allocatedCerts)
 {
     if (newCertArray == nullptr || newCertArray->length != dcmCertChain.certCount) {
         LOGE("newCertArray is invalid param.");
@@ -141,7 +141,7 @@ int32_t CopyCertificates(DcmCertChain &dcmCertChain, DmBlob *newCertArray, uint3
     return DM_OK;
 }
 
-int32_t AuthGenerateAttest::ConvertDcmCertChainToDmCertChain(DcmCertChain &dcmCertChain, DmCertChain &dmCertChain)
+int32_t AuthGenerateAttest::ConvertDcmCertChainToDmCertChain(const DcmCertChain &dcmCertChain, DmCertChain &dmCertChain)
 {
     LOGI("ConvertDcmCertChainToDmCertChain start!");
     int32_t ret = ValidateInput(dcmCertChain);

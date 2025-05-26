@@ -32,7 +32,7 @@ public:
     }
 
     int32_t GenerateCertificate(DmCertChain &dmCertChain);
-    int32_t ConvertDcmCertChainToDmCertChain(DcmCertChain &dcmCertChain, DmCertChain &dmCertChain);
+    int32_t ConvertDcmCertChainToDmCertChain(const DcmCertChain &dcmCertChain, DmCertChain &dmCertChain);
     int32_t InitCertChain(DcmCertChain *certChain);
     void FreeCertChain(DcmCertChain *chain);
 };

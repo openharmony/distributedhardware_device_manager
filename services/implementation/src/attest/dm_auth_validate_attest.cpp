@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_t randNum, HksParamSet *outputParam)
+int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_t randNum, const HksParamSet *outputParam)
 {
     if (deviceIdHash == nullptr || udidStr == nullptr || outputParam == nullptr) {
         LOGE("input param is nullptr.");
@@ -46,7 +46,7 @@ int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_
     return DM_OK;
 }
 
-int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const char *deviceIdHash)
+int32_t AuthValidateAttest::VerifyCertificate(const DmCertChain &dmCertChain, const char *deviceIdHash)
 {
     if (deviceIdHash == nullptr) {
         LOGE("deviceIdHash is nullptr.");
@@ -76,15 +76,18 @@ int32_t AuthValidateAttest::VerifyCertificate(DmCertChain &dmCertChain, const ch
     if (ret != HKS_SUCCESS) {
         LOGE("HksValidateCertChain fail, ret=%{public}d", ret);
         FreeHksCertChain(hksCertChain);
+        HksFreeParamSet(&outputParam);
         return ret;
     }
     ret = ProcessValidationResult(deviceIdHash, udidStr, randNum, outputParam);
     if (ret != DM_OK) {
         LOGE("ProcessValidationResult fail, ret=%{public}d", ret);
         FreeHksCertChain(hksCertChain);
+        HksFreeParamSet(&outputParam);
         return ret;
     }
     FreeHksCertChain(hksCertChain);
+    HksFreeParamSet(&outputParam);
     return DM_OK;
 }
 
@@ -160,7 +163,7 @@ int32_t CopySingleCert(const DmBlob &src, HksBlob &dest)
     return DM_OK;
 }
 
-int32_t AuthValidateAttest::ConvertDmCertChainToHksCertChain(DmCertChain &dmCertChain, HksCertChain &hksCertChain)
+int32_t AuthValidateAttest::ConvertDmCertChainToHksCertChain(const DmCertChain &dmCertChain, HksCertChain &hksCertChain)
 {
     if (dmCertChain.certCount == 0 || dmCertChain.cert == nullptr) {
         return ERR_DM_INPUT_PARA_INVALID;
