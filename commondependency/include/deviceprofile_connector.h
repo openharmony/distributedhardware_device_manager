@@ -292,6 +292,7 @@ public:
     void GenerateAclHash(DistributedDeviceProfile::AccessControlProfile &acl,
         std::map<std::string, std::vector<std::string>> &aclMap, const std::string &dmVersion);
     DM_EXPORT int32_t checkIsSameAccountByUdidHash(const std::string udidHash);
+<<<<<<< HEAD
 
     /**
      * @brief Get the Acl List Hash for this dmVersion
@@ -302,6 +303,8 @@ public:
      * @param dmVersion target dm version
      * @return EXPORT 0 for success
      */
+=======
+>>>>>>> 25ba107b (删除无用注释)
     DM_EXPORT int32_t GetAclListHashStr(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion = "");
     DM_EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);
