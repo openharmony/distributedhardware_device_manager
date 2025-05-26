@@ -290,6 +290,7 @@ public:
         std::map<std::string, std::vector<std::string>> &aclMap, std::string dmVersion = "");
     void GenerateAclHash(DistributedDeviceProfile::AccessControlProfile &acl,
         std::map<std::string, std::vector<std::string>> &aclMap, const std::string &dmVersion);
+    DM_EXPORT int32_t checkIsSameAccountByUdidHash(const std::string udidHash);
     /**
      * @brief Get the Acl List Hash for this dmVersion
      *

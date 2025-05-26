@@ -201,7 +201,7 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUse
     std::vector<std::string> aclVerDesc;
     std::map<std::string, AclHashItem> remoteAllAclMap;
     SortAclListDesc(remoteAllAclList, aclVerDesc, remoteAllAclMap);
-    std::string matchVersion = MatchTargetVersion(DM_CURRENT_VERSION, aclVerDesc);
+    std::string matchVersion = MatchTargetVersion(DM_ACL_AGING_VERSION, aclVerDesc);
 
     std::vector<std::string> remoteAclHashList = {};
     if (remoteAllAclMap.find(matchVersion) != remoteAllAclMap.end()) {
