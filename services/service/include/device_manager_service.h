@@ -100,6 +100,11 @@ public:
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash, const std::string &extra);
 
+    int32_t ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash);
+
+    int32_t ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash,
+        const std::string &extra);
+
     int32_t SetUserOperation(std::string &pkgName, int32_t action, const std::string &params);
 
     void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
@@ -215,6 +220,10 @@ public:
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     void ProcessSyncUserIds(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
+
+    void ProcessUninstApp(int32_t userId, int32_t tokenId);
+    void ProcessUnBindApp(int32_t userId, int32_t tokenId, const std::string &extra, const std::string &udid);
+
     int32_t SetLocalDisplayNameToSoftbus(const std::string &displayName);
     void RemoveNotifyRecord(const ProcessInfo &processInfo);
     int32_t RegDevStateCallbackToService(const std::string &pkgName);
@@ -245,9 +254,15 @@ public:
         std::vector<std::string> &networkIds);
     void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
     int32_t UnRegisterPinHolderCallback(const std::string &pkgName);
+    void ProcessReceiveRspAppUninstall(const std::string &remoteUdid);
+    void ProcessReceiveRspAppUnbind(const std::string &remoteUdid);
     void ProcessCommonUserStatusEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     int32_t GetLocalDeviceName(std::string &deviceName);
+    bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
@@ -262,8 +277,11 @@ private:
         int32_t bindLevel, uint64_t peerTokenId);
     void SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId);
     void SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
+    int32_t CalculateBroadCastDelayTime();
     void SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
         uint64_t tokenId, uint64_t peerTokenId);
+    void SendAppUnInstallBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+        uint64_t tokenId);
     void SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
     void SendAccountLogoutBroadCast(const std::vector<std::string> &peerUdids, const std::string &accountId,
         const std::string &accountName, int32_t userId);
@@ -333,6 +351,19 @@ private:
     void InitServiceInfos(const std::vector<DistributedDeviceProfile::LocalServiceInfo> &dpLocalServiceItems,
         std::vector<DMLocalServiceInfo> &serviceInfos);
     void HandleUserSwitched();
+
+    void NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId);
+    void NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
+        const std::map<std::string, std::string> &wifiDevices);
+    int32_t SendUninstAppByWifi(int32_t userId, int32_t tokenId, const std::string &networkId);
+
+    void GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t tokenId,
+        std::map<std::string, std::string> &wifiDevices, bool &isBleWay);
+    void NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
+        const std::map<std::string, std::string> &wifiDevices);
+    int32_t SendUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
+        const std::string &networkId, const std::string &udid);
+
     void NotifyRemoteLocalUserSwitch(const std::string &localUdid, const std::vector<std::string> &peerUdids,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     void NotifyRemoteLocalUserSwitchByWifi(const std::string &localUdid,
@@ -387,6 +418,8 @@ private:
     bool IsCallerInWhiteList();
     bool IsDMAdapterCheckApiWhiteListLoaded();
 #endif
+    bool GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
+        const std::string &sinkNetWorkId, std::string &sinkUdid);
 
 private:
     bool isImplsoLoaded_ = false;
@@ -411,6 +444,9 @@ private:
     std::shared_ptr<DmScreenCommonEventManager> screenCommonEventManager_;
     std::vector<int32_t> foregroundUserVec_;
     std::vector<int32_t> backgroundUserVec_;
+    std::mutex broadCastLock_;
+    int64_t SendLastBroadCastTime_ = 0;
+    int64_t lastDelayTime_ = 0;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI

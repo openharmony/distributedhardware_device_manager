@@ -188,6 +188,7 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
     CHECK_NULL_VOID(context);
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    FilterProfilesByContext(profiles, context);
     uint32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
@@ -459,6 +460,10 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     context->accesser.aclTypeList = aclNegoResult.Dump();
 
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_USER_CONFIRM, context);
+    context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
+        static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), DM_OK);
+    context->listener->OnBindResult(context->processInfo, context->peerTargetId,
+        DM_OK, static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), "");
     context->timer->StartTimer(std::string(CONFIRM_TIMEOUT_TASK),
         DmAuthState::GetTaskTimeout(context, CONFIRM_TIMEOUT_TASK, CONFIRM_TIMEOUT),
         [context] (std::string name) {

@@ -53,7 +53,23 @@ constexpr const static char* ONBINDRESULT_MAPPING_LIST[ONBINDRESULT_MAPPING_NUM]
 
 const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
     { DmAuthStateType::AUTH_SRC_FINISH_STATE, DmAuthStatus::STATUS_DM_AUTH_FINISH },
-    { DmAuthStateType::AUTH_SINK_FINISH_STATE, DmAuthStatus::STATUS_DM_SINK_AUTH_FINISH }
+    { DmAuthStateType::AUTH_SINK_FINISH_STATE, DmAuthStatus::STATUS_DM_SINK_AUTH_FINISH },
+    { DmAuthStateType::AUTH_IDLE_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_START_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_NEGOTIATE_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_CONFIRM_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_PIN_NEGOTIATE_START_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_PIN_INPUT_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_START_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_DONE_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_PIN_AUTH_MSG_NEGOTIATE_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_PIN_AUTH_DONE_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_CREDENTIAL_EXCHANGE_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_NEGOTIATE_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT },
+    { DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE, DmAuthStatus::STATUS_DM_AUTH_DEFAULT }
 };
 
 const std::map<int32_t, int32_t> NEW_AND_OLD_REPLAY_MAPPING = {
@@ -96,10 +112,10 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("SourceFinish reason:%{public}d", context->reason);
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
-        GetOutputState(context->accesser.bundleName, context->state), context->reason);
+        GetOutputState(context->state), context->reason);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
         GetOutputReplay(context->accesser.bundleName, context->reason),
-        GetOutputState(context->accesser.bundleName, context->state), GenerateBindResultContent(context));
+        GetOutputState(context->state), GenerateBindResultContent(context));
     context->successFinished = true;
 
     if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED) {
@@ -134,7 +150,7 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
     context->processInfo.pkgName = context->accessee.pkgName;
     context->listener->OnSinkBindResult(context->processInfo, context->peerTargetId,
         GetOutputReplay(context->accessee.bundleName, context->reason),
-        GetOutputState(context->accessee.bundleName, context->state), GenerateBindResultContent(context));
+        GetOutputState(context->state), GenerateBindResultContent(context));
     context->successFinished = true;
     if (context->reason != DM_OK) {
         // 根据凭据id 删除sink端多余的凭据
@@ -165,6 +181,7 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
     }
 
     context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_SHOW);
+    context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_CANCEL_CONFIRM_SHOW);
     context->timer->DeleteAll();
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_RESP_FINISH, context); // 发送201给source侧
 }
@@ -330,24 +347,14 @@ bool DmAuthState::HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const 
         (srcTokenIdHash == context->accessee.tokenIdHash));
 }
 
-int32_t DmAuthState::GetOutputState(const std::string &processName, int32_t state)
+int32_t DmAuthState::GetOutputState(int32_t state)
 {
     LOGI("state %{public}d.", state);
-    bool needMapFlag = false;
-    for (uint16_t index = 0; index < ONBINDRESULT_MAPPING_NUM; ++index) {
-        if (std::string(ONBINDRESULT_MAPPING_LIST[index]) == processName) {
-            LOGI("processName %{public}s new protocol param convert to old protocol param.", processName.c_str());
-            needMapFlag = true;
-            break;
-        }
+    auto it = NEW_AND_OLD_STATE_MAPPING.find(static_cast<DmAuthStateType>(state));
+    if (it != NEW_AND_OLD_STATE_MAPPING.end()) {
+        return static_cast<int32_t>(it->second);
     }
-    if (needMapFlag) {
-        auto it = NEW_AND_OLD_STATE_MAPPING.find(static_cast<DmAuthStateType>(state));
-        if (it != NEW_AND_OLD_STATE_MAPPING.end()) {
-            return static_cast<int32_t>(it->second);
-        }
-    }
-    return state;
+    return static_cast<int32_t>(STATUS_DM_AUTH_DEFAULT);
 }
 
 int32_t DmAuthState::GetOutputReplay(const std::string &processName, int32_t replay)
@@ -418,6 +425,29 @@ void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
         return;
     }
     context->softbusConnector->SetProcessInfo(processInfo);
+}
+
+void DmAuthState::FilterProfilesByContext(
+    std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> aclProfilesVec;
+    for (const auto &item : profiles) {
+        std::string accesserDeviceIdHash = Crypto::GetUdidHash(item.GetAccesser().GetAccesserDeviceId());
+        std::string accesseeDeviceIdHash = Crypto::GetUdidHash(item.GetAccessee().GetAccesseeDeviceId());
+        if ((context->accesser.deviceIdHash == accesserDeviceIdHash &&
+            context->accessee.deviceIdHash == accesseeDeviceIdHash &&
+            context->accesser.userId == item.GetAccesser().GetAccesserUserId() &&
+            context->accessee.userId == item.GetAccessee().GetAccesseeUserId()) ||
+            (context->accessee.deviceIdHash == accesserDeviceIdHash &&
+            context->accesser.deviceIdHash == accesseeDeviceIdHash &&
+            context->accessee.userId == item.GetAccesser().GetAccesserUserId() &&
+            context->accesser.userId == item.GetAccessee().GetAccesseeUserId())) {
+            aclProfilesVec.push_back(item);
+        }
+    }
+    profiles.clear();
+    profiles.assign(aclProfilesVec.begin(), aclProfilesVec.end());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -545,8 +545,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
         LOGE("DmAuthMessageProcessor::ParseMessageRspCredExchange error, decrypt data failed.");
         return ERR_DM_FAILED;
     }
-
-    LOGI("DmAuthMessageProcessor::ParseMessageRspCredExchange plainText=%{public}s", plainText.c_str());
+    LOGI("plainText=%{public}s", GetAnonyJsonString(plainText).c_str());
 
     JsonObject jsonData(plainText);
 
@@ -590,7 +589,7 @@ std::string DmAuthMessageProcessor::CreateMessage(DmMessageType msgType, std::sh
         return "";
     }
     int32_t ret = (this->*(itr->second))(context, jsonObj);
-    LOGI("DmAuthMessageProcessor::CreateMessage start. message is %{public}s", jsonObj.Dump().c_str());
+    LOGI("start. message is %{public}s", GetAnonyJsonString(jsonObj.Dump()).c_str());
     return (ret == DM_OK) ? jsonObj.Dump() : "";
 }
 
@@ -721,7 +720,7 @@ int32_t DmAuthMessageProcessor::CreateMessageRspCredExchange(std::shared_ptr<DmA
 
     std::string plainText = jsonData.Dump();
     std::string cipherText;
-    LOGI("DmAuthMessageProcessor::CreateMessageRspCredExchange plainText=%{public}s", plainText.c_str());
+    LOGI("plainText=%{public}s", GetAnonyJsonString(plainText).c_str());
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
     if (ret != DM_OK) {
         LOGI("DmAuthMessageProcessor::CreateMessageRspCredExchange encryptMessage failed.");

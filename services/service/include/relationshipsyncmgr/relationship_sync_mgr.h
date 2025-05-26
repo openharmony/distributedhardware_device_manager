@@ -75,6 +75,7 @@ struct RelationShipChangeMsg {
     void ToAccountLogoutPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDeviceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToAppUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
+    void ToAppUninstallPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToServiceUnbindPayLoad(uint8_t *&msg, uint32_t &len) const;
     bool ToSyncFrontOrBackUserIdPayLoad(uint8_t *&msg, uint32_t &len) const;
     void ToDelUserPayLoad(uint8_t *&msg, uint32_t &len) const;
@@ -90,7 +91,8 @@ struct RelationShipChangeMsg {
     bool FromDelUserPayLoad(const cJSON *payloadJson);
     bool FromStopUserPayLoad(const cJSON *payloadJson);
     bool FromShareUnbindPayLoad(const cJSON *payloadJson);
-    void GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum);
+    bool FromAppUninstallPayLoad(const cJSON *payloadJson);
+    bool GetBroadCastId(const cJSON *payloadJson, uint32_t userIdNum);
 
     std::string ToJson() const;
     bool FromJson(const std::string &msgJson);
