@@ -314,7 +314,7 @@ int32_t FreezeProcess::UpdateFreezeState(int64_t nowTime)
     return DM_OK;
 }
 
-void FreezeProcess::CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t nextFreezeTime)
+void FreezeProcess::CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t &nextFreezeTime)
 {
     switch (nowFreezeTime) {
         case NOT_FREEZE_TIME:
