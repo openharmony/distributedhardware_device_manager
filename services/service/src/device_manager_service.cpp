@@ -1712,6 +1712,10 @@ void DeviceManagerService::InitServiceInfos(
 
 int32_t DeviceManagerService::RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call RegisterLocalServiceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
     bool success = InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
@@ -1728,6 +1732,11 @@ int32_t DeviceManagerService::RegisterLocalServiceInfo(const DMLocalServiceInfo 
 
 int32_t DeviceManagerService::UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call UnRegisterLocalServiceInfo.",
+            bundleName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
 #else
@@ -1739,6 +1748,10 @@ int32_t DeviceManagerService::UnRegisterLocalServiceInfo(const std::string &bund
 
 int32_t DeviceManagerService::UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call UpdateLocalServiceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
     bool success = InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
@@ -1756,6 +1769,11 @@ int32_t DeviceManagerService::UpdateLocalServiceInfo(const DMLocalServiceInfo &s
 int32_t DeviceManagerService::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
     int32_t pinExchangeType, DMLocalServiceInfo &serviceInfo)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call GetLocalServiceInfo.",
+            bundleName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
