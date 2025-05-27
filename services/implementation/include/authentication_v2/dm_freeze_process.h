@@ -71,7 +71,7 @@ private:
     int32_t CleanBindFailedEvents(int64_t reservedDataTimeStamp);
     int32_t CleanFreezeState(int64_t reservedDataTimeStamp);
     int32_t UpdateFreezeState(int64_t nowTime);
-    void CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t nextFreezeTime);
+    void CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t &nextFreezeTime);
 
 private:
     DeviceFreezeState freezeStateCache_;
