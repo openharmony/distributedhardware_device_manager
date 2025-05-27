@@ -28,6 +28,7 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 constexpr const char* DM_KV_STORE_PREFIX = "DM2_";
+constexpr const char* DM_KV_STORE_FREEZE_PREFIX = "anti_ddos_local_";
 constexpr const char* DB_KEY_DELIMITER = "###";
 constexpr int64_t DM_KV_STORE_REFRESH_TIME = 24 * 60 * 60; // one day
 constexpr int64_t MAX_SUPPORTED_EXIST_TIME = 3 * 24 * 60 * 60; // 3days
@@ -143,6 +144,40 @@ DM_EXPORT int32_t KVAdapterManager::AppUnintall(const std::string &appId)
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->DeleteByAppId(appId, DM_KV_STORE_PREFIX) != DM_OK) {
         LOGE("DeleteByAppId failed");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::GetFreezeData(const std::string &key, std::string &value)
+{
+    std::string dmKey = DM_KV_STORE_FREEZE_PREFIX + key;
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Get(dmKey, value) != DM_OK) {
+        LOGE("Get freeze data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::PutFreezeData(const std::string &key, std::string &value)
+{
+    std::string dmKey = DM_KV_STORE_FREEZE_PREFIX + key;
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Put(dmKey, value) != DM_OK) {
+        LOGE("Insert freeze data failed, k:%{public}s, v:%{public}s", dmKey.c_str(), value.c_str());
+        return ERR_DM_FAILED;
+    }
+    LOGI("Insert freeze data success, k:%{public}s, v:%{public}s", dmKey.c_str(), value.c_str());
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::DeleteFreezeData(const std::string &key)
+{
+    std::string dmKey = DM_KV_STORE_FREEZE_PREFIX + key;
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Delete(dmKey) != DM_OK) {
+        LOGE("delete freeze data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
         return ERR_DM_FAILED;
     }
     return DM_OK;

@@ -243,5 +243,24 @@ int32_t KVAdapter::DeleteBatch(const std::vector<std::string> &keys)
     }
     return DM_OK;
 }
+
+int32_t KVAdapter::Delete(const std::string& key)
+{
+    DistributedKv::Status status;
+    {
+        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        if (kvStorePtr_ == nullptr) {
+            LOGE("kvStorePtr is nullptr!");
+            return ERR_DM_POINT_NULL;
+        }
+        DistributedKv::Key kvKey(key);
+        status = kvStorePtr_->Delete(kvKey);
+    }
+    if (status != DistributedKv::Status::SUCCESS) {
+        LOGE("Delete kv by key failed!");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

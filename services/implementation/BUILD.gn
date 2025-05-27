@@ -195,6 +195,7 @@ if (defined(ohos_lite)) {
       "src/authentication_v2/dm_auth_state.cpp",
       "src/authentication_v2/dm_auth_state_machine.cpp",
       "src/authentication_v2/dm_negotiate_process.cpp",
+      "src/authentication_v2/dm_freeze_process.cpp",
       "src/config/dm_config_manager.cpp",
       "src/credential/dm_credential_manager.cpp",
       "src/cryptomgr/crypto_mgr.cpp",

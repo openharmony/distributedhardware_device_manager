@@ -43,6 +43,7 @@ public:
     int32_t DeleteKvStore();
     int32_t DeleteByAppId(const std::string &appId, const std::string &prefix);
     int32_t DeleteBatch(const std::vector<std::string> &keys);
+    int32_t Delete(const std::string& key);
     void OnRemoteDied() override;
 
 private:

@@ -23,6 +23,7 @@
 #include "dm_auth_state_machine.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
+#include "dm_freeze_process.h"
 #include "multiple_user_connector.h"
 
 namespace OHOS {
@@ -110,6 +111,18 @@ int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkFinishState::Action start");
     context->state = static_cast<int32_t>(GetStateType());
+    int32_t ret = DM_OK;
+    LOGI("reason: %{public}d", context->reason);
+    if (context->reason == DM_OK) {
+        ret = FreezeProcess::GetInstance().DeleteFreezeRecord(context->accessee.bundleName,
+            context->accessee.deviceType);
+        LOGI("DeleteFreezeRecord ret: %{public}d", ret);
+    }
+    if (context->reason != DM_OK && context->reason != ERR_DM_DEVICE_FREEZED) {
+        ret = FreezeProcess::GetInstance().UpdateFreezeRecord(context->accessee.bundleName,
+            context->accessee.deviceType);
+        LOGI("UpdateFreezeData ret: %{public}d", ret);
+    }
     SinkFinish(context);
     LOGI("AuthSinkFinishState::Action ok");
     if (context->cleanNotifyCallback != nullptr) {

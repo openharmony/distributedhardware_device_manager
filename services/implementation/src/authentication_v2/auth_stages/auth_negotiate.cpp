@@ -32,6 +32,7 @@
 #include "dm_random.h"
 #include "dm_auth_context.h"
 #include "dm_auth_state.h"
+#include "dm_freeze_process.h"
 #include "deviceprofile_connector.h"
 #include "distributed_device_profile_errors.h"
 #include "device_auth.h"
@@ -160,6 +161,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.language = DmLanguageManager::GetInstance().GetSystemLanguage();
     context->accessee.deviceName = context->listener->GetLocalDisplayDeviceNameForPrivacy();
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
+    context->accessee.deviceType = context->softbusConnector->GetLocalDeviceTypeId();
     return DM_OK;
 }
 
@@ -223,6 +225,10 @@ int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
+    if (FreezeProcess::GetInstance().IsFreezed(context->accessee.bundleName, context->accessee.deviceType)) {
+        LOGE("Device is Freezed");
+        return ERR_DM_DEVICE_FREEZED;
+    }
     // 1. Create an authorization timer
     if (context->timer != nullptr) {
         context->timer->StartTimer(std::string(AUTHENTICATE_TIMEOUT_TASK),

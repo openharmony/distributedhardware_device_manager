@@ -33,6 +33,7 @@
 #include "device_name_manager.h"
 #include "dm_error_type.h"
 #include "dm_device_info.h"
+#include "dm_freeze_process.h"
 #include "ffrt.h"
 #include <unistd.h>
 #include <string>
@@ -187,6 +188,9 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
         KVAdapterManager::GetInstance().ReInit();
+        if (FreezeProcess::GetInstance().SyncFreezeData() != DM_OK) {
+            LOGE("SyncFreezeData failed.");
+        }
         return;
     }
 #endif
