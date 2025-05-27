@@ -35,7 +35,6 @@ void DmSoftbusListenerFuzzTest(const uint8_t* data, size_t size)
         (size > DM_MAX_DEVICE_ID_LEN))) {
         return;
     }
-
     FuzzedDataProvider fdp(data, size);
     DmDeviceInfo deviceInfo;
     deviceInfo.deviceTypeId = fdp.ConsumeIntegral<std::int16_t>();
