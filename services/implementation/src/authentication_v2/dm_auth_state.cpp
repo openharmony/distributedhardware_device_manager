@@ -46,6 +46,7 @@ const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
 constexpr int32_t ONBINDRESULT_MAPPING_NUM = 2;
 constexpr int32_t MS_PER_SECOND = 1000;
 constexpr int32_t US_PER_MSECOND = 1000;
+constexpr int32_t GET_SYSTEMTIME_MAX_NUM = 3;
 constexpr const static char* ONBINDRESULT_MAPPING_LIST[ONBINDRESULT_MAPPING_NUM] = {
     "CollaborationFwk",
     "cast_engine_service",
@@ -382,11 +383,16 @@ uint64_t DmAuthState::GetSysTimeMs()
     struct timeval time;
     time.tv_sec = 0;
     time.tv_usec = 0;
-    if (gettimeofday(&time, nullptr) != 0) {
-        LOGE("GetSysTimeMs failed.");
-        return 0;
+    int32_t retryNum = 0;
+    while (retryNum < GET_SYSTEMTIME_MAX_NUM) {
+        if (gettimeofday(&time, nullptr) != 0) {
+            retryNum++;
+            LOGE("GetSysTimeMs failed. retryNum: %{public}d", retryNum);
+            continue;
+        }
+        return (uint64_t) time.tv_sec * MS_PER_SECOND + (uint64_t)time.tv_usec / US_PER_MSECOND;
     }
-    return (uint64_t) time.tv_sec * MS_PER_SECOND + (uint64_t)time.tv_usec / US_PER_MSECOND;
+    return 0;
 }
 
 void DmAuthState::DeleteAcl(std::shared_ptr<DmAuthContext> context,

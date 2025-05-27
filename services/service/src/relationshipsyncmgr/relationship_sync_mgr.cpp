@@ -70,6 +70,7 @@ namespace {
     const int32_t BROADCAST_PAYLOAD_LEN = 10;
     const int32_t BROADCAST_TIMEOUT_S = 5;
     const int32_t CURRENT_TIME_SEC_FLAG = 10;
+    const int32_t GET_CURRENT_TIME_MAX_NUM = 3;
 
     const char * const MSG_TYPE = "TYPE";
     const char * const MSG_VALUE = "VALUE";
@@ -253,7 +254,7 @@ bool RelationShipChangeMsg::FromShareUnbindPayLoad(const cJSON *payloadJson)
     this->broadCastId = 0;
     for (uint32_t j = CREDID_PAYLOAD_LEN; j < SHARE_UNBIND_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, true);
+        CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             this->broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - CREDID_PAYLOAD_LEN) * BITS_PER_BYTE);
@@ -491,7 +492,7 @@ bool RelationShipChangeMsg::FromAccountLogoutPayLoad(const cJSON *payloadJson)
     broadCastId = 0;
     for (uint32_t j = ACCOUNT_LOGOUT_BROADCAST_LEN; j < ACCOUNT_LOGOUT_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, true);
+        CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - ACCOUNT_LOGOUT_BROADCAST_LEN) * BITS_PER_BYTE);
@@ -522,7 +523,7 @@ bool RelationShipChangeMsg::FromDeviceUnbindPayLoad(const cJSON *payloadJson)
     broadCastId = 0;
     for (uint32_t j = USERID_PAYLOAD_LEN; j < DEVICE_UNBIND_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, true);
+        CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
@@ -570,7 +571,7 @@ bool RelationShipChangeMsg::FromAppUnbindPayLoad(const cJSON *payloadJson)
     broadCastId = 0;
     for (uint32_t j = BROADCAST_PAYLOAD_LEN; j < APP_UNBIND_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, true);
+        CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - BROADCAST_PAYLOAD_LEN) * BITS_PER_BYTE);
@@ -627,7 +628,7 @@ bool RelationShipChangeMsg::GetBroadCastId(const cJSON *payloadJson, uint32_t us
 {
     broadCastId = 0;
     cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, userIdNum * USERID_BYTES + 1);
-    CHECK_NULL_RETURN(payloadItem, true);
+    CHECK_NULL_RETURN(payloadItem, false);
     if (cJSON_IsNumber(payloadItem)) {
         broadCastId |= static_cast<uint8_t>(payloadItem->valueint);
     }
@@ -713,7 +714,7 @@ bool RelationShipChangeMsg::FromDelUserPayLoad(const cJSON *payloadJson)
     this->broadCastId = 0;
     for (uint32_t j = USERID_PAYLOAD_LEN; j < DEL_USER_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, true);
+        CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             this->broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
@@ -745,7 +746,7 @@ bool RelationShipChangeMsg::FromStopUserPayLoad(const cJSON *payloadJson)
     this->broadCastId = 0;
     for (uint32_t j = USERID_PAYLOAD_LEN; j < STOP_USER_PAYLOAD_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
-        CHECK_NULL_RETURN(payloadItem, true);
+        CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             this->broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
@@ -910,27 +911,36 @@ void ReleationShipSyncMgr::HandleRecvBroadCastTimeout(const std::string &key)
 
 bool ReleationShipSyncMgr::GetCurrentTimeSec(int32_t &sec)
 {
+    int32_t retryNum = 0;
     time_t now;
-    time(&now);
     struct tm ltm;
-    struct tm *res = localtime_r(&now, &ltm);
-    if (res == nullptr) {
-        LOGE("get current time failed.");
-        return false;
+    while (retryNum < GET_CURRENT_TIME_MAX_NUM) {
+        time(&now);
+        struct tm *res = localtime_r(&now, &ltm);
+        if (res == nullptr) {
+            retryNum++;
+            LOGE("get current time failed. retryNum: %{public}d", retryNum);
+            continue;
+        }
+        sec = ltm.tm_sec % CURRENT_TIME_SEC_FLAG;
+        if (sec == 0) {
+            sec = CURRENT_TIME_SEC_FLAG;
+        }
+        return true;
     }
-    sec = ltm.tm_sec % CURRENT_TIME_SEC_FLAG;
-    return true;
+    return false;
 }
 
 std::string ReleationShipSyncMgr::SyncTrustRelationShip(RelationShipChangeMsg &msg)
 {
     int32_t currentTimeSec = 0;
-    msg.broadCastId = static_cast<uint8_t>(CURRENT_TIME_SEC_FLAG);
+    msg.broadCastId = 0;
     if (!GetCurrentTimeSec(currentTimeSec)) {
         LOGE("get current time failed, use default value");
         return msg.ToJson();
     }
     msg.broadCastId = static_cast<uint8_t>(currentTimeSec);
+    LOGI("send trust change msg: %{public}s", msg.ToString().c_str());
     return msg.ToJson();
 }
 
@@ -945,11 +955,14 @@ RelationShipChangeMsg ReleationShipSyncMgr::ParseTrustRelationShipChange(const s
 
 bool ReleationShipSyncMgr::IsNewBroadCastId(const RelationShipChangeMsg &msg)
 {
-    if (timer_ == nullptr) {
-        timer_ = std::make_shared<DmTimer>();
+    if (msg.broadCastId == 0) {
+        return true;
     }
     std::string key = msg.ToMapKey();
     std::lock_guard<std::mutex> autoLock(lock_);
+    if (timer_ == nullptr) {
+        timer_ = std::make_shared<DmTimer>();
+    }
     auto iter = recvBroadCastIdMap_.find(key);
     if (iter == recvBroadCastIdMap_.end()) {
         recvBroadCastIdMap_[key] = msg.broadCastId;
