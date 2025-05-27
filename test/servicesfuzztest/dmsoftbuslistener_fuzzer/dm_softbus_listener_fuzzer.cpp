@@ -44,13 +44,11 @@ void DmSoftbusListenerFuzzTest(const uint8_t* data, size_t size)
     deviceInfo.extraData = fdp.ConsumeRandomLengthString();
     SoftbusListener::DeviceNameChange(deviceInfo);
     SoftbusListener::DeviceScreenStatusChange(deviceInfo);
-
     int32_t errcode = fdp.ConsumeIntegral<std::int32_t>();
     uint16_t deviceTypeId = fdp.ConsumeIntegral<std::uint16_t>();
     string proofInfoStr = fdp.ConsumeRandomLengthString();
     SoftbusListener::CredentialAuthStatusProcess(proofInfoStr, deviceTypeId, errcode);
-
-    const char* proofInfo = proofInfoStr.c_str(); 
+    const char* proofInfo = proofInfoStr.c_str();
     DevUserInfo localDevUserInfo;
     localDevUserInfo.deviceId = fdp.ConsumeRandomLengthString();
     localDevUserInfo.userId = fdp.ConsumeIntegral<std::int32_t>();
@@ -59,13 +57,10 @@ void DmSoftbusListenerFuzzTest(const uint8_t* data, size_t size)
     remoteDevUserInfo.userId = fdp.ConsumeIntegral<std::int32_t>();
     string remoteAclList = fdp.ConsumeRandomLengthString();
     SoftbusListener::OnSyncLocalAclList(localDevUserInfo, remoteDevUserInfo, remoteAclList);
-
     string aclList = fdp.ConsumeRandomLengthString();
     SoftbusListener::OnGetAclListHash(localDevUserInfo, remoteDevUserInfo, aclList);
-
     uint32_t proofLen = fdp.ConsumeIntegral<std::uint32_t>();
     SoftbusListener::OnCredentialAuthStatus(proofInfo, proofLen, deviceTypeId, errcode);
-
     uint16_t typeValue = fdp.ConsumeIntegral<std::uint16_t>();
     NodeStatusType type = static_cast<NodeStatusType>(typeValue);
     NodeStatus status;
@@ -73,24 +68,17 @@ void DmSoftbusListenerFuzzTest(const uint8_t* data, size_t size)
     status.basicInfo.osType = fdp.ConsumeIntegral<std::uint32_t>();
     status.reserved[0] = fdp.ConsumeIntegral<std::uint16_t>();
     SoftbusListener::OnDeviceScreenStatusChanged(type, &status);
-
     SoftbusListener listener;
     std::string networkIdStr = fdp.ConsumeRandomLengthString();
-    const char* networkId = networkIdStr.c_str(); 
     int32_t networkType = fdp.ConsumeIntegral<std::int32_t>();
-    listener.GetNetworkTypeByNetworkId(networkId, networkType);
-
+    listener.GetNetworkTypeByNetworkId(networkIdStr.c_str(), networkType);
     std::string name = fdp.ConsumeRandomLengthString();
     SoftbusListener::CloseDmRadarHelperObj(name);
-
     std::string msg = fdp.ConsumeRandomLengthString();
     listener.SendAclChangedBroadcast(msg);
-
     int32_t screenStatus = fdp.ConsumeIntegral<std::int32_t>();
     listener.GetDeviceScreenStatus(networkId, screenStatus);
-
     listener.DeleteCacheDeviceInfo();
-
     std::string displayName = fdp.ConsumeRandomLengthString();
     listener.SetLocalDisplayName(displayName);
 }
