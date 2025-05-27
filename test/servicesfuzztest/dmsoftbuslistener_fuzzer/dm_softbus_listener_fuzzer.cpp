@@ -78,8 +78,6 @@ void DmSoftbusListenerFuzzTest(const uint8_t* data, size_t size)
     int32_t screenStatus = fdp.ConsumeIntegral<std::int32_t>();
     listener.GetDeviceScreenStatus(networkId, screenStatus);
     listener.DeleteCacheDeviceInfo();
-    std::string displayName = fdp.ConsumeRandomLengthString();
-    listener.SetLocalDisplayName(displayName);
 }
 }
 }
