@@ -47,7 +47,7 @@ DM_EXPORT extern const uint32_t SERVICE;
 DM_EXPORT extern const uint32_t APP;
 
 extern const char* TAG_PEER_BUNDLE_NAME;
-extern const char* TAG_PEER_TOKENID;
+DM_EXPORT extern const char* TAG_PEER_TOKENID;
 
 const uint32_t DM_IDENTICAL_ACCOUNT = 1;
 const uint32_t DM_SHARE = 2;
@@ -205,7 +205,7 @@ public:
     DM_EXPORT int32_t GetBindLevel(const std::string &pkgName,
         const std::string &localUdid, const std::string &udid, uint64_t &tokenId);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds, const std::string &localUdid);
-    std::vector<std::string> GetDeviceIdAndUdidListByTokenId(const std::vector<int32_t> &userIds,
+    DM_EXPORT std::vector<std::string> GetDeviceIdAndUdidListByTokenId(const std::vector<int32_t> &userIds,
         const std::string &localUdid, int32_t tokenId);
     DM_EXPORT std::multimap<std::string, int32_t> GetDeviceIdAndUserId(
         int32_t userId, const std::string &accountId, const std::string &localUdid);
