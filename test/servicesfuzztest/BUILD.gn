@@ -26,6 +26,7 @@ group("fuzztest") {
     "deviceprofileconnector_fuzzer:fuzztest",
     "devicepublish_fuzzer:fuzztest",
     "dmcommtool_fuzzer:fuzztest",
+    "dmcommtooltwo_fuzzer:fuzztest",
     "dmtransport_fuzzer:fuzztest",
     "dmtransportmsg_fuzzer:fuzztest",
     "dpinitcallback_fuzzer:fuzztest",
