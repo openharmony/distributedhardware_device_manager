@@ -19,6 +19,7 @@ group("test") {
     deps += [
       "benchmarktest:benchmarktest",
       "commonfuzztest:fuzztest",
+      "interfacesfuzztest:fuzztest",
       "servicesfuzztest:fuzztest",
       "softbusfuzztest:fuzztest",
       "unittest:unittest",
