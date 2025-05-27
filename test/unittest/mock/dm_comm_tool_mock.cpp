@@ -34,5 +34,10 @@ int32_t DMCommTool::CreateUserStopMessage(int32_t stopUserId, std::string &msgSt
 {
     return DmDMCommTool::dmDMCommTool->CreateUserStopMessage(stopUserId, msgStr);
 }
+
+int32_t DMCommTool::SendUninstAppObj(int32_t userId, int32_t tokenId, const std::string &networkId)
+{
+    return DmDMCommTool::dmDMCommTool->SendUninstAppObj(userId, tokenId, networkId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -40,5 +40,11 @@ int32_t HiChainConnector::GetRelatedGroups(int32_t userId, const std::string &de
 {
     return DmHiChainConnector::dmHiChainConnector->GetRelatedGroups(userId, deviceId, groupList);
 }
+
+int32_t HiChainConnector::DeleteGroupByACL(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec,
+    std::vector<int32_t> &userIdVec)
+{
+    return DmHiChainConnector::dmHiChainConnector->DeleteGroupByACL(delACLInfoVec, userIdVec);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -43,6 +43,7 @@ void DeviceManagerServiceImplFirstTest::SetUpTestCase()
     DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock_;
     DmDmDeviceStateManager::dmDeviceStateManager = dmDeviceStateManagerMock_;
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = deviceManagerServiceImplMock_;
+    DmHiChainConnector::dmHiChainConnector = hiChainConnectorMock_;
 }
 
 void DeviceManagerServiceImplFirstTest::TearDownTestCase()
@@ -57,6 +58,8 @@ void DeviceManagerServiceImplFirstTest::TearDownTestCase()
     dmDeviceStateManagerMock_ = nullptr;
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl = nullptr;
     deviceManagerServiceImplMock_ = nullptr;
+    DmHiChainConnector::dmHiChainConnector = nullptr;
+    hiChainConnectorMock_ = nullptr;
 }
 
 namespace {
@@ -531,6 +534,259 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, SetOnlineProcessInfo_006, testing::e
         bindType, processInfo, devInfo, requestDeviceId, trustDeviceId, devState);
 
     EXPECT_EQ(devInfo.authForm, DmAuthForm::SHARE);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdByUserIdAndTokenId_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t tokenId = 1234;
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetDeviceIdAndUdidListByTokenId(_, _, _))
+        .WillOnce(Return(std::vector<std::string>()));
+
+    auto result = deviceManagerServiceImpl_->GetDeviceIdByUserIdAndTokenId(userId, tokenId);
+    EXPECT_TRUE(result.empty());
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdByUserIdAndTokenId_002, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t tokenId = 1234;
+
+    std::vector<std::string> expectedDeviceIds = {"deviceId1"};
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetDeviceIdAndUdidListByTokenId(_, _, _))
+        .WillOnce(Return(expectedDeviceIds));
+
+    auto result = deviceManagerServiceImpl_->GetDeviceIdByUserIdAndTokenId(userId, tokenId);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0], "deviceId1");
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, GetDeviceIdByUserIdAndTokenId_003, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t tokenId = 1234;
+
+    std::vector<std::string> expectedDeviceIds = {"deviceId1", "deviceId2"};
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetDeviceIdAndUdidListByTokenId(_, _, _))
+        .WillOnce(Return(expectedDeviceIds));
+
+    auto result = deviceManagerServiceImpl_->GetDeviceIdByUserIdAndTokenId(userId, tokenId);
+    EXPECT_EQ(result.size(), 2);
+    EXPECT_NE(std::find(result.begin(), result.end(), "deviceId1"), result.end());
+    EXPECT_NE(std::find(result.begin(), result.end(), "deviceId2"), result.end());
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1001;
+    int32_t accessTokenId = 2001;
+    
+    deviceManagerServiceImpl_->listener_ = nullptr;
+    
+    auto result = deviceManagerServiceImpl_->ProcessAppUninstall(userId, accessTokenId);
+    EXPECT_EQ(result, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_002, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl())
+        .WillOnce(Return(std::vector<DistributedDeviceProfile::AccessControlProfile>()));
+
+    int32_t result = deviceManagerServiceImpl_->ProcessAppUninstall(userId, accessTokenId);
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_003, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.GetAccesser().SetAccesserTokenId(5678);
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl())
+        .WillOnce(Return(profiles));
+
+    int32_t result = deviceManagerServiceImpl_->ProcessAppUninstall(userId, accessTokenId);
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_004, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.GetAccesser().SetAccesserTokenId(accessTokenId);
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*hiChainConnectorMock_, DeleteGroupByACL(_, _)).Times(1);
+
+    int32_t result = deviceManagerServiceImpl_->ProcessAppUninstall(userId, accessTokenId);
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_005, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.GetAccesser().SetAccesserTokenId(accessTokenId);
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, IsLnnAcl(_)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*deviceProfileConnectorMock_, CacheAcerAclId(_, _)).Times(1);
+    EXPECT_CALL(*hiChainConnectorMock_, DeleteGroupByACL(_, _)).Times(1);
+
+    int32_t result = deviceManagerServiceImpl_->ProcessAppUninstall(userId, accessTokenId);
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_006, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.GetAccesser().SetAccesserTokenId(accessTokenId);
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*hiChainConnectorMock_, DeleteGroupByACL(_, _)).Times(0);
+
+    int32_t result = deviceManagerServiceImpl_->ProcessAppUninstall(userId, accessTokenId);
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_007, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.GetAccesser().SetAccesserTokenId(accessTokenId);
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl())
+        .WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, IsLnnAcl(_)).WillRepeatedly(Return(false));
+    EXPECT_CALL(*hiChainConnectorMock_, DeleteGroupByACL(_, _)).Times(1);
+
+    int32_t result = deviceManagerServiceImpl_->ProcessAppUninstall(userId, accessTokenId);
+    EXPECT_EQ(result, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessUnBindApp_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+    std::string extra = "invalid_json";
+    std::string udid = "remoteUdid";
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleAppUnBindEvent(userId, udid, accessTokenId)).Times(1);
+
+    deviceManagerServiceImpl_->ProcessUnBindApp(userId, accessTokenId, extra, udid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessUnBindApp_002, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+    std::string extra = R"({"key": "value"})";
+    std::string udid = "remoteUdid";
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleAppUnBindEvent(userId, udid, accessTokenId)).Times(1);
+
+    deviceManagerServiceImpl_->ProcessUnBindApp(userId, accessTokenId, extra, udid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessUnBindApp_003, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+    int32_t peerTokenId = 5678;
+    std::string extra = R"({"peerTokenId": 5678})";
+    std::string udid = "remoteUdid";
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleAppUnBindEvent(userId, udid, accessTokenId, peerTokenId)).Times(1);
+
+    deviceManagerServiceImpl_->ProcessUnBindApp(userId, accessTokenId, extra, udid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessUnBindApp_004, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+    std::string extra = R"({"peerTokenId": "invalid"})";
+    std::string udid = "remoteUdid";
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleAppUnBindEvent(userId, udid, accessTokenId)).Times(1);
+
+    deviceManagerServiceImpl_->ProcessUnBindApp(userId, accessTokenId, extra, udid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessUnBindApp_005, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1;
+    int32_t accessTokenId = 1234;
+    std::string extra = "";
+    std::string udid = "remoteUdid";
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleAppUnBindEvent(userId, udid, accessTokenId)).Times(1);
+
+    deviceManagerServiceImpl_->ProcessUnBindApp(userId, accessTokenId, extra, udid);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclByTokenId_001, testing::ext::TestSize.Level1)
+{
+    int32_t accessTokenId = 1234;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.GetAccesser().SetAccesserTokenId(5678);
+    profiles.push_back(profile);
+
+    std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> delProfileMap;
+    std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
+    std::vector<int32_t> userIdVec;
+
+    deviceManagerServiceImpl_->DeleteAclByTokenId(accessTokenId, profiles, delProfileMap, delACLInfoVec, userIdVec);
+
+    EXPECT_TRUE(delProfileMap.empty());
+    EXPECT_TRUE(delACLInfoVec.empty());
+    EXPECT_TRUE(userIdVec.empty());
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclByTokenId_002, testing::ext::TestSize.Level1)
+{
+    int32_t accessTokenId = 1234;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+
+    std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> delProfileMap;
+    std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
+    std::vector<int32_t> userIdVec;
+
+    deviceManagerServiceImpl_->DeleteAclByTokenId(accessTokenId, profiles, delProfileMap, delACLInfoVec, userIdVec);
+
+    EXPECT_TRUE(profiles.empty());
+    EXPECT_TRUE(delProfileMap.empty());
+    EXPECT_TRUE(delACLInfoVec.empty());
+    EXPECT_TRUE(userIdVec.empty());
 }
 } // namespace
 } // namespace DistributedHardware
