@@ -21,7 +21,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_t randNum, const HksParamSet *outputParam)
+int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr,
+    uint64_t randNum, const HksParamSet *outputParam)
 {
     if (deviceIdHash == nullptr || udidStr == nullptr || outputParam == nullptr) {
         LOGE("input param is nullptr.");
@@ -29,6 +30,10 @@ int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_
     }
     uint32_t cnt = 0;
     HksBlob *blob = &outputParam->params[cnt].blob;
+    if (blob == nullptr) {
+        LOGE("outputParam blob is nullptr");
+        return ERR_DM_GET_PARAM_FAILED;
+    }
     if (memcpy_s(&randNum, sizeof(uint64_t), blob->data, blob->size) != EOK) {
         LOGE("memcpy randNum failed");
         return ERR_DM_GET_PARAM_FAILED;
@@ -39,6 +44,8 @@ int32_t ProcessValidationResult(const char *deviceIdHash, char *udidStr, uint64_
         return ERR_DM_GET_PARAM_FAILED;
     }
     std::string certDeviceIdHash = Crypto::GetUdidHash(std::string(udidStr));
+    LOGI("accesser udidHash=%{public}s, certudidHash=%{public}s",
+        GetAnonyString(std::string(deviceIdHash)).c_str(), GetAnonyString(certDeviceIdHash).c_str());
     if (strcmp(deviceIdHash, certDeviceIdHash.c_str()) != 0) {
         LOGE("verifyCertificate fail");
         return ERR_DM_DESERIAL_CERT_FAILED;

@@ -52,6 +52,7 @@ public:
 
     std::string SerializeDmCertChain(const DmCertChain *chain);
     bool DeserializeDmCertChain(const std::string &data, DmCertChain *outChain);
+    void FreeCertChain(DmCertChain *chain);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
