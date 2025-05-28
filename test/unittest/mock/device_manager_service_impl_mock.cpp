@@ -89,5 +89,18 @@ int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &l
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckDeviceInfoPermission(localUdid, peerDeviceId);
 }
+
+void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId)
+{
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId);
+}
+
+void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId, int32_t peerTokenId)
+{
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleAppUnBindEvent(remoteUserId, remoteUdid,
+        tokenId, peerTokenId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

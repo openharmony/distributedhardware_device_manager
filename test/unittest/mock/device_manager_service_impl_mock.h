@@ -43,6 +43,9 @@ public:
     virtual void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
         const std::string &localUdid) = 0;
     virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;
+    virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
+    virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+        int32_t tokenId, int32_t peerTokenId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
 };
@@ -63,6 +66,9 @@ public:
         std::string &, bool &));
     MOCK_METHOD(void, HandleShareUnbindBroadCast, (const std::string &, const int32_t &, const std::string &));
     MOCK_METHOD(int32_t, CheckDeviceInfoPermission, (const std::string &, const std::string &));
+    MOCK_METHOD(void, HandleAppUnBindEvent, (int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId));
+    MOCK_METHOD(void, HandleAppUnBindEvent, (int32_t remoteUserId, const std::string &remoteUdid,
+        int32_t tokenId, int32_t peerTokenId));
 };
 }
 }

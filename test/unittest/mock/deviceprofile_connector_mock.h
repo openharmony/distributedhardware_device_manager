@@ -70,6 +70,11 @@ public:
         const std::string &targetDeviceId, int32_t userId) = 0;
     virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAccessControlProfile() = 0;
     virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAclIncludeLnnAcl() = 0;
+    virtual std::vector<std::string> GetDeviceIdAndUdidListByTokenId(const std::vector<int32_t> &userIds,
+        const std::string &localUdid, int32_t tokenId) = 0;
+    virtual void CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
+        std::vector<DmAclIdParam> &aclInfos) = 0;
+    virtual bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -114,6 +119,11 @@ public:
         (const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId));
     MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAccessControlProfile, ());
     MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAllAclIncludeLnnAcl, ());
+    MOCK_METHOD(std::vector<std::string>, GetDeviceIdAndUdidListByTokenId, (const std::vector<int32_t> &userIds,
+        const std::string &localUdid, int32_t tokenId));
+    MOCK_METHOD(void, CacheAcerAclId, (const DistributedDeviceProfile::AccessControlProfile &profile,
+        std::vector<DmAclIdParam> &aclInfos));
+    MOCK_METHOD(bool, IsLnnAcl, (const DistributedDeviceProfile::AccessControlProfile &profile));
 };
 }
 }

@@ -935,5 +935,46 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetAuthFormMap_007, testing::ext::Tes
     EXPECT_EQ(ret.size(), 1);
     EXPECT_EQ(ret[trustDeviceId], DmAuthForm::IDENTICAL_ACCOUNT);
 }
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_001, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> userIds;
+    std::string emptyUdid;
+    int32_t tokenId = 1234;
+
+    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(userIds, emptyUdid, tokenId);
+    EXPECT_TRUE(result.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_002, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> emptyUserIds;
+    std::string localUdid = "localDeviceId";
+    int32_t tokenId = 1234;
+    
+    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(emptyUserIds, localUdid, tokenId);
+    EXPECT_TRUE(result.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_003, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> userIds = {1, 2};
+    std::string emptyUdid;
+    int32_t tokenId = 1234;
+    
+    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(userIds, emptyUdid, tokenId);
+    EXPECT_TRUE(result.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_004, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> userIds = {1, 2};
+    std::string localUdid = "localDeviceId";
+    int32_t tokenId = 1234;
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
+    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(userIds, localUdid, tokenId);
+    EXPECT_TRUE(result.empty());
+}
 } // namespace DistributedHardware
 } // namespace OHOS

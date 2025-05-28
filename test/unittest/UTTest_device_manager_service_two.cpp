@@ -1879,6 +1879,85 @@ HWTEST_F(DeviceManagerServiceTest, GetLocalDeviceName_201, testing::ext::TestSiz
     int32_t ret = DeviceManagerService::GetInstance().GetLocalDeviceName(deviceName);
     EXPECT_EQ(ret, DM_OK);
 }
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_201, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "";
+    std::string deviceId = "";
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_202, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_203, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "";
+    std::string deviceId = "";
+    std::string extra;
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceTest, ValidateUnBindDeviceParams_204, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+    DeletePermission();
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SendUninstAppByWifi_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1001;
+    int32_t tokenId = 1002;
+    std::string networkId = "networkId123";
+    EXPECT_CALL(*dMCommToolMock_, SendUninstAppObj(_, _, _)).WillOnce(Return(DM_OK));
+    int32_t ret = DeviceManagerService::GetInstance().SendUninstAppByWifi(userId, tokenId, networkId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceTest, SendUninstAppByWifi_002, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1001;
+    int32_t tokenId = 1002;
+    std::string networkId = "networkId123";
+    EXPECT_CALL(*dMCommToolMock_, SendUninstAppObj(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = DeviceManagerService::GetInstance().SendUninstAppByWifi(userId, tokenId, networkId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceTest, GetNotifyRemoteUnBindAppWay_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1001;
+    int32_t tokenId = 11;
+    std::map<std::string, std::string> wifiDevices;
+    bool isBleWay = false;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    DeviceManagerService::GetInstance().GetNotifyRemoteUnBindAppWay(userId, tokenId, wifiDevices, isBleWay);
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+HWTEST_F(DeviceManagerServiceTest, GetNotifyRemoteUnBindAppWay_002, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 1001;
+    int32_t tokenId = 11;
+    std::map<std::string, std::string> wifiDevices;
+    bool isBleWay = false;
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    DeviceManagerService::GetInstance().GetNotifyRemoteUnBindAppWay(userId, tokenId, wifiDevices, isBleWay);
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
