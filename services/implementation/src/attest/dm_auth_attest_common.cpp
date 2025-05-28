@@ -107,9 +107,15 @@ bool AuthAttestCommon::DeserializeDmCertChain(const std::string &data, DmCertCha
     const uint32_t certCount = jsonObject[TAG_CERT_COUNT].Get<uint32_t>();
     JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     jsonArrayObj.Parse(jsonObject[TAG_CERT].Dump());
-    DmBlob *certs = new DmBlob[certCount]{0};
+    DmBlob *certs = new DmBlob[certCount];
     if (certs == nullptr) {
         LOGE("Memory allocation failed for certs array");
+        return false;
+    }
+    if (memset_s(certs, sizeof(DmBlob) * certCount, 0, sizeof(DmBlob) * certCount) != DM_OK) {
+        LOGE("memset_s failed.");
+        delete[] certs;
+        certs = nullptr;
         return false;
     }
     bool success = true;
@@ -137,6 +143,23 @@ bool AuthAttestCommon::DeserializeDmCertChain(const std::string &data, DmCertCha
     outChain->cert = certs;
     outChain->certCount = certCount;
     return true;
+}
+
+void AuthAttestCommon::FreeCertChain(DmCertChain *chain)
+{
+    if (chain == nullptr) {
+        LOGI("chain is nullptr!");
+        return;
+    }
+    for (uint32_t i = 0; i < chain->certCount; ++i) {
+        delete[] chain->cert[i].data;
+        chain->cert[i].data = nullptr;
+        chain->cert[i].size = 0;
+    }
+    delete[] chain->cert;
+    chain->cert = nullptr;
+    chain->certCount = 0;
+    delete chain;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

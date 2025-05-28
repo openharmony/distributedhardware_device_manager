@@ -49,6 +49,7 @@ int32_t AuthGenerateAttest::GenerateCertificate(DmCertChain &dmCertChain)
         return ret;
     }
     FreeCertChain(dcmCertChain);
+    LOGI("Success.");
     return DM_OK;
 }
 
@@ -114,7 +115,7 @@ int32_t ValidateInput(const DcmCertChain &dcmCertChain)
 
 int32_t CopyCertificates(const DcmCertChain &dcmCertChain, DmBlob *newCertArray, uint32_t &allocatedCerts)
 {
-    if (newCertArray == nullptr || newCertArray->length != dcmCertChain.certCount) {
+    if (newCertArray == nullptr) {
         LOGE("newCertArray is invalid param.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -169,6 +170,10 @@ int32_t AuthGenerateAttest::ConvertDcmCertChainToDmCertChain(const DcmCertChain 
     }
     dmCertChain.cert = newCertArray;
     dmCertChain.certCount = dcmCertChain.certCount;
+    for (uint32_t i = 0; i < dcmCertChain.certCount; ++i) {
+        delete[] newCertArray[i].data;
+    }
+    delete[] newCertArray;
     return DM_OK;
 }
 } // namespace DistributedHardware
