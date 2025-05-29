@@ -32,7 +32,7 @@
  
  void StopAuthenticateDeviceTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -43,7 +43,7 @@
  
  void UnBindDeviceTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -54,7 +54,7 @@
  
  void ShiftLNNGearTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -64,7 +64,7 @@
  
  void RegDevTrustChangeCallbackTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -75,7 +75,7 @@
  
  void GetNetworkIdByUdidTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -87,7 +87,7 @@
  
  void RegisterCredentialAuthStatusCallbackTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -98,7 +98,7 @@
  
  void GetAllTrustedDeviceListTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -110,7 +110,7 @@
  
  void RegisterSinkBindCallbackTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -121,7 +121,7 @@
  
  void GetDeviceProfileInfoListTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -133,7 +133,7 @@
  
  void GetDeviceIconInfoTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -145,7 +145,7 @@
  
  void PutDeviceProfileInfoListTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -168,7 +168,7 @@
  
  void GetDeviceNetworkIdListTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -180,7 +180,7 @@
  
  void SetLocalDeviceNameTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -192,7 +192,7 @@
  
  void SetRemoteDeviceNameTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -205,7 +205,7 @@
  
  void RestoreLocalDeviceNameTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
@@ -228,7 +228,7 @@
  
  void UnRegisterPinHolderCallbackTest(const uint8_t* data, size_t size)
  {
-     if ((data == nullptr) || (size = 0)) {
+     if ((data == nullptr) || (size == 0)) {
          return;
      }
      FuzzedDataProvider fdp(data, size);
