@@ -47,13 +47,14 @@ void DmSoftbusListenerFuzzTest(const uint8_t* data, size_t size)
     uint16_t deviceTypeId = fdp.ConsumeIntegral<std::uint16_t>();
     string proofInfoStr = fdp.ConsumeRandomLengthString();
     SoftbusListener::CredentialAuthStatusProcess(proofInfoStr, deviceTypeId, errcode);
-    
     const char* proofInfo = proofInfoStr.c_str();
     DevUserInfo localDevUserInfo;
-    localDevUserInfo.deviceId = fdp.ConsumeRandomLengthString();
+    std::string localDeviceId = fdp.ConsumeRandomLengthString(DM_MAX_DEVICE_ID_LEN);
+    localDevUserInfo.deviceId = localDeviceId.substr(0, DM_MAX_DEVICE_ID_LEN - 1);
     localDevUserInfo.userId = fdp.ConsumeIntegral<std::int32_t>();
     DevUserInfo remoteDevUserInfo;
-    remoteDevUserInfo.deviceId = fdp.ConsumeRandomLengthString();
+    std::string remoteDeviceId = fdp.ConsumeRandomLengthString(DM_MAX_DEVICE_ID_LEN);
+    remoteDevUserInfo.deviceId = remoteDeviceId.substr(0, DM_MAX_DEVICE_ID_LEN - 1);
     remoteDevUserInfo.userId = fdp.ConsumeIntegral<std::int32_t>();
     string remoteAclList = fdp.ConsumeRandomLengthString();
     SoftbusListener::OnSyncLocalAclList(localDevUserInfo, remoteDevUserInfo, remoteAclList);
@@ -70,14 +71,16 @@ void DmSoftbusListenerFuzzTest(const uint8_t* data, size_t size)
     SoftbusListener::OnDeviceScreenStatusChanged(type, &status);
     SoftbusListener listener;
     std::string networkIdStr = fdp.ConsumeRandomLengthString();
-    int32_t networkType = fdp.ConsumeIntegral<std::int32_t>();
-    listener.GetNetworkTypeByNetworkId(networkIdStr.c_str(), networkType);
+    if (!networkIdStr.empty()) { 
+        int32_t networkType = fdp.ConsumeIntegral<std::int32_t>();
+        listener.GetNetworkTypeByNetworkId(networkIdStr.c_str(), networkType);
+    }
     std::string name = fdp.ConsumeRandomLengthString();
     SoftbusListener::CloseDmRadarHelperObj(name);
     std::string msg = fdp.ConsumeRandomLengthString();
     listener.SendAclChangedBroadcast(msg);
     int32_t screenStatus = fdp.ConsumeIntegral<std::int32_t>();
-    listener.GetDeviceScreenStatus(networkId, screenStatus);
+    listener.GetDeviceScreenStatus(networkIdStr.c_str(), screenStatus);
     listener.DeleteCacheDeviceInfo();
 }
 }
