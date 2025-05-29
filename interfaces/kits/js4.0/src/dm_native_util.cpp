@@ -225,7 +225,7 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync)
             break;
         case ERR_DM_INPUT_PARA_INVALID:
         case ERR_DM_UNSUPPORTED_AUTH_TYPE:
-        case ERR_DM_MAX_SIZE_FAIL:
+        case ERR_DM_CALLBACK_REGISTER_FAILED:
             error = CreateErrorForCall(env, ERR_INVALID_PARAMS, ERR_MESSAGE_INVALID_PARAMS, isAsync);
             break;
         case ERR_DM_INIT_FAILED:

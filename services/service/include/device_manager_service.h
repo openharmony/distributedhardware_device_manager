@@ -410,7 +410,7 @@ private:
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
     DM_EXPORT void SubscribeDataShareCommonEvent();
 #endif
-    void HandleNetworkConnected();
+    void HandleNetworkConnected(int32_t networkStatus);
     void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
         const std::string &accountIdHash, const std::string &accountName, int32_t userId);
     void CheckPermission(bool &isOnlyShowNetworkId);

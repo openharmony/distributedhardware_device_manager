@@ -1261,17 +1261,9 @@ int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std:
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (getDeviceProfileInfoCallback_.size() > MAX_CONTAINER_SIZE) {
         LOGE("callback map size is more than max size");
-        return ERR_DM_MAX_SIZE_FAIL;
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     getDeviceProfileInfoCallback_[pkgName] = callback;
-    return DM_OK;
-}
-
-int32_t DeviceManagerNotify::UnRegisterGetDeviceProfileInfoListCallback(const std::string &pkgName)
-{
-    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
-    std::lock_guard<std::mutex> autoLock(bindLock_);
-    getDeviceProfileInfoCallback_.erase(pkgName);
     return DM_OK;
 }
 
@@ -1307,7 +1299,7 @@ int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (getDeviceIconInfoCallback_.size() > MAX_CONTAINER_SIZE) {
         LOGE("callback map size is more than max size");
-        return ERR_DM_MAX_SIZE_FAIL;
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     auto iter = getDeviceIconInfoCallback_.find(pkgName);
     if (iter == getDeviceIconInfoCallback_.end()) {
@@ -1316,28 +1308,13 @@ int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string
     }
     if (iter->second.size() > MAX_CONTAINER_SIZE) {
         LOGE("callback map for pkg size is more than max size");
-        return ERR_DM_MAX_SIZE_FAIL;
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     if (iter->second[uk].size() > MAX_CONTAINER_SIZE) {
         LOGE("callback set size is more than max size");
-        return ERR_DM_MAX_SIZE_FAIL;
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     iter->second[uk].insert(callback);
-    return DM_OK;
-}
-
-int32_t DeviceManagerNotify::UnRegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk)
-{
-    LOGI("In, pkgName: %{public}s", pkgName.c_str());
-    std::lock_guard<std::mutex> autoLock(bindLock_);
-    auto iter = getDeviceIconInfoCallback_.find(pkgName);
-    if (iter == getDeviceIconInfoCallback_.end()) {
-        return DM_OK;
-    }
-    iter->second.erase(uk);
-    if (iter->second.empty()) {
-        getDeviceIconInfoCallback_.erase(pkgName);
-    }
     return DM_OK;
 }
 
@@ -1388,17 +1365,9 @@ int32_t DeviceManagerNotify::RegisterSetLocalDeviceNameCallback(const std::strin
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (setLocalDeviceNameCallback_.size() > MAX_CONTAINER_SIZE) {
         LOGI("callback map size is more than max size");
-        return ERR_DM_MAX_SIZE_FAIL;
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     setLocalDeviceNameCallback_[pkgName] = callback;
-    return DM_OK;
-}
-
-int32_t DeviceManagerNotify::UnRegisterSetLocalDeviceNameCallback(const std::string &pkgName)
-{
-    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
-    std::lock_guard<std::mutex> autoLock(bindLock_);
-    setLocalDeviceNameCallback_.erase(pkgName);
     return DM_OK;
 }
 
@@ -1409,7 +1378,7 @@ int32_t DeviceManagerNotify::RegisterSetRemoteDeviceNameCallback(const std::stri
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (setRemoteDeviceNameCallback_.size() > MAX_CONTAINER_SIZE) {
         LOGI("callback map size is more than max size");
-        return ERR_DM_MAX_SIZE_FAIL;
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     auto iter = setRemoteDeviceNameCallback_.find(pkgName);
     if (iter == setRemoteDeviceNameCallback_.end()) {
@@ -1418,25 +1387,9 @@ int32_t DeviceManagerNotify::RegisterSetRemoteDeviceNameCallback(const std::stri
     }
     if (iter->second.size() > MAX_CONTAINER_SIZE) {
         LOGI("callback map size is more than max size");
-        return ERR_DM_MAX_SIZE_FAIL;
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     iter->second[deviceId] = callback;
-    return DM_OK;
-}
-
-int32_t DeviceManagerNotify::UnRegisterSetRemoteDeviceNameCallback(const std::string &pkgName,
-    const std::string &deviceId)
-{
-    LOGI("In, pkgName: %{public}s.", pkgName.c_str());
-    std::lock_guard<std::mutex> autoLock(bindLock_);
-    auto iter = setRemoteDeviceNameCallback_.find(pkgName);
-    if (iter == setRemoteDeviceNameCallback_.end()) {
-        return DM_OK;
-    }
-    iter->second.erase(deviceId);
-    if (iter->second.empty()) {
-        setRemoteDeviceNameCallback_.erase(pkgName);
-    }
     return DM_OK;
 }
 
