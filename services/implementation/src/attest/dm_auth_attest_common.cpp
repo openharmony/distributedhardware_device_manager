@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-const int32_t MAX_CERT_COUNT = 1024;
+const int32_t MAX_CERT_COUNT = 100;
 constexpr int32_t HEX_TO_UINT8 = 2;
 
 AuthAttestCommon::AuthAttestCommon()
@@ -36,7 +36,7 @@ AuthAttestCommon::~AuthAttestCommon()
 
 std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
 {
-    if (chain == nullptr || chain->cert == nullptr || chain->certCount == 0) {
+    if (chain == nullptr || chain->cert == nullptr || chain->certCount == 0 || chain->certCount > MAX_CERT_COUNT) {
         LOGE("input param is invalid.");
         return "{}";
     }
@@ -164,6 +164,8 @@ void AuthAttestCommon::FreeDmCertChain(DmCertChain &chain)
     if (chain.cert != nullptr) {
         for (uint32_t i = 0; i < chain.certCount; ++i) {
             delete[] chain.cert[i].data;
+            chain.cert[i].data = nullptr;
+            chain.cert[i].size = 0;
         }
         delete[] chain.cert;
         chain.cert = nullptr;
