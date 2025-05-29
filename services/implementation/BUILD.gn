@@ -178,6 +178,8 @@ if (defined(ohos_lite)) {
       "src/ability/standard/dm_ability_manager.cpp",
       "src/ability/standard/dm_dialog_manager.cpp",
       "src/adapter/standard/dm_adapter_manager.cpp",
+      "src/attest/dm_auth_attest_common.cpp",
+      "src/attest/dm_auth_cert.cpp",
       "src/authentication/auth_message_processor.cpp",
       "src/authentication/auth_request_state.cpp",
       "src/authentication/auth_response_state.cpp",
@@ -270,18 +272,6 @@ if (defined(ohos_lite)) {
       sources += [ "src/dependency/MSDP/spatial_location_callback_impl.cpp" ]
       defines += [ "SUPPORT_MSDP" ]
       external_deps += [ "spatial_awareness:spatial_awareness_client" ]
-    }
-
-    if (!device_manager_common) {
-      sources += [
-        "src/attest/dm_auth_attest_common.cpp",
-        "src/attest/dm_auth_generate_attest.cpp",
-        "src/attest/dm_auth_validate_attest.cpp",
-      ]
-      external_deps += [
-        "device_certificate_manager:device_cert_mgr_sdk",
-        "huks:libhukssdk",
-      ]
     }
 
     subsystem_name = "distributedhardware"

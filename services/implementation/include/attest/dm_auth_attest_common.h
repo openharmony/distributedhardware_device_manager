@@ -25,23 +25,13 @@
 
 #include "dm_anonymous.h"
 #include "dm_auth_manager_base.h"
+#include "dm_cert.h"
 #include "dm_crypto.h"
 #include "dm_random.h"
 #include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-
-typedef struct DmBlob {
-    uint32_t size;
-    uint8_t *data;
-} DmBlob;
-
-typedef struct DmCertChain {
-    DmBlob *cert;
-    uint32_t certCount;
-} DmCertChain;
-
 class AuthAttestCommon {
 public:
     static AuthAttestCommon &GetInstance(void)
@@ -52,7 +42,10 @@ public:
 
     std::string SerializeDmCertChain(const DmCertChain *chain);
     bool DeserializeDmCertChain(const std::string &data, DmCertChain *outChain);
-    void FreeCertChain(DmCertChain *chain);
+    void FreeDmCertChain(DmCertChain &chain);
+private:
+    AuthAttestCommon();
+    ~AuthAttestCommon();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

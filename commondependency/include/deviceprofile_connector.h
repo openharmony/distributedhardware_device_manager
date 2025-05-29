@@ -291,7 +291,7 @@ public:
         std::map<std::string, std::vector<std::string>> &aclMap, std::string dmVersion = "");
     void GenerateAclHash(DistributedDeviceProfile::AccessControlProfile &acl,
         std::map<std::string, std::vector<std::string>> &aclMap, const std::string &dmVersion);
-    DM_EXPORT int32_t checkIsSameAccountByUdidHash(const std::string &udidHash);
+    DM_EXPORT int32_t CheckIsSameAccountByUdidHash(const std::string &udidHash);
     DM_EXPORT int32_t GetAclListHashStr(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion = "");
     DM_EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);

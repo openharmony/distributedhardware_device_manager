@@ -400,13 +400,6 @@ ohos_unittest("UTTest_device_manager_service") {
     "hilog:libhilog",
     "selinux_adapter:librestorecon",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_device_manager_service }}}
@@ -434,13 +427,6 @@ ohos_unittest("UTTest_dm_softbus_cache") {
     "hilog:libhilog",
     "selinux_adapter:librestorecon",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_dm_softbus_cache }}}
@@ -474,13 +460,6 @@ ohos_unittest("UTTest_device_manager_service_three") {
     "hilog:libhilog",
     "selinux_adapter:librestorecon",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_device_manager_service_three }}}
@@ -1271,13 +1250,6 @@ ohos_unittest("UTTest_device_manager_service_impl") {
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_device_manager_service_impl }}}
@@ -1308,13 +1280,6 @@ ohos_unittest("UTTest_device_manager_service_impl_first") {
     "os_account:libaccountkits",
     "os_account:os_account_innerkits",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_device_manager_service_impl_first }}}
@@ -2072,13 +2037,6 @@ ohos_unittest("UTTest_auth_pin_auth_state") {
     "googletest:gmock_main",
     "hilog:libhilog",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_auth_pin_auth_state }}}
@@ -2137,13 +2095,6 @@ ohos_unittest("UTTest_auth_credential_state") {
     "googletest:gmock_main",
     "hilog:libhilog",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_auth_credential_state }}}
@@ -2175,13 +2126,6 @@ ohos_unittest("UTTest_auth_acl") {
     "googletest:gmock_main",
     "hilog:libhilog",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_auth_acl }}}
@@ -2215,13 +2159,6 @@ ohos_unittest("UTTest_auth_negotiate") {
     "googletest:gmock_main",
     "hilog:libhilog",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ## UnitTest UTTest_auth_negotiate }}}

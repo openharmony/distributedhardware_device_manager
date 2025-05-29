@@ -24,6 +24,8 @@
 #include "multiple_user_connector.h"
 
 #include "auth_manager.h"
+#include "dm_auth_cert.h"
+#include "dm_auth_attest_common.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_random.h"
@@ -36,10 +38,6 @@
 #include "dm_auth_context.h"
 #include "dm_auth_message_processor.h"
 #include "dm_auth_state.h"
-#if !defined(DEVICE_MANAGER_COMMON_FLAG)
-#include "dm_auth_generate_attest.h"
-#include "dm_auth_validate_attest.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -635,12 +633,13 @@ std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context_)
     return "";
 #else
     DmCertChain dmCertChain;
-    int32_t certRet = AuthGenerateAttest::GetInstance().GenerateCertificate(dmCertChain);
+    int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
     if (certRet != DM_OK) {
         LOGE("generate cert fail, certRet = %{public}d", certRet);
         return "";
     }
     std::string cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+    AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
     return cert;
 #endif
 }
