@@ -185,6 +185,7 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
 int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
 {
 #ifdef DEVICE_MANAGER_COMMON_FLAG
+    (void)context;
     LOGI("Blue device do not verify cert!");
     return DM_OK;
 #else
@@ -198,7 +199,7 @@ int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
         && context->accesser.isCommonFlag == true) {
         LOGI("src is common device.");
         if (DeviceProfileConnector::GetInstance()
-            .checkIsSameAccountByUdidHash(context->accesser.deviceIdHash) == DM_OK) {
+            .CheckIsSameAccountByUdidHash(context->accesser.deviceIdHash) == DM_OK) {
             LOGE("src is common device, but the udidHash is identical in acl!");
             return ERR_DM_VERIFY_CERT_FAILED;
             }
