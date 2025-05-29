@@ -47,6 +47,7 @@ void DmSoftbusListenerFuzzTest(const uint8_t* data, size_t size)
     uint16_t deviceTypeId = fdp.ConsumeIntegral<std::uint16_t>();
     string proofInfoStr = fdp.ConsumeRandomLengthString();
     SoftbusListener::CredentialAuthStatusProcess(proofInfoStr, deviceTypeId, errcode);
+    
     const char* proofInfo = proofInfoStr.c_str();
     DevUserInfo localDevUserInfo;
     localDevUserInfo.deviceId = fdp.ConsumeRandomLengthString();
