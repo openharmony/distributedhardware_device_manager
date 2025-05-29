@@ -102,7 +102,7 @@ public:
     virtual int32_t PutDeviceProfileInfoList(const std::string &pkgName,
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
     virtual std::vector<std::string> GetDeviceNamePrefixs() = 0;
-    virtual void HandleNetworkConnected() = 0;
+    virtual void HandleNetworkConnected(int32_t networkStatus) = 0;
     virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName) = 0;
     virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
         const std::string &deviceName) = 0;
@@ -110,6 +110,7 @@ public:
         std::vector<DmDeviceProfileInfo> &dmDeviceProfileInfos) = 0;
     virtual int32_t RestoreLocalDeviceName() = 0;
     virtual void ClearCacheWhenLogout(int32_t userId, const std::string &oldAccountId) = 0;
+    virtual void HandleScreenLockEvent(bool isLock) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);

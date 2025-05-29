@@ -136,7 +136,8 @@ void DmScreenEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     std::string receiveEvent = data.GetWant().GetAction();
     LOGI("Received screen event: %{public}s", receiveEvent.c_str());
-    if (receiveEvent != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
+    if (receiveEvent != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED &&
+        receiveEvent != EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         return;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

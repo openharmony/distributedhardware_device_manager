@@ -2612,13 +2612,14 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
     ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFO_LIST, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
+        DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfoListResult(pkgName, {},
+            ERR_DM_IPC_SEND_REQUEST_FAILED);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
+        DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfoListResult(pkgName, {}, ret);
         return ret;
     }
     LOGI("Completed");
@@ -2643,16 +2644,24 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
     ret = ipcClientProxy_->SendRequest(GET_DEVICE_ICON_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
+        DmDeviceIconInfo deviceIconInfo;
+        deviceIconInfo.InitByDmDeviceIconInfoFilterOptions(filterOptions);
+        DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo,
+            ERR_DM_IPC_SEND_REQUEST_FAILED);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
+        DmDeviceIconInfo deviceIconInfo;
+        deviceIconInfo.InitByDmDeviceIconInfoFilterOptions(filterOptions);
+        DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo, ret);
         return ret;
     }
 #endif
+    (void)pkgName;
+    (void)filterOptions;
+    (void)callback;
     return DM_OK;
 }
 
@@ -2787,7 +2796,7 @@ int32_t DeviceManagerImpl::GetLocalServiceInfoByBundleNameAndPinExchangeType(
 int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
     std::shared_ptr<SetLocalDeviceNameCallback> callback)
 {
-    if (pkgName.empty() || deviceName.empty()) {
+    if (pkgName.empty() || deviceName.empty() || deviceName.size() > DEVICE_NAME_MAX_BYTES) {
         LOGE("param invalid, pkgName : %{public}s, deviceName = %{public}s",
             pkgName.c_str(), GetAnonyString(deviceName).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2805,13 +2814,13 @@ int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const 
     ret = ipcClientProxy_->SendRequest(SET_LOCAL_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterSetLocalDeviceNameCallback(pkgName);
+        DeviceManagerNotify::GetInstance().OnSetLocalDeviceNameResult(pkgName, ERR_DM_IPC_SEND_REQUEST_FAILED);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterSetLocalDeviceNameCallback(pkgName);
+        DeviceManagerNotify::GetInstance().OnSetLocalDeviceNameResult(pkgName, ret);
         return ret;
     }
     LOGI("Completed");
@@ -2821,7 +2830,7 @@ int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const 
 int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
     const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback)
 {
-    if (pkgName.empty() || deviceName.empty()) {
+    if (pkgName.empty() || deviceName.empty() || deviceName.size() > DEVICE_NAME_MAX_BYTES || deviceId.empty()) {
         LOGE("param invalid, pkgName : %{public}s, deviceName = %{public}s",
             pkgName.c_str(), GetAnonyString(deviceName).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2840,13 +2849,14 @@ int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const
     ret = ipcClientProxy_->SendRequest(SET_REMOTE_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterSetRemoteDeviceNameCallback(pkgName, deviceId);
+        DeviceManagerNotify::GetInstance().OnSetRemoteDeviceNameResult(pkgName, deviceId,
+            ERR_DM_IPC_SEND_REQUEST_FAILED);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterSetRemoteDeviceNameCallback(pkgName, deviceId);
+        DeviceManagerNotify::GetInstance().OnSetRemoteDeviceNameResult(pkgName, deviceId, ret);
         return ret;
     }
     LOGI("Completed");
