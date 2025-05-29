@@ -18,6 +18,7 @@
 
 #include <cstdint>
 #include <chrono>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -245,6 +246,8 @@ public:
 private:
     std::string GetAnonyUdid(std::string udid);
     int32_t GetApiType();
+    std::string localCallerName_;
+    std::mutex lock_;
 };
 
 extern "C" IDmRadarHelper *CreateDmRadarInstance();
