@@ -3472,7 +3472,7 @@ void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t toke
         }
     }
     if (!bleUdids.empty()) {
-        SendAppUnInstallBroadCast(peerUdids, userId, tokenId);
+        SendAppUnInstallBroadCast(bleUdids, userId, tokenId);
     }
     if (!wifiDevices.empty()) {
         NotifyRemoteUninstallAppByWifi(userId, tokenId, wifiDevices);
