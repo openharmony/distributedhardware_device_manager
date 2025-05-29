@@ -357,5 +357,67 @@ HWTEST_F(DMTransportMsgTest, ToString_01, testing::ext::TestSize.Level1)
     auto notifyUserIdsString = notifyUserIds.ToString();
     EXPECT_EQ(notifyUserIdsString, jsonObj);
 }
+
+HWTEST_F(DMTransportMsgTest, UninstAppToJsonAndFromJson, testing::ext::TestSize.Level1)
+{
+    UninstAppMsg uninstAppMsg(2, 3);
+
+    cJSON *jsonObject = cJSON_CreateObject();
+    ToJson(jsonObject, uninstAppMsg);
+    
+    UninstAppMsg newUninstAppMsg;
+    FromJson(jsonObject, newUninstAppMsg);
+
+    EXPECT_EQ(newUninstAppMsg.userId_, 2);
+    EXPECT_EQ(newUninstAppMsg.tokenId_, 3);
+
+    cJSON_Delete(jsonObject);
+
+    cJSON *nullJsonObject = nullptr;
+    ToJson(nullJsonObject, uninstAppMsg);
+
+    UninstAppMsg emptyMsg;
+    FromJson(nullJsonObject, emptyMsg);
+    
+    EXPECT_EQ(emptyMsg.userId_, -1);
+    cJSON *emptyObject = cJSON_CreateObject();
+    FromJson(emptyObject, emptyMsg);
+    EXPECT_EQ(emptyMsg.userId_, -1);
+
+    cJSON_Delete(nullJsonObject);
+    cJSON_Delete(emptyObject);
+}
+
+HWTEST_F(DMTransportMsgTest, UnbindAppToJsonAndFromJson, testing::ext::TestSize.Level1)
+{
+    UnBindAppMsg unBindAppMsg(2, 3, "", "test_udid");
+
+    cJSON *jsonObject = cJSON_CreateObject();
+    ToJson(jsonObject, unBindAppMsg);
+    
+    UnBindAppMsg newUnBindAppMsg;
+    FromJson(jsonObject, newUnBindAppMsg);
+
+    EXPECT_EQ(newUnBindAppMsg.userId_, 2);
+    EXPECT_EQ(newUnBindAppMsg.tokenId_, 3);
+    EXPECT_EQ(newUnBindAppMsg.extra_, "");
+    EXPECT_EQ(newUnBindAppMsg.udid_, "test_udid");
+
+    cJSON_Delete(jsonObject);
+
+    cJSON *nullJsonObject = nullptr;
+    ToJson(nullJsonObject, unBindAppMsg);
+
+    UnBindAppMsg emptyMsg;
+    FromJson(nullJsonObject, emptyMsg);
+    
+    EXPECT_EQ(emptyMsg.userId_, -1);
+    cJSON *emptyObject = cJSON_CreateObject();
+    FromJson(emptyObject, emptyMsg);
+    EXPECT_EQ(emptyMsg.userId_, -1);
+
+    cJSON_Delete(nullJsonObject);
+    cJSON_Delete(emptyObject);
+}
 } // DistributedHardware
 } // OHOS

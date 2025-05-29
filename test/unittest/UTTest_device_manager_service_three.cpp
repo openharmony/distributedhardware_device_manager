@@ -88,6 +88,8 @@ void DeviceManagerServiceThreeTest::TearDownTestCase()
 
 namespace {
 
+const int32_t SEND_DELAY_MAX_TIME = 5;
+
 void SetSetDnPolicyPermission()
 {
     const int32_t permsNum = 1;
@@ -623,6 +625,196 @@ HWTEST_F(DeviceManagerServiceThreeTest, ClearDiscoveryCache_001, testing::ext::T
     DeviceManagerService::GetInstance().ClearDiscoveryCache(processInfo);
     EXPECT_NE(DeviceManagerService::GetInstance().discoveryMgr_, nullptr);
     DeviceManagerService::GetInstance().UninitDMServiceListener();
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ValidateUnBindDeviceParams_301, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ValidateUnBindDeviceParams_302, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos.test.pkgName";
+    std::string deviceId = "deviceId";
+    std::string extra;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = DeviceManagerService::GetInstance().ValidateUnBindDeviceParams(pkgName, deviceId, extra);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ProcessUninstApp_301, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 100;
+    int32_t tokenId = 200;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().ProcessUninstApp(userId, tokenId);
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ProcessUnBindApp_301, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 100;
+    int32_t tokenId = 200;
+    std::string extra;
+    std::string udid = "ohos.test.udid";
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().ProcessUnBindApp(userId, tokenId, extra, udid);
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, CalculateBroadCastDelayTime_001, testing::ext::TestSize.Level1)
+{
+    DeviceManagerService::GetInstance().SendLastBroadCastTime_ = 10;
+    int32_t delayTime = DeviceManagerService::GetInstance().CalculateBroadCastDelayTime();
+    EXPECT_NE(delayTime, SEND_DELAY_MAX_TIME);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, CalculateBroadCastDelayTime_002, testing::ext::TestSize.Level1)
+{
+    int32_t delayTime = DeviceManagerService::GetInstance().CalculateBroadCastDelayTime();
+    EXPECT_NE(delayTime, SEND_DELAY_MAX_TIME);
+}
+HWTEST_F(DeviceManagerServiceThreeTest, ParseRelationShipChangeType_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNINSTALL;
+    auto ret = DeviceManagerService::GetInstance().ParseRelationShipChangeType(msg);
+    EXPECT_EQ(ret, true);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, SubscribePackageCommonEvent_301, testing::ext::TestSize.Level1)
+{
+    DeviceManagerService::GetInstance().packageCommonEventManager_ = std::make_shared<DmPackageCommonEventManager>();
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, SubscribePackageCommonEvent_302, testing::ext::TestSize.Level1)
+{
+    DeviceManagerService::GetInstance().packageCommonEventManager_ = std::make_shared<DmPackageCommonEventManager>();
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, SubscribePackageCommonEvent_303, testing::ext::TestSize.Level1)
+{
+    DeviceManagerService::GetInstance().packageCommonEventManager_ = nullptr;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, SubscribePackageCommonEvent_304, testing::ext::TestSize.Level1)
+{
+    DeviceManagerService::GetInstance().packageCommonEventManager_ = nullptr;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteUninstallApp_301, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 100;
+    int32_t tokenId = 200;
+    DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().NotifyRemoteUninstallApp(userId, tokenId);
+    EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteUninstallApp_302, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 100;
+    int32_t tokenId = 200;
+    DeviceManagerService::GetInstance().softbusListener_ = nullptr;
+    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
+    DeviceManagerService::GetInstance().NotifyRemoteUninstallApp(userId, tokenId);
+    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteUninstallAppByWifi_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 100;
+    int32_t tokenId = 200;
+    std::map<std::string, std::string> wifiDevices;
+    DeviceManagerService::GetInstance().timer_ = nullptr;
+    DeviceManagerService::GetInstance().NotifyRemoteUninstallAppByWifi(userId, tokenId, wifiDevices);
+    EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteUninstallAppByWifi_002, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 100;
+    int32_t tokenId = 200;
+    std::map<std::string, std::string> wifiDevices;
+    DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
+    DeviceManagerService::GetInstance().NotifyRemoteUninstallAppByWifi(userId, tokenId, wifiDevices);
+    EXPECT_NE(DeviceManagerService::GetInstance().timer_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteUninstallAppByWifi_003, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 100;
+    int32_t tokenId = 200;
+    std::map<std::string, std::string> wifiDevices;
+    DeviceManagerService::GetInstance().timer_ = nullptr;
+    DeviceManagerService::GetInstance().NotifyRemoteUninstallAppByWifi(userId, tokenId, wifiDevices);
+    EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, NotifyRemoteUnBindAppByWifi_001, testing::ext::TestSize.Level1)
+{
+    int32_t userId = 100;
+    int32_t tokenId = 200;
+    std::map<std::string, std::string> wifiDevices;
+    std::string extra;
+    DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
+    DeviceManagerService::GetInstance().NotifyRemoteUnBindAppByWifi(userId, tokenId, extra, wifiDevices);
+    EXPECT_NE(DeviceManagerService::GetInstance().timer_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ProcessReceiveRspAppUninstall_301, testing::ext::TestSize.Level1)
+{
+   std::string remoteUdid = "ohos";
+   DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
+   DeviceManagerService::GetInstance().ProcessReceiveRspAppUninstall(remoteUdid);
+   EXPECT_NE(DeviceManagerService::GetInstance().timer_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ProcessReceiveRspAppUninstall_302, testing::ext::TestSize.Level1)
+{
+   std::string remoteUdid = "ohos";
+   DeviceManagerService::GetInstance().timer_ = nullptr;
+   DeviceManagerService::GetInstance().ProcessReceiveRspAppUninstall(remoteUdid);
+   EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ProcessReceiveRspAppUnbind_301, testing::ext::TestSize.Level1)
+{
+    std::string remoteUdid = "ohos";
+    DeviceManagerService::GetInstance().timer_ = std::make_shared<DmTimer>();
+    DeviceManagerService::GetInstance().ProcessReceiveRspAppUnbind(remoteUdid);
+    EXPECT_NE(DeviceManagerService::GetInstance().timer_, nullptr);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ProcessReceiveRspAppUnbind_302, testing::ext::TestSize.Level1)
+{
+    std::string remoteUdid = "ohos";
+    DeviceManagerService::GetInstance().timer_ = nullptr;
+    DeviceManagerService::GetInstance().ProcessReceiveRspAppUnbind(remoteUdid);
+    EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
 }
 } // namespace
 } // namespace DistributedHardware
