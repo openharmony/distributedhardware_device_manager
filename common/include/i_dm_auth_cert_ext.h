@@ -30,3 +30,4 @@ public:
 using CreateDMAuthCertFuncPtr = IDMAuthCertExt *(*)(void);
 } // namespace DistributedHardware
 } // namespace OHOS
+#endif // OHOS_I_DM_AUTH_CERT_EXT_H
