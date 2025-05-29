@@ -22,6 +22,8 @@
 #include "accessee.h"
 #include "auth_manager.h"
 #include "app_manager.h"
+#include "dm_auth_cert.h"
+#include "dm_auth_attest_common.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
 #include "dm_timer.h"
@@ -41,10 +43,6 @@
 #include "multiple_user_connector.h"
 #include "os_account_manager.h"
 #include "parameter.h"
-#if !defined(DEVICE_MANAGER_COMMON_FLAG)
-#include "dm_auth_generate_attest.h"
-#include "dm_auth_validate_attest.h"
-#endif
 
 using namespace OHOS::Security::AccessToken;
 
@@ -203,17 +201,19 @@ int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
             .checkIsSameAccountByUdidHash(context->accesser.deviceIdHash) == DM_OK) {
             LOGE("src is common device, but the udidHash is identical in acl!");
             return ERR_DM_VERIFY_CERT_FAILED;
-        }
+            }
         return DM_OK;
-    }
+        }
     DmCertChain dmCertChain{nullptr, 0};
     if (!AuthAttestCommon::GetInstance()
         .DeserializeDmCertChain(context->accesser.cert, &dmCertChain)) {
         LOGE("cert deserialize fail!");
         return ERR_DM_DESERIAL_CERT_FAILED;
-    }
-    int32_t certRet = AuthValidateAttest::GetInstance()
+        }
+    int32_t certRet = AuthCert::GetInstance()
         .VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
+    // free dmCertChain memory
+    AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
     if (certRet != DM_OK) {
         LOGE("validate cert fail, certRet = %{public}d", certRet);
         return ERR_DM_VERIFY_CERT_FAILED;

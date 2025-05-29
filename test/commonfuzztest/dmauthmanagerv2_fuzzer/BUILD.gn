@@ -69,13 +69,6 @@ ohos_fuzztest("DmAuthManagerV2FuzzTest") {
     "DH_LOG_TAG=\"DmAuthManagerV2FuzzTest\"",
     "LOG_DOMAIN=0xD004110",
   ]
-
-  if (!device_manager_common) {
-    external_deps += [
-      "device_certificate_manager:device_cert_mgr_sdk",
-      "huks:libhukssdk",
-    ]
-  }
 }
 
 ###############################################################################

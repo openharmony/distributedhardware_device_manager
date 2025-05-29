@@ -24,9 +24,20 @@ namespace DistributedHardware {
 const int32_t MAX_CERT_COUNT = 1024;
 constexpr int32_t HEX_TO_UINT8 = 2;
 
+AuthAttestCommon::AuthAttestCommon()
+{
+    LOGD("AuthAttestCommon constructor");
+}
+
+AuthAttestCommon::~AuthAttestCommon()
+{
+    LOGD("AuthAttestCommon destructor");
+}
+
 std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
 {
     if (chain == nullptr || chain->cert == nullptr || chain->certCount == 0) {
+        LOGE("input param is invalid.");
         return "{}";
     }
     JsonObject jsonObject;
@@ -35,15 +46,18 @@ std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
     for (uint32_t i = 0; i < chain->certCount; ++i) {
         const DmBlob &blob = chain->cert[i];
         if (blob.data == nullptr || blob.size == 0) {
+            LOGE("blob data or size is empty.");
             return "{}";
         }
         const uint32_t hexLen = blob.size * HEX_TO_UINT8 + 1; // 2*blob.size + 1
         char *hexBuffer = new char[hexLen]{0};
         if (hexBuffer == nullptr) {
+            LOGE("hexBuffer malloc failed.");
             return "{}";
         }
         int32_t ret = Crypto::ConvertBytesToHexString(hexBuffer, hexLen, blob.data, blob.size);
         if (ret != DM_OK) {
+            LOGE("ConvertBytesToHexString failed.");
             delete[] hexBuffer;
             return "{}";
         }
@@ -145,21 +159,16 @@ bool AuthAttestCommon::DeserializeDmCertChain(const std::string &data, DmCertCha
     return true;
 }
 
-void AuthAttestCommon::FreeCertChain(DmCertChain *chain)
+void AuthAttestCommon::FreeDmCertChain(DmCertChain &chain)
 {
-    if (chain == nullptr) {
-        LOGI("chain is nullptr!");
-        return;
+    if (chain.cert != nullptr) {
+        for (uint32_t i = 0; i < chain.certCount; ++i) {
+            delete[] chain.cert[i].data;
+        }
+        delete[] chain.cert;
+        chain.cert = nullptr;
+        chain.certCount = 0;
     }
-    for (uint32_t i = 0; i < chain->certCount; ++i) {
-        delete[] chain->cert[i].data;
-        chain->cert[i].data = nullptr;
-        chain->cert[i].size = 0;
-    }
-    delete[] chain->cert;
-    chain->cert = nullptr;
-    chain->certCount = 0;
-    delete chain;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

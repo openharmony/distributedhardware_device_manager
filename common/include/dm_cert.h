@@ -13,29 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_DM_AUTH_GENERATE_ATTEST_H
-#define OHOS_DM_AUTH_GENERATE_ATTEST_H
 
-#include "dm_auth_attest_common.h"
+#ifndef OHOS_DM_CERT_H
+#define OHOS_DM_CERT_H
 
-#include "dcm_api.h"
-#include "dcm_type.h"
+#define DM_CERTS_COUNT 4
+#define UDID_BUF_LEN 65
+#define DM_CERTIFICATE_SIZE 8192
+
+#include <stdint.h>
+#include <string>
+
+#include "dm_random.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class AuthGenerateAttest {
-public:
-    static AuthGenerateAttest &GetInstance(void)
-    {
-        static AuthGenerateAttest instance;
-        return instance;
-    }
+typedef struct DmBlob {
+    uint32_t size;
+    uint8_t *data;
+} DmBlob;
 
-    int32_t GenerateCertificate(DmCertChain &dmCertChain);
-    int32_t ConvertDcmCertChainToDmCertChain(const DcmCertChain &dcmCertChain, DmCertChain &dmCertChain);
-    int32_t InitCertChain(DcmCertChain *certChain);
-    void FreeCertChain(DcmCertChain *chain);
-};
+typedef struct DmCertChain {
+    DmBlob *cert;
+    uint32_t certCount;
+} DmCertChain;
 } // namespace DistributedHardware
 } // namespace OHOS
-#endif // OHOS_DM_AUTH_GENERATE_ATTEST_H
+#endif //OHOS_DM_CERT_H
