@@ -15,7 +15,6 @@
 
 #include "device_manager_impl.h"
 #include <random>
-#include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -46,6 +45,7 @@
 #include "ipc_get_info_by_network_req.h"
 #include "ipc_get_info_by_network_rsp.h"
 #include "ipc_get_local_device_info_rsp.h"
+#include "ipc_get_local_device_name_rsp.h"
 #include "ipc_get_local_display_device_name_req.h"
 #include "ipc_get_local_display_device_name_rsp.h"
 #include "ipc_get_localserviceinfo_rsp.h"
@@ -1010,7 +1010,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
             "%{public}s", pkgName.c_str(), GetAnonyString(reqJsonStr).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("start to RequestCredential.");
+    LOGI("start.");
     std::map<std::string, std::string> requestParam;
     requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
     requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, reqJsonStr);
@@ -1032,7 +1032,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
         return ret;
     }
     returnJsonStr = rsp->GetCredentialResult();
-    LOGI("request device credential completed.");
+    LOGI("completed.");
     return DM_OK;
 }
 
@@ -1043,7 +1043,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
             pkgName.c_str(), GetAnonyString(credentialInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("start to ImportCredential.");
+    LOGI("start.");
     std::map<std::string, std::string> requestParam;
     requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
     requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, credentialInfo);
@@ -1064,7 +1064,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
         LOGE("failed to get return errcode while import credential.");
         return ret;
     }
-    LOGI("import credential to device completed.");
+    LOGI("completed.");
     return DM_OK;
 }
 
@@ -1075,7 +1075,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
             pkgName.c_str(), GetAnonyString(deleteInfo).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("start to DeleteCredential.");
+    LOGI("start.");
     std::map<std::string, std::string> requestParam;
     requestParam.emplace(DM_CREDENTIAL_TYPE, DM_TYPE_OH);
     requestParam.emplace(DM_CREDENTIAL_REQJSONSTR, deleteInfo);
@@ -1096,7 +1096,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
         LOGE("failed to get return errcode while import credential.");
         return ret;
     }
-    LOGI("delete credential from device completed.");
+    LOGI("completed.");
     return DM_OK;
 }
 
@@ -1125,7 +1125,7 @@ int32_t DeviceManagerImpl::RegisterCredentialCallback(const std::string &pkgName
         LOGE("RegisterCredentialCallback error: Failed with ret %{public}d", ret);
         return ret;
     }
-    LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
+    LOGI("Completed");
     return DM_OK;
 }
 
@@ -1455,6 +1455,24 @@ int32_t DeviceManagerImpl::GetLocalDeviceName(const std::string &pkgName, std::s
     return DM_OK;
 }
 
+int32_t DeviceManagerImpl::GetLocalDeviceName(std::string &deviceName)
+{
+    std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::shared_ptr<IpcGetLocalDeviceNameRsp> rsp = std::make_shared<IpcGetLocalDeviceNameRsp>();
+    int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_NAME, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Get local device name failed ret: %{public}d", ret);
+        return ret;
+    }
+    deviceName = rsp->GetLocalDeviceName();
+    return DM_OK;
+}
+
 int32_t DeviceManagerImpl::GetLocalDeviceType(const std::string &pkgName,  int32_t &deviceType)
 {
     LOGI("Start, pkgName : %{public}s", pkgName.c_str());
@@ -1511,7 +1529,7 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
         LOGE("BindDevice error: Invalid para. pkgName : %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("BindDevice start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("start, pkgName: %{public}s", pkgName.c_str());
     JsonObject paramJson(bindParam);
     if (paramJson.IsDiscarded()) {
         LOGE("BindDevice bindParam %{public}s.", bindParam.c_str());
@@ -1584,7 +1602,6 @@ int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::s
     req->SetPkgName(pkgName);
     req->SetDeviceId(deviceId);
     req->SetExtraInfo(extra);
-    LOGI("DeviceManagerImpl::UnBindDevice extra: %{public}s.", extra.c_str());
     int32_t ret = ipcClientProxy_->SendRequest(UNBIND_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnBindDevice error: Send Request failed ret: %{public}d", ret);
@@ -1857,7 +1874,7 @@ int32_t DeviceManagerImpl::BindTarget(const std::string &pkgName, const PeerTarg
         LOGE("DeviceManagerImpl::BindTarget failed: input pkgName or targetId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DeviceManagerImpl::BindTarget start, pkgName: %{public}s", pkgName.c_str());
+    LOGI("start, pkgName: %{public}s", pkgName.c_str());
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     bindParam[TOKENID] = std::to_string(OHOS::IPCSkeleton::GetSelfTokenID());
 #endif
@@ -1947,7 +1964,7 @@ int32_t DeviceManagerImpl::CheckAccessToTarget(uint64_t tokenId, const std::stri
 {
     (void)tokenId;
     (void)targetId;
-    LOGI("Start");
+    LOGI("unsupport");
     return ERR_DM_UNSUPPORTED_METHOD;
 }
 
@@ -2122,11 +2139,11 @@ int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const Pe
 
 int32_t DeviceManagerImpl::DpAclAdd(const int64_t accessControlId, const std::string &udid, const int32_t bindType)
 {
-    LOGI("Start.");
     if (bindType != IDENTICAL_ACCOUNT) {
-        LOGI("DeviceManagerImpl::DpAclAdd is not identical account");
+        LOGI("not identical account");
         return DM_OK;
     }
+    LOGI("Start.");
     std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetStr(udid);
@@ -2223,52 +2240,6 @@ bool DeviceManagerImpl::IsSameAccount(const std::string &netWorkId)
     return true;
 }
 
-bool DeviceManagerImpl::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
-{
-    LOGI("Start");
-    std::shared_ptr<IpcCheckAcl> req = std::make_shared<IpcCheckAcl>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetAccessCaller(caller);
-    req->SetAccessCallee(callee);
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_ACCESS_CONTROL, req, rsp);
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", ret, anonyLocalUdid_);
-        LOGE("CheckAccessControl Send Request failed ret: %{public}d", ret);
-        return false;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", ret, anonyLocalUdid_);
-        LOGE("CheckAccessControl Failed with ret: %{public}d", ret);
-        return false;
-    }
-    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAccessControl", DM_OK, anonyLocalUdid_);
-    return true;
-}
-
-bool DeviceManagerImpl::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
-{
-    LOGI("Start");
-    std::shared_ptr<IpcCheckAcl> req = std::make_shared<IpcCheckAcl>();
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    req->SetAccessCaller(caller);
-    req->SetAccessCallee(callee);
-    int32_t ret = ipcClientProxy_->SendRequest(CHECK_SAME_ACCOUNT, req, rsp);
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", ret, anonyLocalUdid_);
-        LOGE("CheckIsSameAccount Send Request failed ret: %{public}d", ret);
-        return false;
-    }
-    ret = rsp->GetErrCode();
-    if (ret != DM_OK) {
-        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", ret, anonyLocalUdid_);
-        LOGE("CheckIsSameAccount Failed with ret: %{public}d", ret);
-        return false;
-    }
-    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckIsSameAccount", DM_OK, anonyLocalUdid_);
-    return true;
-}
-
 int32_t DeviceManagerImpl::GetErrCode(int32_t errCode)
 {
     auto flag = MAP_ERROR_CODE.find(errCode);
@@ -2296,7 +2267,6 @@ int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
         LOGE("ShiftLNNGear error: Failed with ret %{public}d", ret);
         return ret;
     }
-    LOGI("Completed");
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "ShiftLNNGear", DM_OK, anonyLocalUdid_);
     return DM_OK;
 }
@@ -2642,13 +2612,14 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
     ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFO_LIST, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
+        DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfoListResult(pkgName, {},
+            ERR_DM_IPC_SEND_REQUEST_FAILED);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceProfileInfoListCallback(pkgName);
+        DeviceManagerNotify::GetInstance().OnGetDeviceProfileInfoListResult(pkgName, {}, ret);
         return ret;
     }
     LOGI("Completed");
@@ -2673,16 +2644,24 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
     ret = ipcClientProxy_->SendRequest(GET_DEVICE_ICON_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
+        DmDeviceIconInfo deviceIconInfo;
+        deviceIconInfo.InitByDmDeviceIconInfoFilterOptions(filterOptions);
+        DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo,
+            ERR_DM_IPC_SEND_REQUEST_FAILED);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterGetDeviceIconInfoCallback(pkgName, uk);
+        DmDeviceIconInfo deviceIconInfo;
+        deviceIconInfo.InitByDmDeviceIconInfoFilterOptions(filterOptions);
+        DeviceManagerNotify::GetInstance().OnGetDeviceIconInfoResult(pkgName, deviceIconInfo, ret);
         return ret;
     }
 #endif
+    (void)pkgName;
+    (void)filterOptions;
+    (void)callback;
     return DM_OK;
 }
 
@@ -2817,7 +2796,7 @@ int32_t DeviceManagerImpl::GetLocalServiceInfoByBundleNameAndPinExchangeType(
 int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
     std::shared_ptr<SetLocalDeviceNameCallback> callback)
 {
-    if (pkgName.empty() || deviceName.empty()) {
+    if (pkgName.empty() || deviceName.empty() || deviceName.size() > DEVICE_NAME_MAX_BYTES) {
         LOGE("param invalid, pkgName : %{public}s, deviceName = %{public}s",
             pkgName.c_str(), GetAnonyString(deviceName).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2835,13 +2814,13 @@ int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const 
     ret = ipcClientProxy_->SendRequest(SET_LOCAL_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterSetLocalDeviceNameCallback(pkgName);
+        DeviceManagerNotify::GetInstance().OnSetLocalDeviceNameResult(pkgName, ERR_DM_IPC_SEND_REQUEST_FAILED);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterSetLocalDeviceNameCallback(pkgName);
+        DeviceManagerNotify::GetInstance().OnSetLocalDeviceNameResult(pkgName, ret);
         return ret;
     }
     LOGI("Completed");
@@ -2851,7 +2830,7 @@ int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const 
 int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
     const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback)
 {
-    if (pkgName.empty() || deviceName.empty()) {
+    if (pkgName.empty() || deviceName.empty() || deviceName.size() > DEVICE_NAME_MAX_BYTES || deviceId.empty()) {
         LOGE("param invalid, pkgName : %{public}s, deviceName = %{public}s",
             pkgName.c_str(), GetAnonyString(deviceName).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
@@ -2870,13 +2849,14 @@ int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const
     ret = ipcClientProxy_->SendRequest(SET_REMOTE_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterSetRemoteDeviceNameCallback(pkgName, deviceId);
+        DeviceManagerNotify::GetInstance().OnSetRemoteDeviceNameResult(pkgName, deviceId,
+            ERR_DM_IPC_SEND_REQUEST_FAILED);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         LOGE("error: Failed with ret %{public}d", ret);
-        DeviceManagerNotify::GetInstance().UnRegisterSetRemoteDeviceNameCallback(pkgName, deviceId);
+        DeviceManagerNotify::GetInstance().OnSetRemoteDeviceNameResult(pkgName, deviceId, ret);
         return ret;
     }
     LOGI("Completed");
@@ -2950,6 +2930,63 @@ int32_t DeviceManagerImpl::UnRegisterPinHolderCallback(const std::string &pkgNam
         return ret;
     }
     return DM_OK;
+}
+
+bool DeviceManagerImpl::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_ACCESS_CONTROL);
+}
+
+bool DeviceManagerImpl::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SAME_ACCOUNT);
+}
+
+
+bool DeviceManagerImpl::CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SRC_ACCESS_CONTROL);
+}
+
+bool DeviceManagerImpl::CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SINK_ACCESS_CONTROL);
+}
+
+bool DeviceManagerImpl::CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SRC_SAME_ACCOUNT);
+}
+
+bool DeviceManagerImpl::CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    LOGI("Start");
+    return CheckAclByIpcCode(caller, callee, CHECK_SINK_SAME_ACCOUNT);
+}
+
+bool DeviceManagerImpl::CheckAclByIpcCode(const DmAccessCaller &caller, const DmAccessCallee &callee,
+        const DMIpcCmdInterfaceCode &ipcCode)
+{
+    LOGI("start, ipcCode %{public}d.", static_cast<int32_t>(ipcCode));
+    std::shared_ptr<IpcCheckAcl> req = std::make_shared<IpcCheckAcl>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetAccessCaller(caller);
+    req->SetAccessCallee(callee);
+    int32_t ret = ipcClientProxy_->SendRequest(ipcCode, req, rsp);
+    if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", ret, anonyLocalUdid_);
+        LOGE("CheckIsSameAccount Send Request failed ret: %{public}d", ret);
+        return false;
+    }
+    bool result = static_cast<bool>(rsp->GetErrCode());
+    DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", static_cast<int32_t>(result),
+        anonyLocalUdid_);
+    return result;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

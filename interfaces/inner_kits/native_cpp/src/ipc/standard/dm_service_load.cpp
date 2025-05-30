@@ -27,11 +27,11 @@ DM_IMPLEMENT_SINGLE_INSTANCE(DmServiceLoad);
 
 int32_t DmServiceLoad::LoadDMService(void)
 {
-    LOGI("LoadDMService start");
     if (isDMServiceLoading_) {
         LOGI("DM service is loading.");
         return DM_OK;
     }
+    LOGI("start");
     isDMServiceLoading_ = true;
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {

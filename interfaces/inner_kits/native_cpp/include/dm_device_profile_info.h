@@ -30,6 +30,14 @@ typedef struct DmProductInfo {
     std::string imageVersion = "";
 } DmProductInfo;
 
+typedef struct DmDeviceIconInfoFilterOptions {
+    std::string productId = "";
+    std::string subProductId = "";
+    std::string internalModel = "";
+    std::string imageType = "";
+    std::string specName = "";
+} DmDeviceIconInfoFilterOptions;
+
 typedef struct DmDeviceIconInfo {
     std::string productId = "";
     std::string subProductId = "";
@@ -40,6 +48,15 @@ typedef struct DmDeviceIconInfo {
     std::string version = "";
     std::string url = "";
     std::vector<uint8_t> icon = {};
+
+    void InitByDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFilterOptions &filterOptions)
+    {
+        productId = filterOptions.productId;
+        subProductId = filterOptions.subProductId;
+        internalModel = filterOptions.internalModel;
+        imageType = filterOptions.imageType;
+        specName = filterOptions.specName;
+    }
 } DmDeviceIconInfo;
 
 typedef struct DmServiceProfileInfo {
@@ -53,14 +70,6 @@ typedef struct DmDeviceProfileInfoFilterOptions {
     bool isCloud = true;
     std::vector<std::string> deviceIdList = {};
 } DmDeviceProfileInfoFilterOptions;
-
-typedef struct DmDeviceIconInfoFilterOptions {
-    std::string productId = "";
-    std::string subProductId = "";
-    std::string internalModel = "";
-    std::string imageType = "";
-    std::string specName = "";
-} DmDeviceIconInfoFilterOptions;
 
 typedef struct DmDeviceProfileInfo {
     std::string deviceId = "";

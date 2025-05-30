@@ -32,6 +32,7 @@ public:
 
     MOCK_METHOD(ErrCode, GetNameForUid, (const int, std::string &));
     MOCK_METHOD(ErrCode, GetBundleInfoV9, (const std::string &, int32_t, BundleInfo &, int32_t));
+    MOCK_METHOD(ErrCode, GetBundleInfoForSelf, (int32_t, BundleInfo &));
 };
 } // namespace DistributedHardware
 } // namespace OHOS

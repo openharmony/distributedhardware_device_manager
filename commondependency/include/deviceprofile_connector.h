@@ -47,7 +47,7 @@ DM_EXPORT extern const uint32_t SERVICE;
 DM_EXPORT extern const uint32_t APP;
 
 extern const char* TAG_PEER_BUNDLE_NAME;
-extern const char* TAG_PEER_TOKENID;
+DM_EXPORT extern const char* TAG_PEER_TOKENID;
 
 const uint32_t DM_IDENTICAL_ACCOUNT = 1;
 const uint32_t DM_SHARE = 2;
@@ -169,8 +169,7 @@ public:
         const std::string &pkgName, const std::string &deviceId);
     DM_EXPORT std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName,
         std::string requestDeviceId, std::string trustUdid);
-    DM_EXPORT uint64_t GetTokenIdByNameAndDeviceId(std::string pkgName,
-        std::string requestDeviceId);
+    DM_EXPORT uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId);
     DM_EXPORT std::vector<int32_t> SyncAclByBindType(std::string pkgName,
         std::vector<int32_t> bindTypeVec, std::string localDeviceId, std::string targetDeviceId);
     int32_t GetDeviceAclParam(DmDiscoveryInfo discoveryInfo, bool &isOnline, int32_t &authForm);
@@ -187,7 +186,6 @@ public:
     DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo>
         GetProcessInfoFromAclByUserId(const std::string &localDeviceId, const std::string &targetDeviceId,
         int32_t userId);
-    bool CheckIdenticalAccount(int32_t userId, const std::string &accountId);
     DM_EXPORT bool CheckSrcDevIdInAclForDevBind(const std::string &pkgName,
         const std::string &deviceId);
     DM_EXPORT bool CheckSinkDevIdInAclForDevBind(const std::string &pkgName,
@@ -199,14 +197,16 @@ public:
     std::vector<int32_t> CompareBindType(std::vector<DistributedDeviceProfile::AccessControlProfile> profiles,
         std::string pkgName, std::vector<int32_t> &sinkBindType, std::string localDeviceId, std::string targetDeviceId);
     DM_EXPORT int32_t IsSameAccount(const std::string &udid);
-    DM_EXPORT int32_t CheckAccessControl(const DmAccessCaller &caller,
+    DM_EXPORT bool CheckAccessControl(const DmAccessCaller &caller,
         const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid);
-    DM_EXPORT int32_t CheckIsSameAccount(const DmAccessCaller &caller,
+    DM_EXPORT bool CheckIsSameAccount(const DmAccessCaller &caller,
         const std::string &srcUdid, const DmAccessCallee &callee, const std::string &sinkUdid);
     DM_EXPORT void DeleteAccessControlList(const std::string &udid);
     DM_EXPORT int32_t GetBindLevel(const std::string &pkgName,
         const std::string &localUdid, const std::string &udid, uint64_t &tokenId);
     std::map<std::string, int32_t> GetDeviceIdAndBindLevel(std::vector<int32_t> userIds, const std::string &localUdid);
+    DM_EXPORT std::vector<std::string> GetDeviceIdAndUdidListByTokenId(const std::vector<int32_t> &userIds,
+        const std::string &localUdid, int32_t tokenId);
     DM_EXPORT std::multimap<std::string, int32_t> GetDeviceIdAndUserId(
         int32_t userId, const std::string &accountId, const std::string &localUdid);
     int32_t HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
@@ -291,15 +291,7 @@ public:
         std::map<std::string, std::vector<std::string>> &aclMap, std::string dmVersion = "");
     void GenerateAclHash(DistributedDeviceProfile::AccessControlProfile &acl,
         std::map<std::string, std::vector<std::string>> &aclMap, const std::string &dmVersion);
-    /**
-     * @brief Get the Acl List Hash for this dmVersion
-     *
-     * @param localDevUserInfo local device user info
-     * @param remoteDevUserInfo remote device user info
-     * @param aclList output save the acl hash
-     * @param dmVersion target dm version
-     * @return EXPORT 0 for success
-     */
+    DM_EXPORT int32_t CheckIsSameAccountByUdidHash(const std::string &udidHash);
     DM_EXPORT int32_t GetAclListHashStr(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclListHash, std::string dmVersion = "");
     DM_EXPORT bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile);
@@ -315,6 +307,14 @@ public:
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles);
     DM_EXPORT int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    DM_EXPORT bool CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT bool CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -372,6 +372,12 @@ private:
         const std::string &localUdid, const uint32_t localTokenId,
         const std::string &remoteUdid, const uint32_t peerTokenId,
         DmOfflineParam &offlineParam);
+    bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const int32_t remoteUserId, const std::string &remoteUdid,
+        const int32_t tokenId, const int32_t peerTokenId, DmOfflineParam &offlineParam);
+    bool FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
+        const std::string &localUdid, const int32_t remoteUserId, const std::string &remoteUdid,
+        const int32_t remoteTokenId, DmOfflineParam &offlineParam);
 
     std::string GetAppServiceAuthVersionInfo(std::string localUdid, std::string remoteUdid, int32_t tokenId,
         int32_t userId, std::vector<DistributedDeviceProfile::AccessControlProfile> profiles);
@@ -383,6 +389,24 @@ private:
         DmAclIdParam &dmAclIdParam);
     void CheckLastLnnAcl(const std::string &localDeviceId, int32_t userId, const std::string &remoteDeviceId,
         DmOfflineParam &offlineParam, std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles);
+    bool CheckSrcAcuntAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+        const std::string &sinkUdid);
+    bool CheckSinkAcuntAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+        const std::string &sinkUdid);
+    bool CheckSrcShareAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+        const std::string &sinkUdid);
+    bool CheckSinkShareAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+        const std::string &sinkUdid);
+    bool CheckSrcP2PAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+        const std::string &sinkUdid);
+    bool CheckSinkP2PAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
+        const std::string &sinkUdid);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

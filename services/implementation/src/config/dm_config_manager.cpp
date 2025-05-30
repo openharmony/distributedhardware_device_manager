@@ -97,12 +97,6 @@ void DmConfigManager::ParseAdapterConfig()
         }
         soLoadInfo[i].soPath = std::string(DM_LIB_LOAD_PATH);
         soAdapterLoadInfo_[soLoadInfo[i].soName] = soLoadInfo[i];
-        LOGI("soAdapterLoadInfo name is: %{public}s", soLoadInfo[i].name.c_str());
-        LOGI("soAdapterLoadInfo type is: %{public}s", soLoadInfo[i].type.c_str());
-        LOGI("soAdapterLoadInfo version is: %{public}s", soLoadInfo[i].version.c_str());
-        LOGI("soAdapterLoadInfo funcName is: %{public}s", soLoadInfo[i].funcName.c_str());
-        LOGI("soAdapterLoadInfo soName is: %{public}s", soLoadInfo[i].soName.c_str());
-        LOGI("soAdapterLoadInfo soPath is: %{public}s", soLoadInfo[i].soPath.c_str());
     }
 }
 
@@ -128,13 +122,6 @@ void DmConfigManager::ParseAuthConfig()
         }
         soLoadInfo[i].soPath = std::string(DM_LIB_LOAD_PATH);
         soAuthLoadInfo_[soLoadInfo[i].authType] = soLoadInfo[i];
-        LOGI("soAuthLoadInfo name is: %{public}s", soLoadInfo[i].name.c_str());
-        LOGI("soAuthLoadInfo type is: %{public}s", soLoadInfo[i].type.c_str());
-        LOGI("soAuthLoadInfo version is: %{public}s", soLoadInfo[i].version.c_str());
-        LOGI("soAuthLoadInfo funcName is: %{public}s", soLoadInfo[i].funcName.c_str());
-        LOGI("soAuthLoadInfo soName is: %{public}s", soLoadInfo[i].soName.c_str());
-        LOGI("soAuthLoadInfo soPath is: %{public}s", soLoadInfo[i].soPath.c_str());
-        LOGI("soAuthLoadInfo authType is: %{public}d", soLoadInfo[i].authType);
     }
 }
 

@@ -35,7 +35,7 @@ SpatialLocationCallbackImpl::~SpatialLocationCallbackImpl()
 
 void SpatialLocationCallbackImpl::OnPinCodeChanged(const Msdp::PinCodeResponse &pinCodeResponse)
 {
-    LOGI("SpatialLocationCallbackImpl::OnPinCodeChanged Start.");
+    LOGI("Start.");
     if (pinCodeResponse.pincode.length() != pinCodeLength) {
         LOGE("OnPinCodeChanged pincode length error.");
         return;

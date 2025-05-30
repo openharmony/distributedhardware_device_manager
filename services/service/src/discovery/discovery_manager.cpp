@@ -59,11 +59,11 @@ DiscoveryManager::~DiscoveryManager()
 int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    LOGI("DiscoveryManager::EnableDiscoveryListener begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
     std::string pkgNameTemp = AddMultiUserIdentify(pkgName);
     DmSubscribeInfo dmSubInfo;
     dmSubInfo.subscribeId = DM_INVALID_FLAG_ID;
@@ -78,21 +78,22 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     UpdateInfoFreq(discoverParam, dmSubInfo);
     if (discoverParam.find(PARAM_KEY_META_TYPE) != discoverParam.end()) {
         std::string metaType = discoverParam.find(PARAM_KEY_META_TYPE)->second;
-        LOGI("EnableDiscoveryListener, input MetaType = %{public}s in discoverParam map.", metaType.c_str());
+        LOGI("input MetaType = %{public}s.", metaType.c_str());
     }
     if (discoverParam.find(PARAM_KEY_SUBSCRIBE_ID) != discoverParam.end() &&
         IsNumberString((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second))) {
-            uint16_t externalSubId = std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+            uint16_t externalSubId =
+                static_cast<uint16_t>(std::atoi((discoverParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str()));
             dmSubInfo.subscribeId = GenInnerSubId(pkgNameTemp, externalSubId);
     }
     if (discoverParam.find(PARAM_KEY_DISC_CAPABILITY) != discoverParam.end()) {
         std::string capability = discoverParam.find(PARAM_KEY_DISC_CAPABILITY)->second;
         if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, capability.c_str()) != EOK) {
-            LOGI("EnableDiscoveryListener failed, capability copy err.");
+            LOGE("failed, capability copy err.");
             return ERR_DM_ENABLE_DISCOVERY_LISTENER_FAILED;
         }
     }
-    LOGI("EnableDiscoveryListener capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
+    LOGI("capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
         capabilityMap_[pkgNameTemp] = std::string(dmSubInfo.capability);
@@ -100,7 +101,7 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
     UpdateInfoMedium(discoverParam, dmSubInfo);
     int32_t ret = softbusListener_->RefreshSoftbusLNN(DM_PKG_NAME, dmSubInfo, LNN_DISC_CAPABILITY);
     if (ret != DM_OK) {
-        LOGE("EnableDiscoveryListener failed, softbus refresh lnn ret: %{public}d.", ret);
+        LOGE("failed, softbus refresh lnn ret: %{public}d.", ret);
         return ret;
     }
     softbusListener_->RegisterSoftbusLnnOpsCbk(pkgNameTemp, shared_from_this());
@@ -110,11 +111,11 @@ int32_t DiscoveryManager::EnableDiscoveryListener(const std::string &pkgName,
 int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &extraParam)
 {
-    LOGI("DiscoveryManager::DisableDiscoveryListener begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
     std::string pkgNameTemp = RemoveMultiUserIdentify(pkgName);
     if (extraParam.find(PARAM_KEY_META_TYPE) != extraParam.end()) {
         LOGI("DisableDiscoveryListener, input MetaType = %{public}s",
@@ -123,7 +124,8 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
     uint16_t innerSubId = DM_INVALID_FLAG_ID;
     if (extraParam.find(PARAM_KEY_SUBSCRIBE_ID) != extraParam.end() &&
         IsNumberString(extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second)) {
-        uint16_t externalSubId = std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str());
+        uint16_t externalSubId =
+            static_cast<uint16_t>(std::atoi((extraParam.find(PARAM_KEY_SUBSCRIBE_ID)->second).c_str()));
         innerSubId = GetAndRemoveInnerSubId(pkgNameTemp, externalSubId);
     }
     {
@@ -143,11 +145,11 @@ int32_t DiscoveryManager::DisableDiscoveryListener(const std::string &pkgName,
 int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    LOGI("DiscoveryManager::StartDiscovering begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
     std::string pkgNameTemp = AddMultiUserIdentify(pkgName);
     DmSubscribeInfo dmSubInfo;
     ConfigDiscParam(discoverParam, &dmSubInfo);
@@ -183,7 +185,6 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
 void DiscoveryManager::ConfigDiscParam(const std::map<std::string, std::string> &discoverParam,
     DmSubscribeInfo *dmSubInfo)
 {
-    LOGI("DiscoveryManager::ConfigDiscParam");
     if (dmSubInfo == nullptr) {
         LOGE("ConfigDiscParam failed, dmSubInfo is nullptr.");
         return;
@@ -218,7 +219,7 @@ int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName
         LOGE("capability copy err.");
         return ERR_DM_START_DISCOVERING_FAILED;
     }
-    LOGI("StartDiscovering for mine meta node process, pkgName = %{public}s, capability = %{public}s",
+    LOGI("mine meta node process, pkgName = %{public}s, capability = %{public}s",
         pkgName.c_str(), std::string(dmSubInfo.capability).c_str());
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
@@ -246,7 +247,7 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(const std::string &pkgName,
         LOGE("capability copy err.");
         return ERR_DM_START_DISCOVERING_FAILED;
     }
-    LOGI("StartDiscovering for standard meta node process, pkgName = %{public}s, capability = %{public}s",
+    LOGI("standard meta node process, pkgName = %{public}s, capability = %{public}s",
         pkgName.c_str(), std::string(dmSubInfo.capability).c_str());
 
     {
@@ -267,33 +268,29 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(const std::string &pkgName,
 int32_t DiscoveryManager::StartDiscovering4MetaType(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
-    LOGI("StartDiscovering for meta node process, input metaType = %{public}s, pkgName = %{public}s",
+    LOGI("meta node process, input metaType = %{public}s, pkgName = %{public}s",
          (param.find(PARAM_KEY_META_TYPE)->second).c_str(), pkgName.c_str());
     MetaNodeType metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
     switch (metaType) {
         case MetaNodeType::PROXY_SHARE:
-            LOGI("StartDiscovering4MetaType for share meta node process.");
             if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_SHARE) != EOK) {
                 LOGE("capability copy error.");
                 return ERR_DM_FAILED;
             }
             break;
         case MetaNodeType::PROXY_WEAR:
-            LOGI("StartDiscovering4MetaType for wear meta node process.");
             if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_WEAR) != EOK) {
                 LOGE("capability copy error.");
                 return ERR_DM_FAILED;
             }
             break;
         case MetaNodeType::PROXY_CASTPLUS:
-            LOGI("StartDiscovering4MetaType for cast_plus meta node process.");
             if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_CASTPLUS) != EOK) {
                 LOGE("capability copy error.");
                 return ERR_DM_FAILED;
             }
             break;
         default:
-            LOGE("StartDiscovering4MetaType failed, unsupport meta type : %{public}d.", metaType);
             return ERR_DM_UNSUPPORTED_METHOD;
     }
 
@@ -301,7 +298,7 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(const std::string &pkgName, 
     if (param.find(PARAM_KEY_CUSTOM_DATA) != param.end()) {
         customData = param.find(PARAM_KEY_CUSTOM_DATA)->second;
     }
-    LOGI("StartDiscovering4MetaType capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
+    LOGI("capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
         capabilityMap_[pkgName] =std::string(dmSubInfo.capability);
@@ -316,23 +313,23 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(const std::string &pkgName, 
 
 int32_t DiscoveryManager::StopDiscovering(const std::string &pkgName, uint16_t subscribeId)
 {
-    LOGI("DiscoveryManager::StopDiscovering begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
     std::string pkgNameTemp = RemoveMultiUserIdentify(pkgName);
     return StopDiscoveringByInnerSubId(pkgNameTemp, subscribeId);
 }
 
 int32_t DiscoveryManager::StopDiscoveringByInnerSubId(const std::string &pkgName, uint16_t subscribeId)
 {
-    LOGI("DiscoveryManager::StopDiscovering begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    uint16_t innerSubId = GetAndRemoveInnerSubId(pkgName, subscribeId);
+    LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
+    uint16_t innerSubId = static_cast<uint16_t>(GetAndRemoveInnerSubId(pkgName, subscribeId));
     if (innerSubId == DM_INVALID_FLAG_ID) {
         LOGE("Invalid parameter, cannot find subscribeId in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -457,7 +454,7 @@ bool DiscoveryManager::CompareCapability(uint32_t capabilityType, const std::str
 
 void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t subscribeId, int32_t result)
 {
-    LOGI("DiscoveryManager::OnDiscoveringResult, subscribeId = %{public}d, result = %{public}d.", subscribeId, result);
+    LOGI("subscribeId = %{public}d, result = %{public}d.", subscribeId, result);
     int32_t userId = -1;
     std::string callerPkgName = "";
     GetPkgNameAndUserId(pkgName, callerPkgName, userId);
@@ -544,7 +541,7 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
 
 void DiscoveryManager::HandleDiscoveryTimeout(const std::string &pkgName)
 {
-    LOGI("DiscoveryManager::HandleDiscoveryTimeout, pkgName: %{public}s.", pkgName.c_str());
+    LOGI("pkgName: %{public}s.", pkgName.c_str());
     uint16_t subscribeId = 0;
     {
         std::lock_guard<std::mutex> autoLock(locks_);
@@ -641,13 +638,12 @@ bool DiscoveryManager::IsCommonDependencyReady()
     }
     dpConnector_ = func();
     isSoLoaded_ = true;
-    LOGI("IsCommonDependencyReady success.");
     return true;
 }
 
 bool DiscoveryManager::CloseCommonDependencyObj()
 {
-    LOGI("DiscoveryManager::CloseCommonDependencyObj start.");
+    LOGI("start.");
     std::lock_guard<std::mutex> lock(comDependencyLoadLock);
     if (!isSoLoaded_ && (dpConnector_ == nullptr) && (dpConnectorHandle_ == nullptr)) {
         return true;
@@ -661,7 +657,6 @@ bool DiscoveryManager::CloseCommonDependencyObj()
     isSoLoaded_ = false;
     dpConnector_ = nullptr;
     dpConnectorHandle_ = nullptr;
-    LOGI("close libdevicemanagerdependency so success.");
     return true;
 }
 #endif
@@ -679,7 +674,7 @@ void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
         uint16_t innerSubId = DM_INVALID_FLAG_ID;
         {
             std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
-            innerSubId = pkgName2SubIdMap_[pkgNameTemp][it];
+            innerSubId = static_cast<uint16_t>(pkgName2SubIdMap_[pkgNameTemp][it]);
             randSubIdSet_.erase(innerSubId);
             pkgName2SubIdMap_.erase(pkgNameTemp);
         }

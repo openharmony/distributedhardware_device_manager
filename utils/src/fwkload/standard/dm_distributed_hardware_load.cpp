@@ -27,7 +27,7 @@ constexpr uint32_t MAX_LOAD_VALUE = 3;
 constexpr int32_t DM_OK = 0;
 DM_EXPORT void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 {
-    LOGI("enter DmDistributedHardwareLoad::LoadDistributedHardwareFwk");
+    LOGI("start");
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         LOGE("failed to get system ability mgr.");
@@ -54,7 +54,7 @@ uint32_t DmDistributedHardwareLoad::GetDistributedHardwareLoadCount()
 void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
     int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
 {
-    LOGI("DmDistributedHardware Load SA success, systemAbilityId:%{public}d, remoteObject result:%{public}s",
+    LOGI("Load SA success, systemAbilityId:%{public}d, remoteObject result:%{public}s",
         systemAbilityId, (remoteObject != nullptr) ? "true" : "false");
     if (remoteObject == nullptr) {
         LOGE("remoteObject is nullptr");
@@ -64,7 +64,7 @@ void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
 }
 void DistributedHardwareLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
 {
-    LOGE("DmDistributedHardware Load SA failed, systemAbilityId:%{public}d", systemAbilityId);
+    LOGE("Load SA failed, systemAbilityId:%{public}d", systemAbilityId);
 
     if (DmDistributedHardwareLoad::GetInstance().GetDistributedHardwareLoadCount() < MAX_LOAD_VALUE) {
         DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();

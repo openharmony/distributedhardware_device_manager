@@ -188,6 +188,7 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
     CHECK_NULL_VOID(context);
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    FilterProfilesByContext(profiles, context);
     uint32_t bindLevel = DM_INVALIED_TYPE;
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
@@ -269,7 +270,7 @@ bool AuthSrcConfirmState::CheckCredIdInAcl(std::shared_ptr<DmAuthContext> contex
         case DM_IDENTICAL_ACCOUNT:
         case DM_SHARE:
         case DM_LNN:
-            if (credInfo[credId][FILED_CRED_TYPE].Get<int32_t>() == bindType) {
+            if (credInfo[credId][FILED_CRED_TYPE].Get<uint32_t>() == bindType) {
                 checkResult = true;
             } else {
                 DeleteAcl(context, profile);
@@ -288,7 +289,7 @@ void AuthSrcConfirmState::CheckCredIdInAclForP2P(std::shared_ptr<DmAuthContext> 
     const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, uint32_t bindType,
     bool &checkResult)
 {
-    if (credInfo[credId][FILED_CRED_TYPE].Get<int32_t>() == bindType) {
+    if (credInfo[credId][FILED_CRED_TYPE].Get<uint32_t>() == bindType) {
         std::vector<std::string> appList;
         credInfo[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
         const size_t APP_LIST_SIZE = 2;
@@ -438,14 +439,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("start.");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
-    // check version compatibility
     context->timer->DeleteTimer(std::string(NEGOTIATE_TIMEOUT_TASK));
-    if (CompareVersion(context->accessee.dmVersion, std::string(DM_VERSION_5_1_0))) {
-        LOGE("incompatible version %{public}s compare to 5.1.0",
-            context->accessee.dmVersion.c_str());
-        context->reason = ERR_DM_VERSION_INCOMPATIBLE;
-        return ERR_DM_VERSION_INCOMPATIBLE;
-    }
     GetCustomDescBySinkLanguage(context);
     context->accessee.isOnline = SoftbusCache::GetInstance().CheckIsOnline(context->accessee.deviceIdHash);
     JsonObject credInfo;
@@ -466,6 +460,10 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     context->accesser.aclTypeList = aclNegoResult.Dump();
 
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_USER_CONFIRM, context);
+    context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
+        static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), DM_OK);
+    context->listener->OnBindResult(context->processInfo, context->peerTargetId,
+        DM_OK, static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), "");
     context->timer->StartTimer(std::string(CONFIRM_TIMEOUT_TASK),
         DmAuthState::GetTaskTimeout(context, CONFIRM_TIMEOUT_TASK, CONFIRM_TIMEOUT),
         [context] (std::string name) {

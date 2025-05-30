@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2074,6 +2074,20 @@ HWTEST_F(DeviceManagerImplTest, GetLocalDisplayDeviceName_201, testing::ext::Tes
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(DM_OK));
     ret = DeviceManager::GetInstance().GetLocalDisplayDeviceName(pkgName, maxNameLength, displayName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerImplTest, GetLocalDeviceName_201, testing::ext::TestSize.Level0)
+{
+    std::string deviceName = "deviceName";
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    int32_t ret = DeviceManager::GetInstance().GetLocalDeviceName(deviceName);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+                .Times(1).WillOnce(testing::Return(DM_OK));
+    ret = DeviceManager::GetInstance().GetLocalDeviceName(deviceName);
     ASSERT_EQ(ret, DM_OK);
 }
 } // namespace

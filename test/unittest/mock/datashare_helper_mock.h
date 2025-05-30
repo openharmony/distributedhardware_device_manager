@@ -37,6 +37,7 @@ using OHOS::DataShare::RdbChangeNode;
 using OHOS::DataShare::Template;
 using OHOS::DataShare::TemplateId;
 using OHOS::DataShare::UpdateOperations;
+using namespace OHOS::DataShare;
 
 class DataShareHelperMock : public DataShareHelper {
 public:
@@ -60,6 +61,12 @@ public:
     MOCK_METHOD(int, RegisterObserver, (const Uri &, const sptr<IDataAbilityObserver> &));
     MOCK_METHOD(int, UnregisterObserver, (const Uri &, const sptr<IDataAbilityObserver> &));
     MOCK_METHOD(void, NotifyChange, (const Uri &));
+    MOCK_METHOD(
+        void, RegisterObserverExtProvider, (const Uri &uri, const std::shared_ptr<DataShareObserver> dataObserver,
+            bool isDescendants), (override));
+    MOCK_METHOD(void, UnregisterObserverExtProvider, (const Uri &uri,
+        const std::shared_ptr<DataShareObserver> dataObserver), (override));
+    MOCK_METHOD(void, NotifyChangeExtProvider, (const DataShareObserver::ChangeInfo &changeInfo), (override));
     MOCK_METHOD(Uri, NormalizeUri, (Uri &));
     MOCK_METHOD(Uri, DenormalizeUri, (Uri &));
     MOCK_METHOD(int, AddQueryTemplate, (const std::string &, int64_t, Template &));

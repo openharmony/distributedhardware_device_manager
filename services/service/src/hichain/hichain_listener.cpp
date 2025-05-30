@@ -106,7 +106,7 @@ HichainListener::~HichainListener()
 
 void HichainListener::RegisterDataChangeCb()
 {
-    LOGI("HichainListener::RegisterDataChangeCb start");
+    LOGI("start");
     if (deviceGroupManager_ == nullptr) {
         LOGE("deviceGroupManager_ is null!");
         return;
@@ -116,12 +116,12 @@ void HichainListener::RegisterDataChangeCb()
         LOGE("[HICHAIN]regDataChangeListener failed with ret: %{public}d.", ret);
         return;
     }
-    LOGI("RegisterDataChangeCb success!");
+    LOGI("success!");
 }
 
 void HichainListener::RegisterCredentialCb()
 {
-    LOGI("HichainListener::RegisterCredentialCb start");
+    LOGI("start");
     if (credManager_ == nullptr) {
         LOGE("credManager_ is null!");
         return;
@@ -131,12 +131,12 @@ void HichainListener::RegisterCredentialCb()
         LOGE("[HICHAIN]registerChangeListener failed with ret: %{public}d.", ret);
         return;
     }
-    LOGI("RegisterCredentialCb success!");
+    LOGI("success!");
 }
 
 void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *groupInfo)
 {
-    LOGI("HichainListener::onDeviceUnBound start");
+    LOGI("start");
     if (peerUdid == nullptr || groupInfo == nullptr) {
         LOGE("peerUdid or groupInfo is null!");
         return;
@@ -167,7 +167,7 @@ void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *g
 
 void HichainListener::OnCredentialDeleted(const char *credId, const char *credInfo)
 {
-    LOGI("HichainListener::OnCredentialDeleted start");
+    LOGI("start");
     if (credId == nullptr || credInfo == nullptr) {
         LOGE("credId or credInfo is null!");
         return;
@@ -182,7 +182,7 @@ void HichainListener::OnCredentialDeleted(const char *credId, const char *credIn
 
 void HichainListener::DeleteAllGroup(const std::string &localUdid, const std::vector<int32_t> &backgroundUserIds)
 {
-    LOGI("OnStart HichainListener::DeleteAllGroup");
+    LOGI("start");
     for (auto &userId : backgroundUserIds) {
         std::vector<GroupsInfo> groupList;
         GetRelatedGroups(userId, localUdid, groupList);
@@ -222,11 +222,11 @@ int32_t HichainListener::GetRelatedGroupsExt(int32_t userId, const std::string &
 int32_t HichainListener::GetRelatedGroupsCommon(int32_t userId, const std::string &deviceId, const char* pkgName,
     std::vector<GroupsInfo> &groupList)
 {
-    LOGI("Start to get related groups.");
     if (userId < 0) {
         LOGE("user id failed");
         return ERR_DM_FAILED;
     }
+    LOGI("Start.");
     uint32_t groupNum = 0;
     char *returnGroups = nullptr;
     int32_t ret =

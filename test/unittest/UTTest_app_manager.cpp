@@ -333,5 +333,26 @@ HWTEST_F(AppManagerTest, GetCallerProcessName_002, testing::ext::TestSize.Level2
     auto ret = AppManager::GetInstance().GetCallerProcessName(output);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
+
+HWTEST_F(AppManagerTest, GetBundleNameForSelf_001, testing::ext::TestSize.Level2)
+{
+    ASSERT_TRUE(client_ != nullptr);
+    auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
+    auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
+    EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_))
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(bundleMgr));
+    EXPECT_CALL(*client_, GetSystemAbilityManager())
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(systemAbilityManager));
+    EXPECT_CALL(*bundleMgr, GetBundleInfoForSelf(_, _))
+        .Times(INVOKE_COUNT)
+        .WillOnce(Return(ERR_OK));
+
+    std::string bundleName = "";
+    auto result = AppManager::GetInstance().GetBundleNameForSelf(bundleName);
+    EXPECT_EQ(result, DM_OK);
+    EXPECT_EQ(bundleName, "");
+}
 } // namespace DistributedHardware
 } // namespace OHOS

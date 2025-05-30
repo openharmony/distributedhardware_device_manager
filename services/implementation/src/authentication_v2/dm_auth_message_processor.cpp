@@ -116,7 +116,7 @@ void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access, bool i
     access.deviceId = srcAccessToSync.deviceId;
     access.userId = srcAccessToSync.userId;
     access.accountId = srcAccessToSync.accountId;
-    access.tokenId = srcAccessToSync.tokenId;
+    access.tokenId = static_cast<int64_t>(srcAccessToSync.tokenId);
     access.bundleName = srcAccessToSync.bundleName;
     access.pkgName = srcAccessToSync.pkgName;
     access.bindLevel = srcAccessToSync.bindLevel;
@@ -526,7 +526,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
     context->accesser.transmitPublicKey = jsonData[TAG_TRANSMIT_PUBLIC_KEY].Get<std::string>();
     context->accesser.deviceId = jsonData[TAG_DEVICE_ID].Get<std::string>();
     context->accesser.userId = jsonData[TAG_PEER_USER_SPACE_ID].Get<int32_t>();
-    context->accesser.tokenId = jsonData[TAG_TOKEN_ID].Get<uint64_t>();
+    context->accesser.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkCredentialExchangeState>());
     return DM_OK;
 }
@@ -545,8 +545,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
         LOGE("DmAuthMessageProcessor::ParseMessageRspCredExchange error, decrypt data failed.");
         return ERR_DM_FAILED;
     }
-
-    LOGI("DmAuthMessageProcessor::ParseMessageRspCredExchange plainText=%{public}s", plainText.c_str());
+    LOGI("plainText=%{public}s", GetAnonyJsonString(plainText).c_str());
 
     JsonObject jsonData(plainText);
 
@@ -572,7 +571,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
     context->accessee.transmitPublicKey = jsonData[TAG_TRANSMIT_PUBLIC_KEY].Get<std::string>();
     context->accessee.deviceId = jsonData[TAG_DEVICE_ID].Get<std::string>();
     context->accessee.userId = jsonData[TAG_PEER_USER_SPACE_ID].Get<int32_t>();
-    context->accessee.tokenId = jsonData[TAG_TOKEN_ID].Get<uint64_t>();
+    context->accessee.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
 
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthStartState>());
     return DM_OK;
@@ -590,7 +589,7 @@ std::string DmAuthMessageProcessor::CreateMessage(DmMessageType msgType, std::sh
         return "";
     }
     int32_t ret = (this->*(itr->second))(context, jsonObj);
-    LOGI("DmAuthMessageProcessor::CreateMessage start. message is %{public}s", jsonObj.Dump().c_str());
+    LOGI("start. message is %{public}s", GetAnonyJsonString(jsonObj.Dump()).c_str());
     return (ret == DM_OK) ? jsonObj.Dump() : "";
 }
 
@@ -647,12 +646,15 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_TOKEN_ID_HASH] = context->accesser.tokenIdHash;
     jsonObject[TAG_BUNDLE_NAME_V2] = context->accesser.bundleName;
     jsonObject[TAG_EXTRA_INFO] = context->accesser.extraInfo;
+    jsonObject[TAG_IS_COMMON_FLAG] = context->accesser.isCommonFlag;
+    jsonObject[TAG_DM_CERT_CHAIN] = context->accesser.cert;
 
     jsonObject[TAG_PEER_BUNDLE_NAME_V2] = context->accessee.bundleName;
     jsonObject[TAG_ULTRASONIC_SIDE] = static_cast<int32_t>(context->ultrasonicInfo);
     jsonObject[TAG_PEER_DISPLAY_ID] = context->accessee.displayId;
     jsonObject[TAG_PEER_PKG_NAME] = context->accessee.pkgName;
     jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
+
     return DM_OK;
 }
 
@@ -718,7 +720,7 @@ int32_t DmAuthMessageProcessor::CreateMessageRspCredExchange(std::shared_ptr<DmA
 
     std::string plainText = jsonData.Dump();
     std::string cipherText;
-    LOGI("DmAuthMessageProcessor::CreateMessageRspCredExchange plainText=%{public}s", plainText.c_str());
+    LOGI("plainText=%{public}s", GetAnonyJsonString(plainText).c_str());
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
     if (ret != DM_OK) {
         LOGI("DmAuthMessageProcessor::CreateMessageRspCredExchange encryptMessage failed.");
@@ -974,17 +976,14 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
         context->logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<uint64_t>();
         context->requestId = static_cast<int64_t>(context->logicalSessionId);
     }
-
     if (jsonObject[TAG_PKG_NAME].IsString()) {
         context->pkgName = jsonObject[TAG_PKG_NAME].Get<std::string>();
         context->accesser.pkgName = context->pkgName;
         context->accessee.pkgName = context->accesser.pkgName;
     }
-
     if (jsonObject[TAG_PEER_PKG_NAME].IsString()) {
         context->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
     }
-
     if (jsonObject[TAG_DM_VERSION_V2].IsString()) {
         context->accesser.dmVersion = jsonObject[TAG_DM_VERSION_V2].Get<std::string>();
     }
@@ -1003,7 +1002,6 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     if (jsonObject[TAG_BUNDLE_NAME_V2].IsString()) {
         context->accesser.bundleName = jsonObject[TAG_BUNDLE_NAME_V2].Get<std::string>();
     }
-
     if (jsonObject[TAG_EXTRA_INFO].IsString()) {
         context->accesser.extraInfo = jsonObject[TAG_EXTRA_INFO].Get<std::string>();
     }
@@ -1018,9 +1016,20 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
         context->pkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
     }
     ParseUltrasonicSide(jsonObject, context);
-
+    ParseCert(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
     return DM_OK;
+}
+
+void DmAuthMessageProcessor::ParseCert(const JsonObject &jsonObject,
+    std::shared_ptr<DmAuthContext> context)
+{
+    if (jsonObject[TAG_DM_CERT_CHAIN].IsString()) {
+        context->accesser.cert = jsonObject[TAG_DM_CERT_CHAIN].Get<std::string>();
+    }
+    if (jsonObject[TAG_IS_COMMON_FLAG].IsBoolean()) {
+        context->accesser.isCommonFlag = jsonObject[TAG_IS_COMMON_FLAG].Get<bool>();
+    }
 }
 
 void DmAuthMessageProcessor::ParseUltrasonicSide(
@@ -1401,7 +1410,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     DmAccess &remoteAccess = (context->accesser.deviceId == localUdid) ? context->accessee : context->accesser;
     std::string aclHashList;
     int32_t ret = DeviceProfileConnector::GetInstance().GetAclListHashStr({localUdid, access.userId},
-        {remoteAccess.deviceId, remoteAccess.userId}, aclHashList, DM_CURRENT_VERSION);
+        {remoteAccess.deviceId, remoteAccess.userId}, aclHashList, DM_ACL_AGING_VERSION);
     if (ret != DM_OK) {
         LOGE("DmAuthMessageProcessor::EncryptSyncMessage GetAclListHashStr failed");
         return ERR_DM_FAILED;
@@ -1433,7 +1442,7 @@ int32_t DmAuthMessageProcessor::ACLToStr(DistributedDeviceProfile::AccessControl
     dmAcl.accesseeId = acl.GetAccesseeId();
     dmAcl.deviceId = acl.GetTrustDeviceId();
     dmAcl.sessionKey = acl.GetSessionKey();
-    dmAcl.bindType = acl.GetBindType();
+    dmAcl.bindType = static_cast<int32_t>(acl.GetBindType());
     dmAcl.authType = acl.GetAuthenticationType();
     dmAcl.deviceType = acl.GetDeviceIdType();
     dmAcl.deviceIdHash = acl.GetDeviceIdHash();

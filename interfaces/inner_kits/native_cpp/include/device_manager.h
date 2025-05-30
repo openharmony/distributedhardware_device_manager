@@ -343,6 +343,12 @@ public:
     virtual int32_t GetLocalDeviceName(const std::string &pkgName, std::string &deviceName) = 0;
 
     /**
+     * @brief Get local device name.
+     * @return Returns device name.
+     */
+    virtual int32_t GetLocalDeviceName(std::string &deviceName) = 0;
+
+    /**
      * @brief Get local device type.
      * @param pkgName package name.
      * @return Returns device type.
@@ -608,15 +614,6 @@ public:
     virtual int32_t UnRegisterDeviceScreenStatusCallback(const std::string &pkgName) = 0;
     virtual int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus) = 0;
-
-    /**
-     * @brief Set Dn Policy
-     * @param pkgName  package name.
-     * @param policy contain DM_POLICY_STRATEGY_FOR_BLE and DM_POLICY_TIMEOUT key and value.
-     *               DM_POLICY_STRATEGY_FOR_BLE: Strategy BLE networking go-online policy, suppress or restore.
-     *               DM_POLICY_TIMEOUT: Indicates the duration for suppressing ble networking.
-     * @return Returns 0 if success.
-     */
     virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId) = 0;
@@ -630,17 +627,9 @@ public:
         std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual int32_t RegisterAuthenticationType(const std::string &pkgName,
         const std::map<std::string, std::string> &authParam) = 0;
-
-    /**
-     * @brief Query the device list of same account.
-     * @param filterOptions  query parameters.
-     * @param callback       qeury result callback.
-     * @return Returns 0 if success.
-     */
     virtual int32_t GetDeviceProfileInfoList(const std::string &pkgName,
         const DmDeviceProfileInfoFilterOptions &filterOptions,
         std::shared_ptr<GetDeviceProfileInfoListCallback> callback) = 0;
-
     virtual int32_t GetDeviceIconInfo(const std::string &pkgName, const DmDeviceIconInfoFilterOptions &filterOptions,
         std::shared_ptr<GetDeviceIconInfoCallback> callback) = 0;
     virtual int32_t PutDeviceProfileInfoList(const std::string &pkgName,
@@ -659,12 +648,11 @@ public:
     virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) = 0;
     virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds) = 0;
-    /**
-     * @brief UnRegister Pin Code Holder Callback
-     * @param pkgName  package name.
-     * @return Returns 0 if success.
-     */
     virtual int32_t UnRegisterPinHolderCallback(const std::string &pkgName) = 0;
+    virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
+    virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
+    virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
+    virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

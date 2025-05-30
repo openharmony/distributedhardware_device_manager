@@ -1,0 +1,42 @@
+{
+    "plural":[
+        {
+            "name":"dm_incorrect_code",
+            "value":[
+                {
+                    "quantity":"one",
+                    "value":"Дұрыс емес. %d әрекет қалды.",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"other",
+                    "value":"Дұрыс емес. %d әрекет қалды.",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
+        },
+        {
+            "name":"dm_not_allow",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"Сенбеу (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"one",
+                    "value":"Сенбеу (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
+        }
+    ]
+}

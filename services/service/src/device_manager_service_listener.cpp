@@ -190,7 +190,6 @@ int32_t DeviceManagerServiceListener::FillUdidAndUuidToDeviceInfo(const std::str
 void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
     const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo)
 {
-    LOGI("DeviceManagerServiceListener::ProcessDeviceStateChange, state = %{public}d", state);
     std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId,
         DmCommonNotifyEvent::REG_DEVICE_STATE);
     std::vector<ProcessInfo> hpProcessInfoVec;
@@ -249,7 +248,6 @@ void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &proc
 void DeviceManagerServiceListener::OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
                                                        const DmDeviceInfo &info)
 {
-    LOGI("OnDeviceStateChange, state = %{public}d", state);
     DmDeviceBasicInfo deviceBasicInfo;
     ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, info, deviceBasicInfo);
     if (processInfo.pkgName == std::string(DM_PKG_NAME)) {
@@ -284,7 +282,7 @@ void DeviceManagerServiceListener::OnDeviceFound(const ProcessInfo &processInfo,
 void DeviceManagerServiceListener::OnDiscoveryFailed(const ProcessInfo &processInfo, uint16_t subscribeId,
                                                      int32_t failedReason)
 {
-    LOGI("DeviceManagerServiceListener::OnDiscoveryFailed");
+    LOGI("OnDiscoveryFailed");
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::make_shared<IpcNotifyDiscoverResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -297,7 +295,7 @@ void DeviceManagerServiceListener::OnDiscoveryFailed(const ProcessInfo &processI
 
 void DeviceManagerServiceListener::OnDiscoverySuccess(const ProcessInfo &processInfo, int32_t subscribeId)
 {
-    LOGI("DeviceManagerServiceListener::OnDiscoverySuccess");
+    LOGI("OnDiscoverySuccess");
     std::shared_ptr<IpcNotifyDiscoverResultReq> pReq = std::make_shared<IpcNotifyDiscoverResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -310,7 +308,7 @@ void DeviceManagerServiceListener::OnDiscoverySuccess(const ProcessInfo &process
 
 void DeviceManagerServiceListener::OnPublishResult(const std::string &pkgName, int32_t publishId, int32_t publishResult)
 {
-    LOGI("DeviceManagerServiceListener::OnPublishResult : %{public}d", publishResult);
+    LOGI("OnPublishResult : %{public}d", publishResult);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -420,7 +418,7 @@ void DeviceManagerServiceListener::OnUnbindResult(const ProcessInfo &processInfo
 void DeviceManagerServiceListener::OnPinHolderCreate(const ProcessInfo &processInfo, const std::string &deviceId,
     DmPinType pinType, const std::string &payload)
 {
-    LOGI("DeviceManagerServiceListener::OnPinHolderCreate : %{public}s", processInfo.pkgName.c_str());
+    LOGI("OnPinHolderCreate : %{public}s", processInfo.pkgName.c_str());
     std::shared_ptr<IpcCreatePinHolderReq> pReq = std::make_shared<IpcCreatePinHolderReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -435,7 +433,7 @@ void DeviceManagerServiceListener::OnPinHolderCreate(const ProcessInfo &processI
 void DeviceManagerServiceListener::OnPinHolderDestroy(const ProcessInfo &processInfo, DmPinType pinType,
     const std::string &payload)
 {
-    LOGI("DeviceManagerServiceListener::OnPinHolderDestroy : %{public}s", processInfo.pkgName.c_str());
+    LOGI("OnPinHolderDestroy : %{public}s", processInfo.pkgName.c_str());
     std::shared_ptr<IpcDestroyPinHolderReq> pReq = std::make_shared<IpcDestroyPinHolderReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -448,7 +446,7 @@ void DeviceManagerServiceListener::OnPinHolderDestroy(const ProcessInfo &process
 
 void DeviceManagerServiceListener::OnCreateResult(const ProcessInfo &processInfo, int32_t result)
 {
-    LOGI("DeviceManagerServiceListener::OnCreateResult : %{public}d", result);
+    LOGI("OnCreateResult : %{public}d", result);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -460,7 +458,7 @@ void DeviceManagerServiceListener::OnCreateResult(const ProcessInfo &processInfo
 
 void DeviceManagerServiceListener::OnDestroyResult(const ProcessInfo &processInfo, int32_t result)
 {
-    LOGI("DeviceManagerServiceListener::OnDestroyResult : %{public}d", result);
+    LOGI("OnDestroyResult : %{public}d", result);
     std::shared_ptr<IpcNotifyPublishResultReq> pReq = std::make_shared<IpcNotifyPublishResultReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
 
@@ -488,7 +486,6 @@ void DeviceManagerServiceListener::OnPinHolderEvent(const ProcessInfo &processIn
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo)
 {
-    LOGD("pkgName %{public}s.", pkgName.c_str());
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
         LOGD("GetAppIdByPkgName failed");
@@ -514,7 +511,6 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::st
 int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyDeviceId(const std::string &pkgName,
     const std::string &udidHash, std::string &anoyDeviceId)
 {
-    LOGI("pkgName %{public}s, udidHash %{public}s.", pkgName.c_str(), GetAnonyString(udidHash).c_str());
     std::string appId = "";
     if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
         LOGD("GetAppIdByPkgName failed");

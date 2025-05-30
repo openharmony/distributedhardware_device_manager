@@ -73,10 +73,10 @@ bool DeviceManagerServiceImpl::CheckSharePeerSrc(const std::string &peerUdid, co
 }
 
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId,
-    const char *credInfo, const std::string &localUdid, std::string &remoteUdid)
+    const char *credInfo, const std::string &localUdid, std::string &remoteUdid, bool &isShareType)
 {
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleCredentialDeleted(credId,
-        credInfo, localUdid, remoteUdid);
+        credInfo, localUdid, remoteUdid, isShareType);
 }
 void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &credId,
     const int32_t &userId, const std::string &localUdid)
@@ -88,6 +88,19 @@ int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &l
     const std::string &peerDeviceId)
 {
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckDeviceInfoPermission(localUdid, peerDeviceId);
+}
+
+void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId)
+{
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId);
+}
+
+void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId, int32_t peerTokenId)
+{
+    DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleAppUnBindEvent(remoteUserId, remoteUdid,
+        tokenId, peerTokenId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

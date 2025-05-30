@@ -59,6 +59,5 @@ bool PermissionManager::CheckProcessNameValidPutDeviceProfileInfoList(const std:
 {
     return DmPermissionManager::dmPermissionManager->CheckProcessNameValidPutDeviceProfileInfoList(processName);
 }
-
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -49,7 +49,7 @@ int32_t DmTimer::StartTimer(std::string name, int32_t timeOut, TimerCallback cal
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(queue_, ERR_DM_POINT_NULL);
-    LOGI("DmTimer StartTimer start name: %{public}s", name.c_str());
+    LOGI("start name: %{public}s", name.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
 
     auto taskFunc = [callback, name] () { callback(name); };
@@ -68,7 +68,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
         LOGE("DmTimer DeleteTimer timer is null");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("DmTimer DeleteTimer start name: %{public}s", timerName.c_str());
+    LOGI("start name: %{public}s", timerName.c_str());
     std::lock_guard<std::mutex> locker(timerMutex_);
     auto item = timerVec_.find(timerName);
     if (item == timerVec_.end()) {
@@ -87,7 +87,7 @@ int32_t DmTimer::DeleteTimer(std::string timerName)
 
 DM_EXPORT int32_t DmTimer::DeleteAll()
 {
-    LOGI("DmTimer DeleteAll start");
+    LOGI("start");
     std::lock_guard<std::mutex> locker(timerMutex_);
     for (const auto &name : timerVec_) {
         if (name.second != nullptr && queue_ != nullptr) {

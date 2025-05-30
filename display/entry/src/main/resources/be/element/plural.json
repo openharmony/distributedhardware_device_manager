@@ -1,0 +1,70 @@
+{
+    "plural":[
+        {
+            "name":"dm_incorrect_code",
+            "value":[
+                {
+                    "quantity":"one",
+                    "value":"Няправільна. Засталося спроб: %d.",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"other",
+                    "value":"Няправільна. Засталося спроб: %d.",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"few",
+                    "value":"Няправільна. Засталося спроб: %d.",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"many",
+                    "value":"Няправільна. Засталося спроб: %d.",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
+        },
+        {
+            "name":"dm_not_allow",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"Не давяраць (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"one",
+                    "value":"Не давяраць (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"few",
+                    "value":"Не давяраць (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"many",
+                    "value":"Не давяраць (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
+        }
+    ]
+}

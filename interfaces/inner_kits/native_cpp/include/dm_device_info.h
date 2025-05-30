@@ -149,6 +149,10 @@ typedef enum DmAuthForm {
      * Across Account Device auth.
      */
     ACROSS_ACCOUNT = 2,
+    /**
+     * Share
+     */
+    SHARE = 3,
 } DmAuthForm;
 
 /**
@@ -381,6 +385,7 @@ typedef struct DmAccessCallee {
     std::string accountId;
     std::string networkId;
     std::string peerId;
+    std::string pkgName;
     int32_t userId;
     uint64_t tokenId = 0;
     std::string extra;

@@ -24,6 +24,8 @@
 #include "multiple_user_connector.h"
 
 #include "auth_manager.h"
+#include "dm_auth_cert.h"
+#include "dm_auth_attest_common.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_random.h"
@@ -130,8 +132,8 @@ AuthManager::AuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     context_->authenticationMap[AUTH_TYPE_PIN_ULTRASONIC] = nullptr;
     context_->authenticationMap[AUTH_TYPE_NFC] = nullptr;
     context_->authenticationMap[AUTH_TYPE_CRE] = nullptr;
-    context_->accesser.dmVersion = DM_VERSION_5_1_0;
-    context_->accessee.dmVersion = DM_VERSION_5_1_0;
+    context_->accesser.dmVersion = DM_VERSION_5_1_1;
+    context_->accessee.dmVersion = DM_VERSION_5_1_1;
     context_->timer = std::make_shared<DmTimer>();
     context_->authMessageProcessor = std::make_shared<DmAuthMessageProcessor>();
 }
@@ -619,6 +621,29 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     return DM_OK;
 }
 
+std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context_)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    if (context_ == nullptr) {
+        LOGE("context_ is nullptr!");
+        return "";
+    }
+    context_->accesser.isCommonFlag = true;
+    LOGI("Blue device do not generate cert!");
+    return "";
+#else
+    DmCertChain dmCertChain;
+    int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
+    if (certRet != DM_OK) {
+        LOGE("generate cert fail, certRet = %{public}d", certRet);
+        return "";
+    }
+    std::string cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+    AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
+    return cert;
+#endif
+}
+
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId)
 {
@@ -660,6 +685,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
+    context_->accesser.cert = GenerateCertificate(context_);
     context_->sessionId = sessionId;
     context_->logicalSessionId = logicalSessionId;
     context_->requestId = static_cast<int64_t>(logicalSessionId);
@@ -839,6 +865,11 @@ int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &param
 void AuthSrcManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
 {
     LOGI("AuthSrcManager::AuthDeviceError start.");
+    CHECK_NULL_VOID(context_);
+    if (requestId != context_->requestId) {
+        LOGE("requestId: %{public}" PRId64", context_->requestId: %{public}" PRId64".", requestId, context_->requestId);
+        return;
+    }
     auto curState = context_->authStateMachine->GetCurState();
     if (curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE ||
         curState == DmAuthStateType::AUTH_SRC_PIN_AUTH_MSG_NEGOTIATE_STATE ||
@@ -968,6 +999,7 @@ char *AuthSinkManager::AuthDeviceRequest(int64_t requestId, int operationCode, c
             jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
             jsonObj[FIELD_PIN_CODE] = pinCode;
         }
+        LOGI("pinCode: %{public}s", GetAnonyString(pinCode).c_str());
     } else if (curState == DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_START_STATE) {
         if (context_->isOnline) { // Non-first time certification
             jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;

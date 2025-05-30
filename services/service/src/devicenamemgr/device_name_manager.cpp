@@ -277,7 +277,7 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
 {
     LOGI("In userId:%{public}d", userId);
     if (userId == -1) {
-        LOGI("userId:%{public}d is invalid", userId);
+        LOGE("userId:%{public}d is invalid", userId);
         return;
     }
     std::string userDefinedDeviceName = "";
@@ -494,7 +494,7 @@ std::string DeviceNameManager::AnoyPrivacyString(const std::string &str)
         res += wholeCharVec[i];
     }
     res += ANOY_STRING;
-    for (int32_t j = wholeCharVec.size() - NUM3; j < wholeCharVec.size(); j++) {
+    for (size_t j = wholeCharVec.size() - NUM3; j < wholeCharVec.size(); j++) {
         res += wholeCharVec[j];
     }
     return res;

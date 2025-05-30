@@ -347,6 +347,7 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
 
     std::string pinCode = jsonObject[PIN_CODE_KEY].Get<std::string>();
     std::string groupId = jsonObject[TAG_GROUP_ID].Get<std::string>();
+    LOGI("pinCode: %{public}s", GetAnonyString(pinCode).c_str());
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;

@@ -40,7 +40,7 @@ std::mutex g_publishMutex;
 
 void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32_t screenState)
 {
-    LOGI("PublishCommonEventCallback start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d",
+    LOGI("start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d",
         bluetoothState, wifiState, screenState);
     std::lock_guard<std::mutex> saLock(g_publishMutex);
     DmDeviceInfo info;
@@ -49,7 +49,6 @@ void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32
         LOGE("deviceType: %{public}d is watch, not publish", static_cast<int32_t>(info.deviceTypeId));
         return;
     }
-    LOGI("deviceType: %{public}d", static_cast<int32_t>(info.deviceTypeId));
     SoftbusPublish softbusPublish;
     if (screenState == DM_SCREEN_OFF) {
         int32_t ret = softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
@@ -101,7 +100,7 @@ SoftbusPublish::~SoftbusPublish()
 
 void SoftbusPublish::OnSoftbusPublishResult(int publishId, PublishResult result)
 {
-    LOGD("OnSoftbusPublishResult, publishId: %{public}d, result: %{public}d.", publishId, result);
+    LOGD("publishId: %{public}d, result: %{public}d.", publishId, result);
 }
 
 int32_t SoftbusPublish::PublishSoftbusLNN()
@@ -114,10 +113,7 @@ int32_t SoftbusPublish::PublishSoftbusLNN()
     publishInfo.capability = DM_CAPABILITY_OSD;
     publishInfo.ranging = false;
 
-    LOGI("Begin, publishId: %{public}d, mode: 0x%{public}x, medium: %{public}d, capability:"
-        "%{public}s, ranging: %{public}d, freq: %{public}d.", publishInfo.publishId, publishInfo.mode,
-        publishInfo.medium, publishInfo.capability, publishInfo.ranging, publishInfo.freq);
-
+    LOGI("Begin");
     int32_t ret = PublishLNN(DM_PKG_NAME, &publishInfo, &softbusPublishCallback_);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]PublishLNN failed, ret: %{public}d.", ret);

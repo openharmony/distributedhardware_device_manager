@@ -167,13 +167,11 @@ HWTEST_F(DeviceProfileConnectorSecondTest, PutAccessControlList_201, testing::ex
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
 
-HWTEST_F(DeviceProfileConnectorSecondTest, CheckIdenticalAccount_201, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceProfileConnectorSecondTest, DeleteSigTrustACL_201, testing::ext::TestSize.Level1)
 {
     int32_t userId = 0;
     std::string accountId;
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAccessControlProfile(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    bool ret = DeviceProfileConnector::GetInstance().CheckIdenticalAccount(userId, accountId);
-    EXPECT_FALSE(ret);
 
     userId = 1;
     int32_t bindType = 1;
@@ -270,7 +268,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckIsSameAccount_001, testing::ext:
     DmAccessCallee callee;
     std::string sinkUdid = "non_identical_udid";
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
-    EXPECT_EQ(connector.CheckIsSameAccount(caller, srcUdid, callee, sinkUdid), ERR_DM_FAILED);
+    EXPECT_EQ(connector.CheckIsSameAccount(caller, srcUdid, callee, sinkUdid), false);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndBindLevel_001, testing::ext::TestSize.Level1)
@@ -593,7 +591,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_009, testing::ext::T
     profiles.SetBindLevel(USER);
     DmDiscoveryInfo discoveryInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+    EXPECT_EQ(ret, SHARE);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_010, testing::ext::TestSize.Level1)
@@ -607,7 +605,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_010, testing::ext::T
     discoveryInfo.pkgname = "ohos_test";
     discoveryInfo.localDeviceId = "localDeviceId";
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+    EXPECT_EQ(ret, SHARE);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_011, testing::ext::TestSize.Level1)
@@ -621,7 +619,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, HandleDmAuthForm_011, testing::ext::T
     discoveryInfo.pkgname = "pkgName";
     discoveryInfo.localDeviceId = "localDeviceId";
     int32_t ret = DeviceProfileConnector::GetInstance().HandleDmAuthForm(profiles, discoveryInfo);
-    EXPECT_EQ(ret, ACROSS_ACCOUNT);
+    EXPECT_EQ(ret, SHARE);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_001, testing::ext::TestSize.Level1)
@@ -630,7 +628,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_001, testing::ext:
     int32_t userId = 123456;
     std::string deviceId = "deviceId";
     std::string trustDeviceId = "trustDeviceId";
-    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+    int32_t bindType = DmAuthForm::SHARE;
 
     DistributedDeviceProfile::Accessee accessee;
     accessee.SetAccesseeUserId(userId);
@@ -652,7 +650,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_002, testing::ext:
     int32_t userId = 123456;
     std::string deviceId = "deviceId";
     std::string trustDeviceId = "trustDeviceId";
-    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+    int32_t bindType = DmAuthForm::SHARE;
 
     DistributedDeviceProfile::Accessee accessee;
     accessee.SetAccesseeUserId(0);
@@ -665,7 +663,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_002, testing::ext:
 
     bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
         profile, userId, deviceId, trustDeviceId, bindType);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_003, testing::ext::TestSize.Level1)
@@ -674,7 +672,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_003, testing::ext:
     int32_t userId = 123456;
     std::string deviceId = "deviceId";
     std::string trustDeviceId = "trustDeviceId";
-    int32_t bindType = DmAuthForm::ACROSS_ACCOUNT;
+    int32_t bindType = DmAuthForm::SHARE;
 
     DistributedDeviceProfile::Accessee accessee;
     accessee.SetAccesseeUserId(-1);
@@ -686,7 +684,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_003, testing::ext:
     profile.SetAccesser(accesser);
     bool ret = DeviceProfileConnector::GetInstance().CheckSinkShareType(
         profile, userId, deviceId, trustDeviceId, bindType);
-    EXPECT_TRUE(ret);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(DeviceProfileConnectorSecondTest, CheckSinkShareType_004, testing::ext::TestSize.Level1)
@@ -1675,6 +1673,46 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceAuthVersionInfo_006, testing
     std::string result = DeviceProfileConnector::GetInstance()
         .GetDeviceAuthVersionInfo(localUdid, remoteUdid, profiles);
     EXPECT_EQ(result, "");
+}
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_001, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> userIds;
+    std::string emptyUdid;
+    int32_t tokenId = 1234;
+
+    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(userIds, emptyUdid, tokenId);
+    EXPECT_TRUE(result.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_002, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> emptyUserIds;
+    std::string localUdid = "localDeviceId";
+    int32_t tokenId = 1234;
+    
+    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(emptyUserIds, localUdid, tokenId);
+    EXPECT_TRUE(result.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_003, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> userIds = {1, 2};
+    std::string emptyUdid;
+    int32_t tokenId = 1234;
+    
+    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(userIds, emptyUdid, tokenId);
+    EXPECT_TRUE(result.empty());
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_004, testing::ext::TestSize.Level1)
+{
+    std::vector<int32_t> userIds = {1, 2};
+    std::string localUdid = "localDeviceId";
+    int32_t tokenId = 1234;
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
+    auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(userIds, localUdid, tokenId);
+    EXPECT_TRUE(result.empty());
 }
 } // namespace DistributedHardware
 } // namespace OHOS

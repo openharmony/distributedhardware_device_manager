@@ -94,6 +94,7 @@ bool IpcModelCodec::EncodeDmAccessCallee(const DmAccessCallee &callee, MessagePa
     bRet = (bRet && parcel.WriteString(callee.accountId));
     bRet = (bRet && parcel.WriteString(callee.networkId));
     bRet = (bRet && parcel.WriteString(callee.peerId));
+    bRet = (bRet && parcel.WriteString(callee.pkgName));
     bRet = (bRet && parcel.WriteInt32(callee.userId));
     bRet = (bRet && parcel.WriteString(callee.extra));
     bRet = (bRet && parcel.WriteUint64(callee.tokenId));
@@ -378,6 +379,10 @@ bool IpcModelCodec::EncodeLocalServiceInfos(const std::vector<DMLocalServiceInfo
         return false;
     }
     bool bRet = true;
+    if (num > IPC_VECTOR_MAX_SIZE) {
+        LOGE("num is Invalid value, num = %{public}u", num);
+        return false;
+    }
     for (uint32_t k = 0; k < num; k++) {
         DMLocalServiceInfo serviceInfo = serviceInfos[k];
         bRet = EncodeLocalServiceInfo(serviceInfo, parcel);

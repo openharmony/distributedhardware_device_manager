@@ -17,6 +17,7 @@
 #define OHOS_DEVICE_MANAGER_IMPL_H
 
 #include "device_manager.h"
+#include "device_manager_ipc_interface_code.h"
 #if !defined(__LITEOS_M__)
 #include "ipc_client_manager.h"
 #include "ipc_client_proxy.h"
@@ -327,6 +328,7 @@ public:
     virtual int32_t GetLocalDeviceId(const std::string &pkgName, std::string &networkId) override;
     virtual int32_t GetLocalDeviceType(const std::string &pkgName, int32_t &deviceType) override;
     virtual int32_t GetLocalDeviceName(const std::string &pkgName, std::string &deviceName) override;
+    virtual int32_t GetLocalDeviceName(std::string &deviceName) override;
     virtual int32_t GetDeviceName(const std::string &pkgName, const std::string &networkId,
         std::string &deviceName) override;
     virtual int32_t GetDeviceType(const std::string &pkgName,
@@ -433,6 +435,10 @@ public:
     virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
         std::vector<std::string> &networkIds) override;
     virtual int32_t UnRegisterPinHolderCallback(const std::string &pkgName) override;
+    virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
+    virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
+    virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
+    virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
 
 private:
     DeviceManagerImpl() = default;
@@ -452,6 +458,8 @@ private:
     uint16_t GetSubscribeIdFromMap(const std::string &pkgName);
     void SyncCallbackToService(DmCommonNotifyEvent dmCommonNotifyEvent, const std::string &pkgName);
     int32_t GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid);
+    bool CheckAclByIpcCode(const DmAccessCaller &caller, const DmAccessCallee &callee,
+        const DMIpcCmdInterfaceCode &ipcCode);
 
 private:
 #if !defined(__LITEOS_M__)

