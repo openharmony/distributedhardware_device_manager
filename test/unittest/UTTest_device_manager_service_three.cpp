@@ -654,6 +654,8 @@ HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_304, testing::ext::TestSi
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
 HWTEST_F(DeviceManagerServiceThreeTest, ValidateUnBindDeviceParams_301, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos.test.pkgName";
