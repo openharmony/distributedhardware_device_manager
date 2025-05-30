@@ -1,0 +1,77 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("AuthMessageProcessorFuzzTest") {
+  module_out_path = fuzz_test_output_path
+  fuzz_config_file =
+      "${devicemanager_path}/test/servicesfuzztest/authmessageprocessor_fuzzer"
+
+  include_dirs = [
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include/ipc",
+    "${innerkits_path}/native_cpp/include/ipc/standard",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Werror",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [ "auth_message_processor_fuzzer.cpp" ]
+
+  deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${json_path}:devicemanagerjson",
+    "${services_path}:devicemanagerservicetest",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
+  ]
+
+  external_deps = [
+    "bounds_checking_function:libsec_shared",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+    "samgr:samgr_proxy",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"AuthMessageProcessorFuzzTest\"",
+    "LOG_DOMAIN=0xD004110",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+
+  deps = [ ":AuthMessageProcessorFuzzTest" ]
+}
+###############################################################################
