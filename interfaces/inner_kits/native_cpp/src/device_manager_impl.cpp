@@ -2796,16 +2796,17 @@ int32_t DeviceManagerImpl::GetLocalServiceInfoByBundleNameAndPinExchangeType(
 int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
     std::shared_ptr<SetLocalDeviceNameCallback> callback)
 {
-    if (pkgName.empty() || deviceName.empty() || deviceName.size() > DEVICE_NAME_MAX_BYTES) {
-        LOGE("param invalid, pkgName : %{public}s, deviceName = %{public}s",
-            pkgName.c_str(), GetAnonyString(deviceName).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     int32_t ret = DeviceManagerNotify::GetInstance().RegisterSetLocalDeviceNameCallback(pkgName, callback);
     if (ret != DM_OK) {
         LOGE("Register Callback failed ret: %{public}d", ret);
         return ret;
+    }
+    if (pkgName.empty() || deviceName.empty() || deviceName.size() > DEVICE_NAME_MAX_BYTES) {
+        LOGE("param invalid, pkgName=%{public}s, deviceName=%{public}s",
+            pkgName.c_str(), GetAnonyString(deviceName).c_str());
+        DeviceManagerNotify::GetInstance().OnSetLocalDeviceNameResult(pkgName, ERR_DM_INPUT_PARA_INVALID);
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IpcSetLocalDeviceNameReq> req = std::make_shared<IpcSetLocalDeviceNameReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
@@ -2830,16 +2831,17 @@ int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const 
 int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
     const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback)
 {
-    if (pkgName.empty() || deviceName.empty() || deviceName.size() > DEVICE_NAME_MAX_BYTES || deviceId.empty()) {
-        LOGE("param invalid, pkgName : %{public}s, deviceName = %{public}s",
-            pkgName.c_str(), GetAnonyString(deviceName).c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     int32_t ret = DeviceManagerNotify::GetInstance().RegisterSetRemoteDeviceNameCallback(pkgName, deviceId, callback);
     if (ret != DM_OK) {
         LOGE("Register Callback failed ret: %{public}d", ret);
         return ret;
+    }
+    if (pkgName.empty() || deviceName.empty() || deviceName.size() > DEVICE_NAME_MAX_BYTES || deviceId.empty()) {
+        LOGE("param invalid, pkgName=%{public}s, deviceName=%{public}s, deviceId=%{public}s",
+            pkgName.c_str(), GetAnonyString(deviceName).c_str(), GetAnonyString(deviceId).c_str());
+        DeviceManagerNotify::GetInstance().OnSetRemoteDeviceNameResult(pkgName, deviceId, ERR_DM_INPUT_PARA_INVALID);
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     std::shared_ptr<IpcSetRemoteDeviceNameReq> req = std::make_shared<IpcSetRemoteDeviceNameReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
