@@ -153,7 +153,7 @@ HWTEST_F(DeviceManagerImplTest, PublishDeviceDiscovery1, testing::ext::TestSize.
     std::string packName = "";
     DmPublishInfo publishInfo;
     std::shared_ptr<PublishCallback> callback = nullptr;
-    int32_t ret = DeviceManager::GetInstance().StartDeviceDiscovery(packName, publishInfo, callback);
+    int32_t ret = DeviceManager::GetInstance().PublishDeviceDiscovery(packName, publishInfo, callback);
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 

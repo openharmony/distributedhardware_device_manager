@@ -2481,7 +2481,7 @@ napi_value DeviceManagerNapi::SetLocalDeviceNamePromise(napi_env env,
             (void)status;
             SetLocalDeviceNameAsyncCallbackInfo *jsCallback =
                 reinterpret_cast<SetLocalDeviceNameAsyncCallbackInfo *>(data);
-            if (jsCallback->code == ERR_DM_CALLBACK_REGISTER_FAILED || jsCallback->code == ERR_DM_INPUT_PARA_INVALID) {
+            if (jsCallback->code == ERR_DM_CALLBACK_REGISTER_FAILED) {
                 if (jsCallback->deferred != nullptr) {
                     napi_value error = CreateBusinessError(env, jsCallback->code, false);
                     napi_reject_deferred(env, jsCallback->deferred, error);
@@ -2527,7 +2527,7 @@ napi_value DeviceManagerNapi::SetRemoteDeviceNamePromise(napi_env env,
             (void)status;
             SetRemoteDeviceNameAsyncCallbackInfo *jsCallback =
                 reinterpret_cast<SetRemoteDeviceNameAsyncCallbackInfo *>(data);
-            if (jsCallback->code == ERR_DM_CALLBACK_REGISTER_FAILED || jsCallback->code == ERR_DM_INPUT_PARA_INVALID) {
+            if (jsCallback->code == ERR_DM_CALLBACK_REGISTER_FAILED) {
                 if (jsCallback->deferred != nullptr) {
                     napi_value error = CreateBusinessError(env, jsCallback->code, false);
                     napi_reject_deferred(env, jsCallback->deferred, error);

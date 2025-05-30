@@ -1258,6 +1258,10 @@ int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std:
     std::shared_ptr<GetDeviceProfileInfoListCallback> callback)
 {
     LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    if (callback == nullptr || pkgName.empty()) {
+        LOGE("callback is null or pkgName is empty");
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
+    }
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (getDeviceProfileInfoCallback_.size() > MAX_CONTAINER_SIZE) {
         LOGE("callback map size is more than max size");
@@ -1296,6 +1300,10 @@ int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string
     std::shared_ptr<GetDeviceIconInfoCallback> callback)
 {
     LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    if (callback == nullptr || pkgName.empty()) {
+        LOGE("callback is null or pkgName is empty");
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
+    }
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (getDeviceIconInfoCallback_.size() > MAX_CONTAINER_SIZE) {
         LOGE("callback map size is more than max size");
@@ -1362,9 +1370,13 @@ int32_t DeviceManagerNotify::RegisterSetLocalDeviceNameCallback(const std::strin
     std::shared_ptr<SetLocalDeviceNameCallback> callback)
 {
     LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    if (callback == nullptr || pkgName.empty()) {
+        LOGE("callback is null or pkgName is empty");
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
+    }
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (setLocalDeviceNameCallback_.size() > MAX_CONTAINER_SIZE) {
-        LOGI("callback map size is more than max size");
+        LOGE("callback map size is more than max size");
         return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     setLocalDeviceNameCallback_[pkgName] = callback;
@@ -1375,9 +1387,13 @@ int32_t DeviceManagerNotify::RegisterSetRemoteDeviceNameCallback(const std::stri
     const std::string &deviceId, std::shared_ptr<SetRemoteDeviceNameCallback> callback)
 {
     LOGI("In, pkgName: %{public}s.", pkgName.c_str());
+    if (callback == nullptr || pkgName.empty() || deviceId.empty()) {
+        LOGE("callback is null or pkgName is empty or deviceId is empty");
+        return ERR_DM_CALLBACK_REGISTER_FAILED;
+    }
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (setRemoteDeviceNameCallback_.size() > MAX_CONTAINER_SIZE) {
-        LOGI("callback map size is more than max size");
+        LOGE("callback map size is more than max size");
         return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     auto iter = setRemoteDeviceNameCallback_.find(pkgName);
@@ -1386,7 +1402,7 @@ int32_t DeviceManagerNotify::RegisterSetRemoteDeviceNameCallback(const std::stri
         return DM_OK;
     }
     if (iter->second.size() > MAX_CONTAINER_SIZE) {
-        LOGI("callback map size is more than max size");
+        LOGE("callback map size is more than max size");
         return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     iter->second[deviceId] = callback;
