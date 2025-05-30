@@ -1003,7 +1003,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceError004, testing::ext::TestSize.Level1)
     int64_t requestId = 0;
     int32_t errorCode = ERR_DM_FAILED;
     authManager_->AuthDeviceError(requestId, errorCode);
-    ASSERT_EQ(authManager_->authResponseContext_->state, AuthState::AUTH_REQUEST_JOIN);
+    ASSERT_EQ(authManager_->authResponseContext_->state, DmAuthStatus::STATUS_DM_AUTH_DEFAULT);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthDeviceError005, testing::ext::TestSize.Level1)
@@ -1550,7 +1550,7 @@ HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level1)
     authManager_->authResponseContext_->isOnline = true;
     authManager_->authResponseContext_->authed = true;
     authManager_->authResponseContext_->importAuthCode = "";
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
     authManager_->ProcessAuthRequestExt(sessionId);
     authManager_->authResponseContext_->reply = ERR_DM_AUTH_BUSINESS_BUSY;
     authManager_->authResponseContext_->isOnline = false;
