@@ -22,6 +22,7 @@
 #include "dm_auth_state.h"
 #include "dm_auth_state_machine.h"
 #include "dm_dialog_manager.h"
+#include "dm_freeze_process.h"
 #include "dm_log.h"
 #include "dm_negotiate_process.h"
 #include "dm_random.h"
@@ -181,7 +182,10 @@ int32_t AuthSinkPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context
         LOGE("AuthSinkPinAuthStartState::Action invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-
+    if (FreezeProcess::GetInstance().CleanFreezeRecord(context->accessee.bundleName,
+        context->accessee.deviceType) != DM_OK) {
+        LOGE("CleanFreezeRecord failed.");
+    }
     // process pincode auth
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
@@ -493,6 +497,10 @@ int32_t AuthSrcPinInputState::ShowStartAuthDialog(std::shared_ptr<DmAuthContext>
         return STOP_BIND;
     }
 
+    context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
+        static_cast<int32_t>(STATUS_DM_SHOW_PIN_INPUT_UI), DM_OK);
+    context->listener->OnBindResult(context->processInfo, context->peerTargetId,
+        DM_OK, static_cast<int32_t>(STATUS_DM_SHOW_PIN_INPUT_UI), "");
     DmDialogManager::GetInstance().ShowInputDialog(context->accessee.deviceName);
     LOGI("AuthSrcPinInputState::ShowStartAuthDialog end.");
     return DM_OK;
@@ -754,6 +762,10 @@ int32_t AuthSinkReverseUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext
     context->timer->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
     context->timer->DeleteTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK));
     context->pinNegotiateStarted = true;
+    if (FreezeProcess::GetInstance().CleanFreezeRecord(context->accessee.bundleName,
+        context->accessee.deviceType) != DM_OK) {
+        LOGE("CleanFreezeRecord failed.");
+    }
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
         LOGE("AuthSinkPinAuthStartState::Action call ProcessCredData err");
@@ -809,6 +821,10 @@ int32_t AuthSinkForwardUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext
     context->timer->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
     context->timer->DeleteTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK));
     context->pinNegotiateStarted = true;
+    if (FreezeProcess::GetInstance().CleanFreezeRecord(context->accessee.bundleName,
+        context->accessee.deviceType) != DM_OK) {
+        LOGE("CleanFreezeRecord failed.");
+    }
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
         LOGE("AuthSinkForwardUltrasonicDoneState::Action call ProcessCredData err");

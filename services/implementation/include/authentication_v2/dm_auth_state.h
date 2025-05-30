@@ -156,7 +156,7 @@ public:
     void FilterProfilesByContext(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         std::shared_ptr<DmAuthContext> context);
     int32_t GetAclBindType(std::shared_ptr<DmAuthContext> context, std::string credId);
-    int32_t GetOutputState(const std::string &processName, int32_t state);
+    int32_t GetOutputState(int32_t state);
     int32_t GetOutputReplay(const std::string &processName, int32_t replay);
     static uint64_t GetSysTimeMs();
     static void DeleteAcl(std::shared_ptr<DmAuthContext> context,

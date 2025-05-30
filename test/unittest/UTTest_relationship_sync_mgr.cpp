@@ -912,6 +912,10 @@ HWTEST_F(ReleationShipSyncMgrTest, FromBroadcastPayLoad_010, testing::ext::TestS
     type = RelationShipChangeType::SHARE_UNBIND;
     ret = msg.FromBroadcastPayLoad(payloadJson, type);
     EXPECT_FALSE(ret);
+
+    type = RelationShipChangeType::APP_UNINSTALL;
+    ret = msg.FromBroadcastPayLoad(payloadJson, type);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, IsChangeTypeValid_001, testing::ext::TestSize.Level1)
@@ -961,6 +965,19 @@ HWTEST_F(ReleationShipSyncMgrTest, IsValid_011, testing::ext::TestSize.Level1)
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::SHARE_UNBIND;
     msg.userId = 12345;
+
+    ASSERT_TRUE(msg.IsValid());
+
+    msg.userId = UINT32_MAX;
+    ASSERT_FALSE(msg.IsValid());
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, IsValid_012, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNINSTALL;
+    msg.userId = 12345;
+    msg.tokenId = 12345;
 
     ASSERT_TRUE(msg.IsValid());
 
@@ -1230,6 +1247,23 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_012, testing::ext::TestSiz
     EXPECT_EQ(result, false);
 }
 
+HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_013, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.type = RelationShipChangeType::APP_UNINSTALL;
+    msg.userId = 12345;
+    msg.tokenId = 67890;
+    msg.peerUdids = {"udid1", "udid2"};
+    
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+    
+    bool result = msg.ToBroadcastPayLoad(msgPtr, len);
+    ASSERT_TRUE(result);
+    
+    delete[] msgPtr;
+}
+
 HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_001, testing::ext::TestSize.Level1)
 {
     RelationShipChangeMsg msg;
@@ -1381,6 +1415,49 @@ HWTEST_F(ReleationShipSyncMgrTest, FromShareUnbindPayLoad_005, testing::ext::Tes
     ASSERT_TRUE(result);
 
     cJSON_Delete(payloadJson);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, ToAppUninstallPayLoad_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    msg.userId = 12345;
+    msg.tokenId = 67890;
+    msg.broadCastId = 0;
+    uint8_t* msgPtr = nullptr;
+    uint32_t len = 0;
+    msg.ToAppUninstallPayLoad(msgPtr, len);
+    ASSERT_EQ(len, 7);
+}
+
+HWTEST_F(ReleationShipSyncMgrTest, FromAppUninstallPayLoad_001, testing::ext::TestSize.Level1)
+{
+    RelationShipChangeMsg msg;
+    cJSON payloadJson;
+    bool result = msg.FromAppUninstallPayLoad(&payloadJson);
+    ASSERT_EQ(result, false);
+    result = msg.FromAppUninstallPayLoad(nullptr);
+    ASSERT_EQ(result, false);
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "tokenId": 67890,
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "test1": 1,
+        "test2": 2,
+        "test3": 3,
+        "test4": 4,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    result = msg.FromAppUninstallPayLoad(jsonObject);
+    ASSERT_EQ(result, false);
 }
 
 }

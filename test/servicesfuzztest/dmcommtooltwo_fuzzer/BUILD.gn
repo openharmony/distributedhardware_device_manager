@@ -1,0 +1,94 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("DmCommToolTwoFuzzTest") {
+  module_out_path = fuzz_test_output_path
+  fuzz_config_file =
+      "${devicemanager_path}/test/servicesfuzztest/dmcommtooltwo_fuzzer"
+
+  include_dirs = [
+    "${utils_path}/include",
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include/ipc/standard",
+    "${innerkits_path}/native_cpp/include/ipc",
+    "${innerkits_path}/native_cpp/include/notify",
+    "${common_path}/include",
+    "${common_path}/include/ipc",
+    "${common_path}/include/ipc/model",
+    "${utils_path}/include/ipc/standard",
+    "${servicesimpl_path}/include",
+    "${servicesimpl_path}/include/dependency/timer",
+    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/authentication",
+    "${servicesimpl_path}/include/adapter",
+    "${servicesimpl_path}/include/ipc/standard",
+    "${servicesimpl_path}/include/publish",
+    "${servicesimpl_path}/include/dependency/deviceprofile",
+    "${servicesimpl_path}/include/dependency/hichain",
+    "${servicesimpl_path}/include/devicestate",
+    "${devicemanager_path}/interfaces/kits/js/include",
+    "${devicemanager_path}/services/service/include/relationshipsyncmgr",
+    "${devicemanager_path}/test/unittest/mock",
+    "${servicesimpl_path}/include/ability",
+    "${servicesimpl_path}/include/config",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [ "dm_comm_tool_two_fuzzer.cpp" ]
+
+  deps = [
+    "${json_path}:devicemanagerjson",
+    "${devicemanager_path}/services/service:devicemanagerservicetest",
+    "${utils_path}:devicemanagerutilstest",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"DmCommToolTwoFuzzTest\"",
+    "LOG_DOMAIN=0xD004110",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
+    "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
+    "ffrt:libffrt",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "safwk:system_ability_fwk",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+
+  deps = [ ":DmCommToolTwoFuzzTest" ]
+}
+###############################################################################

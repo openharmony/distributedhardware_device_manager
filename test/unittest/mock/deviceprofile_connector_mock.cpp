@@ -182,5 +182,23 @@ std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnect
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetAllAclIncludeLnnAcl();
 }
+
+std::vector<std::string> DeviceProfileConnector::GetDeviceIdAndUdidListByTokenId(
+    const std::vector<int32_t> &userIds, const std::string &localUdid, int32_t tokenId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetDeviceIdAndUdidListByTokenId(userIds, localUdid,
+        tokenId);
+}
+
+void DeviceProfileConnector::CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
+    std::vector<DmAclIdParam> &aclInfos)
+{
+    DmDeviceProfileConnector::dmDeviceProfileConnector->CacheAcerAclId(profile, aclInfos);
+}
+
+bool DeviceProfileConnector::IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->IsLnnAcl(profile);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

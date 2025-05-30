@@ -73,7 +73,6 @@ namespace {
     const int32_t NORMAL = 0;
     const int32_t SYSTEM_BASIC = 1;
     const int32_t SYSTEM_CORE = 2;
-    constexpr int32_t NETWORK_AVAILABLE = 3;
     constexpr const char *ALL_PKGNAME = "";
     constexpr const char *NETWORKID = "NETWORK_ID";
     constexpr uint32_t INVALIED_BIND_LEVEL = 0;
@@ -85,8 +84,13 @@ namespace {
     const std::string USERID_CHECKSUM_ISCHANGE_KEY = "ischange";
     constexpr const char* USER_SWITCH_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userSwitchByWifi";
     constexpr const char* USER_STOP_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:userStopByWifi";
+    constexpr const char* APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:appUninstallByWifi";
+    constexpr const char* APP_UNBIND_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:appUnbindByWifi";
     constexpr const char* ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK = "deviceManagerTimer:accountCommonEventByWifi";
     const int32_t USER_SWITCH_BY_WIFI_TIMEOUT_S = 2;
+    const int32_t SEND_DELAY_MAX_TIME = 5;
+    const int32_t SEND_DELAY_MIN_TIME = 0;
+    const int32_t DELAY_TIME_SEC_CONVERSION = 1000000;      // 1000*1000
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     const std::string GET_LOCAL_DEVICE_NAME_API_NAME = "GetLocalDeviceName";
 #endif
@@ -183,8 +187,8 @@ DM_EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
         if (arg1 == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
             DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
         }
-        if (arg1 == CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE && arg2 == NETWORK_AVAILABLE) {
-            this->HandleNetworkConnected();
+        if (arg1 == CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE) {
+            this->HandleNetworkConnected(arg2);
         }
     };
     std::vector<std::string> commonEventVec;
@@ -785,18 +789,9 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
 
 int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call UnBindDevice.");
-        return ERR_DM_NO_PERMISSION;
-    }
-    LOGI("Begin for pkgName = %{public}s, udidHash = %{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str());
-    if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("UnBindDevice failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+    int32_t result = ValidateUnBindDeviceParams(pkgName, udidHash);
+    if (result != DM_OK) {
+        return result;
     }
     std::string realDeviceId = udidHash;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -820,33 +815,33 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         LOGE("UnAuthenticateDevice failed, Acl not contain the bindLevel %{public}d.", bindLevel);
         return ERR_DM_FAILED;
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::vector<std::string> peerUdids;
+    peerUdids.emplace_back(udid);
+
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::map<std::string, std::string> wifiDevices;
+    bool isBleActive = false;
+    GetNotifyRemoteUnBindAppWay(userId, tokenId, wifiDevices, isBleActive);
+    if (isBleActive) {
+        SendUnBindBroadCast(peerUdids, userId, tokenId, bindLevel);
+    } else {
+        NotifyRemoteUnBindAppByWifi(userId, tokenId, "", wifiDevices);
+    }
+#endif
     if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
         return ERR_DM_FAILED;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::vector<std::string> peerUdids;
-    peerUdids.emplace_back(udid);
-    SendUnBindBroadCast(peerUdids, MultipleUserConnector::GetCurrentAccountUserID(), tokenId, bindLevel);
-#endif
     return DM_OK;
 }
 
 int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash,
     const std::string &extra)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
-        LOGE("The caller does not have permission to call UnBindDevice.");
-        return ERR_DM_NO_PERMISSION;
-    }
-    LOGI("Begin for pkgName = %{public}s, udidHash = %{public}s", pkgName.c_str(), GetAnonyString(udidHash).c_str());
-    if (pkgName.empty() || udidHash.empty()) {
-        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("UnBindDevice failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
+    int32_t result = ValidateUnBindDeviceParams(pkgName, udidHash, extra);
+    if (result != DM_OK) {
+        return result;
     }
     std::string realDeviceId = udidHash;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -871,16 +866,64 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         return ERR_DM_FAILED;
     }
     [[maybe_unused]] uint64_t peerTokenId = dmServiceImpl_->GetTokenIdByNameAndDeviceId(extra, udid);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::vector<std::string> peerUdids;
+    peerUdids.emplace_back(udid);
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::map<std::string, std::string> wifiDevices;
+    bool isBleActive = false;
+    GetNotifyRemoteUnBindAppWay(userId, tokenId, wifiDevices, isBleActive);
+    if (isBleActive) {
+        SendUnBindBroadCast(peerUdids, MultipleUserConnector::GetCurrentAccountUserID(), tokenId,
+            bindLevel, peerTokenId);
+    } else {
+        NotifyRemoteUnBindAppByWifi(userId, tokenId, extra, wifiDevices);
+    }
+#endif
     if (dmServiceImpl_->UnBindDevice(pkgName, udid, bindLevel, extra) != DM_OK) {
         LOGE("dmServiceImpl_ UnBindDevice failed.");
         return ERR_DM_FAILED;
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::vector<std::string> peerUdids;
-    peerUdids.emplace_back(udid);
-    SendUnBindBroadCast(peerUdids, MultipleUserConnector::GetCurrentAccountUserID(), tokenId,
-        bindLevel, peerTokenId);
-#endif
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash)
+{
+    LOGI("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s",
+        GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str());
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call UnBindDevice.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnBindDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgName, const std::string &udidHash,
+    const std::string &extra)
+{
+    LOGI("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s, "
+        "extra: %{public}s", GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str(),
+        GetAnonyString(extra).c_str());
+    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+        LOGE("The caller does not have permission to call UnBindDevice.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnBindDevice failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
     return DM_OK;
 }
 
@@ -1668,6 +1711,10 @@ void DeviceManagerService::InitServiceInfos(
 
 int32_t DeviceManagerService::RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call RegisterLocalServiceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
     bool success = InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
@@ -1684,6 +1731,11 @@ int32_t DeviceManagerService::RegisterLocalServiceInfo(const DMLocalServiceInfo 
 
 int32_t DeviceManagerService::UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call UnRegisterLocalServiceInfo.",
+            bundleName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceProfileConnector::GetInstance().DeleteLocalServiceInfo(bundleName, pinExchangeType);
 #else
@@ -1695,6 +1747,10 @@ int32_t DeviceManagerService::UnRegisterLocalServiceInfo(const std::string &bund
 
 int32_t DeviceManagerService::UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call UpdateLocalServiceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
     bool success = InitDPLocalServiceInfo(serviceInfo, dpLocalServiceInfo);
@@ -1712,6 +1768,11 @@ int32_t DeviceManagerService::UpdateLocalServiceInfo(const DMLocalServiceInfo &s
 int32_t DeviceManagerService::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
     int32_t pinExchangeType, DMLocalServiceInfo &serviceInfo)
 {
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller: %{public}s does not have permission to call GetLocalServiceInfo.",
+            bundleName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DistributedDeviceProfile::LocalServiceInfo dpLocalServiceInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName,
@@ -1857,35 +1918,23 @@ int32_t DeviceManagerService::IsSameAccount(const std::string &networkId)
 
 bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckAccessControl.", caller.pkgName.c_str());
-        return false;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("CheckAccessControl failed, instance not init or init failed.");
-        return false;
-    }
     std::string srcUdid = "";
-    SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
     std::string sinkUdid = "";
-    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), sinkUdid);
-    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("GetAccessUdidByNetworkId failed.");
+        return false;
+    }
+    return dmServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid); 
 }
 
 bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
-        LOGE("The caller: %{public}s does not have permission to call CheckIsSameAccount.", caller.pkgName.c_str());
-        return false;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("CheckIsSameAccount failed, instance not init or init failed.");
-        return false;
-    }
     std::string srcUdid = "";
-    SoftbusListener::GetUdidByNetworkId(caller.networkId.c_str(), srcUdid);
     std::string sinkUdid = "";
-    SoftbusListener::GetUdidByNetworkId(callee.networkId.c_str(), sinkUdid);
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("GetAccessUdidByNetworkId failed.");
+        return false;
+    }
     return dmServiceImpl_->CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
@@ -1941,7 +1990,6 @@ void DeviceManagerService::SendShareTypeUnBindBroadCast(const char *credId, cons
     msg.credId = credId;
     msg.peerUdids = peerUdids;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
-    LOGI("broadCastMsg = %{public}s.", broadCastMsg.c_str());
     CHECK_NULL_VOID(softbusListener_);
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
@@ -1955,6 +2003,7 @@ void DeviceManagerService::SubscribeScreenLockEvent()
     ScreenEventCallback callback = [=](const auto &arg1) { this->ScreenCommonEventCallback(arg1); };
     std::vector<std::string> screenEventVec;
     screenEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
+    screenEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
     if (screenCommonEventManager_->SubscribeScreenCommonEvent(screenEventVec, callback)) {
         LOGI("Success");
     }
@@ -1967,6 +2016,10 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
         MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
+        if (beforeUserId != -1 && currentUserId != -1 && IsDMServiceAdapterResidentLoad()) {
+            dmServiceImplExtResident_->AccountUserSwitched(
+                currentUserId, MultipleUserConnector::GetOhosAccountId());
+        }
         DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
             [this, commonEventType] () {
                 DeviceManagerService::HandleAccountCommonEvent(commonEventType);
@@ -2547,6 +2600,25 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
     }
 }
 
+void DeviceManagerService::ProcessUninstApp(int32_t userId, int32_t tokenId)
+{
+    LOGI("DeviceManagerService::ProcessUninstApp userId: %{public}s, tokenId: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->ProcessAppUninstall(userId, tokenId);
+    }
+}
+
+void DeviceManagerService::ProcessUnBindApp(int32_t userId, int32_t tokenId, const std::string &extra,
+    const std::string &udid)
+{
+    LOGI("DeviceManagerService::ProcessUnBindApp userId: %{public}s, tokenId: %{public}s, udid: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(udid).c_str());
+    if (IsDMServiceImplReady()) {
+        dmServiceImpl_->ProcessUnBindApp(userId, tokenId, extra, udid);
+    }
+}
+
 void DeviceManagerService::SendCommonEventBroadCast(const std::vector<std::string> &peerUdids,
     const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds, bool isNeedResponse)
 {
@@ -2627,6 +2699,12 @@ void DeviceManagerService::ProcessCommonUserStatusEvent(const std::vector<uint32
 
 void DeviceManagerService::ScreenCommonEventCallback(std::string commonEventType)
 {
+    if (IsDMServiceAdapterResidentLoad()) {
+        bool isLock = commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED;
+        dmServiceImplExtResident_->HandleScreenLockEvent(isLock);
+    } else {
+        LOGE("ScreenCommonEventCallback failed, dmServiceImplExtResident not init or init failed.");
+    }
     if (!IsDMImplSoLoaded()) {
         LOGE("ScreenCommonEventCallback failed, instance not init or init failed.");
         return;
@@ -2806,31 +2884,81 @@ void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::stri
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
 }
 
+int32_t DeviceManagerService::CalculateBroadCastDelayTime()
+{
+    int64_t timeDiff = 0;
+    int32_t delayTime = 0;
+    int64_t currentTime =
+        std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    {
+        std::lock_guard<std::mutex> lock(broadCastLock_);
+        if (SendLastBroadCastTime_ == 0) {
+            SendLastBroadCastTime_ = currentTime;
+        }
+        timeDiff = currentTime - SendLastBroadCastTime_;
+        delayTime = SEND_DELAY_MAX_TIME - timeDiff + lastDelayTime_;
+        if (delayTime < SEND_DELAY_MIN_TIME || delayTime == SEND_DELAY_MAX_TIME) {
+            delayTime = SEND_DELAY_MIN_TIME;
+        }
+        SendLastBroadCastTime_ = currentTime;
+        lastDelayTime_ = delayTime;
+    }
+    return delayTime;
+}
+
 void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId)
 {
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::APP_UNBIND;
-    msg.userId = static_cast<uint32_t>(userId);
-    msg.peerUdids = peerUdids;
-    msg.tokenId = tokenId;
-    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
-    CHECK_NULL_VOID(softbusListener_);
-    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+    int32_t delayTime = CalculateBroadCastDelayTime();
+    std::function<void()> task = [=]() {
+        LOGI("SendAppUnBindBroadCast Start.");
+        RelationShipChangeMsg msg;
+        msg.type = RelationShipChangeType::APP_UNBIND;
+        msg.userId = static_cast<uint32_t>(userId);
+        msg.peerUdids = peerUdids;
+        msg.tokenId = tokenId;
+        std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+        CHECK_NULL_VOID(softbusListener_);
+        softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+    };
+    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
 }
 
 void DeviceManagerService::SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, uint64_t peerTokenId)
 {
-    RelationShipChangeMsg msg;
-    msg.type = RelationShipChangeType::APP_UNBIND;
-    msg.userId = static_cast<uint32_t>(userId);
-    msg.peerUdids = peerUdids;
-    msg.tokenId = tokenId;
-    msg.peerTokenId = peerTokenId;
-    std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
-    CHECK_NULL_VOID(softbusListener_);
-    softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+    int32_t delayTime = CalculateBroadCastDelayTime();
+    std::function<void()> task = [=]() {
+        LOGI("SendAppUnBindBroadCast Start.");
+        RelationShipChangeMsg msg;
+        msg.type = RelationShipChangeType::APP_UNBIND;
+        msg.userId = static_cast<uint32_t>(userId);
+        msg.peerUdids = peerUdids;
+        msg.tokenId = tokenId;
+        msg.peerTokenId = peerTokenId;
+        std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+        CHECK_NULL_VOID(softbusListener_);
+        softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+    };
+    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
+}
+
+void DeviceManagerService::SendAppUnInstallBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+    uint64_t tokenId)
+{
+    int32_t delayTime = CalculateBroadCastDelayTime();
+    std::function<void()> task = [=]() {
+        LOGI("SendAppUnInstallBroadCast Start.");
+        RelationShipChangeMsg msg;
+        msg.type = RelationShipChangeType::APP_UNINSTALL;
+        msg.userId = static_cast<uint32_t>(userId);
+        msg.peerUdids = peerUdids;
+        msg.tokenId = tokenId;
+        std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
+        CHECK_NULL_VOID(softbusListener_);
+        softbusListener_->SendAclChangedBroadcast(broadCastMsg);
+    };
+    ffrt::submit(task, ffrt::task_attr().delay(delayTime * DELAY_TIME_SEC_CONVERSION));
 }
 
 void DeviceManagerService::SendServiceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
@@ -2861,9 +2989,14 @@ void DeviceManagerService::HandleCredentialDeleted(const char *credId, const cha
         return;
     }
     std::string remoteUdid = "";
-    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+    bool isShareType = false;
+    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isShareType);
     if (remoteUdid.empty()) {
         LOGE("HandleCredentialDeleted failed, remoteUdid is empty.");
+        return;
+    }
+    if (!isShareType) {
+        LOGE("HandleCredentialDeleted not share type.");
         return;
     }
     std::vector<std::string> peerUdids;
@@ -2932,6 +3065,9 @@ bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeM
             break;
         case RelationShipChangeType::SHARE_UNBIND:
             HandleShareUnbindBroadCast(relationShipMsg.userId, relationShipMsg.credId);
+            break;
+        case RelationShipChangeType::APP_UNINSTALL:
+            ProcessUninstApp(relationShipMsg.userId, static_cast<int32_t>(relationShipMsg.tokenId));
             break;
         default:
             LOGI("Dm have not this event type.");
@@ -3138,6 +3274,8 @@ void DeviceManagerService::SubscribePackageCommonEvent()
         packageCommonEventManager_ = std::make_shared<DmPackageCommonEventManager>();
     }
     PackageEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
+        int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+        NotifyRemoteUninstallApp(userId, arg3);
         if (IsDMServiceImplReady()) {
             dmServiceImpl_->ProcessAppUnintall(arg1, arg3);
         }
@@ -3313,6 +3451,184 @@ void DeviceManagerService::NotifyRemoteLocalUserSwitch(int32_t curUserId, int32_
     }
     if (!wifiDevices.empty()) {
         NotifyRemoteLocalUserSwitchByWifi(curUserId, preUserId, wifiDevices, foregroundUserIds, backgroundUserIds);
+    }
+}
+
+void DeviceManagerService::NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId)
+{
+    LOGI("DeviceManagerService::NotifyRemoteUninstallApp userId: %{public}s, tokenId: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+    std::vector<std::string> peerUdids;
+    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    if (IsDMServiceImplReady()) {
+        peerUdids = dmServiceImpl_->GetDeviceIdByUserIdAndTokenId(currentUserId, tokenId);
+    }
+    if (peerUdids.empty()) {
+        LOGE("peerUdids is empty");
+        return;
+    }
+    if (softbusListener_ == nullptr) {
+        LOGE("softbusListener_ is null");
+        return;
+    }
+    std::vector<std::string> bleUdids;
+    std::map<std::string, std::string> wifiDevices;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGE("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGE("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+    if (!bleUdids.empty()) {
+        SendAppUnInstallBroadCast(peerUdids, userId, tokenId);
+    }
+    if (!wifiDevices.empty()) {
+        NotifyRemoteUninstallAppByWifi(userId, tokenId, wifiDevices);
+    }
+}
+
+
+void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
+    const std::map<std::string, std::string> &wifiDevices)
+{
+    LOGI("DeviceManagerService::NotifyRemoteUninstallAppByWifi userId: %{public}s, tokenId: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+    for (const auto &it : wifiDevices) {
+        int32_t result = SendUninstAppByWifi(userId, tokenId, it.second);
+        if (result != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            continue;
+        }
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        std::string networkId = it.second;
+        timer_->StartTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S, [this, networkId] (std::string name) {
+                DMCommTool::GetInstance()->StopSocket(networkId);
+            });
+    }
+}
+
+void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
+    const std::map<std::string, std::string> &wifiDevices)
+{
+    LOGI("DeviceManagerService::NotifyRemoteUnBindAppByWifi userId: %{public}s, tokenId: %{public}s, extra: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str(), GetAnonyString(extra).c_str());
+    for (const auto &it : wifiDevices) {
+        char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
+        GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
+        std::string localUdid = std::string(localUdidTemp);
+        int32_t result = SendUnBindAppByWifi(userId, tokenId, extra, it.second, localUdid);
+        if (result != DM_OK) {
+            LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
+            continue;
+        }
+        if (timer_ == nullptr) {
+            timer_ = std::make_shared<DmTimer>();
+        }
+        std::string udid = it.first;
+        std::string networkId = it.second;
+        timer_->StartTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid),
+            USER_SWITCH_BY_WIFI_TIMEOUT_S, [this, networkId] (std::string name) {
+                DMCommTool::GetInstance()->StopSocket(networkId);
+            });
+    }
+}
+
+void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remoteUdid)
+{
+    LOGI("ProcessReceiveRspAppUninstall remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    if (timer_ != nullptr && remoteUdid != "") {
+        timer_->DeleteTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
+}
+
+void DeviceManagerService::ProcessReceiveRspAppUnbind(const std::string &remoteUdid)
+{
+    LOGI("ProcessReceiveRspAppUnbind remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    if (timer_ != nullptr && remoteUdid != "") {
+        timer_->DeleteTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    }
+}
+
+int32_t DeviceManagerService::SendUninstAppByWifi(int32_t userId, int32_t tokenId, const std::string &networkId)
+{
+    LOGE("DeviceManagerService::SendUninstAppByWifi userId: %{public}s, tokenId: %{public}s",
+        GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+    return DMCommTool::GetInstance()->SendUninstAppObj(userId, tokenId, networkId);
+}
+
+int32_t DeviceManagerService::SendUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
+    const std::string &networkId, const std::string &udid)
+{
+    LOGE("DeviceManagerService::SendUnBindAppByWifi");
+    return DMCommTool::GetInstance()->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
+}
+
+void DeviceManagerService::GetNotifyRemoteUnBindAppWay(int32_t userId, int32_t tokenId,
+    std::map<std::string, std::string> &wifiDevices, bool &isBleWay)
+{
+    std::vector<std::string> peerUdids;
+    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::map<std::string, int32_t> deviceMap = dmServiceImpl_->GetDeviceIdAndBindLevel(currentUserId);
+    for (const auto &item : deviceMap) {
+        peerUdids.push_back(item.first);
+    }
+    if (peerUdids.empty()) {
+        LOGE("peerUdids is empty");
+        return;
+    }
+    if (softbusListener_ == nullptr) {
+        LOGE("softbusListener_ is null");
+        return;
+    }
+
+    std::vector<std::string> bleUdids;
+    for (const auto &udid : peerUdids) {
+        std::string netWorkId = "";
+        SoftbusCache::GetInstance().GetNetworkIdFromCache(udid, netWorkId);
+        if (netWorkId.empty()) {
+            LOGE("netWorkId is empty: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        int32_t networkType = 0;
+        int32_t ret = softbusListener_->GetNetworkTypeByNetworkId(netWorkId.c_str(), networkType);
+        if (ret != DM_OK || networkType <= 0) {
+            LOGE("get networkType failed: %{public}s", GetAnonyString(udid).c_str());
+            bleUdids.push_back(udid);
+            continue;
+        }
+        uint32_t addrTypeMask = 1 << NetworkType::BIT_NETWORK_TYPE_BLE;
+        if ((static_cast<uint32_t>(networkType) & addrTypeMask) != 0x0) {
+            bleUdids.push_back(udid);
+        } else {
+            wifiDevices.insert(std::pair<std::string, std::string>(udid, netWorkId));
+        }
+    }
+    
+    if (!bleUdids.empty()) {
+        isBleWay = true;
+    } else {
+        isBleWay = false;
     }
 }
 
@@ -3697,14 +4013,14 @@ std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
     return dmServiceImplExtResident_->GetDeviceNamePrefixs();
 }
 
-void DeviceManagerService::HandleNetworkConnected()
+void DeviceManagerService::HandleNetworkConnected(int32_t networkStatus)
 {
     LOGI("In");
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("HandleNetworkConnected failed, adapter instance not init or init failed.");
         return;
     }
-    dmServiceImplExtResident_->HandleNetworkConnected();
+    dmServiceImplExtResident_->HandleNetworkConnected(networkStatus);
 }
 
 int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
@@ -3888,6 +4204,68 @@ int32_t DeviceManagerService::GetLocalDeviceName(std::string &deviceName)
 #endif
     (void) deviceName;
     return DM_OK;
+}
+
+bool DeviceManagerService::GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
+    const std::string &sinkNetWorkId, std::string &sinkUdid)
+{
+    LOGI("start srcNetWorkId %{public}s, sinkNetWorkId %{public}s.", GetAnonyString(srcNetWorkId).c_str(),
+        GetAnonyString(sinkNetWorkId).c_str());
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller not have permission to call GetAccessUdidByNetworkId.");
+        return false;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("GetAccessUdidByNetworkId failed, instance not init or init failed.");
+        return false;
+    }
+    SoftbusListener::GetUdidByNetworkId(srcNetWorkId.c_str(), srcUdid);
+    SoftbusListener::GetUdidByNetworkId(sinkNetWorkId.c_str(), sinkUdid);
+    return true;
+}
+
+bool DeviceManagerService::CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    std::string srcUdid = "";
+    std::string sinkUdid = "";
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("The caller %{public}s GetAccessUdidByNetworkId failed.", caller.pkgName.c_str());
+        return false;
+    }
+    return dmServiceImpl_->CheckSrcAccessControl(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerService::CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    std::string srcUdid = "";
+    std::string sinkUdid = "";
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("The caller %{public}s GetAccessUdidByNetworkId failed.", caller.pkgName.c_str());
+        return false;
+    }
+    return dmServiceImpl_->CheckSinkAccessControl(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerService::CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    std::string srcUdid = "";
+    std::string sinkUdid = "";
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("The caller %{public}s GetAccessUdidByNetworkId failed.", caller.pkgName.c_str());
+        return false;
+    }
+    return dmServiceImpl_->CheckSrcIsSameAccount(caller, srcUdid, callee, sinkUdid);
+}
+
+bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
+{
+    std::string srcUdid = "";
+    std::string sinkUdid = "";
+    if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
+        LOGE("The caller %{public}s GetAccessUdidByNetworkId failed.", caller.pkgName.c_str());
+        return false;
+    }
+    return dmServiceImpl_->CheckSinkIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

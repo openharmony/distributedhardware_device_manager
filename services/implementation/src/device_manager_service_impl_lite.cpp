@@ -331,12 +331,13 @@ int32_t DeviceManagerServiceImpl::ImportAuthCode(const std::string &pkgName, con
 }
 
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
-    const std::string &localUdid, std::string &remoteUdid)
+    const std::string &localUdid, std::string &remoteUdid, bool &isShareType)
 {
     (void)credId;
     (void)credInfo;
     (void)localUdid;
     (void)remoteUdid;
+    (void)isShareType;
     return;
 }
 
@@ -406,6 +407,14 @@ int32_t DeviceManagerServiceImpl::IsSameAccount(const std::string &udid)
     return DM_OK;
 }
 
+std::vector<std::string> DeviceManagerServiceImpl::GetDeviceIdByUserIdAndTokenId(int32_t userId, int32_t tokenId)
+{
+    (void)userId;
+    (void)tokenId;
+    std::vector<std::string> tmp;
+    return tmp;
+}
+
 uint64_t DeviceManagerServiceImpl::GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId)
 {
     (void)extra;
@@ -419,24 +428,24 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
     return;
 }
 
-int32_t DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+bool DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     (void)caller;
     (void)srcUdid;
     (void)callee;
     (void)sinkUdid;
-    return DM_OK;
+    return true;
 }
 
-int32_t DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+bool DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
     (void)caller;
     (void)srcUdid;
     (void)callee;
     (void)sinkUdid;
-    return DM_OK;
+    return true;
 }
 
 void DeviceManagerServiceImpl::HandleDeviceNotTrust(const std::string &udid)
@@ -570,6 +579,23 @@ int32_t DeviceManagerServiceImpl::ProcessAppUnintall(const std::string &appId, i
     return 0;
 }
 
+int32_t DeviceManagerServiceImpl::ProcessAppUninstall(int32_t userId, int32_t accessTokenId)
+{
+    (void)userId;
+    (void)accessTokenId;
+    return 0;
+}
+
+void DeviceManagerServiceImpl::ProcessUnBindApp(int32_t userId, int32_t accessTokenId, const std::string &extra,
+    const std::string &udid)
+{
+    (void)userId;
+    (void)accessTokenId;
+    (void)extra;
+    (void)udid;
+    return;
+}
+
 void DeviceManagerServiceImpl::HandleSyncUserIdEvent(const std::vector<uint32_t> &foregroundUserIds,
     const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid, bool isCheckUserStatus)
 {
@@ -667,6 +693,46 @@ void DeviceManagerServiceImpl::HandleCommonEventBroadCast(const std::vector<uint
     (void)backgroundUserIds;
     (void)remoteUdid;
     return;
+}
+
+bool DeviceManagerServiceImpl::CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return true;
+}
+
+bool DeviceManagerServiceImpl::CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return true;
+}
+
+bool DeviceManagerServiceImpl::CheckSrcIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return true;
+}
+
+bool DeviceManagerServiceImpl::CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    (void)caller;
+    (void)srcUdid;
+    (void)callee;
+    (void)sinkUdid;
+    return true;
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

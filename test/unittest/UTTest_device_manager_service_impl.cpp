@@ -1649,8 +1649,8 @@ HWTEST_F(DeviceManagerServiceImplTest, CheckIsSameAccount_001, testing::ext::Tes
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    int ret = deviceManagerServiceImpl_->CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    bool ret = deviceManagerServiceImpl_->CheckIsSameAccount(caller, srcUdid, callee, sinkUdid);
+    EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, CheckAccessControl_001, testing::ext::TestSize.Level1)
@@ -1663,8 +1663,8 @@ HWTEST_F(DeviceManagerServiceImplTest, CheckAccessControl_001, testing::ext::Tes
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
-    int ret = deviceManagerServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid);
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    bool ret = deviceManagerServiceImpl_->CheckAccessControl(caller, srcUdid, callee, sinkUdid);
+    EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, HandleDeviceScreenStatusChange_001, testing::ext::TestSize.Level1)

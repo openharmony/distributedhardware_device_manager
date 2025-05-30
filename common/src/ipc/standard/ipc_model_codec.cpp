@@ -94,6 +94,7 @@ bool IpcModelCodec::EncodeDmAccessCallee(const DmAccessCallee &callee, MessagePa
     bRet = (bRet && parcel.WriteString(callee.accountId));
     bRet = (bRet && parcel.WriteString(callee.networkId));
     bRet = (bRet && parcel.WriteString(callee.peerId));
+    bRet = (bRet && parcel.WriteString(callee.pkgName));
     bRet = (bRet && parcel.WriteInt32(callee.userId));
     bRet = (bRet && parcel.WriteString(callee.extra));
     bRet = (bRet && parcel.WriteUint64(callee.tokenId));
