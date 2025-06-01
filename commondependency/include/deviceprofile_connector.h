@@ -406,10 +406,10 @@ private:
     bool CheckSinkP2PAccessControl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
-    bool CheckSinkUserAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
+    bool CheckSinkUserP2PAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
-    bool CheckSinkAppOrServiceAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
+    bool CheckSinkAppOrServiceP2PAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
 };

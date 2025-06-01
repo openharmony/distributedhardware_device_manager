@@ -3178,13 +3178,13 @@ bool DeviceProfileConnector::CheckSinkP2PAccessControl(const DistributedDevicePr
     uint32_t bindLevel = profile.GetBindLevel();
     switch (bindLevel) {
         case USER:
-            if (CheckSinkUserAcl(profile, caller, srcUdid, callee, sinkUdid)) {
+            if (CheckSinkUserP2PAcl(profile, caller, srcUdid, callee, sinkUdid)) {
                 return true;
             }
             break;
         case SERVICE:
         case APP:
-            if (CheckSinkAppOrServiceAcl(profile, caller, srcUdid, callee, sinkUdid)) {
+            if (CheckSinkAppOrServiceP2PAcl(profile, caller, srcUdid, callee, sinkUdid)) {
                 return true;
             }
             break;
@@ -3195,7 +3195,7 @@ bool DeviceProfileConnector::CheckSinkP2PAccessControl(const DistributedDevicePr
     return false;
 }
 
-bool DeviceProfileConnector::CheckSinkUserAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
+bool DeviceProfileConnector::CheckSinkUserP2PAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
     const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
     const std::string &sinkUdid)
 {
@@ -3217,7 +3217,7 @@ bool DeviceProfileConnector::CheckSinkUserAcl(const DistributedDeviceProfile::Ac
     return false;
 }
 
-bool DeviceProfileConnector::CheckSinkAppOrServiceAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
+bool DeviceProfileConnector::CheckSinkAppOrServiceP2PAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
     const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
     const std::string &sinkUdid)
 {
