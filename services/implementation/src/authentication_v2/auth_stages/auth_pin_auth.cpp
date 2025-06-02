@@ -351,8 +351,8 @@ int32_t AuthSrcPinNegotiateStartState::NegotiatePinAuth(std::shared_ptr<DmAuthCo
             // try to fallback to next auth type
             if (context->currentAuthTypeIdx + 1 >= context->authTypeList.size()) {
                 LOGE("all auth type failed");
-                context->reason = ERR_DM_AUTH_REJECT;
-                return ERR_DM_AUTH_REJECT;
+                context->reason = ERR_DM_BIND_PIN_CODE_ERROR;
+                return ERR_DM_BIND_PIN_CODE_ERROR;
             }
             context->currentAuthTypeIdx++;
             context->authType = context->authTypeList[context->currentAuthTypeIdx];
@@ -554,8 +554,8 @@ int32_t AuthSinkPinNegotiateStartState::Action(std::shared_ptr<DmAuthContext> co
             auto idx = context->currentAuthTypeIdx;
             if (idx + 1 >= context->authTypeList.size()) {
                 LOGE("AuthSinkPinNegotiateStartState::Action all auth type failed");
-                context->reason = ERR_DM_AUTH_REJECT;
-                return ERR_DM_AUTH_REJECT;
+                context->reason = ERR_DM_BIND_PIN_CODE_ERROR;
+                return ERR_DM_BIND_PIN_CODE_ERROR;
             }
             ++idx;
             context->currentAuthTypeIdx = idx;
