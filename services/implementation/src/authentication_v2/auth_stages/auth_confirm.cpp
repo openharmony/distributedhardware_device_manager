@@ -722,7 +722,7 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
         }
         if (context->confirmOperation == USER_OPERATION_TYPE_CANCEL_AUTH) {
             LOGE("AuthSinkConfirmState::Action USER_OPERATION_TYPE_CANCEL_AUTH");
-            context->reason = ERR_DM_BIND_USER_CANCEL;
+            context->reason = ERR_DM_AUTH_PEER_REJECT;
             return ERR_DM_FAILED;
         }
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
