@@ -627,6 +627,35 @@ HWTEST_F(DeviceManagerServiceThreeTest, ClearDiscoveryCache_001, testing::ext::T
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_302, testing::ext::TestSize.Level1)
+{
+    std::string pkgName;
+    std::string authCode;
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(false));
+    int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_303, testing::ext::TestSize.Level1)
+{
+    std::string pkgName;
+    std::string authCode;
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(ERR_DM_FAILED));
+    int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_304, testing::ext::TestSize.Level1)
+{
+    std::string pkgName;
+    std::string authCode;
+    EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidOnAuthCode(_)).WillOnce(Return(true));
+    int32_t ret = DeviceManagerService::GetInstance().ImportAuthCode(pkgName, authCode);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
 HWTEST_F(DeviceManagerServiceThreeTest, ValidateUnBindDeviceParams_301, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos.test.pkgName";
