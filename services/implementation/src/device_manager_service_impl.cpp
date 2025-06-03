@@ -2763,7 +2763,7 @@ void DeviceManagerServiceImpl::GetBindCallerInfo(DmBindCallerInfo &bindCallerInf
     }
     std::string hostPkgLabel = GetBundleLable(pkgName);
     bindCallerInfo.userId = userId;
-    bindCallerInfo.tokenId = callingTokenId;
+    bindCallerInfo.tokenId = static_cast<int32_t>(callingTokenId);
     bindCallerInfo.bindLevel = bindLevel;
     bindCallerInfo.bundleName = bundleName;
     bindCallerInfo.hostPkgLabel  = hostPkgLabel;
