@@ -269,11 +269,14 @@ private:
         std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
         std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec);
 
-    void DeleteAclByTokenId(const int32_t &accessTokenId,
+    void GetDelACLInfoVec(const int32_t &accessTokenId,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
-        std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
         std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec,
-        const uint32_t &userId, const std::string &localUdid);
+        const uint32_t &userId);
+
+    void DeleteAclByDelProfileMap(
+        const std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,
+        std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles, const std::string &localUdid);
 
     bool CheckLnnAcl(DistributedDeviceProfile::AccessControlProfile delProfile,
         DistributedDeviceProfile::AccessControlProfile lastprofile);

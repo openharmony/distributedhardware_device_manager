@@ -81,7 +81,7 @@ struct UninstAppMsg {
     int32_t userId_;
     int32_t tokenId_;
     UninstAppMsg() : userId_(-1), tokenId_(-1) {}
-    UninstAppMsg(const int32_t &userId, const int32_t &tokenId)
+    UninstAppMsg(int32_t userId, int32_t tokenId)
         : userId_(userId), tokenId_(tokenId) {}
 };
 
@@ -94,7 +94,7 @@ struct UnBindAppMsg {
     std::string extra_;
     std::string udid_;
     UnBindAppMsg() : userId_(-1), tokenId_(-1), extra_(""), udid_("") {}
-    UnBindAppMsg(const int32_t &userId, const int32_t &tokenId, const std::string &extra, const std::string &udid)
+    UnBindAppMsg(int32_t userId, int32_t tokenId, const std::string &extra, const std::string &udid)
         : userId_(userId), tokenId_(tokenId), extra_(extra), udid_(udid) {}
 };
 
