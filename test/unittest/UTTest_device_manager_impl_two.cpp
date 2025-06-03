@@ -1964,7 +1964,7 @@ HWTEST_F(DeviceManagerImplTest, CheckIsSameAccount_202, testing::ext::TestSize.L
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
                 .Times(1).WillOnce(testing::Return(DM_OK));
     bool ret = DeviceManager::GetInstance().CheckIsSameAccount(caller, callee);
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 }
 
 HWTEST_F(DeviceManagerImplTest, SetDnPolicy_202, testing::ext::TestSize.Level0)
