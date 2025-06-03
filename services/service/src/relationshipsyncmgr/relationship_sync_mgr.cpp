@@ -105,7 +105,7 @@ namespace {
 
 RelationShipChangeMsg::RelationShipChangeMsg() : type(RelationShipChangeType::TYPE_MAX),
     userId(UINT32_MAX), accountId(""), tokenId(UINT64_MAX), peerUdids({}), peerUdid(""), accountName(""),
-    syncUserIdFlag(false), userIdInfos({}), isNewEvent(false)
+    syncUserIdFlag(false), userIdInfos({}), isNewEvent(false), broadCastId(UINT8_MAX)
 {
 }
 
