@@ -289,10 +289,15 @@ private:
     void SetBindCallerInfoToBindParam(const std::map<std::string, std::string> &bindParam,
         std::map<std::string, std::string> &bindParamTmp, const DmBindCallerInfo &bindCallerInfo);
     std::string GetBundleLable(const std::string &bundleName);
+    int32_t GetLogicalIdAndTokenIdBySessionId(uint64_t &logicalSessionId, uint64_t &tokenId, int32_t sessionId);
+    void SaveTokenIdAndSessionId(uint64_t &tokenId, int32_t &sessionId, uint64_t &logicalSessionId);
+    void ReleaseMaps();
+    int32_t InitNewProtocolAuthMgr(bool isSrcSide, uint64_t tokenId, uint64_t logicalSessionId,
+        const std::string &pkgName);
+    int32_t InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName);
 private:
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
-    std::mutex authMgrMtx_;
-    std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
+
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
@@ -313,9 +318,14 @@ private:
     std::map<int, std::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
     std::map<int, std::mutex> sessionEnableMutexMap_;      // Lock corresponding to the session
     std::map<int, bool> sessionEnableCvReadyMap_;  // Condition variable ready flag
+    std::mutex logicalSessionId2TokenIdMapMtx_;
     std::map<uint64_t, uint64_t> logicalSessionId2TokenIdMap_;  // The relationship between logicalSessionId and tokenId
+    std::mutex logicalSessionId2SessionIdMapMtx_;
     std::map<uint64_t, int> logicalSessionId2SessionIdMap_;  // The relationship logicalSessionId and physical sessionId
+    std::mutex configsMapMutex_;
     std::map<uint64_t, std::shared_ptr<Config>> configsMap_;    // Import when authMgr is not initialized
+    std::mutex authMgrMapMtx_;
+    std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
 
     std::thread thread_;
     std::atomic<bool> running_;

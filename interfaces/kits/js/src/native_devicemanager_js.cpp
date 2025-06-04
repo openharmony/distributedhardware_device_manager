@@ -2084,6 +2084,8 @@ napi_value DeviceManagerNapi::GetTrustedDeviceList(napi_env env, napi_callback_i
         return CallDeviceList(env, info, deviceInfoListAsyncCallbackInfo);
     } else if (argc == DM_NAPI_ARGS_TWO) {
         return GetTrustedDeviceListByFilter(env, info, deviceInfoListAsyncCallbackInfo);
+    } else {
+        DeleteAsyncCallbackInfo(deviceInfoListAsyncCallbackInfo);
     }
     napi_get_undefined(env, &result);
     return result;
