@@ -1171,6 +1171,7 @@ bool DeviceManagerService::IsDMServiceImplReady()
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
     }
+    LOGI("libdevicemanagerserviceimpl start load.");
     void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
     if (so_handle == nullptr) {
         so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
