@@ -26,6 +26,7 @@ namespace DistributedHardware {
 namespace {
     constexpr uint32_t MAX_DATA_LEN = 65536;
     constexpr uint32_t DM_IDENTICAL_ACCOUNT = 1;
+    constexpr uint32_t ACCOUNT_SHARED = 3;
     constexpr const char* DM_PKG_NAME_EXT = "com.huawei.devicemanager";
 }
 
@@ -167,13 +168,28 @@ void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *g
 
 void HichainListener::OnCredentialDeleted(const char *credId, const char *credInfo)
 {
-    LOGI("start");
     if (credId == nullptr || credInfo == nullptr) {
         LOGE("credId or credInfo is null!");
         return;
     }
     if (strlen(credId) > MAX_DATA_LEN || strlen(credInfo) > MAX_DATA_LEN) {
         LOGE("credId or credInfo is invalid");
+        return;
+    }
+    LOGI("start, credId: %{public}s.", GetAnonyString(credId).c_str());
+    JsonObject jsonObject;
+    jsonObject.Parse(std::string(credInfo));
+    if (jsonObject.IsDiscarded()) {
+        LOGE("credInfo prase error.");
+        return;
+    }
+    uint32_t credType = 0;
+    std::string credTypeTag = "credType";
+    if (IsInt32(jsonObject, credTypeTag)) {
+        credType = jsonObject[credTypeTag].Get<int32_t>();
+    }
+    if (credType != ACCOUNT_SHARED) {
+        LOGE("credType %{public}d is invalid.", credType);
         return;
     }
     DeviceManagerService::GetInstance().HandleCredentialDeleted(credId, credInfo);

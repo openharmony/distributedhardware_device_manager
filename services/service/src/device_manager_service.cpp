@@ -2989,14 +2989,9 @@ void DeviceManagerService::HandleCredentialDeleted(const char *credId, const cha
         return;
     }
     std::string remoteUdid = "";
-    bool isShareType = false;
-    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isShareType);
+    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
     if (remoteUdid.empty()) {
         LOGE("HandleCredentialDeleted failed, remoteUdid is empty.");
-        return;
-    }
-    if (!isShareType) {
-        LOGE("HandleCredentialDeleted not share type.");
         return;
     }
     std::vector<std::string> peerUdids;
