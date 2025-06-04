@@ -1480,11 +1480,11 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     authManager_->NegotiateRespMsg(DM_VERSION_4_1_5_1);
     authManager_->NegotiateRespMsg(DM_VERSION_5_0_2);
     EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
     authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
 
     EXPECT_CALL(*softbusSessionMock_, GetPeerDeviceId(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
     authManager_->GetPeerUdidHash(sessionId, peerUdidHash);
     ret = authManager_->StopAuthenticateDevice(pkgName);
     ASSERT_EQ(ret, DM_OK);
