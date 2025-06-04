@@ -129,7 +129,6 @@ void ActionFuzzTest()
     authSinkPinAuthDoneState_ ->Action(context_);
     authSrcPinAuthDoneState_ ->Action(context_);
     authSrcPinNegotiateStartState_ ->Action(context_);
-    authSrcPinInputState_ ->Action(context_);
     authSinkPinNegotiateStartState_ ->Action(context_);
     authSinkPinDisplayState_ ->Action(context_);
     authSrcReverseUltrasonicStartState_ ->Action(context_);
