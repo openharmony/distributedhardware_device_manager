@@ -111,6 +111,13 @@
         {
             "name":"dm_password_error",
             "value":"密码错误，连接失败。"
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"%2$s的“%1$s”请求连接本机。请选择授权的业务：",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }
