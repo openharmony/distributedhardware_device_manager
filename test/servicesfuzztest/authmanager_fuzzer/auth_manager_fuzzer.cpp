@@ -56,7 +56,6 @@ void ConvertSrcVersionFuzzTest(FuzzedDataProvider &fdp)
     authManager->GetAuthContext();
     authManager->GeneratePincode();
     authManager->ConvertSrcVersion(version, edition);
-
 }
 
 void RegisterUiStateCallbackFuzzTest(FuzzedDataProvider &fdp)
