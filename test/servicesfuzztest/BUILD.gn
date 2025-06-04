@@ -15,6 +15,7 @@ group("fuzztest") {
   testonly = true
 
   deps = [
+    "authconfirm_fuzzer:fuzztest",
     "authmessageprocessor_fuzzer:fuzztest",
     "cryptomgr_fuzzer:fuzztest",
     "devicediscovery_fuzzer:fuzztest",
