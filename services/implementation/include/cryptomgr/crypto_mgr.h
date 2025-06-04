@@ -57,7 +57,7 @@ private:
     int32_t DoDecryptData(AesGcmCipherKey *cipherKey, const unsigned char *input, uint32_t inLen,
         unsigned char *decryptData, uint32_t *decryptLen);
     int32_t MbedAesGcmDecrypt(const AesGcmCipherKey *cipherKey, const unsigned char *cipherText,
-        uint32_t cipherTextSize, unsigned char *plain, uint32_t plainLen);
+        uint32_t cipherTextSize, unsigned char *plain, uint32_t &plainLen);
 private:
     std::mutex sessionKeyMtx_;
     DMSessionKey sessionKey_;

@@ -242,7 +242,7 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
 }
 
 int32_t CryptoMgr::MbedAesGcmDecrypt(const AesGcmCipherKey *cipherKey, const unsigned char *cipherText,
-    uint32_t cipherTextSize, unsigned char *plain, uint32_t plainLen)
+    uint32_t cipherTextSize, unsigned char *plain, uint32_t &plainLen)
 {
     if ((cipherKey == NULL) || (cipherText == NULL) || (cipherTextSize <= OVERHEAD_LEN) || plain == NULL ||
         (plainLen < cipherTextSize - OVERHEAD_LEN)) {
@@ -268,9 +268,9 @@ int32_t CryptoMgr::MbedAesGcmDecrypt(const AesGcmCipherKey *cipherKey, const uns
         mbedtls_gcm_free(&aesContext);
         return ERR_DM_CRYPTO_OPT_FAILED;
     }
-
+    plainLen = (uint32_t)actualPlainLen;
     mbedtls_gcm_free(&aesContext);
-    return actualPlainLen;
+    return DM_OK;
 }
 
 int32_t CryptoMgr::DoDecryptData(AesGcmCipherKey *cipherKey, const unsigned char *input, uint32_t inLen,
@@ -286,10 +286,10 @@ int32_t CryptoMgr::DoDecryptData(AesGcmCipherKey *cipherKey, const unsigned char
     }
     uint32_t outLen = inLen - OVERHEAD_LEN;
     int32_t result = MbedAesGcmDecrypt(cipherKey, input, inLen, decryptData, outLen);
-    if (result <= 0) {
+    if (result != DM_OK) {
         return ERR_DM_CRYPTO_OPT_FAILED;
     }
-    *decryptLen = (uint32_t)result;
+    *decryptLen = outLen;
     return DM_OK;
 }
 
