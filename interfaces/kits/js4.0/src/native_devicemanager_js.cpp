@@ -1346,6 +1346,8 @@ napi_value DeviceManagerNapi::GetAvailableDeviceList(napi_env env, napi_callback
             return nullptr;
         }
         return CallDeviceList(env, info, deviceBasicInfoListAsyncCallbackInfo);
+    } else {
+        DeleteAsyncCallbackInfo(deviceBasicInfoListAsyncCallbackInfo);
     }
     napi_get_undefined(env, &result);
     return result;
