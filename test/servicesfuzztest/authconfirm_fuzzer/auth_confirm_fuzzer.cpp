@@ -122,35 +122,35 @@ void GenerateJsonObject(JsonObject &jsonObject, FuzzedDataProvider &fdp)
 
 void ActionFuzzTest()
 {
-    authSrcPinAuthStartState_ ->Action(context_);
-    authSinkPinAuthStartState_ ->Action(context_);
-    authSrcPinAuthMsgNegotiateState_ ->Action(context_);
-    authSinkPinAuthMsgNegotiateState_ ->Action(context_);
-    authSinkPinAuthDoneState_ ->Action(context_);
-    authSrcPinAuthDoneState_ ->Action(context_);
-    authSrcPinNegotiateStartState_ ->Action(context_);
-    authSinkPinNegotiateStartState_ ->Action(context_);
-    authSinkPinDisplayState_ ->Action(context_);
-    authSrcReverseUltrasonicStartState_ ->Action(context_);
-    authSrcReverseUltrasonicDoneState_ ->Action(context_);
-    authSrcForwardUltrasonicStartState_ ->Action(context_);
-    authSrcForwardUltrasonicDoneState_ ->Action(context_);
-    authSinkReverseUltrasonicStartState_ ->Action(context_);
-    authSinkReverseUltrasonicDoneState_ ->Action(context_);
-    authSinkForwardUltrasonicStartState_ ->Action(context_);
-    authSinkForwardUltrasonicDoneState_ ->Action(context_);
-    authSrcCredentialAuthNegotiateState_ ->Action(context_);
-    authSrcCredentialAuthDoneState_ ->Action(context_);
-    authSinkCredentialAuthStartState_ ->Action(context_);
-    authSinkCredentialAuthNegotiateState_ ->Action(context_);
-    authSrcCredentialExchangeState_ ->Action(context_);
-    authSinkCredentialExchangeState_ ->Action(context_);
-    authSrcCredentialAuthStartState_ ->Action(context_);
-    authSrcConfirmState_ -> Action(context_);
-    authSinkConfirmState_ -> Action(context_);
-    authSrcStartState_ -> Action(context_);
-    authSrcNegotiateStateMachine_ -> Action(context_);
-    authSinkNegotiateStateMachine_ -> Action(context_);
+    authSrcPinAuthStartState_->Action(context_);
+    authSinkPinAuthStartState_->Action(context_);
+    authSrcPinAuthMsgNegotiateState_->Action(context_);
+    authSinkPinAuthMsgNegotiateState_->Action(context_);
+    authSinkPinAuthDoneState_->Action(context_);
+    authSrcPinAuthDoneState_->Action(context_);
+    authSrcPinNegotiateStartState_->Action(context_);
+    authSinkPinNegotiateStartState_->Action(context_);
+    authSinkPinDisplayState_->Action(context_);
+    authSrcReverseUltrasonicStartState_->Action(context_);
+    authSrcReverseUltrasonicDoneState_->Action(context_);
+    authSrcForwardUltrasonicStartState_->Action(context_);
+    authSrcForwardUltrasonicDoneState_->Action(context_);
+    authSinkReverseUltrasonicStartState_->Action(context_);
+    authSinkReverseUltrasonicDoneState_->Action(context_);
+    authSinkForwardUltrasonicStartState_->Action(context_);
+    authSinkForwardUltrasonicDoneState_->Action(context_);
+    authSrcCredentialAuthNegotiateState_->Action(context_);
+    authSrcCredentialAuthDoneState_->Action(context_);
+    authSinkCredentialAuthStartState_->Action(context_);
+    authSinkCredentialAuthNegotiateState_->Action(context_);
+    authSrcCredentialExchangeState_->Action(context_);
+    authSinkCredentialExchangeState_->Action(context_);
+    authSrcCredentialAuthStartState_->Action(context_);
+    authSrcConfirmState_->Action(context_);
+    authSinkConfirmState_->Action(context_);
+    authSrcStartState_->Action(context_);
+    authSrcNegotiateStateMachine_->Action(context_);
+    authSinkNegotiateStateMachine_->Action(context_);
 }
 
 void AuthConfirmFuzzTestNext(JsonObject &jsonObject, FuzzedDataProvider &fdp)
@@ -159,34 +159,34 @@ void AuthConfirmFuzzTestNext(JsonObject &jsonObject, FuzzedDataProvider &fdp)
     DistributedDeviceProfile::Accessee accessee;
     accesser.SetAccesserExtraData(fdp.ConsumeRandomLengthString());
     accessee.SetAccesseeExtraData(fdp.ConsumeRandomLengthString());
-    authSrcConfirmState_ -> NegotiateCredential(context_, jsonObject);
-    authSrcConfirmState_ -> NegotiateAcl(context_, jsonObject);
-    authSrcConfirmState_ -> GetIdenticalCredentialInfo(context_, jsonObject);
-    authSrcConfirmState_ -> GetShareCredentialInfo(context_, jsonObject);
-    authSrcConfirmState_ -> GetP2PCredentialInfo(context_, jsonObject);
-    authSinkConfirmState_ -> NegotiateCredential(context_, jsonObject);
-    authSinkConfirmState_ -> NegotiateAcl(context_, jsonObject);
-    authSinkNegotiateStateMachine_ -> GetIdenticalCredentialInfo(context_, jsonObject);
-    authSinkNegotiateStateMachine_ -> GetShareCredentialInfo(context_, jsonObject);
-    authSinkNegotiateStateMachine_ -> GetP2PCredentialInfo(context_, jsonObject);
-    authSrcConfirmState_ -> GetCustomDescBySinkLanguage(context_);
-    authSinkConfirmState_ -> ShowConfigDialog(context_);
-    authSinkConfirmState_ -> ReadServiceInfo(context_);
-    authSinkConfirmState_ -> ProcessBindAuthorize(context_);
-    authSinkConfirmState_ -> ProcessNoBindAuthorize(context_);
-    authSinkStatePinAuthComm_ -> IsAuthCodeReady(context_);
-    authSinkStatePinAuthComm_ -> GeneratePincode(context_);
-    authSinkStatePinAuthComm_ -> ShowAuthInfoDialog(context_);
-    authSinkNegotiateStateMachine_ -> RespQueryAcceseeIds(context_);
-    authSinkNegotiateStateMachine_ -> ProcRespNegotiate5_1_0(context_);
-    authSrcConfirmState_ -> IdenticalAccountAclCompare(context_, accesser, accessee);
-    authSrcConfirmState_ -> ShareAclCompare(context_, accesser, accessee);
-    authSrcConfirmState_ -> Point2PointAclCompare(context_, accesser, accessee);
-    authSrcConfirmState_ -> LnnAclCompare(context_, accesser, accessee);
-    authSinkNegotiateStateMachine_ -> IdenticalAccountAclCompare(context_, accesser, accessee);
-    authSinkNegotiateStateMachine_ -> ShareAclCompare(context_, accesser, accessee);
-    authSinkNegotiateStateMachine_ -> Point2PointAclCompare(context_, accesser, accessee);
-    authSinkNegotiateStateMachine_ -> LnnAclCompare(context_, accesser, accessee);
+    authSrcConfirmState_->NegotiateCredential(context_, jsonObject);
+    authSrcConfirmState_->NegotiateAcl(context_, jsonObject);
+    authSrcConfirmState_->GetIdenticalCredentialInfo(context_, jsonObject);
+    authSrcConfirmState_->GetShareCredentialInfo(context_, jsonObject);
+    authSrcConfirmState_->GetP2PCredentialInfo(context_, jsonObject);
+    authSinkConfirmState_->NegotiateCredential(context_, jsonObject);
+    authSinkConfirmState_->NegotiateAcl(context_, jsonObject);
+    authSinkNegotiateStateMachine_->GetIdenticalCredentialInfo(context_, jsonObject);
+    authSinkNegotiateStateMachine_->GetShareCredentialInfo(context_, jsonObject);
+    authSinkNegotiateStateMachine_->GetP2PCredentialInfo(context_, jsonObject);
+    authSrcConfirmState_->GetCustomDescBySinkLanguage(context_);
+    authSinkConfirmState_->ShowConfigDialog(context_);
+    authSinkConfirmState_->ReadServiceInfo(context_);
+    authSinkConfirmState_->ProcessBindAuthorize(context_);
+    authSinkConfirmState_->ProcessNoBindAuthorize(context_);
+    authSinkStatePinAuthComm_->IsAuthCodeReady(context_);
+    authSinkStatePinAuthComm_->GeneratePincode(context_);
+    authSinkStatePinAuthComm_->ShowAuthInfoDialog(context_);
+    authSinkNegotiateStateMachine_->RespQueryAcceseeIds(context_);
+    authSinkNegotiateStateMachine_->ProcRespNegotiate5_1_0(context_);
+    authSrcConfirmState_->IdenticalAccountAclCompare(context_, accesser, accessee);
+    authSrcConfirmState_->ShareAclCompare(context_, accesser, accessee);
+    authSrcConfirmState_->Point2PointAclCompare(context_, accesser, accessee);
+    authSrcConfirmState_->LnnAclCompare(context_, accesser, accessee);
+    authSinkNegotiateStateMachine_->IdenticalAccountAclCompare(context_, accesser, accessee);
+    authSinkNegotiateStateMachine_->ShareAclCompare(context_, accesser, accessee);
+    authSinkNegotiateStateMachine_->Point2PointAclCompare(context_, accesser, accessee);
+    authSinkNegotiateStateMachine_->LnnAclCompare(context_, accesser, accessee);
 }
 
 void AuthConfirmFuzzTest(const uint8_t* data, size_t size)
@@ -216,26 +216,26 @@ void AuthConfirmFuzzTest(const uint8_t* data, size_t size)
     GenerateJsonObject(jsonObjectThree, fdp);
     std::vector<std::string> deleteCredInfo;
     GenerateStrings(deleteCredInfo, fdp);
-    context_ -> extraInfo = fdp.ConsumeRandomLengthString();
-    authSrcConfirmState_ -> GetSrcAclInfoForP2P(context_, acl, jsonObject, jsonObjectTwo);
-    authSrcConfirmState_ -> CheckCredIdInAcl(context_, acl, jsonObject, bindType);
-    authSrcConfirmState_ -> CheckCredIdInAclForP2P(context_, credId, acl, jsonObjectTwo, bindType, checkResult);
-    authSrcConfirmState_ -> GetSrcCredType(context_, jsonObject, jsonObjectTwo, jsonObjectThree);
-    authSrcConfirmState_ -> GetSrcCredTypeForP2P(context_, jsonObject, jsonObjectTwo, jsonObjectThree, credType,
+    context_->extraInfo = fdp.ConsumeRandomLengthString();
+    authSrcConfirmState_->GetSrcAclInfoForP2P(context_, acl, jsonObject, jsonObjectTwo);
+    authSrcConfirmState_->CheckCredIdInAcl(context_, acl, jsonObject, bindType);
+    authSrcConfirmState_->CheckCredIdInAclForP2P(context_, credId, acl, jsonObjectTwo, bindType, checkResult);
+    authSrcConfirmState_->GetSrcCredType(context_, jsonObject, jsonObjectTwo, jsonObjectThree);
+    authSrcConfirmState_->GetSrcCredTypeForP2P(context_, jsonObject, jsonObjectTwo, jsonObjectThree, credType,
         deleteCredInfo);
-    authSinkConfirmState_ -> MatchFallBackCandidateList(context_, DmAuthType::AUTH_TYPE_PIN);
-    authSinkConfirmState_ -> GetCredIdByCredType(context_, credType);
-    authSinkStatePinAuthComm_ -> HandleSessionHeartbeat(context_, name);
-    authSinkStatePinAuthComm_ -> IsPinCodeValid(numpin);
-    authSinkStatePinAuthComm_ -> IsPinCodeValid(strpin);
-    authSinkNegotiateStateMachine_ -> GetSinkAclInfo(context_, jsonObject, jsonObjectTwo);
-    authSinkNegotiateStateMachine_ -> GetSinkAclInfoForP2P(context_, acl, jsonObject, jsonObjectTwo);
-    authSinkNegotiateStateMachine_ -> CheckCredIdInAcl(context_, acl, jsonObject, bindType);
-    authSinkNegotiateStateMachine_ -> CheckCredIdInAclForP2P(context_, credId, acl, jsonObject, bindType, checkResult);
-    authSinkNegotiateStateMachine_ -> GetSinkCredType(context_, jsonObject, jsonObjectTwo, jsonObjectThree);
-    authSinkNegotiateStateMachine_ -> GetSinkCredTypeForP2P(context_, jsonObject, jsonObjectTwo, jsonObjectThree,
+    authSinkConfirmState_->MatchFallBackCandidateList(context_, DmAuthType::AUTH_TYPE_PIN);
+    authSinkConfirmState_->GetCredIdByCredType(context_, credType);
+    authSinkStatePinAuthComm_->HandleSessionHeartbeat(context_, name);
+    authSinkStatePinAuthComm_->IsPinCodeValid(numpin);
+    authSinkStatePinAuthComm_->IsPinCodeValid(strpin);
+    authSinkNegotiateStateMachine_->GetSinkAclInfo(context_, jsonObject, jsonObjectTwo);
+    authSinkNegotiateStateMachine_->GetSinkAclInfoForP2P(context_, acl, jsonObject, jsonObjectTwo);
+    authSinkNegotiateStateMachine_->CheckCredIdInAcl(context_, acl, jsonObject, bindType);
+    authSinkNegotiateStateMachine_->CheckCredIdInAclForP2P(context_, credId, acl, jsonObject, bindType, checkResult);
+    authSinkNegotiateStateMachine_->GetSinkCredType(context_, jsonObject, jsonObjectTwo, jsonObjectThree);
+    authSinkNegotiateStateMachine_->GetSinkCredTypeForP2P(context_, jsonObject, jsonObjectTwo, jsonObjectThree,
         credType, deleteCredInfo);
-    authSrcConfirmState_ -> GetSrcAclInfo(context_, jsonObject, jsonObjectTwo);
+    authSrcConfirmState_->GetSrcAclInfo(context_, jsonObject, jsonObjectTwo);
     ActionFuzzTest();
     AuthConfirmFuzzTestNext(jsonObject, fdp);
 }
