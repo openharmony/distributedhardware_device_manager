@@ -33,16 +33,15 @@
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-std::shared_ptr<DmAuthMessageProcessor> dmAuthMessageProcessor_ = std::make_shared<DmAuthMessageProcessor>();
-std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
-std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
-std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
-std::shared_ptr<AuthManager> authManager = std::make_shared<AuthSrcManager>(softbusConnector,
-    hiChainConnector, listener, hiChainAuthConnector);
-std::shared_ptr<DmAuthContext> context_ = authManager->GetAuthContext();
-
-std::shared_ptr<AuthManager> authSinkManager = std::make_shared<AuthSinkManager>(softbusConnector, hiChainConnector,
+    std::shared_ptr<DmAuthMessageProcessor> dmAuthMessageProcessor_ = std::make_shared<DmAuthMessageProcessor>();
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
+    std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
+    std::shared_ptr<AuthManager> authManager = std::make_shared<AuthSrcManager>(softbusConnector,
+        hiChainConnector, listener, hiChainAuthConnector);
+    std::shared_ptr<DmAuthContext> context_ = authManager->GetAuthContext();
+    std::shared_ptr<AuthManager> authSinkManager = std::make_shared<AuthSinkManager>(softbusConnector, hiChainConnector,
         listener, hiChainAuthConnector);
 }
 
