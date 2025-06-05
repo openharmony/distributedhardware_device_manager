@@ -278,10 +278,6 @@ void DeviceManagerServiceImpl::ImportAuthCodeToConfig(std::shared_ptr<AuthManage
 int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_t tokenId, uint64_t logicalSessionId,
     const std::string &pkgName)
 {
-    if (pkgName.empty()) {
-        LOGE("pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     LOGI("isSrcSide:%{public}d, tokenId: %{public}" PRIu64 ", logicalSesId: %{public}" PRIu64 ", pkgname:%{public}s",
         isSrcSide, tokenId, logicalSessionId, pkgName.c_str());
     std::shared_ptr<AuthManagerBase> authMgr = nullptr;
@@ -310,10 +306,6 @@ int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_
 
 int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName)
 {
-    if (pkgName.empty()) {
-        LOGE("pkgName is empty");
-        return ERR_DM_INPUT_PARA_INVALID;
-    }
     LOGI("tokenId: %{public}" PRIu64 ", pkgname:%{public}s", tokenId, pkgName.c_str());
     if (authMgr_ == nullptr) {
         CreateGlobalClassicalAuthMgr();
