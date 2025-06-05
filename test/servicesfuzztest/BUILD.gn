@@ -16,6 +16,7 @@ group("fuzztest") {
 
   deps = [
     "authconfirm_fuzzer:fuzztest",
+    "authmanager_fuzzer:fuzztest",
     "authmessageprocessor_fuzzer:fuzztest",
     "cryptomgr_fuzzer:fuzztest",
     "devicediscovery_fuzzer:fuzztest",
