@@ -89,6 +89,7 @@ group("unittest") {
     ":UTTest_mine_softbus_listener",
     ":UTTest_mini_tools_kit",
     ":UTTest_multiple_user_connector",
+    ":UTTest_oh_device_manager",
     ":UTTest_permission_manager",
     ":UTTest_pin_auth",
     ":UTTest_pin_auth_ui",
@@ -1108,6 +1109,43 @@ ohos_unittest("UTTest_permission_manager") {
 }
 
 ## UnitTest UTTest_permission_manager }}}
+
+## UnitTest UTTest_oh_device_manager {{{
+ohos_unittest("UTTest_oh_device_manager") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/interfaces/kits/ndk/include",
+    "${common_path}/include",
+    "${common_path}/include/ipc",
+    "${innerkits_path}/native_cpp/include",
+  ]
+  sources = [
+    "${devicemanager_path}/interfaces/kits/ndk/src/dm_client.cpp",
+    "${devicemanager_path}/interfaces/kits/ndk/src/oh_device_manager.cpp",
+    "${devicemanager_path}/test/unittest/UTTest_oh_device_manager.cpp",
+  ]
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"devicemanager_ndk\"",
+    "LOG_DOMAIN=0xD004110",
+  ]
+
+  deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${utils_path}:devicemanagerutils",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "eventhandler:libeventhandler",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+## UnitTest UTTest_oh_device_manager }}}
 
 ## UnitTest UTTest_device_manager_notify {{{
 ohos_unittest("UTTest_device_manager_notify") {
