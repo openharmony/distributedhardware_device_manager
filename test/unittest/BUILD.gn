@@ -89,6 +89,7 @@ group("unittest") {
     ":UTTest_mine_softbus_listener",
     ":UTTest_mini_tools_kit",
     ":UTTest_multiple_user_connector",
+    
     ":UTTest_permission_manager",
     ":UTTest_pin_auth",
     ":UTTest_pin_auth_ui",
