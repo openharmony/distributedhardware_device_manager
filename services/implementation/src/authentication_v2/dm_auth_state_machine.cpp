@@ -311,7 +311,7 @@ void DmAuthStateMachine::NotifyEventFinish(DmEventType eventType)
 void DmAuthStateMachine::Run(std::shared_ptr<DmAuthContext> context)
 {
     while (running_.load()) {
-        DmAuthStateType preStateType = GetCurState();
+        context->state = static_cast<int32_t>(GetCurState());
         auto state = FetchAndSetCurState();
         if (!state.has_value()) {
             break;
@@ -321,7 +321,6 @@ void DmAuthStateMachine::Run(std::shared_ptr<DmAuthContext> context)
         }
         // Obtain the status and execute the status action.
         DmAuthStateType stateType = state.value()->GetStateType();
-        context->state = static_cast<int32_t>(preStateType);
         int32_t ret = state.value()->Action(context);
         if (ret != DM_OK) {
             LOGE("DmAuthStateMachine::Run err:%{public}d", ret);

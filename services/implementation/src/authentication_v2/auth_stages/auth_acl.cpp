@@ -110,10 +110,10 @@ DmAuthStateType AuthSrcDataSyncState::GetStateType()
 int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkFinishState::Action start");
-    context->state = static_cast<int32_t>(GetStateType());
     int32_t ret = DM_OK;
     LOGI("reason: %{public}d", context->reason);
     if (context->reason == DM_OK) {
+        context->state = static_cast<int32_t>(GetStateType());
         ret = FreezeProcess::GetInstance().DeleteFreezeRecord(context->accessee.bundleName,
             context->accessee.deviceType);
         LOGI("DeleteFreezeRecord ret: %{public}d", ret);
@@ -143,6 +143,8 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
     LOGI("AuthSrcFinishState::Action start");
     if (context->reason != DM_OK) {
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
+    } else {
+        context->state = static_cast<int32_t>(GetStateType());
     }
     SourceFinish(context);
     LOGI("AuthSrcFinishState::Action ok");
