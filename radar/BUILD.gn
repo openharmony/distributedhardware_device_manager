@@ -68,7 +68,7 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include",
       "${json_path}/include",
     ]
-    branch_protector_ret = "pac_ret"
+
     sanitize = {
       cfi = true
       cfi_cross_dso = true
@@ -125,7 +125,7 @@ if (defined(ohos_lite)) {
       "${innerkits_path}/native_cpp/include",
       "${json_path}/include",
     ]
-    branch_protector_ret = "pac_ret"
+
     sanitize = {
       cfi = true
       cfi_cross_dso = true

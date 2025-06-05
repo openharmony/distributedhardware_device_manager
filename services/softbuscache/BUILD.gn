@@ -50,7 +50,6 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("dmdevicecache") {
-    branch_protector_ret = "pac_ret"
     sanitize = {
       boundary_sanitize = true
       cfi = true
