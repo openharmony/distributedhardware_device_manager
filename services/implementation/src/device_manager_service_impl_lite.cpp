@@ -331,13 +331,12 @@ int32_t DeviceManagerServiceImpl::ImportAuthCode(const std::string &pkgName, con
 }
 
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
-    const std::string &localUdid, std::string &remoteUdid, bool &isShareType)
+    const std::string &localUdid, std::string &remoteUdid)
 {
     (void)credId;
     (void)credInfo;
     (void)localUdid;
     (void)remoteUdid;
-    (void)isShareType;
     return;
 }
 
