@@ -58,7 +58,7 @@
         },
         {
             "name":"dm_confirm_proxy",
-            "value":"%1$s on %2$s requests to connect to this device.Please select the authorized service:",
+            "value":"%1$s on %2$s requests to connect to this device. Please select the authorized service:",
             "attr":{
                 "priority":"translate"
             }
