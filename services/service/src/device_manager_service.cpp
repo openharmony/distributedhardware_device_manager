@@ -2912,6 +2912,7 @@ void DeviceManagerService::HandleUserSwitchTimeout(int32_t curUserId, int32_t pr
 
 void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId)
 {
+    LOGI("In");
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
     if (IsPC()) {
         return;
