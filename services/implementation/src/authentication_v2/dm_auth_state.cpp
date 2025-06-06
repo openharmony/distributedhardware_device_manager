@@ -111,7 +111,7 @@ bool DmAuthState::IsScreenLocked()
 
 void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("SourceFinish reason:%{public}d", context->reason);
+    LOGI("SourceFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
         GetOutputState(context->state), context->reason);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
@@ -147,7 +147,7 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 
 void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
 {
-    LOGI("SinkFinish reason:%{public}d", context->reason);
+    LOGI("SinkFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
     context->processInfo.pkgName = context->accessee.pkgName;
     context->listener->OnSinkBindResult(context->processInfo, context->peerTargetId,
         GetOutputReplay(context->accessee.bundleName, context->reason),
