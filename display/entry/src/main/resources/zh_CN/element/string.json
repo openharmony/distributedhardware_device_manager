@@ -114,7 +114,7 @@
         },
         {
             "name":"dm_confirm_proxy",
-            "value":"%2$s的%1$s请求连接本机。请选择授权的业务：",
+            "value":"%s请求连接本机。请选择授权的业务：",
             "attr":{
                 "priority":"translate"
             }
