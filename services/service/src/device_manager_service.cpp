@@ -69,7 +69,6 @@ namespace {
     const int32_t NORMAL = 0;
     const int32_t SYSTEM_BASIC = 1;
     const int32_t SYSTEM_CORE = 2;
-    constexpr int32_t NETWORK_AVAILABLE = 3;
     constexpr const char *ALL_PKGNAME = "";
     constexpr const char *NETWORKID = "NETWORK_ID";
     constexpr uint32_t INVALIED_BIND_LEVEL = 0;
@@ -175,8 +174,8 @@ void DeviceManagerService::SubscribeDataShareCommonEvent()
         if (arg1 == CommonEventSupport::COMMON_EVENT_LOCALE_CHANGED) {
             DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
         }
-        if (arg1 == CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE && arg2 == NETWORK_AVAILABLE) {
-            this->CheckRegisterInfoWithWise();
+        if (arg1 == CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE) {
+            this->HandleNetworkConnected(arg2);
         }
     };
     std::vector<std::string> commonEventVec;
@@ -1862,6 +1861,7 @@ void DeviceManagerService::SubscribeScreenLockEvent()
     ScreenEventCallback callback = [=](const auto &arg1) { this->ScreenCommonEventCallback(arg1); };
     std::vector<std::string> screenEventVec;
     screenEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED);
+    screenEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
     if (screenCommonEventManager_->SubscribeScreenCommonEvent(screenEventVec, callback)) {
         LOGI("Success");
     }
@@ -2262,6 +2262,12 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
 
 void DeviceManagerService::ScreenCommonEventCallback(std::string commonEventType)
 {
+    if (IsDMServiceAdapterResidentLoad()) {
+        bool isLock = commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED;
+        dmServiceImplExtResident_->HandleScreenLockEvent(isLock);
+    } else {
+        LOGE("ScreenCommonEventCallback failed, dmServiceImplExtResident not init or init failed.");
+    }
     if (!IsDMImplSoLoaded()) {
         LOGE("ScreenCommonEventCallback failed, instance not init or init failed.");
         return;
@@ -3239,14 +3245,14 @@ std::vector<std::string> DeviceManagerService::GetDeviceNamePrefixs()
     return dmServiceImplExtResident_->GetDeviceNamePrefixs();
 }
 
-void DeviceManagerService::CheckRegisterInfoWithWise()
+void DeviceManagerService::HandleNetworkConnected(int32_t networkStatus)
 {
     LOGI("In");
     if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("CheckRegisterInfoWithWise failed, adapter instance not init or init failed.");
+        LOGE("HandleNetworkConnected failed, adapter instance not init or init failed.");
         return;
     }
-    dmServiceImplExtResident_->CheckRegisterInfoWithWise();
+    dmServiceImplExtResident_->HandleNetworkConnected(networkStatus);
 }
 
 int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
