@@ -403,7 +403,7 @@ int32_t DeviceNameManager::ModifyUserDefinedName(const std::string &deviceName)
 
 int32_t DeviceNameManager::RestoreLocalDeviceName()
 {
-    LOGI("In");
+    LOGI("DeviceNameManager In");
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     SetUserDefinedDeviceName("", userId);
     SetDisplayDeviceNameState("", userId);
