@@ -111,6 +111,10 @@
         {
             "name":"dm_password_error",
             "value":"Incorrect password. Connection failed."
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"%s requests to connect to this device. Please select the authorized service:"
         }
     ]
 }
