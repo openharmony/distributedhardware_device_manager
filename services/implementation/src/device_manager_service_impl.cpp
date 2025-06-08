@@ -65,6 +65,7 @@ constexpr const char* DM_TAG_PEER_DISPLAY_ID = "peerDisplayId";
 constexpr const char* DM_TAG_ACCESSEE_USER_ID = "accesseeUserId";
 constexpr const char* DM_TAG_EXTRA_INFO = "extraInfo";
 constexpr const char* CHANGE_PINTYPE = "1";
+constexpr const char* BIND_CALLER_USERID = "bindCallerUserId";
 // currently, we just support one bind session in one device at same time
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
 const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
@@ -1731,23 +1732,48 @@ void DeviceManagerServiceImpl::SaveTokenIdAndSessionId(uint64_t &tokenId,
     }
 }
 
-void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::string &pkgName,
-    const PeerTargetId &targetId, const std::map<std::string, std::string> &bindParam)
+bool DeviceManagerServiceImpl::ParseConnectAddrAndSetProcessInfo(const PeerTargetId &targetId,
+    PeerTargetId &targetIdTmp, const std::map<std::string, std::string> &bindParam, ProcessInfo &processInfo,
+    const std::string &pkgName)
 {
+    processInfo.pkgName = pkgName;
+    if (bindParam.count(BIND_CALLER_USERID) != 0) {
+        processInfo.userId = std::atoi(bindParam.at(BIND_CALLER_USERID).c_str());
+    }
     std::string deviceId = "";
-    PeerTargetId targetIdTmp = const_cast<PeerTargetId&>(targetId);
     if (ParseConnectAddr(targetId, deviceId, bindParam) == DM_OK) {
         targetIdTmp.deviceId = deviceId;
     } else {
         if (targetId.deviceId.empty()) {
             LOGE("DeviceManagerServiceImpl::BindTarget failed, ParseConnectAddr failed.");
-            return;
+            OnAuthResultAndOnBindResult(processInfo, targetId, targetId.deviceId, ERR_DM_INPUT_PARA_INVALID);
+            return false;
         }
+    }
+    return true;
+}
+
+void DeviceManagerServiceImpl::OnAuthResultAndOnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId,
+    const std::string &deviceId, int32_t reason)
+{
+    CHECK_NULL_VOID(listener_);
+    listener_->OnAuthResult(processInfo, deviceId, "", DmAuthStatus::STATUS_DM_AUTH_DEFAULT, reason);
+    listener_->OnBindResult(processInfo, targetId, reason, DmAuthStatus::STATUS_DM_AUTH_DEFAULT, "");
+}
+
+void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::string &pkgName,
+    const PeerTargetId &targetId, const std::map<std::string, std::string> &bindParam)
+{
+    PeerTargetId targetIdTmp = const_cast<PeerTargetId&>(targetId);
+    ProcessInfo processInfo;
+    if (!ParseConnectAddrAndSetProcessInfo(targetId, targetIdTmp, bindParam, processInfo, pkgName)) {
+        return;
     }
     // Created only at the source end. The same target device will not be created repeatedly with the new protocol.
     std::shared_ptr<Session> curSession = GetOrCreateSession(targetIdTmp.deviceId, bindParam);
     if (curSession == nullptr) {
         LOGE("Failed to create the session. Target deviceId: %{public}s.", targetIdTmp.deviceId.c_str());
+        OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ERR_DM_TIME_OUT);
         return;
     }
 
@@ -1759,6 +1785,7 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
         if (curSession->logicalSessionSet_.find(logicalSessionId) != curSession->logicalSessionSet_.end()) {
             LOGE("Failed to create the logical session.");
             softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+            OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ERR_DM_INPUT_PARA_INVALID);
             return;
         }
     }
@@ -1768,6 +1795,7 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
     if (ret != DM_OK) {
         LOGE("InitAndRegisterAuthMgr failed, ret %{public}d.", ret);
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+        OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ret);
         return;
     }
     curSession->logicalSessionSet_.insert(logicalSessionId);
@@ -1776,12 +1804,14 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
     auto authMgr = GetAuthMgrByTokenId(tokenId);
     if (authMgr == nullptr) {
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
+        OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ERR_DM_POINT_NULL);
         return;
     }
     authMgr->SetBindTargetParams(targetId);
     if ((ret = authMgr->BindTarget(pkgName, targetIdTmp, bindParam, sessionId, logicalSessionId)) != DM_OK) {
         LOGE("authMgr BindTarget failed, ret %{public}d.", ret);
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
+        OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ret);
     }
     LOGI("end, tokenId %{public}" PRId64".", tokenId);
     return;

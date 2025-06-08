@@ -295,6 +295,11 @@ private:
     int32_t InitNewProtocolAuthMgr(bool isSrcSide, uint64_t tokenId, uint64_t logicalSessionId,
         const std::string &pkgName);
     int32_t InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName);
+    bool ParseConnectAddrAndSetProcessInfo(const PeerTargetId &targetId,
+        PeerTargetId &targetIdTmp, const std::map<std::string, std::string> &bindParam, ProcessInfo &processInfo,
+        const std::string &pkgName);
+    void OnAuthResultAndOnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId,
+        const std::string &deviceId, int32_t reason);
 private:
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
 
