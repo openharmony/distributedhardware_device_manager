@@ -35,12 +35,13 @@ namespace {
 HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_001, testing::ext::TestSize.Level0)
 {
     char *localDeviceName = nullptr;
-    unsigned int len = 0;
+    unsigned int len = 256;
     int32_t result = OH_DeviceManager_GetLocalDeviceName(&localDeviceName, len);
 
     EXPECT_EQ(result, DM_ERR_OBTAIN_BUNDLE_NAME);
-
-    delete[] localDeviceName;
+    if (localDeviceName != nullptr) {
+        delete[] localDeviceName;
+    }
 }
 } // namespace
 } // namespace DistributedHardware
