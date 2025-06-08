@@ -39,8 +39,9 @@ HWTEST_F(OhDeviceManagerTest, OH_DeviceManager_GetLocalDeviceName_001, testing::
     int32_t result = OH_DeviceManager_GetLocalDeviceName(&localDeviceName, len);
 
     EXPECT_EQ(result, DM_ERR_OBTAIN_BUNDLE_NAME);
-
-    delete[] localDeviceName;
+    if (localDeviceName != nullptr) {
+        delete[] localDeviceName;
+    }
 }
 } // namespace
 } // namespace DistributedHardware
