@@ -75,20 +75,16 @@ public:
 
     int32_t RegisterGetDeviceProfileInfoListCallback(const std::string &pkgName,
         std::shared_ptr<GetDeviceProfileInfoListCallback> callback);
-    int32_t UnRegisterGetDeviceProfileInfoListCallback(const std::string &pkgName);
     void OnGetDeviceProfileInfoListResult(const std::string &pkgName,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code);
     int32_t RegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk,
         std::shared_ptr<GetDeviceIconInfoCallback> callback);
-    int32_t UnRegisterGetDeviceIconInfoCallback(const std::string &pkgName, const std::string &uk);
     void OnGetDeviceIconInfoResult(const std::string &pkgName, const DmDeviceIconInfo &deviceIconInfo, int32_t code);
     int32_t RegisterSetLocalDeviceNameCallback(const std::string &pkgName,
         std::shared_ptr<SetLocalDeviceNameCallback> callback);
-    int32_t UnRegisterSetLocalDeviceNameCallback(const std::string &pkgName);
     void OnSetLocalDeviceNameResult(const std::string &pkgName, int32_t code);
     int32_t RegisterSetRemoteDeviceNameCallback(const std::string &pkgName, const std::string &deviceId,
         std::shared_ptr<SetRemoteDeviceNameCallback> callback);
-    int32_t UnRegisterSetRemoteDeviceNameCallback(const std::string &pkgName, const std::string &deviceId);
     void OnSetRemoteDeviceNameResult(const std::string &pkgName, const std::string &deviceId, int32_t code);
 
 public:

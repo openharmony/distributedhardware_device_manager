@@ -40,6 +40,14 @@ namespace {
     napi_value thisVar = nullptr;     \
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, nullptr))
 
+#define CHECK_NULL_VOID_RET_LOG(ptr, fmt, ...)      \
+    do {                                            \
+        if ((ptr) == NULL) {                        \
+            LOGE(fmt, ##__VA_ARGS__);               \
+            return;                                 \
+        }                                           \
+    } while (0)
+
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
@@ -546,6 +554,7 @@ void DmNapiGetDeviceProfileInfoListCallback::OnResult(const std::vector<DmDevice
     int32_t code)
 {
     LOGI("In code:%{public}d, size:%{public}zu", code, deviceProfileInfos.size());
+    CHECK_NULL_VOID_RET_LOG(deferred_, "deferred_ is nullptr");
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(env_, &loop);
     if (loop == nullptr) {
@@ -728,6 +737,7 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
 void DeviceManagerNapi::OnGetDeviceProfileInfoListCallbackResult(DeviceProfileInfosAsyncCallbackInfo *jsCallback)
 {
     LOGI("In");
+    CHECK_NULL_VOID_RET_LOG(jsCallback, "jsCallback is nullptr");
     napi_handle_scope scope;
     napi_open_handle_scope(env_, &scope);
     if (jsCallback->code != DM_OK) {
@@ -756,6 +766,7 @@ void DeviceManagerNapi::OnGetDeviceProfileInfoListCallbackResult(DeviceProfileIn
 void DeviceManagerNapi::OnGetDeviceIconInfoCallbackResult(DeviceIconInfoAsyncCallbackInfo *jsCallback)
 {
     LOGI("In");
+    CHECK_NULL_VOID_RET_LOG(jsCallback, "jsCallback is nullptr");
     napi_handle_scope scope;
     napi_open_handle_scope(env_, &scope);
     if (jsCallback->code != DM_OK) {
@@ -775,6 +786,7 @@ void DeviceManagerNapi::OnGetDeviceIconInfoCallbackResult(DeviceIconInfoAsyncCal
 void DeviceManagerNapi::OnSetLocalDeviceNameCallbackResult(SetLocalDeviceNameAsyncCallbackInfo *jsCallback)
 {
     LOGI("In");
+    CHECK_NULL_VOID_RET_LOG(jsCallback, "jsCallback is nullptr");
     napi_handle_scope scope;
     napi_open_handle_scope(env_, &scope);
     if (jsCallback->code != DM_OK) {
@@ -793,6 +805,7 @@ void DeviceManagerNapi::OnSetLocalDeviceNameCallbackResult(SetLocalDeviceNameAsy
 void DeviceManagerNapi::OnSetRemoteDeviceNameCallbackResult(SetRemoteDeviceNameAsyncCallbackInfo *jsCallback)
 {
     LOGI("In");
+    CHECK_NULL_VOID_RET_LOG(jsCallback, "jsCallback is nullptr");
     napi_handle_scope scope;
     napi_open_handle_scope(env_, &scope);
     if (jsCallback->code != DM_OK) {
@@ -2004,9 +2017,13 @@ napi_value DeviceManagerNapi::GetDeviceProfileInfoListPromise(napi_env env,
             (void)status;
             DeviceProfileInfosAsyncCallbackInfo *jsCallback =
                 reinterpret_cast<DeviceProfileInfosAsyncCallbackInfo *>(data);
-            if (jsCallback->code != DM_OK) {
-                napi_value error = CreateBusinessError(env, jsCallback->code, false);
-                napi_reject_deferred(env, jsCallback->deferred, error);
+            if (jsCallback->code == ERR_DM_CALLBACK_REGISTER_FAILED) {
+                if (jsCallback->deferred != nullptr) {
+                    napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                    napi_reject_deferred(env, jsCallback->deferred, error);
+                } else {
+                    LOGE("jsCallback->deferred is null");
+                }
             }
             napi_delete_async_work(env, jsCallback->asyncWork);
             delete jsCallback;
@@ -2167,9 +2184,13 @@ napi_value DeviceManagerNapi::GetDeviceIconInfoPromise(napi_env env, DeviceIconI
             (void)status;
             DeviceIconInfoAsyncCallbackInfo *jsCallback =
                 reinterpret_cast<DeviceIconInfoAsyncCallbackInfo *>(data);
-            if (jsCallback->code != DM_OK) {
-                napi_value error = CreateBusinessError(env, jsCallback->code, false);
-                napi_reject_deferred(env, jsCallback->deferred, error);
+            if (jsCallback->code == ERR_DM_CALLBACK_REGISTER_FAILED) {
+                if (jsCallback->deferred != nullptr) {
+                    napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                    napi_reject_deferred(env, jsCallback->deferred, error);
+                } else {
+                    LOGE("jsCallback->deferred is null");
+                }
             }
             napi_delete_async_work(env, jsCallback->asyncWork);
             delete jsCallback;
@@ -2464,9 +2485,13 @@ napi_value DeviceManagerNapi::SetLocalDeviceNamePromise(napi_env env,
             (void)status;
             SetLocalDeviceNameAsyncCallbackInfo *jsCallback =
                 reinterpret_cast<SetLocalDeviceNameAsyncCallbackInfo *>(data);
-            if (jsCallback->code != DM_OK) {
-                napi_value error = CreateBusinessError(env, jsCallback->code, false);
-                napi_reject_deferred(env, jsCallback->deferred, error);
+            if (jsCallback->code == ERR_DM_CALLBACK_REGISTER_FAILED || jsCallback->code == ERR_DM_INPUT_PARA_INVALID) {
+                if (jsCallback->deferred != nullptr) {
+                    napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                    napi_reject_deferred(env, jsCallback->deferred, error);
+                } else {
+                    LOGE("jsCallback->deferred is null");
+                }
             }
             napi_delete_async_work(env, jsCallback->asyncWork);
             delete jsCallback;
@@ -2506,9 +2531,13 @@ napi_value DeviceManagerNapi::SetRemoteDeviceNamePromise(napi_env env,
             (void)status;
             SetRemoteDeviceNameAsyncCallbackInfo *jsCallback =
                 reinterpret_cast<SetRemoteDeviceNameAsyncCallbackInfo *>(data);
-            if (jsCallback->code != DM_OK) {
-                napi_value error = CreateBusinessError(env, jsCallback->code, false);
-                napi_reject_deferred(env, jsCallback->deferred, error);
+            if (jsCallback->code == ERR_DM_CALLBACK_REGISTER_FAILED || jsCallback->code == ERR_DM_INPUT_PARA_INVALID) {
+                if (jsCallback->deferred != nullptr) {
+                    napi_value error = CreateBusinessError(env, jsCallback->code, false);
+                    napi_reject_deferred(env, jsCallback->deferred, error);
+                } else {
+                    LOGE("jsCallback->deferred is null");
+                }
             }
             napi_delete_async_work(env, jsCallback->asyncWork);
             delete jsCallback;
@@ -2944,6 +2973,7 @@ void DmNapiGetDeviceIconInfoCallback::OnResult(const OHOS::DistributedHardware::
     int32_t code)
 {
     LOGI("In code:%{public}d", code);
+    CHECK_NULL_VOID_RET_LOG(deferred_, "deferred_ is nullptr");
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(env_, &loop);
     if (loop == nullptr) {
@@ -2993,6 +3023,7 @@ void DmNapiGetDeviceIconInfoCallback::OnResult(const OHOS::DistributedHardware::
 void DmNapiSetLocalDeviceNameCallback::OnResult(int32_t code)
 {
     LOGI("In code:%{public}d", code);
+    CHECK_NULL_VOID_RET_LOG(deferred_, "deferred_ is nullptr");
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(env_, &loop);
     if (loop == nullptr) {
@@ -3041,6 +3072,7 @@ void DmNapiSetLocalDeviceNameCallback::OnResult(int32_t code)
 void DmNapiSetRemoteDeviceNameCallback::OnResult(int32_t code)
 {
     LOGI("In code:%{public}d", code);
+    CHECK_NULL_VOID_RET_LOG(deferred_, "deferred_ is nullptr");
     uv_loop_s *loop = nullptr;
     napi_get_uv_event_loop(env_, &loop);
     if (loop == nullptr) {
