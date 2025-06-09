@@ -39,6 +39,7 @@
 #include "parameter.h"
 #include "dm_random.h"
 #include "common_event_support.h"
+#include "ffrt.h"
 using namespace OHOS::EventFwk;
 #endif
 
@@ -111,10 +112,6 @@ std::string CreateTerminateMessage(void)
 
 }
 
-std::condition_variable DeviceManagerServiceImpl::cleanEventCv_;
-std::mutex DeviceManagerServiceImpl::cleanEventMutex_;
-std::queue<uint64_t> DeviceManagerServiceImpl::cleanEventQueue_;
-
 Session::Session(int sessionId, std::string deviceId)
 {
     sessionId_ = sessionId;
@@ -123,15 +120,11 @@ Session::Session(int sessionId, std::string deviceId)
 
 DeviceManagerServiceImpl::DeviceManagerServiceImpl()
 {
-    running_ = true;
-    thread_ = std::thread(&DeviceManagerServiceImpl::CleanWorker, this);
     LOGI("DeviceManagerServiceImpl constructor");
 }
 
 DeviceManagerServiceImpl::~DeviceManagerServiceImpl()
 {
-    Stop();
-    thread_.join();
     LOGI("DeviceManagerServiceImpl destructor");
 }
 
@@ -185,50 +178,10 @@ static uint64_t GetTokenId(bool isSrcSide, int32_t displayId, std::string &bundl
     return tokenId;
 }
 
-uint64_t DeviceManagerServiceImpl::FetchCleanEvent()
-{
-    std::unique_lock lock(cleanEventMutex_);
-    cleanEventCv_.wait(lock, [&] {
-        return !running_.load() || !cleanEventQueue_.empty();
-    });
-
-    if (!running_.load()) return 0;
-
-    uint64_t logicalSessionId = cleanEventQueue_.front();
-    cleanEventQueue_.pop();
-    return logicalSessionId;
-}
-
-void DeviceManagerServiceImpl::CleanWorker()
-{
-    while (running_.load()) {
-        auto logicalSessionId = FetchCleanEvent();
-        LOGI("clean auth_mgr, its logicalSessionId: %{public}" PRIu64 "",
-            logicalSessionId);
-        CleanAuthMgrByLogicalSessionId(logicalSessionId);
-    }
-    while (!cleanEventQueue_.empty()) {
-        uint64_t logicalSessionId = cleanEventQueue_.front();
-        cleanEventQueue_.pop();
-        CleanAuthMgrByLogicalSessionId(logicalSessionId);
-    }
-    LOGI("end");
-}
-
-void DeviceManagerServiceImpl::Stop()
-{
-    std::lock_guard lock(cleanEventMutex_);
-    running_.store(false);
-    cleanEventCv_.notify_all();
-}
-
 void DeviceManagerServiceImpl::NotifyCleanEvent(uint64_t logicalSessionId)
 {
     LOGI("logicalSessionId: %{public}" PRIu64 ".", logicalSessionId);
-    std::lock_guard lock(cleanEventMutex_);
-    // Store into the queue
-    cleanEventQueue_.push(logicalSessionId);
-    cleanEventCv_.notify_one();
+    ffrt::submit([=]() { CleanAuthMgrByLogicalSessionId(logicalSessionId); });
 }
 
 void DeviceManagerServiceImpl::ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId,
@@ -292,8 +245,11 @@ int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_
         authMgr = std::make_shared<AuthSinkManager>(softbusConnector_, hiChainConnector_,
             listener_, hiChainAuthConnector_);
     }
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId) {
+        this->NotifyCleanEvent(logicalSessionId);
+    };
     // Register resource destruction notification function
-    authMgr->RegisterCleanNotifyCallback(&DeviceManagerServiceImpl::NotifyCleanEvent);
+    authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
     CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
     hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
     LOGI("Initialize authMgr token: %{public}" PRId64 ".", tokenId);
@@ -686,7 +642,10 @@ void DeviceManagerServiceImpl::CreateGlobalClassicalAuthMgr()
     // Create old auth_mar, only create an independent one
     authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, hiChainConnector_, listener_,
         hiChainAuthConnector_);
-    authMgr_->RegisterCleanNotifyCallback(&DeviceManagerServiceImpl::NotifyCleanEvent);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId) {
+        this->NotifyCleanEvent(logicalSessionId);
+    };
+    authMgr_->RegisterCleanNotifyCallback(cleanNotifyCallback);
     softbusConnector_->RegisterConnectorCallback(authMgr_);
     softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
     hiChainConnector_->RegisterHiChainCallback(authMgr_);

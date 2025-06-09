@@ -186,7 +186,7 @@ public:
         int32_t bindLevel, const std::string &extra);
     int32_t DeleteAclV2(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
-    static void NotifyCleanEvent(uint64_t logicalSessionId);
+    void NotifyCleanEvent(uint64_t logicalSessionId);
     void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
         int32_t remoteTokenId);
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
@@ -253,11 +253,6 @@ private:
     void ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId, const std::string &pkgName);
     void ImportAuthCodeToConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId);
 
-    // Resource cleanup thread
-    void CleanWorker();
-    // Stop the thread
-    void Stop();
-    uint64_t FetchCleanEvent();
     void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId);
     void CleanSessionMap(int sessionId, std::shared_ptr<Session> session);
     void CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId);
@@ -331,12 +326,6 @@ private:
     std::map<uint64_t, std::shared_ptr<Config>> configsMap_;    // Import when authMgr is not initialized
     std::mutex authMgrMapMtx_;
     std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
-
-    std::thread thread_;
-    std::atomic<bool> running_;
-    static std::condition_variable cleanEventCv_;
-    static std::mutex cleanEventMutex_;
-    static std::queue<uint64_t> cleanEventQueue_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
