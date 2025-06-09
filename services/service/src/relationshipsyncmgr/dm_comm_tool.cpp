@@ -844,6 +844,7 @@ int32_t DMCommTool::SendLogoutAccountInfo(const std::string &rmtNetworkId,
 void DMCommTool::ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> commMsg)
 {
     CHECK_NULL_VOID(commMsg);
+    this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
     LOGI("Receive remote logout, networkId: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);

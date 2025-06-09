@@ -20,6 +20,7 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #include "dm_transport_msg.h"
+#include "softbus_error_code.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -28,6 +29,7 @@ namespace {
 constexpr uint32_t MAX_SEND_MSG_LENGTH = 4 * 1024 * 1024;
 constexpr uint32_t INTERCEPT_STRING_LENGTH = 20;
 constexpr uint32_t MAX_ROUND_SIZE = 1000;
+constexpr int32_t BIND_SOCKET_INTERVAL_MS = 200000;           // 200ms
 static QosTV g_qosInfo[] = {
     { .qos = QOS_TYPE_MIN_BW, .value = 256 * 1024},
     { .qos = QOS_TYPE_MAX_LATENCY, .value = 8000 },
@@ -374,12 +376,30 @@ void DMTransport::ClearDeviceSocketOpened(const std::string &remoteDevId, int32_
 
 int32_t DMTransport::StartSocket(const std::string &rmtNetworkId, int32_t &socketId)
 {
+    int32_t errCode = ERR_DM_FAILED;
+    int32_t count = 0;
+    const int32_t maxCount = 10;
+
+    do {
+        errCode = StartSocketInner(rmtNetworkId, socketId);
+        if (errCode != ERR_DM_SOCKET_IN_USED) {
+            break;
+        }
+        count++;
+        usleep(BIND_SOCKET_INTERVAL_MS);
+    } while (count < maxCount);
+
+    return errCode;
+}
+
+int32_t DMTransport::StartSocketInner(const std::string &rmtNetworkId, int32_t &socketId)
+{
     if (!IsIdLengthValid(rmtNetworkId)) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (IsDeviceSessionOpened(rmtNetworkId, socketId)) {
         LOGE("Softbus session has already opened, deviceId: %{public}s", GetAnonyString(rmtNetworkId).c_str());
-        return DM_OK;
+        return ERR_DM_SOCKET_IN_USED;
     }
 
     int32_t socket = CreateClientSocket(rmtNetworkId);
@@ -390,6 +410,10 @@ int32_t DMTransport::StartSocket(const std::string &rmtNetworkId, int32_t &socke
 
     int32_t ret = Bind(socket, g_qosInfo, g_qosTvParamIndex, &iSocketListener);
     if (ret < DM_OK) {
+        if (ret == SOFTBUS_TRANS_SOCKET_IN_USE) {
+            LOGI("Softbus trans socket in use.");
+            return ERR_DM_SOCKET_IN_USED;
+        }
         LOGE("OpenSession fail, rmtNetworkId: %{public}s, socket: %{public}d, ret: %{public}d",
             GetAnonyString(rmtNetworkId).c_str(), socket, ret);
         Shutdown(socket);
