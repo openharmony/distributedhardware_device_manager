@@ -31,7 +31,7 @@ namespace {
 constexpr uint32_t MAX_SEND_MSG_LENGTH = 4 * 1024 * 1024;
 constexpr uint32_t INTERCEPT_STRING_LENGTH = 20;
 constexpr uint32_t MAX_ROUND_SIZE = 1000;
-constexpr int32_t BIND_SOCKET_INTERVAL_MS = 200000;           // 200ms
+const int32_t USLEEP_TIME_US_200000 = 200000;           // 200ms
 static QosTV g_qosInfo[] = {
     { .qos = QOS_TYPE_MIN_BW, .value = 256 * 1024},
     { .qos = QOS_TYPE_MAX_LATENCY, .value = 8000 },
@@ -388,7 +388,7 @@ int32_t DMTransport::StartSocket(const std::string &rmtNetworkId, int32_t &socke
             break;
         }
         count++;
-        usleep(BIND_SOCKET_INTERVAL_MS);
+        usleep(USLEEP_TIME_US_200000);
     } while (count < maxCount);
 
     return errCode;
