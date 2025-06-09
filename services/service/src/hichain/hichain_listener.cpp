@@ -186,7 +186,7 @@ void HichainListener::OnCredentialDeleted(const char *credId, const char *credIn
     uint32_t credType = 0;
     std::string credTypeTag = "credType";
     if (IsInt32(jsonObject, credTypeTag)) {
-        credType = jsonObject[credTypeTag].Get<int32_t>();
+        credType = static_cast<uint32_t>(jsonObject[credTypeTag].Get<int32_t>());
     }
     if (credType != ACCOUNT_SHARED) {
         LOGE("credType %{public}d is invalid.", credType);
