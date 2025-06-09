@@ -839,7 +839,7 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
 {
     if (pkgName.empty() || params.empty()) {
         LOGE("DeviceManager::SetUserOperation start, pkgName: %{public}s, params: %{public}s", pkgName.c_str(),
-            params.c_str());
+            GetAnonyString(params).c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());

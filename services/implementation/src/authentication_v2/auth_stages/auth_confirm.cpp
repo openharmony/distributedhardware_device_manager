@@ -399,8 +399,9 @@ void AuthSrcConfirmState::GetIdenticalCredentialInfo(std::shared_ptr<DmAuthConte
     queryParams[FILED_USER_ID] = MultipleUserConnector::GetOhosAccountNameByUserId(context->accesser.userId);
     queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_RELATED;
     CHECK_NULL_VOID(context->hiChainAuthConnector);
-    if (context->hiChainAuthConnector->QueryCredentialInfo(context->accesser.userId, queryParams, credInfo) != DM_OK) {
-        LOGE("QueryCredentialInfo failed credInfo %{public}s.", credInfo.Dump().c_str());
+    int32_t ret = context->hiChainAuthConnector->QueryCredentialInfo(context->accesser.userId, queryParams, credInfo);
+    if (ret != DM_OK) {
+        LOGE("QueryCredentialInfo failed ret %{public}d.", ret);
     }
 }
 
@@ -414,8 +415,9 @@ void AuthSrcConfirmState::GetShareCredentialInfo(std::shared_ptr<DmAuthContext> 
     queryParams[FILED_PEER_USER_SPACE_ID] = std::to_string(context->accessee.userId);
     queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_ACROSS;
     CHECK_NULL_VOID(context->hiChainAuthConnector);
-    if (context->hiChainAuthConnector->QueryCredentialInfo(context->accesser.userId, queryParams, credInfo) != DM_OK) {
-        LOGE("QueryCredentialInfo failed credInfo %{public}s.", credInfo.Dump().c_str());
+    int32_t ret = context->hiChainAuthConnector->QueryCredentialInfo(context->accesser.userId, queryParams, credInfo);
+    if (ret != DM_OK) {
+        LOGE("QueryCredentialInfo failed ret %{public}d.", ret);
     }
 }
 
@@ -430,8 +432,9 @@ void AuthSrcConfirmState::GetP2PCredentialInfo(std::shared_ptr<DmAuthContext> co
     queryParams[FILED_CRED_TYPE] = DM_AUTH_CREDENTIAL_ACCOUNT_UNRELATED;
     queryParams[FILED_CRED_OWNER] = "DM";
     CHECK_NULL_VOID(context->hiChainAuthConnector);
-    if (context->hiChainAuthConnector->QueryCredentialInfo(context->accesser.userId, queryParams, credInfo) != DM_OK) {
-        LOGE("QueryCredentialInfo failed credInfo %{public}s.", credInfo.Dump().c_str());
+    int32_t ret = context->hiChainAuthConnector->QueryCredentialInfo(context->accesser.userId, queryParams, credInfo);
+    if (ret != DM_OK) {
+        LOGE("QueryCredentialInfo failed ret %{public}d.", ret);
     }
 }
 

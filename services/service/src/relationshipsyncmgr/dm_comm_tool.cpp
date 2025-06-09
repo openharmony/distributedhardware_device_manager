@@ -393,7 +393,7 @@ void DMCommTool::ProcessReceiveCommonEvent(const std::shared_ptr<InnerCommMsg> c
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
     if (rmtUdid.empty()) {
-        LOGE("Can not find remote udid by networkid: %{public}s", commMsg->remoteNetworkId.c_str());
+        LOGE("Can not find remote udid by networkid: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
         return;
     }
 
@@ -439,7 +439,7 @@ void DMCommTool::ProcessResponseCommonEvent(const std::shared_ptr<InnerCommMsg> 
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
     if (rmtUdid.empty()) {
-        LOGE("Can not find remote udid by networkid: %{public}s", commMsg->remoteNetworkId.c_str());
+        LOGE("Can not find remote udid by networkid: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
         return;
     }
 
@@ -462,7 +462,7 @@ void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> 
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
     if (rmtUdid.empty()) {
-        LOGE("Can not find remote udid by networkid: %{public}s", commMsg->remoteNetworkId.c_str());
+        LOGE("Can not find remote udid by networkid: %{public}s", GetAnonyString(commMsg->remoteNetworkId).c_str());
         return;
     }
 
@@ -565,7 +565,7 @@ void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg
 
 void DMCommTool::StopSocket(const std::string &networkId)
 {
-    LOGI("DMCommTool::StopSocket, networkId = %{public}s", networkId.c_str());
+    LOGI("DMCommTool::StopSocket, networkId = %{public}s", GetAnonyString(networkId).c_str());
     if (dmTransportPtr_ == nullptr) {
         LOGE("dmTransportPtr_ is null");
         return;
