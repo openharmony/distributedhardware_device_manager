@@ -23,6 +23,7 @@ namespace DistributedHardware {
 
 const int32_t MAX_CERT_COUNT = 100;
 constexpr int32_t HEX_TO_UINT8 = 2;
+const int32_t MAX_LEN_PER_CERT = 8192;
 
 AuthAttestCommon::AuthAttestCommon()
 {
@@ -45,8 +46,8 @@ std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
     JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     for (uint32_t i = 0; i < chain->certCount; ++i) {
         const DmBlob &blob = chain->cert[i];
-        if (blob.data == nullptr || blob.size == 0) {
-            LOGE("blob data or size is empty.");
+        if (blob.data == nullptr || blob.size == 0 || blob.size > MAX_LEN_PER_CERT) {
+            LOGE("Invalid blob: null data or invalid size.");
             return "{}";
         }
         const uint32_t hexLen = blob.size * HEX_TO_UINT8 + 1; // 2*blob.size + 1
