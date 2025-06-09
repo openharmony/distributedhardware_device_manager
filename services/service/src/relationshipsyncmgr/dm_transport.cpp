@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <unistd.h>
+
 #include "dm_transport.h"
 #include "dm_anonymous.h"
 #include "dm_comm_tool.h"
