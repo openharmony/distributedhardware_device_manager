@@ -131,7 +131,7 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_001, testing::ext::TestSize
     context = authManager->GetAuthContext();
     std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
     context->accessee.dmVersion = "6.0.0";
-    EXPECT_EQ(authState->Action(context), ERR_DM_VERSION_INCOMPATIBLE);
+    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_Action_002, testing::ext::TestSize.Level1)

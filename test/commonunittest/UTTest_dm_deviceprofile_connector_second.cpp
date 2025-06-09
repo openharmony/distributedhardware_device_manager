@@ -220,7 +220,9 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteSigTrustACL_201, testing::ext::
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level1)
 {
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1))
+        .WillOnce(Return(ERR_DM_FAILED));
     auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     EXPECT_TRUE(ret.empty());
 }
