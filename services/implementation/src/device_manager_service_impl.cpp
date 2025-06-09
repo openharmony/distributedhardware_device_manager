@@ -1772,7 +1772,8 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
     // Created only at the source end. The same target device will not be created repeatedly with the new protocol.
     std::shared_ptr<Session> curSession = GetOrCreateSession(targetIdTmp.deviceId, bindParam);
     if (curSession == nullptr) {
-        LOGE("Failed to create the session. Target deviceId: %{public}s.", targetIdTmp.deviceId.c_str());
+        LOGE("Failed to create the session. Target deviceId: %{public}s.",
+            GetAnonyString(targetIdTmp.deviceId).c_str());
         OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ERR_DM_TIME_OUT);
         return;
     }

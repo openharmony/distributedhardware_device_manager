@@ -85,7 +85,7 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
             char udidHashTmp[DM_MAX_DEVICE_ID_LEN] = {0};
             if (Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t*>(udidHashTmp)) != DM_OK) {
                 LOGE("AuthSrcDataSyncState joinLnn get udidhash by udid: %{public}s failed",
-                    context->accessee.deviceId.c_str());
+                    GetAnonyString(context->accessee.deviceId).c_str());
                 return ERR_DM_FAILED;
             }
             std::string peerUdidHash = std::string(udidHashTmp);
