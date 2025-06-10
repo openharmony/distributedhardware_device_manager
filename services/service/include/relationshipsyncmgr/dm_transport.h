@@ -46,6 +46,7 @@ private:
     std::string GetRemoteNetworkIdBySocketId(int32_t socketId);
     void ClearDeviceSocketOpened(const std::string &remoteDevId, int32_t socketId);
     void HandleReceiveMessage(const int32_t socketId, const std::string &payload);
+    int32_t StartSocketInner(const std::string &rmtNetworkId, int32_t &socketId);
 
 private:
     std::mutex rmtSocketIdMtx_;
