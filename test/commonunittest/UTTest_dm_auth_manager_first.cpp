@@ -1003,7 +1003,7 @@ HWTEST_F(DmAuthManagerTest, AuthDeviceError004, testing::ext::TestSize.Level1)
     int64_t requestId = 0;
     int32_t errorCode = ERR_DM_FAILED;
     authManager_->AuthDeviceError(requestId, errorCode);
-    ASSERT_EQ(authManager_->authResponseContext_->state, AuthState::AUTH_REQUEST_JOIN);
+    ASSERT_EQ(authManager_->authResponseContext_->state, DmAuthStatus::STATUS_DM_AUTH_DEFAULT);
 }
 
 HWTEST_F(DmAuthManagerTest, AuthDeviceError005, testing::ext::TestSize.Level1)

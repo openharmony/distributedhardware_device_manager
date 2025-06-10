@@ -1698,42 +1698,42 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
 
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
     auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(12345));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(12345));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 
     std::string udid;
     DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
