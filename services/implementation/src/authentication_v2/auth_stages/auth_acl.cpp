@@ -77,7 +77,7 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     }
     bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
     // Trigger networking
-    if (!context->accesser.isOnline || isNeedJoinLnn) {
+    if ((!context->accesser.isOnline || isNeedJoinLnn) && context->isNeedJoinLnn) {
         if (context->connSessionType == CONN_SESSION_TYPE_HML) {
             context->softbusConnector->JoinLnnByHml(context->sessionId, context->accesser.transmitSessionKeyId,
                 context->accessee.transmitSessionKeyId);
@@ -123,6 +123,7 @@ int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
             context->accessee.deviceType);
         LOGI("UpdateFreezeData ret: %{public}d", ret);
     }
+    context->isNeedJoinLnn = true;
     SinkFinish(context);
     LOGI("AuthSinkFinishState::Action ok");
     if (context->cleanNotifyCallback != nullptr) {
@@ -146,6 +147,7 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
     } else {
         context->state = static_cast<int32_t>(GetStateType());
     }
+    context->isNeedJoinLnn = true;
     SourceFinish(context);
     LOGI("AuthSrcFinishState::Action ok");
     std::shared_ptr<DmAuthContext> tempContext = context;
