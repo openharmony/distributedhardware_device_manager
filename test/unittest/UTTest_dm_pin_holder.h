@@ -260,6 +260,14 @@ public:
     {
         return "";
     }
+
+    virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m)
+    {
+        (void)deviceId;
+        (void)actionId;
+        (void)isEnable160m;
+        return 0;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

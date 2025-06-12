@@ -868,10 +868,11 @@ int32_t DmAuthManager::EstablishAuthChannel(const std::string &deviceId)
     int32_t sessionId = 0;
     if (IsHmlSessionType()) {
         CHECK_NULL_RETURN(authRequestContext_, ERR_DM_FAILED);
+        CHECK_NULL_RETURN(listener_, ERR_DM_FAILED);
         LOGI("hmlActionId %{public}d, hmlReleaseTime %{public}d, hmlEnable160M %{public}d",
             authRequestContext_->hmlActionId, authRequestContext_->closeSessionDelaySeconds,
             authRequestContext_->hmlEnable160M);
-        sessionId = softbusConnector_->GetSoftbusSession()->OpenAuthSessionWithPara(deviceId,
+        sessionId = listener_->OpenAuthSessionWithPara(deviceId,
             authRequestContext_->hmlActionId, authRequestContext_->hmlEnable160M);
     } else {
         sessionId = softbusConnector_->GetSoftbusSession()->OpenAuthSession(deviceId);
