@@ -37,8 +37,6 @@ const uint32_t IDENTICAL_ACCOUNT_TYPE = 6;
 const uint32_t SERVICE_PEER_TO_PEER_TYPE = 7;
 const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 8;
 
-const int32_t USLEEP_TIME_US_120000 = 120000; // 120ms
-constexpr uint32_t RETRY_TIMES = 3;
 
 const uint32_t DM_INVALIED_TYPE = 2048;
 const uint32_t SERVICE = 2;
