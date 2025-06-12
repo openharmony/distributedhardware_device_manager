@@ -2195,8 +2195,6 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
     return offlineParam;
 }
 
-
-
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
