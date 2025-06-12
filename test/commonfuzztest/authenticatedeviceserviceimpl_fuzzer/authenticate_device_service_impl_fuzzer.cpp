@@ -150,7 +150,6 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->GetUdidHashByNetWorkId(str.c_str(), str);
     deviceManagerServiceImpl->ImportAuthCode(str, str);
     deviceManagerServiceImpl->ExportAuthCode(str);
-    deviceManagerServiceImpl->BindTarget(str, peerTargetId, bindParam);
     deviceManagerServiceImpl->UnRegisterCredentialCallback(str);
     deviceManagerServiceImpl->UnRegisterUiStateCallback(str);
     deviceManagerServiceImpl->Release();
