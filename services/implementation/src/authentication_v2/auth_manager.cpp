@@ -24,8 +24,6 @@
 #include "multiple_user_connector.h"
 
 #include "auth_manager.h"
-#include "dm_auth_cert.h"
-#include "dm_auth_attest_common.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_random.h"
@@ -133,8 +131,8 @@ AuthManager::AuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     context_->authenticationMap[AUTH_TYPE_PIN_ULTRASONIC] = nullptr;
     context_->authenticationMap[AUTH_TYPE_NFC] = nullptr;
     context_->authenticationMap[AUTH_TYPE_CRE] = nullptr;
-    context_->accesser.dmVersion = DM_VERSION_5_1_1;
-    context_->accessee.dmVersion = DM_VERSION_5_1_1;
+    context_->accesser.dmVersion = DM_CURRENT_VERSION;
+    context_->accessee.dmVersion = DM_CURRENT_VERSION;
     context_->timer = std::make_shared<DmTimer>();
     context_->authMessageProcessor = std::make_shared<DmAuthMessageProcessor>();
 }
@@ -622,29 +620,6 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     return DM_OK;
 }
 
-std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context_)
-{
-#ifdef DEVICE_MANAGER_COMMON_FLAG
-    if (context_ == nullptr) {
-        LOGE("context_ is nullptr!");
-        return "";
-    }
-    context_->accesser.isCommonFlag = true;
-    LOGI("Blue device do not generate cert!");
-    return "";
-#else
-    DmCertChain dmCertChain;
-    int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
-    if (certRet != DM_OK) {
-        LOGE("generate cert fail, certRet = %{public}d", certRet);
-        return "";
-    }
-    std::string cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
-    AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
-    return cert;
-#endif
-}
-
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId)
 {
@@ -688,7 +663,6 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
         return ERR_DM_INPUT_PARA_INVALID;
     }
 
-    context_->accesser.cert = GenerateCertificate(context_);
     context_->sessionId = sessionId;
     context_->logicalSessionId = logicalSessionId;
     context_->requestId = static_cast<int64_t>(logicalSessionId);
