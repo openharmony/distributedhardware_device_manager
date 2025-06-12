@@ -646,8 +646,6 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_TOKEN_ID_HASH] = context->accesser.tokenIdHash;
     jsonObject[TAG_BUNDLE_NAME_V2] = context->accesser.bundleName;
     jsonObject[TAG_EXTRA_INFO] = context->accesser.extraInfo;
-    jsonObject[TAG_IS_COMMON_FLAG] = context->accesser.isCommonFlag;
-    jsonObject[TAG_DM_CERT_CHAIN] = context->accesser.cert;
 
     jsonObject[TAG_PEER_BUNDLE_NAME_V2] = context->accessee.bundleName;
     jsonObject[TAG_ULTRASONIC_SIDE] = static_cast<int32_t>(context->ultrasonicInfo);
@@ -1016,7 +1014,6 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
         context->pkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
     }
     ParseUltrasonicSide(jsonObject, context);
-    ParseCert(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
     return DM_OK;
 }

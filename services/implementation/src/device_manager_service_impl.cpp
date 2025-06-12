@@ -1147,7 +1147,7 @@ void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, 
             return;
         }
         if (msgType == MSG_TYPE_REQ_ACL_NEGOTIATE || msgType == MSG_TYPE_RESP_ACL_NEGOTIATE) {
-            curSession->version_ = DM_VERSION_5_1_1;
+            curSession->version_ = DM_CURRENT_VERSION;
         }
     } else {
         /**
