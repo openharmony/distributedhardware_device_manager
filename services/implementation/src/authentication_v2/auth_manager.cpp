@@ -47,6 +47,7 @@ constexpr int32_t MIN_PIN_CODE = 100000;
 constexpr int32_t MAX_PIN_CODE = 999999;
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
+const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 
 int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
 {
@@ -661,6 +662,10 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
         LOGE("ReportDiscoverUserRes failed");
     }
+    if (bindParam.find(IS_NEED_JOIN_LNN) != bindParam.end()) {
+        std::string isNeedJoinLnnStr = bindParam.at(IS_NEED_JOIN_LNN);
+        context_->isNeedJoinLnn = std::atoi(isNeedJoinLnnStr.c_str());
+    }
     if (pkgName.empty()) {
         LOGE("AuthManager::BindTarget failed, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -677,9 +682,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     }
     if (!targetId.deviceId.empty()) {
         ret = AuthenticateDevice(pkgName, authType, targetId.deviceId, ParseExtraFromMap(bindParam));
-        if (ret != DM_OK) {
-            return ret;
-        }
+        if (ret != DM_OK) { return ret; }
     } else {
         LOGE("AuthManager::BindTarget failed, targetId is error.");
         return ERR_DM_INPUT_PARA_INVALID;

@@ -219,6 +219,7 @@ struct DmAuthContext {
     DmAccess accesser;
     DmAccess accessee;
     std::multimap<DmAccess, DmAccess> proxy;    // Multimap where the key is the accessor and the value is the accesssee
+    bool isNeedJoinLnn{true};
 
     std::shared_ptr<DmAuthStateMachine> authStateMachine;
     std::shared_ptr<AuthUiStateManager> authUiStateMgr;

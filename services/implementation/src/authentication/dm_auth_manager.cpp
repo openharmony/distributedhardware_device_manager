@@ -64,6 +64,7 @@ const int32_t ALREADY_BIND = 1;
 const int32_t STRTOLL_BASE_10 = 10;
 const int32_t MAX_PUT_SESSIONKEY_TIMEOUT = 100; //ms
 const int32_t SESSION_CLOSE_TIMEOUT = 2;
+const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -1495,6 +1496,7 @@ void DmAuthManager::AuthenticateFinish()
     isAddingMember_ = false;
     isAuthenticateDevice_ = false;
     isAuthDevice_ = false;
+    isNeedJoinLnn_ = true;
     if (DeviceProfileConnector::GetInstance().GetTrustNumber(remoteDeviceId_) >= 1 &&
         CompareVersion(remoteVersion_, std::string(DM_VERSION_4_1_5_1)) &&
         softbusConnector_->CheckIsOnline(remoteDeviceId_) && authResponseContext_->isFinish) {
@@ -2039,6 +2041,10 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     };
     if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
         LOGE("ReportDiscoverUserRes failed");
+    }
+    if (bindParam.find(IS_NEED_JOIN_LNN) != bindParam.end()) {
+        std::string isNeedJoinLnnStr = bindParam.at(IS_NEED_JOIN_LNN);
+        isNeedJoinLnn_ = std::atoi(isNeedJoinLnnStr.c_str());
     }
     if (pkgName.empty()) {
         LOGE("DmAuthManager::BindTarget failed, pkgName is empty.");
@@ -3256,7 +3262,10 @@ void DmAuthManager::JoinLnn(const std::string &deviceId, bool isForceJoin)
             authResponseContext_->remoteSessionKeyId);
         return;
     }
-    softbusConnector_->JoinLnn(deviceId, isForceJoin);
+    if (isNeedJoinLnn_) {
+        LOGI("isNeedJoinLnn %{public}d", isNeedJoinLnn_);
+        softbusConnector_->JoinLnn(deviceId, isForceJoin);
+    }
 }
 
 int32_t DmAuthManager::GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId)

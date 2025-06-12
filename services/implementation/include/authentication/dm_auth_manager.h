@@ -626,6 +626,7 @@ private:
     std::string dmVersion_ = "";
     bool isAuthDevice_ = false;
     bool isAuthenticateDevice_ = false;
+    bool isNeedJoinLnn_ = true;
     int32_t authForm_ = DmAuthForm::ACROSS_ACCOUNT;
     std::string remoteVersion_ = "";
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
