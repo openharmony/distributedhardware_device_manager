@@ -114,13 +114,11 @@ int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
     LOGI("reason: %{public}d", context->reason);
     if (context->reason == DM_OK) {
         context->state = static_cast<int32_t>(GetStateType());
-        ret = FreezeProcess::GetInstance().DeleteFreezeRecord(context->accessee.bundleName,
-            context->accessee.deviceType);
+        ret = FreezeProcess::GetInstance().DeleteFreezeRecord();
         LOGI("DeleteFreezeRecord ret: %{public}d", ret);
     }
-    if (context->reason != DM_OK && context->reason != ERR_DM_DEVICE_FREEZED) {
-        ret = FreezeProcess::GetInstance().UpdateFreezeRecord(context->accessee.bundleName,
-            context->accessee.deviceType);
+    if (context->reason == ERR_DM_BIND_PIN_CODE_ERROR) {
+        ret = FreezeProcess::GetInstance().UpdateFreezeRecord();
         LOGI("UpdateFreezeData ret: %{public}d", ret);
     }
     SinkFinish(context);
