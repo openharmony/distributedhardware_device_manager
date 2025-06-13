@@ -216,14 +216,14 @@ public:
         (void)processInfo;
     }
 
-    virtual void OnDevStateCallbackAdd(const ProcessInfo &processInfo,
+    void OnDevStateCallbackAdd(const ProcessInfo &processInfo,
         const std::vector<DmDeviceInfo> &deviceList) override
     {
         (void)processInfo;
         (void)deviceList;
     }
 
-    virtual void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
+    void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override
     {
         (void)processInfo;
@@ -231,7 +231,7 @@ public:
         (void)code;
     }
 
-    virtual void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
+    void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,
         const DmDeviceIconInfo &dmDeviceIconInfo, int32_t code) override
     {
         (void)processInfo;
@@ -239,7 +239,7 @@ public:
         (void)code;
     }
 
-    virtual void OnSetLocalDeviceNameResult(const ProcessInfo &processInfo,
+    void OnSetLocalDeviceNameResult(const ProcessInfo &processInfo,
         const std::string &deviceName, int32_t code) override
     {
         (void)processInfo;
@@ -247,7 +247,7 @@ public:
         (void)code;
     }
 
-    virtual void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
+    void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) override
     {
         (void)processInfo;
