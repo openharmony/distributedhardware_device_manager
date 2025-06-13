@@ -164,7 +164,6 @@ void AuthenticateDeviceServiceImplFuzzTestSec(const uint8_t* data, size_t size)
     std::string str(reinterpret_cast<const char*>(data), size);
     FuzzedDataProvider fdp(data, size);
     AddPermission();
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     auto deviceManagerServiceImplSec = std::make_shared<DeviceManagerServiceImpl>();
 
     deviceManagerServiceImplSec->BindTarget(str, peerTargetId, bindParam);
