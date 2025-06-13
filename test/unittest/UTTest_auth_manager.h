@@ -12,44 +12,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-#ifndef UTTEST_AUTH_NEGOTIATE_STATE_H
-#define UTTEST_AUTH_NEGOTIATE_STATE_H
 
-#include "gtest/gtest.h"
+#ifndef OHOS_UTTEST_AUTH_MANAGER_H
+#define OHOS_UTTEST_AUTH_MANAGER_H
+
+#include <gtest/gtest.h>
+
 #include "auth_manager.h"
-#include "accesstoken_kit_mock.h"
-#include "softbus_connector_mock.h"
-#include "softbus_session_mock.h"
+#include "device_manager_service_listener.h"
+#include "hichain_connector.h"
+#include "softbus_connector.h"
 #include "distributed_device_profile_client_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-
-class AuthNegotiateTest : public testing::Test {
+class AuthManagerTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
 private:
-    static inline std::shared_ptr<SoftbusConnectorMock> softbusConnectorMock =
-        std::make_shared<SoftbusConnectorMock>();
-    static inline std::shared_ptr<SoftbusSessionMock> softbusSessionMock =
-        std::make_shared<SoftbusSessionMock>();
     static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
         distributedDeviceProfileClientMock_ =
         std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
-    static inline std::shared_ptr<AccessTokenKitMock> tokenMock = nullptr;
+
     std::shared_ptr<SoftbusConnector> softbusConnector;
-    std::shared_ptr<IDeviceManagerServiceListener> listener;
+    std::shared_ptr<IDeviceManagerServiceListener> deviceManagerServicelistener;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector;
     std::shared_ptr<HiChainConnector> hiChainConnector;
     std::shared_ptr<AuthManager> authManager;
-    std::shared_ptr<DmAuthContext> context;
-    std::shared_ptr<SoftbusSession> softbusSession;
 };
-
-}
-}
+} // namespace DistributedHardware
+} // namespace OHOS
 #endif

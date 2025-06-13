@@ -86,5 +86,15 @@ int32_t DistributedDeviceProfileClient::GetLocalServiceInfoByBundleAndPinType(co
     return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->GetLocalServiceInfoByBundleAndPinType(
         bundleName, pinExchangeType, localServiceInfo);
 }
+
+int32_t DistributedDeviceProfileClient::GetBusinessEvent(BusinessEvent &event)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->GetBusinessEvent(event);
+}
+
+int32_t DistributedDeviceProfileClient::PutBusinessEvent(const DistributedDeviceProfile::BusinessEvent &event)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->PutBusinessEvent(event);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

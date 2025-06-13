@@ -149,6 +149,8 @@ const char* CONN_SESSION_TYPE_HML = "HML";
 const char* CONN_SESSION_TYPE_BLE = "BLE";
 const char* UN_BIND_PARAM_UDID_KEY = "udidKey";
 
+const char* DM_BUSINESS_ID = "business_id";
+
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
     { ERR_DM_TIME_OUT, 96929745 }, { ERR_DM_UNSUPPORTED_AUTH_TYPE, 96929760 }, { ERR_DM_AUTH_BUSINESS_BUSY, 96929761 },

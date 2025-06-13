@@ -107,6 +107,7 @@ DM_EXPORT std::string SafetyDump(const JsonItemObject &jsonObj);
 std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index);
 bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &key);
 std::string GetAnonyJsonString(const std::string &value);
+int64_t GetCurrentTimestamp();
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

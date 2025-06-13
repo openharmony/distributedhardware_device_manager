@@ -20,6 +20,7 @@
 
 #include "access_control_profile.h"
 #include "authentication.h"
+#include "auth_manager.h"
 #include "auth_ui_state_manager.h"
 #include "dm_ability_manager.h"
 #include "dm_anonymous.h"
@@ -202,6 +203,7 @@ struct DmAuthContext {
     bool successFinished{false};
     bool isAppCredentialVerified{false};        // Whether the application credential has been verified
     bool hmlEnable160M{false};
+    std::string businessId;
     std::string pkgName;    // Business-provided identifier, custom-defined by business, carries risk of spoofing
     std::string pkgLabel;
     std::string importCodeBundleName;           // Bundle name for imported PIN code

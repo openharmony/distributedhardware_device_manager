@@ -459,5 +459,12 @@ std::string GetAnonyJsonString(const std::string &value)
     }
     return paramJson.Dump();
 }
+
+int64_t GetCurrentTimestamp()
+{
+    auto now = std::chrono::system_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
+    return duration.count();
+}
 } // namespace DistributedHardware
 } // namespace OHOS

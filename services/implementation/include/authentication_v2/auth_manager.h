@@ -123,6 +123,8 @@ public:
     void PrepareSoftbusSessionCallback();
     void DeleteTimer();
 
+    int32_t HandleBusinessEvents(const std::string &businessId, int32_t action);
+
 protected:
     std::shared_ptr<DmAuthContext> context_;
     std::mutex bindParamMutex_;
