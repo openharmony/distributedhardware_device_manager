@@ -154,6 +154,21 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->UnRegisterUiStateCallback(str);
     deviceManagerServiceImpl->Release();
 }
+
+void AuthenticateDeviceServiceImplFuzzTestSec(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t))) {
+        return;
+    }
+
+    std::string str(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    AddPermission();
+    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    auto deviceManagerServiceImplSec = std::make_shared<DeviceManagerServiceImpl>();
+
+    deviceManagerServiceImplSec->BindTarget(str, peerTargetId, bindParam);
+}
 }
 }
 
@@ -162,6 +177,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::AuthenticateDeviceServiceImplFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceServiceImplFuzzTestSec(data, size);
 
     return 0;
 }
