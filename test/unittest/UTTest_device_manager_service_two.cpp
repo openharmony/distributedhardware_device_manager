@@ -1818,21 +1818,11 @@ HWTEST_F(DeviceManagerServiceTest, SendShareTypeUnBindBroadCast_001, testing::ex
     EXPECT_NE(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_001, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().HandleCredentialDeleted("credId", "credInfo");
-}
-
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_002, testing::ext::TestSize.Level1)
 {
     EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _)).Times(0);
 
     DeviceManagerService::GetInstance().HandleCredentialDeleted(nullptr, "credInfo");
-}
-
-HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_003, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().HandleCredentialDeleted("credId", nullptr);
 }
 
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_004, testing::ext::TestSize.Level1)

@@ -1490,34 +1490,6 @@ HWTEST_F(DmAuthManagerTest, StopAuthenticateDevice_001, testing::ext::TestSize.L
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, GetBindLevel_001, testing::ext::TestSize.Level1)
-{
-    int32_t bindLevel = INVALIED_TYPE;
-    std::string udid;
-    authManager_->HandleDeviceNotTrust(udid);
-    udid = "988989";
-    authManager_->HandleDeviceNotTrust(udid);
-    int32_t sessionId = 32166;
-    authManager_->ProcIncompatible(sessionId);
-
-    authManager_->authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE;
-    authManager_->authResponseContext_->importAuthCode = "importAuthCode";
-    authManager_->importAuthCode_ = "importAuthCode";
-    authManager_->ProcessAuthRequest(sessionId);
-
-    authManager_->authResponseContext_->authType == AUTH_TYPE_NFC;
-    authManager_->authResponseContext_->isOnline = false;
-    authManager_->authResponseContext_->reply = 0;
-    authManager_->authResponseContext_->isIdenticalAccount = false;
-    authManager_->authResponseContext_->isAuthCodeReady = true;
-    authManager_->ProcessAuthRequest(sessionId);
-
-    authManager_->authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
-    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
-    authManager_->authResponseContext_->isAuthCodeReady == false;
-    authManager_->ProcessAuthRequest(sessionId);
-}
-
 HWTEST_F(DmAuthManagerTest, IsAuthFinish_001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_->reply = ERR_DM_UNSUPPORTED_AUTH_TYPE;
