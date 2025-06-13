@@ -191,7 +191,7 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
-	if (IsAntiDisturbanceMode(context->businessId)) {
+    if (IsAntiDisturbanceMode(context->businessId)) {
         LOGI("Sink is AntiDisturbMode.");
         context->reason = ERR_DM_ANTI_DISTURB_MODE;
         return ERR_DM_ANTI_DISTURB_MODE;

@@ -145,7 +145,7 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_003, testing::ext::Te
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->authStateMachine = std::make_shared<DmAuthStateMachine>(context);
     JsonObject jsonObject;
-    jsonObject[TAG_PEER_BUNDLE_NAME_V2] = "testBundleName"; 
+    jsonObject[TAG_PEER_BUNDLE_NAME_V2] = "testBundleName";
 
     std::shared_ptr<DmAuthMessageProcessor> processor = std::make_shared<DmAuthMessageProcessor>();
     int32_t ret = processor->ParseNegotiateMessage(jsonObject, context);
