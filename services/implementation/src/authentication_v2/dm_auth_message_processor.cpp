@@ -653,6 +653,9 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_PEER_PKG_NAME] = context->accessee.pkgName;
     jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
 
+    if (!context->businessId.empty()) {
+        jsonObject[DM_BUSINESS_ID] = context->businessId;
+    }
     return DM_OK;
 }
 
@@ -974,13 +977,35 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
         context->logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<uint64_t>();
         context->requestId = static_cast<int64_t>(context->logicalSessionId);
     }
+    if (IsString(jsonObject, TAG_PEER_PKG_NAME)) {
+        context->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
+    }
+    if (IsString(jsonObject, TAG_PEER_BUNDLE_NAME_V2)) {
+        context->accessee.bundleName = jsonObject[TAG_PEER_BUNDLE_NAME_V2].Get<std::string>();
+    }
+    if (IsInt32(jsonObject, TAG_PEER_DISPLAY_ID)) {
+        context->accessee.displayId = jsonObject[TAG_PEER_DISPLAY_ID].Get<int32_t>();
+    }
+    if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
+        context->pkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
+    }
+    if (IsString(jsonObject, DM_BUSINESS_ID)) {
+        context->businessId = jsonObject[DM_BUSINESS_ID].Get<std::string>();
+    }
+    ParseAccesserInfo(jsonObject, context);
+    ParseUltrasonicSide(jsonObject, context);
+    ParseCert(jsonObject, context);
+    context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
+    return DM_OK;
+}
+
+void DmAuthMessageProcessor::ParseAccesserInfo(const JsonObject &jsonObject,
+    std::shared_ptr<DmAuthContext> context)
+{
     if (jsonObject[TAG_PKG_NAME].IsString()) {
         context->pkgName = jsonObject[TAG_PKG_NAME].Get<std::string>();
         context->accesser.pkgName = context->pkgName;
         context->accessee.pkgName = context->accesser.pkgName;
-    }
-    if (jsonObject[TAG_PEER_PKG_NAME].IsString()) {
-        context->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
     }
     if (jsonObject[TAG_DM_VERSION_V2].IsString()) {
         context->accesser.dmVersion = jsonObject[TAG_DM_VERSION_V2].Get<std::string>();
@@ -1003,19 +1028,6 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     if (jsonObject[TAG_EXTRA_INFO].IsString()) {
         context->accesser.extraInfo = jsonObject[TAG_EXTRA_INFO].Get<std::string>();
     }
-
-    if (jsonObject[TAG_PEER_BUNDLE_NAME_V2].IsString()) {
-        context->accessee.bundleName = jsonObject[TAG_PEER_BUNDLE_NAME_V2].Get<std::string>();
-    }
-    if (jsonObject[TAG_PEER_DISPLAY_ID].IsNumberInteger()) {
-        context->accessee.displayId = jsonObject[TAG_PEER_DISPLAY_ID].Get<int32_t>();
-    }
-    if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
-        context->pkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
-    }
-    ParseUltrasonicSide(jsonObject, context);
-    context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
-    return DM_OK;
 }
 
 void DmAuthMessageProcessor::ParseCert(const JsonObject &jsonObject,

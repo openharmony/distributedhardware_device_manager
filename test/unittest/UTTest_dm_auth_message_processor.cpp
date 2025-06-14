@@ -111,6 +111,90 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseMessageForwardUltrasonicNegotiate_001,
     EXPECT_EQ(processor->ParseMessageForwardUltrasonicNegotiate(json, context), DM_OK);
 }
 
+HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->authStateMachine = std::make_shared<DmAuthStateMachine>(context);
+    JsonObject jsonObject;
+    jsonObject[DM_TAG_LOGICAL_SESSION_ID] = 12345;
+
+    std::shared_ptr<DmAuthMessageProcessor> processor = std::make_shared<DmAuthMessageProcessor>();
+    int32_t ret = processor->ParseNegotiateMessage(jsonObject, context);
+
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(context->logicalSessionId, 12345);
+    EXPECT_EQ(context->requestId, 12345);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->authStateMachine = std::make_shared<DmAuthStateMachine>(context);
+    JsonObject jsonObject;
+    jsonObject[TAG_PEER_PKG_NAME] = "testPkgName";
+
+    std::shared_ptr<DmAuthMessageProcessor> processor = std::make_shared<DmAuthMessageProcessor>();
+    int32_t ret = processor->ParseNegotiateMessage(jsonObject, context);
+
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(context->accessee.pkgName, "testPkgName");
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->authStateMachine = std::make_shared<DmAuthStateMachine>(context);
+    JsonObject jsonObject;
+    jsonObject[TAG_PEER_BUNDLE_NAME_V2] = "testBundleName";
+
+    std::shared_ptr<DmAuthMessageProcessor> processor = std::make_shared<DmAuthMessageProcessor>();
+    int32_t ret = processor->ParseNegotiateMessage(jsonObject, context);
+
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(context->accessee.bundleName, "testBundleName");
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->authStateMachine = std::make_shared<DmAuthStateMachine>(context);
+    JsonObject jsonObject;
+    jsonObject[TAG_PEER_DISPLAY_ID] = 123;
+
+    std::shared_ptr<DmAuthMessageProcessor> processor = std::make_shared<DmAuthMessageProcessor>();
+    int32_t ret = processor->ParseNegotiateMessage(jsonObject, context);
+
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(context->accessee.displayId, 123);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_005, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->authStateMachine = std::make_shared<DmAuthStateMachine>(context);
+    JsonObject jsonObject;
+    jsonObject[TAG_HOST_PKGLABEL] = "testPkgLabel";
+
+    std::shared_ptr<DmAuthMessageProcessor> processor = std::make_shared<DmAuthMessageProcessor>();
+    int32_t ret = processor->ParseNegotiateMessage(jsonObject, context);
+
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(context->pkgLabel, "testPkgLabel");
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->authStateMachine = std::make_shared<DmAuthStateMachine>(context);
+    JsonObject jsonObject;
+    jsonObject[DM_BUSINESS_ID] = "testBusinessId";
+
+    std::shared_ptr<DmAuthMessageProcessor> processor = std::make_shared<DmAuthMessageProcessor>();
+    int32_t ret = processor->ParseNegotiateMessage(jsonObject, context);
+
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(context->businessId, "testBusinessId");
+}
 } // namespace DistributedHardware
 } // namespace OHOS
  

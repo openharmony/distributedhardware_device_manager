@@ -33,6 +33,8 @@ void AuthNegotiateTest::SetUpTestCase()
 
     DmSoftbusConnector::dmSoftbusConnector = softbusConnectorMock;
     DmSoftbusSession::dmSoftbusSession = softbusSessionMock;
+    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
+        distributedDeviceProfileClientMock_;
 }
 
 void AuthNegotiateTest::TearDownTestCase()
@@ -42,6 +44,8 @@ void AuthNegotiateTest::TearDownTestCase()
     softbusSessionMock = nullptr;
     DmSoftbusConnector::dmSoftbusConnector = nullptr;
     DmSoftbusSession::dmSoftbusSession = nullptr;
+    DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
+    distributedDeviceProfileClientMock_ = nullptr;
 }
 
 void AuthNegotiateTest::SetUp()
@@ -61,6 +65,7 @@ void AuthNegotiateTest::SetUp()
 
     Mock::VerifyAndClearExpectations(&*softbusConnectorMock);
     Mock::VerifyAndClearExpectations(&*softbusSessionMock);
+    Mock::VerifyAndClearExpectations(&*distributedDeviceProfileClientMock_);
 }
 
 void AuthNegotiateTest::TearDown()
@@ -75,6 +80,24 @@ void AuthNegotiateTest::TearDown()
 
     Mock::VerifyAndClearExpectations(&*tokenMock);
     tokenMock = nullptr;
+}
+
+int32_t GetBusinessEventMockTrue(DistributedDeviceProfile::BusinessEvent &event)
+{
+    event.SetBusinessValue("{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":true}");
+    return DM_OK;
+}
+
+int32_t GetBusinessEventMockEmpty(DistributedDeviceProfile::BusinessEvent &event)
+{
+    event.SetBusinessValue("");
+    return DM_OK;
+}
+
+int32_t GetBusinessEventMockFalse(DistributedDeviceProfile::BusinessEvent &event)
+{
+    event.SetBusinessValue("{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":false}");
+    return DM_OK;
 }
 
 HWTEST_F(AuthNegotiateTest, AuthSrcStartState_001, testing::ext::TestSize.Level1)
@@ -221,5 +244,143 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_008, testing::ext::Tes
     EXPECT_FALSE(result);
 }
 
+HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_Action_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->businessId = "test_business_id";
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetBusinessEvent(::testing::_))
+        .WillOnce(::testing::Invoke(GetBusinessEventMockTrue));
+
+    int32_t result = authState->Action(context);
+
+    EXPECT_EQ(result, ERR_DM_ANTI_DISTURB_MODE);
+    EXPECT_EQ(context->reason, ERR_DM_ANTI_DISTURB_MODE);
+}
+
+HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_Action_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->businessId = "test_business_id";
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetBusinessEvent(::testing::_))
+        .WillOnce(::testing::Invoke(GetBusinessEventMockFalse));
+
+    int32_t result = authState->Action(context);
+
+    EXPECT_NE(result, ERR_DM_ANTI_DISTURB_MODE);
+    EXPECT_NE(context->reason, ERR_DM_ANTI_DISTURB_MODE);
+}
+
+HWTEST_F(AuthNegotiateTest, IsAntiDisturbanceMode_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "";
+    businessId.clear();
+    EXPECT_FALSE(authState->IsAntiDisturbanceMode(businessId));
+}
+
+HWTEST_F(AuthNegotiateTest, IsAntiDisturbanceMode_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetBusinessEvent(::testing::_))
+        .WillOnce(::testing::Return(ERR_DM_FAILED));
+
+    EXPECT_FALSE(authState->IsAntiDisturbanceMode(businessId));
+}
+
+HWTEST_F(AuthNegotiateTest, IsAntiDisturbanceMode_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetBusinessEvent(::testing::_))
+        .WillOnce(::testing::Invoke(GetBusinessEventMockEmpty));
+
+    EXPECT_FALSE(authState->IsAntiDisturbanceMode(businessId));
+}
+
+HWTEST_F(AuthNegotiateTest, IsAntiDisturbanceMode_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetBusinessEvent(::testing::_))
+        .WillOnce(::testing::Invoke(GetBusinessEventMockTrue));
+
+    EXPECT_TRUE(authState->IsAntiDisturbanceMode(businessId));
+}
+
+HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+    std::string businessValue = "invalid_json";
+    EXPECT_FALSE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
+
+HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+    std::string businessValue = "{\"is_in_anti_disturbance_mode\":true}";
+    EXPECT_FALSE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
+
+HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+    std::string businessValue = "{\"business_id\":\"wrong_id\",\"is_in_anti_disturbance_mode\":true}";
+    EXPECT_FALSE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
+
+HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+    std::string businessValue = "{\"business_id\":\"test_business_id\"}";
+    EXPECT_FALSE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
+
+HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_005, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+    std::string businessValue = "{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":true}";
+    EXPECT_TRUE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
+
+HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_006, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+    std::string businessValue = "{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":false}";
+    EXPECT_FALSE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
+
+HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_007, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+    std::string businessValue = "{\"business_id\":123,\"is_in_anti_disturbance_mode\":true}";
+
+    EXPECT_FALSE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
+
+HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_008, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::string businessId = "test_business_id";
+    std::string businessValue = "{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":123}";
+
+    EXPECT_FALSE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
 }
 }

@@ -477,6 +477,8 @@ private:
         JsonObject &credTypeJson);
     void GetSinkCredTypeForP2P(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credObj,
         JsonObject &aclInfo, JsonObject &credTypeJson, int32_t credType, std::vector<std::string> &deleteCredInfo);
+    bool IsAntiDisturbanceMode(const std::string &businessId);
+    bool ParseAndCheckAntiDisturbanceMode(const std::string &businessId, const std::string &businessValue);
 };
 
 class AuthSinkDataSyncState : public DmAuthState {

@@ -16,6 +16,8 @@
 #include <memory>
 
 #include "app_manager.h"
+#include "business_event.h"
+#include "distributed_device_profile_client.h"
 #include "softbus_common.h"
 #include "system_ability_definition.h"
 #include "iservice_registry.h"
@@ -36,6 +38,7 @@
 #include "dm_auth_context.h"
 #include "dm_auth_message_processor.h"
 #include "dm_auth_state.h"
+#include "json_object.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -46,6 +49,9 @@ constexpr int32_t MAX_PIN_CODE = 999999;
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
+const char* DM_REJECT_KEY = "business_id_cast+_reject_event";
+const char* DM_AUTH_DIALOG_REJECT = "is_auth_dialog_reject";
+const char* DM_TIMESTAMP = "timestamp";
 
 int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr)
 {
@@ -135,6 +141,7 @@ AuthManager::AuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
     context_->accessee.dmVersion = DM_CURRENT_VERSION;
     context_->timer = std::make_shared<DmTimer>();
     context_->authMessageProcessor = std::make_shared<DmAuthMessageProcessor>();
+    context_->businessId = "";
 }
 
 AuthManager::~AuthManager()
@@ -415,6 +422,9 @@ std::string AuthManager::GetBundleName(const JsonObject &jsonObject)
 
 void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
 {
+    if (IsString(jsonObject, DM_BUSINESS_ID)) {
+        context_->businessId = jsonObject[DM_BUSINESS_ID].Get<std::string>();
+    }
     if (jsonObject[APP_OPERATION_KEY].IsString()) {
         context_->appOperation = jsonObject[APP_OPERATION_KEY].Get<std::string>();
     }
@@ -725,6 +735,16 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
     if (context_ == nullptr || context_->authStateMachine == nullptr) {
         LOGE("OnUserOperation: Authenticate is not start");
         return ERR_DM_AUTH_NOT_START;
+    }
+
+    std::string businessId = context_->businessId;
+    if (!businessId.empty()) {
+        LOGI("AuthSinkManager::OnUserOperation found businessId: %{public}s", businessId.c_str());
+        int32_t ret = HandleBusinessEvents(businessId, action);
+        if (ret != DM_OK) {
+            LOGE("AuthSinkManager::OnUserOperation failed to handle business events, ret: %{public}d", ret);
+            return ret;
+        }
     }
 
     switch (action) {
@@ -1079,6 +1099,25 @@ void AuthManager::DeleteTimer()
         bindParam_.clear();
     }
     LOGI("end.");
+}
+
+int32_t AuthManager::HandleBusinessEvents(const std::string &businessId, int32_t action)
+{
+    LOGI("AuthManager::HandleBusinessEvents start.");
+    DistributedDeviceProfile::BusinessEvent rejectEvent;
+    rejectEvent.SetBusinessKey(DM_REJECT_KEY);
+    JsonObject rejectJson;
+    rejectJson[DM_BUSINESS_ID] = businessId;
+    rejectJson[DM_AUTH_DIALOG_REJECT] = (action == USER_OPERATION_TYPE_CANCEL_AUTH);
+    rejectJson[DM_TIMESTAMP] = std::to_string(GetCurrentTimestamp());
+    rejectEvent.SetBusinessValue(rejectJson.Dump());
+    int32_t ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutBusinessEvent(rejectEvent);
+    if (ret != DM_OK) {
+        LOGE("HandleBusinessEvents failed to store reject_event, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("HandleBusinessEvents successfully stored reject_event.");
+    return DM_OK;
 }
 }  // namespace DistributedHardware
 }  // namespace OHOS

@@ -22,6 +22,8 @@
 #include "accessee.h"
 #include "auth_manager.h"
 #include "app_manager.h"
+#include "business_event.h"
+#include "distributed_device_profile_client.h"
 #include "dm_auth_cert.h"
 #include "dm_auth_attest_common.h"
 #include "dm_crypto.h"
@@ -48,6 +50,10 @@ using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+    const char* DM_DISTURBANCE_EVENT_KEY = "business_id_cast+_disturbance_event";
+    const char* DM_ANTI_DISTURBANCE_MODE = "is_in_anti_disturbance_mode";
+}
 
 DmAuthStateType AuthSrcStartState::GetStateType()
 {
@@ -184,6 +190,11 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
+    if (IsAntiDisturbanceMode(context->businessId)) {
+        LOGI("Sink is AntiDisturbMode.");
+        context->reason = ERR_DM_ANTI_DISTURB_MODE;
+        return ERR_DM_ANTI_DISTURB_MODE;
+    }
     if (FreezeProcess::GetInstance().IsFrozen()) {
         LOGE("Device is Frozen");
         return ERR_DM_DEVICE_FROZEN;
@@ -534,6 +545,57 @@ void AuthSinkNegotiateStateMachine::GetP2PCredentialInfo(std::shared_ptr<DmAuthC
     if (context->hiChainAuthConnector->QueryCredentialInfo(context->accessee.userId, queryParams, credInfo) != DM_OK) {
         LOGE("QueryCredentialInfo failed credInfo %{public}s.", credInfo.Dump().c_str());
     }
+}
+
+bool AuthSinkNegotiateStateMachine::IsAntiDisturbanceMode(const std::string &businessId)
+{
+    LOGI("AuthManager::IsAntiDisturbMode start.");
+    if (businessId.empty()) {
+        LOGE("AuthManager::IsAntiDisturbMode businessId is empty.");
+        return false;
+    }
+
+    DistributedDeviceProfile::BusinessEvent event;
+    event.SetBusinessKey(DM_DISTURBANCE_EVENT_KEY);
+    int32_t ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().GetBusinessEvent(event);
+    if (ret != DM_OK) {
+        LOGE("GetBusinessEvent failed to get event, ret: %{public}d", ret);
+        return false;
+    }
+    std::string businessValue = event.GetBusinessValue();
+    if (businessValue.empty()) {
+        LOGE("AuthManager::IsAntiDisturbMode failed: businessValue is empty.");
+        return false;
+    }
+    return ParseAndCheckAntiDisturbanceMode(businessId, businessValue);
+}
+
+bool AuthSinkNegotiateStateMachine::ParseAndCheckAntiDisturbanceMode(const std::string &businessId,
+    const std::string &businessValue)
+{
+    JsonObject jsonObject(businessValue);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("AuthManager::IsAntiDisturbMode failed: invalid JSON format in businessValue.");
+        return false;
+    }
+    if (!IsString(jsonObject, DM_BUSINESS_ID)) {
+        LOGE("AuthManager::IsAntiDisturbMode failed: 'business_id' field is missing or invalid.");
+        return false;
+    }
+    std::string parsedBusinessId = jsonObject[DM_BUSINESS_ID].Get<std::string>();
+    if (parsedBusinessId != businessId) {
+        LOGE("AuthManager::IsAntiDisturbMode failed: businessId mismatch. Expected: %{public}s, Found: %{public}s",
+            businessId.c_str(), parsedBusinessId.c_str());
+        return false;
+    }
+    if (!jsonObject.Contains(DM_ANTI_DISTURBANCE_MODE) || !jsonObject[DM_ANTI_DISTURBANCE_MODE].IsBoolean()) {
+        LOGE("AuthManager::IsAntiDisturbMode failed: 'is_in_anti_disturbance_mode' field is missing or invalid.");
+        return false;
+    }
+    bool isInAntiDisturbanceMode = jsonObject[DM_ANTI_DISTURBANCE_MODE].Get<bool>();
+    LOGI("AuthManager::IsAntiDisturbMode result: %{public}s", isInAntiDisturbanceMode ? "true" : "false");
+
+    return isInAntiDisturbanceMode;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
