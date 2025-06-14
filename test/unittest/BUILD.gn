@@ -70,6 +70,7 @@ group("unittest") {
     ":UTTest_dm_transport",
     ":UTTest_dm_transport_msg",
     ":UTTest_dp_inited_callback",
+    ":UTTest_freeze_process",
     ":UTTest_hichain_auth_connector",
     ":UTTest_hichain_connector",
     ":UTTest_hichain_listener",
@@ -2381,3 +2382,24 @@ ohos_static_library("device_manager_test_common") {
   part_name = "device_manager"
 }
 ## Build device_manager_test_common.a }}}
+
+## UnitTest UTTest_freeze_process {{{
+
+ohos_unittest("UTTest_freeze_process") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_freeze_process.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_freeze_process }}}
