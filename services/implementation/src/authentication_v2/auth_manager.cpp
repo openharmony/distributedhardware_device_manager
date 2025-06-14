@@ -16,6 +16,8 @@
 #include <memory>
 
 #include "app_manager.h"
+#include "business_event.h"
+#include "distributed_device_profile_client.h"
 #include "softbus_common.h"
 #include "system_ability_definition.h"
 #include "iservice_registry.h"
