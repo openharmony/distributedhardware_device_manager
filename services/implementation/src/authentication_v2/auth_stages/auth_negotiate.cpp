@@ -159,7 +159,6 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.language = DmLanguageManager::GetInstance().GetSystemLanguage();
     context->accessee.deviceName = context->listener->GetLocalDisplayDeviceNameForPrivacy();
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
-    context->accessee.deviceType = context->softbusConnector->GetLocalDeviceTypeId();
     return DM_OK;
 }
 
@@ -185,9 +184,9 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
 int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkNegotiateStateMachine::Action sessionid %{public}d", context->sessionId);
-    if (FreezeProcess::GetInstance().IsFreezed(context->accessee.bundleName, context->accessee.deviceType)) {
-        LOGE("Device is Freezed");
-        return ERR_DM_DEVICE_FREEZED;
+    if (FreezeProcess::GetInstance().IsFrozen()) {
+        LOGE("Device is Frozen");
+        return ERR_DM_DEVICE_FROZEN;
     }
     // 1. Create an authorization timer
     if (context->timer != nullptr) {
