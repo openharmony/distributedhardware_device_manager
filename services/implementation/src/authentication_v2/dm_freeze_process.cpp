@@ -30,15 +30,14 @@ constexpr const char* START_FREEZE_TIME_KEY = "startFreezeTimeStamp";
 constexpr const char* STOP_FREEZE_TIME_KEY = "stopFreezeTimeStamp";
 constexpr const char* FAILED_TIMES_STAMPS_KEY = "failedTimeStamps";
 constexpr const char* FREEZE_TIMES_STAMPS_KEY = "freezeTimeStamps";
-constexpr const char* CAST_BUNDLE_NAME = "cast_engine_service";
-constexpr int32_t MAX_CONTINUEOUS_BIND_FAILED_NUM = 2;
+constexpr int32_t MAX_CONTINUOUS_BIND_FAILED_NUM = 2;
 constexpr int64_t CONTINUEOUS_FAILED_INTERVAL = 6 * 60;
 constexpr int64_t DATA_REFRESH_INTERVAL = 20 * 60;
-constexpr int64_t NOT_FREEZE_TIME = 0;
-constexpr int64_t FIRST_FREEZE_TIME = 60;
-constexpr int64_t SECOND_FREEZE_TIME = 3 * 60;
-constexpr int64_t THIRD_FREEZE_TIME = 5 * 60;
-constexpr int64_t MAX_FREEZE_TIME = 10 * 60;
+constexpr int64_t NOT_FREEZE_DURATION_SEC = 0;
+constexpr int64_t FIRST_FREEZE_DURATION_SEC = 60;
+constexpr int64_t SECOND_FREEZE_DURATION_SEC = 3 * 60;
+constexpr int64_t THIRD_FREEZE_DURATION_SEC = 5 * 60;
+constexpr int64_t MAX_FREEZE_DURATION_SEC = 10 * 60;
 }
 
 DM_IMPLEMENT_SINGLE_INSTANCE(FreezeProcess);
@@ -53,7 +52,11 @@ int32_t FreezeProcess::SyncFreezeData()
         return ret;
     }
     DeviceFreezeState freezeStateObj;
-    ConvertJsonToDeviceFreezeState(freezeStatesValue, freezeStateObj);
+    ret = ConvertJsonToDeviceFreezeState(freezeStatesValue, freezeStateObj);
+    if (ret != DM_OK) {
+        LOGE("ConvertJsonToDeviceFreezeState, ret: %{public}d", ret);
+        return ret;
+    }
     {
         std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
         freezeStateCache_ = freezeStateObj;
@@ -65,90 +68,92 @@ int32_t FreezeProcess::SyncFreezeData()
         return ret;
     }
     BindFailedEvents bindFailedEventsObj;
-    ConvertJsonToBindFailedEvents(bindFailedEventsValue, bindFailedEventsObj);
+    ret = ConvertJsonToBindFailedEvents(bindFailedEventsValue, bindFailedEventsObj);
+    if (ret != DM_OK) {
+        LOGE("ConvertJsonToBindFailedEvents, ret: %{public}d", ret);
+        return ret;
+    }
     std::lock_guard<std::mutex> lock(bindFailedEventsCacheMtx_);
     bindFailedEventsCache_ = bindFailedEventsObj;
     LOGI("Sync freeze data success");
     return DM_OK;
 }
 
-void FreezeProcess::ConvertJsonToDeviceFreezeState(const std::string &result, DeviceFreezeState &freezeStateObj)
+int32_t FreezeProcess::ConvertJsonToDeviceFreezeState(const std::string &result, DeviceFreezeState &freezeStateObj)
 {
     if (result.empty()) {
         LOGE("result is empty");
-        return;
+        return ERR_DM_FAILED;
     }
-    cJSON *root = cJSON_Parse(result.c_str());
-    if (root == nullptr) {
-        LOGE("cJSON_Parse failed");
-        return;
+    JsonObject resultJson(result);
+    if (resultJson.IsDiscarded()) {
+        LOGE("resultJson parse failed");
+        return ERR_DM_FAILED;
     }
-    cJSON *startFreezeTimeStampItem = cJSON_GetObjectItemCaseSensitive(root, START_FREEZE_TIME_KEY);
-    if (startFreezeTimeStampItem != nullptr && cJSON_IsNumber(startFreezeTimeStampItem)) {
-        freezeStateObj.startFreezeTimeStamp = startFreezeTimeStampItem->valueint;
+    if (IsInt64(resultJson, START_FREEZE_TIME_KEY)) {
+        freezeStateObj.startFreezeTimeStamp = resultJson[START_FREEZE_TIME_KEY].Get<int64_t>();
     }
-    cJSON *stopFreezeTimeStampItem = cJSON_GetObjectItemCaseSensitive(root, STOP_FREEZE_TIME_KEY);
-    if (stopFreezeTimeStampItem != nullptr && cJSON_IsNumber(stopFreezeTimeStampItem)) {
-        freezeStateObj.stopFreezeTimeStamp = stopFreezeTimeStampItem->valueint;
+    if (IsInt64(resultJson, STOP_FREEZE_TIME_KEY)) {
+        freezeStateObj.stopFreezeTimeStamp = resultJson[STOP_FREEZE_TIME_KEY].Get<int64_t>();
     }
     LOGI("ConvertJsonToDeviceFreezeState success");
-    cJSON_Delete(root);
+    return DM_OK;
 }
 
-void FreezeProcess::ConvertJsonToBindFailedEvents(const std::string &result, BindFailedEvents &bindFailedEventsObj)
+int32_t FreezeProcess::ConvertJsonToBindFailedEvents(const std::string &result, BindFailedEvents &bindFailedEventsObj)
 {
     if (result.empty()) {
         LOGE("result is empty");
-        return;
+        return ERR_DM_FAILED;
     }
-    cJSON *root = cJSON_Parse(result.c_str());
-    if (root == nullptr) {
-        LOGE("cJSON_Parse failed");
-        return;
+    JsonObject resultJson(result);
+    if (resultJson.IsDiscarded()) {
+        LOGE("resultJson parse failed");
+        return ERR_DM_FAILED;
     }
-    cJSON *failedTimeStampsJson = cJSON_GetObjectItem(root, FAILED_TIMES_STAMPS_KEY);
-    if (failedTimeStampsJson != nullptr && cJSON_IsArray(failedTimeStampsJson)) {
-        cJSON *item;
-        cJSON_ArrayForEach(item, failedTimeStampsJson)
-        {
-            bindFailedEventsObj.failedTimeStamps.push_back(item->valueint);
-        }
+    if (IsArray(resultJson, FAILED_TIMES_STAMPS_KEY)) {
+        std::vector<int64_t> failedTimeStampsTmp;
+        resultJson[FAILED_TIMES_STAMPS_KEY].Get(failedTimeStampsTmp);
+        bindFailedEventsObj.failedTimeStamps = failedTimeStampsTmp;
     }
-    cJSON *freezeTimeStampsJson = cJSON_GetObjectItem(root, FREEZE_TIMES_STAMPS_KEY);
-    if (freezeTimeStampsJson != nullptr && cJSON_IsArray(freezeTimeStampsJson)) {
-        cJSON *item;
-        cJSON_ArrayForEach(item, freezeTimeStampsJson)
-        {
-            bindFailedEventsObj.freezeTimeStamps.push_back(item->valueint);
-        }
+    if (IsArray(resultJson, FREEZE_TIMES_STAMPS_KEY)) {
+        std::vector<int64_t> freezeTimeStampsTmp;
+        resultJson[FREEZE_TIMES_STAMPS_KEY].Get(freezeTimeStampsTmp);
+        bindFailedEventsObj.freezeTimeStamps = freezeTimeStampsTmp;
     }
     LOGI("ConvertJsonToBindFailedEvents success");
-    cJSON_Delete(root);
+    return DM_OK;
 }
 
-bool FreezeProcess::IsFreezed(const std::string &bundleName, int32_t deviceType)
+bool FreezeProcess::IsFrozen()
 {
-    if (bundleName == CAST_BUNDLE_NAME && deviceType == DEVICE_TYPE_TV) {
-        LOGI("device is TV, business is cast+, no need freeze");
-        return false;
+    {
+        std::lock_guard<std::mutex> lock(isSyncedMtx_);
+        if (!isSynced_) {
+            SyncFreezeData();
+            isSynced_ = true;
+        }
     }
-    std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
-    if (bindFailedEventsCache_.IsEmpty()) {
-        LOGI("bindFailedEventsCache is empty");
-        return false;
+    int64_t stopFreezeTimeStamp = 0;
+    {
+        std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
+        if (bindFailedEventsCache_.IsEmpty()) {
+            LOGI("bindFailedEventsCache is empty");
+            return false;
+        }
+        stopFreezeTimeStamp = freezeStateCache_.stopFreezeTimeStamp;
     }
     int64_t nowTime = GetSecondsSince1970ToNow();
-    int64_t stopFreezeTimeStamp = freezeStateCache_.stopFreezeTimeStamp;
-    return nowTime > stopFreezeTimeStamp ? false : true;
+    bool isFrozen = nowTime > stopFreezeTimeStamp ? false : true;
+    if (CleanFreezeRecord(nowTime) != DM_OK) {
+        LOGE("CleanFreezeRecord failed");
+    }
+    return isFrozen;
 }
 
-int32_t FreezeProcess::CleanFreezeRecord(const std::string &bundleName, int32_t deviceType)
+int32_t FreezeProcess::CleanFreezeRecord(int64_t nowTime)
 {
-    if (bundleName == CAST_BUNDLE_NAME && deviceType == DEVICE_TYPE_TV) {
-        LOGI("device is TV, business is cast+, no need clean");
-        return DM_OK;
-    }
-    int64_t reservedDataTimeStamp = GetSecondsSince1970ToNow() - DATA_REFRESH_INTERVAL;
+    int64_t reservedDataTimeStamp = nowTime - DATA_REFRESH_INTERVAL;
     if (CleanBindFailedEvents(reservedDataTimeStamp) != DM_OK) {
         LOGE("CleanBindFailedEvents failed");
         return ERR_DM_FAILED;
@@ -233,12 +238,8 @@ void FreezeProcess::ConvertDeviceFreezeStateToJson(const DeviceFreezeState &valu
     result = SafetyDump(jsonObj);
 }
 
-int32_t FreezeProcess::DeleteFreezeRecord(const std::string &bundleName, int32_t deviceType)
+int32_t FreezeProcess::DeleteFreezeRecord()
 {
-    if (bundleName == CAST_BUNDLE_NAME && deviceType == DEVICE_TYPE_TV) {
-        LOGI("device is TV, business is cast+, no need delete");
-        return DM_OK;
-    }
     if (KVAdapterManager::GetInstance().DeleteFreezeData(FREEZE_STATE_KEY) != DM_OK) {
         LOGE("delete freezeStates data failed");
         return ERR_DM_FAILED;
@@ -256,12 +257,8 @@ int32_t FreezeProcess::DeleteFreezeRecord(const std::string &bundleName, int32_t
     return DM_OK;
 }
 
-int32_t FreezeProcess::UpdateFreezeRecord(const std::string &bundleName, int32_t deviceType)
+int32_t FreezeProcess::UpdateFreezeRecord()
 {
-    if (bundleName == CAST_BUNDLE_NAME && deviceType == DEVICE_TYPE_TV) {
-        LOGI("device is TV, business is cast+, no need update");
-        return DM_OK;
-    }
     int64_t nowTime = GetSecondsSince1970ToNow();
     std::lock_guard<std::mutex> lock(bindFailedEventsCacheMtx_);
     BindFailedEvents bindFailedEventsTmp = bindFailedEventsCache_;
@@ -273,7 +270,7 @@ int32_t FreezeProcess::UpdateFreezeRecord(const std::string &bundleName, int32_t
         bindFailedEventsTmp.failedTimeStamps.end(),
         [nowTime, lastFreezeTimeStamps](
             int64_t v) { return v > nowTime - CONTINUEOUS_FAILED_INTERVAL && v > lastFreezeTimeStamps; });
-    if (continueBindFailedNum < MAX_CONTINUEOUS_BIND_FAILED_NUM) {
+    if (continueBindFailedNum < MAX_CONTINUOUS_BIND_FAILED_NUM) {
         bindFailedEventsTmp.failedTimeStamps.push_back(nowTime);
         std::string bindFailedEventsStr = "";
         ConvertBindFailedEventsToJson(bindFailedEventsTmp, bindFailedEventsStr);
@@ -317,17 +314,17 @@ int32_t FreezeProcess::UpdateFreezeState(int64_t nowTime)
 void FreezeProcess::CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t &nextFreezeTime)
 {
     switch (nowFreezeTime) {
-        case NOT_FREEZE_TIME:
-            nextFreezeTime = FIRST_FREEZE_TIME;
+        case NOT_FREEZE_DURATION_SEC:
+            nextFreezeTime = FIRST_FREEZE_DURATION_SEC;
             break;
-        case FIRST_FREEZE_TIME:
-            nextFreezeTime = SECOND_FREEZE_TIME;
+        case FIRST_FREEZE_DURATION_SEC:
+            nextFreezeTime = SECOND_FREEZE_DURATION_SEC;
             break;
-        case SECOND_FREEZE_TIME:
-            nextFreezeTime = THIRD_FREEZE_TIME;
+        case SECOND_FREEZE_DURATION_SEC:
+            nextFreezeTime = THIRD_FREEZE_DURATION_SEC;
             break;
         default:
-            nextFreezeTime = MAX_FREEZE_TIME;
+            nextFreezeTime = MAX_FREEZE_DURATION_SEC;
             break;
     }
 }
