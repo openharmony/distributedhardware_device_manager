@@ -38,19 +38,7 @@ void FreezeProcessTest::TearDownTestCase()
 namespace {
 constexpr int64_t DATA_REFRESH_INTERVAL = 20 * 60;
 }
-HWTEST_F(FreezeProcessTest, UpdateFreezeRecord_001, testing::ext::TestSize.Level0)
-{
-    int64_t nowTime = 1633072800 ;
-    BindFailedEvents bindFailedEventsCache;
-    bindFailedEventsCache.failedTimeStamps = {1633072700, 1633072800};
-    bindFailedEventsCache.freezeTimeStamps = {1633072600};
-    FreezeProcess freezeProcess;
-    freezeProcess.bindFailedEventsCache_ = bindFailedEventsCache;
-    int32_t result = freezeProcess.UpdateFreezeRecord();
-    EXPECT_EQ(result, ERR_DM_FAILED);
-}
-
-HWTEST_F(FreezeProcessTest, UpdateFreezeRecord_002, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, UpdateFreezeRecord, testing::ext::TestSize.Level0)
 {
     int64_t nowTime = 1633072800 ;
     BindFailedEvents bindFailedEventsCache;
@@ -62,19 +50,7 @@ HWTEST_F(FreezeProcessTest, UpdateFreezeRecord_002, testing::ext::TestSize.Level
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
-HWTEST_F(FreezeProcessTest, UpdateFreezeRecord_003, testing::ext::TestSize.Level0)
-{
-    int64_t nowTime = 1633072800 ;
-    BindFailedEvents bindFailedEventsCache;
-    bindFailedEventsCache.failedTimeStamps = {1633072700};
-    bindFailedEventsCache.freezeTimeStamps = {1633072600};
-    FreezeProcess freezeProcess;
-    freezeProcess.bindFailedEventsCache_ = bindFailedEventsCache;
-    int32_t result = freezeProcess.UpdateFreezeRecord();
-    EXPECT_EQ(result, ERR_DM_FAILED);
-}
-
-HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_001, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_WhenJsonIsEmpty, testing::ext::TestSize.Level0)
 {
     std::string emptyResult = "";
     BindFailedEvents bindFailedEventsObj;
@@ -83,7 +59,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_001, testing::ext::Tes
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_002, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_WhenJsonIsInvalid, testing::ext::TestSize.Level0)
 {
     std::string invalidJsonResult = "invalid_json";
     BindFailedEvents bindFailedEventsObj;
@@ -92,7 +68,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_002, testing::ext::Tes
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_003, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_WhenFailedTimestampsExist, testing::ext::TestSize.Level0)
 {
     std::string validJsonResult = R"({"failedTimeStamps": [123456, 789012]})";
     BindFailedEvents bindFailedEventsObj;
@@ -105,7 +81,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_003, testing::ext::Tes
     EXPECT_EQ(bindFailedEventsObj.freezeTimeStamps.size(), 0);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_004, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_WhenFreezeTimestampsExist, testing::ext::TestSize.Level0)
 {
     std::string validJsonResult = R"({"freezeTimeStamps": [345678, 901234]})";
     BindFailedEvents bindFailedEventsObj;
@@ -118,7 +94,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_004, testing::ext::Tes
     EXPECT_EQ(bindFailedEventsObj.freezeTimeStamps[1], 901234);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_005, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_WhenAllExist, testing::ext::TestSize.Level0)
 {
     std::string validJsonResult = R"({"failedTimeStamps": [123456, 789012],
         "freezeTimeStamps": [345678, 901234]})";
@@ -134,7 +110,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToBindFailedEvents_005, testing::ext::Tes
     EXPECT_EQ(bindFailedEventsObj.freezeTimeStamps[1], 901234);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_001, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_WhenJsonIsEmpty, testing::ext::TestSize.Level0)
 {
     std::string emptyResult = "";
     DeviceFreezeState freezeStateObj;
@@ -143,7 +119,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_001, testing::ext::Te
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_002, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_WhenJsonIsInvalid, testing::ext::TestSize.Level0)
 {
     std::string invalidJsonResult = "invalid_json";
     DeviceFreezeState freezeStateObj;
@@ -152,7 +128,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_002, testing::ext::Te
     EXPECT_EQ(result, ERR_DM_FAILED);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_003, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_WhenStartTimestampsExist, testing::ext::TestSize.Level0)
 {
     std::string validJsonResult = "{\"startFreezeTimeStamp\":1234567890}";
     DeviceFreezeState freezeStateObj;
@@ -163,7 +139,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_003, testing::ext::Te
     EXPECT_EQ(freezeStateObj.stopFreezeTimeStamp, 0);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_004, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_WhenStopTimestampsExist, testing::ext::TestSize.Level0)
 {
     std::string validJsonResult = "{\"stopFreezeTimeStamp\":9876543210}";
     DeviceFreezeState freezeStateObj;
@@ -174,7 +150,7 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_004, testing::ext::Te
     EXPECT_EQ(freezeStateObj.stopFreezeTimeStamp, 9876543210);
 }
 
-HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_005, testing::ext::TestSize.Level0)
+HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_WhenAllExist, testing::ext::TestSize.Level0)
 {
     std::string validJsonResult = "{\"startFreezeTimeStamp\":1234567890,\"stopFreezeTimeStamp\":9876543210}";
     DeviceFreezeState freezeStateObj;

@@ -65,6 +65,8 @@ const int32_t STRTOLL_BASE_10 = 10;
 const int32_t MAX_PUT_SESSIONKEY_TIMEOUT = 100; //ms
 const int32_t SESSION_CLOSE_TIMEOUT = 2;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
+constexpr const char* NEED_JOIN_LNN = "0";
+constexpr const char* NO_NEED_JOIN_LNN = "1";
 
 // clone task timeout map
 const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
@@ -2043,9 +2045,13 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
     if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
         LOGE("ReportDiscoverUserRes failed");
     }
+    std::string isNeedJoinLnnStr;
     if (bindParam.find(IS_NEED_JOIN_LNN) != bindParam.end()) {
-        std::string isNeedJoinLnnStr = bindParam.at(IS_NEED_JOIN_LNN);
+        isNeedJoinLnnStr = bindParam.at(IS_NEED_JOIN_LNN);
+    }
+    if (isNeedJoinLnnStr == NEED_JOIN_LNN || isNeedJoinLnnStr == NO_NEED_JOIN_LNN) {
         isNeedJoinLnn_ = std::atoi(isNeedJoinLnnStr.c_str());
+        LOGI("isNeedJoinLnn: %{public}d.", isNeedJoinLnn_);
     }
     if (pkgName.empty()) {
         LOGE("DmAuthManager::BindTarget failed, pkgName is empty.");
