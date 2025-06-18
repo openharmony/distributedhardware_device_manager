@@ -40,30 +40,34 @@ int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
     LOGI("Blue device do not verify cert!");
     return DM_OK;
 #else
+    if (context == nullptr) {
+        LOGE("context_ is nullptr!");
+        return ERR_DM_POINT_NULL;
+    }
     // Compatible with 5.1.0 and earlier
     if (!CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)) {
         LOGI("cert verify is not supported");
         return DM_OK;
     }
     // Compatible common device
-    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)
-        && context->accesser.isCommonFlag == true) {
+    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0) &&
+        context->accesser.isCommonFlag == true) {
         LOGI("src is common device.");
-        if (DeviceProfileConnector::GetInstance()
-            .CheckIsSameAccountByUdidHash(context->accesser.deviceIdHash) == DM_OK) {
+        if (DeviceProfileConnector::GetInstance().
+            CheckIsSameAccountByUdidHash(context->accesser.deviceIdHash) == DM_OK) {
             LOGE("src is common device, but the udidHash is identical in acl!");
             return ERR_DM_VERIFY_CERT_FAILED;
-            }
-        return DM_OK;
         }
+        return DM_OK;
+    }
     DmCertChain dmCertChain{nullptr, 0};
-    if (!AuthAttestCommon::GetInstance()
-        .DeserializeDmCertChain(context->accesser.cert, &dmCertChain)) {
+    if (!AuthAttestCommon::GetInstance().
+        DeserializeDmCertChain(context->accesser.cert, &dmCertChain)) {
         LOGE("cert deserialize fail!");
         return ERR_DM_DESERIAL_CERT_FAILED;
-        }
-    int32_t certRet = AuthCert::GetInstance()
-        .VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
+    }
+    int32_t certRet = AuthCert::GetInstance().
+        VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
     // free dmCertChain memory
     AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
     if (certRet != DM_OK) {
