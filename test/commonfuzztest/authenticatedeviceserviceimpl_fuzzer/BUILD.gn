@@ -45,6 +45,7 @@ ohos_fuzztest("AuthenticateDeviceServiceImplFuzzTest") {
     "${servicesimpl_path}/include/config",
   ]
 
+
   cflags = [
     "-g",
     "-O0",
