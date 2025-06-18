@@ -4169,15 +4169,6 @@ void DeviceManagerService::ProcessSyncAccountLogout(const std::string &accountId
     dmServiceImpl_->HandleAccountLogoutEvent(userId, accountId, peerUdid);
 }
 
-int32_t DeviceManagerService::OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m)
-{
-    if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
-    }
-    return dmServiceImplExtResident_->OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
-}
-
 int32_t DeviceManagerService::UnRegisterPinHolderCallback(const std::string &pkgName)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {

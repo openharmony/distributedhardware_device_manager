@@ -2493,15 +2493,6 @@ HWTEST_F(DeviceManagerServiceTest, GetEncryptedUuidByNetworkId_004, testing::ext
     EXPECT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DeviceManagerServiceTest, OpenAuthSessionWithPara_001, testing::ext::TestSize.Level1)
-{
-    const std::string deviceId = "OpenAuthSessionWithPara";
-    int32_t actionId = 0;
-    bool isEnable160m = false;
-    int32_t ret = DeviceManagerService::GetInstance().OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
-    EXPECT_NE(ret, DM_OK);
-}
-
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 HWTEST_F(DeviceManagerServiceTest, ConvertUdidHashToAnoyDeviceId_001, testing::ext::TestSize.Level1)
 {

@@ -110,7 +110,6 @@ public:
         std::vector<DmDeviceProfileInfo> &dmDeviceProfileInfos) = 0;
     virtual int32_t RestoreLocalDeviceName() = 0;
     virtual void ClearCacheWhenLogout(int32_t userId, const std::string &oldAccountId) = 0;
-    virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
     virtual void HandleScreenLockEvent(bool isLock) = 0;
 };
 
