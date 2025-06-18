@@ -24,8 +24,6 @@
 #include "app_manager.h"
 #include "business_event.h"
 #include "distributed_device_profile_client.h"
-#include "dm_auth_cert.h"
-#include "dm_auth_attest_common.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
 #include "dm_timer.h"

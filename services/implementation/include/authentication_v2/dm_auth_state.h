@@ -428,6 +428,8 @@ public:
     virtual ~AuthSrcCredentialAuthDoneState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+private:
+    std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkCredentialAuthStartState : public DmAuthState {
@@ -486,6 +488,8 @@ public:
     virtual ~AuthSinkDataSyncState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+private:
+    int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSrcDataSyncState : public DmAuthState {

@@ -836,7 +836,7 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
             context->confirmOperation = static_cast<UiAction>(userConfirmOpt);
         }
     }
-
+    ParseCert(jsonObject, context);
     return DM_OK;
 }
 
@@ -994,7 +994,6 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     }
     ParseAccesserInfo(jsonObject, context);
     ParseUltrasonicSide(jsonObject, context);
-    ParseCert(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
     return DM_OK;
 }
@@ -1430,7 +1429,8 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
         LOGI("Sink Send user confirm opt");
         syncMsgJson[TAG_USER_CONFIRM_OPT] = context->confirmOperation;
     }
-
+    syncMsgJson[TAG_IS_COMMON_FLAG] = context->accesser.isCommonFlag;
+    syncMsgJson[TAG_DM_CERT_CHAIN] = context->accesser.cert;
     std::string syncMsg = syncMsgJson.Dump();
     std::string compressMsg = CompressSyncMsg(syncMsg);
     if (compressMsg.empty()) {
