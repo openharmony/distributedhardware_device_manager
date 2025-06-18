@@ -18,6 +18,8 @@
 
 #include "auth_manager.h"
 #include "deviceprofile_connector.h"
+#include "dm_auth_attest_common.h"
+#include "dm_auth_cert.h"
 #include "dm_auth_context.h"
 #include "dm_auth_state.h"
 #include "dm_auth_state_machine.h"
@@ -31,6 +33,47 @@ namespace DistributedHardware {
 
 const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
 
+int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    (void)context;
+    LOGI("Blue device do not verify cert!");
+    return DM_OK;
+#else
+    // Compatible with 5.1.0 and earlier
+    if (!CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)) {
+        LOGI("cert verify is not supported");
+        return DM_OK;
+    }
+    // Compatible common device
+    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_0)
+        && context->accesser.isCommonFlag == true) {
+        LOGI("src is common device.");
+        if (DeviceProfileConnector::GetInstance()
+            .CheckIsSameAccountByUdidHash(context->accesser.deviceIdHash) == DM_OK) {
+            LOGE("src is common device, but the udidHash is identical in acl!");
+            return ERR_DM_VERIFY_CERT_FAILED;
+            }
+        return DM_OK;
+        }
+    DmCertChain dmCertChain{nullptr, 0};
+    if (!AuthAttestCommon::GetInstance()
+        .DeserializeDmCertChain(context->accesser.cert, &dmCertChain)) {
+        LOGE("cert deserialize fail!");
+        return ERR_DM_DESERIAL_CERT_FAILED;
+        }
+    int32_t certRet = AuthCert::GetInstance()
+        .VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
+    // free dmCertChain memory
+    AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
+    if (certRet != DM_OK) {
+        LOGE("validate cert fail, certRet = %{public}d", certRet);
+        return ERR_DM_VERIFY_CERT_FAILED;
+    }
+    return DM_OK;
+#endif
+}
+
 // Received 180 synchronization message, send 190 message
 int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
@@ -38,7 +81,12 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     // Query the ACL of the sink end. Compare the ACLs at both ends.
     context->softbusConnector->SyncLocalAclListProcess({context->accessee.deviceId, context->accessee.userId},
         {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList);
-
+    int32_t ret = VerifyCertificate(context);
+    if (ret != DM_OK) {
+        LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
+        context->reason = ret;
+        return ret;
+    }
     // Synchronize the local SP information, the format is uncertain, not done for now
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
     context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();

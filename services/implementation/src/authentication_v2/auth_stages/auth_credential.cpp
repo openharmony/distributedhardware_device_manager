@@ -16,6 +16,8 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include "dm_auth_attest_common.h"
+#include "dm_auth_cert.h"
 #include "dm_auth_context.h"
 #include "dm_auth_manager_base.h"
 #include "dm_auth_message_processor.h"
@@ -108,6 +110,29 @@ DmAuthStateType AuthSrcCredentialAuthDoneState::GetStateType()
     return DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE;
 }
 
+std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    if (context == nullptr) {
+        LOGE("context_ is nullptr!");
+        return "";
+    }
+    context->accesser.isCommonFlag = true;
+    LOGI("Blue device do not generate cert!");
+    return "";
+#else
+    DmCertChain dmCertChain;
+    int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
+    if (certRet != DM_OK) {
+        LOGE("generate cert fail, certRet = %{public}d", certRet);
+        return "";
+    }
+    std::string cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+    AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
+    return cert;
+#endif
+}
+
 int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
     // decrypt and transmit transmitData
@@ -115,7 +140,6 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
     if (ret != DM_OK) {
         return ret;
     }
-
     // Authentication completion triggers the Onfinish callback event.
     if (context->authStateMachine->WaitExpectEvent(ON_FINISH) != ON_FINISH) {
         LOGE("AuthSrcCredentialAuthDoneState::Action Hichain auth SINK transmit data failed");
@@ -128,7 +152,6 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
         LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
         return ret;
     }
-
     // first time joinLnn, auth lnnCredential
     if (context->accesser.isGenerateLnnCredential == true && context->isAppCredentialVerified == false &&
         context->accesser.bindLevel != USER) {
@@ -141,7 +164,6 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
             LOGE("AuthSrcCredentialAuthDoneState::Action Hichain auth credentail failed");
             return ret;
         }
-
         // wait for onTransmit event
         if (context->authStateMachine->WaitExpectEvent(ON_TRANSMIT) != ON_TRANSMIT) {
             LOGE("AuthSrcCredentialAuthDoneState::Action failed, ON_TRANSMIT event not arrived.");
@@ -151,9 +173,11 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
     } else if (context->accesser.isGenerateLnnCredential == true && context->accesser.bindLevel != USER) {
         SetAuthContext(skId, context->accesser.lnnSkTimeStamp, context->accesser.lnnSessionKeyId);
         msgType = MSG_TYPE_REQ_DATA_SYNC;
+        context->accesser.cert = GenerateCertificate(context);
     } else {  // Non-first-time authentication transport credential process
         SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
         msgType = MSG_TYPE_REQ_DATA_SYNC;
+        context->accesser.cert = GenerateCertificate(context);
     }
     std::string message =
         context->authMessageProcessor->CreateMessage(msgType, context);
@@ -161,7 +185,6 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
         LOGE("AuthSrcCredentialAuthDoneState::Action CreateMessage failed");
         return ERR_DM_FAILED;
     }
-
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
