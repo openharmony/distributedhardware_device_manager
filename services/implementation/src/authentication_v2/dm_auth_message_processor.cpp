@@ -994,7 +994,6 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     }
     ParseAccesserInfo(jsonObject, context);
     ParseUltrasonicSide(jsonObject, context);
-    ParseCert(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
     return DM_OK;
 }

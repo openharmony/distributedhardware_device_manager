@@ -33,11 +33,11 @@ namespace DistributedHardware {
 
 const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
 
-int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
+int32_t AuthSinkDataSyncState::VerifyCertificate(std::shared_ptr<DmAuthContext> context)
 {
 #ifdef DEVICE_MANAGER_COMMON_FLAG
     (void)context;
-    LOGI("Blue device do not verify cert!");
+    LOGI("open source device do not verify cert!");
     return DM_OK;
 #else
     if (context == nullptr) {
@@ -82,15 +82,16 @@ int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context)
 int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkDataSyncState::Action start");
-    // Query the ACL of the sink end. Compare the ACLs at both ends.
-    context->softbusConnector->SyncLocalAclListProcess({context->accessee.deviceId, context->accessee.userId},
-        {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList);
+    // verify device cert
     int32_t ret = VerifyCertificate(context);
     if (ret != DM_OK) {
         LOGE("AuthSinkNegotiateStateMachine::Action cert verify fail!");
         context->reason = ret;
         return ret;
     }
+    // Query the ACL of the sink end. Compare the ACLs at both ends.
+    context->softbusConnector->SyncLocalAclListProcess({context->accessee.deviceId, context->accessee.userId},
+        {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList);
     // Synchronize the local SP information, the format is uncertain, not done for now
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
     context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();

@@ -110,7 +110,7 @@ DmAuthStateType AuthSrcCredentialAuthDoneState::GetStateType()
     return DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE;
 }
 
-std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context)
+std::string AuthSrcCredentialAuthDoneState::GenerateCertificate(std::shared_ptr<DmAuthContext> context)
 {
 #ifdef DEVICE_MANAGER_COMMON_FLAG
     if (context == nullptr) {
@@ -118,7 +118,7 @@ std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context)
         return "";
     }
     context->accesser.isCommonFlag = true;
-    LOGI("Blue device do not generate cert!");
+    LOGI("open device do not generate cert!");
     return "";
 #else
     DmCertChain dmCertChain;
@@ -172,12 +172,12 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
         // First-time authentication and Lnn credential process
     } else if (context->accesser.isGenerateLnnCredential == true && context->accesser.bindLevel != USER) {
         SetAuthContext(skId, context->accesser.lnnSkTimeStamp, context->accesser.lnnSessionKeyId);
-        msgType = MSG_TYPE_REQ_DATA_SYNC;
         context->accesser.cert = GenerateCertificate(context);
+        msgType = MSG_TYPE_REQ_DATA_SYNC;
     } else {  // Non-first-time authentication transport credential process
         SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
-        msgType = MSG_TYPE_REQ_DATA_SYNC;
         context->accesser.cert = GenerateCertificate(context);
+        msgType = MSG_TYPE_REQ_DATA_SYNC;
     }
     std::string message =
         context->authMessageProcessor->CreateMessage(msgType, context);
