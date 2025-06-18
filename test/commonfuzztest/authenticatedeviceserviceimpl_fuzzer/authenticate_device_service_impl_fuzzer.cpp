@@ -47,6 +47,7 @@ int32_t g_eventId = 1;
 int32_t g_action = 1;
 int32_t g_authType = -1;
 uint16_t g_subscribeId = 123;
+int32_t USLEEP_TIME_US_5000000 = 5000000;
 
 std::string g_reqJsonStr = R"(
 {
@@ -150,23 +151,11 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->GetUdidHashByNetWorkId(str.c_str(), str);
     deviceManagerServiceImpl->ImportAuthCode(str, str);
     deviceManagerServiceImpl->ExportAuthCode(str);
+    deviceManagerServiceImpl->BindTarget(str, peerTargetId, bindParam);
     deviceManagerServiceImpl->UnRegisterCredentialCallback(str);
     deviceManagerServiceImpl->UnRegisterUiStateCallback(str);
+    usleep(USLEEP_TIME_US_5000000);
     deviceManagerServiceImpl->Release();
-}
-
-void AuthenticateDeviceServiceImplFuzzTestSec(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t))) {
-        return;
-    }
-
-    std::string str(reinterpret_cast<const char*>(data), size);
-    FuzzedDataProvider fdp(data, size);
-    AddPermission();
-    auto deviceManagerServiceImplSec = std::make_shared<DeviceManagerServiceImpl>();
-
-    deviceManagerServiceImplSec->BindTarget(str, peerTargetId, bindParam);
 }
 }
 }
@@ -176,7 +165,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::AuthenticateDeviceServiceImplFuzzTest(data, size);
-    OHOS::DistributedHardware::AuthenticateDeviceServiceImplFuzzTestSec(data, size);
 
     return 0;
 }
