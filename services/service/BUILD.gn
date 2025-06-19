@@ -106,6 +106,7 @@ if (defined(ohos_lite)) {
 
       external_deps = [
         "bounds_checking_function:libsec_shared",
+        "json:nlohmann_json_static",
         "openssl:libcrypto_shared",
       ]
 
@@ -270,6 +271,7 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "ipc:ipc_single",
+      "json:nlohmann_json_static",
       "openssl:libcrypto_shared",
       "os_account:libaccountkits",
       "os_account:os_account_innerkits",
@@ -413,6 +415,7 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "ipc:ipc_core",
       "ipc:ipc_single",
+      "json:nlohmann_json_static",
       "openssl:libcrypto_shared",
       "os_account:libaccountkits",
       "os_account:os_account_innerkits",
