@@ -351,6 +351,17 @@ std::string JsonItemObject::Dump() const
     return Dump(false);
 }
 
+std::string JsonItemObject::DumpIgnoreError() const
+{
+    return Dump(false, true);
+}
+
+std::string JsonItemObject::Dump(bool formatFlag, bool isIgnoreError) const
+{
+    (void) isIgnoreError;
+    return Dump(formatFlag);
+}
+
 std::string JsonItemObject::Dump(bool formatFlag) const
 {
     if (item_ == nullptr) {

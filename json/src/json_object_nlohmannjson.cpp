@@ -286,6 +286,32 @@ std::string JsonItemObject::Dump() const
     return Dump(false);
 }
 
+std::string JsonItemObject::DumpIgnoreError() const
+{
+    return Dump(false, true);
+}
+
+std::string JsonItemObject::Dump(bool formatFlag, bool isIgnoreError) const
+{
+    if (item_ == nullptr) {
+        LOGE("item_ is nullptr");
+        return "";
+    }
+    int indent = -1;
+    char indent_char = ' ';
+    bool ensure_ascii = false;
+    nlohmann::detail::error_handler_t error_handler = nlohmann::detail::error_handler_t::strict;
+    if (formatFlag) {
+        indent = 1;
+        indent_char = '\t';
+        error_handler = nlohmann::detail::error_handler_t::ignore;
+    }
+    if (isIgnoreError) {
+        error_handler = nlohmann::detail::error_handler_t::ignore;
+    }
+    return GetJsonPointer(item_)->dump(indent, indent_char, ensure_ascii, error_handler);
+}
+
 std::string JsonItemObject::Dump(bool formatFlag) const
 {
     if (item_ == nullptr) {
