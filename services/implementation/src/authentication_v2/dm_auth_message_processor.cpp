@@ -977,9 +977,6 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
         context->logicalSessionId = jsonObject[DM_TAG_LOGICAL_SESSION_ID].Get<uint64_t>();
         context->requestId = static_cast<int64_t>(context->logicalSessionId);
     }
-    if (IsString(jsonObject, TAG_PEER_PKG_NAME)) {
-        context->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
-    }
     if (IsString(jsonObject, TAG_PEER_BUNDLE_NAME_V2)) {
         context->accessee.bundleName = jsonObject[TAG_PEER_BUNDLE_NAME_V2].Get<std::string>();
     }
@@ -1005,6 +1002,9 @@ void DmAuthMessageProcessor::ParseAccesserInfo(const JsonObject &jsonObject,
         context->pkgName = jsonObject[TAG_PKG_NAME].Get<std::string>();
         context->accesser.pkgName = context->pkgName;
         context->accessee.pkgName = context->accesser.pkgName;
+    }
+    if (IsString(jsonObject, TAG_PEER_PKG_NAME)) {
+        context->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
     }
     if (jsonObject[TAG_DM_VERSION_V2].IsString()) {
         context->accesser.dmVersion = jsonObject[TAG_DM_VERSION_V2].Get<std::string>();
