@@ -47,6 +47,7 @@ int32_t g_eventId = 1;
 int32_t g_action = 1;
 int32_t g_authType = -1;
 uint16_t g_subscribeId = 123;
+int32_t USLEEP_TIME_US_5000000 = 5000000;
 
 std::string g_reqJsonStr = R"(
 {
@@ -153,6 +154,7 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->BindTarget(str, peerTargetId, bindParam);
     deviceManagerServiceImpl->UnRegisterCredentialCallback(str);
     deviceManagerServiceImpl->UnRegisterUiStateCallback(str);
+    usleep(USLEEP_TIME_US_5000000);
     deviceManagerServiceImpl->Release();
 }
 }
