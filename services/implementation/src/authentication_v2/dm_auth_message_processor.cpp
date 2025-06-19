@@ -1003,7 +1003,7 @@ void DmAuthMessageProcessor::ParseAccesserInfo(const JsonObject &jsonObject,
         context->accesser.pkgName = context->pkgName;
         context->accessee.pkgName = context->accesser.pkgName;
     }
-    if (IsString(jsonObject, TAG_PEER_PKG_NAME)) {
+    if (jsonObject[TAG_PEER_PKG_NAME].IsString()) {
         context->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
     }
     if (jsonObject[TAG_DM_VERSION_V2].IsString()) {
