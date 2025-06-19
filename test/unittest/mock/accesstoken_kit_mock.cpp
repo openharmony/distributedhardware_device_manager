@@ -35,9 +35,9 @@ int AccessTokenKit::GetNativeTokenInfo(AccessTokenID tokenID, NativeTokenInfo &n
     return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetNativeTokenInfo(tokenID, nativeTokenInfoRes);
 }
 
-AccessTokenID AccessTokenKit::GetNativeTokenId(const std::string &GetNativeTokenId)
+AccessTokenID AccessTokenKit::GetNativeTokenId(const std::string &nativeTokenId)
 {
-    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetNativeTokenId(GetNativeTokenId);
+    return AccessTokenKitInterface::GetOrCreateAccessTokenKit()->GetNativeTokenId(nativeTokenId);
 }
 
 AccessTokenID AccessTokenKit::GetHapTokenID(int32_t userID, const std::string &bundleName, int32_t instIndex)
