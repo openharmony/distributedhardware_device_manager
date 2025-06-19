@@ -55,6 +55,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"\"%s\"에서 이 장치에 연결하려고 합니다. 액세스할 수 있는 서비스를 선택하십시오.",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

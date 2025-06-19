@@ -91,6 +91,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"%s 請求連接本機。請選擇授權的服務：",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

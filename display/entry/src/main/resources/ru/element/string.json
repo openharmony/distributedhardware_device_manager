@@ -55,6 +55,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"%s хочет подключиться к этому устройству. Выберите службы, к которым у него будет доступ:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

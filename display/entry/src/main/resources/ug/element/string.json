@@ -70,6 +70,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"بۇ ئۈسكۈنىگە ‎%s‎ ئۇلانماقچى، ئىجازەتلەيدىغان مۇلازىمەت تاللاڭ:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

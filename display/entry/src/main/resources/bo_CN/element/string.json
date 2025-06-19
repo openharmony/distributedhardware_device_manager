@@ -70,6 +70,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"%s ཡིས་འཕྲུལ་ཆས་འདི་ལ་སྦྲེལ་མཐུད་བྱ་རྒྱུའི་རེ་ཞུ་བྱེད། དབང་སྤྲོད་རྒྱུའི་ལས་སྒོ་འདེམས་རོགས།",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }
