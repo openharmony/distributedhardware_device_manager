@@ -55,6 +55,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"\"%s\" muốn kết nối với thiết bị này. Vui lòng chọn những dịch vụ nào mà ứng dụng này có thể truy cập:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

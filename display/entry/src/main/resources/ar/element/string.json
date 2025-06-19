@@ -55,6 +55,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"يرغب \"%s\" في الاتصال بهذا الجهاز. يُرجى تحديد الخدمات التي يمكنه الوصول إليها:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

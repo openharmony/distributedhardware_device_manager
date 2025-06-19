@@ -55,6 +55,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"「%s」がこのデバイスへの接続を要求しています。アクセスできるサービスを選択してください：",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

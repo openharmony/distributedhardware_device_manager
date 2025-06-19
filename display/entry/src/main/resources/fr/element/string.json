@@ -55,6 +55,13 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"\"%s\" souhaite se connecter à cet appareil. Veuillez sélectionner les services auxquels il peut accéder :",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

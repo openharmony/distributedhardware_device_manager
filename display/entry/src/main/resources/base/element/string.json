@@ -114,7 +114,10 @@
         },
         {
             "name":"dm_confirm_proxy",
-            "value":"%s requests to connect to this device. Please select the authorized service:"
+            "value":"\"%s\" would like to connect to this device. Please select which services it can access:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }
