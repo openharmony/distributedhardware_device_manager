@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "dm_crypto.h"
 #include "dm_negotiate_process.h"
 
 namespace OHOS {
@@ -108,12 +109,89 @@ int32_t NegotiateProcess::HandleNegotiateResult(std::shared_ptr<DmAuthContext> c
     AuthType authType = ConvertAuthType(context->authType);
     LOGI("credType %{public}d, aclType %{public}d, authType %{public}d.",
         static_cast<int32_t>(credType), static_cast<int32_t>(aclType), static_cast<int32_t>(authType));
+    int32_t ret = ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
     NegotiateSpec negotiateSpec(credType, aclType, authType);
     auto handler = handlers_.find(negotiateSpec);
-    if (handler != handlers_.end()) {
-        return handler->second->NegotiateHandle(context);
+    if (handler != handlers_.end() && handler->second != nullptr) {
+        ret = handler->second->NegotiateHandle(context);
+    } else {
+        return ret;
     }
-    return ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty() ||
+        (credType == CredType::DM_IDENTICAL_CREDTYPE && aclType == AclType::DM_IDENTICAL_ACL) ||
+        (credType == CredType::DM_SHARE_CREDTYPE && aclType == AclType::DM_SHARE_ACL)) {
+        return ret;
+    }
+    return HandleProxyNegotiateResult(context, ret);
+}
+
+int32_t NegotiateProcess::HandleProxyNegotiateResult(std::shared_ptr<DmAuthContext> context, int32_t result)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return DM_OK;
+    }
+    bool isTrust = true;
+    for (auto &app : context->subjectProxyOnes) {
+        std::string credTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+            app.proxyAccesser.credTypeList : app.proxyAccessee.credTypeList;
+        std::string aclTypeList = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+            app.proxyAccesser.aclTypeList : app.proxyAccessee.aclTypeList;
+        CredType credType = ConvertCredType(credTypeList);
+        AclType aclType = ConvertAclType(aclTypeList);
+        if (credType == CredType::DM_P2P_CREDTYPE && aclType == AclType::DM_P2P_ACL) {
+            app.needBind = false;
+            app.needAgreeCredential = false;
+            app.needAuth = false;
+            app.IsNeedSetProxyRelationShip = IsNeedSetProxyRelationShip(context, app);
+        }
+    }
+    return DM_OK;
+}
+
+bool NegotiateProcess::IsNeedSetProxyRelationShip(std::shared_ptr<DmAuthContext> context,
+    DmProxyAuthContext &proxyContext)
+{
+    DmProxyAccess &access = context->direction == DmAuthDirection::DM_AUTH_SOURCE ?
+        proxyContext.proxyAccesser : proxyContext.proxyAccessee;
+    if (access.aclProfiles.find(DM_POINT_TO_POINT) == access.aclProfiles.end()) {
+        return true;
+    }
+    std::string accesserExtraData = access.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserExtraData();
+    std::string accesseeExtraData = access.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeExtraData();
+    if ((IsExistTheTokenId(accesserExtraData, proxyContext.proxyAccesser.tokenIdHash) &&
+        IsExistTheTokenId(accesseeExtraData, proxyContext.proxyAccessee.tokenIdHash)) ||
+        (IsExistTheTokenId(accesserExtraData, proxyContext.proxyAccessee.tokenIdHash) &&
+        IsExistTheTokenId(accesseeExtraData, proxyContext.proxyAccesser.tokenIdHash))) {
+        return false;
+    }
+    return true;
+}
+
+bool NegotiateProcess::IsExistTheTokenId(const std::string extraData, const std::string tokenIdHash)
+{
+    if (extraData.empty()) {
+        return false;
+    }
+    JsonObject extObj;
+    extObj.Parse(extraData);
+    if (extObj.IsDiscarded()) {
+        return false;
+    }
+    JsonObject proxyObj;
+    if (IsString(extObj, TAG_PROXY)) {
+        std::string proxyStr = extObj[TAG_PROXY].Get<std::string>();
+        proxyObj.Parse(proxyStr);
+    }
+    if (proxyObj.IsDiscarded()) {
+        return false;
+    }
+    for (auto const &item : proxyObj.Items()) {
+        if (item.IsNumber() && tokenIdHash == Crypto::GetTokenIdHash(std::to_string(item.Get<int64_t>()))) {
+            return true;
+        }
+    }
+    return false;
 }
 
 CredType NegotiateProcess::ConvertCredType(const std::string &credType)
@@ -131,10 +209,13 @@ CredType NegotiateProcess::ConvertCredType(const std::string &credType)
     }
     if (credTypeJson.Contains("identicalCredType")) {
         credTypeTemp = CredType::DM_IDENTICAL_CREDTYPE;
+        return credTypeTemp;
     } else if (credTypeJson.Contains("shareCredType")) {
         credTypeTemp = CredType::DM_SHARE_CREDTYPE;
+        return credTypeTemp;
     } else if (credTypeJson.Contains("pointTopointCredType")) {
         credTypeTemp = CredType::DM_P2P_CREDTYPE;
+        return credTypeTemp;
     } else {
         credTypeTemp = CredType::DM_NO_CRED;
     }
@@ -156,10 +237,13 @@ AclType NegotiateProcess::ConvertAclType(const std::string &aclType)
     }
     if (aclTypeJson.Contains("identicalAcl")) {
         aclTypeTemp = AclType::DM_IDENTICAL_ACL;
+        return aclTypeTemp;
     } else if (aclTypeJson.Contains("shareAcl")) {
         aclTypeTemp = AclType::DM_SHARE_ACL;
+        return aclTypeTemp;
     } else if (aclTypeJson.Contains("pointTopointAcl")) {
         aclTypeTemp = AclType::DM_P2P_ACL;
+        return aclTypeTemp;
     } else {
         aclTypeTemp = AclType::DM_NO_ACL;
     }

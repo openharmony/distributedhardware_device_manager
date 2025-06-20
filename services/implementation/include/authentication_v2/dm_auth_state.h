@@ -155,19 +155,36 @@ public:
     void SetAclInfo(std::shared_ptr<DmAuthContext> context);
     void FilterProfilesByContext(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         std::shared_ptr<DmAuthContext> context);
+    void UpdateCredInfo(std::shared_ptr<DmAuthContext> context);
+    bool IsNeedBind(std::shared_ptr<DmAuthContext> context);
+    bool IsNeedAgreeCredential(std::shared_ptr<DmAuthContext> context);
+    bool IsNeedAuth(std::shared_ptr<DmAuthContext> context);
+    bool GetSessionKey(std::shared_ptr<DmAuthContext> context);
+    bool IsAclHasCredential(const DistributedDeviceProfile::AccessControlProfile &profile,
+        const std::string &credInfoJson, std::string &credId);
     int32_t GetAclBindType(std::shared_ptr<DmAuthContext> context, std::string credId);
     int32_t GetOutputState(int32_t state);
     int32_t GetOutputReplay(const std::string &processName, int32_t replay);
     static uint64_t GetSysTimeMs();
     static void DeleteAcl(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
+    static void DeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
+        const JsonItemObject &credInfo, const DistributedDeviceProfile::AccessControlProfile &profile);
+    static void DirectlyDeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
+        const JsonItemObject &credInfo);
+    static void DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
+        const DistributedDeviceProfile::AccessControlProfile &profile);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
-    bool NeedAgreeCredential(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
+    bool ProxyNeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
+    bool GetReuseSkId(std::shared_ptr<DmAuthContext> context, int32_t &skId);
+    void GetReuseACL(std::shared_ptr<DmAuthContext> context, DistributedDeviceProfile::AccessControlProfile &profile);
     uint32_t GetCredType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo);
+    int32_t GetProxyCredInfo(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo,
+        const std::vector<std::string> &tokenIdHashList);
     uint32_t GetCredentialType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo);
-    bool HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const std::vector<std::string> &tokenList);
+    bool HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const std::vector<std::string> &tokenIdHashList);
     void SetProcessInfo(std::shared_ptr<DmAuthContext> context);
 };
 
@@ -178,7 +195,9 @@ public:
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 private:
     void NegotiateCredential(std::shared_ptr<DmAuthContext> context, JsonObject &credTypeNegoRsult);
+    void NegotiateProxyCredential(std::shared_ptr<DmAuthContext> context);
     void NegotiateAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclNegoRsult);
+    void NegotiateProxyAcl(std::shared_ptr<DmAuthContext> context);
     void GetSrcCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
     void GetIdenticalCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
     void GetShareCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
@@ -186,6 +205,8 @@ private:
     void GetSrcAclInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo, JsonObject &aclInfo);
     void GetSrcAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, JsonObject &aclInfo);
+    void GetSrcProxyAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
+        const DistributedDeviceProfile::AccessControlProfile &profile);
     bool IdenticalAccountAclCompare(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee);
     bool ShareAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -203,7 +224,9 @@ private:
         JsonObject &credTypeJson);
     void GetSrcCredTypeForP2P(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credObj,
         JsonObject &aclInfo, JsonObject &credTypeJson, int32_t credType, std::vector<std::string> &deleteCredInfo);
+    void GetSrcProxyCredTypeForP2P(std::shared_ptr<DmAuthContext> context, std::vector<std::string> &deleteCredInfo);
     void GetCustomDescBySinkLanguage(std::shared_ptr<DmAuthContext> context);
+    void ResetBindLevel(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkStatePinAuthComm {
@@ -224,11 +247,19 @@ public:
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 private:
     void NegotiateCredential(std::shared_ptr<DmAuthContext> context, JsonObject &credTypeNegoRsult);
+    void NegotiateProxyCredential(std::shared_ptr<DmAuthContext> context);
     void NegotiateAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclNegoRsult);
+    void NegotiateProxyAcl(std::shared_ptr<DmAuthContext> context);
     int32_t ShowConfigDialog(std::shared_ptr<DmAuthContext> context);
+    int32_t CreateProxyData(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObj);
+    void GetBundleLabel(std::shared_ptr<DmAuthContext> context);
     void ReadServiceInfo(std::shared_ptr<DmAuthContext> context);
     void MatchFallBackCandidateList(std::shared_ptr<DmAuthContext> context, DmAuthType authType);
     int32_t ProcessBindAuthorize(std::shared_ptr<DmAuthContext> context);
+    int32_t ProcessUserAuthorize(std::shared_ptr<DmAuthContext> context);
+    bool ProcessUserOption(std::shared_ptr<DmAuthContext> context, const std::string &authorizeInfo);
+    bool ProcessServerAuthorize(std::shared_ptr<DmAuthContext> context);
+    bool IsUserAuthorize(JsonObject &paramObj, DmProxyAccess &access);
     int32_t ProcessNoBindAuthorize(std::shared_ptr<DmAuthContext> context);
     std::string GetCredIdByCredType(std::shared_ptr<DmAuthContext> context, int32_t credType);
 };
@@ -391,6 +422,7 @@ public:
 protected:
     std::string CreateAuthParamsString(DmAuthScope authorizedScope, DmAuthCredentialAddMethod method,
         const std::shared_ptr<DmAuthContext> &authContext);
+    void GenerateTokenIds(const std::shared_ptr<DmAuthContext> &authContext, JsonObject &jsonObj);
     int32_t GenerateCredIdAndPublicKey(DmAuthScope authorizedScope, std::shared_ptr<DmAuthContext> &authContext);
     int32_t AgreeCredential(DmAuthScope authorizedScope, std::shared_ptr<DmAuthContext> &authContext);
 };
@@ -428,6 +460,9 @@ public:
     virtual ~AuthSrcCredentialAuthDoneState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    int32_t SendCredentialAuthMessage(std::shared_ptr<DmAuthContext> context, DmMessageType &msgType);
+    int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
+    int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
 private:
     std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context);
 };
@@ -444,6 +479,7 @@ public:
     virtual ~AuthSinkCredentialAuthNegotiateState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkNegotiateStateMachine : public DmAuthState {
@@ -454,6 +490,7 @@ public:
 
 private:
     int32_t RespQueryAcceseeIds(std::shared_ptr<DmAuthContext> context);
+    int32_t RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context);
     int32_t ProcRespNegotiate5_1_0(std::shared_ptr<DmAuthContext> context);
     void GetSinkCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
     void GetIdenticalCredentialInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo);
@@ -462,6 +499,8 @@ private:
     void GetSinkAclInfo(std::shared_ptr<DmAuthContext> context, JsonObject &credInfo, JsonObject &aclInfo);
     void GetSinkAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, JsonObject &aclInfo);
+    void GetSinkProxyAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
+        const DistributedDeviceProfile::AccessControlProfile &profile);
     bool IdenticalAccountAclCompare(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee);
     bool ShareAclCompare(std::shared_ptr<DmAuthContext> context,
@@ -479,6 +518,7 @@ private:
         JsonObject &credTypeJson);
     void GetSinkCredTypeForP2P(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credObj,
         JsonObject &aclInfo, JsonObject &credTypeJson, int32_t credType, std::vector<std::string> &deleteCredInfo);
+    void GetSinkProxyCredTypeForP2P(std::shared_ptr<DmAuthContext> context, std::vector<std::string> &deleteCredInfo);
     bool IsAntiDisturbanceMode(const std::string &businessId);
     bool ParseAndCheckAntiDisturbanceMode(const std::string &businessId, const std::string &businessValue);
 };
@@ -488,6 +528,7 @@ public:
     virtual ~AuthSinkDataSyncState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
 private:
     int32_t VerifyCertificate(std::shared_ptr<DmAuthContext> context);
 };
@@ -497,6 +538,7 @@ public:
     virtual ~AuthSrcDataSyncState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
 };
 
 class AuthSinkFinishState : public DmAuthState {
