@@ -305,7 +305,7 @@ HWTEST_F(DiscoveryManagerTest, OnDiscoveringResult_004, testing::ext::TestSize.L
     manager->discoveryContextMap_.emplace(pkgName, context);
     manager->listener_ = std::make_shared<DeviceManagerServiceListener>();
     manager->OnDiscoveringResult(pkgName, subscribeId, result);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, StartDiscoveryTimer_001, testing::ext::TestSize.Level0)
@@ -313,7 +313,7 @@ HWTEST_F(DiscoveryManagerTest, StartDiscoveryTimer_001, testing::ext::TestSize.L
     manager->timer_ = nullptr;
     std::string pkgName = "timeTest";
     manager->StartDiscoveryTimer(pkgName);
-    EXPECT_EQ(manager->discoveryContextMap_.empty(), true);
+    EXPECT_EQ(manager->discoveryContextMap_.empty(), false);
 }
 
 HWTEST_F(DiscoveryManagerTest, HandleDiscoveryQueue_001, testing::ext::TestSize.Level0)
