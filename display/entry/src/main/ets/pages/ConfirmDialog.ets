@@ -21,6 +21,7 @@ import display from '@ohos.display';
 import mediaQuery from '@ohos.mediaquery';
 import i18n from '@ohos.i18n';
 import { KeyCode } from '@ohos.multimodalInput.keyCode';
+import window from '@ohos.window';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
@@ -33,6 +34,16 @@ const DEVICE_TYPE_2IN1: number = 0xA2F;
 const DEVICE_TYPE_PC: number = 0x0C;
 const CAST_PKG_NAME: string = 'CastEngineService';
 
+interface AppData {
+  hostPkgLabel: string;
+  bundleName: string;
+  bundleInfo: string;
+}
+
+interface AppSendData {
+  bundleName: string;
+}
+
 @CustomDialog
 struct ConfirmCustomDialog {
   @State peerAppOperation: string = '';
@@ -44,12 +55,70 @@ struct ConfirmCustomDialog {
   @State isAvailableType: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
   @State title: string = '';
-  controller?: CustomDialogController;
-  isPC: boolean = false;
+  @State isProxy: boolean = false;
+  @State appDataList: AppData[] = [];
+  @State selectedAppDataList: AppSendData[] = [];
+  @State isFoldable: boolean = display.isFoldable();
+  @State isFolded: display.FoldStatus = display.getFoldStatus();
+  @State mLocalHeight: number = display.getDefaultDisplaySync().height;
+  @State currentOrientation: window.Orientation = window.Orientation.UNSPECIFIED;
+  @State marginValue: number = 0;
+  @State fontSizeScale: number = AppStorage.get('fontSizeScale') as number;
+  @State isPhone: boolean = false;
+  @State isPC: boolean = false;
+  @State isTablet: boolean = false;
+  @State isCar: boolean = false;
+   @State fontSize: string = '';
+  @State textHeight: number = 0;
+  @State scrollHeight: number = 0;
+  @State buttonHeight: number = 0;
+  @State columnHeight: number = 0;
+  @State symbolHeight: number = 0;
+  @State extraInfo: string = '';
+
+  controller ?: CustomDialogController;
+  listener: mediaQuery.MediaQueryListener = mediaQuery.matchMediaSync('(orientation: landscape)');
+
+  private updateOrientation() {
+    let isPortrait: boolean = mediaQuery.matchMediaSync('(orientation: portrait)').matches;
+    this.currentOrientation = isPortrait ? window.Orientation.PORTRAIT : window.Orientation.LANDSCAPE;
+    console.info(`currentOrientation: ${this.currentOrientation}`);
+  }
+
+  private updateFoldState() {
+    try {
+      this.isFolded = display.getFoldStatus();
+      console.log('fold status:', this.isFolded);
+    } catch (err) {
+      console.error(`status update failed: ${err.message}`);
+    }
+  }
 
   aboutToAppear() {
+    this.updateOrientation();
+    this.getDeviceType();
+    this.appDataList = this.getAppDataList();
+
+    if (AppStorage.get('isProxyBind') != null) {
+      this.isProxy = AppStorage.get('isProxyBind') as boolean;
+      console.log('isProxy is ' + this.isProxy);
+    }
+
+    if (!this.isPhone && this.isProxy) {
+      this.onCancel;
+    }
+
+    if (AppStorage.get('title') != null) {
+      this.title = AppStorage.get('title') as string;
+      console.log('title is ' + this.title);
+    }
+
     console.log(TAG + 'aboutToAppear execute PinCustomDialog')
     let context = getContext() as common.UIAbilityContext;
+
+    this.fontSizeScale = context.config?.fontSizeScale ?? 1;
+    console.log('=-= fontScale:' + this.fontSizeScale);
+    this.setMarginValue();
 
     if (AppStorage.get('deviceName') != null) {
       this.peerDeviceName = AppStorage.get('deviceName') as string;
@@ -57,22 +126,37 @@ struct ConfirmCustomDialog {
     }
     let customDescriptionStr: string = AppStorage.get('customDescriptionStr') as string;
     let hostPkgLabel: string = AppStorage.get('hostPkgLabel') as string;
-    if (hostPkgLabel === CAST_PKG_NAME) {
-      this.title =
-        context.resourceManager.getStringSync($r('app.string.dm_confirm_title_cast').id, this.peerDeviceName);
-    } else if (hostPkgLabel != null) {
-      this.title = context.resourceManager.getStringSync($r('app.string.dm_confirm_title_hap').id, hostPkgLabel,
-        this.peerDeviceName);
-      this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_intention').id);
-      if (customDescriptionStr != undefined && customDescriptionStr != '') {
-        this.peerCustomDescription = this.peerDeviceName + customDescriptionStr;
+    if (this.isProxy) {
+      if (hostPkgLabel === CAST_PKG_NAME) {
+        this.peerCustomDescription =
+          context.resourceManager.getStringSync($r('app.string.dm_confirm_title_cast').id, this.peerDeviceName);
+      } else if (hostPkgLabel != null) {
+        this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_proxy').id,
+          this.peerDeviceName);
+      } else {
+        let titleFirst: string =
+          context.resourceManager.getStringSync($r('app.string.dm_connect_device').id, this.peerDeviceName);
+        this.peerCustomDescription =
+          context.resourceManager.getStringSync($r('app.string.dm_is_trust_device').id, titleFirst);
       }
     } else {
-      let titleFirst: string =
-        context.resourceManager.getStringSync($r('app.string.dm_connect_device').id, this.peerDeviceName);
-      this.title =
-        context.resourceManager.getStringSync($r('app.string.dm_is_trust_device').id, titleFirst);
-      this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_intention').id);
+      if (hostPkgLabel === CAST_PKG_NAME) {
+        this.title =
+          context.resourceManager.getStringSync($r('app.string.dm_confirm_title_cast').id, this.peerDeviceName);
+      } else if (hostPkgLabel != null) {
+        this.title = context.resourceManager.getStringSync($r('app.string.dm_confirm_title_hap').id, hostPkgLabel,
+          this.peerDeviceName);
+        this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_intention').id);
+        if (customDescriptionStr != undefined && customDescriptionStr != '') {
+          this.peerCustomDescription = this.peerDeviceName + customDescriptionStr;
+        }
+      } else {
+        let titleFirst: string =
+          context.resourceManager.getStringSync($r('app.string.dm_connect_device').id, this.peerDeviceName);
+        this.title =
+          context.resourceManager.getStringSync($r('app.string.dm_is_trust_device').id, titleFirst);
+        this.peerCustomDescription = context.resourceManager.getStringSync($r('app.string.dm_confirm_intention').id);
+      }
     }
 
     if (AppStorage.get('deviceType') != null) {
@@ -92,7 +176,21 @@ struct ConfirmCustomDialog {
       }
     }, 1000)
     console.log(TAG + 'deviceInfo.deviceType:' + deviceInfo.deviceType);
-    this.isPC = Constant.isPC();
+    
+    this.listener.on('change', () => {
+      this.updateOrientation();
+    });
+    display.on('foldDisplayModeChange', () => {
+      this.updateFoldState();
+    });
+  }
+
+  aboutToDisappear() {
+    if (this.listener) {
+      this.listener.off('change');
+    }
+    display.off('foldDisplayModeChange');
+    clearInterval(this.times);
   }
 
   onAllowOnce() {
@@ -101,9 +199,13 @@ struct ConfirmCustomDialog {
       console.log('createDeviceManager is null')
       return
     }
-
+    const param = {
+      'appUserData': this.selectedAppDataList
+    };
+    const jsonStr = JSON.stringify(param);
     console.log('allow once' + ACTION_ALLOW_AUTH_ONCE)
-    this.setUserOperation(ACTION_ALLOW_AUTH_ONCE)
+    console.log('param:' + jsonStr)
+    this.setUserAuthorization(ACTION_ALLOW_AUTH_ONCE, jsonStr)
     this.destruction()
   }
 
@@ -113,9 +215,13 @@ struct ConfirmCustomDialog {
       console.log('createDeviceManager is null')
       return
     }
-
+    const param = {
+      'appUserData': this.selectedAppDataList
+    };
+    const jsonStr = JSON.stringify(param);
     console.log('allow always' + ACTION_ALLOW_AUTH_ALWAYS)
-    this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS)
+    console.log('param:' + jsonStr)
+    this.setUserAuthorization(ACTION_ALLOW_AUTH_ALWAYS, jsonStr)
     this.destruction()
   }
 
@@ -129,6 +235,60 @@ struct ConfirmCustomDialog {
     console.log('cancel' + ACTION_CANCEL_AUTH)
     this.setUserOperation(ACTION_CANCEL_AUTH)
     this.destruction()
+  }
+
+  getAppDataList(): AppData[] {
+    try {
+      const jsonStr = AppStorage.get('appUserData') as string;
+      return JSON.parse(jsonStr) as AppData[];
+    } catch (e) {
+      console.error('Failed to parse data:', e);
+      return [];
+    }
+  }
+
+  getDeviceType(): void {
+    this.isPhone = Constant.isPhone();
+    this.isPC = Constant.isPC();
+    this.isTablet = Constant.isTablet();
+    this.isCar = Constant.isCar();
+  }
+  
+  setMarginValue(): void {
+    if ((this.fontSizeScale >= 1) && (this.fontSizeScale < 1.75)) {
+      if (this.fontSizeScale === 1) {
+        this.fontSize = '20vp';
+      } else if (this.fontSizeScale === 1.15) {
+        this.fontSize = '23vp';
+      } else if (this.fontSizeScale === 1.3) {
+        this.fontSize = '26vp';
+      } else if (this.fontSizeScale === 1.45) {
+        this.fontSize = '29vp';
+      }
+      this.marginValue = 0;
+    } else if (this.fontSizeScale === 1.75) {
+      this.fontSize = '35vp';
+      this.marginValue = 5;
+    } else if (this.fontSizeScale === 2) {
+      this.fontSize = '40vp';
+      this.marginValue = 9;
+    } else if (this.fontSizeScale === 3.2) {
+      this.fontSize = '40vp';
+      this.marginValue = 13;
+    }
+  }
+
+  setUserAuthorization(operation: number, param: string) {
+    console.log(TAG + 'setUserAuthorization: ' + operation)
+    if (dmClass == null) {
+      console.log(TAG + 'setUserAuthorization: ' + 'dmClass null')
+      return;
+    }
+    try {
+      dmClass.setUserOperation(operation, param);
+    } catch (error) {
+      console.log(TAG + 'dmClass setUserOperation failed')
+    }
   }
 
   setUserOperation(operation: number) {
@@ -145,11 +305,24 @@ struct ConfirmCustomDialog {
   }
 
   destruction() {
-    let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
+      let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
     if (session) {
       session.terminateSelf();
     }
   }
+
+  private toggleSelection(app: AppData, index: number, checked: boolean) {
+  if (checked) {
+    if (!this.selectedAppDataList.some(item => item.bundleName === app.bundleName)) {
+      this.selectedAppDataList = [...this.selectedAppDataList, { bundleName: app.bundleName }];
+    }
+  } else {
+    this.selectedAppDataList = this.selectedAppDataList.filter(
+      item => item.bundleName !== app.bundleName
+    );
+  }
+  console.log('The currently selected data:', this.selectedAppDataList);
+ }
 
   getImages(peerdeviceType: number): Resource {
     console.info('peerdeviceType is ' + peerdeviceType);
@@ -191,18 +364,21 @@ struct ConfirmCustomDialog {
         .height(32)
         .fill($r('sys.color.ohos_id_color_activated'))
       Column() {
-        SymbolGlyph(this.getImages(this.peerDeviceType))
+          SymbolGlyph(this.getImages(this.peerDeviceType))
           .fontSize('20vp')
           .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
           .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
           .offset({ x: 6, y: 6 })
       }
+        .onAreaChange((o, n) => {
+          this.symbolHeight = n.height as number;
+        })
     }
-    .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
-    .margin({ bottom: 16, top: 24 })
+      .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
+      .margin({ top: 24, bottom: 15 })
   }
-
-  private isTibetanLanguages(): boolean {
+  
+    private isTibetanLanguages(): boolean {
     console.info(`${TAG} isTibetanLanguages in`);
     let locale = new Intl.Locale(i18n.System.getSystemLanguage()).toString();
     console.info(`${TAG} isTibetanLanguages: ${locale}`);
@@ -216,132 +392,1279 @@ struct ConfirmCustomDialog {
       breakpoints: { value: ['600vp', '840vp'] }
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
-        Column() {
-          this.Symbol();
-          Column() {
-            Text(this.title)
-              .textAlign(TextAlign.Center)
-              .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-              .fontWeight(FontWeight.Bold)
-              .fontColor($r('sys.color.ohos_id_color_text_primary'))
-              .minFontSize(12)
-              .maxFontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-              .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
-              .lineHeight(this.isTibetanLanguages() ? 22 : 0)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .width('auto')
-              .maxLines(2)
-            Text(this.peerCustomDescription)
-              .textAlign(TextAlign.Start)
-              .fontColor($r('sys.color.ohos_id_color_text_secondary'))
-              .fontWeight(FontWeight.Regular)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .fontSize($r('sys.float.ohos_id_text_size_body2'))
-              .maxLines(2)
-              .width('auto')
-              .lineHeight(this.isTibetanLanguages() ? 22 : 0)
-              .margin({ top: 8 })
-              .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
-          }.margin({
-            top: this.isAvailableType ? 0 : 24,
-            bottom: 16, left: 24, right: 24 })
-
-          Column() {
-            Button($r('app.string.dm_allow_always'))
-              .margin({ bottom: 4 })
-              .onClick(() => {
-                this.onAllowAlways();
-              })
-              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .height(this.isTibetanLanguages() ? 'auto' : 40)
-              .width(this.isPC ? 250 : '100%')
-              .backgroundColor(this.btnColor)
-              .onHover((isHover?: boolean, event?: HoverEvent): void => {
-                if (isHover) {
-                  this.btnColor = $r('sys.color.ohos_id_color_hover');
-                } else {
-                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+        if (this.isProxy && this.isPhone) {
+          if (this.isFoldable) {
+            if (this.isFolded === display.FoldStatus.FOLD_STATUS_FOLDED) {
+              if (this.currentOrientation === window.Orientation.PORTRAIT) {
+                Column() {
+                  this.Symbol();
+                  Column() {
+                    Text(this.title)
+                      .textAlign(TextAlign.Center)
+                      .fontSize(this.fontSize)
+                      .fontWeight(FontWeight.Bold)
+                      .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                      .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+                      .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                      .textOverflow({ overflow: TextOverflow.None })
+                      .width('auto')
+                      .maxLines(2)
+                  }
+                  .onAreaChange((o, n) => {
+                    this.textHeight = n.height as number;
+                    console.info('**textHeight**:${this.textHeight}')
+                  })
+                  .margin({
+                    top: this.isAvailableType ? 0 : (24),
+                    bottom: 15, left: 24, right: 24
+                  })
+                  .accessibilityGroup(true)
+                  .accessibilityLevel('yes')
+                    
+                  Column() {
+                    Scroll(){
+                      Column(){
+                        Text(this.peerCustomDescription)
+                          .textAlign(TextAlign.Center)
+                          .fontColor($r('sys.color.font_primary'))
+                          .fontSize($r('sys.float.Body_L'))
+                          .width('auto')
+                          .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                          .margin({
+                            bottom: 12, left: 12, right: 12
+                          })
+                          .padding({ left: (this.isPC) ? 10 : 0, right: (this.isPC) ? 10 : 0 })
+                          .accessibilityGroup(true)
+                          .accessibilityLevel('yes')
+    
+                        Stack(){
+                          List({ space: 0 }) {
+                            ForEach(this.appDataList, (app: AppData, index: number) => {
+                              ListItem() {
+                                Row() {
+                                  Column() {
+                                    Column() {
+                                      Text(app.hostPkgLabel)
+                                        .fontSize($r('sys.float.Body_L'))
+                                        .fontColor($r('sys.color.font_primary'))
+                                        .textAlign(TextAlign.Start)
+                                        .maxLines(2)
+                                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                                        .width('100%')
+                                    }
+                                    .margin({ top: this.marginValue, bottom: 2 })
+                                    Column() {
+                                      Text(app.bundleInfo)
+                                        .fontSize($r('sys.float.Body_M'))
+                                        .fontColor($r('sys.color.font_secondary'))
+                                        .textAlign(TextAlign.Start)
+                                        .width('100%')
+                                    }
+                                    .margin({ bottom: this.marginValue })
+                                  }
+                                  .layoutWeight(1)
+                                  .padding({
+                                    right: 8
+                                  })
+                                  .accessibilityGroup(true)
+                                  .accessibilityLevel('yes')
+                                  .margin({
+                                    top: index === 0 ? 4 : 0,
+                                    bottom: index === (this.appDataList.length - 1) ? 4 : 0
+                                  })
+    
+                                  Checkbox({ name: app.hostPkgLabel, })
+                                    .select(this.selectedAppDataList.some(item => item.bundleName === app.bundleName))
+                                    .shape(CheckBoxShape.CIRCLE)
+                                    .size({ width: 20, height: 20 })
+                                    .onChange((checked: boolean) => {
+                                      this.toggleSelection(app, index, checked);
+                                    })
+                                }
+                                .width('100%')
+                                .padding({ top: 11, bottom: 11, left: 12, right: 12 })
+                              }
+                            }, (app: AppData) => app.hostPkgLabel)
+                          }
+                          .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                          .backgroundColor($r('sys.color.comp_background_list_card'))
+                          .width('100%')
+                          .divider({
+                            strokeWidth: 1,
+                            color: $r('sys.color.ohos_id_color_sub_background'),
+                            startMargin: 12,
+                            endMargin: 12
+                          })
+                          .edgeEffect(EdgeEffect.Spring)
+                        }
+                      }
+                      .margin({ left: 12, right: 12 })
+                    }
+                    .onAreaChange((o, n) => {
+                      this.scrollHeight = n.height as number;
+                      console.info('**scrollHeight**:${this.scrollHeight}')
+                     })
+                    .constraintSize({
+                      maxHeight: (this.columnHeight - this.symbolHeight - this.buttonHeight - this.textHeight - 81)
+                    })
+                    .onAreaChange((o, n) => {
+                      this.scrollHeight = n.height as number;
+                    })
+                    .scrollable(ScrollDirection.Vertical)
+                    .scrollBar(BarState.On)
+                  }
+                  .margin({ bottom: 8})
+                    
+                  Column() {
+                    Button($r('app.string.dm_allow_always'))
+                      .margin({ top: 0, bottom: 4 })
+                      .padding({ top: 8, bottom: 8 })
+                      .type(ButtonType.ROUNDED_RECTANGLE)
+                      .onClick(() => {
+                        this.onAllowAlways();
+                      })
+                      .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                      .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                      .width('100%')
+                      .backgroundColor(this.btnColor)
+                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        if (isHover) {
+                          this.btnColor = $r('sys.color.ohos_id_color_hover');
+                        } else {
+                          this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                        }
+                      })
+                      .stateStyles({
+                        pressed: {
+                          .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                        },
+                        normal: {
+                          .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                        }
+                      })
+                      .accessibilityGroup(true)
+                      .accessibilityLevel('yes')
+  
+                    Button($r('app.string.dm_allow_this_time'))
+                      .margin({ bottom: 4 })
+                      .padding({ top: 8, bottom: 8 })
+                      .type(ButtonType.ROUNDED_RECTANGLE)
+                      .onClick(() => {
+                        this.onAllowOnce();
+                      })
+                      .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                      .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                      .width('100%')
+                      .backgroundColor(this.btnColor)
+                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        if (isHover) {
+                          this.btnColor = $r('sys.color.ohos_id_color_hover');
+                        } else {
+                          this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                        }
+                      })
+                      .stateStyles({
+                        pressed: {
+                          .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                        },
+                        normal: {
+                          .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                        }
+                      })
+                      .accessibilityGroup(true)
+                      .accessibilityLevel('yes')
+  
+                    Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
+                      .padding({ top: 8, bottom: 8 })
+                      .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                      .defaultFocus(true)
+                      .type(ButtonType.ROUNDED_RECTANGLE)
+                      .onKeyEvent((event?: KeyEvent) => {
+                        if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                          console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                          return;
+                        }
+                        if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                          console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                          this.onCancel();
+                        }
+                      })
+                      .onClick(() => {
+                        this.onCancel();
+                      })
+                      .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                      .width('100%')
+                      .backgroundColor(this.btnColor)
+                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        if (isHover) {
+                          this.btnColor = $r('sys.color.ohos_id_color_hover');
+                        } else {
+                          this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                        }
+                      })
+                      .stateStyles({
+                        pressed: {
+                          .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                        },
+                        normal: {
+                          .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                        }
+                      })
+                      .accessibilityGroup(true)
+                      .accessibilityLevel('yes')
+                  }
+                  .onAreaChange((o, n) => {
+                    this.buttonHeight = n.height as number;
+                    console.info(`**buttonHeight**:${this.buttonHeight}`)
+                  })
+                  .margin({
+                    left: 16,
+                    right: 16,
+                    bottom: this.isPC ? 16 : 8
+                  })
                 }
-              })
-              .stateStyles({
-                pressed: {
-                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-                },
-                normal: {
-                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                .margin({
+                  left: 16, right: 16,
+                })
+                .height('auto')
+                .clip(true)
+                .backgroundColor($r('sys.color.mask_fourth'))
+                .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+              } else if (this.currentOrientation === window.Orientation.LANDSCAPE) {
+                Column(){
+                  this.Symbol();
+                  Scroll() {
+                    Column() {
+                      Column() {
+                        Text(this.title)
+                          .textAlign(TextAlign.Center)
+                          .fontSize(this.fontSize)
+                          .fontWeight(FontWeight.Bold)
+                          .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                          .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+                          .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                          .textOverflow({ overflow: TextOverflow.None })
+                          .width('auto')
+                          .maxLines(2)
+                      }
+                      .margin({
+                        top: this.isAvailableType ? 0 : 24, left: 12, right: 12,
+                        bottom: 15
+                      })
+                      .accessibilityGroup(true)
+                      .accessibilityLevel('yes')
+  
+                      Text(this.peerCustomDescription)
+                        .textAlign(TextAlign.Center)
+                        .fontColor($r('sys.color.font_primary'))
+                        .fontSize($r('sys.float.Body_L'))
+                        .width('auto')
+                        .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                        .margin({
+                          left: 12,
+                          right: 12,
+                          bottom: 12
+                        })
+                        .padding({ left: 20, right: 20 })
+                        .accessibilityGroup(true)
+                        .accessibilityLevel('yes')
+                      List({ space: 0 }) {
+                        ForEach(this.appDataList, (app: AppData, index: number) => {
+                          ListItem() {
+                            Row() {
+                              Column() {
+                                Column() {
+                                  Text(app.hostPkgLabel)
+                                  .fontSize($r('sys.float.Body_L'))
+                                    .fontColor($r('sys.color.font_primary'))
+                                    .textAlign(TextAlign.Start)
+                                    .maxLines(2)
+                                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                                    .width('100%')
+                                }
+                                  .margin({ top: this.marginValue, bottom: 2 })
+                                Column() {
+                                  Text(app.bundleInfo)
+                                    .fontSize($r('sys.float.Body_M'))
+                                    .fontColor($r('sys.color.font_secondary'))
+                                    .textAlign(TextAlign.Start)
+                                    .width('100%')
+                                }
+                                  .margin({ bottom: this.marginValue })
+                              }
+                                .layoutWeight(1)
+                                .padding({
+                                  right: 12
+                                })
+                                .accessibilityGroup(true)
+                                .accessibilityLevel('yes')
+                                .margin({
+                                  top: index === 0 ? 4 : 0,
+                                  bottom: index === (this.appDataList.length - 1) ? 4 : 0
+                                })
+  
+                              Checkbox({ name: app.hostPkgLabel, })
+                                .select(this.selectedAppDataList.some(item => item.bundleName === app.bundleName))
+                                .shape(CheckBoxShape.CIRCLE)
+                                .size({ width: 20, height: 20 })
+                                .onChange((checked: boolean) => {
+                                  this.toggleSelection(app, index, checked);
+                                  })
+                            }
+                            .width('100%')
+                            .padding(12)
+                          }
+                        }, (app: AppData) => app.hostPkgLabel)
+                      }
+                      .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                      .backgroundColor($r('sys.color.comp_background_list_card'))
+                      .width('auto')
+                      .divider({
+                        strokeWidth: 1,
+                        color: $r('sys.color.ohos_id_color_sub_background'),
+                        startMargin: 24,
+                        endMargin: 24
+                      })
+                      .margin({ bottom: 4 })
+                      .edgeEffect(EdgeEffect.Spring)
+                      .scrollBar(BarState.On)
+  
+                      Button($r('app.string.dm_allow_always'))
+                        .margin({ top: 4, bottom: 4, right: 4, left: 4 })
+                        .padding({ top: 8, bottom: 8 })
+                        .type(ButtonType.ROUNDED_RECTANGLE)
+                        .onClick(() => {
+                          this.onAllowAlways();
+                        })
+                        .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                        .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                        .width(this.isPC ? 250 : '100%')
+                        .backgroundColor(this.btnColor)
+                        .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                          if (isHover) {
+                            this.btnColor = $r('sys.color.ohos_id_color_hover');
+                          } else {
+                            this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                          }
+                        })
+                        .stateStyles({
+                          pressed: {
+                            .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                          },
+                          normal: {
+                            .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                          }
+                        })
+                        .accessibilityGroup(true)
+                        .accessibilityLevel('yes')
+                          
+                      Button($r('app.string.dm_allow_this_time'))
+                      .margin({ bottom: 4, right: 4, left: 4 })
+                        .padding({ top: 8, bottom: 8 })
+                        .type(ButtonType.ROUNDED_RECTANGLE)
+                        .onClick(() => {
+                          this.onAllowOnce();
+                        })
+                        .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                        .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                        .width(this.isPC ? 250 : '100%')
+                        .backgroundColor(this.btnColor)
+                        .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                          if (isHover) {
+                            this.btnColor = $r('sys.color.ohos_id_color_hover');
+                          } else {
+                            this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                          }
+                        })
+                        .stateStyles({
+                          pressed: {
+                            .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                          },
+                          normal: {
+                            .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                          }
+                        })
+                        .accessibilityGroup(true)
+                        .accessibilityLevel('yes')
+  
+                      Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
+                        .margin({ bottom: 8, right: 4, left: 4 })
+                        .padding({ top: 8, bottom: 8 })
+                        .type(ButtonType.ROUNDED_RECTANGLE)
+                        .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                        .defaultFocus(true)
+                        .onKeyEvent((event?: KeyEvent) => {
+                          if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                            console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                            return;
+                          }
+                          if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                            console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                            this.onCancel();
+                          }
+                        })
+                        .onClick(() => {
+                          this.onCancel();
+                        })
+                        .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                        .width(this.isPC ? 250 : '100%')
+                        .backgroundColor(this.btnColor)
+                        .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                          if (isHover) {
+                            this.btnColor = $r('sys.color.ohos_id_color_hover');
+                          } else {
+                            this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                          }
+                        })
+                        .stateStyles({
+                          pressed: {
+                                .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                          },
+                          normal: {
+                                .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                          }
+                        })
+                        .accessibilityGroup(true)
+                        .accessibilityLevel('yes')
+                  }
+                  .margin({ left: 12, right: 12 })
                 }
-              })
-            Button($r('app.string.dm_allow_this_time'))
-              .margin({ bottom: 4 })
-              .onClick(() => {
-                this.onAllowOnce();
-              })
-              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .height(this.isTibetanLanguages() ? 'auto' : 40)
-              .width(this.isPC ? 250 : '100%')
-              .backgroundColor(this.btnColor)
-              .onHover((isHover?: boolean, event?: HoverEvent): void => {
-                if (isHover) {
-                  this.btnColor = $r('sys.color.ohos_id_color_hover');
-                } else {
-                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                .layoutWeight(1)
+                .constraintSize({
+                  maxHeight: 'auto'
+                })
+                .scrollable(ScrollDirection.Vertical)
+                .scrollBar(BarState.On)
                 }
-              })
-              .stateStyles({
-                pressed: {
-                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-                },
-                normal: {
-                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                .width(400)
+                .height(266)
+                .clip(true)
+                .backgroundColor($r('sys.color.mask_fourth'))
+                .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+              }
+            } else if (this.isFolded === display.FoldStatus.FOLD_STATUS_EXPANDED ||
+              this.isFolded === display.FoldStatus.FOLD_STATUS_HALF_FOLDED) {
+              Column(){
+                this.Symbol();
+                Column() {
+                  Text(this.title)
+                    .textAlign(TextAlign.Center)
+                    .fontSize(this.fontSize)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                    .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+                    .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                    .textOverflow({ overflow: TextOverflow.None })
+                    .width('auto')
+                    .maxLines(2)
                 }
-              })
-            Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
-              .margin({ left: 16, right: 16 })
-              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-              .defaultFocus(true)
-              .onKeyEvent((event?: KeyEvent) => {
-                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
-                  return;
+                .onAreaChange((o, n) => {
+                  this.textHeight = n.height as number;
+                  console.info('**textHeight**:${this.textHeight}')
+                })
+                .margin({
+                  top: this.isAvailableType ? 0 : (24),
+                  bottom: 15, left: 24, right: 24
+                })
+                .accessibilityGroup(true)
+                .accessibilityLevel('yes')
+  
+                Column() {
+                  Scroll() {
+                    Column() {
+                      Text(this.peerCustomDescription)
+                        .textAlign(TextAlign.Center)
+                        .fontColor($r('sys.color.font_primary'))
+                        .fontSize($r('sys.float.Body_L'))
+                        .width('auto')
+                        .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                        .margin({
+                          bottom: 12, left: 24, right: 24
+                        })
+                        .accessibilityGroup(true)
+                        .accessibilityLevel('yes')
+                      Stack() {
+                        List({ space: 0 }) {
+                          ForEach(this.appDataList, (app: AppData, index: number) => {
+                            ListItem() {
+                              Row() {
+                                Column() {
+                                  Column() {
+                                    Text(app.hostPkgLabel)
+                                      .fontSize($r('sys.float.Body_L'))
+                                      .fontColor($r('sys.color.font_primary'))
+                                      .textAlign(TextAlign.Start)
+                                      .maxLines(2)
+                                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                                      .width('100%')
+                                  }
+                                    .margin({ top: this.marginValue, bottom: 2 })
+                                  Column() {
+                                    Text(app.bundleInfo)
+                                      .fontSize($r('sys.float.Body_M'))
+                                      .fontColor($r('sys.color.font_secondary'))
+                                      .textAlign(TextAlign.Start)
+                                      .width('100%')
+                                  }
+                                    .margin({ bottom: this.marginValue })
+                                }
+                                  .layoutWeight(1)
+                                  .padding({
+                                    right: 8
+                                  })
+                                  .accessibilityGroup(true)
+                                  .accessibilityLevel('yes')
+                                  .margin({
+                                    top: index === 0 ? 4 : 0,
+                                    bottom: index === (this.appDataList.length - 1) ? 4 : 0
+                                  })
+    
+                                Checkbox({ name: app.hostPkgLabel, })
+                                  .select(this.selectedAppDataList.some(item => item.bundleName === app.bundleName))
+                                  .shape(CheckBoxShape.CIRCLE)
+                                  .size({ width: 20, height: 20 })
+                                  .onChange((checked: boolean) => {
+                                    this.toggleSelection(app, index, checked);
+                                  })
+                              }
+                                .width('100%')
+                                .padding({ top: 11, bottom: 11, left: 12, right: 12 })
+                            }
+                          }, (app: AppData) => app.hostPkgLabel)
+                        }
+                        .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                        .backgroundColor($r('sys.color.comp_background_list_card'))
+                        .width('100%')
+                        .divider({
+                          strokeWidth: 1,
+                          color: $r('sys.color.ohos_id_color_sub_background'),
+                          startMargin: 24,
+                          endMargin: 24
+                        })
+                        .edgeEffect(EdgeEffect.Spring)
+                      }
+                    }
+                    .margin({ left: 12, right: 12 })
+                  }
+                  .onAreaChange((o, n) => {
+                    this.scrollHeight = n.height as number;
+                    console.info('**scrollHeight**:${this.scrollHeight}')
+                  })
+                  .constraintSize({
+                    maxHeight: (this.columnHeight - this.symbolHeight - this.buttonHeight - this.textHeight - 81)
+                  })
+                  .scrollable(ScrollDirection.Vertical)
+                  .scrollBar(BarState.On)
                 }
-                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
-                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
-                  this.onCancel();
+                .margin({ bottom: 8})
+  
+                Column() {
+                  Button($r('app.string.dm_allow_always'))
+                    .margin({ top: 0, bottom: 4 })
+                    .padding({ top: 8, bottom: 8 })
+                    .type(ButtonType.ROUNDED_RECTANGLE)
+                    .onClick(() => {
+                      this.onAllowAlways();
+                    })
+                    .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                    .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                    .width('100%')
+                    .backgroundColor(this.btnColor)
+                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      if (isHover) {
+                        this.btnColor = $r('sys.color.ohos_id_color_hover');
+                      } else {
+                        this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                      }
+                    })
+                    .stateStyles({
+                      pressed: {
+                        .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                      },
+                      normal: {
+                        .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                      }
+                    })
+                    .accessibilityGroup(true)
+                    .accessibilityLevel('yes')
+  
+                  Button($r('app.string.dm_allow_this_time'))
+                    .margin({ bottom: 4 })
+                    .padding({ top: 8, bottom: 8 })
+                    .type(ButtonType.ROUNDED_RECTANGLE)
+                    .onClick(() => {
+                      this.onAllowOnce();
+                    })
+                    .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                    .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                    .width('100%')
+                    .backgroundColor(this.btnColor)
+                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      if (isHover) {
+                        this.btnColor = $r('sys.color.ohos_id_color_hover');
+                      } else {
+                        this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                      }
+                    })
+                    .stateStyles({
+                      pressed: {
+                        .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                      },
+                      normal: {
+                        .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                      }
+                    })
+                    .accessibilityGroup(true)
+                    .accessibilityLevel('yes')
+  
+                  Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
+                    .padding({ top: 8, bottom: 8 })
+                    .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                    .defaultFocus(true)
+                    .type(ButtonType.ROUNDED_RECTANGLE)
+                    .onKeyEvent((event?: KeyEvent) => {
+                      if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                        console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                        return;
+                      }
+                      if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                        console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                        this.onCancel();
+                      }
+                    })
+                    .onClick(() => {
+                      this.onCancel();
+                    })
+                    .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                    .width('100%')
+                    .backgroundColor(this.btnColor)
+                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      if (isHover) {
+                        this.btnColor = $r('sys.color.ohos_id_color_hover');
+                      } else {
+                        this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                      }
+                    })
+                    .stateStyles({
+                      pressed: {
+                        .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                      },
+                      normal: {
+                        .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                      }
+                    })
+                    .accessibilityGroup(true)
+                    .accessibilityLevel('yes')
                 }
-              })
-              .onClick(() => {
-                this.onCancel();
-              })
-              .height(this.isTibetanLanguages() ? 'auto' : 40)
-              .width(this.isPC ? 250 : '100%')
-              .backgroundColor(this.btnColor)
-              .onHover((isHover?: boolean, event?: HoverEvent): void => {
-                if (isHover) {
-                  this.btnColor = $r('sys.color.ohos_id_color_hover');
-                } else {
-                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                .onAreaChange((o, n) => {
+                  this.buttonHeight = n.height as number;
+                  console.info('**buttonHeight**:${this.buttonHeight}')
+                })
+                .margin({
+                  left: 16,
+                  right: 16,
+                  bottom: this.isPC ? 16 : 8
+                })
+              }
+              .width(400)
+              .height('auto')
+              .clip(true)
+              .backgroundColor($r('sys.color.mask_fourth'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+              .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+            }
+          } else {
+            if (this.currentOrientation === window.Orientation.PORTRAIT) {
+              Column() {
+                this.Symbol();
+                Column() {
+                  Text(this.title)
+                    .textAlign(TextAlign.Center)
+                    .fontSize(this.fontSize)
+                    .fontWeight(FontWeight.Bold)
+                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                    .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+                    .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                    .textOverflow({ overflow: TextOverflow.None })
+                    .width('auto')
+                    .maxLines(2)
                 }
-              })
-              .stateStyles({
-                pressed: {
-                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-                },
-                normal: {
-                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                .onAreaChange((o, n) => {
+                  this.textHeight = n.height as number;
+                  console.info(`**textHeight**:${this.textHeight}`)
+                })
+                .margin({
+                  top: this.isAvailableType ? 0 : (24),
+                  bottom: 15, left: 24, right: 24
+                })
+                .accessibilityGroup(true)
+                .accessibilityLevel('yes')
+  
+                Column() {
+                  Scroll(){
+                    Column(){
+                      Text(this.peerCustomDescription)
+                        .textAlign(TextAlign.Center)
+                        .fontColor($r('sys.color.font_primary'))
+                        .fontSize($r('sys.float.Body_L'))
+                        .width('auto')
+                        .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                        .margin({
+                          bottom: 12, left: 12, right: 12
+                        })
+                        .accessibilityGroup(true)
+                        .accessibilityLevel('yes')
+                      
+                      Stack(){
+                        List({ space: 0 }) {
+                          ForEach(this.appDataList, (app: AppData, index: number) => {
+                            ListItem() {
+                              Row() {
+                                Column() {
+                                  Column() {
+                                    Text(app.hostPkgLabel)
+                                      .fontSize($r('sys.float.Body_L'))
+                                      .fontColor($r('sys.color.font_primary'))
+                                      .textAlign(TextAlign.Start)
+                                      .maxLines(2)
+                                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                                      .width('100%')
+                                  }
+                                  .margin({ top: this.marginValue, bottom: 2 })
+                                  Column() {
+                                    Text(app.bundleInfo)
+                                      .fontSize($r('sys.float.Body_M'))
+                                      .fontColor($r('sys.color.font_secondary'))
+                                      .textAlign(TextAlign.Start)
+                                      .width('100%')
+                                  }
+                                    .margin({ bottom: this.marginValue })
+                                }
+                                .layoutWeight(1)
+                                .padding({
+                                  right: 8
+                                })
+                                .accessibilityGroup(true)
+                                .accessibilityLevel('yes')
+                                .margin({
+                                  top: index === 0 ? 4 : 0,
+                                  bottom: index === (this.appDataList.length - 1) ? 4 : 0
+                                })
+    
+                                Checkbox({ name: app.hostPkgLabel, })
+                                  .select(this.selectedAppDataList.some(item => item.bundleName === app.bundleName))
+                                  .shape(CheckBoxShape.CIRCLE)
+                                  .size({ width: 20, height: 20 })
+                                  .onChange((checked: boolean) => {
+                                    this.toggleSelection(app, index, checked);
+                                  })
+                              }
+                              .width('100%')
+                              .padding({ top: 11, bottom: 11, left: 12, right: 12 })
+                            }
+                          }, (app: AppData) => app.hostPkgLabel)
+                        }
+                        .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                        .backgroundColor($r('sys.color.comp_background_list_card'))
+                        .width('100%')
+                        .divider({
+                          strokeWidth: 1,
+                          color: $r('sys.color.ohos_id_color_sub_background'),
+                          startMargin: 12,
+                          endMargin: 12
+                        })
+                        .edgeEffect(EdgeEffect.Spring)
+                      }
+                    }
+                    .margin({ left: 12, right: 12 })
+                  }
+                  .constraintSize({
+                    maxHeight: (this.columnHeight - this.symbolHeight - this.buttonHeight - this.textHeight - 82)
+                  })
+                  .onAreaChange((o, n) => {
+                    this.scrollHeight = n.height as number;
+                    console.info(`**scrollHeight**:${this.scrollHeight}`)
+                  })
+                  .scrollable(ScrollDirection.Vertical)
+                  .scrollBar(BarState.On)
                 }
+                .margin({ bottom: 8 })
+  
+                Column() {
+                  Button($r('app.string.dm_allow_always'))
+                    .margin({ top: 0, bottom: 4 })
+                    .padding({ top: 8, bottom: 8 })
+                    .type(ButtonType.ROUNDED_RECTANGLE)
+                    .onClick(() => {
+                      this.onAllowAlways();
+                    })
+                    .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                    .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                    .width('100%')
+                    .backgroundColor(this.btnColor)
+                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      if (isHover) {
+                        this.btnColor = $r('sys.color.ohos_id_color_hover');
+                      } else {
+                        this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                      }
+                    })
+                    .stateStyles({
+                      pressed: {
+                        .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                      },
+                      normal: {
+                        .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                      }
+                    })
+                    .accessibilityGroup(true)
+                    .accessibilityLevel('yes')
+  
+                  Button($r('app.string.dm_allow_this_time'))
+                    .margin({ bottom: 4 })
+                    .padding({ top: 8, bottom: 8 })
+                    .type(ButtonType.ROUNDED_RECTANGLE)
+                    .onClick(() => {
+                      this.onAllowOnce();
+                    })
+                    .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                    .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                    .width('100%')
+                    .backgroundColor(this.btnColor)
+                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      if (isHover) {
+                        this.btnColor = $r('sys.color.ohos_id_color_hover');
+                      } else {
+                        this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                      }
+                    })
+                    .stateStyles({
+                      pressed: {
+                        .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                      },
+                      normal: {
+                        .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                      }
+                    })
+                    .accessibilityGroup(true)
+                    .accessibilityLevel('yes')
+  
+                  Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
+                    .padding({ top: 8, bottom: 8 })
+                    .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                    .defaultFocus(true)
+                    .type(ButtonType.ROUNDED_RECTANGLE)
+                    .onKeyEvent((event?: KeyEvent) => {
+                      if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                        console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                        return;
+                      }
+                      if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                        console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                        this.onCancel();
+                      }
+                    })
+                    .onClick(() => {
+                      this.onCancel();
+                    })
+                    .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                    .width('100%')
+                    .backgroundColor(this.btnColor)
+                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      if (isHover) {
+                        this.btnColor = $r('sys.color.ohos_id_color_hover');
+                      } else {
+                        this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                      }
+                    })
+                    .stateStyles({
+                      pressed: {
+                        .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                      },
+                      normal: {
+                        .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                      }
+                    })
+                    .accessibilityGroup(true)
+                    .accessibilityLevel('yes')
+                  }
+                .onAreaChange((o, n) => {
+                  this.buttonHeight = n.height as number;
+                  console.info(`**buttonHeight**:${this.buttonHeight}`)
+                })
+                .margin({
+                  left: 16,
+                  right: 16,
+                  bottom: this.isPC ? 16 : 8
+                })
+              }
+              .margin({
+                left: 16, right: 16,
               })
+              .height('auto')
+              .clip(true)
+              .backgroundColor($r('sys.color.mask_fourth'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+              .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+            } else if (this.currentOrientation === window.Orientation.LANDSCAPE) {
+              Column(){
+                this.Symbol();
+                Scroll() {
+                  Column() {
+                    Column() {
+                      Text(this.title)
+                        .textAlign(TextAlign.Center)
+                        .fontSize(this.fontSize)
+                        .fontWeight(FontWeight.Bold)
+                        .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                        .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+                        .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                        .textOverflow({ overflow: TextOverflow.None })
+                        .width('auto')
+                        .maxLines(2)
+                    }
+                    .margin({
+                      top: this.isAvailableType ? 0 : 24, left: 12, right: 12,
+                      bottom: 15
+                    })
+                    .accessibilityGroup(true)
+                    .accessibilityLevel('yes')
+  
+                    Text(this.peerCustomDescription)
+                      .textAlign(TextAlign.Center)
+                      .fontColor($r('sys.color.font_primary'))
+                      .fontSize($r('sys.float.Body_L'))
+                      .width('auto')
+                      .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                      .margin({
+                        left: 12,
+                        right: 12,
+                        bottom: 12
+                      })
+                      .padding({ left: 20, right: 20 })
+                      .accessibilityGroup(true)
+                      .accessibilityLevel('yes')
+                    List({ space: 0 }) {
+                      ForEach(this.appDataList, (app: AppData, index: number) => {
+                        ListItem() {
+                          Row() {
+                            Column() {
+                              Column() {
+                                Text(app.hostPkgLabel)
+                                  .fontSize($r('sys.float.Body_L'))
+                                  .fontColor($r('sys.color.font_primary'))
+                                  .textAlign(TextAlign.Start)
+                                  .maxLines(2)
+                                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+                                  .width('100%')
+                              }
+                              .margin({ top: this.marginValue, bottom: 2 })
+                              Column() {
+                                Text(app.bundleInfo)
+                                  .fontSize($r('sys.float.Body_M'))
+                                  .fontColor($r('sys.color.font_secondary'))
+                                  .textAlign(TextAlign.Start)
+                                  .width('100%')
+                              }
+                              .margin({ bottom: this.marginValue })
+                            }
+                            .layoutWeight(1)
+                            .padding({
+                              right: 12
+                            })
+                            .accessibilityGroup(true)
+                            .accessibilityLevel('yes')
+                            .margin({
+                              top: index === 0 ? 4 : 0,
+                              bottom: index === (this.appDataList.length - 1) ? 4 : 0
+                            })
+  
+                            Checkbox({ name: app.hostPkgLabel, })
+                              .select(this.selectedAppDataList.some(item => item.bundleName === app.bundleName))
+                              .shape(CheckBoxShape.CIRCLE)
+                              .size({ width: 20, height: 20 })
+                              .onChange((checked: boolean) => {
+                                this.toggleSelection(app, index, checked);
+                              })
+                          }
+                          .width('100%')
+                          .padding(12)
+                        }
+                      }, (app: AppData) => app.hostPkgLabel)
+                    }
+                    .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                    .backgroundColor($r('sys.color.comp_background_list_card'))
+                    .width('auto')
+                    .divider({
+                      strokeWidth: 1,
+                      color: $r('sys.color.ohos_id_color_sub_background'),
+                      startMargin: 24,
+                      endMargin: 24
+                    })
+                    .margin({ bottom: 4 })
+                    .edgeEffect(EdgeEffect.Spring)
+                    .scrollBar(BarState.Off)
+  
+                    Button($r('app.string.dm_allow_always'))
+                      .margin({ top: 4, bottom: 4, right: 4, left: 4 })
+                      .padding({ top: 8, bottom: 8 })
+                      .type(ButtonType.ROUNDED_RECTANGLE)
+                      .onClick(() => {
+                        this.onAllowAlways();
+                      })
+                      .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                      .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                      .width(this.isPC ? 250 : '100%')
+                      .backgroundColor(this.btnColor)
+                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        if (isHover) {
+                          this.btnColor = $r('sys.color.ohos_id_color_hover');
+                        } else {
+                          this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                        }
+                      })
+                      .stateStyles({
+                          pressed: {
+                              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                        },
+                        normal: {
+                              .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                        }
+                      })
+                      .accessibilityGroup(true)
+                      .accessibilityLevel('yes')
+  
+                    Button($r('app.string.dm_allow_this_time'))
+                      .margin({ bottom: 4, right: 4, left: 4 })
+                      .padding({ top: 8, bottom: 8 })
+                      .type(ButtonType.ROUNDED_RECTANGLE)
+                      .onClick(() => {
+                        this.onAllowOnce();
+                      })
+                      .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                      .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                      .width(this.isPC ? 250 : '100%')
+                      .backgroundColor(this.btnColor)
+                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        if (isHover) {
+                          this.btnColor = $r('sys.color.ohos_id_color_hover');
+                        } else {
+                          this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                        }
+                      })
+                      .stateStyles({
+                        pressed: {
+                              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                        },
+                        normal: {
+                              .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                        }
+                      })
+                      .accessibilityGroup(true)
+                      .accessibilityLevel('yes')
+                                          
+                    Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
+                      .margin({ bottom: 8, right: 4, left: 4 })
+                      .padding({ top: 8, bottom: 8 })
+                      .type(ButtonType.ROUNDED_RECTANGLE)
+                      .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                      .defaultFocus(true)
+                      .onKeyEvent((event?: KeyEvent) => {
+                        if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                          console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                          return;
+                        }
+                        if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                          console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                          this.onCancel();
+                        }
+                      })
+                      .onClick(() => {
+                        this.onCancel();
+                      })
+                      .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                      .width(this.isPC ? 250 : '100%')
+                      .backgroundColor(this.btnColor)
+                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        if (isHover) {
+                          this.btnColor = $r('sys.color.ohos_id_color_hover');
+                        } else {
+                          this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                        }
+                      })
+                      .stateStyles({
+                        pressed: {
+                              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                        },
+                        normal: {
+                              .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                        }
+                      })
+                      .accessibilityGroup(true)
+                      .accessibilityLevel('yes')
+                  }
+                  .margin({ left: 12, right: 12 })
+                }
+                .layoutWeight(1)
+                .constraintSize({
+                  maxHeight: 'auto'
+                })
+                .scrollable(ScrollDirection.Vertical)
+                .scrollBar(BarState.On)
+              }
+              .width(400)
+              .height(266)
+              .clip(true)
+              .backgroundColor($r('sys.color.mask_fourth'))
+              .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+              .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+            }
           }
-          .margin({
-            left: 16,
-            right: 16,
-            bottom: this.isPC ? 24 : 8
-          })
+        } else {
+          Column() {
+            this.Symbol();
+            Column() {
+              Text(this.title)
+                .textAlign(TextAlign.Center)
+                .fontSize($r('sys.float.Title_S'))
+                .fontWeight(FontWeight.Bold)
+                .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
+                .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                .textOverflow({ overflow: TextOverflow.None })
+                .width('auto')
+                .maxLines(2)
+            }
+            .margin({
+              top: this.isAvailableType ? 0 : 24,
+              bottom: 15, left: 24, right: 24
+            })
+            .width('100%')
+            Column() {
+              Text(this.peerCustomDescription)
+                .textAlign(TextAlign.Start)
+                .fontColor($r('sys.color.ohos_id_color_text_secondary'))
+                .fontWeight(FontWeight.Regular)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .fontSize($r('sys.float.ohos_id_text_size_body2'))
+                .maxLines(2)
+                .width('auto')
+                .lineHeight(this.isTibetanLanguages() ? 22 : 0)
+                .margin({ top: 8 })
+                .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
+            }.margin({
+              top: this.isAvailableType ? 0 : 24,
+              bottom: 16, left: 24, right: 24
+            })
+            
+            Column() {
+              Button($r('app.string.dm_allow_always'))
+                .margin({ bottom: 4 })
+                .padding({ top: 8, bottom: 8 })
+                .onClick(() => {
+                  this.onAllowAlways();
+                })
+                .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                .width('100%')
+                .backgroundColor(this.btnColor)
+                .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                  if (isHover) {
+                    this.btnColor = $r('sys.color.ohos_id_color_hover');
+                  } else {
+                    this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                  }
+                })
+                .stateStyles({
+                  pressed: {
+                    .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                  },
+                  normal: {
+                    .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                  }
+                })
+              Button($r('app.string.dm_allow_this_time'))
+                .margin({ bottom: 4 })
+                .padding({ top: 8, bottom: 8 })
+                .onClick(() => {
+                  this.onAllowOnce();
+                })
+                .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                .width('100%')
+                .backgroundColor(this.btnColor)
+                .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                  if (isHover) {
+                    this.btnColor = $r('sys.color.ohos_id_color_hover');
+                  } else {
+                    this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                  }
+                })
+                .stateStyles({
+                  pressed: {
+                      .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                  },
+                  normal: {
+                      .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                  }
+                })     
+              Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
+                .margin({ left: 16, right: 16 })
+                .padding({ top: 8, bottom: 8 })
+                .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+                .defaultFocus(true)
+                .onKeyEvent((event?: KeyEvent) => {
+                  if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                    console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                    return;
+                  }
+                  if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                    console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                    this.onCancel();
+                  }
+                })
+                .onClick(() => {
+                  this.onCancel();
+                })
+                .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
+                .width('100%')
+                .backgroundColor(this.btnColor)
+                .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                  if (isHover) {
+                    this.btnColor = $r('sys.color.ohos_id_color_hover');
+                  } else {
+                    this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                  }
+                })
+                .stateStyles({
+                  pressed: {
+                      .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                  },
+                  normal: {
+                      .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                  }
+                })
+            }
+            .margin({
+              left: 16,
+              right: 16,
+              bottom: this.isPC ? 24 : 8
+            })
+          }
+          .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+          .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+          .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
         }
-        .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
-        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
       }
-    }.constraintSize({ maxHeight: '90%' })
+    }
+    .onAreaChange((o, n) => {
+      this.columnHeight = n.height as number;
+      console.info(`**columnHeight**:${this.columnHeight}`)
+    })
+    .constraintSize({ maxHeight: (px2vp(this.mLocalHeight) - 28 - 39)*0.9 })       
+        .height('auto')
   }
 }
 
@@ -351,11 +1674,11 @@ struct dialogPlusPage {
   dialogController: CustomDialogController = new CustomDialogController({
     builder: ConfirmCustomDialog(),
     autoCancel: false,
-    onWillDismiss: ()=>{
+    onWillDismiss: () => {
       this.onWillDismiss()
     },
     alignment: DialogAlignment.Center,
-    offset: { dx: 0, dy: -20 },
+    offset: { dx: 0, dy: 0 },
     customStyle: true,
     maskColor: $r('sys.color.ohos_id_color_mask_thin')
   });
@@ -386,7 +1709,7 @@ struct dialogPlusPage {
   }
 
   onWillDismiss() {
-    console.log(TAG + 'onWillDismiss: ' + ACTION_CANCEL_AUTH)
+        console.log(TAG + 'onWillDismiss: ' + ACTION_CANCEL_AUTH)
     this.setUserOperation(ACTION_CANCEL_AUTH);
     this.destruction();
   }

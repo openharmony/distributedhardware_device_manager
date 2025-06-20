@@ -16,6 +16,7 @@ import UIExtensionAbility from '@ohos.app.ability.UIExtensionAbility'
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
 import Want from '@ohos.app.ability.Want';
 import deviceInfo from '@ohos.deviceInfo';
+import { Configuration } from "@ohos.app.ability.Configuration";
 const TAG: string = '[DeviceManagerUI:Confirm]==>'
 
 export default class ConfirmUIExtAbility extends UIExtensionAbility {
@@ -38,6 +39,15 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         }
         if (want.parameters.hostPkgLabel) {
             AppStorage.setOrCreate('hostPkgLabel', want.parameters.hostPkgLabel);
+        }
+        if (want.parameters.isProxyBind) {
+            AppStorage.setOrCreate('isProxyBind', want.parameters.isProxyBind);
+        }
+        if (want.parameters.appUserData) {
+            AppStorage.setOrCreate('appUserData', want.parameters.appUserData);
+        }
+        if (want.parameters.title) {
+            AppStorage.setOrCreate('title', want.parameters.title);
         }
 
         let param: Record<string, UIExtensionContentSession> = {
@@ -62,5 +72,10 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         let extensionHostWindow = session.getUIExtensionHostWindowProxy();
         extensionHostWindow.hideNonSecureWindows(false);
         console.log(TAG, `UIExtAbility onSessionDestroy`)
+    }
+
+    onConfigurationUpdate(newConfig: Configuration): void {
+        AppStorage.setOrCreate('fontSizeScale', newConfig.fontSizeScale);
+        console.info('test_log', `onConfigurationUpdate fontSizeScale: ${newConfig.fontSizeScale}`);
     }
 }
