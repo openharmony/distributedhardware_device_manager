@@ -16,7 +16,7 @@ import UIExtensionAbility from '@ohos.app.ability.UIExtensionAbility'
 import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSession'
 import Want from '@ohos.app.ability.Want';
 import deviceInfo from '@ohos.deviceInfo';
-import { Configuration } from "@ohos.app.ability.Configuration";
+import { Configuration } from '@ohos.app.ability.Configuration';
 const TAG: string = '[DeviceManagerUI:Confirm]==>'
 
 export default class ConfirmUIExtAbility extends UIExtensionAbility {
