@@ -20,7 +20,7 @@ import common from '@ohos.app.ability.common';
 import display from '@ohos.display';
 import mediaQuery from '@ohos.mediaquery';
 import i18n from '@ohos.i18n';
-import { KeyCode } from '@ohos.multimodalInput.keyCode';
+import KeyCode from '@ohos.multimodalInput.keyCode';
 import window from '@ohos.window';
 
 let dmClass: deviceManager.DeviceManager | null;
@@ -68,7 +68,7 @@ struct ConfirmCustomDialog {
   @State isPC: boolean = false;
   @State isTablet: boolean = false;
   @State isCar: boolean = false;
-   @State fontSize: string = '';
+  @State fontSize: string = '';
   @State textHeight: number = 0;
   @State scrollHeight: number = 0;
   @State buttonHeight: number = 0;
@@ -241,8 +241,8 @@ struct ConfirmCustomDialog {
     try {
       const jsonStr = AppStorage.get('appUserData') as string;
       return JSON.parse(jsonStr) as AppData[];
-    } catch (e) {
-      console.error('Failed to parse data:', e);
+    } catch (err) {
+      console.error('Failed to parse data:', err);
       return [];
     }
   }
@@ -286,7 +286,7 @@ struct ConfirmCustomDialog {
     }
     try {
       dmClass.setUserOperation(operation, param);
-    } catch (error) {
+    } catch (err) {
       console.log(TAG + 'dmClass setUserOperation failed')
     }
   }
@@ -299,13 +299,13 @@ struct ConfirmCustomDialog {
     }
     try {
       dmClass.setUserOperation(operation, 'extra');
-    } catch (error) {
+    } catch (err) {
       console.log(TAG + 'dmClass setUserOperation failed')
     }
   }
 
   destruction() {
-      let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
+    let session = AppStorage.get<UIExtensionContentSession>('ConfirmSession');
     if (session) {
       session.terminateSelf();
     }
@@ -364,21 +364,21 @@ struct ConfirmCustomDialog {
         .height(32)
         .fill($r('sys.color.ohos_id_color_activated'))
       Column() {
-          SymbolGlyph(this.getImages(this.peerDeviceType))
-          .fontSize('20vp')
-          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
-          .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
-          .offset({ x: 6, y: 6 })
+        SymbolGlyph(this.getImages(this.peerDeviceType))
+        .fontSize('20vp')
+        .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
+        .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
+        .offset({ x: 6, y: 6 })
       }
         .onAreaChange((o, n) => {
           this.symbolHeight = n.height as number;
         })
     }
-      .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
-      .margin({ top: 24, bottom: 15 })
+  .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
+  .margin({ top: 24, bottom: 15 })
   }
-  
-    private isTibetanLanguages(): boolean {
+
+  private isTibetanLanguages(): boolean {
     console.info(`${TAG} isTibetanLanguages in`);
     let locale = new Intl.Locale(i18n.System.getSystemLanguage()).toString();
     console.info(`${TAG} isTibetanLanguages: ${locale}`);
@@ -415,7 +415,7 @@ struct ConfirmCustomDialog {
                     console.info('**textHeight**:${this.textHeight}')
                   })
                   .margin({
-                    top: this.isAvailableType ? 0 : (24),
+                    top: this.isAvailableType ? 0 : 24,
                     bottom: 15, left: 24, right: 24
                   })
                   .accessibilityGroup(true)
@@ -819,10 +819,10 @@ struct ConfirmCustomDialog {
                         })
                         .stateStyles({
                           pressed: {
-                                .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                            .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
                           },
                           normal: {
-                                .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                            .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                           }
                         })
                         .accessibilityGroup(true)
@@ -1426,11 +1426,11 @@ struct ConfirmCustomDialog {
                         }
                       })
                       .stateStyles({
-                          pressed: {
-                              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                        pressed: {
+                          .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
                         },
                         normal: {
-                              .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                          .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                         }
                       })
                       .accessibilityGroup(true)
@@ -1456,10 +1456,10 @@ struct ConfirmCustomDialog {
                       })
                       .stateStyles({
                         pressed: {
-                              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                          .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
                         },
                         normal: {
-                              .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                          .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                         }
                       })
                       .accessibilityGroup(true)
@@ -1496,10 +1496,10 @@ struct ConfirmCustomDialog {
                       })
                       .stateStyles({
                         pressed: {
-                              .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                          .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
                         },
                         normal: {
-                              .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                          .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                         }
                       })
                       .accessibilityGroup(true)
@@ -1722,7 +1722,7 @@ struct dialogPlusPage {
     }
     try {
       dmClass.setUserOperation(operation, 'extra');
-    } catch (error) {
+    } catch (err) {
       console.log(TAG + 'dmClass setUserOperation failed')
     }
   }
@@ -1745,7 +1745,7 @@ struct dialogPlusPage {
       try {
         dmClass.off('uiStateChange');
         dmClass.release();
-      } catch (error) {
+      } catch (err) {
         console.log('dmClass release failed')
       }
       dmClass = null
