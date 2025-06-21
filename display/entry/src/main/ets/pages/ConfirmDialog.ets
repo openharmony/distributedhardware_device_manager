@@ -116,7 +116,7 @@ struct ConfirmCustomDialog {
     console.log(TAG + 'aboutToAppear execute PinCustomDialog')
     let context = getContext() as common.UIAbilityContext;
 
-    this.fontSizeScale = context.config?.fontSizeScale ?? 1;
+    this.fontSizeScale = context.config ?.fontSizeScale ?? 1;
     console.log('=-= fontScale:' + this.fontSizeScale);
     this.setMarginValue();
 
@@ -375,8 +375,8 @@ struct ConfirmCustomDialog {
           this.symbolHeight = n.height as number;
         })
     }
-  .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
-  .margin({ top: 24, bottom: 15 })
+    .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
+    .margin({ top: 24, bottom: 15 })
   }
 
   private isTibetanLanguages(): boolean {
@@ -581,12 +581,12 @@ struct ConfirmCustomDialog {
                       .defaultFocus(true)
                       .type(ButtonType.ROUNDED_RECTANGLE)
                       .onKeyEvent((event ?: KeyEvent) => {
-                        if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                          console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                        if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Down) {
+                          console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                           return;
                         }
-                        if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
-                          console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                        if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Up) {
+                          console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                           this.onCancel();
                         }
                       })
@@ -796,12 +796,12 @@ struct ConfirmCustomDialog {
                         .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                         .defaultFocus(true)
                         .onKeyEvent((event ?: KeyEvent) => {
-                          if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                            console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                          if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Down) {
+                            console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                             return;
                           }
-                          if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
-                            console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                          if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Up) {
+                            console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                             this.onCancel();
                           }
                         })
@@ -1026,12 +1026,12 @@ struct ConfirmCustomDialog {
                     .defaultFocus(true)
                     .type(ButtonType.ROUNDED_RECTANGLE)
                     .onKeyEvent((event ?: KeyEvent) => {
-                      if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                        console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                      if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Down) {
+                        console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                         return;
                       }
-                      if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
-                        console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                      if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Up) {
+                        console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                         this.onCancel();
                       }
                     })
@@ -1258,12 +1258,12 @@ struct ConfirmCustomDialog {
                     .defaultFocus(true)
                     .type(ButtonType.ROUNDED_RECTANGLE)
                     .onKeyEvent((event ?: KeyEvent) => {
-                      if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                        console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                      if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Down) {
+                        console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                         return;
                       }
-                      if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
-                        console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                      if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Up) {
+                        console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                         this.onCancel();
                       }
                     })
@@ -1473,12 +1473,12 @@ struct ConfirmCustomDialog {
                       .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                       .defaultFocus(true)
                       .onKeyEvent((event ?: KeyEvent) => {
-                        if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                          console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                        if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Down) {
+                          console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                           return;
                         }
-                        if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
-                          console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                        if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Up) {
+                          console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                           this.onCancel();
                         }
                       })
@@ -1605,10 +1605,10 @@ struct ConfirmCustomDialog {
                 })
                 .stateStyles({
                   pressed: {
-                      .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                    .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
                   },
                   normal: {
-                      .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                    .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                   }
                 })     
               Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
@@ -1617,12 +1617,12 @@ struct ConfirmCustomDialog {
                 .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                 .defaultFocus(true)
                 .onKeyEvent((event ?: KeyEvent) => {
-                  if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                    console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Down) {
+                    console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                     return;
                   }
-                  if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
-                    console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  if (event && event ?.keyCode === KeyCode.KEYCODE_HOME && event ?.type === KeyType.Up) {
+                    console.log(TAG + 'onKeyEvent eventType: ' + event ?.type)
                     this.onCancel();
                   }
                 })
@@ -1641,10 +1641,10 @@ struct ConfirmCustomDialog {
                 })
                 .stateStyles({
                   pressed: {
-                      .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                    .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
                   },
                   normal: {
-                      .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                    .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
                   }
                 })
             }
@@ -1664,8 +1664,8 @@ struct ConfirmCustomDialog {
       this.columnHeight = n.height as number;
       console.info(`**columnHeight**:${this.columnHeight}`)
     })
-    .constraintSize({ maxHeight: (px2vp(this.mLocalHeight) - 28 - 39)*0.9 })       
-        .height('auto')
+    .constraintSize({ maxHeight: (px2vp(this.mLocalHeight) - 28 - 39) * 0.9 })       
+      .height('auto')
   }
 }
 
@@ -1710,7 +1710,7 @@ struct dialogPlusPage {
   }
 
   onWillDismiss() {
-        console.log(TAG + 'onWillDismiss: ' + ACTION_CANCEL_AUTH)
+    console.log(TAG + 'onWillDismiss: ' + ACTION_CANCEL_AUTH)
     this.setUserOperation(ACTION_CANCEL_AUTH);
     this.destruction();
   }
