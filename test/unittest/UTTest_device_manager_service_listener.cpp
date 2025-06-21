@@ -1084,16 +1084,6 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::Test
     listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
-
-HWTEST_F(DeviceManagerServiceListenerTest, OpenAuthSessionWithPara_001, testing::ext::TestSize.Level1)
-{
-    const std::string deviceId = "OpenAuthSessionWithPara";
-    int32_t actionId = 0;
-    bool isEnable160m = false;
-    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
-    int32_t ret = listener_->OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
-    EXPECT_NE(ret, DM_OK);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

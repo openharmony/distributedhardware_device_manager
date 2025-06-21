@@ -45,7 +45,6 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "datetime_ex.h"
 #include "device_name_manager.h"
-#include "device_manager_service.h"
 #include "kv_adapter_manager.h"
 #include "multiple_user_connector.h"
 #endif
@@ -1017,16 +1016,6 @@ std::string DeviceManagerServiceListener::GetLocalDisplayDeviceNameForPrivacy()
     return DeviceNameManager::GetInstance().GetLocalDisplayDeviceNameForPrivacy();
 #else
     return "";
-#endif
-}
-
-int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string &deviceId,
-    int32_t actionId, bool isEnable160m)
-{
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return DeviceManagerService::GetInstance().OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
-#else
-    return DM_OK;
 #endif
 }
 } // namespace DistributedHardware

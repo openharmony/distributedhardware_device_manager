@@ -178,7 +178,6 @@ public:
      * @return std::string the name without privacy info
      */
     virtual std::string GetLocalDisplayDeviceNameForPrivacy() = 0;
-    virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

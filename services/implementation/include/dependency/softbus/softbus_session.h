@@ -60,6 +60,13 @@ public:
     int32_t OpenAuthSession(const std::string &deviceId);
 
     /**
+     * @tc.name: SoftbusSession::OpenAuthSessionWithPara
+     * @tc.desc: Open HML AuthSession of the Softbus Session
+     * @tc.type: FUNC
+     */
+    int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m);
+
+    /**
      * @tc.name: SoftbusSession::CloseAuthSession
      * @tc.desc: Close AuthSession of the Softbus Session
      * @tc.type: FUNC
