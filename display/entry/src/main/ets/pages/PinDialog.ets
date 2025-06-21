@@ -52,7 +52,6 @@ struct PinCustomDialog {
     // 获取pinCode
     this.pinCode = AppStorage.get('pinCode') as string;
     this.pinCodeArr = this.pinCode.split('');
-    console.log(TAG + 'this.pinCodeArr' + this.pinCodeArr);
   }
 
   setUserOperation(operation: number) {
