@@ -20,7 +20,7 @@ import common from '@ohos.app.ability.common';
 import display from '@ohos.display';
 import mediaQuery from '@ohos.mediaquery';
 import i18n from '@ohos.i18n';
-import KeyCode from '@ohos.multimodalInput.keyCode';
+import { KeyCode } from '@ohos.multimodalInput.keyCode';
 import window from '@ohos.window';
 
 let dmClass: deviceManager.DeviceManager | null;
@@ -527,7 +527,7 @@ struct ConfirmCustomDialog {
                       .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                       .width('100%')
                       .backgroundColor(this.btnColor)
-                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                         if (isHover) {
                           this.btnColor = $r('sys.color.ohos_id_color_hover');
                         } else {
@@ -556,7 +556,7 @@ struct ConfirmCustomDialog {
                       .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                       .width('100%')
                       .backgroundColor(this.btnColor)
-                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                         if (isHover) {
                           this.btnColor = $r('sys.color.ohos_id_color_hover');
                         } else {
@@ -579,7 +579,7 @@ struct ConfirmCustomDialog {
                       .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                       .defaultFocus(true)
                       .type(ButtonType.ROUNDED_RECTANGLE)
-                      .onKeyEvent((event?: KeyEvent) => {
+                      .onKeyEvent((event ?: KeyEvent) => {
                         if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
                           console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
                           return;
@@ -595,7 +595,7 @@ struct ConfirmCustomDialog {
                       .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                       .width('100%')
                       .backgroundColor(this.btnColor)
-                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                         if (isHover) {
                           this.btnColor = $r('sys.color.ohos_id_color_hover');
                         } else {
@@ -741,7 +741,7 @@ struct ConfirmCustomDialog {
                         .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                         .width(this.isPC ? 250 : '100%')
                         .backgroundColor(this.btnColor)
-                        .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                           if (isHover) {
                             this.btnColor = $r('sys.color.ohos_id_color_hover');
                           } else {
@@ -770,7 +770,7 @@ struct ConfirmCustomDialog {
                         .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                         .width(this.isPC ? 250 : '100%')
                         .backgroundColor(this.btnColor)
-                        .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                           if (isHover) {
                             this.btnColor = $r('sys.color.ohos_id_color_hover');
                           } else {
@@ -794,7 +794,7 @@ struct ConfirmCustomDialog {
                         .type(ButtonType.ROUNDED_RECTANGLE)
                         .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                         .defaultFocus(true)
-                        .onKeyEvent((event?: KeyEvent) => {
+                        .onKeyEvent((event ?: KeyEvent) => {
                           if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
                             console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
                             return;
@@ -810,7 +810,7 @@ struct ConfirmCustomDialog {
                         .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                         .width(this.isPC ? 250 : '100%')
                         .backgroundColor(this.btnColor)
-                        .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                        .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                           if (isHover) {
                             this.btnColor = $r('sys.color.ohos_id_color_hover');
                           } else {
@@ -972,7 +972,7 @@ struct ConfirmCustomDialog {
                     .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                     .width('100%')
                     .backgroundColor(this.btnColor)
-                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                    .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                       if (isHover) {
                         this.btnColor = $r('sys.color.ohos_id_color_hover');
                       } else {
@@ -1001,7 +1001,7 @@ struct ConfirmCustomDialog {
                     .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                     .width('100%')
                     .backgroundColor(this.btnColor)
-                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                    .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                       if (isHover) {
                         this.btnColor = $r('sys.color.ohos_id_color_hover');
                       } else {
@@ -1024,7 +1024,7 @@ struct ConfirmCustomDialog {
                     .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                     .defaultFocus(true)
                     .type(ButtonType.ROUNDED_RECTANGLE)
-                    .onKeyEvent((event?: KeyEvent) => {
+                    .onKeyEvent((event ?: KeyEvent) => {
                       if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
                         console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
                         return;
@@ -1040,7 +1040,7 @@ struct ConfirmCustomDialog {
                     .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                     .width('100%')
                     .backgroundColor(this.btnColor)
-                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                    .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                       if (isHover) {
                         this.btnColor = $r('sys.color.ohos_id_color_hover');
                       } else {
@@ -1204,7 +1204,7 @@ struct ConfirmCustomDialog {
                     .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                     .width('100%')
                     .backgroundColor(this.btnColor)
-                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                    .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                       if (isHover) {
                         this.btnColor = $r('sys.color.ohos_id_color_hover');
                       } else {
@@ -1233,7 +1233,7 @@ struct ConfirmCustomDialog {
                     .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                     .width('100%')
                     .backgroundColor(this.btnColor)
-                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                    .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                       if (isHover) {
                         this.btnColor = $r('sys.color.ohos_id_color_hover');
                       } else {
@@ -1256,7 +1256,7 @@ struct ConfirmCustomDialog {
                     .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                     .defaultFocus(true)
                     .type(ButtonType.ROUNDED_RECTANGLE)
-                    .onKeyEvent((event?: KeyEvent) => {
+                    .onKeyEvent((event ?: KeyEvent) => {
                       if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
                         console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
                         return;
@@ -1272,7 +1272,7 @@ struct ConfirmCustomDialog {
                     .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                     .width('100%')
                     .backgroundColor(this.btnColor)
-                    .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                    .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                       if (isHover) {
                         this.btnColor = $r('sys.color.ohos_id_color_hover');
                       } else {
@@ -1418,7 +1418,7 @@ struct ConfirmCustomDialog {
                       .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                       .width(this.isPC ? 250 : '100%')
                       .backgroundColor(this.btnColor)
-                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                         if (isHover) {
                           this.btnColor = $r('sys.color.ohos_id_color_hover');
                         } else {
@@ -1447,7 +1447,7 @@ struct ConfirmCustomDialog {
                       .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                       .width(this.isPC ? 250 : '100%')
                       .backgroundColor(this.btnColor)
-                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                         if (isHover) {
                           this.btnColor = $r('sys.color.ohos_id_color_hover');
                         } else {
@@ -1471,7 +1471,7 @@ struct ConfirmCustomDialog {
                       .type(ButtonType.ROUNDED_RECTANGLE)
                       .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                       .defaultFocus(true)
-                      .onKeyEvent((event?: KeyEvent) => {
+                      .onKeyEvent((event ?: KeyEvent) => {
                         if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
                           console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
                           return;
@@ -1487,7 +1487,7 @@ struct ConfirmCustomDialog {
                       .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                       .width(this.isPC ? 250 : '100%')
                       .backgroundColor(this.btnColor)
-                      .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                      .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                         if (isHover) {
                           this.btnColor = $r('sys.color.ohos_id_color_hover');
                         } else {
@@ -1570,7 +1570,7 @@ struct ConfirmCustomDialog {
                 .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                 .width('100%')
                 .backgroundColor(this.btnColor)
-                .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                   if (isHover) {
                     this.btnColor = $r('sys.color.ohos_id_color_hover');
                   } else {
@@ -1595,7 +1595,7 @@ struct ConfirmCustomDialog {
                 .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                 .width('100%')
                 .backgroundColor(this.btnColor)
-                .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                   if (isHover) {
                     this.btnColor = $r('sys.color.ohos_id_color_hover');
                   } else {
@@ -1615,7 +1615,7 @@ struct ConfirmCustomDialog {
                 .padding({ top: 8, bottom: 8 })
                 .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
                 .defaultFocus(true)
-                .onKeyEvent((event?: KeyEvent) => {
+                .onKeyEvent((event ?: KeyEvent) => {
                   if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
                     console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
                     return;
@@ -1631,7 +1631,7 @@ struct ConfirmCustomDialog {
                 .height(this.isTibetanLanguages() ? 'auto' : (this.fontSizeScale > 1 ? 56 : 40))
                 .width('100%')
                 .backgroundColor(this.btnColor)
-                .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                .onHover((isHover ?: boolean, event ?: HoverEvent): void => {
                   if (isHover) {
                     this.btnColor = $r('sys.color.ohos_id_color_hover');
                   } else {
