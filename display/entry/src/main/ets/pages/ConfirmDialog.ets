@@ -254,6 +254,7 @@ struct ConfirmCustomDialog {
     this.isCar = Constant.isCar();
   }
   
+  // fontSizeScale means senior mode display magnification scale
   setMarginValue(): void {
     if ((this.fontSizeScale >= 1) && (this.fontSizeScale < 1.75)) {
       if (this.fontSizeScale === 1) {
