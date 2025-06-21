@@ -91,7 +91,6 @@ public:
         const std::string &deviceName, int32_t code) override;
 
     std::string GetLocalDisplayDeviceNameForPrivacy() override;
-    int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

@@ -23,6 +23,9 @@
 #include "json_object.h"
 #include "softbus_connector.h"
 #include "softbus_error_code.h"
+#ifndef DEVICE_MANAGER_COMMON_FLAG
+#include "session_ex.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -70,6 +73,29 @@ int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
     DmTraceEnd();
     LOGI("OpenAuthSession success. sessionId: %{public}d.", sessionId);
     return sessionId;
+}
+
+int32_t SoftbusSession::OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGE("[SOFTBUS] OpenAuthSessionWithPara no implement");
+    return SOFTBUS_NOT_IMPLEMENT;
+#else
+    DmTraceStart(std::string(DM_HITRACE_AUTH_TO_OPPEN_SESSION));
+    LinkPara para;
+    para.type = PARA_ACTION;
+    para.action.actionId = static_cast<uint32_t>(actionId);
+    para.enable160M = isEnable160m;
+    para.accountInfo = false;
+    int32_t sessionId = ::OpenAuthSessionWithPara(DM_SESSION_NAME, &para);
+    if (sessionId < 0) {
+        LOGE("[SOFTBUS]open session error, sessionId: %{public}d.", sessionId);
+        return sessionId;
+    }
+    DmTraceEnd();
+    LOGI("OpenAuthSessionWithPara success. sessionId: %{public}d.", sessionId);
+    return sessionId;
+#endif
 }
 
 int32_t SoftbusSession::CloseAuthSession(int32_t sessionId)

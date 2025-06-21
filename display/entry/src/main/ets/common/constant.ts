@@ -33,4 +33,10 @@ export default class Constant {
   static isPC(): boolean {
     return (deviceInfo.deviceType === 'pc' || deviceInfo.deviceType === '2in1');
   }
+  static isCar(): boolean {
+    return (deviceInfo.deviceType === 'car');
+  }
+  static isTablet(): boolean {
+    return (deviceInfo.deviceType === 'tablet');
+  }
 };

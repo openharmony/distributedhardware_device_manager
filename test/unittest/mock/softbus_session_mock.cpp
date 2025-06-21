@@ -30,6 +30,11 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
     return DmSoftbusSession::dmSoftbusSession->SendData(sessionId, message);
 }
 
+int32_t SoftbusSession::OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m)
+{
+    return DmSoftbusSession::dmSoftbusSession->OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
+}
+
 int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
 {
     return DmSoftbusSession::dmSoftbusSession->OpenAuthSession(deviceId);
