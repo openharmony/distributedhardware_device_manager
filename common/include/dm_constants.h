@@ -188,6 +188,10 @@ extern const char* DM_VERSION_5_1_1;
 extern const char* DM_CURRENT_VERSION;
 extern const char* DM_ACL_AGING_VERSION;
 extern const char* DM_VERSION_5_0_OLD_MAX;      // Estimated highest version number of the old version
+extern const int32_t DM_HO_OSTYPE;
+extern const int32_t DM_OH_OSTYPE;
+extern const char* PEER_UDID;
+extern const char* PEER_OSTYPE;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CONSTANTS_H

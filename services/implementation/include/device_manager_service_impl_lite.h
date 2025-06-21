@@ -181,6 +181,7 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
+    void DeleteHoDeviceByForeGroundUserId(const std::string &udid, const std::vector<int32_t> &foreGroundUserIds);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

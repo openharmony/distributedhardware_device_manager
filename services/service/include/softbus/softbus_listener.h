@@ -142,6 +142,8 @@ private:
     static int32_t GetAttrFromCustomData(const cJSON *const customDataJson, DmDeviceInfo &dmDevInfo,
         int32_t &actionId);
     static int32_t GetAttrFromExtraData(DmDeviceInfo &dmDevInfo, int32_t &actionId);
+    static void ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr);
+    bool CheckPeerUdidTrusted(const std::string &udid);
 private:
     static std::string hostName_;
     static bool isRadarSoLoad_;

@@ -34,6 +34,7 @@
 #include "multiple_user_connector.h"
 #endif
 #include "ipc_skeleton.h"
+#include "kv_adapter_manager.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
 
@@ -285,9 +286,9 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
     deviceOnLine.detach();
 #endif
+    std::string peerUdid;
+    GetUdidByNetworkId(info->networkId, peerUdid);
     {
-        std::string peerUdid;
-        GetUdidByNetworkId(info->networkId, peerUdid);
         struct RadarInfo radarInfo = {
             .funcName = "OnSoftbusDeviceOnline",
             .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -302,6 +303,9 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
             }
         }
     }
+    std::string osTypeStr = "";
+    ConvertOsTypeToJson(info->osType, osTypeStr);
+    KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
 }
 
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
@@ -333,9 +337,9 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     deviceOffLine.detach();
 #endif
+    std::string peerUdid;
+    GetUdidByNetworkId(info->networkId, peerUdid);
     {
-        std::string peerUdid;
-        GetUdidByNetworkId(info->networkId, peerUdid);
         struct RadarInfo radarInfo = {
             .funcName = "OnSoftbusDeviceOffline",
             .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -348,6 +352,9 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
                 LOGE("ReportNetworkOffline failed");
             }
         }
+    }
+    if (!CheckPeerUdidTrusted(peerUdid)) {
+        KVAdapterManager::GetInstance().DeleteOstypeData(peerUdid);
     }
 }
 
@@ -1429,6 +1436,29 @@ void SoftbusListener::GetActionId(const std::string &deviceId, int32_t &actionId
         return;
     }
     actionId = discoveredDeviceActionIdMap.find(deviceId)->second;
+}
+
+void SoftbusListener::ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr)
+{
+    LOGI("ostype %{public}d.", osType);
+    JsonObject jsonObj;
+    jsonObj[PEER_OSTYPE] = osType;
+    osTypeStr = SafetyDump(jsonObj);
+}
+
+bool SoftbusListener::CheckPeerUdidTrusted(const std::string &udid)
+{
+    LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
+    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    for (const auto &item : allProfile) {
+        if (item.GetTrustDeviceId() == udid) {
+            LOGI("udid %{public}s in acl.", GetAnonyString(udid).c_str());
+            return true;
+        }
+    }
+    LOGI("udid %{public}s not in acl.", GetAnonyString(udid).c_str());
+    return false;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

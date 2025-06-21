@@ -1629,6 +1629,7 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     LOGI("BindTarget unstardard begin.");
+    DeleteForegroundUserHoDevice();
     return dmServiceImplExtResident_->BindTargetExt(pkgName, targetId, bindParam);
 }
 
@@ -2015,16 +2016,7 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     const std::string commonEventType, int32_t currentUserId, int32_t beforeUserId)
 {
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
-        DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
-        MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
-        if (beforeUserId != -1 && currentUserId != -1 && IsDMServiceAdapterResidentLoad()) {
-            dmServiceImplExtResident_->AccountUserSwitched(
-                currentUserId, MultipleUserConnector::GetOhosAccountId());
-        }
-        DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
-            [this, commonEventType] () {
-                DeviceManagerService::HandleAccountCommonEvent(commonEventType);
-            });
+        HandleUserSwitchEventCallback(commonEventType, currentUserId, beforeUserId);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
         MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
@@ -4262,6 +4254,71 @@ bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, 
         return false;
     }
     return dmServiceImpl_->CheckSinkIsSameAccount(caller, srcUdid, callee, sinkUdid);
+}
+
+void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId,
+    int32_t beforeUserId)
+{
+    LOGI("commonEventType %{public}s, currentUserId %{public}d, beforeUserId %{public}d.",commonEventType.c_str(),
+        currentUserId, beforeUserId);
+    DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
+    MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
+    if (beforeUserId != -1 && currentUserId != -1 && IsDMServiceAdapterResidentLoad()) {
+        std::vector<std::string> peerUdids;
+        GetHoOsTypeUdids(peerUdids);
+        dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
+    }
+    DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
+        [this, commonEventType] () {
+             DeviceManagerService::HandleAccountCommonEvent(commonEventType);
+    });
+}
+
+void DeviceManagerService::GetHoOsTypeUdids(std::vector<std::string> &peerUdids)
+{
+    std::vector<std::string> osTypeStrs;
+    if (KVAdapterManager::GetInstance().GetAllOstypeData(osTypeStrs) != DM_OK) {
+        LOGE("Get all ostype failed.");
+        return;
+    }
+    for (const auto &item : osTypeStrs) {
+        JsonObject osTypeObj(item);
+        if (osTypeObj.IsDiscarded()) {
+            LOGE("msg prase error.");
+            continue;
+        }
+        if (!IsString(osTypeObj, PEER_UDID) || !IsInt32(osTypeObj, PEER_OSTYPE)) {
+            LOGE("osTypeObj value invalid.");
+            continue;
+        }
+        if (osTypeObj[PEER_OSTYPE].Get<int32_t>() == DM_HO_OSTYPE) {
+            peerUdids.push_back(osTypeObj[PEER_UDID].Get<std::string>());
+        }
+    }
+}
+
+void DeviceManagerService::DeleteForegroundUserHoDevice()
+{
+    std::vector<std::string> peerUdids;
+    GetHoOsTypeUdids(peerUdids);
+    if (peerUdids.empty()) {
+        LOGE("peerUdids empty.");
+        return;
+    }
+    std::vector<int32_t> foreGroundUserIds;
+    MultipleUserConnector::GetForegroundUserIds(foreGroundUserIds);
+    if (foreGroundUserIds.empty()) {
+        LOGE("foreGroundUserIds is empty");
+        return;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("instance init failed.");
+        return;
+    }
+    
+    for (const auto &item : peerUdids) {
+        dmServiceImpl_->DeleteHoDeviceByForeGroundUserId(item, foreGroundUserIds);
+    }
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -45,6 +45,7 @@ public:
     int32_t DeleteBatch(const std::vector<std::string> &keys);
     int32_t Delete(const std::string& key);
     void OnRemoteDied() override;
+    int32_t GetAllOstypeData(const std::string &key, std::vector<std::string> &values);
 
 private:
     DistributedKv::Status GetLocalKvStorePtr();
