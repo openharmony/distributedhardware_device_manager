@@ -366,10 +366,10 @@ struct ConfirmCustomDialog {
         .fill($r('sys.color.ohos_id_color_activated'))
       Column() {
         SymbolGlyph(this.getImages(this.peerDeviceType))
-        .fontSize('20vp')
-        .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
-        .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
-        .offset({ x: 6, y: 6 })
+          .fontSize('20vp')
+          .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
+          .fontColor([$r('sys.color.ohos_id_color_primary_contrary')])
+          .offset({ x: 6, y: 6 })
       }
         .onAreaChange((o, n) => {
           this.symbolHeight = n.height as number;
