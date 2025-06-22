@@ -469,6 +469,7 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     }
 
     ParseHmlInfoInJsonObject(jsonObject);
+    ParseProxyJsonObject(jsonObject);
     return;
 }
 
@@ -613,6 +614,11 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
         LOGE("AuthManager::AuthenticateDevice failed, param is invaild.");
         return ret;
     }
+    ret = CheckProxyAuthParamVaild(extra);
+    if (ret != DM_OK) {
+        LOGE("CheckProxyAuthParamVaild failed.");
+        return ret;
+    }
     context_->isAuthenticateDevice = true;
     if (authType == AUTH_TYPE_CRE) {
         LOGI("AuthManager::AuthenticateDevice for credential type, joinLNN directly.");
@@ -753,6 +759,7 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
         case USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS:
             context_->confirmOperation = static_cast<UiAction>(action);
             context_->reply = USER_OPERATION_TYPE_ALLOW_AUTH;
+            context_->userOperationParam = params;
             if (action == USER_OPERATION_TYPE_CANCEL_AUTH) {
                 LOGI("AuthSinkManager::OnUserOperation USER_OPERATION_TYPE_CANCEL_AUTH.");
                 context_->reply = USER_OPERATION_TYPE_CANCEL_AUTH;
@@ -1118,6 +1125,104 @@ int32_t AuthManager::HandleBusinessEvents(const std::string &businessId, int32_t
     }
     LOGI("HandleBusinessEvents successfully stored reject_event.");
     return DM_OK;
+}
+int32_t AuthManager::CheckProxyAuthParamVaild(const std::string &extra)
+{
+    LOGI("start.");
+    JsonObject jsonObject(extra);
+    if (jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
+        return DM_OK;
+    }
+    if (jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<std::string>() != DM_VAL_TRUE) {
+        return DM_OK;
+    }
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("no proxy permission");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!jsonObject.Contains(PARAM_KEY_SUBJECT_PROXYED_SUBJECTS) ||
+        !IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        LOGE("no subject proxyed apps");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!item.Contains(TAG_BUNDLE_NAME) || !IsString(item, TAG_BUNDLE_NAME)) {
+            LOGE("bundleName invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+        if (!item.Contains(TAG_TOKENID) || !IsInt64(item, TAG_TOKENID)) {
+            LOGE("tokenId invalid");
+            return ERR_DM_INPUT_PARA_INVALID;
+        }
+    }
+    return DM_OK;
+}
+
+void AuthManager::ParseProxyJsonObject(const JsonObject &jsonObject)
+{
+    if (context_ == nullptr || jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_IS_PROXY_BIND) ||
+        jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<std::string>() != DM_VAL_TRUE) {
+        return;
+    }
+    context_->IsProxyBind = true;
+    if (IsString(jsonObject, PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT) &&
+        jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT].Get<std::string>() == DM_VAL_FALSE) {
+        context_->IsCallingProxyAsSubject = false;
+    }
+    if (!jsonObject.Contains(PARAM_KEY_SUBJECT_PROXYED_SUBJECTS) ||
+        !IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        LOGE("no subject proxyed apps");
+        return;
+    }
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!item.Contains(TAG_BUNDLE_NAME) || !IsString(item, TAG_BUNDLE_NAME)) {
+            LOGE("bundleName invalid");
+            return;
+        }
+        if (!item.Contains(TAG_TOKENID) || !IsInt64(item, TAG_TOKENID)) {
+            LOGE("tokenId invalid");
+            return;
+        }
+        std::string bundleName = item[TAG_BUNDLE_NAME].Get<std::string>();
+        if (context_->accesser.bundleName == bundleName) {
+            LOGE("proxy bundleName same as caller bundleName");
+            return;
+        }
+        std::string peerBundleName = bundleName;
+        if (item.Contains(PARAM_KEY_PEER_BUNDLE_NAME) && IsString(item, PARAM_KEY_PEER_BUNDLE_NAME)) {
+            peerBundleName = item[PARAM_KEY_PEER_BUNDLE_NAME].Get<std::string>();
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = Crypto::Sha256(bundleName + peerBundleName);
+        if (std::find(context_->subjectProxyOnes.begin(), context_->subjectProxyOnes.end(), proxyAuthContext) ==
+            context_->subjectProxyOnes.end()) {
+            proxyAuthContext.proxyAccesser.bundleName = bundleName;
+            proxyAuthContext.proxyAccesser.tokenId = item[TAG_TOKENID].Get<int64_t>();
+            proxyAuthContext.proxyAccesser.tokenIdHash =
+                Crypto::GetTokenIdHash(std::to_string(proxyAuthContext.proxyAccesser.tokenId));
+            proxyAuthContext.proxyAccessee.bundleName = peerBundleName;
+            GetBindLevelByBundleName(bundleName, context_->accesser.userId, proxyAuthContext.proxyAccesser.bindLevel);
+            context_->subjectProxyOnes.push_back(proxyAuthContext);
+        }
+    }
+}
+
+void AuthManager::GetBindLevelByBundleName(std::string &bundleName, int32_t userId, int32_t &bindLevel)
+{
+    int64_t tokenId = 0;
+    if (AppManager::GetInstance().GetHapTokenIdByName(userId, bundleName, 0, tokenId) == DM_OK) {
+        bindLevel = DmRole::DM_ROLE_FA;
+    } else if (AppManager::GetInstance().GetNativeTokenIdByName(bundleName, tokenId) == DM_OK) {
+        bindLevel = DmRole::DM_ROLE_SA;
+    } else {
+        LOGE("src not contain the bundlename %{public}s.", bundleName.c_str());
+    }
 }
 }  // namespace DistributedHardware
 }  // namespace OHOS

@@ -254,6 +254,8 @@ public:
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId);
 
     DM_EXPORT int32_t DeleteSessionKey(int32_t userId, int32_t sessionKeyId);
+    DM_EXPORT int32_t GetSessionKey(int32_t userId, int32_t sessionKeyId,
+        std::vector<unsigned char> &sessionKeyArray);
     DM_EXPORT int32_t SubscribeDeviceProfileInited(
         sptr<DistributedDeviceProfile::IDpInitedCallback> dpInitedCallback);
     DM_EXPORT int32_t UnSubscribeDeviceProfileInited();

@@ -2756,6 +2756,18 @@ int32_t DeviceProfileConnector::DeleteSessionKey(int32_t userId, int32_t session
     return DM_OK;
 }
 
+int32_t DeviceProfileConnector::GetSessionKey(int32_t userId, int32_t sessionKeyId,
+    std::vector<unsigned char> &sessionKeyArray)
+{
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetSessionKey(static_cast<uint32_t>(userId),
+        sessionKeyId, sessionKeyArray);
+    if (ret != DM_OK) {
+        LOGE("failed: %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
 bool DeviceProfileConnector::CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
     const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
     const std::vector<int32_t> &backgroundUserIds)

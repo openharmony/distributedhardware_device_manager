@@ -135,6 +135,8 @@ protected:
     void GetRemoteDeviceId(std::string &deviceId);
 private:
     void ParseHmlInfoInJsonObject(const JsonObject &jsonObject);
+    void ParseProxyJsonObject(const JsonObject &jsonObject);
+    void GetBindLevelByBundleName(std::string &bundleName, int32_t userId, int32_t &bindLevel);
     void ParseJsonObject(const JsonObject &jsonObject);
     void GetAuthParam(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
@@ -144,6 +146,7 @@ private:
     bool IsAuthCodeReady(const std::string &sessionName);
     int32_t CheckAuthParamVaild(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
+    int32_t CheckProxyAuthParamVaild(const std::string &extra);
     void InitAuthState(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
     int32_t AuthenticateDevice(const std::string &sessionName, int32_t authType,

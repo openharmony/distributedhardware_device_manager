@@ -57,6 +57,7 @@ const char* TAG_TOKENID = "tokenId";
 const char* TAG_HOST_PKGLABEL = "hostPkgLabel";
 const char* TAG_REMOTE_DEVICE_NAME = "REMOTE_DEVICE_NAME";
 const char* TAG_HOST = "HOST";
+const char* TAG_PROXY_CONTEXT_ID = "proxyContextId";
 
 const char* APP_OPERATION_KEY = "appOperation";
 const char* TARGET_PKG_NAME_KEY = "targetPkgName";

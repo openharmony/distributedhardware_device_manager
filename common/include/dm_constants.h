@@ -158,7 +158,13 @@ DM_EXPORT extern const char* PARAM_KEY_HML_ACTIONID;
 DM_EXPORT extern const char* CONN_SESSION_TYPE_HML;
 DM_EXPORT extern const char* CONN_SESSION_TYPE_BLE;
 DM_EXPORT extern const char* UN_BIND_PARAM_UDID_KEY;
-
+DM_EXPORT extern const char* PARAM_KEY_IS_PROXY_BIND;
+DM_EXPORT extern const char* PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT;
+DM_EXPORT extern const char* PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
+DM_EXPORT extern const char* DM_VAL_TRUE;
+DM_EXPORT extern const char* DM_VAL_FALSE;
+DM_EXPORT extern const char* APP_USER_DATA;
+DM_EXPORT extern const char* BUNDLE_INFO;
 DM_EXPORT extern const char* DM_BUSINESS_ID;
 
 // screen state
@@ -185,6 +191,7 @@ extern const char* DM_VERSION_5_0_4;
 extern const char* DM_VERSION_5_0_5;
 extern const char* DM_VERSION_5_1_0;
 extern const char* DM_VERSION_5_1_1;
+extern const char* DM_VERSION_5_1_2;
 extern const char* DM_CURRENT_VERSION;
 extern const char* DM_ACL_AGING_VERSION;
 extern const char* DM_VERSION_5_0_OLD_MAX;      // Estimated highest version number of the old version

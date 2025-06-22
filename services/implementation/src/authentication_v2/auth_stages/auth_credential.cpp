@@ -135,28 +135,31 @@ std::string AuthSrcCredentialAuthDoneState::GenerateCertificate(std::shared_ptr<
 
 int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (GetSessionKey(context)) {
+        DerivativeSessionKey(context);
+        context->accesser.cert = GenerateCertificate(context);
+        context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_DATA_SYNC, context);
+        return DM_OK;
+    }
     // decrypt and transmit transmitData
     int32_t ret = g_authCredentialTransmitDecryptProcess(context, ON_SESSION_KEY_RETURNED);
     if (ret != DM_OK) {
         return ret;
     }
+
     // Authentication completion triggers the Onfinish callback event.
     if (context->authStateMachine->WaitExpectEvent(ON_FINISH) != ON_FINISH) {
         LOGE("AuthSrcCredentialAuthDoneState::Action Hichain auth SINK transmit data failed");
         return ERR_DM_FAILED;
     }
     DmMessageType msgType;
-    int32_t skId;
-    ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accesser.userId, skId);
-    if (ret != DM_OK) {
-        LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
-        return ret;
-    }
+
     // first time joinLnn, auth lnnCredential
     if (context->accesser.isGenerateLnnCredential == true && context->isAppCredentialVerified == false &&
         context->accesser.bindLevel != USER) {
         context->isAppCredentialVerified = true;
-        SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
+        DerivativeSessionKey(context);
         msgType = MSG_TYPE_REQ_CREDENTIAL_AUTH_START;
         ret = context->hiChainAuthConnector->AuthCredential(context->accesser.userId, context->requestId,
                                                             context->accesser.lnnCredentialId, std::string(""));
@@ -164,6 +167,7 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
             LOGE("AuthSrcCredentialAuthDoneState::Action Hichain auth credentail failed");
             return ret;
         }
+
         // wait for onTransmit event
         if (context->authStateMachine->WaitExpectEvent(ON_TRANSMIT) != ON_TRANSMIT) {
             LOGE("AuthSrcCredentialAuthDoneState::Action failed, ON_TRANSMIT event not arrived.");
@@ -171,21 +175,97 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
         }
         // First-time authentication and Lnn credential process
     } else if (context->accesser.isGenerateLnnCredential == true && context->accesser.bindLevel != USER) {
+        int32_t skId = 0;
+        int32_t ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accesser.userId, skId);
+        if (ret != DM_OK) {
+            LOGE("DP save user session key failed %{public}d", ret);
+            return ret;
+        }
         SetAuthContext(skId, context->accesser.lnnSkTimeStamp, context->accesser.lnnSessionKeyId);
         context->accesser.cert = GenerateCertificate(context);
         msgType = MSG_TYPE_REQ_DATA_SYNC;
     } else {  // Non-first-time authentication transport credential process
-        SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
+        DerivativeSessionKey(context);
         context->accesser.cert = GenerateCertificate(context);
         msgType = MSG_TYPE_REQ_DATA_SYNC;
     }
-    std::string message =
-        context->authMessageProcessor->CreateMessage(msgType, context);
+    return SendCredentialAuthMessage(context, msgType);
+}
+
+int32_t AuthSrcCredentialAuthDoneState::SendCredentialAuthMessage(std::shared_ptr<DmAuthContext> context,
+    DmMessageType &msgType)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
+    std::string message = context->authMessageProcessor->CreateMessage(msgType, context);
     if (message.empty()) {
         LOGE("AuthSrcCredentialAuthDoneState::Action CreateMessage failed");
         return ERR_DM_FAILED;
     }
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
+}
+
+int32_t AuthSrcCredentialAuthDoneState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        int32_t skId = 0;
+        int32_t ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accesser.userId, skId);
+        if (ret != DM_OK) {
+            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+            return ret;
+        }
+        SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
+        return DM_OK;
+    }
+    return DerivativeProxySessionKey(context);
+}
+
+int32_t AuthSrcCredentialAuthDoneState::DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->reUseCreId.empty()) {
+        context->accesser.transmitCredentialId = context->reUseCreId;
+    }
+    if (context->IsCallingProxyAsSubject && !context->accesser.isAuthed) {
+        int32_t skId = 0;
+        int32_t ret = 0;
+        if (!context->reUseCreId.empty()) {
+            std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+            context->accesser.tokenIdHash + context->accessee.tokenIdHash;
+            ret = context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
+            context->accesser.transmitCredentialId = context->reUseCreId;
+        } else {
+            ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accesser.userId, skId);
+        }
+        if (ret != DM_OK) {
+            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+            return ret;
+        }
+        SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        if (app.proxyAccesser.isAuthed) {
+            continue;
+        }
+        int32_t skId = 0;
+        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
+        int32_t ret =
+            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
+        if (ret != DM_OK) {
+            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+            return ret;
+        }
+        app.proxyAccesser.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
+        app.proxyAccesser.transmitSessionKeyId = skId;
+        if (!context->reUseCreId.empty()) {
+            app.proxyAccesser.transmitCredentialId = context->reUseCreId;
+            continue;
+        }
+        app.proxyAccesser.transmitCredentialId = context->accesser.transmitCredentialId;
+    }
+    return DM_OK;
 }
 
 DmAuthStateType AuthSinkCredentialAuthStartState::GetStateType()
@@ -233,21 +313,60 @@ int32_t AuthSinkCredentialAuthNegotiateState::Action(std::shared_ptr<DmAuthConte
         return ERR_DM_FAILED;
     }
     int32_t skId;
-    ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accessee.userId, skId);
-    if (ret != DM_OK) {
-        LOGE("AuthSinkCredentialAuthNegotiateState::Action DP save user session key failed");
-        return ret;
-    }
 
     // First lnn cred auth, second time receiving 161 message
     if (context->accessee.isGenerateLnnCredential == true && context->accessee.bindLevel != USER &&
         context->isAppCredentialVerified == true) {
+        ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accessee.userId, skId);
+        if (ret != DM_OK) {
+            LOGE("AuthSinkCredentialAuthNegotiateState::Action DP save user session key failed");
+            return ret;
+        }
         context->accessee.lnnSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
         context->accessee.lnnSessionKeyId = skId;
     } else {  // Twice transport cred auth
         context->isAppCredentialVerified = true;
-        context->accessee.transmitSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
-        context->accessee.transmitSessionKeyId = skId;
+        if (!context->IsProxyBind || context->subjectProxyOnes.empty() ||
+            (context->IsCallingProxyAsSubject && !context->accessee.isAuthed)) {
+            ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accessee.userId, skId);
+            if (ret != DM_OK) {
+                LOGE("DP save user session key failed %{public}d", ret);
+                return ret;
+            }
+            context->accessee.transmitSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
+            context->accessee.transmitSessionKeyId = skId;
+        }
+        DerivativeSessionKey(context);
+    }
+    return DM_OK;
+}
+
+int32_t AuthSinkCredentialAuthNegotiateState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return DM_OK;
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        if (app.proxyAccessee.isAuthed) {
+            continue;
+        }
+        int32_t skId = 0;
+        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
+        int32_t ret =
+            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
+        if (ret != DM_OK) {
+            LOGE("AuthSinkCredentialAuthNegotiateState::Action DP save user session key failed %{public}d", ret);
+            return ret;
+        }
+        app.proxyAccessee.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
+        app.proxyAccessee.transmitSessionKeyId = skId;
+        if (!context->reUseCreId.empty()) {
+            app.proxyAccessee.transmitCredentialId = context->reUseCreId;
+            continue;
+        }
+        app.proxyAccessee.transmitCredentialId = context->accessee.transmitCredentialId;
     }
     return DM_OK;
 }
@@ -291,14 +410,38 @@ std::string AuthCredentialAgreeState::CreateAuthParamsString(DmAuthScope authori
         jsonObj[TAG_AUTHORIZED_SCOPE] = authorizedScope;
     }
     if (authorizedScope == DM_AUTH_SCOPE_APP || authorizedScope == DM_AUTH_SCOPE_USER) {
-        std::vector<std::string> tokenIds = {std::to_string(authContext->accesser.tokenId),
-            std::to_string(authContext->accessee.tokenId)};
-        jsonObj[TAG_AUTHORIZED_APP_LIST] = tokenIds;
+        GenerateTokenIds(authContext, jsonObj);
     }
     jsonObj[TAG_CREDENTIAL_OWNER] = DM_AUTH_CREDENTIAL_OWNER;
 
     LOGI("AuthCredentialAgreeState::CreateAuthParamsString leave.");
     return jsonObj.Dump();
+}
+
+void AuthCredentialAgreeState::GenerateTokenIds(const std::shared_ptr<DmAuthContext> &context,
+    JsonObject &jsonObj)
+{
+    CHECK_NULL_VOID(context);
+    std::vector<std::string> tokenIds;
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        tokenIds.push_back(std::to_string(context->accesser.tokenId));
+        tokenIds.push_back(std::to_string(context->accessee.tokenId));
+        jsonObj[TAG_AUTHORIZED_APP_LIST] = tokenIds;
+        return;
+    }
+    if (context->IsCallingProxyAsSubject) {
+        tokenIds.push_back(std::to_string(context->accesser.tokenId));
+        tokenIds.push_back(std::to_string(context->accessee.tokenId));
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        tokenIds.push_back(std::to_string(app.proxyAccesser.tokenId));
+        tokenIds.push_back(std::to_string(app.proxyAccessee.tokenId));
+    }
+    if (tokenIds.empty()) {
+        LOGE("no tokenId.");
+        return;
+    }
+    jsonObj[TAG_AUTHORIZED_APP_LIST] = tokenIds;
 }
 
 // Generate credential ID and public key
@@ -389,17 +532,19 @@ int32_t AuthSrcCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> co
     LOGI("AuthSrcCredentialExchangeState::Action() start.");
     int32_t ret = ERR_DM_FAILED;
     context->isAppCredentialVerified = false;
-
     if (!NeedAgreeAcl(context)) {
-        context->authStateMachine->TransitionTo(std::make_shared<AuthSrcDataSyncState>());
+        context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthDoneState>());
+        return DM_OK;
+    }
+    if (GetSessionKey(context)) {
+        context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthDoneState>());
         return DM_OK;
     }
 
-    if (!NeedAgreeCredential(context)) {
+    if (!IsNeedAgreeCredential(context)) {
         context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthStartState>());
         return DM_OK;
     }
-
     // First authentication, generate LNN credentials and public key
     if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
         ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_LNN, context);
@@ -440,7 +585,6 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
     std::string tmpCredId;
     int32_t osAccountId = context->accessee.userId;
     context->isAppCredentialVerified = false;
-
     if (context == nullptr || context->hiChainAuthConnector == nullptr ||
         context->authMessageProcessor == nullptr || context->softbusConnector == nullptr) {
         return ret;
@@ -469,7 +613,6 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
         context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
     }
 
-    //
     DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
     if (context->accessee.bindLevel == APP || context->accessee.bindLevel == SERVICE) {
         authorizedScope = DM_AUTH_SCOPE_APP;
@@ -518,7 +661,7 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         return ret;
     }
 
-    if (NeedAgreeCredential(context)) {
+    if (IsNeedAgreeCredential(context)) {
         // First authentication
         if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
             // Agree lnn credentials and public key
