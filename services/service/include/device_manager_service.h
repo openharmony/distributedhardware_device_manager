@@ -422,7 +422,7 @@ private:
         const std::string &sinkNetWorkId, std::string &sinkUdid);
     void HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId, int32_t beforeUserId);
     void GetHoOsTypeUdids(std::vector<std::string> &peerUdids);
-    void DeleteForegroundUserHoDevice();
+    void DeleteHoDevice();
 
 private:
     bool isImplsoLoaded_ = false;

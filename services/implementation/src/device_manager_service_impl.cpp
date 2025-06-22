@@ -2944,15 +2944,16 @@ bool DeviceManagerServiceImpl::CheckSinkIsSameAccount(const DmAccessCaller &call
     return DeviceProfileConnector::GetInstance().CheckSinkIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
-void DeviceManagerServiceImpl::DeleteHoDeviceByForeGroundUserId(const std::string &udid,
-    const std::vector<int32_t> &foreGroundUserIds)
+void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
+    const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds)
 {
-    LOGI("peerudid %{public}s, foreGroundUserIds %{public}s.", GetAnonyString(udid).c_str(),
-        GetIntegerList(foreGroundUserIds).c_str());
+    LOGI("peerudid %{public}s, foreGroundUserIds %{public}s, backGroundUserIds %{public}s.",
+        GetAnonyString(peerUdid).c_str(), GetIntegerList(foreGroundUserIds).c_str(),
+        GetIntegerList(backGroundUserIds).c_str());
     //delete acl
-    DeviceProfileConnector::GetInstance().DeleteHoDeviceByForeGroundUserId(udid, foreGroundUserIds);
+    DeviceProfileConnector::GetInstance().DeleteHoDevice(peerUdid, foreGroundUserIds, backGroundUserIds);
     //delete group
-    hiChainConnector_->DeleteAllGroupByUdid(udid);
+    hiChainConnector_->DeleteHoDevice(peerUdid, foreGroundUserIds, backGroundUserIds);
     return;
 }
 

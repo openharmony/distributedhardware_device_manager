@@ -3297,17 +3297,18 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
     return false;
 }
 
-DM_EXPORT void DeviceProfileConnector::DeleteHoDeviceByForeGroundUserId(const std::string &udid,
-    const std::vector<int32_t> &foreGroundUserIds)
+DM_EXPORT void DeviceProfileConnector::DeleteHoDevice(const std::string &peerUdid,
+    const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds)
 {
-    if (udid.empty() || foreGroundUserIds.size() == 0) {
+    if (udid.empty() || foreGroundUserIds.empty() || backGroundUserIds.empty()) {
         LOGE("invalid input param.");
         return;
     }
+    std::vector<int32_t> localUserIds = foreGroundUserIds + backGroundUserIds;
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
     for (const auto &item : profiles) {
-        if (udid != item.GetTrustDeviceId()) {
+        if (udid != item.GetTrustDeviceId() || item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             continue;
         }
         std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();
@@ -3317,13 +3318,13 @@ DM_EXPORT void DeviceProfileConnector::DeleteHoDeviceByForeGroundUserId(const st
         int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
         std::string aceePkgName = item.GetAccessee().GetAccesseeBundleName();
 
-        if (localUdid == acerDeviceId && udid == aceeDeviceId && !CheckExtWhiteList(acerPkgName) &&
-            std::find(foreGroundUserIds.begin(), foreGroundUserIds.end(), acerUserId) != foreGroundUserIds.end()) {
+        if (localUdid == acerDeviceId && peerUdid == aceeDeviceId && !CheckExtWhiteList(acerPkgName) &&
+            std::find(localUserIds.begin(), localUserIds.end(), acerUserId) != localUserIds.end()) {
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
             continue;
         }
-        if (udid == acerDeviceId && localUdid == aceeDeviceId && !CheckExtWhiteList(aceePkgName) &&
-            std::find(foreGroundUserIds.begin(), foreGroundUserIds.end(), aceeUserId) != foreGroundUserIds.end()) {
+        if (peerUdid == acerDeviceId && localUdid == aceeDeviceId && !CheckExtWhiteList(aceePkgName) &&
+            std::find(localUserIds.begin(), localUserIds.end(), aceeUserId) != localUserIds.end()) {
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
             continue;
         }

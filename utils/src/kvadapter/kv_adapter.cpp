@@ -287,6 +287,10 @@ int32_t KVAdapter::GetAllOstypeData(const std::string &key, std::vector<std::str
             LOGE("entry parse error.");
             continue;
         }
+        if (entry.key.ToString().size() < DM_OSTYPE_PREFIX_LEN) {
+            LOGE("entry value invalid.");
+            continue;
+        }
         JsonObject jsonObj;
         jsonObj[PEER_UDID] = entry.key.ToString().substr(DM_OSTYPE_PREFIX_LEN);
         jsonObj[PEER_OSTYPE] = osTyoeJson[PEER_OSTYPE].Get<int32_t>();

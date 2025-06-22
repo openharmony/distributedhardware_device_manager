@@ -734,11 +734,12 @@ bool DeviceManagerServiceImpl::CheckSinkIsSameAccount(const DmAccessCaller &call
     return true;
 }
 
-void DeviceManagerServiceImpl::DeleteHoDeviceByForeGroundUserId(const std::string &udid,
-    const std::vector<int32_t> &foreGroundUserIds)
+void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
+    const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds)
 {
-    (void)udid;
+    (void)peerUdid;
     (void)foreGroundUserIds;
+    (void)backGroundUserIds;
     return;
 }
 

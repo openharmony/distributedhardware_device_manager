@@ -203,7 +203,8 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
-    void DeleteHoDeviceByForeGroundUserId(const std::string &udid, const std::vector<int32_t> &foreGroundUserIds);
+    void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
+        const std::vector<int32_t> &backGroundUserIds);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

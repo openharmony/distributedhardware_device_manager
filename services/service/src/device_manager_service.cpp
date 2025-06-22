@@ -1629,7 +1629,6 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     LOGI("BindTarget unstardard begin.");
-    DeleteForegroundUserHoDevice();
     return dmServiceImplExtResident_->BindTargetExt(pkgName, targetId, bindParam);
 }
 
@@ -4297,7 +4296,7 @@ void DeviceManagerService::GetHoOsTypeUdids(std::vector<std::string> &peerUdids)
     }
 }
 
-void DeviceManagerService::DeleteForegroundUserHoDevice()
+void DeviceManagerService::DeleteHoDevice()
 {
     std::vector<std::string> peerUdids;
     GetHoOsTypeUdids(peerUdids);
@@ -4307,8 +4306,11 @@ void DeviceManagerService::DeleteForegroundUserHoDevice()
     }
     std::vector<int32_t> foreGroundUserIds;
     MultipleUserConnector::GetForegroundUserIds(foreGroundUserIds);
-    if (foreGroundUserIds.empty()) {
-        LOGE("foreGroundUserIds is empty");
+    std::vector<int32_t> backGroundUserIds;
+    MultipleUserConnector::GetBackgroundUserIds(backGroundUserIds);
+    if (foreGroundUserIds.empty() || backGroundUserIds.empty()) {
+        LOGE("backGroundUserIds %{public}s, foreGroundUserIds %{public}s.", GetIntegerList(backGroundUserIds).c_str(),
+            GetIntegerList(foreGroundUserIds).c_str());
         return;
     }
     if (!IsDMServiceImplReady()) {
@@ -4317,7 +4319,7 @@ void DeviceManagerService::DeleteForegroundUserHoDevice()
     }
     
     for (const auto &item : peerUdids) {
-        dmServiceImpl_->DeleteHoDeviceByForeGroundUserId(item, foreGroundUserIds);
+        dmServiceImpl_->DeleteHoDevice(item, foreGroundUserIds, backGroundUserIds);
     }
 }
 } // namespace DistributedHardware

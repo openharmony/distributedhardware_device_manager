@@ -236,7 +236,8 @@ public:
         std::vector<int32_t> &userIdVec);
     bool IsNeedDelete(std::string &groupName, int32_t userId,
         std::vector<std::pair<int32_t, std::string>> &delACLInfoVec);
-
+    void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
+        const std::vector<int32_t> &backGroundUserIds);
 private:
     int64_t GenRequestId();
     int32_t SyncGroups(std::string deviceId, std::vector<std::string> &remoteGroupIdList);
