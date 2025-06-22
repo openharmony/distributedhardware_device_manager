@@ -302,7 +302,7 @@ void SoftBusListenerFifthFuzzTest(const uint8_t* data, size_t size)
     int32_t errcode = fdp.ConsumeIntegral<int32_t>();
     uint16_t deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
     softbusListener_->CredentialAuthStatusProcess(deviceList, deviceTypeId, errcode);
-    DevUserInfo localDevUserInfo; 
+    DevUserInfo localDevUserInfo;
     DevUserInfo remoteDevUserInfo;
     std::string remoteAclList = fdp.ConsumeRandomLengthString();
     softbusListener_->OnSyncLocalAclList(localDevUserInfo, remoteDevUserInfo, remoteAclList);
