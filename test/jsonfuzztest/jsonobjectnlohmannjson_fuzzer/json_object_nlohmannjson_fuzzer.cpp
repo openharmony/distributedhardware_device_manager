@@ -34,28 +34,28 @@ void JsonObjectNlohmannjsonFuzzTest(const uint8_t* data, size_t size)
     JsonItemObject itemObject;
     JsonItemObject itemObjectNew;
     itemObject["key1"] = fdp.ConsumeIntegral<int32_t>();
-    std::string str_value = fdp.ConsumeRandomLengthString();
-    int16_t int16_value = fdp.ConsumeIntegral<int16_t>();
-    double double_value = fdp.ConsumeFloatingPoint<double>();
-    bool bool_value = fdp.ConsumeBool();
-    uint8_t uint8_value = fdp.ConsumeIntegral<uint8_t>();
-    uint16_t uint16_value = fdp.ConsumeIntegral<uint16_t>();
-    uint32_t uint32_value = fdp.ConsumeIntegral<uint32_t>();
-    int64_t int64_value = fdp.ConsumeIntegral<int64_t>();
-    ToJson(itemObject, double_value);
-    ToJson(itemObject, int16_value);
-    FromJson(itemObject, double_value);
-    FromJson(itemObject, bool_value);
-    FromJson(itemObject, uint8_value);
-    FromJson(itemObject, uint16_value);
+    std::string strValue = fdp.ConsumeRandomLengthString();
+    int16_t int16Value = fdp.ConsumeIntegral<int16_t>();
+    double doubleValue = fdp.ConsumeFloatingPoint<double>();
+    bool boolValue = fdp.ConsumeBool();
+    uint8_t uint8Value = fdp.ConsumeIntegral<uint8_t>();
+    uint16_t uint16Value = fdp.ConsumeIntegral<uint16_t>();
+    uint32_t uint32Value = fdp.ConsumeIntegral<uint32_t>();
+    int64_t int64Value = fdp.ConsumeIntegral<int64_t>();
+    ToJson(itemObject, doubleValue);
+    ToJson(itemObject, int16Value);
+    FromJson(itemObject, doubleValue);
+    FromJson(itemObject, boolValue);
+    FromJson(itemObject, uint8Value);
+    FromJson(itemObject, uint16Value);
     itemObject.IsNumber();
     itemObjectNew = itemObject;
-    itemObjectNew.PushBack(str_value);
-    itemObjectNew.PushBack(double_value);
-    itemObjectNew.PushBack(int64_value);
-    itemObjectNew.GetTo(double_value);
-    itemObjectNew.GetTo(uint32_value);
-    itemObjectNew.GetTo(bool_value);
+    itemObjectNew.PushBack(strValue);
+    itemObjectNew.PushBack(doubleValue);
+    itemObjectNew.PushBack(int64Value);
+    itemObjectNew.GetTo(doubleValue);
+    itemObjectNew.GetTo(uint32Value);
+    itemObjectNew.GetTo(boolValue);
 }
 }
 }
