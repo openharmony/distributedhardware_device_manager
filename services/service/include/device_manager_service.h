@@ -96,6 +96,9 @@ public:
     int32_t BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
         const std::string &bindParam);
 
+    int32_t UnBindDeviceParseExtra(const std::string &pkgName, const std::string &udidHash,
+        const std::string &extra);
+
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash);
 
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udidHash, const std::string &extra);
@@ -205,6 +208,8 @@ public:
     void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid);
     void HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid,
         const std::vector<std::string> &acceptEventUdids);
+    std::set<std::pair<std::string, std::string>> GetProxyInfosByParseExtra(const std::string &pkgName,
+        const std::string &extra, std::vector<std::pair<int64_t, int64_t>> &agentToProxyVec);
 #endif
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
     void ClearDiscoveryCache(const ProcessInfo &processInfo);

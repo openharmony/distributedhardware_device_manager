@@ -259,6 +259,7 @@ private:
     int32_t DeleteAclForProcV2(const std::string &localUdid, uint32_t localTokenId, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra, int32_t userId);
     int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
+    void DeleteCredential(DmAclIdParam &acl);
     void DeleteAclByTokenId(const int32_t accessTokenId,
         std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
         std::map<int64_t, DistributedDeviceProfile::AccessControlProfile> &delProfileMap,

@@ -1954,46 +1954,6 @@ HWTEST_F(DmAuthManagerTest, GetCloseSessionDelaySeconds_001, testing::ext::TestS
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, GetTokenIdByBundleName_001, testing::ext::TestSize.Level1)
-{
-    int32_t userId = 1;
-    std::string bundleName = "b********Info";
-    int64_t tokenId = 0;
-    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
-    int32_t ret = authManager_->GetTokenIdByBundleName(userId, bundleName, tokenId);
-    ASSERT_EQ(ret, DM_OK);
-
-    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(ERR_DM_FAILED));
-    EXPECT_CALL(*appManagerMock_, GetHapTokenIdByName(_, _, _, _)).WillOnce(Return(ERR_DM_FAILED));
-    ret = authManager_->GetTokenIdByBundleName(userId, bundleName, tokenId);
-    ASSERT_EQ(ret, ERR_DM_FAILED);
-
-    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*appManagerMock_, GetHapTokenIdByName(_, _, _, _)).WillOnce(Return(DM_OK));
-    ret = authManager_->GetTokenIdByBundleName(userId, bundleName, tokenId);
-    ASSERT_EQ(ret, DM_OK);
-
-    std::string deviceId = "de*******8";
-    authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
-    authManager_->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
-    authManager_->authRequestContext_->connSessionType = CONN_SESSION_TYPE_HML;
-    authManager_->JoinLnn(deviceId, false);
-
-    int32_t errorCode = 0;
-    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    authManager_->authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener);
-    authManager_->authResponseContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
-    authManager_->UpdateInputPincodeDialog(errorCode);
-
-    authManager_->authResponseContext_->authType = AUTH_TYPE_NFC;
-    errorCode = ERR_DM_HICHAIN_PROOFMISMATCH;
-    authManager_->pincodeDialogEverShown_ = false;
-    authManager_->authRequestContext_->hostPkgName = "hostPkgName";
-    authManager_->importAuthCode_ = "14785";
-    authManager_->importPkgName_ = "hostPkgName";
-    authManager_->UpdateInputPincodeDialog(errorCode);
-}
-
 HWTEST_F(DmAuthManagerTest, CheckNeedShowAuthInfoDialog_001, testing::ext::TestSize.Level1)
 {
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();

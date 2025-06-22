@@ -186,6 +186,10 @@ public:
     DM_EXPORT std::vector<OHOS::DistributedHardware::ProcessInfo>
         GetProcessInfoFromAclByUserId(const std::string &localDeviceId, const std::string &targetDeviceId,
         int32_t userId);
+    DM_EXPORT DistributedDeviceProfile::AccessControlProfile GetAccessControlProfileByAccessControlId(
+        int64_t accessControlId);
+    DM_EXPORT std::vector<std::pair<int64_t, int64_t>> GetAgentToProxyVecFromAclByUserId(
+        const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId);
     DM_EXPORT bool CheckSrcDevIdInAclForDevBind(const std::string &pkgName,
         const std::string &deviceId);
     DM_EXPORT bool CheckSinkDevIdInAclForDevBind(const std::string &pkgName,
@@ -332,6 +336,7 @@ private:
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
+    bool CheckAuthFormProxyTokenId(const std::string &extraStr);
     int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,
         DmDiscoveryInfo discoveryInfo);
     bool SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile, const DmAccessCaller &caller,
@@ -386,7 +391,6 @@ private:
     std::string GetDeviceAuthVersionInfo(std::string localUdid, std::string remoteUdid,
         std::vector<DistributedDeviceProfile::AccessControlProfile> profiles);
 
-    void ParseExtra(const std::string &extra, uint64_t &peerTokenId, std::string &peerBundleName);
     bool CacheLnnAcl(DistributedDeviceProfile::AccessControlProfile profile, const std::string &localUdid,
         DmAclIdParam &dmAclIdParam);
     void CheckLastLnnAcl(const std::string &localDeviceId, int32_t userId, const std::string &remoteDeviceId,

@@ -56,6 +56,8 @@ DM_EXPORT extern const char* FIELD_CREDENTIAL_EXISTS;
 DM_EXPORT extern const char* DM_TYPE_MINE;
 DM_EXPORT extern const char* DM_TYPE_OH;
 DM_EXPORT extern const char* TAG_SESSION_HEARTBEAT;
+DM_EXPORT extern const char* TAG_BUNDLE_NAME;
+DM_EXPORT extern const char* TAG_TOKENID;
 
 //The following constant are provided only for HiLink.
 DM_EXPORT extern const char *EXT_PART;
@@ -159,6 +161,7 @@ DM_EXPORT extern const char* CONN_SESSION_TYPE_HML;
 DM_EXPORT extern const char* CONN_SESSION_TYPE_BLE;
 DM_EXPORT extern const char* UN_BIND_PARAM_UDID_KEY;
 DM_EXPORT extern const char* PARAM_KEY_IS_PROXY_BIND;
+DM_EXPORT extern const char* PARAM_KEY_IS_PROXY_UNBIND;
 DM_EXPORT extern const char* PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT;
 DM_EXPORT extern const char* PARAM_KEY_SUBJECT_PROXYED_SUBJECTS;
 DM_EXPORT extern const char* DM_VAL_TRUE;

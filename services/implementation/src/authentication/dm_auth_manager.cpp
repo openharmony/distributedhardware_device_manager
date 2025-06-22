@@ -3268,19 +3268,6 @@ void DmAuthManager::JoinLnn(const std::string &deviceId, bool isForceJoin)
     }
 }
 
-int32_t DmAuthManager::GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId)
-{
-    int32_t ret = AppManager::GetInstance().GetNativeTokenIdByName(bundleName, tokenId);
-    if (ret == DM_OK) {
-        return DM_OK;
-    }
-    ret = AppManager::GetInstance().GetHapTokenIdByName(userId, bundleName, 0, tokenId);
-    if (ret != DM_OK) {
-        LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(bundleName).c_str());
-    }
-    return ret;
-}
-
 void DmAuthManager::OnSoftbusJoinLNNResult(const int32_t sessionId, const char *networkId, int32_t result)
 {
     (void)sessionId;

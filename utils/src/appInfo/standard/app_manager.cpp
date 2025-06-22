@@ -191,6 +191,35 @@ DM_EXPORT int32_t AppManager::GetCallerName(bool isSystemSA, std::string &caller
     return DM_OK;
 }
 
+DM_EXPORT int32_t AppManager::GetBundleNameByTokenId(int64_t tokenId, std::string &bundleName)
+{
+    if (tokenId < 0) {
+        LOGE("GetBundleNameByTokenId error.");
+        return ERR_DM_FAILED;
+    }
+    AccessTokenID tokenIdTemp = static_cast<AccessTokenID>(tokenId);
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenIdTemp);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
+        HapTokenInfo tokenInfo;
+        if (AccessTokenKit::GetHapTokenInfo(tokenIdTemp, tokenInfo) != EOK) {
+            LOGE("GetHapTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        bundleName = std::move(tokenInfo.bundleName);
+    } else if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        NativeTokenInfo tokenInfo;
+        if (AccessTokenKit::GetNativeTokenInfo(tokenIdTemp, tokenInfo) != EOK) {
+            LOGE("GetNativeTokenInfo failed.");
+            return ERR_DM_FAILED;
+        }
+        bundleName = std::move(tokenInfo.processName);
+    } else {
+        LOGE("failed, unsupported process.");
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
 DM_EXPORT int32_t AppManager::GetNativeTokenIdByName(std::string &processName,
     int64_t &tokenId)
 {
@@ -249,6 +278,19 @@ DM_EXPORT int32_t AppManager::GetCallerProcessName(std::string &processName)
 
     LOGI("Get process name: %{public}s success.", processName.c_str());
     return DM_OK;
+}
+
+int32_t AppManager::GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId)
+{
+    int32_t ret = GetNativeTokenIdByName(bundleName, tokenId);
+    if (ret == DM_OK) {
+        return DM_OK;
+    }
+    ret = GetHapTokenIdByName(userId, bundleName, 0, tokenId);
+    if (ret != DM_OK) {
+        LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(bundleName).c_str());
+    }
+    return ret;
 }
 
 int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)

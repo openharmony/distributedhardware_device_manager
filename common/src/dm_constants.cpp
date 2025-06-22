@@ -47,6 +47,8 @@ const char* FIELD_CREDENTIAL_EXISTS = "isCredentialExists";
 const char* DM_TYPE_MINE = "MINE";
 const char* DM_TYPE_OH = "OH";
 const char* TAG_SESSION_HEARTBEAT = "session_heartbeat";
+const char* TAG_BUNDLE_NAME = "bundleName";
+const char* TAG_TOKENID = "tokenId";
 
 //The following constant are provided only for HiLink.
 const char *EXT_PART = "ext_part";
@@ -149,6 +151,7 @@ const char* CONN_SESSION_TYPE_HML = "HML";
 const char* CONN_SESSION_TYPE_BLE = "BLE";
 const char* UN_BIND_PARAM_UDID_KEY = "udidKey";
 const char* PARAM_KEY_IS_PROXY_BIND = "isProxyBind";
+const char* PARAM_KEY_IS_PROXY_UNBIND = "isProxyUnBind";
 const char* PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT = "isCallingProxyAsSubject";
 const char* PARAM_KEY_SUBJECT_PROXYED_SUBJECTS = "subjectProxyOnes";
 const char* DM_VAL_TRUE = "true";
