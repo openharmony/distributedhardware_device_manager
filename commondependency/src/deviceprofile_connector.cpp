@@ -24,6 +24,9 @@
 #include "multiple_user_connector.h"
 #include "distributed_device_profile_client.h"
 #include "system_ability_definition.h"
+#include "ipc_skeleton.h"
+#include "dm_jsonstr_handle.h"
+#include "app_manager.h"
 
 using namespace OHOS::DistributedDeviceProfile;
 
@@ -425,21 +428,6 @@ void DeviceProfileConnector::DeleteCacheAcl(std::vector<int64_t> delAclIdVec,
     }
 }
 
-void DeviceProfileConnector::ParseExtra(const std::string &extra, uint64_t &peerTokenId, std::string &peerBundleName)
-{
-    JsonObject extraInfoJson(extra);
-    if (extraInfoJson.IsDiscarded()) {
-        LOGE("ParseExtra extraInfoJson error");
-        return;
-    }
-    if (!extraInfoJson[TAG_PEER_BUNDLE_NAME].IsString() || !extraInfoJson[TAG_PEER_TOKENID].IsNumberInteger()) {
-        LOGE("ParseExtra TAG_PEER_BUNDLE_NAME or TAG_PEER_TOKENID error");
-        return;
-    }
-    peerTokenId = extraInfoJson[TAG_PEER_TOKENID].Get<uint64_t>();
-    peerBundleName = extraInfoJson[TAG_PEER_BUNDLE_NAME].Get<std::string>();
-}
-
 bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::AccessControlProfile &acl,
     const std::string &localUdid, const uint32_t localTokenId,
     const std::string &remoteUdid, const uint32_t peerTokenId,
@@ -573,7 +561,7 @@ void DeviceProfileConnector::FilterNeedDeleteACLInfos(
 {
     uint64_t peerTokenId = 0;
     std::string peerBundleName = "";
-    ParseExtra(extra, peerTokenId, peerBundleName);
+    JsonStrHandle::GetInstance().GetPeerAppInfoParseExtra(extra, peerTokenId, peerBundleName);
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != remoteUdid) {
             continue;
@@ -796,6 +784,18 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
     return DM_OK;
 }
 
+bool DeviceProfileConnector::CheckAuthFormProxyTokenId(const std::string &extraStr)
+{
+    std::vector<int64_t> proxyTokenIdVec = JsonStrHandle::GetInstance().GetProxyTokenIdByExtra(extraStr);
+    int64_t callingTokenId = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
+    for (auto &proxyTokenId : proxyTokenIdVec) {
+        if (callingTokenId == proxyTokenId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProfile profiles,
     DmDiscoveryInfo discoveryInfo)
 {
@@ -807,11 +807,13 @@ int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProf
         return form;
     }
     if (profiles.GetBindLevel() == APP || profiles.GetBindLevel() == SERVICE) {
-        if (discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() &&
+        if ((discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() ||
+            CheckAuthFormProxyTokenId(profiles.GetAccesser().GetAccesserExtraData())) &&
             discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
             return form;
         }
-        if (discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() &&
+        if ((discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() ||
+            CheckAuthFormProxyTokenId(profiles.GetAccessee().GetAccesseeExtraData())) &&
             discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
             return form;
         }
@@ -925,7 +927,7 @@ DM_EXPORT uint64_t DeviceProfileConnector::GetTokenIdByNameAndDeviceId(std::stri
 {
     uint64_t peerTokenId = 0;
     std::string pkgName = "";
-    ParseExtra(extra, peerTokenId, pkgName);
+    JsonStrHandle::GetInstance().GetPeerAppInfoParseExtra(extra, peerTokenId, pkgName);
     std::vector<AccessControlProfile> profiles = GetAccessControlProfile();
     for (auto &item : profiles) {
         if (item.GetAccesser().GetAccesserBundleName() == pkgName &&
@@ -1086,20 +1088,77 @@ std::vector<OHOS::DistributedHardware::ProcessInfo> DeviceProfileConnector::GetP
         std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
         std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
         OHOS::DistributedHardware::ProcessInfo processInfo;
+        std::string extraStr;
         if (accesserUdid == localDeviceId) {
             processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
             processInfo.userId = item.GetAccesser().GetAccesserUserId();
             processInfoVec.push_back(processInfo);
-            continue;
-        }
-        if (accesseeUdid == localDeviceId) {
+            extraStr = item.GetAccesser().GetAccesserExtraData();
+        } else if (accesseeUdid == localDeviceId) {
             processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
             processInfo.userId = item.GetAccessee().GetAccesseeUserId();
             processInfoVec.push_back(processInfo);
+            extraStr = item.GetAccessee().GetAccesseeExtraData();
+        } else {
             continue;
+        }
+        std::vector<int64_t> proxyTokenIdVec = JsonStrHandle::GetInstance().GetProxyTokenIdByExtra(extraStr);
+        for (auto &proxyTokenId : proxyTokenIdVec) {
+            std::string proxyBundleName;
+            if (AppManager::GetInstance().GetBundleNameByTokenId(proxyTokenId, proxyBundleName) != DM_OK) {
+                continue;
+            }
+            processInfo.pkgName = proxyBundleName;
+            processInfoVec.push_back(processInfo);
         }
     }
     return processInfoVec;
+}
+
+DM_EXPORT AccessControlProfile DeviceProfileConnector::GetAccessControlProfileByAccessControlId(
+    int64_t accessControlId)
+{
+    AccessControlProfile profile;
+    profile.SetAccessControlId(0);
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    for (auto &item : profiles) {
+        if (item.GetAccessControlId() == accessControlId) {
+            return item;
+        }
+    }
+    return profile;
+}
+
+DM_EXPORT std::vector<std::pair<int64_t, int64_t>> DeviceProfileConnector::GetAgentToProxyVecFromAclByUserId(
+    const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId)
+{
+    std::vector<AccessControlProfile> filterProfiles = GetAclProfileByUserId(localDeviceId,
+        userId, targetDeviceId);
+    LOGI("filterProfiles size is %{public}zu", filterProfiles.size());
+    std::vector<std::pair<int64_t, int64_t>> agentToProxyVec;
+    for (auto &item : filterProfiles) {
+        if (IsLnnAcl(item) || item.GetTrustDeviceId() != targetDeviceId) {
+            continue;
+        }
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        int64_t agentTokenId;
+        std::string extraStr;
+        if (accesserUdid == localDeviceId) {
+            agentTokenId = item.GetAccesser().GetAccesserTokenId();
+            extraStr = item.GetAccesser().GetAccesserExtraData();
+        } else if (accesseeUdid == localDeviceId) {
+            agentTokenId = item.GetAccessee().GetAccesseeTokenId();
+            extraStr = item.GetAccessee().GetAccesseeExtraData();
+        } else {
+            continue;
+        }
+        std::vector<int64_t> proxyTokenIdVec = JsonStrHandle::GetInstance().GetProxyTokenIdByExtra(extraStr);
+        for (auto &proxyTokenId : proxyTokenIdVec) {
+            agentToProxyVec.push_back(std::pair<int64_t, int64_t>(agentTokenId, proxyTokenId));
+        }
+    }
+    return agentToProxyVec;
 }
 
 int32_t DeviceProfileConnector::PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser, DmAccessee dmAccessee)
@@ -1349,7 +1408,7 @@ void DeviceProfileConnector::DeleteAppBindLevel(DmOfflineParam &offlineParam, co
     int32_t deleteNums = 0;
     uint64_t peerTokenId = 0;
     std::string peerBundleName;
-    ParseExtra(extra, peerTokenId, peerBundleName);
+    JsonStrHandle::GetInstance().GetPeerAppInfoParseExtra(extra, peerTokenId, peerBundleName);
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != remoteUdid || item.GetBindType() == DM_IDENTICAL_ACCOUNT ||
             item.GetBindLevel() != APP) {

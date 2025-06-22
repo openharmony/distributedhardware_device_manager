@@ -490,19 +490,6 @@ void AuthManager::ParseUltrasonicSide(const JsonObject &jsonObject)
     }
 }
 
-int32_t AuthManager::GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId)
-{
-    int32_t ret = AppManager::GetInstance().GetNativeTokenIdByName(bundleName, tokenId);
-    if (ret == DM_OK) {
-        return DM_OK;
-    }
-    ret = AppManager::GetInstance().GetHapTokenIdByName(userId, bundleName, 0, tokenId);
-    if (ret != DM_OK) {
-        LOGE("get tokenId by bundleName failed %{public}s", GetAnonyString(bundleName).c_str());
-    }
-    return ret;
-}
-
 bool CheckBindLevel(const JsonItemObject &jsonObj, const std::string &key, int32_t &bindLevel)
 {
     if (IsJsonValIntegerString(jsonObj, TAG_BIND_LEVEL)) {
