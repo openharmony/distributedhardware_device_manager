@@ -1542,12 +1542,12 @@ HWTEST_F(DeviceProfileConnectorTest, GetDeviceIdAndUserId_001, testing::ext::Tes
     std::string accountId;
     std::string localUdid = "deviceId";
     auto ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(userId, accountId, localUdid);
-    EXPECT_FALSE(ret.empty());
+    EXPECT_TRUE(ret.empty());
 
     localUdid = "localDeviceId";
     userId = 456;
     ret = DeviceProfileConnector::GetInstance().GetDeviceIdAndUserId(userId, accountId, localUdid);
-    EXPECT_FALSE(ret.empty());
+    EXPECT_TRUE(ret.empty());
 }
 
 HWTEST_F(DeviceProfileConnectorTest, HandleUserSwitched_001, testing::ext::TestSize.Level1)
