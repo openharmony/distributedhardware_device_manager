@@ -247,6 +247,9 @@ int32_t DmAuthMessageProcessor::SaveDerivativeSessionKeyToDP(int32_t userId, con
     newSessionKey.keyLen = newKeyLen;
     int ret = DeviceProfileConnector::GetInstance().PutSessionKey(userId,
         std::vector<unsigned char>(newSessionKey.key, newSessionKey.key + newSessionKey.keyLen), skId);
+    if (ret != DM_OK) {
+        LOGE("DP save user session key failed %{public}d", ret);
+    }
     if (newSessionKey.key != nullptr) {
         (void)memset_s(newSessionKey.key, newSessionKey.keyLen, 0, newSessionKey.keyLen);
         free(newSessionKey.key);
@@ -869,7 +872,7 @@ int32_t DmAuthMessageProcessor::CreateProxyRespNegotiateMessage(std::shared_ptr<
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     jsonObject[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
-    if (context != nullptr && context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+    if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
         JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
         for (const auto &app : context->subjectProxyOnes) {
             JsonObject object;
@@ -1542,6 +1545,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRespUserConfirm(const JsonObject &js
 int32_t DmAuthMessageProcessor::ParseMessageProxyRespUserConfirm(const JsonObject &json,
     std::shared_ptr<DmAuthContext> context)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (!context->IsProxyBind) {
         return DM_OK;
     }

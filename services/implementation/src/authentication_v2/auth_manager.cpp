@@ -1159,8 +1159,7 @@ void AuthManager::ParseProxyJsonObject(const JsonObject &jsonObject)
         jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT].Get<std::string>() == DM_VAL_FALSE) {
         context_->IsCallingProxyAsSubject = false;
     }
-    if (!jsonObject.Contains(PARAM_KEY_SUBJECT_PROXYED_SUBJECTS) ||
-        !IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
         LOGE("no subject proxyed apps");
         return;
     }
@@ -1168,11 +1167,11 @@ void AuthManager::ParseProxyJsonObject(const JsonObject &jsonObject)
     JsonObject allProxyObj;
     allProxyObj.Parse(subjectProxyOnesStr);
     for (auto const &item : allProxyObj.Items()) {
-        if (!item.Contains(TAG_BUNDLE_NAME) || !IsString(item, TAG_BUNDLE_NAME)) {
+        if (!IsString(item, TAG_BUNDLE_NAME)) {
             LOGE("bundleName invalid");
             return;
         }
-        if (!item.Contains(TAG_TOKENID) || !IsInt64(item, TAG_TOKENID)) {
+        if (!IsInt64(item, TAG_TOKENID)) {
             LOGE("tokenId invalid");
             return;
         }

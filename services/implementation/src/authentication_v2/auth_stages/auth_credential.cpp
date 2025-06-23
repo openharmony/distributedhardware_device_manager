@@ -533,7 +533,7 @@ int32_t AuthSrcCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> co
     int32_t ret = ERR_DM_FAILED;
     context->isAppCredentialVerified = false;
     if (!NeedAgreeAcl(context)) {
-        context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthDoneState>());
+        context->authStateMachine->TransitionTo(std::make_shared<AuthSrcDataSyncState>());
         return DM_OK;
     }
     if (GetSessionKey(context)) {
