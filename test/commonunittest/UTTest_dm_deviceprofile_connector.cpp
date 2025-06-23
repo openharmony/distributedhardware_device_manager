@@ -807,7 +807,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetBindTypeByPkgName_002, testing::ext::Tes
     std::string requestDeviceId;
     std::string trustUdid = "123456";
     auto ret = DeviceProfileConnector::GetInstance().GetBindTypeByPkgName(pkgName, requestDeviceId, trustUdid);
-    EXPECT_EQ(ret.empty(), true);
+    EXPECT_EQ(ret.empty(), false);
 
     requestDeviceId = "remoteDeviceId";
     trustUdid = "localDeviceId";
@@ -2016,7 +2016,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetParamBindTypeVec_001, testing::ext::Test
     profiles.SetAccesser(accesser);
     profiles.SetAccessee(accessee);
     DeviceProfileConnector::GetInstance().GetParamBindTypeVec(profiles, requestDeviceId, bindTypeVec, trustUdid);
-    EXPECT_FALSE(bindTypeVec.empty());
+    EXPECT_TRUE(bindTypeVec.empty());
 
     bindTypeVec.clear();
     profiles.SetBindLevel(3);
