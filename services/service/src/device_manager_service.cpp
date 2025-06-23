@@ -4255,6 +4255,7 @@ bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, 
     return dmServiceImpl_->CheckSinkIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId,
     int32_t beforeUserId)
 {
@@ -4321,5 +4322,6 @@ void DeviceManagerService::DeleteHoDevice()
         dmServiceImpl_->DeleteHoDevice(item, foreGroundUserIds, backGroundUserIds);
     }
 }
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

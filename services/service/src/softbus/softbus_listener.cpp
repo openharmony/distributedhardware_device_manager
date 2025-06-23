@@ -31,10 +31,10 @@
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_transport_msg.h"
 #include "ffrt.h"
+#include "kv_adapter_manager.h"
 #include "multiple_user_connector.h"
 #endif
 #include "ipc_skeleton.h"
-#include "kv_adapter_manager.h"
 #include "parameter.h"
 #include "system_ability_definition.h"
 
@@ -305,7 +305,9 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
     std::string osTypeStr = "";
     ConvertOsTypeToJson(info->osType, osTypeStr);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
+#endif
 }
 
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
@@ -353,9 +355,11 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
             }
         }
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (!CheckPeerUdidTrusted(peerUdid)) {
         KVAdapterManager::GetInstance().DeleteOstypeData(peerUdid);
     }
+#endif
 }
 
 void SoftbusListener::UpdateDeviceName(NodeBasicInfo *info)
@@ -1449,6 +1453,7 @@ void SoftbusListener::ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr
 bool SoftbusListener::CheckPeerUdidTrusted(const std::string &udid)
 {
     LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     for (const auto &item : allProfile) {
@@ -1458,6 +1463,7 @@ bool SoftbusListener::CheckPeerUdidTrusted(const std::string &udid)
         }
     }
     LOGI("udid %{public}s not in acl.", GetAnonyString(udid).c_str());
+#endif
     return false;
 }
 } // namespace DistributedHardware

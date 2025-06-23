@@ -417,12 +417,12 @@ private:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     bool IsCallerInWhiteList();
     bool IsDMAdapterCheckApiWhiteListLoaded();
-#endif
-    bool GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
-        const std::string &sinkNetWorkId, std::string &sinkUdid);
     void HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId, int32_t beforeUserId);
     void GetHoOsTypeUdids(std::vector<std::string> &peerUdids);
     void DeleteHoDevice();
+#endif
+    bool GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
+        const std::string &sinkNetWorkId, std::string &sinkUdid);
 
 private:
     bool isImplsoLoaded_ = false;
