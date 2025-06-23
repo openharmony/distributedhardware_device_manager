@@ -28,6 +28,7 @@ group("fuzztest") {
     "devicenamemanagerone_fuzzer:fuzztest",
     "deviceprofileconnector_fuzzer:fuzztest",
     "devicepublish_fuzzer:fuzztest",
+    "dmauthattestcommon_fuzzer:fuzztest",
     "dmcommtool_fuzzer:fuzztest",
     "dmcommtooltwo_fuzzer:fuzztest",
     "dmtransport_fuzzer:fuzztest",

@@ -86,6 +86,35 @@ void DmTransPortMsgFuzzTest(const uint8_t* data, size_t size)
     notifyUserIds.ToString();
     cJSON_Delete(jsonObject);
 }
+
+void DmTransPortMsgFirstFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t code = fdp.ConsumeIntegral<int32_t>();
+    std::string msg(reinterpret_cast<const char*>(data), size);
+    std::string remoteUdid(reinterpret_cast<const char*>(data), size);
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON* jsonObject = nullptr;
+    LogoutAccountMsg accountInfo;
+    ToJson(jsonObject, accountInfo);
+    FromJson(jsonObject, accountInfo);
+    cJSON_Delete(jsonObject);
+}
 }
 }
 
@@ -94,5 +123,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::DmTransPortMsgFuzzTest(data, size);
+    OHOS::DistributedHardware::DmTransPortMsgFirstFuzzTest(data, size);
     return 0;
 }
