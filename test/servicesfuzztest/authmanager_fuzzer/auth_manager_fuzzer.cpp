@@ -170,14 +170,6 @@ void ParseJsonObjectFuzzTest(FuzzedDataProvider &fdp)
     authManager->ParseJsonObject(jsonObject);
 }
 
-void GetTokenIdByBundleNameFuzzTest(FuzzedDataProvider &fdp)
-{
-    int32_t userId = fdp.ConsumeIntegral<int32_t>();
-    std::string bundleName = fdp.ConsumeRandomLengthString();
-    int64_t tokenId = fdp.ConsumeIntegral<int64_t>();
-    authManager->GetTokenIdByBundleName(userId, bundleName, tokenId);
-}
-
 void GetBindLevelFuzzTest(FuzzedDataProvider &fdp)
 {
     int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
@@ -380,7 +372,6 @@ void AuthManagerFuzzTest(const uint8_t* data, size_t size)
     AuthDeviceFinishFuzzTest(fdp);
     GetAuthCodeAndPkgNameFuzzTest(fdp);
     GetPinCodeFuzzTest(fdp);
-    GetTokenIdByBundleNameFuzzTest(fdp);
     AuthenticateDeviceFuzzTest(fdp);
     BindTargetFuzzTest(fdp);
     ParseUltrasonicSideFuzzTest(fdp);

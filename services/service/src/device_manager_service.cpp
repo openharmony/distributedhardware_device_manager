@@ -33,6 +33,7 @@
 #include "dm_comm_tool.h"
 #include "dm_random.h"
 #include "dm_transport_msg.h"
+#include "dm_jsonstr_handle.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "kv_adapter_manager.h"
@@ -73,6 +74,7 @@ namespace {
     const int32_t NORMAL = 0;
     const int32_t SYSTEM_BASIC = 1;
     const int32_t SYSTEM_CORE = 2;
+    const uint32_t UNBIND_PROXY_ITEM_SIZE = 1;
     constexpr const char *ALL_PKGNAME = "";
     constexpr const char *NETWORKID = "NETWORK_ID";
     constexpr uint32_t INVALIED_BIND_LEVEL = 0;
@@ -834,6 +836,108 @@ int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std
         return ERR_DM_FAILED;
     }
     return DM_OK;
+}
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+std::set<std::pair<std::string, std::string>> DeviceManagerService::GetProxyInfosByParseExtra(
+    const std::string &pkgName, const std::string &extra,
+    std::vector<std::pair<int64_t, int64_t>> &agentToProxyVec)
+{
+    std::set<std::pair<std::string, std::string>> proxyInfos;
+    JsonObject jsonObject(extra);
+    if (jsonObject.IsDiscarded()) {
+        proxyInfos.insert(std::pair<std::string, std::string>(pkgName, extra));
+        return proxyInfos;
+    }
+    if (IsString(jsonObject, PARAM_KEY_IS_PROXY_UNBIND) &&
+        jsonObject[PARAM_KEY_IS_PROXY_UNBIND].Get<std::string>() == DM_VAL_TRUE) {
+        if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+            return proxyInfos;
+        }
+    } else {
+        if (!jsonObject.Contains(PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+            proxyInfos.insert(std::pair<std::string, std::string>(pkgName, extra));
+        }
+        return proxyInfos;
+    }
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("no proxy permission");
+        return proxyInfos;
+    }
+    std::string subjectProxyAppsStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    if (!allProxyObj.Parse(subjectProxyAppsStr) || allProxyObj.Items().size() != UNBIND_PROXY_ITEM_SIZE) {
+        return proxyInfos;
+    }
+    int64_t proxyTokenId = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
+    for (const auto &object : allProxyObj.Items()) {
+        if (!object.Contains(TAG_BUNDLE_NAME) || !IsString(object, TAG_BUNDLE_NAME)) {
+            continue;
+        }
+        if (!object.Contains(TAG_TOKENID) || !IsInt64(object, TAG_TOKENID)) {
+            continue;
+        }
+        std::string bundleName = object[TAG_BUNDLE_NAME].Get<std::string>();
+        int64_t agentTokenId = object[TAG_TOKENID].Get<int64_t>();
+        for (uint32_t i = 0; i < agentToProxyVec.size(); i++) {
+            if (agentTokenId == agentToProxyVec[i].first && proxyTokenId == agentToProxyVec[i].second) {
+                proxyInfos.insert(std::pair<std::string, std::string>(bundleName, object.Dump()));
+                break;
+            }
+        }
+    }
+    return proxyInfos;
+}
+#endif
+
+int32_t DeviceManagerService::UnBindDeviceParseExtra(const std::string &pkgName, const std::string &udidHash,
+    const std::string &extra)
+{
+    int32_t result = ValidateUnBindDeviceParams(pkgName, udidHash, extra);
+    if (result != DM_OK) {
+        return result;
+    }
+    std::string realDeviceId = udidHash;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::string udidHashTemp = "";
+    if (GetUdidHashByAnoyDeviceId(udidHash, udidHashTemp) == DM_OK) {
+        realDeviceId = udidHashTemp;
+    }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
+    std::string udid = "";
+    if (softbusListener_->GetUdidFromDp(realDeviceId, udid) != DM_OK) {
+        LOGE("Get udid by udidhash failed.");
+        return ERR_DM_FAILED;
+    }
+    char localUdid[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localUdid, DEVICE_UUID_LENGTH);
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::vector<std::pair<int64_t, int64_t>> agentToProxyVec =
+        DeviceProfileConnector::GetInstance().GetAgentToProxyVecFromAclByUserId(
+            std::string(localUdid), udid, userId);
+    std::set<std::pair<std::string, std::string>> proxyInfoSet = GetProxyInfosByParseExtra(
+        pkgName, extra, agentToProxyVec);
+    if (proxyInfoSet.size() != UNBIND_PROXY_ITEM_SIZE) {
+        LOGE("UnBind size error.");
+        return ERR_DM_FAILED;
+    }
+    auto proxyInfo = proxyInfoSet.begin();
+    uint64_t peerTokenId = 0;
+    std::string peerBundleName = "";
+    JsonStrHandle::GetInstance().GetPeerAppInfoParseExtra(proxyInfo->second, peerTokenId, peerBundleName);
+    if (peerBundleName == "") {
+        result = UnBindDevice(proxyInfo->first, udidHash);
+    } else {
+        result = UnBindDevice(proxyInfo->first, udidHash, proxyInfo->second);
+    }
+#else
+    if (extra == "") {
+        result = UnBindDevice(pkgName, udidHash);
+    } else {
+        result = UnBindDevice(pkgName, udidHash, extra);
+    }
+#endif
+    return result;
 }
 
 int32_t DeviceManagerService::UnBindDevice(const std::string &pkgName, const std::string &udidHash,

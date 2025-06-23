@@ -114,7 +114,7 @@ bool AuthSinkStatePinAuthComm::IsAuthCodeReady(std::shared_ptr<DmAuthContext> co
         return false;
     }
     if (context->pkgName != context->importPkgName) {
-        LOGE("AuthSinkNegotiateStateMachine::IsAuthCodeReady pkgName %{public}s not supported with "
+        LOGE("AuthSinkStatePinAuthComm::IsAuthCodeReady pkgName %{public}s not supported with "
             "import pkgName %{public}s.", context->pkgName.c_str(), context->importPkgName.c_str());
         return false;
     }
@@ -268,7 +268,6 @@ int32_t AuthSinkPinAuthMsgNegotiateState::Action(std::shared_ptr<DmAuthContext> 
         LOGI("AuthSinkPinAuthMsgNegotiateState::AuthDevice WAIT ON_SESSION_KEY_RETURNED ON_ERROR failed, maybe retry.");
         return DM_OK;
     }
-
     LOGE("AuthSinkPinAuthMsgNegotiateState::AuthDevice failed.");
     return STOP_BIND;
 }
@@ -281,6 +280,7 @@ DmAuthStateType AuthSinkPinAuthDoneState::GetStateType()
 int32_t AuthSinkPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkPinAuthDoneState Action");
+    GetSessionKey(context);
     return DM_OK;
 }
 
@@ -390,17 +390,17 @@ int32_t AuthSrcPinNegotiateStartState::Action(std::shared_ptr<DmAuthContext> con
         int32_t ret = NegotiateProcess::GetInstance().HandleNegotiateResult(context);
         if (ret != DM_OK) {
             LOGE("HandleNegotiateResult failed ret %{public}d", ret);
-            context->reason = ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
+            context->reason = ret;
             return ret;
         }
     }
-    if (!context->needBind && !context->needAgreeCredential && context->needAuth) {
+    if (!IsNeedBind(context) && !IsNeedAgreeCredential(context) && IsNeedAuth(context)) {
         return ProcessCredAuth(context);
     }
-    if (context->needBind) {
+    if (IsNeedBind(context)) {
         return ProcessPinBind(context);
     }
-    if (!context->needBind && !context->needAgreeCredential && !context->needAuth) {
+    if (!IsNeedBind(context) && !IsNeedAgreeCredential(context) && !IsNeedAuth(context)) {
         context->reason = ERR_DM_BIND_TRUST_TARGET;
         context->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
         return DM_OK;

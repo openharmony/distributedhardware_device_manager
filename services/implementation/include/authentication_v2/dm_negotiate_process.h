@@ -180,6 +180,9 @@ public:
     NegotiateProcess();
     ~NegotiateProcess();
     int32_t HandleNegotiateResult(std::shared_ptr<DmAuthContext> context);
+    int32_t HandleProxyNegotiateResult(std::shared_ptr<DmAuthContext> context, int32_t result);
+    bool IsNeedSetProxyRelationShip(std::shared_ptr<DmAuthContext> context, DmProxyAuthContext &proxyContext);
+    bool IsExistTheTokenId(const std::string extraData, const std::string tokenIdHash);
 private:
     CredType ConvertCredType(const std::string &credType);
     AclType ConvertAclType(const std::string &aclType);

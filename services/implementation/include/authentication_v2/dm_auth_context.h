@@ -96,6 +96,53 @@ enum DmUltrasonicInfo {
     DM_Ultrasonic_Invalid = 2,
 };
 
+typedef struct DmProxyAccess {
+    std::string pkgName;
+    std::string pkgLabel;
+    std::string bundleInfo;
+    std::string bundleName;
+    std::string peerBundleName;
+    int64_t tokenId;
+    std::string tokenIdHash;
+    int32_t bindLevel;
+    std::string transmitCredentialId;
+    std::string transmitPublicKey;
+    std::string publicKey;
+    int32_t sessionKeyId;
+    int32_t transmitSessionKeyId;
+    int64_t transmitSkTimeStamp;
+    int64_t skTimeStamp;        // Used for aging, time is 2 days
+    bool isAuthed;
+    std::string aclTypeList;        // Trust relationship list, used for data aging, KV format
+    std::string credTypeList;
+    std::string aclStrList;
+    std::map<int32_t, std::string> credentialInfos;
+    std::map<int32_t, DistributedDeviceProfile::AccessControlProfile> aclProfiles;
+    std::string credInfoJson;
+    std::string aclTypeJson;
+} DmProxyAccess;
+
+struct DmProxyAuthContext {
+    std::string proxyContextId;
+    std::string customData;
+    std::string pkgLabel;
+    bool needBind{true};
+    bool needAgreeCredential{true};
+    bool needAuth{true};
+    bool IsNeedSetProxyRelationShip{false};
+    DmProxyAccess proxyAccesser;
+    DmProxyAccess proxyAccessee;
+    bool operator==(const DmProxyAuthContext &other) const
+    {
+        return (proxyContextId == other.proxyContextId);
+    }
+
+    bool operator<(const DmProxyAuthContext &other) const
+    {
+        return proxyContextId < other.proxyContextId;
+    }
+};
+
 // Used for one-touch pairing
 struct DmPeerTargetAddress {
     // directly establish a Bluetooth connection
@@ -153,6 +200,7 @@ struct DmAccess {
     int64_t lnnSkTimeStamp{0};     // Used for aging, time is 2 days, user-level credential timestamp
     int64_t skTimeStamp;        // Used for aging, time is 2 days
     bool isAuthed;
+    bool isUserLevelAuthed;
     bool isOnline;
     bool isGenerateLnnCredential{true};
     bool isPutLnnAcl{true};
@@ -197,6 +245,7 @@ struct DmAuthContext {
     int32_t connDelayCloseTime;
     int32_t reason{DM_OK};
     int32_t reply;
+    std::string userOperationParam;
     int32_t state;
     int32_t hmlActionId = 0;
     bool authenticating;        // Indicator whether authentication is in progress
@@ -222,6 +271,13 @@ struct DmAuthContext {
     DmAccess accessee;
     std::multimap<DmAccess, DmAccess> proxy;    // Multimap where the key is the accessor and the value is the accesssee
     bool isNeedJoinLnn{true};
+    bool IsProxyBind{false};
+    bool IsCallingProxyAsSubject{true};
+    bool IsNeedSetProxy{false};
+    bool isNeedAuthorize{false};
+    std::vector<DmProxyAuthContext> subjectProxyOnes;
+    std::string reUseCreId;
+    std::string srvExtarInfo;
 
     std::shared_ptr<DmAuthStateMachine> authStateMachine;
     std::shared_ptr<AuthUiStateManager> authUiStateMgr;

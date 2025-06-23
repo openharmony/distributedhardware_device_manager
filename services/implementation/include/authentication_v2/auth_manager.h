@@ -110,7 +110,6 @@ public:
     void SetAuthContext(std::shared_ptr<DmAuthContext> context);
     std::shared_ptr<DmAuthContext> GetAuthContext();
     static bool IsHmlSessionType(const std::string &sessionType);
-    int32_t GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId);
     void GetBindTargetParams(std::string &pkgName, PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam);
     void GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode);
@@ -135,6 +134,8 @@ protected:
     void GetRemoteDeviceId(std::string &deviceId);
 private:
     void ParseHmlInfoInJsonObject(const JsonObject &jsonObject);
+    void ParseProxyJsonObject(const JsonObject &jsonObject);
+    void GetBindLevelByBundleName(std::string &bundleName, int32_t userId, int32_t &bindLevel);
     void ParseJsonObject(const JsonObject &jsonObject);
     void GetAuthParam(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
@@ -144,6 +145,7 @@ private:
     bool IsAuthCodeReady(const std::string &sessionName);
     int32_t CheckAuthParamVaild(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
+    int32_t CheckProxyAuthParamVaild(const std::string &extra);
     void InitAuthState(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
     int32_t AuthenticateDevice(const std::string &sessionName, int32_t authType,

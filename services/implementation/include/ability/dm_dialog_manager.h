@@ -77,6 +77,14 @@ public:
     {
         return hostPkgLabel_;
     }
+    static bool GetIsProxyBind()
+    {
+        return isProxyBind_;
+    }
+    static std::string GetAppUserData()
+    {
+        return appUserData_;
+    }
 private:
     DmDialogManager();
     ~DmDialogManager();
@@ -102,6 +110,8 @@ private:
     static std::atomic<bool> isConnectSystemUI_;
     static sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_;
     static DmDialogManager dialogMgr_;
+    static bool isProxyBind_;
+    static std::string appUserData_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

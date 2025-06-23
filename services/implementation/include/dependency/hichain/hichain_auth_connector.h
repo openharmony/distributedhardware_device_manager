@@ -75,9 +75,11 @@ public:
     int32_t AuthCredential(int32_t osAccountId, int64_t authReqId, const std::string &credId,
         const std::string &pinCode);
     int32_t AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode);
-
+    int32_t AddTokensToCredential(const std::string &credId, int32_t userId, std::vector<std::string> &tokenIds);
+    int32_t UpdateCredential(const std::string &credId, int32_t userId, std::vector<std::string> &tokenIds);
 private:
     void FreeJsonString(char *jsonStr);
+    void FreeCharArray(char *charArray);
     static std::shared_ptr<IDmDeviceAuthCallback> GetDeviceAuthCallback(int64_t id);
 
 private:
