@@ -20,7 +20,6 @@ group("test") {
       "benchmarktest:benchmarktest",
       "commonfuzztest:fuzztest",
       "interfacesfuzztest:fuzztest",
-      "jsonfuzztest:fuzztest",
       "servicesfuzztest:fuzztest",
       "softbusfuzztest:fuzztest",
       "unittest:unittest",
