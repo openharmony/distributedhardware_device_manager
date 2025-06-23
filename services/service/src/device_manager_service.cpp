@@ -4258,7 +4258,7 @@ bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, 
 void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId,
     int32_t beforeUserId)
 {
-    LOGI("commonEventType %{public}s, currentUserId %{public}d, beforeUserId %{public}d.",commonEventType.c_str(),
+    LOGI("commonEventType %{public}s, currentUserId %{public}d, beforeUserId %{public}d.", commonEventType.c_str(),
         currentUserId, beforeUserId);
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
     MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
@@ -4268,7 +4268,7 @@ void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &comm
     }
     DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
         [this, commonEventType] () {
-             DeviceManagerService::HandleAccountCommonEvent(commonEventType);
+            DeviceManagerService::HandleAccountCommonEvent(commonEventType);
     });
 }
 
