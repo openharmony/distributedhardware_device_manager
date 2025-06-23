@@ -267,14 +267,14 @@ bool DmAuthState::ProxyNeedAgreeAcl(std::shared_ptr<DmAuthContext> context)
     }
     if (context->direction == DM_AUTH_SOURCE) {
         for (const auto &app : context->subjectProxyOnes) {
-            if (!app.proxyAccesser.isAuthed) {
+            if (!app.proxyAccesser.isAuthed || app.IsNeedSetProxyRelationShip) {
                 return true;
             }
         }
         return false;
     }
     for (const auto &app : context->subjectProxyOnes) {
-        if (!app.proxyAccessee.isAuthed) {
+        if (!app.proxyAccessee.isAuthed || app.IsNeedSetProxyRelationShip) {
             return true;
         }
     }
