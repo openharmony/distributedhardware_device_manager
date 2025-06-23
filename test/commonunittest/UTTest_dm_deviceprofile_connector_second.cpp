@@ -221,7 +221,8 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteSigTrustACL_201, testing::ext::
 
 HWTEST_F(DeviceProfileConnectorSecondTest, GetAllAccessControlProfile_201, testing::ext::TestSize.Level1)
 {
-    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_))
+        .Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
     auto ret = DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     EXPECT_TRUE(ret.empty());
 }
@@ -242,8 +243,10 @@ HWTEST_F(DeviceProfileConnectorSecondTest, DeleteAclForAccountLogOut_001, testin
     std::string peerUdid = "peer_device_id";
     int32_t peerUserId = 2;
     DmOfflineParam offlineParam;
+    DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
+    std::string accoutId = "accountId";
     EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
-    int32_t result = connector.DeleteAclForAccountLogOut(localUdid, localUserId, peerUdid, peerUserId, offlineParam);
+    int32_t result = connector.DeleteAclForAccountLogOut(info, accoutId, offlineParam);
 
     EXPECT_EQ(result, false);
 }

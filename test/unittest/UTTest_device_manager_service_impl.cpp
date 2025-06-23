@@ -470,16 +470,16 @@ HWTEST_F(DeviceManagerServiceImplTest, NotifyEvent_005, testing::ext::TestSize.L
     devIdAndUserMap.insert(std::make_pair("devId02", 102));
     devIdAndUserMap.insert(std::make_pair("devId03", 103));
     EXPECT_CALL(*deviceProfileConnectorMock_, GetDevIdAndUserIdByActHash(_, _, _, _)).WillOnce(Return(devIdAndUserMap));
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _, _))
-        .Times(::testing::AtLeast(3)).WillOnce(Return(true));
     deviceManagerServiceImpl_->HandleAccountLogoutEvent(remoteUserId, remoteAccountHash, remoteUdid);
 
     std::string localUdid = "localUdid";
     int32_t localUserId = 123;
     std::string peerUdid = "peerUdid";
     int32_t peerUserId = 456;
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _, _)).WillOnce(Return(true));
-    deviceManagerServiceImpl_->HandleIdentAccountLogout(localUdid, localUserId, peerUdid, peerUserId);
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _)).WillOnce(Return(true));
+    DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
+    std::string accountId = "accountId";
+    deviceManagerServiceImpl_->HandleIdentAccountLogout(info, accountId);
 
     EXPECT_CALL(*dmDeviceStateManagerMock_, ProcNotifyEvent(_, _)).WillOnce(Return(DM_OK));
     int ret = deviceManagerServiceImpl_->NotifyEvent(pkgName, eventId, event);
@@ -1497,9 +1497,10 @@ HWTEST_F(DeviceManagerServiceImplTest, UnBindDevice_104, testing::ext::TestSize.
     int32_t userId = 100;
     std::string accountId = "60008";
     std::vector<std::string> peerUdids;
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _, _))
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _))
         .Times(::testing::AtLeast(1)).WillOnce(Return(true));
-    deviceManagerServiceImpl_->HandleIdentAccountLogout(udid, userId, udid, userId);
+    DMAclQuadInfo info = {udid, userId, udid, userId};
+    deviceManagerServiceImpl_->HandleIdentAccountLogout(info, accountId);
     deviceManagerServiceImpl_->HandleUserRemoved(peerUdids, userId);
     deviceManagerServiceImpl_->HandleDeviceNotTrust(udid);
     EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
@@ -1843,7 +1844,7 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     int32_t localUserId = 123456;
     std::string peerUdid = "remoteUdid";
     int32_t peerUserId = 1;
-    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _, _, _)).WillRepeatedly(Return(true));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAclForAccountLogOut(_, _, _)).WillRepeatedly(Return(true));
     if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
@@ -1851,7 +1852,8 @@ HWTEST_F(DeviceManagerServiceImplTest, GetDeviceIdAndUserId_001, testing::ext::T
     if (deviceManagerServiceImpl_->deviceStateMgr_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
-    deviceManagerServiceImpl_->HandleIdentAccountLogout(localUdid, localUserId, peerUdid, peerUserId);
+    DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
+    deviceManagerServiceImpl_->HandleIdentAccountLogout(info, accountId);
 
     std::vector<uint32_t> foregroundUserIds;
     std::vector<uint32_t> backgroundUserIds;

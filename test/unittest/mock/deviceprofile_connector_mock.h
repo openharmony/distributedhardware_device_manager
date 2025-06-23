@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,8 +35,8 @@ public:
     virtual uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId) = 0;
     virtual std::map<int32_t, int32_t> GetUserIdAndBindLevel(const std::string &localUdid,
         const std::string &peerUdid) = 0;
-    virtual bool DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
-        const std::string &peerUdid, int32_t peerUserId, DmOfflineParam &offlineParam) = 0;
+    virtual bool DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
+        DmOfflineParam &offlineParam) = 0;
     virtual DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId,
         const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid) = 0;
     virtual std::multimap<std::string, int32_t> GetDevIdAndUserIdByActHash(const std::string &localUdid,
@@ -87,7 +87,7 @@ public:
         const std::string &));
     MOCK_METHOD(uint32_t, CheckBindType, (std::string, std::string));
     MOCK_METHOD((std::map<int32_t, int32_t>), GetUserIdAndBindLevel, (const std::string &, const std::string &));
-    MOCK_METHOD(bool, DeleteAclForAccountLogOut, (const std::string &, int32_t, const std::string &, int32_t,
+    MOCK_METHOD(bool, DeleteAclForAccountLogOut, (const DMAclQuadInfo &, const std::string &,
         DmOfflineParam &));
     MOCK_METHOD((DmOfflineParam), HandleAppUnBindEvent, (int32_t, const std::string &,
         int32_t, const std::string &));
