@@ -17,37 +17,19 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DeviceNameManagerFuzzTest") {
+ohos_fuzztest("DmNegotiateProcessFuzzTest") {
   module_out_path = fuzz_test_output_path
   fuzz_config_file =
-      "${devicemanager_path}/test/servicesfuzztest/devicenamemanager_fuzzer"
+      "${devicemanager_path}/test/commonfuzztest/dmnegotiateprocess_fuzzer"
 
   include_dirs = [
-    "${utils_path}/include",
     "${innerkits_path}/native_cpp/include",
-    "${innerkits_path}/native_cpp/include/ipc/standard",
-    "${innerkits_path}/native_cpp/include/ipc",
-    "${innerkits_path}/native_cpp/include/notify",
-    "${common_path}/include",
-    "${common_path}/include/ipc",
-    "${common_path}/include/ipc/model",
-    "${utils_path}/include/ipc/standard",
-    "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/dependency/timer",
-    "${servicesimpl_path}/include/discovery",
-    "${servicesimpl_path}/include/dependency/softbus",
-    "${servicesimpl_path}/include/authentication",
-    "${servicesimpl_path}/include/adapter",
-    "${servicesimpl_path}/include/ipc/standard",
-    "${servicesimpl_path}/include/publish",
-    "${servicesimpl_path}/include/dependency/cryptomgr",
-    "${servicesimpl_path}/include/dependency/deviceprofile",
-    "${servicesimpl_path}/include/dependency/hichain",
-    "${servicesimpl_path}/include/devicestate",
-    "${devicemanager_path}/interfaces/kits/js/include",
-    "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
+    "${servicesimpl_path}/include/adapter",
+    "${servicesimpl_path}/include/authentication_v2",
+    "${servicesimpl_path}/include/dependency/hichain",
+    "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/dependency/timer",
   ]
 
   cflags = [
@@ -55,35 +37,37 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "device_name_manager_fuzzer.cpp" ]
+  sources = [ "dm_negotiate_process_fuzzer.cpp" ]
 
   deps = [
-    "${devicemanager_path}/services/service:devicemanagerservice",
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${services_path}:devicemanagerservicetest",
+    "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutilstest",
+  ]
+
+  external_deps = [
+    "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
   ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DeviceNameManagerFuzzTest\"",
+    "DH_LOG_TAG=\"DmNegotiateProcessFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-    "napi:ace_napi",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
 }
 
@@ -91,6 +75,6 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":DeviceNameManagerFuzzTest" ]
+  deps = [ ":DmNegotiateProcessFuzzTest" ]
 }
 ###############################################################################

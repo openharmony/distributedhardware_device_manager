@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,37 +17,25 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DeviceNameManagerFuzzTest") {
+ohos_fuzztest("DmAuthAttestCommonFuzzTest") {
   module_out_path = fuzz_test_output_path
   fuzz_config_file =
-      "${devicemanager_path}/test/servicesfuzztest/devicenamemanager_fuzzer"
+      "${devicemanager_path}/test/servicesfuzztest/dmauthattestcommon_fuzzer"
 
   include_dirs = [
     "${utils_path}/include",
-    "${innerkits_path}/native_cpp/include",
-    "${innerkits_path}/native_cpp/include/ipc/standard",
-    "${innerkits_path}/native_cpp/include/ipc",
-    "${innerkits_path}/native_cpp/include/notify",
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
     "${utils_path}/include/ipc/standard",
     "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/dependency/timer",
-    "${servicesimpl_path}/include/discovery",
-    "${servicesimpl_path}/include/dependency/softbus",
-    "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/adapter",
-    "${servicesimpl_path}/include/ipc/standard",
-    "${servicesimpl_path}/include/publish",
-    "${servicesimpl_path}/include/dependency/cryptomgr",
-    "${servicesimpl_path}/include/dependency/deviceprofile",
-    "${servicesimpl_path}/include/dependency/hichain",
-    "${servicesimpl_path}/include/devicestate",
-    "${devicemanager_path}/interfaces/kits/js/include",
-    "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
     "${servicesimpl_path}/include/config",
+    "${innerkits_path}/native_cpp/include",
+    "${servicesimpl_path}/include/attest",
+    "${utils_path}/include/kvadapter",
+    "${json_path}/include",
   ]
 
   cflags = [
@@ -55,35 +43,31 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
     "-O0",
     "-Dprivate=public",
     "-Dprotected=public",
+    "-Werror",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-
-  sources = [ "device_name_manager_fuzzer.cpp" ]
+  sources = [
+    "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
+    "dm_auth_attest_common_fuzzer.cpp",
+    "${json_path}/src/json_object_cjson.cpp",
+  ]
 
   deps = [
-    "${devicemanager_path}/services/service:devicemanagerservice",
-    "${utils_path}:devicemanagerutilstest",
+    "${devicemanager_path}/services/implementation:devicemanagerserviceimpl",
   ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DeviceNameManagerFuzzTest\"",
+    "DH_LOG_TAG=\"DmAuthAttestCommonFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
   ]
 
   external_deps = [
+    "cJSON:cjson",
     "c_utils:utils",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-    "napi:ace_napi",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
+    "hilog:libhilog",
   ]
 }
 
@@ -91,6 +75,6 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":DeviceNameManagerFuzzTest" ]
+  deps = [ ":DmAuthAttestCommonFuzzTest" ]
 }
 ###############################################################################

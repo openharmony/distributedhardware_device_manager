@@ -13,24 +13,24 @@
  * limitations under the License.
  */
 
+#include "device_name_manager_fuzzer.h"
+
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <memory>
 #include <string>
 #include <unistd.h>
 #include <unordered_map>
-#include <fuzzer/FuzzedDataProvider.h>
 
-#include "device_name_manager_fuzzer.h"
 #include "device_name_manager.h"
 #include "dm_constants.h"
-
 
 namespace OHOS {
 namespace DistributedHardware {
 
 namespace {
-    constexpr int32_t INT32_SIZE = 5;
+constexpr int32_t INT32_SIZE = 5;
 }
 
 std::shared_ptr<DeviceNameManager> deviceNameMgr_ = std::make_shared<DeviceNameManager>();
@@ -105,8 +105,28 @@ void DeviceNameManagerFirstFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DataShare::DataShareHelper> helper = nullptr;
     deviceNameMgr_->ReleaseDataShareHelper(helper);
 }
+
+void DeviceNameManagerSecondFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    std::shared_ptr<DeviceNameManager> deviceNameMgr = std::make_shared<DeviceNameManager>();
+    deviceNameMgr->UnInit();
+    deviceNameMgr->GetUserDefinedDeviceName();
+    std::string str;
+    deviceNameMgr->AnoyPrivacyString(str);
+    str = "1";
+    deviceNameMgr->AnoyPrivacyString(str);
+    str = "1234";
+    deviceNameMgr->AnoyPrivacyString(str);
+    str = fdp.ConsumeRandomLengthString();
+    deviceNameMgr->AnoyPrivacyString(str);
+    deviceNameMgr->ConvertToWholeCharacter(str);
 }
-}
+} // namespace DistributedHardware
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
@@ -114,5 +134,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     /* Run your code on data */
     OHOS::DistributedHardware::DeviceNameManagerFuzzTest(data, size);
     OHOS::DistributedHardware::DeviceNameManagerFirstFuzzTest(data, size);
+    OHOS::DistributedHardware::DeviceNameManagerSecondFuzzTest(data, size);
     return 0;
 }
