@@ -3306,6 +3306,7 @@ DM_EXPORT void DeviceProfileConnector::DeleteHoDevice(const std::string &peerUdi
     }
     std::vector<int32_t> localUserIds(foreGroundUserIds.begin(), foreGroundUserIds.end());
     std::copy(backGroundUserIds.begin(), backGroundUserIds.end(), std::back_inserter(localUserIds));
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
     for (const auto &item : profiles) {
         if (peerUdid != item.GetTrustDeviceId() || item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
