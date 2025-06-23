@@ -260,6 +260,11 @@ public:
     {
         return "";
     }
+
+    virtual void SetExistPkgName(const std::set<std::string> &pkgNameSet)
+    {
+        (void)pkgNameSet;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

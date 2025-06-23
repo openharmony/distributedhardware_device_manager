@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -462,6 +462,13 @@ typedef struct DevUserInfo {
     std::string deviceId;
     int32_t userId;
 } DevUserInfo;
+
+typedef struct DMAclQuadInfo {
+    std::string localUdid;
+    int32_t localUserId;
+    std::string peerUdid;
+    int32_t peerUserId;
+} DMAclQuadInfo;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H
