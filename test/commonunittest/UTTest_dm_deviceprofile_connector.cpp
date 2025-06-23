@@ -1466,8 +1466,8 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     int32_t peerUserId = 555;
     DmOfflineParam offlineParam;
     DMAclQuadInfo info = {localUdid, localUserId, peerUdid, peerUserId};
-    std::string accoutId = "accountId";
-    bool ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accoutId, offlineParam);
+    std::string accountId = "accountId";
+    bool ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
     EXPECT_FALSE(ret);
 
     localUdid = "deviceId";
@@ -1475,7 +1475,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUdid = "deviceId";
     peerUserId = 456;
     info = {localUdid, localUserId, peerUdid, peerUserId};
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accoutId, offlineParam);
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
     EXPECT_FALSE(ret);
 
     localUdid = "deviceId";
@@ -1483,7 +1483,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUdid = "deviceId";
     peerUserId = 123456;
     info = {localUdid, localUserId, peerUdid, peerUserId};
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accoutId, offlineParam);
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
     EXPECT_FALSE(ret);
 
     localUdid = "localDeviceId";
@@ -1491,7 +1491,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUdid = "remoteDeviceId";
     peerUserId = 123456;
     info = {localUdid, localUserId, peerUdid, peerUserId};
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accoutId, offlineParam);
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
     EXPECT_FALSE(ret);
 
     localUdid = "remoteDeviceId";
@@ -1499,7 +1499,7 @@ HWTEST_F(DeviceProfileConnectorTest, DeleteAclForAccountLogOut_001, testing::ext
     peerUdid = "localDeviceId";
     peerUserId = 1234;
     info = {localUdid, localUserId, peerUdid, peerUserId};
-    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accoutId, offlineParam);
+    ret = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId, offlineParam);
     EXPECT_FALSE(ret);
 }
 
