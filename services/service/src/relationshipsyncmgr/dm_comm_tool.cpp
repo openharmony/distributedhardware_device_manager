@@ -262,9 +262,13 @@ void DMCommTool::RspLocalFrontOrBackUserIds(const std::string rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds, int32_t socketId)
 {
     UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
+    if (dmTransportPtr_ == nullptr) {
+        LOGE("dmTransportPtr_ is null.");
+        return;
+    }
     cJSON *root = cJSON_CreateObject();
-    if (root == nullptr || dmTransportPtr_ == nullptr) {
-        LOGE("Create cJSON object failed.");
+    if (root == nullptr) {
+        LOGE("Create cJSON object failed: root is null.");
         return;
     }
     ToJson(root, userIdsMsg);
