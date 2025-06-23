@@ -211,6 +211,7 @@ DM_EXPORT int32_t KVAdapterManager::GetAllOstypeData(std::vector<std::string> &v
 
 DM_EXPORT int32_t KVAdapterManager::PutOstypeData(const std::string &key, const std::string &value)
 {
+    LOGI("key %{publkic}s, value %{public}s.", GetAnonyString(dmKey).c_str(), value.c_str());
     std::string dmKey = std::string(DM_OSTYPE_PREFIX) + std::string(DB_KEY_DELIMITER) + std::string(DM_UDID_PREFIX) +
         std::string(DB_KEY_DELIMITER) + key;
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
@@ -223,6 +224,7 @@ DM_EXPORT int32_t KVAdapterManager::PutOstypeData(const std::string &key, const 
 
 DM_EXPORT int32_t KVAdapterManager::DeleteOstypeData(const std::string &key)
 {
+    LOGI("key %{publkic}s, value %{public}s.", GetAnonyString(dmKey).c_str(), value.c_str());
     std::string dmKey = std::string(DM_OSTYPE_PREFIX) + std::string(DB_KEY_DELIMITER) + std::string(DM_UDID_PREFIX) +
         std::string(DB_KEY_DELIMITER) + key;
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);

@@ -1343,11 +1343,12 @@ void HiChainConnector::DeleteHoDevice(const std::string &peerUdid, const std::ve
     LOGI("peerudid %{public}s, foreGroundUserIds %{public}s, backGroundUserIds %{public}s.",
         GetAnonyString(peerUdid).c_str(), GetIntegerList(foreGroundUserIds).c_str(),
         GetIntegerList(backGroundUserIds).c_str());
-    std::vector<int32_t> localUserIds = foreGroundUserIds + backGroundUserIds;
+    std::vector<int32_t> localUserIds(foreGroundUserIds.begin(), foreGroundUserIds.end());
+    std::copy(backGroundUserIds.begin(), backGroundUserIds.end(), std::back_inserter(localUserIds));
     for (const auto &item : localUserIds) {
         std::vector<GroupInfo> groupList;
         GetRelatedGroupsCommon(item, peerUdid, DM_PKG_NAME_EXT, groupList);
-        for (const auto &iter : groupListExt) {
+        for (auto &iter : groupList) {
             if (iter.groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
                 continue;
             }

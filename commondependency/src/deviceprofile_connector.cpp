@@ -3300,15 +3300,15 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
 DM_EXPORT void DeviceProfileConnector::DeleteHoDevice(const std::string &peerUdid,
     const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds)
 {
-    if (udid.empty() || foreGroundUserIds.empty() || backGroundUserIds.empty()) {
+    if (peerUdid.empty() || foreGroundUserIds.empty() || backGroundUserIds.empty()) {
         LOGE("invalid input param.");
         return;
     }
-    std::vector<int32_t> localUserIds = foreGroundUserIds + backGroundUserIds;
-    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::vector<int32_t> localUserIds(foreGroundUserIds.begin(), foreGroundUserIds.end());
+    std::copy(backGroundUserIds.begin(), backGroundUserIds.end(), std::back_inserter(localUserIds));
     std::string localUdid = GetLocalDeviceId();
     for (const auto &item : profiles) {
-        if (udid != item.GetTrustDeviceId() || item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+        if (peerUdid != item.GetTrustDeviceId() || item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
             continue;
         }
         std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();

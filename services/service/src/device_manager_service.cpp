@@ -4263,8 +4263,7 @@ void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &comm
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
     MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     if (beforeUserId != -1 && currentUserId != -1 && IsDMServiceAdapterResidentLoad()) {
-        std::vector<std::string> peerUdids;
-        GetHoOsTypeUdids(peerUdids);
+        DeleteHoDevice();
         dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
     }
     DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
