@@ -22,7 +22,6 @@
 #include <thread>
 #include <unistd.h>
 
-#include "datetime_ex.h"
 #include "device_manager_service.h"
 #include "dm_crypto.h"
 #include "dm_constants.h"
@@ -30,6 +29,7 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "datetime_ex.h"
 #include "dm_transport_msg.h"
 #include "ffrt.h"
 #include "kv_adapter_manager.h"
@@ -308,41 +308,6 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     PutOstypeData(peerUdid, info->osType);
 #endif
-}
-
-int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid, int32_t osType)
-{
-    LOGI("peerUdid %{public}s.", GetAnonyString(peerUdid).c_str());
-    std::vector<std::string> osTypeStrs;
-    if (KVAdapterManager::GetInstance().GetAllOstypeData(osTypeStrs) != DM_OK) {
-        LOGE("Get all ostype failed.");
-        return ERR_DM_FAILED;
-    }
-    if (osTypeStrs.size() > MAX_OSTYPE_SIZE) {
-        int64_t timeStamp = GetSecondsSince1970ToNow();
-        std::string deleteUdid = "";
-        for (const auto &item : osTypeStrs) {
-            JsonObject osTypeObj(item);
-            if (osTypeObj.IsDiscarded() || !IsString(osTypeObj, PEER_UDID) || !IsInt32(osTypeObj, PEER_OSTYPE) ||
-                !IsInt64(osTypeObj, TIME_STAMP)) {
-                LOGE("osTypeObj value invalid.");
-                continue;
-            }
-            int64_t osTypeTimeStamp = osTypeObj[TIME_STAMP].Get<int64_t>();
-            std::string osTypeUdid = osTypeObj[PEER_UDID].Get<std::string>();
-            if (osTypeTimeStamp < timeStamp && !SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(osTypeUdid)) {
-                timeStamp = osTypeTimeStamp;
-                deleteUdid = osTypeUdid;
-            }
-        }
-        if (KVAdapterManager::GetInstance().DeleteOstypeData(deleteUdid) != DM_OK) {
-            LOGE("DeleteOstypeData failed.");
-            return ERR_DM_FAILED;
-        }
-    }
-    std::string osTypeStr = "";
-    ConvertOsTypeToJson(osType, osTypeStr);
-    return KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
 }
 
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
@@ -1477,6 +1442,7 @@ void SoftbusListener::GetActionId(const std::string &deviceId, int32_t &actionId
     actionId = discoveredDeviceActionIdMap.find(deviceId)->second;
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void SoftbusListener::ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr)
 {
     LOGI("ostype %{public}d.", osType);
@@ -1490,7 +1456,6 @@ void SoftbusListener::ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr
 bool SoftbusListener::CheckPeerUdidTrusted(const std::string &udid)
 {
     LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     for (const auto &item : allProfile) {
@@ -1500,8 +1465,43 @@ bool SoftbusListener::CheckPeerUdidTrusted(const std::string &udid)
         }
     }
     LOGI("udid %{public}s not in acl.", GetAnonyString(udid).c_str());
-#endif
     return false;
 }
+
+int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid, int32_t osType)
+{
+    LOGI("peerUdid %{public}s.", GetAnonyString(peerUdid).c_str());
+    std::vector<std::string> osTypeStrs;
+    if (KVAdapterManager::GetInstance().GetAllOstypeData(osTypeStrs) != DM_OK) {
+        LOGE("Get all ostype failed.");
+        return ERR_DM_FAILED;
+    }
+    if (osTypeStrs.size() > MAX_OSTYPE_SIZE) {
+        int64_t timeStamp = GetSecondsSince1970ToNow();
+        std::string deleteUdid = "";
+        for (const auto &item : osTypeStrs) {
+            JsonObject osTypeObj(item);
+            if (osTypeObj.IsDiscarded() || !IsString(osTypeObj, PEER_UDID) || !IsInt32(osTypeObj, PEER_OSTYPE) ||
+                !IsInt64(osTypeObj, TIME_STAMP)) {
+                LOGE("osTypeObj value invalid.");
+                continue;
+            }
+            int64_t osTypeTimeStamp = osTypeObj[TIME_STAMP].Get<int64_t>();
+            std::string osTypeUdid = osTypeObj[PEER_UDID].Get<std::string>();
+            if (osTypeTimeStamp < timeStamp && !SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(osTypeUdid)) {
+                timeStamp = osTypeTimeStamp;
+                deleteUdid = osTypeUdid;
+            }
+        }
+        if (KVAdapterManager::GetInstance().DeleteOstypeData(deleteUdid) != DM_OK) {
+            LOGE("DeleteOstypeData failed.");
+            return ERR_DM_FAILED;
+        }
+    }
+    std::string osTypeStr = "";
+    ConvertOsTypeToJson(osType, osTypeStr);
+    return KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS
