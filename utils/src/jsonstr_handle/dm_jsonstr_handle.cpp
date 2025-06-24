@@ -36,7 +36,7 @@ DM_EXPORT void JsonStrHandle::GetPeerAppInfoParseExtra(const std::string &extra,
         LOGE("ParseExtra extraInfoJson error");
         return;
     }
-    if (!IsString(extraInfoJson, TAG_PEER_BUNDLE_NAME) || !IsInt64(extraInfoJson, TAG_PEER_TOKENID)) {
+    if (!IsString(extraInfoJson, TAG_PEER_BUNDLE_NAME) || !IsUint64(extraInfoJson, TAG_PEER_TOKENID)) {
         LOGE("ParseExtra TAG_PEER_BUNDLE_NAME or TAG_PEER_TOKENID error");
         return;
     }

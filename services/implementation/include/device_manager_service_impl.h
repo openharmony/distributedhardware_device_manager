@@ -155,8 +155,7 @@ public:
     void HandleDeviceNotTrust(const std::string &udid);
     int32_t GetBindLevel(const std::string &pkgName, const std::string &localUdid,
         const std::string &udid, uint64_t &tokenId);
-    void HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId, const std::string &peerUdid,
-        int32_t peerUserId);
+    void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
@@ -296,6 +295,7 @@ private:
         const std::string &pkgName);
     void OnAuthResultAndOnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId,
         const std::string &deviceId, int32_t reason);
+    void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet);
 private:
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
 

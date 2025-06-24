@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,11 +50,11 @@ std::map<int32_t, int32_t> DeviceProfileConnector::GetUserIdAndBindLevel(const s
     return DmDeviceProfileConnector::dmDeviceProfileConnector->GetUserIdAndBindLevel(localUdid, peerUdid);
 }
 
-bool DeviceProfileConnector::DeleteAclForAccountLogOut(const std::string &localUdid, int32_t localUserId,
-    const std::string &peerUdid, int32_t peerUserId, DmOfflineParam &offlineParam)
+bool DeviceProfileConnector::DeleteAclForAccountLogOut(const DMAclQuadInfo &info, const std::string &accountId,
+    DmOfflineParam &offlineParam)
 {
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForAccountLogOut(localUdid, localUserId,
-        peerUdid, peerUserId, offlineParam);
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteAclForAccountLogOut(info, accountId,
+        offlineParam);
 }
 
 DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,

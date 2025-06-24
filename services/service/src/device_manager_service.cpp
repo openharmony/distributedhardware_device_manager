@@ -2531,7 +2531,8 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
         NotifyRemoteLocalLogout(peerUdids, std::string(accountIdHash), accountName, userId);
     }
     for (const auto &item : deviceMap) {
-        dmServiceImpl_->HandleIdentAccountLogout(localUdid, userId, item.first, item.second);
+        DMAclQuadInfo info = {localUdid, userId, item.first, item.second};
+        dmServiceImpl_->HandleIdentAccountLogout(info, accountId);
     }
 }
 

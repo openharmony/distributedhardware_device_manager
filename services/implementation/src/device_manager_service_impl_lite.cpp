@@ -506,13 +506,10 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
     return;
 }
 
-void DeviceManagerServiceImpl::HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId,
-    const std::string &peerUdid, int32_t peerUserId)
+void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId)
 {
-    (void)localUdid;
-    (void)localUserId;
-    (void)peerUdid;
-    (void)peerUserId;
+    (void)info;
+    (void)accountId;
     return;
 }
 

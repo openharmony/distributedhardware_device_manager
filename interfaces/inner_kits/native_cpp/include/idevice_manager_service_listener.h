@@ -16,6 +16,8 @@
 #ifndef OHOS_I_DM_SERVICE_LISTENER_H
 #define OHOS_I_DM_SERVICE_LISTENER_H
 
+#include <set>
+
 #include "dm_device_info.h"
 #include "dm_device_profile_info.h"
 
@@ -171,6 +173,7 @@ public:
         const std::string &deviceName, int32_t code) = 0;
     virtual void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) = 0;
+    virtual void SetExistPkgName(const std::set<std::string> &pkgNameSet) = 0;
 
     /**
      * @brief Get the Local Display Device Name after privacy processed

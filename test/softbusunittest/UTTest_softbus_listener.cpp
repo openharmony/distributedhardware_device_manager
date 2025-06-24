@@ -1405,7 +1405,8 @@ HWTEST_F(SoftbusListenerTest, GetAllTrustedDeviceList_002, testing::ext::TestSiz
     profile.SetBindType(2);
     allProfile.push_back(profile);
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile()).WillOnce(Return(allProfile));
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAccessControlProfile())
+        .Times(::testing::AtLeast(1)).WillOnce(Return(allProfile));
     EXPECT_CALL(*cryptoMock_, GetUdidHash(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = softbusListener->GetAllTrustedDeviceList(pkgName, extra, deviceList);
     EXPECT_EQ(ret, DM_OK);

@@ -395,10 +395,10 @@ void AuthSrcConfirmState::GetSrcProxyAclInfoForP2P(std::shared_ptr<DmAuthContext
             credInfoJsonObj[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
             const size_t APP_LIST_SIZE = 2;
             if (appList.size() < APP_LIST_SIZE ||
-                std::find(appList.begin(), appList.end(), std::to_string(profile.GetAccesser().GetAccesserTokenId()))
-                == appList.end() ||
-                std::find(appList.begin(), appList.end(), std::to_string(profile.GetAccessee().GetAccesseeTokenId()))
-                == appList.end()) {
+                std::find(appList.begin(), appList.end(),
+                    std::to_string(profile.GetAccesser().GetAccesserTokenId())) == appList.end() ||
+                std::find(appList.begin(), appList.end(),
+                    std::to_string(profile.GetAccessee().GetAccesseeTokenId())) == appList.end()) {
                 continue;
             }
             JsonObject aclTypeJson;
@@ -1137,11 +1137,11 @@ bool AuthSinkConfirmState::IsUserAuthorize(JsonObject &paramObj, DmProxyAccess &
         return false;
     }
     for (auto const &item : paramObj.Items()) {
-        if (!item.Contains(TAG_BUNDLE_NAME) || !IsString(item, TAG_BUNDLE_NAME)) {
+        if (!IsString(item, TAG_BUNDLE_NAME)) {
             continue;
         }
         if (access.bundleName == item[TAG_BUNDLE_NAME].Get<std::string>()) {
-            if (item.Contains(BUNDLE_INFO) && IsString(item, BUNDLE_INFO)) {
+            if (IsString(item, BUNDLE_INFO)) {
                 access.bundleInfo = item[BUNDLE_INFO].Get<std::string>();
             }
             return true;
