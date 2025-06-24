@@ -22,6 +22,7 @@
 #include <thread>
 #include <unistd.h>
 
+#include "datetime_ex.h"
 #include "device_manager_service.h"
 #include "dm_crypto.h"
 #include "dm_constants.h"
@@ -305,20 +306,20 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
         }
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    PutOstypeData(peerUdid);
+    PutOstypeData(peerUdid, info->osType);
 #endif
 }
 
-int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid)
+int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid, int32_t osType)
 {
     LOGI("peerUdid %{public}s.", GetAnonyString(peerUdid).c_str());
     std::vector<std::string> osTypeStrs;
     if (KVAdapterManager::GetInstance().GetAllOstypeData(osTypeStrs) != DM_OK) {
         LOGE("Get all ostype failed.");
-        return;
+        return ERR_DM_FAILED;
     }
     if (osTypeStrs.size() > MAX_OSTYPE_SIZE) {
-        int64_t currentTimeStamp = GetSecondsSince1970ToNow();
+        int64_t timeStamp = GetSecondsSince1970ToNow();
         std::string deleteUdid = "";
         for (const auto &item : osTypeStrs) {
             JsonObject osTypeObj(item);
@@ -328,17 +329,20 @@ int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid)
                 continue;
             }
             int64_t osTypeTimeStamp = osTypeObj[TIME_STAMP].Get<int64_t>();
-            std::string osTypeUdid = osTypeObj[PEER_UDID].Get<std::string>()
-            if (osTypeTimeStamp < timeStamp && !CheckIsOnline(osTypeUdid)) {
+            std::string osTypeUdid = osTypeObj[PEER_UDID].Get<std::string>();
+            if (osTypeTimeStamp < timeStamp && !SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(osTypeUdid)) {
                 timeStamp = osTypeTimeStamp;
                 deleteUdid = osTypeUdid;
             }
         }
-        KVAdapterManager::GetInstance().DeleteOstypeData(deleteUdid);
+        if (KVAdapterManager::GetInstance().DeleteOstypeData(deleteUdid) != DM_OK) {
+            LOGE("DeleteOstypeData failed.");
+            return ERR_DM_FAILED;
+        }
     }
     std::string osTypeStr = "";
-    ConvertOsTypeToJson(info->osType, osTypeStr);
-    KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
+    ConvertOsTypeToJson(osType, osTypeStr);
+    return KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
 }
 
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)

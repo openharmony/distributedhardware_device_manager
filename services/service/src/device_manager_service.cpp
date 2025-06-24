@@ -4285,8 +4285,8 @@ void DeviceManagerService::GetHoOsTypeUdids(std::vector<std::string> &peerUdids)
     }
 }
 
-void DeviceManagerService::DeleteHoDevice(const std::vector<int32_t> &foregroundUserIds,
-    const std::vector<int32_t> &backgroundUserIds)
+void DeviceManagerService::DeleteHoDevice(const std::vector<int32_t> &foreGroundUserIds,
+    const std::vector<int32_t> &backGroundUserIds)
 {
     if (foreGroundUserIds.empty() || backGroundUserIds.empty()) {
         LOGE("backGroundUserIds %{public}s, foreGroundUserIds %{public}s.", GetIntegerList(backGroundUserIds).c_str(),

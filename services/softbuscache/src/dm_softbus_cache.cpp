@@ -473,7 +473,7 @@ bool SoftbusCache::CheckIsOnline(const std::string &udidHash)
     return false;
 }
 
-bool SoftbusCache::CheckIsOnline(const std::string &peerUdid)
+bool SoftbusCache::CheckIsOnlineByPeerUdid(const std::string &peerUdid)
 {
     {
         std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);

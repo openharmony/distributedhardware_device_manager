@@ -405,7 +405,7 @@ private:
         bool isNeedResponse);
     void HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId, int32_t beforeUserId);
     void GetHoOsTypeUdids(std::vector<std::string> &peerUdids);
-    void DeleteHoDevice(const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void DeleteHoDevice(const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds);
     void HandleAccountLogoutEventCallback(const std::string &commonEventType, int32_t currentUserId,
         int32_t beforeUserId);
 
