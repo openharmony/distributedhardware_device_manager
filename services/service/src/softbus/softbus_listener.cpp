@@ -45,6 +45,7 @@ const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t MAX_CACHED_DISCOVERED_DEVICE_SIZE = 100;
 const int32_t MAX_SOFTBUS_MSG_LEN = 2000;
+const int32_t MAX_OSTYPE_SIZE = 1000;
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
@@ -303,11 +304,41 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
             }
         }
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    PutOstypeData(peerUdid);
+#endif
+}
+
+int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid)
+{
+    LOGI("peerUdid %{public}s.", GetAnonyString(peerUdid).c_str());
+    std::vector<std::string> osTypeStrs;
+    if (KVAdapterManager::GetInstance().GetAllOstypeData(osTypeStrs) != DM_OK) {
+        LOGE("Get all ostype failed.");
+        return;
+    }
+    if (osTypeStrs.size() > MAX_OSTYPE_SIZE) {
+        int64_t currentTimeStamp = GetSecondsSince1970ToNow();
+        std::string deleteUdid = "";
+        for (const auto &item : osTypeStrs) {
+            JsonObject osTypeObj(item);
+            if (osTypeObj.IsDiscarded() || !IsString(osTypeObj, PEER_UDID) || !IsInt32(osTypeObj, PEER_OSTYPE) ||
+                !IsInt64(osTypeObj, TIME_STAMP)) {
+                LOGE("osTypeObj value invalid.");
+                continue;
+            }
+            int64_t osTypeTimeStamp = osTypeObj[TIME_STAMP].Get<int64_t>();
+            std::string osTypeUdid = osTypeObj[PEER_UDID].Get<std::string>()
+            if (osTypeTimeStamp < timeStamp && !CheckIsOnline(osTypeUdid)) {
+                timeStamp = osTypeTimeStamp;
+                deleteUdid = osTypeUdid;
+            }
+        }
+        KVAdapterManager::GetInstance().DeleteOstypeData(deleteUdid);
+    }
     std::string osTypeStr = "";
     ConvertOsTypeToJson(info->osType, osTypeStr);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
-#endif
 }
 
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
@@ -1445,8 +1476,10 @@ void SoftbusListener::GetActionId(const std::string &deviceId, int32_t &actionId
 void SoftbusListener::ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr)
 {
     LOGI("ostype %{public}d.", osType);
+    int64_t nowTime = GetSecondsSince1970ToNow();
     JsonObject jsonObj;
     jsonObj[PEER_OSTYPE] = osType;
+    jsonObj[TIME_STAMP] = nowTime;
     osTypeStr = SafetyDump(jsonObj);
 }
 

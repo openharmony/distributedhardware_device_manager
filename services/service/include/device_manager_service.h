@@ -405,7 +405,9 @@ private:
         bool isNeedResponse);
     void HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId, int32_t beforeUserId);
     void GetHoOsTypeUdids(std::vector<std::string> &peerUdids);
-    void DeleteHoDevice();
+    void DeleteHoDevice(const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
+    void HandleAccountLogoutEventCallback(const std::string &commonEventType, int32_t currentUserId,
+        int32_t beforeUserId);
 
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();

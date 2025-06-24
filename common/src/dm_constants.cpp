@@ -180,5 +180,6 @@ const int32_t DM_HO_OSTYPE = -1;
 const int32_t DM_OH_OSTYPE = 10;
 const char* PEER_UDID = "peer_udid";
 const char* PEER_OSTYPE = "peer_ostype";
+const char* TIME_STAMP = "time_stamp";
 } // namespace DistributedHardware
 } // namespace OHOS

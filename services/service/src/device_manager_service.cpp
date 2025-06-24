@@ -648,7 +648,7 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
         LOGE("The caller: %{public}s does not have permission to call AuthenticateDevice.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty() || deviceId.empty()) {
+    if (pkgName.empty() || deviceId.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("DeviceManagerService::AuthenticateDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -750,7 +750,7 @@ int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t aut
         LOGE("The caller does not have permission to call BindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty() || deviceId.empty()) {
+    if (pkgName.empty() || deviceId.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("DeviceManagerService::BindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -895,7 +895,7 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
         LOGE("The caller does not have permission to call UnBindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty() || udidHash.empty()) {
+    if (pkgName.empty() || udidHash.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -916,7 +916,7 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
         LOGE("The caller does not have permission to call UnBindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty() || udidHash.empty()) {
+    if (pkgName.empty() || udidHash.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("DeviceManagerService::UnBindDevice error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1596,7 +1596,7 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
         return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
-    if (pkgName.empty()) {
+    if (pkgName.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1640,7 +1640,7 @@ int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const Pee
         return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
-    if (pkgName.empty()) {
+    if (pkgName.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -2020,15 +2020,7 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
         DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
         MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
-        DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
-        DMAccountInfo dmAccountInfo = MultipleUserConnector::GetAccountInfoByUserId(beforeUserId);
-        if (dmAccountInfo.accountId.empty()) {
-            return;
-        }
-        HandleAccountLogout(currentUserId, dmAccountInfo.accountId, dmAccountInfo.accountName);
-        MultipleUserConnector::DeleteAccountInfoByUserId(currentUserId);
-        MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
-            MultipleUserConnector::GetCurrentDMAccountInfo());
+        HandleAccountLogoutEventCallback(commonEventType, currentUserId, beforeUserId);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(beforeUserId);
         MultipleUserConnector::DeleteAccountInfoByUserId(beforeUserId);
@@ -2092,6 +2084,7 @@ void DeviceManagerService::HandleAccountCommonEvent(const std::string commonEven
         LOGI("User status has not changed.");
         return;
     }
+    DeleteHoDevice(foregroundUserVec, backgroundUserVec);
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
@@ -3334,7 +3327,7 @@ int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pk
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList)
 {
     LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
-    if (pkgName.empty()) {
+    if (pkgName.empty() || pkgName == std::string(DM_PKG_NAME)) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -4263,10 +4256,6 @@ void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &comm
         currentUserId, beforeUserId);
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
     MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
-    if (beforeUserId != -1 && currentUserId != -1 && IsDMServiceAdapterResidentLoad()) {
-        DeleteHoDevice();
-        dmServiceImplExtResident_->AccountUserSwitched(currentUserId, MultipleUserConnector::GetOhosAccountId());
-    }
     DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
         [this, commonEventType] () {
             DeviceManagerService::HandleAccountCommonEvent(commonEventType);
@@ -4296,31 +4285,48 @@ void DeviceManagerService::GetHoOsTypeUdids(std::vector<std::string> &peerUdids)
     }
 }
 
-void DeviceManagerService::DeleteHoDevice()
+void DeviceManagerService::DeleteHoDevice(const std::vector<int32_t> &foregroundUserIds,
+    const std::vector<int32_t> &backgroundUserIds)
 {
+    if (foreGroundUserIds.empty() || backGroundUserIds.empty()) {
+        LOGE("backGroundUserIds %{public}s, foreGroundUserIds %{public}s.", GetIntegerList(backGroundUserIds).c_str(),
+            GetIntegerList(foreGroundUserIds).c_str());
+        return;
+    }
     std::vector<std::string> peerUdids;
     GetHoOsTypeUdids(peerUdids);
     if (peerUdids.empty()) {
         LOGE("peerUdids empty.");
         return;
     }
-    std::vector<int32_t> foreGroundUserIds;
-    MultipleUserConnector::GetForegroundUserIds(foreGroundUserIds);
-    std::vector<int32_t> backGroundUserIds;
-    MultipleUserConnector::GetBackgroundUserIds(backGroundUserIds);
-    if (foreGroundUserIds.empty() || backGroundUserIds.empty()) {
-        LOGE("backGroundUserIds %{public}s, foreGroundUserIds %{public}s.", GetIntegerList(backGroundUserIds).c_str(),
-            GetIntegerList(foreGroundUserIds).c_str());
-        return;
+    if (IsDMServiceAdapterResidentLoad()) {
+        dmServiceImplExtResident_->AccountUserSwitched(MultipleUserConnector::GetCurrentAccountUserID(),
+            MultipleUserConnector::GetOhosAccountId());
     }
     if (!IsDMServiceImplReady()) {
         LOGE("instance init failed.");
         return;
     }
-    
     for (const auto &item : peerUdids) {
         dmServiceImpl_->DeleteHoDevice(item, foreGroundUserIds, backGroundUserIds);
     }
+}
+
+void DeviceManagerService::HandleAccountLogoutEventCallback(const std::string &commonEventType, int32_t currentUserId,
+        int32_t beforeUserId)
+{
+    LOGI("commonEventType %{public}s, currentUserId %{public}d, beforeUserId %{public}d.", commonEventType.c_str(),
+        currentUserId, beforeUserId);
+    DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
+    DMAccountInfo dmAccountInfo = MultipleUserConnector::GetAccountInfoByUserId(beforeUserId);
+    if (dmAccountInfo.accountId.empty()) {
+        LOGE("dmAccountInfo accountId empty.");
+        return;
+    }
+    HandleAccountLogout(currentUserId, dmAccountInfo.accountId, dmAccountInfo.accountName);
+    MultipleUserConnector::DeleteAccountInfoByUserId(currentUserId);
+    MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
+        MultipleUserConnector::GetCurrentDMAccountInfo());
 }
 #endif
 } // namespace DistributedHardware
