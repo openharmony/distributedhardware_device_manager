@@ -1034,7 +1034,9 @@ void DeviceManagerServiceListener::SetExistPkgName(const std::set<std::string> &
 std::string DeviceManagerServiceListener::GetLocalDisplayDeviceNameForPrivacy()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return DeviceNameManager::GetInstance().GetLocalDisplayDeviceNameForPrivacy();
+    std::string displayName = "";
+    DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(0, displayName);
+    return displayName;
 #else
     return "";
 #endif

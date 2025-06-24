@@ -115,15 +115,6 @@ void DeviceNameManagerSecondFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DeviceNameManager> deviceNameMgr = std::make_shared<DeviceNameManager>();
     deviceNameMgr->UnInit();
     deviceNameMgr->GetUserDefinedDeviceName();
-    std::string str;
-    deviceNameMgr->AnoyPrivacyString(str);
-    str = "1";
-    deviceNameMgr->AnoyPrivacyString(str);
-    str = "1234";
-    deviceNameMgr->AnoyPrivacyString(str);
-    str = fdp.ConsumeRandomLengthString();
-    deviceNameMgr->AnoyPrivacyString(str);
-    deviceNameMgr->ConvertToWholeCharacter(str);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
