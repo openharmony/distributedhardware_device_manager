@@ -51,6 +51,7 @@ public:
     int32_t GetNetworkIdFromCache(const std::string &udid, std::string &networkId);
     int32_t GetDeviceNameFromCache(const std::string &udid, std::string &deviceName);
     bool CheckIsOnline(const std::string &udidHash);
+    bool CheckIsOnline(const std::string &peerUdid);
 private:
     int32_t GetUdidByNetworkId(const char *networkId, std::string &udid);
     int32_t GetUuidByNetworkId(const char *networkId, std::string &uuid);
