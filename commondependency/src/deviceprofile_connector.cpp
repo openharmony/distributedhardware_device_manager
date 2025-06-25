@@ -2196,8 +2196,9 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
-    if (DistributedDeviceProfileClient::GetInstance().GetAllAccessControlProfile(profiles) != DM_OK) {
-        LOGE("DP failed.");
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetAllAccessControlProfile(profiles);
+    if (ret != DM_OK) {
+        LOGE("DP failed, ret = %{public}d", ret);
     }
     return profiles;
 }
@@ -2205,8 +2206,9 @@ DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccess
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAclIncludeLnnAcl()
 {
     std::vector<AccessControlProfile> profiles;
-    if (DistributedDeviceProfileClient::GetInstance().GetAllAclIncludeLnnAcl(profiles) != DM_OK) {
-        LOGE("DP failed.");
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetAllAclIncludeLnnAcl(profiles);
+    if (ret != DM_OK) {
+        LOGE("DP failed, ret = %{public}d", ret);
     }
     return profiles;
 }
