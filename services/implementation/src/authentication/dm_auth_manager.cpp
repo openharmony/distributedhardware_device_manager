@@ -1696,7 +1696,8 @@ int32_t DmAuthManager::GetPinCode(std::string &code)
         LOGE("failed to GetPinCode because authResponseContext_ is nullptr");
         return ERR_DM_FAILED;
     }
-    LOGI("ShowConfigDialog start add member pin code.");
+    LOGI("ShowConfigDialog start add member pin code, pinCode: %{public}s",
+        GetAnonyString(authResponseContext_->code).c_str());
     code = authResponseContext_->code;
     return DM_OK;
 }

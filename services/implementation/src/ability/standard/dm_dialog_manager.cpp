@@ -118,6 +118,7 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
 
 void DmDialogManager::ShowPinDialog(const std::string param)
 {
+    LOGI("pinCode: %{public}s", GetAnonyString(param).c_str());
     bundleName_ = DM_UI_BUNDLE_NAME;
     abilityName_ = PIN_ABILITY_NAME;
     pinCode_ = param;
@@ -201,6 +202,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     if (DmDialogManager::GetAbilityName() == INPUT_ABILITY_NAME) {
         param["sysDialogZOrder"] = WINDOW_LEVEL_UPPER;
     }
+    LOGI("pinCode: %{public}s", GetAnonyString(DmDialogManager::GetPinCode()).c_str());
     param["isProxyBind"] = DmDialogManager::GetIsProxyBind();
     param["appUserData"] = DmDialogManager::GetAppUserData();
     param["pinCode"] = DmDialogManager::GetPinCode();

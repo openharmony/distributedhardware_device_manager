@@ -1015,7 +1015,7 @@ int32_t AuthManager::GetPinCode(std::string &code)
         LOGE("AuthManager failed to GetPinCode because context_ is nullptr");
         return ERR_DM_FAILED;
     }
-    LOGI("GetPinCode called.");
+    LOGI("GetPinCode called, pinCode: %{public}s", GetAnonyString(context_->pinCode).c_str());
     code = context_->pinCode;
     return DM_OK;
 }
