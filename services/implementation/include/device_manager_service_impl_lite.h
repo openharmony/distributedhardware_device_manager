@@ -138,8 +138,7 @@ public:
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId);
-    void HandleIdentAccountLogout(const std::string &localUdid, int32_t localUserId, const std::string &peerUdid,
-        int32_t peerUserId);
+    void HandleIdentAccountLogout(const DMAclQuadInfo &info, const std::string &accountId);
     void HandleUserRemoved(std::vector<std::string> peerUdids, int32_t preUserId);
     void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
     void HandleUserSwitched(const std::vector<std::string> &deviceVec, int32_t currentUserId,

@@ -400,7 +400,7 @@ bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent)
 
 DM_EXPORT std::string SafetyDump(const JsonItemObject &jsonObj)
 {
-    return jsonObj.Dump();
+    return jsonObj.DumpIgnoreError();
 }
 
 std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index)

@@ -28,6 +28,8 @@ namespace OHOS {
 namespace DistributedHardware {
 struct DmAuthContext;
 struct DmAccess;
+struct DmProxyAuthContext;
+struct DmProxyAccess;
 
 extern const char* TAG_LNN_PUBLIC_KEY;
 extern const char* TAG_TRANSMIT_PUBLIC_KEY;
@@ -200,11 +202,20 @@ public:
 
     // Save the permanent session key to the data profile
     int32_t SaveSessionKeyToDP(int32_t userId, int32_t &skId);
-
+    int32_t SaveDerivativeSessionKeyToDP(int32_t userId, const std::string &suffix, int32_t &skId);
+    int32_t GetSessionKey(int32_t userId, int32_t &skId);
     // Save the current access control list
     int32_t PutAccessControlList(std::shared_ptr<DmAuthContext> context,
         DmAccess &access, std::string trustDeviceId);
-
+    int32_t SetProxyAccess(std::shared_ptr<DmAuthContext> context, DmProxyAuthContext &proxyAuthContext,
+        DistributedDeviceProfile::Accesser &accesser, DistributedDeviceProfile::Accessee &accessee);
+    int32_t PutProxyAccessControlList(std::shared_ptr<DmAuthContext> context,
+        DistributedDeviceProfile::AccessControlProfile &profile, DistributedDeviceProfile::Accesser &accesser,
+        DistributedDeviceProfile::Accessee &accessee);
+    bool IsExistTheToken(JsonObject &proxyObj, int64_t tokenId);
+    void SetAclProxyRelate(std::shared_ptr<DmAuthContext> context);
+    void SetAclProxyRelate(std::shared_ptr<DmAuthContext> context,
+        DistributedDeviceProfile::AccessControlProfile &profile);
     // Extract the access control list (ACL) for message parsing and bus usage.
     // If no ACL is available, return an empty string. The returned string is in
     // JSON format: {dmversion:x,accesser:[{accesserDeviceId:y,...},...], accessee:{...}}
@@ -217,17 +228,22 @@ private:
 
     // Used to encrypt the synchronization message
     int32_t EncryptSyncMessage(std::shared_ptr<DmAuthContext> &context, DmAccess &accessSide, std::string &encSyncMsg);
+    int32_t CreateProxyAccessMessage(std::shared_ptr<DmAuthContext> &context, JsonObject &syncMsgJson);
     // Parse the authentication start message
     int32_t ParseAuthStartMessage(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
 
     // Parse the 80 message
     int32_t ParseNegotiateMessage(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
+    int32_t ParseProxyNegotiateMessage(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 90 message
     int32_t ParseMessageRespAclNegotiate(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
+    int32_t ParseMessageProxyRespAclNegotiate(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 100 message
     int32_t ParseMessageReqUserConfirm(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
+    int32_t ParseMessageProxyReqUserConfirm(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
     // Parse the 110 message
     int32_t ParseMessageRespUserConfirm(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
+    int32_t ParseMessageProxyRespUserConfirm(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
     // Parse the 120 message
     int32_t ParseMessageReqPinAuthStart(const JsonObject &json, std::shared_ptr<DmAuthContext> context);
     // Parse the 130 message
@@ -240,6 +256,7 @@ private:
     int32_t ParseMessageReqCredExchange(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 150 message
     int32_t ParseMessageRspCredExchange(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
+    int32_t ParseProxyCredExchangeToSync(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject);
     // Parse the 161, 170, and 171 messages
     int32_t ParseMessageNegotiateTransmit(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 180 message
@@ -262,10 +279,13 @@ private:
 
     // Create the 80 message
     int32_t CreateNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
+    int32_t CreateProxyNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Create the 90 message
     int32_t CreateRespNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
+    int32_t CreateProxyRespNegotiateMessage(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Create the 100 message
     int32_t CreateMessageReqUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json);
+    int32_t CreateMessageProxyReqUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json);
     // Create the 110 message
     int32_t CreateMessageRespUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json);
     // Create the 120 message
@@ -280,6 +300,7 @@ private:
     int32_t CreateMessageReqCredExchange(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Create the 150 message
     int32_t CreateMessageRspCredExchange(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
+    int32_t CreateProxyCredExchangeMessage(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonData);
     // Create the 160 message
     int32_t CreateMessageReqCredAuthStart(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Construct the 161, 170, and 171 credential authentication messages
@@ -304,6 +325,7 @@ private:
     // Parse the sync message
     int32_t ParseSyncMessage(std::shared_ptr<DmAuthContext> &context,
         DmAccess &access, JsonObject &jsonObject);
+    int32_t ParseProxyAccessToSync(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject);
     int32_t CreateMessageForwardUltrasonicStart(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     int32_t CreateMessageReverseUltrasonicStart(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     int32_t CreateMessageForwardUltrasonicNegotiate(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);

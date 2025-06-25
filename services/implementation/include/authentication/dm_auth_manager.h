@@ -593,7 +593,6 @@ private:
     bool IsSinkMsgValid();
     bool IsSourceMsgValid();
     void ProcessReqPublicKey();
-    int32_t GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId);
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
     void GetBindCallerInfo();
 

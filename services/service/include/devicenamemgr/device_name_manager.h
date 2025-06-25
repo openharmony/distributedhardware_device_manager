@@ -45,7 +45,6 @@ public:
     int32_t RestoreLocalDeviceName();
     int32_t InitDeviceNameWhenLanguageOrRegionChanged();
     std::string GetUserDefinedDeviceName();
-    std::string GetLocalDisplayDeviceNameForPrivacy();
 
 private:
     DeviceNameManager() = default;
@@ -58,23 +57,6 @@ private:
     std::string GetLocalDisplayDeviceName(const std::string &prefixName, const std::string &subffixName,
         int32_t maxNamelength);
     std::string SubstrByBytes(const std::string &str, int32_t maxNumBytes);
-    /**
-     * @brief Convert the raw string to whole character, consider character encoding, such as One Chinese
-     *        letter maybe encoded to 3 bytes.
-     *
-     * @param str raw string
-     * @return std::string string in encoded letter.
-     */
-    std::vector<std::string> ConvertToWholeCharacter(const std::string &str);
-    /**
-     * @brief anonymize the string middle part, left begin and end 3 letter, the middle part set "***"
-     *
-     * @param str the raw string
-     * @return std::string the string processed
-     */
-    std::string AnoyPrivacyString(const std::string &str);
-    std::string GenLocalAnoyDeviceNameWithNickAndMarketName(const std::string &nickName,
-        const std::string &marketName);
 
     std::string GetSystemLanguage();
     std::string GetSystemRegion();

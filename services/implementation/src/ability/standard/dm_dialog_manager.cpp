@@ -50,6 +50,8 @@ std::string DmDialogManager::targetDeviceName_ = "";
 std::string DmDialogManager::pinCode_ = "";
 std::string DmDialogManager::hostPkgLabel_ = "";
 int32_t DmDialogManager::deviceType_ = -1;
+bool DmDialogManager::isProxyBind_ = false;
+std::string DmDialogManager::appUserData_ = "";
 DmDialogManager DmDialogManager::dialogMgr_;
 sptr<OHOS::AAFwk::IAbilityConnection> DmDialogManager::dialogConnectionCallback_(
     new (std::nothrow) DialogAbilityConnection());
@@ -95,6 +97,12 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
         }
         if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
             hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
+        }
+        if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
+            isProxyBind_ = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
+        }
+        if (IsString(jsonObject, APP_USER_DATA)) {
+            appUserData_ = jsonObject[APP_USER_DATA].Get<std::string>();
         }
     }
 
@@ -195,6 +203,8 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
         param["sysDialogZOrder"] = WINDOW_LEVEL_UPPER;
     }
     LOGI("pinCode: %{public}s", GetAnonyString(DmDialogManager::GetPinCode()).c_str());
+    param["isProxyBind"] = DmDialogManager::GetIsProxyBind();
+    param["appUserData"] = DmDialogManager::GetAppUserData();
     param["pinCode"] = DmDialogManager::GetPinCode();
     param["deviceName"] = DmDialogManager::GetDeviceName();
     param["appOperationStr"] = DmDialogManager::GetAppOperationStr();

@@ -63,7 +63,7 @@ ohos_fuzztest("DeviceManagerImplFuzzTest") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${utils_path}:devicemanagerutils",
+    "${utils_path}:devicemanagerutilstest",
   ]
 
   defines = [

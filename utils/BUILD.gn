@@ -24,9 +24,10 @@ if (defined(ohos_lite)) {
     shared_library("devicemanagerutils") {
       include_dirs = [
         "include",
+        "include/appInfo/lite",
         "include/crypto",
         "include/fwkload/lite",
-        "include/appInfo/lite",
+        "include/jsonstr_handle",
         "include/timer/lite",
         "${common_path}/include",
         "${common_path}/include/dfx",
@@ -51,6 +52,7 @@ if (defined(ohos_lite)) {
         "src/crypto/dm_crypto.cpp",
         "src/dm_random.cpp",
         "src/fwkload/lite/dm_distributed_hardware_load.cpp",
+        "src/jsonstr_handle/dm_jsonstr_handle.cpp",
         "src/timer/lite/dm_timer.cpp",
       ]
 
@@ -75,10 +77,11 @@ if (defined(ohos_lite)) {
   config("devicemanagerutils_config") {
     include_dirs = [
       "include",
-      "include/crypto",
-      "include/kvadapter",
-      "include/fwkload/standard",
       "include/appInfo/standard",
+      "include/crypto",
+      "include/fwkload/standard",
+      "include/jsonstr_handle",
+      "include/kvadapter",
       "include/timer",
       "${innerkits_path}/native_cpp/include",
       "${common_path}/include",
@@ -128,6 +131,7 @@ if (defined(ohos_lite)) {
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
+      "src/jsonstr_handle/dm_jsonstr_handle.cpp",
       "src/kvadapter/dm_kv_info.cpp",
       "src/kvadapter/kv_adapter.cpp",
       "src/kvadapter/kv_adapter_manager.cpp",

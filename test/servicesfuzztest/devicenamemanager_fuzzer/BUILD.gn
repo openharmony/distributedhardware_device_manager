@@ -63,7 +63,7 @@ ohos_fuzztest("DeviceNameManagerFuzzTest") {
 
   deps = [
     "${devicemanager_path}/services/service:devicemanagerservice",
-    "${utils_path}:devicemanagerutils",
+    "${utils_path}:devicemanagerutilstest",
   ]
 
   defines = [

@@ -89,6 +89,7 @@ public:
         const std::string &deviceName, int32_t code) override;
     void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) override;
+    void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
 
     std::string GetLocalDisplayDeviceNameForPrivacy() override;
 
@@ -131,6 +132,8 @@ private:
     static std::mutex alreadyNotifyPkgNameLock_;
     static std::map<std::string, DmDeviceInfo> alreadyOnlinePkgName_;
     static std::unordered_set<std::string> highPriorityPkgNameSet_;
+    static std::mutex actUnrelatedPkgNameLock_;
+    static std::set<std::string> actUnrelatedPkgName_;
 #endif
 };
 } // namespace DistributedHardware

@@ -38,6 +38,14 @@ void HiChainAuthConnector::FreeJsonString(char *jsonStr)
     }
 }
 
+void HiChainAuthConnector::FreeCharArray(char *charArray)
+{
+    if (charArray != nullptr) {
+        free(charArray);
+        charArray = nullptr;
+    }
+}
+
 HiChainAuthConnector::HiChainAuthConnector()
 {
     deviceAuthCallback_ = {.onTransmit = HiChainAuthConnector::onTransmit,
@@ -528,6 +536,73 @@ int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int3
         return ERR_DM_FAILED;
     }
     FreeJsonString(returnData);
+    return DM_OK;
+}
+
+int32_t HiChainAuthConnector::AddTokensToCredential(const std::string &credId, int32_t userId,
+    std::vector<std::string> &tokenIds)
+{
+    const CredManager *cm = GetCredMgrInstance();
+    if (cm == nullptr) {
+        LOGE("cm is null.");
+        return ERR_DM_FAILED;
+    }
+    char *returnCredInfo = nullptr;
+    int32_t ret = cm->queryCredInfoByCredId(userId, credId.c_str(), &returnCredInfo);
+    if (ret != DM_OK) {
+        FreeCharArray(returnCredInfo);
+        LOGE("[HICHAIN]::QueryCredInfoByCredId failed, ret: %{public}d.", ret);
+        return ret;
+    }
+    JsonObject credInfoJson(returnCredInfo);
+    FreeCharArray(returnCredInfo);
+    if (credInfoJson.IsDiscarded()) {
+        LOGE("QueryCredInfoByCredId credential info jsonStr error");
+        return ERR_DM_FAILED;
+    }
+    std::vector<std::string> appList;
+    if (credInfoJson.Contains(FIELD_AUTHORIZED_APP_LIST)) {
+        credInfoJson[FIELD_AUTHORIZED_APP_LIST].Get(appList);
+    }
+    appList.insert(appList.end(), tokenIds.begin(), tokenIds.end());
+    JsonObject jsonObj;
+    jsonObj[FIELD_AUTHORIZED_APP_LIST] = appList;
+    ret = cm->updateCredInfo(userId, credId.c_str(), jsonObj.Dump().c_str());
+    if (ret != DM_OK) {
+        LOGE("[HICHAIN]::updateCredInfo failed, ret: %{public}d.", ret);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t HiChainAuthConnector::UpdateCredential(const std::string &credId, int32_t userId,
+    std::vector<std::string> &tokenIds)
+{
+    const CredManager *cm = GetCredMgrInstance();
+    if (cm == nullptr) {
+        LOGE("cm is null.");
+        return ERR_DM_FAILED;
+    }
+    char *returnCredInfo = nullptr;
+    int32_t ret = cm->queryCredInfoByCredId(userId, credId.c_str(), &returnCredInfo);
+    if (ret != DM_OK) {
+        FreeCharArray(returnCredInfo);
+        LOGE("[HICHAIN]::QueryCredInfoByCredId failed, ret: %{public}d.", ret);
+        return ret;
+    }
+    JsonObject credInfoJson(returnCredInfo);
+    FreeCharArray(returnCredInfo);
+    if (credInfoJson.IsDiscarded()) {
+        LOGE("QueryCredInfoByCredId credential info jsonStr error");
+        return ERR_DM_FAILED;
+    }
+    JsonObject jsonObj;
+    jsonObj[FIELD_AUTHORIZED_APP_LIST] = tokenIds;
+    ret = cm->updateCredInfo(userId, credId.c_str(), jsonObj.Dump().c_str());
+    if (ret != DM_OK) {
+        LOGE("[HICHAIN]::updateCredInfo failed, ret: %{public}d.", ret);
+        return ret;
+    }
     return DM_OK;
 }
 } // namespace DistributedHardware

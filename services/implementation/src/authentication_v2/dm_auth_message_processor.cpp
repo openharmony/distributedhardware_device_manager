@@ -107,6 +107,7 @@ constexpr const int32_t DM_HASH_LEN = 32;
 const char* TAG_DEVICE_TYPE = "DEVICETYPE";
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
+constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
 
 void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access, bool isUseDeviceFullName)
 {
@@ -193,7 +194,6 @@ bool IsMessageValid(const JsonItemObject &jsonObject)
     }
     return true;
 }
-
 }
 
 int32_t DmAuthMessageProcessor::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyLen)
@@ -212,6 +212,63 @@ int32_t DmAuthMessageProcessor::SaveSessionKeyToDP(int32_t userId, int32_t &skId
         return ERR_DM_FAILED;
     }
     return DeviceProfileConnector::GetInstance().PutSessionKey(userId, cryptoMgr_->GetSessionKey(), skId);
+}
+
+int32_t DmAuthMessageProcessor::SaveDerivativeSessionKeyToDP(int32_t userId, const std::string &suffix, int32_t &skId)
+{
+    if (cryptoMgr_ == nullptr) {
+        LOGE("DmAuthMessageProcessor::SaveSessionKeyToDP failed, cryptoMgr_ is nullptr.");
+        return ERR_DM_FAILED;
+    }
+    std::vector<unsigned char> sessionKey = cryptoMgr_->GetSessionKey();
+    size_t keyLen = sessionKey.size();
+    std::string keyStr;
+    for (size_t i = 0; i < sessionKey.size(); ++i) {
+        keyStr = keyStr + (char)sessionKey.data()[i];
+    }
+    std::string newKeyStr = Crypto::Sha256(keyStr + suffix);
+    DMSessionKey newSessionKey;
+    size_t newKeyLen = std::min(keyLen, newKeyStr.size());
+    if (newKeyLen == 0 || newKeyLen > MAX_SESSION_KEY_LENGTH) {
+        LOGE("newKeyLen invaild, cannot allocate memory.");
+        return ERR_DM_FAILED;
+    }
+    newSessionKey.key = (uint8_t*)calloc(newKeyLen, sizeof(uint8_t));
+    if (memcpy_s(newSessionKey.key, newKeyLen, newKeyStr.c_str(), newKeyLen) != DM_OK) {
+        LOGE("copy key data failed.");
+        if (newSessionKey.key != nullptr) {
+            (void)memset_s(newSessionKey.key, newKeyLen, 0, newKeyLen);
+            free(newSessionKey.key);
+            newSessionKey.key = nullptr;
+            newSessionKey.keyLen = 0;
+        }
+        return ERR_DM_FAILED;
+    }
+    newSessionKey.keyLen = newKeyLen;
+    int ret = DeviceProfileConnector::GetInstance().PutSessionKey(userId,
+        std::vector<unsigned char>(newSessionKey.key, newSessionKey.key + newSessionKey.keyLen), skId);
+    if (ret != DM_OK) {
+        LOGE("DP save user session key failed %{public}d", ret);
+    }
+    if (newSessionKey.key != nullptr) {
+        (void)memset_s(newSessionKey.key, newSessionKey.keyLen, 0, newSessionKey.keyLen);
+        free(newSessionKey.key);
+        newSessionKey.key = nullptr;
+        newSessionKey.keyLen = 0;
+    }
+    return ret;
+}
+
+int32_t DmAuthMessageProcessor::GetSessionKey(int32_t userId, int32_t &skId)
+{
+    std::vector<unsigned char> sessionKey;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetSessionKey(userId, skId, sessionKey);
+    if (ret != DM_OK) {
+        LOGE("failed: %{public}d", ret);
+        return ret;
+    }
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
+    return cryptoMgr_->ProcessSessionKey(sessionKey.data(), sessionKey.size());
 }
 
 int32_t DmAuthMessageProcessor::DeleteSessionKeyToDP(int32_t userId, int32_t skId)
@@ -307,21 +364,93 @@ int32_t DmAuthMessageProcessor::PutAccessControlList(std::shared_ptr<DmAuthConte
             LOGE("PutAccessControlProfile failed.");
         }
     }
-    std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
-    extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
-    profile.SetExtraData(extraData.Dump());
-    profile.SetBindLevel(access.bindLevel);
-    SetTransmitAccessControlList(context, accesser, accessee);
-    profile.SetBindLevel(access.bindLevel);
-    profile.SetBindType(access.transmitBindType);
-    profile.SetAccessee(accessee);
-    profile.SetAccesser(accesser);
-    int32_t ret =
-        DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
-    if (ret != DM_OK) {
-        LOGE("PutAccessControlProfile failed.");
+    bool isAuthed = (context->direction == DM_AUTH_SOURCE) ? context->accesser.isAuthed : context->accessee.isAuthed;
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty() || (context->IsCallingProxyAsSubject && !isAuthed)) {
+        std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
+        extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
+        profile.SetExtraData(extraData.Dump());
+        profile.SetBindLevel(access.bindLevel);
+        SetTransmitAccessControlList(context, accesser, accessee);
+        profile.SetBindLevel(access.bindLevel);
+        profile.SetBindType(access.transmitBindType);
+        profile.SetAccessee(accessee);
+        profile.SetAccesser(accesser);
+        int32_t ret =
+            DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
+        if (ret != DM_OK) {
+            LOGE("PutAccessControlProfile failed.");
+        }
     }
-    return ret;
+    return PutProxyAccessControlList(context, profile, accesser, accessee);
+}
+
+int32_t DmAuthMessageProcessor::SetProxyAccess(std::shared_ptr<DmAuthContext> context,
+    DmProxyAuthContext &proxyAuthContext, DistributedDeviceProfile::Accesser &accesser,
+    DistributedDeviceProfile::Accessee &accessee)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    accesser.SetAccesserTokenId(proxyAuthContext.proxyAccesser.tokenId);
+    accesser.SetAccesserBundleName(proxyAuthContext.proxyAccesser.bundleName);
+    accesser.SetAccesserCredentialIdStr(proxyAuthContext.proxyAccesser.transmitCredentialId);
+    accesser.SetAccesserSessionKeyId(proxyAuthContext.proxyAccesser.transmitSessionKeyId);
+    accesser.SetAccesserSKTimeStamp(proxyAuthContext.proxyAccesser.skTimeStamp);
+    JsonObject accesserProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    accesserProxyObj.PushBack(context->accesser.tokenId);
+    JsonObject accesserExtObj;
+    if (!context->accesser.extraInfo.empty()) {
+        accesserExtObj.Parse(context->accesser.extraInfo);
+    }
+    accesserExtObj[TAG_PROXY] = accesserProxyObj.Dump();
+    accesser.SetAccesserExtraData(accesserExtObj.Dump());
+
+    accessee.SetAccesseeTokenId(proxyAuthContext.proxyAccessee.tokenId);
+    accessee.SetAccesseeBundleName(proxyAuthContext.proxyAccessee.bundleName);
+    accessee.SetAccesseeCredentialIdStr(proxyAuthContext.proxyAccessee.transmitCredentialId);
+    accessee.SetAccesseeSessionKeyId(proxyAuthContext.proxyAccessee.transmitSessionKeyId);
+    accessee.SetAccesseeSKTimeStamp(proxyAuthContext.proxyAccessee.skTimeStamp);
+    JsonObject accesseeProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    accesseeProxyObj.PushBack(context->accessee.tokenId);
+    JsonObject accesseeExtObj;
+    if (!context->accessee.extraInfo.empty()) {
+        accesseeExtObj.Parse(context->accessee.extraInfo);
+    }
+    accesseeExtObj[TAG_PROXY] = accesseeProxyObj.Dump();
+    accessee.SetAccesseeExtraData(accesseeExtObj.Dump());
+    return DM_OK;
+}
+
+int32_t DmAuthMessageProcessor::PutProxyAccessControlList(std::shared_ptr<DmAuthContext> context,
+    DistributedDeviceProfile::AccessControlProfile &profile, DistributedDeviceProfile::Accesser &accesser,
+    DistributedDeviceProfile::Accessee &accessee)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return DM_OK;
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        if (context->direction == DM_AUTH_SOURCE ? app.proxyAccesser.isAuthed : app.proxyAccessee.isAuthed) {
+            continue;
+        }
+        SetProxyAccess(context, app, accesser, accessee);
+        JsonObject extraData;
+        std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
+        extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
+        profile.SetExtraData(extraData.Dump());
+        profile.SetBindLevel(context->direction == DM_AUTH_SOURCE ? app.proxyAccesser.bindLevel :
+            app.proxyAccessee.bindLevel);
+        profile.SetBindType(context->direction == DM_AUTH_SOURCE ? context->accesser.transmitBindType :
+            context->accessee.transmitBindType);
+        profile.SetAccessee(accessee);
+        profile.SetAccesser(accesser);
+        int32_t ret =
+            DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
+        if (ret != DM_OK) {
+            LOGE("PutAccessControlProfile failed. %{public}d", ret);
+            return ret;
+        }
+    }
+    SetAclProxyRelate(context);
+    return DM_OK;
 }
 
 DmAuthMessageProcessor::DmAuthMessageProcessor()
@@ -527,6 +656,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
     context->accesser.deviceId = jsonData[TAG_DEVICE_ID].Get<std::string>();
     context->accesser.userId = jsonData[TAG_PEER_USER_SPACE_ID].Get<int32_t>();
     context->accesser.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
+    ParseProxyCredExchangeToSync(context, jsonData);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkCredentialExchangeState>());
     return DM_OK;
 }
@@ -572,8 +702,41 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
     context->accessee.deviceId = jsonData[TAG_DEVICE_ID].Get<std::string>();
     context->accessee.userId = jsonData[TAG_PEER_USER_SPACE_ID].Get<int32_t>();
     context->accessee.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
-
+    ParseProxyCredExchangeToSync(context, jsonData);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthStartState>());
+    return DM_OK;
+}
+
+int32_t DmAuthMessageProcessor::ParseProxyCredExchangeToSync(std::shared_ptr<DmAuthContext> &context,
+    JsonObject &jsonObject)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return DM_OK;
+    }
+    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        LOGE("no subjectProxyOnes");
+        return ERR_DM_FAILED;
+    }
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!IsString(item, TAG_PROXY_CONTEXT_ID)) {
+            continue;
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
+        auto it = std::find(context->subjectProxyOnes.begin(), context->subjectProxyOnes.end(), proxyAuthContext);
+        if (it != context->subjectProxyOnes.end()) {
+            if (!IsInt64(item, TAG_TOKEN_ID)) {
+                LOGE("no tokenId");
+                return ERR_DM_FAILED;
+            }
+            DmProxyAccess &access = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccessee : it->proxyAccesser;
+            access.tokenId = item[TAG_TOKEN_ID].Get<int64_t>();
+        }
+    }
     return DM_OK;
 }
 
@@ -656,6 +819,29 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     if (!context->businessId.empty()) {
         jsonObject[DM_BUSINESS_ID] = context->businessId;
     }
+    CreateProxyNegotiateMessage(context, jsonObject);
+    return DM_OK;
+}
+
+int32_t DmAuthMessageProcessor::CreateProxyNegotiateMessage(std::shared_ptr<DmAuthContext> context,
+    JsonObject &jsonObject)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    jsonObject[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
+    jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT] = context->IsCallingProxyAsSubject;
+    if (context != nullptr && context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+        JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+        for (const auto &app : context->subjectProxyOnes) {
+            JsonObject object;
+            object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
+            object[TAG_HOST_PKGLABEL] = app.pkgLabel;
+            object[TAG_BUNDLE_NAME] = app.proxyAccesser.bundleName;
+            object[TAG_PEER_BUNDLE_NAME] = app.proxyAccessee.bundleName;
+            object[TAG_TOKEN_ID_HASH] = app.proxyAccesser.tokenIdHash;
+            allProxyObj.PushBack(object);
+        }
+        jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
+    }
     return DM_OK;
 }
 
@@ -677,7 +863,27 @@ int32_t DmAuthMessageProcessor::CreateRespNegotiateMessage(std::shared_ptr<DmAut
     jsonObject[TAG_NETWORKID_ID] = context->accessee.networkId;
 
     jsonObject[TAG_IS_ONLINE] = context->accesser.isOnline;
+    CreateProxyRespNegotiateMessage(context, jsonObject);
+    return DM_OK;
+}
 
+int32_t DmAuthMessageProcessor::CreateProxyRespNegotiateMessage(std::shared_ptr<DmAuthContext> context,
+    JsonObject &jsonObject)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    jsonObject[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
+    if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+        JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+        for (const auto &app : context->subjectProxyOnes) {
+            JsonObject object;
+            object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
+            object[TAG_TOKEN_ID_HASH] = app.proxyAccessee.tokenIdHash;
+            object[TAG_ACL_TYPE_LIST] = app.proxyAccessee.aclTypeList;
+            object[TAG_CERT_TYPE_LIST] = app.proxyAccessee.credTypeList;
+            allProxyObj.PushBack(object);
+        }
+        jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
+    }
     return DM_OK;
 }
 
@@ -693,7 +899,7 @@ int32_t DmAuthMessageProcessor::CreateMessageReqCredExchange(std::shared_ptr<DmA
     jsonData[TAG_DEVICE_ID] = context->accesser.deviceId;
     jsonData[TAG_PEER_USER_SPACE_ID] = context->accesser.userId;
     jsonData[TAG_TOKEN_ID] = context->accesser.tokenId;
-
+    CreateProxyCredExchangeMessage(context, jsonData);
     std::string plainText = jsonData.Dump();
     std::string cipherText;
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
@@ -718,7 +924,7 @@ int32_t DmAuthMessageProcessor::CreateMessageRspCredExchange(std::shared_ptr<DmA
     jsonData[TAG_DEVICE_ID] = context->accessee.deviceId;
     jsonData[TAG_PEER_USER_SPACE_ID] = context->accessee.userId;
     jsonData[TAG_TOKEN_ID] = context->accessee.tokenId;
-
+    CreateProxyCredExchangeMessage(context, jsonData);
     std::string plainText = jsonData.Dump();
     std::string cipherText;
     LOGI("plainText=%{public}s", GetAnonyJsonString(plainText).c_str());
@@ -729,6 +935,25 @@ int32_t DmAuthMessageProcessor::CreateMessageRspCredExchange(std::shared_ptr<DmA
     }
     jsonObject[TAG_DATA] = cipherText;
     return ret;
+}
+
+int32_t DmAuthMessageProcessor::CreateProxyCredExchangeMessage(std::shared_ptr<DmAuthContext> &context,
+    JsonObject &jsonData)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return DM_OK;
+    }
+    JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    for (const auto &app : context->subjectProxyOnes) {
+        const DmProxyAccess &access = (context->direction == DM_AUTH_SOURCE) ? app.proxyAccesser : app.proxyAccessee;
+        JsonObject object;
+        object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
+        object[TAG_TOKEN_ID] = access.tokenId;
+        allProxyObj.PushBack(object);
+    }
+    jsonData[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
+    return DM_OK;
 }
 
 // Create 160 message.
@@ -793,6 +1018,7 @@ bool DmAuthMessageProcessor::CheckAccessValidityAndAssign(std::shared_ptr<DmAuth
         access.lnnSessionKeyId = accessTmp.lnnSessionKeyId;
         access.lnnSkTimeStamp = accessTmp.lnnSkTimeStamp;
         access.lnnCredentialId = accessTmp.lnnCredentialId;
+        access.tokenId = accessTmp.tokenId;
     }
     return isSame;
 }
@@ -814,6 +1040,10 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
     // Parse into access
     ParseDmAccessToSync(srcAccessStr, accessTmp, false);
     // check access validity
+    if (ParseProxyAccessToSync(context, jsonObject) != DM_OK) {
+        LOGE("ParseProxyAccessToSync error, stop auth.");
+        return ERR_DM_FAILED;
+    }
     if (!CheckAccessValidityAndAssign(context, access, accessTmp)) {
         LOGE("ParseSyncMessage CheckAccessValidityAndAssign error, data between two stages different, stop auth.");
         return ERR_DM_FAILED;
@@ -824,7 +1054,6 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
         return ERR_DM_FAILED;
     }
     access.aclStrList = jsonObject[TAG_ACL_CHECKSUM].Get<std::string>();
-
     if (context->direction == DmAuthDirection::DM_AUTH_SOURCE) {
         LOGI("Source parse sink user confirm opt");
         int32_t userConfirmOpt = static_cast<int32_t>(USER_OPERATION_TYPE_CANCEL_AUTH);
@@ -840,27 +1069,78 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
     return DM_OK;
 }
 
+int32_t DmAuthMessageProcessor::ParseProxyAccessToSync(std::shared_ptr<DmAuthContext> &context,
+    JsonObject &jsonObject)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return DM_OK;
+    }
+    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        LOGE("no subjectProxyOnes");
+        return ERR_DM_FAILED;
+    }
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!IsString(item, TAG_PROXY_CONTEXT_ID)) {
+            LOGE("no proxyContextId");
+            return ERR_DM_FAILED;
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
+        auto it = std::find(context->subjectProxyOnes.begin(), context->subjectProxyOnes.end(), proxyAuthContext);
+        if (it != context->subjectProxyOnes.end()) {
+            if (!IsInt64(item, TAG_TOKEN_ID) || !IsString(item, TAG_TRANSMIT_SK_ID) ||
+                !IsInt32(item, TAG_BIND_LEVEL) || !IsInt64(item, TAG_TRANSMIT_SK_TIMESTAMP) ||
+                !IsString(item, TAG_TRANSMIT_CREDENTIAL_ID)) {
+                LOGE("proxyContext format error");
+                return ERR_DM_FAILED;
+            }
+
+            DmProxyAccess &access = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccessee : it->proxyAccesser;
+            DmProxyAccess &selfAccess = (context->direction == DM_AUTH_SOURCE) ? it->proxyAccesser : it->proxyAccessee;
+            if (Crypto::GetTokenIdHash(std::to_string(item[TAG_TOKEN_ID].Get<int64_t>())) == access.tokenIdHash &&
+                item[TAG_BIND_LEVEL].Get<int32_t>() == selfAccess.bindLevel) {
+                access.tokenId  = item[TAG_TOKEN_ID].Get<int64_t>();
+                access.bindLevel = item[TAG_BIND_LEVEL].Get<int32_t>();
+                access.transmitSessionKeyId = std::atoi(item[TAG_TRANSMIT_SK_ID].Get<std::string>().c_str());
+                access.skTimeStamp = item[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>();
+                access.transmitCredentialId  = item[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
+            } else {
+                LOGE("tokenId or bindLevel invaild");
+                return ERR_DM_FAILED;
+            }
+        } else {
+            LOGE("proxyContextId not exist");
+            return ERR_DM_FAILED;
+        }
+    }
+    return DM_OK;
+}
+
 int32_t DmAuthMessageProcessor::DecryptSyncMessage(std::shared_ptr<DmAuthContext> &context,
     DmAccess &access, std::string &enSyncMsg)
 {
     std::string syncMsgCompress = "";
     int32_t ret = cryptoMgr_->DecryptMessage(enSyncMsg, syncMsgCompress);
     if (ret != DM_OK) {
-        LOGE("DecryptSyncMessage syncMsg error");
+        LOGE("syncMsg error");
         return ret;
     }
     JsonObject plainJson(syncMsgCompress);
     if (plainJson.IsDiscarded()) {
-        LOGE("DecryptSyncMessage plainJson error");
+        LOGE("plainJson error");
         return ERR_DM_FAILED;
     }
     if (!plainJson[TAG_COMPRESS_ORI_LEN].IsNumberInteger()) {
-        LOGE("DecryptSyncMessage TAG_COMPRESS_ORI_LEN json error");
+        LOGE("TAG_COMPRESS_ORI_LEN json error");
         return ERR_DM_FAILED;
     }
     int32_t dataLen = plainJson[TAG_COMPRESS_ORI_LEN].Get<int32_t>();
     if (!plainJson[TAG_COMPRESS].IsString()) {
-        LOGE("DecryptSyncMessage TAG_COMPRESS_ORI_LEN json error");
+        LOGE("TAG_COMPRESS_ORI_LEN json error");
         return ERR_DM_FAILED;
     }
     std::string compressMsg = plainJson[TAG_COMPRESS].Get<std::string>();
@@ -868,13 +1148,13 @@ int32_t DmAuthMessageProcessor::DecryptSyncMessage(std::shared_ptr<DmAuthContext
     std::string syncMsg = DecompressSyncMsg(compressBase64, dataLen);
     JsonObject jsonObject(syncMsg);
     if (jsonObject.IsDiscarded()) {
-        LOGE("DmAuthMessageProcessor::DecryptSyncMessage  jsonStr error");
+        LOGE("jsonStr error");
         return ERR_DM_FAILED;
     }
 
     ret = ParseSyncMessage(context, access, jsonObject);
     if (ret != DM_OK) {
-        LOGE("DecryptSyncMessage ParseSyncMessage jsonStr error");
+        LOGE("ParseSyncMessage jsonStr error");
         return ret;
     }
     return DM_OK;
@@ -991,6 +1271,7 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     }
     ParseAccesserInfo(jsonObject, context);
     ParseUltrasonicSide(jsonObject, context);
+    ParseProxyNegotiateMessage(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
     return DM_OK;
 }
@@ -1038,6 +1319,46 @@ void DmAuthMessageProcessor::ParseCert(const JsonObject &jsonObject,
     if (jsonObject[TAG_IS_COMMON_FLAG].IsBoolean()) {
         context->accesser.isCommonFlag = jsonObject[TAG_IS_COMMON_FLAG].Get<bool>();
     }
+}
+
+int32_t DmAuthMessageProcessor::ParseProxyNegotiateMessage(
+    const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    context->IsProxyBind = false;
+    //accesser dmVersion greater than DM_VERSION_5_1_1
+    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_1) && IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
+        context->IsProxyBind = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
+    }
+    if (!context->IsProxyBind) {
+        return DM_OK;
+    }
+    if (IsBool(jsonObject, PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT)) {
+        context->IsCallingProxyAsSubject = jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT].Get<bool>();
+    }
+
+    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!IsString(item, TAG_PROXY_CONTEXT_ID) || !IsString(item, TAG_BUNDLE_NAME) ||
+            !IsString(item, TAG_PEER_BUNDLE_NAME) || !IsString(item, TAG_TOKEN_ID_HASH)) {
+            continue;
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
+        proxyAuthContext.proxyAccesser.bundleName = item[TAG_BUNDLE_NAME].Get<std::string>();
+        proxyAuthContext.proxyAccessee.bundleName = item[TAG_PEER_BUNDLE_NAME].Get<std::string>();
+        proxyAuthContext.proxyAccesser.tokenIdHash = item[TAG_TOKEN_ID_HASH].Get<std::string>();
+        if (IsString(item, TAG_HOST_PKGLABEL)) {
+            proxyAuthContext.pkgLabel = item[TAG_HOST_PKGLABEL].Get<std::string>();
+        }
+        context->subjectProxyOnes.push_back(proxyAuthContext);
+    }
+    return DM_OK;
 }
 
 void DmAuthMessageProcessor::ParseUltrasonicSide(
@@ -1107,7 +1428,44 @@ int32_t DmAuthMessageProcessor::ParseMessageRespAclNegotiate(const JsonObject &j
     if (jsonObject[TAG_EXTRA_INFO].IsString()) {
         context->accessee.extraInfo = jsonObject[TAG_EXTRA_INFO].Get<std::string>();
     }
+    ParseMessageProxyRespAclNegotiate(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcConfirmState>());
+    return DM_OK;
+}
+
+int32_t DmAuthMessageProcessor::ParseMessageProxyRespAclNegotiate(const JsonObject &jsonObject,
+    std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    //sink not support proxy
+    if (!CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_1)) {
+        context->IsProxyBind = false;
+        LOGE("sink does not support proxy");
+        return DM_OK;
+    }
+    if (!context->IsProxyBind) {
+        return DM_OK;
+    }
+    if (!IsString(jsonObject, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string subjectProxyOnesStr = jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!IsString(item, TAG_PROXY_CONTEXT_ID) || !IsString(item, TAG_TOKEN_ID_HASH) ||
+            !IsString(item, TAG_ACL_TYPE_LIST) || !IsString(item, TAG_CERT_TYPE_LIST)) {
+            continue;
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
+        auto it = std::find(context->subjectProxyOnes.begin(), context->subjectProxyOnes.end(), proxyAuthContext);
+        if (it != context->subjectProxyOnes.end()) {
+            it->proxyAccessee.tokenIdHash = item[TAG_TOKEN_ID_HASH].Get<std::string>();
+            it->proxyAccessee.aclTypeList = item[TAG_ACL_TYPE_LIST].Get<std::string>();
+            it->proxyAccessee.credTypeList = item[TAG_CERT_TYPE_LIST].Get<std::string>();
+        }
+    }
     return DM_OK;
 }
 
@@ -1135,7 +1493,37 @@ int32_t DmAuthMessageProcessor::ParseMessageReqUserConfirm(const JsonObject &jso
     if (IsString(json, TAG_CUSTOM_DESCRIPTION)) {
         context->customData = json[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
     }
+    ParseMessageProxyReqUserConfirm(json, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkConfirmState>());
+    return DM_OK;
+}
+
+int32_t DmAuthMessageProcessor::ParseMessageProxyReqUserConfirm(const JsonObject &json,
+    std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind) {
+        return DM_OK;
+    }
+    if (!IsString(json, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string subjectProxyOnesStr = json[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    for (auto const &item : allProxyObj.Items()) {
+        if (!IsString(item, TAG_PROXY_CONTEXT_ID) || !IsString(item, TAG_ACL_TYPE_LIST) ||
+            !IsString(item, TAG_CERT_TYPE_LIST)) {
+            continue;
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
+        auto it = std::find(context->subjectProxyOnes.begin(), context->subjectProxyOnes.end(), proxyAuthContext);
+        if (it != context->subjectProxyOnes.end()) {
+            it->proxyAccesser.aclTypeList = item[TAG_ACL_TYPE_LIST].Get<std::string>();
+            it->proxyAccesser.credTypeList = item[TAG_CERT_TYPE_LIST].Get<std::string>();
+        }
+    }
     return DM_OK;
 }
 
@@ -1149,7 +1537,45 @@ int32_t DmAuthMessageProcessor::ParseMessageRespUserConfirm(const JsonObject &js
     if (json[TAG_EXTRA_INFO].IsString()) {
         context->accessee.extraInfo = json[TAG_EXTRA_INFO].Get<std::string>();
     }
+    ParseMessageProxyRespUserConfirm(json, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
+    return DM_OK;
+}
+
+int32_t DmAuthMessageProcessor::ParseMessageProxyRespUserConfirm(const JsonObject &json,
+    std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind) {
+        return DM_OK;
+    }
+    if (!IsString(json, PARAM_KEY_SUBJECT_PROXYED_SUBJECTS)) {
+        context->subjectProxyOnes.clear();
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::string subjectProxyOnesStr = json[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS].Get<std::string>();
+    JsonObject allProxyObj;
+    allProxyObj.Parse(subjectProxyOnesStr);
+    if (allProxyObj.IsDiscarded()) {
+        context->subjectProxyOnes.clear();
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::vector<DmProxyAuthContext> sinksubjectProxyOnes;
+    for (auto const &item : allProxyObj.Items()) {
+        if (!IsString(item, TAG_PROXY_CONTEXT_ID)) {
+            continue;
+        }
+        DmProxyAuthContext proxyAuthContext;
+        proxyAuthContext.proxyContextId = item[TAG_PROXY_CONTEXT_ID].Get<std::string>();
+        sinksubjectProxyOnes.push_back(proxyAuthContext);
+    }
+    for (auto item = context->subjectProxyOnes.begin(); item != context->subjectProxyOnes.end();) {
+        if (std::find(sinksubjectProxyOnes.begin(), sinksubjectProxyOnes.end(), *item) != sinksubjectProxyOnes.end()) {
+            item++;
+        } else {
+            item = context->subjectProxyOnes.erase(item);
+        }
+    }
     return DM_OK;
 }
 
@@ -1231,7 +1657,24 @@ int32_t DmAuthMessageProcessor::CreateMessageReqUserConfirm(std::shared_ptr<DmAu
     json[TAG_DEVICE_NAME] = context->accesser.deviceName;
     json[TAG_EXTRA_INFO] = context->accesser.extraInfo;
     json[TAG_CUSTOM_DESCRIPTION] = context->customData;
+    CreateMessageProxyReqUserConfirm(context, json);
+    return DM_OK;
+}
 
+int32_t DmAuthMessageProcessor::CreateMessageProxyReqUserConfirm(std::shared_ptr<DmAuthContext> context,
+    JsonObject &json)
+{
+    if (context != nullptr && context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+        JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+        for (const auto &app : context->subjectProxyOnes) {
+            JsonObject object;
+            object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
+            object[TAG_ACL_TYPE_LIST] = app.proxyAccesser.aclTypeList;
+            object[TAG_CERT_TYPE_LIST] = app.proxyAccesser.credTypeList;
+            allProxyObj.PushBack(object);
+        }
+        json[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
+    }
     return DM_OK;
 }
 
@@ -1239,6 +1682,15 @@ int32_t DmAuthMessageProcessor::CreateMessageRespUserConfirm(std::shared_ptr<DmA
 {
     json[TAG_AUTH_TYPE_LIST] = vectorAuthTypeToString(context->authTypeList);
     json[TAG_EXTRA_INFO] = context->accessee.extraInfo;
+    if (context != nullptr && context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+        JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+        for (const auto &app : context->subjectProxyOnes) {
+            JsonObject object;
+            object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
+            allProxyObj.PushBack(object);
+        }
+        json[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
+    }
     return DM_OK;
 }
 
@@ -1431,6 +1883,7 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     }
     syncMsgJson[TAG_IS_COMMON_FLAG] = context->accesser.isCommonFlag;
     syncMsgJson[TAG_DM_CERT_CHAIN] = context->accesser.cert;
+    CreateProxyAccessMessage(context, syncMsgJson);
     std::string syncMsg = syncMsgJson.Dump();
     std::string compressMsg = CompressSyncMsg(syncMsg);
     if (compressMsg.empty()) {
@@ -1441,6 +1894,39 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     plainJson[TAG_COMPRESS_ORI_LEN] = syncMsg.size();
     plainJson[TAG_COMPRESS] = Base64Encode(compressMsg);
     return cryptoMgr_->EncryptMessage(plainJson.Dump(), encSyncMsg);
+}
+
+int32_t DmAuthMessageProcessor::CreateProxyAccessMessage(std::shared_ptr<DmAuthContext> &context,
+    JsonObject &syncMsgJson)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return DM_OK;
+    }
+    JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    for (const auto &app : context->subjectProxyOnes) {
+        DmProxyAccess access;
+        if (context->direction == DM_AUTH_SOURCE) {
+            access = app.proxyAccesser;
+        } else {
+            access = app.proxyAccessee;
+        }
+        if (access.isAuthed) {
+            continue;
+        }
+        JsonObject object;
+        object[TAG_PROXY_CONTEXT_ID] = app.proxyContextId;
+        object[TAG_TOKEN_ID] = access.tokenId;
+        object[TAG_BUNDLE_NAME] = access.bundleName;
+        object[TAG_BIND_LEVEL] = access.bindLevel;
+        object[TAG_PKG_NAME] = access.pkgName;
+        object[TAG_TRANSMIT_SK_ID] = std::to_string(access.transmitSessionKeyId);
+        object[TAG_TRANSMIT_SK_TIMESTAMP] = access.skTimeStamp;
+        object[TAG_TRANSMIT_CREDENTIAL_ID] = access.transmitCredentialId;
+        allProxyObj.PushBack(object);
+    }
+    syncMsgJson[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
+    return DM_OK;
 }
 
 int32_t DmAuthMessageProcessor::ACLToStr(DistributedDeviceProfile::AccessControlProfile acl, std::string aclStr)
@@ -1501,6 +1987,85 @@ int32_t DmAuthMessageProcessor::ParseAuthStartMessage(const JsonObject &jsonObje
     return DM_OK;
 }
 
+bool DmAuthMessageProcessor::IsExistTheToken(JsonObject &proxyObj, int64_t tokenId)
+{
+    if (proxyObj.IsDiscarded()) {
+        return false;
+    }
+    for (auto const &item : proxyObj.Items()) {
+        if (tokenId == item.Get<int64_t>()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void DmAuthMessageProcessor::SetAclProxyRelate(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return;
+    }
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    DmAccess &remoteAccess = (context->direction == DM_AUTH_SOURCE) ? context->accessee : context->accesser;
+    for (auto &app : context->subjectProxyOnes) {
+        DmProxyAccess &proxyAccess = (context->direction == DM_AUTH_SOURCE) ? app.proxyAccesser : app.proxyAccessee;
+        if (!proxyAccess.isAuthed || proxyAccess.aclProfiles.find(DM_POINT_TO_POINT) ==
+            proxyAccess.aclProfiles.end()) {
+            continue;
+        }
+        SetAclProxyRelate(context, proxyAccess.aclProfiles[DM_POINT_TO_POINT]);
+    }
+}
+
+void DmAuthMessageProcessor::SetAclProxyRelate(std::shared_ptr<DmAuthContext> context,
+    DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    DmAccess &remoteAccess = (context->direction == DM_AUTH_SOURCE) ? context->accessee : context->accesser;
+    bool isNeedUpdateProxy = false;
+    JsonObject accesserExtObj;
+    if (!profile.GetAccesser().GetAccesserExtraData().empty()) {
+        accesserExtObj.Parse(profile.GetAccesser().GetAccesserExtraData());
+    }
+    JsonObject accesserProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    if (IsString(accesserExtObj, TAG_PROXY)) {
+        std::string proxyStr = accesserExtObj[TAG_PROXY].Get<std::string>();
+        accesserProxyObj.Parse(proxyStr);
+    }
+    int64_t tokenId = access.deviceId == profile.GetAccesser().GetAccesserDeviceId() ? access.tokenId :
+        remoteAccess.tokenId;
+    if (!IsExistTheToken(accesserProxyObj, tokenId)) {
+        isNeedUpdateProxy = true;
+        accesserProxyObj.PushBack(tokenId);
+        accesserExtObj[TAG_PROXY] = accesserProxyObj.Dump();
+        DistributedDeviceProfile::Accesser accesser = profile.GetAccesser();
+        accesser.SetAccesserExtraData(accesserExtObj.Dump());
+        profile.SetAccesser(accesser);
+    }
+
+    JsonObject accesseeExtObj;
+    if (!profile.GetAccessee().GetAccesseeExtraData().empty()) {
+        accesseeExtObj.Parse(profile.GetAccessee().GetAccesseeExtraData());
+    }
+    JsonObject accesseeProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    if (IsString(accesseeExtObj, TAG_PROXY)) {
+        std::string proxyStr = accesseeExtObj[TAG_PROXY].Get<std::string>();
+        accesseeProxyObj.Parse(proxyStr);
+    }
+    tokenId = access.deviceId == profile.GetAccesser().GetAccesserDeviceId() ? remoteAccess.tokenId : access.tokenId;
+    if (!IsExistTheToken(accesseeProxyObj, tokenId)) {
+        isNeedUpdateProxy = true;
+        accesseeProxyObj.PushBack(tokenId);
+        accesseeExtObj[TAG_PROXY] = accesseeProxyObj.Dump();
+        DistributedDeviceProfile::Accessee accessee = profile.GetAccessee();
+        accessee.SetAccesseeExtraData(accesseeExtObj.Dump());
+        profile.SetAccessee(accessee);
+    }
+    if (isNeedUpdateProxy) {
+        DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+    }
+}
 
 void ToJson(JsonItemObject &itemObject, const DmAccessControlTable &table)
 {

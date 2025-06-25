@@ -55,6 +55,8 @@ namespace OHOS {
 namespace DistributedHardware {
 std::mutex DeviceManagerServiceListener::alreadyNotifyPkgNameLock_;
 std::map<std::string, DmDeviceInfo> DeviceManagerServiceListener::alreadyOnlinePkgName_ = {};
+std::mutex DeviceManagerServiceListener::actUnrelatedPkgNameLock_;
+std::set<std::string> DeviceManagerServiceListener::actUnrelatedPkgName_ = {};
 std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNameSet_ = { "ohos.deviceprofile",
     "ohos.distributeddata.service" };
 
@@ -789,6 +791,12 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     for (const auto &it : procInfoVec) {
+        {
+            std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+            if (actUnrelatedPkgName_.find(it.pkgName) != actUnrelatedPkgName_.end()) {
+                continue;
+            }
+        }
         std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
@@ -800,6 +808,10 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
         }
         SetDeviceInfo(pReq, it, state, info, deviceBasicInfo);
         ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    }
+    {
+        std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+        actUnrelatedPkgName_.clear();
     }
 }
 
@@ -1010,10 +1022,21 @@ void DeviceManagerServiceListener::OnSetRemoteDeviceNameResult(const ProcessInfo
     ipcServerListener_.SendRequest(SET_REMOTE_DEVICE_NAME_RESULT, pReq, pRsp);
 }
 
+void DeviceManagerServiceListener::SetExistPkgName(const std::set<std::string> &pkgNameSet)
+{
+    std::lock_guard<std::mutex> autoLock(actUnrelatedPkgNameLock_);
+    actUnrelatedPkgName_.clear();
+    for (auto it : pkgNameSet) {
+        actUnrelatedPkgName_.insert(it);
+    }
+}
+
 std::string DeviceManagerServiceListener::GetLocalDisplayDeviceNameForPrivacy()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    return DeviceNameManager::GetInstance().GetLocalDisplayDeviceNameForPrivacy();
+    std::string displayName = "";
+    DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(0, displayName);
+    return displayName;
 #else
     return "";
 #endif

@@ -155,7 +155,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
         LOGE("sink not contain the bundlename %{public}s.", context->accessee.bundleName.c_str());
         return ERR_DM_GET_TOKENID_FAILED;
     }
-    if (AuthManagerBase::CheckProcessNameInWhiteList(context->accessee.bundleName)) {
+    if (!context->IsProxyBind && AuthManagerBase::CheckProcessNameInWhiteList(context->accessee.bundleName)) {
         context->accessee.bindLevel = DmRole::DM_ROLE_USER;
     }
     context->accessee.tokenIdHash = Crypto::GetTokenIdHash(std::to_string(context->accessee.tokenId));
@@ -163,6 +163,31 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.language = DmLanguageManager::GetInstance().GetSystemLanguage();
     context->accessee.deviceName = context->listener->GetLocalDisplayDeviceNameForPrivacy();
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
+    return RespQueryProxyAcceseeIds(context);
+}
+
+int32_t AuthSinkNegotiateStateMachine::RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind) {
+        return DM_OK;
+    }
+    if (context->subjectProxyOnes.empty()) {
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    for (auto item = context->subjectProxyOnes.begin(); item != context->subjectProxyOnes.end(); ++item) {
+        if (AppManager::GetInstance().GetNativeTokenIdByName(item->proxyAccessee.bundleName,
+            item->proxyAccessee.tokenId) == DM_OK) {
+            item->proxyAccessee.bindLevel = DmRole::DM_ROLE_SA;
+        } else if (AppManager::GetInstance().GetHapTokenIdByName(context->accessee.userId,
+            item->proxyAccessee.bundleName, 0, item->proxyAccessee.tokenId) == DM_OK) {
+            item->proxyAccessee.bindLevel = DmRole::DM_ROLE_FA;
+        } else {
+            LOGE("sink not contain the bundlename %{public}s.", item->proxyAccessee.bundleName.c_str());
+            return ERR_DM_GET_TOKENID_FAILED;
+        }
+        item->proxyAccessee.tokenIdHash = Crypto::GetTokenIdHash(std::to_string(item->proxyAccessee.tokenId));
+    }
     return DM_OK;
 }
 
@@ -238,6 +263,7 @@ void AuthSinkNegotiateStateMachine::GetSinkCredType(std::shared_ptr<DmAuthContex
         if (!item.Contains(FILED_CRED_TYPE) || !item[FILED_CRED_TYPE].IsNumberInteger() ||
             !item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
             deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
+            DirectlyDeleteCredential(context, context->accessee.userId, item);
             continue;
         }
         int32_t credType = item[FILED_CRED_TYPE].Get<int32_t>();
@@ -261,6 +287,7 @@ void AuthSinkNegotiateStateMachine::GetSinkCredType(std::shared_ptr<DmAuthContex
                     context->accessee.aclProfiles[DM_LNN].GetAccesser().GetAccesserCredentialIdStr() !=
                     item[FILED_CRED_ID].Get<std::string>())) {
                     deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
+                    DirectlyDeleteCredential(context, context->accessee.userId, item);
                 } else {
                     credTypeJson["lnnCredType"] = credType;
                     context->accessee.credentialInfos[credType] = item.Dump();
@@ -271,10 +298,10 @@ void AuthSinkNegotiateStateMachine::GetSinkCredType(std::shared_ptr<DmAuthContex
                 break;
         }
     }
-        for (const auto &item : deleteCredInfo) {
-            credInfo.Erase(item);
-            context->hiChainAuthConnector->DeleteCredential(context->accessee.userId, item);
-        }
+    GetSinkProxyCredTypeForP2P(context, deleteCredInfo);
+    for (const auto &item : deleteCredInfo) {
+        credInfo.Erase(item);
+    }
 }
 
 void AuthSinkNegotiateStateMachine::GetSinkCredTypeForP2P(std::shared_ptr<DmAuthContext> context,
@@ -288,9 +315,60 @@ void AuthSinkNegotiateStateMachine::GetSinkCredTypeForP2P(std::shared_ptr<DmAuth
         context->accessee.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr() !=
         credObj[FILED_CRED_ID].Get<std::string>())) {
         deleteCredInfo.push_back(credObj[FILED_CRED_ID].Get<std::string>());
+        DeleteCredential(context, context->accessee.userId, credObj, context->accessee.aclProfiles[DM_POINT_TO_POINT]);
     } else {
         credTypeJson["pointTopointCredType"] = credType;
         context->accessee.credentialInfos[credType] = credObj.Dump();
+    }
+}
+
+void AuthSinkNegotiateStateMachine::GetSinkProxyCredTypeForP2P(std::shared_ptr<DmAuthContext> context,
+    std::vector<std::string> &deleteCredInfo)
+{
+    CHECK_NULL_VOID(context);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return;
+    }
+    for (auto item = context->subjectProxyOnes.begin(); item != context->subjectProxyOnes.end(); ++item) {
+        JsonObject credInfoJson;
+        if (!item->proxyAccessee.credInfoJson.empty()) {
+            credInfoJson.Parse(item->proxyAccessee.credInfoJson);
+        }
+        for (const auto &credItem : credInfoJson.Items()) {
+            if (!credItem.Contains(FILED_CRED_TYPE) || !credItem[FILED_CRED_TYPE].IsNumberInteger() ||
+                !credItem.Contains(FILED_CRED_ID) || !credItem[FILED_CRED_ID].IsString()) {
+                deleteCredInfo.push_back(credItem[FILED_CRED_ID].Get<std::string>());
+                DirectlyDeleteCredential(context, context->accessee.userId, credItem);
+                continue;
+            }
+            int32_t credType = credItem[FILED_CRED_TYPE].Get<int32_t>();
+            if (credType != static_cast<int32_t>(DM_POINT_TO_POINT)) {
+                continue;
+            }
+            std::string credId = credItem[FILED_CRED_ID].Get<std::string>();
+            JsonObject aclTypeJson;
+            if (!item->proxyAccessee.aclTypeList.empty()) {
+                aclTypeJson.Parse(item->proxyAccessee.aclTypeList);
+            }
+            if (!aclTypeJson.Contains("pointTopointAcl") ||
+                item->proxyAccessee.aclProfiles.find(DM_POINT_TO_POINT) == item->proxyAccessee.aclProfiles.end() ||
+                (item->proxyAccessee.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeCredentialIdStr() !=
+                    credItem[FILED_CRED_ID].Get<std::string>() &&
+                item->proxyAccessee.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr() !=
+                credItem[FILED_CRED_ID].Get<std::string>())) {
+                deleteCredInfo.push_back(credItem[FILED_CRED_ID].Get<std::string>());
+                DeleteCredential(context, context->accessee.userId, credItem,
+                    item->proxyAccessee.aclProfiles[DM_POINT_TO_POINT]);
+                continue;
+            }
+            JsonObject validCredInfoJson;
+            if (!item->proxyAccessee.credTypeList.empty()) {
+                validCredInfoJson.Parse(item->proxyAccessee.credTypeList);
+            }
+            validCredInfoJson["pointTopointCredType"] = credType;
+            item->proxyAccessee.credTypeList = validCredInfoJson.Dump();
+            item->proxyAccessee.credentialInfos[credType] = credItem.Dump();
+        }
     }
 }
 
@@ -354,6 +432,52 @@ void AuthSinkNegotiateStateMachine::GetSinkAclInfoForP2P(std::shared_ptr<DmAuthC
         aclInfo["lnnAcl"] = DM_LNN;
         context->accessee.aclProfiles[DM_LNN] = profile;
     }
+    GetSinkProxyAclInfoForP2P(context, profile);
+}
+
+void AuthSinkNegotiateStateMachine::GetSinkProxyAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
+    const DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    CHECK_NULL_VOID(context);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return;
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        if ((profile.GetAccessee().GetAccesseeTokenId() == app.proxyAccessee.tokenId &&
+            Crypto::GetTokenIdHash(std::to_string(profile.GetAccesser().GetAccesserTokenId())) ==
+            app.proxyAccesser.tokenIdHash) ||
+            (profile.GetAccesser().GetAccesserTokenId() == app.proxyAccessee.tokenId &&
+            Crypto::GetTokenIdHash(std::to_string(profile.GetAccessee().GetAccesseeTokenId())) ==
+            app.proxyAccesser.tokenIdHash)) {
+            std::string credId;
+            if (!IsAclHasCredential(profile, app.proxyAccessee.credInfoJson, credId)) {
+                DeleteAclAndSk(context, profile);
+                continue;
+            }
+            std::vector<std::string> appList;
+            JsonObject credInfoJsonObj;
+            if (!app.proxyAccessee.credInfoJson.empty()) {
+                credInfoJsonObj.Parse(app.proxyAccessee.credInfoJson);
+            }
+            credInfoJsonObj[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
+            const size_t APP_LIST_SIZE = 2;
+            if (appList.size() < APP_LIST_SIZE ||
+                std::find(appList.begin(), appList.end(),
+                    std::to_string(profile.GetAccesser().GetAccesserTokenId())) == appList.end() ||
+                std::find(appList.begin(), appList.end(),
+                    std::to_string(profile.GetAccessee().GetAccesseeTokenId())) == appList.end()) {
+                DeleteAclAndSk(context, profile);
+                continue;
+            }
+            JsonObject aclTypeJson;
+            if (!app.proxyAccessee.aclTypeList.empty()) {
+                aclTypeJson.Parse(app.proxyAccessee.aclTypeList);
+            }
+            aclTypeJson["pointTopointAcl"] = DM_POINT_TO_POINT;
+            app.proxyAccessee.aclTypeList = aclTypeJson.Dump();
+            app.proxyAccessee.aclProfiles[DM_POINT_TO_POINT] = profile;
+        }
+    }
 }
 
 bool AuthSinkNegotiateStateMachine::CheckCredIdInAcl(std::shared_ptr<DmAuthContext> context,
@@ -364,7 +488,7 @@ bool AuthSinkNegotiateStateMachine::CheckCredIdInAcl(std::shared_ptr<DmAuthConte
         credId = profile.GetAccesser().GetAccesserCredentialIdStr();
         if (!credInfo.Contains(credId)) {
             LOGE("credInfoJson not contain credId %{public}s.", credId.c_str());
-            DeleteAcl(context, profile);
+            DeleteAclAndSk(context, profile);
             return false;
         }
     }
@@ -405,13 +529,13 @@ void AuthSinkNegotiateStateMachine::CheckCredIdInAclForP2P(std::shared_ptr<DmAut
         credInfo[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
         const size_t APP_LIST_SIZE = 2;
         if (appList.size() >= APP_LIST_SIZE &&
-            ((std::to_string(profile.GetAccesser().GetAccesserTokenId()) == appList[0] &&
-            std::to_string(profile.GetAccessee().GetAccesseeTokenId()) == appList[1]) ||
-            (std::to_string(profile.GetAccessee().GetAccesseeTokenId()) == appList[0] &&
-            std::to_string(profile.GetAccesser().GetAccesserTokenId()) == appList[1]))) {
+            std::find(appList.begin(), appList.end(),
+                std::to_string(profile.GetAccesser().GetAccesserTokenId())) != appList.end() &&
+            std::find(appList.begin(), appList.end(),
+                std::to_string(profile.GetAccessee().GetAccesseeTokenId())) != appList.end()) {
             checkResult = true;
         } else {
-            DeleteAcl(context, profile);
+            DeleteAclAndSk(context, profile);
         }
     } else {
         DeleteAcl(context, profile);

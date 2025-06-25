@@ -92,6 +92,9 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     // Query the ACL of the sink end. Compare the ACLs at both ends.
     context->softbusConnector->SyncLocalAclListProcess({context->accessee.deviceId, context->accessee.userId},
         {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList);
+    if (GetSessionKey(context)) {
+        DerivativeSessionKey(context);
+    }
     // Synchronize the local SP information, the format is uncertain, not done for now
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
     context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
@@ -104,11 +107,54 @@ DmAuthStateType AuthSinkDataSyncState::GetStateType()
     return DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE;
 }
 
+int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return DM_OK;
+    }
+    context->accessee.transmitCredentialId = context->reUseCreId;
+    if (context->IsCallingProxyAsSubject && !context->accessee.isAuthed) {
+        int32_t skId = 0;
+        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+            context->accesser.tokenIdHash + context->accessee.tokenIdHash;
+        int32_t ret =
+            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
+        if (ret != DM_OK) {
+            LOGE("AuthSinkDataSyncState::Action DP save user session key failed");
+            return ret;
+        }
+        context->accessee.transmitSkTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
+        context->accessee.transmitSessionKeyId = skId;
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        if (app.proxyAccessee.isAuthed) {
+            continue;
+        }
+        int32_t skId = 0;
+        std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
+            app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
+        int32_t ret =
+            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
+        if (ret != DM_OK) {
+            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+            return ret;
+        }
+        app.proxyAccessee.skTimeStamp = static_cast<int64_t>(DmAuthState::GetSysTimeMs());
+        app.proxyAccessee.transmitSessionKeyId = skId;
+        if (!context->reUseCreId.empty()) {
+            app.proxyAccessee.transmitCredentialId = context->reUseCreId;
+            continue;
+        }
+        app.proxyAccessee.transmitCredentialId = context->accessee.transmitCredentialId;
+    }
+    return DM_OK;
+}
+
 // Received 190 message, sent 200 message
 int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcDataSyncState::Action start");
-
     if (NeedAgreeAcl(context)) {
         // Query the ACL of the sink end. Compare the ACLs at both ends.
         context->softbusConnector->SyncLocalAclListProcess({context->accesser.deviceId, context->accesser.userId},
@@ -116,18 +162,13 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
         context->accesser.deviceName = context->softbusConnector->GetLocalDeviceName();
         // Save this acl
         SetAclInfo(context);
+        UpdateCredInfo(context);
         context->authMessageProcessor->PutAccessControlList(context, context->accesser, context->accessee.deviceId);
         // Synchronize the local SP information, the format is uncertain, not done for now
     }
 
     std::string peerDeviceId = "";
-    peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
-    if (peerDeviceId.empty()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
-    }
-    if (peerDeviceId.empty()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
-    }
+    GetPeerDeviceId(context, peerDeviceId);
     bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
     // Trigger networking
     if ((!context->accesser.isOnline || isNeedJoinLnn) && context->isNeedJoinLnn) {
@@ -157,6 +198,50 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 DmAuthStateType AuthSrcDataSyncState::GetStateType()
 {
     return DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE;
+}
+
+void AuthSrcDataSyncState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId)
+{
+    CHECK_NULL_VOID(context);
+    if (context->accesser.aclProfiles.find(DM_IDENTICAL_ACCOUNT) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (context->accesser.aclProfiles.find(DM_SHARE) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
+        if (peerDeviceId == context->accesser.deviceId) {
+            peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccesser().GetAccesserDeviceId();
+        }
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (context->accesser.aclProfiles.find(DM_POINT_TO_POINT) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
+        if (peerDeviceId == context->accesser.deviceId) {
+            peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
+        }
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return;
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        if (app.proxyAccesser.aclProfiles.find(DM_POINT_TO_POINT) != app.proxyAccesser.aclProfiles.end()) {
+            peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
+            if (peerDeviceId == context->accesser.deviceId) {
+                peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
+            }
+            if (!peerDeviceId.empty()) {
+                return;
+            }
+        }
+    }
+    LOGE("failed");
 }
 
 // Received 200 end message, send 201

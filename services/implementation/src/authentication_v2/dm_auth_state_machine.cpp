@@ -68,6 +68,7 @@ void DmAuthStateMachine::InsertSrcTransTable()
             DmAuthStateType::AUTH_SRC_REVERSE_ULTRASONIC_START_STATE,
             DmAuthStateType::AUTH_SRC_FORWARD_ULTRASONIC_START_STATE,
             DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE,
+            DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE,
         }},
         {DmAuthStateType::AUTH_SRC_PIN_INPUT_STATE, {
             DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE,
@@ -87,6 +88,7 @@ void DmAuthStateMachine::InsertSrcTransTable()
         {DmAuthStateType::AUTH_SRC_CREDENTIAL_EXCHANGE_STATE, {
             DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE,
             DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE,
+            DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE,
         }},
         {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE,
          {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_NEGOTIATE_STATE}},
@@ -165,10 +167,12 @@ void DmAuthStateMachine::InsertSinkTransTable()
         {DmAuthStateType::AUTH_SINK_PIN_AUTH_MSG_NEGOTIATE_STATE, {
             DmAuthStateType::AUTH_SINK_PIN_AUTH_DONE_STATE,
             DmAuthStateType::AUTH_SINK_PIN_NEGOTIATE_START_STATE,
+            DmAuthStateType::AUTH_SINK_FINISH_STATE,
         }},
         {DmAuthStateType::AUTH_SINK_PIN_AUTH_DONE_STATE, {
             DmAuthStateType::AUTH_SINK_CREDENTIAL_EXCHANGE_STATE,
             DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_START_STATE,
+            DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE,
             DmAuthStateType::AUTH_SINK_FINISH_STATE,
         }},
         {DmAuthStateType::AUTH_SINK_CREDENTIAL_EXCHANGE_STATE, {

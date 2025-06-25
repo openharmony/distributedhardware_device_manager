@@ -1084,6 +1084,15 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::Test
     listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 }
+
+HWTEST_F(DeviceManagerServiceListenerTest, GetLocalDisplayDeviceNameForPrivacy_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
+    EXPECT_NE(listener_, nullptr);
+    std::string displayDeviceName = "";
+    displayDeviceName = listener_->GetLocalDisplayDeviceNameForPrivacy();
+    EXPECT_FALSE(displayDeviceName.empty());
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS
