@@ -1975,13 +1975,6 @@ HWTEST_F(DeviceManagerServiceImplTest, GetTokenIdByNameAndDeviceId_001, testing:
     }
     EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _, _)).WillOnce(Return(dmOfflineParam));
     deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId, peerTokenId);
-
-    int32_t bindType = 1;
-    std::string peerUdid = "peerUdid";
-    std::string localUdid = "localUdid";
-    int32_t localUserId = 1;
-    std::string localAccountId = "localAccountId";
-    deviceManagerServiceImpl_->HandleDeviceUnBind(bindType, peerUdid, localUdid, localUserId, localAccountId);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, RegisterAuthenticationType_001, testing::ext::TestSize.Level1)

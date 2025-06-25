@@ -59,7 +59,6 @@ if (defined(ohos_lite)) {
         "//foundation/distributedshedule/samgr_lite/interfaces/kits/samgr",
         "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
         "${devicemanager_path}/radar/include",
-        "${devicemanager_path}/services/implementation/include/authentication_v2",
         "${softbuscache_parh}/include",
       ]
 
@@ -150,9 +149,7 @@ if (defined(ohos_lite)) {
       "${common_path}/include/ipc/standard",
       "${devicemanager_path}/commondependency/include",
       "${devicemanager_path}/radar/include",
-      "${devicemanager_path}/services/implementation/include/authentication_v2",
       "${innerkits_path}/native_cpp/include",
-      "${servicesimpl_path}/include/dependency/deviceprofile",
       "${softbuscache_parh}/include",
       "${utils_path}/include/appInfo/standard",
       "${utils_path}/include/crypto",
@@ -243,7 +240,6 @@ if (defined(ohos_lite)) {
     deps = [
       "${devicemanager_path}/commondependency:devicemanagerdependency",
       "${devicemanager_path}/radar:devicemanagerradar",
-      "${devicemanager_path}/services/implementation:devicemanagerserviceimpl",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${json_path}:devicemanagerjson",
       "${softbuscache_parh}:dmdevicecache",
@@ -387,7 +383,6 @@ if (defined(ohos_lite)) {
     deps = [
       "${devicemanager_path}/commondependency:devicemanagerdependency",
       "${devicemanager_path}/radar:devicemanagerradar",
-      "${devicemanager_path}/services/implementation:devicemanagerserviceimpl",
       "${innerkits_path}/native_cpp:devicemanagersdk",
       "${json_path}:devicemanagerjson",
       "${softbuscache_parh}:dmdevicecache",
