@@ -256,7 +256,7 @@ public:
         (void)code;
     }
 
-    virtual std::string GetLocalDisplayDeviceNameForPrivacy()
+    virtual std::string GetLocalDisplayDeviceName()
     {
         return "";
     }
