@@ -20,6 +20,7 @@ group("fuzztest") {
     "authenticatedevice_fuzzer:fuzztest",
     "authenticatedeviceservice_fuzzer:fuzztest",
     "authenticatedeviceserviceimpl_fuzzer:fuzztest",
+    "authpinauth_fuzzer:fuzztest",
     "dmauthmanager_fuzzer:fuzztest",
     "dmauthmanagerv2_fuzzer:fuzztest",
     "dmanonyous_fuzzer:fuzztest",
