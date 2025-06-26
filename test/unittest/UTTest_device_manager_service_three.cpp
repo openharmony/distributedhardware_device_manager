@@ -627,6 +627,18 @@ HWTEST_F(DeviceManagerServiceThreeTest, ClearDiscoveryCache_001, testing::ext::T
     DeviceManagerService::GetInstance().UninitDMServiceListener();
 }
 
+HWTEST_F(DeviceManagerServiceThreeTest, GetProxyInfosByParseExtra_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "pkgName";
+    std::string extra = "extra";
+    std::vector<std::pair<int64_t, int64_t>> agentToProxyVec;
+    std::set<std::pair<std::string, std::string>> proxyInfos;
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    proxyInfos = DeviceManagerService::GetInstance().GetProxyInfosByParseExtra(pkgName, extra, agentToProxyVec);
+    DeviceManagerService::GetInstance().UninitDMServiceListener();
+    EXPECT_NE(proxyInfos.empty(), true);
+}
+
 HWTEST_F(DeviceManagerServiceThreeTest, ImportAuthCode_302, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
