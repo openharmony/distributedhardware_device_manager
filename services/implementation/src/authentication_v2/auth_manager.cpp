@@ -544,7 +544,7 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     context_->accesser.deviceId = std::string(localDeviceId);
     context_->pkgName = pkgName;
     context_->authType = (DmAuthType)authType;
-    context_->accesser.deviceName = context_->listener->GetLocalDisplayDeviceNameForPrivacy();
+    context_->accesser.deviceName = context_->listener->GetLocalDisplayDeviceName();
     context_->accesser.deviceType = context_->softbusConnector->GetLocalDeviceTypeId();
     context_->accesser.isOnline = false;
 

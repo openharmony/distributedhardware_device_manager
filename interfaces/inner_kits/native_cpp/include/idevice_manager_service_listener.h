@@ -175,12 +175,7 @@ public:
         const std::string &deviceName, int32_t code) = 0;
     virtual void SetExistPkgName(const std::set<std::string> &pkgNameSet) = 0;
 
-    /**
-     * @brief Get the Local Display Device Name after privacy processed
-     *
-     * @return std::string the name without privacy info
-     */
-    virtual std::string GetLocalDisplayDeviceNameForPrivacy() = 0;
+    virtual std::string GetLocalDisplayDeviceName() = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

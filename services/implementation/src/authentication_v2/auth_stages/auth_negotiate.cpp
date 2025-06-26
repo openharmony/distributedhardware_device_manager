@@ -161,7 +161,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.tokenIdHash = Crypto::GetTokenIdHash(std::to_string(context->accessee.tokenId));
     context->accesser.isOnline = context->softbusConnector->CheckIsOnline(context->accesser.deviceIdHash, true);
     context->accessee.language = DmLanguageManager::GetInstance().GetSystemLanguage();
-    context->accessee.deviceName = context->listener->GetLocalDisplayDeviceNameForPrivacy();
+    context->accessee.deviceName = context->listener->GetLocalDisplayDeviceName();
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
     return RespQueryProxyAcceseeIds(context);
 }

@@ -91,7 +91,7 @@ public:
         const std::string &deviceName, int32_t code) override;
     void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
 
-    std::string GetLocalDisplayDeviceNameForPrivacy() override;
+    std::string GetLocalDisplayDeviceName() override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
