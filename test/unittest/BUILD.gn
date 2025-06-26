@@ -21,6 +21,7 @@ group("unittest") {
   deps = [
     ":UTTest_advertise_manager",
     ":UTTest_app_manager",
+    ":UTTest_app_manager_two",
     ":UTTest_auth_acl",
     ":UTTest_auth_confirm",
     ":UTTest_auth_credential_state",
@@ -86,6 +87,7 @@ group("unittest") {
     ":UTTest_ipc_server_listener",
     ":UTTest_ipc_server_stub",
     ":UTTest_json_object",
+    ":UTTest_json_str_handle",
     ":UTTest_kv_adapter_manager",
     ":UTTest_mine_hichain_connector",
     ":UTTest_mine_softbus_listener",
@@ -250,6 +252,67 @@ ohos_unittest("UTTest_ipc_cmd_register") {
 }
 
 ## UnitTest UTTest_ipc_cmd_register }}}
+
+## UnitTest UTTest_app_manager_two {{{
+ohos_unittest("UTTest_app_manager_two") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/commondependency/include",
+    "${devicemanager_path}/test/commonunittest",
+  ]
+
+  sources = [ "${devicemanager_path}/test/unittest/UTTest_app_manager_two.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "eventhandler:libeventhandler",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "os_account:libaccountkits",
+    "os_account:os_account_innerkits",
+  ]
+}
+
+## UnitTest UTTest_app_manager_two }}}
+
+## UnitTest UTTest_json_str_handle {{{
+ohos_unittest("UTTest_json_str_handle") {
+  module_out_path = module_out_path
+
+  sources = [
+    "UTTest_json_str_handle.cpp",
+    "${utils_path}/src/jsonstr_handle/dm_jsonstr_handle.cpp"
+  ]
+
+  deps = [
+    ":device_manager_test_common",
+    "${utils_path}:devicemanagerutilstest"
+  ]
+
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "selinux_adapter:librestorecon",
+  ]
+}
+
+## UnitTest UTTest_json_str_handle }}}
 
 ## UnitTest UTTest_dm_pin_holder {{{
 ohos_unittest("UTTest_dm_pin_holder") {
