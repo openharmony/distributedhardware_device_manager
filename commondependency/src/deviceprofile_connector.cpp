@@ -30,13 +30,12 @@ using namespace OHOS::DistributedDeviceProfile;
 const uint32_t INVALIED_TYPE = 0;
 const uint32_t APP_PEER_TO_PEER_TYPE = 1;
 const uint32_t APP_ACROSS_ACCOUNT_TYPE = 2;
-const uint32_t SHARE_TYPE = 3;
-const uint32_t DEVICE_PEER_TO_PEER_TYPE = 4;
-const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 5;
-const uint32_t IDENTICAL_ACCOUNT_TYPE = 6;
-const uint32_t SERVICE_PEER_TO_PEER_TYPE = 7;
-const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 8;
-
+const uint32_t SERVICE_PEER_TO_PEER_TYPE = 3;
+const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 4;
+const uint32_t SHARE_TYPE = 5;
+const uint32_t DEVICE_PEER_TO_PEER_TYPE = 6;
+const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 7;
+const uint32_t IDENTICAL_ACCOUNT_TYPE = 8;
 
 const uint32_t DM_INVALIED_TYPE = 2048;
 const uint32_t SERVICE = 2;

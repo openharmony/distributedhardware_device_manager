@@ -94,6 +94,9 @@ namespace {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     const std::string GET_LOCAL_DEVICE_NAME_API_NAME = "GetLocalDeviceName";
 #endif
+    constexpr const char* LOCAL_ALL_USERID = "local_all_userId";
+    constexpr const char* LOCAL_FOREGROUND_USERID = "local_foreground_userId";
+    constexpr const char* LOCAL_BACKGROUND_USERID = "local_background_userId";
 }
 
 DeviceManagerService::~DeviceManagerService()
@@ -280,13 +283,6 @@ int32_t DeviceManagerService::InitDMServiceListener()
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DMCommTool::GetInstance()->Init();
-    int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec_);
-    int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec_);
-    MultipleUserConnector::ClearLockedUser(foregroundUserVec_, backgroundUserVec_);
-    if (retFront != DM_OK || retBack != DM_OK) {
-        LOGE("retFront: %{public}d, retBack: %{public}d, frontuserids: %{public}s, backuserids: %{public}s",
-            retFront, retBack, GetIntegerList(foregroundUserVec_).c_str(), GetIntegerList(backgroundUserVec_).c_str());
-    }
     int32_t currentUserId = MultipleUserConnector::GetFirstForegroundUserId();
     if (IsPC() && !MultipleUserConnector::IsUserUnlocked(currentUserId)) {
         HandleUserStopEvent(currentUserId);
@@ -2045,26 +2041,58 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     return;
 }
 
+void DeviceManagerService::GetLocalUserIdFromDataBase(std::vector<int32_t> &foregroundUsers,
+    std::vector<int32_t> &backgroundUsers)
+{
+    std::string userIdStr;
+    KVAdapterManager::GetInstance().GetLocalUserIdData(LOCAL_ALL_USERID, userIdStr);
+    if (userIdStr.empty()) {
+        LOGE("result is empty");
+        return;
+    }
+    JsonObject userIdJson(userIdStr);
+    if (userIdJson.IsDiscarded()) {
+        LOGE("userIdJson parse failed");
+        return;
+    }
+    if (IsArray(userIdJson, LOCAL_FOREGROUND_USERID)) {
+        resultJson[LOCAL_FOREGROUND_USERID].Get(foregroundUsers);
+    }
+    if (IsArray(userIdJson, LOCAL_BACKGROUND_USERID)) {
+        resultJson[LOCAL_BACKGROUND_USERID].Get(backgroundUsers);
+    }
+}
+
+void DeviceManagerService::PutLocalUserIdToDataBase(const std::vector<int32_t> &foregroundUsers,
+    const std::vector<int32_t> &backgroundUsers)
+{
+    JsonObject jsonObj;
+    jsonObj[LOCAL_FOREGROUND_USERID] = foregroundUsers;
+    jsonObj[LOCAL_BACKGROUND_USERID] = backgroundUsers;
+    std::string localUserIdStr = SafetyDump(jsonObj);
+    KVAdapterManager::GetInstance().PutLocalUserIdData(LOCAL_ALL_USERID, localUserIdStr);
+}
+
 bool DeviceManagerService::IsUserStatusChanged(std::vector<int32_t> foregroundUserVec,
     std::vector<int32_t> backgroundUserVec)
 {
     LOGI("foregroundUserVec: %{public}s, backgroundUserVec: %{public}s",
         GetIntegerList(foregroundUserVec).c_str(), GetIntegerList(backgroundUserVec).c_str());
-    std::lock_guard<std::mutex> lock(userVecLock_);
+    std::vector<int32_t> dBForegroundUserIds;
+    std::vector<int32_t> dBBackgroundUserIds;
+    GetLocalUserIdFromDataBase(dBForegroundUserIds, dBBackgroundUserIds);
+    LOGI("dBForegroundUserIds: %{public}s, dBBackgroundUserIds: %{public}s",
+        GetIntegerList(dBForegroundUserIds).c_str(), GetIntegerList(dBBackgroundUserIds).c_str());
     std::sort(foregroundUserVec.begin(), foregroundUserVec.end());
     std::sort(backgroundUserVec.begin(), backgroundUserVec.end());
-    std::sort(foregroundUserVec_.begin(), foregroundUserVec_.end());
-    std::sort(backgroundUserVec_.begin(), backgroundUserVec_.end());
-    if (foregroundUserVec == foregroundUserVec_ && backgroundUserVec == backgroundUserVec_) {
+    std::sort(dBForegroundUserIds.begin(), dBForegroundUserIds.end());
+    std::sort(dBBackgroundUserIds.begin(), dBBackgroundUserIds.end());
+    if (foregroundUserVec == dBForegroundUserIds && backgroundUserVec == dBBackgroundUserIds) {
         LOGI("User status has not changed.");
-        return true;
+        return false;
     }
-    LOGD("User status has changed");
-    foregroundUserVec_.clear();
-    backgroundUserVec_.clear();
-    foregroundUserVec_ = foregroundUserVec;
-    backgroundUserVec_ = backgroundUserVec;
-    return false;
+    PutLocalUserIdToDataBase(dBForegroundUserIds, dBBackgroundUserIds);
+    return true;
 }
 
 void DeviceManagerService::HandleAccountCommonEvent(const std::string commonEventType)
@@ -2080,7 +2108,7 @@ void DeviceManagerService::HandleAccountCommonEvent(const std::string commonEven
             retFront, retBack, GetIntegerList(foregroundUserVec).c_str(), GetIntegerList(backgroundUserVec).c_str());
         return;
     }
-    if (IsUserStatusChanged(foregroundUserVec, backgroundUserVec)) {
+    if (!IsUserStatusChanged(foregroundUserVec, backgroundUserVec)) {
         LOGI("User status has not changed.");
         return;
     }

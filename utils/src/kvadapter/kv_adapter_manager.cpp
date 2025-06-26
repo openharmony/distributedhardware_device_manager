@@ -38,7 +38,7 @@ constexpr const char* DM_UDID_PREFIX = "udid";
 
 DM_IMPLEMENT_SINGLE_INSTANCE(KVAdapterManager);
 
-std::string ComposePrefix()
+std::string ComposeOsTypePrefix()
 {
     std::string dmKey = std::string(DM_OSTYPE_PREFIX) + std::string(DB_KEY_DELIMITER) + std::string(DM_UDID_PREFIX) +
         std::string(DB_KEY_DELIMITER);
@@ -194,10 +194,10 @@ DM_EXPORT int32_t KVAdapterManager::DeleteFreezeData(const std::string &key)
 
 DM_EXPORT int32_t KVAdapterManager::GetAllOstypeData(std::vector<std::string> &values)
 {
-    std::string dmKey = ComposePrefix();
+    std::string dmKey = ComposeOsTypePrefix();
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->GetAllOstypeData(dmKey, values) != DM_OK) {
-        LOGE("Get freeze data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+        LOGE("Get all data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -206,10 +206,10 @@ DM_EXPORT int32_t KVAdapterManager::GetAllOstypeData(std::vector<std::string> &v
 DM_EXPORT int32_t KVAdapterManager::PutOstypeData(const std::string &key, const std::string &value)
 {
     LOGI("key %{publkic}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str());
-    std::string dmKey = ComposePrefix() + key;
+    std::string dmKey = ComposeOsTypePrefix() + key;
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Put(dmKey, value) != DM_OK) {
-        LOGE("Insert freeze data failed, k:%{public}s, v:%{public}s", GetAnonyString(dmKey).c_str(), value.c_str());
+        LOGE("Insert data failed, k:%{public}s, v:%{public}s", GetAnonyString(dmKey).c_str(), value.c_str());
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -218,10 +218,32 @@ DM_EXPORT int32_t KVAdapterManager::PutOstypeData(const std::string &key, const 
 DM_EXPORT int32_t KVAdapterManager::DeleteOstypeData(const std::string &key)
 {
     LOGI("key %{publkic}s.", GetAnonyString(key).c_str());
-    std::string dmKey = ComposePrefix() + key;
+    std::string dmKey = ComposeOsTypePrefix() + key;
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Delete(dmKey) != DM_OK) {
-        LOGE("delete freeze data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+        LOGE("delete data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::GetLocalUserIdData(const std::string &key, std::string &value)
+{
+    LOGI("key %{public}s.", GetAnonyString(key).c_str());
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Get(dmKey, value) != DM_OK) {
+        LOGE("Get data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::PutLocalUserIdData(const std::string &key, const std::string &value)
+{
+    LOGI("key %{public}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str() );
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Put(dmKey, value) != DM_OK) {
+        LOGE("Put data failed, key:%{public}s, value:%{public}s", GetAnonyString(dmKey).c_str(), value.c_str());
         return ERR_DM_FAILED;
     }
     return DM_OK;

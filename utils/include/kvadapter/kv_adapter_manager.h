@@ -44,6 +44,8 @@ public:
     DM_EXPORT int32_t GetAllOstypeData(std::vector<std::string> &values);
     DM_EXPORT int32_t PutOstypeData(const std::string &key, const std::string &value);
     DM_EXPORT int32_t DeleteOstypeData(const std::string &key);
+    DM_EXPORT int32_t GetLocalUserIdData(const std::string &key, std::string &value);
+    DM_EXPORT int32_t PutLocalUserIdData(const std::string &key, const std::string &value);
 
 private:
     KVAdapterManager() = default;

@@ -425,6 +425,9 @@ private:
 #endif
     bool GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
         const std::string &sinkNetWorkId, std::string &sinkUdid);
+    void GetLocalUserIdFromDataBase(std::vector<int32_t> &foregroundUsers, std::vector<int32_t> &backgroundUsers);
+    void PutLocalUserIdToDataBase(const std::vector<int32_t> &foregroundUsers,
+        const std::vector<int32_t> &backgroundUsers);
 
 private:
     bool isImplsoLoaded_ = false;
