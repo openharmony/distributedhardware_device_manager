@@ -35,7 +35,7 @@ struct PinCustomDialog {
   @State pinCodeArr: Array<string> = [];
   @State btnColor: ResourceColor = Color.Transparent;
   @State isPC: boolean = false;
-  @State mLocalWidth: number = display.getDefaultDisplaySync().width;
+  @State mLocalWidth: number = 0;
   controller?: CustomDialogController
 
   cancel() {
@@ -53,6 +53,12 @@ struct PinCustomDialog {
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear execute PinCustomDialog');
+    try {
+      this.mLocalWidth = display.getDefaultDisplaySync().width;
+    } catch (err) {
+      console.error('Failed to get display width:', err);
+      this.mLocalWidth = 0;
+    }
     this.isPC = Constant.isPC();
     this.pinCode = AppStorage.get('pinCode') as string;
     this.pinCodeArr = this.pinCode.split('');
