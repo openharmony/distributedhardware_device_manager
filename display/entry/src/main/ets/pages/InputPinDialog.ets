@@ -46,27 +46,44 @@ struct InputCustomDialog {
   @State isPC: boolean = false;
   @State isPhone: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
-  @State mLocalHeight: number = display.getDefaultDisplaySync().height;
+  @State mLocalHeight: number = 0;
   listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
   controller?: CustomDialogController;
   private scroller: Scroller = new Scroller();
 
   onPortrait(mediaQueryResult: mediaquery.MediaQueryResult) {
-    this.mLocalHeight = display.getDefaultDisplaySync().height;
+    try {
+      this.mLocalHeight = display.getDefaultDisplaySync().height;
+    } catch (e) {
+      console.error('Failed to get display height:', e);
+      this.mLocalHeight = 0;
+    }
+ 
     let heightRatio = px2vp(this.mLocalHeight) * 0.2;
+ 
     if (mediaQueryResult.matches as boolean) {
-        if (this.isPhone) {
-            if (display.isFoldable() &&
-                display.getFoldDisplayMode() === display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
+      if (this.isPhone) {
+        try {
+          if (display.isFoldable() &&
+              display.getFoldDisplayMode() === display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
+            this.heightNum = heightRatio;
+          } else {
+            try {
+              if (!display.isFoldable()) {
                 this.heightNum = heightRatio;
-            } else if (!display.isFoldable()) {
-                this.heightNum = heightRatio;
+              }
+            } catch (e) {
+              console.error('Failed to check isFoldable (else if):', e);
             }
-        } else {
-            this.heightNum = 300;
+          }
+        } catch (e) {
+          console.error('Failed to check isFoldable or fold mode:', e);
         }
+      } else {
+        this.heightNum = 300;
+      }
     } else {
-        this.heightNum = 800;
+      this.heightNum = 800;
     }
   }
 
@@ -78,6 +95,12 @@ struct InputCustomDialog {
 
   aboutToAppear() {
     console.info(TAG + 'InputCustomDialog aboutToAppear');
+    try {
+      this.mLocalHeight = display.getDefaultDisplaySync().height;
+    } catch (err) {
+      console.error('Failed to get display height:', err);
+      this.mLocalHeight = 0;
+    }
     this.isPC = Constant.isPC();
     this.isPhone = Constant.isPhone();
     let ims = inputMethod.getSetting();
@@ -85,12 +108,23 @@ struct InputCustomDialog {
       this.scroller.scrollTo({yOffset: 72, xOffset: 0});
     });
     if (AppStorage.get('mediaQueryResult') != null && AppStorage.get('mediaQueryResult') as boolean && this.isPhone) {
-        let heightRatio = px2vp(this.mLocalHeight) * 0.2;
-        if (display.isFoldable() && display.getFoldDisplayMode() === display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
-            this.heightNum = heightRatio;
-        } else if (!display.isFoldable()) {
-            this.heightNum = heightRatio;
+      let heightRatio = px2vp(this.mLocalHeight) * 0.2;
+      try {
+        if (display.isFoldable() &&
+            display.getFoldDisplayMode() === display.FoldDisplayMode.FOLD_DISPLAY_MODE_MAIN) {
+          this.heightNum = heightRatio;
+        } else {
+          try {
+            if (!display.isFoldable()) {
+              this.heightNum = heightRatio;
+            }
+          } catch (err) {
+            console.error('Failed to check isFoldable (else if):', err);
+          }
         }
+      } catch (err) {
+        console.error('Failed to check isFoldable or fold mode:', err);
+      }
     }
     if (AppStorage.get('targetDeviceName') != null) {
       this.targetDeviceName = AppStorage.get('targetDeviceName') as string;
