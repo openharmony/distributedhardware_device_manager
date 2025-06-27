@@ -2091,8 +2091,8 @@ bool DeviceManagerService::IsUserStatusChanged(std::vector<int32_t> foregroundUs
         LOGI("User status has not changed.");
         return false;
     }
-    dBForegroundUserIds = backgroundUserVec;
-    dBForegroundUserIds = dBForegroundUserIds;
+    dBForegroundUserIds = foregroundUserVec;
+    dBBackgroundUserIds = backgroundUserVec;
     PutLocalUserIdToDataBase(dBForegroundUserIds, dBBackgroundUserIds);
     return true;
 }
