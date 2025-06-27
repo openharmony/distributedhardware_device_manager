@@ -4343,7 +4343,7 @@ void DeviceManagerService::DeleteHoDevice(const std::vector<int32_t> &foreGround
 }
 
 void DeviceManagerService::HandleAccountLogoutEventCallback(const std::string &commonEventType, int32_t currentUserId,
-        int32_t beforeUserId)
+    int32_t beforeUserId)
 {
     LOGI("commonEventType %{public}s, currentUserId %{public}d, beforeUserId %{public}d.", commonEventType.c_str(),
         currentUserId, beforeUserId);

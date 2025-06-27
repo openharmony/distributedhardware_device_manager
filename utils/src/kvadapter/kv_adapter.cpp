@@ -22,6 +22,7 @@
 #include "datetime_ex.h"
 #include "string_ex.h"
 
+#include "data_query.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_error_type.h"
@@ -296,6 +297,26 @@ int32_t KVAdapter::GetAllOstypeData(const std::string &key, std::vector<std::str
         jsonObj[PEER_OSTYPE] = osTyoeJson[PEER_OSTYPE].Get<int32_t>();
         jsonObj[TIME_STAMP] = osTyoeJson[TIME_STAMP].Get<int64_t>();
         values.push_back(SafetyDump(jsonObj));
+    }
+    return DM_OK;
+}
+
+int32_t KVAdapter::GetOstypeCountByPrefix(const std::string &prefix, int32_t &count)
+{
+    LOGI("prefix %{public}s.", prefix.c_str());
+    if (prefix.empty()) {
+        LOGE("prefix is empty.");
+        return ERR_DM_FAILED;
+    }
+    {
+        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
+        DataQuery prefixQuery;
+        prefixQuery.KeyPrefix(prefix);
+        if (kvStorePtr_->GetCount(prefixQuery, count) != DistributedKv::Status::SUCCESS) {
+            LOGE("GetCount failed.");
+            return ERR_DM_FAILED;
+        }
     }
     return DM_OK;
 }

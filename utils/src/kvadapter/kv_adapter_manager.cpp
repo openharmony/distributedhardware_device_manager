@@ -240,12 +240,24 @@ DM_EXPORT int32_t KVAdapterManager::GetLocalUserIdData(const std::string &key, s
 
 DM_EXPORT int32_t KVAdapterManager::PutLocalUserIdData(const std::string &key, const std::string &value)
 {
-    LOGI("key %{public}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str() );
+    LOGI("key %{public}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str());
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Put(key, value) != DM_OK) {
         LOGE("Put data failed, key:%{public}s, value:%{public}s", GetAnonyString(key).c_str(), value.c_str());
         return ERR_DM_FAILED;
     }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::GetCountByPrefix(int32_t &count)
+{
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    std::string osTypePrefix = ComposeOsTypePrefix();
+    if (kvAdapter_->GetOstypeCountByPrefix(osTypePrefix, count) != DM_OK) {
+        LOGE("GetOstypeCountByPrefix failed, osTypePrefix:%{public}s.", osTypePrefix.c_str());
+        return ERR_DM_FAILED;
+    }
+    LOGI("count %{public}d.", count);
     return DM_OK;
 }
 } // namespace DistributedHardware
