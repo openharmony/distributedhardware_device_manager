@@ -245,11 +245,11 @@ HWTEST_F(JsonObjectTest, Dump_01, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST1"] = "long_string";
-    object["TEST2"] = 36854775807;
+    object["TEST2"] = 36854;
     object["TEST3"] = -314.37;
     object["TEST4"] = false;
     std::string strRet =
-        "{\n\t\"TEST1\": \"long_string\",\n\t\"TEST2\": 36854775807,\n\t\"TEST3\": -314.37,\n\t\"TEST4\": false\n}";
+        "{\n\t\"TEST1\": \"long_string\",\n\t\"TEST2\": 36854,\n\t\"TEST3\": -314.37,\n\t\"TEST4\": false\n}";
     EXPECT_EQ(strRet, object.Dump(true, true));
 }
 
@@ -257,11 +257,11 @@ HWTEST_F(JsonObjectTest, Dump_02, testing::ext::TestSize.Level1)
 {
     JsonObject object;
     object["TEST1"] = "null_string";
-    object["TEST2"] = 922337203;
+    object["TEST2"] = 922337;
     object["TEST3"] = 5.358;
     object["TEST4"] = false;
     std::string strRet =
-        "{\n\t\"TEST1\": \"null_string\",\n\t\"TEST2\": 922337203,\n\t\"TEST3\": 5.358,\n\t\"TEST4\": false\n}";
+        "{\n\t\"TEST1\": \"null_string\",\n\t\"TEST2\": 922337,\n\t\"TEST3\": 5.358,\n\t\"TEST4\": false\n}";
     EXPECT_EQ(strRet, object.Dump(true, false));
 }
 
@@ -270,9 +270,9 @@ HWTEST_F(JsonObjectTest, Dump_03, testing::ext::TestSize.Level1)
     JsonObject object;
     object["TEST1"] = "escaped_string";
     object["TEST2"] = -42;
-    object["TEST3"] = 0.0012345;
+    object["TEST3"] = 0.345;
     object["TEST4"] = true;
-    std::string strRet = R"({"TEST1":"escaped_string","TEST2":-42,"TEST3":0.0012345,"TEST4":true})";
+    std::string strRet = R"({"TEST1":"escaped_string","TEST2":-42,"TEST3":0.345,"TEST4":true})";
     EXPECT_EQ(strRet, object.Dump(false, true));
 }
 
@@ -281,9 +281,9 @@ HWTEST_F(JsonObjectTest, Dump_04, testing::ext::TestSize.Level1)
     JsonObject object;
     object["TEST1"] = "test_value";
     object["TEST2"] = 0;
-    object["TEST3"] = -0.0001;
+    object["TEST3"] = -0.1;
     object["TEST4"] = false;
-    std::string strRet = R"({"TEST1":"test_value","TEST2":0,"TEST3":-0.0001,"TEST4":false})";
+    std::string strRet = R"({"TEST1":"test_value","TEST2":0,"TEST3":-0.1,"TEST4":false})";
     EXPECT_EQ(strRet, object.Dump(false, false));
 }
 

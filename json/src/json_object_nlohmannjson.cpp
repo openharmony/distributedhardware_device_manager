@@ -304,7 +304,6 @@ std::string JsonItemObject::Dump(bool formatFlag, bool isIgnoreError) const
     if (formatFlag) {
         indent = 1;
         indent_char = '\t';
-        error_handler = nlohmann::detail::error_handler_t::ignore;
     }
     if (isIgnoreError) {
         error_handler = nlohmann::detail::error_handler_t::ignore;
