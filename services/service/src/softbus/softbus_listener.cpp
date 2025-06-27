@@ -1472,10 +1472,7 @@ int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid, int32_t osTy
 {
     LOGI("peerUdid %{public}s.", GetAnonyString(peerUdid).c_str());
     int32_t osTypeCount = 0;
-    if (KVAdapterManager::GetInstance().GetOsTypeCount(osTypeCount) != DM_OK) {
-        LOGE("Get ostype count %{public}d failed.", osTypeCount);
-        return ERR_DM_FAILED;
-    }
+    KVAdapterManager::GetInstance().GetOsTypeCount(osTypeCount);
     if (osTypeCount > MAX_OSTYPE_SIZE) {
         std::vector<std::string> osTypeStrs;
         if (KVAdapterManager::GetInstance().GetAllOstypeData(osTypeStrs) != DM_OK) {

@@ -312,7 +312,7 @@ int32_t KVAdapter::GetOstypeCountByPrefix(const std::string &prefix, int32_t &co
         std::lock_guard<std::mutex> lock(kvAdapterMutex_);
         CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
         DataQuery prefixQuery;
-        prefixQuery.KeyPrefix(prefix);
+        prefixQuery.InKeys({prefix});
         if (kvStorePtr_->GetCount(prefixQuery, count) != DistributedKv::Status::SUCCESS) {
             LOGE("GetCount failed.");
             return ERR_DM_FAILED;
