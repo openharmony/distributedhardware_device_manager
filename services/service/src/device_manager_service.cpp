@@ -2056,10 +2056,10 @@ void DeviceManagerService::GetLocalUserIdFromDataBase(std::vector<int32_t> &fore
         return;
     }
     if (IsArray(userIdJson, LOCAL_FOREGROUND_USERID)) {
-        resultJson[LOCAL_FOREGROUND_USERID].Get(foregroundUsers);
+        userIdJson[LOCAL_FOREGROUND_USERID].Get(foregroundUsers);
     }
     if (IsArray(userIdJson, LOCAL_BACKGROUND_USERID)) {
-        resultJson[LOCAL_BACKGROUND_USERID].Get(backgroundUsers);
+        userIdJson[LOCAL_BACKGROUND_USERID].Get(backgroundUsers);
     }
 }
 
@@ -2091,6 +2091,8 @@ bool DeviceManagerService::IsUserStatusChanged(std::vector<int32_t> foregroundUs
         LOGI("User status has not changed.");
         return false;
     }
+    dBForegroundUserIds = backgroundUserVec;
+    dBForegroundUserIds = dBForegroundUserIds;
     PutLocalUserIdToDataBase(dBForegroundUserIds, dBBackgroundUserIds);
     return true;
 }

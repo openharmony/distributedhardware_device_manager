@@ -231,8 +231,8 @@ DM_EXPORT int32_t KVAdapterManager::GetLocalUserIdData(const std::string &key, s
 {
     LOGI("key %{public}s.", GetAnonyString(key).c_str());
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
-    if (kvAdapter_->Get(dmKey, value) != DM_OK) {
-        LOGE("Get data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+    if (kvAdapter_->Get(key, value) != DM_OK) {
+        LOGE("Get data failed, key: %{public}s", GetAnonyString(key).c_str());
         return ERR_DM_FAILED;
     }
     return DM_OK;
@@ -242,8 +242,8 @@ DM_EXPORT int32_t KVAdapterManager::PutLocalUserIdData(const std::string &key, c
 {
     LOGI("key %{public}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str() );
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
-    if (kvAdapter_->Put(dmKey, value) != DM_OK) {
-        LOGE("Put data failed, key:%{public}s, value:%{public}s", GetAnonyString(dmKey).c_str(), value.c_str());
+    if (kvAdapter_->Put(key, value) != DM_OK) {
+        LOGE("Put data failed, key:%{public}s, value:%{public}s", GetAnonyString(key).c_str(), value.c_str());
         return ERR_DM_FAILED;
     }
     return DM_OK;
