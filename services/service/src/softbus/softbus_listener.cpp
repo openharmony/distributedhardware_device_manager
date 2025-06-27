@@ -1471,43 +1471,8 @@ bool SoftbusListener::CheckPeerUdidTrusted(const std::string &udid)
 int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid, int32_t osType)
 {
     LOGI("peerUdid %{public}s.", GetAnonyString(peerUdid).c_str());
-    std::vector<std::string> osTypeStrs;
-    if (KVAdapterManager::GetInstance().GetAllOstypeData(osTypeStrs) != DM_OK) {
-        LOGE("Get all ostype failed.");
-        return ERR_DM_FAILED;
-    }
-    if (osTypeStrs.size() > MAX_OSTYPE_SIZE) {
-        int64_t earliestTimeStamp = GetSecondsSince1970ToNow();
-        std::string earliestPeerUdid = "";
-        for (const auto &item : osTypeStrs) {
-            JsonObject osTypeObj(item);
-            if (osTypeObj.IsDiscarded() || !IsString(osTypeObj, PEER_UDID) || !IsInt32(osTypeObj, PEER_OSTYPE) ||
-                !IsInt64(osTypeObj, TIME_STAMP)) {
-                LOGE("osTypeObj value invalid.");
-                continue;
-            }
-            int64_t osTypeTimeStamp = osTypeObj[TIME_STAMP].Get<int64_t>();
-            std::string osTypeUdid = osTypeObj[PEER_UDID].Get<std::string>();
-            if (osTypeTimeStamp < earliestTimeStamp && !SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(osTypeUdid)) {
-                earliestTimeStamp = osTypeTimeStamp;
-                earliestPeerUdid = osTypeUdid;
-            }
-        }
-        if (KVAdapterManager::GetInstance().DeleteOstypeData(earliestPeerUdid) != DM_OK) {
-            LOGE("DeleteOstypeData failed.");
-            return ERR_DM_FAILED;
-        }
-    }
-    std::string osTypeStr = "";
-    ConvertOsTypeToJson(osType, osTypeStr);
-    return KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
-}
-
-int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid, int32_t osType)
-{
-    LOGI("peerUdid %{public}s.", GetAnonyString(peerUdid).c_str());
     int32_t osTypeCount = 0;
-    if (KVAdapterManager::GetInstance().GetCountByPrefix(osTypeCount) != DM_OK) {
+    if (KVAdapterManager::GetInstance().GetOsTypeCount(osTypeCount) != DM_OK) {
         LOGE("Get ostype count %{public}d failed.", osTypeCount);
         return ERR_DM_FAILED;
     }

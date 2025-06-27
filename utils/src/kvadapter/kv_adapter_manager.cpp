@@ -249,7 +249,7 @@ DM_EXPORT int32_t KVAdapterManager::PutLocalUserIdData(const std::string &key, c
     return DM_OK;
 }
 
-DM_EXPORT int32_t KVAdapterManager::GetCountByPrefix(int32_t &count)
+DM_EXPORT int32_t KVAdapterManager::GetOsTypeCount(int32_t &count)
 {
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     std::string osTypePrefix = ComposeOsTypePrefix();
