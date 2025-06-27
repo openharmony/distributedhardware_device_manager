@@ -56,7 +56,7 @@ typedef struct BindFailedEvents {
 class FreezeProcess {
 DM_DECLARE_SINGLE_INSTANCE_BASE(FreezeProcess);
 public:
-    bool IsFrozen();
+    bool IsFrozen(int64_t &remainingFrozenTime);
     int32_t DeleteFreezeRecord();
     int32_t UpdateFreezeRecord();
 private:

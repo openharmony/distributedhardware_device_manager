@@ -218,8 +218,10 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
         context->reason = ERR_DM_ANTI_DISTURB_MODE;
         return ERR_DM_ANTI_DISTURB_MODE;
     }
-    if (FreezeProcess::GetInstance().IsFrozen()) {
+    int64_t remainingFrozenTime = 0;
+    if (FreezeProcess::GetInstance().IsFrozen(remainingFrozenTime)) {
         LOGE("Device is Frozen");
+        context->remainingFrozenTime = remainingFrozenTime;
         return ERR_DM_DEVICE_FROZEN;
     }
     // 1. Create an authorization timer

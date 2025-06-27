@@ -125,7 +125,7 @@ int32_t FreezeProcess::ConvertJsonToBindFailedEvents(const std::string &result, 
     return DM_OK;
 }
 
-bool FreezeProcess::IsFrozen()
+bool FreezeProcess::IsFrozen(int64_t &remainingFrozenTime)
 {
     {
         std::lock_guard<std::mutex> lock(isSyncedMtx_);
@@ -145,6 +145,9 @@ bool FreezeProcess::IsFrozen()
     }
     int64_t nowTime = GetSecondsSince1970ToNow();
     bool isFrozen = nowTime > stopFreezeTimeStamp ? false : true;
+    if (isFrozen) {
+        remainingFrozenTime = stopFreezeTimeStamp - nowTime;
+    }
     if (CleanFreezeRecord(nowTime) != DM_OK) {
         LOGE("CleanFreezeRecord failed");
     }
