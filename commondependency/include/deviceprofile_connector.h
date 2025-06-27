@@ -326,6 +326,8 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     DM_EXPORT bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid);
+    DM_EXPORT void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
+        const std::vector<int32_t> &backGroundUserIds);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
@@ -424,6 +426,7 @@ private:
     bool CheckSinkAppOrServiceP2PAcl(const DistributedDeviceProfile::AccessControlProfile &profile,
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
+    bool CheckExtWhiteList(const std::string &bundleName);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

@@ -33,13 +33,12 @@ using namespace OHOS::DistributedDeviceProfile;
 const uint32_t INVALIED_TYPE = 0;
 const uint32_t APP_PEER_TO_PEER_TYPE = 1;
 const uint32_t APP_ACROSS_ACCOUNT_TYPE = 2;
-const uint32_t SHARE_TYPE = 3;
-const uint32_t DEVICE_PEER_TO_PEER_TYPE = 4;
-const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 5;
-const uint32_t IDENTICAL_ACCOUNT_TYPE = 6;
-const uint32_t SERVICE_PEER_TO_PEER_TYPE = 7;
-const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 8;
-
+const uint32_t SERVICE_PEER_TO_PEER_TYPE = 3;
+const uint32_t SERVICE_ACROSS_ACCOUNT_TYPE = 4;
+const uint32_t SHARE_TYPE = 5;
+const uint32_t DEVICE_PEER_TO_PEER_TYPE = 6;
+const uint32_t DEVICE_ACROSS_ACCOUNT_TYPE = 7;
+const uint32_t IDENTICAL_ACCOUNT_TYPE = 8;
 
 const uint32_t DM_INVALIED_TYPE = 2048;
 const uint32_t SERVICE = 2;
@@ -60,6 +59,10 @@ namespace {
 const int32_t DM_SUPPORT_ACL_AGING_VERSION_NUM = 1;
 const std::string DM_VERSION_STR_5_1_0 = DM_VERSION_5_1_0;
 const std::vector<std::string> DM_SUPPORT_ACL_AGING_VERSIONS = {DM_VERSION_STR_5_1_0};
+constexpr uint32_t AUTH_EXT_WHITE_LIST_NUM = 1;
+constexpr const static char* g_extWhiteList[AUTH_EXT_WHITE_LIST_NUM] = {
+    "CastEngineService",
+};
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 void PrintProfile(const AccessControlProfile &profile)
@@ -3426,6 +3429,56 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
             continue;
         }
         if (CheckSinkAcuntAccessControl(item, caller, srcUdid, callee, sinkUdid)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+DM_EXPORT void DeviceProfileConnector::DeleteHoDevice(const std::string &peerUdid,
+    const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds)
+{
+    if (peerUdid.empty() || foreGroundUserIds.empty() || backGroundUserIds.empty()) {
+        LOGE("invalid input param.");
+        return;
+    }
+    std::vector<int32_t> localUserIds(foreGroundUserIds.begin(), foreGroundUserIds.end());
+    std::copy(backGroundUserIds.begin(), backGroundUserIds.end(), std::back_inserter(localUserIds));
+    std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
+    std::string localUdid = GetLocalDeviceId();
+    for (const auto &item : profiles) {
+        if (peerUdid != item.GetTrustDeviceId() || item.GetBindType() == DM_IDENTICAL_ACCOUNT) {
+            continue;
+        }
+        std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();
+        int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
+        std::string acerPkgName = item.GetAccesser().GetAccesserBundleName();
+        std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
+        int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
+        std::string aceePkgName = item.GetAccessee().GetAccesseeBundleName();
+
+        if (localUdid == acerDeviceId && peerUdid == aceeDeviceId && !CheckExtWhiteList(acerPkgName) &&
+            std::find(localUserIds.begin(), localUserIds.end(), acerUserId) != localUserIds.end()) {
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+            continue;
+        }
+        if (peerUdid == acerDeviceId && localUdid == aceeDeviceId && !CheckExtWhiteList(aceePkgName) &&
+            std::find(localUserIds.begin(), localUserIds.end(), aceeUserId) != localUserIds.end()) {
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+            continue;
+        }
+    }
+}
+
+bool DeviceProfileConnector::CheckExtWhiteList(const std::string &pkgName)
+{
+    LOGI("start pkgName %{public}s.", pkgName.c_str());
+    if (pkgName.empty()) {
+        LOGE("bundleName empty.");
+        return false;
+    }
+    for (uint32_t index = 0 ; index < AUTH_EXT_WHITE_LIST_NUM ; index++) {
+        if (pkgName == g_extWhiteList[index]) {
             return true;
         }
     }

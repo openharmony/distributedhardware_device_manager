@@ -29,8 +29,10 @@
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "datetime_ex.h"
 #include "dm_transport_msg.h"
 #include "ffrt.h"
+#include "kv_adapter_manager.h"
 #include "multiple_user_connector.h"
 #endif
 #include "ipc_skeleton.h"
@@ -44,6 +46,7 @@ const int32_t SOFTBUS_CHECK_INTERVAL = 100000; // 100ms
 const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t MAX_CACHED_DISCOVERED_DEVICE_SIZE = 100;
 const int32_t MAX_SOFTBUS_MSG_LEN = 2000;
+const int32_t MAX_OSTYPE_SIZE = 1000;
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
@@ -285,9 +288,9 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
     deviceOnLine.detach();
 #endif
+    std::string peerUdid;
+    GetUdidByNetworkId(info->networkId, peerUdid);
     {
-        std::string peerUdid;
-        GetUdidByNetworkId(info->networkId, peerUdid);
         struct RadarInfo radarInfo = {
             .funcName = "OnSoftbusDeviceOnline",
             .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -302,6 +305,9 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
             }
         }
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    PutOstypeData(peerUdid, info->osType);
+#endif
 }
 
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
@@ -333,9 +339,9 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     deviceOffLine.detach();
 #endif
+    std::string peerUdid;
+    GetUdidByNetworkId(info->networkId, peerUdid);
     {
-        std::string peerUdid;
-        GetUdidByNetworkId(info->networkId, peerUdid);
         struct RadarInfo radarInfo = {
             .funcName = "OnSoftbusDeviceOffline",
             .stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC),
@@ -349,6 +355,11 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
             }
         }
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (!CheckPeerUdidTrusted(peerUdid)) {
+        KVAdapterManager::GetInstance().DeleteOstypeData(peerUdid);
+    }
+#endif
 }
 
 void SoftbusListener::UpdateDeviceName(NodeBasicInfo *info)
@@ -1430,5 +1441,70 @@ void SoftbusListener::GetActionId(const std::string &deviceId, int32_t &actionId
     }
     actionId = discoveredDeviceActionIdMap.find(deviceId)->second;
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void SoftbusListener::ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr)
+{
+    LOGI("ostype %{public}d.", osType);
+    int64_t nowTime = GetSecondsSince1970ToNow();
+    JsonObject jsonObj;
+    jsonObj[PEER_OSTYPE] = osType;
+    jsonObj[TIME_STAMP] = nowTime;
+    osTypeStr = SafetyDump(jsonObj);
+}
+
+bool SoftbusListener::CheckPeerUdidTrusted(const std::string &udid)
+{
+    LOGI("udid %{public}s.", GetAnonyString(udid).c_str());
+    std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    for (const auto &item : allProfile) {
+        if (item.GetTrustDeviceId() == udid) {
+            LOGI("udid %{public}s in acl.", GetAnonyString(udid).c_str());
+            return true;
+        }
+    }
+    LOGI("udid %{public}s not in acl.", GetAnonyString(udid).c_str());
+    return false;
+}
+
+int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid, int32_t osType)
+{
+    LOGI("peerUdid %{public}s.", GetAnonyString(peerUdid).c_str());
+    int32_t osTypeCount = 0;
+    KVAdapterManager::GetInstance().GetOsTypeCount(osTypeCount);
+    if (osTypeCount > MAX_OSTYPE_SIZE) {
+        std::vector<std::string> osTypeStrs;
+        if (KVAdapterManager::GetInstance().GetAllOstypeData(osTypeStrs) != DM_OK) {
+            LOGE("Get all ostype failed.");
+            return ERR_DM_FAILED;
+        }
+        int64_t earliestTimeStamp = GetSecondsSince1970ToNow();
+        std::string earliestPeerUdid = "";
+        for (const auto &item : osTypeStrs) {
+            JsonObject osTypeObj(item);
+            if (osTypeObj.IsDiscarded() || !IsString(osTypeObj, PEER_UDID) || !IsInt32(osTypeObj, PEER_OSTYPE) ||
+                !IsInt64(osTypeObj, TIME_STAMP)) {
+                LOGE("osTypeObj value invalid.");
+                continue;
+            }
+            int64_t osTypeTimeStamp = osTypeObj[TIME_STAMP].Get<int64_t>();
+            std::string osTypeUdid = osTypeObj[PEER_UDID].Get<std::string>();
+            if (osTypeTimeStamp < earliestTimeStamp &&
+                !SoftbusCache::GetInstance().CheckIsOnlineByPeerUdid(osTypeUdid)) {
+                earliestTimeStamp = osTypeTimeStamp;
+                earliestPeerUdid = osTypeUdid;
+            }
+        }
+        if (KVAdapterManager::GetInstance().DeleteOstypeData(earliestPeerUdid) != DM_OK) {
+            LOGE("DeleteOstypeData failed.");
+            return ERR_DM_FAILED;
+        }
+    }
+    std::string osTypeStr = "";
+    ConvertOsTypeToJson(osType, osTypeStr);
+    return KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
+}
+#endif
 } // namespace DistributedHardware
 } // namespace OHOS

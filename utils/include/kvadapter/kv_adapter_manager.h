@@ -41,6 +41,12 @@ public:
     DM_EXPORT int32_t GetFreezeData(const std::string &key, std::string &value);
     DM_EXPORT int32_t PutFreezeData(const std::string &key, std::string &value);
     DM_EXPORT int32_t DeleteFreezeData(const std::string &key);
+    DM_EXPORT int32_t GetAllOstypeData(std::vector<std::string> &values);
+    DM_EXPORT int32_t PutOstypeData(const std::string &key, const std::string &value);
+    DM_EXPORT int32_t DeleteOstypeData(const std::string &key);
+    DM_EXPORT int32_t GetLocalUserIdData(const std::string &key, std::string &value);
+    DM_EXPORT int32_t PutLocalUserIdData(const std::string &key, const std::string &value);
+    DM_EXPORT int32_t GetOsTypeCount(int32_t &count);
 
 private:
     KVAdapterManager() = default;

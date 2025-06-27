@@ -32,9 +32,18 @@ constexpr const char* DM_KV_STORE_FREEZE_PREFIX = "anti_ddos_local_";
 constexpr const char* DB_KEY_DELIMITER = "###";
 constexpr int64_t DM_KV_STORE_REFRESH_TIME = 24 * 60 * 60; // one day
 constexpr int64_t MAX_SUPPORTED_EXIST_TIME = 3 * 24 * 60 * 60; // 3days
+constexpr const char* DM_OSTYPE_PREFIX = "ostype";
+constexpr const char* DM_UDID_PREFIX = "udid";
 }
 
 DM_IMPLEMENT_SINGLE_INSTANCE(KVAdapterManager);
+
+std::string ComposeOsTypePrefix()
+{
+    std::string dmKey = std::string(DM_OSTYPE_PREFIX) + std::string(DB_KEY_DELIMITER) + std::string(DM_UDID_PREFIX) +
+        std::string(DB_KEY_DELIMITER);
+    return dmKey;
+}
 
 DM_EXPORT int32_t KVAdapterManager::Init()
 {
@@ -180,6 +189,75 @@ DM_EXPORT int32_t KVAdapterManager::DeleteFreezeData(const std::string &key)
         LOGE("delete freeze data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
         return ERR_DM_FAILED;
     }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::GetAllOstypeData(std::vector<std::string> &values)
+{
+    std::string dmKey = ComposeOsTypePrefix();
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->GetAllOstypeData(dmKey, values) != DM_OK) {
+        LOGE("Get all data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::PutOstypeData(const std::string &key, const std::string &value)
+{
+    LOGI("key %{publkic}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str());
+    std::string dmKey = ComposeOsTypePrefix() + key;
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Put(dmKey, value) != DM_OK) {
+        LOGE("Insert data failed, k:%{public}s, v:%{public}s", GetAnonyString(dmKey).c_str(), value.c_str());
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::DeleteOstypeData(const std::string &key)
+{
+    LOGI("key %{publkic}s.", GetAnonyString(key).c_str());
+    std::string dmKey = ComposeOsTypePrefix() + key;
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Delete(dmKey) != DM_OK) {
+        LOGE("delete data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::GetLocalUserIdData(const std::string &key, std::string &value)
+{
+    LOGI("key %{public}s.", GetAnonyString(key).c_str());
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Get(key, value) != DM_OK) {
+        LOGE("Get data failed, key: %{public}s", GetAnonyString(key).c_str());
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::PutLocalUserIdData(const std::string &key, const std::string &value)
+{
+    LOGI("key %{public}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str());
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    if (kvAdapter_->Put(key, value) != DM_OK) {
+        LOGE("Put data failed, key:%{public}s, value:%{public}s", GetAnonyString(key).c_str(), value.c_str());
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+DM_EXPORT int32_t KVAdapterManager::GetOsTypeCount(int32_t &count)
+{
+    CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
+    std::string osTypePrefix = ComposeOsTypePrefix();
+    if (kvAdapter_->GetOstypeCountByPrefix(osTypePrefix, count) != DM_OK) {
+        LOGE("GetOstypeCountByPrefix failed, osTypePrefix:%{public}s.", osTypePrefix.c_str());
+        return ERR_DM_FAILED;
+    }
+    LOGI("count %{public}d.", count);
     return DM_OK;
 }
 } // namespace DistributedHardware

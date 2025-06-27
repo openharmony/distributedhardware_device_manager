@@ -22,7 +22,9 @@
 #include "datetime_ex.h"
 #include "string_ex.h"
 
+#include "data_query.h"
 #include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
 #include "ffrt.h"
@@ -39,6 +41,7 @@ namespace {
     constexpr int32_t MAX_STRING_LEN = 4096;
     constexpr int32_t MAX_INIT_RETRY_TIMES = 20;
     constexpr int32_t INIT_RETRY_SLEEP_INTERVAL = 200 * 1000; // 200ms
+    constexpr uint32_t DM_OSTYPE_PREFIX_LEN = 16;
 }
 
 int32_t KVAdapter::Init()
@@ -259,6 +262,61 @@ int32_t KVAdapter::Delete(const std::string& key)
     if (status != DistributedKv::Status::SUCCESS) {
         LOGE("Delete kv by key failed!");
         return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
+
+int32_t KVAdapter::GetAllOstypeData(const std::string &key, std::vector<std::string> &values)
+{
+    if (key.empty()) {
+        LOGE("key is empty");
+        return ERR_DM_FAILED;
+    }
+    std::vector<DistributedKv::Entry> localEntries;
+    {
+        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
+        if (kvStorePtr_->GetEntries(key, localEntries) != DistributedKv::Status::SUCCESS) {
+            LOGE("Get entrys from DB failed.");
+            return ERR_DM_FAILED;
+        }
+    }
+    values.clear();
+    for (const auto &entry : localEntries) {
+        JsonObject osTyoeJson(entry.value.ToString());
+        if (osTyoeJson.IsDiscarded() || !IsInt32(osTyoeJson, PEER_OSTYPE) || !IsInt64(osTyoeJson, TIME_STAMP)) {
+            LOGE("entry parse error.");
+            continue;
+        }
+        if (entry.key.ToString().size() < DM_OSTYPE_PREFIX_LEN) {
+            LOGE("entry value invalid.");
+            continue;
+        }
+        JsonObject jsonObj;
+        jsonObj[PEER_UDID] = entry.key.ToString().substr(DM_OSTYPE_PREFIX_LEN);
+        jsonObj[PEER_OSTYPE] = osTyoeJson[PEER_OSTYPE].Get<int32_t>();
+        jsonObj[TIME_STAMP] = osTyoeJson[TIME_STAMP].Get<int64_t>();
+        values.push_back(SafetyDump(jsonObj));
+    }
+    return DM_OK;
+}
+
+int32_t KVAdapter::GetOstypeCountByPrefix(const std::string &prefix, int32_t &count)
+{
+    LOGI("prefix %{public}s.", prefix.c_str());
+    if (prefix.empty()) {
+        LOGE("prefix is empty.");
+        return ERR_DM_FAILED;
+    }
+    {
+        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
+        DataQuery prefixQuery;
+        prefixQuery.InKeys({prefix});
+        if (kvStorePtr_->GetCount(prefixQuery, count) != DistributedKv::Status::SUCCESS) {
+            LOGE("GetCount failed.");
+            return ERR_DM_FAILED;
+        }
     }
     return DM_OK;
 }

@@ -457,19 +457,32 @@ int32_t SoftbusCache::GetDeviceNameFromCache(const std::string &udid, std::strin
     return ERR_DM_FAILED;
 }
 
-bool SoftbusCache::CheckIsOnline(const std::string &deviceId)
+bool SoftbusCache::CheckIsOnline(const std::string &udidHash)
 {
     {
         std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
         for (const auto &item : deviceInfo_) {
-            LOGI("deviceId %{public}s, cache deviceId %{public}s.", GetAnonyString(deviceId).c_str(),
+            LOGI("deviceId %{public}s, cache udidHash %{public}s.", GetAnonyString(udidHash).c_str(),
                 GetAnonyString(std::string(item.second.second.deviceId)).c_str());
-            if (std::string(item.second.second.deviceId) == deviceId) {
+            if (std::string(item.second.second.deviceId) == udidHash) {
                 LOGI("CheckIsOnline is true.");
                 return true;
             }
         }
     }
+    return false;
+}
+
+bool SoftbusCache::CheckIsOnlineByPeerUdid(const std::string &peerUdid)
+{
+    {
+        std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
+        if (deviceInfo_.find(peerUdid) != deviceInfo_.end()) {
+            LOGI("peerUdid %{public}s is online.", GetAnonyString(peerUdid).c_str());
+            return true;
+        }
+    }
+    LOGI("peerUdid %{public}s is not online.", GetAnonyString(peerUdid).c_str());
     return false;
 }
 } // namespace DistributedHardware

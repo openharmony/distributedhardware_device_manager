@@ -138,6 +138,9 @@ private:
     int32_t InitSoftPublishLNN();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     void ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile, DmDeviceInfo &dmDevice);
+    static void ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr);
+    static bool CheckPeerUdidTrusted(const std::string &udid);
+    static int32_t PutOstypeData(const std::string &peerUdid, int32_t osType);
 #endif
     static int32_t GetAttrFromCustomData(const cJSON *const customDataJson, DmDeviceInfo &dmDevInfo,
         int32_t &actionId);

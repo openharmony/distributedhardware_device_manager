@@ -408,6 +408,11 @@ private:
     void SendCommonEventBroadCast(const std::vector<std::string> &peerUdids,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds,
         bool isNeedResponse);
+    void HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId, int32_t beforeUserId);
+    void GetHoOsTypeUdids(std::vector<std::string> &peerUdids);
+    void DeleteHoDevice(const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds);
+    void HandleAccountLogoutEventCallback(const std::string &commonEventType, int32_t currentUserId,
+        int32_t beforeUserId);
 
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
@@ -425,6 +430,9 @@ private:
 #endif
     bool GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
         const std::string &sinkNetWorkId, std::string &sinkUdid);
+    void GetLocalUserIdFromDataBase(std::vector<int32_t> &foregroundUsers, std::vector<int32_t> &backgroundUsers);
+    void PutLocalUserIdToDataBase(const std::vector<int32_t> &foregroundUsers,
+        const std::vector<int32_t> &backgroundUsers);
 
 private:
     bool isImplsoLoaded_ = false;

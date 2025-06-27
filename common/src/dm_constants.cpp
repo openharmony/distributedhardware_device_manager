@@ -186,5 +186,10 @@ const char* DM_VERSION_5_1_2 = "5.1.2";
 const char* DM_CURRENT_VERSION = DM_VERSION_5_1_2;
 const char* DM_ACL_AGING_VERSION = DM_VERSION_5_1_0;
 const char* DM_VERSION_5_0_OLD_MAX = "5.0.99";       // Estimated highest version number of the old version
+const int32_t DM_HO_OSTYPE = -1;
+const int32_t DM_OH_OSTYPE = 10;
+const char* PEER_UDID = "peer_udid";
+const char* PEER_OSTYPE = "peer_ostype";
+const char* TIME_STAMP = "time_stamp";
 } // namespace DistributedHardware
 } // namespace OHOS

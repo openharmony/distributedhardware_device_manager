@@ -284,6 +284,8 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
+    virtual void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
+        const std::vector<int32_t> &backGroundUserIds) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

@@ -3021,6 +3021,19 @@ bool DeviceManagerServiceImpl::CheckSinkIsSameAccount(const DmAccessCaller &call
     return DeviceProfileConnector::GetInstance().CheckSinkIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
+void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
+    const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds)
+{
+    LOGI("peerudid %{public}s, foreGroundUserIds %{public}s, backGroundUserIds %{public}s.",
+        GetAnonyString(peerUdid).c_str(), GetIntegerList(foreGroundUserIds).c_str(),
+        GetIntegerList(backGroundUserIds).c_str());
+    //delete acl
+    DeviceProfileConnector::GetInstance().DeleteHoDevice(peerUdid, foreGroundUserIds, backGroundUserIds);
+    //delete group
+    hiChainConnector_->DeleteHoDevice(peerUdid, foreGroundUserIds, backGroundUserIds);
+    return;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;
