@@ -205,7 +205,7 @@ DM_EXPORT int32_t KVAdapterManager::GetAllOstypeData(std::vector<std::string> &v
 
 DM_EXPORT int32_t KVAdapterManager::PutOstypeData(const std::string &key, const std::string &value)
 {
-    LOGI("key %{publkic}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str());
+    LOGI("key %{public}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str());
     std::string dmKey = ComposeOsTypePrefix() + key;
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Put(dmKey, value) != DM_OK) {
@@ -217,7 +217,7 @@ DM_EXPORT int32_t KVAdapterManager::PutOstypeData(const std::string &key, const 
 
 DM_EXPORT int32_t KVAdapterManager::DeleteOstypeData(const std::string &key)
 {
-    LOGI("key %{publkic}s.", GetAnonyString(key).c_str());
+    LOGI("key %{public}s.", GetAnonyString(key).c_str());
     std::string dmKey = ComposeOsTypePrefix() + key;
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Delete(dmKey) != DM_OK) {
