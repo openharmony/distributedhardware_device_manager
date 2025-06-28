@@ -26,6 +26,7 @@ enum {
     /* Transfer to the other end device, not define specification error code */
     ERR_DM_NOT_SYSTEM_APP = 202,
     ERR_DM_TIME_OUT = -20001,
+    ERR_DM_PEER_CONFIRM_TIME_OUT = -20002,
     ERR_DM_UNSUPPORTED_AUTH_TYPE = -20018,
     ERR_DM_AUTH_BUSINESS_BUSY = -20019,
     ERR_DM_AUTH_PEER_REJECT = -20021,
