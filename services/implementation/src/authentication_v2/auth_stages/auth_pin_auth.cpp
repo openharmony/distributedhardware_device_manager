@@ -261,6 +261,7 @@ int32_t AuthSinkPinAuthMsgNegotiateState::Action(std::shared_ptr<DmAuthContext> 
     if (retEvent == DmEventType::ON_SESSION_KEY_RETURNED) {
         retEvent = context->authStateMachine->WaitExpectEvent(DmEventType::ON_FINISH);
         if (retEvent == DmEventType::ON_FINISH || retEvent == DmEventType::ON_ERROR) {
+            context->timer->DeleteTimer(std::string(WAIT_PIN_AUTH_TIMEOUT_TASK));
             context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinAuthDoneState>());
             return DM_OK;
         }
@@ -314,6 +315,7 @@ int32_t AuthSrcPinAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
     ret = context->authStateMachine->WaitExpectEvent(ON_FINISH);
     if (ret == ON_FINISH) {
         LOGI("AuthSrcPinAuthDoneState::Action wait ON_FINISH done");
+        context->timer->DeleteTimer(std::string(WAIT_PIN_AUTH_TIMEOUT_TASK));
         return DM_OK;
     } else if (ret == ON_ERROR) {
         return DM_OK;
