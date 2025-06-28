@@ -179,6 +179,7 @@ struct ConfirmCustomDialog {
     
     this.listener.on('change', () => {
       this.updateOrientation();
+      this.mLocalHeight = display.getDefaultDisplaySync().height;
     });
     display.on('foldDisplayModeChange', () => {
       this.updateFoldState();
@@ -387,13 +388,13 @@ struct ConfirmCustomDialog {
   }
 
   build() {
-    GridRow({
-      columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
-      gutter: { x: 4 },
-      breakpoints: { value: ['600vp', '840vp'] }
-    }) {
-      GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
-        if (this.isProxy && this.isPhone) {
+    if (this.isProxy && this.isPhone) {
+      GridRow({
+        columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
+        gutter: { x: 4 },
+        breakpoints: { value: ['600vp', '840vp'] }
+      }) {
+        GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
           if (this.isFoldable) {
             if (this.isFolded === display.FoldStatus.FOLD_STATUS_FOLDED) {
               if (this.currentOrientation === window.Orientation.PORTRAIT) {
@@ -492,7 +493,7 @@ struct ConfirmCustomDialog {
                           .width('100%')
                           .divider({
                             strokeWidth: 1,
-                            color: $r('sys.color.ohos_id_color_sub_background'),
+                            color: $r('sys.color.ohos_id_color_list_separator'),
                             startMargin: 12,
                             endMargin: 12
                           })
@@ -501,12 +502,14 @@ struct ConfirmCustomDialog {
                       }
                       .margin({ left: 12, right: 12 })
                     }
+                    .height('auto')
                     .onAreaChange((o, n) => {
                       this.scrollHeight = n.height as number;
                       console.info('**scrollHeight**:${this.scrollHeight}')
                      })
                     .constraintSize({
-                      maxHeight: (this.columnHeight - this.symbolHeight - this.buttonHeight - this.textHeight - 81)
+                      maxHeight: ((px2vp(this.mLocalHeight) - 28 - 39) * 0.9 - this.symbolHeight -
+                        this.buttonHeight - this.textHeight - 81)
                     })
                     .onAreaChange((o, n) => {
                       this.scrollHeight = n.height as number;
@@ -630,7 +633,7 @@ struct ConfirmCustomDialog {
                 .height('auto')
                 .clip(true)
                 .backgroundColor($r('sys.color.mask_fourth'))
-                .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                .borderRadius($r('sys.float.alert_container_shape'))
                 .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
               } else if (this.currentOrientation === window.Orientation.LANDSCAPE) {
                 Column(){
@@ -723,9 +726,9 @@ struct ConfirmCustomDialog {
                       .width('auto')
                       .divider({
                         strokeWidth: 1,
-                        color: $r('sys.color.ohos_id_color_sub_background'),
-                        startMargin: 24,
-                        endMargin: 24
+                        color: $r('sys.color.ohos_id_color_list_separator'),
+                        startMargin: 12,
+                        endMargin: 12
                       })
                       .margin({ bottom: 4 })
                       .edgeEffect(EdgeEffect.Spring)
@@ -831,6 +834,9 @@ struct ConfirmCustomDialog {
                   }
                   .margin({ left: 12, right: 12 })
                 }
+                .border({
+                  radius: { topLeft: 0, topRight: 0, bottomLeft: 32, bottomRight: 32 } 
+                })
                 .layoutWeight(1)
                 .constraintSize({
                   maxHeight: 'auto'
@@ -842,7 +848,7 @@ struct ConfirmCustomDialog {
                 .height(266)
                 .clip(true)
                 .backgroundColor($r('sys.color.mask_fourth'))
-                .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+                .borderRadius($r('sys.float.alert_container_shape'))
                 .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
               }
             } else if (this.isFolded === display.FoldStatus.FOLD_STATUS_EXPANDED ||
@@ -940,21 +946,23 @@ struct ConfirmCustomDialog {
                         .width('100%')
                         .divider({
                           strokeWidth: 1,
-                          color: $r('sys.color.ohos_id_color_sub_background'),
-                          startMargin: 24,
-                          endMargin: 24
+                          color: $r('sys.color.ohos_id_color_list_separator'),
+                          startMargin: 12,
+                          endMargin: 12
                         })
                         .edgeEffect(EdgeEffect.Spring)
                       }
                     }
                     .margin({ left: 12, right: 12 })
                   }
+                  .height('auto')
                   .onAreaChange((o, n) => {
                     this.scrollHeight = n.height as number;
                     console.info('**scrollHeight**:${this.scrollHeight}')
                   })
                   .constraintSize({
-                    maxHeight: (this.columnHeight - this.symbolHeight - this.buttonHeight - this.textHeight - 81)
+                    maxHeight: ((px2vp(this.mLocalHeight) - 28 - 39) * 0.9 - this.symbolHeight -
+                      this.buttonHeight - this.textHeight - 81)
                   })
                   .scrollable(ScrollDirection.Vertical)
                   .scrollBar(BarState.On)
@@ -1073,7 +1081,7 @@ struct ConfirmCustomDialog {
               .height('auto')
               .clip(true)
               .backgroundColor($r('sys.color.mask_fourth'))
-              .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+              .borderRadius($r('sys.float.alert_container_shape'))
               .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
             }
           } else {
@@ -1172,7 +1180,7 @@ struct ConfirmCustomDialog {
                         .width('100%')
                         .divider({
                           strokeWidth: 1,
-                          color: $r('sys.color.ohos_id_color_sub_background'),
+                          color: $r('sys.color.ohos_id_color_list_separator'),
                           startMargin: 12,
                           endMargin: 12
                         })
@@ -1181,8 +1189,10 @@ struct ConfirmCustomDialog {
                     }
                     .margin({ left: 12, right: 12 })
                   }
+                  .height('auto')
                   .constraintSize({
-                    maxHeight: (this.columnHeight - this.symbolHeight - this.buttonHeight - this.textHeight - 82)
+                    maxHeight: ((px2vp(this.mLocalHeight) - 28 - 39) * 0.9 - this.symbolHeight -
+                      this.buttonHeight - this.textHeight - 82)
                   })
                   .onAreaChange((o, n) => {
                     this.scrollHeight = n.height as number;
@@ -1307,7 +1317,7 @@ struct ConfirmCustomDialog {
               .height('auto')
               .clip(true)
               .backgroundColor($r('sys.color.mask_fourth'))
-              .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+              .borderRadius($r('sys.float.alert_container_shape'))
               .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
             } else if (this.currentOrientation === window.Orientation.LANDSCAPE) {
               Column(){
@@ -1400,9 +1410,9 @@ struct ConfirmCustomDialog {
                     .width('auto')
                     .divider({
                       strokeWidth: 1,
-                      color: $r('sys.color.ohos_id_color_sub_background'),
-                      startMargin: 24,
-                      endMargin: 24
+                      color: $r('sys.color.ohos_id_color_list_separator'),
+                      startMargin: 12,
+                      endMargin: 12
                     })
                     .margin({ bottom: 4 })
                     .edgeEffect(EdgeEffect.Spring)
@@ -1508,6 +1518,9 @@ struct ConfirmCustomDialog {
                   }
                   .margin({ left: 12, right: 12 })
                 }
+                .border({
+                  radius: { topLeft: 0, topRight: 0, bottomLeft: 32, bottomRight: 32 }
+                })
                 .layoutWeight(1)
                 .constraintSize({
                   maxHeight: 'auto'
@@ -1519,11 +1532,25 @@ struct ConfirmCustomDialog {
               .height(266)
               .clip(true)
               .backgroundColor($r('sys.color.mask_fourth'))
-              .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
+              .borderRadius($r('sys.float.alert_container_shape'))
               .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
             }
           }
-        } else {
+        }
+      }
+      .onAreaChange((o, n) => {
+        this.columnHeight = n.height as number;
+        console.info(`**columnHeight**:${this.columnHeight}`)
+      })
+      .constraintSize({ maxHeight: (px2vp(this.mLocalHeight) - 28 - 39) * 0.9 })
+      .height('auto')
+    } else {
+      GridRow({
+        columns: { xs: 4, sm: 8, md: this.isPC ? 24 : 12 },
+        gutter: { x: 4 },
+        breakpoints: { value: ['600vp', '840vp'] }
+      }) {
+        GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
           Column() {
             this.Symbol();
             Column() {
@@ -1659,13 +1686,8 @@ struct ConfirmCustomDialog {
           .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
         }
       }
+      .constraintSize({ maxHeight: '90%' })
     }
-    .onAreaChange((o, n) => {
-      this.columnHeight = n.height as number;
-      console.info(`**columnHeight**:${this.columnHeight}`)
-    })
-    .constraintSize({ maxHeight: (px2vp(this.mLocalHeight) - 28 - 39) * 0.9 })       
-      .height('auto')
   }
 }
 
