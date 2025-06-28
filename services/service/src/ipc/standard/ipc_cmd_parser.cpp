@@ -53,6 +53,7 @@ namespace OHOS {
 namespace DistributedHardware {
 const unsigned int XCOLLIE_TIMEOUT_S = 5;
 constexpr const char* SCENEBOARD_PROCESS = "com.ohos.sceneboard";
+
 void DecodeDmAccessCaller(MessageParcel &parcel, DmAccessCaller &caller)
 {
     caller.accountId = parcel.ReadString();
@@ -117,7 +118,7 @@ int32_t SetXcollieTimer()
     std::string processName = "";
     AppManager::GetInstance().GetCallerProcessName(processName);
     if (processName != SCENEBOARD_PROCESS) {
-        return DM_OK;
+        return ERR_DM_SET_XCOLLIE_FAILED;
     }
     return OHOS::HiviewDFX::XCollie::GetInstance().SetTimer("RegisterDeviceManagerListener", XCOLLIE_TIMEOUT_S,
         nullptr, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
@@ -125,9 +126,7 @@ int32_t SetXcollieTimer()
 
 void CancelXcollieTimer(int32_t id)
 {
-    std::string processName = "";
-    AppManager::GetInstance().GetCallerProcessName(processName);
-    if (processName != SCENEBOARD_PROCESS) {
+    if (id == ERR_DM_SET_XCOLLIE_FAILED) {
         return;
     }
     OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
@@ -456,7 +455,7 @@ ON_IPC_CMD(GET_ALL_TRUST_DEVICE_LIST, MessageParcel &data, MessageParcel &reply)
 
 ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel &reply)
 {
-    int32_t timerId = SetXcollieTimer();
+    int32_t timerId = SetXcollieTimer(); // only apply for SCENEBOARD_PROCESS
     std::string pkgName = data.ReadString();
     sptr<IRemoteObject> listener = data.ReadRemoteObject();
     if (listener == nullptr) {
