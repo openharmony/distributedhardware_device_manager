@@ -2133,7 +2133,7 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
             [this, commonEventType] () {
                 DeviceManagerService::HandleAccountCommonEvent(commonEventType);
             });
-    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED) {
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED && IsPC()) {
         DeviceNameManager::GetInstance().AccountSysReady(beforeUserId);
         DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
             [this, commonEventType] () {
