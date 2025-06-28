@@ -397,7 +397,9 @@ struct InputCustomDialog {
         })
       }
     }.margin({top: 8, bottom: 20})
-    
+    .constraintSize({
+      maxHeight: '40%'
+    })
   }
 }
 
