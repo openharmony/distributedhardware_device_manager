@@ -756,7 +756,7 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
             LOGI("AuthSinkManager::OnUserOperation USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT.");
             context_->confirmOperation = USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT;
-            context_->reason = ERR_DM_TIME_OUT;
+            context_->reason = ERR_DM_PEER_CONFIRM_TIME_OUT;
             context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
