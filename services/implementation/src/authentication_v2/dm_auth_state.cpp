@@ -204,6 +204,10 @@ std::string DmAuthState::GenerateBindResultContent(std::shared_ptr<DmAuthContext
         jsonObj[TAG_DEVICE_ID] = deviceIdHash;
     }
     jsonObj[TAG_CONFIRM_OPERATION_V2] = context->confirmOperation;
+    if (context->remainingFrozenTime != 0) {
+        jsonObj[TAG_REMAINING_FROZEN_TIME] = context->remainingFrozenTime;
+    }
+    LOGI("remainingFrozenTime: %{public}" PRId64, context->remainingFrozenTime);
     std::string content = jsonObj.Dump();
     return content;
 }

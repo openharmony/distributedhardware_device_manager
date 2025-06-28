@@ -248,6 +248,7 @@ struct DmAuthContext {
     std::string userOperationParam;
     int32_t state;
     int32_t hmlActionId = 0;
+    int64_t remainingFrozenTime = 0;
     bool authenticating;        // Indicator whether authentication is in progress
     bool successFinished{false};
     bool isAppCredentialVerified{false};        // Whether the application credential has been verified

@@ -99,6 +99,7 @@ const char* TAG_CREDENTIAL_INFO = "credentialInfo";
 const char* TAG_CERT_INFO = "certInfo";
 const char* TAG_LANGUAGE = "language";
 const char* TAG_ULTRASONIC_SIDE = "ultrasonicSide";
+const char* TAG_REMAINING_FROZEN_TIME = "remainingFrozenTime";
 constexpr const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
 
 namespace {
@@ -994,6 +995,7 @@ int32_t DmAuthMessageProcessor::CreateMessageFinish(std::shared_ptr<DmAuthContex
 {
     jsonObject[TAG_REPLY] = context->reply;
     jsonObject[TAG_REASON] = context->reason;
+    jsonObject[TAG_REMAINING_FROZEN_TIME] = context->remainingFrozenTime;
     return DM_OK;
 }
 
@@ -1222,11 +1224,14 @@ int32_t DmAuthMessageProcessor::ParseMessageSinkFinish(const JsonObject &jsonObj
 int32_t DmAuthMessageProcessor::ParseMessageSrcFinish(const JsonObject &jsonObject,
     std::shared_ptr<DmAuthContext> context)
 {
-    if (jsonObject[TAG_REPLY].IsNumberInteger()) {
+    if (IsInt32(jsonObject, TAG_REPLY)) {
         context->reply = jsonObject[TAG_REPLY].Get<int32_t>();
     }
-    if (jsonObject[TAG_REASON].IsNumberInteger()) {
+    if (IsInt32(jsonObject, TAG_REASON)) {
         context->reason = jsonObject[TAG_REASON].Get<int32_t>();
+    }
+    if (IsInt64(jsonObject, TAG_REMAINING_FROZEN_TIME)) {
+        context->remainingFrozenTime = jsonObject[TAG_REMAINING_FROZEN_TIME].Get<int64_t>();
     }
 
     /* In case of an exception, there may be a state waiting for an event.
