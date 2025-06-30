@@ -47,6 +47,7 @@ public:
     MOCK_METHOD(bool, Release, ());
     MOCK_METHOD(std::vector<std::string>, GetFileTypes, (Uri &, const std::string &));
     MOCK_METHOD(int, OpenFile, (Uri &, const std::string &));
+    MOCK_METHOD(int, OpenFileWithErrCode, (Uri &, const std::string &, int32_t &));
     MOCK_METHOD(int, OpenRawFile, (Uri &, const std::string &));
     MOCK_METHOD(int, Insert, (Uri &, const DataShareValuesBucket &));
     MOCK_METHOD(int, InsertExt, (Uri &, const DataShareValuesBucket &, std::string &));
