@@ -2162,6 +2162,22 @@ ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NAME, MessageParcel &reply, std::shared_pt
     return DM_OK;
 }
 
+ON_IPC_SET_REQUEST(GET_LOCAL_DEVICE_NAME_OLD, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcReq> pReq = std::static_pointer_cast<IpcReq>(pBaseReq);
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_LOCAL_DEVICE_NAME_OLD, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetLocalDeviceNameRsp> pRsp = std::static_pointer_cast<IpcGetLocalDeviceNameRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetLocalDeviceName(reply.ReadString());
+    return DM_OK;
+}
+
 ON_IPC_SET_REQUEST(CHECK_SRC_ACCESS_CONTROL, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
 {
     return SetRequest(CHECK_SRC_ACCESS_CONTROL, pBaseReq, data);

@@ -264,6 +264,7 @@ public:
     void ProcessCommonUserStatusEvent(const std::vector<uint32_t> &foregroundUserIds,
         const std::vector<uint32_t> &backgroundUserIds, const std::string &remoteUdid);
     int32_t GetLocalDeviceName(std::string &deviceName);
+    int32_t GetLocalDeviceNameOld(std::string &deviceName);
     bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
@@ -418,7 +419,6 @@ private:
     void HandleNetworkConnected(int32_t networkStatus);
     void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,
         const std::string &accountIdHash, const std::string &accountName, int32_t userId);
-    void CheckPermission(bool &isOnlyShowNetworkId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     bool IsCallerInWhiteList();
     bool IsDMAdapterCheckApiWhiteListLoaded();

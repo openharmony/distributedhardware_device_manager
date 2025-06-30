@@ -1974,6 +1974,21 @@ ON_IPC_CMD(GET_LOCAL_DEVICE_NAME, MessageParcel &data, MessageParcel &reply)
     return DM_OK;
 }
 
+ON_IPC_CMD(GET_LOCAL_DEVICE_NAME_OLD, MessageParcel &data, MessageParcel &reply)
+{
+    std::string deviceName = "";
+    int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceNameOld(deviceName);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteString(deviceName)) {
+        LOGE("write deviceName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(CHECK_SRC_ACCESS_CONTROL, MessageParcel &data, MessageParcel &reply)
 {
     return OnIpcCmd(CHECK_SRC_ACCESS_CONTROL, data, reply);
