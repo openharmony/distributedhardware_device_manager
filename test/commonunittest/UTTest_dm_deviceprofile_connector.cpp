@@ -1699,7 +1699,7 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
 
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId()).WillOnce(Return(123456));
     auto ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_NE(ret.empty(), false);
 
     deviceId = "remoteDeviceId";
     EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())

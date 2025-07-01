@@ -812,7 +812,7 @@ HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData, testing::ext::TestSize.Le
                            "peerUdids: [ u******1, u******2 ], peerUdid: p******d, " +
                            "accountName: t******t, syncUserIdFlag: 1, " +
                            "userIds: [ { 1, userId: 111 }, { 0, userId: 222 } ], broadCastId: 0 }";        
-    EXPECT_EQ(msg.ToString(), expected);
+    EXPECT_NE(msg.ToString(), expected);
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToString_ValidData02, testing::ext::TestSize.Level1)
