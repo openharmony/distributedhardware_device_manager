@@ -852,7 +852,7 @@ HWTEST_F(AuthCredentialStateTest, AuthSrcCredentialAuthDoneState_007, testing::e
     context->transmitData = "test";
 
     EXPECT_CALL(*dmHiChainAuthConnectorMock, ProcessCredData(_, _)).WillOnce(Return(DM_OK));
- EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, SaveSessionKeyToDP(_, _))
+    EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, SaveSessionKeyToDP(_, _))
         .WillOnce(Return(ERR_DM_FAILED));
 
     EXPECT_EQ(authState->Action(context), ERR_DM_FAILED);
