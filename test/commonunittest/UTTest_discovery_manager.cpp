@@ -141,6 +141,18 @@ HWTEST_F(DiscoveryManagerTest, StartDiscovering_003, testing::ext::TestSize.Leve
     EXPECT_EQ(ret, ERR_DM_DISCOVERY_REPEATED);
 }
 
+HWTEST_F(DiscoveryManagerTest, StartDiscovering_004, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName_test1";
+    std::map<std::string, std::string> discoverParam;
+    std::map<std::string, std::string> filterOptions;
+    discoverParam.insert(std::pair<std::string, std::string>("SUBSCRIBE_ID", "test_value1"));
+    discoverParam.insert(std::pair<std::string, std::string>("DISC_MEDIUM", "test_value2"));
+    filterOptions.insert(std::pair<std::string, std::string>("PARAM_KEY_FILTER_OPTIONS", "test_value3"));
+    int32_t ret = manager->StartDiscovering(pkgName, discoverParam, filterOptions);
+    EXPECT_EQ(true, checkSoftbusRes(ret));
+}
+
 HWTEST_F(DiscoveryManagerTest, StartDiscovering4MineLibary_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "pkgName";

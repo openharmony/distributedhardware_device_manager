@@ -168,9 +168,11 @@ int32_t DiscoveryManager::StartDiscovering(const std::string &pkgName,
     StartDiscoveryTimer(pkgNameTemp);
 
     auto it = filterOptions.find(PARAM_KEY_FILTER_OPTIONS);
-    JsonObject jsonObject(it->second);
-    if (!jsonObject.IsDiscarded() && jsonObject.Contains(TYPE_MINE)) {
-        return StartDiscovering4MineLibary(pkgNameTemp, dmSubInfo, it->second);
+    if (it != filterOptions.end()) {
+        JsonObject jsonObject(it->second);
+        if (!jsonObject.IsDiscarded() && jsonObject.Contains(TYPE_MINE)) {
+            return StartDiscovering4MineLibary(pkgNameTemp, dmSubInfo, it->second);
+        }
     }
 
     int32_t ret = isStandardMetaNode ? StartDiscoveringNoMetaType(pkgNameTemp, dmSubInfo, discoverParam) :
