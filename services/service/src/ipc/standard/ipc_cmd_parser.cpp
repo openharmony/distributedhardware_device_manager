@@ -118,7 +118,7 @@ int32_t SetXcollieTimer()
     std::string processName = "";
     AppManager::GetInstance().GetCallerProcessName(processName);
     if (processName != SCENEBOARD_PROCESS) {
-        return ERR_DM_SET_XCOLLIE_FAILED;
+        return INVALID_ID;
     }
     return OHOS::HiviewDFX::XCollie::GetInstance().SetTimer("RegisterDeviceManagerListener", XCOLLIE_TIMEOUT_S,
         nullptr, nullptr, OHOS::HiviewDFX::XCOLLIE_FLAG_LOG | OHOS::HiviewDFX::XCOLLIE_FLAG_RECOVERY);
@@ -126,7 +126,7 @@ int32_t SetXcollieTimer()
 
 void CancelXcollieTimer(int32_t id)
 {
-    if (id == ERR_DM_SET_XCOLLIE_FAILED) {
+    if (id == INVALID_ID) {
         return;
     }
     OHOS::HiviewDFX::XCollie::GetInstance().CancelTimer(id);
