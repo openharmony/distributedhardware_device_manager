@@ -1192,7 +1192,7 @@ struct ConfirmCustomDialog {
                   .height('auto')
                   .constraintSize({
                     maxHeight: ((px2vp(this.mLocalHeight) - 28 - 39) * 0.9 - this.symbolHeight -
-                      this.buttonHeight - this.textHeight - 82)
+                      this.buttonHeight - this.textHeight - 81)
                   })
                   .onAreaChange((o, n) => {
                     this.scrollHeight = n.height as number;
