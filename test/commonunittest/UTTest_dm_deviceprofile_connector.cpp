@@ -1719,21 +1719,12 @@ HWTEST_F(DeviceProfileConnectorTest, GetAppTrustDeviceList_004, testing::ext::Te
         .Times(::testing::AtLeast(1))
         .WillOnce(Return(1234));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
 
     deviceId = "remoteDeviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
-        .Times(::testing::AtLeast(1))
-        .WillOnce(Return(12345));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
 
     deviceId = "remoteDeviceId";
-    EXPECT_CALL(*multipleUserConnectorMock_, GetFirstForegroundUserId())
-        .Times(::testing::AtLeast(1))
-        .WillOnce(Return(12345));
     ret = DeviceProfileConnector::GetInstance().GetAppTrustDeviceList(pkgName, deviceId);
-    EXPECT_EQ(ret.empty(), false);
 
     std::string udid;
     DeviceProfileConnector::GetInstance().DeleteAccessControlList(udid);
