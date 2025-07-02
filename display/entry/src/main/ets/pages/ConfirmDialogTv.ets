@@ -49,12 +49,18 @@ struct ConfirmCustomDialog {
   @State isAvailableType: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
   @State title: string = '';
-  @State mLocalWidth: number = display.getDefaultDisplaySync().width;
+  @State mLocalWidth: number = 0;
   controller?: CustomDialogController;
   isPC: boolean = false;
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear execute PinCustomDialog')
     console.log(this.mLocalWidth + 'mLocalWidth')
+    try {
+      this.mLocalWidth = display.getDefaultDisplaySync().width;
+    } catch (err) {
+      console.error('Failed to get display width:', err);
+      this.mLocalWidth = 0;
+    }
     let context = getContext() as common.UIAbilityContext;
 
     if (AppStorage.get('deviceName') != null) {
