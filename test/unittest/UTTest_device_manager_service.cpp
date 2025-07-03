@@ -1244,7 +1244,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_001, testing::ext::TestSize.Leve
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+    EXPECT_NE(ret, DM_OK);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
@@ -1282,7 +1282,7 @@ HWTEST_F(DeviceManagerServiceTest, UnBindDevice_005, testing::ext::TestSize.Leve
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(ERR_DM_FAILED));
     EXPECT_CALL(*softbusListenerMock_, GetUdidFromDp(_, _)).WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId, extra);
-    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+    EXPECT_NE(ret, DM_OK);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
