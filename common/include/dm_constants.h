@@ -118,6 +118,7 @@ DM_EXPORT extern const char* PARAM_KEY_USB_IP;
 DM_EXPORT extern const char* PARAM_KEY_USB_PORT;
 DM_EXPORT extern const char* PARAM_KEY_NCM_IP;
 DM_EXPORT extern const char* PARAM_KEY_NCM_PORT;
+DM_EXPORT extern const char* PARAM_KEY_ACCOUNT_HASH;
 DM_EXPORT extern const char* PARAM_KEY_AUTH_TOKEN;
 DM_EXPORT extern const char* PARAM_KEY_AUTH_TYPE;
 DM_EXPORT extern const char* PARAM_KEY_PIN_CODE;
