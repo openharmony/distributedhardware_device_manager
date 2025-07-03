@@ -109,6 +109,7 @@ const char* PARAM_KEY_USB_IP = "USB_IP";
 const char* PARAM_KEY_USB_PORT = "USB_PORT";
 const char* PARAM_KEY_NCM_IP = "NCM_IP";
 const char* PARAM_KEY_NCM_PORT = "NCM_PORT";
+const char* PARAM_KEY_ACCOUNT_HASH = "ACCOUNT_HASH";
 const char* PARAM_KEY_AUTH_TOKEN = "AUTH_TOKEN";
 const char* PARAM_KEY_AUTH_TYPE = "AUTH_TYPE";
 const char* PARAM_KEY_PIN_CODE = "PIN_CODE";
