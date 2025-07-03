@@ -131,8 +131,7 @@ void JsonItemObjectAssignmentNLFuzzTest(const uint8_t* data, size_t size)
     (void)data;
     (void)size;
     JsonItemObject sourceObj;
-    JsonItemObject targetObj;
-    targetObj = sourceObj;
+    JsonItemObject targetObj = sourceObj;
 }
 
 void PushBackDoubleNLFuzzTest(const uint8_t* data, size_t size)
@@ -206,7 +205,7 @@ void GetToBoolNLFuzzTest(const uint8_t* data, size_t size)
 
     FuzzedDataProvider fdp(data, size);
     JsonItemObject Object;
-    bool value = fdp.ConsumeBool();;
+    bool value = fdp.ConsumeBool();
     Object.GetTo(value);
 }
 }
