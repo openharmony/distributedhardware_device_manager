@@ -38,7 +38,6 @@ void DpInitedCallbackFuzzTest(const uint8_t* data, size_t size)
     }
     DpInitedCallback dpInitedCallback;
     dpInitedCallback.PutAllTrustedDevices();
-    dpInitedCallback.OnDpInited();
 }
 
 void DpInitedCallbackFirstFuzzTest(const uint8_t* data, size_t size)
