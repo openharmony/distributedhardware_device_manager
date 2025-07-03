@@ -200,50 +200,6 @@ DmAuthStateType AuthSrcDataSyncState::GetStateType()
     return DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE;
 }
 
-void AuthSrcDataSyncState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId)
-{
-    CHECK_NULL_VOID(context);
-    if (context->accesser.aclProfiles.find(DM_IDENTICAL_ACCOUNT) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (context->accesser.aclProfiles.find(DM_SHARE) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
-        if (peerDeviceId == context->accesser.deviceId) {
-            peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccesser().GetAccesserDeviceId();
-        }
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (context->accesser.aclProfiles.find(DM_POINT_TO_POINT) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
-        if (peerDeviceId == context->accesser.deviceId) {
-            peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
-        }
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return;
-    }
-    for (auto &app : context->subjectProxyOnes) {
-        if (app.proxyAccesser.aclProfiles.find(DM_POINT_TO_POINT) != app.proxyAccesser.aclProfiles.end()) {
-            peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
-            if (peerDeviceId == context->accesser.deviceId) {
-                peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
-            }
-            if (!peerDeviceId.empty()) {
-                return;
-            }
-        }
-    }
-    LOGE("failed");
-}
-
 // Received 200 end message, send 201
 int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
@@ -289,7 +245,7 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
     GetPeerDeviceId(context, peerDeviceId);
     bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
     // Trigger networking
-    if (context->reason = DM_BIND_TRUST_TARGET && (!context->accesser.isOnline || isNeedJoinLnn)) {
+    if (context->reason == DM_BIND_TRUST_TARGET && (!context->accesser.isOnline || isNeedJoinLnn)) {
         if (context->connSessionType == CONN_SESSION_TYPE_HML) {
             context->softbusConnector->JoinLnnByHml(context->sessionId, context->accesser.transmitSessionKeyId,
                 context->accessee.transmitSessionKeyId);

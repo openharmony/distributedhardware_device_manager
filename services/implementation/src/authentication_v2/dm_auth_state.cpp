@@ -808,5 +808,49 @@ void DmAuthState::DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
     context->authMessageProcessor->DeleteSessionKeyToDP(userId, sessionKeyId);
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
 }
+
+void DmAuthState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId)
+{
+    CHECK_NULL_VOID(context);
+    if (context->accesser.aclProfiles.find(DM_IDENTICAL_ACCOUNT) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (context->accesser.aclProfiles.find(DM_SHARE) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
+        if (peerDeviceId == context->accesser.deviceId) {
+            peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccesser().GetAccesserDeviceId();
+        }
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (context->accesser.aclProfiles.find(DM_POINT_TO_POINT) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
+        if (peerDeviceId == context->accesser.deviceId) {
+            peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
+        }
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return;
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        if (app.proxyAccesser.aclProfiles.find(DM_POINT_TO_POINT) != app.proxyAccesser.aclProfiles.end()) {
+            peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
+            if (peerDeviceId == context->accesser.deviceId) {
+                peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
+            }
+            if (!peerDeviceId.empty()) {
+                return;
+            }
+        }
+    }
+    LOGE("failed");
+}
 } // namespace DistributedHardware
 } // namespace OHOS
