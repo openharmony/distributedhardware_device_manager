@@ -948,6 +948,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     }
     jsonObj[PARAM_KEY_DISC_CAPABILITY] = device.capabilityBitmap[0];
     ParseConnAddrInfo(addrInfo, jsonObj);
+    jsonObj[PARAM_KEY_ACCOUNT_HASH] = std::string(device.accountHash);
     dmDevice.extraData = SafetyDump(jsonObj);
 }
 
