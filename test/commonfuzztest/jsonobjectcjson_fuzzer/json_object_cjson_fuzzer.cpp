@@ -311,7 +311,7 @@ void DuplicateFuzzTest(const uint8_t* data, size_t size)
     (void)data;
     (void)size;
     JsonObject object;
-    JsonItemObject objectTemp;
+    JsonObject objectTemp;
     object.Duplicate(objectTemp);
 }
 }
