@@ -22,7 +22,7 @@ namespace DistributedHardware {
 
 void ToJsonDoubleFuzzTest(const uint8_t* data, size_t size)
 {
-    if (data == nullptr || size == 0) {
+    if (data == nullptr || size < sizeof(double)) {
         return;
     }
 
@@ -201,25 +201,25 @@ void ToStringFuzzTest(const uint8_t* data, size_t size)
     (void)data;
     (void)size;
 
-    JsonItemObject Object;
+    JsonItemObject object;
 
-    ToString(Object);
+    ToString(object);
 }
 
 void IsArrayFuzzTest(const uint8_t* data, size_t size)
 {
     (void)data;
     (void)size;
-    JsonItemObject Object;
-    Object.IsArray();
+    JsonItemObject object;
+    object.IsArray();
 }
 
 void IsObjectFuzzTest(const uint8_t* data, size_t size)
 {
     (void)data;
     (void)size;
-    JsonItemObject Object;
-    Object.IsObject();
+    JsonItemObject object;
+    object.IsObject();
 }
 
 void JsonItemObjectAssignmentFuzzTest(const uint8_t* data, size_t size)
@@ -237,10 +237,10 @@ void PushBackDoubleFuzzTest(const uint8_t* data, size_t size)
     }
 
     FuzzedDataProvider fdp(data, size);
-    JsonItemObject Object;
+    JsonItemObject object;
 
     double value = fdp.ConsumeFloatingPoint<double>();
-    Object.PushBack(value);
+    object.PushBack(value);
 }
 
 void PushBackInt64FuzzTest(const uint8_t* data, size_t size)
@@ -250,26 +250,28 @@ void PushBackInt64FuzzTest(const uint8_t* data, size_t size)
     }
 
     FuzzedDataProvider fdp(data, size);
-    JsonItemObject Object;
+    JsonItemObject object;
 
     int64_t value = fdp.ConsumeIntegral<int64_t>();
-    Object.PushBack(value);
+    object.PushBack(value);
 }
 
 void PushBackJsonItemObjectFuzzTest(const uint8_t* data, size_t size)
 {
     (void)data;
     (void)size;
-    JsonItemObject Object;
-    Object.PushBack(Object);
+    JsonItemObject object;
+    JsonItemObject objectTemp;
+    object.PushBack(objectTemp);
 }
 
 void AddItemToArrayFuzzTest(const uint8_t* data, size_t size)
 {
     (void)data;
     (void)size;
-    JsonItemObject Object;
-    Object.AddItemToArray(Object);
+    JsonItemObject object;
+    JsonItemObject objectTemp;
+    object.AddItemToArray(objectTemp);
 }
 
 void GetToBoolFuzzTest(const uint8_t* data, size_t size)
@@ -279,17 +281,17 @@ void GetToBoolFuzzTest(const uint8_t* data, size_t size)
     }
 
     FuzzedDataProvider fdp(data, size);
-    JsonItemObject Object;
+    JsonItemObject object;
     bool value = fdp.ConsumeBool();
-    Object.GetTo(value);
+    object.GetTo(value);
 }
 
 void InitArrayFuzzTest(const uint8_t* data, size_t size)
 {
     (void)data;
     (void)size;
-    JsonItemObject Object;
-    Object.InitArray();
+    JsonItemObject object;
+    object.InitArray();
 }
 
 void EraseFuzzTest(const uint8_t* data, size_t size)
@@ -299,17 +301,18 @@ void EraseFuzzTest(const uint8_t* data, size_t size)
     }
 
     FuzzedDataProvider fdp(data, size);
-    JsonItemObject Object;
+    JsonItemObject object;
     std::string key = fdp.ConsumeRandomLengthString();
-    Object.Erase(key);
+    object.Erase(key);
 }
 
 void DuplicateFuzzTest(const uint8_t* data, size_t size)
 {
     (void)data;
     (void)size;
-    JsonObject Object;
-    Object.Duplicate(Object);
+    JsonObject object;
+    JsonItemObject objectTemp;
+    object.Duplicate(objectTemp);
 }
 }
 }
