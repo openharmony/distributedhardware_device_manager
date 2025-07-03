@@ -148,6 +148,8 @@ void CheckAuthParamVaildFuzzTest(FuzzedDataProvider &fdp)
     std::string extra = fdp.ConsumeRandomLengthString();
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
     authManager->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
+    authType = 1;
+    authManager->CheckAuthParamVaild(pkgName, authType, deviceId, extra);
 }
 
 void ParseHmlInfoInJsonObjectFuzzTest(FuzzedDataProvider &fdp)
@@ -167,6 +169,7 @@ void ParseJsonObjectFuzzTest(FuzzedDataProvider &fdp)
     jsonObject[TAG_APP_THUMBNAIL2] = fdp.ConsumeRandomLengthString();
     jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS] = fdp.ConsumeRandomLengthString();
     jsonObject[TAG_PEER_PKG_NAME] = fdp.ConsumeRandomLengthString();
+    jsonObject[DM_BUSINESS_ID] = fdp.ConsumeRandomLengthString();
     authManager->ParseJsonObject(jsonObject);
 }
 
@@ -182,6 +185,10 @@ void GetAuthParamFuzzTest(FuzzedDataProvider &fdp)
     std::string pkgName = fdp.ConsumeRandomLengthString();
     std::string deviceId = fdp.ConsumeRandomLengthString();
     std::string extra = fdp.ConsumeRandomLengthString();
+    authManager->GetAuthParam(pkgName, authType, deviceId, extra);
+    JsonObject jsonObject;
+    jsonObject[TAG_BIND_LEVEL] = fdp.ConsumeIntegral<int32_t>();
+    extra = jsonObject.Dump();
     authManager->GetAuthParam(pkgName, authType, deviceId, extra);
 }
 
@@ -208,12 +215,16 @@ void AuthDeviceErrorFuzzTest(FuzzedDataProvider &fdp)
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     int32_t errorCode = fdp.ConsumeIntegral<int32_t>();
     authManager->AuthDeviceError(requestId, errorCode);
+    authSinkManager->AuthDeviceError(requestId, errorCode);
+    requestId = context_->requestId;
+    authManager->AuthDeviceError(requestId, errorCode);
 }
 
 void AuthDeviceFinishFuzzTest(FuzzedDataProvider &fdp)
 {
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     authManager->AuthDeviceFinish(requestId);
+    authSinkManager->AuthDeviceFinish(requestId);
 }
 
 void GetPinCodeFuzzTest(FuzzedDataProvider &fdp)
@@ -250,6 +261,10 @@ void BindTargetFuzzTest(FuzzedDataProvider &fdp)
     int sessionId = fdp.ConsumeIntegral<int>();
     uint64_t logicalSessionId = fdp.ConsumeIntegral<uint64_t>();
     authManager->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
+    bindParam[PARAM_KEY_AUTH_TYPE] = "1";
+    authManager->BindTarget(pkgName, targetId, bindParam, sessionId, logicalSessionId);
+    authManager->GetBindTargetParams(pkgName, targetId, bindParam);
+    authManager->SetBindTargetParams(targetId);
 }
 
 void OnSessionClosedFuzzTest(FuzzedDataProvider &fdp)
@@ -277,6 +292,10 @@ void OnUserOperationFuzzTest(FuzzedDataProvider &fdp)
     int32_t action = fdp.ConsumeIntegral<int32_t>();
     std::string params = fdp.ConsumeRandomLengthString();
     authSinkManager->OnUserOperation(action, params);
+    action = USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT;
+    authSinkManager->OnUserOperation(action, params);
+    action = USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY;
+    authSinkManager->OnUserOperation(action, params);
 }
 
 void OnSessionOpenedFuzzTest(FuzzedDataProvider &fdp)
@@ -285,6 +304,7 @@ void OnSessionOpenedFuzzTest(FuzzedDataProvider &fdp)
     int32_t sessionSide = fdp.ConsumeIntegral<int32_t>();
     int32_t result = fdp.ConsumeIntegral<int32_t>();
     authManager->OnSessionOpened(sessionId, sessionSide, result);
+    authSinkManager->OnSessionOpened(sessionId, sessionSide, result);
 }
 
 void OnSrcSessionClosedFuzzTest(FuzzedDataProvider &fdp)
@@ -306,6 +326,10 @@ void OnSrcUserOperationFuzzTest(FuzzedDataProvider &fdp)
 {
     int32_t action = fdp.ConsumeIntegral<int32_t>();
     std::string params = fdp.ConsumeRandomLengthString();
+    authManager->OnUserOperation(action, params);
+    action = USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT;
+    authManager->OnUserOperation(action, params);
+    action = USER_OPERATION_TYPE_DONE_PINCODE_INPUT;
     authManager->OnUserOperation(action, params);
 }
 
@@ -341,6 +365,15 @@ void AuthSinkDeviceRequestFuzzTest(FuzzedDataProvider &fdp)
     authSinkManager->AuthDeviceRequest(requestId, operationCode, reqParams);
     authManager->DeleteTimer();
     authManager->GetBindCallerInfo();
+}
+
+void HandleBusinessEventsFuzzTest(FuzzedDataProvider &fdp)
+{
+    std::string businessId = fdp.ConsumeRandomLengthString();
+    int action = fdp.ConsumeIntegral<int>();
+    authManager->HandleBusinessEvents(businessId, action);
+    authManager->ClearSoftbusSessionCallback();
+    authManager->PrepareSoftbusSessionCallback();
 }
 
 void AuthManagerFuzzTest(const uint8_t* data, size_t size)
@@ -388,6 +421,7 @@ void AuthManagerFuzzTest(const uint8_t* data, size_t size)
     AuthSinkDeviceTransmitFuzzTest(fdp);
     AuthSinkDeviceSessionKeyFuzzTest(fdp);
     AuthSinkDeviceRequestFuzzTest(fdp);
+    HandleBusinessEventsFuzzTest(fdp);
 }
 }
 }

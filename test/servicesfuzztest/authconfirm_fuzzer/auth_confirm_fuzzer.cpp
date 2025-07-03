@@ -118,6 +118,7 @@ void GenerateJsonObject(JsonObject &jsonObject, FuzzedDataProvider &fdp)
     jsonObject[TAG_PEER_BUNDLE_NAME_V2] = fdp.ConsumeRandomLengthString();
     jsonObject[DM_TAG_LOGICAL_SESSION_ID] = fdp.ConsumeIntegral<uint64_t>();
     jsonObject[TAG_PEER_DISPLAY_ID] = fdp.ConsumeIntegral<int32_t>();
+    jsonObject[DM_BUSINESS_ID] = fdp.ConsumeRandomLengthString();
 }
 
 void ActionFuzzTest()
@@ -187,6 +188,34 @@ void AuthConfirmFuzzTestNext(JsonObject &jsonObject, FuzzedDataProvider &fdp)
     authSinkNegotiateStateMachine_->ShareAclCompare(context_, accesser, accessee);
     authSinkNegotiateStateMachine_->Point2PointAclCompare(context_, accesser, accessee);
     authSinkNegotiateStateMachine_->LnnAclCompare(context_, accesser, accessee);
+    authSrcPinInputState_->ShowStartAuthDialog(context_);
+    authSrcPinInputState_->Action(context_);
+    context_->importAuthCode = "123456";
+    context_->importPkgName = "pkgName";
+    authSinkStatePinAuthComm_->IsAuthCodeReady(context_);
+    authSinkStatePinAuthComm_->IsPinCodeValid(context_->importAuthCode);
+}
+
+void AuthConfirmFuzzTestThird(FuzzedDataProvider &fdp)
+{
+    std::string businessId = fdp.ConsumeRandomLengthString();
+    std::string businessValue = fdp.ConsumeRandomLengthString();
+    authSinkNegotiateStateMachine_->IsAntiDisturbanceMode(businessId);
+    authSinkNegotiateStateMachine_->IsAntiDisturbanceMode("");
+    authSinkNegotiateStateMachine_->ParseAndCheckAntiDisturbanceMode(businessId, businessValue);
+    businessId = "test_business_id";
+    businessValue = "{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":true}";
+    authSinkNegotiateStateMachine_->ParseAndCheckAntiDisturbanceMode(businessId, businessValue);
+    authSrcNegotiateStateMachine_->GetStateType();
+    authSrcPinAuthStartState_->GetStateType();
+    authSinkPinAuthDoneState_->GetStateType();
+    authSrcReverseUltrasonicStartState_->GetStateType();
+    authSrcForwardUltrasonicStartState_->GetStateType();
+    authSinkReverseUltrasonicStartState_->GetStateType();
+    authSinkForwardUltrasonicDoneState_->GetStateType();
+    authSrcPinNegotiateStartState_->ProcessCredAuth(context_);
+    int32_t credType = fdp.ConsumeIntegral<int32_t>();
+    authSrcPinNegotiateStartState_->GetCredIdByCredType(context_, credType);
 }
 
 void AuthConfirmFuzzTest(const uint8_t* data, size_t size)
@@ -238,6 +267,7 @@ void AuthConfirmFuzzTest(const uint8_t* data, size_t size)
     authSrcConfirmState_->GetSrcAclInfo(context_, jsonObject, jsonObjectTwo);
     ActionFuzzTest();
     AuthConfirmFuzzTestNext(jsonObject, fdp);
+    AuthConfirmFuzzTestThird(fdp);
 }
 }
 }

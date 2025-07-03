@@ -72,6 +72,16 @@ void AddGroupInfo(std::vector<GroupInfo> &groupList)
     groupList.push_back(groupInfo2);
 }
 
+void GenerateJsonObject(JsonObject &jsonObject, FuzzedDataProvider &fdp)
+{
+    jsonObject[FIELD_GROUP_NAME] = fdp.ConsumeRandomLengthString();
+    jsonObject[FIELD_GROUP_ID] = fdp.ConsumeRandomLengthString();
+    jsonObject[FIELD_GROUP_OWNER] = fdp.ConsumeRandomLengthString();
+    jsonObject[FIELD_GROUP_TYPE] = fdp.ConsumeIntegral<int32_t>();
+    jsonObject[FIELD_GROUP_VISIBILITY] = fdp.ConsumeIntegral<int32_t>();
+    jsonObject[FIELD_USER_ID] = fdp.ConsumeRandomLengthString();
+}
+
 void AddAclInfo(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std::vector<int32_t> &userIdVec)
 {
     int32_t key = 12;
@@ -349,6 +359,13 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     std::vector<std::string> fieldDeviceList = {"deviceList"};
     jsonDeviceList[FIELD_DEVICE_LIST] = fieldDeviceList;
     hichainConnector->ParseRemoteCredential(groupType, userId, jsonDeviceList, params, osAccountUserId);
+    FuzzedDataProvider fdp(data, size);
+    int32_t userIdInt = fdp.ConsumeIntegral<int32_t>();
+    std::string groupId = fdp.ConsumeRandomLengthString();
+    hichainConnector->DeleteGroupExt(userIdInt, groupId);
+    GroupInfo groupInfo;
+    GenerateJsonObject(jsonObj, fdp);
+    FromJson(jsonObj, groupInfo);
 }
 
 void HiChainConnectorSevenhFuzzTest(const uint8_t* data, size_t size)

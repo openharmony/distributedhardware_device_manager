@@ -59,6 +59,10 @@ void DmCommToolFuzzTest(const uint8_t* data, size_t size)
     dmCommToolPtr_->ProcessResponseUserIdsEvent(innerCommMsg);
     dmCommToolPtr_->ProcessReceiveCommonEvent(innerCommMsg);
     dmCommToolPtr_->ProcessResponseCommonEvent(innerCommMsg);
+    dmCommToolPtr_->ProcessReceiveUninstAppEvent(innerCommMsg);
+    dmCommToolPtr_->ProcessReceiveUnBindAppEvent(innerCommMsg);
+    dmCommToolPtr_->ProcessReceiveRspAppUninstallEvent(innerCommMsg);
+    dmCommToolPtr_->ProcessReceiveRspAppUnbindEvent(innerCommMsg);
     dmCommToolPtr_->GetDMTransportPtr();
     dmCommToolPtr_->GetEventHandler();
 }
@@ -87,6 +91,15 @@ void DmCommToolFirstFuzzTest(const uint8_t* data, size_t size)
     std::string commonEventType;
     EventCallback eventCallback;
     dmCommToolPtr_->StartCommonEvent(commonEventType, eventCallback);
+    dmCommToolPtr_->Init();
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
+    int32_t tokenId = fdp.ConsumeIntegral<int32_t>();
+    dmCommToolPtr_->SendUninstAppObj(userId, tokenId, rmtNetworkId);
+    dmCommToolPtr_->RspAppUninstall(rmtNetworkId, socketId);
+    dmCommToolPtr_->RspAppUnbind(rmtNetworkId, socketId);
+    std::string udid = fdp.ConsumeRandomLengthString();
+    dmCommToolPtr_->SendUnBindAppObj(userId, tokenId, msg, rmtNetworkId, udid);
+    dmCommToolPtr_->StopSocket(rmtNetworkId);
 }
 }
 }

@@ -57,6 +57,27 @@ void GenerateJsonObject(JsonObject &jsonObject, FuzzedDataProvider &fdp)
     jsonObject[TAG_PEER_BUNDLE_NAME_V2] = fdp.ConsumeRandomLengthString();
     jsonObject[DM_TAG_LOGICAL_SESSION_ID] = fdp.ConsumeIntegral<uint64_t>();
     jsonObject[TAG_PEER_DISPLAY_ID] = fdp.ConsumeIntegral<int32_t>();
+    jsonObject[TAG_TRANSMIT_SK_ID] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_TRANSMIT_SK_TIMESTAMP] = fdp.ConsumeIntegral<int64_t>();
+    jsonObject[TAG_TRANSMIT_CREDENTIAL_ID] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_DMVERSION] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_LNN_SK_ID] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_LNN_SK_TIMESTAMP] = fdp.ConsumeIntegral<int64_t>();
+    jsonObject[TAG_LNN_CREDENTIAL_ID] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_MSG_TYPE] = fdp.ConsumeIntegral<int32_t>();
+    jsonObject[TAG_SYNC] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_ACCESS] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_DEVICE_VERSION] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_DEVICE_NAME] = fdp.ConsumeRandomLengthString();
+    jsonObject[TAG_NETWORKID_ID] = fdp.ConsumeRandomLengthString();
+}
+
+void AuthContextFuzzTest(FuzzedDataProvider &fdp)
+{
+    DmAuthSide side = DmAuthSide::DM_AUTH_LOCAL_SIDE;
+    DmAuthScope scope = DmAuthScope::DM_AUTH_SCOPE_INVALID;
+    std::string publicKey = fdp.ConsumeRandomLengthString();
+    context_->SetPublicKey(side, scope, publicKey);
 }
 
 void AuthMessageProcessorFuzzTestNext(JsonObject &jsonObject)
@@ -101,6 +122,13 @@ void AuthMessageProcessorFuzzTestNext(JsonObject &jsonObject)
     dmAuthMessageProcessor_ -> CreateMessageReverseUltrasonicStart(context_, jsonObject);
     dmAuthMessageProcessor_ -> CreateMessageForwardUltrasonicNegotiate(context_, jsonObject);
     dmAuthMessageProcessor_ -> CreateMessageReverseUltrasonicDone(context_, jsonObject);
+    dmAuthMessageProcessor_ -> CheckLogicalSessionId(jsonObject, context_);
+    std::string message = jsonObject.Dump();
+    dmAuthMessageProcessor_ -> ParseMessage(context_, message);
+    DmAccessControlTable table;
+    FromJson(jsonObject, table);
+    DmAccessToSync sync;
+    FromJson(jsonObject, sync);
 }
 
 void AuthMessageProcessorFuzzTest(const uint8_t* data, size_t size)
@@ -150,6 +178,7 @@ void AuthMessageProcessorFuzzTest(const uint8_t* data, size_t size)
     dmAuthMessageProcessor_ -> SetTransmitAccessControlList(context_, accesser, accessee);
     dmAuthMessageProcessor_ -> SetLnnAccessControlList(context_, accesser, accessee);
     AuthMessageProcessorFuzzTestNext(jsonObject);
+    AuthContextFuzzTest(fdp);
 }
 }
 }

@@ -1,0 +1,66 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/test.gni")
+import("../../../device_manager.gni")
+
+##############################fuzztest##########################################
+ohos_fuzztest("JsonObjectNlohmannjsonFuzzTest") {
+  module_out_path = fuzz_test_output_path
+  fuzz_config_file =
+      "${devicemanager_path}/test/commonfuzztest/jsonobjectnlohmannjson_fuzzer"
+
+  include_dirs = [
+    "${common_path}/include",
+    "${devicemanager_path}/json/include",
+  ]
+
+  cflags = [
+    "-g",
+    "-O0",
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = [
+    "json_object_nlohmannjson_fuzzer.cpp",
+    "${devicemanager_path}/json/src/json_object_nlohmannjson.cpp",
+    ]
+
+  deps = []
+
+  defines = [
+    "HI_LOG_ENABLE",
+    "DH_LOG_TAG=\"JsonObjectNlohmannjsonFuzzTest\"",
+    "LOG_DOMAIN=0xD004110",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "cJSON:cjson",
+    "hilog:libhilog",
+    "json:nlohmann_json_static"
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+
+  deps = [ ":JsonObjectNlohmannjsonFuzzTest" ]
+}
+###############################################################################

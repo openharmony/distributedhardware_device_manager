@@ -97,22 +97,30 @@ void DmTransPortMsgFirstFuzzTest(const uint8_t* data, size_t size)
     std::string msg(reinterpret_cast<const char*>(data), size);
     std::string remoteUdid(reinterpret_cast<const char*>(data), size);
     const char* jsonString = R"({
-        "MsgType": "0",
-        "userId": "12345",
         "accountId": "a******3",
-        "peerUdids": ["u******1", "u******2"],
-        "peerUdid": "p******d",
-        "accountName": "t******t",
-        "syncUserIdFlag": 1,
-        "userIds": [
-            {"type": 1, "userId": 111},
-            {"type": 0, "userId": 222}
-        ]
+        "userId": 123,
+        "tokenId": 123456,
+        "extra": "extra",
+        "udid": "p******d",
     })";
     cJSON* jsonObject = nullptr;
     LogoutAccountMsg accountInfo;
     ToJson(jsonObject, accountInfo);
     FromJson(jsonObject, accountInfo);
+    UninstAppMsg uninstAppMsg;
+    ToJson(jsonObject, uninstAppMsg);
+    FromJson(jsonObject, uninstAppMsg);
+    UnBindAppMsg unBindAppMsg;
+    ToJson(jsonObject, unBindAppMsg);
+    FromJson(jsonObject, unBindAppMsg);
+
+    jsonObject = cJSON_Parse(jsonString);
+    ToJson(jsonObject, accountInfo);
+    FromJson(jsonObject, accountInfo);
+    ToJson(jsonObject, uninstAppMsg);
+    FromJson(jsonObject, uninstAppMsg);
+    ToJson(jsonObject, unBindAppMsg);
+    FromJson(jsonObject, unBindAppMsg);
     cJSON_Delete(jsonObject);
 }
 }

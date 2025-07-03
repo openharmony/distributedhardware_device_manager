@@ -31,6 +31,8 @@ group("fuzztest") {
     "generateencrypteduuid_fuzzer:fuzztest",
     "getdeviceinfo_fuzzer:fuzztest",
     "hichainconnector_fuzzer:fuzztest",
+    "jsonobjectcjson_fuzzer:fuzztest",
+    "jsonobjectnlohmannjson_fuzzer:fuzztest",
     "ondatareceived_fuzzer:fuzztest",
     "ondatareceivedv2_fuzzer:fuzztest",
     "onerror_fuzzer:fuzztest",

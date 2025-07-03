@@ -32,11 +32,19 @@ void AuthAclFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
     std::string result = fdp.ConsumeRandomLengthString();
-    std::shared_ptr<DmAuthState> authSink = std::make_shared<AuthSinkDataSyncState>();
-    std::shared_ptr<DmAuthState> authSrc = std::make_shared<AuthSrcDataSyncState>();
+    std::shared_ptr<AuthSinkDataSyncState> authSink = std::make_shared<AuthSinkDataSyncState>();
+    std::shared_ptr<AuthSrcDataSyncState> authSrc = std::make_shared<AuthSrcDataSyncState>();
 
     authSink->GetStateType();
     authSrc->GetStateType();
+
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accesser.dmVersion = DM_VERSION_5_1_0;
+    context->accesser.isCommonFlag = true;
+    authSink->VerifyCertificate(context);
+    context->accesser.isCommonFlag = false;
+    authSink->VerifyCertificate(context);
+    authSink->VerifyCertificate(nullptr);
 }
 }
 }
