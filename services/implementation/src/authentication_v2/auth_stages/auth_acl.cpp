@@ -289,7 +289,7 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
     GetPeerDeviceId(context, peerDeviceId);
     bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
     // Trigger networking
-    if (context->reason = ERR_DM_BIND_TRUST_TARGET && (!context->accesser.isOnline || isNeedJoinLnn)) {
+    if (context->reason = DM_BIND_TRUST_TARGET && (!context->accesser.isOnline || isNeedJoinLnn)) {
         if (context->connSessionType == CONN_SESSION_TYPE_HML) {
             context->softbusConnector->JoinLnnByHml(context->sessionId, context->accesser.transmitSessionKeyId,
                 context->accessee.transmitSessionKeyId);

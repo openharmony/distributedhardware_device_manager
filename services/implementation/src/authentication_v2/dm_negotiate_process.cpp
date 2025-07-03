@@ -34,8 +34,8 @@ int32_t EndBind(std::shared_ptr<DmAuthContext> context)
     context->needBind = false;
     context->needAgreeCredential = false;
     context->needAuth = false;
-    context->reason = ERR_DM_BIND_TRUST_TARGET;
-    return ERR_DM_BIND_TRUST_TARGET;
+    context->reason = DM_BIND_TRUST_TARGET;
+    return DM_BIND_TRUST_TARGET;
 }
 
 int32_t OnlyCredAuth(std::shared_ptr<DmAuthContext> context)

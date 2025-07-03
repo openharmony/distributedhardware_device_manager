@@ -76,7 +76,7 @@ const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
 const std::map<int32_t, int32_t> NEW_AND_OLD_REPLAY_MAPPING = {
     { DM_ALREADY_AUTHED, SOFTBUS_OK },
     { SOFTBUS_OK, SOFTBUS_OK },
-    { ERR_DM_BIND_TRUST_TARGET, DM_OK }
+    { DM_BIND_TRUST_TARGET, DM_OK }
 };
 
 int32_t DmAuthState::GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut)
@@ -121,7 +121,7 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
     context->successFinished = true;
 
     if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED && context->reUseCreId.empty() &&
-        context->reason != ERR_DM_BIND_TRUST_TARGET) {
+        context->reason != DM_BIND_TRUST_TARGET) {
         // 根据凭据id 删除sink端多余的凭据
         context->hiChainAuthConnector->DeleteCredential(context->accesser.userId,
             context->accesser.lnnCredentialId);
