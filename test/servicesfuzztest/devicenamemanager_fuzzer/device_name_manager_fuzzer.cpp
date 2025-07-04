@@ -25,6 +25,7 @@
 
 #include "device_name_manager.h"
 #include "dm_constants.h"
+#include "dm_datashare_common_event.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -115,6 +116,10 @@ void DeviceNameManagerSecondFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<DeviceNameManager> deviceNameMgr = std::make_shared<DeviceNameManager>();
     deviceNameMgr->UnInit();
     deviceNameMgr->GetUserDefinedDeviceName();
+    deviceNameMgr_->GetSystemRegion();
+    DmDataShareCommonEventManager eventManager;
+    eventManager.eventValidFlag_ = true;
+    eventManager.UnsubscribeDataShareCommonEvent();
 }
 } // namespace DistributedHardware
 } // namespace OHOS

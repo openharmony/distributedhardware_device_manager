@@ -125,6 +125,11 @@ void SoftBusConnectorSecondFuzzTest(const uint8_t* data, size_t size)
     memcpy_s(nodeBasicInfo.networkId, sizeof(nodeBasicInfo.networkId), "networkId", sizeof("networkId"));
     memcpy_s(nodeBasicInfo.deviceName, sizeof(nodeBasicInfo.deviceName), "deviceName", sizeof("deviceName"));
     softbusConnector->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDeviceInfo);
+    DevUserInfo localUserInfo;
+    DevUserInfo remoteUserInfo;
+    std::string remoteAclList = fdp.ConsumeRandomLengthString();
+    softbusConnector->SyncLocalAclListProcess(localUserInfo, remoteUserInfo, remoteAclList);
+    softbusConnector->GetAclListHash(localUserInfo, remoteUserInfo, remoteAclList);
 }
 }
 }

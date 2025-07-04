@@ -24,7 +24,6 @@
 
 #include "data_query.h"
 #include "dm_anonymous.h"
-#include "dm_constants.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
 #include "ffrt.h"
@@ -42,6 +41,9 @@ namespace {
     constexpr int32_t MAX_INIT_RETRY_TIMES = 20;
     constexpr int32_t INIT_RETRY_SLEEP_INTERVAL = 200 * 1000; // 200ms
     constexpr uint32_t DM_OSTYPE_PREFIX_LEN = 16;
+    const char* PEER_UDID = "peer_udid";
+    const char* PEER_OSTYPE = "peer_os_type";
+    const char* TIME_STAMP = "timestamp";
 }
 
 int32_t KVAdapter::Init()

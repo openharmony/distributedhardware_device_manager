@@ -27,6 +27,17 @@ namespace OHOS {
 namespace DistributedHardware {
  
 namespace {}
+class DevTrustChangeCallbackTest : public DevTrustChangeCallback {
+public:
+    virtual ~DevTrustChangeCallbackTest() {}
+    void OnDeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm) override {}
+};
+
+class CredentialAuthStatusCallbackTest : public CredentialAuthStatusCallback {
+public:
+    virtual ~CredentialAuthStatusCallbackTest() {}
+    void OnCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode) override {}
+};
 
 void StopAuthenticateDeviceTest(const uint8_t *data, size_t size)
 {
@@ -69,6 +80,8 @@ void RegDevTrustChangeCallbackTest(const uint8_t *data, size_t size)
     std::shared_ptr<DevTrustChangeCallback> callback = nullptr;
     std::string pkgName = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
+    callback = std::make_shared<DevTrustChangeCallbackTest>();
+    DeviceManagerImpl::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
 }
 
 void GetNetworkIdByUdidTest(const uint8_t *data, size_t size)
@@ -92,6 +105,10 @@ void RegisterCredentialAuthStatusCallbackTest(const uint8_t *data, size_t size)
     std::string pkgName = fdp.ConsumeRandomLengthString();
     std::shared_ptr<CredentialAuthStatusCallback> callback = nullptr;
     DeviceManagerImpl::GetInstance().RegisterCredentialAuthStatusCallback(pkgName, callback);
+    callback = std::make_shared<CredentialAuthStatusCallbackTest>();
+    DeviceManagerImpl::GetInstance().RegisterCredentialAuthStatusCallback(pkgName, callback);
+    DeviceManagerImpl::GetInstance().UnRegisterCredentialAuthStatusCallback(pkgName);
+    DeviceManagerImpl::GetInstance().UnRegisterCredentialAuthStatusCallback("");
 }
 
 void GetAllTrustedDeviceListTest(const uint8_t *data, size_t size)
@@ -136,9 +153,9 @@ void GetDeviceIconInfoTest(const uint8_t *data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     std::string pkgName = fdp.ConsumeRandomLengthString();
-    DmDeviceProfileInfoFilterOptions filterOptions;
-    std::shared_ptr<GetDeviceProfileInfoListCallback> callback = nullptr;
-    DeviceManagerImpl::GetInstance().GetDeviceProfileInfoList(pkgName, filterOptions, callback);
+    DmDeviceIconInfoFilterOptions filterOptions;
+    std::shared_ptr<GetDeviceIconInfoCallback> callback = nullptr;
+    DeviceManagerImpl::GetInstance().GetDeviceIconInfo(pkgName, filterOptions, callback);
 }
 
 void PutDeviceProfileInfoListTest(const uint8_t *data, size_t size)
@@ -223,6 +240,16 @@ void GetLocalServiceInfoByBundleNameAndPinExchangeTypeTest(const uint8_t *data, 
     DeviceManagerImpl::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(bundleName, maxNameLength, info);
 }
 
+void GetErrorCodeTest(const uint8_t *data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t errCode = fdp.ConsumeIntegral<int32_t>();
+    DeviceManagerImpl::GetInstance().GetErrCode(errCode);
+}
+
 void UnRegisterPinHolderCallbackTest(const uint8_t *data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -251,6 +278,7 @@ void DeviceManagerImplFuzzTest(const uint8_t *data, size_t size)
     DmAccessCallee callee;
     DMIpcCmdInterfaceCode ipcCode = REGISTER_DEVICE_MANAGER_LISTENER;
     DeviceManagerImpl::GetInstance().GetLocalDeviceName(pkgName, deviceName);
+    DeviceManagerImpl::GetInstance().GetLocalDeviceName(pkgName);
     DeviceManagerImpl::GetInstance().UnBindDevice(pkgName, deviceId, extra);
     DeviceManagerImpl::GetInstance().UnRegisterSinkBindCallback(pkgName);
     DeviceManagerImpl::GetInstance().RegisterLocalServiceInfo(localServiceInfo);
@@ -290,5 +318,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::DistributedHardware::GetLocalServiceInfoByBundleNameAndPinExchangeTypeTest(data, size);
     OHOS::DistributedHardware::UnRegisterPinHolderCallbackTest(data, size);
     OHOS::DistributedHardware::DeviceManagerImplFuzzTest(data, size);
+    OHOS::DistributedHardware::GetErrorCodeTest(data, size);
     return 0;
 }

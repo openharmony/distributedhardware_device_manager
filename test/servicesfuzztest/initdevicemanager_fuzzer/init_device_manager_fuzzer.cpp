@@ -41,6 +41,10 @@ void InitDeviceManagerFuzzTest(const uint8_t* data, size_t size)
 
     DeviceManager::GetInstance().InitDeviceManager(packName, callback);
     DeviceManager::GetInstance().UnInitDeviceManager(packName);
+    packName = "";
+    callback = nullptr;
+    DeviceManager::GetInstance().InitDeviceManager(packName, callback);
+    DeviceManager::GetInstance().UnInitDeviceManager(packName);
 }
 }
 }

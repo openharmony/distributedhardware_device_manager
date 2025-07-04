@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 #include <unistd.h>
 
@@ -84,6 +85,12 @@ class DeviceManagerUiCallbackTest : public DeviceManagerUiCallback {
 public:
     virtual ~DeviceManagerUiCallbackTest() {}
     void OnCall(const std::string &paramJson) override {}
+};
+
+class DeviceScreenStatusCallbackTest : public DeviceScreenStatusCallback {
+public:
+    virtual ~DeviceScreenStatusCallbackTest() {}
+    void OnDeviceScreenStatus(const DmDeviceInfo &deviceInfo) override {}
 };
 
 std::string g_returnStr;
@@ -216,6 +223,7 @@ void AuthenticateDeviceFirstFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().RegisterDevStatusCallback(str, str, g_statusCallback);
     DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(str, g_Uicallback);
     std::string emptyStr = "";
+    DeviceManager::GetInstance().RegisterDevStateCallback(emptyStr, str, g_stateCallback);
     DeviceManager::GetInstance().AuthenticateDevice(str, g_authType, g_deviceInfo, emptyStr, g_callbackk);
     DeviceManager::GetInstance().UnAuthenticateDevice(str, g_deviceInfo);
     std::string pkgName = "pkgName";
@@ -278,6 +286,7 @@ void AuthenticateDeviceThirdFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().UnBindDevice(str, g_deviceInfo.deviceId);
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStateCallback(str);
+    DeviceManager::GetInstance().UnRegisterDevStateCallback(emptyStr);
     DeviceManager::GetInstance().UnRegisterDevStatusCallback(str);
     std::map<std::string, std::string> authParam;
     authParam[DM_AUTHENTICATION_TYPE] = str;
@@ -332,6 +341,7 @@ void AuthenticateDeviceFourthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().RemovePublishCallback("test");
     DeviceManagerImpl::GetInstance().RegisterPinHolderCallback(str, nullptr);
     DeviceManagerImpl::GetInstance().GetDeviceSecurityLevel(str, emptyStr, indexTwo);
+    DeviceManagerImpl::GetInstance().GetDeviceSecurityLevel(str, str, indexTwo);
     DeviceManagerImpl::GetInstance().IsSameAccount(emptyStr);
 }
 
@@ -371,19 +381,42 @@ void AuthenticateDeviceFifthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().BindDevice(str, 1, emptyStr, emptyStr, nullptr);
     DeviceManagerImpl::GetInstance().UnBindDevice(str, emptyStr);
     DeviceManagerImpl::GetInstance().GetNetworkTypeByNetworkId(str, emptyStr, indexTwo);
+    DeviceManagerImpl::GetInstance().GetNetworkTypeByNetworkId(str, str, indexTwo);
     DeviceManagerImpl::GetInstance().ImportAuthCode(emptyStr, emptyStr);
+    DeviceManagerImpl::GetInstance().ImportAuthCode(str, str);
+    std::string authCode = "123456";
+    DeviceManagerImpl::GetInstance().ImportAuthCode(str, authCode);
     DeviceManagerImpl::GetInstance().ExportAuthCode(g_returnStr);
+}
+
+void AuthenticateDeviceSixthFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0)) {
+        return;
+    }
+    AddPermission();
+    FuzzedDataProvider fdp(data, size);
+    std::string str = fdp.ConsumeRandomLengthString();
+
+    std::string emptyStr = "";
+    int32_t indexTwo = 2;
     std::map<std::string, std::string> discoverParam;
     DeviceManagerImpl::GetInstance().StartDiscovering(str, discoverParam, discoverParam, nullptr);
     DeviceManagerImpl::GetInstance().StopDiscovering(str, discoverParam);
     DeviceManagerImpl::GetInstance().RegisterDiscoveryCallback(str, discoverParam, discoverParam, nullptr);
     DeviceManagerImpl::GetInstance().UnRegisterDiscoveryCallback(str);
+    DeviceManagerImpl::GetInstance().UnRegisterDiscoveryCallback(emptyStr);
     DeviceManagerImpl::GetInstance().StartAdvertising(str, discoverParam, nullptr);
+    DeviceManagerImpl::GetInstance().StartAdvertising(str, discoverParam, g_publishCallback);
     DeviceManagerImpl::GetInstance().StopAdvertising(str, discoverParam);
     DeviceManagerImpl::GetInstance().SetDnPolicy(str, discoverParam);
     DeviceManagerImpl::GetInstance().RegisterDeviceScreenStatusCallback(emptyStr, nullptr);
     DeviceManagerImpl::GetInstance().UnRegisterDeviceScreenStatusCallback(emptyStr);
+    std::shared_ptr<DeviceScreenStatusCallback> callback = std::make_shared<DeviceScreenStatusCallbackTest>();
+    DeviceManagerImpl::GetInstance().RegisterDeviceScreenStatusCallback(str, callback);
+    DeviceManagerImpl::GetInstance().UnRegisterDeviceScreenStatusCallback(str);
     DeviceManagerImpl::GetInstance().GetDeviceScreenStatus(emptyStr, emptyStr, indexTwo);
+    DeviceManagerImpl::GetInstance().GetDeviceScreenStatus(str, str, indexTwo);
 }
 }
 }
@@ -397,5 +430,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::AuthenticateDeviceThirdFuzzTest(data, size);
     OHOS::DistributedHardware::AuthenticateDeviceFourthFuzzTest(data, size);
     OHOS::DistributedHardware::AuthenticateDeviceFifthFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceSixthFuzzTest(data, size);
     return 0;
 }

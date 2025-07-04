@@ -41,7 +41,7 @@ void AuthCredentialFuzzTest(const uint8_t* data, size_t size)
     context->isAppCredentialVerified = false;
     context->accesser.bindLevel = SERVICE;
     std::shared_ptr<DmAuthState> authFirst = std::make_shared<AuthSrcCredentialAuthNegotiateState>();
-    std::shared_ptr<DmAuthState> authSecond = std::make_shared<AuthSrcCredentialAuthDoneState>();
+    std::shared_ptr<AuthSrcCredentialAuthDoneState> authSecond = std::make_shared<AuthSrcCredentialAuthDoneState>();
     std::shared_ptr<DmAuthState> authThird = std::make_shared<AuthSinkCredentialAuthNegotiateState>();
     std::shared_ptr<DmAuthState> authForth = std::make_shared<AuthSrcCredentialExchangeState>();
     std::shared_ptr<DmAuthState> authFifth = std::make_shared<AuthSinkCredentialExchangeState>();
@@ -54,6 +54,7 @@ void AuthCredentialFuzzTest(const uint8_t* data, size_t size)
     context->accesser.isGenerateLnnCredential = false;
     authFirst->GetStateType();
     authSecond->GetStateType();
+    authSecond->GenerateCertificate(context);
     authThird->GetStateType();
     authForth->GetStateType();
     authFifth->GetStateType();

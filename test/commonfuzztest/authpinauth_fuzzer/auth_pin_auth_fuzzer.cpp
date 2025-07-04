@@ -49,10 +49,13 @@ void AuthPinAuthFuzzTest(const uint8_t* data, size_t size)
     auth2->GetStateType();
     int32_t credType = fdp.ConsumeIntegral<int32_t>();
     auth3->GetCredIdByCredType(context, credType);
+    context->pinNegotiateStarted = false;
+    auth3->ProcessPinBind(context);
     context->isAppCredentialVerified = true;
     context->accesser.isGenerateLnnCredential = false;
     context->listener = std::make_shared<DeviceManagerServiceListener>();
     auth4->ShowStartAuthDialog(context);
+    auth4->Action(context);
     auth5->GetStateType();
     auth6->GetStateType();
     auth7->GetStateType();

@@ -58,6 +58,8 @@ void DmFreezeProcessFuzzTest(const uint8_t *data, size_t size)
     FreezeProcess::GetInstance().ConvertJsonToBindFailedEvents(result, bindFailedEvents);
     bundleName = fdp.ConsumeRandomLengthString();
     deviceType = fdp.ConsumeIntegral<int32_t>();
+    freezeStateObj.startFreezeTimeStamp = fdp.ConsumeIntegral<int32_t>();
+    FreezeProcess::GetInstance().freezeStateCache_ = freezeStateObj;
     FreezeProcess::GetInstance().CleanBindFailedEvents(reservedDataTimeStamp);
     FreezeProcess::GetInstance().CleanFreezeState(reservedDataTimeStamp);
     FreezeProcess::GetInstance().ConvertDeviceFreezeStateToJson(freezeStateObj, result);
@@ -74,6 +76,8 @@ void DmFreezeProcessFuzzTest(const uint8_t *data, size_t size)
     nowTime = MAX_FREEZE_TIME;
     FreezeProcess::GetInstance().CalculateNextFreezeTime(nowTime, nextTime);
     FreezeProcess::GetInstance().DeleteFreezeRecord();
+    FreezeProcess::GetInstance().UpdateFreezeRecord();
+    FreezeProcess::GetInstance().ConvertBindFailedEventsToJson(bindFailedEvents, result);
 }
 }
 }

@@ -38,6 +38,8 @@ void DeviceListFuzzTest(const uint8_t* data, size_t size)
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
     DeviceManager::GetInstance().GetTrustedDeviceList(bundleName, extra, devList);
     DeviceManager::GetInstance().GetLocalDeviceInfo(bundleName, deviceInfo);
+    bundleName = "";
+    DeviceManager::GetInstance().GetTrustedDeviceList(bundleName, extra, devList);
 }
 }
 }
