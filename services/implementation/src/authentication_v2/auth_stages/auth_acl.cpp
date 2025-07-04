@@ -234,7 +234,7 @@ DmAuthStateType AuthSinkFinishState::GetStateType()
 int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcFinishState::Action start");
-    if (context->reason != DM_OK) {
+    if (context->reason != DM_OK && context->reason != DM_BIND_TRUST_TARGET) {
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
     } else {
         context->state = static_cast<int32_t>(GetStateType());
