@@ -75,7 +75,8 @@ const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
 
 const std::map<int32_t, int32_t> NEW_AND_OLD_REPLAY_MAPPING = {
     { DM_ALREADY_AUTHED, SOFTBUS_OK },
-    { SOFTBUS_OK, SOFTBUS_OK }
+    { SOFTBUS_OK, SOFTBUS_OK },
+    { DM_BIND_TRUST_TARGET, DM_OK }
 };
 
 int32_t DmAuthState::GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut)
@@ -119,7 +120,8 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
         GetOutputState(context->state), GenerateBindResultContent(context));
     context->successFinished = true;
 
-    if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED && context->reUseCreId.empty()) {
+    if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED && context->reUseCreId.empty() &&
+        context->reason != DM_BIND_TRUST_TARGET) {
         // 根据凭据id 删除sink端多余的凭据
         context->hiChainAuthConnector->DeleteCredential(context->accesser.userId,
             context->accesser.lnnCredentialId);
@@ -805,6 +807,50 @@ void DmAuthState::DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
         profile.GetAccesser().GetAccesserSessionKeyId() : profile.GetAccessee().GetAccesseeSessionKeyId();
     context->authMessageProcessor->DeleteSessionKeyToDP(userId, sessionKeyId);
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
+}
+
+void DmAuthState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId)
+{
+    CHECK_NULL_VOID(context);
+    if (context->accesser.aclProfiles.find(DM_IDENTICAL_ACCOUNT) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (context->accesser.aclProfiles.find(DM_SHARE) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
+        if (peerDeviceId == context->accesser.deviceId) {
+            peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccesser().GetAccesserDeviceId();
+        }
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (context->accesser.aclProfiles.find(DM_POINT_TO_POINT) != context->accesser.aclProfiles.end()) {
+        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
+        if (peerDeviceId == context->accesser.deviceId) {
+            peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
+        }
+        if (!peerDeviceId.empty()) {
+            return;
+        }
+    }
+    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
+        return;
+    }
+    for (auto &app : context->subjectProxyOnes) {
+        if (app.proxyAccesser.aclProfiles.find(DM_POINT_TO_POINT) != app.proxyAccesser.aclProfiles.end()) {
+            peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
+            if (peerDeviceId == context->accesser.deviceId) {
+                peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
+            }
+            if (!peerDeviceId.empty()) {
+                return;
+            }
+        }
+    }
+    LOGE("failed");
 }
 } // namespace DistributedHardware
 } // namespace OHOS

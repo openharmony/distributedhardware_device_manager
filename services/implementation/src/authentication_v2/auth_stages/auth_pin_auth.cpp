@@ -403,7 +403,7 @@ int32_t AuthSrcPinNegotiateStartState::Action(std::shared_ptr<DmAuthContext> con
         return ProcessPinBind(context);
     }
     if (!IsNeedBind(context) && !IsNeedAgreeCredential(context) && !IsNeedAuth(context)) {
-        context->reason = ERR_DM_BIND_TRUST_TARGET;
+        context->reason = DM_BIND_TRUST_TARGET;
         context->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
         return DM_OK;
     }

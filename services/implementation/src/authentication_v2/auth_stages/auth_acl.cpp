@@ -200,50 +200,6 @@ DmAuthStateType AuthSrcDataSyncState::GetStateType()
     return DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE;
 }
 
-void AuthSrcDataSyncState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId)
-{
-    CHECK_NULL_VOID(context);
-    if (context->accesser.aclProfiles.find(DM_IDENTICAL_ACCOUNT) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT].GetAccessee().GetAccesseeDeviceId();
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (context->accesser.aclProfiles.find(DM_SHARE) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccessee().GetAccesseeDeviceId();
-        if (peerDeviceId == context->accesser.deviceId) {
-            peerDeviceId = context->accesser.aclProfiles[DM_SHARE].GetAccesser().GetAccesserDeviceId();
-        }
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (context->accesser.aclProfiles.find(DM_POINT_TO_POINT) != context->accesser.aclProfiles.end()) {
-        peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
-        if (peerDeviceId == context->accesser.deviceId) {
-            peerDeviceId = context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
-        }
-        if (!peerDeviceId.empty()) {
-            return;
-        }
-    }
-    if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        return;
-    }
-    for (auto &app : context->subjectProxyOnes) {
-        if (app.proxyAccesser.aclProfiles.find(DM_POINT_TO_POINT) != app.proxyAccesser.aclProfiles.end()) {
-            peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccessee().GetAccesseeDeviceId();
-            if (peerDeviceId == context->accesser.deviceId) {
-                peerDeviceId = app.proxyAccesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserDeviceId();
-            }
-            if (!peerDeviceId.empty()) {
-                return;
-            }
-        }
-    }
-    LOGE("failed");
-}
-
 // Received 200 end message, send 201
 int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
@@ -278,13 +234,33 @@ DmAuthStateType AuthSinkFinishState::GetStateType()
 int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcFinishState::Action start");
-    if (context->reason != DM_OK) {
+    if (context->reason != DM_OK && context->reason != DM_BIND_TRUST_TARGET) {
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
     } else {
         context->state = static_cast<int32_t>(GetStateType());
     }
     context->isNeedJoinLnn = true;
     SourceFinish(context);
+    std::string peerDeviceId = "";
+    GetPeerDeviceId(context, peerDeviceId);
+    bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
+    // Trigger networking
+    if (context->reason == DM_BIND_TRUST_TARGET && (!context->accesser.isOnline || isNeedJoinLnn)) {
+        if (context->connSessionType == CONN_SESSION_TYPE_HML) {
+            context->softbusConnector->JoinLnnByHml(context->sessionId, context->accesser.transmitSessionKeyId,
+                context->accessee.transmitSessionKeyId);
+        } else {
+            char udidHashTmp[DM_MAX_DEVICE_ID_LEN] = {0};
+            if (Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t*>(udidHashTmp)) != DM_OK) {
+                LOGE("AuthSrcDataSyncState joinLnn get udidhash by udid: %{public}s failed",
+                    GetAnonyString(context->accessee.deviceId).c_str());
+                return ERR_DM_FAILED;
+            }
+            std::string peerUdidHash = std::string(udidHashTmp);
+            context->softbusConnector->JoinLNNBySkId(context->sessionId, context->accesser.transmitSessionKeyId,
+                context->accessee.transmitSessionKeyId, context->accessee.addr, peerUdidHash);
+        }
+    }
     LOGI("AuthSrcFinishState::Action ok");
     std::shared_ptr<DmAuthContext> tempContext = context;
     auto taskFunc = [this, tempContext]() {
