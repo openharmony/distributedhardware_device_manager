@@ -16,7 +16,7 @@
 @!namespace("@ohos.distributedDeviceManager", "distributedDeviceManager")
 
 @!sts_inject("""
-static { loadLibrary("device_manager_ani_taihe");}
+static { loadLibrary("device_manager_ani_taihe.z");}
 """)
 
 struct  DeviceBasicInfo {
@@ -76,17 +76,17 @@ interface DeviceManager {
     @!sts_inject_into_interface("on(type: string, callback: (data: object) => void): void;")
     @!sts_inject_into_class("""on(type: string, callback: object): void {
         if (type === "discoverSuccess") {
-            this.OnDiscoverSuccess_inner(callback as (data: DeviceStateChangeAction) => void);
+            this.onDiscoverSuccess(callback as (data: DeviceStateChangeAction) => void);
         } else if (type === "deviceStateChange") {
-            this.OnDeviceStateChange_inner(callback as (data: DeviceStateChangeData) => void);
+            this.onDeviceStateChange(callback as (data: DeviceStateChangeData) => void);
         } else if (type === "replyResult") {
-            this.OnreplyResult_inner(callback as (data: DeviceResult) => void);
+            this.onreplyResult(callback as (data: DeviceResult) => void);
         } else if (type === "deviceNameChange") {
-            this.OnDeviceNameChange_inner(callback as (data: DeviceResult) => void);
+            this.onDeviceNameChange(callback as (data: DeviceResult) => void);
         } else if (type === "discoverFailure") {
-            this.OnDiscoverFailure_inner(callback as (data: DeviceResultNumber) => void);
+            this.onDiscoverFailure(callback as (data: DeviceResultNumber) => void);
         } else if (type ==="serviceDie") {
-            this.OnServiceDie_inner(callback as () => void);
+            this.onServiceDie(callback as () => void);
         } else {
             throw new Error(`Unknown type: ${type}`);
         }
@@ -96,17 +96,17 @@ interface DeviceManager {
     @!sts_inject_into_interface("off(type: string, callback?: (data: object) => void): void;")
     @!sts_inject_into_class("""off(type: string, callback?: object): void {
         if (type === "discoverSuccess") {
-            this.OffDiscoverSuccess_inner(callback as (((data: DeviceStateChangeAction) => void) | undefined));
+            this.offDiscoverSuccess(callback as (((data: DeviceStateChangeAction) => void) | undefined));
         } else if (type === "deviceStateChange") {
-            this.OffDeviceStateChange_inner(callback as (((data: DeviceStateChangeData) => void) | undefined));
+            this.offDeviceStateChange(callback as (((data: DeviceStateChangeData) => void) | undefined));
         } else if (type === "replyResult") {
-            this.OffreplyResult_inner(callback as (((data: DeviceResult) => void) | undefined));
+            this.offreplyResult(callback as (((data: DeviceResult) => void) | undefined));
         } else if (type === "deviceNameChange") {
-            this.OffDeviceNameChange_inner(callback as (((data: DeviceResult) => void) | undefined));
+            this.offDeviceNameChange(callback as (((data: DeviceResult) => void) | undefined));
         } else if (type === "discoverFailure"){
-            this.OffDiscoverFailure_inner(callback as (((data: DeviceResultNumber) => void) | undefined));
+            this.offDiscoverFailure(callback as (((data: DeviceResultNumber) => void) | undefined));
         } else if (type ==="serviceDie") {
-            this.OffServiceDie_inner(callback as () => void);
+            this.offServiceDie(callback as () => void);
         }else {
             throw new Error(`Unknown type: ${type}`);
         }
