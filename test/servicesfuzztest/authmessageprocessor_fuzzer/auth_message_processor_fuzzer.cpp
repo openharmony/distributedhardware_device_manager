@@ -70,6 +70,7 @@ void GenerateJsonObject(JsonObject &jsonObject, FuzzedDataProvider &fdp)
     jsonObject[TAG_DEVICE_VERSION] = fdp.ConsumeRandomLengthString();
     jsonObject[TAG_DEVICE_NAME] = fdp.ConsumeRandomLengthString();
     jsonObject[TAG_NETWORKID_ID] = fdp.ConsumeRandomLengthString();
+    jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = fdp.ConsumeRandomLengthString();
 }
 
 void AuthContextFuzzTest(FuzzedDataProvider &fdp)
@@ -131,6 +132,52 @@ void AuthMessageProcessorFuzzTestNext(JsonObject &jsonObject)
     FromJson(jsonObject, sync);
 }
 
+void AuthMessageProcessorFuzzTestNextTwo(FuzzedDataProvider &fdp, JsonObject &jsonObject)
+{
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
+    int32_t skId = fdp.ConsumeIntegral<int32_t>();
+    std::string suffix = fdp.ConsumeRandomLengthString();
+    int64_t tokenId = fdp.ConsumeIntegral<int64_t>();
+    DistributedDeviceProfile::AccessControlProfile acl;
+    DistributedDeviceProfile::Accesser accesser;
+    DistributedDeviceProfile::Accessee accessee;
+    acl.SetExtraData(fdp.ConsumeRandomLengthString());
+    accesser.SetAccesserExtraData(fdp.ConsumeRandomLengthString());
+    accessee.SetAccesseeExtraData(fdp.ConsumeRandomLengthString());
+    DmProxyAuthContext dmProxyAuthContext;
+    dmProxyAuthContext.customData = fdp.ConsumeRandomLengthString();
+    context_->IsProxyBind = false;
+    context_->subjectProxyOnes.clear();
+    dmAuthMessageProcessor_->ParseProxyCredExchangeToSync(context_, jsonObject);
+    context_->IsProxyBind = true;
+    context_->subjectProxyOnes.emplace_back(dmProxyAuthContext);
+    dmAuthMessageProcessor_->ParseProxyCredExchangeToSync(context_, jsonObject);
+    dmAuthMessageProcessor_->CreateProxyNegotiateMessage(context_, jsonObject);
+    dmAuthMessageProcessor_->CreateProxyRespNegotiateMessage(context_, jsonObject);
+    dmAuthMessageProcessor_->CreateProxyCredExchangeMessage(context_, jsonObject);
+    dmAuthMessageProcessor_->ParseProxyAccessToSync(context_, jsonObject);
+    dmAuthMessageProcessor_->ParseProxyNegotiateMessage(jsonObject, context_);
+    context_->accessee.dmVersion = DM_VERSION_5_1_0;
+    dmAuthMessageProcessor_->ParseMessageProxyRespAclNegotiate(jsonObject, context_);
+    context_->accessee.dmVersion = DM_VERSION_5_1_1;
+    dmAuthMessageProcessor_->ParseMessageProxyRespAclNegotiate(jsonObject, context_);
+    dmAuthMessageProcessor_->ParseMessageProxyReqUserConfirm(jsonObject, context_);
+    dmAuthMessageProcessor_->ParseMessageProxyRespUserConfirm(jsonObject, context_);
+    dmAuthMessageProcessor_->CreateMessageProxyReqUserConfirm(context_, jsonObject);
+    dmAuthMessageProcessor_->CreateProxyAccessMessage(context_, jsonObject);
+    dmAuthMessageProcessor_->cryptoMgr_ = std::make_shared<CryptoMgr>();
+    dmAuthMessageProcessor_->SaveDerivativeSessionKeyToDP(userId, suffix, skId);
+    dmAuthMessageProcessor_->GetSessionKey(userId, skId);
+    context_->accesser.extraInfo = "";
+    dmAuthMessageProcessor_->SetProxyAccess(context_, dmProxyAuthContext, accesser, accessee);
+    dmAuthMessageProcessor_->PutProxyAccessControlList(context_, acl, accesser, accessee);
+    dmAuthMessageProcessor_->IsExistTheToken(jsonObject, tokenId);
+    dmAuthMessageProcessor_->SetAclProxyRelate(context_);
+    acl.accesser_.SetAccesserExtraData("");
+    acl.accessee_.SetAccesseeExtraData("");
+    dmAuthMessageProcessor_->SetAclProxyRelate(context_, acl);
+}
+
 void AuthMessageProcessorFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
@@ -178,6 +225,7 @@ void AuthMessageProcessorFuzzTest(const uint8_t* data, size_t size)
     dmAuthMessageProcessor_ -> SetTransmitAccessControlList(context_, accesser, accessee);
     dmAuthMessageProcessor_ -> SetLnnAccessControlList(context_, accesser, accessee);
     AuthMessageProcessorFuzzTestNext(jsonObject);
+    AuthMessageProcessorFuzzTestNextTwo(fdp, jsonObject);
     AuthContextFuzzTest(fdp);
 }
 }
