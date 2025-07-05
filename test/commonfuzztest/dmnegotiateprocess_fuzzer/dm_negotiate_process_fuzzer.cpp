@@ -19,10 +19,51 @@
 #include <string>
 
 #include "device_manager_service_listener.h"
+#include "dm_auth_state.h"
 #include "dm_negotiate_process.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+
+void RespQueryProxyAcceseeIdsFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->IsProxyBind = true;
+    context->accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    DmProxyAuthContext dmProxyAuthContext;
+    dmProxyAuthContext.proxyAccessee.bundleName = fdp.ConsumeRandomLengthString();
+    dmProxyAuthContext.proxyAccessee.tokenId = fdp.ConsumeIntegral<int64_t>();
+    context->subjectProxyOnes.push_back(dmProxyAuthContext);
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authSinkPtr = std::make_shared<AuthSinkNegotiateStateMachine>();
+    authSinkPtr->RespQueryProxyAcceseeIds(context);
+}
+
+void GetSinkProxyCredTypeForP2PFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->IsProxyBind = true;
+    context->accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    DmProxyAuthContext dmProxyAuthContext;
+    dmProxyAuthContext.proxyAccessee.bundleName = fdp.ConsumeRandomLengthString();
+    dmProxyAuthContext.proxyAccessee.tokenId = fdp.ConsumeIntegral<int64_t>();
+    dmProxyAuthContext.proxyAccessee.credInfoJson = fdp.ConsumeRandomLengthString();
+    dmProxyAuthContext.proxyAccessee.aclTypeList = fdp.ConsumeRandomLengthString();
+    dmProxyAuthContext.proxyAccessee.credTypeList = fdp.ConsumeRandomLengthString();
+    context->subjectProxyOnes.push_back(dmProxyAuthContext);
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authSinkPtr = std::make_shared<AuthSinkNegotiateStateMachine>();
+    std::vector<std::string> deleteCredInfo;
+    authSinkPtr->GetSinkProxyCredTypeForP2P(context, deleteCredInfo);
+    DistributedDeviceProfile::AccessControlProfile profile;
+    authSinkPtr->GetSinkProxyAclInfoForP2P(context, profile);
+}
 
 void DmNegotiateProcessFuzzTest(const uint8_t* data, size_t size)
 {
@@ -66,6 +107,9 @@ void DmNegotiateProcessFuzzTest(const uint8_t* data, size_t size)
     p2pCredP2pAclImportAuthType.NegotiateHandle(context);
     P2pCredP2pAclInputAuthType p2pCredP2pAclInputAuthType;
     p2pCredP2pAclInputAuthType.NegotiateHandle(context);
+
+    RespQueryProxyAcceseeIdsFuzzTest(data, size);
+    GetSinkProxyCredTypeForP2PFuzzTest(data, size);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
