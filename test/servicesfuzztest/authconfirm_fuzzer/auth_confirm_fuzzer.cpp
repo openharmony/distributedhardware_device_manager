@@ -165,6 +165,7 @@ void AuthConfirmFuzzTestNext(JsonObject &jsonObject, FuzzedDataProvider &fdp)
     authSrcConfirmState_->GetIdenticalCredentialInfo(context_, jsonObject);
     authSrcConfirmState_->GetShareCredentialInfo(context_, jsonObject);
     authSrcConfirmState_->GetP2PCredentialInfo(context_, jsonObject);
+    authSinkConfirmState_->CreateProxyData(context_, jsonObject);
     authSinkConfirmState_->NegotiateCredential(context_, jsonObject);
     authSinkConfirmState_->NegotiateAcl(context_, jsonObject);
     authSinkNegotiateStateMachine_->GetIdenticalCredentialInfo(context_, jsonObject);
@@ -200,6 +201,9 @@ void AuthConfirmFuzzTestThird(FuzzedDataProvider &fdp)
 {
     std::string businessId = fdp.ConsumeRandomLengthString();
     std::string businessValue = fdp.ConsumeRandomLengthString();
+    std::string authorizeInfo = fdp.ConsumeRandomLengthString();
+    std::vector<std::string> deleteCredInfo;
+    DistributedDeviceProfile::AccessControlProfile acl;
     authSinkNegotiateStateMachine_->IsAntiDisturbanceMode(businessId);
     authSinkNegotiateStateMachine_->IsAntiDisturbanceMode("");
     authSinkNegotiateStateMachine_->ParseAndCheckAntiDisturbanceMode(businessId, businessValue);
@@ -215,8 +219,18 @@ void AuthConfirmFuzzTestThird(FuzzedDataProvider &fdp)
     authSinkForwardUltrasonicDoneState_->GetStateType();
     authSrcPinNegotiateStartState_->ProcessCredAuth(context_);
     int32_t credType = fdp.ConsumeIntegral<int32_t>();
-    
     authSrcPinNegotiateStartState_->GetCredIdByCredType(context_, credType);
+    authSrcConfirmState_->NegotiateProxyCredential(context_);
+    authSrcConfirmState_->NegotiateProxyAcl(context_);
+    authSrcConfirmState_->ResetBindLevel(context_);
+    authSinkConfirmState_->GetBundleLabel(context_);
+    authSinkConfirmState_->NegotiateProxyAcl(context_);
+    authSinkConfirmState_->ProcessUserAuthorize(context_);
+    authSinkConfirmState_->ProcessServerAuthorize(context_);
+    authSinkConfirmState_->NegotiateProxyCredential(context_);
+    authSrcConfirmState_->GetSrcProxyCredTypeForP2P(context_, deleteCredInfo);
+    authSinkConfirmState_->ProcessUserOption(context_, authorizeInfo);
+    authSrcConfirmState_->GetSrcProxyAclInfoForP2P(context_, acl);
 }
 
 void AuthConfirmFuzzTest(const uint8_t* data, size_t size)
