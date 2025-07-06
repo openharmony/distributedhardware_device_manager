@@ -46,6 +46,7 @@ ohos_fuzztest("AuthCredentialFuzzTest") {
 
   deps = [
     "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${json_path}:devicemanagerjson",
     "${services_path}:devicemanagerservicetest",
     "${servicesimpl_path}:devicemanagerserviceimpl",
     "${utils_path}:devicemanagerutilstest",
