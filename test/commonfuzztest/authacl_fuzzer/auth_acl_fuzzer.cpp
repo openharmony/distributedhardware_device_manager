@@ -45,6 +45,7 @@ void AuthAclFuzzTest(const uint8_t* data, size_t size)
     context->accesser.isCommonFlag = false;
     authSink->VerifyCertificate(context);
     authSink->VerifyCertificate(nullptr);
+    
 }
 }
 }

@@ -215,6 +215,7 @@ void AuthConfirmFuzzTestThird(FuzzedDataProvider &fdp)
     authSinkForwardUltrasonicDoneState_->GetStateType();
     authSrcPinNegotiateStartState_->ProcessCredAuth(context_);
     int32_t credType = fdp.ConsumeIntegral<int32_t>();
+    
     authSrcPinNegotiateStartState_->GetCredIdByCredType(context_, credType);
 }
 
