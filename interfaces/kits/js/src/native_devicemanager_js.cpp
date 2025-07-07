@@ -207,7 +207,7 @@ napi_value CreateBusinessError(napi_env env, int32_t errCode, bool isAsync = tru
     return error;
 }
 
-void DeleteUvWork(uv_work_t *work)
+void DeleteUvWork(uv_work_t *&work)
 {
     if (work == nullptr) {
         return;
@@ -217,7 +217,7 @@ void DeleteUvWork(uv_work_t *work)
     LOGI("delete work!");
 }
 
-void DeleteDmNapiStateJsCallbackPtr(DmNapiStateJsCallback *pJsCallbackPtr)
+void DeleteDmNapiStateJsCallbackPtr(DmNapiStateJsCallback *&pJsCallbackPtr)
 {
     if (pJsCallbackPtr == nullptr) {
         return;
@@ -227,7 +227,7 @@ void DeleteDmNapiStateJsCallbackPtr(DmNapiStateJsCallback *pJsCallbackPtr)
     LOGI("delete DmNapiStateJsCallback callbackPtr!");
 }
 
-void DeleteAsyncCallbackInfo(DeviceInfoListAsyncCallbackInfo *pAsynCallbackInfo)
+void DeleteAsyncCallbackInfo(DeviceInfoListAsyncCallbackInfo *&pAsynCallbackInfo)
 {
     if (pAsynCallbackInfo == nullptr) {
         return;
