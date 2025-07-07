@@ -32,6 +32,7 @@ void AuthAclFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
     std::string result = fdp.ConsumeRandomLengthString();
+    std::string peerDeviceId = fdp.ConsumeRandomLengthString();
     std::shared_ptr<AuthSinkDataSyncState> authSink = std::make_shared<AuthSinkDataSyncState>();
     std::shared_ptr<AuthSrcDataSyncState> authSrc = std::make_shared<AuthSrcDataSyncState>();
 
@@ -45,6 +46,9 @@ void AuthAclFuzzTest(const uint8_t* data, size_t size)
     context->accesser.isCommonFlag = false;
     authSink->VerifyCertificate(context);
     authSink->VerifyCertificate(nullptr);
+    context->IsProxyBind = true;
+    authSink->DerivativeSessionKey(context);
+    authSrc->GetPeerDeviceId(context, peerDeviceId);
 }
 }
 }
