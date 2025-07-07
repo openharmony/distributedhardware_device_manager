@@ -220,6 +220,7 @@ void AuthConfirmFuzzTestThird(FuzzedDataProvider &fdp)
     authSrcPinNegotiateStartState_->ProcessCredAuth(context_);
     int32_t credType = fdp.ConsumeIntegral<int32_t>();
     authSrcPinNegotiateStartState_->GetCredIdByCredType(context_, credType);
+    context_->IsProxyBind = true;
     authSrcConfirmState_->NegotiateProxyCredential(context_);
     authSrcConfirmState_->NegotiateProxyAcl(context_);
     authSrcConfirmState_->ResetBindLevel(context_);
