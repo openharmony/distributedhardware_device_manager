@@ -16,6 +16,7 @@
 #include "ipc_server_stub.h"
 
 #include <cstdio>
+#include <unordered_set>
 
 #include "ipc_cmd_register.h"
 #include "ipc_skeleton.h"
@@ -44,6 +45,15 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+const std::unordered_set<int32_t> CLIENT_CODE { SERVER_DEVICE_STATE_NOTIFY, SERVER_DEVICE_FOUND, BIND_TARGET_RESULT,
+SERVER_DEVICE_DISCOVERY, SERVER_PUBLISH_FINISH, SERVER_AUTH_RESULT, SERVER_DEVICE_FA_NOTIFY, SERVER_CREDENTIAL_RESULT,
+SERVER_CREATE_PIN_HOLDER, SERVER_DESTROY_PIN_HOLDER, SERVER_CREATE_PIN_HOLDER_RESULT, SERVER_DESTROY_PIN_HOLDER_RESULT,
+SERVER_ON_PIN_HOLDER_EVENT, UNBIND_TARGET_RESULT, REMOTE_DEVICE_TRUST_CHANGE, SERVER_DEVICE_SCREEN_STATE_NOTIFY,
+SERVICE_CREDENTIAL_AUTH_STATUS_NOTIFY, SINK_BIND_TARGET_RESULT, GET_DEVICE_PROFILE_INFO_LIST_RESULT,
+GET_DEVICE_ICON_INFO_RESULT, SET_LOCAL_DEVICE_NAME_RESULT, SET_REMOTE_DEVICE_NAME_RESULT };
+}
+
 DM_IMPLEMENT_SINGLE_INSTANCE(IpcServerStub);
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(&IpcServerStub::GetInstance());
@@ -242,6 +252,9 @@ void IpcServerStub::OnStop()
 
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    if (CLIENT_CODE.find(code) != CLIENT_CODE.end()) {
+        return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+    }
     auto remoteDescriptor = data.ReadInterfaceToken();
     if (GetDescriptor() != remoteDescriptor) {
         LOGI("ReadInterfaceToken fail!");
