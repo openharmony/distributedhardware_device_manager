@@ -92,6 +92,7 @@ public:
     void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
 
     std::string GetLocalDisplayDeviceName() override;
+    int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,

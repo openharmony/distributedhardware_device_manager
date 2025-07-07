@@ -1529,8 +1529,8 @@ int DeviceManagerServiceImpl::OpenAuthSession(const std::string& deviceId,
             return ret;
         }
         LOGI("hmlActionId %{public}d, hmlEnable160M %{public}d", hmlActionId, hmlEnable160M);
-        return softbusConnector_->GetSoftbusSession()->OpenAuthSessionWithPara(deviceId,
-            hmlActionId, hmlEnable160M);
+        CHECK_NULL_RETURN(listener_, ERR_DM_FAILED);
+        return listener_->OpenAuthSessionWithPara(deviceId, hmlActionId, hmlEnable160M);
     } else {
         return softbusConnector_->GetSoftbusSession()->OpenAuthSession(deviceId);
     }

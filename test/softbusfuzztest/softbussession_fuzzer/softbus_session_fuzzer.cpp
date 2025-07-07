@@ -75,8 +75,6 @@ void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
     softbusSession->SendHeartbeatData(sessionId, str);
     softbusSession->OnSessionClosed(result);
     softbusSession->UnRegisterSessionCallback();
-    bool isEnable = fdp.ConsumeBool();
-    softbusSession->OpenAuthSessionWithPara(str, sessionId, isEnable);
 }
 }
 }
