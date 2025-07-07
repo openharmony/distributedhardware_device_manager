@@ -86,7 +86,7 @@ std::mutex g_authCallbackMapMutex;
 std::mutex g_bindCallbackMapMutex;
 std::mutex g_dmUiCallbackMapMutex;
 
-void DeleteUvWork(uv_work_t *work)
+void DeleteUvWork(uv_work_t *&work)
 {
     if (work == nullptr) {
         return;
@@ -96,7 +96,7 @@ void DeleteUvWork(uv_work_t *work)
     LOGI("delete work!");
 }
 
-void DeleteDmNapiStatusJsCallbackPtr(DmNapiStatusJsCallback *pJsCallbackPtr)
+void DeleteDmNapiStatusJsCallbackPtr(DmNapiStatusJsCallback *&pJsCallbackPtr)
 {
     if (pJsCallbackPtr == nullptr) {
         return;
@@ -106,7 +106,7 @@ void DeleteDmNapiStatusJsCallbackPtr(DmNapiStatusJsCallback *pJsCallbackPtr)
     LOGI("delete DmNapiStatusJsCallback callbackPtr!");
 }
 
-void DeleteAsyncCallbackInfo(DeviceBasicInfoListAsyncCallbackInfo *pAsynCallbackInfo)
+void DeleteAsyncCallbackInfo(DeviceBasicInfoListAsyncCallbackInfo *&pAsynCallbackInfo)
 {
     if (pAsynCallbackInfo == nullptr) {
         return;
