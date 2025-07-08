@@ -101,22 +101,22 @@ struct ConfirmCustomDialog {
 
     try {
       this.isFoldable = display.isFoldable();
-    } catch (error) {
-      console.error('Failed to get isFoldable:', error);
+    } catch (err) {
+      console.error('Failed to get isFoldable:', err);
       this.isFoldable = false;
     }
 
     try {
       this.isFolded = display.getFoldStatus();
     } catch (err) {
-      console.error('Failed to get FoldStatus:', error);
+      console.error('Failed to get FoldStatus:', err);
       this.isFolded = display.FoldStatus.FOLD_STATUS_UNKNOWN;
     }
 
     try {
       this.mLocalHeight = display.getDefaultDisplaySync().height;
-    } catch (error) {
-      console.error('Failed to get display height:', error);
+    } catch (err) {
+      console.error('Failed to get display height:', err);
       this.mLocalHeight = 1;
     }
 
