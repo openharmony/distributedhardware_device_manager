@@ -1704,6 +1704,7 @@ int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
 int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam)
 {
+    LOGI("DeviceManagerService::BindTarget");
     if (!PermissionManager::GetInstance().CheckNewPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
