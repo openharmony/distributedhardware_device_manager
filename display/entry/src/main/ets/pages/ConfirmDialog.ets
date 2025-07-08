@@ -58,9 +58,9 @@ struct ConfirmCustomDialog {
   @State isProxy: boolean = false;
   @State appDataList: AppData[] = [];
   @State selectedAppDataList: AppSendData[] = [];
-  @State isFoldable: boolean = display.isFoldable();
-  @State isFolded: display.FoldStatus = display.getFoldStatus();
-  @State mLocalHeight: number = display.getDefaultDisplaySync().height;
+  @State isFoldable: boolean = false;
+  @State isFolded: display.FoldStatus = display.FoldStatus.FOLD_STATUS_UNKNOWN;
+  @State mLocalHeight: number = 1;
   @State currentOrientation: window.Orientation = window.Orientation.UNSPECIFIED;
   @State marginValue: number = 0;
   @State fontSizeScale: number = AppStorage.get('fontSizeScale') as number;
@@ -98,6 +98,27 @@ struct ConfirmCustomDialog {
     this.updateOrientation();
     this.getDeviceType();
     this.appDataList = this.getAppDataList();
+
+    try {
+      this.isFoldable = display.isFoldable();
+    } catch (error) {
+      console.error('Failed to get isFoldable:', error);
+      this.isFoldable = false;
+    }
+
+    try {
+      this.isFolded = display.getFoldStatus();
+    } catch (err) {
+      console.error('Failed to get FoldStatus:', error);
+      this.isFolded = display.FoldStatus.FOLD_STATUS_UNKNOWN;
+    }
+
+    try {
+      this.mLocalHeight = display.getDefaultDisplaySync().height;
+    } catch (error) {
+      console.error('Failed to get display height:', error);
+      this.mLocalHeight = 1;
+    }
 
     if (AppStorage.get('isProxyBind') != null) {
       this.isProxy = AppStorage.get('isProxyBind') as boolean;
@@ -179,18 +200,31 @@ struct ConfirmCustomDialog {
     
     this.listener.on('change', () => {
       this.updateOrientation();
-      this.mLocalHeight = display.getDefaultDisplaySync().height;
+      try {
+        this.mLocalHeight = display.getDefaultDisplaySync().height;
+      } catch (err) {
+        console.error('Failed to get display height:', err);
+        this.mLocalHeight = 1;
+      }
     });
-    display.on('foldDisplayModeChange', () => {
-      this.updateFoldState();
-    });
+    try {
+      display.on('foldDisplayModeChange', () => {
+        this.updateFoldState();
+      });
+    } catch (err) {
+      console.error('Failed to register event listener:', err);
+    }
   }
 
   aboutToDisappear() {
     if (this.listener) {
       this.listener.off('change');
     }
-    display.off('foldDisplayModeChange');
+    try {
+      display.off('foldDisplayModeChange');
+    } catch (err) {
+      console.error('Failed to remove foldDisplayModeChange listener:', err);
+    }
     clearInterval(this.times);
   }
 
