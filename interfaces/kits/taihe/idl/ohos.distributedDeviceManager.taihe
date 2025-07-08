@@ -1,0 +1,137 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+@!namespace("@ohos.distributedDeviceManager", "distributedDeviceManager")
+
+@!sts_inject("""
+static { loadLibrary("device_manager_ani_taihe.z");}
+""")
+
+struct  DeviceBasicInfo {
+    deviceId: String;
+    deviceName: String;
+    deviceType: String;
+    networkId: String;
+    extraData: String;
+}
+
+function MakeDeviceBasicInfo(deviceId:String, deviceName:String, deviceType:String,
+                             networkId:String, extraData: String): DeviceBasicInfo;
+
+struct ServiceProfileInfo {
+    deviceId: String;
+}
+
+enum DeviceStateChange: i32 {
+    UNKNOWN = 0,
+    AVAILABLE = 1,
+    UNAVAILABLE = 2,
+}
+
+struct DeviceNameChangeResult {
+    deviceName: String;
+}
+
+function MakeDeviceNameChangeResult(deviceName: String): DeviceNameChangeResult;
+
+struct ReplyResult {
+    param: String;
+}
+
+function MakeReplyResult(param: String): ReplyResult;
+
+struct DiscoveryFailureResult {
+    reason: i32;
+}
+
+function MakeDiscoveryFailureResult(reason: i32): DiscoveryFailureResult;
+
+struct DiscoverySuccessResult {
+    device: DeviceBasicInfo;
+}
+
+function MakeDiscoverySuccessResult(device: DeviceBasicInfo): DiscoverySuccessResult;
+
+struct DeviceStateChangeResult {
+    deviceStateChange: DeviceStateChange;
+    deviceBasicInfo: DeviceBasicInfo;
+}
+
+function MakeDeviceStateChangeResult(deviceStateChange : DeviceStateChange,
+                                   deviceBasicInfo : DeviceBasicInfo): DeviceStateChangeResult;
+
+interface DeviceManager {
+    GetLocalDeviceId(): String;
+    UnbindTarget(deviceId: String): void;
+    GetDeviceType(networkId: String): f64;
+    GetDeviceName(networkId: String): String;
+    GetLocalDeviceNetworkId(): String;
+
+    @!sts_inject_into_interface("on(type: string, callback: (data: object) => void): void;")
+    @!sts_inject_into_class("""on(type: string, callback: object): void {
+        if (type === "discoverSuccess") {
+            this.onDiscoverSuccess(callback as (data: DiscoverySuccessResult) => void);
+        } else if (type === "deviceStateChange") {
+            this.onDeviceStateChange(callback as (data: DeviceStateChangeResult) => void);
+        } else if (type === "replyResult") {
+            this.onReplyResult(callback as (data: ReplyResult) => void);
+        } else if (type === "deviceNameChange") {
+            this.onDeviceNameChange(callback as (data: DeviceNameChangeResult) => void);
+        } else if (type === "discoverFailure") {
+            this.onDiscoverFailure(callback as (data: DiscoveryFailureResult) => void);
+        } else if (type ==="serviceDie") {
+            this.onServiceDie(callback as () => void);
+        } else {
+            throw new Error(`Unknown type: ${type}`);
+        }
+    }
+    """)
+
+    @!sts_inject_into_interface("off(type: string, callback?: (data: object) => void): void;")
+    @!sts_inject_into_class("""off(type: string, callback?: object): void {
+        if (type === "discoverSuccess") {
+            this.offDiscoverSuccess(callback as (((data: DiscoverySuccessResult) => void) | undefined));
+        } else if (type === "deviceStateChange") {
+            this.offDeviceStateChange(callback as (((data: DeviceStateChangeResult) => void) | undefined));
+        } else if (type === "replyResult") {
+            this.offReplyResult(callback as (((data: ReplyResult) => void) | undefined));
+        } else if (type === "deviceNameChange") {
+            this.offDeviceNameChange(callback as (((data: DeviceNameChangeResult) => void) | undefined));
+        } else if (type === "discoverFailure"){
+            this.offDiscoverFailure(callback as (((data: DiscoveryFailureResult) => void) | undefined));
+        } else if (type ==="serviceDie") {
+            this.offServiceDie(callback as () => void);
+        }else {
+            throw new Error(`Unknown type: ${type}`);
+        }
+    }
+    """)
+
+    OnDiscoverSuccess(onDiscoverSuccesscb: (device: DiscoverySuccessResult) => void): void;
+    OffDiscoverSuccess(offDiscoverSuccesscb: Optional<(device: DiscoverySuccessResult) => void>): void;
+    OnDeviceStateChange(onDeviceStateChangecb: (deviceStateChangeData: DeviceStateChangeResult) => void): void;
+    OffDeviceStateChange(offDeviceStateChangecb:
+                         Optional<(deviceStateChangeData: DeviceStateChangeResult) => void>): void;
+    OnReplyResult(onReplyResultcb: (data: ReplyResult) => void): void;
+    OffReplyResult(offReplyResultcb:  Optional<(data: ReplyResult) => void>): void;
+    OnDeviceNameChange(onDeviceNameChangecb: (deviceName: DeviceNameChangeResult) => void): void;
+    OffDeviceNameChange(offDeviceNameChangecb: Optional<(deviceName: DeviceNameChangeResult) => void>): void;
+    OnDiscoverFailure(onDiscoverFailurecb: (reason: DiscoveryFailureResult) => void): void;
+    OffDiscoverFailure(offDiscoverFailurecb: Optional<(reason: DiscoveryFailureResult) => void>): void;
+    OnServiceDie(onServiceDiecb: () => void): void;
+    OffServiceDie(offServiceDiecb: Optional<() => void>): void;
+}
+
+function CreateDeviceManager(bundleName: String): DeviceManager;
