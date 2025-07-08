@@ -370,7 +370,7 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetUserIdAndBindLevel_002, testing::e
 {
     std::string localUdid = "local_udid";
     std::string peerUdid = "peer_udid";
-        EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAccessControlProfile(_)).WillOnce(Return(DM_OK));
     std::map<int32_t, int32_t> result = connector.GetUserIdAndBindLevel(localUdid, peerUdid);
 
     EXPECT_TRUE(result.empty());
