@@ -95,30 +95,27 @@ struct ConfirmCustomDialog {
   }
 
   aboutToAppear() {
-    this.updateOrientation();
-    this.getDeviceType();
-    this.appDataList = this.getAppDataList();
-
     try {
       this.isFoldable = display.isFoldable();
     } catch (err) {
       console.error('Failed to get isFoldable:', err);
-      this.isFoldable = false;
     }
 
     try {
       this.isFolded = display.getFoldStatus();
     } catch (err) {
       console.error('Failed to get FoldStatus:', err);
-      this.isFolded = display.FoldStatus.FOLD_STATUS_UNKNOWN;
     }
 
     try {
       this.mLocalHeight = display.getDefaultDisplaySync().height;
     } catch (err) {
       console.error('Failed to get display height:', err);
-      this.mLocalHeight = 1;
     }
+
+    this.updateOrientation();
+    this.getDeviceType();
+    this.appDataList = this.getAppDataList();
 
     if (AppStorage.get('isProxyBind') != null) {
       this.isProxy = AppStorage.get('isProxyBind') as boolean;
@@ -204,7 +201,6 @@ struct ConfirmCustomDialog {
         this.mLocalHeight = display.getDefaultDisplaySync().height;
       } catch (err) {
         console.error('Failed to get display height:', err);
-        this.mLocalHeight = 1;
       }
     });
     try {
