@@ -3074,11 +3074,11 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleAccountCommonEvent(
             continue;
         }
         if ((item.GetAccesser().GetAccesserDeviceId() == localUdid &&
-            (find(backgroundUserIds.begin(), backgroundUserIds.end(),
-            item.GetAccesser().GetAccesserUserId()) != backgroundUserIds.end()) && item.GetStatus() == ACTIVE) ||
+            (find(foregroundUserIds.begin(), foregroundUserIds.end(),
+            item.GetAccesser().GetAccesserUserId()) == foregroundUserIds.end()) && item.GetStatus() == ACTIVE) ||
             (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
-            (find(backgroundUserIds.begin(), backgroundUserIds.end(),
-            item.GetAccessee().GetAccesseeUserId()) != backgroundUserIds.end()) && item.GetStatus() == ACTIVE)) {
+            (find(foregroundUserIds.begin(), foregroundUserIds.end(),
+            item.GetAccessee().GetAccesseeUserId()) == foregroundUserIds.end()) && item.GetStatus() == ACTIVE)) {
             item.SetStatus(INACTIVE);
             inActiveProfiles.push_back(item);
             continue;
