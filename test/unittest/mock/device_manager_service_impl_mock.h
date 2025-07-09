@@ -46,6 +46,10 @@ public:
     virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
     virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId) = 0;
+    virtual bool CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
+    virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
 };
@@ -69,6 +73,10 @@ public:
     MOCK_METHOD(void, HandleAppUnBindEvent, (int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId));
     MOCK_METHOD(void, HandleAppUnBindEvent, (int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId));
+    MOCK_METHOD(bool, CheckAccessControl, (const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid));
+    MOCK_METHOD(bool, CheckIsSameAccount, (const DmAccessCaller &caller, const std::string &srcUdid,
+        const DmAccessCallee &callee, const std::string &sinkUdid));
 };
 }
 }

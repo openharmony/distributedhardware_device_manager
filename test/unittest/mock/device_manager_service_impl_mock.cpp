@@ -102,5 +102,19 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleAppUnBindEvent(remoteUserId, remoteUdid,
         tokenId, peerTokenId);
 }
+
+bool DeviceManagerServiceImpl::CheckAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckAccessControl(caller, srcUdid, callee,
+        sinkUdid);
+}
+
+bool DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
+    const DmAccessCallee &callee, const std::string &sinkUdid)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckIsSameAccount(caller, srcUdid, callee,
+        sinkUdid);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
