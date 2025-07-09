@@ -47,6 +47,7 @@ const int32_t SOFTBUS_SUBSCRIBE_ID_MASK = 0x0000FFFF;
 const int32_t MAX_CACHED_DISCOVERED_DEVICE_SIZE = 100;
 const int32_t MAX_SOFTBUS_MSG_LEN = 2000;
 const int32_t MAX_OSTYPE_SIZE = 1000;
+constexpr int32_t MAX_CACHED_MAP_NUM = 5000;
 #if (defined(__LITEOS_M__) || defined(LITE_DEVICE))
 constexpr const char* DEVICE_ONLINE = "deviceOnLine";
 constexpr const char* DEVICE_OFFLINE = "deviceOffLine";
@@ -494,6 +495,10 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
     {
         std::lock_guard<std::mutex> lock(g_lockDeviceIdSet);
         if (deviceIdSet.find(std::string(dmDevInfo.deviceId)) == deviceIdSet.end()) {
+            if (deviceIdSet.size() >= MAX_CACHED_MAP_NUM) {
+                LOGE("deviceIdSet size exceed the limit!");
+                deviceIdSet.erase(deviceIdSet.begin());
+            }
             deviceIdSet.insert(std::string(dmDevInfo.deviceId));
             struct RadarInfo info = {
                 .funcName = "OnSoftbusDeviceFound",
@@ -519,6 +524,10 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         return;
     }
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
+    if (discoveredDeviceActionIdMap.size() >= MAX_CACHED_MAP_NUM) {
+        LOGE("discoveredDeviceActionIdMap size exceed the limit!");
+        discoveredDeviceActionIdMap.erase(discoveredDeviceActionIdMap.begin());
+    }
     discoveredDeviceActionIdMap[dmDevInfo.deviceId] = actionId;
     CacheDiscoveredDevice(device);
     for (auto &iter : lnnOpsCbkMap) {
@@ -745,6 +754,10 @@ int32_t SoftbusListener::RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         return ERR_DM_POINT_NULL;
     }
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
+    if (lnnOpsCbkMap.size() >= MAX_CACHED_MAP_NUM) {
+        LOGE("lnnOpsCbkMap size exceed the limit!");
+        return ERR_DM_FAILED;
+    }
     lnnOpsCbkMap.erase(pkgName);
     lnnOpsCbkMap.emplace(pkgName, callback);
     return DM_OK;
