@@ -495,7 +495,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
     {
         std::lock_guard<std::mutex> lock(g_lockDeviceIdSet);
         if (deviceIdSet.find(std::string(dmDevInfo.deviceId)) == deviceIdSet.end()) {
-            if (deviceIdSet.size() > MAX_CACHED_MAP_NUM) {
+            if (deviceIdSet.size() >= MAX_CACHED_MAP_NUM) {
                 LOGE("deviceIdSet size exceed the limit!");
                 return;
             }
@@ -524,7 +524,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         return;
     }
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
-    if (discoveredDeviceActionIdMap.size() > MAX_CACHED_MAP_NUM) {
+    if (discoveredDeviceActionIdMap.size() >= MAX_CACHED_MAP_NUM) {
         LOGE("discoveredDeviceActionIdMap size exceed the limit!");
         return;
     }
@@ -754,7 +754,7 @@ int32_t SoftbusListener::RegisterSoftbusLnnOpsCbk(const std::string &pkgName,
         return ERR_DM_POINT_NULL;
     }
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
-    if (lnnOpsCbkMap.size() > MAX_CACHED_MAP_NUM) {
+    if (lnnOpsCbkMap.size() >= MAX_CACHED_MAP_NUM) {
         LOGE("lnnOpsCbkMap size exceed the limit!");
         return ERR_DM_FAILED;
     }
@@ -1170,7 +1170,7 @@ void SoftbusListener::CacheDeviceInfo(const std::string deviceId, std::shared_pt
         discoveredDeviceMap.erase(deviceId);
     }
     deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
-    if (discoveredDeviceMap.size() > MAX_CACHED_MAP_NUM) {
+    if (discoveredDeviceMap.size() >= MAX_CACHED_MAP_NUM) {
         LOGE("discoveredDeviceMap size exceed the limit!");
         return;
     }
