@@ -497,7 +497,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
         if (deviceIdSet.find(std::string(dmDevInfo.deviceId)) == deviceIdSet.end()) {
             if (deviceIdSet.size() >= MAX_CACHED_MAP_NUM) {
                 LOGE("deviceIdSet size exceed the limit!");
-                return;
+                deviceIdSet.erase(deviceIdSet.begin());
             }
             deviceIdSet.insert(std::string(dmDevInfo.deviceId));
             struct RadarInfo info = {
@@ -526,7 +526,7 @@ void SoftbusListener::OnSoftbusDeviceFound(const DeviceInfo *device)
     std::lock_guard<std::mutex> lock(g_lnnCbkMapMutex);
     if (discoveredDeviceActionIdMap.size() >= MAX_CACHED_MAP_NUM) {
         LOGE("discoveredDeviceActionIdMap size exceed the limit!");
-        return;
+        discoveredDeviceActionIdMap.erase(discoveredDeviceActionIdMap.begin());
     }
     discoveredDeviceActionIdMap[dmDevInfo.deviceId] = actionId;
     CacheDiscoveredDevice(device);
