@@ -1170,10 +1170,6 @@ void SoftbusListener::CacheDeviceInfo(const std::string deviceId, std::shared_pt
         discoveredDeviceMap.erase(deviceId);
     }
     deviceVec.push_back(std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>(addrType, infoPtr));
-    if (discoveredDeviceMap.size() >= MAX_CACHED_MAP_NUM) {
-        LOGE("discoveredDeviceMap size exceed the limit!");
-        return;
-    }
     discoveredDeviceMap.insert(std::pair<std::string,
         std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>>(deviceId, deviceVec));
 }
