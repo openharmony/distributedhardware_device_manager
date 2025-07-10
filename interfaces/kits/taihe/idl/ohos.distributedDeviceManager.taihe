@@ -75,7 +75,7 @@ function MakeDeviceStateChangeResult(deviceStateChange : DeviceStateChange,
 interface DeviceManager {
     GetLocalDeviceId(): String;
     UnbindTarget(deviceId: String): void;
-    GetDeviceType(networkId: String): f64;
+    GetDeviceType(networkId: String): i32;
     GetDeviceName(networkId: String): String;
     GetLocalDeviceNetworkId(): String;
 
