@@ -787,12 +787,16 @@ int32_t DeviceProfileConnector::GetDeviceAclParam(DmDiscoveryInfo discoveryInfo,
     return DM_OK;
 }
 
-bool DeviceProfileConnector::CheckAuthFormProxyTokenId(const std::string &extraStr)
+bool DeviceProfileConnector::CheckAuthFormProxyTokenId(const std::string pkgName, const std::string &extraStr)
 {
     std::vector<int64_t> proxyTokenIdVec = JsonStrHandle::GetInstance().GetProxyTokenIdByExtra(extraStr);
     int64_t callingTokenId = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
     for (auto &proxyTokenId : proxyTokenIdVec) {
-        if (callingTokenId == proxyTokenId) {
+        std::string proxyBundleName;
+        if (AppManager::GetInstance().GetBundleNameByTokenId(proxyTokenId, proxyBundleName) != DM_OK) {
+            continue;
+        }
+        if (callingTokenId == proxyTokenId && pkgName == proxyBundleName) {
             return true;
         }
     }
@@ -811,12 +815,12 @@ int32_t DeviceProfileConnector::CheckAuthForm(DmAuthForm form, AccessControlProf
     }
     if (profiles.GetBindLevel() == APP || profiles.GetBindLevel() == SERVICE) {
         if ((discoveryInfo.pkgname == profiles.GetAccesser().GetAccesserBundleName() ||
-            CheckAuthFormProxyTokenId(profiles.GetAccesser().GetAccesserExtraData())) &&
+            CheckAuthFormProxyTokenId(discoveryInfo.pkgname, profiles.GetAccesser().GetAccesserExtraData())) &&
             discoveryInfo.localDeviceId == profiles.GetAccesser().GetAccesserDeviceId()) {
             return form;
         }
         if ((discoveryInfo.pkgname == profiles.GetAccessee().GetAccesseeBundleName() ||
-            CheckAuthFormProxyTokenId(profiles.GetAccessee().GetAccesseeExtraData())) &&
+            CheckAuthFormProxyTokenId(discoveryInfo.pkgname, profiles.GetAccessee().GetAccesseeExtraData())) &&
             discoveryInfo.localDeviceId == profiles.GetAccessee().GetAccesseeDeviceId()) {
             return form;
         }

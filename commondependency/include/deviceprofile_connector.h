@@ -343,7 +343,7 @@ private:
         const std::vector<DistributedDeviceProfile::AccessControlProfile> &profilesFilter, const int32_t &userId);
     int32_t GetAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, const std::string &trustDev,
         const std::string &reqDev);
-    bool CheckAuthFormProxyTokenId(const std::string &extraStr);
+    bool CheckAuthFormProxyTokenId(const std::string pkgName, const std::string &extraStr);
     int32_t CheckAuthForm(DmAuthForm form, DistributedDeviceProfile::AccessControlProfile profiles,
         DmDiscoveryInfo discoveryInfo);
     bool SingleUserProcess(const DistributedDeviceProfile::AccessControlProfile &profile, const DmAccessCaller &caller,
