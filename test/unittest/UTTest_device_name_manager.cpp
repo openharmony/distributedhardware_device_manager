@@ -673,5 +673,43 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_008, testing::ext::Tes
     EXPECT_EQ(result, "VeryLon...");
 }
 
+HWTEST_F(DeviceNameManagerTest, DependsIsReady_001, testing::ext::TestSize.Level1)
+{
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = false;
+    bool result = DeviceNameManager::GetInstance().DependsIsReady();
+    EXPECT_FALSE(result);
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+}
+
+HWTEST_F(DeviceNameManagerTest, DependsIsReady_002, testing::ext::TestSize.Level1)
+{
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    bool srcAccountSysReady = DeviceNameManager::GetInstance().isAccountSysReady_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = true;
+    DeviceNameManager::GetInstance().isAccountSysReady_ = false;
+    EXPECT_CALL(*multipleUserConnector_, GetCurrentAccountUserID()).WillRepeatedly(Return(DEFAULT_USER_ID));
+    bool result = DeviceNameManager::GetInstance().DependsIsReady();
+    EXPECT_FALSE(result);
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+    DeviceNameManager::GetInstance().isAccountSysReady_ = srcAccountSysReady;
+}
+
+HWTEST_F(DeviceNameManagerTest, DependsIsReady_003, testing::ext::TestSize.Level1)
+{
+    bool srcDataShareReady = DeviceNameManager::GetInstance().isDataShareReady_;
+    bool srcAccountSysReady = DeviceNameManager::GetInstance().isAccountSysReady_;
+    sptr<IRemoteObject> srcRemoteObj = DeviceNameManager::GetInstance().remoteObj_;
+    DeviceNameManager::GetInstance().isDataShareReady_ = true;
+    DeviceNameManager::GetInstance().isAccountSysReady_ = false;
+    DeviceNameManager::GetInstance().remoteObj_ = nullptr;
+    EXPECT_CALL(*multipleUserConnector_, GetCurrentAccountUserID()).WillRepeatedly(Return(0));
+    bool result = DeviceNameManager::GetInstance().DependsIsReady();
+    EXPECT_TRUE(DeviceNameManager::GetInstance().isAccountSysReady_);
+    EXPECT_FALSE(result);
+    DeviceNameManager::GetInstance().isDataShareReady_ = srcDataShareReady;
+    DeviceNameManager::GetInstance().isAccountSysReady_ = srcAccountSysReady;
+    DeviceNameManager::GetInstance().remoteObj_ = srcRemoteObj;
+}
 } // DistributedHardware
 } // OHOS
