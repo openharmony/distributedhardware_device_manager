@@ -33,45 +33,46 @@ ohos_taihe("run_taihe") {
   ]
 }
 
-taihe_shared_library("device_manager_ani_taihe") {
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
+if (device_manager_enable_ets_frontend) {
+  taihe_shared_library("device_manager_ani_taihe") {
+    sanitize = {
+      integer_overflow = true
+      ubsan = true
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+    }
+
+    taihe_generated_file_path = "$taihe_generated_file_path"
+    subsystem_name = "$subsystem_name"
+    part_name = "$part_name"
+
+    include_dirs = [
+      "include",
+      "${innerkits_path}/native_cpp/include",
+      "${devicemanager_path}/interfaces/kits/taihe/include",
+    ]
+
+    sources = get_target_outputs(":run_taihe")
+    sources += [
+      "src/ani_constructor.cpp",
+      "src/ohos.distributedDeviceManager.cpp",
+      "src/dm_ani_callback.cpp"
+    ]
+
+    deps = [
+      ":run_taihe",
+      "${innerkits_path}/native_cpp:devicemanagersdk"
+    ]
+
+    external_deps = [
+      "hilog:libhilog",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
+      "eventhandler:libeventhandler",
+    ]
   }
-
-  taihe_generated_file_path = "$taihe_generated_file_path"
-  subsystem_name = "$subsystem_name"
-  part_name = "$part_name"
-
-  include_dirs = [
-    "include",
-    "${innerkits_path}/native_cpp/include",
-    "${devicemanager_path}/interfaces/kits/taihe/include",
-  ]
-
-  sources = get_target_outputs(":run_taihe")
-  sources += [
-    "src/ani_constructor.cpp",
-    "src/ohos.distributedDeviceManager.cpp",
-    "src/dm_ani_callback.cpp"
-  ]
-
-  deps = [
-    ":run_taihe",
-    "${innerkits_path}/native_cpp:devicemanagersdk"
-  ]
-
-  external_deps = [
-    "hilog:libhilog",
-    "bundle_framework:appexecfwk_base",
-    "bundle_framework:appexecfwk_core",
-    "eventhandler:libeventhandler",
-  ]
-}
 
   generate_static_abc("ohos_distributedDeviceManager_abc") {
     base_url = "$taihe_generated_file_path"
@@ -90,10 +91,13 @@ taihe_shared_library("device_manager_ani_taihe") {
       ":ohos_distributedDeviceManager_abc"
     ]
   }
+}
 
 group("devicemanager_ani") {
-  deps = [
-    ":device_manager_ani_taihe",
-    ":ohos_distributedDeviceManager_etc",
-  ]
+  if (device_manager_enable_ets_frontend) {
+    deps = [
+      ":device_manager_ani_taihe",
+      ":ohos_distributedDeviceManager_etc",
+    ]
+  }
 }
