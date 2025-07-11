@@ -32,15 +32,17 @@ namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
 constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
-constexpr int32_t AUTH_CODE_WHITE_LIST_NUM = 6;
-constexpr const static char* g_authCodeWhiteList[AUTH_CODE_WHITE_LIST_NUM] = {
+constexpr const static char* AUTH_CODE_WHITE_LIST[] = {
     "com.huawei.msdp.hmringgenerator",
     "com.huawei.msdp.hmringdiscriminator",
     "CollaborationFwk",
     "wear_link_service",
     "watch_system_service",
     "cast_engine_service",
+    "glasses_collaboration_service",
+    "xr_glass_app_service",
 };
+constexpr int32_t AUTH_CODE_WHITE_LIST_NUM = std::size(AUTH_CODE_WHITE_LIST);
 
 constexpr int32_t PIN_HOLDER_WHITE_LIST_NUM = 1;
 constexpr const static char* g_pinHolderWhiteList[PIN_HOLDER_WHITE_LIST_NUM] = {
@@ -61,13 +63,14 @@ constexpr const static char* SYSTEM_SA_WHITE_LIST[SYSTEM_SA_WHITE_LIST_NUM] = {
     "hmos.collaborationfwk.deviceDetect",
 };
 
-constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = 4;
-constexpr const static char* g_setDnPolicyWhiteList[SETDNPOLICY_WHITE_LIST_NUM] = {
+constexpr const static char* SET_DN_POLICY_WHITE_LIST[] = {
     "collaboration_service",
     "watch_system_service",
     "com.huawei.hmos.walletservice",
     "com.ohos.distributedjstest",
+    "glasses_collaboration_service",
 };
+constexpr uint32_t SETDNPOLICY_WHITE_LIST_NUM = std::size(SET_DN_POLICY_WHITE_LIST);
 
 constexpr uint32_t GETDEVICEINFO_WHITE_LIST_NUM = 3;
 constexpr const static char* g_getDeviceInfoWhiteList[GETDEVICEINFO_WHITE_LIST_NUM] = {
@@ -191,7 +194,7 @@ bool PermissionManager::CheckProcessNameValidOnAuthCode(const std::string &proce
     }
     uint16_t index = 0;
     for (; index < AUTH_CODE_WHITE_LIST_NUM; ++index) {
-        std::string tmp(g_authCodeWhiteList[index]);
+        std::string tmp(AUTH_CODE_WHITE_LIST[index]);
         if (processName == tmp) {
             return true;
         }
@@ -259,7 +262,7 @@ bool PermissionManager::CheckProcessNameValidOnSetDnPolicy(const std::string &pr
     }
     uint16_t index = 0;
     for (; index < SETDNPOLICY_WHITE_LIST_NUM; ++index) {
-        std::string tmp(g_setDnPolicyWhiteList[index]);
+        std::string tmp(SET_DN_POLICY_WHITE_LIST[index]);
         if (processName == tmp) {
             return true;
         }
