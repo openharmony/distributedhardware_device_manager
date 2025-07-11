@@ -298,6 +298,33 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_004, testing
     deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isSendBroadCast);
 }
 
+HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_005, testing::ext::TestSize.Level1)
+{
+    const char *credId = "testCredId";
+    const char *credInfo = R"({"deviceId": "remoteUdid", "osAccountId": 1})";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    bool isSendBroadCast = false;
+
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(1));
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    AccessControlProfile profile;
+    profile.SetBindType(DM_SHARE);
+    profile.GetAccesser().SetAccesserCredentialIdStr(credId);
+    profile.GetAccesser().SetAccesserDeviceId(localUdid);
+    profile.GetAccesser().SetAccesserUserId(1);
+    profile.GetAccessee().SetAccesseeUserId(1);
+    profile.GetAccessee().SetAccesseeDeviceId(remoteUdid);
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile()).WillOnce(Return(profiles));
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteAccessControlById(_)).Times(1);
+
+    deviceManagerServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isSendBroadCast);
+    EXPECT_TRUE(isSendBroadCast);
+}
+
 HWTEST_F(DeviceManagerServiceImplFirstTest, HandleShareUnbindBroadCast_001, testing::ext::TestSize.Level1)
 {
     std::string credId = "12345";

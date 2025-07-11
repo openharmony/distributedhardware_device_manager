@@ -1893,6 +1893,34 @@ HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_004, testing::ext::Te
     DeviceManagerService::GetInstance().HandleCredentialDeleted("credId", "credInfo");
 }
 
+HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_005, testing::ext::TestSize.Level1)
+{
+    const char *credId = "testCredId";
+    const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    bool isSendBroadCast = false;
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(StrEq(credId), StrEq(credInfo), _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(remoteUdid), SetArgReferee<4>(isSendBroadCast)));
+
+    DeviceManagerService::GetInstance().HandleCredentialDeleted(credId, credInfo);
+}
+
+HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_006, testing::ext::TestSize.Level1)
+{
+    const char *credId = "testCredId";
+    const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    bool isSendBroadCast = true;
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(StrEq(credId), StrEq(credInfo), _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(remoteUdid), SetArgReferee<4>(isSendBroadCast)));
+
+    DeviceManagerService::GetInstance().HandleCredentialDeleted(credId, credInfo);
+}
+
 HWTEST_F(DeviceManagerServiceTest, HandleShareUnbindBroadCast_001, testing::ext::TestSize.Level1)
 {
     std::string credId = "123456";
