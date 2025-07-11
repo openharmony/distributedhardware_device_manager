@@ -82,7 +82,7 @@ const std::map<int32_t, int32_t> NEW_AND_OLD_REPLAY_MAPPING = {
 int32_t DmAuthState::GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut)
 {
     LOGI("GetTaskTimeout, taskName: %{public}s, authType_: %{public}d", taskName, context->authType);
-    if (DmAuthState::IsImportAuthCodeCompatibility(context->authType)) {
+    if (AUTH_TYPE_IMPORT_AUTH_CODE == context->authType) {
         auto timeout = TASK_TIME_OUT_MAP.find(std::string(taskName));
         if (timeout != TASK_TIME_OUT_MAP.end()) {
             return timeout->second;
