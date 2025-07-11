@@ -268,7 +268,7 @@ public:
     virtual void DeleteAlwaysAllowTimeOut() = 0;
     virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
-        std::string &remoteUdid) = 0;
+        std::string &remoteUdid, bool &isSendBroadCast) = 0;
     virtual void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
         const std::string &localUdid) = 0;
     virtual int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId) = 0;

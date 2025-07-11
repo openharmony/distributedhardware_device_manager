@@ -3123,9 +3123,14 @@ void DeviceManagerService::HandleCredentialDeleted(const char *credId, const cha
         return;
     }
     std::string remoteUdid = "";
-    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+    bool isSendBroadCast = false;
+    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isSendBroadCast);
     if (remoteUdid.empty()) {
         LOGE("HandleCredentialDeleted failed, remoteUdid is empty.");
+        return;
+    }
+    if (!isSendBroadCast) {
+        LOGI("HandleCredentialDeleted not need to send broadcast.");
         return;
     }
     std::vector<std::string> peerUdids;

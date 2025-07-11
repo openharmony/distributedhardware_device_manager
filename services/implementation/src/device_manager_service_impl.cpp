@@ -2654,7 +2654,7 @@ void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUd
 }
 
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
-    const std::string &localUdid, std::string &remoteUdid)
+    const std::string &localUdid, std::string &remoteUdid, bool &isSendBroadCast)
 {
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAccessControlProfile();
@@ -2689,6 +2689,7 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
             item.GetAccessee().GetAccesseeUserId() == localUserId &&
             item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
+            isSendBroadCast = true;
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }

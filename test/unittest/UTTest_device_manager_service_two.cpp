@@ -1880,7 +1880,7 @@ HWTEST_F(DeviceManagerServiceTest, SendShareTypeUnBindBroadCast_001, testing::ex
 
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_002, testing::ext::TestSize.Level1)
 {
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _)).Times(0);
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _, _)).Times(0);
 
     DeviceManagerService::GetInstance().HandleCredentialDeleted(nullptr, "credInfo");
 }
