@@ -635,7 +635,8 @@ void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
     }
     context->accesser.isCommonFlag = true;
     LOGI("open device do not generate cert!");
-    return "";
+    context_->accesser.cert = "common";
+    return ;
 #else
     DmCertChain dmCertChain;
     int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
@@ -643,9 +644,9 @@ void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
         LOGE("generate cert fail, certRet = %{public}d", certRet);
         return "";
     }
-    std::string cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+    context_->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
     AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
-    return cert;
+    return ;
 #endif
 }
 
