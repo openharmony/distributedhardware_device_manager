@@ -111,29 +111,6 @@ DmAuthStateType AuthSrcCredentialAuthDoneState::GetStateType()
     return DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE;
 }
 
-std::string AuthSrcCredentialAuthDoneState::GenerateCertificate(std::shared_ptr<DmAuthContext> context)
-{
-#ifdef DEVICE_MANAGER_COMMON_FLAG
-    if (context == nullptr) {
-        LOGE("context_ is nullptr!");
-        return "";
-    }
-    context->accesser.isCommonFlag = true;
-    LOGI("open device do not generate cert!");
-    return "";
-#else
-    DmCertChain dmCertChain;
-    int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
-    if (certRet != DM_OK) {
-        LOGE("generate cert fail, certRet = %{public}d", certRet);
-        return "";
-    }
-    std::string cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
-    AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
-    return cert;
-#endif
-}
-
 int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -746,12 +723,10 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
     int32_t ret = ERR_DM_FAILED;
     std::string tmpCredId = "";
     int32_t osAccountId = context->accesser.userId;
-
     if (context == nullptr || context->hiChainAuthConnector == nullptr ||
         context->authMessageProcessor == nullptr || context->softbusConnector == nullptr) {
         return ret;
     }
-
     if (IsNeedAgreeCredential(context)) {
         // First authentication
         if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
@@ -763,18 +738,15 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
                 context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN, "");
                 return ret;
             }
-
             // Delete temporary lnn credentials sync
             ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
         }
-
         DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
         if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
             authorizedScope = DM_AUTH_SCOPE_APP;
         } else if (context->accesser.bindLevel == USER) {
             authorizedScope = DM_AUTH_SCOPE_USER;
         }
-
         // Agree transport credentials and public key
         tmpCredId = context->accesser.transmitCredentialId;
         ret = AgreeCredential(authorizedScope, context);
@@ -784,11 +756,15 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
             LOGE("AuthSrcCredentialAuthStartState::Action failed, agree app cred failed.");
             return ret;
         }
-
         // Delete temporary transport credentials sync
         ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
     }
-
+    // compareVersion send 141
+    std::string message = "";
+    if (CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_2)) {
+        message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_SK_DERIVE, context);
+        return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
+    }
     // Transport credential authentication
     ret = context->hiChainAuthConnector->AuthCredential(osAccountId, context->requestId,
         context->accesser.transmitCredentialId, std::string(""));
@@ -796,17 +772,11 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         LOGE("AuthSrcCredentialAuthStartState::Action failed, auth app cred failed.");
         return ret;
     }
-
     if (context->authStateMachine->WaitExpectEvent(ON_TRANSMIT) != ON_TRANSMIT) {
         LOGE("AuthSrcCredentialAuthStartState::Action failed, ON_TRANSMIT event not arrived.");
         return ERR_DM_FAILED;
     }
-    std::string message = "";
-    if (CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_2)) {
-        message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_SK_DERIVE, context);
-    } else {
-        message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_CREDENTIAL_AUTH_START, context);
-    }
+    message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_CREDENTIAL_AUTH_START, context);
     LOGI(" AuthSrcCredentialAuthStartState::Action leave.");
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
