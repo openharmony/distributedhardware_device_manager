@@ -481,7 +481,6 @@ public:
     int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
     int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
 private:
-    std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context);
     std::mutex certCVMtx_;
     std::condition_variable certCV_;
 };
