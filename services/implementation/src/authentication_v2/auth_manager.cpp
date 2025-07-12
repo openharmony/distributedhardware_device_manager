@@ -626,7 +626,7 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     return DM_OK;
 }
 
-std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context)
+void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
 {
 #ifdef DEVICE_MANAGER_COMMON_FLAG
     if (context == nullptr) {
@@ -697,7 +697,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     context_->requestId = static_cast<int64_t>(logicalSessionId);
     context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcNegotiateStateMachine>());
     // generate cert sync
-    ffrt::submit([=]() { context_->accesser.cert = GenerateCertificate(context_);});
+    ffrt::submit([=]() { GenerateCertificate(context_);});
     info = { .funcName = "BindTarget" };
     info.channelId = sessionId;
     DmRadarHelper::GetInstance().ReportAuthSendRequest(info);
