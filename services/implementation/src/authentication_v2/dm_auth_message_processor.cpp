@@ -738,7 +738,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqSKDerive(const JsonObject &jsonOb
     if (!jsonData[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
         LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive, MSG_TYPE_REQ_CREDENTIAL_EXCHANGE message error.");
         return ERR_DM_FAILED;
-        }
+    }
     context->accesser.transmitCredentialId = jsonData[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkSKDeriveState>());
     return DM_OK;
