@@ -470,6 +470,8 @@ DmAuthMessageProcessor::DmAuthMessageProcessor()
             &DmAuthMessageProcessor::CreateMessageRespPinAuthNegotiate},
         {DmMessageType::MSG_TYPE_REQ_CREDENTIAL_EXCHANGE, &DmAuthMessageProcessor::CreateMessageReqCredExchange},
         {DmMessageType::MSG_TYPE_RESP_CREDENTIAL_EXCHANGE, &DmAuthMessageProcessor::CreateMessageRspCredExchange},
+        {DmMessageType::MSG_TYPE_REQ_SK_DERIVE, &DmAuthMessageProcessor::CreateMessageReqSKDerive},
+        {DmMessageType::MSG_TYPE_RESP_SK_DERIVE, &DmAuthMessageProcessor::CreateMessageRspSKDerive},
         {DmMessageType::MSG_TYPE_REQ_CREDENTIAL_AUTH_START, &DmAuthMessageProcessor::CreateMessageReqCredAuthStart},
         {DmMessageType::MSG_TYPE_REQ_CREDENTIAL_AUTH_NEGOTIATE,
             &DmAuthMessageProcessor::CreateCredentialNegotiateMessage},
@@ -493,6 +495,8 @@ DmAuthMessageProcessor::DmAuthMessageProcessor()
             &DmAuthMessageProcessor::ParseMessageRespPinAuthNegotiate},
         {DmMessageType::MSG_TYPE_REQ_CREDENTIAL_EXCHANGE, &DmAuthMessageProcessor::ParseMessageReqCredExchange},
         {DmMessageType::MSG_TYPE_RESP_CREDENTIAL_EXCHANGE, &DmAuthMessageProcessor::ParseMessageRspCredExchange},
+        {DmMessageType::MSG_TYPE_REQ_SK_DERIVE, &DmAuthMessageProcessor::ParseMessageReqSKDerive},
+        {DmMessageType::MSG_TYPE_RESP_SK_DERIVE, &DmAuthMessageProcessor::ParseMessageRspSKDerive},
         {DmMessageType::MSG_TYPE_REQ_CREDENTIAL_AUTH_START, &DmAuthMessageProcessor::ParseAuthStartMessage},
         {DmMessageType::MSG_TYPE_REQ_CREDENTIAL_AUTH_NEGOTIATE, &DmAuthMessageProcessor::ParseMessageNegotiateTransmit},
         {DmMessageType::MSG_TYPE_RESP_CREDENTIAL_AUTH_START, &DmAuthMessageProcessor::ParseMessageNegotiateTransmit},
@@ -662,6 +666,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqCredExchange(const JsonObject &js
     return DM_OK;
 }
 
+// parse 150
 int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &jsonObject,
     std::shared_ptr<DmAuthContext> context)
 {
@@ -705,6 +710,68 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
     context->accessee.tokenId = jsonData[TAG_TOKEN_ID].Get<int64_t>();
     ParseProxyCredExchangeToSync(context, jsonData);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthStartState>());
+    return DM_OK;
+}
+
+// parse 141
+int32_t DmAuthMessageProcessor::ParseMessageReqSKDerive(const JsonObject &jsonObject,
+    std::shared_ptr<DmAuthContext> context)
+{
+    if (jsonObject.IsDiscarded() || !jsonObject[TAG_DATA].IsString()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return ERR_DM_FAILED;
+    }
+    std::string plainText;
+    if (cryptoMgr_->DecryptMessage(jsonObject[TAG_DATA].Get<std::string>(), plainText) != DM_OK) {
+        LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive() error, decrypt data failed.");
+        return ERR_DM_FAILED;
+    }
+    JsonObject jsonData(plainText);
+    // First authentication, parse lnn public key
+    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
+        if (!jsonData[TAG_LNN_CREDENTIAL_ID].IsString()) {
+            LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive() error, first auth, no lnnPublicKey.");
+            return ERR_DM_FAILED;
+        }
+        context->accesser.lnnCredentialId = jsonData[TAG_LNN_CREDENTIAL_ID].Get<std::string>();
+    }
+    if (!jsonData[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
+        LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive, MSG_TYPE_REQ_CREDENTIAL_EXCHANGE message error.");
+        return ERR_DM_FAILED;
+        }
+    context->accesser.transmitCredentialId = jsonData[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
+    context->authStateMachine->TransitionTo(std::make_shared<AuthSinkSKDeriveState>());
+    return DM_OK;
+}
+
+// parse 151
+int32_t DmAuthMessageProcessor::ParseMessageRspSKDerive(const JsonObject &jsonObject,
+    std::shared_ptr<DmAuthContext> context)
+{
+    if (jsonObject.IsDiscarded() || !jsonObject[TAG_DATA].IsString()) {
+        LOGE("DecodeRequestAuth jsonStr error");
+        return ERR_DM_FAILED;
+    }
+    std::string plainText;
+    if (cryptoMgr_->DecryptMessage(jsonObject[TAG_DATA].Get<std::string>(), plainText) != DM_OK) {
+        LOGE("DmAuthMessageProcessor::ParseMessageRspSKDerive() error, decrypt data failed.");
+        return ERR_DM_FAILED;
+    }
+    JsonObject jsonData(plainText);
+    // First authentication, parse lnn public key
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
+        if (!jsonData[TAG_LNN_CREDENTIAL_ID].IsString()) {
+            LOGE("DmAuthMessageProcessor::ParseMessageRspSKDerive() error, first auth, no lnnPublicKey.");
+            return ERR_DM_FAILED;
+        }
+        context->accessee.lnnCredentialId = jsonData[TAG_LNN_CREDENTIAL_ID].Get<std::string>();
+    }
+    if (!jsonData[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
+        LOGE("DmAuthMessageProcessor::ParseMessageRspSKDerive, MSG_TYPE_REQ_CREDENTIAL_EXCHANGE message error.");
+        return ERR_DM_FAILED;
+    }
+    context->accessee.transmitCredentialId = jsonData[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
+    context->authStateMachine->TransitionTo(std::make_shared<AuthSrcSKDeriveState>());
     return DM_OK;
 }
 
@@ -955,6 +1022,48 @@ int32_t DmAuthMessageProcessor::CreateProxyCredExchangeMessage(std::shared_ptr<D
     }
     jsonData[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
     return DM_OK;
+}
+
+// Create 141 message.
+int32_t DmAuthMessageProcessor::CreateMessageReqSKDerive(std::shared_ptr<DmAuthContext> context,
+    JsonObject &jsonObject)
+{
+    JsonObject jsonData;
+    jsonData[TAG_TRANSMIT_CREDENTIAL_ID] = context->accesser.transmitCredentialId;
+    // First certification
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
+        jsonData[TAG_LNN_CREDENTIAL_ID] = context->accesser.lnnCredentialId;
+    }
+    std::string plainText = jsonData.Dump();
+    std::string cipherText;
+    int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
+    if (ret != DM_OK) {
+        LOGI("DmAuthMessageProcessor::CreateMessageReqCredExchange encryptMessage failed.");
+        return ret;
+    }
+    jsonObject[TAG_DATA] = cipherText;
+    return ret;
+}
+
+// Create 151 message.
+int32_t DmAuthMessageProcessor::CreateMessageRspSKDerive(std::shared_ptr<DmAuthContext> context,
+    JsonObject &jsonObject)
+{
+    JsonObject jsonData;
+    jsonData[TAG_TRANSMIT_CREDENTIAL_ID] = context->accessee.transmitCredentialId;
+    // First certification
+    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
+        jsonData[TAG_LNN_CREDENTIAL_ID] = context->accessee.lnnCredentialId;
+    }
+    std::string plainText = jsonData.Dump();
+    std::string cipherText;
+    int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
+    if (ret != DM_OK) {
+        LOGI("DmAuthMessageProcessor::CreateMessageReqCredExchange encryptMessage failed.");
+        return ret;
+    }
+    jsonObject[TAG_DATA] = cipherText;
+    return ret;
 }
 
 // Create 160 message.

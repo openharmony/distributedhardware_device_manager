@@ -26,6 +26,7 @@
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "deviceprofile_connector.h"
+#include "ffrt.h"
 #include "hichain_auth_connector.h"
 #include "multiple_user_connector.h"
 
@@ -37,8 +38,8 @@ namespace {
 // tag in Lowercase, need by hichain tag
 constexpr const char* TAG_LOWER_DEVICE_ID = "deviceId";
 constexpr const char* TAG_LOWER_USER_ID = "userId";
-
 constexpr const char* DM_AUTH_CREDENTIAL_OWNER = "DM";
+const int32_t GENERATE_CERT_TIMEOUT = 100; // 100ms
 
 // decrypt process
 int32_t g_authCredentialTransmitDecryptProcess(std::shared_ptr<DmAuthContext> context, DmEventType event)
@@ -138,7 +139,9 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (GetSessionKey(context)) {
         DerivativeSessionKey(context);
-        context->accesser.cert = GenerateCertificate(context);
+        std::unique_lock<std::mutex> cvLock(certCVMtx_);
+        certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
+            [=] {return !context->accesser.cert.empty();});
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_DATA_SYNC, context);
         return DM_OK;
     }
@@ -182,11 +185,15 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
             return ret;
         }
         SetAuthContext(skId, context->accesser.lnnSkTimeStamp, context->accesser.lnnSessionKeyId);
-        context->accesser.cert = GenerateCertificate(context);
+        std::unique_lock<std::mutex> cvLock(certCVMtx_);
+        certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
+            [=] {return !context->accesser.cert.empty();});
         msgType = MSG_TYPE_REQ_DATA_SYNC;
     } else {  // Non-first-time authentication transport credential process
         DerivativeSessionKey(context);
-        context->accesser.cert = GenerateCertificate(context);
+        std::unique_lock<std::mutex> cvLock(certCVMtx_);
+        certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
+            [=] {return !context->accesser.cert.empty();});
         msgType = MSG_TYPE_REQ_DATA_SYNC;
     }
     return SendCredentialAuthMessage(context, msgType);
@@ -609,8 +616,8 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
             return ret;
         }
 
-       // Delete temporary credentials
-        context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
+       // Delete temporary credentials sync
+        ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
     }
 
     DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
@@ -636,11 +643,95 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
         return ret;
     }
 
-    // Delete temporary transport credentials
-    context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
+    // Delete temporary transport credentials sync
+    ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
 
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_RESP_CREDENTIAL_EXCHANGE, context);
     LOGI("AuthSinkCredentialExchangeState::Action leave.");
+    return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
+}
+
+DmAuthStateType AuthSrcSKDeriveState::GetStateType()
+{
+    return DmAuthStateType::AUTH_SRC_SK_DERIVE_STATE;
+}
+
+// receive 151 message
+int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
+{
+    LOGI("AuthSrcSKDeriveState::Action start.");
+    // First authentication lnn cred
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
+        int32_t skId = 0;
+        // derive lnn sk
+        std::string suffix = context->accesser.lnnCredentialId + context->accessee.lnnCredentialId;
+        int32_t ret =
+            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
+        if (ret != DM_OK) {
+            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+            return ret;
+        }
+        context->accesser.lnnSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
+        context->accesser.lnnSessionKeyId = skId;
+        SetAuthContext(skId, context->accesser.lnnSkTimeStamp, context->accesser.lnnSessionKeyId);
+    }
+    int32_t skId = 0;
+    // derive transmit sk
+    std::string suffix = context->accesser.transmitCredentialId + context->accessee.transmitCredentialId;
+    int32_t ret =
+        context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
+    if (ret != DM_OK) {
+        LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+        return ret;
+    }
+    context->accesser.transmitSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
+    context->accesser.transmitSessionKeyId = skId;
+    SetAuthContext(skId, context->accesser.transmitSkTimeStamp, context->accesser.transmitSessionKeyId);
+    // send 180
+    std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_DATA_SYNC, context);
+    LOGI("AuthSrcSKDeriveState::Action() leave.");
+    return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
+}
+
+DmAuthStateType AuthSinkSKDeriveState::GetStateType()
+{
+    return DmAuthStateType::AUTH_SINK_SK_DERIVE_STATE;
+}
+
+// receive 141 message
+int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
+{
+    LOGI("AuthSinkSKDeriveState::Action start.");
+    // First authentication lnn cred
+    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != USER) {
+        int32_t skId = 0;
+        // derive lnn sk
+        std::string suffix = context->accesser.lnnCredentialId + context->accessee.lnnCredentialId;
+        int32_t ret =
+            context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
+        if (ret != DM_OK) {
+            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+            return ret;
+        }
+        context->accessee.lnnSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
+        context->accessee.lnnSessionKeyId = skId;
+        SetAuthContext(skId, context->accessee.lnnSkTimeStamp, context->accessee.lnnSessionKeyId);
+    }
+    int32_t skId = 0;
+    // derive transmit sk
+    std::string suffix = context->accesser.transmitCredentialId + context->accessee.transmitCredentialId;
+    int32_t ret =
+        context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
+    if (ret != DM_OK) {
+        LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+        return ret;
+    }
+    context->accessee.transmitSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
+    context->accessee.transmitSessionKeyId = skId;
+    SetAuthContext(skId, context->accessee.transmitSkTimeStamp, context->accessee.transmitSessionKeyId);
+    // send 151
+    std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_RESP_SK_DERIVE, context);
+    LOGI("AuthSinkSKDeriveState::Action() leave.");
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -673,8 +764,8 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
                 return ret;
             }
 
-            // Delete temporary lnn credentials
-            context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
+            // Delete temporary lnn credentials sync
+            ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
         }
 
         DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
@@ -694,8 +785,8 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
             return ret;
         }
 
-        // Delete temporary transport credentials
-        context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
+        // Delete temporary transport credentials sync
+        ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
     }
 
     // Transport credential authentication
@@ -710,8 +801,12 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         LOGE("AuthSrcCredentialAuthStartState::Action failed, ON_TRANSMIT event not arrived.");
         return ERR_DM_FAILED;
     }
-
-    std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_CREDENTIAL_AUTH_START, context);
+    std::string message = "";
+    if (CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_2)) {
+        message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_SK_DERIVE, context);
+    } else {
+        message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_CREDENTIAL_AUTH_START, context);
+    }
     LOGI(" AuthSrcCredentialAuthStartState::Action leave.");
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }

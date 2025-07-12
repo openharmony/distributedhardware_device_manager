@@ -90,22 +90,18 @@ void DmAuthStateMachine::InsertSrcTransTable()
             DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE,
             DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE,
         }},
-        {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE,
-         {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_NEGOTIATE_STATE}},
-
-        {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_NEGOTIATE_STATE,
-         {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE}},
-
+        {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE, {
+            DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_NEGOTIATE_STATE,
+            DmAuthStateType::AUTH_SRC_SK_DERIVE_STATE,
+        }},
+        {DmAuthStateType::AUTH_SRC_SK_DERIVE_STATE, {DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE}},
+        {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_NEGOTIATE_STATE,{DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE}},
         {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE,
          {DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE, DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_NEGOTIATE_STATE}},
-
         {DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE, {DmAuthStateType::AUTH_SRC_FINISH_STATE}},
-
         {DmAuthStateType::AUTH_SRC_FINISH_STATE, {}}
     });
-
     InsertUltrasonicSrcTransTable();
-
     return;
 }
 
@@ -177,7 +173,9 @@ void DmAuthStateMachine::InsertSinkTransTable()
         }},
         {DmAuthStateType::AUTH_SINK_CREDENTIAL_EXCHANGE_STATE, {
             DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_START_STATE,
+            DmAuthStateType::AUTH_SINK_SK_DERIVE_STATE,
         }},
+        {DmAuthStateType::AUTH_SINK_SK_DERIVE_STATE, {DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE}},
         {DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_START_STATE, {
             DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_NEGOTIATE_STATE,
         }},
@@ -186,9 +184,7 @@ void DmAuthStateMachine::InsertSinkTransTable()
         {DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE, {DmAuthStateType::AUTH_SINK_FINISH_STATE}},
         {DmAuthStateType::AUTH_SINK_FINISH_STATE, {}}
     });
-
     InsertUltrasonicSinkTransTable();
-
     return;
 }
 

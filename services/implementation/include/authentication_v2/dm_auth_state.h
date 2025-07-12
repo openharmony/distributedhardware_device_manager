@@ -58,6 +58,7 @@ enum class DmAuthStateType {
     AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE = 16,   // Received 170 credential authentication message, sent 161 message
     AUTH_SRC_DATA_SYNC_STATE = 17,              // Received 190 message, sent 200 message
     AUTH_SRC_FINISH_STATE = 18,                 // Received 201 message
+    AUTH_SRC_SK_DERIVE_STATE = 19,              // Received 151 message
 
     // sink end state
     AUTH_SINK_START_STATE = 50,                 // Bus trigger OnSessionOpened
@@ -77,6 +78,7 @@ enum class DmAuthStateType {
     AUTH_SINK_CREDENTIAL_AUTH_NEGOTIATE_STATE = 64, // Received 161 credential negotiation message,
     AUTH_SINK_DATA_SYNC_STATE = 65,             // Received 180 synchronization message, send 190 message
     AUTH_SINK_FINISH_STATE = 66,                // Received 200 end message, send 201 message
+    AUTH_SINK_SK_DERIVE_STATE = 67,             // Received 141 message
 };
 
 // Credential Addition Method
@@ -442,6 +444,20 @@ public:
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
+class AuthSrcSKDeriveState : public DmAuthState {
+public:
+    virtual ~AuthSrcSKDeriveState() {};
+    DmAuthStateType GetStateType() override;
+    int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+};
+
+class AuthSinkSKDeriveState : public DmAuthState {
+public:
+    virtual ~AuthSinkSKDeriveState() {};
+    DmAuthStateType GetStateType() override;
+    int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+};
+
 class AuthSrcCredentialAuthStartState : public AuthCredentialAgreeState {
 public:
     virtual ~AuthSrcCredentialAuthStartState() {};
@@ -466,6 +482,8 @@ public:
     int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
 private:
     std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context);
+    std::mutex certCVMtx_;
+    std::condition_variable certCV_;
 };
 
 class AuthSinkCredentialAuthStartState : public DmAuthState {
