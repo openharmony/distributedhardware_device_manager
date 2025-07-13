@@ -641,7 +641,7 @@ void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
     int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
     if (certRet != DM_OK) {
         LOGE("generate cert fail, certRet = %{public}d", certRet);
-        return "";
+        return;
     }
     context_->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
     AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
