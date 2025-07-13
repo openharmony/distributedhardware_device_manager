@@ -644,6 +644,9 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
     if (context == nullptr || context->hiChainAuthConnector == nullptr) {
         return ERR_DM_POINT_NULL;
     }
+    int32_t ret = DM_OK;
+    std::string tmpCredId = "";
+    int32_t osAccountId = context->accesser.userId;
     // First authentication
     if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
         // Agree lnn credentials and public key
@@ -681,7 +684,6 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
 {
     LOGI("AuthSrcCredentialAuthStartState::Action start.");
     int32_t ret = ERR_DM_FAILED;
-    std::string tmpCredId = "";
     int32_t osAccountId = context->accesser.userId;
     if (context == nullptr || context->hiChainAuthConnector == nullptr ||
         context->authMessageProcessor == nullptr || context->softbusConnector == nullptr) {

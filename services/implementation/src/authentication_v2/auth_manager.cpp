@@ -629,13 +629,13 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
 void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
 {
     if (context == nullptr) {
-        LOGE("context_ is nullptr!");
+        LOGE("context is nullptr!");
         return;
     }
 #ifdef DEVICE_MANAGER_COMMON_FLAG
     context->accesser.isCommonFlag = true;
     LOGI("open device do not generate cert!");
-    context_->accesser.cert = "common";
+    context->accesser.cert = "common";
 #else
     DmCertChain dmCertChain;
     int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
@@ -643,7 +643,7 @@ void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
         LOGE("generate cert fail, certRet = %{public}d", certRet);
         return;
     }
-    context_->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+    context->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
     AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
 #endif
     return;
