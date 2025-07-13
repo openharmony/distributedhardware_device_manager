@@ -141,6 +141,7 @@ int32_t AuthSrcCredentialAuthDoneState::HandleSrcCredentialAuthDone(std::shared_
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     DmMessageType msgType;
+    int32_t ret = DM_OK;
     // first time joinLnn, auth lnnCredential
     if (context->accesser.isGenerateLnnCredential == true && context->isAppCredentialVerified == false &&
         context->accesser.bindLevel != USER) {
