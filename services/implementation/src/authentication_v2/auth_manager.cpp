@@ -628,15 +628,14 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
 
 void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
 {
-#ifdef DEVICE_MANAGER_COMMON_FLAG
     if (context == nullptr) {
         LOGE("context_ is nullptr!");
-        return "";
+        return;
     }
+#ifdef DEVICE_MANAGER_COMMON_FLAG
     context->accesser.isCommonFlag = true;
     LOGI("open device do not generate cert!");
     context_->accesser.cert = "common";
-    return ;
 #else
     DmCertChain dmCertChain;
     int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
@@ -646,8 +645,8 @@ void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
     }
     context_->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
     AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
-    return ;
 #endif
+    return;
 }
 
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
