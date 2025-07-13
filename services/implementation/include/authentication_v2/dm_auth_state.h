@@ -464,7 +464,7 @@ public:
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 private:
-    void AgreeAndDeleteCredential(std::shared_ptr<DmAuthContext> context);
+    int32_t AgreeAndDeleteCredential(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSrcCredentialAuthNegotiateState : public DmAuthState {

@@ -727,6 +727,8 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
 int32_t DmAuthMessageProcessor::ParseMessageReqSKDerive(const JsonObject &jsonObject,
     std::shared_ptr<DmAuthContext> context)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
     if (jsonObject.IsDiscarded() || !jsonObject[TAG_DATA].IsString()) {
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
@@ -758,6 +760,8 @@ int32_t DmAuthMessageProcessor::ParseMessageReqSKDerive(const JsonObject &jsonOb
 int32_t DmAuthMessageProcessor::ParseMessageRspSKDerive(const JsonObject &jsonObject,
     std::shared_ptr<DmAuthContext> context)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
     if (jsonObject.IsDiscarded() || !jsonObject[TAG_DATA].IsString()) {
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
@@ -1038,6 +1042,8 @@ int32_t DmAuthMessageProcessor::CreateProxyCredExchangeMessage(std::shared_ptr<D
 int32_t DmAuthMessageProcessor::CreateMessageReqSKDerive(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
     JsonObject jsonData;
     jsonData[TAG_TRANSMIT_CREDENTIAL_ID] = context->accesser.transmitCredentialId;
     // First certification
@@ -1059,6 +1065,8 @@ int32_t DmAuthMessageProcessor::CreateMessageReqSKDerive(std::shared_ptr<DmAuthC
 int32_t DmAuthMessageProcessor::CreateMessageRspSKDerive(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(cryptoMgr_, ERR_DM_POINT_NULL);
     JsonObject jsonData;
     jsonData[TAG_TRANSMIT_CREDENTIAL_ID] = context->accessee.transmitCredentialId;
     // First certification

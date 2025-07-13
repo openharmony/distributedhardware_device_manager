@@ -642,6 +642,11 @@ DmAuthStateType AuthSrcSKDeriveState::GetStateType()
 int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcSKDeriveState::Action start.");
+    if (context == nullptr ||
+        context->authMessageProcessor == nullptr || context->softbusConnector == nullptr) {
+        LOGE("AuthSrcSKDeriveState::Action para is invalid.");
+        return ERR_DM_POINT_NULL;
+    }
     // First authentication lnn cred
     if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
         int32_t skId = 0;
@@ -684,6 +689,11 @@ DmAuthStateType AuthSinkSKDeriveState::GetStateType()
 int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkSKDeriveState::Action start.");
+    if (context == nullptr ||
+        context->authMessageProcessor == nullptr || context->softbusConnector == nullptr) {
+        LOGE("AuthSinkSKDeriveState::Action para is invalid.");
+        return ERR_DM_POINT_NULL;
+    }
     // First authentication lnn cred
     if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != USER) {
         int32_t skId = 0;
@@ -722,10 +732,10 @@ DmAuthStateType AuthSrcCredentialAuthStartState::GetStateType()
     return DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE;
 }
 
-void AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_ptr<DmAuthContext> context)
+int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_ptr<DmAuthContext> context)
 {
     if (context == nullptr || context->hiChainAuthConnector == nullptr) {
-        return ;
+        return ERR_DM_POINT_NULL;
     }
     // First authentication
     if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
@@ -757,6 +767,7 @@ void AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_ptr<D
     }
     // Delete temporary transport credentials sync
     ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
+    return DM_OK;
 }
 
 int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
@@ -770,7 +781,9 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         return ret;
     }
     if (IsNeedAgreeCredential(context)) {
-        AgreeAndDeleteCredential(context);
+        if (AgreeAndDeleteCredential(context) != DM_OK) {
+            return AgreeAndDeleteCredential(context);
+        }
     }
     // compareVersion send 141
     std::string message = "";
