@@ -127,14 +127,12 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
     if (ret != DM_OK) {
         return ret;
     }
-
     // Authentication completion triggers the Onfinish callback event.
     if (context->authStateMachine->WaitExpectEvent(ON_FINISH) != ON_FINISH) {
         LOGE("AuthSrcCredentialAuthDoneState::Action Hichain auth SINK transmit data failed");
         return ERR_DM_FAILED;
     }
     DmMessageType msgType;
-
     // first time joinLnn, auth lnnCredential
     if (context->accesser.isGenerateLnnCredential == true && context->isAppCredentialVerified == false &&
         context->accesser.bindLevel != USER) {
@@ -147,7 +145,6 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
             LOGE("AuthSrcCredentialAuthDoneState::Action Hichain auth credentail failed");
             return ret;
         }
-
         // wait for onTransmit event
         if (context->authStateMachine->WaitExpectEvent(ON_TRANSMIT) != ON_TRANSMIT) {
             LOGE("AuthSrcCredentialAuthDoneState::Action failed, ON_TRANSMIT event not arrived.");
@@ -645,7 +642,7 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
         int32_t ret =
             context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
         if (ret != DM_OK) {
-            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+            LOGE("AuthSrcSKDeriveState::Action DP save user session key failed");
             return ret;
         }
         context->accesser.lnnSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
@@ -658,7 +655,7 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     int32_t ret =
         context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
     if (ret != DM_OK) {
-        LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+        LOGE("AuthSrcSKDeriveState::Action DP save user session key failed");
         return ret;
     }
     context->accesser.transmitSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
@@ -687,7 +684,7 @@ int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
         int32_t ret =
             context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
         if (ret != DM_OK) {
-            LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+            LOGE("AuthSinkSKDeriveState::Action DP save user session key failed");
             return ret;
         }
         context->accessee.lnnSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
@@ -700,7 +697,7 @@ int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     int32_t ret =
         context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
     if (ret != DM_OK) {
-        LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
+        LOGE("AuthSinkSKDeriveState::Action DP save user session key failed");
         return ret;
     }
     context->accessee.transmitSkTimeStamp = static_cast<int64_t>(GetSysTimeMs());
@@ -717,6 +714,43 @@ DmAuthStateType AuthSrcCredentialAuthStartState::GetStateType()
     return DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE;
 }
 
+void AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_ptr<DmAuthContext> context)
+{
+    if (context == nullptr || context->hiChainAuthConnector == nullptr) {
+        return ;
+    }
+    // First authentication
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
+        // Agree lnn credentials and public key
+        tmpCredId = context->accesser.lnnCredentialId;
+        ret = AgreeCredential(DM_AUTH_SCOPE_LNN, context);
+        if (ret != DM_OK) {
+            context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
+            context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN, "");
+            return ret;
+        }
+        // Delete temporary lnn credentials sync
+        ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
+    }
+    DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
+    if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
+        authorizedScope = DM_AUTH_SCOPE_APP;
+    } else if (context->accesser.bindLevel == USER) {
+        authorizedScope = DM_AUTH_SCOPE_USER;
+    }
+    // Agree transport credentials and public key
+    tmpCredId = context->accesser.transmitCredentialId;
+    ret = AgreeCredential(authorizedScope, context);
+    if (ret != DM_OK) {
+        context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
+        context->SetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope, "");
+        LOGE("AuthSrcCredentialAuthStartState::Action failed, agree app cred failed.");
+        return ret;
+    }
+    // Delete temporary transport credentials sync
+    ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
+}
+
 int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcCredentialAuthStartState::Action start.");
@@ -728,36 +762,7 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         return ret;
     }
     if (IsNeedAgreeCredential(context)) {
-        // First authentication
-        if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
-            // Agree lnn credentials and public key
-            tmpCredId = context->accesser.lnnCredentialId;
-            ret = AgreeCredential(DM_AUTH_SCOPE_LNN, context);
-            if (ret != DM_OK) {
-                context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
-                context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN, "");
-                return ret;
-            }
-            // Delete temporary lnn credentials sync
-            ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
-        }
-        DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
-        if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
-            authorizedScope = DM_AUTH_SCOPE_APP;
-        } else if (context->accesser.bindLevel == USER) {
-            authorizedScope = DM_AUTH_SCOPE_USER;
-        }
-        // Agree transport credentials and public key
-        tmpCredId = context->accesser.transmitCredentialId;
-        ret = AgreeCredential(authorizedScope, context);
-        if (ret != DM_OK) {
-            context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
-            context->SetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope, "");
-            LOGE("AuthSrcCredentialAuthStartState::Action failed, agree app cred failed.");
-            return ret;
-        }
-        // Delete temporary transport credentials sync
-        ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
+        AgreeAndDeleteCredential(context);
     }
     // compareVersion send 141
     std::string message = "";

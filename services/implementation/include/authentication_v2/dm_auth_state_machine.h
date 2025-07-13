@@ -81,6 +81,8 @@ private:
     void InsertSinkTransTable();
     void InsertUltrasonicSrcTransTable();
     void InsertUltrasonicSinkTransTable();
+    void InsertCredentialAuthSrcTransTable();
+    void InsertCredentialAuthSinkTransTable();
 
     // Fetch the current state and execute it
     std::optional<std::shared_ptr<DmAuthState>> FetchAndSetCurState();
