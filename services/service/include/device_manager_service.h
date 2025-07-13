@@ -32,6 +32,7 @@
 #include "hichain_listener.h"
 #include "i_dm_check_api_white_list.h"
 #include "i_dm_service_impl_ext_resident.h"
+#include "i_dm_device_risk_detect.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_account_common_event.h"
 #include "dm_datashare_common_event.h"
@@ -58,6 +59,10 @@ public:
     int32_t InitSoftbusListener();
 
     void InitHichainListener();
+
+    void StartDetectDeviceRisk();
+
+    void DelAllRelateShip();
 
     DM_EXPORT void RegisterCallerAppId(const std::string &pkgName);
 
@@ -275,9 +280,11 @@ private:
     bool IsDMImplSoLoaded();
     bool IsDMServiceAdapterSoLoaded();
     bool IsDMServiceAdapterResidentLoad();
+    bool IsDMDeviceRiskDetectSoLoaded();
     bool IsMsgEmptyAndDMServiceImplReady(const std::string &msg);
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapterResident();
+    void UnloadDMDeviceRiskDetect();
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
         int32_t bindLevel);
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
@@ -438,9 +445,13 @@ private:
 private:
     bool isImplsoLoaded_ = false;
     bool isAdapterResidentSoLoaded_ = false;
+    bool isDeviceRiskDetectSoLoaded_ = false;
     void *residentSoHandle_ = nullptr;
+    void *deviceRiskDetectSoHandle_ = nullptr;
     std::mutex isImplLoadLock_;
     std::mutex isAdapterResidentLoadLock_;
+    std::mutex isDeviceRiskDetectSoLoadLock_;
+    std::mutex detectLock_;
     std::mutex hichainListenerLock_;
     std::mutex userVecLock_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
@@ -450,6 +461,7 @@ private:
     std::shared_ptr<DeviceManagerServiceListener> listener_;
     std::shared_ptr<IDeviceManagerServiceImpl> dmServiceImpl_;
     std::shared_ptr<IDMServiceImplExtResident> dmServiceImplExtResident_;
+    std::shared_ptr<IDMDeviceRiskDetect> dmDeviceRiskDetect_;
     std::string localDeviceId_;
     std::shared_ptr<PinHolder> pinHolder_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))

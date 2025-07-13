@@ -40,6 +40,7 @@
 #include "multiple_user_connector.h"
 #include "relationship_sync_mgr.h"
 #include "openssl/sha.h"
+#include "system_ability_definition.h"
 #if defined(SUPPORT_POWER_MANAGER)
 #include "power_mgr_client.h"
 #endif // SUPPORT_POWER_MANAGER
@@ -63,6 +64,7 @@ constexpr const char* LIB_IMPL_NAME = "libdevicemanagerserviceimpl.so";
 #endif
 constexpr const char* LIB_DM_ADAPTER_NAME = "libdevicemanageradapter.z.so";
 constexpr const char* LIB_DM_RESIDENT_NAME = "libdevicemanagerresident.z.so";
+constexpr const char* LIB_DM_DEVICE_RISK_DETECT_NAME = "libdevicemanagerriskdetect.z.so";
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
 constexpr const char* LIB_DM_CHECK_API_WHITE_LIST_NAME = "libdm_check_api_whitelist.z.so";
 #endif
@@ -106,6 +108,7 @@ DeviceManagerService::~DeviceManagerService()
     LOGI("DeviceManagerService destructor");
     UnloadDMServiceImplSo();
     UnloadDMServiceAdapterResident();
+    UnloadDMDeviceRiskDetect();
 }
 
 int32_t DeviceManagerService::Init()
@@ -151,6 +154,82 @@ void DeviceManagerService::InitHichainListener()
     hichainListener_->RegisterDataChangeCb();
     hichainListener_->RegisterCredentialCb();
 }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void DeviceManagerService::StartDetectDeviceRisk()
+{
+    std::lock_guard<std::mutex> lock(detectLock_);
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    CHECK_NULL_VOID(samgr);
+    if (samgr->CheckSystemAbility(RISK_ANALYSIS_MANAGER_SA_ID) == nullptr) {
+        LOGE("%{public}d sa not start", RISK_ANALYSIS_MANAGER_SA_ID);
+        return;
+    }
+    if (!IsDMDeviceRiskDetectSoLoaded()) {
+        LOGE("load dm device risk detect failed.");
+        return;
+    }
+    std::string efuse;
+    std::string fastbootLock;
+    std::string processPrivilege;
+    std::string rootPackage;
+    int32_t ret = dmDeviceRiskDetect_->DetectDeviceRisk(efuse, fastbootLock, processPrivilege, rootPackage);
+    if (ret != DM_OK) {
+        LOGE("DetectDeviceRisk failed. ret:%{public}d", ret);
+        return;
+    }
+    LOGI("efuse:%{public}s, fastbootLock:%{public}s, processPrivilege:%{public}s, rootPackage:%{public}s",
+        efuse.c_str(), fastbootLock.c_str(), processPrivilege.c_str(), rootPackage.c_str());
+    if (efuse == DM_RISK || (efuse == DM_SAFE && fastbootLock == DM_RISK)) {
+        LOGI("device status is development");
+        return;
+    } else if (processPrivilege == DM_RISK || rootPackage == DM_RISK) {
+        LOGI("device status is Illegal");
+        DelAllRelateShip();
+    } else {
+        LOGI("device status is Commercial");
+        return;
+    }
+}
+
+void DeviceManagerService::DelAllRelateShip()
+{
+    std::lock_guard<std::mutex> lock(hichainListenerLock_);
+    if (hichainListener_ == nullptr) {
+        hichainListener_ = std::make_shared<HichainListener>();
+    }
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid = static_cast<std::string>(localDeviceId);
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    std::vector<int32_t> currentUserIds;
+    currentUserIds.push_back(userId);
+    hichainListener_->DeleteAllGroup(localUdid, currentUserIds);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    for (auto &item : profiles) {
+        std::string acerDeviceId = item.GetAccesser().GetAccesserDeviceId();
+        std::string aceeDeviceId = item.GetAccessee().GetAccesseeDeviceId();
+        if (localUdid == acerDeviceId) {
+            int32_t acerUserId = item.GetAccesser().GetAccesserUserId();
+            int32_t acerSkId = item.GetAccesser().GetAccesserSessionKeyId();
+            DeviceProfileConnector::GetInstance().DeleteSessionKey(acerUserId, acerSkId);
+
+            std::string acerCredId = item.GetAccesser().GetAccesserCredentialIdStr();
+            hichainListener_->DeleteCredential(acerUserId, acerCredId);
+        } else if (localUdid == aceeDeviceId) {
+            int32_t aceeUserId = item.GetAccessee().GetAccesseeUserId();
+            int32_t aceeSkId = item.GetAccessee().GetAccesseeSessionKeyId();
+            DeviceProfileConnector::GetInstance().DeleteSessionKey(aceeUserId, aceeSkId);
+
+            std::string aceeCredId = item.GetAccessee().GetAccesseeCredentialIdStr();
+            hichainListener_->DeleteCredential(aceeUserId, aceeCredId);
+        }
+        int32_t aclId = item.GetAccessControlId();
+        DeviceProfileConnector::GetInstance().DeleteAccessControlById(aclId);
+    }
+}
+#endif
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
@@ -1588,6 +1667,58 @@ void DeviceManagerService::UnloadDMServiceAdapterResident()
         LOGI("dm service resident residentSoHandle_ is not nullptr.");
         dlclose(residentSoHandle_);
         residentSoHandle_ = nullptr;
+    }
+}
+
+bool DeviceManagerService::IsDMDeviceRiskDetectSoLoaded()
+{
+    std::lock_guard<std::mutex> lock(isDeviceRiskDetectSoLoadLock_);
+    if (isDeviceRiskDetectSoLoaded_ && (dmDeviceRiskDetect_ != nullptr)) {
+        return true;
+    }
+    deviceRiskDetectSoHandle_ = dlopen(LIB_DM_DEVICE_RISK_DETECT_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (deviceRiskDetectSoHandle_ == nullptr) {
+        deviceRiskDetectSoHandle_ = dlopen(LIB_DM_DEVICE_RISK_DETECT_NAME, RTLD_NOW | RTLD_NODELETE);
+    }
+    if (deviceRiskDetectSoHandle_ == nullptr) {
+        LOGE("load dm device risk detect so failed.");
+        return false;
+    }
+    dlerror();
+    auto func = (CreateDMDeviceRiskDetectFuncPtr)dlsym(deviceRiskDetectSoHandle_, "CreateDMDeviceRiskDetectObject");
+    if (dlerror() != nullptr || func == nullptr) {
+        dlclose(deviceRiskDetectSoHandle_);
+        deviceRiskDetectSoHandle_ = nullptr;
+        LOGE("Create object function is not exist.");
+        return false;
+    }
+
+    dmDeviceRiskDetect_ = std::shared_ptr<IDMDeviceRiskDetect>(func());
+    if (dmDeviceRiskDetect_->Initialize() != DM_OK) {
+        dlclose(deviceRiskDetectSoHandle_);
+        deviceRiskDetectSoHandle_ = nullptr;
+        dmDeviceRiskDetect_ = nullptr;
+        isDeviceRiskDetectSoLoaded_ = false;
+        LOGE("dm sdevice risk detect init failed.");
+        return false;
+    }
+    isDeviceRiskDetectSoLoaded_ = true;
+    LOGI("Success.");
+    return true;
+}
+
+void DeviceManagerService::UnloadDMDeviceRiskDetect()
+{
+    LOGI("Start.");
+    std::lock_guard<std::mutex> lock(isDeviceRiskDetectSoLoadLock_);
+    if (dmDeviceRiskDetect_ != nullptr) {
+        dmDeviceRiskDetect_->Release();
+        dmDeviceRiskDetect_ = nullptr;
+    }
+    if (deviceRiskDetectSoHandle_ != nullptr) {
+        LOGI("dm device risk detect deviceRiskDetectSoHandle_ is not nullptr.");
+        dlclose(deviceRiskDetectSoHandle_);
+        deviceRiskDetectSoHandle_ = nullptr;
     }
 }
 

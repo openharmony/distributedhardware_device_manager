@@ -268,6 +268,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
         LOGE("NodeBasicInfo is nullptr.");
         return;
     }
+    DeviceManagerService::GetInstance().StartDetectDeviceRisk();
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     LOGI("device online networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());

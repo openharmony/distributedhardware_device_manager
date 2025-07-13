@@ -93,6 +93,7 @@ void IpcServerStub::OnStart()
 #endif
     AddSystemAbilityListener(DEVICE_AUTH_SERVICE_ID);
     AddSystemAbilityListener(ACCESS_TOKEN_MANAGER_SERVICE_ID);
+    AddSystemAbilityListener(RISK_ANALYSIS_MANAGER_SA_ID);
     DeviceManagerService::GetInstance().SubscribePackageCommonEvent();
 }
 
@@ -206,6 +207,10 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
     }
     if (systemAbilityId == ACCESS_TOKEN_MANAGER_SERVICE_ID) {
         DeviceManagerService::GetInstance().InitHichainListener();
+        return;
+    }
+    if (systemAbilityId == RISK_ANALYSIS_MANAGER_SA_ID) {
+        DeviceManagerService::GetInstance().StartDetectDeviceRisk();
         return;
     }
 }

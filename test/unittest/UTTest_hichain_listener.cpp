@@ -15,6 +15,7 @@
 
 #include "UTTest_hichain_listener.h"
 #include "dm_anonymous.h"
+#include "dm_error_type.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -157,5 +158,23 @@ HWTEST_F(HichainListenerTest, OnCredentialDeleted_005, testing::ext::TestSize.Le
     EXPECT_TRUE(true); // Verifying early return for invalid length
 }
 
+HWTEST_F(HichainListenerTest, DeleteCredential_001, testing::ext::TestSize.Level2)
+{
+    HichainListener listener;
+    listener.credManager_ = nullptr;
+    int32_t osAccountId = 123;
+    std::string credId = "123456789";
+    int32_t ret = listener.DeleteCredential(osAccountId, credId);
+    EXPECT_EQ(ret, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(HichainListenerTest, DeleteCredential_002, testing::ext::TestSize.Level2)
+{
+    HichainListener listener;
+    int32_t osAccountId = 123;
+    std::string credId = "123456789";
+    int32_t ret = listener.DeleteCredential(osAccountId, credId);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
 } // DistributedHardware
 } // OHOS
