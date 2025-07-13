@@ -73,11 +73,6 @@ void DmAuthStateMachine::InsertSrcTransTable()
         {DmAuthStateType::AUTH_SRC_PIN_INPUT_STATE, {
             DmAuthStateType::AUTH_SRC_PIN_AUTH_START_STATE,
         }},
-        {DmAuthStateType::AUTH_SRC_CREDENTIAL_EXCHANGE_STATE, {
-            DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE,
-            DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE,
-            DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE,
-        }},
         {DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE, {DmAuthStateType::AUTH_SRC_FINISH_STATE}},
         {DmAuthStateType::AUTH_SRC_FINISH_STATE, {}}
     });
@@ -100,6 +95,11 @@ void DmAuthStateMachine::InsertCredentialAuthSrcTransTable()
         {DmAuthStateType::AUTH_SRC_PIN_AUTH_DONE_STATE, {
             DmAuthStateType::AUTH_SRC_CREDENTIAL_EXCHANGE_STATE,
             DmAuthStateType::AUTH_SRC_PIN_NEGOTIATE_START_STATE,
+        }},
+        {DmAuthStateType::AUTH_SRC_CREDENTIAL_EXCHANGE_STATE, {
+            DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE,
+            DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE,
+            DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE,
         }},
         {DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_START_STATE, {
             DmAuthStateType::AUTH_SRC_CREDENTIAL_AUTH_NEGOTIATE_STATE,
