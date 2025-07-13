@@ -226,8 +226,10 @@ public:
     void DmAuthUltrasonicMessageProcessor();
 
 private:
+    // construct function implementation
+    void ConstructCreateMessageFunMap();
+    void ConstructParaseMessageFuncMap();
     // Internal implementations for various message types
-
     // Used to encrypt the synchronization message
     int32_t EncryptSyncMessage(std::shared_ptr<DmAuthContext> &context, DmAccess &accessSide, std::string &encSyncMsg);
     int32_t CreateProxyAccessMessage(std::shared_ptr<DmAuthContext> &context, JsonObject &syncMsgJson);
