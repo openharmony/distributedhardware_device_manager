@@ -114,6 +114,7 @@ DmAuthStateType AuthSrcCredentialAuthDoneState::GetStateType()
 int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     if (GetSessionKey(context)) {
         DerivativeSessionKey(context);
         std::unique_lock<std::mutex> cvLock(certCVMtx_);
@@ -132,6 +133,13 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
         LOGE("AuthSrcCredentialAuthDoneState::Action Hichain auth SINK transmit data failed");
         return ERR_DM_FAILED;
     }
+    return HandleSrcCredentialAuthDone(context);
+}
+
+int32_t AuthSrcCredentialAuthDoneState::HandleSrcCredentialAuthDone(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     DmMessageType msgType;
     // first time joinLnn, auth lnnCredential
     if (context->accesser.isGenerateLnnCredential == true && context->isAppCredentialVerified == false &&

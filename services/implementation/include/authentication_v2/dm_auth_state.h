@@ -482,6 +482,7 @@ public:
     int32_t SendCredentialAuthMessage(std::shared_ptr<DmAuthContext> context, DmMessageType &msgType);
     int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
     int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
+    int32_t HandleSrcCredentialAuthDone(std::shared_ptr<DmAuthContext> context);
 private:
     std::mutex certCVMtx_;
     std::condition_variable certCV_;
