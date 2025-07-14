@@ -318,5 +318,21 @@ int32_t HichainListener::DeleteGroupExt(int32_t userId, std::string &groupId)
     }
     return DM_OK;
 }
+
+int32_t HichainListener::DeleteCredential(int32_t osAccountId, const std::string &credId)
+{
+    LOGI("start. osAccountId=%{public}s, credId=%{public}s", GetAnonyInt32(osAccountId).c_str(),
+        GetAnonyString(credId).c_str());
+    if (credManager_ == nullptr) {
+        LOGE("credManager_ is nullptr");
+        return ERR_DM_POINT_NULL;
+    }
+    int32_t ret = credManager_->deleteCredential(osAccountId, credId.c_str());
+    if (ret != DM_OK) {
+        LOGE("Hichain deleteCredential failed ret %{public}d.", ret);
+        return ERR_DM_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
