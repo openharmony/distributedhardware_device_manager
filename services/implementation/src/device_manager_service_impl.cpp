@@ -1873,8 +1873,11 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &inf
     CHECK_NULL_VOID(hiChainConnector_);
     hiChainConnector_->DeleteAllGroup(info.localUserId);
     CHECK_NULL_VOID(hiChainAuthConnector_);
-    hiChainAuthConnector_->DeleteCredential(info.peerUdid, info.localUserId, info.peerUserId);
-    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    {
+        std::lock_guard lock(logoutMutex_);
+        hiChainAuthConnector_->DeleteCredential(info.peerUdid, info.localUserId, info.peerUserId);
+        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    }
 
     std::set<std::string> pkgNameSet;
     GetBundleName(info, pkgNameSet);
@@ -2073,8 +2076,12 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
         CHECK_NULL_VOID(hiChainConnector_);
         hiChainConnector_->DeleteAllGroup(item.second);
         CHECK_NULL_VOID(hiChainAuthConnector_);
-        hiChainAuthConnector_->DeleteCredential(remoteUdid, item.second, remoteUserId);
-        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+        {
+            std::lock_guard lock(logoutMutex_);
+            hiChainAuthConnector_->DeleteCredential(remoteUdid, item.second, remoteUserId);
+            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+        }
+
         std::set<std::string> pkgNameSet;
         GetBundleName(info, pkgNameSet);
         if (notifyOffline) {
@@ -2656,8 +2663,12 @@ void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUd
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
     const std::string &localUdid, std::string &remoteUdid, bool &isSendBroadCast)
 {
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
-        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    {
+        std::lock_guard lock(logoutMutex_);
+        profiles = DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    }
+
     JsonObject jsonObject;
     jsonObject.Parse(std::string(credInfo));
     if (jsonObject.IsDiscarded()) {

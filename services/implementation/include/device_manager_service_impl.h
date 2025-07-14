@@ -311,6 +311,7 @@ private:
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::atomic<bool> isCredentialType_ = false;
+    std::mutex logoutMutex_;
     sptr<DpInitedCallback> dpInitedCallback_ = nullptr;
 
     // The session ID corresponding to the device ID, used only on the src side
