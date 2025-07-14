@@ -3959,6 +3959,20 @@ void DeviceManagerService::HandleUserSwitchedEvent(int32_t currentUserId, int32_
 void DeviceManagerService::HandleUserStopEvent(int32_t stopUserId)
 {
     LOGI("stopUserId %{public}s.", GetAnonyInt32(stopUserId).c_str());
+    std::vector<int32_t> foregroundUserVec;
+    int32_t retFront = MultipleUserConnector::GetForegroundUserIds(foregroundUserVec);
+    std::vector<int32_t> backgroundUserVec;
+    int32_t retBack = MultipleUserConnector::GetBackgroundUserIds(backgroundUserVec);
+    MultipleUserConnector::ClearLockedUser(foregroundUserVec, backgroundUserVec);
+    if (retFront != DM_OK || retBack != DM_OK) {
+        LOGE("retFront: %{public}d, retBack: %{public}d, frontuserids: %{public}s, backuserids: %{public}s",
+            retFront, retBack, GetIntegerList(foregroundUserVec).c_str(), GetIntegerList(backgroundUserVec).c_str());
+        return;
+    }
+    if (!IsUserStatusChanged(foregroundUserVec, backgroundUserVec)) {
+        LOGI("User status has not changed.");
+        return;
+    }
     std::vector<int32_t> stopUserVec;
     stopUserVec.push_back(stopUserId);
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
