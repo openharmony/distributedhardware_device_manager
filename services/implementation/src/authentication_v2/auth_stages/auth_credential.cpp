@@ -182,8 +182,7 @@ int32_t AuthSrcCredentialAuthDoneState::HandleSrcCredentialAuthDone(std::shared_
     return SendCredentialAuthMessage(context, msgType);
 }
 
-int32_t AuthSrcCredentialAuthDoneState::
-(std::shared_ptr<DmAuthContext> context,
+int32_t AuthSrcCredentialAuthDoneState::SendCredentialAuthMessage(std::shared_ptr<DmAuthContext> context,
     DmMessageType &msgType)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -725,6 +724,8 @@ DmAuthStateType AuthSrcSKDeriveState::GetStateType()
 int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcSKDeriveState::Action start.");
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     // First authentication lnn cred
     if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
         int32_t skId = 0;
@@ -754,9 +755,9 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
 int32_t AuthSrcSKDeriveState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     // no proxy
     if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
-        // 派生应用的sk【临时SK+accesser.transmitCredentialId+accessee.transmitCredentialId】 saveTransmitSkToDp
         int32_t skId = 0;
         // derive transmit sk
         std::string suffix = context->accesser.transmitCredentialId + context->accessee.transmitCredentialId;
@@ -778,6 +779,7 @@ int32_t AuthSrcSKDeriveState::DerivativeSessionKey(std::shared_ptr<DmAuthContext
 int32_t AuthSrcSKDeriveState::DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     if (!context->reUseCreId.empty()) {
         context->accesser.transmitCredentialId = context->reUseCreId;
     }
@@ -834,6 +836,8 @@ DmAuthStateType AuthSinkSKDeriveState::GetStateType()
 int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkSKDeriveState::Action start.");
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     // First authentication lnn cred
     if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != USER) {
         int32_t skId = 0;
@@ -871,6 +875,7 @@ int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
 int32_t AuthSinkSKDeriveState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
         return DM_OK;
     }
