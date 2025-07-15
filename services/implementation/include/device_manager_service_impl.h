@@ -298,6 +298,7 @@ private:
     void OnAuthResultAndOnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId,
         const std::string &deviceId, int32_t reason);
     void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet);
+    void DeleteSessionKey(const std::string &userId);
 private:
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
 

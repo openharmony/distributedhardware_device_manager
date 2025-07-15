@@ -2701,10 +2701,7 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
             item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
             isSendBroadCast = true;
-            int32_t skId = item.GetAccesser().GetAccesserSessionKeyId();
-            DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
-            skId = item.GetAccessee().GetAccesseeSessionKeyId();
-            DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
+            DeleteSessionKey(userId);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
@@ -2722,6 +2719,7 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
         }
         std::string accesserCredId = "";
         std::string accesseeCredId = "";
+        int32_t skId = -1;
         for (int32_t i = 0; i < BROADCAST_CREDID_LENGTH; i++) {
             accesserCredId += item.GetAccesser().GetAccesserCredentialIdStr()[i];
             accesseeCredId += item.GetAccessee().GetAccesseeCredentialIdStr()[i];
@@ -2729,11 +2727,13 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
         if (accesserCredId == credId && item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == localUserId &&
             item.GetAccesser().GetAccesserUserId() == userId) {
+            DeleteSessionKey(userId);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
         if (accesseeCredId == credId && item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == localUserId &&
             item.GetAccessee().GetAccesseeUserId() == userId) {
+            DeleteSessionKey(userId);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
@@ -3048,6 +3048,14 @@ void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
     //delete group
     hiChainConnector_->DeleteHoDevice(peerUdid, foreGroundUserIds, backGroundUserIds);
     return;
+}
+
+void DeviceManagerServiceImpl::DeleteSessionKey(const std::string &userId)
+{
+    int32_t skId = item.GetAccessee().GetAccesseeSessionKeyId();
+    DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
+    skId = item.GetAccessee().GetAccesseeSessionKeyId();
+    DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
