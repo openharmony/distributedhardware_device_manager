@@ -130,7 +130,7 @@ public:
         std::vector<int32_t> &backgroundUserVec);
     DM_EXPORT static DMAccountInfo GetCurrentDMAccountInfo();
     DM_EXPORT static void GetCallingTokenId(uint32_t &tokenId);
-    DM_EXPORT static int32_t GetUserIdByDisplayId(uint64_t displayId);
+    DM_EXPORT static int32_t GetUserIdByDisplayId(int32_t displayId);
 private:
     static int32_t oldUserId_;
     static std::string accountId_;
