@@ -2719,7 +2719,6 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
         }
         std::string accesserCredId = "";
         std::string accesseeCredId = "";
-        int32_t skId = -1;
         for (int32_t i = 0; i < BROADCAST_CREDID_LENGTH; i++) {
             accesserCredId += item.GetAccesser().GetAccesserCredentialIdStr()[i];
             accesseeCredId += item.GetAccessee().GetAccesseeCredentialIdStr()[i];
@@ -3053,7 +3052,7 @@ void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
 void DeviceManagerServiceImpl::DeleteSessionKey(int32_t userId,
     const DistributedDeviceProfile::AccessControlProfile &profile)
 {
-    int32_t skId = profile.GetAccessee().GetAccesseeSessionKeyId();
+    int32_t skId = profile.GetAccesser().GetAccesserSessionKeyId();
     DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
     skId = profile.GetAccessee().GetAccesseeSessionKeyId();
     DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
