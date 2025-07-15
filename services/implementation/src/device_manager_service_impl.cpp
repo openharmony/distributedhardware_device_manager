@@ -2701,7 +2701,7 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
             item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
             isSendBroadCast = true;
-            DeleteSessionKey(userId);
+            DeleteSessionKey(userId, item);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
@@ -2727,13 +2727,13 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
         if (accesserCredId == credId && item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == localUserId &&
             item.GetAccesser().GetAccesserUserId() == userId) {
-            DeleteSessionKey(userId);
+            DeleteSessionKey(userId, item);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
         if (accesseeCredId == credId && item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == localUserId &&
             item.GetAccessee().GetAccesseeUserId() == userId) {
-            DeleteSessionKey(userId);
+            DeleteSessionKey(userId, item);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
@@ -3050,11 +3050,12 @@ void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
     return;
 }
 
-void DeviceManagerServiceImpl::DeleteSessionKey(const std::string &userId)
+void DeviceManagerServiceImpl::DeleteSessionKey(int32_t userId,
+    const DistributedDeviceProfile::AccessControlProfile &profile)
 {
-    int32_t skId = item.GetAccessee().GetAccesseeSessionKeyId();
+    int32_t skId = profile.GetAccessee().GetAccesseeSessionKeyId();
     DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
-    skId = item.GetAccessee().GetAccesseeSessionKeyId();
+    skId = profile.GetAccessee().GetAccesseeSessionKeyId();
     DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
 }
 
