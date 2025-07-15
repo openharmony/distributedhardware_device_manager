@@ -2701,6 +2701,10 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
             item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
             isSendBroadCast = true;
+            int32_t skId = item.GetAccesser().GetAccesserSessionKeyId();
+            DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
+            skId = item.GetAccessee().GetAccesseeSessionKeyId();
+            DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
