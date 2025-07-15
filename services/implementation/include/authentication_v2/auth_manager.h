@@ -153,6 +153,7 @@ private:
     void ParseUltrasonicSide(const JsonObject &jsonObject);
     void GetBindCallerInfo();
     int32_t GetBindLevel(int32_t bindLevel);
+    void GetIsNeedJoinLnnParam(const std::map<std::string, std::string> &bindParam);
 };
 
 class AuthSrcManager : public AuthManager {

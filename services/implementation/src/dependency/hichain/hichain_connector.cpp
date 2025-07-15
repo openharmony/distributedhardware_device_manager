@@ -22,6 +22,7 @@
 
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "dm_dfx_constants.h"
 #include "dm_hisysevent.h"
 #include "dm_log.h"
@@ -347,7 +348,8 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
 
     std::string pinCode = jsonObject[PIN_CODE_KEY].Get<std::string>();
     std::string groupId = jsonObject[TAG_GROUP_ID].Get<std::string>();
-    LOGI("pinCode: %{public}s", GetAnonyString(pinCode).c_str());
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode));
+    LOGI("AddMember pinCodeHash: %{public}s", pinCodeHash.c_str());
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_PEER_TO_PEER_GROUP;
