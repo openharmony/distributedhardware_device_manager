@@ -454,7 +454,7 @@ int32_t DmAuthMessageProcessor::PutProxyAccessControlList(std::shared_ptr<DmAuth
     return DM_OK;
 }
 
-void DmAuthMessageProcessor::ConstructCreateMessageFunMap()
+void DmAuthMessageProcessor::ConstructCreateMessageFuncMap()
 {
     createMessageFuncMap_ = {
         {DmMessageType::MSG_TYPE_REQ_ACL_NEGOTIATE, &DmAuthMessageProcessor::CreateNegotiateMessage},
@@ -515,7 +515,7 @@ DmAuthMessageProcessor::DmAuthMessageProcessor()
 {
     LOGI("DmAuthMessageProcessor constructor");
     cryptoMgr_ = std::make_shared<CryptoMgr>();
-    ConstructCreateMessageFunMap();
+    ConstructCreateMessageFuncMap();
     ConstructParaseMessageFuncMap();
     DmAuthUltrasonicMessageProcessor();
 }

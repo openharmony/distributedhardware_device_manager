@@ -227,7 +227,7 @@ public:
 
 private:
     // construct function implementation
-    void ConstructCreateMessageFunMap();
+    void ConstructCreateMessageFuncMap();
     void ConstructParaseMessageFuncMap();
     // Internal implementations for various message types
     // Used to encrypt the synchronization message
