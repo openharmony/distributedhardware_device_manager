@@ -636,7 +636,6 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
     if (ret != DM_OK) {
         context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
         context->SetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope, "");
-        LOGE("AuthSinkCredentialExchangeState::Action failed, agree app cred failed.");
         return ret;
     }
 
@@ -712,7 +711,6 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
     }
 
     if (context->authStateMachine->WaitExpectEvent(ON_TRANSMIT) != ON_TRANSMIT) {
-        LOGE("AuthSrcCredentialAuthStartState::Action failed, ON_TRANSMIT event not arrived.");
         return ERR_DM_FAILED;
     }
 
