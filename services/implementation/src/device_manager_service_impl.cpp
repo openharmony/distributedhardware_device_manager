@@ -2869,6 +2869,19 @@ int32_t DeviceManagerServiceImpl::DeleteAclForProcV2(const std::string &localUdi
     return DM_OK;
 }
 
+bool DeviceManagerServiceImpl::IsProxyUnbind(const std::string &extra)
+{
+    JsonObject jsonObject(extra);
+    if (jsonObject.IsDiscarded()) {
+        return false;
+    }
+    if (IsString(jsonObject, PARAM_KEY_IS_PROXY_UNBIND) &&
+        jsonObject[PARAM_KEY_IS_PROXY_UNBIND].Get<std::string>() == DM_VAL_TRUE) {
+        return true;
+    }
+    return false;
+}
+
 int32_t DeviceManagerServiceImpl::DeleteAclV2(const std::string &pkgName, const std::string &localUdid,
     const std::string &remoteUdid, int32_t bindLevel, const std::string &extra)
 {
@@ -2876,8 +2889,14 @@ int32_t DeviceManagerServiceImpl::DeleteAclV2(const std::string &pkgName, const 
         pkgName.c_str(), GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), bindLevel);
     int64_t tokenId = 0;
     int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
-    std::string bundleName = pkgName;
-    AppManager::GetInstance().GetTokenIdByBundleName(userId, bundleName, tokenId);
+    if (IsProxyUnbind(extra) != true) {
+        uint32_t callingTokenId = 0;
+        MultipleUserConnector::GetTokenId(callingTokenId);
+        tokenId = static_cast<int64_t>(callingTokenId);
+    } else {
+        std::string bundleName = pkgName;
+        AppManager::GetInstance().GetTokenIdByBundleName(userId, bundleName, tokenId);
+    }
     bool isNewVersion = IsAuthNewVersion(bindLevel, localUdid, remoteUdid, tokenId, userId);
     if (!isNewVersion) {
         return DeleteAcl(pkgName, localUdid, remoteUdid, bindLevel, extra);

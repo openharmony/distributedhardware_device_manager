@@ -183,6 +183,7 @@ public:
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     int32_t DeleteAcl(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
+    bool IsProxyUnbind(const std::string &extra);
     int32_t DeleteAclV2(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
     void NotifyCleanEvent(uint64_t logicalSessionId);
