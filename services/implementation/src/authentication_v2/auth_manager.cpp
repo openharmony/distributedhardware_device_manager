@@ -990,7 +990,8 @@ char *AuthSinkManager::AuthDeviceRequest(int64_t requestId, int operationCode, c
             jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
             jsonObj[FIELD_PIN_CODE] = pinCode;
         }
-        LOGI("pinCode: %{public}s", GetAnonyString(pinCode).c_str());
+        std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode));
+        LOGI("AuthDeviceRequest pinCodeHash: %{public}s", pinCodeHash.c_str());
     } else if (curState == DmAuthStateType::AUTH_SINK_CREDENTIAL_AUTH_START_STATE) {
         if (context_->isOnline) { // Non-first time certification
             jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
@@ -1015,7 +1016,8 @@ int32_t AuthManager::GetPinCode(std::string &code)
         LOGE("AuthManager failed to GetPinCode because context_ is nullptr");
         return ERR_DM_FAILED;
     }
-    LOGI("GetPinCode called, pinCode: %{public}s", GetAnonyString(context_->pinCode).c_str());
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context_->pinCode));
+    LOGI("GetPinCode pinCodeHash: %{public}s", pinCodeHash.c_str());
     code = context_->pinCode;
     return DM_OK;
 }

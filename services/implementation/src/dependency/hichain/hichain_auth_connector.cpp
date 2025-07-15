@@ -19,6 +19,7 @@
 #include "dm_log.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
+#include "dm_crypto.h"
 #include "hichain_connector_callback.h"
 #include "parameter.h"
 #include "cJSON.h"
@@ -114,7 +115,8 @@ std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::GetDeviceAuthCallba
 int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osAccountId, std::string udid,
     int64_t requestId)
 {
-    LOGI("start, pinCode: %{public}s", GetAnonyString(pinCode).c_str());
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode));
+    LOGI("AuthDevice pinCodeHash: %{public}s", pinCodeHash.c_str());
     JsonObject authParamJson;
     authParamJson["osAccountId"] = osAccountId;
     authParamJson["pinCode"] = pinCode;
@@ -255,7 +257,8 @@ int32_t HiChainAuthConnector::AuthCredential(int32_t osAccountId, int64_t authRe
 
 int32_t HiChainAuthConnector::AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode)
 {
-    LOGI("start, pinCode: %{public}s", GetAnonyString(pinCode).c_str());
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode));
+    LOGI("AuthCredentialPinCode pinCodeHash: %{public}s", pinCodeHash.c_str());
     if (pinCode.size() < MIN_PINCODE_SIZE) {
         LOGE("HiChainAuthConnector::AuthCredentialPinCode failed, pinCode size is %{public}zu.", pinCode.size());
         return ERR_DM_FAILED;

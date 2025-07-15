@@ -2577,7 +2577,8 @@ char *DmAuthManager::AuthDeviceRequest(int64_t requestId, int operationCode, con
         jsonObj[FIELD_CONFIRMATION] = RequestResponse::REQUEST_ACCEPTED;
         jsonObj[FIELD_PIN_CODE] = pinCode;
     }
-    LOGI("pinCode: %{public}s", GetAnonyString(pinCode).c_str());
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode));
+    LOGI("AuthDeviceRequest pinCodeHash: %{public}s", pinCodeHash.c_str());
     std::string deviceId = "";
     GetRemoteDeviceId(deviceId);
     jsonObj[FIELD_PEER_CONN_DEVICE_ID] = deviceId;

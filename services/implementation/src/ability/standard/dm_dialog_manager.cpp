@@ -22,6 +22,7 @@
 #include "auth_message_processor.h"
 #include "dm_anonymous.h"
 #include "dm_log.h"
+#include "dm_crypto.h"
 #include "json_object.h"
 #include "parameter.h"
 #include "dm_single_instance.h"
@@ -202,7 +203,8 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     if (DmDialogManager::GetAbilityName() == INPUT_ABILITY_NAME) {
         param["sysDialogZOrder"] = WINDOW_LEVEL_UPPER;
     }
-    LOGI("pinCode: %{public}s", GetAnonyString(DmDialogManager::GetPinCode()).c_str());
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(DmDialogManager::GetPinCode()));
+    LOGI("OnAbilityConnectDone pinCodeHash: %{public}s", pinCodeHash.c_str());
     param["isProxyBind"] = DmDialogManager::GetIsProxyBind();
     param["appUserData"] = DmDialogManager::GetAppUserData();
     param["pinCode"] = DmDialogManager::GetPinCode();
