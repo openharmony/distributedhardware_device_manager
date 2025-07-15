@@ -306,16 +306,21 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, HandleCredentialDeleted_005, testing
     std::string remoteUdid = "remoteUdid";
     bool isSendBroadCast = false;
 
-    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(1));
+    EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).Times(::testing::AtLeast(1))
+        .WillOnce(Return(1));
 
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
     AccessControlProfile profile;
     profile.SetBindType(DM_SHARE);
-    profile.GetAccesser().SetAccesserCredentialIdStr(credId);
-    profile.GetAccesser().SetAccesserDeviceId(localUdid);
-    profile.GetAccesser().SetAccesserUserId(1);
-    profile.GetAccessee().SetAccesseeUserId(1);
-    profile.GetAccessee().SetAccesseeDeviceId(remoteUdid);
+    Accesser accesser;
+    accesser.SetAccesserCredentialIdStr(credId);
+    accesser.SetAccesserDeviceId(localUdid);
+    accesser.SetAccesserUserId(1);
+    Accessee accessee;
+    accessee.SetAccesseeUserId(1);
+    accessee.SetAccesseeDeviceId(remoteUdid);
+    profile.SetAccesser(accesser);
+    profile.SetAccessee(accessee);
     profiles.push_back(profile);
 
     EXPECT_CALL(*deviceProfileConnectorMock_, GetAccessControlProfile()).WillOnce(Return(profiles));
