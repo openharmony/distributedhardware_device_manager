@@ -21,6 +21,7 @@
 #include "dm_auth_state_machine.h"
 #include "dm_auth_state.h"
 #include "dm_auth_state_machine.h"
+#include "dm_crypto.h"
 #include "dm_dialog_manager.h"
 #include "dm_log.h"
 #include "dm_negotiate_process.h"
@@ -54,6 +55,8 @@ int32_t AuthSinkStatePinAuthComm::ShowAuthInfoDialog(std::shared_ptr<DmAuthConte
     }
 
     DmDialogManager::GetInstance().ShowPinDialog(context->pinCode);
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context->pinCode));
+    LOGI("ShowAuthInfoDialog pinCodeHash: %{public}s", pinCodeHash.c_str());
     context->timer->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK),
         DmAuthState::GetTaskTimeout(context, SESSION_HEARTBEAT_TIMEOUT_TASK, SESSION_HEARTBEAT_TIMEOUT),
         [context] (std::string name) {
@@ -125,6 +128,8 @@ void AuthSinkStatePinAuthComm::GeneratePincode(std::shared_ptr<DmAuthContext> co
 {
     int32_t pinCode = GenRandInt(MIN_PIN_CODE, MAX_PIN_CODE);
     context->pinCode = std::to_string(pinCode);
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context->pinCode));
+    LOGI("GeneratePincode pinCodeHash: %{public}s", pinCodeHash.c_str());
 }
 
 DmAuthStateType AuthSrcPinAuthStartState::GetStateType()
@@ -181,6 +186,8 @@ int32_t AuthSinkPinAuthStartState::Action(std::shared_ptr<DmAuthContext> context
         LOGE("AuthSinkPinAuthStartState::Action invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(context->pinCode));
+    LOGI("AuthSinkPinAuthStartState pinCodeHash: %{public}s", pinCodeHash.c_str());
     // process pincode auth
     auto ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
