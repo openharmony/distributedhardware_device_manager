@@ -49,6 +49,8 @@ constexpr int32_t MAX_PIN_CODE = 999999;
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
+constexpr const char* NEED_JOIN_LNN = "0";
+constexpr const char* NO_NEED_JOIN_LNN = "1";
 const char* DM_REJECT_KEY = "business_id_cast+_reject_event";
 const char* DM_AUTH_DIALOG_REJECT = "is_auth_dialog_reject";
 const char* DM_TIMESTAMP = "timestamp";
@@ -640,10 +642,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     if (!DmRadarHelper::GetInstance().ReportDiscoverUserRes(info)) {
         LOGE("ReportDiscoverUserRes failed");
     }
-    if (bindParam.find(IS_NEED_JOIN_LNN) != bindParam.end()) {
-        std::string isNeedJoinLnnStr = bindParam.at(IS_NEED_JOIN_LNN);
-        context_->isNeedJoinLnn = std::atoi(isNeedJoinLnnStr.c_str());
-    }
+    GetIsNeedJoinLnnParam(bindParam);
     if (pkgName.empty()) {
         LOGE("AuthManager::BindTarget failed, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -674,6 +673,18 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     info.channelId = sessionId;
     DmRadarHelper::GetInstance().ReportAuthSendRequest(info);
     return ret;
+}
+
+void AuthManager::GetIsNeedJoinLnnParam(const std::map<std::string, std::string> &bindParam)
+{
+    std::string isNeedJoinLnnStr;
+    if (bindParam.find(IS_NEED_JOIN_LNN) != bindParam.end()) {
+        isNeedJoinLnnStr = bindParam.at(IS_NEED_JOIN_LNN);
+    }
+    if (isNeedJoinLnnStr == NEED_JOIN_LNN || isNeedJoinLnnStr == NO_NEED_JOIN_LNN) {
+        context_->isNeedJoinLnn = std::atoi(isNeedJoinLnnStr.c_str());
+        LOGI("isNeedJoinLnn: %{public}d.", context_->isNeedJoinLnn);
+    }
 }
 
 AuthSinkManager::AuthSinkManager(std::shared_ptr<SoftbusConnector> softbusConnector,
