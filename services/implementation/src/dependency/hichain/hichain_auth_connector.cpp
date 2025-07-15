@@ -256,7 +256,7 @@ int32_t HiChainAuthConnector::AuthCredential(int32_t osAccountId, int64_t authRe
 int32_t HiChainAuthConnector::AuthCredentialPinCode(int32_t osAccountId, int64_t authReqId, const std::string &pinCode)
 {
     LOGI("start, pinCode: %{public}s", GetAnonyString(pinCode).c_str());
-    if (pinCode.size() < MIN_PINCODE_SIZE) {
+    if (static_cast<int32_t>(pinCode.size()) < MIN_PINCODE_SIZE) {
         LOGE("HiChainAuthConnector::AuthCredentialPinCode failed, pinCode size is %{public}zu.", pinCode.size());
         return ERR_DM_FAILED;
     }
