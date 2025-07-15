@@ -2710,8 +2710,11 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
 void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
     const std::string &localUdid)
 {
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
-        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    {
+        std::lock_guard lock(logoutMutex_);
+        profiles = DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    }
     int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
     for (const auto &item : profiles) {
         if (item.GetBindType() != DM_SHARE) {
