@@ -745,7 +745,8 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     DerivativeSessionKey(context);
     // wait cert generate
     std::unique_lock<std::mutex> cvLock(certCVMtx_);
-    certCV_.wait_for(cvLock, std::chrono::milliseconds(100), [=] {return !context->accesser.cert.empty();});
+    certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
+        [=] {return !context->accesser.cert.empty();});
     // send 180
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_DATA_SYNC, context);
     LOGI("AuthSrcSKDeriveState::Action() leave.");

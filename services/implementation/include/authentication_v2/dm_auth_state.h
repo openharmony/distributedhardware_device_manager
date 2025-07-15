@@ -152,7 +152,6 @@ public:
     static int32_t GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut);
     static void HandleAuthenticateTimeout(std::shared_ptr<DmAuthContext> context, std::string name);
     static bool IsImportAuthCodeCompatibility(DmAuthType authType);
-
     void SetAclExtraInfo(std::shared_ptr<DmAuthContext> context);
     void SetAclInfo(std::shared_ptr<DmAuthContext> context);
     void FilterProfilesByContext(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
