@@ -1873,8 +1873,11 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &inf
     CHECK_NULL_VOID(hiChainConnector_);
     hiChainConnector_->DeleteAllGroup(info.localUserId);
     CHECK_NULL_VOID(hiChainAuthConnector_);
-    hiChainAuthConnector_->DeleteCredential(info.peerUdid, info.localUserId, info.peerUserId);
-    DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    {
+        std::lock_guard lock(logoutMutex_);
+        hiChainAuthConnector_->DeleteCredential(info.peerUdid, info.localUserId, info.peerUserId);
+        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+    }
 
     std::set<std::string> pkgNameSet;
     GetBundleName(info, pkgNameSet);
@@ -2073,8 +2076,12 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
         CHECK_NULL_VOID(hiChainConnector_);
         hiChainConnector_->DeleteAllGroup(item.second);
         CHECK_NULL_VOID(hiChainAuthConnector_);
-        hiChainAuthConnector_->DeleteCredential(remoteUdid, item.second, remoteUserId);
-        DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+        {
+            std::lock_guard lock(logoutMutex_);
+            hiChainAuthConnector_->DeleteCredential(remoteUdid, item.second, remoteUserId);
+            DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
+        }
+
         std::set<std::string> pkgNameSet;
         GetBundleName(info, pkgNameSet);
         if (notifyOffline) {
@@ -2654,10 +2661,14 @@ void DeviceManagerServiceImpl::CheckDeleteCredential(const std::string &remoteUd
 }
 
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const char *credInfo,
-    const std::string &localUdid, std::string &remoteUdid)
+    const std::string &localUdid, std::string &remoteUdid, bool &isSendBroadCast)
 {
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
-        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    {
+        std::lock_guard lock(logoutMutex_);
+        profiles = DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    }
+
     JsonObject jsonObject;
     jsonObject.Parse(std::string(credInfo));
     if (jsonObject.IsDiscarded()) {
@@ -2689,6 +2700,8 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
             item.GetAccessee().GetAccesseeUserId() == localUserId &&
             item.GetAccesser().GetAccesserUserId() == userId &&
             item.GetAccesser().GetAccesserDeviceId() == remoteUdid)) {
+            isSendBroadCast = true;
+            DeleteSessionKey(userId, item);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
@@ -2697,8 +2710,11 @@ void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId, const
 void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,
     const std::string &localUdid)
 {
-    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
-        DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    {
+        std::lock_guard lock(logoutMutex_);
+        profiles = DeviceProfileConnector::GetInstance().GetAccessControlProfile();
+    }
     int32_t localUserId = MultipleUserConnector::GetCurrentAccountUserID();
     for (const auto &item : profiles) {
         if (item.GetBindType() != DM_SHARE) {
@@ -2713,11 +2729,13 @@ void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &cre
         if (accesserCredId == credId && item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccessee().GetAccesseeUserId() == localUserId &&
             item.GetAccesser().GetAccesserUserId() == userId) {
+            DeleteSessionKey(userId, item);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
         if (accesseeCredId == credId && item.GetAccesser().GetAccesserDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserUserId() == localUserId &&
             item.GetAccessee().GetAccesseeUserId() == userId) {
+            DeleteSessionKey(userId, item);
             DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
         }
     }
@@ -3032,6 +3050,15 @@ void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
     //delete group
     hiChainConnector_->DeleteHoDevice(peerUdid, foreGroundUserIds, backGroundUserIds);
     return;
+}
+
+void DeviceManagerServiceImpl::DeleteSessionKey(int32_t userId,
+    const DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    int32_t skId = profile.GetAccesser().GetAccesserSessionKeyId();
+    DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
+    skId = profile.GetAccessee().GetAccesseeSessionKeyId();
+    DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

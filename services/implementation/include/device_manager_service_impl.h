@@ -178,7 +178,7 @@ public:
     void DeleteAlwaysAllowTimeOut();
     void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId);
     void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
-        std::string &remoteUdid);
+        std::string &remoteUdid, bool &isSendBroadCast);
     void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId, const std::string &localUdid);
     int32_t CheckDeviceInfoPermission(const std::string &localUdid, const std::string &peerDeviceId);
     int32_t DeleteAcl(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
@@ -298,6 +298,7 @@ private:
     void OnAuthResultAndOnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId,
         const std::string &deviceId, int32_t reason);
     void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet);
+    void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
 private:
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
 
@@ -311,6 +312,7 @@ private:
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::atomic<bool> isCredentialType_ = false;
+    std::mutex logoutMutex_;
     sptr<DpInitedCallback> dpInitedCallback_ = nullptr;
 
     // The session ID corresponding to the device ID, used only on the src side
