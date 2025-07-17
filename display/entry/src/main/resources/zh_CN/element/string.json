@@ -22,7 +22,10 @@
         },
         {
             "name":"dm_is_trust_device",
-            "value":"%s是否信任此设备？"
+            "value":"%s是否信任此设备？",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_allow_temp",
@@ -47,15 +50,24 @@
         },
         {
             "name":"dm_connect_device",
-            "value":"%s 想要连接本机。"
+            "value":"%s 想要连接本机。",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_connect",
-            "value":"连接 %s"
+            "value":"连接 %s",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_enter_connect_code",
-            "value":"请输入对端设备上显示的连接码"
+            "value":"请输入对端设备上显示的连接码",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_cancel",
@@ -66,7 +78,10 @@
         },
         {
             "name":"dm_authenticating",
-            "value":"正在认证中，请稍侯…"
+            "value":"正在认证中，请稍侯…",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_connect_code",
@@ -77,7 +92,10 @@
         },
         {
             "name":"dm_confirm_title_cast",
-            "value":"%s想要投屏至本机。是否信任此设备？"
+            "value":"%s想要投屏至本机。是否信任此设备？",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_confirm_title_hap",
@@ -95,11 +113,17 @@
         },
         {
             "name":"dm_bluetooth_dialog_content",
-            "value":"设备连接需开启蓝牙，请开启后重试。"
+            "value":"设备连接需开启蓝牙，请开启后重试。",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_bluetooth_dialog_close",
-            "value":"知道了"
+            "value":"知道了",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_enter_peer_connect_code",
@@ -110,7 +134,10 @@
         },
         {
             "name":"dm_password_error",
-            "value":"密码错误，连接失败。"
+            "value":"密码错误，连接失败。",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_confirm_proxy",

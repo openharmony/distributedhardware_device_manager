@@ -2,9 +2,9 @@
     "string":[
         {
             "name":"dm_connect_code",
-            "value":"رمز الاتصال",
+            "value":"رمز التوصيل",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -32,21 +32,21 @@
             "name":"dm_confirm_intention",
             "value":"هذا الإذن مطلوب لمزامنة البيانات والمشاركة بين الأجهزة.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"الوثوق هذه المرة",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"الوثوق دائمًا",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -59,6 +59,69 @@
         {
             "name":"dm_confirm_proxy",
             "value":"يرغب \"%s\" في الاتصال بهذا الجهاز. يُرجى تحديد الخدمات التي يمكنه الوصول إليها:",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"أدخل رمز الاتصال الظاهر على شاشة الجهاز الآخر.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"يريد %s عرض شاشته على جهازك. هل تثق بهذا الجهاز؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s هل تثق بهذا الجهاز؟",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"كلمة المرور غير صحيحة. تعذّر الاتصال.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"موافق",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"جارية المصادقة…",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"يريد %s الاتصال بجهازك.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"مطلوب تشغيل البلوتوث للاتصال بجهاز آخر. يُرجى تشغيله والمحاولة مرة أخرى.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"الاتصال بالجهاز «\u202a%s\u202c»",
             "attr":{
                 "priority":"translate"
             }

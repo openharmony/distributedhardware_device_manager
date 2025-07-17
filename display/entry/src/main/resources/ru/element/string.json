@@ -32,21 +32,21 @@
             "name":"dm_confirm_intention",
             "value":"Это необходимо для синхронизации данных и взаимодействия между устройствами.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"Доверять сейчас",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"Всегда доверять",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -59,6 +59,69 @@
         {
             "name":"dm_confirm_proxy",
             "value":"%s хочет подключиться к этому устройству. Выберите службы, к которым у него будет доступ:",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"Введите код подключения, отобразившийся на другом устройстве.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s хочет транслировать контент экрана на вашем устройстве. Доверять этому устройству?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s Доверять этому устройству?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"Неверный пароль. Сбой подключения.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"Аутентификация...",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s хочет подключиться к вашему устройству.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"Для подключения к другому устройству необходимо включить Bluetooth. Включите и повторите попытку.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"Подключить к %s",
             "attr":{
                 "priority":"translate"
             }

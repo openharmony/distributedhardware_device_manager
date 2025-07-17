@@ -5,11 +5,17 @@
             "value":[
                 {
                     "quantity":"one",
-                    "value":"ئۇلاش كودى خاتا. يەنە %d پۇرسەت قالدى."
+                    "value":"ئۇلاش كودى خاتا. يەنە %d پۇرسەت قالدى.",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 },
                 {
                     "quantity":"other",
-                    "value":"ئۇلاش كودى خاتا. يەنە %d پۇرسەت قالدى."
+                    "value":"ئۇلاش كودى خاتا. يەنە %d پۇرسەت قالدى.",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 }
             ]
         },
@@ -18,11 +24,17 @@
             "value":[
                 {
                     "quantity":"other",
-                    "value":"ئىشەنمەيمەن (%d)"
+                    "value":"ئىشەنمەيمەن (%d)",
+                    "attr":{
+                        "priority":"LT"
+                    }
                 },
                 {
                     "quantity":"one",
-                    "value":"ئىشەنمەيمەن (%d)"
+                    "value":"ئىشەنمەيمەن (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
                 }
             ]
         }
