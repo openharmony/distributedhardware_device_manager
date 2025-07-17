@@ -1880,7 +1880,7 @@ HWTEST_F(DeviceManagerServiceTest, SendShareTypeUnBindBroadCast_001, testing::ex
 
 HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_002, testing::ext::TestSize.Level1)
 {
-    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _)).Times(0);
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(_, _, _, _, _)).Times(0);
 
     DeviceManagerService::GetInstance().HandleCredentialDeleted(nullptr, "credInfo");
 }
@@ -1891,6 +1891,34 @@ HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_004, testing::ext::Te
     EXPECT_CALL(*softbusListenerMock_, SendAclChangedBroadcast(_)).Times(0);
 
     DeviceManagerService::GetInstance().HandleCredentialDeleted("credId", "credInfo");
+}
+
+HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_005, testing::ext::TestSize.Level1)
+{
+    const char *credId = "testCredId";
+    const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    bool isSendBroadCast = false;
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(StrEq(credId), StrEq(credInfo), _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(remoteUdid), SetArgReferee<4>(isSendBroadCast)));
+
+    DeviceManagerService::GetInstance().HandleCredentialDeleted(credId, credInfo);
+}
+
+HWTEST_F(DeviceManagerServiceTest, HandleCredentialDeleted_006, testing::ext::TestSize.Level1)
+{
+    const char *credId = "testCredId";
+    const char *credInfo = R"({"deviceId": "remoteUdid", "userId": 1})";
+    std::string localUdid = "localUdid";
+    std::string remoteUdid = "remoteUdid";
+    bool isSendBroadCast = true;
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, HandleCredentialDeleted(StrEq(credId), StrEq(credInfo), _, _, _))
+        .WillOnce(DoAll(SetArgReferee<3>(remoteUdid), SetArgReferee<4>(isSendBroadCast)));
+
+    DeviceManagerService::GetInstance().HandleCredentialDeleted(credId, credInfo);
 }
 
 HWTEST_F(DeviceManagerServiceTest, HandleShareUnbindBroadCast_001, testing::ext::TestSize.Level1)
