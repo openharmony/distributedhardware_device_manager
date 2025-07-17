@@ -958,7 +958,7 @@ std::set<std::pair<std::string, std::string>> DeviceManagerService::GetProxyInfo
         return proxyInfos;
     }
     int64_t proxyTokenId = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
-    for (const auto &object : allProxyObj.Items()) {
+    for (auto object : allProxyObj.Items()) {
         if (!object.Contains(TAG_BUNDLE_NAME) || !IsString(object, TAG_BUNDLE_NAME)) {
             continue;
         }
@@ -969,6 +969,7 @@ std::set<std::pair<std::string, std::string>> DeviceManagerService::GetProxyInfo
         int64_t agentTokenId = object[TAG_TOKENID].Get<int64_t>();
         for (uint32_t i = 0; i < agentToProxyVec.size(); i++) {
             if (agentTokenId == agentToProxyVec[i].first && proxyTokenId == agentToProxyVec[i].second) {
+                object[PARAM_KEY_IS_PROXY_UNBIND] = DM_VAL_TRUE;
                 proxyInfos.insert(std::pair<std::string, std::string>(bundleName, object.Dump()));
                 break;
             }
