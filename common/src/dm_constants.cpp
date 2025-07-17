@@ -161,8 +161,6 @@ const char* DM_VAL_FALSE = "false";
 const char* APP_USER_DATA = "appUserData";
 const char* BUNDLE_INFO = "bundleInfo";
 const char* DM_BUSINESS_ID = "business_id";
-const char* DM_RISK = "risk";
-const char* DM_SAFE = "safe";
 
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
