@@ -153,6 +153,8 @@ private:
     void ParseUltrasonicSide(const JsonObject &jsonObject);
     void GetBindCallerInfo();
     int32_t GetBindLevel(int32_t bindLevel);
+    std::mutex certMtx_;
+    std::condition_variable certCV_;
 };
 
 class AuthSrcManager : public AuthManager {

@@ -35,9 +35,6 @@ public:
     int32_t GetNativeTokenIdByName(std::string &processName, int64_t &tokenId);
     int32_t GetHapTokenIdByName(int32_t userId, std::string &bundleName, int32_t instIndex, int64_t &tokenId);
     int32_t GetBundleNameForSelf(std::string &bundleName);
-private:
-    std::mutex certMtx_;
-    std::condition_variable certCV_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
