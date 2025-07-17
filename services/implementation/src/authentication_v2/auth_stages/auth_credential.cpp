@@ -795,8 +795,7 @@ int32_t AuthSrcSKDeriveState::DerivativeProxySessionKey(std::shared_ptr<DmAuthCo
         } else {
             // derive transmit sk
             std::string suffix = context->accesser.transmitCredentialId + context->accessee.transmitCredentialId;
-            int32_t ret =
-                context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
+            ret = context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
         }
         if (ret != DM_OK) {
             LOGE("AuthSrcSKDeriveState::Action DP save user session key failed");

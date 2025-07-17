@@ -643,7 +643,11 @@ void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
         LOGE("generate cert fail, certRet = %{public}d", certRet);
         return;
     }
-    context->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+    std::lock_guard<std::mutex> lock(certMtx_);
+    {
+        context->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+        certCV_.notify_all();
+    }
     AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
 #endif
     return;

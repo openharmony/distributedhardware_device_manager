@@ -483,7 +483,7 @@ void DmAuthMessageProcessor::ConstructCreateMessageFuncMap()
     };
 }
 
-void DmAuthMessageProcessor::ConstructParaseMessageFuncMap()
+void DmAuthMessageProcessor::ConstructParseMessageFuncMap()
 {
     paraseMessageFuncMap_ = {
         {DmMessageType::MSG_TYPE_REQ_ACL_NEGOTIATE, &DmAuthMessageProcessor::ParseNegotiateMessage},
@@ -516,7 +516,7 @@ DmAuthMessageProcessor::DmAuthMessageProcessor()
     LOGI("DmAuthMessageProcessor constructor");
     cryptoMgr_ = std::make_shared<CryptoMgr>();
     ConstructCreateMessageFuncMap();
-    ConstructParaseMessageFuncMap();
+    ConstructParseMessageFuncMap();
     DmAuthUltrasonicMessageProcessor();
 }
 

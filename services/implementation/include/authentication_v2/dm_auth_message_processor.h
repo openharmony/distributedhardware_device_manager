@@ -228,7 +228,7 @@ public:
 private:
     // construct function implementation
     void ConstructCreateMessageFuncMap();
-    void ConstructParaseMessageFuncMap();
+    void ConstructParseMessageFuncMap();
     // Internal implementations for various message types
     // Used to encrypt the synchronization message
     int32_t EncryptSyncMessage(std::shared_ptr<DmAuthContext> &context, DmAccess &accessSide, std::string &encSyncMsg);
