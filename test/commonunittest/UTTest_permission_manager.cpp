@@ -91,7 +91,7 @@ HWTEST_F(PermissionManagerTest, CheckPermission_001, testing::ext::TestSize.Leve
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_TYPE_BUTT));
     ret = PermissionManager::GetInstance().CheckPermission();
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_HAP));
@@ -169,7 +169,7 @@ HWTEST_F(PermissionManagerTest, CheckMonitorPermission_001, testing::ext::TestSi
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_TYPE_BUTT));
     ret = PermissionManager::GetInstance().CheckMonitorPermission();
-    ASSERT_TRUE(ret);
+    ASSERT_FALSE(ret);
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
     EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
