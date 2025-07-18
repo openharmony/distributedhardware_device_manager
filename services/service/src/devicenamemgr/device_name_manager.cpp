@@ -97,8 +97,11 @@ bool DeviceNameManager::DependsIsReady()
         return false;
     }
     if (!isAccountSysReady_) {
-        LOGE("Account system not ready");
-        return false;
+        if (MultipleUserConnector::GetCurrentAccountUserID() == DEFAULT_USER_ID) {
+            LOGE("Account system not ready");
+            return false;
+        }
+        isAccountSysReady_ = true;
     }
     if (GetRemoteObj() == nullptr) {
         LOGE("dm sa not publish");
@@ -273,7 +276,7 @@ void DeviceNameManager::UnRegisterDeviceNameChangeMonitor(int32_t userId)
 void DeviceNameManager::InitDeviceName(int32_t userId)
 {
     LOGI("In userId:%{public}d", userId);
-    if (userId == -1) {
+    if (userId == DEFAULT_USER_ID) {
         LOGI("userId:%{public}d is invalid", userId);
         return;
     }
