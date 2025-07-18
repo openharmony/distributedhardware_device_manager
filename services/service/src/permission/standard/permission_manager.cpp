@@ -107,7 +107,20 @@ bool PermissionManager::CheckNewPermission(void)
 
 bool PermissionManager::CheckMonitorPermission(void)
 {
-    return VerifyAccessTokenByPermissionName(DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION);
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("CheckMonitorPermission GetCallingTokenID error.");
+        return false;
+    }
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
+        if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION) !=
+            PermissionState::PERMISSION_GRANTED) {
+            LOGE("DM service access is denied, please apply for corresponding permissions.");
+            return false;
+        }
+    }
+    return true;
 }
 
 int32_t PermissionManager::GetCallerProcessName(std::string &processName)
@@ -304,8 +317,7 @@ bool PermissionManager::VerifyAccessTokenByPermissionName(const std::string& per
     }
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP || tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
-        if (AccessTokenKit::VerifyAccessToken(tokenCaller, permissionName) ==
-            PermissionState::PERMISSION_GRANTED) {
+        if (AccessTokenKit::VerifyAccessToken(tokenCaller, permissionName) == PermissionState::PERMISSION_GRANTED) {
             return true;
         }
     }
