@@ -503,8 +503,8 @@ int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAc
 int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peerOsAccountId, std::string deviceId,
     std::string publicKey)
 {
-    LOGI("start, deviceId: %{public}s, peerOsAccountId: %{public}d",
-        GetAnonyString(deviceId).c_str(), peerOsAccountId);
+    LOGI("start, deviceId: %{public}s, peerOsAccountId: %{public}s",
+        GetAnonyString(deviceId).c_str(), GetAnonyInt32(peerOsAccountId).c_str());
     JsonObject jsonObj;
     jsonObj["osAccountId"] = osAccountId;
     jsonObj["peerOsAccountId"] = peerOsAccountId;

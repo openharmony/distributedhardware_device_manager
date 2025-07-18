@@ -39,6 +39,9 @@ public:
     bool CheckProcessNameValidModifyLocalDeviceName(const std::string &processName);
     bool CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName);
     bool CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName);
+
+private:
+    bool VerifyAccessTokenByPermissionName(const std::string& permissionName);
 };
 } // namespace DistributedHardware
 } // namespace OHOS
