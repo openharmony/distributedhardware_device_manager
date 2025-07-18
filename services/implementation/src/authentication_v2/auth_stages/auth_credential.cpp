@@ -663,7 +663,8 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
     DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
     if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
         authorizedScope = DM_AUTH_SCOPE_APP;
-    } else if (context->accesser.bindLevel == USER) {
+    }
+    if (context->accesser.bindLevel == USER) {
         authorizedScope = DM_AUTH_SCOPE_USER;
     }
     // Agree transport credentials and public key
@@ -690,8 +691,9 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         return ret;
     }
     if (IsNeedAgreeCredential(context)) {
-        if (AgreeAndDeleteCredential(context) != DM_OK) {
-            return AgreeAndDeleteCredential(context);
+        ret = AgreeAndDeleteCredential(context);
+        if (ret != DM_OK) {
+            return ret;
         }
     }
     // compareVersion send 141
