@@ -119,7 +119,6 @@ void DmAuthStateMachine::InsertCredentialAuthSrcTransTable()
     });
 }
 
-
 void DmAuthStateMachine::InsertUltrasonicSrcTransTable()
 {
     stateTransitionTable_.insert({
