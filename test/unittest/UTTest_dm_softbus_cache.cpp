@@ -250,7 +250,7 @@ HWTEST_F(DMSoftbusCacheTest, GetUdidFromCache_001, testing::ext::TestSize.Level1
     EXPECT_EQ(SoftbusCache::GetInstance().GetUdidFromCache("networkid", udid), DM_OK);
     EXPECT_EQ(udid, "udid");
     int32_t ret = SoftbusCache::GetInstance().GetUdidFromCache("test", udid);
-    EXPECT_NE(CheckSoftbusRes(ret), DM_OK);
+    EXPECT_NE(CheckSoftbusRes(ret), true);
 }
 } // namespace
 } // namespace DistributedHardware
