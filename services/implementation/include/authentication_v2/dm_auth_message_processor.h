@@ -115,6 +115,8 @@ enum DmMessageType {
     MSG_TYPE_RESP_PIN_AUTH_MSG_NEGOTIATE = 131,
     MSG_TYPE_REQ_CREDENTIAL_EXCHANGE = 140,
     MSG_TYPE_RESP_CREDENTIAL_EXCHANGE = 150,
+    MSG_TYPE_REQ_SK_DERIVE = 141,
+    MSG_TYPE_RESP_SK_DERIVE = 151,
     MSG_TYPE_REQ_CREDENTIAL_AUTH_START = 160,
     MSG_TYPE_RESP_CREDENTIAL_AUTH_START = 170,
     MSG_TYPE_REQ_CREDENTIAL_AUTH_NEGOTIATE = 161,
@@ -224,8 +226,10 @@ public:
     void DmAuthUltrasonicMessageProcessor();
 
 private:
+    // construct function implementation
+    void ConstructCreateMessageFuncMap();
+    void ConstructParseMessageFuncMap();
     // Internal implementations for various message types
-
     // Used to encrypt the synchronization message
     int32_t EncryptSyncMessage(std::shared_ptr<DmAuthContext> &context, DmAccess &accessSide, std::string &encSyncMsg);
     int32_t CreateProxyAccessMessage(std::shared_ptr<DmAuthContext> &context, JsonObject &syncMsgJson);
@@ -257,6 +261,10 @@ private:
     // Parse the 150 message
     int32_t ParseMessageRspCredExchange(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     int32_t ParseProxyCredExchangeToSync(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonObject);
+    // Parse the 141 message
+    int32_t ParseMessageReqSKDerive(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
+    // Parse the 151 message
+    int32_t ParseMessageRspSKDerive(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 161, 170, and 171 messages
     int32_t ParseMessageNegotiateTransmit(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     // Parse the 180 message
@@ -301,6 +309,10 @@ private:
     // Create the 150 message
     int32_t CreateMessageRspCredExchange(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     int32_t CreateProxyCredExchangeMessage(std::shared_ptr<DmAuthContext> &context, JsonObject &jsonData);
+    // Create 141 message.
+    int32_t CreateMessageReqSKDerive(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
+    // Create 151 message.
+    int32_t CreateMessageRspSKDerive(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Create the 160 message
     int32_t CreateMessageReqCredAuthStart(std::shared_ptr<DmAuthContext> context, JsonObject &jsonObject);
     // Construct the 161, 170, and 171 credential authentication messages

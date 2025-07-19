@@ -102,7 +102,6 @@ void AuthCredentialFuzzTest(const uint8_t* data, size_t size)
     context->accesser.isGenerateLnnCredential = false;
     authFirst->GetStateType();
     authSecond->GetStateType();
-    authSecond->GenerateCertificate(context);
     authThird->GetStateType();
     authForth->GetStateType();
     authFifth->GetStateType();

@@ -58,6 +58,7 @@ enum class DmAuthStateType {
     AUTH_SRC_CREDENTIAL_AUTH_DONE_STATE = 16,   // Received 170 credential authentication message, sent 161 message
     AUTH_SRC_DATA_SYNC_STATE = 17,              // Received 190 message, sent 200 message
     AUTH_SRC_FINISH_STATE = 18,                 // Received 201 message
+    AUTH_SRC_SK_DERIVE_STATE = 19,              // Received 151 message
 
     // sink end state
     AUTH_SINK_START_STATE = 50,                 // Bus trigger OnSessionOpened
@@ -77,6 +78,7 @@ enum class DmAuthStateType {
     AUTH_SINK_CREDENTIAL_AUTH_NEGOTIATE_STATE = 64, // Received 161 credential negotiation message,
     AUTH_SINK_DATA_SYNC_STATE = 65,             // Received 180 synchronization message, send 190 message
     AUTH_SINK_FINISH_STATE = 66,                // Received 200 end message, send 201 message
+    AUTH_SINK_SK_DERIVE_STATE = 67,             // Received 141 message
 };
 
 // Credential Addition Method
@@ -150,7 +152,6 @@ public:
     static int32_t GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut);
     static void HandleAuthenticateTimeout(std::shared_ptr<DmAuthContext> context, std::string name);
     static bool IsImportAuthCodeCompatibility(DmAuthType authType);
-
     void SetAclExtraInfo(std::shared_ptr<DmAuthContext> context);
     void SetAclInfo(std::shared_ptr<DmAuthContext> context);
     void FilterProfilesByContext(std::vector<DistributedDeviceProfile::AccessControlProfile> &profiles,
@@ -442,11 +443,33 @@ public:
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 };
 
+class AuthSrcSKDeriveState : public DmAuthState {
+public:
+    virtual ~AuthSrcSKDeriveState() {};
+    DmAuthStateType GetStateType() override;
+    int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
+    int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
+private:
+    std::mutex certCVMtx_;
+    std::condition_variable certCV_;
+};
+
+class AuthSinkSKDeriveState : public DmAuthState {
+public:
+    virtual ~AuthSinkSKDeriveState() {};
+    DmAuthStateType GetStateType() override;
+    int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
+};
+
 class AuthSrcCredentialAuthStartState : public AuthCredentialAgreeState {
 public:
     virtual ~AuthSrcCredentialAuthStartState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+private:
+    int32_t AgreeAndDeleteCredential(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSrcCredentialAuthNegotiateState : public DmAuthState {
@@ -464,8 +487,10 @@ public:
     int32_t SendCredentialAuthMessage(std::shared_ptr<DmAuthContext> context, DmMessageType &msgType);
     int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
     int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
+    int32_t HandleSrcCredentialAuthDone(std::shared_ptr<DmAuthContext> context);
 private:
-    std::string GenerateCertificate(std::shared_ptr<DmAuthContext> context);
+    std::mutex certCVMtx_;
+    std::condition_variable certCV_;
 };
 
 class AuthSinkCredentialAuthStartState : public DmAuthState {
