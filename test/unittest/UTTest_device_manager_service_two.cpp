@@ -1829,8 +1829,6 @@ HWTEST_F(DeviceManagerServiceTest, GetDeviceNetworkIdList_202, testing::ext::Tes
 
     int32_t stopUserId = 1;
     std::map<std::string, int32_t> deviceMap;
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetDeviceIdAndBindLevel(_, _))
-        .WillOnce(Return(deviceMap));
     DeviceManagerService::GetInstance().InitDMServiceListener();
     DeviceManagerService::GetInstance().HandleUserStopEvent(stopUserId);
 
