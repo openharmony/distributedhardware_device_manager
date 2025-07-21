@@ -415,8 +415,8 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ret;
     }
 #endif
-    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK, anonyLocalUdid_);
     LOGI("Completed");
     return DM_OK;
@@ -432,8 +432,8 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStatusCallback", DM_OK, anonyLocalUdid_);
     LOGI("Completed");
     return DM_OK;
@@ -2318,8 +2318,8 @@ int32_t DeviceManagerImpl::RegDevTrustChangeCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("PkgName %{public}s.", pkgName.c_str());
-    SyncCallbackToService(DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE, pkgName);
     DeviceManagerNotify::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE, pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegDevTrustChangeCallback", DM_OK, anonyLocalUdid_);
     return DM_OK;
 }
@@ -2331,8 +2331,8 @@ int32_t DeviceManagerImpl::RegisterDeviceScreenStatusCallback(const std::string 
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceScreenStatusCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE, pkgName);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
@@ -2415,8 +2415,8 @@ int32_t DeviceManagerImpl::RegisterCredentialAuthStatusCallback(const std::strin
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SyncCallbackToService(DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY, pkgName);
     DeviceManagerNotify::GetInstance().RegisterCredentialAuthStatusCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY, pkgName);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }

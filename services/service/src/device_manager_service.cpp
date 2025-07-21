@@ -4588,7 +4588,8 @@ void DeviceManagerService::GetHoOsTypeUdids(std::vector<std::string> &peerUdids)
             LOGE("osTypeObj value invalid.");
             continue;
         }
-        if (osTypeObj[PEER_OSTYPE].Get<int32_t>() == DM_HO_OSTYPE) {
+        if (osTypeObj[PEER_OSTYPE].Get<int32_t>() == OLD_DM_HO_OSTYPE ||
+            osTypeObj[PEER_OSTYPE].Get<int32_t>() == NEW_DM_HO_OSTYPE) {
             peerUdids.push_back(osTypeObj[PEER_UDID].Get<std::string>());
         }
     }
