@@ -2,67 +2,115 @@
     "string":[
         {
             "name":"dm_enter_connect_code",
-            "value":"قارشى ئۈسكۈنىدە كۆرۈنگەن ئۇلاش كودىنى كىرگۈزۈڭ."
+            "value":"قارشى ئۈسكۈنىدە كۆرۈنگەن ئۇلاش كودىنى كىرگۈزۈڭ.",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_connect_code",
-            "value":"ئۇلاش كودى"
+            "value":"ئۇلاش كودى",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_cancel",
-            "value":"بىكار قىلىش"
+            "value":"بىكار قىلىش",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_authenticating",
-            "value":"دەلىللەۋاتىدۇ، سەل كۈتۈڭ..."
+            "value":"دەلىللەۋاتىدۇ، سەل كۈتۈڭ...",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_connect",
-            "value":"\u200f%s ئۇلاش"
+            "value":"\u200f%s ئۇلاش",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_allow_temp",
-            "value":"بۇ قېتىم ئىشىنىمەن"
+            "value":"بۇ قېتىم ئىشىنىمەن",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_allow_always",
-            "value":"ئىشىنىمەن"
+            "value":"ئىشىنىمەن",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_confirm_title_cast",
-            "value":"نۆۋەتتە %s ئېكران سۇنماقچى، بۇ ئۈسكۈنىگە ئىشىنەمسىز؟"
+            "value":"نۆۋەتتە %s ئېكران سۇنماقچى، بۇ ئۈسكۈنىگە ئىشىنەمسىز؟",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_is_trust_device",
-            "value":"\u200f%s بۇ ئۈسكۈنىگە ئىشىنەمسىز؟"
+            "value":"\u200f%s بۇ ئۈسكۈنىگە ئىشىنەمسىز؟",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_confirm_title_hap",
-            "value":"نۆۋەتتە %2$s دىكى «%1$s» بۇ ئۈسكۈنىنى زىيارەت قىلماقچى، بۇ ئەپكە ئىشىنەمسىز؟"
+            "value":"نۆۋەتتە %2$s دىكى «%1$s» بۇ ئۈسكۈنىنى زىيارەت قىلماقچى، بۇ ئەپكە ئىشىنەمسىز؟",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_connect_device",
-            "value":"نۆۋەتتە %s بۇ ئۈسكۈنىگە ئۇلانماقچى."
+            "value":"نۆۋەتتە %s بۇ ئۈسكۈنىگە ئۇلانماقچى.",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_confirm_intention",
-            "value":"بۇ ئىجازەت مەلۇمات ماسقەدەملەش ۋە ئۈسكۈنە ھەمكارلىقى ئۈچۈن ئىشلىتىلىدۇ."
+            "value":"بۇ ئىجازەت مەلۇمات ماسقەدەملەش ۋە ئۈسكۈنە ھەمكارلىقى ئۈچۈن ئىشلىتىلىدۇ.",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_bluetooth_dialog_close",
-            "value":"بىلدىم"
+            "value":"بىلدىم",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_bluetooth_dialog_content",
-            "value":"ئۈسكۈنە ئۇلاش ئۈچۈن كۆكچىشنى ئېچىش كېرەك، ئېچىپ قايتا سىناڭ."
+            "value":"ئۈسكۈنە ئۇلاش ئۈچۈن كۆكچىشنى ئېچىش كېرەك، ئېچىپ قايتا سىناڭ.",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_password_error",
-            "value":"مەخپىي نومۇر خاتا، ئۇلانمىدى."
+            "value":"مەخپىي نومۇر خاتا، ئۇلانمىدى.",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_enter_peer_connect_code",
-            "value":"ئۇلاش كودى كىرگۈزۈڭ"
+            "value":"ئۇلاش كودى كىرگۈزۈڭ",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_allow_this_time",

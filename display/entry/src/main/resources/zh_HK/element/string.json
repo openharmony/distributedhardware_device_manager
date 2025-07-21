@@ -2,7 +2,10 @@
     "string":[
         {
             "name":"dm_enter_connect_code",
-            "value":"請輸入對端裝置上顯示的連接碼"
+            "value":"請輸入對端裝置上顯示的連接碼",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_connect_code",
@@ -20,11 +23,17 @@
         },
         {
             "name":"dm_authenticating",
-            "value":"驗證中，請稍侯…"
+            "value":"驗證中，請稍侯…",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_connect",
-            "value":"連接 %s"
+            "value":"連接 %s",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_allow_temp",
@@ -42,11 +51,17 @@
         },
         {
             "name":"dm_confirm_title_cast",
-            "value":"%s 想要投影至本機。信任此裝置？"
+            "value":"%s 想要投影至本機。信任此裝置？",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_is_trust_device",
-            "value":"%s信任此裝置？"
+            "value":"%s信任此裝置？",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_confirm_title_hap",
@@ -57,7 +72,10 @@
         },
         {
             "name":"dm_connect_device",
-            "value":"%s 想要連接本機。"
+            "value":"%s 想要連接本機。",
+            "attr":{
+                "priority":"LT"
+            }
         },
         {
             "name":"dm_confirm_intention",
@@ -68,15 +86,24 @@
         },
         {
             "name":"dm_bluetooth_dialog_close",
-            "value":"知道了"
+            "value":"知道了",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_bluetooth_dialog_content",
-            "value":"裝置連接需要啟用藍牙。請先啟用，然後重試。"
+            "value":"裝置連接需要啟用藍牙。請先啟用，然後重試。",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_password_error",
-            "value":"密碼錯誤，連接失敗。"
+            "value":"密碼錯誤，連接失敗。",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"dm_enter_peer_connect_code",
