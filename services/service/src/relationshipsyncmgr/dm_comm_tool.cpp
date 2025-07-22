@@ -696,7 +696,7 @@ int32_t DMCommTool::ParseUserStopMessage(const std::string &msgStr, int32_t &sto
         return ERR_DM_FAILED;
     }
     cJSON *stopUserIdObj = cJSON_GetObjectItem(root, USER_STOP_MSG_KEY);
-    if (stopUserIdObj == NULL || !stopUserIdObj.is_number_integer()) {
+    if (stopUserIdObj == NULL || !cJSON_IsNumber(stopUserIdObj)) {
         LOGE("parse stopUserId id failed.");
         cJSON_Delete(root);
         return ERR_DM_FAILED;
