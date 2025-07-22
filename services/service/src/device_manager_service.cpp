@@ -169,27 +169,13 @@ void DeviceManagerService::StartDetectDeviceRisk()
         LOGE("load dm device risk detect failed.");
         return;
     }
-    std::string efuse;
-    std::string fastbootLock;
-    std::string processPrivilege;
-    std::string rootPackage;
-    int32_t ret = dmDeviceRiskDetect_->DetectDeviceRisk(efuse, fastbootLock, processPrivilege, rootPackage);
-    if (ret != DM_OK) {
-        LOGE("DetectDeviceRisk failed. ret:%{public}d", ret);
-        return;
-    }
-    LOGI("efuse:%{public}s, fastbootLock:%{public}s, processPrivilege:%{public}s, rootPackage:%{public}s",
-        efuse.c_str(), fastbootLock.c_str(), processPrivilege.c_str(), rootPackage.c_str());
-    if (efuse == DM_RISK || (efuse == DM_SAFE && fastbootLock == DM_RISK)) {
-        LOGI("device status is development");
-        return;
-    } else if (processPrivilege == DM_RISK || rootPackage == DM_RISK) {
+
+    bool isRisk = dmDeviceRiskDetect_->IsDeviceHasRisk();
+    if (isRisk) {
         LOGI("device status is Illegal");
         DelAllRelateShip();
-    } else {
-        LOGI("device status is Commercial");
-        return;
     }
+    return;
 }
 
 void DeviceManagerService::DelAllRelateShip()
