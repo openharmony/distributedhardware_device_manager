@@ -1562,7 +1562,7 @@ bool DmAuthManager::IsPinCodeValid(const std::string strpin)
         return false;
     }
     for (size_t i = 0; i < strpin.length(); i++) {
-        if (isdigit(strpin[i]) == 0) {
+        if (!isdigit(strpin[i])) {
             return false;
         }
     }
