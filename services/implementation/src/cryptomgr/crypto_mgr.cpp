@@ -212,6 +212,7 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
         LOGE("set key fail");
         return ERR_DM_CRYPTO_OPT_FAILED;
     }
+
     if (inputMsgBytesLen < OVERHEAD_LEN) {
         LOGE("invalid para");
         return ERR_DM_CRYPTO_PARA_INVALID;
