@@ -748,7 +748,7 @@ int32_t DmAuthMessageProcessor::ParseMessageReqSKDerive(const JsonObject &jsonOb
         context->accesser.lnnCredentialId = jsonData[TAG_LNN_CREDENTIAL_ID].Get<std::string>();
     }
     if (!jsonData[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive, MSG_TYPE_REQ_CREDENTIAL_EXCHANGE message error.");
+        LOGE("DmAuthMessageProcessor::ParseMessageReqSKDerive, MSG_TYPE_REQ_SK_DERIVE message error.");
         return ERR_DM_FAILED;
     }
     context->accesser.transmitCredentialId = jsonData[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
@@ -781,7 +781,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRspSKDerive(const JsonObject &jsonOb
         context->accessee.lnnCredentialId = jsonData[TAG_LNN_CREDENTIAL_ID].Get<std::string>();
     }
     if (!jsonData[TAG_TRANSMIT_CREDENTIAL_ID].IsString()) {
-        LOGE("DmAuthMessageProcessor::ParseMessageRspSKDerive, MSG_TYPE_REQ_CREDENTIAL_EXCHANGE message error.");
+        LOGE("DmAuthMessageProcessor::ParseMessageRspSKDerive, MSG_TYPE_RESP_SK_DERIVE message error.");
         return ERR_DM_FAILED;
     }
     context->accessee.transmitCredentialId = jsonData[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>();
@@ -1054,7 +1054,7 @@ int32_t DmAuthMessageProcessor::CreateMessageReqSKDerive(std::shared_ptr<DmAuthC
     std::string cipherText;
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
     if (ret != DM_OK) {
-        LOGI("DmAuthMessageProcessor::CreateMessageReqCredExchange encryptMessage failed.");
+        LOGE("DmAuthMessageProcessor::CreateMessageReqSKDerive encryptMessage failed.");
         return ret;
     }
     jsonObject[TAG_DATA] = cipherText;
@@ -1077,7 +1077,7 @@ int32_t DmAuthMessageProcessor::CreateMessageRspSKDerive(std::shared_ptr<DmAuthC
     std::string cipherText;
     int32_t ret = cryptoMgr_->EncryptMessage(plainText, cipherText);
     if (ret != DM_OK) {
-        LOGI("DmAuthMessageProcessor::CreateMessageReqCredExchange encryptMessage failed.");
+        LOGE("DmAuthMessageProcessor::CreateMessageRspSKDerive encryptMessage failed.");
         return ret;
     }
     jsonObject[TAG_DATA] = cipherText;
