@@ -52,9 +52,9 @@ void DmNativeEvent::Off(std::string &eventType)
 {
     LOGI("DmNativeEvent Off in for event: %{public}s", eventType.c_str());
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    if (scope == nullptr) {
-        LOGE("scope is nullptr");
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
         return;
     }
 
@@ -75,9 +75,9 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
 {
     LOGI("OnEvent for %{public}s", eventType.c_str());
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    if (scope == nullptr) {
-        LOGE("scope is nullptr");
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
         return;
     }
 
@@ -90,7 +90,7 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
     }
     auto listener = iter->second;
     napi_value thisVar = nullptr;
-    napi_status status = napi_get_reference_value(env_, thisVarRef_, &thisVar);
+    status = napi_get_reference_value(env_, thisVarRef_, &thisVar);
     if (status != napi_ok) {
         LOGE("napi_get_reference_value thisVar for %{public}s failed, status = %{public}d", eventType.c_str(), status);
         napi_close_handle_scope(env_, scope);

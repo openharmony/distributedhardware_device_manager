@@ -755,7 +755,11 @@ void DeviceManagerNapi::OnDeviceStateChange(DmNapiDevStateChangeAction action,
                                             const OHOS::DistributedHardware::DmDeviceInfo &deviceInfo)
 {
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "action", (int)action, result);
@@ -777,7 +781,11 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &
 {
     LOGI("OnDeviceFound for subscribeId %{public}d, range : %{public}d", (int32_t)subscribeId, deviceInfo.range);
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "subscribeId", (int)subscribeId, result);
@@ -800,7 +808,11 @@ void DeviceManagerNapi::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedRe
 {
     LOGI("OnDiscoveryFailed for subscribeId %{public}d", (int32_t)subscribeId);
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "subscribeId", (int)subscribeId, result);
@@ -815,7 +827,11 @@ void DeviceManagerNapi::OnPublishResult(int32_t publishId, int32_t publishResult
 {
     LOGI("OnPublishResult for publishId %{public}d, publishResult %{public}d", publishId, publishResult);
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "publishId", publishId, result);
@@ -834,9 +850,9 @@ void DeviceManagerNapi::OnCredentialResult(int32_t &action, const std::string &c
 {
     LOGI("OnCredentialResult for action: %{public}d", action);
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env_, &scope);
-    if (scope == nullptr) {
-        LOGE("scope is nullptr");
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
         return;
     }
     napi_value result = nullptr;
@@ -866,7 +882,11 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
 {
     LOGI("OnAuthResult for status: %{public}d, reason: %{public}d", status, reason);
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status openHandleStatus = napi_open_handle_scope(env_, &scope);
+    if (openHandleStatus != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value thisVar = nullptr;
     napi_get_reference_value(env_, thisVarRef_, &thisVar);
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
@@ -1616,7 +1636,11 @@ void DeviceManagerNapi::OnDmUiCall(const std::string &paramJson)
 {
     LOGI("OnCall for paramJson");
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result;
     napi_create_object(env_, &result);
     SetValueUtf8String(env_, "param", paramJson, result);

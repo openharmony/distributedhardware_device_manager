@@ -624,7 +624,11 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
     const OHOS::DistributedHardware::DmDeviceBasicInfo &deviceBasicInfo)
 {
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "action", (int)action, result);
@@ -642,7 +646,11 @@ void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicI
 {
     LOGI("OnDeviceFound DmDeviceBasicInfo for subscribeId %{public}d", (int32_t)subscribeId);
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
 
@@ -659,7 +667,11 @@ void DeviceManagerNapi::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedRe
 {
     LOGI("OnDiscoveryFailed for subscribeId %{public}d", (int32_t)subscribeId);
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "reason", (int)failedReason, result);
@@ -673,7 +685,11 @@ void DeviceManagerNapi::OnPublishResult(int32_t publishId, int32_t publishResult
 {
     LOGI("OnPublishResult for publishId %{public}d, publishResult %{public}d", publishId, publishResult);
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result = nullptr;
     napi_create_object(env_, &result);
     SetValueInt32(env_, "publishId", publishId, result);
@@ -693,7 +709,11 @@ void DeviceManagerNapi::OnAuthResult(const std::string &deviceId, const std::str
 {
     LOGI("OnAuthResult for status: %{public}d, reason: %{public}d", status, reason);
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status openHandleStatus = napi_open_handle_scope(env_, &scope);
+    if (openHandleStatus != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value thisVar = nullptr;
     napi_get_reference_value(env_, thisVarRef_, &thisVar);
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
@@ -739,7 +759,11 @@ void DeviceManagerNapi::OnGetDeviceProfileInfoListCallbackResult(DeviceProfileIn
     LOGI("In");
     CHECK_NULL_VOID_RET_LOG(jsCallback, "jsCallback is nullptr");
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     if (jsCallback->code != DM_OK) {
         napi_value error = CreateBusinessError(env_, jsCallback->code, false);
         napi_reject_deferred(env_, jsCallback->deferred, error);
@@ -768,7 +792,11 @@ void DeviceManagerNapi::OnGetDeviceIconInfoCallbackResult(DeviceIconInfoAsyncCal
     LOGI("In");
     CHECK_NULL_VOID_RET_LOG(jsCallback, "jsCallback is nullptr");
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     if (jsCallback->code != DM_OK) {
         napi_value error = CreateBusinessError(env_, jsCallback->code, false);
         napi_reject_deferred(env_, jsCallback->deferred, error);
@@ -788,7 +816,11 @@ void DeviceManagerNapi::OnSetLocalDeviceNameCallbackResult(SetLocalDeviceNameAsy
     LOGI("In");
     CHECK_NULL_VOID_RET_LOG(jsCallback, "jsCallback is nullptr");
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     if (jsCallback->code != DM_OK) {
         napi_value error = CreateBusinessError(env_, jsCallback->code, false);
         napi_reject_deferred(env_, jsCallback->deferred, error);
@@ -807,7 +839,11 @@ void DeviceManagerNapi::OnSetRemoteDeviceNameCallbackResult(SetRemoteDeviceNameA
     LOGI("In");
     CHECK_NULL_VOID_RET_LOG(jsCallback, "jsCallback is nullptr");
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     if (jsCallback->code != DM_OK) {
         napi_value error = CreateBusinessError(env_, jsCallback->code, false);
         napi_reject_deferred(env_, jsCallback->deferred, error);
@@ -1086,7 +1122,11 @@ void DeviceManagerNapi::OnDmUiCall(const std::string &paramJson)
 {
     LOGI("OnCall for paramJson");
     napi_handle_scope scope;
-    napi_open_handle_scope(env_, &scope);
+    napi_status status = napi_open_handle_scope(env_, &scope);
+    if (status != napi_ok || scope == nullptr) {
+        LOGE("open handle scope failed");
+        return;
+    }
     napi_value result;
     napi_create_object(env_, &result);
     SetValueUtf8String(env_, "param", paramJson, result);
