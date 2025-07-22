@@ -212,7 +212,10 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
         LOGE("set key fail");
         return ERR_DM_CRYPTO_OPT_FAILED;
     }
-
+    if (inputMsgBytesLen < OVERHEAD_LEN) {
+        LOGE("invalid para");
+        return ERR_DM_CRYPTO_PARA_INVALID;
+    }
     uint32_t outLen = inputMsgBytesLen - OVERHEAD_LEN + 1; /* for '\0' */
     unsigned char *outData = (unsigned char *)calloc(outLen, sizeof(unsigned char));
     if (outData == nullptr) {
@@ -276,7 +279,8 @@ int32_t CryptoMgr::MbedAesGcmDecrypt(const AesGcmCipherKey *cipherKey, const uns
 int32_t CryptoMgr::DoDecryptData(AesGcmCipherKey *cipherKey, const unsigned char *input, uint32_t inLen,
     unsigned char *decryptData, uint32_t *decryptLen)
 {
-    if (cipherKey == NULL || input == NULL || inLen < GCM_IV_LEN || decryptData == NULL || decryptLen == NULL) {
+    if (cipherKey == NULL || input == NULL || inLen < GCM_IV_LEN || decryptData == NULL || decryptLen == NULL ||
+        inLen < OVERHEAD_LEN) {
         return ERR_DM_CRYPTO_PARA_INVALID;
     }
 

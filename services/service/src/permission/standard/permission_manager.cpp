@@ -114,13 +114,19 @@ bool PermissionManager::CheckMonitorPermission(void)
     }
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
-        if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION) !=
+        if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION) ==
             PermissionState::PERMISSION_GRANTED) {
-            LOGE("DM service access is denied, please apply for corresponding permissions.");
-            return false;
+            return true;
         }
     }
-    return true;
+    if (tokenTypeFlag == tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
+        if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_SERVICE_ACCESS_NEWPERMISSION) ==
+            PermissionState::PERMISSION_GRANTED) {
+            return true;
+        }
+    }
+    LOGE("DM service access is denied, please apply for corresponding permissions.");
+    return false;
 }
 
 int32_t PermissionManager::GetCallerProcessName(std::string &processName)
