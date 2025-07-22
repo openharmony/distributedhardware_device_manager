@@ -280,8 +280,7 @@ int32_t CryptoMgr::MbedAesGcmDecrypt(const AesGcmCipherKey *cipherKey, const uns
 int32_t CryptoMgr::DoDecryptData(AesGcmCipherKey *cipherKey, const unsigned char *input, uint32_t inLen,
     unsigned char *decryptData, uint32_t *decryptLen)
 {
-    if (cipherKey == NULL || input == NULL || inLen < GCM_IV_LEN || decryptData == NULL || decryptLen == NULL ||
-        inLen < OVERHEAD_LEN) {
+    if (cipherKey == NULL || input == NULL || inLen < OVERHEAD_LEN || decryptData == NULL || decryptLen == NULL) {
         return ERR_DM_CRYPTO_PARA_INVALID;
     }
 
