@@ -119,7 +119,7 @@ bool PermissionManager::CheckMonitorPermission(void)
             return true;
         }
     }
-    if (tokenTypeFlag == tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
+    if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
         if (AccessTokenKit::VerifyAccessToken(tokenCaller, DM_SERVICE_ACCESS_NEWPERMISSION) ==
             PermissionState::PERMISSION_GRANTED) {
             return true;
