@@ -71,7 +71,6 @@ void DmTransPortFirstFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-
     const char* jsonString = R"({
         "MsgType": "0",
         "userId": "12345",
@@ -85,7 +84,6 @@ void DmTransPortFirstFuzzTest(const uint8_t* data, size_t size)
             {"type": 0, "userId": 222}
         ]
     })";
-
     std::string payload(jsonString);
     FuzzedDataProvider fdp(data, size);
     int32_t socketId = fdp.ConsumeIntegral<int32_t>();
@@ -108,12 +106,16 @@ void DmTransPortFirstFuzzTest(const uint8_t* data, size_t size)
     dmTransPortPtr_->StartSocket(rmtNetworkId, socketId);
     dmTransPortPtr_->StopSocket(rmtNetworkId);
     dmTransPortPtr_->Send(rmtNetworkId, payload, socketId);
+    dmTransPortPtr_->IsDeviceSessionOpened(rmtNetworkId, socketId);
+    dmTransPortPtr_->ClearDeviceSocketOpened(rmtNetworkId, socketId);
     rmtNetworkId = "rmtNetworkId";
     dmTransPortPtr_->CreateClientSocket(rmtNetworkId);
     dmTransPortPtr_->UnInit();
     dmTransPortPtr_->IsDeviceSessionOpened(rmtNetworkId, socketId);
     std::string remoteDevId(reinterpret_cast<const char*>(data), size);
     dmTransPortPtr_->ClearDeviceSocketOpened(remoteDevId, socketId);
+    socketId = 1;
+    dmTransPortPtr_->Send(rmtNetworkId, payload, socketId);
 }
 
 void DmTransPortSecondFuzzTest(const uint8_t* data, size_t size)
