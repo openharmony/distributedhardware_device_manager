@@ -65,7 +65,6 @@ struct ConfirmCustomDialog {
 
     if (AppStorage.get('deviceName') != null) {
       this.peerDeviceName = AppStorage.get('deviceName') as string + ' ';
-      console.log('peerDeviceName is ' + this.peerDeviceName);
     }
     let customDescriptionStr: string = AppStorage.get('customDescriptionStr') as string;
     let hostPkgLabel: string = AppStorage.get('hostPkgLabel') as string;

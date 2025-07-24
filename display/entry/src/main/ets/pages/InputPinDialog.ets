@@ -128,7 +128,6 @@ struct InputCustomDialog {
     }
     if (AppStorage.get('targetDeviceName') != null) {
       this.targetDeviceName = AppStorage.get('targetDeviceName') as string;
-      console.log('targetDeviceName is ' + this.targetDeviceName);
     }
     if (AppStorage.get('model') != null) {
       this.model = AppStorage.get('model') as string;

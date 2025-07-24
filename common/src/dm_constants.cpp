@@ -174,6 +174,7 @@ const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
 };
 
 // wise device
+const int32_t MAX_CONTAINER_SIZE = 1000;
 const int32_t MAX_DEVICE_PROFILE_SIZE = 500;
 const char* ACL_IS_LNN_ACL_KEY = "IsLnnAcl";
 const char* ACL_IS_LNN_ACL_VAL_TRUE = "true";

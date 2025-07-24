@@ -78,14 +78,14 @@ bool DmDataShareCommonEventManager::SubscribeDataShareCommonEvent(const std::vec
         subscriber_ = nullptr;
         return false;
     }
-    while (counter_ != MAX_TRY_TIMES) {
+    int32_t counter = 0;
+    while (counter <= MAX_TRY_TIMES) {
         if (samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_) == ERR_OK) {
             LOGI("SubscribeAccountEvent success.");
-            counter_ = 0;
             break;
         }
-        if (++counter_ == MAX_TRY_TIMES) {
-            LOGI("SubscribeAccountEvent failed.");
+        if (++counter == MAX_TRY_TIMES) {
+            LOGE("SubscribeAccountEvent failed.");
         }
         sleep(1);
     }

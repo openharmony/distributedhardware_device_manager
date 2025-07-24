@@ -79,14 +79,14 @@ bool DmScreenCommonEventManager::SubscribeScreenCommonEvent(const std::vector<st
         subscriber_ = nullptr;
         return false;
     }
-    while (counter_ != MAX_TRY_TIMES) {
+    int32_t counter = 0;
+    while (counter <= MAX_TRY_TIMES) {
         if (samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_) == ERR_OK) {
             LOGI("SubscribeScreenEvent success.");
-            counter_ = 0;
             break;
         }
-        if (++counter_ == MAX_TRY_TIMES) {
-            LOGI("SubscribeScreenEvent failed.");
+        if (++counter == MAX_TRY_TIMES) {
+            LOGE("SubscribeScreenEvent failed.");
         }
         sleep(1);
     }

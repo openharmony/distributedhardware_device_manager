@@ -40,7 +40,7 @@ bool DmRadarHelper::ReportDiscoverResCallback(struct RadarInfo &info)
     return true;
 }
 
-bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
+bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo info)
 {
     return true;
 }

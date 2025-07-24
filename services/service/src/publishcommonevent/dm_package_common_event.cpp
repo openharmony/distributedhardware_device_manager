@@ -80,14 +80,14 @@ bool DmPackageCommonEventManager::SubscribePackageCommonEvent(const std::vector<
         subscriber_ = nullptr;
         return false;
     }
-    while (counter_ != MAX_TRY_TIMES) {
+    int32_t counter = 0;
+    while (counter <= MAX_TRY_TIMES) {
         if (samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_) == ERR_OK) {
             LOGI("SubscribePackageEvent success.");
-            counter_ = 0;
             break;
         }
-        if (++counter_ == MAX_TRY_TIMES) {
-            LOGI("SubscribePackageEvent failed.");
+        if (++counter == MAX_TRY_TIMES) {
+            LOGE("SubscribePackageEvent failed.");
         }
         sleep(1);
     }

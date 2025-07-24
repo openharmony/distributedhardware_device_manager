@@ -2889,7 +2889,11 @@ int32_t DeviceManagerServiceImpl::DeleteAclForProcV2(const std::string &localUdi
 
 bool DeviceManagerServiceImpl::IsProxyUnbind(const std::string &extra)
 {
-    JsonObject jsonObject(extra);
+    if (extra.empty()) {
+        return false;
+    }
+    JsonObject jsonObject;
+    jsonObject.Parse(extra);
     if (jsonObject.IsDiscarded()) {
         return false;
     }
