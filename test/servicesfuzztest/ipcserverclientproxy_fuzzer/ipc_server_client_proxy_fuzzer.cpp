@@ -37,7 +37,7 @@ void IpcServerClientProxyFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     sptr<IRemoteObject> remoteObject = nullptr;
-    std::string pkgNameStr = fdp.ConsumeRandomLengthString(DM_MAX_DEVICE_ID_LEN);
+    std::string pkgNameStr = fdp.ConsumeRandomLengthString(50);
     req->SetPkgName(pkgNameStr);
 
     auto instance = new IpcServerClientProxy(remoteObject);
