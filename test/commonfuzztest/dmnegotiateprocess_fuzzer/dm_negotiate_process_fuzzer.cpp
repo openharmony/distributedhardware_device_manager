@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "dm_negotiate_process_fuzzer.h"
 
 #include <fuzzer/FuzzedDataProvider.h>
@@ -70,7 +71,11 @@ void DmNegotiateProcessFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->needBind = fdp.ConsumeBool();
+    context->needAgreeCredential = fdp.ConsumeBool();
+    context->needAuth = fdp.ConsumeBool();
     NoCredNoAclImportAuthType noCredNoAclImportAuthType;
     noCredNoAclImportAuthType.NegotiateHandle(context);
     NoCredNoAclInputAuthType noCredNoAclInputAuthType;

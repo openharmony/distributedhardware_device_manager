@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "ipc_server_client_proxy_fuzzer.h"
 
 #include <algorithm>
@@ -31,11 +32,13 @@ void IpcServerClientProxyFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-
+    FuzzedDataProvider fdp(data, size);
     int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     sptr<IRemoteObject> remoteObject = nullptr;
+    std::string pkgNameStr = fdp.ConsumeRandomLengthString(DM_MAX_DEVICE_ID_LEN);
+    req->SetPkgName(pkgNameStr);
 
     auto instance = new IpcServerClientProxy(remoteObject);
     if (instance != nullptr) {

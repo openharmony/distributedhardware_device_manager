@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 #include <chrono>
 #include <securec.h>
 #include <string>
@@ -29,10 +31,13 @@ void OnSoftbusDeviceOnlineFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(uint16_t) || (size > DM_MAX_DEVICE_ID_LEN))) {
         return;
     }
-
+    auto info = std::make_unique<NodeBasicInfo>();
+    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    NodeBasicInfo *info = nullptr;
-    softbusListener->OnSoftbusDeviceOnline(info);
+    info->deviceTypeId = fdp.ConsumeIntegral<std::uint16_t>();
+    info->osType = fdp.ConsumeIntegral<std::int32_t>();
+
+    softbusListener->OnSoftbusDeviceOnline(info.get());
 }
 }
 }
