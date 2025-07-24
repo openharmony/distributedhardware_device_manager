@@ -32,7 +32,7 @@ void DmAnonyousFuzzTest(const uint8_t* data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     std::vector<std::string> strList;
-    int64_t testNumber = 123;
+    int64_t testNumber = fdp.ConsumeIntegral<int64_t>();
     std::string test1 = fdp.ConsumeRandomLengthString();
     std::string test2 = fdp.ConsumeRandomLengthString();
     strList.push_back(test1);
@@ -72,7 +72,7 @@ void DmAnonyousFuzzTestFirst(const uint8_t* data, size_t size)
     std::string str2 = fdp.ConsumeRandomLengthString();
     int32_t versionNum = 0;
     int64_t decimal = 10;
-    int64_t testNumber = 123;
+    int64_t testNumber = fdp.ConsumeIntegral<int64_t>();
     StringToInt(str1, decimal);
     StringToInt64(str1, decimal);
     GetVersionNumber("1.0.0", versionNum);
