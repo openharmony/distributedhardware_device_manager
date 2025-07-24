@@ -50,7 +50,7 @@ void DpInitedCallbackFirstFuzzTest(const uint8_t* data, size_t size)
     DpInitedCallback dpInitedCallback;
     std::unordered_map<std::string, DmAuthForm> authFormMap;
     DistributedDeviceProfile::TrustedDeviceInfo trustedDeviceInfo;
-    std::string extraDataStr = fdp.ConsumeRandomLengthString(DM_MAX_DEVICE_ID_LEN);
+    std::string extraDataStr = fdp.ConsumeRandomLengthString(50);
     DmDeviceInfo deviceInfo;
     deviceInfo.extraData = extraDataStr;
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
