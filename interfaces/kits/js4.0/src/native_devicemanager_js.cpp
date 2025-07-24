@@ -1248,7 +1248,7 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env,
 {
     napi_value resourceName;
     napi_create_string_latin1(env, "GetAvailableListInfo", NAPI_AUTO_LENGTH, &resourceName);
-    napi_create_async_work(
+    napi_status result = napi_create_async_work(
         env, nullptr, resourceName,
         [](napi_env env, void *data) {
             DeviceBasicInfoListAsyncCallbackInfo *devBasicInfoListAsyncCallbackInfo =
@@ -1273,11 +1273,14 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env,
                 reinterpret_cast<DeviceBasicInfoListAsyncCallbackInfo *>(data);
             CallGetAvailableDeviceListStatus(env, status, dBasicInfoListAsyncCallbackInfo);
             napi_delete_async_work(env, dBasicInfoListAsyncCallbackInfo->asyncWork);
-            delete dBasicInfoListAsyncCallbackInfo;
-            dBasicInfoListAsyncCallbackInfo = nullptr;
+            DeleteAsyncCallbackInfo(dBasicInfoListAsyncCallbackInfo);
         },
         (void *)deviceBasicInfoListAsyncCallbackInfo, &deviceBasicInfoListAsyncCallbackInfo->asyncWork);
     napi_queue_async_work_with_qos(env, deviceBasicInfoListAsyncCallbackInfo->asyncWork, napi_qos_user_initiated);
+    if (result != napi_ok) {
+        LOGE("CallAsyncWork failed result %{public}d", result);
+        DeleteAsyncCallbackInfo(deviceBasicInfoListAsyncCallbackInfo);
+    }
 }
 
 napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info info,
@@ -1293,6 +1296,9 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
         LOGI("CallDeviceList for argc %{public}zu Type = %{public}d", argc, (int)eventHandleType);
         napi_create_reference(env, argv[0], 1, &deviceBasicInfoListAsyncCallbackInfo->callback);
         CallAsyncWork(env, deviceBasicInfoListAsyncCallbackInfo);
+    } else {
+        LOGE("CallDeviceList eventHandleType invalid");
+        DeleteAsyncCallbackInfo(deviceBasicInfoListAsyncCallbackInfo);
     }
     napi_get_undefined(env, &result);
     return result;
