@@ -46,11 +46,12 @@ void IpcCmdRegisterFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
-    std::string pkgNameStr = fdp.ConsumeRandomLengthString(DM_MAX_DEVICE_ID_LEN);
+    std::string pkgNameStr = fdp.ConsumeRandomLengthString(50);
     req->SetPkgName(pkgNameStr);
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     MessageParcel data1;
     MessageParcel reply1;
+    data1.WriteString(pkgNameStr);
 
     IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data1);
     IpcCmdRegister::GetInstance().ReadResponse(cmdCode, data1, rsp);
