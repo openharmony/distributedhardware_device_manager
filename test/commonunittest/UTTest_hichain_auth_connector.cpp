@@ -130,8 +130,12 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_001, testing::ext::TestSize.Level1)
     int operationCode = 0;
     char *reqParams = nullptr;
     hiChain_->dmDeviceAuthCallback_ = nullptr;
-    hiChain_->onRequest(requestId, operationCode, reqParams);
+    char *ret = hiChain_->onRequest(requestId, operationCode, reqParams);
     EXPECT_EQ(hiChain_->dmDeviceAuthCallback_, nullptr);
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
 }
 
 HWTEST_F(HiChainAuthConnectorTest, onRequest_002, testing::ext::TestSize.Level1)
@@ -140,8 +144,12 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_002, testing::ext::TestSize.Level1)
     int operationCode = 0;
     char *reqParams = nullptr;
     hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
-    hiChain_->onRequest(requestId, operationCode, reqParams);
+    char *ret = hiChain_->onRequest(requestId, operationCode, reqParams);
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
 }
 
 HWTEST_F(HiChainAuthConnectorTest, onRequest_003, testing::ext::TestSize.Level1)
@@ -152,8 +160,12 @@ HWTEST_F(HiChainAuthConnectorTest, onRequest_003, testing::ext::TestSize.Level1)
     char *reqParams = nullptr;
     hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
     hiChain_->dmDeviceAuthCallback_->AuthDeviceError(requestId, errorCode);
-    hiChain_->onRequest(requestId, operationCode, reqParams);
+    char *ret = hiChain_->onRequest(requestId, operationCode, reqParams);
     EXPECT_NE(hiChain_->dmDeviceAuthCallback_, nullptr);
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
 }
 
 HWTEST_F(HiChainAuthConnectorTest, onFinish_001, testing::ext::TestSize.Level1)

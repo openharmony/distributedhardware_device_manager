@@ -126,7 +126,11 @@ void AuthDeviceRequestFuzzTest(FuzzedDataProvider &fdp)
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     int operationCode = fdp.ConsumeIntegral<int>();
     const char* reqParams = fdp.ConsumeRandomLengthString().c_str();
-    authManager->AuthDeviceRequest(requestId, operationCode, reqParams);
+    char *ret = authManager->AuthDeviceRequest(requestId, operationCode, reqParams);
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
 }
 
 void SetAuthTypeFuzzTest(FuzzedDataProvider &fdp)
@@ -362,7 +366,11 @@ void AuthSinkDeviceRequestFuzzTest(FuzzedDataProvider &fdp)
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     int operationCode = fdp.ConsumeIntegral<int>();
     const char* reqParams = fdp.ConsumeRandomLengthString().c_str();
-    authSinkManager->AuthDeviceRequest(requestId, operationCode, reqParams);
+    char *ret = authSinkManager->AuthDeviceRequest(requestId, operationCode, reqParams);
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
     authManager->DeleteTimer();
     authManager->GetBindCallerInfo();
 }

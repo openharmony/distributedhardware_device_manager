@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -103,6 +103,7 @@ int32_t RegisterDeviceManagerListener(IpcIo *req, IpcIo *reply)
     AddDeathRecipient(svc, DeathCb, pkgName, &cbId);
     svcId.cbId = cbId;
     std::string strPkgName = reinterpret_cast<const char*>(name);
+    delete[] pkgName;
     return IpcServerListenermgr::GetInstance().RegisterListener(strPkgName, &svcId);
 }
 

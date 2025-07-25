@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -178,17 +178,14 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     std::vector<GroupInfo> groupList;
     std::string queryParams(reinterpret_cast<const char*>(data), size);
     std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string groupId(reinterpret_cast<const char*>(data), size);
     std::string deviceId(reinterpret_cast<const char*>(data), size);
     std::string reqDeviceId(reinterpret_cast<const char*>(data), size);
     JsonObject jsonOutObj;
     std::shared_ptr<IDmGroupResCallback> callback;
     std::string jsonStr(reinterpret_cast<const char*>(data), size);
     int32_t groupType = fdp.ConsumeIntegral<int32_t>();
-    int32_t switchUserId = fdp.ConsumeIntegral<int32_t>();
     std::string reqParams(reinterpret_cast<const char*>(data), size);
     std::string credentialInfo(reinterpret_cast<const char*>(data), size);
-    int operationCode = GroupOperationCode::MEMBER_JOIN;
     hichainConnector->deviceGroupManager_ = nullptr;
     hichainConnector->AddMember(deviceId, queryParams);
     hichainConnector->getRegisterInfo(queryParams, jsonStr);
@@ -198,7 +195,11 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->GetGroupInfoCommon(authType, queryParams, pkgName.c_str(), groupList);
     hichainConnector->hiChainConnectorCallback_ = nullptr;
     hichainConnector->GetConnectPara(deviceId, reqDeviceId);
-    hichainConnector->onRequest(requestId, operationCode, reqParams.c_str());
+    char *ret = hichainConnector->onRequest(requestId, GroupOperationCode::MEMBER_JOIN, reqParams.c_str());
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
     if (hichainConnector->deviceGroupManager_ == nullptr) {
         hichainConnector->deviceGroupManager_ = GetGmInstance();
@@ -228,7 +229,6 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
     std::string returnData(reinterpret_cast<const char*>(data), size);
     std::string userId = "userId_forth";
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
-    int operationCode = GroupOperationCode::MEMBER_JOIN;
     int errCode = 102;
     std::vector<std::string> syncGroupList;
     std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
@@ -246,18 +246,19 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->DealRedundanceGroup(userId, authType);
     hichainConnector->DeleteGroupByACL(delACLInfoVec, userIdVec);
     hichainConnector->IsNeedDelete(groupName, authType, delACLInfoVec);
-    hichainConnector->onFinish(requestId, operationCode, returnData.c_str());
-    hichainConnector->onError(requestId, operationCode, errCode, returnData.c_str());
-    hichainConnector->onRequest(requestId, operationCode, returnData.c_str());
-    operationCode = GroupOperationCode::GROUP_CREATE;
-    hichainConnector->onFinish(requestId, operationCode, returnData.c_str());
-    hichainConnector->onError(requestId, operationCode, errCode, returnData.c_str());
-    operationCode == GroupOperationCode::MEMBER_DELETE;
-    hichainConnector->onFinish(requestId, operationCode, returnData.c_str());
-    hichainConnector->onError(requestId, operationCode, errCode, returnData.c_str());
-    operationCode == GroupOperationCode::GROUP_DISBAND;
-    hichainConnector->onFinish(requestId, operationCode, returnData.c_str());
-    hichainConnector->onError(requestId, operationCode, errCode, returnData.c_str());
+    hichainConnector->onFinish(requestId, GroupOperationCode::MEMBER_JOIN, returnData.c_str());
+    hichainConnector->onError(requestId, GroupOperationCode::MEMBER_JOIN, errCode, returnData.c_str());
+    char *ret = hichainConnector->onRequest(requestId, GroupOperationCode::MEMBER_JOIN, returnData.c_str());
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
+    hichainConnector->onFinish(requestId, GroupOperationCode::GROUP_CREATE, returnData.c_str());
+    hichainConnector->onError(requestId, GroupOperationCode::GROUP_CREATE, errCode, returnData.c_str());
+    hichainConnector->onFinish(requestId, GroupOperationCode::MEMBER_DELETE, returnData.c_str());
+    hichainConnector->onError(requestId, GroupOperationCode::MEMBER_DELETE, errCode, returnData.c_str());
+    hichainConnector->onFinish(requestId, GroupOperationCode::GROUP_DISBAND, returnData.c_str());
+    hichainConnector->onError(requestId, GroupOperationCode::GROUP_DISBAND, errCode, returnData.c_str());
     hichainConnector->GenRequestId();
     hichainConnector->GetRelatedGroups(deviceId, groupList);
     hichainConnector->GetRelatedGroupsExt(deviceId, groupList);

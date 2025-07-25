@@ -676,7 +676,12 @@ int32_t DMCommTool::CreateUserStopMessage(int32_t stopUserId, std::string &msgSt
         cJSON_Delete(root);
         return ERR_DM_FAILED;
     }
-    cJSON_AddItemToObject(root, USER_STOP_MSG_KEY, numberObj);
+    if (!cJSON_AddItemToObject(root, USER_STOP_MSG_KEY, numberObj)) {
+        LOGE("add numberObj to root failed.");
+        cJSON_Delete(numberObj);
+        cJSON_Delete(root);
+        return ERR_DM_FAILED;
+    }
     char *msg = cJSON_PrintUnformatted(root);
     if (msg == nullptr) {
         cJSON_Delete(root);
