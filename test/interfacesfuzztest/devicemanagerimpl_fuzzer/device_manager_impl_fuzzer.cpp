@@ -47,6 +47,8 @@ void StopAuthenticateDeviceTest(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     std::string pkgName = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().StopAuthenticateDevice(pkgName);
+    std::string emptyPkgName = "";
+    DeviceManagerImpl::GetInstance().StopAuthenticateDevice(emptyPkgName);
     DeviceManagerImpl::GetInstance().OnDmServiceDied();
 }
 
@@ -94,6 +96,7 @@ void GetNetworkIdByUdidTest(const uint8_t *data, size_t size)
     std::string udid = fdp.ConsumeRandomLengthString();
     std::string networkId = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().GetNetworkIdByUdid(pkgName, udid, networkId);
+    DeviceManagerImpl::GetInstance().GetNetworkIdByUdid("pkgName", "udid", networkId);
 }
 
 void RegisterCredentialAuthStatusCallbackTest(const uint8_t *data, size_t size)
@@ -121,6 +124,8 @@ void GetAllTrustedDeviceListTest(const uint8_t *data, size_t size)
     std::string extra = fdp.ConsumeRandomLengthString();
     std::vector<DmDeviceInfo> deviceList;
     DeviceManagerImpl::GetInstance().GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    std::string emptyPkgName = "";
+    DeviceManagerImpl::GetInstance().GetAllTrustedDeviceList(emptyPkgName, extra, deviceList);
 }
 
 void RegisterSinkBindCallbackTest(const uint8_t *data, size_t size)
@@ -132,6 +137,8 @@ void RegisterSinkBindCallbackTest(const uint8_t *data, size_t size)
     std::string pkgName = fdp.ConsumeRandomLengthString();
     std::shared_ptr<BindTargetCallback> callback = nullptr;
     DeviceManagerImpl::GetInstance().RegisterSinkBindCallback(pkgName, callback);
+    std::string emptyPkgName = "";
+    DeviceManagerImpl::GetInstance().RegisterSinkBindCallback(emptyPkgName, callback);
 }
 
 void GetDeviceProfileInfoListTest(const uint8_t *data, size_t size)
@@ -226,6 +233,8 @@ void RestoreLocalDeviceNameTest(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     std::string pkgName = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().RestoreLocalDeviceName(pkgName);
+    std::string emptyPkgName = "";
+    DeviceManagerImpl::GetInstance().RestoreLocalDeviceName(emptyPkgName);
 }
 
 void GetLocalServiceInfoByBundleNameAndPinExchangeTypeTest(const uint8_t *data, size_t size)
@@ -258,6 +267,8 @@ void UnRegisterPinHolderCallbackTest(const uint8_t *data, size_t size)
     FuzzedDataProvider fdp(data, size);
     std::string pkgName = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().UnRegisterPinHolderCallback(pkgName);
+    std::string emptyPkgName = "";
+    DeviceManagerImpl::GetInstance().UnRegisterPinHolderCallback(emptyPkgName);
 }
 
 void DeviceManagerImplFuzzTest(const uint8_t *data, size_t size)
@@ -280,7 +291,9 @@ void DeviceManagerImplFuzzTest(const uint8_t *data, size_t size)
     DeviceManagerImpl::GetInstance().GetLocalDeviceName(pkgName, deviceName);
     DeviceManagerImpl::GetInstance().GetLocalDeviceName(pkgName);
     DeviceManagerImpl::GetInstance().UnBindDevice(pkgName, deviceId, extra);
+    DeviceManagerImpl::GetInstance().UnBindDevice("pkgName", "deviceId", extra);
     DeviceManagerImpl::GetInstance().UnRegisterSinkBindCallback(pkgName);
+    DeviceManagerImpl::GetInstance().UnRegisterSinkBindCallback("");
     DeviceManagerImpl::GetInstance().RegisterLocalServiceInfo(localServiceInfo);
     DeviceManagerImpl::GetInstance().UnRegisterLocalServiceInfo(bundleName, pinExchangeType);
     DeviceManagerImpl::GetInstance().UpdateLocalServiceInfo(localServiceInfo);
@@ -291,6 +304,32 @@ void DeviceManagerImplFuzzTest(const uint8_t *data, size_t size)
     DeviceManagerImpl::GetInstance().CheckSrcIsSameAccount(caller, callee);
     DeviceManagerImpl::GetInstance().CheckSinkIsSameAccount(caller, callee);
     DeviceManagerImpl::GetInstance().CheckAclByIpcCode(caller, callee, ipcCode);
+}
+
+void SyncCallbacksToServiceFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t maxStringLength = 64;
+    if (data == nullptr || size < sizeof(int32_t) + maxStringLength) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+
+    std::map<DmCommonNotifyEvent, std::set<std::string>> callbackMap;
+    DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
+
+    int32_t minCount = 1;
+    int32_t maxCount = 5;
+    DmCommonNotifyEvent event = static_cast<DmCommonNotifyEvent>(fdp.ConsumeIntegral<int32_t>());
+    std::set<std::string> pkgNames;
+    callbackMap[event] = pkgNames;
+    DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
+    int32_t pkgCount = fdp.ConsumeIntegralInRange<int32_t>(minCount, maxCount);
+    for (int32_t j = 0; j < pkgCount; ++j) {
+        pkgNames.insert(fdp.ConsumeRandomLengthString(maxStringLength));
+    }
+    callbackMap[event] = pkgNames;
+    DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
 }
 }
 }
@@ -319,5 +358,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::DistributedHardware::UnRegisterPinHolderCallbackTest(data, size);
     OHOS::DistributedHardware::DeviceManagerImplFuzzTest(data, size);
     OHOS::DistributedHardware::GetErrorCodeTest(data, size);
+    OHOS::DistributedHardware::SyncCallbacksToServiceFuzzTest(data, size);
     return 0;
 }
