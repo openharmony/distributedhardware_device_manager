@@ -368,7 +368,7 @@ void JsToBindParam(const napi_env &env, const napi_value &object, std::string &b
     jsonObj[PARAM_KEY_WIFI_IP] = std::string(wifiIP);
     jsonObj[PARAM_KEY_WIFI_PORT] = wifiPort;
     jsonObj[BIND_LEVEL] = bindLevel;
-    bindParam = SafetyDump(jsonObj);
+    bindParam = jsonObj.Dump();
 }
 
 bool IsSystemApp()
@@ -433,7 +433,7 @@ void JsToDmDiscoveryExtra(const napi_env &env, const napi_value &object, std::st
     if (deviceType != DM_NAPI_DISCOVER_EXTRA_INIT_ONE) {
         jsonObj["deviceType"] = deviceType;
     }
-    extra = SafetyDump(jsonObj);
+    extra = jsonObj.Dump();
     LOGI("JsToDmDiscoveryExtra, extra :%{public}s", extra.c_str());
 }
 

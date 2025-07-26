@@ -42,7 +42,7 @@ HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_001, testing::ext::TestSize.Lev
     JsonObject jsonObj;
     jsonObj[TAG_DEVICE_ID] = "51352xxxx";
     jsonObj[TAG_CRYPTO_SUPPORT] = true;
-    std::string message = SafetyDump(jsonObj);
+    std::string message = jsonObj.Dump();
     std::string encryptData;
     std::string decryptData;
     ret = cryptoMgr->EncryptMessage(message, encryptData);
@@ -61,7 +61,7 @@ HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_002, testing::ext::TestSize.Lev
     JsonObject jsonObj;
     jsonObj[TAG_DEVICE_ID] = "51352xxxx";
     jsonObj[TAG_CRYPTO_SUPPORT] = true;
-    std::string message = SafetyDump(jsonObj);
+    std::string message = jsonObj.Dump();
     std::string encryptData1;
     std::string encryptData2;
     std::string decryptData;
@@ -115,7 +115,7 @@ HWTEST_F(CryptoMgrTest, EncryptAndDecryptMessage_005, testing::ext::TestSize.Lev
     JsonObject jsonObj;
     jsonObj[TAG_DEVICE_ID] = "51352xxxx";
     jsonObj[TAG_CRYPTO_SUPPORT] = true;
-    std::string message = SafetyDump(jsonObj);
+    std::string message = jsonObj.Dump();
     std::string encryptData;
     std::string decryptData;
     auto ret = cryptoMgr->EncryptMessage(message, encryptData);

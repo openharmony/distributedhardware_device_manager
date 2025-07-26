@@ -230,17 +230,6 @@ HWTEST_F(JsonObjectTest, SetValue_012, testing::ext::TestSize.Level1)
     EXPECT_EQ(strRet, object1.Dump());
 }
 
-HWTEST_F(JsonObjectTest, DumpIgnoreError_01, testing::ext::TestSize.Level1)
-{
-    JsonObject object;
-    object["TEST1"] = "special_characters!@#.123";
-    object["TEST2"] = 1;
-    object["TEST3"] = 0.0;
-    object["TEST4"] = true;
-    std::string strRet = R"({"TEST1":"special_characters!@#.123","TEST2":1,"TEST3":0.0,"TEST4":true})";
-    EXPECT_EQ(strRet, object.DumpIgnoreError());
-}
-
 HWTEST_F(JsonObjectTest, Dump_01, testing::ext::TestSize.Level1)
 {
     JsonObject object;

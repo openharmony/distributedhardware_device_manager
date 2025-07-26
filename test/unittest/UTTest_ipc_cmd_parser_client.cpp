@@ -1079,7 +1079,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_037, testing::ext::TestSize.Le
 
     JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     MessageParcel data;
     data.WriteString(message);
@@ -1097,7 +1097,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_038, testing::ext::TestSize.Le
     JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
     jsonObject[DM_CREDENTIAL_RETURNJSONSTR] = credential;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     MessageParcel data;
     data.WriteString(message);
@@ -1113,7 +1113,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_039, testing::ext::TestSize.Le
 
     JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_OH;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     MessageParcel data;
     data.WriteString(message);
@@ -1131,7 +1131,7 @@ HWTEST_F(IpcCmdParserClientTest, ReadResponseFunc_040, testing::ext::TestSize.Le
     JsonObject jsonObject;
     jsonObject[DM_CREDENTIAL_TYPE] = DM_TYPE_MINE;
     jsonObject[DM_CREDENTIAL_RETURNJSONSTR] = credential;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     MessageParcel data;
     data.WriteString(message);

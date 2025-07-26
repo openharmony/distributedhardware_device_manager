@@ -296,7 +296,7 @@ int32_t HichainListener::DeleteGroup(const int32_t userId, std::string &groupId)
     int64_t requestId = GenRequestId();
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
-    std::string disbandParams = SafetyDump(jsonObj);
+    std::string disbandParams = jsonObj.Dump();
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME, disbandParams.c_str());
     if (ret != 0) {
         LOGE("[HICHAIN]fail to delete group with ret:%{public}d.", ret);
@@ -310,7 +310,7 @@ int32_t HichainListener::DeleteGroupExt(int32_t userId, std::string &groupId)
     int64_t requestId = GenRequestId();
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
-    std::string disbandParams = SafetyDump(jsonObj);
+    std::string disbandParams = jsonObj.Dump();
     int32_t ret = deviceGroupManager_->deleteGroup(userId, requestId, DM_PKG_NAME_EXT, disbandParams.c_str());
     if (ret != 0) {
         LOGE("[HICHAIN]fail to delete group with ret:%{public}d.", ret);

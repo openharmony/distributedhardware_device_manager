@@ -470,7 +470,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateMsg_103, testing::ext::TestSize.Level1)
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     JsonObject jsonObject;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->ProcessCreateMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -481,7 +481,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateMsg_104, testing::ext::TestSize.Level1)
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     JsonObject jsonObject;
     jsonObject[TAG_PIN_TYPE] = "TAG_PIN_TYPE";
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->ProcessCreateMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -493,7 +493,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateMsg_105, testing::ext::TestSize.Level1)
     JsonObject jsonObject;
     jsonObject[TAG_PIN_TYPE] = DmPinType::SUPER_SONIC;
     jsonObject[TAG_PAYLOAD] = DmPinType::SUPER_SONIC;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->ProcessCreateMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -503,7 +503,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_101, testing::ext::TestSize.Level
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     JsonObject jsonObject;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->ProcessCreateRespMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -514,7 +514,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_102, testing::ext::TestSize.Level
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     JsonObject jsonObject;
     jsonObject[TAG_REPLY] = DmPinType::NUMBER_PIN_CODE;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->listener_ = nullptr;
     pinHolder->ProcessCreateRespMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
@@ -526,7 +526,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_103, testing::ext::TestSize.Level
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     JsonObject jsonObject;
     jsonObject[TAG_REPLY] = DmPinType::SUPER_SONIC;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->session_ = nullptr;
     pinHolder->ProcessCreateRespMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
@@ -538,7 +538,7 @@ HWTEST_F(DmPinHolderTest, ProcessCreateRespMsg_104, testing::ext::TestSize.Level
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     JsonObject jsonObject;
     jsonObject[TAG_REPLY] = DmPinType::NUMBER_PIN_CODE;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->session_ = nullptr;
     pinHolder->ProcessCreateRespMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
@@ -569,7 +569,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_103, testing::ext::TestSize.Level1)
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     JsonObject jsonObject;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->ProcessDestroyMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -580,7 +580,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_104, testing::ext::TestSize.Level1)
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
     JsonObject jsonObject;
     jsonObject[TAG_PIN_TYPE] = "TAG_PIN_TYPE";
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->ProcessDestroyMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -592,7 +592,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyMsg_105, testing::ext::TestSize.Level1)
     JsonObject jsonObject;
     jsonObject[TAG_PIN_TYPE] = DmPinType::SUPER_SONIC;
     jsonObject[TAG_PAYLOAD] = DmPinType::SUPER_SONIC;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->ProcessDestroyMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -614,7 +614,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_101, testing::ext::TestSize.Level1)
     int32_t sessionId = 1;
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->OnDataReceived(sessionId, message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -626,7 +626,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_102, testing::ext::TestSize.Level1)
     int32_t sessionId = 1;
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER_RESP;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->OnDataReceived(sessionId, message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -638,7 +638,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_103, testing::ext::TestSize.Level1)
     int32_t sessionId = 1;
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->OnDataReceived(sessionId, message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -650,7 +650,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_104, testing::ext::TestSize.Level1)
     int32_t sessionId = 1;
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER_RESP;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->OnDataReceived(sessionId, message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -663,7 +663,7 @@ HWTEST_F(DmPinHolderTest, OnDataReceived_105, testing::ext::TestSize.Level1)
     int32_t data = 300;
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = data;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->OnDataReceived(sessionId, message);
     ASSERT_NE(pinHolder->timer_, nullptr);
 }
@@ -940,14 +940,14 @@ HWTEST_F(DmPinHolderTest, CreateMsgScene_101, testing::ext::TestSize.Level1)
     sourceJson[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER;
     sourceJson[TAG_PIN_TYPE] = DmPinType::QR_CODE;
     sourceJson[TAG_PAYLOAD] = PAY_LOAD;
-    std::string sourceMessage = SafetyDump(sourceJson);
+    std::string sourceMessage = sourceJson.Dump();
 
     JsonObject sinkJson;
     sinkJson[TAG_MSG_TYPE] = MSG_TYPE_CREATE_PIN_HOLDER_RESP;
     sinkJson[TAG_PIN_TYPE] = DmPinType::QR_CODE;
     sinkJson[TAG_PAYLOAD] = PAY_LOAD;
     sinkJson[TAG_REPLY] = REPLY_SUCCESS;
-    std::string sinkMessage = SafetyDump(sourceJson);
+    std::string sinkMessage = sinkJson.Dump();
 
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -967,7 +967,7 @@ HWTEST_F(DmPinHolderTest, CreateRespMsgScene_101, testing::ext::TestSize.Level2)
     jsonObject[TAG_PIN_TYPE] = DmPinType::QR_CODE;
     jsonObject[TAG_PAYLOAD] = PAY_LOAD;
     jsonObject[TAG_REPLY] = REPLY_FAILED;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -983,7 +983,7 @@ HWTEST_F(DmPinHolderTest, DestroyMsgScene_101, testing::ext::TestSize.Level1)
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER;
     jsonObject[TAG_PIN_TYPE] = DmPinType::QR_CODE;
     jsonObject[TAG_PAYLOAD] = PAY_LOAD;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -999,7 +999,7 @@ HWTEST_F(DmPinHolderTest, DestroyResMsgScene_101, testing::ext::TestSize.Level1)
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_DESTROY_PIN_HOLDER_RESP;
     jsonObject[TAG_PIN_TYPE] = DmPinType::QR_CODE;
     jsonObject[TAG_PAYLOAD] = PAY_LOAD;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -1015,7 +1015,7 @@ HWTEST_F(DmPinHolderTest, ChangeMsgScene_101, testing::ext::TestSize.Level1)
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE;
     jsonObject[TAG_PIN_TYPE] = DmPinType::QR_CODE;
     jsonObject[TAG_PAYLOAD] = PAY_LOAD;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -1031,7 +1031,7 @@ HWTEST_F(DmPinHolderTest, ChangeRespMsgScene_101, testing::ext::TestSize.Level1)
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_PIN_HOLDER_CHANGE_RESP;
     jsonObject[TAG_PIN_TYPE] = DmPinType::QR_CODE;
     jsonObject[TAG_PAYLOAD] = PAY_LOAD;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -1047,7 +1047,7 @@ HWTEST_F(DmPinHolderTest, CloseSessionMsgScene_101, testing::ext::TestSize.Level
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_PIN_CLOSE_SESSION;
     jsonObject[TAG_PIN_TYPE] = DmPinType::QR_CODE;
     jsonObject[TAG_PAYLOAD] = PAY_LOAD;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
 
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
@@ -1251,7 +1251,7 @@ HWTEST_F(DmPinHolderTest, ProcessCloseSessionMsg_102, testing::ext::TestSize.Lev
     JsonObject jsonObject;
     jsonObject[TAG_PIN_TYPE] = DmPinType::SUPER_SONIC;
     jsonObject[TAG_PAYLOAD] = DmPinType::SUPER_SONIC;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     pinHolder->sinkState_ = SINK_CREATE;
     pinHolder->ProcessDestroyMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
@@ -1290,7 +1290,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyResMsg_102, testing::ext::TestSize.Level
     JsonObject jsonObject;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     jsonObject[TAG_REPLY] = DmPinType::NUMBER_PIN_CODE;
     pinHolder->ProcessDestroyResMsg(message);
     ASSERT_NE(pinHolder->timer_, nullptr);
@@ -1301,7 +1301,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyResMsg_103, testing::ext::TestSize.Level
     JsonObject jsonObject;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     jsonObject[TAG_REPLY] = DmPinType::NUMBER_PIN_CODE;
     pinHolder->session_ = nullptr;
     pinHolder->ProcessDestroyResMsg(message);
@@ -1313,7 +1313,7 @@ HWTEST_F(DmPinHolderTest, ProcessDestroyResMsg_104, testing::ext::TestSize.Level
     JsonObject jsonObject;
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<IDeviceManagerServiceListenerTest>();
     std::shared_ptr<PinHolder> pinHolder = std::make_shared<PinHolder>(listener);
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     jsonObject[TAG_REPLY] = DmPinType::NUMBER_PIN_CODE;
     pinHolder->listener_ = nullptr;
     pinHolder->ProcessDestroyResMsg(message);

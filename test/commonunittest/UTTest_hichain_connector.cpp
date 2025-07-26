@@ -1202,7 +1202,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_001, testing::ext::TestS
 HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
-    std::string credentialInfo = SafetyDump(jsonObj);
+    std::string credentialInfo = jsonObj.Dump();
     std::string params;
     std::string groupOwner;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -1221,7 +1221,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_003, testing::ext::TestS
     JsonObject jsonObj;
     jsonObj["authType"] = 1;
     jsonObj[FIELD_USER_ID] = "156103";
-    std::string credentialInfo = SafetyDump(jsonObj);
+    std::string credentialInfo = jsonObj.Dump();
     std::string params;
     std::string groupOwner;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -1240,7 +1240,7 @@ HWTEST_F(HichainConnectorTest, ParseRemoteCredentialExt_004, testing::ext::TestS
     JsonObject jsonObj;
     jsonObj["authType"] = 4;
     jsonObj[FIELD_USER_ID] = "156103";
-    std::string credentialInfo = SafetyDump(jsonObj);
+    std::string credentialInfo = jsonObj.Dump();
     std::string params;
     std::string groupOwner;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
@@ -1272,7 +1272,7 @@ HWTEST_F(HichainConnectorTest, addMultiMembersExt_001, testing::ext::TestSize.Le
 HWTEST_F(HichainConnectorTest, addMultiMembersExt_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
-    std::string credentialInfo = SafetyDump(jsonObj);
+    std::string credentialInfo = jsonObj.Dump();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t ret = hiChainConnector->addMultiMembersExt(credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
@@ -1316,7 +1316,7 @@ HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_001, testing::ext::TestSize
 HWTEST_F(HichainConnectorTest, GetTrustedDevicesUdid_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObj;
-    std::string jsonStr = SafetyDump(jsonObj);
+    std::string jsonStr = jsonObj.Dump();
     std::vector<std::string> udidList;
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     int32_t ret = hiChainConnector->GetTrustedDevicesUdid(jsonStr.c_str(), udidList);

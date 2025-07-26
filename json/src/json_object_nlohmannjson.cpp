@@ -278,15 +278,10 @@ JsonItemObject& JsonItemObject::operator=(const JsonItemObject &object)
 
 std::string JsonItemObject::DumpFormated() const
 {
-    return Dump(true);
+    return Dump(true, true);
 }
 
 std::string JsonItemObject::Dump() const
-{
-    return Dump(false);
-}
-
-std::string JsonItemObject::DumpIgnoreError() const
 {
     return Dump(false, true);
 }
@@ -309,18 +304,6 @@ std::string JsonItemObject::Dump(bool formatFlag, bool isIgnoreError) const
         error_handler = nlohmann::detail::error_handler_t::ignore;
     }
     return GetJsonPointer(item_)->dump(indent, indent_char, ensure_ascii, error_handler);
-}
-
-std::string JsonItemObject::Dump(bool formatFlag) const
-{
-    if (item_ == nullptr) {
-        LOGE("item_ is nullptr");
-        return "";
-    }
-    if (formatFlag) {
-        return GetJsonPointer(item_)->dump(1, '\t', false, nlohmann::detail::error_handler_t::ignore);
-    }
-    return GetJsonPointer(item_)->dump();
 }
 
 JsonItemObject JsonItemObject::operator[](const std::string &key)

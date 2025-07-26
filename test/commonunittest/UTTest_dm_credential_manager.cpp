@@ -181,7 +181,7 @@ HWTEST_F(DmCredentialManagerTest, RequestCredential_001, testing::ext::TestSize.
     JsonObject jsonObject;
     jsonObject["userId"] = "test";
     jsonObject["version"] = "test";
-    reqJsonStr = SafetyDump(jsonObject);
+    reqJsonStr = jsonObject.Dump();
     ret = dmCreMgr_->RequestCredential(reqJsonStr, returnJsonStr);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
@@ -279,22 +279,22 @@ HWTEST_F(DmCredentialManagerTest, ImportCredential_001, testing::ext::TestSize.L
     JsonObject jsonObject(credentialInfo);
     jsonObject["TType"] = 1;
     jsonObject["processType"] = 1;
-    credentialInfo = SafetyDump(jsonObject);
+    credentialInfo = jsonObject.Dump();
     ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
     jsonObject["processType"] = -1;
-    credentialInfo = SafetyDump(jsonObject);
+    credentialInfo = jsonObject.Dump();
     ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
     jsonObject["processType"] = 2;
-    credentialInfo = SafetyDump(jsonObject);
+    credentialInfo = jsonObject.Dump();
     ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
     jsonObject["TType"] = "test";
-    credentialInfo = SafetyDump(jsonObject);
+    credentialInfo = jsonObject.Dump();
     ret = dmCreMgr_->ImportCredential(pkgName, credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -718,13 +718,13 @@ HWTEST_F(DmCredentialManagerTest, ImportRemoteCredential_001, testing::ext::Test
     jsonObject[FIELD_USER_ID] = 0;
     jsonObject[FIELD_PEER_USER_ID] = "peerUserId";
 
-    std::string credentialInfo = SafetyDump(jsonObject);
+    std::string credentialInfo = jsonObject.Dump();
     dmCreMgr_->hiChainConnector_->deviceGroupManager_ = nullptr;
     int32_t ret = dmCreMgr_->ImportRemoteCredential(credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
     jsonObject[FIELD_CREDENTIAL_DATA] = 0;
-    credentialInfo = SafetyDump(jsonObject);
+    credentialInfo = jsonObject.Dump();
     ret = dmCreMgr_->ImportRemoteCredential(credentialInfo);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
@@ -1656,7 +1656,7 @@ HWTEST_F(DmCredentialManagerTest, from_json_001, testing::ext::TestSize.Level1)
     JsonObject jsonPkInfo;
     jsonOutObj[FIELD_SERVER_PK] = "serverPk";
     jsonOutObj[FIELD_PKINFO_SIGNATURE] = "pkInfoSignature";
-    jsonOutObj[FIELD_PKINFO] = SafetyDump(jsonPkInfo);
+    jsonOutObj[FIELD_PKINFO] = jsonPkInfo.Dump();
     jsonOutObj[FIELD_PEER_DEVICE_ID] = "peerDeviceId";
     FromJson(jsonOutObj, credentialDataInfo);
     EXPECT_FALSE(credentialDataInfo.serverPk.empty());

@@ -121,7 +121,7 @@ int32_t HiChainAuthConnector::AuthDevice(const std::string &pinCode, int32_t osA
     authParamJson["osAccountId"] = osAccountId;
     authParamJson["pinCode"] = pinCode;
     authParamJson["acquireType"] = AcquireType::P2P_BIND;
-    std::string authParam = SafetyDump(authParamJson);
+    std::string authParam = authParamJson.Dump();
     LOGI("StartAuthDevice authParam %{public}s ,requestId %{public}" PRId64, GetAnonyString(authParam).c_str(),
         requestId);
     int32_t ret = StartAuthDevice(requestId, authParam.c_str(), &deviceAuthCallback_);
@@ -138,7 +138,7 @@ int32_t HiChainAuthConnector::ProcessAuthData(int64_t requestId, std::string aut
     JsonObject jsonAuthParam;
     jsonAuthParam["osAccountId"] = osAccountId;
     jsonAuthParam["data"] = authData;
-    int32_t ret = ProcessAuthDevice(requestId, SafetyDump(jsonAuthParam).c_str(), &deviceAuthCallback_);
+    int32_t ret = ProcessAuthDevice(requestId, jsonAuthParam.Dump().c_str(), &deviceAuthCallback_);
     if (ret != HC_SUCCESS) {
         LOGE("Hichain processData failed ret %{public}d.", ret);
         return ERR_DM_FAILED;
@@ -353,7 +353,7 @@ int32_t HiChainAuthConnector::GenerateCredential(std::string &localUdid, int32_t
     jsonObj["deviceId"] = localUdid;
     jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["flag"] = 1;
-    std::string requestParam = SafetyDump(jsonObj);
+    std::string requestParam = jsonObj.Dump();
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_CREATE, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain generate credential failed.");
@@ -449,7 +449,7 @@ bool HiChainAuthConnector::QueryCredential(std::string &localUdid, int32_t osAcc
     jsonObj["deviceId"] = localUdid;
     jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["flag"] = 1;
-    std::string requestParam = SafetyDump(jsonObj);
+    std::string requestParam = jsonObj.Dump();
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_QUERY, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain query credential failed.");
@@ -478,7 +478,7 @@ int32_t HiChainAuthConnector::GetCredential(std::string &localUdid, int32_t osAc
     jsonObj["deviceId"] = localUdid;
     jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["flag"] = 1;
-    std::string requestParam = SafetyDump(jsonObj);
+    std::string requestParam = jsonObj.Dump();
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_QUERY, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain query credential failed.");
@@ -511,7 +511,7 @@ int32_t HiChainAuthConnector::ImportCredential(int32_t osAccountId, int32_t peer
     jsonObj["deviceId"] = deviceId;
     jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["publicKey"] = publicKey;
-    std::string requestParam = SafetyDump(jsonObj);
+    std::string requestParam = jsonObj.Dump();
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_IMPORT, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain query credential failed.");
@@ -531,7 +531,7 @@ int32_t HiChainAuthConnector::DeleteCredential(const std::string &deviceId, int3
     jsonObj["acquireType"] = AcquireType::P2P_BIND;
     jsonObj["osAccountId"] = userId;
     jsonObj["peerOsAccountId"] = peerUserId;
-    std::string requestParam = SafetyDump(jsonObj);
+    std::string requestParam = jsonObj.Dump();
     char *returnData = nullptr;
     if (ProcessCredential(CRED_OP_DELETE, requestParam.c_str(), &returnData) != HC_SUCCESS) {
         LOGE("Hichain query credential failed.");

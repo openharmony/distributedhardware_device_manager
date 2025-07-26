@@ -118,7 +118,7 @@ HWTEST_F(DmAuthManagerTest, OnDataReceived_007, testing::ext::TestSize.Level1)
     int32_t sessionId = 0;
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = 200;
-    std::string message = SafetyDump(jsonObject);
+    std::string message = jsonObject.Dump();
     authManager_->OnDataReceived(sessionId, message);
     authManager_->authRequestState_ = nullptr;
     authManager_->authResponseState_ = nullptr;
@@ -1380,7 +1380,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_002, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     jsonObject["targetPkgName"] = 1234;
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1393,7 +1393,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_003, testing::ext::TestSize.Level1)
     JsonObject jsonObject;
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = 1234;
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1407,7 +1407,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_004, testing::ext::TestSize.Level1)
     jsonObject["targetPkgName"] = "1234";
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = 1234;
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1422,7 +1422,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_005, testing::ext::TestSize.Level1)
     jsonObject["appOperation"] = "1234";
     jsonObject["customDescription"] = "1234";
     jsonObject["appThumbnail"] = 1234;
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1438,7 +1438,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_006, testing::ext::TestSize.Level1)
     jsonObject["customDescription"] = "1234";
     jsonObject["appThumbnail"] = "1234";
     jsonObject["tokenId"] = "1234";
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1455,7 +1455,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_007, testing::ext::TestSize.Level1)
     jsonObject["appThumbnail"] = "1234";
     jsonObject["tokenId"] = 1234;
     jsonObject["bindLevel"] = "1234";
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1472,7 +1472,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_008, testing::ext::TestSize.Level1)
     jsonObject["appThumbnail"] = "1234";
     jsonObject["tokenId"] = 1234;
     jsonObject["bindLevel"] = 1234;
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1484,7 +1484,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_009, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     jsonObject["DM_CLOSE_SESSION_DELAY_SECONDS"] = 1234;
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1496,7 +1496,7 @@ HWTEST_F(DmAuthManagerTest, GetAuthParam_010, testing::ext::TestSize.Level1)
 {
     JsonObject jsonObject;
     jsonObject["DM_CLOSE_SESSION_DELAY_SECONDS"] = "1234";
-    std::string extra = SafetyDump(jsonObject);
+    std::string extra = jsonObject.Dump();
     int32_t authType = 5;
     std::string pkgName = "ohos_test";
     std::string deviceId = "512156";
@@ -1590,7 +1590,7 @@ HWTEST_F(DmAuthManagerTest, IsIdenticalAccount_201, testing::ext::TestSize.Level
 
     JsonObject jsonPeerGroupIdObj;
     jsonPeerGroupIdObj["groupId"] = "123456";
-    authManager_->authResponseContext_->accountGroupIdHash = SafetyDump(jsonPeerGroupIdObj);
+    authManager_->authResponseContext_->accountGroupIdHash = jsonPeerGroupIdObj.Dump();
     EXPECT_CALL(*multipleUserConnectorMock_, GetCurrentAccountUserID()).WillOnce(Return(0));
     EXPECT_CALL(*hiChainConnectorMock_, GetGroupInfo(_, _, _)).WillOnce(Return(true));
     EXPECT_CALL(*cryptoMock_, GetGroupIdHash(_)).WillOnce(Return("123"));

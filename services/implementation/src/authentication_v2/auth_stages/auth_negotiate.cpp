@@ -72,7 +72,7 @@ std::string AuthSrcNegotiateStateMachine::GetAccountGroupIdHash(std::shared_ptr<
 {
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
-    std::string queryParams = SafetyDump(jsonObj);
+    std::string queryParams = jsonObj.Dump();
 
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (osAccountUserId < 0) {
@@ -87,7 +87,7 @@ std::string AuthSrcNegotiateStateMachine::GetAccountGroupIdHash(std::shared_ptr<
     for (auto &groupInfo : groupList) {
         jsonAccountObj.PushBack(Crypto::GetGroupIdHash(groupInfo.groupId));
     }
-    return SafetyDump(jsonAccountObj);
+    return jsonAccountObj.Dump();
 }
 
 int32_t AuthSrcNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> context)

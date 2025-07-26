@@ -2305,7 +2305,7 @@ void DeviceManagerService::PutLocalUserIdToDataBase(const std::vector<int32_t> &
     JsonObject jsonObj;
     jsonObj[LOCAL_FOREGROUND_USERID] = foregroundUsers;
     jsonObj[LOCAL_BACKGROUND_USERID] = backgroundUsers;
-    std::string localUserIdStr = SafetyDump(jsonObj);
+    std::string localUserIdStr = jsonObj.Dump();
     KVAdapterManager::GetInstance().PutLocalUserIdData(LOCAL_ALL_USERID, localUserIdStr);
 }
 

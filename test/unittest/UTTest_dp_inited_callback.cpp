@@ -73,7 +73,7 @@ HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_001, testing::ext::TestSize.
     JsonObject jsonObject;
     jsonObject[PARAM_KEY_OS_VERSION] = "5.0.3";
     jsonObject[PARAM_KEY_OS_TYPE] = 1;
-    std::string extraData = SafetyDump(jsonObject);
+    std::string extraData = jsonObject.Dump();
     auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
     ASSERT_TRUE(ret);
 
@@ -172,7 +172,7 @@ HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_005, testing::ext::TestSize.
 
     JsonObject jsonObject;
     jsonObject[PARAM_KEY_OS_VERSION] = 1;
-    std::string extraData = SafetyDump(jsonObject);
+    std::string extraData = jsonObject.Dump();
     auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
     ASSERT_TRUE(ret);
 
@@ -206,7 +206,7 @@ HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_006, testing::ext::TestSize.
     JsonObject jsonObject;
     jsonObject[PARAM_KEY_OS_VERSION] = "5.0.3";
     jsonObject[PARAM_KEY_OS_TYPE] = "1";
-    std::string extraData = SafetyDump(jsonObject);
+    std::string extraData = jsonObject.Dump();
     auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
     ASSERT_TRUE(ret);
 
@@ -239,7 +239,7 @@ HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_007, testing::ext::TestSize.
     JsonObject jsonObject;
     jsonObject[PARAM_KEY_OS_VERSION] = "5.0.3";
     jsonObject[PARAM_KEY_OS_TYPE] = 1;
-    std::string extraData = SafetyDump(jsonObject);
+    std::string extraData = jsonObject.Dump();
     auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
     ASSERT_TRUE(ret);
 
@@ -275,7 +275,7 @@ HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_008, testing::ext::TestSize.
     JsonObject jsonObject;
     jsonObject[PARAM_KEY_OS_VERSION] = "5.0.3";
     jsonObject[PARAM_KEY_OS_TYPE] = 1;
-    std::string extraData = SafetyDump(jsonObject);
+    std::string extraData = jsonObject.Dump();
     auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
     ASSERT_TRUE(ret);
     std::vector<DmDeviceInfo> deviceInfos = { deviceInfo };
@@ -310,7 +310,7 @@ HWTEST_F(DpInitedCallbackTest, PutAllTrustedDevices_009, testing::ext::TestSize.
     JsonObject jsonObject;
     jsonObject[PARAM_KEY_OS_VERSION] = "5.0.3";
     jsonObject[PARAM_KEY_OS_TYPE] = 1;
-    std::string extraData = SafetyDump(jsonObject);
+    std::string extraData = jsonObject.Dump();
     auto ret = CreateDmDeviceInfo(networkId, extraData, deviceInfo);
     ASSERT_TRUE(ret);
 

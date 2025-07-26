@@ -753,7 +753,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     jsonObj[PIN_TOKEN] = authResponseContext_->token;
     jsonObj[QR_CODE_KEY] = GenerateGroupName();
     jsonObj[NFC_CODE_KEY] = GenerateGroupName();
-    authResponseContext_->authToken = SafetyDump(jsonObj);
+    authResponseContext_->authToken = jsonObj.Dump();
     LOGI("DmAuthManager::OnGroupCreated start group id %{public}s", GetAnonyString(groupId).c_str());
     authResponseContext_->groupId = groupId;
     authResponseContext_->code = pinCode;
@@ -1341,7 +1341,7 @@ int32_t DmAuthManager::AddMember(const std::string &pinCode)
     jsonObject[PIN_CODE_KEY] = pinCode;
     jsonObject[TAG_REQUEST_ID] = authResponseContext_->requestId;
     jsonObject[TAG_DEVICE_ID] = authResponseContext_->deviceId;
-    std::string connectInfo = SafetyDump(jsonObject);
+    std::string connectInfo = jsonObject.Dump();
     if (timer_ != nullptr) {
         timer_->StartTimer(std::string(ADD_TIMEOUT_TASK),
             GetTaskTimeout(ADD_TIMEOUT_TASK, ADD_TIMEOUT), [this] (std::string name) {
@@ -1751,7 +1751,7 @@ void DmAuthManager::ShowConfigDialog()
     jsonObj[TAG_LOCAL_DEVICE_TYPE] = authResponseContext_->deviceTypeId;
     jsonObj[TAG_REQUESTER] = authResponseContext_->deviceName;
     jsonObj[TAG_HOST_PKGLABEL] = authResponseContext_->hostPkgLabel;
-    const std::string params = SafetyDump(jsonObj);
+    const std::string params = jsonObj.Dump();
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid = static_cast<std::string>(localDeviceId);
@@ -1965,7 +1965,7 @@ bool DmAuthManager::IsIdenticalAccount()
 {
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
-    std::string queryParams = SafetyDump(jsonObj);
+    std::string queryParams = jsonObj.Dump();
 
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (osAccountUserId < 0) {
@@ -2006,7 +2006,7 @@ std::string DmAuthManager::GetAccountGroupIdHash()
 {
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
-    std::string queryParams = SafetyDump(jsonObj);
+    std::string queryParams = jsonObj.Dump();
 
     int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
     if (osAccountUserId < 0) {
@@ -2021,7 +2021,7 @@ std::string DmAuthManager::GetAccountGroupIdHash()
     for (auto &groupInfo : groupList) {
         jsonAccountObj.PushBack(Crypto::GetGroupIdHash(groupInfo.groupId));
     }
-    return SafetyDump(jsonAccountObj);
+    return jsonAccountObj.Dump();
 }
 
 int32_t DmAuthManager::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
@@ -2214,7 +2214,7 @@ std::string DmAuthManager::GenerateBindResultContent()
         jsonObj[TAG_DEVICE_ID] = deviceIdHash;
     }
     jsonObj[TAG_CONFIRM_OPERATION] = authResponseContext_->confirmOperation;
-    std::string content = SafetyDump(jsonObj);
+    std::string content = jsonObj.Dump();
     return content;
 }
 
@@ -2588,7 +2588,7 @@ char *DmAuthManager::AuthDeviceRequest(int64_t requestId, int operationCode, con
     std::string deviceId = "";
     GetRemoteDeviceId(deviceId);
     jsonObj[FIELD_PEER_CONN_DEVICE_ID] = deviceId;
-    std::string jsonStr = SafetyDump(jsonObj);
+    std::string jsonStr = jsonObj.Dump();
     char *buffer = strdup(jsonStr.c_str());
     return buffer;
 }
@@ -2720,7 +2720,7 @@ void DmAuthManager::ProcRespNegotiate(const int32_t &sessionId)
         }
     }
     jsonObject[TAG_CRYPTO_SUPPORT] = false;
-    message = SafetyDump(jsonObject);
+    message = jsonObject.Dump();
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
 }
 
@@ -2731,7 +2731,7 @@ void DmAuthManager::ProcIncompatible(const int32_t &sessionId)
     respNegotiateMsg[TAG_REPLY] = ERR_DM_VERSION_INCOMPATIBLE;
     respNegotiateMsg[TAG_VER] = DM_ITF_VER;
     respNegotiateMsg[TAG_MSG_TYPE] = MSG_TYPE_RESP_NEGOTIATE;
-    std::string message = SafetyDump(respNegotiateMsg);
+    std::string message = respNegotiateMsg.Dump();
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
 }
 
@@ -2879,7 +2879,7 @@ void DmAuthManager::HandleSessionHeartbeat(std::string name)
     LOGI("DmAuthManager::HandleSessionHeartbeat name %{public}s", name.c_str());
     JsonObject jsonObj;
     jsonObj[TAG_SESSION_HEARTBEAT] = TAG_SESSION_HEARTBEAT;
-    std::string message = SafetyDump(jsonObj);
+    std::string message = jsonObj.Dump();
     softbusConnector_->GetSoftbusSession()->SendHeartbeatData(authResponseContext_->sessionId, message);
 
     if (authRequestState_ != nullptr) {
