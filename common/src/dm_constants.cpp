@@ -160,6 +160,7 @@ const char* DM_VAL_TRUE = "true";
 const char* DM_VAL_FALSE = "false";
 const char* APP_USER_DATA = "appUserData";
 const char* BUNDLE_INFO = "bundleInfo";
+const char* TITLE = "title";
 const char* DM_BUSINESS_ID = "business_id";
 
 // errCode map

@@ -912,6 +912,7 @@ int32_t DmAuthMessageProcessor::CreateProxyNegotiateMessage(std::shared_ptr<DmAu
     jsonObject[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
     jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT] = context->IsCallingProxyAsSubject;
     if (context != nullptr && context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+        jsonObject[TAG_AUTH_TYPE] = context->authType;
         JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
         for (const auto &app : context->subjectProxyOnes) {
             JsonObject object;
@@ -1465,6 +1466,9 @@ int32_t DmAuthMessageProcessor::ParseProxyNegotiateMessage(
     if (!context->IsProxyBind) {
         return DM_OK;
     }
+    if (IsInt32(jsonObject, TAG_AUTH_TYPE)) {
+        context->authType = static_cast<DmAuthType>(jsonObject[TAG_AUTH_TYPE].Get<int32_t>());
+    }
     if (IsBool(jsonObject, PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT)) {
         context->IsCallingProxyAsSubject = jsonObject[PARAM_KEY_IS_CALLING_PROXY_AS_SUBJECT].Get<bool>();
     }
@@ -1574,6 +1578,8 @@ int32_t DmAuthMessageProcessor::ParseMessageProxyRespAclNegotiate(const JsonObje
         context->IsProxyBind = false;
         LOGE("sink does not support proxy");
         return DM_OK;
+    } else if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
+        context->IsProxyBind = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
     }
     if (!context->IsProxyBind) {
         return DM_OK;

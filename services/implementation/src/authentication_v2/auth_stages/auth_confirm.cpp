@@ -770,6 +770,7 @@ int32_t AuthSinkConfirmState::CreateProxyData(std::shared_ptr<DmAuthContext> con
         allProxyObj.PushBack(object);
     }
     jsonObj[APP_USER_DATA] = allProxyObj.Dump();
+    jsonObj[TITLE] = context->title;
     return DM_OK;
 }
 
@@ -1117,6 +1118,9 @@ bool AuthSinkConfirmState::ProcessServerAuthorize(std::shared_ptr<DmAuthContext>
         context->subjectProxyOnes.clear();
         LOGE("no subject proxy data");
         return false;
+    }
+    if (IsString(jsonObj, TITLE)) {
+        context->title = jsonObj[TITLE].Get<std::string>();
     }
     JsonObject appDataObj;
     std::string appDataStr = jsonObj[APP_USER_DATA].Dump();

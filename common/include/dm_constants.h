@@ -170,6 +170,7 @@ DM_EXPORT extern const char* DM_VAL_TRUE;
 DM_EXPORT extern const char* DM_VAL_FALSE;
 DM_EXPORT extern const char* APP_USER_DATA;
 DM_EXPORT extern const char* BUNDLE_INFO;
+DM_EXPORT extern const char* TITLE;
 DM_EXPORT extern const char* DM_BUSINESS_ID;
 
 // screen state

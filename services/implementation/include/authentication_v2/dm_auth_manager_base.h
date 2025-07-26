@@ -250,6 +250,7 @@ public:
     void DisableInsensibleSwitching();
     int32_t ParseAuthType(const std::map<std::string, std::string> &bindParam, int32_t &authType);
     static bool CheckProcessNameInWhiteList(const std::string &processName);
+    static bool CheckProcessNameInProxyAdaptationList(const std::string &processName);
 protected:
     bool NeedInsensibleSwitching();
     bool isTransferReady_{true};

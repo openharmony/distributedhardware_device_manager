@@ -547,6 +547,7 @@ private:
     void GetSinkProxyCredTypeForP2P(std::shared_ptr<DmAuthContext> context, std::vector<std::string> &deleteCredInfo);
     bool IsAntiDisturbanceMode(const std::string &businessId);
     bool ParseAndCheckAntiDisturbanceMode(const std::string &businessId, const std::string &businessValue);
+    void SetIsProxyBind(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkDataSyncState : public DmAuthState {
