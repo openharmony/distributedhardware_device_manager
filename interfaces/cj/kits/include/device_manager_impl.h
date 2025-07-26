@@ -63,6 +63,7 @@ private:
     static int32_t Transform2FfiDeviceBasicInfo(const DmDeviceBasicInfo &in, FfiDeviceBasicInfo &out);
     int32_t BindTargetWarpper(const std::string &deviceId,
         const std::string &bindParam, std::shared_ptr<DmFfiBindTargetCallback> callback);
+    int32_t BindDevice(const std::string &deviceId, const std::string &bindParam);
     int32_t WaitForCallbackCv();
 
     int32_t RegisterDevStatusCallback();

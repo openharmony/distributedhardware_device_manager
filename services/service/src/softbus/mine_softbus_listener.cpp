@@ -247,7 +247,10 @@ int32_t MineSoftbusListener::ParseSearchJson(const string &pkgName, const string
         return ERR_DM_INVALID_JSON_STRING;
     }
     int32_t retValue = DM_OK;
-    uint32_t findMode = object[FIELD_DEVICE_MODE].Get<uint32_t>();
+    uint32_t findMode = 0;
+    if (IsUint32(object, FIELD_DEVICE_MODE)) {
+        findMode = object[FIELD_DEVICE_MODE].Get<uint32_t>();
+    }
     LOGI("quick search device mode is: %{public}u", findMode);
     switch (findMode) {
         case FIND_ALL_DEVICE:

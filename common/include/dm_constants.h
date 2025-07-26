@@ -182,6 +182,7 @@ enum ScreenState {
 // errCode map
 DM_EXPORT extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
 // wise device
+DM_EXPORT extern const int32_t MAX_CONTAINER_SIZE;
 DM_EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 const int32_t DEVICE_NAME_MAX_BYTES = 100;
 

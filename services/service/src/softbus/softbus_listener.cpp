@@ -87,6 +87,7 @@ static std::set<std::string> deviceIdSet;
 bool SoftbusListener::isRadarSoLoad_ = false;
 IDmRadarHelper* SoftbusListener::dmRadarHelper_ = nullptr;
 void* SoftbusListener::radarHandle_ = nullptr;
+static std::mutex g_hostNameMutex;
 std::string SoftbusListener::hostName_ = "";
 int32_t g_onlineDeviceNum = 0;
 
@@ -1209,11 +1210,13 @@ int32_t SoftbusListener::GetIPAddrTypeFromCache(const std::string &deviceId, con
 
 void SoftbusListener::SetHostPkgName(const std::string hostName)
 {
+    std::lock_guard<std::mutex> lock(g_hostNameMutex);
     hostName_ = hostName;
 }
 
 std::string SoftbusListener::GetHostPkgName()
 {
+    std::lock_guard<std::mutex> lock(g_hostNameMutex);
     return hostName_;
 }
 

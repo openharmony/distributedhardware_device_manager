@@ -223,10 +223,7 @@ int32_t DmAuthMessageProcessor::SaveDerivativeSessionKeyToDP(int32_t userId, con
     }
     std::vector<unsigned char> sessionKey = cryptoMgr_->GetSessionKey();
     size_t keyLen = sessionKey.size();
-    std::string keyStr;
-    for (size_t i = 0; i < sessionKey.size(); ++i) {
-        keyStr = keyStr + (char)sessionKey.data()[i];
-    }
+    std::string keyStr(sessionKey.begin(), sessionKey.end());
     std::string newKeyStr = Crypto::Sha256(keyStr + suffix);
     DMSessionKey newSessionKey;
     size_t newKeyLen = std::min(keyLen, newKeyStr.size());

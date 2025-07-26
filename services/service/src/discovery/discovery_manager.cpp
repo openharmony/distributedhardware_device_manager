@@ -270,9 +270,12 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(const std::string &pkgName,
 int32_t DiscoveryManager::StartDiscovering4MetaType(const std::string &pkgName, DmSubscribeInfo &dmSubInfo,
     const std::map<std::string, std::string> &param)
 {
-    LOGI("meta node process, input metaType = %{public}s, pkgName = %{public}s",
-         (param.find(PARAM_KEY_META_TYPE)->second).c_str(), pkgName.c_str());
-    MetaNodeType metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
+    MetaNodeType metaType = MetaNodeType::CUSTOM_UNKNOWN;
+    if (param.find(PARAM_KEY_META_TYPE) != param.end()) {
+        LOGI("meta node process, input metaType = %{public}s, pkgName = %{public}s",
+            (param.find(PARAM_KEY_META_TYPE)->second).c_str(), pkgName.c_str());
+        metaType = (MetaNodeType)(std::atoi((param.find(PARAM_KEY_META_TYPE)->second).c_str()));
+    }
     switch (metaType) {
         case MetaNodeType::PROXY_SHARE:
             if (strcpy_s(dmSubInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, DM_CAPABILITY_SHARE) != EOK) {

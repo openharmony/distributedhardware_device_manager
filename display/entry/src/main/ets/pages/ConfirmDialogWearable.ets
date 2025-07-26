@@ -145,7 +145,6 @@ struct Index {
 
     if (AppStorage.get('deviceName') != null) {
       this.peerDeviceName = AppStorage.get('deviceName') as string;
-      console.log('peerDeviceName is ' + this.peerDeviceName);
     }
     let hostPkgLabel: string = AppStorage.get('hostPkgLabel') as string;
     if (hostPkgLabel === CAST_PKG_NAME) {

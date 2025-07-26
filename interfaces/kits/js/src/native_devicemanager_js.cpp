@@ -1314,7 +1314,7 @@ void DeviceManagerNapi::JsToDmDiscoveryExtra(const napi_env &env, const napi_val
     }
     NAPI_CALL_RETURN_VOID(env, napi_get_value_string_utf8(env, object, filterOption, typeLen + 1, &typeLen));
     extra = filterOption;
-    LOGI("JsToDmDiscoveryExtra, extra :%{public}s, typeLen : %{public}zu", extra.c_str(), typeLen);
+    LOGI("JsToDmDiscoveryExtra, typeLen : %{public}zu", typeLen);
 }
 
 bool DeviceManagerNapi::IsSystemApp()
@@ -1346,6 +1346,10 @@ void DeviceManagerNapi::RegisterDevStateCallback(napi_env env, std::string &bund
     }
     {
         std::lock_guard<std::mutex> autoLock(g_deviceStateCallbackMapMutex);
+        if (g_deviceStateCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+            LOGE("g_deviceStateCallbackMap map size is more than max size");
+            return;
+        }
         g_deviceStateCallbackMap[bundleName] = callback;
     }
     return;
@@ -1363,6 +1367,10 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
         auto callback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
         {
             std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
+            if (g_DiscoveryCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_DiscoveryCallbackMap map size is more than max size");
+                return;
+            }
             g_DiscoveryCallbackMap[bundleName] = callback;
         }
         std::shared_ptr<DmNapiDiscoveryCallback> discoveryCallback = callback;
@@ -1374,6 +1382,10 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
         auto callback = std::make_shared<DmNapiPublishCallback>(env, bundleName);
         {
             std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
+            if (g_publishCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_publishCallbackMap map size is more than max size");
+                return;
+            }
             g_publishCallbackMap[bundleName] = callback;
         }
         std::shared_ptr<DmNapiPublishCallback> publishCallback = callback;
@@ -1383,13 +1395,16 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
 
     if (eventType == DM_NAPI_EVENT_UI_STATE_CHANGE) {
         auto callback = std::make_shared<DmNapiDeviceManagerUiCallback>(env, bundleName);
-        int32_t ret = DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(bundleName, callback);
-        if (ret != 0) {
+        if (DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(bundleName, callback) != 0) {
             LOGE("RegisterDeviceManagerFaCallback failed for bundleName %{public}s", bundleName.c_str());
             return;
         }
         {
             std::lock_guard<std::mutex> autoLock(g_dmUiCallbackMapMutex);
+            if (g_dmUiCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_dmUiCallbackMap map size is more than max size");
+                return;
+            }
             g_dmUiCallbackMap[bundleName] = callback;
         }
     }
@@ -1398,8 +1413,8 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName, 
 void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
                                          std::string &eventType, std::string &extra)
 {
-    LOGI("CreateDmCallback for bundleName %{public}s eventType %{public}s extra = %{public}s",
-         bundleName.c_str(), eventType.c_str(), extra.c_str());
+    LOGI("CreateDmCallback for bundleName %{public}s eventType %{public}s",
+         bundleName.c_str(), eventType.c_str());
     if (eventType == DM_NAPI_EVENT_DEVICE_STATE_CHANGE) {
         auto callback = std::make_shared<DmNapiDeviceStateCallback>(env, bundleName);
         int32_t ret = DeviceManager::GetInstance().RegisterDevStateCallback(bundleName, extra, callback);
@@ -1409,6 +1424,10 @@ void DeviceManagerNapi::CreateDmCallback(napi_env env, std::string &bundleName,
         }
         {
             std::lock_guard<std::mutex> autoLock(g_deviceStateCallbackMapMutex);
+            if (g_deviceStateCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_deviceStateCallbackMap map size is more than max size");
+                return;
+            }
             g_deviceStateCallbackMap[bundleName] = callback;
         }
     }
@@ -2282,6 +2301,10 @@ void DeviceManagerNapi::LockDiscoveryCallbackMutex(napi_env env, DmSubscribeInfo
         auto iter = g_DiscoveryCallbackMap.find(bundleName);
         if (iter == g_DiscoveryCallbackMap.end()) {
             discoveryCallback = std::make_shared<DmNapiDiscoveryCallback>(env, bundleName);
+            if (g_DiscoveryCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_DiscoveryCallbackMap map size is more than max size");
+                return;
+            }
             g_DiscoveryCallbackMap[bundleName] = discoveryCallback;
         } else {
             discoveryCallback = iter->second;
@@ -2406,6 +2429,10 @@ napi_value DeviceManagerNapi::PublishDeviceDiscoverySync(napi_env env, napi_call
         auto iter = g_publishCallbackMap.find(deviceManagerWrapper->bundleName_);
         if (iter == g_publishCallbackMap.end()) {
             publishCallback = std::make_shared<DmNapiPublishCallback>(env, deviceManagerWrapper->bundleName_);
+            if (g_publishCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_publishCallbackMap map size is more than max size");
+                return nullptr;
+            }
             g_publishCallbackMap[deviceManagerWrapper->bundleName_] = publishCallback;
         } else {
             publishCallback = iter->second;
@@ -2477,13 +2504,9 @@ napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_inf
         return nullptr;
     }
     napi_value result = nullptr;
-    if (!IsJSObjectType(env, argv[0], "deviceInfo")) {
-        return nullptr;
-    }
-    if (!IsJSObjectType(env, argv[DM_NAPI_ARGS_ONE], "authParam")) {
-        return nullptr;
-    }
-    if (!IsFunctionType(env, argv[DM_NAPI_ARGS_TWO])) {
+    if (!IsJSObjectType(env, argv[0], "deviceInfo") ||
+        !IsJSObjectType(env, argv[DM_NAPI_ARGS_ONE], "authParam") ||
+        !IsFunctionType(env, argv[DM_NAPI_ARGS_TWO])) {
         return nullptr;
     }
 
@@ -2501,6 +2524,10 @@ napi_value DeviceManagerNapi::AuthenticateDevice(napi_env env, napi_callback_inf
         auto iter = g_authCallbackMap.find(deviceManagerWrapper->bundleName_);
         if (iter == g_authCallbackMap.end()) {
             authCallback = std::make_shared<DmNapiAuthenticateCallback>(env, deviceManagerWrapper->bundleName_);
+            if (g_authCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_authCallbackMap map size is more than max size");
+                return nullptr;
+            }
             g_authCallbackMap[deviceManagerWrapper->bundleName_] = authCallback;
         } else {
             authCallback = iter->second;
@@ -2579,6 +2606,10 @@ int32_t DeviceManagerNapi::RegisterCredentialCallback(napi_env env, const std::s
         auto iter = g_creCallbackMap.find(pkgName);
         if (iter == g_creCallbackMap.end()) {
             creCallback = std::make_shared<DmNapiCredentialCallback>(env, pkgName);
+            if (g_creCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_creCallbackMap map size is more than max size");
+                return ERR_DM_FAILED;
+            }
             g_creCallbackMap[pkgName] = creCallback;
         } else {
             creCallback = iter->second;
@@ -2734,7 +2765,6 @@ napi_value DeviceManagerNapi::JsOnFrench(napi_env env, int32_t num, napi_value t
             char extra[DM_NAPI_BUF_LENGTH] = {0};
             napi_get_value_string_utf8(env, argv[1], extra, extraLen + 1, &extraLen);
             std::string extraString = extra;
-            LOGI("extra = %{public}s", extraString.c_str());
             CreateDmCallback(env, deviceManagerWrapper->bundleName_, eventType, extraString);
         } else {
             CreateDmCallback(env, deviceManagerWrapper->bundleName_, eventType);
@@ -2996,14 +3026,20 @@ void DeviceManagerNapi::HandleCreateDmCallBack(const napi_env &env, AsyncCallbac
             std::string bundleName = std::string(asyCallbackInfo->bundleName);
             std::shared_ptr<DmNapiInitCallback> initCallback = std::make_shared<DmNapiInitCallback>(env, bundleName);
             int32_t ret = DeviceManager::GetInstance().InitDeviceManager(bundleName, initCallback);
-            if (ret == 0) {
-                std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
-                g_initCallbackMap[bundleName] = initCallback;
-                asyCallbackInfo->status = 0;
-            } else {
+            if (ret != 0) {
                 asyCallbackInfo->status = 1;
                 asyCallbackInfo->ret = ret;
+                return;
             }
+            std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
+            if (g_initCallbackMap.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("g_initCallbackMap map size is more than max size");
+                asyCallbackInfo->status = 1;
+                asyCallbackInfo->ret = ERR_DM_NOT_INIT;
+                return;
+            }
+            g_initCallbackMap[bundleName] = initCallback;
+            asyCallbackInfo->status = 0;
         }, HandleCreateDmCallBackCompletedCB, (void *)asCallbackInfo, &asCallbackInfo->asyncWork);
     napi_queue_async_work_with_qos(env, asCallbackInfo->asyncWork, napi_qos_user_initiated);
 }
@@ -3253,6 +3289,10 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
 
     obj->bundleName_ = std::string(bundleName);
     std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
+    if (g_deviceManagerMap.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("g_deviceManagerMap map size is more than max size");
+        return nullptr;
+    }
     g_deviceManagerMap[obj->bundleName_] = obj;
     napi_status status = napi_wrap(
         env, thisVar, reinterpret_cast<void *>(obj),
