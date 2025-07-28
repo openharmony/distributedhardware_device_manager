@@ -649,7 +649,7 @@ void DecodeLocalServiceInfosFuzzTest(const uint8_t* data, size_t size)
     for (uint32_t i = 0; i < num; ++i) {
         parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
         parcel.WriteInt32(fdp.ConsumeIntegral<int32_t>());
-        parcel.WriteInt32(fdp.ConsumeIntegral<int32_t>()); 
+        parcel.WriteInt32(fdp.ConsumeIntegral<int32_t>());
         parcel.WriteInt32(fdp.ConsumeIntegral<int32_t>());
         parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
         parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
