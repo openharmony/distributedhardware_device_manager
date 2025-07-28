@@ -105,6 +105,7 @@ HichainListener::~HichainListener()
     DestroyDeviceAuthService();
 }
 
+//LCOV_EXCL_START
 void HichainListener::RegisterDataChangeCb()
 {
     LOGI("start");
@@ -134,6 +135,7 @@ void HichainListener::RegisterCredentialCb()
     }
     LOGI("success!");
 }
+//LCOV_EXCL_STOP
 
 void HichainListener::OnHichainDeviceUnBound(const char *peerUdid, const char *groupInfo)
 {

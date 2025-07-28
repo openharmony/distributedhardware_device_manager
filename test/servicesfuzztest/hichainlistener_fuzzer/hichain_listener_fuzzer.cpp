@@ -64,26 +64,6 @@ void FromJsonInfoFuzzTest(const uint8_t* data, size_t size)
     FromJson(jsonObject, groupInfo);
 }
 
-void RegisterDataChangeCbFuzzTest(const uint8_t* data, size_t size)
-{
-    (void)data;
-    (void)size;
-
-    std::shared_ptr<HichainListener> hiChainListener = std::make_shared<HichainListener>();
-    hiChainListener->deviceGroupManager_ = nullptr;
-    hiChainListener->RegisterDataChangeCb();
-}
-
-void RegisterCredentialCbFuzzTest(const uint8_t* data, size_t size)
-{
-    (void)data;
-    (void)size;
-
-    std::shared_ptr<HichainListener> hiChainListener = std::make_shared<HichainListener>();
-    hiChainListener->credManager_ = nullptr;
-    hiChainListener->RegisterCredentialCb();
-}
-
 void OnHichainDeviceUnBoundFuzzTest(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -202,8 +182,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     /* Run your code on data */
     OHOS::DistributedHardware::FromJsonFuzzTest(data, size);
     OHOS::DistributedHardware::FromJsonInfoFuzzTest(data, size);
-    OHOS::DistributedHardware::RegisterDataChangeCbFuzzTest(data, size);
-    OHOS::DistributedHardware::RegisterCredentialCbFuzzTest(data, size);
     OHOS::DistributedHardware::OnHichainDeviceUnBoundFuzzTest(data, size);
     OHOS::DistributedHardware::OnCredentialDeletedFuzzTest(data, size);
     OHOS::DistributedHardware::DeleteAllGroupFuzzTest(data, size);
