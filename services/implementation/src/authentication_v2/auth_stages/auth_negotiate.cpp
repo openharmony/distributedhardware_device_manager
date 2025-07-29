@@ -134,7 +134,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
 
     // 2. Get userId
     context->accessee.userId = MultipleUserConnector::GetUserIdByDisplayId(
-        context->accessee.displayId);
+        static_cast<uint64_t>(context->accessee.displayId));
     if (context->accessee.userId < 0) {
         LOGE("get userId failed.");
         return ERR_DM_GET_LOCAL_USERID_FAILED;
