@@ -85,6 +85,10 @@ public:
     {
         return appUserData_;
     }
+    static std::string GetTitle()
+    {
+        return title_;
+    }
 private:
     DmDialogManager();
     ~DmDialogManager();
@@ -112,6 +116,7 @@ private:
     static DmDialogManager dialogMgr_;
     static bool isProxyBind_;
     static std::string appUserData_;
+    static std::string title_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -278,6 +278,7 @@ struct DmAuthContext {
     bool isNeedAuthorize{false};
     std::vector<DmProxyAuthContext> subjectProxyOnes;
     std::string reUseCreId;
+    std::string title;
     std::string srvExtarInfo;
 
     std::shared_ptr<DmAuthStateMachine> authStateMachine;

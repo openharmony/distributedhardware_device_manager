@@ -115,6 +115,11 @@ constexpr const static char* CLOSE_PROCESS_NAME_WHITE_LIST[CLOSE_PROCESS_NAME_WH
     "watch_system_service"
 };
 
+constexpr const static char* PROCESS_NAME_PROXY_ADAPTATION_LIST[] = {
+    "gameservice_server"
+};
+constexpr uint32_t PROCESS_NAME_PROXY_ADAPTATION_LIST_NUM = std::size(PROCESS_NAME_PROXY_ADAPTATION_LIST);
+
 int32_t AuthManagerBase::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
@@ -559,6 +564,25 @@ bool AuthManagerBase::CheckProcessNameInWhiteList(const std::string &processName
     }
 #endif
     LOGI("CheckProcessNameInWhiteList: %{public}s invalid.", processName.c_str());
+    return false;
+}
+
+bool AuthManagerBase::CheckProcessNameInProxyAdaptationList(const std::string &processName)
+{
+    LOGI("start");
+    if (processName.empty()) {
+        LOGE("processName is empty");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < PROCESS_NAME_PROXY_ADAPTATION_LIST_NUM; ++index) {
+        std::string whitePkgName(PROCESS_NAME_PROXY_ADAPTATION_LIST[index]);
+        if (processName == whitePkgName) {
+            LOGI("processName = %{public}s in adaptation List.", processName.c_str());
+            return true;
+        }
+    }
+    LOGI("processName = %{public}s not in adaptation List.", processName.c_str());
     return false;
 }
 

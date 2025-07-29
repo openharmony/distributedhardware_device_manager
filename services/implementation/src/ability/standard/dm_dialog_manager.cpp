@@ -53,6 +53,7 @@ std::string DmDialogManager::hostPkgLabel_ = "";
 int32_t DmDialogManager::deviceType_ = -1;
 bool DmDialogManager::isProxyBind_ = false;
 std::string DmDialogManager::appUserData_ = "";
+std::string DmDialogManager::title_ = "";
 DmDialogManager DmDialogManager::dialogMgr_;
 sptr<OHOS::AAFwk::IAbilityConnection> DmDialogManager::dialogConnectionCallback_(
     new (std::nothrow) DialogAbilityConnection());
@@ -104,6 +105,9 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
         }
         if (IsString(jsonObject, APP_USER_DATA)) {
             appUserData_ = jsonObject[APP_USER_DATA].Get<std::string>();
+        }
+        if (IsString(jsonObject, TITLE)) {
+            title_ = jsonObject[TITLE].Get<std::string>();
         }
     }
 
@@ -207,6 +211,7 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     LOGI("OnAbilityConnectDone pinCodeHash: %{public}s", pinCodeHash.c_str());
     param["isProxyBind"] = DmDialogManager::GetIsProxyBind();
     param["appUserData"] = DmDialogManager::GetAppUserData();
+    param["title"] = DmDialogManager::GetTitle();
     param["pinCode"] = DmDialogManager::GetPinCode();
     param["deviceName"] = DmDialogManager::GetDeviceName();
     param["appOperationStr"] = DmDialogManager::GetAppOperationStr();

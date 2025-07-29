@@ -241,6 +241,7 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
         context->reason = ERR_DM_VERSION_INCOMPATIBLE;
         return ERR_DM_VERSION_INCOMPATIBLE;
     }
+    SetIsProxyBind(context);
     int32_t ret = ProcRespNegotiate5_1_0(context);
     if (ret != DM_OK) {
         LOGE("AuthSinkNegotiateStateMachine::Action proc response negotiate failed");
@@ -254,6 +255,43 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
             DmAuthState::HandleAuthenticateTimeout(context, name);
         });
     return DM_OK;
+}
+
+void AuthSinkNegotiateStateMachine::SetIsProxyBind(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    if (!context->IsProxyBind) {
+        return;
+    }
+    if (AuthManagerBase::CheckProcessNameInProxyAdaptationList(context->accessee.pkgName)) {
+        LOGI("%{public}s in proxy adaptation list", context->accessee.pkgName.c_str());
+        return;
+    }
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    auto ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        context->accessee.pkgName, context->authType, srvInfo);
+    if (ret != OHOS::DistributedDeviceProfile::DP_SUCCESS) {
+        context->IsProxyBind = false;
+        context->subjectProxyOnes.clear();
+        LOGI("ReadServiceInfo not found");
+        return;
+    }
+    std::string srvExtarInfo = srvInfo.GetExtraInfo();
+    if (srvExtarInfo.empty()) {
+        LOGI("no srvExtarInfo data");
+        context->IsProxyBind = false;
+        context->subjectProxyOnes.clear();
+        return;
+    }
+    JsonObject jsonObj;
+    jsonObj.Parse(srvExtarInfo);
+    if (jsonObj.IsDiscarded() || !jsonObj.Contains(APP_USER_DATA) ||
+        !IsArray(jsonObj, APP_USER_DATA)) {
+        context->IsProxyBind = false;
+        context->subjectProxyOnes.clear();
+        LOGE("no subject proxy data");
+        return;
+    }
 }
 
 void AuthSinkNegotiateStateMachine::GetSinkCredType(std::shared_ptr<DmAuthContext> context,
