@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,21 +22,13 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DmDistributedHardwareLoadTest::SetUp()
-{
-}
+void DmDistributedHardwareLoadTest::SetUp() {}
 
-void DmDistributedHardwareLoadTest::TearDown()
-{
-}
+void DmDistributedHardwareLoadTest::TearDown() {}
 
-void DmDistributedHardwareLoadTest::SetUpTestCase()
-{
-}
+void DmDistributedHardwareLoadTest::SetUpTestCase() {}
 
-void DmDistributedHardwareLoadTest::TearDownTestCase()
-{
-}
+void DmDistributedHardwareLoadTest::TearDownTestCase() {}
 
 HWTEST_F(DmDistributedHardwareLoadTest, LoadDistributedHardwareFwk_001, testing::ext::TestSize.Level0)
 {
@@ -109,12 +101,132 @@ HWTEST_F(DmDistributedHardwareLoadTest, GetGroupIdHash_001, testing::ext::TestSi
     EXPECT_EQ(str.empty(), false);
 }
 
+/**
+ * @tc.name: ConvertHexStringToBytes_001
+ * @tc.desc: Test ConvertHexStringToBytes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
 HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_001, testing::ext::TestSize.Level0)
 {
+    uint32_t inLen = 2;
+    uint32_t outBufLen = 0;
+    const char *inBuf = "12";
     unsigned char *outBuf = nullptr;
-    const char *inBuf = nullptr;
-    auto ret = Crypto::ConvertHexStringToBytes(outBuf, 0, inBuf, 0);
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, outBufLen, inBuf, inLen);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 }
-} // namespace DistributedHardware
-} // namespace OHOS
+
+/**
+ * @tc.name: ConvertHexStringToBytes_002
+ * @tc.desc: Test ConvertHexStringToBytes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_002, testing::ext::TestSize.Level0)
+{
+    uint32_t inLen = 0;
+    uint32_t outBufLen = 1;
+    const char *inBuf = nullptr;
+    unsigned char outBuf[1] = {0};
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, outBufLen, inBuf, inLen);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_003
+ * @tc.desc: Test ConvertHexStringToBytes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_003, testing::ext::TestSize.Level0)
+{
+    uint32_t inLen = 1;
+    uint32_t outBufLen = 1;
+    const char *inBuf = "1";
+    unsigned char outBuf[1] = {0};
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, outBufLen, inBuf, inLen);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_004
+ * @tc.desc: Test ConvertHexStringToBytes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_004, testing::ext::TestSize.Level0)
+{
+    uint32_t inLen = 2;
+    uint32_t outBufLen = 2;
+    const char *inBuf = "1G";
+    unsigned char outBuf[2] = {0};
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, outBufLen, inBuf, inLen);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_005
+ * @tc.desc: Test ConvertHexStringToBytes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_005, testing::ext::TestSize.Level0)
+{
+    uint32_t inLen = 2;
+    uint32_t outBufLen = 2;
+    const char *inBuf = "G1";
+    unsigned char outBuf[2] = {0};
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, outBufLen, inBuf, inLen);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_006
+ * @tc.desc: Test ConvertHexStringToBytes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_006, testing::ext::TestSize.Level0)
+{
+    uint32_t inLen = 2;
+    uint32_t outBufLen = 2;
+    const char *inBuf = "a1";
+    unsigned char outBuf[2] = {0};
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, outBufLen, inBuf, inLen);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_007
+ * @tc.desc: Test ConvertHexStringToBytes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_007, testing::ext::TestSize.Level0)
+{
+    uint32_t inLen = 2;
+    uint32_t outBufLen = 2;
+    const char *inBuf = "Aa";
+    unsigned char outBuf[2] = {0};
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, outBufLen, inBuf, inLen);
+    EXPECT_EQ(ret, DM_OK);
+}
+
+/**
+ * @tc.name: ConvertHexStringToBytes_008
+ * @tc.desc: Test ConvertHexStringToBytes
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DmDistributedHardwareLoadTest, ConvertHexStringToBytes_008, testing::ext::TestSize.Level0)
+{
+    uint32_t inLen = 2;
+    uint32_t outBufLen = 2;
+    const char *inBuf = "AA";
+    unsigned char outBuf[2] = {0};
+    auto ret = Crypto::ConvertHexStringToBytes(outBuf, outBufLen, inBuf, inLen);
+    EXPECT_EQ(ret, DM_OK);
+}
+}  // namespace DistributedHardware
+}  // namespace OHOS

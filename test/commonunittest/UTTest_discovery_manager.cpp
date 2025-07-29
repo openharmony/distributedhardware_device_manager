@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -369,6 +369,38 @@ HWTEST_F(DiscoveryManagerTest, CloseCommonDependencyObj_002, testing::ext::TestS
 {
     bool ret = manager->CloseCommonDependencyObj();
     EXPECT_EQ(ret, true);
+}
+
+/* *
+ * @tc.name: StopDiscoveringByInnerSubId_001
+ * @tc.desc: Test StopDiscoveringByInnerSubId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DiscoveryManagerTest, StopDiscoveringByInnerSubId_001, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    uint16_t subscribeId = 0;
+    int32_t ret = manager->StopDiscoveringByInnerSubId(pkgName, subscribeId);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/* *
+ * @tc.name: StopDiscoveringByInnerSubId_002
+ * @tc.desc: Test StopDiscoveringByInnerSubId
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(DiscoveryManagerTest, StopDiscoveringByInnerSubId_002, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "pkgName";
+    uint16_t subscribeId = 0;
+    manager->pkgNameSet_.insert(pkgName);
+    DiscoveryContext context;
+    manager->discoveryContextMap_.emplace(pkgName, context);
+    int32_t ret = manager->StopDiscoveringByInnerSubId(pkgName, subscribeId);
+
+    EXPECT_EQ(checkSoftbusRes(ret), false);
 }
 } // namespace
 } // namespace DistributedHardware

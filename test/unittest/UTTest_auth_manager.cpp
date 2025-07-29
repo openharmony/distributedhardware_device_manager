@@ -196,5 +196,165 @@ HWTEST_F(AuthManagerTest, OnUserOperation_007, testing::ext::TestSize.Level1)
 
     EXPECT_EQ(ret, DM_OK);
 }
+
+/* *
+ * @tc.name: RegisterUiStateCallback_001
+ * @tc.desc: Test RegisterUiStateCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, RegisterUiStateCallback_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos_test";
+    authManager->context_->authUiStateMgr = nullptr;
+    int32_t ret = authManager->RegisterUiStateCallback(pkgName);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/* *
+ * @tc.name: RegisterUiStateCallback_002
+ * @tc.desc: Test RegisterUiStateCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, RegisterUiStateCallback_002, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos_test";
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    authManager->context_->authUiStateMgr = std::make_shared<AuthUiStateManager>(listener);
+    int32_t ret = authManager->RegisterUiStateCallback(pkgName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/* *
+ * @tc.name: UnRegisterUiStateCallback_001
+ * @tc.desc: Test UnRegisterUiStateCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, UnRegisterUiStateCallback_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos_test";
+    authManager->context_->authUiStateMgr = nullptr;
+    int32_t ret = authManager->UnRegisterUiStateCallback(pkgName);
+    ASSERT_EQ(ret, ERR_DM_FAILED);
+}
+
+/* *
+ * @tc.name: UnRegisterUiStateCallback_002
+ * @tc.desc: Test UnRegisterUiStateCallback
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, UnRegisterUiStateCallback_002, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos_test";
+    std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    authManager->context_->authUiStateMgr = std::make_shared<AuthUiStateManager>(listener);
+    int32_t ret = authManager->UnRegisterUiStateCallback(pkgName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/* *
+ * @tc.name: ImportAuthCode_001
+ * @tc.desc: Test ImportAuthCode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ImportAuthCode_001, testing::ext::TestSize.Level1)
+{
+    std::string authCode = "";
+    std::string pkgName = "pkgName";
+    int32_t ret = authManager->ImportAuthCode(authCode, pkgName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/* *
+ * @tc.name: ImportAuthCode_002
+ * @tc.desc: Test ImportAuthCode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ImportAuthCode_002, testing::ext::TestSize.Level1)
+{
+    std::string authCode = "123456";
+    std::string pkgName = "";
+    int32_t ret = authManager->ImportAuthCode(authCode, pkgName);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+/* *
+ * @tc.name: ImportAuthCode_003
+ * @tc.desc: Test ImportAuthCode
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, ImportAuthCode_003, testing::ext::TestSize.Level1)
+{
+    std::string authCode = "123456";
+    std::string pkgName = "pkgName";
+    int32_t ret = authManager->ImportAuthCode(authCode, pkgName);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+/* *
+ * @tc.name: IsAuthCodeReady_001
+ * @tc.desc: Test IsAuthCodeReady
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, IsAuthCodeReady_001, testing::ext::TestSize.Level1)
+{
+    std::string pkgName;
+    authManager->context_->importAuthCode = "";
+    authManager->context_->importPkgName = "importPkgName";
+    bool ret = authManager->IsAuthCodeReady(pkgName);
+    ASSERT_EQ(ret, false);
+}
+
+/* *
+ * @tc.name: IsAuthCodeReady_002
+ * @tc.desc: Test IsAuthCodeReady
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, IsAuthCodeReady_002, testing::ext::TestSize.Level1)
+{
+    std::string pkgName;
+    authManager->context_->importAuthCode = "importAuthCode";
+    authManager->context_->importPkgName = "";
+    bool ret = authManager->IsAuthCodeReady(pkgName);
+    ASSERT_EQ(ret, false);
+}
+
+/* *
+ * @tc.name: IsAuthCodeReady_003
+ * @tc.desc: Test IsAuthCodeReady
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, IsAuthCodeReady_003, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "pkgName";
+    authManager->context_->importAuthCode = "importAuthCode";
+    authManager->context_->importPkgName = "importPkgName";
+    bool ret = authManager->IsAuthCodeReady(pkgName);
+    ASSERT_EQ(ret, false);
+}
+
+/* *
+ * @tc.name: IsAuthCodeReady_004
+ * @tc.desc: Test IsAuthCodeReady
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(AuthManagerTest, IsAuthCodeReady_004, testing::ext::TestSize.Level1)
+{
+    std::string pkgName = "ohos_test";
+    authManager->context_->importAuthCode = "importAuthCode";
+    authManager->context_->importPkgName = "ohos_test";
+    bool ret = authManager->IsAuthCodeReady(pkgName);
+    ASSERT_EQ(ret, true);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
