@@ -423,8 +423,7 @@ DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(uint64_t displayId
         return userId;
     }
 #ifdef OS_ACCOUNT_PART_EXISTS
-    int32_t ret = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(
-        static_cast<uint64_t>(displayId), userId);
+    int32_t ret = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(displayId, userId);
     if (ret != DM_OK) {
         LOGE("GetForegroundOsAccountLocalId failed ret %{public}d.", ret);
     }
