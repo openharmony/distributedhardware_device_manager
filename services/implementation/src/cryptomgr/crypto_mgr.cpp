@@ -214,7 +214,7 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
     }
 
     if (inputMsgBytesLen < OVERHEAD_LEN) {
-        LOGE("invalid para");
+        LOGE("invalid para.");
         return ERR_DM_CRYPTO_PARA_INVALID;
     }
     uint32_t outLen = inputMsgBytesLen - OVERHEAD_LEN + 1; /* for '\0' */
