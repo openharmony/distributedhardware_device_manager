@@ -419,12 +419,22 @@ HWTEST_F(HichainConnectorTest, onRequest_003, testing::ext::TestSize.Level1)
     EXPECT_CALL(*mockCallback, GetPinCode(testing::_))
         .Times(1)
         .WillOnce(testing::Return(ERR_DM_FAILED));
-    EXPECT_NE(hiChainConnector->onRequest(requestId, operationCode, reqParams), nullptr);
+    char *ret1 = hiChainConnector->onRequest(requestId, operationCode, reqParams);
+    EXPECT_NE(ret1, nullptr);
+    if (ret1 != nullptr) {
+        free(ret1);
+        ret1 = nullptr;
+    }
 
     EXPECT_CALL(*mockCallback, GetPinCode(testing::_))
         .Times(1)
         .WillOnce(testing::Return(DM_OK));
-    EXPECT_NE(hiChainConnector->onRequest(requestId, operationCode, reqParams), nullptr);
+    char *ret2 = hiChainConnector->onRequest(requestId, operationCode, reqParams);
+    EXPECT_NE(ret2, nullptr);
+    if (ret2 != nullptr) {
+        free(ret2);
+        ret2 = nullptr;
+    }
 }
 
 /**

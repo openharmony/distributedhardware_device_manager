@@ -254,6 +254,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_001, testing::
     uint32_t len = 0;
     bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
     ASSERT_EQ(result, false);
+    if (msgPtr != nullptr) {
+        delete[] msgPtr;
+        msgPtr = nullptr;
+    }
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_002, testing::ext::TestSize.Level1)
@@ -266,6 +270,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToSyncFrontOrBackUserIdPayLoad_002, testing::
     msg.syncUserIdFlag = true;
     bool result = msg.ToSyncFrontOrBackUserIdPayLoad(msgPtr, len);
     ASSERT_EQ(result, true);
+    if (msgPtr != nullptr) {
+        delete[] msgPtr;
+        msgPtr = nullptr;
+    }
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, FromAccountLogoutPayLoad_001, testing::ext::TestSize.Level1)
@@ -1003,8 +1011,8 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_001, testing::ext::TestSiz
     ASSERT_TRUE(result);
     ASSERT_NE(msgPtr, nullptr);
     ASSERT_GT(len, 0);
-    
     delete[] msgPtr;
+    msgPtr = nullptr;
 
     msg.userId = 0;
     msg.accountId = "test_01";
@@ -1013,6 +1021,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_001, testing::ext::TestSiz
     result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(len, 9);
     EXPECT_EQ(result, true);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
 }
 
 /**
@@ -1033,8 +1045,8 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_002, testing::ext::TestSiz
     ASSERT_TRUE(result);
     ASSERT_NE(msgPtr, nullptr);
     ASSERT_GT(len, 0);
-
     delete[] msgPtr;
+    msgPtr = nullptr;
 
     msg.userId = 1;
     msg.accountId = "test";
@@ -1042,6 +1054,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_002, testing::ext::TestSiz
     len = 0;
     result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, true);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
 }
 
 /**
@@ -1062,8 +1078,8 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_003, testing::ext::TestSiz
     ASSERT_TRUE(result);
     ASSERT_NE(msgPtr, nullptr);
     ASSERT_GT(len, 0);
-    
     delete[] msgPtr;
+    msgPtr = nullptr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_004, testing::ext::TestSize.Level1)
@@ -1080,8 +1096,8 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_004, testing::ext::TestSiz
     ASSERT_TRUE(result);
     ASSERT_NE(msgPtr, nullptr);
     ASSERT_GT(len, 0);
-    
     delete[] msgPtr;
+    msgPtr = nullptr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_005, testing::ext::TestSize.Level1)
@@ -1106,6 +1122,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_005, testing::ext::TestSiz
     len = 0;
     result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, false);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
 }
 
 /**
@@ -1122,6 +1142,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_006, testing::ext::TestSiz
     uint32_t len = 0;
     bool result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, true);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
 }
 
 /**
@@ -1142,6 +1166,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_007, testing::ext::TestSiz
     uint32_t len = 0;
     bool result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, true);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
 }
 
 /**
@@ -1153,16 +1181,16 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_008, testing::ext::TestSiz
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::DEL_USER;
     msg.userId = 12345;
-    
+
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
-    
+
     bool result = msg.ToBroadcastPayLoad(msgPtr, len);
     ASSERT_TRUE(result);
     ASSERT_NE(msgPtr, nullptr);
     ASSERT_GT(len, 0);
-    
     delete[] msgPtr;
+    msgPtr = nullptr;
 
     msg.userId = 7;
     msg.accountId = "test";
@@ -1170,6 +1198,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_008, testing::ext::TestSiz
     len = 0;
     result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, true);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
 }
 
 /**
@@ -1181,16 +1213,16 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_009, testing::ext::TestSiz
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::STOP_USER;
     msg.userId = 12345;
-    
+
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
-    
+
     bool result = msg.ToBroadcastPayLoad(msgPtr, len);
     ASSERT_TRUE(result);
     ASSERT_NE(msgPtr, nullptr);
     ASSERT_GT(len, 0);
-    
     delete[] msgPtr;
+    msgPtr = nullptr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_010, testing::ext::TestSize.Level1)
@@ -1199,15 +1231,15 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_010, testing::ext::TestSiz
     msg.type = RelationShipChangeType::SHARE_UNBIND;
     msg.userId = 12345;
     msg.peerUdids = {"udid1", "udid2"};
-    
+
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
-    
+
     bool result = msg.ToBroadcastPayLoad(msgPtr, len);
     ASSERT_TRUE(result);
     ASSERT_EQ(msgPtr, nullptr);
-    
     delete[] msgPtr;
+    msgPtr = nullptr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_011, testing::ext::TestSize.Level1)
@@ -1229,6 +1261,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_011, testing::ext::TestSiz
     len = 0;
     result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, false);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
 }
 
 /**
@@ -1245,6 +1281,10 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_012, testing::ext::TestSiz
     uint32_t len = 0;
     bool result = msg.ToBroadcastPayLoad(load, len);
     EXPECT_EQ(result, false);
+    if (load != nullptr) {
+        delete[] load;
+        load = nullptr;
+    }
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_013, testing::ext::TestSize.Level1)
@@ -1254,14 +1294,14 @@ HWTEST_F(ReleationShipSyncMgrTest, ToBroadcastPayLoad_013, testing::ext::TestSiz
     msg.userId = 12345;
     msg.tokenId = 67890;
     msg.peerUdids = {"udid1", "udid2"};
-    
+
     uint8_t* msgPtr = nullptr;
     uint32_t len = 0;
-    
+
     bool result = msg.ToBroadcastPayLoad(msgPtr, len);
     ASSERT_TRUE(result);
-    
     delete[] msgPtr;
+    msgPtr = nullptr;
 }
 
 HWTEST_F(ReleationShipSyncMgrTest, ToShareUnbindPayLoad_001, testing::ext::TestSize.Level1)

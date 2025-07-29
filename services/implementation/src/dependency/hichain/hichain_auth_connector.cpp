@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -382,10 +382,10 @@ int32_t HiChainAuthConnector::QueryCredentialInfo(int32_t userId, const JsonObje
 
     const CredManager *cm = GetCredMgrInstance();
     char *credIdList = nullptr;
-    ret = cm->queryCredentialByParams(userId, queryParams.Dump().c_str(),
-        &credIdList);
+    ret = cm->queryCredentialByParams(userId, queryParams.Dump().c_str(), &credIdList);
     if (ret != DM_OK) {
         LOGE("HiChainAuthConnector::QueryCredentialInfo fail to query credential id list with ret %{public}d.", ret);
+        FreeJsonString(credIdList);
         return ERR_DM_FAILED;
     }
     JsonObject credIdListJson(credIdList);
@@ -405,6 +405,7 @@ int32_t HiChainAuthConnector::QueryCredentialInfo(int32_t userId, const JsonObje
         ret = cm->queryCredInfoByCredId(userId, credId.c_str(), &returnCredInfo);
         if (ret != DM_OK) {
             LOGE("HiChainAuthConnector::QueryCredentialInfo fail to query credential info.");
+            FreeJsonString(returnCredInfo);
             return ERR_DM_FAILED;
         }
         JsonObject credInfoJson(returnCredInfo);
@@ -427,6 +428,7 @@ int32_t HiChainAuthConnector::QueryCredInfoByCredId(int32_t userId, std::string 
     int32_t ret = cm->queryCredInfoByCredId(userId, credId.c_str(), &returnCredInfo);
     if (ret != DM_OK) {
         LOGE("[HICHAIN]::QueryCredInfoByCredId failed, ret: %{public}d.", ret);
+        FreeJsonString(returnCredInfo);
         return ret;
     }
     JsonObject credInfoJson(returnCredInfo);

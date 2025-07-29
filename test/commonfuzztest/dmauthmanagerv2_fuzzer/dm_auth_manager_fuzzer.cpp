@@ -78,7 +78,11 @@ void DmAuthSrcManagerFuzzTest(const uint8_t* data, size_t size)
     authManager->DeleteGroup(str, str);
     authManager->AuthDeviceTransmit(g_requestId, data, size);
     authManager->AuthDeviceSessionKey(g_requestId, data, size);
-    authManager->AuthDeviceRequest(g_requestId, g_operationCode, str.c_str());
+    char *ret = authManager->AuthDeviceRequest(g_requestId, g_operationCode, str.c_str());
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
     authManager->OnDataReceived(g_sessionId, str);
     authManager->OnAuthDeviceDataReceived(g_sessionId, str);
 }
@@ -111,7 +115,11 @@ void DmAuthSinkManagerFuzzTest(const uint8_t* data, size_t size)
     authManager->DeleteGroup(str, str);
     authManager->AuthDeviceTransmit(g_requestId, data, size);
     authManager->AuthDeviceSessionKey(g_requestId, data, size);
-    authManager->AuthDeviceRequest(g_requestId, g_operationCode, str.c_str());
+    char *ret = authManager->AuthDeviceRequest(g_requestId, g_operationCode, str.c_str());
+    if (ret != nullptr) {
+        free(ret);
+        ret = nullptr;
+    }
     authManager->OnDataReceived(g_sessionId, str);
     authManager->OnAuthDeviceDataReceived(g_sessionId, str);
 }

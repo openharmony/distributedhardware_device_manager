@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,7 +53,10 @@ void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
             return;
         }
     }
-    cJSON_AddItemToObject(jsonObject, FOREGROUND_USERIDS_MSG_USERIDS_KEY, foregroundUserIdArr);
+    if (!cJSON_AddItemToObject(jsonObject, FOREGROUND_USERIDS_MSG_USERIDS_KEY, foregroundUserIdArr)) {
+        cJSON_Delete(foregroundUserIdArr);
+        return;
+    }
 
     cJSON *backgroundUserIdArr = cJSON_CreateArray();
     if (backgroundUserIdArr == nullptr) {
@@ -68,7 +71,10 @@ void ToJson(cJSON *jsonObject, const UserIdsMsg &userIdsMsg)
             return;
         }
     }
-    cJSON_AddItemToObject(jsonObject, BACKGROUND_USERIDS_MSG_USERIDS_KEY, backgroundUserIdArr);
+    if (!cJSON_AddItemToObject(jsonObject, BACKGROUND_USERIDS_MSG_USERIDS_KEY, backgroundUserIdArr)) {
+        cJSON_Delete(backgroundUserIdArr);
+        return;
+    }
     cJSON_AddBoolToObject(jsonObject, IS_NEW_EVENT_KEY, userIdsMsg.isNewEvent);
 }
 
@@ -185,7 +191,10 @@ void ToJson(cJSON *jsonObject, const NotifyUserIds &notifyUserIds)
             return;
         }
     }
-    cJSON_AddItemToObject(jsonObject, DSOFTBUS_NOTIFY_USERIDS_USERIDKEY, userIdArr);
+    if (!cJSON_AddItemToObject(jsonObject, DSOFTBUS_NOTIFY_USERIDS_USERIDKEY, userIdArr)) {
+        cJSON_Delete(userIdArr);
+        return;
+    }
 }
 
 void FromJson(const cJSON *jsonObject, NotifyUserIds &notifyUserIds)
