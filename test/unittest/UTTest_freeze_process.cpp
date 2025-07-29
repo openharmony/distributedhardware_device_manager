@@ -160,5 +160,35 @@ HWTEST_F(FreezeProcessTest, ConvertJsonToDeviceFreezeState_WhenAllExist, testing
     EXPECT_EQ(freezeStateObj.startFreezeTimeStamp, 1234567890);
     EXPECT_EQ(freezeStateObj.stopFreezeTimeStamp, 9876543210);
 }
+
+/* *
+ * @tc.name: CleanBindFailedEvents_001
+ * @tc.desc: Test CleanBindFailedEvents
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FreezeProcessTest, CleanBindFailedEvents_001, testing::ext::TestSize.Level0)
+{
+    int64_t reservedDataTimeStamp = 12;
+    FreezeProcess freezeProcess;
+    int32_t result = freezeProcess.CleanBindFailedEvents(reservedDataTimeStamp);
+
+    EXPECT_EQ(result, DM_OK);
+}
+
+/* *
+ * @tc.name: CleanFreezeState_001
+ * @tc.desc: Test CleanFreezeState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(FreezeProcessTest, CleanFreezeState_001, testing::ext::TestSize.Level0)
+{
+    int64_t reservedDataTimeStamp = 12;
+    FreezeProcess freezeProcess;
+    int32_t result = freezeProcess.CleanFreezeState(reservedDataTimeStamp);
+
+    EXPECT_EQ(result, DM_OK);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
