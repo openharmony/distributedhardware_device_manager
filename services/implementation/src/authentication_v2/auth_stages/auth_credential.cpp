@@ -651,7 +651,7 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
     std::string tmpCredId = "";
     int32_t osAccountId = context->accesser.userId;
     // First authentication
-    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         // Agree lnn credentials and public key
         tmpCredId = context->accesser.lnnCredentialId;
         ret = AgreeCredential(DM_AUTH_SCOPE_LNN, context);
@@ -664,10 +664,11 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
         ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
     }
     DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
-    if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
+    if (context->accesser.bindLevel == static_cast<int32_t>(APP) ||
+        context->accesser.bindLevel == static_cast<int32_t>(SERVICE)) {
         authorizedScope = DM_AUTH_SCOPE_APP;
     }
-    if (context->accesser.bindLevel == USER) {
+    if (context->accesser.bindLevel == static_cast<int32_t>(USER)) {
         authorizedScope = DM_AUTH_SCOPE_USER;
     }
     // Agree transport credentials and public key
@@ -731,7 +732,7 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     // First authentication lnn cred
-    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         int32_t skId = 0;
         // derive lnn sk
         std::string suffix = context->accesser.lnnCredentialId + context->accessee.lnnCredentialId;
@@ -843,7 +844,7 @@ int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     // First authentication lnn cred
-    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != USER) {
+    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
         int32_t skId = 0;
         // derive lnn sk
         std::string suffix = context->accesser.lnnCredentialId + context->accessee.lnnCredentialId;
