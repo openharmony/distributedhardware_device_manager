@@ -21,8 +21,7 @@ public:
     virtual ~IDMDeviceRiskDetect() = default;
     virtual int32_t Initialize() = 0;
     virtual int32_t Release() = 0;
-    virtual int32_t DetectDeviceRisk(std::string &efuse, std::string &fastbootLock,
-        std::string &processPrivilege, std::string &rootPackage) = 0;
+    virtual bool IsDeviceHasRisk() = 0;
 };
 
 using CreateDMDeviceRiskDetectFuncPtr = IDMDeviceRiskDetect *(*)(void);

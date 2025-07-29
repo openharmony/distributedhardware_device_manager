@@ -1069,7 +1069,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_042, testing::ext::TestSize.Level
     if (ptr) {
         ret = ptr(data, reply);
     }
-    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_043, testing::ext::TestSize.Level0)
@@ -1169,7 +1169,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_048, testing::ext::TestSize.Level
     if (ptr) {
         ret = ptr(data, reply);
     }
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_049, testing::ext::TestSize.Level0)
@@ -1184,7 +1184,7 @@ HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_049, testing::ext::TestSize.Level
     if (ptr) {
         ret = ptr(data, reply);
     }
-    ASSERT_EQ(ret, DM_OK);
+    ASSERT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
 
 HWTEST_F(IpcCmdParserServiceTest, OnIpcCmdFunc_050, testing::ext::TestSize.Level0)

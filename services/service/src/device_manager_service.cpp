@@ -169,27 +169,13 @@ void DeviceManagerService::StartDetectDeviceRisk()
         LOGE("load dm device risk detect failed.");
         return;
     }
-    std::string efuse;
-    std::string fastbootLock;
-    std::string processPrivilege;
-    std::string rootPackage;
-    int32_t ret = dmDeviceRiskDetect_->DetectDeviceRisk(efuse, fastbootLock, processPrivilege, rootPackage);
-    if (ret != DM_OK) {
-        LOGE("DetectDeviceRisk failed. ret:%{public}d", ret);
-        return;
-    }
-    LOGI("efuse:%{public}s, fastbootLock:%{public}s, processPrivilege:%{public}s, rootPackage:%{public}s",
-        efuse.c_str(), fastbootLock.c_str(), processPrivilege.c_str(), rootPackage.c_str());
-    if (efuse == DM_RISK || (efuse == DM_SAFE && fastbootLock == DM_RISK)) {
-        LOGI("device status is development");
-        return;
-    } else if (processPrivilege == DM_RISK || rootPackage == DM_RISK) {
+
+    bool isRisk = dmDeviceRiskDetect_->IsDeviceHasRisk();
+    if (isRisk) {
         LOGI("device status is Illegal");
         DelAllRelateShip();
-    } else {
-        LOGI("device status is Commercial");
-        return;
     }
+    return;
 }
 
 void DeviceManagerService::DelAllRelateShip()
@@ -958,7 +944,7 @@ std::set<std::pair<std::string, std::string>> DeviceManagerService::GetProxyInfo
         return proxyInfos;
     }
     int64_t proxyTokenId = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
-    for (const auto &object : allProxyObj.Items()) {
+    for (auto object : allProxyObj.Items()) {
         if (!object.Contains(TAG_BUNDLE_NAME) || !IsString(object, TAG_BUNDLE_NAME)) {
             continue;
         }
@@ -969,6 +955,7 @@ std::set<std::pair<std::string, std::string>> DeviceManagerService::GetProxyInfo
         int64_t agentTokenId = object[TAG_TOKENID].Get<int64_t>();
         for (uint32_t i = 0; i < agentToProxyVec.size(); i++) {
             if (agentTokenId == agentToProxyVec[i].first && proxyTokenId == agentToProxyVec[i].second) {
+                object[PARAM_KEY_IS_PROXY_UNBIND] = DM_VAL_TRUE;
                 proxyInfos.insert(std::pair<std::string, std::string>(bundleName, object.Dump()));
                 break;
             }
@@ -3254,9 +3241,14 @@ void DeviceManagerService::HandleCredentialDeleted(const char *credId, const cha
         return;
     }
     std::string remoteUdid = "";
-    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid);
+    bool isSendBroadCast = false;
+    dmServiceImpl_->HandleCredentialDeleted(credId, credInfo, localUdid, remoteUdid, isSendBroadCast);
     if (remoteUdid.empty()) {
         LOGE("HandleCredentialDeleted failed, remoteUdid is empty.");
+        return;
+    }
+    if (!isSendBroadCast) {
+        LOGI("HandleCredentialDeleted not need to send broadcast.");
         return;
     }
     std::vector<std::string> peerUdids;
@@ -4582,7 +4574,8 @@ void DeviceManagerService::GetHoOsTypeUdids(std::vector<std::string> &peerUdids)
             LOGE("osTypeObj value invalid.");
             continue;
         }
-        if (osTypeObj[PEER_OSTYPE].Get<int32_t>() == DM_HO_OSTYPE) {
+        if (osTypeObj[PEER_OSTYPE].Get<int32_t>() == OLD_DM_HO_OSTYPE ||
+            osTypeObj[PEER_OSTYPE].Get<int32_t>() == NEW_DM_HO_OSTYPE) {
             peerUdids.push_back(osTypeObj[PEER_UDID].Get<std::string>());
         }
     }

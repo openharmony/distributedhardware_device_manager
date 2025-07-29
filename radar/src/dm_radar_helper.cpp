@@ -249,7 +249,7 @@ int32_t DmRadarHelper::ReportDiscoverUserResStageOther(struct RadarInfo &info)
         DM_DISCOVER_BEHAVIOR, HISYSEVENT_BEHAVIOR, params, len);
 }
 
-bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo &info)
+bool DmRadarHelper::ReportDiscoverUserRes(struct RadarInfo info)
 {
     int32_t res = DM_OK;
     if (info.stageRes == static_cast<int32_t>(StageRes::STAGE_CANCEL)) {

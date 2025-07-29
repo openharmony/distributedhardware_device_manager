@@ -32,21 +32,21 @@
             "name":"dm_confirm_intention",
             "value":"Cần làm như vậy để đồng bộ và phối hợp dữ liệu trên nhiều thiết bị.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"Tin tưởng lần này",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"Luôn tin tưởng",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -59,6 +59,69 @@
         {
             "name":"dm_confirm_proxy",
             "value":"\"%s\" muốn kết nối với thiết bị này. Vui lòng chọn những dịch vụ nào mà ứng dụng này có thể truy cập:",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"Nhập mã kết nối hiển thị trên thiết bị còn lại.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s muốn phản chiếu màn hình của mình lên thiết bị của bạn. Tin cậy thiết bị này?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s Tin cậy thiết bị này?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"Mật khẩu không chính xác. Kết nối không thành công.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"Đang xác thực…",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s muốn kết nối với thiết bị của bạn.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"Cần bật Bluetooth để kết nối với một thiết bị khác. Vui lòng bật Bluetooth và thử lại.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"Kết nối tới %s",
             "attr":{
                 "priority":"translate"
             }

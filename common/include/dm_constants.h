@@ -171,8 +171,6 @@ DM_EXPORT extern const char* DM_VAL_FALSE;
 DM_EXPORT extern const char* APP_USER_DATA;
 DM_EXPORT extern const char* BUNDLE_INFO;
 DM_EXPORT extern const char* DM_BUSINESS_ID;
-DM_EXPORT extern const char* DM_RISK;
-DM_EXPORT extern const char* DM_SAFE;
 
 // screen state
 enum ScreenState {
@@ -184,6 +182,7 @@ enum ScreenState {
 // errCode map
 DM_EXPORT extern const std::map<int32_t, int32_t> MAP_ERROR_CODE;
 // wise device
+DM_EXPORT extern const int32_t MAX_CONTAINER_SIZE;
 DM_EXPORT extern const int32_t MAX_DEVICE_PROFILE_SIZE;
 const int32_t DEVICE_NAME_MAX_BYTES = 100;
 
@@ -199,10 +198,12 @@ extern const char* DM_VERSION_5_0_5;
 extern const char* DM_VERSION_5_1_0;
 extern const char* DM_VERSION_5_1_1;
 extern const char* DM_VERSION_5_1_2;
+extern const char* DM_VERSION_5_1_3;
 extern const char* DM_CURRENT_VERSION;
 extern const char* DM_ACL_AGING_VERSION;
 extern const char* DM_VERSION_5_0_OLD_MAX;      // Estimated highest version number of the old version
-extern const int32_t DM_HO_OSTYPE;
+extern const int32_t OLD_DM_HO_OSTYPE;
+extern const int32_t NEW_DM_HO_OSTYPE;
 extern const int32_t DM_OH_OSTYPE;
 extern const char* PEER_UDID;
 extern const char* PEER_OSTYPE;

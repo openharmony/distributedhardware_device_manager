@@ -161,8 +161,6 @@ const char* DM_VAL_FALSE = "false";
 const char* APP_USER_DATA = "appUserData";
 const char* BUNDLE_INFO = "bundleInfo";
 const char* DM_BUSINESS_ID = "business_id";
-const char* DM_RISK = "risk";
-const char* DM_SAFE = "safe";
 
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
@@ -174,6 +172,7 @@ const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
 };
 
 // wise device
+const int32_t MAX_CONTAINER_SIZE = 1000;
 const int32_t MAX_DEVICE_PROFILE_SIZE = 500;
 const char* ACL_IS_LNN_ACL_KEY = "IsLnnAcl";
 const char* ACL_IS_LNN_ACL_VAL_TRUE = "true";
@@ -187,10 +186,12 @@ const char* DM_VERSION_5_0_5 = "5.0.5";
 const char* DM_VERSION_5_1_0 = "5.1.0";
 const char* DM_VERSION_5_1_1 = "5.1.1";
 const char* DM_VERSION_5_1_2 = "5.1.2";
-const char* DM_CURRENT_VERSION = DM_VERSION_5_1_2;
+const char* DM_VERSION_5_1_3 = "5.1.3";
+const char* DM_CURRENT_VERSION = DM_VERSION_5_1_3;
 const char* DM_ACL_AGING_VERSION = DM_VERSION_5_1_0;
 const char* DM_VERSION_5_0_OLD_MAX = "5.0.99";       // Estimated highest version number of the old version
-const int32_t DM_HO_OSTYPE = -1;
+const int32_t OLD_DM_HO_OSTYPE = -1;
+const int32_t NEW_DM_HO_OSTYPE = 11;
 const int32_t DM_OH_OSTYPE = 10;
 const char* PEER_UDID = "peer_udid";
 const char* PEER_OSTYPE = "peer_ostype";

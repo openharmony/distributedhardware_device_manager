@@ -73,7 +73,6 @@ void PrintProfile(const AccessControlProfile &profile)
     std::string acerDeviceId = profile.GetAccesser().GetAccesserDeviceId();
     int32_t acerUserId = profile.GetAccesser().GetAccesserUserId();
     std::string acerAccountId = profile.GetAccesser().GetAccesserAccountId();
-    int32_t acerTokenId = static_cast<int32_t>(profile.GetAccesser().GetAccesserTokenId());
     std::string acerPkgName = profile.GetAccesser().GetAccesserBundleName();
     std::string acerCredId = profile.GetAccesser().GetAccesserCredentialIdStr();
     int32_t acerSkId = profile.GetAccesser().GetAccesserSessionKeyId();
@@ -81,18 +80,17 @@ void PrintProfile(const AccessControlProfile &profile)
     std::string aceeDeviceId = profile.GetAccessee().GetAccesseeDeviceId();
     int32_t aceeUserId = profile.GetAccessee().GetAccesseeUserId();
     std::string aceeAccountId = profile.GetAccessee().GetAccesseeAccountId();
-    int32_t aceeTokenId = static_cast<int32_t>(profile.GetAccessee().GetAccesseeTokenId());
     std::string aceePkgName = profile.GetAccessee().GetAccesseeBundleName();
     std::string aceeCredId = profile.GetAccessee().GetAccesseeCredentialIdStr();
     int32_t aceeSkId = profile.GetAccessee().GetAccesseeSessionKeyId();
 
     LOGI("bindType %{public}d, bindLevel %{public}d, acerDeviceId %{public}s, acerUserId %{public}d,"
-        "acerAccountId %{public}s, acerTokenId %{public}d, acerPkgName %{public}s, acerCredId %{public}s,"
+        "acerAccountId %{public}s, acerPkgName %{public}s, acerCredId %{public}s,"
         "acerSkId %{public}d, aceeDeviceId %{public}s, aceeUserId %{public}d, aceeAccountId %{public}s,"
-        "aceeTokenId %{public}d, aceePkgName %{public}s, aceeCredId %{public}s, aceeSkId %{public}d.",
+        "aceePkgName %{public}s, aceeCredId %{public}s, aceeSkId %{public}d.",
         bindType, bindLevel, GetAnonyString(acerDeviceId).c_str(), acerUserId, GetAnonyString(acerAccountId).c_str(),
-        acerTokenId, acerPkgName.c_str(), GetAnonyString(acerCredId).c_str(), acerSkId,
-        GetAnonyString(aceeDeviceId).c_str(), aceeUserId, GetAnonyString(aceeAccountId).c_str(), aceeTokenId,
+        acerPkgName.c_str(), GetAnonyString(acerCredId).c_str(), acerSkId,
+        GetAnonyString(aceeDeviceId).c_str(), aceeUserId, GetAnonyString(aceeAccountId).c_str(),
         aceePkgName.c_str(), GetAnonyString(aceeCredId).c_str(), aceeSkId);
 }
 
@@ -1476,12 +1474,12 @@ void DeviceProfileConnector::DeleteAppBindLevel(DmOfflineParam &offlineParam, co
     const std::vector<AccessControlProfile> &profiles, const std::string &localUdid,
     const std::string &remoteUdid, const std::string &extra)
 {
-    LOGI("DeviceProfileConnector::DeleteAppBindLevel extra %{public}s", extra.c_str());
     int32_t bindNums = 0;
     int32_t deleteNums = 0;
     uint64_t peerTokenId = 0;
     std::string peerBundleName;
     JsonStrHandle::GetInstance().GetPeerAppInfoParseExtra(extra, peerTokenId, peerBundleName);
+    LOGI("DeviceProfileConnector::DeleteAppBindLevel peerBundleName %{public}s", peerBundleName.c_str());
     for (auto &item : profiles) {
         if (item.GetTrustDeviceId() != remoteUdid || item.GetBindType() == DM_IDENTICAL_ACCOUNT ||
             item.GetBindLevel() != APP) {
@@ -1825,11 +1823,11 @@ DM_EXPORT bool DeviceProfileConnector::CheckAccessControl(
     const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
-        "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
-        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
+        "sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
+        caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter =
@@ -1903,11 +1901,11 @@ DM_EXPORT bool DeviceProfileConnector::CheckIsSameAccount(
     const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s,"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
-        "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
-        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
+        "sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
+        caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter
@@ -1928,8 +1926,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckIsSameAccount(
 DM_EXPORT int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgName,
     const std::string &localUdid, const std::string &udid, uint64_t &tokenId)
 {
-    LOGI("pkgName %{public}s, tokenId %{public}" PRId64", udid %{public}s.", pkgName.c_str(),
-        tokenId, GetAnonyString(udid).c_str());
+    LOGI("pkgName %{public}s, udid %{public}s.", pkgName.c_str(), GetAnonyString(udid).c_str());
     std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(localUdid,
         MultipleUserConnector::GetFirstForegroundUserId());
     int32_t bindLevel = INVALIED_TYPE;
@@ -1942,7 +1939,7 @@ DM_EXPORT int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgNam
             item.GetAccessee().GetAccesseeDeviceId() == udid) {
             tokenId = static_cast<uint64_t>(item.GetAccesser().GetAccesserTokenId());
             bindLevel = static_cast<int32_t>(item.GetBindLevel());
-            LOGI("Src get bindLevel %{public}d, tokenid %{public}" PRId64".", bindLevel, tokenId);
+            LOGI("Src get bindLevel %{public}d.", bindLevel);
             continue;
         }
         if (item.GetAccessee().GetAccesseeBundleName() == pkgName &&
@@ -1950,7 +1947,7 @@ DM_EXPORT int32_t DeviceProfileConnector::GetBindLevel(const std::string &pkgNam
             item.GetAccesser().GetAccesserDeviceId() == udid) {
             tokenId = static_cast<uint64_t>(item.GetAccessee().GetAccesseeTokenId());
             bindLevel = static_cast<int32_t>(item.GetBindLevel());
-            LOGI("Sink get bindLevel %{public}d, tokenid %{public}" PRId64".", bindLevel, tokenId);
+            LOGI("Sink get bindLevel %{public}d.", bindLevel);
             continue;
         }
     }
@@ -2136,8 +2133,8 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUse
 DM_EXPORT DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
     const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid)
 {
-    LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}d, localUdid %{public}s.",
-        remoteUserId, GetAnonyString(remoteUdid).c_str(), tokenId, GetAnonyString(localUdid).c_str());
+    LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, localUdid %{public}s.",
+        remoteUserId, GetAnonyString(remoteUdid).c_str(), GetAnonyString(localUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(remoteUdid, remoteUserId, localUdid);
     DmOfflineParam offlineParam;
     if (profiles.empty()) {
@@ -2213,8 +2210,8 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
 DM_EXPORT DmOfflineParam DeviceProfileConnector::HandleAppUnBindEvent(int32_t remoteUserId,
     const std::string &remoteUdid, int32_t tokenId, const std::string &localUdid, int32_t peerTokenId)
 {
-    LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}d, localUdid %{public}s.",
-        remoteUserId, GetAnonyString(remoteUdid).c_str(), tokenId, GetAnonyString(localUdid).c_str());
+    LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, localUdid %{public}s.",
+        remoteUserId, GetAnonyString(remoteUdid).c_str(), GetAnonyString(localUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(remoteUdid, remoteUserId, localUdid);
     DmOfflineParam offlineParam;
     if (profiles.empty()) {
@@ -2291,8 +2288,8 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
 DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUserId,
     const std::string &remoteUdid, const std::string &localUdid, int32_t tokenId)
 {
-    LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, tokenId %{public}d, localUdid %{public}s.",
-        remoteUserId, GetAnonyString(remoteUdid).c_str(), tokenId, GetAnonyString(localUdid).c_str());
+    LOGI("RemoteUserId %{public}d, remoteUdid %{public}s, localUdid %{public}s.",
+        remoteUserId, GetAnonyString(remoteUdid).c_str(), GetAnonyString(localUdid).c_str());
     std::vector<AccessControlProfile> profiles = GetAclProfileByDeviceIdAndUserId(remoteUdid, remoteUserId, localUdid);
     DmOfflineParam offlineParam;
     if (profiles.empty()) {
@@ -3110,11 +3107,11 @@ DM_EXPORT int32_t DeviceProfileConnector::HandleAccountCommonEvent(
 DM_EXPORT bool DeviceProfileConnector::CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s,"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
-        "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
-        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
+        "sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
+        caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
@@ -3235,11 +3232,11 @@ bool DeviceProfileConnector::CheckSrcP2PAccessControl(const DistributedDevicePro
 DM_EXPORT bool DeviceProfileConnector::CheckSinkAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s,"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
-        "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
-        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
+        "sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
+        caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
@@ -3392,11 +3389,11 @@ bool DeviceProfileConnector::CheckSinkAppOrServiceP2PAcl(const DistributedDevice
 DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, "
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
-        "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
-        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
+        "sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
+        caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
@@ -3417,11 +3414,11 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCalle
 DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcTokenId %{public}d,"
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s,"
         "srcAccountId %{public}s, sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s,"
-        "sinkTokenId %{public}d, sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
-        caller.pkgName.c_str(), static_cast<int32_t>(caller.tokenId), GetAnonyString(caller.accountId).c_str(),
-        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(), static_cast<int32_t>(callee.tokenId),
+        "sinkAccountId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
+        caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
+        GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();

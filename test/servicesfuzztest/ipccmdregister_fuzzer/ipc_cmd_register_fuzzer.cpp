@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <fuzzer/FuzzedDataProvider.h>
 #include "ipc_cmd_register_fuzzer.h"
 
 #include <chrono>
@@ -41,11 +43,15 @@ void IpcCmdRegisterFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
+    std::string pkgNameStr = fdp.ConsumeRandomLengthString(50);
+    req->SetPkgName(pkgNameStr);
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     MessageParcel data1;
     MessageParcel reply1;
+    data1.WriteString(pkgNameStr);
 
     IpcCmdRegister::GetInstance().SetRequest(cmdCode, req, data1);
     IpcCmdRegister::GetInstance().ReadResponse(cmdCode, data1, rsp);

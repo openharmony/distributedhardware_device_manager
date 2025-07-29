@@ -17,6 +17,7 @@
 
 #include "dm_error_type.h"
 #include "dm_log.h"
+#include "dm_constants.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "account_info.h"
 #include "ipc_skeleton.h"
@@ -208,6 +209,10 @@ DM_EXPORT void MultipleUserConnector::SetAccountInfo(int32_t userId,
     DMAccountInfo dmAccountInfo)
 {
     std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
+    if (dmAccountInfoMap_.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("dmAccountInfoMap_ size is more than max size");
+        return;
+    }
     dmAccountInfoMap_[userId] = dmAccountInfo;
 }
 

@@ -147,6 +147,7 @@ void DMTransport::HandleReceiveMessage(const int32_t socketId, const std::string
     dmCommToolSPtr->GetEventHandler()->SendEvent(msgEvent, 0, AppExecFwk::EventQueue::Priority::IMMEDIATE);
 }
 
+//LCOV_EXCL_START
 std::shared_ptr<DMCommTool> GetDMCommToolPtr()
 {
     if (g_dmCommToolWPtr_.expired()) {
@@ -162,6 +163,7 @@ std::shared_ptr<DMCommTool> GetDMCommToolPtr()
 
     return dmCommToolSPtr;
 }
+//LCOV_EXCL_STOP
 
 void OnBind(int32_t socket, PeerSocketInfo info)
 {

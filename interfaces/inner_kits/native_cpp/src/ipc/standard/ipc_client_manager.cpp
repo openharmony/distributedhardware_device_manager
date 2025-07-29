@@ -20,6 +20,7 @@
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
 #include "device_manager_impl.h"
+#include "dm_constants.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
 #include "dm_service_load.h"
@@ -83,6 +84,10 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     if (ret != DM_OK) {
         LOGE("InitDeviceManager Failed with ret %{public}d", ret);
         return ret;
+    }
+    if (dmListener_.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("dmListener_ size is more than max size");
+        return ERR_DM_FAILED;
     }
 
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());

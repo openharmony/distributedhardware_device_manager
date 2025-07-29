@@ -73,10 +73,10 @@ bool DeviceManagerServiceImpl::CheckSharePeerSrc(const std::string &peerUdid, co
 }
 
 void DeviceManagerServiceImpl::HandleCredentialDeleted(const char *credId,
-    const char *credInfo, const std::string &localUdid, std::string &remoteUdid)
+    const char *credInfo, const std::string &localUdid, std::string &remoteUdid, bool &isSendBroadCast)
 {
     DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->HandleCredentialDeleted(credId,
-        credInfo, localUdid, remoteUdid);
+        credInfo, localUdid, remoteUdid, isSendBroadCast);
 }
 void DeviceManagerServiceImpl::HandleShareUnbindBroadCast(const std::string &credId,
     const int32_t &userId, const std::string &localUdid)

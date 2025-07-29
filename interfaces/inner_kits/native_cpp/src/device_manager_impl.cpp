@@ -415,8 +415,8 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName, 
         return ret;
     }
 #endif
-    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK, anonyLocalUdid_);
     LOGI("Completed");
     return DM_OK;
@@ -432,8 +432,8 @@ int32_t DeviceManagerImpl::RegisterDevStatusCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
-    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStatusCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStatusCallback", DM_OK, anonyLocalUdid_);
     LOGI("Completed");
     return DM_OK;
@@ -689,7 +689,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
     DeviceManagerNotify::GetInstance().RegisterAuthenticateCallback(pkgName, strDeviceId, callback);
     JsonObject extraJson(extra);
     if (extraJson.IsDiscarded()) {
-        LOGE("extra bindParam %{public}s.", extra.c_str());
+        LOGE("extra bindParam invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -1536,7 +1536,7 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
     LOGI("start, pkgName: %{public}s", pkgName.c_str());
     JsonObject paramJson(bindParam);
     if (paramJson.IsDiscarded()) {
-        LOGE("BindDevice bindParam %{public}s.", bindParam.c_str());
+        LOGE("BindDevice bindParam invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -1654,11 +1654,9 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
 int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {
     if (authCode.empty() || pkgName.empty()) {
-        LOGE("ImportAuthCode error: Invalid para, authCode: %{public}s, pkgName: %{public}s",
-            GetAnonyString(authCode).c_str(), pkgName.c_str());
+        LOGE("ImportAuthCode error: Invalid para, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start, authCode: %{public}s", GetAnonyString(authCode).c_str());
     int32_t length = static_cast<int32_t>(authCode.length());
     if (length < DM_IMPORT_AUTH_CODE_MIN_LENGTH || length > DM_IMPORT_AUTH_CODE_MAX_LENGTH) {
         LOGE("ImportAuthCode error: Invalid para, authCode size error.");
@@ -1711,7 +1709,7 @@ int32_t DeviceManagerImpl::ExportAuthCode(std::string &authCode)
     }
 
     authCode = rsp->GetAuthCode();
-    LOGI("Success, authCode: %{public}s.", GetAnonyString(authCode).c_str());
+    LOGI("Success.");
     return DM_OK;
 }
 
@@ -1988,9 +1986,17 @@ uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
         std::lock_guard<std::mutex> autoLock(subMapLock);
         auto item = pkgName2SubIdMap_.find(pkgNameTemp);
         if (item == pkgName2SubIdMap_.end() && subscribeId == DM_INVALID_FLAG_ID) {
+            if (pkgName2SubIdMap_.size() >= MAX_CONTAINER_SIZE || randSubIdSet_.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("pkgName2SubIdMap_ or randSubIdSet_ size is more than max size");
+                return DM_INVALID_FLAG_ID;
+            }
             subscribeId = GenUniqueRandUint(randSubIdSet_);
             pkgName2SubIdMap_[pkgNameTemp] = subscribeId;
         } else if (item == pkgName2SubIdMap_.end() && subscribeId != DM_INVALID_FLAG_ID) {
+            if (pkgName2SubIdMap_.size() >= MAX_CONTAINER_SIZE || randSubIdSet_.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("pkgName2SubIdMap_ or randSubIdSet_ size is more than max size");
+                return DM_INVALID_FLAG_ID;
+            }
             pkgName2SubIdMap_[pkgNameTemp] = subscribeId;
             randSubIdSet_.emplace(subscribeId);
         } else if (item != pkgName2SubIdMap_.end()) {
@@ -2028,6 +2034,10 @@ int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName)
         if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
             publishId = pkgName2PubIdMap_[pkgName];
         } else {
+            if (pkgName2PubIdMap_.size() >= MAX_CONTAINER_SIZE || randPubIdSet_.size() >= MAX_CONTAINER_SIZE) {
+                LOGE("pkgName2PubIdMap_ or randPubIdSet_ is more than max size");
+                return DM_INVALID_FLAG_ID;
+            }
             publishId = GenUniqueRandUint(randPubIdSet_);
             pkgName2PubIdMap_[pkgName] = publishId;
         }
@@ -2318,8 +2328,8 @@ int32_t DeviceManagerImpl::RegDevTrustChangeCallback(const std::string &pkgName,
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("PkgName %{public}s.", pkgName.c_str());
-    SyncCallbackToService(DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE, pkgName);
     DeviceManagerNotify::GetInstance().RegDevTrustChangeCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_REMOTE_DEVICE_TRUST_CHANGE, pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegDevTrustChangeCallback", DM_OK, anonyLocalUdid_);
     return DM_OK;
 }
@@ -2331,8 +2341,8 @@ int32_t DeviceManagerImpl::RegisterDeviceScreenStatusCallback(const std::string 
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceScreenStatusCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_SCREEN_STATE, pkgName);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
@@ -2415,8 +2425,8 @@ int32_t DeviceManagerImpl::RegisterCredentialAuthStatusCallback(const std::strin
         LOGE("Error: Invalid para");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SyncCallbackToService(DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY, pkgName);
     DeviceManagerNotify::GetInstance().RegisterCredentialAuthStatusCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_CREDENTIAL_AUTH_STATUS_NOTIFY, pkgName);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }

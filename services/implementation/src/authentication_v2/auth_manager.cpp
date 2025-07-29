@@ -26,6 +26,8 @@
 #include "multiple_user_connector.h"
 
 #include "auth_manager.h"
+#include "dm_auth_attest_common.h"
+#include "dm_auth_cert.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_random.h"
@@ -38,6 +40,7 @@
 #include "dm_auth_context.h"
 #include "dm_auth_message_processor.h"
 #include "dm_auth_state.h"
+#include "ffrt.h"
 #include "json_object.h"
 
 namespace OHOS {
@@ -625,6 +628,33 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     return DM_OK;
 }
 
+void GenerateCertificate(std::shared_ptr<DmAuthContext> context)
+{
+    if (context == nullptr) {
+        LOGE("context is nullptr!");
+        return;
+    }
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    context->accesser.isCommonFlag = true;
+    LOGI("open device do not generate cert!");
+    context->accesser.cert = "common";
+#else
+    DmCertChain dmCertChain;
+    int32_t certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
+    if (certRet != DM_OK) {
+        LOGE("generate cert fail, certRet = %{public}d", certRet);
+        return;
+    }
+    {
+        std::lock_guard<std::mutex> lock(certMtx_);
+        context->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
+    }
+    certCV_.notify_all();
+    AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
+#endif
+    return;
+}
+
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam, int sessionId, uint64_t logicalSessionId)
 {
@@ -669,6 +699,8 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     context_->logicalSessionId = logicalSessionId;
     context_->requestId = static_cast<int64_t>(logicalSessionId);
     context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcNegotiateStateMachine>());
+    // generate cert sync
+    ffrt::submit([=]() { GenerateCertificate(context_);});
     info = { .funcName = "BindTarget" };
     info.channelId = sessionId;
     DmRadarHelper::GetInstance().ReportAuthSendRequest(info);

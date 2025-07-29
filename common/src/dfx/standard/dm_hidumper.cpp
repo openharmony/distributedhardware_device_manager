@@ -17,7 +17,7 @@
 
 #include <unordered_map>       // for __hash_map_const_iterator, unordered_map
 #include <utility>             // for pair
-
+#include "dm_constants.h"
 #include "dm_anonymous.h"      // for GetAnonyString
 #include "dm_error_type.h"
 #include "dm_log.h"            // for LOGI, LOGE
@@ -70,6 +70,10 @@ int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &
 void HiDumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo)
 {
     LOGI("HiDumpHelper::SetNodeInfo");
+    if (nodeInfos_.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("nodeInfos_ size is more than max size");
+        return;
+    }
     nodeInfos_.push_back(deviceInfo);
 }
 

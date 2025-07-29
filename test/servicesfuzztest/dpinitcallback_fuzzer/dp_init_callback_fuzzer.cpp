@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -45,11 +46,15 @@ void DpInitedCallbackFirstFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     DpInitedCallback dpInitedCallback;
     std::unordered_map<std::string, DmAuthForm> authFormMap;
-    DmDeviceInfo deviceInfo;
-    deviceInfo.extraData = "";
     DistributedDeviceProfile::TrustedDeviceInfo trustedDeviceInfo;
+    std::string extraDataStr = fdp.ConsumeRandomLengthString(50);
+    DmDeviceInfo deviceInfo;
+    deviceInfo.extraData = extraDataStr;
+    dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
+    deviceInfo.extraData = "";
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
 
     deviceInfo.extraData = "extraInfo";

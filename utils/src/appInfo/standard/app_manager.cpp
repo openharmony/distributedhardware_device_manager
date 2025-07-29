@@ -24,6 +24,7 @@
 #include "system_ability_definition.h"
 #include "tokenid_kit.h"
 
+#include "dm_constants.h"
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
@@ -83,6 +84,10 @@ DM_EXPORT void AppManager::RegisterCallerAppId(const std::string &pkgName)
     }
     LOGI("PkgName %{public}s, appId %{public}s.", pkgName.c_str(), GetAnonyString(appId).c_str());
     std::lock_guard<std::mutex> lock(appIdMapLock_);
+    if (appIdMap_.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("appIdMap_ map size is more than max size");
+        return;
+    }
     appIdMap_[pkgName] = appId;
 }
 

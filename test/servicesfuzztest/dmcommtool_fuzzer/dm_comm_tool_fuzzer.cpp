@@ -95,10 +95,13 @@ void DmCommToolFirstFuzzTest(const uint8_t* data, size_t size)
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     int32_t tokenId = fdp.ConsumeIntegral<int32_t>();
     dmCommToolPtr_->SendUninstAppObj(userId, tokenId, rmtNetworkId);
+    std::string emptyNetworkId = "";
+    dmCommToolPtr_->SendUninstAppObj(userId, tokenId, emptyNetworkId);
     dmCommToolPtr_->RspAppUninstall(rmtNetworkId, socketId);
     dmCommToolPtr_->RspAppUnbind(rmtNetworkId, socketId);
     std::string udid = fdp.ConsumeRandomLengthString();
     dmCommToolPtr_->SendUnBindAppObj(userId, tokenId, msg, rmtNetworkId, udid);
+    dmCommToolPtr_->SendUnBindAppObj(userId, tokenId, msg, emptyNetworkId, udid);
     dmCommToolPtr_->StopSocket(rmtNetworkId);
 }
 }

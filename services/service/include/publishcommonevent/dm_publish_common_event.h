@@ -72,7 +72,6 @@ private:
     std::mutex subscriberMutex_;
     std::shared_ptr<DmPublishEventSubscriber> subscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    int32_t counter_ = 0;
 
 private:
     class SystemAbilityStatusChangeListener : public SystemAbilityStatusChangeStub {

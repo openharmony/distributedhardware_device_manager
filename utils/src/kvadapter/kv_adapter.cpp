@@ -42,8 +42,8 @@ namespace {
     constexpr int32_t INIT_RETRY_SLEEP_INTERVAL = 200 * 1000; // 200ms
     constexpr uint32_t DM_OSTYPE_PREFIX_LEN = 16;
     const char* PEER_UDID = "peer_udid";
-    const char* PEER_OSTYPE = "peer_os_type";
-    const char* TIME_STAMP = "timestamp";
+    const char* PEER_OSTYPE = "peer_ostype";
+    const char* TIME_STAMP = "time_stamp";
 }
 
 int32_t KVAdapter::Init()

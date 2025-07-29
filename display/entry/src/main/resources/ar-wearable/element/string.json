@@ -4,7 +4,7 @@
             "name":"dm_confirm_title_hap",
             "value":"تطبيق %1$s على \u202a%2$s\u202c يريد الوصول إلى هذا الجهاز. الوثوق بهذا التطبيق؟",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

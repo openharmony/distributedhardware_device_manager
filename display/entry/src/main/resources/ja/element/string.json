@@ -32,21 +32,21 @@
             "name":"dm_confirm_intention",
             "value":"これは、デバイス間のデータ同期とコラボレーションに必要です。",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"今回は信頼",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"常に信頼",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -59,6 +59,69 @@
         {
             "name":"dm_confirm_proxy",
             "value":"「%s」がこのデバイスへの接続を要求しています。アクセスできるサービスを選択してください：",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"もう一方のデバイスに表示されている接続コードを入力してください。",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%sがあなたのデバイスに画面をミラーリングしようとしています。このデバイスを信頼しますか？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%sこのデバイスを信頼しますか？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"パスワードが正しくありません。接続に失敗しました。",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"認証中…",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%sがあなたのデバイスに接続しようとしています。",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"他のデバイスに接続するには、Bluetoothを有効にする必要があります。有効にしてから、もう一度お試しください。",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"%sに接続",
             "attr":{
                 "priority":"translate"
             }

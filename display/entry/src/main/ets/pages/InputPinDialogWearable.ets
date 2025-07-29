@@ -125,7 +125,7 @@ struct Index {
   }
 
   setUserOperation(operation: number, extra: string) {
-    console.log('setUserOperation: ' + operation + 'input' + extra);
+    console.log('setUserOperation: ' + operation);
     if (dmClass === null) {
       console.log('setUserOperation: ' + 'dmClass null');
       return;

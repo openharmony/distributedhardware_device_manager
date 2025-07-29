@@ -37,6 +37,10 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
         LOGE("ipcclientstub init failed.");
         return ERR_DM_INIT_FAILED;
     }
+    if (packageInitSet_.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("packageInitSet_ size is more than max size");
+        return ERR_DM_FAILED;
+    }
 
     std::shared_ptr<IpcRegisterListenerReq> req = std::make_shared<IpcRegisterListenerReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();

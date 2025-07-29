@@ -353,7 +353,6 @@ struct ConfirmCustomDialog {
       item => item.bundleName !== app.bundleName
     );
   }
-  console.log('The currently selected data:', this.selectedAppDataList);
  }
 
   getImages(peerdeviceType: number): Resource {

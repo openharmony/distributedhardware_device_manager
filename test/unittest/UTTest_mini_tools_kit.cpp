@@ -14,7 +14,11 @@
  */
 
 #include "UTTest_mini_tools_kit.h"
+#include "accesstoken_kit.h"
 #include "dm_constants.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
+
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -24,7 +28,30 @@ namespace {
     const std::string TEST_SERVICE_NAME = "test_service_name";
 } // namespace
 void MiniToolsKitTest::SetUp()
-{}
+{
+    const int32_t permsNum = 3;
+    const int32_t indexZero = 0;
+    const int32_t indexOne = 1;
+    const int32_t indexTwo = 2;
+    uint64_t tokenId;
+    const char *perms[permsNum];
+    perms[indexZero] = "ohos.permission.ACCESS_SERVICE_DM";
+    perms[indexOne] = "ohos.permission.DISTRIBUTED_DATASYNC";
+    perms[indexTwo] = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,
+        .permsNum = permsNum,
+        .aclsNum = 0,
+        .dcaps = NULL,
+        .perms = perms,
+        .acls = NULL,
+        .processName = "dsoftbus_service",
+        .aplStr = "system_core",
+    };
+    tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+}
 
 void MiniToolsKitTest::TearDown()
 {}
