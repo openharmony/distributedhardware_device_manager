@@ -107,7 +107,7 @@ void DeviceManagerNotify::RegisterDeviceStatusCallback(const std::string &pkgNam
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceStatusCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("deviceStateCallback_ map size is more than max size");
+        LOGE("deviceStatusCallback_ map size is more than max size");
         return;
     }
     deviceStatusCallback_[pkgName] = callback;
@@ -191,7 +191,7 @@ void DeviceManagerNotify::RegisterAuthenticateCallback(const std::string &pkgNam
     std::lock_guard<std::mutex> autoLock(lock_);
     if (authenticateCallback_.count(pkgName) == 0) {
         if (authenticateCallback_.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("devicePublishCallbacks_ map size is more than max size");
+            LOGE("authenticateCallback_ map size is more than max size");
             return;
         }
         authenticateCallback_[pkgName] = std::map<std::string, std::shared_ptr<AuthenticateCallback>>();

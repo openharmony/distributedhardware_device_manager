@@ -24,7 +24,6 @@
 #include "system_ability_definition.h"
 #include "tokenid_kit.h"
 
-#include "dm_constants.h"
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
@@ -33,6 +32,9 @@ using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DistributedHardware {
+namespace {
+const int32_t MAX_CONTAINER_SIZE = 1000;
+}
 DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
 
 const std::string AppManager::GetAppId()

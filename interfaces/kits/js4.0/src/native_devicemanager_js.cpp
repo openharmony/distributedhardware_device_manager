@@ -2853,6 +2853,8 @@ napi_value DeviceManagerNapi::Constructor(napi_env env, napi_callback_info info)
     std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
     if (g_deviceManagerMap.size() >= MAX_CONTAINER_SIZE) {
         LOGE("g_deviceManagerMap map size is more than max size");
+        delete obj;
+        obj = nullptr;
         return nullptr;
     }
     g_deviceManagerMap[obj->bundleName_] = obj;
