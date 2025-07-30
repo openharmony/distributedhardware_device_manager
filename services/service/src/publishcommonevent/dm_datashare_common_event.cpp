@@ -95,6 +95,7 @@ bool DmDataShareCommonEventManager::SubscribeDataShareCommonEvent(const std::vec
     return true;
 }
 
+//LCOV_EXCL_START
 bool DmDataShareCommonEventManager::UnsubscribeDataShareCommonEvent()
 {
     std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
@@ -130,6 +131,7 @@ bool DmDataShareCommonEventManager::UnsubscribeDataShareCommonEvent()
     eventValidFlag_ = false;
     return true;
 }
+//LCOV_EXCL_STOP
 
 void DmDataShareEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {

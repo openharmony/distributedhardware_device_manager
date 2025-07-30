@@ -59,6 +59,7 @@ int32_t DpInitedCallback::OnDpInited()
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 void DpInitedCallback::PutAllTrustedDevices()
 {
     LOGE("In.");
@@ -95,6 +96,7 @@ void DpInitedCallback::PutAllTrustedDevices()
     ret = DeviceProfileConnector::GetInstance().PutAllTrustedDevices(deviceInfos);
     LOGI("ret:%{public}d", ret);
 }
+//LCOV_EXCL_STOP
 
 bool DpInitedCallback::ConvertToTrustedDeviceInfo(const std::unordered_map<std::string, DmAuthForm> &authFormMap,
     const DmDeviceInfo &deviceInfo, DistributedDeviceProfile::TrustedDeviceInfo &trustedDeviceInfo)
