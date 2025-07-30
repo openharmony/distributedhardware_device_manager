@@ -298,7 +298,7 @@ int32_t KVAdapter::GetAllOstypeData(const std::string &key, std::vector<std::str
         jsonObj[PEER_UDID] = entry.key.ToString().substr(DM_OSTYPE_PREFIX_LEN);
         jsonObj[PEER_OSTYPE] = osTyoeJson[PEER_OSTYPE].Get<int32_t>();
         jsonObj[TIME_STAMP] = osTyoeJson[TIME_STAMP].Get<int64_t>();
-        values.push_back(SafetyDump(jsonObj));
+        values.push_back(jsonObj.Dump());
     }
     return DM_OK;
 }

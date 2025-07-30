@@ -958,13 +958,13 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     const ConnectionAddr *addrInfo = &(device.addr)[0];
     if (addrInfo == nullptr) {
         LOGE("ConvertDeviceInfoToDmDevice: addrInfo is nullptr.");
-        dmDevice.extraData = SafetyDump(jsonObj);
+        dmDevice.extraData = jsonObj.Dump();
         return;
     }
     jsonObj[PARAM_KEY_DISC_CAPABILITY] = device.capabilityBitmap[0];
     ParseConnAddrInfo(addrInfo, jsonObj);
     jsonObj[PARAM_KEY_ACCOUNT_HASH] = std::string(device.accountHash);
-    dmDevice.extraData = SafetyDump(jsonObj);
+    dmDevice.extraData = jsonObj.Dump();
 }
 
 void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObject &jsonObj)
@@ -1468,7 +1468,7 @@ void SoftbusListener::ConvertOsTypeToJson(int32_t osType, std::string &osTypeStr
     JsonObject jsonObj;
     jsonObj[PEER_OSTYPE] = osType;
     jsonObj[TIME_STAMP] = nowTime;
-    osTypeStr = SafetyDump(jsonObj);
+    osTypeStr = jsonObj.Dump();
 }
 
 bool SoftbusListener::CheckPeerUdidTrusted(const std::string &udid)

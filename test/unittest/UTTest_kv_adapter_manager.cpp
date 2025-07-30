@@ -94,7 +94,7 @@ std::string KVAdapterManagerTest::CreateDmKVValueStr(const std::string &appId, i
     jsonObject[ANOY_DEVICE_ID_KEY] = "anoy_device";
     jsonObject[SALT_KEY] = "salt";
     jsonObject[LAST_MODIFY_TIME_KEY] = lastModifyTime;
-    return SafetyDump(jsonObject);
+    return jsonObject.Dump();
 }
 
 HWTEST_F(KVAdapterManagerTest, Init_001, testing::ext::TestSize.Level1)

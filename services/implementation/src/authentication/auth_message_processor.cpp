@@ -136,7 +136,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     jsonObj[TAG_SLICE_NUM] = thumbnailSlice + 1;
     jsonObj[TAG_THUMBNAIL_SIZE] = thumbnailSize;
     GetJsonObj(jsonObj);
-    jsonStrVec.push_back(SafetyDump(jsonObj));
+    jsonStrVec.push_back(jsonObj.Dump());
     for (int32_t idx = 0; idx < thumbnailSlice; idx++) {
         JsonObject jsonThumbnailObj;
         jsonThumbnailObj[TAG_VER] = DM_ITF_VER;
@@ -148,7 +148,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
         int32_t leftLen = thumbnailSize - idx * MSG_MAX_SIZE;
         int32_t sliceLen = (leftLen > MSG_MAX_SIZE) ? MSG_MAX_SIZE : leftLen;
         jsonObj[TAG_APP_THUMBNAIL] = authRequestContext_->appThumbnail.substr(idx * MSG_MAX_SIZE, sliceLen);
-        jsonStrVec.push_back(SafetyDump(jsonThumbnailObj));
+        jsonStrVec.push_back(jsonThumbnailObj.Dump());
     }
     return jsonStrVec;
 }
@@ -189,7 +189,7 @@ std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
         default:
             break;
     }
-    return SafetyDump(jsonObj);
+    return jsonObj.Dump();
 }
 
 void AuthMessageProcessor::CreatePublicKeyMessageExt(JsonObject &json)
@@ -211,7 +211,7 @@ void AuthMessageProcessor::CreatePublicKeyMessageExt(JsonObject &json)
             jsonTemp[TAG_SESSIONKEY_ID] = authResponseContext_->localSessionKeyId;
         }
         jsonTemp[TAG_PUBLICKEY] = authResponseContext_->publicKey;
-        std::string strTemp = SafetyDump(jsonTemp);
+        std::string strTemp = jsonTemp.Dump();
         std::string encryptStr = "";
         CHECK_NULL_VOID(cryptoMgr_);
         if (cryptoMgr_->EncryptMessage(strTemp, encryptStr) != DM_OK) {
@@ -714,7 +714,7 @@ std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const
     std::string authDataStr = std::string(reinterpret_cast<const char *>(data), dataLen);
     jsonObj[TAG_DATA] = authDataStr;
     jsonObj[TAG_DATA_LEN] = dataLen;
-    return SafetyDump(jsonObj);
+    return jsonObj.Dump();
 }
 
 void AuthMessageProcessor::CreateReqReCheckMessage(JsonObject &jsonObj)
@@ -727,7 +727,7 @@ void AuthMessageProcessor::CreateReqReCheckMessage(JsonObject &jsonObj)
     jsonTemp[TAG_BIND_LEVEL] = authResponseContext_->bindLevel;
     jsonTemp[TAG_LOCAL_ACCOUNTID] = authResponseContext_->localAccountId;
     jsonTemp[TAG_TOKENID] = authResponseContext_->tokenId;
-    std::string strTemp = SafetyDump(jsonTemp);
+    std::string strTemp = jsonTemp.Dump();
     std::string encryptStr = "";
     CHECK_NULL_VOID(cryptoMgr_);
     if (cryptoMgr_->EncryptMessage(strTemp, encryptStr) != DM_OK) {

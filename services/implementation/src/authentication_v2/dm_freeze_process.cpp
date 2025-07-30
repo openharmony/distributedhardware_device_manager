@@ -230,7 +230,7 @@ void FreezeProcess::ConvertBindFailedEventsToJson(const BindFailedEvents &value,
     JsonObject jsonObj;
     jsonObj[FAILED_TIMES_STAMPS_KEY] = value.failedTimeStamps;
     jsonObj[FREEZE_TIMES_STAMPS_KEY] = value.freezeTimeStamps;
-    result = SafetyDump(jsonObj);
+    result = jsonObj.Dump();
 }
 
 void FreezeProcess::ConvertDeviceFreezeStateToJson(const DeviceFreezeState &value, std::string &result)
@@ -238,7 +238,7 @@ void FreezeProcess::ConvertDeviceFreezeStateToJson(const DeviceFreezeState &valu
     JsonObject jsonObj;
     jsonObj[START_FREEZE_TIME_KEY] = value.startFreezeTimeStamp;
     jsonObj[STOP_FREEZE_TIME_KEY] = value.stopFreezeTimeStamp;
-    result = SafetyDump(jsonObj);
+    result = jsonObj.Dump();
 }
 
 int32_t FreezeProcess::DeleteFreezeRecord()

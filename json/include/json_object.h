@@ -50,7 +50,6 @@ public:
     const JsonItemObject operator[](const std::string &key) const;
     std::string DumpFormated() const;
     std::string Dump() const;
-    std::string DumpIgnoreError() const;
     bool Contains(const std::string &key) const;
     bool IsDiscarded() const;
     bool PushBack(const std::string &strValue);
@@ -124,7 +123,6 @@ public:
 protected:
     JsonItemObject();
     void Delete();
-    std::string Dump(bool formatFlag) const;
     std::string Dump(bool formatFlag, bool isIgnoreError) const;
     void AddItemToArray(JsonItemObject &item);
     bool InitItem(JsonItemObject &item);

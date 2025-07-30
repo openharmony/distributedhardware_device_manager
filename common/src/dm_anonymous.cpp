@@ -198,7 +198,7 @@ std::string ConvertMapToJsonString(const std::map<std::string, std::string> &par
         for (const auto &it : paramMap) {
             jsonObj[it.first] = it.second;
         }
-        jsonStr = SafetyDump(jsonObj);
+        jsonStr = jsonObj.Dump();
     }
     return jsonStr;
 }
@@ -396,11 +396,6 @@ bool IsDmCommonNotifyEventValid(DmCommonNotifyEvent dmCommonNotifyEvent)
         return true;
     }
     return false;
-}
-
-DM_EXPORT std::string SafetyDump(const JsonItemObject &jsonObj)
-{
-    return jsonObj.DumpIgnoreError();
 }
 
 std::string GetSubStr(const std::string &rawStr, const std::string &separator, int32_t index)

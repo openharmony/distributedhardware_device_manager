@@ -154,7 +154,10 @@ AuthManager::~AuthManager()
     if (context_ != nullptr) {
         context_->successFinished = true;
         context_->authStateMachine->Stop();  // Stop statemMachine thread
-        context_->timer->DeleteAll();
+
+        if (context_->timer != nullptr) {
+            context_->timer->DeleteAll();
+        }
         LOGI("AuthManager context variables destroy successful.");
     }
     {

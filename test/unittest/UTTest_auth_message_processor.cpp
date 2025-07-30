@@ -148,7 +148,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     authManager->importPkgName_ = "hostPkgName";
     authMessageProcessor->authMgr_ = authManager;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
-    std::string str1 = SafetyDump(jsonObj);
+    std::string str1 = jsonObj.Dump();
     authMessageProcessor->cryptoAdapter_ = std::make_shared<CryptoAdapterTest>();
     authMessageProcessor->authRequestContext_->authType = AUTH_TYPE_IMPORT_AUTH_CODE;
     authMessageProcessor->CreateNegotiateMessage(jsonObj);
@@ -162,7 +162,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateNegotiateMessage_001, testing::ext::Tes
     jsonObject[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
     jsonObject[TAG_LOCAL_DEVICE_ID] = authMessageProcessor->authResponseContext_->localDeviceId;
     jsonObject[TAG_HOST] = "";
-    std::string str2 = SafetyDump(jsonObject);
+    std::string str2 = jsonObject.Dump();
     ASSERT_NE(str1, str2);
 }
 
@@ -188,8 +188,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateSyncGroupMessage_001, testing::ext::Tes
     jsona[TAG_DEVICE_ID] = authMessageProcessor->authRequestContext_->deviceId;
     jsona[TAG_GROUPIDS] = authMessageProcessor->authRequestContext_->syncGroupList;
     authMessageProcessor->CreateSyncGroupMessage(jsonObj);
-    std::string str1 = SafetyDump(jsona);
-    std::string str2 = SafetyDump(jsonObj);
+    std::string str1 = jsona.Dump();
+    std::string str2 = jsonObj.Dump();
     ASSERT_EQ(str1, str2);
 }
 
@@ -214,7 +214,7 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
     JsonObject jsonB;
     jsonB[TAG_GROUP_ID] = "123456";
     authMessageProcessor->authResponseContext_->groupId =
-        SafetyDump(jsonB);
+        jsonB.Dump();
     authMessageProcessor->authResponseContext_->authToken = "123456";
     authMessageProcessor->authResponseContext_->networkId = "11112222";
     authMessageProcessor->authResponseContext_->requestId = 222222;
@@ -228,8 +228,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseAuthMessage_001, testing::ext::
     jsonA[TAG_GROUP_NAME] = authMessageProcessor->authResponseContext_->groupName;
     jsonA[TAG_AUTH_TOKEN] = authMessageProcessor->authResponseContext_->authToken;
     authMessageProcessor->CreateResponseAuthMessage(jsonObj);
-    std::string str1 = SafetyDump(jsonA);
-    std::string str2 = SafetyDump(jsonObj);
+    std::string str1 = jsonA.Dump();
+    std::string str2 = jsonObj.Dump();
     ASSERT_EQ(str1, str2);
 }
 
@@ -252,8 +252,8 @@ HWTEST_F(AuthMessageProcessorTest, CreateResponseFinishMessage_001, testing::ext
     jsona[TAG_REPLY] = authMessageProcessor->authResponseContext_->reply;
     jsona[TAG_AUTH_FINISH] = authMessageProcessor->authResponseContext_->isFinish;
     authMessageProcessor->CreateResponseFinishMessage(jsonObj);
-    std::string str1 = SafetyDump(jsona);
-    std::string str2 = SafetyDump(jsonObj);
+    std::string str1 = jsona.Dump();
+    std::string str2 = jsonObj.Dump();
     ASSERT_EQ(str1, str2);
 }
 

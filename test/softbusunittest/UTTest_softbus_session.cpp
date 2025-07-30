@@ -107,7 +107,7 @@ HWTEST_F(SoftbusSessionTest, SendData_002, testing::ext::TestSize.Level1)
     JsonObject jsonObj;
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = msgType;
-    std::string message = SafetyDump(jsonObj);
+    std::string message = jsonObj.Dump();
     int32_t sessionId = 0;
     if (softbusSession == nullptr) {
         softbusSession = std::make_shared<SoftbusSession>();

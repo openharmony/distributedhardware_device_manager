@@ -70,7 +70,7 @@ HWTEST_F(HichainListenerTest, OnHichainDeviceUnBound_001, testing::ext::TestSize
     jsonObject[FIELD_GROUP_TYPE] = DM_IDENTICAL_ACCOUNT;
     jsonObject[FIELD_USER_ID] = "hdaoiudhifvafiouoahf-ZhangSan";
     jsonObject[FIELD_OS_ACCOUNT_ID] = 128;
-    const char *groupInfoPtr = SafetyDump(jsonObject).c_str();
+    const char *groupInfoPtr = jsonObject.Dump().c_str();
     listerner.OnHichainDeviceUnBound(peerUdid, groupInfoPtr);
     EXPECT_TRUE(groupInfoPtr != nullptr);
 }

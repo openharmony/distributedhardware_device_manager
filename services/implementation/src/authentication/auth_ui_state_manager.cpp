@@ -62,7 +62,7 @@ void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
     }
     JsonObject jsonObj;
     jsonObj[UI_STATE_MSG] = msg;
-    std::string paramJson = SafetyDump(jsonObj);
+    std::string paramJson = jsonObj.Dump();
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
     for (auto item : pkgSet_) {
         listener_->OnUiCall(item, paramJson);
