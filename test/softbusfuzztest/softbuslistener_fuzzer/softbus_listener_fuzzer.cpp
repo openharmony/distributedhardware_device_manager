@@ -31,6 +31,7 @@ namespace {
     constexpr int32_t INT32NUM = 3;
     constexpr int32_t DATA_LEN = 20;
     constexpr int32_t CONNECTION_ADDR_USB_VALUE = 5;
+    constexpr uint32_t MAX_DEVICE_LIST_LENGTH = 2001;
 }
 
 class ISoftbusDiscoveringCallbackTest : public ISoftbusDiscoveringCallback {
@@ -314,7 +315,8 @@ void SoftBusListenerFifthFuzzTest(const uint8_t* data, size_t size)
     softbusListener_->OnGetAclListHash(localDevUserInfo, remoteDevUserInfo, aclList);
     uint32_t deviceListLen = static_cast<uint32_t>(deviceList.length());
     softbusListener_->OnCredentialAuthStatus(deviceList.data(), deviceListLen, deviceTypeId, errcode);
-    deviceListLen = 2001;
+
+    deviceListLen = MAX_DEVICE_LIST_LENGTH;
     softbusListener_->OnCredentialAuthStatus(deviceList.data(), deviceListLen, deviceTypeId, errcode);
     std::shared_ptr<NodeBasicInfo> info = nullptr;
     softbusListener_->UpdateDeviceName(info.get());

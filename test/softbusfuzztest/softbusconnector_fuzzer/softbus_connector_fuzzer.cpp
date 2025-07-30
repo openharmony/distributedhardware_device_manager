@@ -102,8 +102,10 @@ void SoftBusConnectorSecondFuzzTest(const uint8_t* data, size_t size)
     std::string deviceId = fdp.ConsumeRandomLengthString();
     softbusConnector->JoinLNNBySkId(sessionId, sessionKeyId, remoteSessionKeyId, udid, udidHash);
     softbusConnector->JoinLnnByHml(sessionId, sessionKeyId, remoteSessionKeyId);
-    sessionKeyId = 1;
-    remoteSessionKeyId = 2;
+    int32_t tempSessionKeyId = 1;
+    int32_t tempRemoteSessionKeyId = 2;
+    sessionKeyId = tempSessionKeyId;
+    remoteSessionKeyId = tempRemoteSessionKeyId;
     softbusConnector->JoinLnnByHml(sessionId, sessionKeyId, remoteSessionKeyId);
     DeviceInfo deviceInfo;
     DmDeviceInfo dmDeviceInfo;
