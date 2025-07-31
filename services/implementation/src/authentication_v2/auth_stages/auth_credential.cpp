@@ -144,7 +144,7 @@ int32_t AuthSrcCredentialAuthDoneState::HandleSrcCredentialAuthDone(std::shared_
     int32_t ret = DM_OK;
     // first time joinLnn, auth lnnCredential
     if (context->accesser.isGenerateLnnCredential == true && context->isAppCredentialVerified == false &&
-        context->accesser.bindLevel != USER) {
+        context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         context->isAppCredentialVerified = true;
         DerivativeSessionKey(context);
         msgType = MSG_TYPE_REQ_CREDENTIAL_AUTH_START;
@@ -160,7 +160,8 @@ int32_t AuthSrcCredentialAuthDoneState::HandleSrcCredentialAuthDone(std::shared_
             return ERR_DM_FAILED;
         }
         // First-time authentication and Lnn credential process
-    } else if (context->accesser.isGenerateLnnCredential == true && context->accesser.bindLevel != USER) {
+    } else if (context->accesser.isGenerateLnnCredential == true &&
+        context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         int32_t skId = 0;
         int32_t ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accesser.userId, skId);
         if (ret != DM_OK) {
@@ -305,7 +306,8 @@ int32_t AuthSinkCredentialAuthNegotiateState::Action(std::shared_ptr<DmAuthConte
     int32_t skId;
 
     // First lnn cred auth, second time receiving 161 message
-    if (context->accessee.isGenerateLnnCredential == true && context->accessee.bindLevel != USER &&
+    if (context->accessee.isGenerateLnnCredential == true &&
+        context->accessee.bindLevel != static_cast<int32_t>(USER) &&
         context->isAppCredentialVerified == true) {
         ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accessee.userId, skId);
         if (ret != DM_OK) {
@@ -536,7 +538,7 @@ int32_t AuthSrcCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> co
         return DM_OK;
     }
     // First authentication, generate LNN credentials and public key
-    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_LNN, context);
         if (ret != DM_OK) {
             LOGE("AuthSrcCredentialExchangeState::Action() error, generate user credId and publicKey failed.");
@@ -545,9 +547,10 @@ int32_t AuthSrcCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> co
     }
 
     DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
-    if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
+    if (context->accesser.bindLevel == static_cast<int32_t>(APP) ||
+        context->accesser.bindLevel == static_cast<int32_t>(SERVICE)) {
         authorizedScope = DM_AUTH_SCOPE_APP;
-    } else if (context->accesser.bindLevel == USER) {
+    } else if (context->accesser.bindLevel == static_cast<int32_t>(USER)) {
         authorizedScope = DM_AUTH_SCOPE_USER;
     }
 
@@ -581,7 +584,7 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
     }
 
     // First authentication lnn cred
-    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != USER) {
+    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
         // Generate credentials and public key
         ret = GenerateCredIdAndPublicKey(DM_AUTH_SCOPE_LNN, context);
         if (ret != DM_OK) {
@@ -604,9 +607,10 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
     }
 
     DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
-    if (context->accessee.bindLevel == APP || context->accessee.bindLevel == SERVICE) {
+    if (context->accessee.bindLevel == static_cast<int32_t>(APP) ||
+        context->accessee.bindLevel == static_cast<int32_t>(SERVICE)) {
         authorizedScope = DM_AUTH_SCOPE_APP;
-    } else if (context->accessee.bindLevel == USER) {
+    } else if (context->accessee.bindLevel == static_cast<int32_t>(USER)) {
         authorizedScope = DM_AUTH_SCOPE_USER;
     }
     // Generate transport credentials and public key
@@ -622,7 +626,6 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
     if (ret != DM_OK) {
         context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);
         context->SetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope, "");
-        LOGE("AuthSinkCredentialExchangeState::Action failed, agree app cred failed.");
         return ret;
     }
 
@@ -648,7 +651,7 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
     std::string tmpCredId = "";
     int32_t osAccountId = context->accesser.userId;
     // First authentication
-    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         // Agree lnn credentials and public key
         tmpCredId = context->accesser.lnnCredentialId;
         ret = AgreeCredential(DM_AUTH_SCOPE_LNN, context);
@@ -661,10 +664,11 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
         ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
     }
     DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
-    if (context->accesser.bindLevel == APP || context->accesser.bindLevel == SERVICE) {
+    if (context->accesser.bindLevel == static_cast<int32_t>(APP) ||
+        context->accesser.bindLevel == static_cast<int32_t>(SERVICE)) {
         authorizedScope = DM_AUTH_SCOPE_APP;
     }
-    if (context->accesser.bindLevel == USER) {
+    if (context->accesser.bindLevel == static_cast<int32_t>(USER)) {
         authorizedScope = DM_AUTH_SCOPE_USER;
     }
     // Agree transport credentials and public key
@@ -710,7 +714,6 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         return ret;
     }
     if (context->authStateMachine->WaitExpectEvent(ON_TRANSMIT) != ON_TRANSMIT) {
-        LOGE("AuthSrcCredentialAuthStartState::Action failed, ON_TRANSMIT event not arrived.");
         return ERR_DM_FAILED;
     }
     message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_CREDENTIAL_AUTH_START, context);
@@ -729,7 +732,7 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     // First authentication lnn cred
-    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != USER) {
+    if (context->accesser.isGenerateLnnCredential && context->accesser.bindLevel != static_cast<int32_t>(USER)) {
         int32_t skId = 0;
         // derive lnn sk
         std::string suffix = context->accesser.lnnCredentialId + context->accessee.lnnCredentialId;
@@ -841,7 +844,7 @@ int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     // First authentication lnn cred
-    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != USER) {
+    if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
         int32_t skId = 0;
         // derive lnn sk
         std::string suffix = context->accesser.lnnCredentialId + context->accessee.lnnCredentialId;

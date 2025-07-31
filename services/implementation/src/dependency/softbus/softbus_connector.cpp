@@ -221,6 +221,7 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUse
             case DM_VERSION_INT_5_1_0:
                 ret = SyncLocalAclList5_1_0(localDevUserInfo.deviceId, remoteDevUserInfo.deviceId, localAcl,
                     remoteAclHashList);
+                break;
             default:
                 LOGE("versionNum is invaild, ver: %{public}d", versionNum);
                 break;

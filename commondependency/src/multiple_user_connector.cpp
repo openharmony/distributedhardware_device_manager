@@ -418,7 +418,7 @@ DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(uint64_t displayId
     LOGI("displayId %{public}" PRIu64, displayId);
     int32_t userId = -1;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (displayId == -1) {
+    if (static_cast<int32_t>(displayId) == -1) {
         userId = GetFirstForegroundUserId();
         return userId;
     }
