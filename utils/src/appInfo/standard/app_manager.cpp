@@ -102,7 +102,6 @@ DM_EXPORT void AppManager::UnRegisterCallerAppId(const std::string &pkgName)
     LOGI("PkgName %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> lock(appIdMapLock_);
     if (appIdMap_.find(pkgName) == appIdMap_.end()) {
-        LOGE("AppIdMap not find pkgName.");
         return;
     }
     appIdMap_.erase(pkgName);

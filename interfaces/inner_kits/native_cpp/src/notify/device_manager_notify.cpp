@@ -320,9 +320,6 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStateCallback_.find(pkgName);
         if (iter == deviceStateCallback_.end()) {
-            if (deviceStatusCallback_.find(pkgName) == deviceStatusCallback_.end()) {
-                LOGE("OnDeviceOnline error, device state callback not register.");
-            }
             return;
         }
         tempCbk = iter->second;
@@ -353,9 +350,6 @@ void DeviceManagerNotify::OnDeviceOnline(const std::string &pkgName, const DmDev
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            if (deviceStateCallback_.find(pkgName) == deviceStateCallback_.end()) {
-                LOGE("Error, device status callback not register.");
-            }
             return;
         }
         tempCbk = iter->second;
@@ -386,9 +380,6 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStateCallback_.find(pkgName);
         if (iter == deviceStateCallback_.end()) {
-            if (deviceStatusCallback_.find(pkgName) == deviceStatusCallback_.end()) {
-                LOGE("Error, device state callback not register.");
-            }
             return;
         }
         tempCbk = iter->second;
@@ -420,9 +411,6 @@ void DeviceManagerNotify::OnDeviceOffline(const std::string &pkgName, const DmDe
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            if (deviceStateCallback_.find(pkgName) == deviceStateCallback_.end()) {
-                LOGE("Error, device status callback not register.");
-            }
             return;
         }
         tempCbk = iter->second;
@@ -454,9 +442,6 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStateCallback_.find(pkgName);
         if (iter == deviceStateCallback_.end()) {
-            if (deviceStatusCallback_.find(pkgName) == deviceStatusCallback_.end()) {
-                LOGE("error, device state callback not register, pkgName:%{public}s",pkgName.c_str());
-            }
             return;
         }
         tempCbk = iter->second;
@@ -488,9 +473,6 @@ void DeviceManagerNotify::OnDeviceChanged(const std::string &pkgName, const DmDe
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            if (deviceStateCallback_.find(pkgName) == deviceStateCallback_.end()) {
-                LOGE("error, device state callback not register, pkgName:%{public}s", pkgName.c_str());
-            }
             return;
         }
         tempCbk = iter->second;
@@ -522,9 +504,6 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStateCallback_.find(pkgName);
         if (iter == deviceStateCallback_.end()) {
-            if (deviceStatusCallback_.find(pkgName) == deviceStatusCallback_.end()) {
-                LOGE("error, device state callback not register, pkgName:%{public}s", pkgName.c_str());
-            }
             return;
         }
         tempCbk = iter->second;
@@ -555,9 +534,6 @@ void DeviceManagerNotify::OnDeviceReady(const std::string &pkgName, const DmDevi
         std::lock_guard<std::mutex> autoLock(lock_);
         auto iter = deviceStatusCallback_.find(pkgName);
         if (iter == deviceStatusCallback_.end()) {
-            if (deviceStateCallback_.find(pkgName) != deviceStateCallback_.end()) {
-                LOGE("error, device status callback not register, pkgName:%{public}s", pkgName.c_str());
-            }
             return;
         }
         tempCbk = iter->second;
