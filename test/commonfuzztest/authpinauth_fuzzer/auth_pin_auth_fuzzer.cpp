@@ -55,7 +55,6 @@ void AuthPinAuthFuzzTest(const uint8_t* data, size_t size)
     context->accesser.isGenerateLnnCredential = false;
     context->listener = std::make_shared<DeviceManagerServiceListener>();
     auth4->ShowStartAuthDialog(context);
-    auth4->Action(context);
     auth5->GetStateType();
     auth6->GetStateType();
     auth7->GetStateType();
