@@ -188,6 +188,8 @@ protected:
     uint32_t GetCredentialType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo);
     bool HaveSameTokenId(std::shared_ptr<DmAuthContext> context, const std::vector<std::string> &tokenIdHashList);
     void SetProcessInfo(std::shared_ptr<DmAuthContext> context);
+    bool IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &credId,
+        const DistributedDeviceProfile::AccessControlProfile &profile);
 };
 
 class AuthSrcConfirmState : public DmAuthState {

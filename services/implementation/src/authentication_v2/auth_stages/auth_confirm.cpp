@@ -457,6 +457,12 @@ void AuthSrcConfirmState::CheckCredIdInAclForP2P(std::shared_ptr<DmAuthContext> 
     const DistributedDeviceProfile::AccessControlProfile &profile, JsonObject &credInfo, uint32_t bindType,
     bool &checkResult)
 {
+    if (!DmAuthState::IsMatchCredentialAndP2pACL(credInfo, credId, profile)) {
+        LOGE("acl bindlevel and credential authorizedScope not match");
+        DeleteAcl(context, profile);
+        credInfo.Erase(credId);
+        return;
+    }
     if (credInfo[credId][FILED_CRED_TYPE].Get<uint32_t>() == bindType) {
         std::vector<std::string> appList;
         credInfo[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
