@@ -852,5 +852,23 @@ void DmAuthState::GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::s
     }
     LOGE("failed");
 }
+
+bool DmAuthState::IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &credId,
+    const DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    if (!credInfo.Contains(credId) || !credInfo[credId].Contains(FILED_AUTHORIZED_SCOPE) ||
+        !credInfo[credId][FILED_AUTHORIZED_SCOPE].IsNumberInteger()) {
+        return false;
+    }
+    int32_t authorizedScope = credInfo[credId][FILED_AUTHORIZED_SCOPE].Get<int32_t>();
+    if (authorizedScope == static_cast<int32_t>(DM_AUTH_SCOPE_USER) && profile.GetBindLevel() == USER) {
+        return true;
+    }
+    if (authorizedScope == static_cast<int32_t>(DM_AUTH_SCOPE_APP) &&
+        (profile.GetBindLevel() == SERVICE || profile.GetBindLevel() == APP)) {
+        return true;
+    }
+    return false;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
