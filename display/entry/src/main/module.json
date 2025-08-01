@@ -81,7 +81,7 @@
       },
       {
         "name": "ohos.permission.DISTRIBUTED_DATASYNC",
-        "reason":"need use ohos.permission.DISTRIBUTED_DATASYNC"
+        "reason": "need use ohos.permission.DISTRIBUTED_DATASYNC"
       }
     ],
     "metadata": [
