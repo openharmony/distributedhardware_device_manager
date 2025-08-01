@@ -405,6 +405,22 @@ void HiChainConnectorSevenhFuzzTest(const uint8_t* data, size_t size)
     JsonObject jsonDeviceList;
     hichainConnector->deleteMultiMembers(groupType, usersId, jsonDeviceList);
 }
+
+void GetGroupInfoExtFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
+    int32_t maxStringLength = 64;
+    std::string queryParams = fdp.ConsumeRandomLengthString(maxStringLength);
+    std::vector<GroupInfo> groupList;
+
+    std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
+    hichainConnector->GetGroupInfoExt(userId, queryParams, groupList);
+}
 }
 }
 
@@ -419,5 +435,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::HiChainConnectorFifthFuzzTest(data, size);
     OHOS::DistributedHardware::HiChainConnectorSixthFuzzTest(data, size);
     OHOS::DistributedHardware::HiChainConnectorSevenhFuzzTest(data, size);
+    OHOS::DistributedHardware::GetGroupInfoExtFuzzTest(data, size);
     return 0;
 }

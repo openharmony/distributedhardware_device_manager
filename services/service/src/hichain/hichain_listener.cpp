@@ -284,10 +284,12 @@ int32_t HichainListener::GetRelatedGroupsCommon(int32_t userId, const std::strin
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 int64_t HichainListener::GenRequestId()
 {
     return GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
 }
+//LCOV_EXCL_STOP
 
 int32_t HichainListener::DeleteGroup(const int32_t userId, std::string &groupId)
 {

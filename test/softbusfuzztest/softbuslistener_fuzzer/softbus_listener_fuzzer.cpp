@@ -31,6 +31,7 @@ namespace {
     constexpr int32_t INT32NUM = 3;
     constexpr int32_t DATA_LEN = 20;
     constexpr int32_t CONNECTION_ADDR_USB_VALUE = 5;
+    constexpr uint32_t MAX_DEVICE_LIST_LENGTH = 2001;
 }
 
 class ISoftbusDiscoveringCallbackTest : public ISoftbusDiscoveringCallback {
@@ -282,6 +283,10 @@ void SoftBusListenerForthFuzzTest(const uint8_t* data, size_t size)
     std::string extra(reinterpret_cast<const char*>(data), size);
     std::vector<DmDeviceInfo> deviceList;
     softbusListener_->GetAllTrustedDeviceList(pkgName, extra, deviceList);
+    TrustChangeType changeType = TrustChangeType::DEVICE_NOT_TRUSTED;
+    uint32_t msgLen = 0;
+    char* msg = nullptr;
+    softbusListener_->OnDeviceTrustedChange(changeType, msg, msgLen);
 }
 
 void SoftBusListenerFifthFuzzTest(const uint8_t* data, size_t size)
@@ -309,6 +314,9 @@ void SoftBusListenerFifthFuzzTest(const uint8_t* data, size_t size)
     std::string aclList = fdp.ConsumeRandomLengthString();
     softbusListener_->OnGetAclListHash(localDevUserInfo, remoteDevUserInfo, aclList);
     uint32_t deviceListLen = static_cast<uint32_t>(deviceList.length());
+    softbusListener_->OnCredentialAuthStatus(deviceList.data(), deviceListLen, deviceTypeId, errcode);
+
+    deviceListLen = MAX_DEVICE_LIST_LENGTH;
     softbusListener_->OnCredentialAuthStatus(deviceList.data(), deviceListLen, deviceTypeId, errcode);
     std::shared_ptr<NodeBasicInfo> info = nullptr;
     softbusListener_->UpdateDeviceName(info.get());
@@ -394,6 +402,106 @@ void SoftBusListenerSeventhFuzzTest(const uint8_t* data, size_t size)
     DmDeviceBasicInfo dmdevInfo;
     softbusListener_->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmdevInfo);
 }
+
+void PutOstypeDataFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t maxStringLength = 64;
+    if ((data == nullptr) || (size < sizeof(int32_t) + maxStringLength)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    std::string peerUdid = fdp.ConsumeRandomLengthString(maxStringLength);
+    int32_t osType = fdp.ConsumeIntegral<int32_t>();
+    softbusListener_->PutOstypeData(peerUdid, osType);
+}
+
+void CacheDeviceInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+
+    std::string deviceId = "deviceId";
+    auto deviceInfo = std::make_shared<DeviceInfo>();
+    deviceInfo->addrNum = 1;
+    softbusListener_->CacheDeviceInfo(deviceId, deviceInfo);
+
+    deviceInfo->addr[0].type = static_cast<ConnectionAddrType>(fdp.ConsumeIntegral<int32_t>());
+    fdp.ConsumeData(deviceInfo->addr[0].info.ip.ip, sizeof(deviceInfo->addr[0].info.ip.ip));
+    deviceInfo->addr[0].info.ip.port = fdp.ConsumeIntegral<uint16_t>();
+    softbusListener_->CacheDeviceInfo(deviceId, deviceInfo);
+    deviceInfo->addrNum = 0;
+    softbusListener_->CacheDeviceInfo(deviceId, deviceInfo);
+    softbusListener_->CacheDeviceInfo("", deviceInfo);
+}
+
+void GetUuidByNetworkIdFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t maxStringLength = 64;
+    if ((data == nullptr) || (size < maxStringLength)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    std::string networkId = fdp.ConsumeRandomLengthString(maxStringLength);
+    std::string uuid = "";
+    softbusListener_->GetUuidByNetworkId(networkId.c_str(), uuid);
+}
+
+void SetHostPkgNameFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t maxStringLength = 64;
+    if ((data == nullptr) || (size < maxStringLength)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    std::string hostName = fdp.ConsumeRandomLengthString(maxStringLength);
+    softbusListener_->SetHostPkgName(hostName);
+}
+
+void GetAttrFromCustomDataFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    const char* jsonString = R"({
+        "MsgType": "0",
+        "userId": "12345",
+        "accountId": "a******3",
+        "peerUdids": ["u******1", "u******2"],
+        "peerUdid": "p******d",
+        "accountName": "t******t",
+        "syncUserIdFlag": 1,
+        "userIds": [
+            {"type": 1, "userId": 111},
+            {"type": 0, "userId": 222}
+        ]
+    })";
+    cJSON *jsonObject = cJSON_Parse(jsonString);
+    DmDeviceInfo dmDevInfo;
+    int32_t actionId = fdp.ConsumeIntegral<int32_t>();
+
+    softbusListener_->GetAttrFromCustomData(jsonObject, dmDevInfo, actionId);
+    cJSON_Delete(jsonObject);
+}
+
+void ConvertOsTypeToJsonFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    int32_t osType = fdp.ConsumeIntegral<int32_t>();
+    std::string osTypeStr = "";
+    softbusListener_->ConvertOsTypeToJson(osType, osTypeStr);
+}
 }
 }
 
@@ -409,5 +517,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::SoftBusListenerFifthFuzzTest(data, size);
     OHOS::DistributedHardware::SoftBusListenerSixthFuzzTest(data, size);
     OHOS::DistributedHardware::SoftBusListenerSeventhFuzzTest(data, size);
+    OHOS::DistributedHardware::PutOstypeDataFuzzTest(data, size);
+    OHOS::DistributedHardware::CacheDeviceInfoFuzzTest(data, size);
+    OHOS::DistributedHardware::GetUuidByNetworkIdFuzzTest(data, size);
+    OHOS::DistributedHardware::SetHostPkgNameFuzzTest(data, size);
+    OHOS::DistributedHardware::GetAttrFromCustomDataFuzzTest(data, size);
+    OHOS::DistributedHardware::ConvertOsTypeToJsonFuzzTest(data, size);
     return 0;
 }

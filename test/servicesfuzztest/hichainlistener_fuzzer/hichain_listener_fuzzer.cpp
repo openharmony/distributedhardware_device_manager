@@ -117,7 +117,7 @@ void DeleteAllGroupFuzzTest(const uint8_t* data, size_t size)
 
     std::string localUdid = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
 
-    size_t minUserIdCount = 0;
+    size_t minUserIdCount = 1;
     size_t maxUserIdCount = 10;
     size_t userIdCount = fdp.ConsumeIntegralInRange<size_t>(minUserIdCount, maxUserIdCount);
     std::vector<int32_t> backgroundUserIds;
@@ -170,8 +170,54 @@ void DeleteCredentialFuzzTest(const uint8_t* data, size_t size)
     std::string credId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
 
     std::shared_ptr<HichainListener> hiChainListener = std::make_shared<HichainListener>();
+    hiChainListener->DeleteCredential(osAccountId, credId);
     hiChainListener->credManager_ = nullptr;
     hiChainListener->DeleteCredential(osAccountId, credId);
+}
+
+void DeleteGroupExtFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
+    std::string groupId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+
+    std::shared_ptr<HichainListener> hiChainListener = std::make_shared<HichainListener>();
+    hiChainListener->DeleteGroupExt(userId, groupId);
+}
+
+void DeleteGroupFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t userId = -1;
+    std::string groupId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+
+    std::shared_ptr<HichainListener> hiChainListener = std::make_shared<HichainListener>();
+    hiChainListener->DeleteGroup(userId, groupId);
+    userId = 1;
+    hiChainListener->DeleteGroup(userId, groupId);
+}
+
+void GetRelatedGroupsCommonFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int32_t userId = 1;
+    std::string deviceId = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    std::string pkgName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+
+    std::vector<GroupsInfo> groupList;
+    std::shared_ptr<HichainListener> hiChainListener = std::make_shared<HichainListener>();
+    hiChainListener->GetRelatedGroupsCommon(userId, deviceId, pkgName.c_str(), groupList);
+    userId = -1;
+    hiChainListener->GetRelatedGroupsCommon(userId, deviceId, pkgName.c_str(), groupList);
 }
 }
 }
@@ -188,5 +234,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::GetRelatedGroupsFuzzTest(data, size);
     OHOS::DistributedHardware::GetRelatedGroupsExtFuzzTest(data, size);
     OHOS::DistributedHardware::DeleteCredentialFuzzTest(data, size);
+    OHOS::DistributedHardware::DeleteGroupExtFuzzTest(data, size);
+    OHOS::DistributedHardware::DeleteGroupFuzzTest(data, size);
+    OHOS::DistributedHardware::GetRelatedGroupsCommonFuzzTest(data, size);
     return 0;
 }

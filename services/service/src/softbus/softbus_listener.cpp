@@ -1261,6 +1261,7 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 void SoftbusListener::DeleteCacheDeviceInfo()
 {
     LOGI("start.");
@@ -1276,6 +1277,7 @@ void SoftbusListener::DeleteCacheDeviceInfo()
         DeviceOffLine(it);
     }
 }
+//LCOV_EXCL_STOP
 
 int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
 {
