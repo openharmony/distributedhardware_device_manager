@@ -68,6 +68,9 @@ constexpr const char* DM_TAG_EXTRA_INFO = "extraInfo";
 constexpr const char* FILED_AUTHORIZED_APP_LIST = "authorizedAppList";
 constexpr const char* CHANGE_PINTYPE = "1";
 constexpr const char* BIND_CALLER_USERID = "bindCallerUserId";
+const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
+constexpr const char* NEED_JOIN_LNN = "0";
+constexpr const char* NO_NEED_JOIN_LNN = "1";
 // currently, we just support one bind session in one device at same time
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
 const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
@@ -325,7 +328,13 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId, std::shared_ptr<Se
 {
     session->logicalSessionCnt_.fetch_sub(1);
     if (session->logicalSessionCnt_.load(std::memory_order_relaxed) == 0) {
-        usleep(USLEEP_TIME_US_500000);
+        {
+            std::lock_guard<std::mutex> lock(isNeedJoinLnnMtx_);
+            if (isNeedJoinLnn_) {
+                usleep(USLEEP_TIME_US_500000);
+            }
+            isNeedJoinLnn_ = true;
+        }
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
         std::lock_guard<std::mutex> lock(mapMutex_);
@@ -1668,7 +1677,17 @@ int32_t DeviceManagerServiceImpl::ParseConnectAddr(const PeerTargetId &targetId,
     if (bindParam.count(PARAM_KEY_CONN_ADDR_TYPE) != 0) {
         addrType = bindParam.at(PARAM_KEY_CONN_ADDR_TYPE);
     }
-
+    std::string isNeedJoinLnnStr;
+    if (bindParam.find(IS_NEED_JOIN_LNN) != bindParam.end()) {
+        isNeedJoinLnnStr = bindParam.at(IS_NEED_JOIN_LNN);
+    }
+    LOGI("isNeedJoinLnnStr: %{public}s.", isNeedJoinLnnStr.c_str());
+    {
+        std::lock_guard<std::mutex> lock(isNeedJoinLnnMtx_);
+        if (isNeedJoinLnnStr == NEED_JOIN_LNN || isNeedJoinLnnStr == NO_NEED_JOIN_LNN) {
+            isNeedJoinLnn_ = std::atoi(isNeedJoinLnnStr.c_str());
+        }
+    }
     std::shared_ptr<DeviceInfo> deviceInfo = std::make_shared<DeviceInfo>();
     int32_t index = 0;
     int32_t ret = GetDeviceInfo(targetId, addrType, deviceId, deviceInfo, index);
