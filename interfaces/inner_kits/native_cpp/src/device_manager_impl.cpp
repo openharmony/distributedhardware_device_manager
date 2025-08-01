@@ -1986,17 +1986,13 @@ uint16_t DeviceManagerImpl::AddDiscoveryCallback(const std::string &pkgName,
         std::lock_guard<std::mutex> autoLock(subMapLock);
         auto item = pkgName2SubIdMap_.find(pkgNameTemp);
         if (item == pkgName2SubIdMap_.end() && subscribeId == DM_INVALID_FLAG_ID) {
-            if (pkgName2SubIdMap_.size() >= MAX_CONTAINER_SIZE || randSubIdSet_.size() >= MAX_CONTAINER_SIZE) {
-                LOGE("pkgName2SubIdMap_ or randSubIdSet_ size is more than max size");
-                return DM_INVALID_FLAG_ID;
-            }
+            CHECK_SIZE_RETURN(pkgName2SubIdMap_, DM_INVALID_FLAG_ID);
+            CHECK_SIZE_RETURN(randSubIdSet_, DM_INVALID_FLAG_ID);
             subscribeId = GenUniqueRandUint(randSubIdSet_);
             pkgName2SubIdMap_[pkgNameTemp] = subscribeId;
         } else if (item == pkgName2SubIdMap_.end() && subscribeId != DM_INVALID_FLAG_ID) {
-            if (pkgName2SubIdMap_.size() >= MAX_CONTAINER_SIZE || randSubIdSet_.size() >= MAX_CONTAINER_SIZE) {
-                LOGE("pkgName2SubIdMap_ or randSubIdSet_ size is more than max size");
-                return DM_INVALID_FLAG_ID;
-            }
+            CHECK_SIZE_RETURN(pkgName2SubIdMap_, DM_INVALID_FLAG_ID);
+            CHECK_SIZE_RETURN(randSubIdSet_, DM_INVALID_FLAG_ID);
             pkgName2SubIdMap_[pkgNameTemp] = subscribeId;
             randSubIdSet_.emplace(subscribeId);
         } else if (item != pkgName2SubIdMap_.end()) {
@@ -2034,10 +2030,8 @@ int32_t DeviceManagerImpl::AddPublishCallback(const std::string &pkgName)
         if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
             publishId = pkgName2PubIdMap_[pkgName];
         } else {
-            if (pkgName2PubIdMap_.size() >= MAX_CONTAINER_SIZE || randPubIdSet_.size() >= MAX_CONTAINER_SIZE) {
-                LOGE("pkgName2PubIdMap_ or randPubIdSet_ is more than max size");
-                return DM_INVALID_FLAG_ID;
-            }
+            CHECK_SIZE_RETURN(pkgName2PubIdMap_, DM_INVALID_FLAG_ID);
+            CHECK_SIZE_RETURN(randPubIdSet_, DM_INVALID_FLAG_ID);
             publishId = GenUniqueRandUint(randPubIdSet_);
             pkgName2PubIdMap_[pkgName] = publishId;
         }

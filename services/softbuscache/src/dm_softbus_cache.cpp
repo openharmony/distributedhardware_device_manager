@@ -143,10 +143,7 @@ void SoftbusCache::SaveDeviceInfo(DmDeviceInfo deviceInfo)
         return;
     }
     std::lock_guard<std::mutex> mutexLock(deviceInfosMutex_);
-    if (deviceInfo_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("deviceInfo_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(deviceInfo_);
     deviceInfo_[udid] = std::pair<std::string, DmDeviceInfo>(uuid, deviceInfo);
     LOGI("success udid %{public}s, networkId %{public}s",
         GetAnonyString(udid).c_str(), GetAnonyString(std::string(deviceInfo.networkId)).c_str());
@@ -305,10 +302,7 @@ void SoftbusCache::SaveDeviceSecurityLevel(const char *networkId)
     if (deviceSecurityLevel_.find(std::string(networkId)) != deviceSecurityLevel_.end()) {
         return;
     }
-    if (deviceSecurityLevel_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("deviceSecurityLevel_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(deviceSecurityLevel_);
     int32_t tempSecurityLevel = -1;
     if (GetNodeKeyInfo(DM_PKG_NAME, networkId, NodeDeviceInfoKey::NODE_KEY_DEVICE_SECURITY_LEVEL,
         reinterpret_cast<uint8_t *>(&tempSecurityLevel), LNN_COMMON_LEN) != DM_OK) {
@@ -354,10 +348,7 @@ int32_t SoftbusCache::GetDevLevelFromBus(const char *networkId, int32_t &securit
         LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
         return ERR_DM_FAILED;
     }
-    if (deviceSecurityLevel_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("deviceSecurityLevel_ map size is more than max size");
-        return ERR_DM_FAILED;
-    }
+    CHECK_SIZE_RETURN(deviceSecurityLevel_, ERR_DM_FAILED);
     securityLevel = tempSecurityLevel;
     deviceSecurityLevel_[std::string(networkId)] = tempSecurityLevel;
     LOGI("Get dev level from softbus success, networkId is %{public}s.",

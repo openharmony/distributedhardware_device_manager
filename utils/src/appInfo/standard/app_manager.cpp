@@ -33,7 +33,7 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const int32_t MAX_CONTAINER_SIZE = 1000;
+const uint32_t MAX_CONTAINER_SIZE = 1000;
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
 
@@ -86,10 +86,7 @@ DM_EXPORT void AppManager::RegisterCallerAppId(const std::string &pkgName)
     }
     LOGI("PkgName %{public}s, appId %{public}s.", pkgName.c_str(), GetAnonyString(appId).c_str());
     std::lock_guard<std::mutex> lock(appIdMapLock_);
-    if (appIdMap_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("appIdMap_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(appIdMap_);
     appIdMap_[pkgName] = appId;
 }
 

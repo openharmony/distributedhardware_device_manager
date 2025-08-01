@@ -70,10 +70,7 @@ int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &
 void HiDumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo)
 {
     LOGI("HiDumpHelper::SetNodeInfo");
-    if (nodeInfos_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("nodeInfos_ size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(nodeInfos_);
     nodeInfos_.push_back(deviceInfo);
 }
 

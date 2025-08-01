@@ -51,6 +51,22 @@ namespace DistributedHardware {
             return (ret);                       \
         }                                       \
     } while (0)
+
+#define CHECK_SIZE_VOID(container)                    \
+    do {                                        \
+        if ((container).size() >= MAX_CONTAINER_SIZE) {                 \
+            LOGE("container size is more than max size");    \
+            return;                             \
+        }                                       \
+    } while (0)
+
+#define CHECK_SIZE_RETURN(container, ret)             \
+    do {                                        \
+        if ((container).size() >= MAX_CONTAINER_SIZE) {                 \
+            LOGE("container size is more than max size");    \
+            return (ret);                       \
+        }                                       \
+    } while (0)
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_LOG_H
