@@ -302,7 +302,8 @@ private:
     void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
 private:
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
-
+    bool isNeedJoinLnn_ = true;
+    std::mutex isNeedJoinLnnMtx_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
