@@ -41,6 +41,7 @@ constexpr const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
 constexpr const char* TAG_LOCAL_DEVICE_TYPE = "LOCALDEVICETYPE";
 constexpr const char* TAG_REQUESTER = "REQUESTER";
 constexpr const char* UNVALID_CREDTID = "invalidCredId";
+constexpr const char* TAG_IS_SUPPORT_ULTRASONIC = "isSupportUltrasonic";
 // authType fallback table
 using FallBackKey = std::pair<std::string, DmAuthType>; // accessee.bundleName, authType
 static std::map<FallBackKey, DmAuthType> g_pinAuthTypeFallBackMap = {
@@ -638,6 +639,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     NegotiateAcl(context, aclNegoResult);
     context->accesser.aclTypeList = aclNegoResult.Dump();
     NegotiateProxyAcl(context);
+    NegotiateUltrasonic(context);
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_USER_CONFIRM, context);
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
         static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), DM_OK);
@@ -649,6 +651,32 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
             HandleAuthenticateTimeout(context, name);
         });
     return DM_OK;
+}
+
+void AuthSrcConfirmState::NegotiateUltrasonic(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
+        LOGE("auth type not ultrasonic.");
+        return;
+    }
+    if (context->accessee.extraInfo.empty()) {
+        LOGE("extraInfo empty.");
+        return;
+    }
+    JsonObject json;
+    json.Parse(context->accessee.extraInfo);
+    if (json.IsDiscarded()) {
+        LOGE("extraInfo invalid.");
+        return;
+    }
+    bool isSupportUltrasonic = true;
+    if (IsBool(json, TAG_IS_SUPPORT_ULTRASONIC)) {
+        isSupportUltrasonic = json[TAG_IS_SUPPORT_ULTRASONIC].Get<bool>();
+    }
+    if (!isSupportUltrasonic) {
+        context->authType = AUTH_TYPE_PIN;
+    }
 }
 
 void AuthSrcConfirmState::ResetBindLevel(std::shared_ptr<DmAuthContext> context)
