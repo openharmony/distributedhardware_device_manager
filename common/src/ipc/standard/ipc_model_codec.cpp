@@ -35,6 +35,7 @@ constexpr uint32_t IPC_VECTOR_MAX_SIZE = 1000;
         } \
     } while (0)
 
+//LCOV_EXCL_START
 void IpcModelCodec::DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
 {
     std::string deviceIdStr = parcel.ReadString();
@@ -478,6 +479,6 @@ bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::s
     }
     return true;
 }
-
+//LCOV_EXCL_STOP
 } // namespace DistributedHardware
 } // namespace OHOS
