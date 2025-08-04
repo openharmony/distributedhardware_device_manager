@@ -967,6 +967,7 @@ void SoftbusListener::ConvertDeviceInfoToDmDevice(const DeviceInfo &device, DmDe
     dmDevice.extraData = jsonObj.Dump();
 }
 
+//LCOV_EXCL_START
 void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObject &jsonObj)
 {
     if (addrInfo->type == ConnectionAddrType::CONNECTION_ADDR_ETH) {
@@ -1004,6 +1005,7 @@ void SoftbusListener::ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObje
         LOGI("Unknown connection address type: %{public}d.", addrInfo->type);
     }
 }
+//LCOV_EXCL_STOP
 
 int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_t &networkType)
 {
@@ -1290,6 +1292,7 @@ int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void SoftbusListener::ConvertAclToDeviceInfo(DistributedDeviceProfile::AccessControlProfile &profile,
     DmDeviceInfo &deviceInfo)
@@ -1526,5 +1529,6 @@ int32_t SoftbusListener::PutOstypeData(const std::string &peerUdid, int32_t osTy
     return KVAdapterManager::GetInstance().PutOstypeData(peerUdid, osTypeStr);
 }
 #endif
+//LCOV_EXCL_STOP
 } // namespace DistributedHardware
 } // namespace OHOS
