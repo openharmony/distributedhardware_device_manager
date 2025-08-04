@@ -1717,5 +1717,67 @@ HWTEST_F(DeviceProfileConnectorSecondTest, GetDeviceIdAndUdidListByTokenId_004, 
     auto result = DeviceProfileConnector::GetInstance().GetDeviceIdAndUdidListByTokenId(userIds, localUdid, tokenId);
     EXPECT_TRUE(result.empty());
 }
+
+HWTEST_F(DeviceProfileConnectorSecondTest, IsAllowAuthAlways_001, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    item.SetAuthenticationType(ALLOW_AUTH_ALWAYS);
+    std::string localUdid = item.GetAccesser().GetAccesserDeviceId();
+    int32_t userId = item.GetAccesser().GetAccesserUserId();
+    std::string peerUdid = item.GetAccessee().GetAccesseeDeviceId();
+    std::string pkgName = item.GetAccesser().GetAccesserBundleName();
+    uint64_t tokenId = item.GetAccesser().GetAccesserTokenId();
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().IsAllowAuthAlways(localUdid, userId, peerUdid,
+        pkgName, tokenId);
+    EXPECT_TRUE(result);
+
+    localUdid = item.GetAccessee().GetAccesseeDeviceId();
+    userId = item.GetAccessee().GetAccesseeUserId();
+    peerUdid = item.GetAccesser().GetAccesserDeviceId();
+    pkgName = item.GetAccessee().GetAccesseeBundleName();
+    tokenId = item.GetAccessee().GetAccesseeTokenId();
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl(_))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    result = DeviceProfileConnector::GetInstance().IsAllowAuthAlways(localUdid, userId, peerUdid,
+        pkgName, tokenId);
+    EXPECT_TRUE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, IsAllowAuthAlways_002, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    AddAccessControlProfile(acls);
+    auto &item = acls[0];
+    std::string localUdid = item.GetAccesser().GetAccesserDeviceId();
+    int32_t userId = item.GetAccesser().GetAccesserUserId();
+    std::string peerUdid = item.GetAccessee().GetAccesseeDeviceId();
+    std::string pkgName = item.GetAccesser().GetAccesserBundleName();
+    uint64_t tokenId = item.GetAccesser().GetAccesserTokenId();
+    item.SetAuthenticationType(ALLOW_AUTH_ONCE);
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl((_)))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().IsAllowAuthAlways(localUdid, userId, peerUdid,
+        pkgName, tokenId);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(DeviceProfileConnectorSecondTest, IsAllowAuthAlways_003, testing::ext::TestSize.Level1)
+{
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls;
+    std::string localUdid = "localUdid3";
+    int32_t userId = 3;
+    std::string peerUdid = "peerUdid3";
+    std::string pkgName = "com.example.app3";
+    uint64_t tokenId = 123458;
+    EXPECT_CALL(*distributedDeviceProfileClientMock_, GetAllAclIncludeLnnAcl((_)))
+        .WillOnce(DoAll(SetArgReferee<0>(acls), Return(0)));
+    bool result = DeviceProfileConnector::GetInstance().IsAllowAuthAlways(localUdid, userId, peerUdid,
+        pkgName, tokenId);
+    EXPECT_FALSE(result);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

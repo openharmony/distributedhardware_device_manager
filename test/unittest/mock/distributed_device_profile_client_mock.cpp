@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -95,6 +95,11 @@ int32_t DistributedDeviceProfileClient::GetBusinessEvent(BusinessEvent &event)
 int32_t DistributedDeviceProfileClient::PutBusinessEvent(const DistributedDeviceProfile::BusinessEvent &event)
 {
     return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->PutBusinessEvent(event);
+}
+
+int32_t DistributedDeviceProfileClient::GetAllAclIncludeLnnAcl(std::vector<AccessControlProfile>& profiles)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->GetAllAclIncludeLnnAcl(profiles);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

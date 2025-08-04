@@ -15,6 +15,7 @@
 
 #include "device_manager_service_listener.h"
 #include "dm_crypto.h"
+#include "dm_auth_context.h"
 #include "dm_auth_state.h"
 #include "UTTest_auth_negotiate.h"
 
@@ -169,17 +170,20 @@ HWTEST_F(AuthNegotiateTest, AuthSinkNegotiateStateMachine_005, testing::ext::Tes
     accessee.SetAccesseeTokenId(456);
     profile.SetAccesser(accesser);
     profile.SetAccessee(accessee);
+    profile.SetBindLevel(1);
 
     JsonObject credIdJson;
     credIdJson[FILED_CRED_TYPE] = DM_POINT_TO_POINT;
     std::vector<std::string> appList = {"123", "456"};
     credIdJson[FILED_AUTHORIZED_APP_LIST] = appList;
+    credIdJson[FILED_AUTHORIZED_SCOPE] = DM_AUTH_SCOPE_USER;
     JsonObject credInfo;
     std::string test_cred_id = "123";
     credInfo.Insert(test_cred_id, credIdJson);
 
     bool checkResult = false;
     authState->CheckCredIdInAclForP2P(context, test_cred_id, profile, credInfo, DM_POINT_TO_POINT, checkResult);
+    GTEST_LOG_(INFO) << "checkResult=" << checkResult;
     EXPECT_TRUE(checkResult);
 }
 

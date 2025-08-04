@@ -240,9 +240,13 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
         context->state = static_cast<int32_t>(GetStateType());
     }
     context->isNeedJoinLnn = true;
-    SourceFinish(context);
     std::string peerDeviceId = "";
     GetPeerDeviceId(context, peerDeviceId);
+    if (DeviceProfileConnector::GetInstance().IsAllowAuthAlways(context->accesser.deviceId, context->accesser.userId,
+        peerDeviceId, context->pkgName, context->accesser.tokenId)) {
+        context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
+    }
+    SourceFinish(context);
     bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
     // Trigger networking
     if (context->reason == DM_BIND_TRUST_TARGET && (!context->accesser.isOnline || isNeedJoinLnn)) {

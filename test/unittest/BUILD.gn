@@ -474,7 +474,10 @@ ohos_unittest("UTTest_device_manager_service") {
 ohos_unittest("UTTest_dm_softbus_cache") {
   module_out_path = module_out_path
 
-  sources = [ "UTTest_dm_softbus_cache.cpp" ]
+  sources = [
+    "mock/softbus_center_mock.cpp",
+    "UTTest_dm_softbus_cache.cpp" 
+  ]
 
   deps = [ ":device_manager_test_common" ]
 
