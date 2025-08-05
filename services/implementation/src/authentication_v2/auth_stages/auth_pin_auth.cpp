@@ -513,6 +513,7 @@ int32_t AuthSrcPinInputState::ShowStartAuthDialog(std::shared_ptr<DmAuthContext>
 int32_t AuthSrcPinInputState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcPinInputState::Action start");
+    CHECK_NULL_RETURN(context, STOP_BIND);
     if (context->inputPinAuthFailTimes == 0) {
         auto ret = ShowStartAuthDialog(context);
         if (ret != DM_OK) {
@@ -520,9 +521,11 @@ int32_t AuthSrcPinInputState::Action(std::shared_ptr<DmAuthContext> context)
         }
     } else {
         // clear input pin box, and show try again
+        CHECK_NULL_RETURN(context->authUiStateMgr, STOP_BIND);
         context->authUiStateMgr->UpdateUiState(DmUiStateMsg::MSG_PIN_CODE_ERROR);
     }
 
+    CHECK_NULL_RETURN(context->authStateMachine, STOP_BIND);
     LOGI("AuthSrcPinInputState::Action waitting user operation");
     // wait for user operation
     if (DmEventType::ON_USER_OPERATION !=

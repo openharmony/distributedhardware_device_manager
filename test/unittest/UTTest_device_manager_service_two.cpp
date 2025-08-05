@@ -1605,6 +1605,7 @@ HWTEST_F(DeviceManagerServiceTest, UpdateLocalServiceInfo_201, testing::ext::Tes
     DeviceManagerService::GetInstance().NotifyRemoteLocalUserSwitchByWifi(localUdid, wifiDevices,
         foregroundUserIds, backgroundUserIds);
     GTEST_LOG_(INFO) << "NotifyRemoteLocalUserSwitchByWifi end" ;
+    sleep(3);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
 }
 
