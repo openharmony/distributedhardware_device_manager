@@ -601,18 +601,13 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
             LOGE("AuthSinkCredentialExchangeState::Action failed, agree user cred failed.");
             return ret;
         }
+        context->accessee.isGeneratedLnnCredThisBind = true;
 
        // Delete temporary credentials sync
         ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
     }
 
-    DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
-    if (context->accessee.bindLevel == static_cast<int32_t>(APP) ||
-        context->accessee.bindLevel == static_cast<int32_t>(SERVICE)) {
-        authorizedScope = DM_AUTH_SCOPE_APP;
-    } else if (context->accessee.bindLevel == static_cast<int32_t>(USER)) {
-        authorizedScope = DM_AUTH_SCOPE_USER;
-    }
+    DmAuthScope authorizedScope = GetAuthorizedScope(context->accessee.bindLevel);
     // Generate transport credentials and public key
     ret = GenerateCredIdAndPublicKey(authorizedScope, context);
     if (ret != DM_OK) {
@@ -628,7 +623,7 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
         context->SetCredentialId(DM_AUTH_LOCAL_SIDE, authorizedScope, "");
         return ret;
     }
-
+    context->accessee.isGeneratedTransmitThisBind = true;
     // Delete temporary transport credentials sync
     ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
 
@@ -660,6 +655,7 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
             context->SetCredentialId(DM_AUTH_LOCAL_SIDE, DM_AUTH_SCOPE_LNN, "");
             return ret;
         }
+        context->accesser.isGeneratedLnnCredThisBind = true;
         // Delete temporary lnn credentials sync
         ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
     }
@@ -680,6 +676,7 @@ int32_t AuthSrcCredentialAuthStartState::AgreeAndDeleteCredential(std::shared_pt
         LOGE("AuthSrcCredentialAuthStartState::Action failed, agree app cred failed.");
         return ret;
     }
+    context->accesser.isGeneratedTransmitThisBind = true;
     // Delete temporary transport credentials sync
     ffrt::submit([=]() { context->hiChainAuthConnector->DeleteCredential(osAccountId, tmpCredId);});
     return DM_OK;

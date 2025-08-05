@@ -110,6 +110,17 @@ bool DmAuthState::IsScreenLocked()
     return isLocked;
 }
 
+DmAuthScope DmAuthState::GetAuthorizedScope(int32_t bindLevel)
+{
+    DmAuthScope authorizedScope = DM_AUTH_SCOPE_INVALID;
+    if (bindLevel == static_cast<int32_t>(APP) || bindLevel == static_cast<int32_t>(SERVICE)) {
+        authorizedScope = DM_AUTH_SCOPE_APP;
+    } else if (bindLevel == static_cast<int32_t>(USER)) {
+        authorizedScope = DM_AUTH_SCOPE_USER;
+    }
+    return authorizedScope;
+}
+
 void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("SourceFinish reason:%{public}d, state:%{public}d", context->reason, context->state);
@@ -120,18 +131,8 @@ void DmAuthState::SourceFinish(std::shared_ptr<DmAuthContext> context)
         GetOutputState(context->state), GenerateBindResultContent(context));
     context->successFinished = true;
 
-    if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED && context->reUseCreId.empty() &&
-        context->reason != DM_BIND_TRUST_TARGET) {
-        // 根据凭据id 删除sink端多余的凭据
-        context->hiChainAuthConnector->DeleteCredential(context->accesser.userId,
-            context->accesser.lnnCredentialId);
-        context->hiChainAuthConnector->DeleteCredential(context->accesser.userId,
-            context->accesser.transmitCredentialId);
-        // 根据skid删除sk，删除skid
-        DeviceProfileConnector::GetInstance().DeleteSessionKey(context->accesser.userId,
-            context->accesser.lnnSessionKeyId);
-        DeviceProfileConnector::GetInstance().DeleteSessionKey(context->accesser.userId,
-            context->accesser.transmitSessionKeyId);
+    if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED && context->reason != DM_BIND_TRUST_TARGET) {
+        BindFail(context);
     }
     LOGI("SourceFinish notify online");
     char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
@@ -155,17 +156,8 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
         GetOutputReplay(context->accessee.bundleName, context->reason),
         GetOutputState(context->state), GenerateBindResultContent(context));
     context->successFinished = true;
-    if (context->reason != DM_OK && context->reUseCreId.empty()) {
-        // 根据凭据id 删除sink端多余的凭据
-        context->hiChainAuthConnector->DeleteCredential(context->accessee.userId,
-            context->accessee.lnnCredentialId);
-        context->hiChainAuthConnector->DeleteCredential(context->accessee.userId,
-            context->accessee.transmitCredentialId);
-        // 根据skid删除sk，删除skid
-        DeviceProfileConnector::GetInstance().DeleteSessionKey(context->accessee.userId,
-            context->accessee.lnnSessionKeyId);
-        DeviceProfileConnector::GetInstance().DeleteSessionKey(context->accessee.userId,
-            context->accessee.transmitSessionKeyId);
+    if (context->reason != DM_OK) {
+        BindFail(context);
     } else {
         SetAclInfo(context);
         if (NeedAgreeAcl(context)) {
@@ -869,6 +861,115 @@ bool DmAuthState::IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &
         return true;
     }
     return false;
+}
+
+void DmAuthState::BindFail(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    CHECK_NULL_VOID(context->hiChainAuthConnector);
+    if (context->reason == DM_BIND_TRUST_TARGET) {
+        return;
+    }
+    bool isDelLnnAcl = false;
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    if (access.isGeneratedLnnCredThisBind) {
+        if (!access.lnnCredentialId.empty()) {
+            context->hiChainAuthConnector->DeleteCredential(access.userId, access.lnnCredentialId);
+        }
+        if (access.lnnSessionKeyId != 0) {
+            DeviceProfileConnector::GetInstance().DeleteSessionKey(access.userId, access.lnnSessionKeyId);
+        }
+        isDelLnnAcl = true;
+    }
+    std::vector<std::pair<int64_t, int64_t>> tokenIds;
+    if (!access.isAuthed && access.transmitSessionKeyId != 0) {
+        DeviceProfileConnector::GetInstance().DeleteSessionKey(access.userId, access.transmitSessionKeyId);
+        tokenIds.push_back(std::make_pair(context->accesser.tokenId, context->accessee.tokenId));
+    }
+    if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+        for (auto &app : context->subjectProxyOnes) {
+            DmProxyAccess &proxyAccess = context->direction == DM_AUTH_SOURCE ? app.proxyAccesser : app.proxyAccessee;
+            if (proxyAccess.isAuthed || proxyAccess.transmitSessionKeyId == 0) {
+                continue;
+            }
+            DeviceProfileConnector::GetInstance().DeleteSessionKey(access.userId, proxyAccess.transmitSessionKeyId);
+            tokenIds.push_back(std::make_pair(app.proxyAccesser.tokenId, app.proxyAccessee.tokenId));
+        }
+    }
+    if (access.isGeneratedTransmitThisBind && !access.transmitCredentialId.empty()) {
+        context->hiChainAuthConnector->DeleteCredential(access.userId, access.transmitCredentialId);
+    } else if (!context->reUseCreId.empty()) {
+        RemoveTokenIdsFromCredential(context, context->reUseCreId, tokenIds);
+    } else {
+        LOGE("no credential");
+    }
+    DeleteAcl(context, isDelLnnAcl, tokenIds);
+}
+
+void DmAuthState::DeleteAcl(std::shared_ptr<DmAuthContext> context, bool isDelLnnAcl,
+    std::vector<std::pair<int64_t, int64_t>> &tokenIds)
+{
+    CHECK_NULL_VOID(context);
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    DmAccess &remoteAccess = (context->direction == DM_AUTH_SOURCE) ? context->accessee : context->accesser;
+    if (remoteAccess.deviceId.empty()) {
+        return;
+    }
+    if (!isDelLnnAcl && tokenIds.empty()) {
+        return;
+    }
+    std::vector<DistributedDeviceProfile::AccessControlProfile> acls =
+        DeviceProfileConnector::GetInstance().GetAclList(access.deviceId, access.userId,
+        remoteAccess.deviceId, remoteAccess.userId);
+    for (DistributedDeviceProfile::AccessControlProfile acl : acls) {
+        if (isDelLnnAcl && DeviceProfileConnector::GetInstance().IsLnnAcl(acl)) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(acl.GetAccessControlId());
+            continue;
+        }
+        auto it = std::find(tokenIds.begin(), tokenIds.end(),
+            std::make_pair(acl.GetAccesser().GetAccesserTokenId(), acl.GetAccessee().GetAccesseeTokenId()));
+        if (it != tokenIds.end()) {
+            DeviceProfileConnector::GetInstance().DeleteAccessControlById(acl.GetAccessControlId());
+            continue;
+        }
+    }
+}
+
+void DmAuthState::RemoveTokenIdsFromCredential(std::shared_ptr<DmAuthContext> context, const std::string &credId,
+    std::vector<std::pair<int64_t, int64_t>> &tokenIds)
+{
+    CHECK_NULL_VOID(context);
+    CHECK_NULL_VOID(context->hiChainAuthConnector);
+    DmAccess &access = (context->direction == DM_AUTH_SOURCE) ? context->accesser : context->accessee;
+    JsonObject credJson;
+    context->hiChainAuthConnector->QueryCredInfoByCredId(access.userId, credId, credJson);
+    if (!credJson.Contains(credId)) {
+        LOGE("query cred failed");
+        return;
+    }
+    if (!credJson[credId].Contains(FILED_AUTHORIZED_APP_LIST)) {
+        LOGE("applist is empty");
+        context->hiChainAuthConnector->DeleteCredential(access.userId, credId);
+        return;
+    }
+    std::vector<std::string> appList;
+    credJson[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
+    for (const auto& it : tokenIds) {
+        auto erIt = std::find(appList.begin(), appList.end(), std::to_string(it.first));
+        if (erIt != appList.end()) {
+            appList.erase(erIt);
+        }
+        auto eeIt = std::find(appList.begin(), appList.end(), std::to_string(it.second));
+        if (eeIt != appList.end()) {
+            appList.erase(eeIt);
+        }
+    }
+    if (appList.size() == 0) {
+        LOGE("applist is empty, delete credential");
+        context->hiChainAuthConnector->DeleteCredential(access.userId, credId);
+        return;
+    }
+    context->hiChainAuthConnector->UpdateCredential(credId, access.userId, appList);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
