@@ -82,6 +82,13 @@ bool ValidateInputJson(const std::string &data)
         LOGE("Invalid certCount value %{public}u", certCount);
         return false;
     }
+    JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    jsonArrayObj.Parse(jsonObject[TAG_CERT].Dump());
+    const uint32_t certSize = jsonArrayObj.Items().size();
+    if (certSize != certCount) {
+        LOGE("certSize = %{public}u is invalid.", certSize);
+        return false;
+    }
     return true;
 }
 
