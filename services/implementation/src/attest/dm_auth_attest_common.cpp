@@ -101,6 +101,10 @@ bool ValidateInputJson(const std::string &data)
         return false;
     }
     const uint32_t binSize = hexLen / HEX_TO_UINT8;
+    if (binSize > MAX_LEN_PER_CERT) {
+        LOGE("binSize = %{public}u is invalid.", binSize);
+        return false;
+    }
     cert.data = new uint8_t[binSize]{0};
     if (cert.data == nullptr) {
         LOGE("Data allocation failed at index %{public}u", processedIndex);
