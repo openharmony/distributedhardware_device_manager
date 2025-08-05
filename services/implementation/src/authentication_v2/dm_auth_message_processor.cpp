@@ -35,6 +35,10 @@
 #include "dm_auth_state_machine.h"
 #include "dm_crypto.h"
 
+#ifdef SUPPORT_MSDP
+#include "spatial_awareness_mgr_client.h"
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 
@@ -100,6 +104,8 @@ const char* TAG_CERT_INFO = "certInfo";
 const char* TAG_LANGUAGE = "language";
 const char* TAG_ULTRASONIC_SIDE = "ultrasonicSide";
 const char* TAG_REMAINING_FROZEN_TIME = "remainingFrozenTime";
+const char* TAG_IS_SUPPORT_ULTRASONIC = "isSupportUltrasonic";
+
 constexpr const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
 
 namespace {
@@ -1508,7 +1514,24 @@ void DmAuthMessageProcessor::ParseUltrasonicSide(
         context->ultrasonicInfo = DmUltrasonicInfo::DM_Ultrasonic_Forward;
     } else {
         context->ultrasonicInfo = DmUltrasonicInfo::DM_Ultrasonic_Invalid;
+        return;
     }
+    bool isSupport = true;
+    if (context->ultrasonicInfo == DM_Ultrasonic_Forward) {
+#ifdef SUPPORT_MSDP
+        isSupport = Msdp::SpatialAwarenessMgrClient::GetInstance().IsPinCodeAbilitySupport(
+            Msdp::PinCodeMode::MODE_PIN_SEND_CODE);
+#endif
+    }
+    if (context->ultrasonicInfo == DM_Ultrasonic_Reverse) {
+#ifdef SUPPORT_MSDP
+        isSupport = Msdp::SpatialAwarenessMgrClient::GetInstance().IsPinCodeAbilitySupport(
+            Msdp::PinCodeMode::MODE_PIN_RECEIVE_CODE);
+#endif
+    }
+    JsonObject json;
+    json[TAG_IS_SUPPORT_ULTRASONIC] = isSupport;
+    context->accessee.extraInfo = json.Dump();
 }
 
 int32_t DmAuthMessageProcessor::ParseMessageRespAclNegotiate(const JsonObject &jsonObject,

@@ -356,5 +356,45 @@ HWTEST_F(AuthManagerTest, IsAuthCodeReady_004, testing::ext::TestSize.Level1)
     bool ret = authManager->IsAuthCodeReady(pkgName);
     ASSERT_EQ(ret, true);
 }
+
+HWTEST_F(AuthManagerTest, ParseUltrasonicSide_001, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObject;
+    jsonObject[TAG_ULTRASONIC_SIDE] = "0";
+    authManager->ParseUltrasonicSide(jsonObject);
+    jsonObject[TAG_ULTRASONIC_SIDE] = "1";
+    authManager->ParseUltrasonicSide(jsonObject);
+    EXPECT_NE(authManager->context_, nullptr);
+}
+
+HWTEST_F(AuthManagerTest, AuthSrcConfirmState_NegotiateUltrasonic_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSrcConfirmState> authState = std::make_shared<AuthSrcConfirmState>();
+    std::shared_ptr<DmAuthContext> context = authManager->GetAuthContext();
+
+    context->authType = DmAuthType::AUTH_TYPE_IMPORT_AUTH_CODE;
+    authState->NegotiateUltrasonic(nullptr);
+    authState->NegotiateUltrasonic(context);
+
+    context->authType = DmAuthType::AUTH_TYPE_PIN_ULTRASONIC;
+    authState->NegotiateUltrasonic(context);
+
+    context->accessee.extraInfo = "123456";
+    authState->NegotiateUltrasonic(context);
+
+    JsonObject json;
+    json["isSupportUltrasonic"] = "123456";
+    context->accessee.extraInfo = json.Dump();
+    authState->NegotiateUltrasonic(context);
+
+    json["isSupportUltrasonic"] = true;
+    context->accessee.extraInfo = json.Dump();
+    authState->NegotiateUltrasonic(context);
+
+    json["isSupportUltrasonic"] = false;
+    context->accessee.extraInfo = json.Dump();
+    authState->NegotiateUltrasonic(context);
+    EXPECT_EQ(context->authType, DmAuthType::AUTH_TYPE_PIN);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

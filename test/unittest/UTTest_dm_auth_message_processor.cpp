@@ -195,6 +195,21 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_006, testing::ext::Te
     EXPECT_EQ(ret, DM_OK);
     EXPECT_EQ(context->businessId, "testBusinessId");
 }
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_007, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->authStateMachine = std::make_shared<DmAuthStateMachine>(context);
+    std::shared_ptr<DmAuthMessageProcessor> processor = std::make_shared<DmAuthMessageProcessor>();
+    JsonObject jsonObj;
+    jsonObj["ultrasonicSide"] = 0;
+    int32_t ret = processor->ParseNegotiateMessage(jsonObj, context);
+    jsonObj["ultrasonicSide"] = 1;
+    ret = processor->ParseNegotiateMessage(jsonObj, context);
+
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(context->accessee.extraInfo.empty(), false);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
  

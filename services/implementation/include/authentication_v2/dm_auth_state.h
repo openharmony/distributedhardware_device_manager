@@ -231,6 +231,7 @@ private:
     void GetSrcProxyCredTypeForP2P(std::shared_ptr<DmAuthContext> context, std::vector<std::string> &deleteCredInfo);
     void GetCustomDescBySinkLanguage(std::shared_ptr<DmAuthContext> context);
     void ResetBindLevel(std::shared_ptr<DmAuthContext> context);
+    void NegotiateUltrasonic(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkStatePinAuthComm {

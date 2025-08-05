@@ -43,6 +43,10 @@
 #include "ffrt.h"
 #include "json_object.h"
 
+#ifdef SUPPORT_MSDP
+#include "spatial_awareness_mgr_client.h"
+#endif
+
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
@@ -493,8 +497,25 @@ void AuthManager::ParseUltrasonicSide(const JsonObject &jsonObject)
                 context_->ultrasonicInfo = DmUltrasonicInfo::DM_Ultrasonic_Forward;
             } else {
                 context_->ultrasonicInfo = DmUltrasonicInfo::DM_Ultrasonic_Invalid;
+                return;
             }
         }
+    }
+    bool isSupport = true;
+    if (context_->ultrasonicInfo == DM_Ultrasonic_Forward) {
+#ifdef SUPPORT_MSDP
+        isSupport = Msdp::SpatialAwarenessMgrClient::GetInstance().IsPinCodeAbilitySupport(
+            Msdp::PinCodeMode::MODE_PIN_RECEIVE_CODE);
+#endif
+    }
+    if (context_->ultrasonicInfo == DM_Ultrasonic_Reverse) {
+#ifdef SUPPORT_MSDP
+        isSupport = Msdp::SpatialAwarenessMgrClient::GetInstance().IsPinCodeAbilitySupport(
+            Msdp::PinCodeMode::MODE_PIN_SEND_CODE);
+#endif
+    }
+    if (!isSupport) {
+        context_->authType = AUTH_TYPE_PIN;
     }
 }
 
