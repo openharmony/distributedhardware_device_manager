@@ -156,18 +156,12 @@ DeviceManagerFfiImpl::DeviceManagerFfiImpl(const std::string &bundleName, int32_
     }
     {
         std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
-        if (g_initCallbackMap.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("g_initCallbackMap map size is more than max size");
-            return;
-        }
+        CHECK_SIZE_VOID(g_initCallbackMap);
         g_initCallbackMap[bundleName_] = initCallback;
     }
 
     std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
-    if (g_deviceManagerMap.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("g_deviceManagerMap map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(g_deviceManagerMap);
     g_deviceManagerMap[bundleName_] = this;
 }
 
@@ -377,10 +371,7 @@ int32_t DeviceManagerFfiImpl::StartDiscovering(const std::string &extra)
         std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
         auto iter = g_DiscoveryCallbackMap.find(bundleName_);
         if (iter == g_DiscoveryCallbackMap.end()) {
-            if (g_DiscoveryCallbackMap.size() >= MAX_CONTAINER_SIZE) {
-                LOGE("g_DiscoveryCallbackMap map size is more than max size");
-                return DM_ERR_FAILED;
-            }
+            CHECK_SIZE_RETURN(g_DiscoveryCallbackMap, DM_ERR_FAILED);
             discoveryCallback = std::make_shared<DmFfiDiscoveryCallback>(bundleName_);
             g_DiscoveryCallbackMap[bundleName_] = discoveryCallback;
         } else {
@@ -420,11 +411,8 @@ int32_t DeviceManagerFfiImpl::BindDevice(const std::string &deviceId, const std:
         std::lock_guard<std::mutex> autoLock(g_authCallbackMapMutex);
         auto iter = g_authCallbackMap.find(bundleName_);
         if (iter == g_authCallbackMap.end()) {
+            CHECK_SIZE_RETURN(g_authCallbackMap, DM_ERR_FAILED);
             bindDeviceCallback = std::make_shared<DmFfiAuthenticateCallback>(bundleName_);
-            if (g_authCallbackMap.size() >= MAX_CONTAINER_SIZE) {
-                LOGE("g_authCallbackMap map size is more than max size");
-                return DM_ERR_FAILED;
-            }
             g_authCallbackMap[bundleName_] = bindDeviceCallback;
         } else {
             bindDeviceCallback = iter->second;
@@ -458,10 +446,8 @@ int32_t DeviceManagerFfiImpl::BindTarget(const std::string &deviceId,
         {
             std::lock_guard<std::mutex> autoLock(g_bindCallbackMapMutex);
             auto iter = g_bindCallbackMap.find(bundleName_);
-            if (iter == g_bindCallbackMap.end() && g_bindCallbackMap.size() >= MAX_CONTAINER_SIZE) {
-                LOGE("g_bindCallbackMap map size is more than max size");
-                return DM_ERR_FAILED;
-            } else if (iter == g_bindCallbackMap.end() && g_bindCallbackMap.size() < MAX_CONTAINER_SIZE) {
+            if (iter == g_bindCallbackMap.end()) {
+                CHECK_SIZE_RETURN(g_bindCallbackMap, DM_ERR_FAILED);
                 bindTargetCallback = std::make_shared<DmFfiBindTargetCallback>(bundleName_);
                 g_bindCallbackMap[bundleName_] = bindTargetCallback;
             } else {
@@ -744,10 +730,7 @@ int32_t DeviceManagerFfiImpl::RegisterDevStatusCallback()
     }
     {
         std::lock_guard<std::mutex> autoLock(g_deviceStatusCallbackMapMutex);
-        if (g_deviceStatusCallbackMap.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("g_deviceStatusCallbackMap map size is more than max size");
-            return DM_ERR_FAILED;
-        }
+        CHECK_SIZE_RETURN(g_deviceStatusCallbackMap, DM_ERR_FAILED);
         g_deviceStatusCallbackMap[bundleName_] = callback;
     }
     return ERR_OK;
@@ -758,10 +741,7 @@ int32_t DeviceManagerFfiImpl::RegisterDiscoveryCallback()
     auto discoveryCallback = std::make_shared<DmFfiDiscoveryCallback>(bundleName_);
     {
         std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
-        if (g_DiscoveryCallbackMap.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("g_DiscoveryCallbackMap map size is more than max size");
-            return DM_ERR_FAILED;
-        }
+        CHECK_SIZE_RETURN(g_DiscoveryCallbackMap, DM_ERR_FAILED);
         g_DiscoveryCallbackMap[bundleName_] = discoveryCallback;
     }
     discoveryCallback->IncreaseRefCount();
@@ -773,10 +753,7 @@ int32_t DeviceManagerFfiImpl::RegisterPublishCallback()
     auto publishCallback = std::make_shared<DmFfiPublishCallback>(bundleName_);
     {
         std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
-        if (g_publishCallbackMap.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("g_publishCallbackMap map size is more than max size");
-            return DM_ERR_FAILED;
-        }
+        CHECK_SIZE_RETURN(g_publishCallbackMap, DM_ERR_FAILED);
         g_publishCallbackMap[bundleName_] = publishCallback;
     }
     publishCallback->IncreaseRefCount();
@@ -794,10 +771,7 @@ int32_t DeviceManagerFfiImpl::RegisterReplyCallback()
     }
     {
         std::lock_guard<std::mutex> autoLock(g_dmUiCallbackMapMutex);
-        if (g_dmUiCallbackMap.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("g_dmUiCallbackMap map size is more than max size");
-            return DM_ERR_FAILED;
-        }
+        CHECK_SIZE_RETURN(g_dmUiCallbackMap, DM_ERR_FAILED);
         g_dmUiCallbackMap[bundleName_] = dmUiCallback;
     }
     return ERR_OK;

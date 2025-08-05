@@ -46,10 +46,7 @@ void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgN
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (dmInitCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("dmInitCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(dmInitCallback_);
     dmInitCallback_[pkgName] = dmInitCallback;
 }
 
@@ -71,10 +68,7 @@ void DeviceManagerNotify::RegisterDeviceStateCallback(const std::string &pkgName
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (deviceStateCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("deviceStateCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(deviceStateCallback_);
     deviceStateCallback_[pkgName] = callback;
 }
 
@@ -106,10 +100,7 @@ void DeviceManagerNotify::RegisterDeviceStatusCallback(const std::string &pkgNam
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (deviceStatusCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("deviceStatusCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(deviceStatusCallback_);
     deviceStatusCallback_[pkgName] = callback;
 }
 
@@ -122,10 +113,7 @@ void DeviceManagerNotify::RegisterDiscoveryCallback(const std::string &pkgName, 
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (deviceDiscoveryCallbacks_.count(pkgName) == 0) {
-        if (deviceDiscoveryCallbacks_.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("deviceDiscoveryCallbacks_ map size is more than max size");
-            return;
-        }
+        CHECK_SIZE_VOID(deviceDiscoveryCallbacks_);
         deviceDiscoveryCallbacks_[pkgName] = std::map<uint16_t, std::shared_ptr<DiscoveryCallback>>();
     }
     deviceDiscoveryCallbacks_[pkgName][subscribeId] = callback;
@@ -156,10 +144,7 @@ void DeviceManagerNotify::RegisterPublishCallback(const std::string &pkgName,
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (devicePublishCallbacks_.count(pkgName) == 0) {
-        if (devicePublishCallbacks_.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("devicePublishCallbacks_ map size is more than max size");
-            return;
-        }
+        CHECK_SIZE_VOID(devicePublishCallbacks_);
         devicePublishCallbacks_[pkgName] = std::map<int32_t, std::shared_ptr<PublishCallback>>();
     }
     devicePublishCallbacks_[pkgName][publishId] = callback;
@@ -190,10 +175,7 @@ void DeviceManagerNotify::RegisterAuthenticateCallback(const std::string &pkgNam
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (authenticateCallback_.count(pkgName) == 0) {
-        if (authenticateCallback_.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("authenticateCallback_ map size is more than max size");
-            return;
-        }
+        CHECK_SIZE_VOID(authenticateCallback_);
         authenticateCallback_[pkgName] = std::map<std::string, std::shared_ptr<AuthenticateCallback>>();
     }
     authenticateCallback_[pkgName][deviceId] = callback;
@@ -240,10 +222,7 @@ void DeviceManagerNotify::RegisterDeviceManagerFaCallback(const std::string &pkg
                                                           std::shared_ptr<DeviceManagerUiCallback> callback)
 {
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (dmUiCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("dmUiCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(dmUiCallback_);
     dmUiCallback_[pkgName] = callback;
 }
 
@@ -265,10 +244,7 @@ void DeviceManagerNotify::RegisterCredentialCallback(const std::string &pkgName,
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (credentialCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("credentialCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(credentialCallback_);
     credentialCallback_[pkgName] = callback;
 }
 
@@ -290,10 +266,7 @@ void DeviceManagerNotify::RegisterPinHolderCallback(const std::string &pkgName,
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (pinHolderCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("pinHolderCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(pinHolderCallback_);
     pinHolderCallback_[pkgName] = callback;
 }
 
@@ -745,10 +718,7 @@ void DeviceManagerNotify::RegisterBindCallback(const std::string &pkgName, const
     }
     std::lock_guard<std::mutex> autoLock(bindLock_);
     if (bindCallback_.count(pkgName) == 0) {
-        if (bindCallback_.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("bindCallback_ map size is more than max size");
-            return;
-        }
+        CHECK_SIZE_VOID(bindCallback_);
         bindCallback_[pkgName] = std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>>();
     }
     bindCallback_[pkgName][targetId] = callback;
@@ -764,10 +734,7 @@ void DeviceManagerNotify::RegisterUnbindCallback(const std::string &pkgName, con
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     if (unbindCallback_.count(pkgName) == 0) {
-        if (unbindCallback_.size() >= MAX_CONTAINER_SIZE) {
-            LOGE("unbindCallback_ map size is more than max size");
-            return;
-        }
+        CHECK_SIZE_VOID(unbindCallback_);
         unbindCallback_[pkgName] = std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>>();
     }
     unbindCallback_[pkgName][targetId] = callback;
@@ -1028,10 +995,7 @@ void DeviceManagerNotify::RegDevTrustChangeCallback(const std::string &pkgName,
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (devTrustChangeCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("devTrustChangeCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(devTrustChangeCallback_);
     devTrustChangeCallback_[pkgName] = callback;
 }
 
@@ -1089,10 +1053,7 @@ void DeviceManagerNotify::RegisterDeviceScreenStatusCallback(const std::string &
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (deviceScreenStatusCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("deviceScreenStatusCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(deviceScreenStatusCallback_);
     deviceScreenStatusCallback_[pkgName] = callback;
 }
 
@@ -1137,10 +1098,7 @@ void DeviceManagerNotify::RegisterCredentialAuthStatusCallback(const std::string
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (credentialAuthStatusCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("credentialAuthStatusCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(credentialAuthStatusCallback_);
     credentialAuthStatusCallback_[pkgName] = callback;
 }
 
@@ -1186,10 +1144,7 @@ void DeviceManagerNotify::RegisterSinkBindCallback(const std::string &pkgName,
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
-    if (sinkBindTargetCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("sinkBindTargetCallback_ map size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(sinkBindTargetCallback_);
     sinkBindTargetCallback_[pkgName] = callback;
 }
 
@@ -1299,10 +1254,7 @@ int32_t DeviceManagerNotify::RegisterGetDeviceProfileInfoListCallback(const std:
         return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     std::lock_guard<std::mutex> autoLock(bindLock_);
-    if (getDeviceProfileInfoCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("callback map size is more than max size");
-        return ERR_DM_CALLBACK_REGISTER_FAILED;
-    }
+    CHECK_SIZE_RETURN(getDeviceProfileInfoCallback_, ERR_DM_CALLBACK_REGISTER_FAILED);
     getDeviceProfileInfoCallback_[pkgName] = callback;
     return DM_OK;
 }
@@ -1341,23 +1293,14 @@ int32_t DeviceManagerNotify::RegisterGetDeviceIconInfoCallback(const std::string
         return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     std::lock_guard<std::mutex> autoLock(bindLock_);
-    if (getDeviceIconInfoCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("callback map size is more than max size");
-        return ERR_DM_CALLBACK_REGISTER_FAILED;
-    }
+    CHECK_SIZE_RETURN(getDeviceIconInfoCallback_, ERR_DM_CALLBACK_REGISTER_FAILED);
     auto iter = getDeviceIconInfoCallback_.find(pkgName);
     if (iter == getDeviceIconInfoCallback_.end()) {
         getDeviceIconInfoCallback_[pkgName][uk] = {callback};
         return DM_OK;
     }
-    if (iter->second.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("callback map for pkg size is more than max size");
-        return ERR_DM_CALLBACK_REGISTER_FAILED;
-    }
-    if (iter->second[uk].size() >= MAX_CONTAINER_SIZE) {
-        LOGE("callback set size is more than max size");
-        return ERR_DM_CALLBACK_REGISTER_FAILED;
-    }
+    CHECK_SIZE_RETURN(iter->second, ERR_DM_CALLBACK_REGISTER_FAILED);
+    CHECK_SIZE_RETURN(iter->second[uk], ERR_DM_CALLBACK_REGISTER_FAILED);
     iter->second[uk].insert(callback);
     return DM_OK;
 }
@@ -1411,10 +1354,7 @@ int32_t DeviceManagerNotify::RegisterSetLocalDeviceNameCallback(const std::strin
         return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     std::lock_guard<std::mutex> autoLock(bindLock_);
-    if (setLocalDeviceNameCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("callback map size is more than max size");
-        return ERR_DM_CALLBACK_REGISTER_FAILED;
-    }
+    CHECK_SIZE_RETURN(setLocalDeviceNameCallback_, ERR_DM_CALLBACK_REGISTER_FAILED);
     setLocalDeviceNameCallback_[pkgName] = callback;
     return DM_OK;
 }
@@ -1428,19 +1368,13 @@ int32_t DeviceManagerNotify::RegisterSetRemoteDeviceNameCallback(const std::stri
         return ERR_DM_CALLBACK_REGISTER_FAILED;
     }
     std::lock_guard<std::mutex> autoLock(bindLock_);
-    if (setRemoteDeviceNameCallback_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("callback map size is more than max size");
-        return ERR_DM_CALLBACK_REGISTER_FAILED;
-    }
+    CHECK_SIZE_RETURN(setRemoteDeviceNameCallback_, ERR_DM_CALLBACK_REGISTER_FAILED);
     auto iter = setRemoteDeviceNameCallback_.find(pkgName);
     if (iter == setRemoteDeviceNameCallback_.end()) {
         setRemoteDeviceNameCallback_[pkgName][deviceId] = callback;
         return DM_OK;
     }
-    if (iter->second.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("callback map size is more than max size");
-        return ERR_DM_CALLBACK_REGISTER_FAILED;
-    }
+    CHECK_SIZE_RETURN(iter->second, ERR_DM_CALLBACK_REGISTER_FAILED);
     iter->second[deviceId] = callback;
     return DM_OK;
 }

@@ -209,10 +209,7 @@ DM_EXPORT void MultipleUserConnector::SetAccountInfo(int32_t userId,
     DMAccountInfo dmAccountInfo)
 {
     std::lock_guard<std::mutex> lock(dmAccountInfoMaplock_);
-    if (dmAccountInfoMap_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("dmAccountInfoMap_ size is more than max size");
-        return;
-    }
+    CHECK_SIZE_VOID(dmAccountInfoMap_);
     dmAccountInfoMap_[userId] = dmAccountInfo;
 }
 

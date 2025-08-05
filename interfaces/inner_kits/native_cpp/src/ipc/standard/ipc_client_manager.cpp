@@ -85,11 +85,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
         LOGE("InitDeviceManager Failed with ret %{public}d", ret);
         return ret;
     }
-    if (dmListener_.size() >= MAX_CONTAINER_SIZE) {
-        LOGE("dmListener_ size is more than max size");
-        return ERR_DM_FAILED;
-    }
-
+    CHECK_SIZE_RETURN(dmListener_, ERR_DM_FAILED);
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     std::shared_ptr<IpcRegisterListenerReq> req = std::make_shared<IpcRegisterListenerReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
