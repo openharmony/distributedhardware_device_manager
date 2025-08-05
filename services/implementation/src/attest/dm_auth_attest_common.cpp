@@ -82,6 +82,13 @@ bool ValidateInputJson(const std::string &data)
         LOGE("Invalid certCount value %{public}u", certCount);
         return false;
     }
+    JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
+    jsonArrayObj.Parse(jsonObject[TAG_CERT].Dump());
+    const uint32_t certSize = jsonArrayObj.Items().size();
+    if (certSize != certCount) {
+        LOGE("certSize = %{public}u is invalid.", certSize);
+        return false;
+    }
     return true;
 }
 
@@ -94,6 +101,10 @@ bool ValidateInputJson(const std::string &data)
         return false;
     }
     const uint32_t binSize = hexLen / HEX_TO_UINT8;
+    if (binSize > MAX_LEN_PER_CERT) {
+        LOGE("binSize = %{public}u is invalid.", binSize);
+        return false;
+    }
     cert.data = new uint8_t[binSize]{0};
     if (cert.data == nullptr) {
         LOGE("Data allocation failed at index %{public}u", processedIndex);
