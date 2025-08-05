@@ -22,11 +22,12 @@
 #include <string>
 #include <vector>
 
-#include "device_manager_service.h"
-#include "device_manager_service_listener.h"
-#include "device_manager_service_impl.h"
 #include "common_event_support.h"
+#include "device_manager_service.h"
+#include "device_manager_service_impl.h"
+#include "device_manager_service_listener.h"
 #include "dm_softbus_error_code.h"
+#include "softbus_center_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,6 +37,7 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static inline std::shared_ptr<SoftbusCenterMock> softbusCenterMock_ = std::make_shared<SoftbusCenterMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,6 +42,7 @@ public:
         int32_t pinExchangeType, LocalServiceInfo& localServiceInfo) = 0;
     virtual int32_t GetBusinessEvent(BusinessEvent &event) = 0;
     virtual int32_t PutBusinessEvent(const DistributedDeviceProfile::BusinessEvent &event) = 0;
+    virtual int32_t GetAllAclIncludeLnnAcl(std::vector<AccessControlProfile>& profiles) = 0;
 public:
     static inline std::shared_ptr<DpDistributedDeviceProfileClient> dpDistributedDeviceProfileClient = nullptr;
 };
@@ -62,6 +63,7 @@ public:
     MOCK_METHOD(int32_t, GetLocalServiceInfoByBundleAndPinType, (const std::string&, int32_t, LocalServiceInfo&));
     MOCK_METHOD(int32_t, GetBusinessEvent, (BusinessEvent &event));
     MOCK_METHOD(int32_t, PutBusinessEvent, (const DistributedDeviceProfile::BusinessEvent &event));
+    MOCK_METHOD(int32_t, GetAllAclIncludeLnnAcl, (std::vector<AccessControlProfile>&));
 };
 }
 }

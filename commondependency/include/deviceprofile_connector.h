@@ -328,6 +328,9 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     DM_EXPORT void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
         const std::vector<int32_t> &backGroundUserIds);
+    DM_EXPORT bool IsAllowAuthAlways(const std::string &localUdid, int32_t userId, const std::string &peerUdid,
+        const std::string &pkgName, int64_t tokenId);
+
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,

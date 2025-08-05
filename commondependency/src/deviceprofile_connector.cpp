@@ -3486,6 +3486,22 @@ bool DeviceProfileConnector::CheckExtWhiteList(const std::string &pkgName)
     return false;
 }
 
+bool DeviceProfileConnector::IsAllowAuthAlways(const std::string &localUdid, int32_t userId,
+    const std::string &peerUdid, const std::string &pkgName, int64_t tokenId)
+{
+    auto acls = GetAclProfileByDeviceIdAndUserId(localUdid, userId, peerUdid);
+    for (const auto &item : acls) {
+        auto accesser = item.GetAccesser();
+        auto accessee = item.GetAccessee();
+        if (item.GetAuthenticationType() == ALLOW_AUTH_ALWAYS &&
+            ((accesser.GetAccesserBundleName() == pkgName && accesser.GetAccesserTokenId() == tokenId) ||
+            (accessee.GetAccesseeBundleName() == pkgName && accessee.GetAccesseeTokenId() == tokenId))) {
+            return true;
+        }
+    }
+    return false;
+}
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();
