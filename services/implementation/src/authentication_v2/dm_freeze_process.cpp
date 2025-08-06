@@ -30,6 +30,9 @@ constexpr const char* START_FREEZE_TIME_KEY = "startFreezeTimeStamp";
 constexpr const char* STOP_FREEZE_TIME_KEY = "stopFreezeTimeStamp";
 constexpr const char* FAILED_TIMES_STAMPS_KEY = "failedTimeStamps";
 constexpr const char* FREEZE_TIMES_STAMPS_KEY = "freezeTimeStamps";
+constexpr const char* IS_NEED_FREEZE = "IsNeedFreeze";
+constexpr const char* NEED_FREEZE = "0";
+constexpr const char* NO_NEED_FREEZE = "1";
 constexpr int32_t MAX_CONTINUOUS_BIND_FAILED_NUM = 2;
 constexpr int64_t CONTINUEOUS_FAILED_INTERVAL = 6 * 60;
 constexpr int64_t DATA_REFRESH_INTERVAL = 20 * 60;
@@ -330,6 +333,44 @@ void FreezeProcess::CalculateNextFreezeTime(int64_t nowFreezeTime, int64_t &next
             nextFreezeTime = MAX_FREEZE_DURATION_SEC;
             break;
     }
+}
+
+bool FreezeProcess::IsNeedFreeze(std::shared_ptr<DmAuthContext> context)
+{
+    LOGI("called");
+    bool isNeedFreeze = true;
+    if (context == nullptr) {
+        LOGE("context is null");
+        return isNeedFreeze;
+    }
+    OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
+    auto ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
+        context->accessee.pkgName, context->authType, srvInfo);
+    if (ret != DM_OK) {
+        LOGE("ServiceInfo not found");
+        return isNeedFreeze;
+    }
+    std::string extraInfo = srvInfo.GetExtraInfo();
+    if (extraInfo.empty()) {
+        LOGE("no extraInfo");
+        return isNeedFreeze;
+    }
+    JsonObject jsonObj;
+    jsonObj.Parse(extraInfo);
+    if (jsonObj.IsDiscarded()) {
+        LOGE("extraInfo invalid");
+        return isNeedFreeze;
+    }
+    std::string isNeedFreezeStr;
+    if (IsString(jsonObj, IS_NEED_FREEZE)) {
+        isNeedFreezeStr = jsonObj[IS_NEED_FREEZE].Get<std::string>();
+        LOGI("isNeedFreezeStr: %{public}s.", isNeedFreezeStr.c_str());
+    }
+    if (isNeedFreezeStr == NEED_FREEZE || isNeedFreezeStr == NO_NEED_FREEZE) {
+        isNeedFreeze = std::atoi(isNeedFreezeStr.c_str());
+    }
+    LOGI("isNeedFreeze: %{public}d.", isNeedFreeze);
+    return isNeedFreeze;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

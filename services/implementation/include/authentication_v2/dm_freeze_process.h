@@ -18,8 +18,10 @@
 #include <memory>
 #include <mutex>
 
-#include "kv_adapter_manager.h"
+#include "deviceprofile_connector.h"
+#include "dm_auth_context.h"
 #include "dm_single_instance.h"
+#include "kv_adapter_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -59,6 +61,7 @@ public:
     bool IsFrozen(int64_t &remainingFrozenTime);
     int32_t DeleteFreezeRecord();
     int32_t UpdateFreezeRecord();
+    bool IsNeedFreeze(std::shared_ptr<DmAuthContext> context);
 private:
     FreezeProcess() = default;
     ~FreezeProcess() = default;

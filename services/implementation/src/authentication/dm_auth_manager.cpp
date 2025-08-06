@@ -1608,7 +1608,8 @@ bool DmAuthManager::IsServiceInfoPinExchangeTypeValid(int32_t pinExchangeType)
 {
     if (pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::PINBOX &&
         pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP &&
-        pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::ULTRASOUND) {
+        pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::ULTRASOUND &&
+        pinExchangeType != (int32_t)DMLocalServiceInfoPinExchangeType::IMPORT_AUTH_CODE) {
         return false;
     }
     return true;
