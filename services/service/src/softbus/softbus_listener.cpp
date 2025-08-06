@@ -269,7 +269,6 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
         LOGE("NodeBasicInfo is nullptr.");
         return;
     }
-    DeviceManagerService::GetInstance().StartDetectDeviceRisk();
     DmDeviceInfo dmDeviceInfo;
     ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
     LOGI("device online networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
@@ -283,6 +282,7 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::submit([=]() { DeviceOnLine(dmDeviceInfo); });
+    ffrt::submit([=]() { DeviceManagerService::GetInstance().StartDetectDeviceRisk(); });
 #else
     std::thread deviceOnLine([=]() { DeviceOnLine(dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
