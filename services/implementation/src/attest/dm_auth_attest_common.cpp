@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-const int32_t MAX_CERT_COUNT = 100;
+const int32_t DM_CERT_COUNT = 4;
 constexpr int32_t HEX_TO_UINT8 = 2;
 const int32_t MAX_LEN_PER_CERT = 8192;
 
@@ -37,7 +37,7 @@ AuthAttestCommon::~AuthAttestCommon()
 
 std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
 {
-    if (chain == nullptr || chain->cert == nullptr || chain->certCount == 0 || chain->certCount > MAX_CERT_COUNT) {
+    if (chain == nullptr || chain->cert == nullptr || chain->certCount != DM_CERT_COUNT) {
         LOGE("input param is invalid.");
         return "{}";
     }
@@ -78,7 +78,7 @@ bool ValidateInputJson(const std::string &data)
         return false;
     }
     const uint32_t certCount = jsonObject[TAG_CERT_COUNT].Get<uint32_t>();
-    if (certCount == 0 || certCount > MAX_CERT_COUNT) {
+    if (certCount != DM_CERT_COUNT) {
         LOGE("Invalid certCount value %{public}u", certCount);
         return false;
     }
