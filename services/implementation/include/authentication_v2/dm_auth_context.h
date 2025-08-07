@@ -222,6 +222,8 @@ struct DmAccess {
     std::string extraInfo;      // Expandable field, JSON format, KV structure
     std::string cert;
     bool isCommonFlag{false};
+    bool isGeneratedLnnCredThisBind{false};
+    bool isGeneratedTransmitThisBind{false};
 };
 
 struct DmAuthContext {
