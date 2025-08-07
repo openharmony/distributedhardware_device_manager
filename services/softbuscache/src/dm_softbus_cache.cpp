@@ -54,6 +54,10 @@ void SoftbusCache::DeleteLocalDeviceInfo()
     std::lock_guard<std::mutex> mutexLock(localDevInfoMutex_);
     g_online = false;
     g_getLocalDevInfo = false;
+    if (memset_s(&localDeviceInfo_, sizeof(DmDeviceInfo), 0, sizeof(DmDeviceInfo)) != DM_OK) {
+        LOGE("DeleteLocalDeviceInfo memset_s failed.");
+        return;
+    }
 }
 
 int32_t SoftbusCache::GetLocalDeviceInfo(DmDeviceInfo &nodeInfo)
