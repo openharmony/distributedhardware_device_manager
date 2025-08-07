@@ -218,7 +218,6 @@ struct DmAccess {
     // send both the new and old protocol messages simultaneously in the 80 message when
     // authType == import. Therefore, it is required to define these fields for compatibility processing.
     std::string accountGroupIdHash;
-
     std::string oldBundleName;
     // construct for old version compatible end
     std::string extraInfo;      // Expandable field, JSON format, KV structure
