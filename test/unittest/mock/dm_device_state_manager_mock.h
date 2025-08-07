@@ -28,7 +28,8 @@ public:
 public:
     virtual std::string GetUdidByNetWorkId(std::string networkId) = 0;
     virtual int32_t ProcNotifyEvent(const int32_t eventId, const std::string &deviceId) = 0;
-    virtual void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo) = 0;
+    virtual void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
+        std::vector<ProcessInfo> &processInfoVec) = 0;
 public:
     static inline std::shared_ptr<DmDmDeviceStateManager> dmDeviceStateManager = nullptr;
 };
@@ -37,7 +38,8 @@ class DmDeviceStateManagerMock : public DmDmDeviceStateManager {
 public:
     MOCK_METHOD(std::string, GetUdidByNetWorkId, (std::string));
     MOCK_METHOD(int32_t, ProcNotifyEvent, (const int32_t, const std::string &));
-    MOCK_METHOD(void, HandleDeviceStatusChange, (DmDeviceState devState, DmDeviceInfo &devInfo));
+    MOCK_METHOD(void, HandleDeviceStatusChange, (DmDeviceState devState, DmDeviceInfo &devInfo,
+        std::vector<ProcessInfo> &processInfoVec));
 };
 }
 }

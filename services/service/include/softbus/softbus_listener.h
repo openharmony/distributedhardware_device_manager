@@ -24,9 +24,11 @@
 #include <sstream>
 #include <type_traits>
 #include <vector>
+#include <queue>
 
 #include "cJSON.h"
 #include "softbus_bus_center.h"
+#include "dm_device_info.h"
 #include "dm_publish_info.h"
 #include "dm_radar_helper.h"
 #include "i_softbus_discovering_callback.h"
@@ -37,6 +39,20 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+typedef enum DmSoftbusEventType {
+    EVENT_TYPE_UNKNOWN = 0,
+    EVENT_TYPE_ONLINE = 1,
+    EVENT_TYPE_OFFLINE = 2,
+    EVENT_TYPE_CHANGED = 3,
+    EVENT_TYPE_SCREEN = 4,
+} DmSoftbusEventType;
+
+typedef struct DmSoftbusEvent {
+    DmDeviceInfo dmDeviceInfo;
+    DmSoftbusEventType eventType;
+} DmSoftbusEvent;
+
 class SoftbusListener {
 public:
     SoftbusListener();
@@ -132,6 +148,11 @@ public:
         std::vector<DmDeviceInfo> &deviceList);
     int32_t GetUdidFromDp(const std::string &udidHash, std::string &udid);
     static void GetActionId(const std::string &deviceId, int32_t &actionId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    static bool SaveDeviceIdHash(DmDeviceInfo &deviceInfo);
+    static void SoftbusEventQueueHandle(std::string deviceId);
+    static int32_t SoftbusEventQueueAdd(DmSoftbusEvent &dmSoftbusEventInfo);
+#endif
 private:
     static int32_t FillDeviceInfo(const DeviceInfo &device, DmDeviceInfo &dmDevice);
     static void ParseConnAddrInfo(const ConnectionAddr *addrInfo, JsonObject &jsonObj);

@@ -25,7 +25,6 @@
 #include "device_manager_service.h"
 #include "dm_crypto.h"
 #include "dm_constants.h"
-#include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -90,6 +89,8 @@ void* SoftbusListener::radarHandle_ = nullptr;
 static std::mutex g_hostNameMutex;
 std::string SoftbusListener::hostName_ = "";
 int32_t g_onlineDeviceNum = 0;
+static std::map<std::string, std::queue<DmSoftbusEvent>> g_dmSoftbusEventQueueMap;
+static std::mutex g_dmSoftbusEventQueueLock;
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -236,6 +237,105 @@ void SoftbusListener::OnCredentialAuthStatus(const char *deviceList, uint32_t de
 #endif
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+bool SoftbusListener::SaveDeviceIdHash(DmDeviceInfo &deviceInfo)
+{
+    std::string udid = "";
+    if (deviceInfo.networkId[0] == '\0') {
+        LOGE("networkId is empty.");
+        return false;
+    }
+    GetUdidByNetworkId(deviceInfo.networkId, udid);
+    if (udid.empty()) {
+        LOGE("udid is empty.");
+        return false;
+    }
+    char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+    if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
+        LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(udid).c_str());
+        return false;
+    }
+    if (memcpy_s(deviceInfo.deviceId, sizeof(deviceInfo.deviceId), udidHash,
+                 std::min(sizeof(deviceInfo.deviceId), sizeof(udidHash))) != DM_OK) {
+        LOGE("SaveDeviceInfo copy deviceId failed.");
+        return false;
+    }
+    return true;
+}
+
+void SoftbusListener::SoftbusEventQueueHandle(std::string deviceId)
+{
+    std::queue<DmSoftbusEvent> eventQueue;
+    {
+        std::lock_guard<std::mutex> lock(g_dmSoftbusEventQueueLock);
+        auto it = g_dmSoftbusEventQueueMap.find(deviceId);
+        if (it == g_dmSoftbusEventQueueMap.end()) {
+            return;
+        }
+        if (g_dmSoftbusEventQueueMap[deviceId].empty()) {
+            g_dmSoftbusEventQueueMap.erase(it);
+            LOGI("queue empty, deviceIdHash:%{public}s.", GetAnonyString(deviceId).c_str());
+            return;
+        }
+        g_dmSoftbusEventQueueMap[deviceId].swap(eventQueue);
+    }
+    while (!eventQueue.empty()) {
+        DmSoftbusEvent dmSoftbusEventInfo = eventQueue.front();
+        eventQueue.pop();
+        LOGI("eventType:%{public}d, deviceIdHash:%{public}s.", dmSoftbusEventInfo.eventType,
+            GetAnonyString(deviceId).c_str());
+        if (dmSoftbusEventInfo.eventType == EVENT_TYPE_ONLINE) {
+            DeviceOnLine(dmSoftbusEventInfo.dmDeviceInfo);
+        } else if (dmSoftbusEventInfo.eventType == EVENT_TYPE_OFFLINE) {
+            DeviceOffLine(dmSoftbusEventInfo.dmDeviceInfo);
+        } else if (dmSoftbusEventInfo.eventType == EVENT_TYPE_CHANGED) {
+            DeviceNameChange(dmSoftbusEventInfo.dmDeviceInfo);
+        } else if (dmSoftbusEventInfo.eventType == EVENT_TYPE_SCREEN) {
+            DeviceScreenStatusChange(dmSoftbusEventInfo.dmDeviceInfo);
+        } else {
+            LOGI("unknown eventType, deviceIdHash:%{public}s.", GetAnonyString(deviceId).c_str());
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(g_dmSoftbusEventQueueLock);
+        auto it = g_dmSoftbusEventQueueMap.find(deviceId);
+        if (it == g_dmSoftbusEventQueueMap.end()) {
+            return;
+        }
+        if (g_dmSoftbusEventQueueMap[deviceId].empty()) {
+            g_dmSoftbusEventQueueMap.erase(it);
+            LOGI("queue empty, deviceIdHash:%{public}s.", GetAnonyString(deviceId).c_str());
+            return;
+        } else {
+            ffrt::submit([=]() { SoftbusEventQueueHandle(deviceId); });
+        }
+    }
+}
+
+int32_t SoftbusListener::SoftbusEventQueueAdd(DmSoftbusEvent &dmSoftbusEventInfo)
+{
+    if (!SaveDeviceIdHash(dmSoftbusEventInfo.dmDeviceInfo)) {
+        LOGE("get device Id fail.");
+        return ERR_DM_FAILED;
+    }
+    std::string deviceId(dmSoftbusEventInfo.dmDeviceInfo.deviceId);
+    LOGI("deviceIdHash:%{public}s.", GetAnonyString(deviceId).c_str());
+    {
+        std::lock_guard<std::mutex> lock(g_dmSoftbusEventQueueLock);
+        auto it = g_dmSoftbusEventQueueMap.find(deviceId);
+        if (it == g_dmSoftbusEventQueueMap.end()) {
+            std::queue<DmSoftbusEvent> eventQueue;
+            eventQueue.push(dmSoftbusEventInfo);
+            g_dmSoftbusEventQueueMap[deviceId] = eventQueue;
+            ffrt::submit([=]() { SoftbusEventQueueHandle(deviceId); });
+        } else {
+            g_dmSoftbusEventQueueMap[deviceId].push(dmSoftbusEventInfo);
+        }
+    }
+    return DM_OK;
+}
+#endif
+
 void SoftbusListener::OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatus *status)
 {
     if (status == nullptr) {
@@ -248,51 +348,53 @@ void SoftbusListener::OnDeviceScreenStatusChanged(NodeStatusType type, NodeStatu
         LOGE("type is not matching.");
         return;
     }
-    DmDeviceInfo dmDeviceInfo;
+    DmSoftbusEvent dmSoftbusEventInfo;
+    dmSoftbusEventInfo.eventType = EVENT_TYPE_SCREEN;
     int32_t devScreenStatus = static_cast<int32_t>(status->reserved[0]);
-    ConvertScreenStatusToDmDevice(status->basicInfo, devScreenStatus, dmDeviceInfo);
-    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        ffrt::submit([=]() { DeviceScreenStatusChange(dmDeviceInfo); });
-    #else
-        std::thread devScreenStatusChange([=]() { DeviceScreenStatusChange(dmDeviceInfo); });
-        if (pthread_setname_np(devScreenStatusChange.native_handle(), DEVICE_SCREEN_STATUS_CHANGE) != DM_OK) {
-            LOGE("devScreenStatusChange setname failed.");
-        }
-        devScreenStatusChange.detach();
-    #endif
+    ConvertScreenStatusToDmDevice(status->basicInfo, devScreenStatus, dmSoftbusEventInfo.dmDeviceInfo);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    SoftbusEventQueueAdd(dmSoftbusEventInfo);
+#else
+    std::thread devScreenStatusChange([=]() { DeviceScreenStatusChange(dmSoftbusEventInfo.dmDeviceInfo); });
+    if (pthread_setname_np(devScreenStatusChange.native_handle(), DEVICE_SCREEN_STATUS_CHANGE) != DM_OK) {
+        LOGE("devScreenStatusChange setname failed.");
+    }
+    devScreenStatusChange.detach();
+#endif
 }
 
 void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
 {
     LOGI("received device online callback from softbus.");
-    if (info == nullptr) {
-        LOGE("NodeBasicInfo is nullptr.");
-        return;
-    }
-    DmDeviceInfo dmDeviceInfo;
-    ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-    LOGI("device online networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
-    SoftbusCache::GetInstance().SaveDeviceInfo(dmDeviceInfo);
-    SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmDeviceInfo.networkId);
+    CHECK_NULL_VOID(info);
+    DmSoftbusEvent dmSoftbusEventInfo;
+    dmSoftbusEventInfo.eventType = EVENT_TYPE_ONLINE;
+    ConvertNodeBasicInfoToDmDevice(*info, dmSoftbusEventInfo.dmDeviceInfo);
+    LOGI("device online networkId: %{public}s.", GetAnonyString(dmSoftbusEventInfo.dmDeviceInfo.networkId).c_str());
+    SoftbusCache::GetInstance().SaveDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
+    SoftbusCache::GetInstance().SaveDeviceSecurityLevel(dmSoftbusEventInfo.dmDeviceInfo.networkId);
     SoftbusCache::GetInstance().SaveLocalDeviceInfo();
     UpdateDeviceName(info);
     {
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
         g_onlineDeviceNum++;
     }
+    std::string peerUdid;
+    GetUdidByNetworkId(info->networkId, peerUdid);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { DeviceOnLine(dmDeviceInfo); });
     ffrt::submit([=]() { DeviceManagerService::GetInstance().StartDetectDeviceRisk(); });
+    if (SoftbusEventQueueAdd(dmSoftbusEventInfo) != DM_OK) {
+        return;
+    }
+    PutOstypeData(peerUdid, info->osType);
 #else
-    std::thread deviceOnLine([=]() { DeviceOnLine(dmDeviceInfo); });
+    std::thread deviceOnLine([=]() { DeviceOnLine(dmSoftbusEventInfo.dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOnLine.native_handle(), DEVICE_ONLINE);
     if (ret != DM_OK) {
         LOGE("deviceOnLine setname failed.");
     }
     deviceOnLine.detach();
 #endif
-    std::string peerUdid;
-    GetUdidByNetworkId(info->networkId, peerUdid);
     {
         struct RadarInfo radarInfo = {
             .funcName = "OnSoftbusDeviceOnline",
@@ -308,22 +410,17 @@ void SoftbusListener::OnSoftbusDeviceOnline(NodeBasicInfo *info)
             }
         }
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    PutOstypeData(peerUdid, info->osType);
-#endif
 }
 
 void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
 {
     LOGI("received device offline callback from softbus.");
-    if (info == nullptr) {
-        LOGE("NodeBasicInfo is nullptr.");
-        return;
-    }
-    DmDeviceInfo dmDeviceInfo;
-    ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-    SoftbusCache::GetInstance().DeleteDeviceInfo(dmDeviceInfo);
-    SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmDeviceInfo.networkId);
+    CHECK_NULL_VOID(info);
+    DmSoftbusEvent dmSoftbusEventInfo;
+    dmSoftbusEventInfo.eventType = EVENT_TYPE_OFFLINE;
+    ConvertNodeBasicInfoToDmDevice(*info, dmSoftbusEventInfo.dmDeviceInfo);
+    SoftbusCache::GetInstance().DeleteDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
+    SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmSoftbusEventInfo.dmDeviceInfo.networkId);
     {
         std::lock_guard<std::mutex> lock(g_onlineDeviceNumLock);
         g_onlineDeviceNum--;
@@ -331,19 +428,24 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
             SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
         }
     }
-    LOGI("device offline networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
+    LOGI("device offline networkId: %{public}s.", GetAnonyString(dmSoftbusEventInfo.dmDeviceInfo.networkId).c_str());
+    std::string peerUdid;
+    GetUdidByNetworkId(info->networkId, peerUdid);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([=]() { DeviceOffLine(dmDeviceInfo); });
+    if (SoftbusEventQueueAdd(dmSoftbusEventInfo) != DM_OK) {
+        return;
+    }
+    if (!CheckPeerUdidTrusted(peerUdid)) {
+        KVAdapterManager::GetInstance().DeleteOstypeData(peerUdid);
+    }
 #else
-    std::thread deviceOffLine([=]() { DeviceOffLine(dmDeviceInfo); });
+    std::thread deviceOffLine([=]() { DeviceOffLine(dmSoftbusEventInfo.dmDeviceInfo); });
     int32_t ret = pthread_setname_np(deviceOffLine.native_handle(), DEVICE_OFFLINE);
     if (ret != DM_OK) {
         LOGE("deviceOffLine setname failed.");
     }
     deviceOffLine.detach();
 #endif
-    std::string peerUdid;
-    GetUdidByNetworkId(info->networkId, peerUdid);
     {
         struct RadarInfo radarInfo = {
             .funcName = "OnSoftbusDeviceOffline",
@@ -358,11 +460,6 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
             }
         }
     }
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (!CheckPeerUdidTrusted(peerUdid)) {
-        KVAdapterManager::GetInstance().DeleteOstypeData(peerUdid);
-    }
-#endif
 }
 
 void SoftbusListener::UpdateDeviceName(NodeBasicInfo *info)
@@ -390,7 +487,6 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         return;
     }
     if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
-        DmDeviceInfo dmDeviceInfo;
         int32_t networkType = -1;
         if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
             if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
@@ -403,14 +499,16 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
             UpdateDeviceName(info);
         }
-        ConvertNodeBasicInfoToDmDevice(*info, dmDeviceInfo);
-        LOGI("device changed networkId: %{public}s.", GetAnonyString(dmDeviceInfo.networkId).c_str());
-        dmDeviceInfo.networkType = networkType;
-        SoftbusCache::GetInstance().ChangeDeviceInfo(dmDeviceInfo);
+        DmSoftbusEvent dmSoftbusEventInfo;
+        dmSoftbusEventInfo.eventType = EVENT_TYPE_CHANGED;
+        ConvertNodeBasicInfoToDmDevice(*info, dmSoftbusEventInfo.dmDeviceInfo);
+        LOGI("networkId: %{public}s.", GetAnonyString(dmSoftbusEventInfo.dmDeviceInfo.networkId).c_str());
+        dmSoftbusEventInfo.dmDeviceInfo.networkType = networkType;
+        SoftbusCache::GetInstance().ChangeDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        ffrt::submit([=]() { DeviceNameChange(dmDeviceInfo); });
+        SoftbusEventQueueAdd(dmSoftbusEventInfo);
     #else
-        std::thread deviceInfoChange([=]() { DeviceNameChange(dmDeviceInfo); });
+        std::thread deviceInfoChange([=]() { DeviceNameChange(dmSoftbusEventInfo.dmDeviceInfo); });
         if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
             LOGE("DeviceNameChange setname failed.");
         }

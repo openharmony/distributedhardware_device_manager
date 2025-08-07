@@ -997,10 +997,7 @@ int32_t DeviceManagerService::UnBindDeviceParseExtra(const std::string &pkgName,
         return ERR_DM_FAILED;
     }
     auto proxyInfo = proxyInfoSet.begin();
-    uint64_t peerTokenId = 0;
-    std::string peerBundleName = "";
-    JsonStrHandle::GetInstance().GetPeerAppInfoParseExtra(proxyInfo->second, peerTokenId, peerBundleName);
-    if (peerBundleName == "") {
+    if (proxyInfo->second == "") {
         result = UnBindDevice(proxyInfo->first, udidHash);
     } else {
         result = UnBindDevice(proxyInfo->first, udidHash, proxyInfo->second);
@@ -3289,8 +3286,8 @@ bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeM
         case RelationShipChangeType::APP_UNBIND:
             if (relationShipMsg.peerTokenId != 0) {
                     dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
-                        static_cast<int32_t>(relationShipMsg.tokenId),
-                        static_cast<int32_t>(relationShipMsg.peerTokenId));
+                        static_cast<int32_t>(relationShipMsg.peerTokenId),
+                        static_cast<int32_t>(relationShipMsg.tokenId));
             } else {
                 dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
                     static_cast<int32_t>(relationShipMsg.tokenId));

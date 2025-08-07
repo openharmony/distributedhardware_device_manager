@@ -686,31 +686,31 @@ void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInf
     if (userIdAndBindLevel.empty() || userIdAndBindLevel.find(processInfo.userId) == userIdAndBindLevel.end()) {
         userIdAndBindLevel[processInfo.userId] = INVALIED_TYPE;
     }
+    std::vector<ProcessInfo> processInfoVec;
     for (const auto &item : userIdAndBindLevel) {
         if (static_cast<uint32_t>(item.second) == INVALIED_TYPE) {
             LOGI("The offline device is identical account bind type.");
             devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
             processInfo.userId = item.first;
-            softbusConnector_->SetProcessInfo(processInfo);
+            processInfoVec.push_back(processInfo);
         } else if (static_cast<uint32_t>(item.second) == USER && bindType == SHARE_TYPE) {
             LOGI("The offline device is device bind level and share bind type.");
             devInfo.authForm = DmAuthForm::SHARE;
             processInfo.userId = item.first;
-            softbusConnector_->SetProcessInfo(processInfo);
+            processInfoVec.push_back(processInfo);
         } else if (static_cast<uint32_t>(item.second) == USER && bindType != SHARE_TYPE) {
             LOGI("The offline device is device bind type.");
             devInfo.authForm = DmAuthForm::PEER_TO_PEER;
             processInfo.userId = item.first;
-            softbusConnector_->SetProcessInfo(processInfo);
+            processInfoVec.push_back(processInfo);
         } else if (static_cast<uint32_t>(item.second) == SERVICE || static_cast<uint32_t>(item.second) == APP) {
             LOGI("The offline device is PEER_TO_PEER_TYPE bind type, %{public}" PRIu32, item.second);
-            auto processInfoVec = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(
+            processInfoVec = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(
                 requestDeviceId, trustDeviceId, item.first);
             std::set<ProcessInfo> processInfoSet(processInfoVec.begin(), processInfoVec.end());
             processInfoVec.assign(processInfoSet.begin(), processInfoSet.end());
-            softbusConnector_->SetProcessInfoVec(processInfoVec);
         }
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec);
     }
 }
 
@@ -741,30 +741,27 @@ void DeviceManagerServiceImpl::HandleOnline(DmDeviceState devState, DmDeviceInfo
 void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, ProcessInfo &processInfo,
     DmDeviceInfo &devInfo, const std::string &requestDeviceId, const std::string &trustDeviceId, DmDeviceState devState)
 {
+    std::vector<ProcessInfo> processInfoVec;
     if (bindType == IDENTICAL_ACCOUNT_TYPE) {
         devInfo.authForm = DmAuthForm::IDENTICAL_ACCOUNT;
-        softbusConnector_->SetProcessInfo(processInfo);
+        processInfoVec.push_back(processInfo);
     } else if (bindType == DEVICE_PEER_TO_PEER_TYPE) {
         devInfo.authForm = DmAuthForm::PEER_TO_PEER;
-        softbusConnector_->SetProcessInfo(processInfo);
+        processInfoVec.push_back(processInfo);
     } else if (bindType == DEVICE_ACROSS_ACCOUNT_TYPE) {
         devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
-        softbusConnector_->SetProcessInfo(processInfo);
+        processInfoVec.push_back(processInfo);
     } else if (bindType == APP_PEER_TO_PEER_TYPE || bindType == SERVICE_PEER_TO_PEER_TYPE) {
-        std::vector<ProcessInfo> processInfoVec =
-            DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(requestDeviceId, trustDeviceId,
-                MultipleUserConnector::GetFirstForegroundUserId());
+        processInfoVec = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(requestDeviceId,
+            trustDeviceId, MultipleUserConnector::GetFirstForegroundUserId());
         std::set<ProcessInfo> processInfoSet(processInfoVec.begin(), processInfoVec.end());
         processInfoVec.assign(processInfoSet.begin(), processInfoSet.end());
-        softbusConnector_->SetProcessInfoVec(processInfoVec);
         devInfo.authForm = DmAuthForm::PEER_TO_PEER;
     } else if (bindType == APP_ACROSS_ACCOUNT_TYPE || bindType == SERVICE_ACROSS_ACCOUNT_TYPE) {
-        std::vector<ProcessInfo> processInfoVec =
-            DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(requestDeviceId, trustDeviceId,
-                MultipleUserConnector::GetFirstForegroundUserId());
+        processInfoVec = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(requestDeviceId,
+            trustDeviceId, MultipleUserConnector::GetFirstForegroundUserId());
         std::set<ProcessInfo> processInfoSet(processInfoVec.begin(), processInfoVec.end());
         processInfoVec.assign(processInfoSet.begin(), processInfoSet.end());
-        softbusConnector_->SetProcessInfoVec(processInfoVec);
         devInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
     } else if (bindType == SHARE_TYPE) {
         if (CheckSharePeerSrc(trustDeviceId, requestDeviceId)) {
@@ -772,10 +769,10 @@ void DeviceManagerServiceImpl::SetOnlineProcessInfo(const uint32_t &bindType, Pr
             return;
         }
         devInfo.authForm = DmAuthForm::SHARE;
-        softbusConnector_->SetProcessInfo(processInfo);
+        processInfoVec.push_back(processInfo);
     }
     LOGI("HandleOnline success devInfo authForm is %{public}d.", devInfo.authForm);
-    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec);
     return;
 }
 
@@ -819,8 +816,9 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
         ProcessInfo processInfo;
         processInfo.pkgName = std::string(DM_PKG_NAME);
         processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
-        softbusConnector_->SetChangeProcessInfo(processInfo);
-        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+        std::vector<ProcessInfo> processInfoVec;
+        processInfoVec.push_back(processInfo);
+        deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec);
     }
 }
 
@@ -2313,6 +2311,7 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
     std::string requestDeviceId = static_cast<std::string>(localUdid);
     uint32_t bindType = DeviceProfileConnector::GetInstance().CheckBindType(trustDeviceId, requestDeviceId);
     LOGI("bind type is %{public}d.", bindType);
+    std::vector<ProcessInfo> processInfoVec;
     if (bindType == INVALIED_TYPE) {
         return;
     } else if (bindType == IDENTICAL_ACCOUNT_TYPE || bindType == DEVICE_PEER_TO_PEER_TYPE ||
@@ -2320,14 +2319,12 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
         ProcessInfo processInfo;
         processInfo.pkgName = std::string(DM_PKG_NAME);
         processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
-        softbusConnector_->SetProcessInfo(processInfo);
+        processInfoVec.push_back(processInfo);
     } else if (bindType == APP_PEER_TO_PEER_TYPE || bindType == APP_ACROSS_ACCOUNT_TYPE) {
-        std::vector<ProcessInfo> processInfoVec =
-            DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(requestDeviceId, trustDeviceId,
-                MultipleUserConnector::GetFirstForegroundUserId());
-        softbusConnector_->SetProcessInfoVec(processInfoVec);
+        processInfoVec = DeviceProfileConnector::GetInstance().GetProcessInfoFromAclByUserId(requestDeviceId,
+            trustDeviceId, MultipleUserConnector::GetFirstForegroundUserId());
     }
-    deviceStateMgr_->HandleDeviceScreenStatusChange(devInfo);
+    deviceStateMgr_->HandleDeviceScreenStatusChange(devInfo, processInfoVec);
 }
 
 int32_t DeviceManagerServiceImpl::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
