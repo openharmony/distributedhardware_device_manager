@@ -21,9 +21,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-const int32_t MAX_CERT_COUNT = 100;
 constexpr int32_t HEX_TO_UINT8 = 2;
-const int32_t MAX_LEN_PER_CERT = 8192;
 
 AuthAttestCommon::AuthAttestCommon()
 {
@@ -37,7 +35,7 @@ AuthAttestCommon::~AuthAttestCommon()
 
 std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
 {
-    if (chain == nullptr || chain->cert == nullptr || chain->certCount == 0 || chain->certCount > MAX_CERT_COUNT) {
+    if (chain == nullptr || chain->cert == nullptr || chain->certCount != DM_CERTS_COUNT) {
         LOGE("input param is invalid.");
         return "{}";
     }
@@ -46,7 +44,7 @@ std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
     JsonObject jsonArrayObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
     for (uint32_t i = 0; i < chain->certCount; ++i) {
         const DmBlob &blob = chain->cert[i];
-        if (blob.data == nullptr || blob.size == 0 || blob.size > MAX_LEN_PER_CERT) {
+        if (blob.data == nullptr || blob.size == 0 || blob.size > DM_CERTIFICATE_SIZE) {
             LOGE("Invalid blob: null data or invalid size.");
             return "{}";
         }
@@ -78,7 +76,7 @@ bool ValidateInputJson(const std::string &data)
         return false;
     }
     const uint32_t certCount = jsonObject[TAG_CERT_COUNT].Get<uint32_t>();
-    if (certCount == 0 || certCount > MAX_CERT_COUNT) {
+    if (certCount != DM_CERTS_COUNT) {
         LOGE("Invalid certCount value %{public}u", certCount);
         return false;
     }
@@ -101,7 +99,7 @@ bool ValidateInputJson(const std::string &data)
         return false;
     }
     const uint32_t binSize = hexLen / HEX_TO_UINT8;
-    if (binSize > MAX_LEN_PER_CERT) {
+    if (binSize > DM_CERTIFICATE_SIZE) {
         LOGE("binSize = %{public}u is invalid.", binSize);
         return false;
     }
