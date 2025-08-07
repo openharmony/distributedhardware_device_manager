@@ -82,6 +82,7 @@ const char* TAG_DM_CERT_CHAIN = "dmCertChain";
 const char* TAG_CERT_COUNT = "certCount";
 const char* TAG_CERT = "cert";
 const char* TAG_IS_COMMON_FLAG = "isCommonFlag";
+const char* TAG_CERT_RANDOM = "certRandom";
 
 const int32_t AUTHENTICATE_TIMEOUT = 120;
 const int32_t CONFIRM_TIMEOUT = 60;

@@ -196,14 +196,17 @@ struct DmAccess {
     int32_t sessionKeyId;       // Used as key delivery material, retrieves the SK from the bus
     int32_t transmitSessionKeyId; // Permanent application SKID on this end, returned by DP for ACL updates and aging
     int32_t lnnSessionKeyId{0};    // Permanent user SKID on this end, returned by DP for ACL updates and aging
+    int32_t oldBindLevel;
     int64_t transmitSkTimeStamp; // Used for aging, time is 2 days, application-level credential timestamp
     int64_t lnnSkTimeStamp{0};     // Used for aging, time is 2 days, user-level credential timestamp
     int64_t skTimeStamp;        // Used for aging, time is 2 days
+    int64_t certRandom{0}; // Used for cert generate
     bool isAuthed;
     bool isUserLevelAuthed;
     bool isOnline;
     bool isGenerateLnnCredential{true};
     bool isPutLnnAcl{true};
+    bool isCommonFlag{false};
     std::string dmVersion;
     std::string edition;        // Used for compatibility before version 5.1.0, assists in version negotiation
     std::string aclTypeList;        // Trust relationship list, used for data aging, KV format
@@ -216,12 +219,11 @@ struct DmAccess {
     // send both the new and old protocol messages simultaneously in the 80 message when
     // authType == import. Therefore, it is required to define these fields for compatibility processing.
     std::string accountGroupIdHash;
-    int32_t oldBindLevel;
+
     std::string oldBundleName;
     // construct for old version compatible end
     std::string extraInfo;      // Expandable field, JSON format, KV structure
     std::string cert;
-    bool isCommonFlag{false};
 };
 
 struct DmAuthContext {

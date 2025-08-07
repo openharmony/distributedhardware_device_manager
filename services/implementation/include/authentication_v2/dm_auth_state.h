@@ -232,6 +232,10 @@ private:
     void GetCustomDescBySinkLanguage(std::shared_ptr<DmAuthContext> context);
     void ResetBindLevel(std::shared_ptr<DmAuthContext> context);
     void NegotiateUltrasonic(std::shared_ptr<DmAuthContext> context);
+    void GenerateCertificate(std::shared_ptr<DmAuthContext> context);
+private:
+    std::mutex certMtx_;
+    std::condition_variable certCV_;
 };
 
 class AuthSinkStatePinAuthComm {
