@@ -206,7 +206,6 @@ struct DmAccess {
     bool isOnline;
     bool isGenerateLnnCredential{true};
     bool isPutLnnAcl{true};
-    bool isCommonFlag{false};
     std::string dmVersion;
     std::string edition;        // Used for compatibility before version 5.1.0, assists in version negotiation
     std::string aclTypeList;        // Trust relationship list, used for data aging, KV format
@@ -224,6 +223,9 @@ struct DmAccess {
     // construct for old version compatible end
     std::string extraInfo;      // Expandable field, JSON format, KV structure
     std::string cert;
+    bool isCommonFlag{false};
+    bool isGeneratedLnnCredThisBind{false};
+    bool isGeneratedTransmitThisBind{false};
 };
 
 struct DmAuthContext {

@@ -190,6 +190,12 @@ protected:
     void SetProcessInfo(std::shared_ptr<DmAuthContext> context);
     bool IsMatchCredentialAndP2pACL(JsonObject &credInfo, std::string &credId,
         const DistributedDeviceProfile::AccessControlProfile &profile);
+    DmAuthScope GetAuthorizedScope(int32_t bindLevel);
+    void BindFail(std::shared_ptr<DmAuthContext> context);
+    void DeleteAcl(std::shared_ptr<DmAuthContext> context, bool isDelLnnAcl,
+        std::vector<std::pair<int64_t, int64_t>> &tokenIds);
+    void RemoveTokenIdsFromCredential(std::shared_ptr<DmAuthContext> context, const std::string &credId,
+        std::vector<std::pair<int64_t, int64_t>> &tokenIds);
 };
 
 class AuthSrcConfirmState : public DmAuthState {
