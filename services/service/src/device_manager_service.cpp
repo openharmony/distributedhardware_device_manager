@@ -411,7 +411,8 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
     }
     if (!onlineDeviceList.empty() && IsDMServiceImplReady()) {
         std::unordered_map<std::string, DmAuthForm> udidMap;
-        if (PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName)) {
+        if (PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName) ||
+            PermissionManager::GetInstance().CheckProcessValidOnGetTrustedDeviceList()) {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(std::string(ALL_PKGNAME));
         } else {
             udidMap = dmServiceImpl_->GetAppTrustDeviceIdList(pkgName);

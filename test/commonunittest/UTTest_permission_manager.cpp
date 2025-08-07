@@ -132,15 +132,23 @@ HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_001, testing::ext::TestSi
 */
 HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_002, testing::ext::TestSize.Level1)
 {
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
+    EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
     std::string pkgName1(systemSaWhiteList[0]);
     bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName1);
     ASSERT_EQ(ret, true);
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
+    EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
     std::string pkgName2(systemSaWhiteList[1]);
     ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName2);
     ASSERT_EQ(ret, true);
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
+    EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
     std::string pkgName3(systemSaWhiteList[2]);
     ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName3);
     ASSERT_EQ(ret, true);
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
+    EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
     std::string pkgName4(systemSaWhiteList[3]);
     ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName4);
     ASSERT_EQ(ret, true);
@@ -156,6 +164,8 @@ HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_101, testing::ext::TestSi
 HWTEST_F(PermissionManagerTest, CheckWhiteListSystemSA_102, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "ohos.dhardware";
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
+    EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
     bool ret = PermissionManager::GetInstance().CheckWhiteListSystemSA(pkgName);
     ASSERT_TRUE(ret);
 }

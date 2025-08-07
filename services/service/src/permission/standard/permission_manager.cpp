@@ -93,6 +93,11 @@ constexpr const static char* PUT_DEVICE_PROFILE_INFO_LIST_WHITE_LIST[] = {
     "com.huawei.hmos.tvcooperation",
 };
 constexpr int32_t PUT_DEVICE_PROFILE_INFO_LIST_WHITE_LIST_NUM = std::size(PUT_DEVICE_PROFILE_INFO_LIST_WHITE_LIST);
+
+constexpr const static char* GET_TRUSTED_DEVICE_LIST_WHITE_LIST[] = {
+    "distributedsched",
+};
+constexpr uint32_t GET_TRUSTED_DEVICE_LIST_WHITE_LIST_NUM = std::size(GET_TRUSTED_DEVICE_LIST_WHITE_LIST);
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -201,11 +206,25 @@ bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &proc
 
 bool PermissionManager::CheckWhiteListSystemSA(const std::string &pkgName)
 {
+    bool isInWhiteList = false;
     for (uint16_t index = 0; index < SYSTEM_SA_WHITE_LIST_NUM; ++index) {
         std::string tmp(SYSTEM_SA_WHITE_LIST[index]);
         if (pkgName == tmp) {
+            isInWhiteList = true;
+        }
+    }
+    if (isInWhiteList) {
+        AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+        if (tokenCaller == 0) {
+            LOGE("GetCallingTokenID error.");
+            return false;
+        }
+        ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+        if (tokenTypeFlag == ATokenTypeEnum::TOKEN_NATIVE) {
             return true;
         }
+        LOGE("callser not SA pkgName %{public}s.", GetAnonyString(pkgName).c_str());
+        return false;
     }
     return false;
 }
@@ -328,6 +347,23 @@ bool PermissionManager::VerifyAccessTokenByPermissionName(const std::string& per
         }
     }
     LOGE("DM service access is denied, please apply for corresponding permissions");
+    return false;
+}
+
+bool PermissionManager::CheckProcessValidOnGetTrustedDeviceList()
+{
+    std::string processName = "";
+    if (PermissionManager::GetInstance().GetCallerProcessName(processName) != DM_OK) {
+        LOGE("Get caller process name failed");
+        return false;
+    }
+    uint16_t index = 0;
+    for (; index < GET_TRUSTED_DEVICE_LIST_WHITE_LIST_NUM; ++index) {
+        std::string tmp(GET_TRUSTED_DEVICE_LIST_WHITE_LIST[index]);
+        if (processName == tmp) {
+            return true;
+        }
+    }
     return false;
 }
 } // namespace DistributedHardware
