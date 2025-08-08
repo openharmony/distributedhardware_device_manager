@@ -21,6 +21,7 @@
 #include "dm_auth_attest_common.h"
 #include "dm_auth_cert.h"
 #include "dm_auth_context.h"
+#include "dm_auth_manager_base.h"
 #include "dm_auth_state.h"
 #include "dm_auth_state_machine.h"
 #include "dm_constants.h"
@@ -211,7 +212,10 @@ int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
         ret = FreezeProcess::GetInstance().DeleteFreezeRecord();
         LOGI("DeleteFreezeRecord ret: %{public}d", ret);
     }
-    if (context->reason == ERR_DM_BIND_PIN_CODE_ERROR) {
+    bool isNeedFreeze = FreezeProcess::GetInstance().IsNeedFreeze(context);
+    bool isInWhiteList = AuthManagerBase::CheckProcessNameInWhiteList(context->accessee.bundleName);
+    LOGI("isInWhiteList: %{public}d.", isInWhiteList);
+    if (context->reason == ERR_DM_BIND_PIN_CODE_ERROR && (isNeedFreeze || !isInWhiteList)) {
         ret = FreezeProcess::GetInstance().UpdateFreezeRecord();
         LOGI("UpdateFreezeData ret: %{public}d", ret);
     }

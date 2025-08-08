@@ -439,7 +439,8 @@ enum class DMLocalServiceInfoAuthType : int32_t {
 enum class DMLocalServiceInfoPinExchangeType : int32_t {
     PINBOX = 1,
     ULTRASOUND = 2,
-    FROMDP = 3
+    FROMDP = 3,
+    IMPORT_AUTH_CODE = 5
 };
 
 enum class DMLocalServiceInfoAuthBoxType : int32_t {
