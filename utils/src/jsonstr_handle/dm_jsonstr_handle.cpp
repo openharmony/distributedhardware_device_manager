@@ -36,12 +36,12 @@ DM_EXPORT void JsonStrHandle::GetPeerAppInfoParseExtra(const std::string &extra,
         LOGE("ParseExtra extraInfoJson error");
         return;
     }
-    if (!IsString(extraInfoJson, TAG_PEER_BUNDLE_NAME) || !IsUint64(extraInfoJson, TAG_PEER_TOKENID)) {
-        LOGE("ParseExtra TAG_PEER_BUNDLE_NAME or TAG_PEER_TOKENID error");
-        return;
+    if (IsString(extraInfoJson, TAG_PEER_BUNDLE_NAME)) {
+        peerBundleName = extraInfoJson[TAG_PEER_BUNDLE_NAME].Get<std::string>();
     }
-    peerTokenId = extraInfoJson[TAG_PEER_TOKENID].Get<uint64_t>();
-    peerBundleName = extraInfoJson[TAG_PEER_BUNDLE_NAME].Get<std::string>();
+    if (IsUint64(extraInfoJson, TAG_PEER_TOKENID)) {
+        peerTokenId = extraInfoJson[TAG_PEER_TOKENID].Get<uint64_t>();
+    }
 }
 
 DM_EXPORT std::vector<int64_t> JsonStrHandle::GetProxyTokenIdByExtra(const std::string &extraInfo)

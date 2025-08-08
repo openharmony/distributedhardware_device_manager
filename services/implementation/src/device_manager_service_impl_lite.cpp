@@ -111,8 +111,8 @@ int32_t DeviceManagerServiceImpl::SetUserOperation(std::string &pkgName, int32_t
 
 void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
 {
-    if (deviceStateMgr_ == nullptr) {
-        LOGE("deviceStateMgr_ is nullpter!");
+    if (deviceStateMgr_ == nullptr || softbusConnector_ == nullptr) {
+        LOGE("deviceStateMgr_ or softbusConnector_ is nullpter!");
         return;
     }
     std::string deviceId = GetUdidHashByNetworkId(devInfo.networkId);
@@ -120,7 +120,13 @@ void DeviceManagerServiceImpl::HandleDeviceStatusChange(DmDeviceState devState, 
         LOGE("get deviceId: %{public}s failed", GetAnonyString(deviceId).c_str());
         return;
     }
-    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo);
+    std::vector<ProcessInfo> processInfoVec;
+    if (devState == DEVICE_INFO_CHANGED) {
+        processInfoVec = softbusConnector_->GetChangeProcessInfo();
+    } else {
+        processInfoVec = softbusConnector_->GetProcessInfo();
+    }
+    deviceStateMgr_->HandleDeviceStatusChange(devState, devInfo, processInfoVec);
     return;
 }
 

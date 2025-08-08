@@ -86,7 +86,8 @@ public:
     int32_t ProcNotifyEvent(const int32_t eventId, const std::string &deviceId);
     void SaveOnlineDeviceInfo(const DmDeviceInfo &info);
     void DeleteOfflineDeviceInfo(const DmDeviceInfo &info);
-    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo);
+    void HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
+        std::vector<ProcessInfo> &processInfoVec);
     void OnDbReady(const std::string &pkgName, const std::string &uuid);
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
@@ -98,7 +99,7 @@ public:
     std::string GetUdidByNetWorkId(std::string networkId);
     bool CheckIsOnline(const std::string &udid);
     void DeleteOffLineTimer(std::string udidHash);
-    void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo);
+    void HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo, std::vector<ProcessInfo> &processInfos);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
 #endif
@@ -113,7 +114,8 @@ private:
     int32_t DeleteGroupByDP(const std::string &deviceId);
     void DeleteCredential(DmOfflineParam offlineParam, const std::string &deviceId);
 #endif
-    void ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo);
+    void ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
+        std::vector<ProcessInfo> &processInfoVec);
 private:
     std::mutex timerMapMutex_;
     std::mutex remoteDeviceInfosMutex_;

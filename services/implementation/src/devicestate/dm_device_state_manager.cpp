@@ -115,7 +115,8 @@ void DmDeviceStateManager::OnDeviceOnline(std::string deviceId, int32_t authForm
             stateDeviceInfos_[deviceId] = devInfo;
         }
     }
-    ProcessDeviceStateChange(DEVICE_STATE_ONLINE, devInfo);
+    std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
+    ProcessDeviceStateChange(DEVICE_STATE_ONLINE, devInfo, processInfoVec);
     softbusConnector_->ClearProcessInfo();
 }
 
@@ -131,11 +132,13 @@ void DmDeviceStateManager::OnDeviceOffline(std::string deviceId)
         }
         devInfo = stateDeviceInfos_[deviceId];
     }
-    ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo);
+    std::vector<ProcessInfo> processInfoVec = softbusConnector_->GetProcessInfo();
+    ProcessDeviceStateChange(DEVICE_STATE_OFFLINE, devInfo, processInfoVec);
     softbusConnector_->ClearProcessInfo();
 }
 
-void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
+void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo,
+    std::vector<ProcessInfo> &processInfoVec)
 {
     LOGI("Handle device status change: devState=%{public}d, deviceId=%{public}s.", devState,
         GetAnonyString(devInfo.deviceId).c_str());
@@ -144,8 +147,7 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
             RegisterOffLineTimer(devInfo);
             SaveOnlineDeviceInfo(devInfo);
             DmDistributedHardwareLoad::GetInstance().LoadDistributedHardwareFwk();
-            ProcessDeviceStateChange(devState, devInfo);
-            softbusConnector_->ClearProcessInfo();
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec);
             break;
         case DEVICE_STATE_OFFLINE:
             StartOffLineTimer(devInfo);
@@ -155,13 +157,11 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
                 softbusConnector_->GetUdidByNetworkId(devInfo.networkId, udid);
                 softbusConnector_->EraseUdidFromMap(udid);
             }
-            ProcessDeviceStateChange(devState, devInfo);
-            softbusConnector_->ClearProcessInfo();
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec);
             break;
         case DEVICE_INFO_CHANGED:
             ChangeDeviceInfo(devInfo);
-            ProcessDeviceStateChange(devState, devInfo);
-            softbusConnector_->ClearChangeProcessInfo();
+            ProcessDeviceStateChange(devState, devInfo, processInfoVec);
             break;
         default:
             LOGE("HandleDeviceStatusChange error, unknown device state = %{public}d", devState);
@@ -169,18 +169,12 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 }
 
-void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo)
+void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
+    std::vector<ProcessInfo> &processInfoVec)
 {
     LOGI("begin, devState = %{public}d networkId: %{public}s.", devState,
         GetAnonyString(devInfo.networkId).c_str());
-    CHECK_NULL_VOID(softbusConnector_);
     CHECK_NULL_VOID(listener_);
-    std::vector<ProcessInfo> processInfoVec;
-    if (devState == DEVICE_INFO_CHANGED) {
-        processInfoVec = softbusConnector_->GetChangeProcessInfo();
-    } else {
-        processInfoVec = softbusConnector_->GetProcessInfo();
-    }
     for (const auto &item : processInfoVec) {
         if (!item.pkgName.empty()) {
             LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
@@ -563,12 +557,10 @@ bool DmDeviceStateManager::CheckIsOnline(const std::string &udid)
     return false;
 }
 
-void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo)
+void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo,
+    std::vector<ProcessInfo> &processInfos)
 {
-    CHECK_NULL_VOID(softbusConnector_);
     CHECK_NULL_VOID(listener_);
-    std::vector<ProcessInfo> processInfos = softbusConnector_->GetProcessInfo();
-    softbusConnector_->ClearProcessInfo();
     LOGI("pkgName size: %{public}zu", processInfos.size());
     for (const auto &item : processInfos) {
         listener_->OnDeviceScreenStateChange(item, devInfo);
