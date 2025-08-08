@@ -1267,6 +1267,7 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
 void SoftbusListener::DeleteCacheDeviceInfo()
 {
     LOGI("start.");
+    SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
     std::vector<DmDeviceInfo> onlineDevInfoVec;
     SoftbusCache::GetInstance().GetDeviceInfoFromCache(onlineDevInfoVec);
     if (onlineDevInfoVec.empty()) {
