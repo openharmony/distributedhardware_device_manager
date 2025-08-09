@@ -43,11 +43,12 @@ void DmDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 
 int32_t IpcClientManager::ClientInit()
 {
+    LOGI("Start");
     if (dmInterface_ != nullptr) {
-        LOGD("Already Init");
+        LOGI("DeviceManagerService Already Init");
         return DM_OK;
     }
-    LOGI("Start");
+
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
         LOGE("Get SystemAbilityManager Failed");
@@ -68,7 +69,7 @@ int32_t IpcClientManager::ClientInit()
         LOGE("InitDeviceManagerService: AddDeathRecipient Failed");
     }
     dmInterface_ = iface_cast<IpcRemoteBroker>(object);
-    LOGD("Completed");
+    LOGI("Completed");
     return DM_OK;
 }
 
@@ -85,7 +86,11 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
         LOGE("InitDeviceManager Failed with ret %{public}d", ret);
         return ret;
     }
-    CHECK_SIZE_RETURN(dmListener_, ERR_DM_FAILED);
+    if (dmListener_.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("dmListener_ size is more than max size");
+        return ERR_DM_FAILED;
+    }
+
     sptr<IpcClientStub> listener = sptr<IpcClientStub>(new IpcClientStub());
     std::shared_ptr<IpcRegisterListenerReq> req = std::make_shared<IpcRegisterListenerReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
@@ -111,7 +116,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("pkgName %{public}s", pkgName.c_str());
+    LOGI("UnInit in, pkgName %{public}s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
     if (dmInterface_ == nullptr) {
         LOGE("DeviceManager not Init");
@@ -136,7 +141,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
         }
         dmInterface_ = nullptr;
     }
-    LOGD("completed, pkgName: %{public}s", pkgName.c_str());
+    LOGI("completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
 }
 
@@ -161,7 +166,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 
 int32_t IpcClientManager::OnDmServiceDied()
 {
-    LOGI("begin");
+    LOGI("IpcClientManager::OnDmServiceDied begin");
     {
         std::lock_guard<std::mutex> autoLock(lock_);
         if (dmInterface_ == nullptr) {
@@ -174,7 +179,7 @@ int32_t IpcClientManager::OnDmServiceDied()
         }
         dmInterface_ = nullptr;
     }
-    LOGD("complete");
+    LOGI("IpcClientManager::OnDmServiceDied complete");
     return DM_OK;
 }
 

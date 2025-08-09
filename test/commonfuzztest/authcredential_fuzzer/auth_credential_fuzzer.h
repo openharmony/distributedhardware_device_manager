@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef AUTH_ACL_FUZZER_H
-#define AUTH_ACL_FUZZER_H
+#ifndef AUTH_CREDENTIAL_FUZZER_H
+#define AUTH_CREDENTIAL_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "authacl_fuzzer"
+#define FUZZ_PROJECT_NAME "authcredential_fuzzer"
 
-#endif // AUTH_ACL_FUZZER_H
+#endif // AUTH_CREDENTIAL_FUZZER_H

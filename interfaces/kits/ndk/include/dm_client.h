@@ -31,6 +31,13 @@ public:
     int32_t ReInit();
     int32_t GetLocalDeviceName(std::string &deviceName);
 private:
+    DmClient() = default;
+    ~DmClient() = default;
+    DmClient(const DmClient &) = delete;
+    DmClient &operator=(const DmClient &) = delete;
+    DmClient(DmClient &&) = delete;
+    DmClient &operator=(DmClient &&) = delete;
+private:
     std::mutex initMtx_;
     std::string pkgName_ = "";
     std::shared_ptr<DmInitCallback> dmInitCallback_;

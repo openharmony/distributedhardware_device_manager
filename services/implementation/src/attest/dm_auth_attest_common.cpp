@@ -92,6 +92,10 @@ bool ValidateInputJson(const std::string &data)
 
  bool ProcessCertItem(const JsonItemObject &item, DmBlob &cert, uint32_t processedIndex)
  {
+    if (!item.IsString()) {
+        LOGE("input param is invalid.");
+        return false;
+    }
     std::string hexStr = item.Get<std::string>();
     const size_t hexLen = hexStr.length();
     if (hexLen == 0 || hexLen % HEX_TO_UINT8 != 0) {
@@ -158,12 +162,7 @@ bool AuthAttestCommon::DeserializeDmCertChain(const std::string &data, DmCertCha
         delete[] certs;
         return false;
     }
-    if (outChain->cert != nullptr) {
-        for (uint32_t i = 0; i < outChain->certCount; ++i) {
-            delete[] outChain->cert[i].data;
-        }
-        delete[] outChain->cert;
-    }
+    FreeDmCertChain(*outChain);
     outChain->cert = certs;
     outChain->certCount = certCount;
     return true;
@@ -171,16 +170,19 @@ bool AuthAttestCommon::DeserializeDmCertChain(const std::string &data, DmCertCha
 
 void AuthAttestCommon::FreeDmCertChain(DmCertChain &chain)
 {
-    if (chain.cert != nullptr) {
-        for (uint32_t i = 0; i < chain.certCount; ++i) {
+    if (chain.cert == nullptr) {
+        return;
+    }
+    for (uint32_t i = 0; i < chain.certCount; ++i) {
+        if (chain.cert[i].data != nullptr) {
             delete[] chain.cert[i].data;
             chain.cert[i].data = nullptr;
-            chain.cert[i].size = 0;
         }
-        delete[] chain.cert;
-        chain.cert = nullptr;
-        chain.certCount = 0;
+        chain.cert[i].size = 0;
     }
+    delete[] chain.cert;
+    chain.cert = nullptr;
+    chain.certCount = 0;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

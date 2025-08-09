@@ -110,7 +110,7 @@ int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
         LOGE("Send local foreground userids failed, ret: %{public}d", ret);
         return ERR_DM_FAILED;
     }
-    LOGI("success");
+    LOGI("Send local foreground userids success");
     return DM_OK;
 }
 
@@ -159,7 +159,7 @@ int32_t DMCommTool::SendUninstAppObj(int32_t userId, int32_t tokenId, const std:
     return DM_OK;
 }
 
-int32_t DMCommTool::RspAppUninstall(const std::string rmtNetworkId, int32_t socketId)
+int32_t DMCommTool::RspAppUninstall(const std::string &rmtNetworkId, int32_t socketId)
 {
     LOGI("RspAppUninstall Start.");
     if (dmTransportPtr_ == nullptr) {
@@ -184,7 +184,7 @@ int32_t DMCommTool::RspAppUninstall(const std::string rmtNetworkId, int32_t sock
     return DM_OK;
 }
 
-int32_t DMCommTool::RspAppUnbind(const std::string rmtNetworkId, int32_t socketId)
+int32_t DMCommTool::RspAppUnbind(const std::string &rmtNetworkId, int32_t socketId)
 {
     LOGI("RspAppUnbind Start.");
     if (dmTransportPtr_ == nullptr) {
@@ -258,7 +258,7 @@ int32_t DMCommTool::SendUnBindAppObj(int32_t userId, int32_t tokenId, const std:
     return DM_OK;
 }
 
-void DMCommTool::RspLocalFrontOrBackUserIds(const std::string rmtNetworkId,
+void DMCommTool::RspLocalFrontOrBackUserIds(const std::string &rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds, int32_t socketId)
 {
     UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
@@ -288,7 +288,7 @@ void DMCommTool::RspLocalFrontOrBackUserIds(const std::string rmtNetworkId,
         LOGE("Response local foreground userids failed, ret: %{public}d", ret);
         return;
     }
-    LOGI("success");
+    LOGI("Response local foreground userids success");
 }
 
 DMCommTool::DMCommToolEventHandler::DMCommToolEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> runner,
@@ -393,7 +393,7 @@ void DMCommTool::DMCommToolEventHandler::HandleLocalUserIdEvent(const std::share
 
 void DMCommTool::ProcessReceiveCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg)
 {
-    LOGI("start");
+    LOGI("ProcessReceiveCommonEvent, process and rsp local userid");
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
     if (rmtUdid.empty()) {
@@ -436,7 +436,7 @@ void DMCommTool::ProcessReceiveCommonEvent(const std::shared_ptr<InnerCommMsg> c
 
 void DMCommTool::ProcessResponseCommonEvent(const std::shared_ptr<InnerCommMsg> commMsg)
 {
-    LOGI("start");
+    LOGI("process receive remote userids response");
     // step1: close socket
     this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
 
@@ -462,7 +462,7 @@ void DMCommTool::ProcessResponseCommonEvent(const std::shared_ptr<InnerCommMsg> 
 
 void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg)
 {
-    LOGI("start");
+    LOGI("Receive remote userids, process and rsp local userid");
     std::string rmtUdid = "";
     SoftbusCache::GetInstance().GetUdidFromCache(commMsg->remoteNetworkId.c_str(), rmtUdid);
     if (rmtUdid.empty()) {
@@ -510,7 +510,7 @@ void DMCommTool::ProcessReceiveUserIdsEvent(const std::shared_ptr<InnerCommMsg> 
     }
 }
 
-void DMCommTool::ProcessReceiveUninstAppEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+void DMCommTool::ProcessReceiveUninstAppEvent(const std::shared_ptr<InnerCommMsg> &commMsg)
 {
     if (commMsg == nullptr || commMsg->commMsg == nullptr) {
         LOGE("commMsg or commMsg->commMsg is null");
@@ -539,7 +539,7 @@ void DMCommTool::ProcessReceiveUninstAppEvent(const std::shared_ptr<InnerCommMsg
     }
 }
 
-void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg> commMsg)
+void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg> &commMsg)
 {
     if (commMsg == nullptr || commMsg->commMsg == nullptr) {
         LOGE("commMsg or commMsg->commMsg is null");
@@ -569,7 +569,7 @@ void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg
 
 void DMCommTool::StopSocket(const std::string &networkId)
 {
-    LOGI("DMCommTool::StopSocket, networkId = %{public}s", GetAnonyString(networkId).c_str());
+    LOGI("DMCommTool::StopSocket, networkId = %{public}s", networkId.c_str());
     if (dmTransportPtr_ == nullptr) {
         LOGE("dmTransportPtr_ is null");
         return;
@@ -621,7 +621,7 @@ void DMCommTool::ProcessReceiveRspAppUnbindEvent(const std::shared_ptr<InnerComm
 
 void DMCommTool::ProcessResponseUserIdsEvent(const std::shared_ptr<InnerCommMsg> commMsg)
 {
-    LOGI("start");
+    LOGI("process receive remote userids response");
     // step1: close socket
     this->dmTransportPtr_->StopSocket(commMsg->remoteNetworkId);
 
@@ -846,7 +846,7 @@ int32_t DMCommTool::SendLogoutAccountInfo(const std::string &rmtNetworkId,
         LOGE("Send account logout failed, ret: %{public}d", ret);
         return ERR_DM_FAILED;
     }
-    LOGI("success");
+    LOGI("Send account logout success");
     return DM_OK;
 }
 
@@ -881,7 +881,7 @@ void DMCommTool::ProcessReceiveLogoutEvent(const std::shared_ptr<InnerCommMsg> c
     }
     DeviceManagerService::GetInstance().ProcessSyncAccountLogout(logoutAccountMsg.accountId,
         rmtUdid, logoutAccountMsg.userId);
-    LOGI("success.");
+    LOGI("process remote logout success.");
 }
 
 int32_t DMCommTool::StartCommonEvent(std::string commonEventType, EventCallback eventCallback)
@@ -891,7 +891,7 @@ int32_t DMCommTool::StartCommonEvent(std::string commonEventType, EventCallback 
         return ERR_DM_INPUT_PARA_INVALID;
     }
     CHECK_NULL_RETURN(eventQueue_, ERR_DM_POINT_NULL);
-    LOGI("start eventType: %{public}s", commonEventType.c_str());
+    LOGI("StartCommonEvent start eventType: %{public}s", commonEventType.c_str());
     std::lock_guard<std::mutex> locker(eventMutex_);
     auto taskFunc = [eventCallback] () { eventCallback(); };
     eventQueue_->submit(taskFunc);

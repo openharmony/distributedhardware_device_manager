@@ -24,6 +24,7 @@ namespace DistributedHardware {
 
 void AuthManagerTest::SetUp()
 {
+    InitDeviceAuthService();
     softbusConnector = std::make_shared<SoftbusConnector>();
     deviceManagerServicelistener = std::make_shared<DeviceManagerServiceListener>();
     hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
