@@ -193,7 +193,6 @@ int32_t HiChainAuthConnector::ExportCredential(int32_t osAccountId, const std::s
     }
 
     publicKey = jsonAuthParam["keyValue"].Get<std::string>();
-    LOGI("leave. publicKey=%{public}s", GetAnonyString(publicKey).c_str());
     return DM_OK;
 }
 
