@@ -154,8 +154,6 @@ private:
     void GetBindCallerInfo();
     int32_t GetBindLevel(int32_t bindLevel);
     void GetIsNeedJoinLnnParam(const std::map<std::string, std::string> &bindParam);
-    std::mutex certMtx_;
-    std::condition_variable certCV_;
 };
 
 class AuthSrcManager : public AuthManager {

@@ -947,6 +947,7 @@ int32_t DmAuthMessageProcessor::CreateRespNegotiateMessage(std::shared_ptr<DmAut
     jsonObject[TAG_LANGUAGE] = context->accessee.language;
     jsonObject[TAG_EXTRA_INFO] = context->accessee.extraInfo;
     jsonObject[TAG_NETWORKID_ID] = context->accessee.networkId;
+    jsonObject[TAG_CERT_RANDOM] = context->accessee.certRandom;
 
     jsonObject[TAG_IS_ONLINE] = context->accesser.isOnline;
     CreateProxyRespNegotiateMessage(context, jsonObject);
@@ -1540,49 +1541,41 @@ int32_t DmAuthMessageProcessor::ParseMessageRespAclNegotiate(const JsonObject &j
     if (jsonObject[TAG_DEVICE_VERSION].IsString()) {
         context->accessee.dmVersion = jsonObject[TAG_DEVICE_VERSION].Get<std::string>();
     }
-
     if (jsonObject[TAG_DEVICE_NAME].IsString()) {
         context->accessee.deviceName = jsonObject[TAG_DEVICE_NAME].Get<std::string>();
     }
-
     if (jsonObject[TAG_DEVICE_ID_HASH].IsString()) {
         context->accessee.deviceIdHash = jsonObject[TAG_DEVICE_ID_HASH].Get<std::string>();
     }
-
     if (jsonObject[TAG_USER_ID].IsNumberInteger()) {
         context->accessee.userId = jsonObject[TAG_USER_ID].Get<int32_t>();
     }
-
     if (jsonObject[TAG_ACCOUNT_ID_HASH].IsString()) {
         context->accessee.accountIdHash = jsonObject[TAG_ACCOUNT_ID_HASH].Get<std::string>();
     }
-
     if (jsonObject[TAG_TOKEN_ID_HASH].IsString()) {
         context->accessee.tokenIdHash = jsonObject[TAG_TOKEN_ID_HASH].Get<std::string>();
     }
-
     if (jsonObject[TAG_NETWORKID_ID].IsString()) {
         context->accessee.networkId = jsonObject[TAG_NETWORKID_ID].Get<std::string>();
     }
-
     if (jsonObject[TAG_IS_ONLINE].IsBoolean()) {
         context->isOnline = jsonObject[TAG_IS_ONLINE].Get<bool>();
     }
-
     if (jsonObject[TAG_ACL_TYPE_LIST].IsString()) {
         context->accessee.aclTypeList = jsonObject[TAG_ACL_TYPE_LIST].Get<std::string>();
     }
-
     if (jsonObject[TAG_CERT_TYPE_LIST].IsString()) {
         context->accessee.credTypeList = jsonObject[TAG_CERT_TYPE_LIST].Get<std::string>();
     }
-
     if (jsonObject[TAG_LANGUAGE].IsString()) {
         context->accessee.language = jsonObject[TAG_LANGUAGE].Get<std::string>();
     }
-
     if (jsonObject[TAG_EXTRA_INFO].IsString()) {
         context->accessee.extraInfo = jsonObject[TAG_EXTRA_INFO].Get<std::string>();
+    }
+    if (jsonObject[TAG_CERT_RANDOM].IsNumberInteger()) {
+        context->accessee.certRandom = jsonObject[TAG_CERT_RANDOM].Get<uint64_t>();
     }
     ParseMessageProxyRespAclNegotiate(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcConfirmState>());

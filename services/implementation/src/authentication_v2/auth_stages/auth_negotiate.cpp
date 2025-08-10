@@ -51,6 +51,8 @@ namespace DistributedHardware {
 namespace {
     const char* DM_DISTURBANCE_EVENT_KEY = "business_id_cast+_disturbance_event";
     const char* DM_ANTI_DISTURBANCE_MODE = "is_in_anti_disturbance_mode";
+    const int64_t DM_MIN_RANDOM = 1;
+    const int64_t DM_MAX_RANDOM_INT64 = INT64_MAX;
 }
 
 DmAuthStateType AuthSrcStartState::GetStateType()
@@ -248,6 +250,7 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
         context->reason = ret;
         return ret;
     }
+    context->accessee.certRandom = static_cast<uint64_t>(GenRandLongLong(DM_MIN_RANDOM, DM_MAX_RANDOM_INT64));
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_ACL_NEGOTIATE, context);
     context->timer->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
         DmAuthState::GetTaskTimeout(context, WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT),

@@ -67,8 +67,14 @@ int32_t AuthSinkDataSyncState::VerifyCertificate(std::shared_ptr<DmAuthContext> 
         LOGE("cert deserialize fail!");
         return ERR_DM_DESERIAL_CERT_FAILED;
     }
-    int32_t certRet = AuthCert::GetInstance().
-        VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
+    int32_t certRet = -1;
+    if (CompareVersion(context->accesser.dmVersion, DM_VERSION_5_1_3)) {
+        certRet = AuthCert::GetInstance().
+            VerifyCertificateV2(dmCertChain, context->accesser.deviceIdHash.c_str(), context->accessee.certRandom);
+    } else {
+        certRet = AuthCert::GetInstance().
+            VerifyCertificate(dmCertChain, context->accesser.deviceIdHash.c_str());
+    }
     // free dmCertChain memory
     AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
     if (certRet != DM_OK) {
