@@ -1575,7 +1575,7 @@ int32_t DmAuthMessageProcessor::ParseMessageRespAclNegotiate(const JsonObject &j
         context->accessee.extraInfo = jsonObject[TAG_EXTRA_INFO].Get<std::string>();
     }
     if (jsonObject[TAG_CERT_RANDOM].IsNumberInteger()) {
-        context->accessee.certRandom = jsonObject[TAG_CERT_RANDOM].Get<int64_t>();
+        context->accessee.certRandom = jsonObject[TAG_CERT_RANDOM].Get<uint64_t>();
     }
     ParseMessageProxyRespAclNegotiate(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSrcConfirmState>());

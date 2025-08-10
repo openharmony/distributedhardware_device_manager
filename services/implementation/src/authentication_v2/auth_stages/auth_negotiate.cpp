@@ -250,7 +250,7 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
         context->reason = ret;
         return ret;
     }
-    context->accessee.certRandom = GenRandLongLong(DM_MIN_RANDOM, DM_MAX_RANDOM_INT64);
+    context->accessee.certRandom = static_cast<uint64_t>(GenRandLongLong(DM_MIN_RANDOM, DM_MAX_RANDOM_INT64));
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_ACL_NEGOTIATE, context);
     context->timer->StartTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK),
         DmAuthState::GetTaskTimeout(context, WAIT_REQUEST_TIMEOUT_TASK, WAIT_REQUEST_TIMEOUT),

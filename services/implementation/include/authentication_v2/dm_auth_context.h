@@ -200,7 +200,7 @@ struct DmAccess {
     int64_t transmitSkTimeStamp; // Used for aging, time is 2 days, application-level credential timestamp
     int64_t lnnSkTimeStamp{0};     // Used for aging, time is 2 days, user-level credential timestamp
     int64_t skTimeStamp;        // Used for aging, time is 2 days
-    int64_t certRandom{0}; // Used for cert generate
+    uint64_t certRandom{0}; // Used for cert generate
     bool isAuthed;
     bool isUserLevelAuthed;
     bool isOnline;
@@ -303,7 +303,9 @@ struct DmAuthContext {
     bool needBind{true};
     bool needAgreeCredential{true};
     bool needAuth{true};
-
+    std::mutex certMtx_; // cert lock
+    std::mutex certCVMtx_; // cert cv lock
+    std::condition_variable certCV_; // cert cv
     CleanNotifyCallback cleanNotifyCallback{nullptr};
 
     std::string GetDeviceId(DmAuthSide side);

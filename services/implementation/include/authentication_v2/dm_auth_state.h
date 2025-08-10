@@ -239,9 +239,6 @@ private:
     void ResetBindLevel(std::shared_ptr<DmAuthContext> context);
     void NegotiateUltrasonic(std::shared_ptr<DmAuthContext> context);
     void GenerateCertificate(std::shared_ptr<DmAuthContext> context);
-private:
-    std::mutex certMtx_;
-    std::condition_variable certCV_;
 };
 
 class AuthSinkStatePinAuthComm {
@@ -463,9 +460,6 @@ public:
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
     int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
     int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
-private:
-    std::mutex certCVMtx_;
-    std::condition_variable certCV_;
 };
 
 class AuthSinkSKDeriveState : public DmAuthState {
@@ -501,9 +495,6 @@ public:
     int32_t DerivativeSessionKey(std::shared_ptr<DmAuthContext> context);
     int32_t DerivativeProxySessionKey(std::shared_ptr<DmAuthContext> context);
     int32_t HandleSrcCredentialAuthDone(std::shared_ptr<DmAuthContext> context);
-private:
-    std::mutex certCVMtx_;
-    std::condition_variable certCV_;
 };
 
 class AuthSinkCredentialAuthStartState : public DmAuthState {

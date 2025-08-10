@@ -628,16 +628,21 @@ void AuthSrcConfirmState::GenerateCertificate(std::shared_ptr<DmAuthContext> con
     context->accesser.cert = "common";
 #else
     DmCertChain dmCertChain;
-    int32_t certRet = AuthCert::GetInstance().GenerateCertificateV2(dmCertChain, context->accessee.certRandom);
+    int32_t certRet = -1;
+    if (CompareVersion(context->accessee.dmVersion, DM_VERSION_5_1_3)) {
+        certRet = AuthCert::GetInstance().GenerateCertificateV2(dmCertChain, context->accessee.certRandom);
+    } else {
+        certRet = AuthCert::GetInstance().GenerateCertificate(dmCertChain);
+    }
     if (certRet != DM_OK) {
         LOGE("generate cert fail, certRet = %{public}d", certRet);
         return;
     }
     {
-        std::lock_guard<std::mutex> lock(certMtx_);
+        std::lock_guard<std::mutex> lock(context->certMtx_);
         context->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
     }
-    certCV_.notify_all();
+    context->certCV_.notify_all();
     AuthAttestCommon::GetInstance().FreeDmCertChain(dmCertChain);
 #endif
     return;
@@ -672,7 +677,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     NegotiateUltrasonic(context);
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_USER_CONFIRM, context);
     // generate cert sync
-    ffrt::submit([=]() { GenerateCertificate(context_);});
+    ffrt::submit([=]() { GenerateCertificate(context);});
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
         static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), DM_OK);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,

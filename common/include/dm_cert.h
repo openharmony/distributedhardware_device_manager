@@ -20,6 +20,10 @@
 #define DM_CERTS_COUNT 4
 #define UDID_BUF_LEN 65
 #define DM_CERTIFICATE_SIZE 8192
+#define ATTEST_CERTS_INDEX 0
+#define DEVICE_CERTS_INDEX 1
+#define MANUFACTURE_CERTS_INDEX 2
+#define ROOT_CERTS_INDEX 3
 
 #include <stdint.h>
 #include <string>
