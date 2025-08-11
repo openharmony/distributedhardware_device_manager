@@ -569,7 +569,7 @@ void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg
 
 void DMCommTool::StopSocket(const std::string &networkId)
 {
-    LOGI("DMCommTool::StopSocket, networkId = %{public}s", networkId.c_str());
+    LOGI("DMCommTool::StopSocket, networkId = %{public}s", GetAnonyString(networkId).c_str());
     if (dmTransportPtr_ == nullptr) {
         LOGE("dmTransportPtr_ is null");
         return;
