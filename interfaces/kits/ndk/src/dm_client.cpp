@@ -78,7 +78,7 @@ int32_t DmClient::GetLocalDeviceName(std::string &deviceName)
     ret = DeviceManager::GetInstance().GetLocalDeviceName(deviceName);
     if (ret != DM_OK) {
         LOGE("Get local device name failed, ret=%{public}d", ret);
-        return DM_ERR_OBTAIN_BUNDLE_NAME;
+        return DM_ERR_FAILED;
     }
     return ERR_OK;
 }

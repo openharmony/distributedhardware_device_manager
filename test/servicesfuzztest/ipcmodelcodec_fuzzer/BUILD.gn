@@ -67,7 +67,10 @@ ohos_fuzztest("IpcModelCodecFuzzTest") {
     "LOG_DOMAIN=0xD004110",
   ]
 
-  deps = [ "${innerkits_path}/native_cpp:devicemanagersdk" ]
+  deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${utils_path}:devicemanagerutilstest"
+    ]
 
   external_deps = [
     "c_utils:utils",
@@ -77,8 +80,6 @@ ohos_fuzztest("IpcModelCodecFuzzTest") {
     "napi:ace_napi",
     "safwk:system_ability_fwk",
   ]
-
-  public_deps = [ "${utils_path}:devicemanagerutilstest" ]
 }
 
 ###############################################################################

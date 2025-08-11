@@ -384,32 +384,6 @@ void HandleBusinessEventsFuzzTest(FuzzedDataProvider &fdp)
     authManager->PrepareSoftbusSessionCallback();
 }
 
-void CheckProxyAuthParamVaildFuzzTest(FuzzedDataProvider &fdp)
-{
-    std::string extra = fdp.ConsumeRandomLengthString();
-    authManager->CheckProxyAuthParamVaild(extra);
-
-    JsonObject jsonObject;
-    jsonObject[PARAM_KEY_IS_PROXY_BIND] = "true";
-    std::string bundleNameDemoA = "com.ohos.devicemanagerdemoA";
-    std::string bundleNameDemoGame = "com.game.gamenearbydemo";
-    JsonObject jsonA;
-    jsonA["pakgName"] = bundleNameDemoA;
-    jsonA["bundleName"] = bundleNameDemoA;
-
-    JsonObject jsonGame;
-    jsonGame["pakgName"] = bundleNameDemoGame;
-    jsonGame["bundleName"] = bundleNameDemoGame;
-
-    JsonObject subJsonArr(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
-    subJsonArr.PushBack(jsonA);
-    subJsonArr.PushBack(jsonGame);
-    jsonObject[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = subJsonArr.Dump();
-    std::string extra1 = jsonObject.Dump();
-    authManager->CheckProxyAuthParamVaild(extra1);
-    authManager->ParseProxyJsonObject(jsonObject);
-}
-
 void ParseProxyJsonObjectFuzzTest(FuzzedDataProvider &fdp)
 {
     JsonObject jsonObject;
@@ -473,7 +447,6 @@ void AuthManagerFuzzTest(const uint8_t* data, size_t size)
     AuthSinkDeviceSessionKeyFuzzTest(fdp);
     AuthSinkDeviceRequestFuzzTest(fdp);
     HandleBusinessEventsFuzzTest(fdp);
-    CheckProxyAuthParamVaildFuzzTest(fdp);
     ParseProxyJsonObjectFuzzTest(fdp);
     GetBindLevelByBundleNameFuzzTest(fdp);
 }

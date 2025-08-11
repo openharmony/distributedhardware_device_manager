@@ -31,6 +31,11 @@ AuthCert::AuthCert()
 AuthCert::~AuthCert()
 {
     LOGD("AuthCert destructor");
+    if (authCertSoHandle_ != nullptr) {
+        LOGI("dm auth cert authCertSoHandle_ is not nullptr.");
+        dlclose(authCertSoHandle_);
+        authCertSoHandle_ = nullptr;
+    }
 }
 
 bool AuthCert::IsDMAdapterAuthCertLoaded()

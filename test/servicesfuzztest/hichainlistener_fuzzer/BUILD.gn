@@ -81,8 +81,6 @@ ohos_fuzztest("HiChainListenerFuzzTest") {
     "napi:ace_napi",
     "safwk:system_ability_fwk",
   ]
-
-  public_deps = [ "${utils_path}:devicemanagerutilstest" ]
 }
 
 ###############################################################################

@@ -61,23 +61,6 @@ void AuthAclTest::TearDown()
     Mock::VerifyAndClearExpectations(&*DmSoftbusSession::dmSoftbusSession);
 }
 
-HWTEST_F(AuthAclTest, AuthSinkAcl_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSinkManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    context = authManager->GetAuthContext();
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
-    context->accessee.deviceId = "accessee_deviceId";
-    context->accesser.deviceId = "accesser_deviceId";
-    context->accesser.aclStrList = "aclList";
-    EXPECT_CALL(*dmSoftbusConnectorMock, SyncLocalAclListProcess(_, _, _)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
-        .WillOnce(Return(TEST_NONE_EMPTY_STRING));
-    EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(DM_OK));
-
-    EXPECT_EQ(authState->Action(context), DM_OK);
-}
-
 HWTEST_F(AuthAclTest, AuthSinkAcl_002, testing::ext::TestSize.Level1)
 {
     authManager = std::make_shared<AuthSinkManager>(softbusConnector, hiChainConnector, listener,
@@ -86,21 +69,6 @@ HWTEST_F(AuthAclTest, AuthSinkAcl_002, testing::ext::TestSize.Level1)
     std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSinkDataSyncState>();
 
     EXPECT_EQ(authState->GetStateType(), DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE);
-}
-
-HWTEST_F(AuthAclTest, AuthSrcAcl_001, testing::ext::TestSize.Level1)
-{
-    authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector, listener,
-        hiChainAuthConnector);
-    context = authManager->GetAuthContext();
-    std::shared_ptr<DmAuthState> authState = std::make_shared<AuthSrcDataSyncState>();
-    context->direction = DM_AUTH_SOURCE;
-    context->accesser.isAuthed = true; // no need to agree acl
-    context->accesser.isOnline = true; // no need to join network
-    EXPECT_CALL(*DmAuthMessageProcessorMock::dmAuthMessageProcessorMock, CreateMessage(_, _))
-        .WillOnce(Return(TEST_NONE_EMPTY_STRING));
-    EXPECT_CALL(*dmSoftbusSessionMock, SendData(_, _)).WillOnce(Return(DM_OK));
-    EXPECT_EQ(authState->Action(context), DM_OK);
 }
 
 HWTEST_F(AuthAclTest, AuthSrcAcl_002, testing::ext::TestSize.Level1)

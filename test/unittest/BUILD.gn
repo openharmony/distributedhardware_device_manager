@@ -45,6 +45,8 @@ group("unittest") {
     ":UTTest_discovery_manager",
     ":UTTest_dm_account_common_event",
     ":UTTest_dm_adapter_manager",
+    ":UTTest_dm_auth_attest_common",
+    ":UTTest_dm_auth_cert",
     ":UTTest_dm_anonymous",
     ":UTTest_dm_auth_manager_first",
     ":UTTest_dm_auth_manager_second",
@@ -160,6 +162,48 @@ ohos_unittest("UTTest_pin_auth_ui") {
 }
 
 ## UnitTest UTTest_pin_auth_ui }}}
+
+## UnitTest UTTest_dm_auth_attest_common {{{
+ohos_unittest("UTTest_dm_auth_attest_common") {
+  module_out_path = module_out_path
+
+  sources = [ "UTTest_dm_auth_attest_common.cpp" ]
+ 
+  deps = [ ":device_manager_test_common" ]
+ 
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+  ]
+}
+ 
+## UnitTest UTTest_dm_auth_attest_common }}}
+ 
+## UnitTest UTTest_dm_auth_cert {{{
+ohos_unittest("UTTest_dm_auth_cert") {
+  module_out_path = module_out_path
+ 
+  sources = [ "UTTest_dm_auth_cert.cpp" ]
+ 
+  deps = [ ":device_manager_test_common" ]
+ 
+  external_deps = [
+    "device_auth:deviceauth_sdk",
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+  ]
+}
+ 
+## UnitTest UTTest_dm_auth_cert }}}
 
 ## UnitTest UTTest_ipc_cmd_parser_client {{{
 ohos_unittest("UTTest_ipc_cmd_parser_client") {

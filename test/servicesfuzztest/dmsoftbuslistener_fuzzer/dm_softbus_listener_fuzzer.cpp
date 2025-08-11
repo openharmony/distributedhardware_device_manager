@@ -33,7 +33,7 @@ void DmSoftbusListenerFuzzTestNext(FuzzedDataProvider &fdp)
 {
     SoftbusListener listener;
     std::string networkIdStr = fdp.ConsumeRandomLengthString();
-    if (!networkIdStr.empty()) { 
+    if (!networkIdStr.empty()) {
         int32_t networkType = fdp.ConsumeIntegral<std::int32_t>();
         listener.GetNetworkTypeByNetworkId(networkIdStr.c_str(), networkType);
     }
