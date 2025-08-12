@@ -30,14 +30,14 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, s
     return DmDeviceManagerService::dmDeviceManagerService->GetTrustedDeviceList(pkgName, deviceList);
 }
 
-bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
-{
-    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterResidentLoad();
-}
-
 bool DeviceManagerService::IsDMServiceAdapterSoLoaded()
 {
     return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterSoLoaded();
+}
+
+bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
+{
+    return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterResidentLoad();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
