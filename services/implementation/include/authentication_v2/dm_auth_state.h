@@ -176,6 +176,7 @@ public:
     static void DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
     void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
+    void JoinLnn(std::shared_ptr<DmAuthContext> context);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
