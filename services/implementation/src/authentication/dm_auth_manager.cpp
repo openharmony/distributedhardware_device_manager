@@ -579,7 +579,7 @@ void DmAuthManager::OnSessionClosed(const int32_t sessionId)
     {
         std::lock_guard<std::mutex> lock(groupMutex_);
         if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
-            authResponseContext_->replay == DM_OK && isCreateGroup_ && !isAddMember_) {
+            authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
             LOGI("wait addmemer callback");
             return;
         }
@@ -697,7 +697,7 @@ void DmAuthManager::ProcessReqAuthTerminate()
     {
         std::lock_guard<std::mutex> lock(groupMutex_);
         if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
-            authResponseContext_->replay == DM_OK && isCreateGroup_ && !isAddMember_) {
+            authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
             LOGI("wait addmemer callback");
             transiteToFinishState_ = true;
             return;
