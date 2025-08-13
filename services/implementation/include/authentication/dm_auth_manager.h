@@ -278,7 +278,7 @@ public:
      * @tc.desc: Join Member of the DeviceManager Authenticate Manager
      * @tc.type: FUNC
      */
-    void OnMemberJoin(int64_t requestId, int32_t status);
+    void OnMemberJoin(int64_t requestId, int32_t status, int32_t operationCode);
 
     /**
      * @tc.name: DmAuthManager::EstablishAuthChannel
@@ -595,6 +595,8 @@ private:
     void ProcessReqPublicKey();
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
     void GetBindCallerInfo();
+    void ProcessReqAuthTerminate();
+    void ResetParams();
 
 private:
     std::shared_ptr<SoftbusConnector> softbusConnector_;
@@ -645,6 +647,10 @@ private:
     CleanNotifyCallback cleanNotifyCallback_{nullptr};
     std::mutex bindParamMutex_;
     std::map<std::string, std::string> bindParam_;
+    std::mutex groupMutex_;
+    bool isAddMember_ = false;
+    bool isCreateGroup_ = false;
+    bool transiteToFinishState_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

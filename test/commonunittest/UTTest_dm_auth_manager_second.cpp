@@ -174,7 +174,7 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_001, testing::ext::TestSize.Level1)
     int64_t requestId = 0;
     int32_t status = 11;
     authManager_->authResponseContext_ = nullptr;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
@@ -183,7 +183,7 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_002, testing::ext::TestSize.Level1)
     int64_t requestId = 0;
     int32_t status = 11;
     authManager_->authUiStateMgr_ = nullptr;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
@@ -194,7 +194,7 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_003, testing::ext::TestSize.Level1)
     authManager_->authRequestState_ = std::make_shared<AuthRequestJoinState>();
     authManager_->authResponseState_ = nullptr;
     authManager_->authResponseContext_->authType = 5;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
@@ -206,7 +206,7 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_004, testing::ext::TestSize.Level1)
     authManager_->authResponseState_ = nullptr;
     authManager_->authResponseContext_->authType = 6;
     authManager_->authResponseContext_->requestId = 1;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
@@ -218,7 +218,7 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_006, testing::ext::TestSize.Level1)
     authManager_->authResponseState_ = nullptr;
     authManager_->authResponseContext_->authType = 6;
     authManager_->authResponseContext_->requestId = 0;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
@@ -230,7 +230,7 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_007, testing::ext::TestSize.Level1)
     authManager_->authResponseState_ = std::make_shared<AuthResponseShowState>();
     authManager_->authResponseContext_->authType = 6;
     authManager_->authResponseContext_->requestId = 0;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
@@ -240,7 +240,7 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_008, testing::ext::TestSize.Level1)
     int32_t status = 0;
     authManager_->authRequestState_ = nullptr;
     authManager_->authResponseState_ = nullptr;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_EQ(authManager_->isFinishOfLocal_, true);
 }
 
@@ -257,17 +257,17 @@ HWTEST_F(DmAuthManagerTest, OnMemberJoin_009, testing::ext::TestSize.Level1)
     authManager_->authResponseState_ = authResponseInitStateMock;
     authManager_->authResponseContext_->isFinish = true;
     authManager_->authResponseContext_->requestId = 0;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_TRUE(authManager_->authResponseContext_->isFinish);
 
     authManager_->authResponseContext_->isFinish = true;
     authManager_->authResponseContext_->requestId = 1;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_FALSE(authManager_->authResponseContext_->isFinish);
 
     authManager_->authResponseContext_->isFinish = true;
     status = ERR_DM_FAILED;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     ASSERT_FALSE(authManager_->authResponseContext_->isFinish);
 }
 
