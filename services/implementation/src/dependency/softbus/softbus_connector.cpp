@@ -318,7 +318,7 @@ void SoftbusConnector::JoinLnn(const std::string &deviceId, const std::string &r
 }
 
 void SoftbusConnector::JoinLNNBySkId(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId,
-    std::string udid, std::string udidHash)
+    std::string udid, std::string udidHash, bool isForceJoin)
 {
     LOGI("start, JoinLNNBySkId sessionId: %{public}d, udid: %{public}s.", sessionId, GetAnonyString(udid).c_str());
     std::string connectAddr;
@@ -346,13 +346,14 @@ void SoftbusConnector::JoinLNNBySkId(int32_t sessionId, int32_t sessionKeyId, in
         addrInfo->deviceKeyId.localDeviceKeyId = 0; // 总线修改后适配
         addrInfo->deviceKeyId.remoteDeviceKeyId = 0; // 总线修改后适配
     }
-    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo.get(), OnSoftbusJoinLNNResult, false);
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, addrInfo.get(), OnSoftbusJoinLNNResult, isForceJoin);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]JoinLNNBySkId failed, ret: %{public}d.", ret);
     }
 }
 
-void SoftbusConnector::JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId)
+void SoftbusConnector::JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId,
+    bool isForceJoin)
 {
     LOGI("start, JoinLnnByHml sessionId: %{public}d.", sessionId);
     ConnectionAddr addrInfo;
@@ -367,7 +368,7 @@ void SoftbusConnector::JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int
         addrInfo.deviceKeyId.localDeviceKeyId = 0;
         addrInfo.deviceKeyId.remoteDeviceKeyId = 0;
     }
-    int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult, false);
+    int32_t ret = ::JoinLNN(DM_PKG_NAME, &addrInfo, OnSoftbusJoinLNNResult, isForceJoin);
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]JoinLNN failed, ret: %{public}d.", ret);
     }

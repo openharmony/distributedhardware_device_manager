@@ -86,12 +86,13 @@ public:
      * @tc.desc: join lnn by session id
      * @tc.type: FUNC
      */
-    static void JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId);
+    static void JoinLnnByHml(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId,
+        bool isForceJoin = false);
 
     static void JoinLnn(const std::string &deviceId, const std::string &remoteUdidHash);
 
     static void JoinLNNBySkId(int32_t sessionId, int32_t sessionKeyId, int32_t remoteSessionKeyId,
-        std::string udid, std::string udidHash);
+        std::string udid, std::string udidHash, bool isForceJoin = false);
 
     /**
      * @tc.name: SoftbusConnector::RegisterConnectorCallback
