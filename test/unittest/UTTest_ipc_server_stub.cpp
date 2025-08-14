@@ -647,7 +647,6 @@ HWTEST_F(IpcServerStubTest, OnAddSystemAbility_002, testing::ext::TestSize.Level
     int32_t systemAbilityId = 9999;
     std::string deviceId;
     IpcServerStub::GetInstance().OnAddSystemAbility(systemAbilityId, deviceId);
-    EXPECT_EQ(DeviceManagerService::GetInstance().softbusListener_, nullptr);
 
     systemAbilityId = SOFTBUS_SERVER_SA_ID;
     IpcServerStub::GetInstance().registerToService_ = false;

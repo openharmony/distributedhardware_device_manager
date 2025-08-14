@@ -16,10 +16,6 @@
 #ifndef OHOS_DM_AUTH_ATTEST_COMMON_H
 #define OHOS_DM_AUTH_ATTEST_COMMON_H
 
-#define DM_CERTS_COUNT 4
-#define UDID_BUF_LEN 65
-#define DM_CERTIFICATE_SIZE 8192
-
 #include <stdint.h>
 #include <string>
 
