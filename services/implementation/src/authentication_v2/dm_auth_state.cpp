@@ -971,5 +971,27 @@ void DmAuthState::RemoveTokenIdsFromCredential(std::shared_ptr<DmAuthContext> co
     }
     context->hiChainAuthConnector->UpdateCredential(credId, access.userId, appList);
 }
+
+void DmAuthState::JoinLnn(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_VOID(context);
+    CHECK_NULL_VOID(context->softbusConnector);
+    bool isForceJoin = false;
+    if (!context->accesser.isOnline) {
+        LOGI("The remote device is offline.");
+        isForceJoin = true;
+    }
+    if (context->connSessionType == CONN_SESSION_TYPE_HML) {
+        context->softbusConnector->JoinLnnByHml(context->sessionId, context->accesser.transmitSessionKeyId,
+            context->accessee.transmitSessionKeyId, isForceJoin);
+    } else {
+        char udidHashTmp[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetUdidHash(context->accessee.deviceId, reinterpret_cast<uint8_t*>(udidHashTmp)) == DM_OK) {
+            std::string peerUdidHash = std::string(udidHashTmp);
+            context->softbusConnector->JoinLNNBySkId(context->sessionId, context->accesser.transmitSessionKeyId,
+                context->accessee.transmitSessionKeyId, context->accessee.addr, peerUdidHash, isForceJoin);
+        }
+    }
+}
 } // namespace DistributedHardware
 } // namespace OHOS
