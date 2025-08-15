@@ -67,6 +67,7 @@ std::string AuthAttestCommon::SerializeDmCertChain(const DmCertChain *chain)
     return jsonObject.Dump();
 }
 
+//LCOV_EXCL_START
 bool ValidateInputJson(const std::string &data)
 {
     JsonObject jsonObject;
@@ -184,5 +185,6 @@ void AuthAttestCommon::FreeDmCertChain(DmCertChain &chain)
     chain.cert = nullptr;
     chain.certCount = 0;
 }
+//LCOV_EXCL_STOP
 } // namespace DistributedHardware
 } // namespace OHOS

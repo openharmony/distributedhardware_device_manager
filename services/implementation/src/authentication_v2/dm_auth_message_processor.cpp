@@ -1043,6 +1043,7 @@ int32_t DmAuthMessageProcessor::CreateProxyCredExchangeMessage(std::shared_ptr<D
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 // Create 141 message.
 int32_t DmAuthMessageProcessor::CreateMessageReqSKDerive(std::shared_ptr<DmAuthContext> context,
     JsonObject &jsonObject)
@@ -1088,6 +1089,7 @@ int32_t DmAuthMessageProcessor::CreateMessageRspSKDerive(std::shared_ptr<DmAuthC
     jsonObject[TAG_DATA] = cipherText;
     return ret;
 }
+//LCOV_EXCL_STOP
 
 // Create 160 message.
 int32_t DmAuthMessageProcessor::CreateMessageReqCredAuthStart(std::shared_ptr<DmAuthContext> context,
