@@ -650,7 +650,7 @@ private:
     std::mutex groupMutex_;
     bool isAddMember_ = false;
     bool isCreateGroup_ = false;
-    bool transiteToFinishState_ = false;
+    bool transitToFinishState_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

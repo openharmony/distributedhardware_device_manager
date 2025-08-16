@@ -576,15 +576,15 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
 void DmAuthManager::OnSessionClosed(const int32_t sessionId)
 {
     LOGI("DmAuthManager::OnSessionClosed sessionId = %{public}d", sessionId);
-    {
-        std::lock_guard<std::mutex> lock(groupMutex_);
-        if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
-            authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
-            LOGI("wait addmemer callback");
-            return;
-        }
-    }
     if (authResponseState_ != nullptr && authResponseContext_ != nullptr) {
+        {
+            std::lock_guard<std::mutex> lock(groupMutex_);
+            if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
+                authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
+                LOGI("wait addmemer callback");
+                return;
+            }
+        }
         isFinishOfLocal_ = false;
         authResponseContext_->state = authResponseState_->GetStateType();
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
@@ -699,7 +699,7 @@ void DmAuthManager::ProcessReqAuthTerminate()
         if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
             authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
             LOGI("wait addmemer callback");
-            transiteToFinishState_ = true;
+            transitToFinishState_ = true;
             return;
         }
     }
@@ -799,7 +799,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status, int32_t oper
         {
             std::lock_guard<std::mutex> lock(groupMutex_);
             isAddMember_ = true;
-            if (transiteToFinishState_) {
+            if (transitToFinishState_) {
                 LOGI("Have received src finish state.");
                 authResponseContext_->state = AuthState::AUTH_RESPONSE_FINISH;
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
@@ -1566,7 +1566,7 @@ void DmAuthManager::ResetParams()
     bundleName_ = "";
     isAddMember_ = false;
     isCreateGroup_ = false;
-    transiteToFinishState_ = false;
+    transitToFinishState_ = false;
     if (cleanNotifyCallback_ != nullptr) {
         cleanNotifyCallback_(0);
     }
