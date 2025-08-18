@@ -39,7 +39,7 @@ static DumperInfo g_dumperDeviceType[] = {
 };
 
 // HiDumper info
-constexpr const char* ARGS_HELP_INFO = "-help";
+constexpr const char* ARGS_HELP_INFO = "-h";
 constexpr const char* HIDUMPER_GET_TRUSTED_LIST_INFO = "-getTrustlist";
 
 // HiDumper command
@@ -133,7 +133,7 @@ int32_t HiDumpHelper::ShowHelp(std::string &result)
 {
     LOGI("Show hidumper help");
     result.append("DistributedHardwareDeviceManager hidumper options:\n");
-    result.append(" -help                    ");
+    result.append(" -h                       ");
     result.append(": show help\n");
     result.append(" -getTrustlist            ");
     result.append(": show all trusted device list\n\n");
