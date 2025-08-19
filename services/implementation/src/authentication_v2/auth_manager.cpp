@@ -469,7 +469,7 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
         context_->accesser.userId = MultipleUserConnector::GetFirstForegroundUserId();
     }
     if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
-        context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>());
+        context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
         LOGI("isNeedAuthenticate: %{public}d.", context_->isNeedAuthenticate);
     }
     if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
