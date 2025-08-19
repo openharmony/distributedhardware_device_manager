@@ -971,9 +971,9 @@ void AuthSrcManager::AuthDeviceFinish(int64_t requestId)
     switch (curState) {
         case DmAuthStateType::AUTH_SRC_PIN_AUTH_DONE_STATE:
             if (!context_->isNeedAuthenticate) {
-               LOGI("skip authenticate.");
-               context_->reason = ERR_DM_SKIP_AUTHENTICATE;
-               context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
+                LOGI("skip authenticate.");
+                context_->reason = ERR_DM_SKIP_AUTHENTICATE;
+                context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
             } else {
                 // ON_FINISH event occurs, start credential exchange
                 context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialExchangeState>());
