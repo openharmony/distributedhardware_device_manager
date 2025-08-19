@@ -76,7 +76,8 @@ const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
 const std::map<int32_t, int32_t> NEW_AND_OLD_REPLAY_MAPPING = {
     { DM_ALREADY_AUTHED, SOFTBUS_OK },
     { SOFTBUS_OK, SOFTBUS_OK },
-    { DM_BIND_TRUST_TARGET, DM_OK }
+    { DM_BIND_TRUST_TARGET, DM_OK },
+    { ERR_DM_SKIP_AUTHENTICATE, DM_OK },
 };
 
 int32_t DmAuthState::GetTaskTimeout(std::shared_ptr<DmAuthContext> context, const char* taskName, int32_t taskTimeOut)

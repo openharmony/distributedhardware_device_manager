@@ -144,6 +144,7 @@ enum {
     ERR_DM_DEVICE_FROZEN = 969298355,
     ERR_DM_SOCKET_IN_USED = 969298356,
 	ERR_DM_ANTI_DISTURB_MODE = 969298357,
+    ERR_DM_SKIP_AUTHENTICATE = 969298358,
 };
 } // namespace DistributedHardware
 } // namespace OHOS

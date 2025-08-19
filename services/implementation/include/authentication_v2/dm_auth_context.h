@@ -278,7 +278,7 @@ struct DmAuthContext {
     bool IsProxyBind{false};
     bool IsCallingProxyAsSubject{true};
     bool IsNeedSetProxy{false};
-    bool isNeedAuthorize{false};
+    bool isNeedAuthenticate{true}; // apply for skip authenticate
     std::vector<DmProxyAuthContext> subjectProxyOnes;
     std::string reUseCreId;
     std::string title;
