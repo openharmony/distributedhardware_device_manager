@@ -227,7 +227,7 @@ private:
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
     std::shared_ptr<AuthManagerBase> GetAuthMgr();
-    void AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr);
+    int32_t AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr);
     void EraseAuthMgr(uint64_t tokenId);
     std::shared_ptr<AuthManagerBase> GetAuthMgrByTokenId(uint64_t tokenId);
     std::shared_ptr<AuthManagerBase> GetCurrentAuthMgr();

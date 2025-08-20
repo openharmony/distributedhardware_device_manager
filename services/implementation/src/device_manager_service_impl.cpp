@@ -262,19 +262,24 @@ int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_
     hiChainAuthConnector_->RegisterHiChainAuthCallbackById(logicalSessionId, authMgr);
     LOGI("Initialize authMgr token: %{public}" PRId64 ".", tokenId);
     ImportConfig(authMgr, tokenId, pkgName);
-    AddAuthMgr(tokenId, sessionId, authMgr);
-    return DM_OK;
+    return AddAuthMgr(tokenId, sessionId, authMgr);
 }
 
 int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName, int sessionId)
 {
     LOGI("tokenId: %{public}" PRIu64 ", pkgname:%{public}s", tokenId, pkgName.c_str());
-    if (authMgr_ == nullptr) {
-        CreateGlobalClassicalAuthMgr();
+    {
+        std::lock_guard<std::mutex> lock(authMgr_);
+        if (authMgr_ == nullptr) {
+            CreateGlobalClassicalAuthMgr();
+        }
+        authMgr_->PrepareSoftbusSessionCallback();
+        ImportConfig(authMgr_, tokenId, pkgName);
+        int32_t ret = AddAuthMgr(tokenId, sessionId, authMgr_);
+        if (ret != DM_OK) {
+            return ret;
+        }
     }
-    authMgr_->PrepareSoftbusSessionCallback();
-    AddAuthMgr(tokenId, sessionId, authMgr_);
-    ImportConfig(authMgr_, tokenId, pkgName);
     {
         // The value of logicalSessionId in the old protocol is always 0.
         std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
@@ -403,21 +408,28 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgr()
     return GetAuthMgrByTokenId(tokenId);
 }
 
-void DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr)
+int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr)
 {
     if (authMgr == nullptr) {
-        return;
+        LOGE("authMgr is nullptr.");
+        return ERR_DM_POINT_NULL;
     }
     {
         std::lock_guard<std::mutex> mapLock(mapMutex_);
         if (sessionEnableMap_.find(sessionId) != sessionEnableMap_.end() && !sessionEnableMap_[sessionId]) {
-            return;
+            LOGE("session is not open, no need add authMgr.");
+            return ERR_DM_AUTH_OPEN_SESSION_FAILED;
         }
     }
     {
         std::lock_guard<std::mutex> lock(authMgrMapMtx_);
+        if (authMgrMap_.size() > MAX_NEW_PROC_SESSION_COUNT_TEMP) {
+            LOGE("Other bind session exist, can not start new one. authMgrMap_.size:%{public}zu", authMgrMap_.size());
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
         authMgrMap_[tokenId] = authMgr;
     }
+    return DM_OK;
 }
 
 void DeviceManagerServiceImpl::EraseAuthMgr(uint64_t tokenId)
@@ -1891,6 +1903,10 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
         if (tokenIdSessionIdMap_.find(tokenId) != tokenIdSessionIdMap_.end()) {
             LOGE("BindTarget failed, this device is being bound. please try again later,"
                 "pkgName:%{public}s, tokenId:%{public}" PRIu64, pkgName.c_str(), tokenId);
+            return ERR_DM_AUTH_BUSINESS_BUSY;
+        }
+        if (tokenIdSessionIdMap_.size() > MAX_NEW_PROC_SESSION_COUNT_TEMP) {
+            LOGE("Other bind exist, can not start new one. size:%{public}zu", tokenIdSessionIdMap_.size());
             return ERR_DM_AUTH_BUSINESS_BUSY;
         }
         tokenIdSessionIdMap_[tokenId] = DEFAULT_SESSION_ID;
