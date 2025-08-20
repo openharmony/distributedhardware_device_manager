@@ -577,6 +577,14 @@ void DmAuthManager::OnSessionClosed(const int32_t sessionId)
 {
     LOGI("DmAuthManager::OnSessionClosed sessionId = %{public}d", sessionId);
     if (authResponseState_ != nullptr && authResponseContext_ != nullptr) {
+        {
+            std::lock_guard<std::mutex> lock(groupMutex_);
+            if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
+                authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
+                LOGI("wait addmemer callback");
+                return;
+            }
+        }
         isFinishOfLocal_ = false;
         authResponseContext_->state = authResponseState_->GetStateType();
         authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
@@ -664,14 +672,7 @@ void DmAuthManager::ProcessSinkMsg()
             }
             break;
         case MSG_TYPE_REQ_AUTH_TERMINATE:
-            if (authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
-                isFinishOfLocal_ = false;
-                authResponseContext_->state = authResponseState_->GetStateType();
-                if (authResponseContext_->reply == DM_OK) {
-                    authResponseContext_->state = AuthState::AUTH_RESPONSE_FINISH;
-                }
-                authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
-            }
+            ProcessReqAuthTerminate();
             break;
         case MSG_TYPE_REQ_PUBLICKEY:
             ProcessReqPublicKey();
@@ -688,6 +689,27 @@ void DmAuthManager::ProcessSinkMsg()
             break;
         default:
             break;
+    }
+}
+
+void DmAuthManager::ProcessReqAuthTerminate()
+{
+    {
+        std::lock_guard<std::mutex> lock(groupMutex_);
+        if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
+            authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
+            LOGI("wait addmemer callback");
+            transitToFinishState_ = true;
+            return;
+        }
+    }
+    if (authResponseState_->GetStateType() != AuthState::AUTH_RESPONSE_FINISH) {
+        isFinishOfLocal_ = false;
+        authResponseContext_->state = authResponseState_->GetStateType();
+        if (authResponseContext_->reply == DM_OK) {
+            authResponseContext_->state = AuthState::AUTH_RESPONSE_FINISH;
+        }
+        authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
     }
 }
 
@@ -740,7 +762,6 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
         return;
     }
-    CompatiblePutAcl();
     std::string pinCode = "";
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE && !importAuthCode_.empty()) {
         GetAuthCode(authResponseContext_->hostPkgName, pinCode);
@@ -764,7 +785,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     authResponseState_->TransitionTo(std::make_shared<AuthResponseShowState>());
 }
 
-void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
+void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status, int32_t operationCode)
 {
     isAddingMember_ = false;
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
@@ -772,6 +793,25 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status)
         return;
     }
     LOGI("DmAuthManager OnMemberJoin start authTimes %{public}d", authTimes_);
+    if (status == DM_OK && operationCode == GroupOperationCode::MEMBER_JOIN) {
+        LOGI("join group success.");
+        CompatiblePutAcl();
+        {
+            std::lock_guard<std::mutex> lock(groupMutex_);
+            isAddMember_ = true;
+            if (transitToFinishState_) {
+                LOGI("Have received src finish state.");
+                authResponseContext_->state = AuthState::AUTH_RESPONSE_FINISH;
+                authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
+            }
+        }
+    }
+    if (status == DM_OK && operationCode == GroupOperationCode::GROUP_CREATE) {
+        {
+            std::lock_guard<std::mutex> lock(groupMutex_);
+            isCreateGroup_ = true;
+        }
+    }
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
         MemberJoinAuthRequest(requestId, status);
     } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
@@ -797,10 +837,6 @@ void DmAuthManager::MemberJoinAuthRequest(int64_t requestId, int32_t status)
     authTimes_++;
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(ADD_TIMEOUT_TASK));
-    }
-    if (status == DM_OK) {
-        LOGI("join group success.");
-        CompatiblePutAcl();
     }
     if (authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE) {
         HandleMemberJoinImportAuthCode(requestId, status);
@@ -1515,6 +1551,12 @@ void DmAuthManager::AuthenticateFinish()
     } else if (authRequestState_ != nullptr) {
         SrcAuthenticateFinish();
     }
+    ResetParams();
+    LOGI("DmAuthManager::AuthenticateFinish complete");
+}
+
+void DmAuthManager::ResetParams()
+{
     isFinishOfLocal_ = true;
     authResponseContext_ = nullptr;
     authMessageProcessor_ = nullptr;
@@ -1522,10 +1564,12 @@ void DmAuthManager::AuthenticateFinish()
     authRequestStateTemp_ = nullptr;
     authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
     bundleName_ = "";
+    isAddMember_ = false;
+    isCreateGroup_ = false;
+    transitToFinishState_ = false;
     if (cleanNotifyCallback_ != nullptr) {
         cleanNotifyCallback_(0);
     }
-    LOGI("DmAuthManager::AuthenticateFinish complete");
 }
 
 int32_t DmAuthManager::RegisterUiStateCallback(const std::string pkgName)

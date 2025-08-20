@@ -313,7 +313,7 @@ HWTEST_F(DmAuthManagerTest, JoinNetwork_001, testing::ext::TestSize.Level1)
     const std::string groupId = "{}";
     int32_t status = 1;
     authManager_->OnGroupCreated(requestId, groupId);
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     authManager_->OnDataReceived(sessionId, message);
     authManager_->SetAuthRequestState(authRequestState);
     int32_t ret = authManager_->JoinNetwork();
@@ -380,7 +380,7 @@ HWTEST_F(DmAuthManagerTest, SetPageId_002, testing::ext::TestSize.Level1)
     int32_t status = 2;
     JsonObject jsonObject;
     jsonObject[TAG_MSG_TYPE] = MSG_TYPE_AUTH_BY_PIN;
-    authManager_->OnMemberJoin(requestId, status);
+    authManager_->OnMemberJoin(requestId, status, 0);
     authManager_->OnDataReceived(sessionId, message);
     authManager_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     authManager_->authRequestState_ = std::make_shared<AuthRequestFinishState>();

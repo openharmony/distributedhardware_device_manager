@@ -21,7 +21,7 @@ namespace DistributedHardware {
 class IHiChainConnectorCallback {
 public:
     virtual void OnGroupCreated(int64_t requestId, const std::string &groupId) = 0;
-    virtual void OnMemberJoin(int64_t requestId, int32_t status) = 0;
+    virtual void OnMemberJoin(int64_t requestId, int32_t status, int32_t operationCode) = 0;
     virtual std::string GetConnectAddr(std::string deviceId) = 0;
     virtual int32_t GetPinCode(std::string &code) = 0;
 };

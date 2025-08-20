@@ -171,7 +171,7 @@ void AuthManagerBase::OnGroupCreated(int64_t requestId, const std::string &group
     LOGE("OnGroupCreated is not implemented in the current version");
 }
 
-void AuthManagerBase::OnMemberJoin(int64_t requestId, int32_t status)
+void AuthManagerBase::OnMemberJoin(int64_t requestId, int32_t status, int32_t operationCode)
 {
     LOGE("OnMemberJoin is not implemented in the current version");
 }

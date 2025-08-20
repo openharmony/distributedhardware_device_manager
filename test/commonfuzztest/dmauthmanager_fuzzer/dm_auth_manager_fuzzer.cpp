@@ -65,6 +65,7 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     std::string str(reinterpret_cast<const char*>(data), size);
     int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
+    int32_t operationCode = fdp.ConsumeIntegral<int32_t>();
     g_authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(g_authManager);
     g_authManager->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     g_authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
@@ -87,7 +88,7 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     g_authManager->ShowStartAuthDialog();
     g_authManager->OnDataReceived(g_sessionId, str);
     g_authManager->OnGroupCreated(g_requestId, str);
-    g_authManager->OnMemberJoin(g_requestId, g_status);
+    g_authManager->OnMemberJoin(g_requestId, g_status, operationCode);
     g_authManager->StartNegotiate(g_sessionId);
     g_authManager->RespNegotiate(g_sessionId);
     g_authManager->SendAuthRequest(g_sessionId);
