@@ -269,7 +269,7 @@ int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const
 {
     LOGI("tokenId: %{public}" PRIu64 ", pkgname:%{public}s", tokenId, pkgName.c_str());
     {
-        std::lock_guard<std::mutex> lock(authMgr_);
+        std::lock_guard<std::mutex> lock(authMgrMtx_);
         if (authMgr_ == nullptr) {
             CreateGlobalClassicalAuthMgr();
         }
@@ -428,6 +428,12 @@ int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, st
             return ERR_DM_AUTH_BUSINESS_BUSY;
         }
         authMgrMap_[tokenId] = authMgr;
+    }
+    {
+        std::lock_guard<std::mutex> mapLock(tokenIdSessionIdMapMtx_);
+        if (tokenIdSessionIdMap_.find(tokenId) == tokenIdSessionIdMap_.end()) {
+            tokenIdSessionIdMap_[tokenId] = sessionId;
+        }
     }
     return DM_OK;
 }

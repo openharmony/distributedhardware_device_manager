@@ -304,6 +304,7 @@ private:
     void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet);
     void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
 private:
+    std::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
     bool isNeedJoinLnn_ = true;
     std::mutex isNeedJoinLnnMtx_;
