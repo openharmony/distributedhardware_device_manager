@@ -670,7 +670,7 @@ void AuthSinkNegotiateStateMachine::GetSinkCredentialInfo(std::shared_ptr<DmAuth
         }
         uint32_t credType = DmAuthState::GetCredentialType(context, item);
         if (credType == DM_INVALIED_TYPE || !item.Contains(FILED_CRED_TYPE) ||
-            !item[FILED_CRED_TYPE].IsNumberInteger() || ) {
+            !item[FILED_CRED_TYPE].IsNumberInteger()) {
             deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
             continue;
         }
