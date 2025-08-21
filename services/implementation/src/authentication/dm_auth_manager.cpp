@@ -2361,6 +2361,7 @@ void DmAuthManager::ResponseCredential()
 bool DmAuthManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen)
 {
     LOGI("DmAuthManager::onTransmit start.");
+    CHECK_NULL_VOID(authResponseContext_);
     if (requestId != authResponseContext_->requestId) {
         LOGE("DmAuthManager::onTransmit requestId %{public}" PRId64"is error.", requestId);
         return false;
