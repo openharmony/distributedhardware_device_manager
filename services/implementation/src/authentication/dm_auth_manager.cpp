@@ -2854,8 +2854,12 @@ void DmAuthManager::PutAccessControlList()
     Crypto::GetUdidHash(localUdid, reinterpret_cast<uint8_t *>(mUdidHash));
     std::string localUdidHash = static_cast<std::string>(mUdidHash);
     DmAclInfo aclInfo;
-    aclInfo.bindType = DM_POINT_TO_POINT;
-    authForm_ = DmAuthForm::PEER_TO_PEER;
+    aclInfo.bindType = DM_ACROSS_ACCOUNT;
+    if (authResponseContext_->localAccountId == "ohosAnonymousUid" ||
+        authResponseContext_->remoteAccountId == "ohosAnonymousUid") {
+        aclInfo.bindType = DM_POINT_TO_POINT;
+        authForm_ = DmAuthForm::PEER_TO_PEER;
+    }
     aclInfo.bindLevel = authResponseContext_->bindLevel;
     aclInfo.trustDeviceId = remoteDeviceId_;
     aclInfo.authenticationType = ALLOW_AUTH_ONCE;
