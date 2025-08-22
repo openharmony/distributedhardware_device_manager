@@ -37,7 +37,7 @@ constexpr uint32_t IPC_VECTOR_MAX_SIZE = 1000;
 
 #define CHECK_CPY_SIZE_RETURN(destSize, srcSize) \
     do { \
-        if (destSize <= srcSize) { \
+        if ((destSize) <= (srcSize)) { \
             LOGE("params size invalid"); \
             return; \
         } \
