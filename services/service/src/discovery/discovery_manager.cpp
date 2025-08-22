@@ -368,6 +368,23 @@ int32_t DiscoveryManager::StopDiscoveringByInnerSubId(const std::string &pkgName
 
 void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceInfo &info, bool isOnline)
 {
+    JsonObject jsonObject(info.extraData);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("OnDeviceFound jsonStr error");
+        return;
+    }
+    if (!IsUint32(jsonObject, PARAM_KEY_DISC_CAPABILITY)) {
+        LOGE("err json string: %{public}s", PARAM_KEY_DISC_CAPABILITY);
+        return;
+    }
+    uint32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].Get<uint32_t>();
+    {
+        std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        if (capabilityMap_.find(pkgName) == capabilityMap_.end() ||
+            !CompareCapability(capabilityType, capabilityMap_[pkgName])) {
+            return;
+        }
+    }
     int32_t userId = -1;
     std::string callerPkgName = "";
     GetPkgNameAndUserId(pkgName, callerPkgName, userId);
@@ -380,16 +397,6 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const DmDeviceI
         filterPara.authForm) != DM_OK) {
         LOGE("The found device get online param failed.");
     }
-    JsonObject jsonObject(info.extraData);
-    if (jsonObject.IsDiscarded()) {
-        LOGE("OnDeviceFound jsonStr error");
-        return;
-    }
-    if (!IsUint32(jsonObject, PARAM_KEY_DISC_CAPABILITY)) {
-        LOGE("err json string: %{public}s", PARAM_KEY_DISC_CAPABILITY);
-        return;
-    }
-    uint32_t capabilityType = jsonObject[PARAM_KEY_DISC_CAPABILITY].Get<uint32_t>();
     OnDeviceFound(pkgName, capabilityType, info, filterPara);
 }
 
@@ -420,27 +427,9 @@ void DiscoveryManager::OnDeviceFound(const std::string &pkgName, const uint32_t 
             break;
         }
     }
-    if (!isIndiscoveryContextMap) {
-        {
-            std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
-            if (capabilityMap_.find(pkgName) == capabilityMap_.end() ||
-                !CompareCapability(capabilityType, capabilityMap_[pkgName])) {
-                return;
-            }
-        }
-        LOGD("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
-        listener_->OnDeviceFound(processInfo, externalSubId, info);
-        return;
-    }
     DiscoveryFilter filter;
-    if (filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
-        {
-            std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
-            if (capabilityMap_.find(pkgName) == capabilityMap_.end() ||
-                !CompareCapability(capabilityType, capabilityMap_[pkgName])) {
-                return;
-            }
-        }
+    if (!isIndiscoveryContextMap ||
+        filter.IsValidDevice(discoveryContext.filterOp, discoveryContext.filters, filterPara)) {
         LOGD("OnDeviceFound, pkgName = %{public}s, cabability = %{public}d", pkgName.c_str(), capabilityType);
         listener_->OnDeviceFound(processInfo, externalSubId, info);
     }

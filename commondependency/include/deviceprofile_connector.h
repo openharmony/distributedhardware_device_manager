@@ -165,6 +165,7 @@ public:
     DM_EXPORT int32_t PutAccessControlList(DmAclInfo aclInfo, DmAccesser dmAccesser,
         DmAccessee dmAccessee);
     int32_t UpdateAccessControlList(int32_t userId, std::string &oldAccountId, std::string &newAccountId);
+    void UpdateAccessControlList(const DistributedDeviceProfile::AccessControlProfile &profile);
     DM_EXPORT std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceList(
         const std::string &pkgName, const std::string &deviceId);
     DM_EXPORT std::vector<int32_t> GetBindTypeByPkgName(std::string pkgName,

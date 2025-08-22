@@ -330,6 +330,11 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
         bindLevel = item.GetBindLevel();
         switch (item.GetBindType()) {
             case DM_IDENTICAL_ACCOUNT:
+                if (context->accessee.accountIdHash != context->accesser.accountIdHash ||
+                    context->accesser.accountId != item.GetAccesser().GetAccesserAccountId()) {
+                    DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+                    break;
+                }
                 if (IdenticalAccountAclCompare(context, item.GetAccesser(), item.GetAccessee())) {
                     aclInfo["identicalAcl"] = DM_IDENTICAL_ACCOUNT;
                     context->accesser.aclProfiles[DM_IDENTICAL_ACCOUNT] = item;

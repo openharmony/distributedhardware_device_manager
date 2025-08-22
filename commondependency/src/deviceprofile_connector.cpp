@@ -1593,6 +1593,11 @@ void DeviceProfileConnector::DeleteServiceBindLevel(DmOfflineParam &offlineParam
     offlineParam.leftAclNumber = bindNums - deleteNums;
 }
 
+void DeviceProfileConnector::UpdateAccessControlList(const DistributedDeviceProfile::AccessControlProfile &profile)
+{
+    DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+}
+
 int32_t DeviceProfileConnector::UpdateAccessControlList(int32_t userId, std::string &oldAccountId,
     std::string &newAccountId)
 {
@@ -3118,7 +3123,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcAccessControl(const DmAccessCalle
     std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
     for (const auto &item : profiles) {
         PrintProfile(item);
-        if (item.GetTrustDeviceId() != trustUdid || item.GetStatus() != ACTIVE) {
+        if (item.GetTrustDeviceId() != trustUdid) {
             continue;
         }
         switch (item.GetBindType()) {
@@ -3243,7 +3248,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkAccessControl(const DmAccessCall
     std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
     for (const auto &item : profiles) {
         PrintProfile(item);
-        if (item.GetTrustDeviceId() != trustUdid || item.GetStatus() != ACTIVE) {
+        if (item.GetTrustDeviceId() != trustUdid) {
             continue;
         }
         switch (item.GetBindType()) {
@@ -3400,8 +3405,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCalle
     std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
     for (const auto &item : profiles) {
         PrintProfile(item);
-        if (item.GetTrustDeviceId() != trustUdid || item.GetStatus() != ACTIVE ||
-            item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
+        if (item.GetTrustDeviceId() != trustUdid || item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
             continue;
         }
         if (CheckSrcAcuntAccessControl(item, caller, srcUdid, callee, sinkUdid)) {
@@ -3425,8 +3429,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
     std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
     for (const auto &item : profiles) {
         PrintProfile(item);
-        if (item.GetTrustDeviceId() != trustUdid || item.GetStatus() != ACTIVE ||
-            item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
+        if (item.GetTrustDeviceId() != trustUdid || item.GetBindType() != DM_IDENTICAL_ACCOUNT) {
             continue;
         }
         if (CheckSinkAcuntAccessControl(item, caller, srcUdid, callee, sinkUdid)) {

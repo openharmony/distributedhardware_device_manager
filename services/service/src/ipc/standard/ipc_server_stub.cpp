@@ -228,6 +228,7 @@ void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::st
 bool IpcServerStub::Init()
 {
     LOGI("IpcServerStub::Init ready to init.");
+    KVAdapterManager::GetInstance().Init();
     DeviceManagerService::GetInstance().InitDMServiceListener();
     if (!registerToService_) {
         bool ret = Publish(this);
@@ -237,7 +238,6 @@ bool IpcServerStub::Init()
             return false;
         }
         registerToService_ = true;
-        KVAdapterManager::GetInstance().Init();
     }
     return true;
 }
