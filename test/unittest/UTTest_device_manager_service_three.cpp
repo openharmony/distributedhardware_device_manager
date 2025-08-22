@@ -411,11 +411,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, ExportAuthCode_301, testing::ext::TestSi
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     DeviceManagerService::GetInstance().HandleAccountLogout(userId, accountId, accountName);
 
-    int32_t curUserId = 0;
     int32_t preUserId = 1;
-    EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
-    DeviceManagerService::GetInstance().HandleUserSwitched(curUserId, preUserId);
-
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     DeviceManagerService::GetInstance().HandleUserRemoved(preUserId);
 }

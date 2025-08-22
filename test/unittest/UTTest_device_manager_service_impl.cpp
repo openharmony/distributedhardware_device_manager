@@ -2109,13 +2109,16 @@ HWTEST_F(DeviceManagerServiceImplTest, InitNewProtocolAuthMgr_001, testing::ext:
     uint64_t logicalSessionId = 456789;
     int sessionId = 1;
     const std::string pkgName = "InitNewProtocolAuthMgr";
+    deviceManagerServiceImpl_->authMgrMap_.clear();
     int32_t ret = deviceManagerServiceImpl_->InitNewProtocolAuthMgr(isSrcSide, tokenId, logicalSessionId, pkgName,
         sessionId);
     EXPECT_EQ(ret, DM_OK);
+    deviceManagerServiceImpl_->authMgrMap_.clear();
 
     isSrcSide = false;
     ret = deviceManagerServiceImpl_->InitNewProtocolAuthMgr(isSrcSide, tokenId, logicalSessionId, pkgName, sessionId);
     EXPECT_EQ(ret, DM_OK);
+    deviceManagerServiceImpl_->authMgrMap_.clear();
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, InitOldProtocolAuthMgr_001, testing::ext::TestSize.Level1)
@@ -2123,12 +2126,15 @@ HWTEST_F(DeviceManagerServiceImplTest, InitOldProtocolAuthMgr_001, testing::ext:
     uint64_t tokenId = 100002311;
     int sessionId = 1;
     const std::string pkgName = "InitOldProtocolAuthMgr";
+    deviceManagerServiceImpl_->authMgrMap_.clear();
     int32_t ret = deviceManagerServiceImpl_->InitOldProtocolAuthMgr(tokenId, pkgName, sessionId);
     EXPECT_EQ(ret, DM_OK);
+    deviceManagerServiceImpl_->authMgrMap_.clear();
 
     deviceManagerServiceImpl_->authMgr_ = nullptr;
     ret = deviceManagerServiceImpl_->InitOldProtocolAuthMgr(tokenId, pkgName, sessionId);
     EXPECT_EQ(ret, DM_OK);
+    deviceManagerServiceImpl_->authMgrMap_.clear();
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, CleanSessionMap_001, testing::ext::TestSize.Level1)

@@ -277,6 +277,7 @@ int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const
         ImportConfig(authMgr_, tokenId, pkgName);
         int32_t ret = AddAuthMgr(tokenId, sessionId, authMgr_);
         if (ret != DM_OK) {
+            authMgr_->ClearSoftbusSessionCallback();
             return ret;
         }
     }
@@ -423,7 +424,7 @@ int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, st
     }
     {
         std::lock_guard<std::mutex> lock(authMgrMapMtx_);
-        if (authMgrMap_.size() > MAX_NEW_PROC_SESSION_COUNT_TEMP) {
+        if (authMgrMap_.size() >= MAX_NEW_PROC_SESSION_COUNT_TEMP) {
             LOGE("Other bind session exist, can not start new one. authMgrMap_.size:%{public}zu", authMgrMap_.size());
             return ERR_DM_AUTH_BUSINESS_BUSY;
         }
@@ -1911,7 +1912,7 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
                 "pkgName:%{public}s, tokenId:%{public}" PRIu64, pkgName.c_str(), tokenId);
             return ERR_DM_AUTH_BUSINESS_BUSY;
         }
-        if (tokenIdSessionIdMap_.size() > MAX_NEW_PROC_SESSION_COUNT_TEMP) {
+        if (tokenIdSessionIdMap_.size() >= MAX_NEW_PROC_SESSION_COUNT_TEMP) {
             LOGE("Other bind exist, can not start new one. size:%{public}zu", tokenIdSessionIdMap_.size());
             return ERR_DM_AUTH_BUSINESS_BUSY;
         }

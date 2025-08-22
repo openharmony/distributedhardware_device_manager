@@ -236,11 +236,11 @@ void DmDialogManager::SendMsgRequest(const sptr<IRemoteObject>& remoteObject)
     if (abilityName_ == INPUT_ABILITY_NAME) {
         param["sysDialogZOrder"] = WINDOW_LEVEL_UPPER;
     }
-    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode_));
-    LOGI("OnAbilityConnectDone pinCodeHash: %{public}s", pinCodeHash.c_str());
     param["isProxyBind"] = isProxyBind_;
     param["appUserData"] = appUserData_;
     param["title"] = title_;
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode_));
+    LOGI("OnAbilityConnectDone pinCodeHash: %{public}s", pinCodeHash.c_str());
     param["pinCode"] = pinCode_;
     param["deviceName"] = deviceName_;
     param["appOperationStr"] = appOperationStr_;
