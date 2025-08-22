@@ -372,6 +372,7 @@ private:
     void UpdatePeerUserId(DistributedDeviceProfile::AccessControlProfile profile, std::string &localUdid,
         const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &remoteFrontUserIds);
+    void SetProcessInfoPkgName(const DistributedDeviceProfile::AccessControlProfile &acl, ProcessInfo &processInfo);
     bool CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
         const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
         const std::vector<int32_t> &backgroundUserIds);

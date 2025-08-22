@@ -1223,8 +1223,7 @@ DM_EXPORT bool DeviceProfileConnector::DeleteAclForAccountLogOut(
             accesserAccountId == accountId) {
             offlineParam.bindType = item.GetBindType();
             ProcessInfo processInfo;
-            processInfo.pkgName = item.GetAccesser().GetAccesserBundleName();
-            processInfo.pkgName = processInfo.pkgName.empty() ? std::string(DM_PKG_NAME) : processInfo.pkgName;
+            SetProcessInfoPkgName(item, processInfo);
             processInfo.userId = item.GetAccesser().GetAccesserUserId();
             offlineParam.processVec.emplace_back(processInfo);
             notifyOffline = (item.GetStatus() == ACTIVE);
@@ -1236,8 +1235,7 @@ DM_EXPORT bool DeviceProfileConnector::DeleteAclForAccountLogOut(
             accesseeAccountId == accountId) {
             offlineParam.bindType = item.GetBindType();
             ProcessInfo processInfo;
-            processInfo.pkgName = item.GetAccessee().GetAccesseeBundleName();
-            processInfo.pkgName = processInfo.pkgName.empty() ? std::string(DM_PKG_NAME) : processInfo.pkgName;
+            SetProcessInfoPkgName(item, processInfo);
             processInfo.userId = item.GetAccessee().GetAccesseeUserId();
             offlineParam.processVec.emplace_back(processInfo);
             notifyOffline = (item.GetStatus() == ACTIVE);
@@ -1289,8 +1287,7 @@ void DeviceProfileConnector::CacheOfflineParam(const DistributedDeviceProfile::A
         std::string(accesseeAccountIdHash) == accountIdHash) {
         offlineParam.bindType = profile.GetBindType();
         ProcessInfo processInfo;
-        processInfo.pkgName = profile.GetAccesser().GetAccesserBundleName();
-        processInfo.pkgName = processInfo.pkgName.empty() ? std::string(DM_PKG_NAME) : processInfo.pkgName;
+        SetProcessInfoPkgName(profile, processInfo);
         processInfo.userId = profile.GetAccesser().GetAccesserUserId();
         offlineParam.processVec.emplace_back(processInfo);
         notifyOffline = (profile.GetStatus() == ACTIVE);
@@ -1302,8 +1299,7 @@ void DeviceProfileConnector::CacheOfflineParam(const DistributedDeviceProfile::A
         std::string(accesserAccountIdHash) == accountIdHash) {
         offlineParam.bindType = profile.GetBindType();
         ProcessInfo processInfo;
-        processInfo.pkgName = profile.GetAccessee().GetAccesseeBundleName();
-        processInfo.pkgName = processInfo.pkgName.empty() ? std::string(DM_PKG_NAME) : processInfo.pkgName;
+        SetProcessInfoPkgName(profile, processInfo);
         processInfo.userId = profile.GetAccessee().GetAccesseeUserId();
         offlineParam.processVec.emplace_back(processInfo);
         notifyOffline = (profile.GetStatus() == ACTIVE);
@@ -2592,6 +2588,16 @@ void DeviceProfileConnector::UpdatePeerUserId(AccessControlProfile profile, std:
         profile.SetAccessee(accessee);
         DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
         return;
+    }
+}
+
+void DeviceProfileConnector::SetProcessInfoPkgName(const DistributedDeviceProfile::AccessControlProfile &acl,
+    ProcessInfo &processInfo)
+{
+    if (acl.GetBindType() == DM_IDENTICAL_ACCOUNT || acl.GetBindLevel() == USER) {
+        processInfo.pkgName = std::string(DM_PKG_NAME);
+    } else {
+        processInfo.pkgName = acl.GetAccesser().GetAccesserBundleName();
     }
 }
 
