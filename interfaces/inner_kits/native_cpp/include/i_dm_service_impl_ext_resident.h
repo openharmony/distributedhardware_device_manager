@@ -112,6 +112,7 @@ public:
     virtual void ClearCacheWhenLogout(int32_t userId, const std::string &oldAccountId) = 0;
     virtual void HandleScreenLockEvent(bool isLock) = 0;
     virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
+    virtual void HandleUserSwitchEvent(int32_t currentUserId, int32_t beforeUserId) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);

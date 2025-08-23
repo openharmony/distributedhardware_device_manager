@@ -45,6 +45,7 @@ public:
     int32_t RestoreLocalDeviceName();
     int32_t InitDeviceNameWhenLanguageOrRegionChanged();
     std::string GetUserDefinedDeviceName();
+    std::string GetLocalMarketName();
 
 private:
     DeviceNameManager() = default;
@@ -60,7 +61,6 @@ private:
 
     std::string GetSystemLanguage();
     std::string GetSystemRegion();
-    std::string GetLocalMarketName();
 
     int32_t InitDisplayDeviceNameToSettingsData(const std::string &nickName, const std::string &deviceName,
         int32_t userId);

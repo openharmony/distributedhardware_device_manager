@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,7 @@ public:
     virtual bool CheckProcessNameValidModifyLocalDeviceName(const std::string &processName) = 0;
     virtual bool CheckProcessNameValidModifyRemoteDeviceName(const std::string &processName) = 0;
     virtual bool CheckProcessNameValidPutDeviceProfileInfoList(const std::string &processName) = 0;
+    virtual bool CheckReadLocalDeviceName() = 0;
 public:
     static inline std::shared_ptr<DmPermissionManager> dmPermissionManager = nullptr;
 };
@@ -52,6 +53,7 @@ public:
     MOCK_METHOD(bool, CheckProcessNameValidModifyLocalDeviceName, (const std::string &));
     MOCK_METHOD(bool, CheckProcessNameValidModifyRemoteDeviceName, (const std::string &));
     MOCK_METHOD(bool, CheckProcessNameValidPutDeviceProfileInfoList, (const std::string &));
+    MOCK_METHOD(bool, CheckReadLocalDeviceName, ());
 };
 }
 }

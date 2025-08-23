@@ -340,31 +340,15 @@ private:
         std::string &udidHash);
     void HandleAccountLogout(int32_t userId, const std::string &accountId, const std::string &accountName);
     void HandleUserRemoved(int32_t removedUserId);
-    /**
-     * @brief process the user switch
-     *
-     * @param currentUserId the user id which switched to foreground.
-     * @param beforeUserId the user id which switched to backend.
-     */
-    void HandleUserSwitched(int32_t curUserId, int32_t preUserId);
     void HandleUserIdsBroadCast(const std::vector<UserIdInfo> &remoteUserIdInfos,
         const std::string &remoteUdid, bool isNeedResponse);
     void HandleShareUnbindBroadCast(const int32_t userId, const std::string &credId);
-    void NotifyRemoteLocalUserSwitch(int32_t curUserId, int32_t preUserId, const std::vector<std::string> &peerUdids,
-        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
-    void NotifyRemoteLocalUserSwitchByWifi(int32_t curUserId, int32_t preUserId,
-        const std::map<std::string, std::string> &wifiDevices, const std::vector<int32_t> &foregroundUserIds,
-        const std::vector<int32_t> &backgroundUserIds);
-    int32_t SendUserIdsByWifi(const std::string &networkId, const std::vector<int32_t> &foregroundUserIds,
-        const std::vector<int32_t> &backgroundUserIds);
-    void HandleUserSwitchTimeout(int32_t curUserId, int32_t preUserId, const std::string &udid);
     bool InitDPLocalServiceInfo(const DMLocalServiceInfo &serviceInfo,
         DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem);
     void InitServiceInfo(const DistributedDeviceProfile::LocalServiceInfo &dpLocalServiceItem,
         DMLocalServiceInfo &serviceInfo);
     void InitServiceInfos(const std::vector<DistributedDeviceProfile::LocalServiceInfo> &dpLocalServiceItems,
         std::vector<DMLocalServiceInfo> &serviceInfos);
-    void HandleUserSwitched();
 
     void NotifyRemoteUninstallApp(int32_t userId, int32_t tokenId);
     void NotifyRemoteUninstallAppByWifi(int32_t userId, int32_t tokenId,
@@ -378,13 +362,6 @@ private:
     int32_t SendUnBindAppByWifi(int32_t userId, int32_t tokenId, std::string extra,
         const std::string &networkId, const std::string &udid);
 
-    void NotifyRemoteLocalUserSwitch(const std::string &localUdid, const std::vector<std::string> &peerUdids,
-        const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
-    void NotifyRemoteLocalUserSwitchByWifi(const std::string &localUdid,
-        const std::map<std::string, std::string> &wifiDevices, const std::vector<int32_t> &foregroundUserIds,
-        const std::vector<int32_t> &backgroundUserIds);
-    void HandleUserSwitchTimeout(const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
-        const std::vector<int32_t> &backgroundUserIds, const std::string &udid);
     void UpdateAclAndDeleteGroup(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds);
     void HandleUserSwitchedEvent(int32_t currentUserId, int32_t beforeUserId);
