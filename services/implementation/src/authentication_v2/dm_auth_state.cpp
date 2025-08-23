@@ -621,7 +621,7 @@ void DmAuthState::FilterProfilesByContext(
             context->accesser.userId == item.GetAccessee().GetAccesseeUserId())) {
             if (item.GetStatus() == INACTIVE) {
                 item.SetStatus(ACTIVE);
-                DeviceProfileConnector::GetInstance().UpdateAccessControlList(item);
+                DeviceProfileConnector::GetInstance().UpdateAclStatus(item);
             }
             aclProfilesVec.push_back(item);
         }
