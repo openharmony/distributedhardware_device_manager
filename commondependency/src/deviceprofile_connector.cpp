@@ -1589,7 +1589,7 @@ void DeviceProfileConnector::DeleteServiceBindLevel(DmOfflineParam &offlineParam
     offlineParam.leftAclNumber = bindNums - deleteNums;
 }
 
-void DeviceProfileConnector::UpdateAccessControlList(const DistributedDeviceProfile::AccessControlProfile &profile)
+DM_EXPORT void DeviceProfileConnector::UpdateAclStatus(const DistributedDeviceProfile::AccessControlProfile &profile)
 {
     DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
 }
