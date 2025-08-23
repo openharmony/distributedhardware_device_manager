@@ -439,6 +439,11 @@ void AuthSinkNegotiateStateMachine::GetSinkAclInfo(std::shared_ptr<DmAuthContext
         bindLevel = item.GetBindLevel();
         switch (item.GetBindType()) {
             case DM_IDENTICAL_ACCOUNT:
+                if (context->accessee.accountIdHash != context->accesser.accountIdHash ||
+                    context->accessee.accountId != item.GetAccesser().GetAccesserAccountId()) {
+                    DeviceProfileConnector::GetInstance().DeleteAccessControlById(item.GetAccessControlId());
+                    break;
+                }
                 if (IdenticalAccountAclCompare(context, item.GetAccesser(), item.GetAccessee())) {
                     aclInfo["identicalAcl"] = DM_IDENTICAL_ACCOUNT;
                     context->accessee.aclProfiles[DM_IDENTICAL_ACCOUNT] = item;

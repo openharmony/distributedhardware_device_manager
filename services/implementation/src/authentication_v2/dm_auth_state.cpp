@@ -608,7 +608,7 @@ void DmAuthState::FilterProfilesByContext(
 {
     CHECK_NULL_VOID(context);
     std::vector<DistributedDeviceProfile::AccessControlProfile> aclProfilesVec;
-    for (const auto &item : profiles) {
+    for (auto &item : profiles) {
         std::string accesserDeviceIdHash = Crypto::GetUdidHash(item.GetAccesser().GetAccesserDeviceId());
         std::string accesseeDeviceIdHash = Crypto::GetUdidHash(item.GetAccessee().GetAccesseeDeviceId());
         if ((context->accesser.deviceIdHash == accesserDeviceIdHash &&
@@ -619,6 +619,10 @@ void DmAuthState::FilterProfilesByContext(
             context->accesser.deviceIdHash == accesseeDeviceIdHash &&
             context->accessee.userId == item.GetAccesser().GetAccesserUserId() &&
             context->accesser.userId == item.GetAccessee().GetAccesseeUserId())) {
+            if (item.GetStatus() == INACTIVE) {
+                item.SetStatus(ACTIVE);
+                DeviceProfileConnector::GetInstance().UpdateAccessControlList(item);
+            }
             aclProfilesVec.push_back(item);
         }
     }
