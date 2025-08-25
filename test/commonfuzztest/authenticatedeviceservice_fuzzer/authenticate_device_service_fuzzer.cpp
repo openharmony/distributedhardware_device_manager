@@ -57,16 +57,13 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     }
 
     AddPermission();
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string extra(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string udid;
-    std::string network;
-    std::string device;
-    int32_t authType = 1;
-    DmAuthParam authParam;
-    std::vector<DmDeviceBasicInfo> deviceBasicInfoList;
     FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string extra = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string udid = fdp.ConsumeRandomLengthString();
+    std::string network = fdp.ConsumeRandomLengthString();
+    int32_t authType = fdp.ConsumeIntegral<int32_t>();
     int32_t level = fdp.ConsumeIntegral<int32_t>();
     DeviceManagerService::GetInstance().Init();
     DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);

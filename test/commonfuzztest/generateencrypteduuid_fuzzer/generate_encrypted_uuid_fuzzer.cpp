@@ -15,6 +15,7 @@
 
 #include "generate_encrypted_uuid_fuzzer.h"
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_impl.h"
 
 namespace OHOS {
@@ -25,11 +26,12 @@ void GenerateEncryptedUuidFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string uuid = fdp.ConsumeRandomLengthString();
+    std::string appId = fdp.ConsumeRandomLengthString();
+    std::string encryptedUuid = fdp.ConsumeRandomLengthString();
 
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string uuid(reinterpret_cast<const char*>(data), size);
-    std::string appId(reinterpret_cast<const char*>(data), size);
-    std::string encryptedUuid(reinterpret_cast<const char*>(data), size);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
     DeviceManagerImpl::GetInstance().GenerateEncryptedUuid(pkgName, uuid, appId, encryptedUuid);
