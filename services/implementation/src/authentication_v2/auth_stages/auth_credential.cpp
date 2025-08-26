@@ -611,7 +611,6 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
         context->softbusConnector == nullptr || context->softbusConnector->GetSoftbusSession() == nullptr) {
         return ret;
     }
-    // TODO 换一下位置是否可行
     int32_t osAccountId = context->accessee.userId;
     context->isAppCredentialVerified = false;
 
@@ -723,7 +722,6 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
         context->authStateMachine == nullptr) {
         return ret;
     }
-    // TODO 换一下位置是否可行
     int32_t osAccountId = context->accesser.userId;
     if (IsNeedAgreeCredential(context)) {
         ret = AgreeAndDeleteCredential(context);
