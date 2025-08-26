@@ -115,6 +115,7 @@ const char* TAG_DEVICE_TYPE = "DEVICETYPE";
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
 constexpr uint32_t MAX_SESSION_KEY_LENGTH = 512;
+constexpr uint32_t MAX_MESSAGE_LENGTH = 64 * 1024 * 1024;
 
 void ParseDmAccessToSync(const std::string &jsonString, DmAccess &access, bool isUseDeviceFullName)
 {
@@ -694,7 +695,6 @@ int32_t DmAuthMessageProcessor::ParseMessageRspCredExchange(const JsonObject &js
         LOGE("DmAuthMessageProcessor::ParseMessageRspCredExchange error, decrypt data failed.");
         return ERR_DM_FAILED;
     }
-    LOGI("plainText=%{public}s", GetAnonyJsonString(plainText).c_str());
 
     JsonObject jsonData(plainText);
 
@@ -1960,7 +1960,10 @@ std::string DmAuthMessageProcessor::Base64Encode(std::string &inputStr)
     // Convert input string to binary
     const unsigned char* src = reinterpret_cast<const unsigned char*>(inputStr.data());
     size_t srcLen = inputStr.size();
-
+    if (srcLen >= MAX_MESSAGE_LENGTH) {
+        LOGE("inputStr too long");
+        return "";
+    }
     // Calculate the maximum length after base64 encoding
     size_t maxEncodeLen = ((srcLen + 2) / 3) * 4 + 1;
     std::vector<unsigned char> buffer(maxEncodeLen);
@@ -1980,7 +1983,10 @@ std::string DmAuthMessageProcessor::Base64Decode(std::string &inputStr)
     // Convert input string to binary
     const unsigned char* src = reinterpret_cast<const unsigned char*>(inputStr.data());
     size_t srcLen = inputStr.size();
-
+    if (srcLen >= MAX_MESSAGE_LENGTH) {
+        LOGE("inputStr too long");
+        return "";
+    }
     // Calculate the maximum length after base64 encoding
     size_t maxEncodeLen = (srcLen / 4) *  3 + 1;
     std::vector<unsigned char> buffer(maxEncodeLen);

@@ -35,7 +35,7 @@ public:
     void InitDistributedHardwareLoadCount(void);
     uint32_t GetDistributedHardwareLoadCount(void);
 private:
-    uint32_t distributedHardwareLoadCount_;
+    std::atomic<uint32_t> distributedHardwareLoadCount_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
