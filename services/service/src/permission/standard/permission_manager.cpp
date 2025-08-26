@@ -168,7 +168,7 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         return ERR_DM_FAILED;
     }
 
-    LOGI("Get process name: %{public}s success, tokenCaller ID == %{public}s", processName.c_str(),
+    LOGI("Get process name: %{public}s success, tokenCaller ID == %{public}s.", processName.c_str(),
         GetAnonyInt32(tokenCaller).c_str());
     return DM_OK;
 }
