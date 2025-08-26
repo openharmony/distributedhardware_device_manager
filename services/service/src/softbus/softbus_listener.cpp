@@ -1450,7 +1450,7 @@ int32_t SoftbusListener::GetAllTrustedDeviceList(const std::string &pkgName, con
     std::vector<DistributedDeviceProfile::AccessControlProfile> allProfile =
         DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
     for (DistributedDeviceProfile::AccessControlProfile profile : allProfile) {
-        if (profile.GetBindType() == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+        if (profile.GetBindType() == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP || ACTIVE != profile.GetStatus()) {
             continue;
         }
         DistributedDeviceProfile::Accesser acer = profile.GetAccesser();
