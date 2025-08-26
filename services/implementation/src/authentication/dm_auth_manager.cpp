@@ -3426,7 +3426,7 @@ void DmAuthManager::ProcessReqPublicKey()
 
 void DmAuthManager::GetLocalServiceInfoInDp()
 {
-    CHECK_NULL_RETURN(authResponseContext_, false);
+    CHECK_NULL_VOID(authResponseContext_);
     DistributedDeviceProfile::LocalServiceInfo localServiceInfo;
     int32_t result = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
         authResponseContext_->hostPkgName, (int32_t)DMLocalServiceInfoPinExchangeType::FROMDP, localServiceInfo);
