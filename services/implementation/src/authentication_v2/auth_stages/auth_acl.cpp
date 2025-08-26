@@ -97,12 +97,14 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
         return ret;
     }
     // Query the ACL of the sink end. Compare the ACLs at both ends.
+    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     context->softbusConnector->SyncLocalAclListProcess({context->accessee.deviceId, context->accessee.userId},
         {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList);
     if (GetSessionKey(context)) {
         DerivativeSessionKey(context);
     }
     // Synchronize the local SP information, the format is uncertain, not done for now
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
     context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
     LOGI("AuthSinkDataSyncState::Action ok");
@@ -125,6 +127,7 @@ int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContex
         int32_t skId = 0;
         std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
             context->accesser.tokenIdHash + context->accessee.tokenIdHash;
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
         int32_t ret =
             context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
         if (ret != DM_OK) {
@@ -141,6 +144,7 @@ int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContex
         int32_t skId = 0;
         std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
             app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
         int32_t ret =
             context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
         if (ret != DM_OK) {
@@ -162,6 +166,9 @@ int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContex
 int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcDataSyncState::Action start");
+    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
+    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
     if (NeedAgreeAcl(context)) {
         // Query the ACL of the sink end. Compare the ACLs at both ends.
         context->softbusConnector->SyncLocalAclListProcess({context->accesser.deviceId, context->accesser.userId},
@@ -199,6 +206,7 @@ int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkFinishState::Action start");
     int32_t ret = DM_OK;
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     LOGI("reason: %{public}d", context->reason);
     if (context->reason == DM_OK) {
         context->state = static_cast<int32_t>(GetStateType());
@@ -231,10 +239,13 @@ DmAuthStateType AuthSinkFinishState::GetStateType()
 int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcFinishState::Action start");
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (context->reason == ERR_DM_SKIP_AUTHENTICATE && !context->isNeedAuthenticate) {
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
         context->state = static_cast<int32_t>(GetStateType());
     } else if (context->reason != DM_OK && context->reason != DM_BIND_TRUST_TARGET) {
+
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_AUTH_REQ_FINISH, context);
     } else {
         context->state = static_cast<int32_t>(GetStateType());
@@ -247,6 +258,7 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
         context->confirmOperation = UiAction::USER_OPERATION_TYPE_ALLOW_AUTH_ALWAYS;
     }
     SourceFinish(context);
+    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     bool isNeedJoinLnn = context->softbusConnector->CheckIsNeedJoinLnn(peerDeviceId, context->accessee.addr);
     // Trigger networking
     if (context->reason == DM_BIND_TRUST_TARGET && (!context->accesser.isOnline || isNeedJoinLnn)) {

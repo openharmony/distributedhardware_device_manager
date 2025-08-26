@@ -494,6 +494,7 @@ bool AuthSrcConfirmState::IdenticalAccountAclCompare(std::shared_ptr<DmAuthConte
     const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
 {
     LOGI("start.");
+    CHECK_NULL_RETURN(context, false);
     return accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
         Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash;
@@ -503,6 +504,7 @@ bool AuthSrcConfirmState::ShareAclCompare(std::shared_ptr<DmAuthContext> context
     const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
 {
     LOGI("start.");
+    CHECK_NULL_RETURN(context, false);
     return accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
         Crypto::GetUdidHash(accessee.GetAccesseeDeviceId()) == context->accessee.deviceIdHash;
@@ -512,6 +514,7 @@ bool AuthSrcConfirmState::Point2PointAclCompare(std::shared_ptr<DmAuthContext> c
     const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
 {
     LOGI("start.");
+    CHECK_NULL_RETURN(context, false);
     return (accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId &&
         accesser.GetAccesserTokenId() == context->accesser.tokenId &&
@@ -528,6 +531,7 @@ bool AuthSrcConfirmState::LnnAclCompare(std::shared_ptr<DmAuthContext> context,
     const DistributedDeviceProfile::Accesser &accesser, const DistributedDeviceProfile::Accessee &accessee)
 {
     LOGI("start.");
+    CHECK_NULL_RETURN(context, false);
     return ((accesser.GetAccesserDeviceId() == context->accesser.deviceId &&
         accesser.GetAccesserUserId() == context->accesser.userId) ||
         (accessee.GetAccesseeDeviceId() == context->accesser.deviceId &&
@@ -661,6 +665,7 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcConfirmState start.");
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->timer, ERR_DM_POINT_NULL);
     context->timer->DeleteTimer(std::string(NEGOTIATE_TIMEOUT_TASK));
     ResetBindLevel(context);
     GetCustomDescBySinkLanguage(context);
@@ -684,9 +689,11 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     context->accesser.aclTypeList = aclNegoResult.Dump();
     NegotiateProxyAcl(context);
     NegotiateUltrasonic(context);
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_USER_CONFIRM, context);
     // generate cert sync
     ffrt::submit([=]() { GenerateCertificate(context);});
+    CHECK_NULL_RETURN(context->listener, ERR_DM_POINT_NULL);
     context->listener->OnAuthResult(context->processInfo, context->peerTargetId.deviceId, context->accessee.tokenIdHash,
         static_cast<int32_t>(STATUS_DM_SHOW_AUTHORIZE_UI), DM_OK);
     context->listener->OnBindResult(context->processInfo, context->peerTargetId,
@@ -753,6 +760,7 @@ int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> co
 {
     LOGI("AuthSinkConfirmState::ShowConfigDialog start");
 
+    CHECK_NULL_RETURN(context, STOP_BIND);
     if (context->authType == AUTH_TYPE_PIN_ULTRASONIC &&
         context->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Invalid) {
         LOGE("AuthSinkConfirmState::ShowConfigDialog ultrasonicInfo invalid.");
@@ -775,6 +783,7 @@ int32_t AuthSinkConfirmState::ShowConfigDialog(std::shared_ptr<DmAuthContext> co
     } else if (IsScreenLocked()) {
         LOGE("AuthSinkConfirmState::ShowStartAuthDialog screen is locked.");
         context->reason = ERR_DM_BIND_USER_CANCEL;
+        CHECK_NULL_RETURN(context->authStateMachine, STOP_BIND);
         context->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
         return STOP_BIND;
     }
@@ -985,6 +994,7 @@ void AuthSinkConfirmState::NegotiateProxyAcl(std::shared_ptr<DmAuthContext> cont
 void AuthSinkConfirmState::MatchFallBackCandidateList(
     std::shared_ptr<DmAuthContext> context, DmAuthType authType)
 {
+    CHECK_NULL_VOID(context);
     for (size_t i = 0; i < MAX_FALLBACK_LOOPKUP_TIMES; i++) {
         auto it = g_pinAuthTypeFallBackMap.find({context->accessee.bundleName, authType});
         if (it != g_pinAuthTypeFallBackMap.end()) {
@@ -998,6 +1008,7 @@ void AuthSinkConfirmState::MatchFallBackCandidateList(
 
 void AuthSinkConfirmState::ReadServiceInfo(std::shared_ptr<DmAuthContext> context)
 {
+    CHECK_NULL_VOID(context);
     // query ServiceInfo by accessee.pkgName and authType from client
     OHOS::DistributedDeviceProfile::LocalServiceInfo srvInfo;
     auto ret = DeviceProfileConnector::GetInstance().GetLocalServiceInfoByBundleNameAndPinExchangeType(
@@ -1093,6 +1104,8 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
         context->authType == DmAuthType::AUTH_TYPE_PIN_ULTRASONIC) &&
         (context->serviceInfoFound || AuthSinkStatePinAuthComm::IsAuthCodeReady(context)) &&
         context->authBoxType == DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
+        CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_POINT_NULL);
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
         context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
         return DM_OK;
@@ -1109,12 +1122,14 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
 int32_t AuthSinkConfirmState::ProcessUserAuthorize(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->timer, ERR_DM_POINT_NULL);
     context->timer->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
     if (ShowConfigDialog(context) != DM_OK) {
         LOGE("ShowConfigDialog failed");
         context->reason = ERR_DM_SHOW_CONFIRM_FAILED;
         return ERR_DM_FAILED;
     }
+    CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_POINT_NULL);
     if (DmEventType::ON_USER_OPERATION !=
         context->authStateMachine->WaitExpectEvent(DmEventType::ON_USER_OPERATION)) {
         LOGE("AuthSinkConfirmState::Action ON_USER_OPERATION err");
@@ -1130,6 +1145,7 @@ int32_t AuthSinkConfirmState::ProcessUserAuthorize(std::shared_ptr<DmAuthContext
         context->reason = ERR_DM_AUTH_PEER_REJECT;
         return ERR_DM_FAILED;
     }
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
     return DM_OK;
@@ -1260,6 +1276,8 @@ int32_t AuthSinkConfirmState::ProcessNoBindAuthorize(std::shared_ptr<DmAuthConte
         context->reason = ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
         return ERR_DM_FAILED;
     }
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_POINT_NULL);
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkCredentialAuthStartState>());
     return DM_OK;

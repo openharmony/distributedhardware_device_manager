@@ -51,6 +51,7 @@ int32_t AuthRequestState::TransitionTo(std::shared_ptr<AuthRequestState> state)
         return ERR_DM_FAILED;
     }
     std::shared_ptr<DmAuthRequestContext> contextTemp = GetAuthContext();
+    CHECK_NULL_RETURN(state, ERR_DM_FAILED);
     state->SetAuthManager(stateAuthManager);
     stateAuthManager->SetAuthRequestState(state);
     state->SetAuthContext(contextTemp);
@@ -71,6 +72,7 @@ int32_t AuthRequestInitState::Enter()
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
+    CHECK_NULL_RETURN(context_, ERR_DM_FAILED);
     stateAuthManager->EstablishAuthChannel(context_->deviceId);
     return DM_OK;
 }
@@ -87,6 +89,7 @@ int32_t AuthRequestNegotiateState::Enter()
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
+    CHECK_NULL_RETURN(context_, ERR_DM_FAILED);
     stateAuthManager->StartNegotiate(context_->sessionId);
     return DM_OK;
 }
@@ -103,6 +106,7 @@ int32_t AuthRequestNegotiateDoneState::Enter()
         LOGE("AuthRequestState::authManager_ null");
         return ERR_DM_FAILED;
     }
+    CHECK_NULL_RETURN(context_, ERR_DM_FAILED);
     stateAuthManager->SendAuthRequest(context_->sessionId);
     return DM_OK;
 }
