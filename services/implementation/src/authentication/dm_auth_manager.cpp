@@ -570,9 +570,7 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_INIT) {
             CHECK_NULL_VOID(authRequestContext_);
             authRequestContext_->sessionId = sessionId;
-            CHECK_NULL_VOID(authResponseContext_);
             authResponseContext_->sessionId = sessionId;
-            CHECK_NULL_VOID(authMessageProcessor_);
             authMessageProcessor_->SetRequestContext(authRequestContext_);
             authRequestState_->SetAuthContext(authRequestContext_);
             authRequestState_->TransitionTo(std::make_shared<AuthRequestNegotiateState>());
@@ -580,8 +578,6 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             info.channelId = sessionId;
             DmRadarHelper::GetInstance().ReportAuthSendRequest(info);
         } else {
-            CHECK_NULL_VOID(softbusConnector_);
-            CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
             softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
             LOGE("DmAuthManager::OnSessionOpened but request state is wrong");
         }
@@ -2528,7 +2524,6 @@ void DmAuthManager::SrcAuthDeviceFinish()
         return;
     }
     if (!authResponseContext_->isOnline && authResponseContext_->haveCredential) {
-        CHECK_NULL_VOID(authRequestContext_);
         JoinLnn(authRequestContext_->addr);
         CHECK_NULL_VOID(timer_);
         timer_->DeleteTimer(std::string(AUTHENTICATE_TIMEOUT_TASK));
@@ -2536,7 +2531,6 @@ void DmAuthManager::SrcAuthDeviceFinish()
         return;
     }
     if (!authResponseContext_->isOnline && !authResponseContext_->haveCredential) {
-        CHECK_NULL_VOID(authUiStateMgr_);
         authUiStateMgr_->UpdateUiState(DmUiStateMsg::MSG_CANCEL_PIN_CODE_INPUT);
         if (CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_2))) {
             authRequestState_->TransitionTo(std::make_shared<AuthRequestReCheckMsg>());
