@@ -153,6 +153,8 @@ int32_t AdvertiseManager::GenInnerPublishId(const std::string &pkgName, int32_t 
     int32_t tempPublishId = DM_INVALID_FLAG_ID;
     {
         std::lock_guard<std::mutex> autoLock(pubMapLock_);
+        CHECK_SIZE_RETURN(pkgName2PubIdMap_, DM_INVALID_FLAG_ID);
+        CHECK_SIZE_RETURN(publishIdSet_, DM_INVALID_FLAG_ID);
         if (pkgName2PubIdMap_[pkgName].find(publishId) != pkgName2PubIdMap_[pkgName].end()) {
             return pkgName2PubIdMap_[pkgName][publishId];
         }

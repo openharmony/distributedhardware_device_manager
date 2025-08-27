@@ -27,22 +27,23 @@ DM_IMPLEMENT_SINGLE_INSTANCE(DmServiceLoad);
 
 int32_t DmServiceLoad::LoadDMService(void)
 {
-    if (isDMServiceLoading_) {
+    std::lock_guard<std::mutex> autoLock(dmServiceLoadLock_);
+    if (isDMServiceLoading_.load()) {
         LOGI("DM service is loading.");
         return DM_OK;
     }
     LOGI("start");
-    isDMServiceLoading_ = true;
+    isDMServiceLoading_.store(true);
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgr == nullptr) {
-        isDMServiceLoading_ = false;
+        isDMServiceLoading_.store(false);
         LOGE("failed to get system ability mgr.");
         return ERR_DM_POINT_NULL;
     }
     sptr<DMLoadCallback> dmLoadCallback_(new DMLoadCallback());
     int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, dmLoadCallback_);
     if (ret != DM_OK) {
-        isDMServiceLoading_ = false;
+        isDMServiceLoading_.store(false);
         LOGE("Failed to Load DM service, ret code:%{public}d", ret);
         return ret;
     }
@@ -51,7 +52,8 @@ int32_t DmServiceLoad::LoadDMService(void)
 
 void DmServiceLoad::SetLoadFinish(void)
 {
-    isDMServiceLoading_ = false;
+    std::lock_guard<std::mutex> autoLock(dmServiceLoadLock_);
+    isDMServiceLoading_.store(false);
 }
 
 void DMLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,

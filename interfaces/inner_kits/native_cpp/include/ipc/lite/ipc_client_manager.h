@@ -54,6 +54,7 @@ private:
 
 private:
     IpcClientServerProxy serverProxy_;
+    std::mutex packageInitSetLock_;
     std::set<std::string> packageInitSet_;
 };
 } // namespace DistributedHardware
