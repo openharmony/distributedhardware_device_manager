@@ -523,7 +523,7 @@ int32_t AuthCredentialAgreeState::AgreeCredential(DmAuthScope authorizedScope,
     std::string credId;
     LOGI("AuthCredentialAgreeState::AgreeCredential agree with accountId %{public}d and param %{public}s.",
         osAccountId, GetAnonyJsonString(authParamsString).c_str());
-    if (authContext->hiChainAuthConnector == nullptr){
+    if (authContext->hiChainAuthConnector == nullptr) {
         return ERR_DM_FAILED;
     }
     int32_t ret = authContext->hiChainAuthConnector->AgreeCredential(osAccountId, selfCredId,
