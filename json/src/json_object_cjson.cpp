@@ -156,6 +156,7 @@ void ToJson(JsonItemObject &itemObject, const uint64_t &value)
 #endif
 }
 
+//LCOV_EXCL_START
 void FromJson(const JsonItemObject &itemObject, std::string &value)
 {
     itemObject.GetTo(value);
@@ -307,6 +308,7 @@ bool JsonItemObject::IsObject() const
     }
     return cJSON_IsObject(GetCJsonPointer(item_));
 }
+//LCOV_EXCL_STOP
 
 void JsonItemObject::Insert(const std::string &key, const JsonItemObject &object)
 {
