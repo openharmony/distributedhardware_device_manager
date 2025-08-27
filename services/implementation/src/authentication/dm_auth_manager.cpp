@@ -1209,9 +1209,6 @@ void DmAuthManager::ProcessAuthRequestExt(const int32_t &sessionId)
 {
     LOGI("ProcessAuthRequestExt start.");
     CHECK_NULL_VOID(authResponseContext_);
-
-
-
     if (!CompareVersion(remoteVersion_, std::string(DM_VERSION_5_0_3)) &&
         authResponseContext_->authType == AUTH_TYPE_IMPORT_AUTH_CODE &&
         !authResponseContext_->importAuthCode.empty() && !importAuthCode_.empty()) {
