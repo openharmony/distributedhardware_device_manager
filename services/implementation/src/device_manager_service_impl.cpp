@@ -2619,7 +2619,7 @@ void DeviceManagerServiceImpl::GetDelACLInfoVec(const int32_t &accessTokenId,
             localUdid == item.GetAccessee().GetAccesseeDeviceId()) {
             DmOfflineParam offlineParam;
             delProfileMap[item.GetAccessControlId()] = item;
-            DeviceProfileConnector::GetInstance().CacheAcerAclId(item, offlineParam.needDelAclInfos);
+            DeviceProfileConnector::GetInstance().CacheAceeAclId(item, offlineParam.needDelAclInfos);
             DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
             if (item.GetBindLevel() == USER) {
                 userIdVec.push_back(item.GetAccessee().GetAccesseeUserId());
@@ -2631,7 +2631,7 @@ void DeviceManagerServiceImpl::GetDelACLInfoVec(const int32_t &accessTokenId,
             userId == item.GetAccessee().GetAccesseeUserId() &&
             localUdid == item.GetAccesser().GetAccesserDeviceId()) {
             DmOfflineParam offlineParam;
-            DeviceProfileConnector::GetInstance().CacheAceeAclId(item, offlineParam.needDelAclInfos);
+            DeviceProfileConnector::GetInstance().CacheAcerAclId(item, offlineParam.needDelAclInfos);
             delProfileMap[item.GetAccessControlId()] = item;
             DeleteSkCredAndAcl(offlineParam.needDelAclInfos);
             if (item.GetBindLevel() == USER) {
