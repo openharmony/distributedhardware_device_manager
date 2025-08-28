@@ -246,11 +246,17 @@ int32_t AuthManager::StopAuthenticateDevice(const std::string &pkgName)
     LOGI("AuthManager::StopAuthenticateDevice start");
 
     context_->reason = STOP_BIND;
+    if (context_->authStateMachine->IsWaitEvent()) {
+        context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
+        return DM_OK;
+    }
+
     if (context_->direction == DM_AUTH_SOURCE) {
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
     } else {
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSinkFinishState>());
     }
+    context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
     return DM_OK;
 }
 

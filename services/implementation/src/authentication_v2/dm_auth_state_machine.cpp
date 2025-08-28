@@ -287,9 +287,11 @@ DmEventType DmAuthStateMachine::WaitExpectEvent(DmEventType eventType)
     std::unique_lock lock(eventMutex_);
     auto startTime = std::chrono::high_resolution_clock::now();
     while (running_.load()) {
+        isWait_.store(true);
         eventCv_.wait(lock, [&] {
             return !running_.load() || !eventQueue_.empty();
         });
+        isWait_.store(false);
         if (!running_.load()) {
             return DmEventType::ON_FAIL;
         }
@@ -402,6 +404,11 @@ void DmAuthStateMachine::Stop()
     if (thread_.joinable()) {  // Prevent dobule join
         thread_.join();
     }
+}
+
+bool DmAuthStateMachine::IsWaitEvent()
+{
+    return isWait_.load();
 }
 
 void DmAuthStateMachine::SetCurState(DmAuthStateType state)
