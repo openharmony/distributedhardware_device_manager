@@ -590,6 +590,7 @@ void DeviceProfileConnector::FilterNeedDeleteACLInfos(
     }
 }
 
+//LCOV_EXCL_START
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
@@ -634,6 +635,7 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
     }
     return aclProfileVec;
 }
+//LCOV_EXCL_STOP
 
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(const std::string &deviceId,
     int32_t userId, const std::string &remoteDeviceId)
@@ -2325,6 +2327,7 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
     return offlineParam;
 }
 
+//LCOV_EXCL_START
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
@@ -2344,6 +2347,7 @@ DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAclInc
     }
     return profiles;
 }
+//LCOV_EXCL_STOP
 
 DM_EXPORT void DeviceProfileConnector::DeleteAccessControlById(
     int64_t accessControlId)

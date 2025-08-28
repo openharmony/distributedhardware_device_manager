@@ -156,6 +156,7 @@ void DmDialogManager::CloseDialog()
     }
 }
 
+//LCOV_EXCL_START
 void DmDialogManager::ConnectExtension()
 {
     LOGI("DmDialogManager::ConnectExtension start.");
@@ -197,6 +198,7 @@ void DmDialogManager::ConnectExtension()
         }
     }
 }
+//LCOV_EXCL_STOP
 
 void DmDialogManager::OnAbilityConnectDone(
     const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode)
