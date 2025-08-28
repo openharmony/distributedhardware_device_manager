@@ -134,12 +134,12 @@ void DeviceManagerServiceListener::SetDeviceInfo(std::shared_ptr<IpcNotifyDevice
     FillUdidAndUuidToDeviceInfo(processInfo.pkgName, dmDeviceInfo);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string appId = "";
-    if (AppManager::GetInstance().GetAppIdByPkgName(processInfo.pkgName, appId) != DM_OK) {
+    if (AppManager::GetInstance().GetAppIdByPkgName(processInfo.pkgName, appId, processInfo.userId) != DM_OK) {
         pReq->SetDeviceInfo(dmDeviceInfo);
         pReq->SetDeviceBasicInfo(deviceBasicInfo);
         return;
     }
-    ConvertUdidHashToAnoyAndSave(processInfo.pkgName, dmDeviceInfo);
+    ConvertUdidHashToAnoyAndSave(processInfo.pkgName, dmDeviceInfo, processInfo.userId);
     DmDeviceBasicInfo dmDeviceBasicInfo = deviceBasicInfo;
     if (memset_s(dmDeviceBasicInfo.deviceId, DM_MAX_DEVICE_ID_LEN, 0, DM_MAX_DEVICE_ID_LEN) != DM_OK) {
         LOGE("ConvertNodeBasicInfoToDmDevice memset failed.");
@@ -270,7 +270,7 @@ void DeviceManagerServiceListener::OnDeviceFound(const ProcessInfo &processInfo,
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
     DmDeviceInfo deviceInfo = info;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ConvertUdidHashToAnoyAndSave(processInfo.pkgName, deviceInfo);
+    ConvertUdidHashToAnoyAndSave(processInfo.pkgName, deviceInfo, processInfo.userId);
 #endif
     DmDeviceBasicInfo devBasicInfo;
     ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, deviceInfo, devBasicInfo);
@@ -332,7 +332,7 @@ void DeviceManagerServiceListener::OnAuthResult(const ProcessInfo &processInfo, 
     pReq->SetDeviceId(deviceId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
-    if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, deviceId, deviceIdTemp) == DM_OK) {
+    if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, deviceId, deviceIdTemp, processInfo.userId) == DM_OK) {
         pReq->SetDeviceId(deviceIdTemp);
     }
 #endif
@@ -382,8 +382,8 @@ void DeviceManagerServiceListener::OnBindResult(const ProcessInfo &processInfo, 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     DmKVValue kvValue;
-    if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
-        KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
+    if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp,
+        processInfo.userId) == DM_OK && KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
         returnTargetId.deviceId = deviceIdTemp;
     }
 #endif
@@ -405,8 +405,8 @@ void DeviceManagerServiceListener::OnUnbindResult(const ProcessInfo &processInfo
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     DmKVValue kvValue;
-    if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
-        KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
+    if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp,
+        processInfo.userId) == DM_OK && KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
         returnTargetId.deviceId = deviceIdTemp;
     }
 #endif
@@ -487,10 +487,11 @@ void DeviceManagerServiceListener::OnPinHolderEvent(const ProcessInfo &processIn
     ipcServerListener_.SendRequest(SERVER_ON_PIN_HOLDER_EVENT, pReq, pRsp);
 }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo)
+int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::string &pkgName, DmDeviceInfo &deviceInfo,
+    const int32_t userId)
 {
     std::string appId = "";
-    if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
+    if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId, userId) != DM_OK) {
         LOGD("GetAppIdByPkgName failed");
         return ERR_DM_FAILED;
     }
@@ -512,10 +513,10 @@ int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyAndSave(const std::st
 }
 
 int32_t DeviceManagerServiceListener::ConvertUdidHashToAnoyDeviceId(const std::string &pkgName,
-    const std::string &udidHash, std::string &anoyDeviceId)
+    const std::string &udidHash, std::string &anoyDeviceId, const int32_t userId)
 {
     std::string appId = "";
-    if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId) != DM_OK) {
+    if (AppManager::GetInstance().GetAppIdByPkgName(pkgName, appId, userId) != DM_OK) {
         LOGD("GetAppIdByPkgName failed");
         return ERR_DM_FAILED;
     }
@@ -559,12 +560,12 @@ void DeviceManagerServiceListener::SetDeviceScreenInfo(std::shared_ptr<IpcNotify
     pReq->SetProcessInfo(processInfo);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string appId = "";
-    if (AppManager::GetInstance().GetAppIdByPkgName(processInfo.pkgName, appId) != DM_OK) {
+    if (AppManager::GetInstance().GetAppIdByPkgName(processInfo.pkgName, appId, processInfo.userId) != DM_OK) {
         pReq->SetDeviceInfo(deviceInfo);
         return;
     }
     DmDeviceInfo dmDeviceInfo = deviceInfo;
-    ConvertUdidHashToAnoyAndSave(processInfo.pkgName, dmDeviceInfo);
+    ConvertUdidHashToAnoyAndSave(processInfo.pkgName, dmDeviceInfo, processInfo.userId);
     pReq->SetDeviceInfo(dmDeviceInfo);
     return;
 #endif
@@ -662,8 +663,8 @@ void DeviceManagerServiceListener::OnSinkBindResult(const ProcessInfo &processIn
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::string deviceIdTemp = "";
     DmKVValue kvValue;
-    if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp) == DM_OK &&
-        KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
+    if (ConvertUdidHashToAnoyDeviceId(processInfo.pkgName, targetId.deviceId, deviceIdTemp,
+        processInfo.userId) == DM_OK && KVAdapterManager::GetInstance().Get(deviceIdTemp, kvValue) == DM_OK) {
         returnTargetId.deviceId = deviceIdTemp;
     }
 #endif

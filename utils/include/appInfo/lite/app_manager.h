@@ -26,9 +26,9 @@ class AppManager {
 
 public:
     const std::string GetAppId();
-    void RegisterCallerAppId(const std::string &pkgName);
-    void UnRegisterCallerAppId(const std::string &pkgName);
-    int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
+    void RegisterCallerAppId(const std::string &pkgName, const int32_t userId);
+    void UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId);
+    int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId, const int32_t userId);
     bool IsSystemSA();
     bool IsSystemApp();
     int32_t GetCallerName(bool isSystemSA, std::string &callerName);

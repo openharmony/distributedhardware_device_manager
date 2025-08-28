@@ -1193,7 +1193,8 @@ HWTEST_F(DeviceManagerServiceTest, CheckApiPermission_001, testing::ext::TestSiz
 HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
-    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
+    int32_t userId = 10001;
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName, userId);
     EXPECT_NE(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
@@ -1205,8 +1206,9 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_001, testing::ext::TestSi
 HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
+    int32_t userId = 10001;
     DeviceManagerService::GetInstance().listener_ = nullptr;
-    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName, userId);
     EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
@@ -1218,7 +1220,8 @@ HWTEST_F(DeviceManagerServiceTest, RegisterCallerAppId_002, testing::ext::TestSi
 HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_001, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
-    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
+    int32_t userId = 10001;
+    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName, userId);
     EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 
@@ -1230,8 +1233,9 @@ HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_001, testing::ext::Test
 HWTEST_F(DeviceManagerServiceTest, UnRegisterCallerAppId_002, testing::ext::TestSize.Level1)
 {
     std::string pkgName;
+    int32_t userId = 10001;
     DeviceManagerService::GetInstance().listener_ = nullptr;
-    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
+    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName, userId);
     EXPECT_EQ(DeviceManagerService::GetInstance().listener_, nullptr);
 }
 

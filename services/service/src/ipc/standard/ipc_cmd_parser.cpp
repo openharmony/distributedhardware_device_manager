@@ -472,7 +472,7 @@ ON_IPC_CMD(REGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParcel 
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
-    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName, processInfo.userId);
     int32_t result = IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, callback);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");
@@ -489,7 +489,7 @@ ON_IPC_CMD(UNREGISTER_DEVICE_MANAGER_LISTENER, MessageParcel &data, MessageParce
     ProcessInfo processInfo;
     processInfo.pkgName = pkgName;
     MultipleUserConnector::GetCallerUserId(processInfo.userId);
-    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
+    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName, processInfo.userId);
     int32_t result = IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
     if (!reply.WriteInt32(result)) {
         LOGE("write result failed");

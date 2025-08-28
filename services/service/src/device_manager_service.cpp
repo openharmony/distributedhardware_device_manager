@@ -371,14 +371,14 @@ DM_EXPORT void DeviceManagerService::UninitDMServiceListener()
     LOGI("Uninit.");
 }
 
-DM_EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName)
+DM_EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
-    AppManager::GetInstance().RegisterCallerAppId(pkgName);
+    AppManager::GetInstance().RegisterCallerAppId(pkgName, userId);
 }
 
-DM_EXPORT void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName)
+DM_EXPORT void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
-    AppManager::GetInstance().UnRegisterCallerAppId(pkgName);
+    AppManager::GetInstance().UnRegisterCallerAppId(pkgName, userId);
 }
 
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,

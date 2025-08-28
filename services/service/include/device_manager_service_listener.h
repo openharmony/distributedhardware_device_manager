@@ -109,9 +109,9 @@ private:
     void RemoveOnlinePkgName(const DmDeviceInfo &info);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     DM_EXPORT int32_t ConvertUdidHashToAnoyAndSave(const std::string &pkgName,
-        DmDeviceInfo &deviceInfo);
+        DmDeviceInfo &deviceInfo, const int32_t userId);
     int32_t ConvertUdidHashToAnoyDeviceId(const std::string &pkgName, const std::string &udidHash,
-        std::string &anoyDeviceId);
+        std::string &anoyDeviceId, const int32_t userId);
 #endif
     std::vector<ProcessInfo> GetWhiteListSAProcessInfo(DmCommonNotifyEvent dmCommonNotifyEvent);
     std::vector<ProcessInfo> GetNotifyProcessInfoByUserId(int32_t userId, DmCommonNotifyEvent dmCommonNotifyEvent);

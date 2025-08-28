@@ -191,7 +191,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceFound_001, testing::ext::Test
         .deviceTypeId = 1,
     };
     uint16_t subscribeId = 1;
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDeviceFound(processInfo, subscribeId, info);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
@@ -491,7 +491,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testin
     processInfoTmp.userId = 106;
     int32_t dmCommonNotifyEvent = 3;
     DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfoTmp);
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDeviceScreenStateChange(processInfo, devInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
@@ -508,7 +508,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceScreenStateChange_001, testin
     systemSA.insert("pkgName");
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
     EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).WillOnce(Return(systemSA));
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDeviceScreenStateChange(processInfo, devInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
@@ -537,7 +537,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_001, testing::ext::T
     int32_t result = 1;
     int32_t status = 0;
     std::string content = "content";
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     std::vector<ProcessInfo> processInfos;
@@ -635,7 +635,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessAppStateChange_001, testing::e
     allProcessInfos.push_back(processInfo1);
     EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).WillOnce(Return(systemSA));
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(allProcessInfos));
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
         .Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
     listener_->ProcessAppStateChange(processInfo, state, info, deviceBasicInfo);
@@ -647,14 +647,15 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertUdidHashToAnoyAndSave_001, tes
     std::shared_ptr<DeviceManagerServiceListener> listener_ = std::make_shared<DeviceManagerServiceListener>();
     std::string pkgName = "pkgName004";
     DmDeviceInfo deviceInfo;
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).WillOnce(Return(DM_OK));
+    int32_t userId = 10001;
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(ERR_DM_FAILED));
-    int32_t ret = listener_->ConvertUdidHashToAnoyAndSave(pkgName, deviceInfo);
+    int32_t ret = listener_->ConvertUdidHashToAnoyAndSave(pkgName, deviceInfo, userId);
     EXPECT_EQ(ret, ERR_DM_FAILED);
 
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
-    ret = listener_->ConvertUdidHashToAnoyAndSave(pkgName, deviceInfo);
+    ret = listener_->ConvertUdidHashToAnoyAndSave(pkgName, deviceInfo, userId);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -664,9 +665,10 @@ HWTEST_F(DeviceManagerServiceListenerTest, ConvertUdidHashToAnoyAndSave_002, tes
     std::string pkgName = "pkgName002";
     std::string udidHash = "udidHash";
     std::string anoyDeviceId = "anoyDeviceId";
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).WillOnce(Return(DM_OK));
+    int32_t userId = 10001;
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
-    int32_t ret = listener_->ConvertUdidHashToAnoyDeviceId(pkgName, udidHash, anoyDeviceId);
+    int32_t ret = listener_->ConvertUdidHashToAnoyDeviceId(pkgName, udidHash, anoyDeviceId, userId);
     EXPECT_EQ(ret, DM_OK);
 }
 
@@ -699,7 +701,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceScreenInfo_001, testing::ext
     ProcessInfo processInfo;
     DmDeviceInfo deviceInfo;
     processInfo.pkgName = "pkgName";
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->SetDeviceScreenInfo(pReq, processInfo, deviceInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
@@ -852,7 +854,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceOnline_001, testing::ext
     DmDeviceState state = DmDeviceState::DEVICE_INFO_CHANGED;
     DmDeviceInfo info;
     DmDeviceBasicInfo deviceBasicInfo;
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(4)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
         .Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     listener_->ProcessDeviceOnline(procInfoVec, processInfo, state, info, deviceBasicInfo);
@@ -892,7 +894,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, ProcessDeviceInfoChange_001, testing:
     DmDeviceState state = DmDeviceState::DEVICE_INFO_CHANGED;
     DmDeviceInfo info;
     DmDeviceBasicInfo deviceBasicInfo;
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _))
         .Times(::testing::AtLeast(1)).WillOnce(Return(DM_OK));
     listener_->ProcessDeviceInfoChange(procInfoVec, processInfo, state, info, deviceBasicInfo);
@@ -941,12 +943,12 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDevStateCallbackAdd_001, testing::e
     info.authForm = DmAuthForm::ACROSS_ACCOUNT;
     info.deviceTypeId = 1;
     deviceList.push_back(info);
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDevStateCallbackAdd(processInfo, deviceList);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
 
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnDevStateCallbackAdd(processInfo, deviceList);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
@@ -1009,7 +1011,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_004, testing::ext::TestS
     ProcessInfo processInfo;
     processInfo.pkgName = "com.ohos.helloworld";
     processInfo.userId = 100;
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     listener_->OnBindResult(processInfo, targetId, result, status, content);
@@ -1026,7 +1028,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_004, testing::ext::TestS
     ProcessInfo processInfo;
     processInfo.pkgName = "com.ohos.hellojk";
     processInfo.userId = 100;
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnAuthResult(processInfo, deviceId, token, status, reason);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
@@ -1041,7 +1043,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_002, testing::ext::Tes
     ProcessInfo processInfo;
     processInfo.pkgName = "com.ohos.helloworld01";
     processInfo.userId = 100;
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     listener_->OnUnbindResult(processInfo, targetId, result, content);
@@ -1058,7 +1060,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_002, testing::ext::T
     int32_t result = 1;
     int32_t status = 1;
     std::string content = "content";
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     std::vector<ProcessInfo> processInfos;
@@ -1079,7 +1081,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::Test
     DmDeviceBasicInfo deviceBasicInfo;
 
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).Times(::testing::AtLeast(3)).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
+    EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
     EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);

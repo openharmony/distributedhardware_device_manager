@@ -95,13 +95,14 @@ HWTEST_F(AppManagerTest, RegisterCallerAppId_success_001, testing::ext::TestSize
         .Times(INVOKE_COUNT)
         .WillOnce(DoAll(SetArgReferee<ARG_THIRD>(bundleInfo), Return(ERR_OK)));
     std::string packageName = "packageName";
-    AppManager::GetInstance().RegisterCallerAppId(packageName);
+    int32_t userId = 1001;
+    AppManager::GetInstance().RegisterCallerAppId(packageName, userId);
 
     std::string appId;
-    auto result = AppManager::GetInstance().GetAppIdByPkgName(packageName, appId);
+    auto result = AppManager::GetInstance().GetAppIdByPkgName(packageName, appId, userId);
     EXPECT_EQ(result, DM_OK);
     EXPECT_STREQ(bundleInfo.appId.c_str(), appId.c_str());
-    AppManager::GetInstance().UnRegisterCallerAppId(packageName);
+    AppManager::GetInstance().UnRegisterCallerAppId(packageName, userId);
 }
 
 HWTEST_F(AppManagerTest, RegisterCallerAppId_failed_001, testing::ext::TestSize.Level2)
@@ -111,20 +112,21 @@ HWTEST_F(AppManagerTest, RegisterCallerAppId_failed_001, testing::ext::TestSize.
 
     std::string emptyPackageName;
     std::string appId;
-    AppManager::GetInstance().RegisterCallerAppId(emptyPackageName);
-    AppManager::GetInstance().GetAppIdByPkgName(emptyPackageName, appId);
-    AppManager::GetInstance().UnRegisterCallerAppId(emptyPackageName);
+    int32_t userId = 10001;
+    AppManager::GetInstance().RegisterCallerAppId(emptyPackageName, userId);
+    AppManager::GetInstance().GetAppIdByPkgName(emptyPackageName, appId, userId);
+    AppManager::GetInstance().UnRegisterCallerAppId(emptyPackageName, userId);
 
     EXPECT_CALL(*skeleton_, GetCallingTokenID())
         .Times(AtLeast(INVOKE_COUNT));
     EXPECT_CALL(*token_, GetTokenTypeFlag(_))
-        .Times(INVOKE_COUNT)
+        .Times(AtLeast(INVOKE_COUNT))
         .WillOnce(Return(ATokenTypeEnum::TOKEN_NATIVE));
     std::string packageName = "packageName";
-    AppManager::GetInstance().RegisterCallerAppId(packageName);
-    auto result = AppManager::GetInstance().GetAppIdByPkgName(packageName, appId);
+    AppManager::GetInstance().RegisterCallerAppId(packageName, userId);
+    auto result = AppManager::GetInstance().GetAppIdByPkgName(packageName, appId, userId);
     EXPECT_EQ(result, ERR_DM_FAILED);
-    AppManager::GetInstance().UnRegisterCallerAppId(packageName);
+    AppManager::GetInstance().UnRegisterCallerAppId(packageName, userId);
 }
 
 HWTEST_F(AppManagerTest, GetAppId_001, testing::ext::TestSize.Level2)

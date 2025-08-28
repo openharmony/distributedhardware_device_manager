@@ -65,14 +65,15 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     std::string network = fdp.ConsumeRandomLengthString();
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
     int32_t level = fdp.ConsumeIntegral<int32_t>();
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
     DeviceManagerService::GetInstance().Init();
     DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, extra);
     DeviceManagerService::GetInstance().UnBindDevice(pkgName, deviceId);
     DeviceManagerService::GetInstance().SetUserOperation(pkgName, authType, network);
-    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
-    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName);
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName, userId);
+    DeviceManagerService::GetInstance().UnRegisterCallerAppId(pkgName, userId);
     DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, deviceId, udid);
     DeviceManagerService::GetInstance().CheckApiPermission(level);
 }

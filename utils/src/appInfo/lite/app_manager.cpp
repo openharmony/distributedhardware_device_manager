@@ -25,20 +25,23 @@ const std::string AppManager::GetAppId()
     return "";
 }
 
-void AppManager::RegisterCallerAppId(const std::string &pkgName)
+void AppManager::RegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
     (void)pkgName;
+    (void)userId;
 }
 
-void AppManager::UnRegisterCallerAppId(const std::string &pkgName)
+void AppManager::UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
     (void)pkgName;
+    (void)userId;
 }
 
-int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &appId)
+int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &appId, const int32_t userId)
 {
     (void)pkgName;
     (void)appId;
+    (void)userId;
     return DM_OK;
 }
 
