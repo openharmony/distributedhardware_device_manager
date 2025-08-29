@@ -67,8 +67,8 @@ void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
     if (pkgSet_.empty()) {
         LOGW("pkgSet_ is empty");
-        if (msg == MSG_CANCEL_CONFIRM_SHOW) {
-            LOGW("cancel confirm dialog");
+        if (msg == MSG_CANCEL_CONFIRM_SHOW || msg == MSG_CANCEL_PIN_CODE_INPUT || msg == MSG_CANCEL_PIN_CODE_SHOW) {
+            LOGW("cancel confirm or input pin code dialog");
             DmDialogManager::GetInstance().CloseDialog();
             return;
         }
