@@ -677,7 +677,7 @@ void DeviceManagerNapi::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedRe
     SetValueInt32(env_, "reason", (int)failedReason, result);
     std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)failedReason);
     SetValueUtf8String(env_, "errInfo", errCodeInfo, result);
-    OnEvent("discoverFail", DM_NAPI_ARGS_ONE, &result);
+    OnEvent("discoverFailure", DM_NAPI_ARGS_ONE, &result);
     napi_close_handle_scope(env_, scope);
 }
 
