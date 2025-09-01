@@ -53,6 +53,11 @@ static std::map<FallBackKey, DmAuthType> g_pinAuthTypeFallBackMap = {
 // Maximum number of recursive lookups
 constexpr size_t MAX_FALLBACK_LOOPKUP_TIMES = 2;
 
+AuthSrcConfirmState::~AuthSrcConfirmState()
+{
+    LOGI("AuthSrcConfirmState destructor.");
+}
+
 DmAuthStateType AuthSrcConfirmState::GetStateType()
 {
     return DmAuthStateType::AUTH_SRC_CONFIRM_STATE;
