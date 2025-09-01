@@ -50,7 +50,7 @@ namespace {
 
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
-const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
+const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFailure";
 const std::string DM_NAPI_EVENT_DEVICE_PUBLISH_SUCCESS = "publishSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_PUBLISH_FAIL = "publishFail";
 const std::string DM_NAPI_EVENT_DEVICE_SERVICE_DIE = "serviceDie";
