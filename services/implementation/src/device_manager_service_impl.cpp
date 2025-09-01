@@ -3201,6 +3201,13 @@ void DeviceManagerServiceImpl::DeleteSessionKey(int32_t userId,
     DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
 }
 
+void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
+    const std::string &deviceUdidHash)
+{
+    CHECK_NULL_VOID(deviceStateMgr_);
+    deviceStateMgr_->StartDelTimerByDP(deviceUdid, deviceUdidHash);
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

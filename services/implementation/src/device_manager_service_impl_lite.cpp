@@ -747,6 +747,13 @@ void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
     return;
 }
 
+void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
+    const std::string &deviceUdidHash)
+{
+    (void)deviceUdid;
+    (void)deviceUdidHash;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

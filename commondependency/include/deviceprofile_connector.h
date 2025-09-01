@@ -147,6 +147,7 @@ public:
         const std::vector<std::string> &acceptEventUdids) = 0;
     virtual int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
+    virtual int32_t GetAuthOnceUdids(std::unordered_set<std::string> &udidSet) = 0;
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
@@ -331,7 +332,7 @@ public:
         const std::vector<int32_t> &backGroundUserIds);
     DM_EXPORT bool IsAllowAuthAlways(const std::string &localUdid, int32_t userId, const std::string &peerUdid,
         const std::string &pkgName, int64_t tokenId);
-
+    int32_t GetAuthOnceUdids(std::unordered_set<std::string> &udidSet);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,

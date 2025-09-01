@@ -286,6 +286,8 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
         const std::vector<int32_t> &backGroundUserIds) = 0;
+    virtual void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
+        const std::string &deviceUdidHash) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

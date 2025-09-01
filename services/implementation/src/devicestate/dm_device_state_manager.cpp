@@ -256,13 +256,13 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
 void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 {
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
-    std::string networkId = deviceInfo.networkId;
-    LOGI("Start offline timer for networkId: %{public}s", GetAnonyString(networkId).c_str());
+    std::string deviceId = deviceInfo.deviceId;
+    LOGI("Start offline timer for deviceId: %{public}s", GetAnonyString(deviceId).c_str());
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
     for (auto &iter : stateTimerInfoMap_) {
-        if ((iter.second.networkId == networkId) && !iter.second.isStart) {
+        if ((iter.first == deviceId) && !iter.second.isStart) {
             timer_->StartTimer(iter.second.timerName, OFFLINE_TIMEOUT,
                 [this] (std::string name) {
                     DmDeviceStateManager::DeleteTimeOutGroup(name);
@@ -300,6 +300,12 @@ void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
             auto idIter = udidhash2udidMap_.find(iter->first);
             if (idIter == udidhash2udidMap_.end()) {
                 LOGE("remove hichain group find deviceId: %{public}s failed.", GetAnonyString(iter->first).c_str());
+                break;
+            }
+            if (softbusConnector_ == nullptr || softbusConnector_->CheckIsOnline(idIter->second)) {
+                LOGI("device is online or status is unknown udidHash : %{public}s",
+                    GetAnonyString(idIter->first).c_str());
+                iter->second.isStart = false;
                 break;
             }
             LOGI("remove hichain group with deviceId: %{public}s", GetAnonyString(idIter->second).c_str());
@@ -565,6 +571,40 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo,
     for (const auto &item : processInfos) {
         listener_->OnDeviceScreenStateChange(item, devInfo);
     }
+}
+
+void DmDeviceStateManager::StartDelTimerByDP(const std::string &deviceUdid, const std::string &deviceUdidHash)
+{
+    LOGI("StartDelTimerByDP for udidHash: %{public}s", GetAnonyString(std::string(deviceUdidHash)).c_str());
+    std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
+    auto iter = stateTimerInfoMap_.find(deviceUdidHash);
+    if ((iter != stateTimerInfoMap_.end()) && (timer_ != nullptr)) {
+        timer_->DeleteTimer(iter->second.timerName);
+        stateTimerInfoMap_.erase(iter);
+        auto idIter = udidhash2udidMap_.find(deviceUdidHash);
+        if (idIter != udidhash2udidMap_.end()) {
+            udidhash2udidMap_.erase(idIter);
+        }
+    }
+    std::string sha256UdidHash = Crypto::Sha256(std::string(deviceUdidHash));
+    std::string timerName = std::string(STATE_TIMER_PREFIX) + sha256UdidHash.substr(0, sha256UdidHash.size() / 2);
+    if (stateTimerInfoMap_.find(std::string(deviceUdidHash)) == stateTimerInfoMap_.end()) {
+        StateTimerInfo stateTimer = {
+            .timerName = timerName,
+            .isStart = true,
+        };
+        stateTimerInfoMap_[std::string(deviceUdidHash)] = stateTimer;
+    }
+    if (udidhash2udidMap_.find(std::string(deviceUdidHash)) == udidhash2udidMap_.end()) {
+        udidhash2udidMap_[std::string(deviceUdidHash)] = deviceUdid;
+    }
+    if (timer_ == nullptr) {
+        timer_ = std::make_shared<DmTimer>();
+    }
+    timer_->StartTimer(timerName, OFFLINE_TIMEOUT,
+        [this] (std::string name) {
+            DmDeviceStateManager::DeleteTimeOutGroup(name);
+        });
 }
 } // namespace DistributedHardware
 } // namespace OHOS
