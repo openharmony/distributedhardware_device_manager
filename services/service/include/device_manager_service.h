@@ -64,9 +64,9 @@ public:
 
     void DelAllRelateShip();
 
-    DM_EXPORT void RegisterCallerAppId(const std::string &pkgName);
+    DM_EXPORT void RegisterCallerAppId(const std::string &pkgName, const int32_t userId);
 
-    DM_EXPORT void UnRegisterCallerAppId(const std::string &pkgName);
+    DM_EXPORT void UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId);
     
     void UninitSoftbusListener();
 

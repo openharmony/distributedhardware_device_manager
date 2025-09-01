@@ -33,9 +33,9 @@ class AppManager {
 
 public:
     DM_EXPORT const std::string GetAppId();
-    DM_EXPORT void RegisterCallerAppId(const std::string &pkgName);
-    DM_EXPORT void UnRegisterCallerAppId(const std::string &pkgName);
-    DM_EXPORT int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId);
+    DM_EXPORT void RegisterCallerAppId(const std::string &pkgName, const int32_t userId);
+    DM_EXPORT void UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId);
+    DM_EXPORT int32_t GetAppIdByPkgName(const std::string &pkgName, std::string &appId, const int32_t userId);
     DM_EXPORT bool IsSystemSA();
     DM_EXPORT bool IsSystemApp();
     DM_EXPORT int32_t GetCallerName(bool isSystemSA, std::string &callerName);

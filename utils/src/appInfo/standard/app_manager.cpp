@@ -73,50 +73,70 @@ const std::string AppManager::GetAppId()
     return appId;
 }
 
-DM_EXPORT void AppManager::RegisterCallerAppId(const std::string &pkgName)
+DM_EXPORT void AppManager::RegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
+    }
+    std::string appIdKey = pkgName + "#" + std::to_string(userId);
+    {
+        std::lock_guard<std::mutex> lock(appIdMapLock_);
+        if (appIdMap_.find(appIdKey) != appIdMap_.end()) {
+            LOGI("PkgName %{public}s, userId %{public}d, appId %{public}s.",
+                pkgName.c_str(), userId, GetAnonyString(appIdMap_[appIdKey]).c_str());
+            return;
+        }
     }
     std::string appId = GetAppId();
     if (appId.empty()) {
         LOGD("PkgName %{public}s get appid failed.", pkgName.c_str());
         return;
     }
-    LOGI("PkgName %{public}s, appId %{public}s.", pkgName.c_str(), GetAnonyString(appId).c_str());
+    LOGI("PkgName %{public}s, userId %{public}d, appId %{public}s.",
+        pkgName.c_str(), userId, GetAnonyString(appId).c_str());
     std::lock_guard<std::mutex> lock(appIdMapLock_);
     CHECK_SIZE_VOID(appIdMap_);
-    appIdMap_[pkgName] = appId;
+    appIdMap_[appIdKey] = appId;
 }
 
-DM_EXPORT void AppManager::UnRegisterCallerAppId(const std::string &pkgName)
+DM_EXPORT void AppManager::UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("PkgName %{public}s.", pkgName.c_str());
+    LOGI("PkgName %{public}s, userId %{public}d", pkgName.c_str(), userId);
+    std::string appIdKey = pkgName + "#" + std::to_string(userId);
     std::lock_guard<std::mutex> lock(appIdMapLock_);
-    if (appIdMap_.find(pkgName) == appIdMap_.end()) {
+    if (appIdMap_.find(appIdKey) == appIdMap_.end()) {
         return;
     }
-    appIdMap_.erase(pkgName);
+    appIdMap_.erase(appIdKey);
 }
 
-int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &appId)
+int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &appId, const int32_t userId)
 {
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGD("PkgName %{public}s.", pkgName.c_str());
+    LOGD("PkgName %{public}s, userId %{public}d", pkgName.c_str(), userId);
+    std::string appIdKey = pkgName + "#" + std::to_string(userId);
     std::lock_guard<std::mutex> lock(appIdMapLock_);
-    if (appIdMap_.find(pkgName) == appIdMap_.end()) {
-        LOGD("AppIdMap not find pkgName.");
+    if (appIdMap_.find(appIdKey) != appIdMap_.end()) {
+        appId = appIdMap_[appIdKey];
+        return DM_OK;
+    }
+    appId = GetAppId();
+    if (appId.empty()) {
+        LOGD("PkgName %{public}s get appid failed.", pkgName.c_str());
         return ERR_DM_FAILED;
     }
-    appId = appIdMap_[pkgName];
+    LOGI("PkgName %{public}s, userId %{public}d, appId %{public}s.",
+        pkgName.c_str(), userId, GetAnonyString(appId).c_str());
+    CHECK_SIZE_RETURN(appIdMap_, ERR_DM_FAILED);
+    appIdMap_[appIdKey] = appId;
     return DM_OK;
 }
 
