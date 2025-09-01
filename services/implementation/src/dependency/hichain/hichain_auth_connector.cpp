@@ -27,6 +27,12 @@
 namespace OHOS {
 namespace DistributedHardware {
 
+namespace {
+
+constexpr int32_t HICHAIN_DATA_SIZE = 10240;
+
+}
+
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::dmDeviceAuthCallback_ = nullptr;
 std::map<int64_t, std::shared_ptr<IDmDeviceAuthCallback>> HiChainAuthConnector::dmDeviceAuthCallbackMap_;
 std::mutex HiChainAuthConnector::dmDeviceAuthCallbackMutex_;

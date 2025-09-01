@@ -16,8 +16,6 @@
 #ifndef OHOS_HICHAIN_AUTH_CONNECTOR_H
 #define OHOS_HICHAIN_AUTH_CONNECTOR_H
 
-#define HICHAIN_DATA_SIZE 10240
-
 #include <map>
 #include <mutex>
 
