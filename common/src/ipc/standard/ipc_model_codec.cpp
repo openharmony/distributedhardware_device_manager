@@ -426,6 +426,10 @@ bool IpcModelCodec::DecodeLocalServiceInfos(MessageParcel &parcel, std::vector<D
     uint32_t num = 0;
     READ_HELPER_RET(parcel, Uint32, num, false);
     bool bRet = true;
+    if (num > IPC_VECTOR_MAX_SIZE || num < 0) {
+        LOGE("num is Invalid value, num = %{public}u", num);
+        return false;
+    }
     for (uint32_t k = 0; k < num; k++) {
         DMLocalServiceInfo serviceInfo;
         bRet = DecodeLocalServiceInfo(parcel, serviceInfo);
@@ -482,7 +486,7 @@ bool IpcModelCodec::DecodeStringVector(MessageParcel &parcel, std::vector<std::s
 {
     uint32_t num = 0;
     READ_HELPER_RET(parcel, Uint32, num, false);
-    if (num > IPC_VECTOR_MAX_SIZE) {
+    if (num > IPC_VECTOR_MAX_SIZE || num < 0) {
         LOGE("num is Invalid value, num = %{public}u", num);
         return false;
     }
