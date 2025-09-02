@@ -70,14 +70,21 @@ static std::mutex g_deviceMapMutex;
 static std::mutex g_lnnCbkMapMutex;
 static std::mutex g_radarLoadLock;
 static std::mutex g_onlineDeviceNumLock;
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+static ffrt::mutex g_lockDeviceTrustedChange;
+static ffrt::mutex g_lockUserIdCheckSumChange;
+static ffrt::mutex g_credentialAuthStatus;
+static ffrt::mutex g_dmSoftbusEventQueueLock;
+#else
 static std::mutex g_lockDeviceTrustedChange;
-static std::mutex g_lockUserIdCheckSumChange;
+static std::mutex g_credentialAuthStatus;
+#endif
 static std::mutex g_lockDeviceOnLine;
 static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
 static std::mutex g_lockDeviceIdSet;
 static std::mutex g_lockDevScreenStatusChange;
-static std::mutex g_credentialAuthStatus;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -90,7 +97,6 @@ static std::mutex g_hostNameMutex;
 std::string SoftbusListener::hostName_ = "";
 int32_t g_onlineDeviceNum = 0;
 static std::map<std::string, std::queue<DmSoftbusEvent>> g_dmSoftbusEventQueueMap;
-static std::mutex g_dmSoftbusEventQueueLock;
 
 static int OnSessionOpened(int sessionId, int result)
 {
@@ -165,14 +171,18 @@ void SoftbusListener::DeviceNameChange(DmDeviceInfo deviceInfo)
 
 void SoftbusListener::DeviceNotTrust(const std::string &msg)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(g_lockDeviceTrustedChange);
+#else
     std::lock_guard<std::mutex> lock(g_lockDeviceTrustedChange);
+#endif
     DeviceManagerService::GetInstance().HandleDeviceNotTrust(msg);
 }
 
 void SoftbusListener::DeviceTrustedChange(const std::string &msg)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::lock_guard<std::mutex> lock(g_lockDeviceTrustedChange);
+    std::lock_guard<ffrt::mutex> lock(g_lockDeviceTrustedChange);
     DeviceManagerService::GetInstance().HandleDeviceTrustedChange(msg);
 #else
     (void)msg;
@@ -182,7 +192,7 @@ void SoftbusListener::DeviceTrustedChange(const std::string &msg)
 void SoftbusListener::DeviceUserIdCheckSumChange(const std::string &msg)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::lock_guard<std::mutex> lock(g_lockUserIdCheckSumChange);
+    std::lock_guard<ffrt::mutex> lock(g_lockUserIdCheckSumChange);
     DeviceManagerService::GetInstance().HandleUserIdCheckSumChange(msg);
 #else
     (void)msg;
@@ -197,7 +207,11 @@ void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
 
 void SoftbusListener::CredentialAuthStatusProcess(std::string deviceList, uint16_t deviceTypeId, int32_t errcode)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(g_credentialAuthStatus);
+#else
     std::lock_guard<std::mutex> lock(g_credentialAuthStatus);
+#endif
     DeviceManagerService::GetInstance().HandleCredentialAuthStatus(deviceList, deviceTypeId, errcode);
 }
 
@@ -267,7 +281,7 @@ void SoftbusListener::SoftbusEventQueueHandle(std::string deviceId)
 {
     std::queue<DmSoftbusEvent> eventQueue;
     {
-        std::lock_guard<std::mutex> lock(g_dmSoftbusEventQueueLock);
+        std::lock_guard<ffrt::mutex> lock(g_dmSoftbusEventQueueLock);
         auto it = g_dmSoftbusEventQueueMap.find(deviceId);
         if (it == g_dmSoftbusEventQueueMap.end()) {
             return;
@@ -297,7 +311,7 @@ void SoftbusListener::SoftbusEventQueueHandle(std::string deviceId)
         }
     }
     {
-        std::lock_guard<std::mutex> lock(g_dmSoftbusEventQueueLock);
+        std::lock_guard<ffrt::mutex> lock(g_dmSoftbusEventQueueLock);
         auto it = g_dmSoftbusEventQueueMap.find(deviceId);
         if (it == g_dmSoftbusEventQueueMap.end()) {
             return;
@@ -321,7 +335,7 @@ int32_t SoftbusListener::SoftbusEventQueueAdd(DmSoftbusEvent &dmSoftbusEventInfo
     std::string deviceId(dmSoftbusEventInfo.dmDeviceInfo.deviceId);
     LOGI("deviceIdHash:%{public}s.", GetAnonyString(deviceId).c_str());
     {
-        std::lock_guard<std::mutex> lock(g_dmSoftbusEventQueueLock);
+        std::lock_guard<ffrt::mutex> lock(g_dmSoftbusEventQueueLock);
         auto it = g_dmSoftbusEventQueueMap.find(deviceId);
         if (it == g_dmSoftbusEventQueueMap.end()) {
             std::queue<DmSoftbusEvent> eventQueue;
@@ -1387,6 +1401,7 @@ int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
     int32_t ret = ::SetDisplayName(DM_PKG_NAME, displayName.c_str(), len);
     if (ret != DM_OK) {
         LOGE("SoftbusListener SetLocalDisplayName failed!");
+        return ret;
     }
     return DM_OK;
 }

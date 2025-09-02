@@ -22,6 +22,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+
+namespace {
+
+constexpr int32_t MAX_DATA_LEN = 4096000;   // Maximum MTU Value for Logical Session:4M
+
+}
 std::shared_ptr<IPinholderSessionCallback> PinHolderSession::pinholderSessionCallback_ = nullptr;
 std::mutex PinHolderSession::pinHolderSessionLock_;
 PinHolderSession::PinHolderSession()
@@ -110,7 +116,7 @@ void PinHolderSession::OnSessionClosed(int sessionId)
 
 void PinHolderSession::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
-    if (sessionId < 0 || data == nullptr || dataLen <= 0) {
+    if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > MAX_DATA_LEN) {
         LOGE("[SOFTBUS]fail to receive data from softbus with sessionId: %{public}d, dataLen: %{public}d.", sessionId,
             dataLen);
         return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,9 @@
 #include <string>
 #include <mutex>
 #include "dm_device_info.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ffrt.h"
+#endif
 #include "dm_single_instance.h"
 #include "softbus_bus_center.h"
 #include "softbus_common.h"
@@ -60,8 +63,13 @@ private:
     int32_t GetDevLevelFromBus(const char *networkId, int32_t &securityLevel);
 
 private:
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::mutex deviceInfosMutex_;
+    ffrt::mutex deviceSecurityLevelMutex_;
+#else
     std::mutex deviceInfosMutex_;
     std::mutex deviceSecurityLevelMutex_;
+#endif
     std::unordered_map<std::string, std::pair<std::string, DmDeviceInfo>> deviceInfo_;
     std::unordered_map<std::string, int32_t> deviceSecurityLevel_;
 };
