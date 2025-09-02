@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "auth_ui_state_manager.h"
 #include "dm_anonymous.h"
+#include "dm_dialog_manager.h"
 #include "dm_log.h"
 #include "json_object.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -64,6 +65,15 @@ void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
     jsonObj[UI_STATE_MSG] = msg;
     std::string paramJson = jsonObj.Dump();
     std::lock_guard<std::mutex> lock(pkgSetMutex_);
+    if (pkgSet_.empty()) {
+        LOGW("pkgSet_ is empty");
+        if (msg == MSG_CANCEL_CONFIRM_SHOW) {
+            LOGW("cancel confirm dialog");
+            DmDialogManager::GetInstance().CloseDialog();
+            return;
+        }
+        return;
+    }
     for (auto item : pkgSet_) {
         listener_->OnUiCall(item, paramJson);
     }

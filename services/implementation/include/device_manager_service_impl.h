@@ -227,12 +227,14 @@ private:
     void HandleRemoteUserRemoved(int32_t preUserId, const std::string &remoteUdid);
     DmAuthForm ConvertBindTypeToAuthForm(int32_t bindType);
     std::shared_ptr<AuthManagerBase> GetAuthMgr();
+    int32_t AddAuthMgr(uint64_t tokenId, int sessionId, std::shared_ptr<AuthManagerBase> authMgr);
+    void EraseAuthMgr(uint64_t tokenId);
     std::shared_ptr<AuthManagerBase> GetAuthMgrByTokenId(uint64_t tokenId);
     std::shared_ptr<AuthManagerBase> GetCurrentAuthMgr();
     void CreateGlobalClassicalAuthMgr();
     std::shared_ptr<Session> GetCurSession(int sessionId);
     std::shared_ptr<Session> GetOrCreateSession(const std::string& deviceId,
-        const std::map<std::string, std::string> &bindParam);
+        const std::map<std::string, std::string> &bindParam, uint64_t tokenId);
     int32_t ParseConnectAddr(const PeerTargetId &targetId, std::string &deviceId,
         const std::map<std::string, std::string> &bindParam);
     std::shared_ptr<Config> GetConfigByTokenId();
@@ -256,7 +258,8 @@ private:
     void ImportAuthCodeToConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId);
 
     void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId);
-    void CleanSessionMap(int sessionId, std::shared_ptr<Session> session);
+    void CleanSessionMap(std::shared_ptr<Session> session);
+    void CleanSessionMap(int sessionId);
     void CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId);
     int32_t DeleteAclForProcV2(const std::string &localUdid, uint32_t localTokenId, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra, int32_t userId);
@@ -291,16 +294,17 @@ private:
     void SaveTokenIdAndSessionId(uint64_t &tokenId, int32_t &sessionId, uint64_t &logicalSessionId);
     void ReleaseMaps();
     int32_t InitNewProtocolAuthMgr(bool isSrcSide, uint64_t tokenId, uint64_t logicalSessionId,
-        const std::string &pkgName);
-    int32_t InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName);
-    bool ParseConnectAddrAndSetProcessInfo(const PeerTargetId &targetId,
-        PeerTargetId &targetIdTmp, const std::map<std::string, std::string> &bindParam, ProcessInfo &processInfo,
-        const std::string &pkgName);
+        const std::string &pkgName, int sessionId);
+    int32_t InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName, int sessionId);
+    bool ParseConnectAddrAndSetProcessInfo(PeerTargetId &targetIdTmp,
+        const std::map<std::string, std::string> &bindParam, ProcessInfo &processInfo,
+        const std::string &pkgName, uint64_t tokenId);
     void OnAuthResultAndOnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId,
-        const std::string &deviceId, int32_t reason);
+        const std::string &deviceId, int32_t reason, uint64_t tokenId);
     void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet);
     void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
 private:
+    std::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
     bool isNeedJoinLnn_ = true;
     std::mutex isNeedJoinLnnMtx_;
@@ -320,11 +324,12 @@ private:
     // The session ID corresponding to the device ID, used only on the src side
     std::map<std::string, int> deviceId2SessionIdMap_;
     std::map<int, std::shared_ptr<Session>> sessionsMap_;  // sessionId corresponds to the session object
-    std::map<std::string, std::mutex> deviceIdMutexMap_;  // Lock corresponding to the device ID
     std::mutex mapMutex_;  // sessionsMap_ lock
     std::map<int, std::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
     std::map<int, std::mutex> sessionEnableMutexMap_;      // Lock corresponding to the session
     std::map<int, bool> sessionEnableCvReadyMap_;  // Condition variable ready flag
+    std::map<int, bool> sessionStopMap_;  // stop flag
+    std::map<int, bool> sessionEnableMap_;  // enable flag
     std::mutex logicalSessionId2TokenIdMapMtx_;
     std::map<uint64_t, uint64_t> logicalSessionId2TokenIdMap_;  // The relationship between logicalSessionId and tokenId
     std::mutex logicalSessionId2SessionIdMapMtx_;
@@ -333,6 +338,8 @@ private:
     std::map<uint64_t, std::shared_ptr<Config>> configsMap_;    // Import when authMgr is not initialized
     std::mutex authMgrMapMtx_;
     std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
+    std::mutex tokenIdSessionIdMapMtx_;
+    std::map<uint64_t, int> tokenIdSessionIdMap_;  // New protocol sharing
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

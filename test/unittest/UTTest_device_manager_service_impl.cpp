@@ -1636,8 +1636,9 @@ HWTEST_F(DeviceManagerServiceImplTest, StopAuthenticateDevice_102, testing::ext:
     if (deviceManagerServiceImpl_->authMgr_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
+    deviceManagerServiceImpl_->tokenIdSessionIdMap_.clear();
     int ret = deviceManagerServiceImpl_->StopAuthenticateDevice(pkgName);
-    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, CheckIsSameAccount_001, testing::ext::TestSize.Level1)
@@ -2106,25 +2107,92 @@ HWTEST_F(DeviceManagerServiceImplTest, InitNewProtocolAuthMgr_001, testing::ext:
     bool isSrcSide = true;
     uint64_t tokenId = 1000023;
     uint64_t logicalSessionId = 456789;
+    int sessionId = 1;
     const std::string pkgName = "InitNewProtocolAuthMgr";
-    int32_t ret = deviceManagerServiceImpl_->InitNewProtocolAuthMgr(isSrcSide, tokenId, logicalSessionId, pkgName);
+    int32_t ret = deviceManagerServiceImpl_->InitNewProtocolAuthMgr(isSrcSide, tokenId, logicalSessionId, pkgName,
+        sessionId);
     EXPECT_EQ(ret, DM_OK);
 
     isSrcSide = false;
-    ret = deviceManagerServiceImpl_->InitNewProtocolAuthMgr(isSrcSide, tokenId, logicalSessionId, pkgName);
+    ret = deviceManagerServiceImpl_->InitNewProtocolAuthMgr(isSrcSide, tokenId, logicalSessionId, pkgName, sessionId);
     EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, InitOldProtocolAuthMgr_001, testing::ext::TestSize.Level1)
 {
     uint64_t tokenId = 100002311;
+    int sessionId = 1;
     const std::string pkgName = "InitOldProtocolAuthMgr";
-    int32_t ret = deviceManagerServiceImpl_->InitOldProtocolAuthMgr(tokenId, pkgName);
+    int32_t ret = deviceManagerServiceImpl_->InitOldProtocolAuthMgr(tokenId, pkgName, sessionId);
     EXPECT_EQ(ret, DM_OK);
 
     deviceManagerServiceImpl_->authMgr_ = nullptr;
-    ret = deviceManagerServiceImpl_->InitOldProtocolAuthMgr(tokenId, pkgName);
+    ret = deviceManagerServiceImpl_->InitOldProtocolAuthMgr(tokenId, pkgName, sessionId);
     EXPECT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, CleanSessionMap_001, testing::ext::TestSize.Level1)
+{
+    int sessionId = 0;
+    std::string deviceId = "deviceId";
+    deviceManagerServiceImpl_->CleanSessionMap(nullptr);
+    std::shared_ptr<Session> session = std::make_shared<Session>(sessionId, deviceId);
+    session->logicalSessionCnt_.fetch_add(1);
+    deviceManagerServiceImpl_->CleanSessionMap(session);
+    EXPECT_EQ(session->logicalSessionCnt_.load(), 0);
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, CleanSessionMap_002, testing::ext::TestSize.Level1)
+{
+    int sessionId = 0;
+    deviceManagerServiceImpl_->softbusConnector_ = nullptr;
+    deviceManagerServiceImpl_->CleanSessionMap(sessionId);
+    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    deviceManagerServiceImpl_->sessionsMap_.clear();
+    deviceManagerServiceImpl_->CleanSessionMap(sessionId);
+    std::string deviceId = "deviceId";
+    std::shared_ptr<Session> session = std::make_shared<Session>(sessionId, deviceId);
+    deviceManagerServiceImpl_->sessionsMap_[sessionId] = session;
+    deviceManagerServiceImpl_->CleanSessionMap(sessionId);
+    EXPECT_TRUE(deviceManagerServiceImpl_->sessionsMap_.empty());
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, AddAuthMgr_001, testing::ext::TestSize.Level1)
+{
+    uint64_t tokenId = 0;
+    int sessionId = 1;
+    deviceManagerServiceImpl_->authMgrMap_.clear();
+    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, nullptr);
+    EXPECT_TRUE(deviceManagerServiceImpl_->authMgrMap_.empty());
+
+    if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
+        deviceManagerServiceImpl_->Initialize(listener_);
+    }
+    std::shared_ptr<AuthManagerBase> authMgr = std::make_shared<AuthSrcManager>(
+        deviceManagerServiceImpl_->softbusConnector_, deviceManagerServiceImpl_->hiChainConnector_,
+        deviceManagerServiceImpl_->listener_, deviceManagerServiceImpl_->hiChainAuthConnector_);
+    deviceManagerServiceImpl_->sessionEnableMap_[sessionId] = false;
+    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr);
+    EXPECT_TRUE(deviceManagerServiceImpl_->authMgrMap_.empty());
+
+    deviceManagerServiceImpl_->sessionEnableMap_.clear();
+    deviceManagerServiceImpl_->AddAuthMgr(tokenId, sessionId, authMgr);
+    EXPECT_FALSE(deviceManagerServiceImpl_->authMgrMap_.empty());
+    deviceManagerServiceImpl_->sessionEnableMap_.clear();
+    deviceManagerServiceImpl_->authMgrMap_.clear();
+}
+
+HWTEST_F(DeviceManagerServiceImplTest, EraseAuthMgr_001, testing::ext::TestSize.Level1)
+{
+    uint64_t tokenId = 0;
+    std::shared_ptr<AuthManagerBase> authMgr = std::make_shared<AuthSrcManager>(
+        deviceManagerServiceImpl_->softbusConnector_, deviceManagerServiceImpl_->hiChainConnector_,
+        deviceManagerServiceImpl_->listener_, deviceManagerServiceImpl_->hiChainAuthConnector_);
+    deviceManagerServiceImpl_->authMgrMap_[tokenId] = authMgr;
+    deviceManagerServiceImpl_->EraseAuthMgr(tokenId);
+    EXPECT_TRUE(deviceManagerServiceImpl_->authMgrMap_.find(tokenId) == deviceManagerServiceImpl_->authMgrMap_.end());
 }
 } // namespace
 } // namespace DistributedHardware
