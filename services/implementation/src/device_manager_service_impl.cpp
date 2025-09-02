@@ -1217,7 +1217,6 @@ int32_t DeviceManagerServiceImpl::TransferOldAuthMgr(int32_t msgType, const Json
     return ret;
 }
 
-
 void DeviceManagerServiceImpl::OnBytesReceived(int sessionId, const void *data, unsigned int dataLen)
 {
     if (sessionId < 0 || data == nullptr || dataLen <= 0 || dataLen > MAX_DATA_LEN) {
