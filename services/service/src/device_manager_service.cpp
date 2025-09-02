@@ -354,6 +354,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
     if (IsPC() && !MultipleUserConnector::IsUserUnlocked(currentUserId)) {
         HandleUserStopEvent(currentUserId);
     }
+    InitTaskOfDelTimeOutAcl();
 #endif
     LOGI("Init success.");
     return DM_OK;
@@ -4362,6 +4363,38 @@ void DeviceManagerService::HandleAccountLogoutEventCallback(const std::string &c
     MultipleUserConnector::DeleteAccountInfoByUserId(currentUserId);
     MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
         MultipleUserConnector::GetCurrentDMAccountInfo());
+}
+
+void DeviceManagerService::InitTaskOfDelTimeOutAcl()
+{
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    std::unordered_set<std::string> udidSet;
+    discoveryMgr_->GetCommonDependencyObj()->GetAuthOnceUdids(udidSet);
+    if (udidSet.empty()) {
+        LOGI("no auth once data.");
+        return;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("instance not init or init failed.");
+        return;
+    }
+
+    for (const std::string &udid : udidSet) {
+        char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
+            LOGE("get udidhash failed.");
+            return;
+        }
+        if (SoftbusCache::GetInstance().CheckIsOnline(udidHash)) {
+            LOGE("device is online udidhash %{public}s.", GetAnonyString(udidHash).c_str());
+            continue;
+        }
+        dmServiceImpl_->InitTaskOfDelTimeOutAcl(udid, udidHash);
+    }
 }
 #endif
 } // namespace DistributedHardware

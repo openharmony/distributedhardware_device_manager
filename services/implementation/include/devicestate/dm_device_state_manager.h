@@ -103,6 +103,7 @@ public:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
 #endif
+    void StartDelTimerByDP(const std::string &deviceUdid, const std::string &deviceUdidHash);
 private:
     void StartEventThread();
     void StopEventThread();
