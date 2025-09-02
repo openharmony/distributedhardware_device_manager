@@ -56,8 +56,8 @@ private:
     std::string customDescriptionStr_;
     std::string pinCode_;
     std::string hostPkgLabel_;
-    int32_t deviceType_;
-    bool isProxyBind_;
+    int32_t deviceType_ = -1;
+    bool isProxyBind_ = false;
     std::string appUserData_;
     std::string title_;
     std::mutex mutex_;
