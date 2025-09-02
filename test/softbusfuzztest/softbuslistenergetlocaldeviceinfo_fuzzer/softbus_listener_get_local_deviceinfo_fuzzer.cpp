@@ -16,6 +16,7 @@
 #include <chrono>
 #include <securec.h>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "device_manager_impl.h"
 #include "dm_constants.h"
@@ -26,12 +27,12 @@ namespace OHOS {
 namespace DistributedHardware {
 void GetLocalDeviceInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(int))) {
         return;
     }
-
-    int32_t subscribeId = *(reinterpret_cast<const int32_t*>(data));
-    int publishId = *(reinterpret_cast<const int*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t subscribeId = fdp.ConsumeIntegral<int32_t>();
+    int publishId = fdp.ConsumeIntegral<int>();
     PublishResult pResult = (PublishResult)1;
     RefreshResult rResult = (RefreshResult)1;
     DmDeviceInfo deviceInfo;

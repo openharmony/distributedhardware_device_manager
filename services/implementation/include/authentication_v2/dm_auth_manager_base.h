@@ -144,7 +144,7 @@ public:
 
     virtual void OnGroupCreated(int64_t requestId, const std::string &groupId);
 
-    virtual void OnMemberJoin(int64_t requestId, int32_t status);
+    virtual void OnMemberJoin(int64_t requestId, int32_t status, int32_t operationCode);
 
     virtual int32_t EstablishAuthChannel(const std::string &deviceId);
 

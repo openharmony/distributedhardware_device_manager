@@ -16,10 +16,10 @@
 #include <string>
 #include <cstdlib>
 #include <random>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "deviceprofile_connector.h"
 #include "device_profile_connector_fuzzer.h"
-#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace DistributedHardware {

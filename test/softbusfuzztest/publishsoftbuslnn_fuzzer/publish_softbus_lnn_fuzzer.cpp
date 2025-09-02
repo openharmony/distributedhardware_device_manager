@@ -16,6 +16,7 @@
 #include <chrono>
 #include <securec.h>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "device_manager_impl.h"
 #include "dm_constants.h"
@@ -29,7 +30,9 @@ void PublishSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     DmPublishInfo dmPublishInfo;
+    dmPublishInfo.publishId = fdp.ConsumeIntegral<int32_t>();
     dmPublishInfo.publishId = *(reinterpret_cast<const int32_t*>(data));
     std::string capability(reinterpret_cast<const char*>(data), size);
     std::string customData(reinterpret_cast<const char*>(data), size);

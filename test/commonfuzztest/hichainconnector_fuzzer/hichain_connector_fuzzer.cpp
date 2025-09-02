@@ -43,10 +43,11 @@ public:
         (void)requestId;
         (void)groupId;
     }
-    void OnMemberJoin(int64_t requestId, int32_t status) override
+    void OnMemberJoin(int64_t requestId, int32_t status, int32_t operationCode) override
     {
         (void)requestId;
         (void)status;
+        (void)operationCode;
     }
     std::string GetConnectAddr(std::string deviceId) override
     {

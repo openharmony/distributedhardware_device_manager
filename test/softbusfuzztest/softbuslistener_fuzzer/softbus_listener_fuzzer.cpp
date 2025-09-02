@@ -265,9 +265,6 @@ void SoftBusListenerForthFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    std::string udidHash(reinterpret_cast<const char*>(data), size);
-    std::string udid(reinterpret_cast<const char*>(data), size);
-    softbusListener_->GetUdidFromDp(udidHash, udid);
     NodeBasicInfo nodeBasicInfo = {
         .networkId = {"networkId"},
         .deviceName = {"deviceNameInfo"},
@@ -276,6 +273,7 @@ void SoftBusListenerForthFuzzTest(const uint8_t* data, size_t size)
         .osVersion = {1}
     };
     softbusListener_->OnSoftbusDeviceOffline(&nodeBasicInfo);
+
     DistributedDeviceProfile::AccessControlProfile profile;
     DmDeviceInfo deviceInfo;
     softbusListener_->ConvertAclToDeviceInfo(profile, deviceInfo);

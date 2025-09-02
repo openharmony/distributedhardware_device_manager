@@ -63,8 +63,8 @@ ohos_fuzztest("DmTransPortMsgFuzzTest") {
   sources = [ "dm_transport_msg_fuzzer.cpp" ]
 
   deps = [
-    "${devicemanager_path}/services/service:devicemanagerservicetest",
     "${json_path}:devicemanagerjson",
+    "${devicemanager_path}/services/service:devicemanagerservicetest",
     "${utils_path}:devicemanagerutilstest",
   ]
 

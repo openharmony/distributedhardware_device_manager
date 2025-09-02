@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "ipc_client_manager.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_rsp.h"
@@ -92,13 +93,13 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
 
 void DeviceManagerNotifyOnPublishResultFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(int32_t))) {
         return;
     }
-
+    FuzzedDataProvider fdp(data, size);
     std::string pkgName(reinterpret_cast<const char*>(data), size);
-    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
-    int32_t publishResult = *(reinterpret_cast<const int32_t*>(data));
+    int32_t publishId = fdp.ConsumeIntegral<int32_t>();
+    int32_t publishResult = fdp.ConsumeIntegral<int32_t>();
 
     DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, publishResult);
 }

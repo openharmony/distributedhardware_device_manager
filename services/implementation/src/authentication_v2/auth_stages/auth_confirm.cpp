@@ -197,8 +197,10 @@ void AuthSrcConfirmState::GetSrcCredType(std::shared_ptr<DmAuthContext> context,
     CHECK_NULL_VOID(context);
     std::vector<std::string> deleteCredInfo;
     for (const auto &item : credInfo.Items()) {
-        if (!item.Contains(FILED_CRED_TYPE) || !item[FILED_CRED_TYPE].IsNumberInteger() ||
-            !item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+        if (!item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+            continue;
+        }
+        if (!item.Contains(FILED_CRED_TYPE) || !item[FILED_CRED_TYPE].IsNumberInteger()) {
             deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
             DirectlyDeleteCredential(context, context->accesser.userId, item);
             continue;
@@ -553,10 +555,12 @@ void AuthSrcConfirmState::GetSrcCredentialInfo(std::shared_ptr<DmAuthContext> co
     }
     std::vector<std::string> deleteCredInfo;
     for (auto &item : credInfo.Items()) { // id1:json1, id2:json2, id3:json3
+        if (!item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+            continue;
+        }
         uint32_t credType = DmAuthState::GetCredentialType(context, item);
         if (credType == DM_INVALIED_TYPE || !item.Contains(FILED_CRED_TYPE) ||
-            !item[FILED_CRED_TYPE].IsNumberInteger() || !item.Contains(FILED_CRED_ID) ||
-            !item[FILED_CRED_ID].IsString()) {
+            !item[FILED_CRED_TYPE].IsNumberInteger()) {
             deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
             continue;
         }

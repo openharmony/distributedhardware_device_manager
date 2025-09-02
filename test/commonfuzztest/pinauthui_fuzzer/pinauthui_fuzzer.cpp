@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "pin_auth_ui.h"
 
 #include "dm_ability_manager.h"
@@ -31,8 +31,8 @@ void PinAuthUiFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-
-    int32_t pageId = *(reinterpret_cast<const int32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int32_t pageId = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<DmAuthManager> authManager = nullptr;
     std::shared_ptr<PinAuthUi> pinauthui = std::make_shared<PinAuthUi>();
     pinauthui->ShowPinDialog(pageId, authManager);

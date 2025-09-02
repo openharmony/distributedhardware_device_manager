@@ -336,7 +336,7 @@ int32_t HiChainConnector::AddMember(const std::string &deviceId, const std::stri
         LOGE("DecodeRequestAuth jsonStr error");
         return ERR_DM_FAILED;
     }
-    if (!IsString(jsonObject, TAG_DEVICE_ID) || !IsInt32(jsonObject, PIN_CODE_KEY) ||
+    if (!IsString(jsonObject, TAG_DEVICE_ID) || !IsString(jsonObject, PIN_CODE_KEY) ||
         !IsString(jsonObject, TAG_GROUP_ID) || !IsInt64(jsonObject, TAG_REQUEST_ID) ||
         !IsString(jsonObject, TAG_GROUP_NAME)) {
         LOGE("HiChainConnector::AddMember err json string.");
@@ -386,7 +386,7 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
         SysEventWrite(std::string(ADD_HICHAIN_GROUP_SUCCESS), DM_HISYEVENT_BEHAVIOR,
             std::string(ADD_HICHAIN_GROUP_SUCCESS_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
-            hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
+            hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK, operationCode);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {
@@ -405,7 +405,7 @@ void HiChainConnector::onFinish(int64_t requestId, int operationCode, const char
             }
         } else {
             if (hiChainConnectorCallback_ != nullptr) {
-                hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK);
+                hiChainConnectorCallback_->OnMemberJoin(requestId, DM_OK, operationCode);
                 hiChainConnectorCallback_->OnGroupCreated(requestId, data);
             }
         }
@@ -439,7 +439,7 @@ void HiChainConnector::onError(int64_t requestId, int operationCode, int errorCo
         SysEventWrite(std::string(ADD_HICHAIN_GROUP_FAILED), DM_HISYEVENT_BEHAVIOR,
             std::string(ADD_HICHAIN_GROUP_FAILED_MSG));
         if (hiChainConnectorCallback_ != nullptr) {
-            hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_ADD_GROUP_FAILED);
+            hiChainConnectorCallback_->OnMemberJoin(requestId, ERR_DM_ADD_GROUP_FAILED, operationCode);
         }
     }
     if (operationCode == GroupOperationCode::GROUP_CREATE) {

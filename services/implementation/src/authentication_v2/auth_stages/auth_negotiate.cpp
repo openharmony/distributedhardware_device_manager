@@ -303,8 +303,10 @@ void AuthSinkNegotiateStateMachine::GetSinkCredType(std::shared_ptr<DmAuthContex
     CHECK_NULL_VOID(context);
     std::vector<std::string> deleteCredInfo;
     for (const auto &item : credInfo.Items()) {
-        if (!item.Contains(FILED_CRED_TYPE) || !item[FILED_CRED_TYPE].IsNumberInteger() ||
-            !item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+        if (!item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+            continue;
+        }
+        if (!item.Contains(FILED_CRED_TYPE) || !item[FILED_CRED_TYPE].IsNumberInteger()) {
             deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
             DirectlyDeleteCredential(context, context->accessee.userId, item);
             continue;
@@ -378,8 +380,10 @@ void AuthSinkNegotiateStateMachine::GetSinkProxyCredTypeForP2P(std::shared_ptr<D
             credInfoJson.Parse(item->proxyAccessee.credInfoJson);
         }
         for (const auto &credItem : credInfoJson.Items()) {
-            if (!credItem.Contains(FILED_CRED_TYPE) || !credItem[FILED_CRED_TYPE].IsNumberInteger() ||
-                !credItem.Contains(FILED_CRED_ID) || !credItem[FILED_CRED_ID].IsString()) {
+            if (!credItem.Contains(FILED_CRED_ID) || !credItem[FILED_CRED_ID].IsString()) {
+                continue;
+            }
+            if (!credItem.Contains(FILED_CRED_TYPE) || !credItem[FILED_CRED_TYPE].IsNumberInteger()) {
                 deleteCredInfo.push_back(credItem[FILED_CRED_ID].Get<std::string>());
                 DirectlyDeleteCredential(context, context->accessee.userId, credItem);
                 continue;
@@ -661,10 +665,12 @@ void AuthSinkNegotiateStateMachine::GetSinkCredentialInfo(std::shared_ptr<DmAuth
     }
     std::vector<std::string> deleteCredInfo;
     for (auto& item : credInfo.Items()) { // id1:json1, id2:json2, id3:json3
+        if (!item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
+            continue;
+        }
         uint32_t credType = DmAuthState::GetCredentialType(context, item);
         if (credType == DM_INVALIED_TYPE || !item.Contains(FILED_CRED_TYPE) ||
-            !item[FILED_CRED_TYPE].IsNumberInteger() || !item.Contains(FILED_CRED_ID) ||
-            !item[FILED_CRED_ID].IsString()) {
+            !item[FILED_CRED_TYPE].IsNumberInteger()) {
             deleteCredInfo.push_back(item[FILED_CRED_ID].Get<std::string>());
             continue;
         }

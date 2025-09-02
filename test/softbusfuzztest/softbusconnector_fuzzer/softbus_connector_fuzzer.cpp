@@ -29,13 +29,13 @@ namespace DistributedHardware {
 
 void SoftBusConnectorFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(int) + sizeof(int32_t))) {
         return;
     }
-
+    FuzzedDataProvider fdp(data, size);
     ConnectionAddr *addr = nullptr;
     const char *networkId = reinterpret_cast<const char*>(data);
-    int32_t result = *(reinterpret_cast<const int32_t*>(data));
+    int32_t result = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusJoinLNNResult(addr, networkId, result);
 }

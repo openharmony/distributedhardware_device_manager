@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "softbus_connector.h"
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
@@ -39,8 +39,9 @@ void SoftBusConnectorStateFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
+    FuzzedDataProvider fdp(data, size);
     std::string str(reinterpret_cast<const char*>(data), size);
-    int32_t authForm = *(reinterpret_cast<const int32_t*>(data));
+    int32_t authForm = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<ISoftbusStateCallback> callback = std::make_shared<SoftbusStateCallbackFuzzTest>();
 
