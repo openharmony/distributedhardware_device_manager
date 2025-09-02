@@ -525,7 +525,6 @@ std::string DeviceNameManager::GetLocalMarketName()
             return "";
         }
         localMarketName_ = marketName;
-        free((char *)marketName);
     }
     std::vector<std::string> prefixs = DeviceManagerService::GetInstance().GetDeviceNamePrefixs();
     for (const auto &item : prefixs) {

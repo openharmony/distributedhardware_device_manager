@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -482,6 +482,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "UTTest_device_manager_service_two.cpp",
     "mock/app_manager_mock.cpp",
     "mock/device_manager_service_impl_mock.cpp",
+    "mock/device_name_manager_mock.cpp",
     "mock/deviceprofile_connector_mock.cpp",
     "mock/dm_comm_tool_mock.cpp",
     "mock/dm_crypto_mock.cpp",
@@ -499,6 +500,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "cJSON:cjson",
+    "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",

@@ -14,6 +14,7 @@
  */
 
 #include "UTTest_permission_manager.h"
+#include "access_token.h"
 #include "accesstoken_kit.h"
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
@@ -269,6 +270,25 @@ HWTEST_F(PermissionManagerTest, CheckProcessNameValidOnGetDeviceInfo_001, testin
 
     processName = "gameservice_server";
     ret = PermissionManager::GetInstance().CheckProcessNameValidOnGetDeviceInfo(processName);
+    ASSERT_TRUE(ret);
+}
+
+HWTEST_F(PermissionManagerTest, CheckReadLocalDeviceName_001, testing::ext::TestSize.Level1)
+{
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(0));
+    bool ret = PermissionManager::GetInstance().CheckReadLocalDeviceName();
+    ASSERT_FALSE(ret);
+
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
+    EXPECT_CALL(*accessTokenKitMock_, VerifyAccessToken(_, _))
+        .WillOnce(Return(Security::AccessToken::PermissionState::PERMISSION_DENIED));
+    ret = PermissionManager::GetInstance().CheckPermission();
+    ASSERT_FALSE(ret);
+
+    EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(10));
+    EXPECT_CALL(*accessTokenKitMock_, VerifyAccessToken(_, _))
+        .WillOnce(Return(Security::AccessToken::PermissionState::PERMISSION_GRANTED));
+    ret = PermissionManager::GetInstance().CheckPermission();
     ASSERT_TRUE(ret);
 }
 }
