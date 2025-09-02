@@ -161,6 +161,7 @@ DistributedKv::Status KVAdapter::GetLocalKvStorePtr()
         .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION,
         .baseDir = DATABASE_DIR
     };
+    std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
     DistributedKv::Status status = kvDataMgr_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
     return status;
 }
@@ -168,18 +169,21 @@ DistributedKv::Status KVAdapter::GetLocalKvStorePtr()
 void KVAdapter::RegisterKvStoreDeathListener()
 {
     LOGI("Register syncCompleted listener");
+    std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
     kvDataMgr_.RegisterKvStoreServiceDeathRecipient(shared_from_this());
 }
 
 void KVAdapter::UnregisterKvStoreDeathListener()
 {
     LOGI("UnRegister death listener");
+    std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
     kvDataMgr_.UnRegisterKvStoreServiceDeathRecipient(shared_from_this());
 }
 
 int32_t KVAdapter::DeleteKvStore()
 {
     LOGI("Delete KvStore!");
+    std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
     kvDataMgr_.CloseKvStore(appId_, storeId_);
     kvDataMgr_.DeleteKvStore(appId_, storeId_, DATABASE_DIR);
     return DM_OK;
