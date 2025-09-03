@@ -49,6 +49,9 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         if (want.parameters.title) {
             AppStorage.setOrCreate('title', want.parameters.title);
         }
+        if (want.parameters.metaType) {
+            AppStorage.setOrCreate('metaType', want.parameters.metaType);
+        }
 
         let param: Record<string, UIExtensionContentSession> = {
             'session': session

@@ -17,6 +17,7 @@ import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSessi
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:InputPinDialog]==>';
+let metaType: number = 11;
 const ACTION_CANCEL_PINCODE_INPUT: number = 4;
 const ACTION_DONE_PINCODE_INPUT: number = 5;
 const MSG_PIN_CODE_ERROR: number = 0;
@@ -54,6 +55,9 @@ struct Index {
     if (dmClass) {
       console.log(TAG + 'deviceManager exist');
       return;
+    }
+    if (AppStorage.get('metaType') != null) {
+      metaType = AppStorage.get('metaType') as number;
     }
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
       (err: Error, dm: deviceManager.DeviceManager) => {
@@ -147,7 +151,11 @@ struct Index {
       return;
     }
     console.log('cancle' + ACTION_CANCEL_PINCODE_INPUT);
-    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, 'extra');
+    const param = {
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, jsonStr);
     this.destruction();
   }
 
@@ -163,7 +171,12 @@ struct Index {
       return;
     }
     console.log('confirm' + JSON.stringify(ACTION_DONE_PINCODE_INPUT));
-    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.input);
+    const param = {
+      'pinCode': this.input,
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, jsonStr);
   }
 
   build() {
@@ -288,7 +301,12 @@ struct Index {
     }
     if (length === MAX_PINCODE_LENGTH) {
       setTimeout(() => {
-        this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.input);
+        const param = {
+          'pinCode': this.input,
+          'META_TYPE': metaType
+        };
+        const jsonStr = JSON.stringify(param);
+        this.setUserOperation(ACTION_DONE_PINCODE_INPUT, jsonStr);
       }, 50);
     }
     this.isUserInput = true;

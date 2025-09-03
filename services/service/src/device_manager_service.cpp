@@ -1115,10 +1115,18 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
         LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (IsDMServiceAdapterSoLoaded()) {
+    JsonObject paramJson;
+    paramJson.Parse(params);
+    if (paramJson.IsDiscarded() || !IsString(paramJson, PARAM_KEY_META_TYPE)) {
+        LOGE("meta type not found");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t metaType = paramJson[PARAM_KEY_META_TYPE].Get<int32_t>();
+    if (metaType != PROXY_DEFAULT && IsDMServiceAdapterSoLoaded()) {
+        LOGE("SetUserOperation metaType: %{public}d", metaType);
         dmServiceImplExtResident_->ReplyUiAction(pkgName, action, params);
     }
-    if (!IsDMServiceImplReady()) {
+    if (metaType != PROXY_DEFAULT || !IsDMServiceImplReady()) {
         LOGE("SetUserOperation failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }

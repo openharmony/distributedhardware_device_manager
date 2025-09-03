@@ -24,6 +24,9 @@ export default class InputUIExtAbility extends UIExtensionAbility {
         if (want.parameters && want.parameters.pinCode) {
             AppStorage.setOrCreate('pinCode', want.parameters.pinCode);
         }
+        if (want.parameters.metaType) {
+            AppStorage.setOrCreate('metaType', want.parameters.metaType);
+        }
 
         let param: Record<string, UIExtensionContentSession> = {
             'session': session

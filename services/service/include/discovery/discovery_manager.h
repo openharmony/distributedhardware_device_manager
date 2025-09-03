@@ -52,6 +52,7 @@ typedef enum {
     PROXY_WINPC = 8,
     PROXY_COLLABORATION_FWK = 9,
     PROXY_DMSDP = 10,
+    PROXY_DEFAULT = 11,
     CUSTOM_UNKNOWN,
 } MetaNodeType;
 

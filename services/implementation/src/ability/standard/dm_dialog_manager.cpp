@@ -37,6 +37,7 @@ constexpr int32_t INVALID_USERID = -1;
 constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
 constexpr int32_t WINDOW_LEVEL_UPPER = 2;
 constexpr int32_t WINDOW_LEVEL_DEFAULT = 1;
+constexpr int32_t PROXY_DEFAULT = 11;
 constexpr const char* CONNECT_PIN_DIALOG = "pinDialog";
 constexpr const char* DM_UI_BUNDLE_NAME = "com.ohos.devicemanagerui";
 constexpr const char* CONFIRM_ABILITY_NAME = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
@@ -251,6 +252,7 @@ void DmDialogManager::SendMsgRequest(const sptr<IRemoteObject>& remoteObject)
     param[TAG_TARGET_DEVICE_NAME] = targetDeviceName_;
     param[TAG_HOST_PKGLABEL] = hostPkgLabel_;
     param["disableUpGesture"] = 1;
+    param["metaType"] = PROXY_DEFAULT;
     std::string paramStr = param.Dump();
     data.WriteString16(Str8ToStr16(paramStr));
     LOGI("show dm dialog is begin");
