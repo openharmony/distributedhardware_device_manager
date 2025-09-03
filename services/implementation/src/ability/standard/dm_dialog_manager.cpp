@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,34 +32,20 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-static constexpr int32_t INVALID_USERID = -1;
-static constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
-static constexpr int32_t WINDOW_LEVEL_UPPER = 2;
-static constexpr int32_t WINDOW_LEVEL_DEFAULT = 1;
+namespace {
+constexpr int32_t INVALID_USERID = -1;
+constexpr int32_t MESSAGE_PARCEL_KEY_SIZE = 3;
+constexpr int32_t WINDOW_LEVEL_UPPER = 2;
+constexpr int32_t WINDOW_LEVEL_DEFAULT = 1;
 constexpr const char* CONNECT_PIN_DIALOG = "pinDialog";
 constexpr const char* DM_UI_BUNDLE_NAME = "com.ohos.devicemanagerui";
 constexpr const char* CONFIRM_ABILITY_NAME = "com.ohos.devicemanagerui.ConfirmUIExtAbility";
 constexpr const char* PIN_ABILITY_NAME = "com.ohos.devicemanagerui.PincodeUIExtAbility";
 constexpr const char* INPUT_ABILITY_NAME = "com.ohos.devicemanagerui.InputUIExtAbility";
-
-std::string DmDialogManager::bundleName_ = "";
-std::string DmDialogManager::abilityName_ = "";
-std::string DmDialogManager::deviceName_ = "";
-std::string DmDialogManager::appOperationStr_ = "";
-std::string DmDialogManager::customDescriptionStr_ = "";
-std::string DmDialogManager::targetDeviceName_ = "";
-std::string DmDialogManager::pinCode_ = "";
-std::string DmDialogManager::hostPkgLabel_ = "";
-int32_t DmDialogManager::deviceType_ = -1;
-bool DmDialogManager::isProxyBind_ = false;
-std::string DmDialogManager::appUserData_ = "";
-std::string DmDialogManager::title_ = "";
-DmDialogManager DmDialogManager::dialogMgr_;
-sptr<OHOS::AAFwk::IAbilityConnection> DmDialogManager::dialogConnectionCallback_(
-    new (std::nothrow) DialogAbilityConnection());
-
-std::atomic<bool> DmDialogManager::isConnectSystemUI_(false);
-sptr<IRemoteObject> g_remoteObject = nullptr;
+constexpr uint32_t CLOSE_DIALOG_CMD_CODE = 3;
+constexpr uint32_t SHOW_DIALOG_CMD_CODE = 1;
+}
+DM_IMPLEMENT_SINGLE_INSTANCE(DmDialogManager);
 
 DmDialogManager::DmDialogManager()
 {
@@ -71,11 +57,6 @@ DmDialogManager::~DmDialogManager()
     LOGI("DmDialogManager destructor");
 }
 
-DmDialogManager &DmDialogManager::GetInstance()
-{
-    return dialogMgr_;
-}
-
 void DmDialogManager::ShowConfirmDialog(const std::string param)
 {
     std::string deviceName = "";
@@ -83,54 +64,60 @@ void DmDialogManager::ShowConfirmDialog(const std::string param)
     std::string customDescriptionStr = "";
     std::string hostPkgLabel = "";
     int32_t deviceType = -1;
-    JsonObject jsonObject(param);
-    if (!jsonObject.IsDiscarded()) {
-        if (IsString(jsonObject, TAG_REQUESTER)) {
-            deviceName = jsonObject[TAG_REQUESTER].Get<std::string>();
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        JsonObject jsonObject(param);
+        if (!jsonObject.IsDiscarded()) {
+            if (IsString(jsonObject, TAG_REQUESTER)) {
+                deviceName = jsonObject[TAG_REQUESTER].Get<std::string>();
+            }
+            if (IsString(jsonObject, TAG_APP_OPERATION)) {
+                appOperationStr = jsonObject[TAG_APP_OPERATION].Get<std::string>();
+            }
+            if (IsString(jsonObject, TAG_CUSTOM_DESCRIPTION)) {
+                customDescriptionStr = jsonObject[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
+            }
+            if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
+                deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
+            }
+            if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
+                hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
+            }
+            if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
+                isProxyBind_ = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
+            }
+            if (IsString(jsonObject, APP_USER_DATA)) {
+                appUserData_ = jsonObject[APP_USER_DATA].Get<std::string>();
+            }
+            if (IsString(jsonObject, TITLE)) {
+                title_ = jsonObject[TITLE].Get<std::string>();
+            }
         }
-        if (IsString(jsonObject, TAG_APP_OPERATION)) {
-            appOperationStr = jsonObject[TAG_APP_OPERATION].Get<std::string>();
-        }
-        if (IsString(jsonObject, TAG_CUSTOM_DESCRIPTION)) {
-            customDescriptionStr = jsonObject[TAG_CUSTOM_DESCRIPTION].Get<std::string>();
-        }
-        if (IsInt32(jsonObject, TAG_LOCAL_DEVICE_TYPE)) {
-            deviceType = jsonObject[TAG_LOCAL_DEVICE_TYPE].Get<std::int32_t>();
-        }
-        if (IsString(jsonObject, TAG_HOST_PKGLABEL)) {
-            hostPkgLabel = jsonObject[TAG_HOST_PKGLABEL].Get<std::string>();
-        }
-        if (IsBool(jsonObject, PARAM_KEY_IS_PROXY_BIND)) {
-            isProxyBind_ = jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<bool>();
-        }
-        if (IsString(jsonObject, APP_USER_DATA)) {
-            appUserData_ = jsonObject[APP_USER_DATA].Get<std::string>();
-        }
-        if (IsString(jsonObject, TITLE)) {
-            title_ = jsonObject[TITLE].Get<std::string>();
-        }
-    }
 
-    bundleName_ = DM_UI_BUNDLE_NAME;
-    abilityName_ = CONFIRM_ABILITY_NAME;
-    deviceName_ = deviceName;
-    appOperationStr_ = appOperationStr;
-    customDescriptionStr_ = customDescriptionStr;
-    deviceType_ = deviceType;
-    hostPkgLabel_ = hostPkgLabel;
+        bundleName_ = DM_UI_BUNDLE_NAME;
+        abilityName_ = CONFIRM_ABILITY_NAME;
+        deviceName_ = deviceName;
+        appOperationStr_ = appOperationStr;
+        customDescriptionStr_ = customDescriptionStr;
+        deviceType_ = deviceType;
+        hostPkgLabel_ = hostPkgLabel;
+    }
     ConnectExtension();
 }
 
 void DmDialogManager::ShowPinDialog(const std::string param)
 {
     LOGI("pinCode: %{public}s", GetAnonyString(param).c_str());
-    bundleName_ = DM_UI_BUNDLE_NAME;
-    abilityName_ = PIN_ABILITY_NAME;
-    pinCode_ = param;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        bundleName_ = DM_UI_BUNDLE_NAME;
+        abilityName_ = PIN_ABILITY_NAME;
+        pinCode_ = param;
+    }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    ffrt::submit([]() { ConnectExtension(); });
+    ffrt::submit([]() { DmDialogManager::GetInstance().ConnectExtension(); });
 #else
-    std::thread pinDilog([]() { ConnectExtension(); });
+    std::thread pinDilog([]() { DmDialogManager::GetInstance().ConnectExtension(); });
     int32_t ret = pthread_setname_np(pinDilog.native_handle(), CONNECT_PIN_DIALOG.c_str());
     if (ret != DM_OK) {
         LOGE("pinDilog setname failed.");
@@ -141,18 +128,41 @@ void DmDialogManager::ShowPinDialog(const std::string param)
 
 void DmDialogManager::ShowInputDialog(const std::string param)
 {
-    targetDeviceName_ = param;
-    bundleName_ = DM_UI_BUNDLE_NAME;
-    abilityName_ = INPUT_ABILITY_NAME;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        targetDeviceName_ = param;
+        bundleName_ = DM_UI_BUNDLE_NAME;
+        abilityName_ = INPUT_ABILITY_NAME;
+    }
     ConnectExtension();
+}
+
+void DmDialogManager::CloseDialog()
+{
+    LOGI("In");
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (g_remoteObject == nullptr) {
+        LOGW("g_remoteObject is nullptr");
+        isCloseDialog_.store(true);
+        return;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t ret = g_remoteObject->SendRequest(CLOSE_DIALOG_CMD_CODE, data, reply, option);
+    if (ret != ERR_OK) {
+        LOGE("close dm dialog is failed: %{public}d", ret);
+        return;
+    }
 }
 
 void DmDialogManager::ConnectExtension()
 {
     LOGI("DmDialogManager::ConnectExtension start.");
+    isCloseDialog_.store(false);
     if (isConnectSystemUI_.load() && dialogConnectionCallback_ != nullptr && g_remoteObject != nullptr) {
         AppExecFwk::ElementName element;
-        dialogConnectionCallback_->OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
+        OnAbilityConnectDone(element, g_remoteObject, INVALID_USERID);
         LOGI("DmDialogManager::ConnectExtension dialog has been show.");
         return;
     }
@@ -166,6 +176,14 @@ void DmDialogManager::ConnectExtension()
         return;
     }
 
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (dialogConnectionCallback_ == nullptr) {
+        dialogConnectionCallback_ = new (std::nothrow) DialogAbilityConnection();
+    }
+    if (dialogConnectionCallback_ == nullptr) {
+        LOGE("create dialogConnectionCallback_ failed.");
+        return;
+    }
     LOGI("DmDialogManager::ConnectExtension abilityManager ConnectAbility begin.");
     auto ret = abilityManager->ConnectAbility(want, dialogConnectionCallback_, INVALID_USERID);
     if (ret != ERR_OK) {
@@ -175,12 +193,12 @@ void DmDialogManager::ConnectExtension()
         want.SetElementName(bundleName, abilityName);
         ret = abilityManager->ConnectAbility(want, dialogConnectionCallback_, INVALID_USERID);
         if (ret != ERR_OK) {
-            LOGE("ConnectExtensionAbility systemui failed.");
+            LOGE("ConnectExtensionAbility systemui failed again.");
         }
     }
 }
 
-void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
+void DmDialogManager::OnAbilityConnectDone(
     const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode)
 {
     LOGI("OnAbilityConnectDone");
@@ -192,54 +210,75 @@ void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
     if (g_remoteObject == nullptr) {
         g_remoteObject = remoteObject;
     }
+    isConnectSystemUI_.store(true);
+    if (isCloseDialog_.load()) {
+        LOGW("isCloseDialog_  is true");
+        isCloseDialog_.store(false);
+        return;
+    }
+    SendMsgRequest(remoteObject);
+}
+
+void DmDialogManager::SendMsgRequest(const sptr<IRemoteObject>& remoteObject)
+{
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     data.WriteInt32(MESSAGE_PARCEL_KEY_SIZE);
     data.WriteString16(u"bundleName");
-    data.WriteString16(Str8ToStr16(DmDialogManager::GetBundleName()));
+    data.WriteString16(Str8ToStr16(bundleName_));
     data.WriteString16(u"abilityName");
-    data.WriteString16(Str8ToStr16(DmDialogManager::GetAbilityName()));
+    data.WriteString16(Str8ToStr16(abilityName_));
     data.WriteString16(u"parameters");
     JsonObject param;
     param["ability.want.params.uiExtensionType"] = "sysDialog/common";
     param["sysDialogZOrder"] = WINDOW_LEVEL_DEFAULT;
-    if (DmDialogManager::GetAbilityName() == INPUT_ABILITY_NAME) {
+    if (abilityName_ == INPUT_ABILITY_NAME) {
         param["sysDialogZOrder"] = WINDOW_LEVEL_UPPER;
     }
-    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(DmDialogManager::GetPinCode()));
+    param["isProxyBind"] = isProxyBind_;
+    param["appUserData"] = appUserData_;
+    param["title"] = title_;
+    std::string pinCodeHash = GetAnonyString(Crypto::Sha256(pinCode_));
     LOGI("OnAbilityConnectDone pinCodeHash: %{public}s", pinCodeHash.c_str());
-    param["isProxyBind"] = DmDialogManager::GetIsProxyBind();
-    param["appUserData"] = DmDialogManager::GetAppUserData();
-    param["title"] = DmDialogManager::GetTitle();
-    param["pinCode"] = DmDialogManager::GetPinCode();
-    param["deviceName"] = DmDialogManager::GetDeviceName();
-    param["appOperationStr"] = DmDialogManager::GetAppOperationStr();
-    param["customDescriptionStr"] = DmDialogManager::GetCustomDescriptionStr();
-    param["deviceType"] = DmDialogManager::GetDeviceType();
-    param[TAG_TARGET_DEVICE_NAME] = DmDialogManager::GetTargetDeviceName();
-    param[TAG_HOST_PKGLABEL] = DmDialogManager::GetHostPkgLabel();
+    param["pinCode"] = pinCode_;
+    param["deviceName"] = deviceName_;
+    param["appOperationStr"] = appOperationStr_;
+    param["customDescriptionStr"] = customDescriptionStr_;
+    param["deviceType"] = deviceType_;
+    param[TAG_TARGET_DEVICE_NAME] = targetDeviceName_;
+    param[TAG_HOST_PKGLABEL] = hostPkgLabel_;
     param["disableUpGesture"] = 1;
     std::string paramStr = param.Dump();
     data.WriteString16(Str8ToStr16(paramStr));
     LOGI("show dm dialog is begin");
-    const uint32_t cmdCode = 1;
-    int32_t ret = remoteObject->SendRequest(cmdCode, data, reply, option);
+    int32_t ret = remoteObject->SendRequest(SHOW_DIALOG_CMD_CODE, data, reply, option);
     if (ret != ERR_OK) {
         LOGE("show dm dialog is failed: %{public}d", ret);
         return;
     }
-    isConnectSystemUI_.store(true);
     LOGI("show dm dialog is success");
 }
 
-void DmDialogManager::DialogAbilityConnection::OnAbilityDisconnectDone(
-    const AppExecFwk::ElementName& element, int resultCode)
+void DmDialogManager::OnAbilityDisconnectDone(const AppExecFwk::ElementName& element, int resultCode)
 {
     LOGI("OnAbilityDisconnectDone");
     std::lock_guard<std::mutex> lock(mutex_);
     g_remoteObject = nullptr;
     isConnectSystemUI_.store(false);
+    isCloseDialog_.store(false);
+}
+
+void DmDialogManager::DialogAbilityConnection::OnAbilityConnectDone(
+    const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode)
+{
+    DmDialogManager::GetInstance().OnAbilityConnectDone(element, remoteObject, resultCode);
+}
+
+void DmDialogManager::DialogAbilityConnection::OnAbilityDisconnectDone(
+    const AppExecFwk::ElementName& element, int resultCode)
+{
+    DmDialogManager::GetInstance().OnAbilityDisconnectDone(element, resultCode);
 }
 }
 }

@@ -71,6 +71,7 @@ void DeviceManagerServiceTest::TearDown()
     Mock::VerifyAndClearExpectations(multipleUserConnectorMock_.get());
     Mock::VerifyAndClearExpectations(dMCommToolMock_.get());
     Mock::VerifyAndClearExpectations(deviceProfileConnectorMock_.get());
+    Mock::VerifyAndClearExpectations(deviceNameManagerMock_.get());
 }
 
 void DeviceManagerServiceTest::SetUpTestCase()
@@ -85,6 +86,7 @@ void DeviceManagerServiceTest::SetUpTestCase()
     DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
     DmDMCommTool::dmDMCommTool = dMCommToolMock_;
     DmDeviceProfileConnector::dmDeviceProfileConnector = deviceProfileConnectorMock_;
+    DmDeviceNameManager::dmDeviceNameManager_ = deviceNameManagerMock_;
 }
 
 void DeviceManagerServiceTest::TearDownTestCase()
@@ -109,6 +111,8 @@ void DeviceManagerServiceTest::TearDownTestCase()
     dMCommToolMock_ = nullptr;
     DmDeviceProfileConnector::dmDeviceProfileConnector = nullptr;
     deviceProfileConnectorMock_ = nullptr;
+    DmDeviceNameManager::dmDeviceNameManager_ = nullptr;
+    deviceNameManagerMock_ = nullptr;
 }
 
 namespace {
