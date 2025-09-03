@@ -60,6 +60,7 @@ private:
     DistributedKv::DataType dataType_ = DistributedKv::DataType::TYPE_STATICS;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_ = nullptr;
     std::mutex kvAdapterMutex_;
+    std::mutex kvDataMgrMutex_;
     std::atomic<bool> isInited_ = false;
 };
 } // namespace DistributedHardware
