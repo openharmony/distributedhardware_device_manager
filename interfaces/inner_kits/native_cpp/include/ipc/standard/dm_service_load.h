@@ -16,6 +16,8 @@
 #ifndef OHOS_DM_SA_LOAD_H
 #define OHOS_DM_SA_LOAD_H
 
+#include <mutex>
+
 #include "dm_single_instance.h"
 #include "iremote_object.h"
 #include "system_ability_load_callback_stub.h"
@@ -35,6 +37,7 @@ public:
     void SetLoadFinish(void);
 private:
     std::atomic<bool> isDMServiceLoading_ = false;
+    std::mutex dmServiceLoadLock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

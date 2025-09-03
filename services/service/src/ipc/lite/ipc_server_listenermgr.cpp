@@ -30,6 +30,7 @@ int32_t IpcServerListenermgr::RegisterListener(std::string &pkgName, const Commo
     }
     LOGI("new listener register:%{public}s", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(lock_);
+    CHECK_SIZE_RETURN(dmListenerMap_, ERR_DM_FAILED);
     dmListenerMap_[pkgName] = *svcId;
     return DM_OK;
 }

@@ -225,6 +225,7 @@ void DeviceNameManager::RegisterDeviceNameChangeMonitor(int32_t curUserId, int32
             LOGE("monitor is nullptr");
             return;
         }
+        CHECK_SIZE_VOID(monitorMap_);
         monitorMap_[curUserId] = monitor;
     }
     std::string proxyUri = GetProxyUriStr(SETTINGSDATA_SECURE, curUserId);

@@ -17,6 +17,7 @@
 #define OHOS_DM_HIDUMPER_H
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -41,6 +42,7 @@ private:
     std::string GetDeviceType(int32_t deviceTypeId);
 
 private:
+    std::mutex nodeInfosLock_;
     std::vector<DmDeviceInfo> nodeInfos_;
 };
 } // namespace DistributedHardware

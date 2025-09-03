@@ -236,8 +236,8 @@ void DeviceManagerServiceImpl::ImportAuthCodeToConfig(std::shared_ptr<AuthManage
 int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_t tokenId, uint64_t logicalSessionId,
     const std::string &pkgName)
 {
-    LOGI("isSrcSide:%{public}d, tokenId: %{public}" PRIu64 ", logicalSesId: %{public}" PRIu64 ", pkgname:%{public}s",
-        isSrcSide, tokenId, logicalSessionId, pkgName.c_str());
+    LOGI("isSrcSide:%{public}d, tokenId: %{public}s, logicalSesId: %{public}" PRIu64 ", pkgname:%{public}s",
+        isSrcSide, GetAnonyInt32(tokenId).c_str(), logicalSessionId, pkgName.c_str());
     std::shared_ptr<AuthManagerBase> authMgr = nullptr;
     // Create a new auth_mgr, create authMgr
     if (isSrcSide) {
@@ -267,7 +267,7 @@ int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_
 
 int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName)
 {
-    LOGI("tokenId: %{public}" PRIu64 ", pkgname:%{public}s", tokenId, pkgName.c_str());
+    LOGI("tokenId: %{public}s, pkgname:%{public}s", GetAnonyInt32(tokenId).c_str(), pkgName.c_str());
     if (authMgr_ == nullptr) {
         CreateGlobalClassicalAuthMgr();
     }
@@ -976,7 +976,8 @@ int32_t DeviceManagerServiceImpl::TransferSrcOldAuthMgr(std::shared_ptr<Session>
     uint64_t tokenId = 0;
     int32_t ret = GetLogicalIdAndTokenIdBySessionId(logicalSessionId, tokenId, sessionId);
     if (ret != DM_OK) {
-        LOGE("failed, logicalSessionId: %{public}" PRIu64 ", tokenId: %{public}" PRIu64 "", logicalSessionId, tokenId);
+        LOGE("failed, logicalSessionId: %{public}" PRIu64 ", tokenId: %{public}s", logicalSessionId,
+            GetAnonyInt32(tokenId).c_str());
         return ret;
     }
     std::string pkgName;
@@ -1796,7 +1797,7 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
         CleanAuthMgrByLogicalSessionId(logicalSessionId);
         OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ret);
     }
-    LOGI("end, tokenId %{public}" PRId64".", tokenId);
+    LOGI("end, tokenId %{public}s.", GetAnonyInt32(tokenId).c_str());
     return;
 }
 
@@ -1996,7 +1997,7 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
         std::lock_guard<std::mutex> lock(authMgrMapMtx_);
         for (auto& pair : authMgrMap_) {
             if (pair.second != nullptr) {
-                LOGI("tokenId: %{public}" PRId64 ".", pair.first);
+                LOGI("tokenId: %{public}s.", GetAnonyInt32(pair.first).c_str());
                 pair.second->OnScreenLocked();
             }
         }
@@ -2164,7 +2165,7 @@ void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const 
 void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
     int32_t tokenId)
 {
-    LOGI("tokenId = %{public}d.", tokenId);
+    LOGI("tokenId = %{public}s.", GetAnonyInt32(tokenId).c_str());
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
@@ -2236,8 +2237,8 @@ void DeviceManagerServiceImpl::HandleAppUnBindEvent(int32_t remoteUserId, const 
 void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
     int32_t remoteTokenId)
 {
-    LOGI("remoteTokenId = %{public}d, userId: %{public}d, remoteUdid: %{public}s.",
-        remoteTokenId, userId, GetAnonyString(remoteUdid).c_str());
+    LOGI("remoteTokenId = %{public}s, userId: %{public}d, remoteUdid: %{public}s.",
+        GetAnonyInt32(remoteTokenId).c_str(), userId, GetAnonyString(remoteUdid).c_str());
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
@@ -2999,8 +3000,8 @@ void DeviceManagerServiceImpl::GetBindCallerInfo(DmBindCallerInfo &bindCallerInf
     bindCallerInfo.hostPkgLabel  = hostPkgLabel;
     bindCallerInfo.processName = processName;
     bindCallerInfo.isSystemSA = isSystemSA;
-    LOGI("userId %{public}d, tokenId %{public}d, bindLevel %{public}d, bundleName %{public}s, hostPkgLabel  %{public}s,"
-        "processName %{public}s, isSystemSA %{public}d", userId, callingTokenId, bindLevel,
+    LOGI("userId %{public}d, tokenId %{public}s, bindLevel %{public}d, bundleName %{public}s, hostPkgLabel  %{public}s,"
+        "processName %{public}s, isSystemSA %{public}d", userId, GetAnonyInt32(callingTokenId).c_str(), bindLevel,
         GetAnonyString(bundleName).c_str(), GetAnonyString(hostPkgLabel).c_str(), GetAnonyString(processName).c_str(),
         isSystemSA);
 }

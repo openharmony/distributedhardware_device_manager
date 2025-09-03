@@ -225,6 +225,7 @@ int32_t DiscoveryManager::StartDiscovering4MineLibary(const std::string &pkgName
         pkgName.c_str(), std::string(dmSubInfo.capability).c_str());
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        CHECK_SIZE_RETURN(capabilityMap_, ERR_DM_START_DISCOVERING_FAILED);
         capabilityMap_[pkgName] = std::string(dmSubInfo.capability);
     }
     int32_t ret = mineSoftbusListener_->RefreshSoftbusLNN(pkgName, searchJson, dmSubInfo);
@@ -254,6 +255,7 @@ int32_t DiscoveryManager::StartDiscoveringNoMetaType(const std::string &pkgName,
 
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        CHECK_SIZE_RETURN(capabilityMap_, ERR_DM_START_DISCOVERING_FAILED);
         capabilityMap_[pkgName] = std::string(dmSubInfo.capability);
     }
     std::string customData = LNN_DISC_CAPABILITY;
@@ -306,6 +308,7 @@ int32_t DiscoveryManager::StartDiscovering4MetaType(const std::string &pkgName, 
     LOGI("capability = %{public}s,", std::string(dmSubInfo.capability).c_str());
     {
         std::lock_guard<std::mutex> capLock(capabilityMapLocks_);
+        CHECK_SIZE_RETURN(capabilityMap_, ERR_DM_START_DISCOVERING_FAILED);
         capabilityMap_[pkgName] =std::string(dmSubInfo.capability);
     }
 
@@ -532,6 +535,8 @@ int32_t DiscoveryManager::HandleDiscoveryQueue(const std::string &pkgName, uint1
     }
     {
         std::lock_guard<std::mutex> autoLock(locks_);
+        CHECK_SIZE_RETURN(pkgNameSet_, ERR_DM_DISCOVERY_REPEATED);
+        CHECK_SIZE_RETURN(discoveryContextMap_, ERR_DM_DISCOVERY_REPEATED);
         if (pkgNameSet_.find(pkgName) == pkgNameSet_.end()) {
             pkgNameSet_.emplace(pkgName);
             DiscoveryContext context = {pkgName, filterData, subscribeId, dmFilter.filterOp_, dmFilter.filters_};
@@ -757,6 +762,7 @@ std::string DiscoveryManager::AddMultiUserIdentify(const std::string &pkgName)
     std::string pkgNameTemp = ComposeStr(pkgName, userId);
     {
         std::lock_guard<std::mutex> autoLock(multiUserDiscLocks_);
+        CHECK_SIZE_RETURN(multiUserDiscMap_, pkgNameTemp);
         multiUserDiscMap_[pkgNameTemp] = multiUserDisc;
     }
     return pkgNameTemp;
@@ -801,6 +807,8 @@ int32_t DiscoveryManager::GenInnerSubId(const std::string &pkgName, uint16_t sub
     uint16_t tempSubId = DM_INVALID_FLAG_ID;
     {
         std::lock_guard<std::mutex> autoLock(subIdMapLocks_);
+        CHECK_SIZE_RETURN(pkgName2SubIdMap_, tempSubId);
+        CHECK_SIZE_RETURN(pkgName2SubIdMap_[pkgName], tempSubId);
         if (pkgName2SubIdMap_[pkgName].find(subId) != pkgName2SubIdMap_[pkgName].end()) {
             return pkgName2SubIdMap_[pkgName][subId];
         }
