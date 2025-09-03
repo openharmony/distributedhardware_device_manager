@@ -39,7 +39,7 @@ public:
     ~DeviceManagerImpl() = default;
     std::string GetLocalDeviceId();
     void UnbindTarget(taihe::string_view deviceId);
-    double GetDeviceType(taihe::string_view networkId);
+    int32_t GetDeviceType(taihe::string_view networkId);
     std::string GetDeviceName(taihe::string_view networkId);
     std::string GetLocalDeviceNetworkId();
 

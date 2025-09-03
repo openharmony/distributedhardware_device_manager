@@ -25,7 +25,7 @@
 
 namespace ANI::distributedDeviceManager {
 namespace {
-constexpr double DEVICE_TYPE_UNKNOWN = -1.0;
+constexpr int32_t DEVICE_TYPE_UNKNOWN = -1;
 constexpr const char *DEVICE_TYPE_EMPTY_STR = "";
 constexpr const char *ERROR_DEVICE_ID = "error deviceId";
 constexpr const char *ERROR_NETWORK_ID = "error networkId";
@@ -140,7 +140,7 @@ void DeviceManagerImpl::UnbindTarget(taihe::string_view deviceId)
     }
 }
 
-double DeviceManagerImpl::GetDeviceType(taihe::string_view networkId)
+int32_t DeviceManagerImpl::GetDeviceType(taihe::string_view networkId)
 {
     int32_t deviceType;
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetDeviceType(
@@ -149,7 +149,7 @@ double DeviceManagerImpl::GetDeviceType(taihe::string_view networkId)
         taihe::set_business_error(DM_ERR_FAILED, "GetDeviceType for failed");
         return DEVICE_TYPE_UNKNOWN;
     }
-    return static_cast<double>(deviceType);
+    return deviceType;
 }
 
 std::string DeviceManagerImpl::GetDeviceName(taihe::string_view networkId)
