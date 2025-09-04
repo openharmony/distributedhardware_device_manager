@@ -25,6 +25,7 @@ import i18n from '@ohos.i18n';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:InputPinDialog]==>'
+let metaType: number = 11;
 const ACTION_CANCEL_PINCODE_INPUT: number = 4
 const ACTION_DONE_PINCODE_INPUT: number = 5
 const MSG_PIN_CODE_ERROR: number = 0
@@ -133,6 +134,9 @@ struct InputCustomDialog {
       this.model = AppStorage.get('model') as string;
       console.log('model is ' + this.model);
     }
+    if (AppStorage.get('metaType') != null) {
+      metaType = AppStorage.get('metaType') as number;
+    }
     deviceManager.createDeviceManager('com.ohos.devicemanagerui.input',
       (err: Error, dm: deviceManager.DeviceManager) => {
       if (err) {
@@ -206,7 +210,11 @@ struct InputCustomDialog {
       return;
     }
     console.log('cancle' + ACTION_CANCEL_PINCODE_INPUT);
-    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, 'extra');
+    const param = {
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_CANCEL_PINCODE_INPUT, jsonStr);
     this.destruction();
   }
 
@@ -222,7 +230,12 @@ struct InputCustomDialog {
       return;
     }
     console.log('confirm' + JSON.stringify(ACTION_DONE_PINCODE_INPUT));
-    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, this.password);
+    const param = {
+      'pinCode': this.password,
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_DONE_PINCODE_INPUT, jsonStr);
   }
 
   setUserOperation(operation: number, extra: string) {

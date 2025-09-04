@@ -18,6 +18,7 @@ import UIExtensionContentSession from '@ohos.app.ability.UIExtensionContentSessi
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:PinDialog]==>';
+let metaType: number = 11;
 const ACTION_CANCEL_PINCODE_DISPLAY: number = 3;
 const MSG_CANCEL_PIN_CODE_SHOW: number = 2;
 
@@ -31,6 +32,9 @@ struct PinDialog {
 
   aboutToAppear() {
     console.log(TAG + 'aboutToAppear execute PinCustomDialog');
+    if (AppStorage.get('metaType') != null) {
+      metaType = AppStorage.get('metaType') as number;
+    }
     // 获取pinCode
     this.pinCode = AppStorage.get('pinCode') as string;
     this.pinCodeArr = this.pinCode.split('');
@@ -100,7 +104,7 @@ struct PinDialog {
       });
   }
 
-  setUserOperation(operation: number) {
+  setUserOperation(operation: number, param: string) {
     console.log(TAG + 'setUserOperation: ' + operation);
     if (dmClass === null) {
       console.log(TAG + 'setUserOperation: ' + 'dmClass null');
@@ -108,7 +112,7 @@ struct PinDialog {
     }
     try {
       this.isUserOperate = true;
-      dmClass.setUserOperation(operation, 'extra');
+      dmClass.setUserOperation(operation, param);
     } catch (error) {
       console.log(TAG + 'dmClass setUserOperation failed');
     }
@@ -176,7 +180,11 @@ struct PinDialog {
             .fontColor('#FFFFFF')
             .backgroundColor(Color.Transparent)
             .onClick(() => {
-              this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+              const param = {
+                'META_TYPE': metaType
+              };
+              const jsonStr = JSON.stringify(param);
+              this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY, jsonStr);
               this.destruction();
             })
             .offset({ y: -5 })

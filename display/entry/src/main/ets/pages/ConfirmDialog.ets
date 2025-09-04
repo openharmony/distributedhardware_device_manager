@@ -25,6 +25,7 @@ import window from '@ohos.window';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
+let metaType: number = 11;
 const ACTION_ALLOW_AUTH_ONCE: number = 0;
 const ACTION_CANCEL_AUTH: number = 1;
 const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2;
@@ -126,6 +127,10 @@ struct ConfirmCustomDialog {
       this.onCancel;
     }
 
+    if (AppStorage.get('metaType') != null) {
+      metaType = AppStorage.get('metaType') as number;
+    }
+
     if (AppStorage.get('title') != null) {
       this.title = AppStorage.get('title') as string;
       console.log('title is ' + this.title);
@@ -187,7 +192,11 @@ struct ConfirmCustomDialog {
       if (this.secondsNum === 0) {
         clearInterval(this.times);
         this.times = 0;
-        this.setUserOperation(ACTION_AUTH_CONFIRM_TIMEOUT);
+        const param = {
+          'META_TYPE': metaType
+        };
+        const jsonStr = JSON.stringify(param);
+        this.setUserOperation(ACTION_AUTH_CONFIRM_TIMEOUT, jsonStr);
         this.destruction();
         console.info('click cancel times run out');
       }
@@ -230,12 +239,13 @@ struct ConfirmCustomDialog {
       return
     }
     const param = {
-      'appUserData': this.selectedAppDataList
+      'appUserData': this.selectedAppDataList,
+      'META_TYPE': metaType
     };
     const jsonStr = JSON.stringify(param);
     console.log('allow once' + ACTION_ALLOW_AUTH_ONCE)
     console.log('param:' + jsonStr)
-    this.setUserAuthorization(ACTION_ALLOW_AUTH_ONCE, jsonStr)
+    this.setUserOperation(ACTION_ALLOW_AUTH_ONCE, jsonStr)
     this.destruction()
   }
 
@@ -246,12 +256,13 @@ struct ConfirmCustomDialog {
       return
     }
     const param = {
-      'appUserData': this.selectedAppDataList
+      'appUserData': this.selectedAppDataList,
+      'META_TYPE': metaType
     };
     const jsonStr = JSON.stringify(param);
     console.log('allow always' + ACTION_ALLOW_AUTH_ALWAYS)
     console.log('param:' + jsonStr)
-    this.setUserAuthorization(ACTION_ALLOW_AUTH_ALWAYS, jsonStr)
+    this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS, jsonStr)
     this.destruction()
   }
 
@@ -263,7 +274,11 @@ struct ConfirmCustomDialog {
     }
 
     console.log('cancel' + ACTION_CANCEL_AUTH)
-    this.setUserOperation(ACTION_CANCEL_AUTH)
+    const param = {
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_CANCEL_AUTH, jsonStr)
     this.destruction()
   }
 
@@ -309,27 +324,14 @@ struct ConfirmCustomDialog {
     }
   }
 
-  setUserAuthorization(operation: number, param: string) {
-    console.log(TAG + 'setUserAuthorization: ' + operation)
-    if (dmClass == null) {
-      console.log(TAG + 'setUserAuthorization: ' + 'dmClass null')
-      return;
-    }
-    try {
-      dmClass.setUserOperation(operation, param);
-    } catch (err) {
-      console.log(TAG + 'dmClass setUserOperation failed')
-    }
-  }
-
-  setUserOperation(operation: number) {
+  setUserOperation(operation: number, param: string) {
     console.log(TAG + 'setUserOperation: ' + operation)
     if (dmClass == null) {
       console.log(TAG + 'setUserOperation: ' + 'dmClass null')
       return;
     }
     try {
-      dmClass.setUserOperation(operation, 'extra');
+      dmClass.setUserOperation(operation, param);
     } catch (err) {
       console.log(TAG + 'dmClass setUserOperation failed')
     }
@@ -1761,18 +1763,22 @@ struct dialogPlusPage {
 
   onWillDismiss() {
     console.log(TAG + 'onWillDismiss: ' + ACTION_CANCEL_AUTH)
-    this.setUserOperation(ACTION_CANCEL_AUTH);
+    const param = {
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_CANCEL_AUTH, jsonStr);
     this.destruction();
   }
 
-  setUserOperation(operation: number) {
+  setUserOperation(operation: number, param: string) {
     console.log(TAG + 'setUserOperation: ' + operation)
     if (dmClass == null) {
       console.log(TAG + 'setUserOperation: ' + 'dmClass null')
       return;
     }
     try {
-      dmClass.setUserOperation(operation, 'extra');
+      dmClass.setUserOperation(operation, param);
     } catch (err) {
       console.log(TAG + 'dmClass setUserOperation failed')
     }

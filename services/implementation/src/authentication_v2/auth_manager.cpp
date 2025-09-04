@@ -862,6 +862,9 @@ int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &param
         return ERR_DM_AUTH_NOT_START;
     }
 
+    JsonObject paramJson;
+    paramJson.Parse(params);
+    std::string pinCode;
     switch (action) {
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
             LOGE("AuthSrcManager OnUserOperation user cancel");
@@ -872,12 +875,17 @@ int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &param
         case USER_OPERATION_TYPE_DONE_PINCODE_INPUT:
             LOGE("AuthSrcManager OnUserOperation user input done");
             context_->pinInputResult = USER_OPERATION_TYPE_DONE_PINCODE_INPUT;
+            if (paramJson.IsDiscarded() || !IsString(paramJson, PIN_CODE_KEY)) {
+                LOGE("AuthSrcManager OnUserOperation pinCode not found");
+                return ERR_DM_INPUT_PARA_INVALID;
+            }
+            pinCode = paramJson[PIN_CODE_KEY].Get<std::string>();
             {
-                if (!IsNumberString(params)) {
+                if (!IsNumberString(pinCode)) {
                     LOGE("OnUserOperation jsonStr error");
                     return ERR_DM_INPUT_PARA_INVALID;
                 }
-                context_->pinCode = params;
+                context_->pinCode = pinCode;
             }
             context_->authStateMachine->NotifyEventFinish(DmEventType::ON_USER_OPERATION);
             break;
