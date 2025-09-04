@@ -61,7 +61,7 @@
                     "quantity":"one",
                     "value":"عدم الوثوق (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
@@ -75,7 +75,7 @@
                     "quantity":"few",
                     "value":"عدم الوثوق (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
@@ -89,7 +89,7 @@
                     "quantity":"two",
                     "value":"عدم الوثوق (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

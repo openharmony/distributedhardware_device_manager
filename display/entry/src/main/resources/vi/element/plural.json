@@ -5,9 +5,9 @@
             "value":[
                 {
                     "quantity":"other",
-                    "value":"Không đúng. Còn %d lần thử.",
+                    "value":"Không chính xác. Còn %d lần thử.",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
