@@ -28,19 +28,22 @@ DmNativeEvent::DmNativeEvent(napi_env env, napi_value thisVar)
 
 DmNativeEvent::~DmNativeEvent()
 {
-    for (auto iter = eventMap_.begin(); iter != eventMap_.end(); iter++) {
-        auto listener = iter->second;
-        CHECK_NULL_VOID(listener);
-        napi_delete_reference(env_, listener->handlerRef);
+    {
+        std::lock_guard<std::mutex> autoLock(eventMapLock_);
+        for (auto iter = eventMap_.begin(); iter != eventMap_.end(); iter++) {
+            auto listener = iter->second;
+            CHECK_NULL_VOID(listener);
+            napi_delete_reference(env_, listener->handlerRef);
+        }
+        eventMap_.clear();
     }
-    eventMap_.clear();
     napi_delete_reference(env_, thisVarRef_);
 }
 
 void DmNativeEvent::On(std::string &eventType, napi_value handler)
 {
     LOGI("DmNativeEvent On in for event: %{public}s", eventType.c_str());
-    std::lock_guard<std::mutex> autoLock(lock_);
+    std::lock_guard<std::mutex> autoLock(eventMapLock_);
     auto listener = std::make_shared<DmEventListener>();
     listener->eventType = eventType;
     napi_create_reference(env_, handler, 1, &listener->handlerRef);
@@ -57,7 +60,7 @@ void DmNativeEvent::Off(std::string &eventType)
         return;
     }
 
-    std::lock_guard<std::mutex> autoLock(lock_);
+    std::lock_guard<std::mutex> autoLock(eventMapLock_);
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
         LOGE("eventType %{public}s not find", eventType.c_str());
@@ -80,7 +83,7 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
         return;
     }
 
-    std::lock_guard<std::mutex> autoLock(lock_);
+    std::lock_guard<std::mutex> autoLock(eventMapLock_);
     auto iter = eventMap_.find(eventType);
     if (iter == eventMap_.end()) {
         LOGE("eventType %{public}s not find", eventType.c_str());

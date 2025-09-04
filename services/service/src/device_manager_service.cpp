@@ -2930,7 +2930,8 @@ DM_EXPORT int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(
 void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, int32_t bindLevel)
 {
-    LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
+    LOGI("TokenId %{public}s, bindLevel %{public}d, userId %{public}d.", GetAnonyInt32(tokenId).c_str(),
+        bindLevel, userId);
     if (static_cast<uint32_t>(bindLevel) == USER) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;

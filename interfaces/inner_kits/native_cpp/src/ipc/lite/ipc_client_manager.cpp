@@ -53,6 +53,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
             ret);
         return ret;
     }
+    std::lock_guard<std::mutex> autoLock(packageInitSetLock_);
     packageInitSet_.emplace(pkgName);
     return DM_OK;
 }
@@ -77,6 +78,7 @@ int32_t IpcClientManager::UnInit(const std::string &pkgName)
             ret);
         return ret;
     }
+    std::lock_guard<std::mutex> autoLock(packageInitSetLock_);
     packageInitSet_.erase(pkgName);
     LOGI("UnInitDeviceManager SUCCESS");
     return DM_OK;
@@ -96,6 +98,7 @@ int32_t IpcClientManager::SendRequest(int32_t cmdCode, std::shared_ptr<IpcReq> r
 
 bool IpcClientManager::IsInit(const std::string &pkgName)
 {
+    std::lock_guard<std::mutex> autoLock(packageInitSetLock_);
     for (auto &iter : packageInitSet_) {
         size_t len = iter.size();
         if (len > pkgName.size()) {

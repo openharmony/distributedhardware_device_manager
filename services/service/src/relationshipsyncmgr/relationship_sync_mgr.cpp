@@ -19,6 +19,7 @@
 #include <sstream>
 
 #include "dm_anonymous.h"
+#include "dm_constants.h"
 #include "dm_log.h"
 
 namespace OHOS {
@@ -963,6 +964,7 @@ bool ReleationShipSyncMgr::IsNewBroadCastId(const RelationShipChangeMsg &msg)
     }
     auto iter = recvBroadCastIdMap_.find(key);
     if (iter == recvBroadCastIdMap_.end()) {
+        CHECK_SIZE_RETURN(recvBroadCastIdMap_, true);
         recvBroadCastIdMap_[key] = msg.broadCastId;
         timer_->StartTimer(key, BROADCAST_TIMEOUT_S, [this](std::string key) {
             ReleationShipSyncMgr::HandleRecvBroadCastTimeout(key);
