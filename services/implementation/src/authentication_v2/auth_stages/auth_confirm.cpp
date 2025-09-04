@@ -1098,8 +1098,8 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
         context->authType == DmAuthType::AUTH_TYPE_PIN_ULTRASONIC) &&
         (context->serviceInfoFound || AuthSinkStatePinAuthComm::IsAuthCodeReady(context)) &&
         context->authBoxType == DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
-        context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
         context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
+        context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
         return DM_OK;
     }
     if ((context->authType == DmAuthType::AUTH_TYPE_PIN || context->authType == DmAuthType::AUTH_TYPE_NFC ||
@@ -1135,8 +1135,8 @@ int32_t AuthSinkConfirmState::ProcessUserAuthorize(std::shared_ptr<DmAuthContext
         context->reason = ERR_DM_AUTH_PEER_REJECT;
         return ERR_DM_FAILED;
     }
-    context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
+    context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
     return DM_OK;
 }
 
@@ -1265,8 +1265,8 @@ int32_t AuthSinkConfirmState::ProcessNoBindAuthorize(std::shared_ptr<DmAuthConte
         context->reason = ERR_DM_CAPABILITY_NEGOTIATE_FAILED;
         return ERR_DM_FAILED;
     }
-    context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkCredentialAuthStartState>());
+    context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_USER_CONFIRM, context);
     return DM_OK;
 }
 
