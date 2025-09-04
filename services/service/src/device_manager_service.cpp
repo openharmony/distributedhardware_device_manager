@@ -1117,7 +1117,7 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
     }
     JsonObject paramJson;
     paramJson.Parse(params);
-    if (paramJson.IsDiscarded() || !IsString(paramJson, PARAM_KEY_META_TYPE)) {
+    if (paramJson.IsDiscarded() || !IsInt32(paramJson, PARAM_KEY_META_TYPE)) {
         LOGE("meta type not found");
         return ERR_DM_INPUT_PARA_INVALID;
     }
