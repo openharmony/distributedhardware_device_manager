@@ -268,10 +268,6 @@ int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_
 int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const std::string &pkgName, int sessionId)
 {
     LOGI("tokenId: %{public}s, pkgname:%{public}s", GetAnonyInt32(tokenId).c_str(), pkgName.c_str());
-    if (authMgr_ == nullptr) {
-        CreateGlobalClassicalAuthMgr();
-    }
-    authMgr_->PrepareSoftbusSessionCallback();
     LOGI("tokenId: %{public}" PRIu64 ", pkgname:%{public}s", tokenId, pkgName.c_str());
     {
         std::lock_guard<std::mutex> lock(authMgrMtx_);
