@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"Код подключения",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"Приложение %1$s на устройстве %2$s хочет получить доступ к этому устройству. Доверять этому приложению?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"Отмена",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -53,7 +53,7 @@
             "name":"dm_allow_this_time",
             "value":"Доверять только сейчас",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -67,14 +67,14 @@
             "name":"dm_enter_connect_code",
             "value":"Введите код подключения, отобразившийся на другом устройстве.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_cast",
             "value":"%s хочет транслировать контент экрана на вашем устройстве. Доверять этому устройству?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -95,7 +95,7 @@
             "name":"dm_bluetooth_dialog_close",
             "value":"OK",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -116,14 +116,14 @@
             "name":"dm_bluetooth_dialog_content",
             "value":"Для подключения к другому устройству необходимо включить Bluetooth. Включите и повторите попытку.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_connect",
-            "value":"Подключить к %s",
+            "value":"Подключение к %s",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

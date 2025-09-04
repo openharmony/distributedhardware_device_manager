@@ -4,10 +4,6 @@
             "name":"dm_not_allow",
             "value":[
                 {
-                    "quantity":"one",
-                    "value":"不信任( %d 秒)"
-                },
-                {
                     "quantity":"other",
                     "value":"不信任 (%d 秒)",
                     "attr":{
@@ -19,10 +15,6 @@
         {
             "name":"dm_incorrect_code",
             "value":[
-                {
-                    "quantity":"one",
-                    "value":"连接码错误，还可以尝试 %d 次"
-                },
                 {
                     "quantity":"other",
                     "value":"连接码错误，还可以尝试 %d 次",

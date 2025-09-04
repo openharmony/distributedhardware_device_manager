@@ -3518,18 +3518,15 @@ bool DeviceProfileConnector::IsAllowAuthAlways(const std::string &localUdid, int
 int32_t DeviceProfileConnector::GetAuthOnceUdids(std::unordered_set<std::string> &udidSet)
 {
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
-    int32_t currentUserId = MultipleUserConnector::GetCurrentAccountUserID();
     std::string localUdid = GetLocalDeviceId();
     for (auto &item : profiles) {
         std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
         std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
-        int32_t accesserUserId = item.GetAccesser().GetAccesserUserId();
-        int32_t accesseeUserId = item.GetAccessee().GetAccesseeUserId();
         if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
-            if (accesserUserId == currentUserId && accesserUdid == localUdid) {
+            if (accesserUdid == localUdid) {
                 udidSet.insert(accesseeUdid);
             }
-            if (accesseeUserId == currentUserId && accesseeUdid == localUdid) {
+            if (accesseeUdid == localUdid) {
                 udidSet.insert(accesserUdid);
             }
         }
