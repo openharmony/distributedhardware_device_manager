@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -98,6 +98,8 @@ constexpr const static char* GET_TRUSTED_DEVICE_LIST_WHITE_LIST[] = {
     "distributedsched",
 };
 constexpr uint32_t GET_TRUSTED_DEVICE_LIST_WHITE_LIST_NUM = std::size(GET_TRUSTED_DEVICE_LIST_WHITE_LIST);
+
+constexpr const char* READ_LOCAL_DEVICE_NAME_PERMISSION = "ohos.permission.READ_LOCAL_DEVICE_NAME";
 }
 
 bool PermissionManager::CheckPermission(void)
@@ -364,6 +366,23 @@ bool PermissionManager::CheckProcessValidOnGetTrustedDeviceList()
             return true;
         }
     }
+    return false;
+}
+
+bool PermissionManager::CheckReadLocalDeviceName(void)
+{
+    AccessTokenID tokenCaller = IPCSkeleton::GetCallingTokenID();
+    if (tokenCaller == 0) {
+        LOGE("CheckReadLocalDeviceName GetCallingTokenID error.");
+        return false;
+    }
+    ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
+    if ((tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) &&
+        (AccessTokenKit::VerifyAccessToken(tokenCaller, READ_LOCAL_DEVICE_NAME_PERMISSION) ==
+            PermissionState::PERMISSION_GRANTED)) {
+        return true;
+    }
+    LOGE("Read local device name permission is denied, please apply for corresponding permissions.");
     return false;
 }
 } // namespace DistributedHardware

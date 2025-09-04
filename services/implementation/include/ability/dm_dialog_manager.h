@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,96 +27,44 @@
 namespace OHOS {
 namespace DistributedHardware {
 class DmDialogManager {
+    DM_DECLARE_SINGLE_INSTANCE_BASE(DmDialogManager);
 public:
-    static DmDialogManager &GetInstance();
-    static void ConnectExtension();
+    void ConnectExtension();
     void ShowConfirmDialog(const std::string param);
     void ShowPinDialog(const std::string param);
     void ShowInputDialog(const std::string param);
-    static std::string GetBundleName()
-    {
-        return bundleName_;
-    }
-
-    static std::string GetAbilityName()
-    {
-        return abilityName_;
-    }
-
-    static std::string GetPinCode()
-    {
-        return pinCode_;
-    }
-
-    static std::string GetDeviceName()
-    {
-        return deviceName_;
-    }
-
-    static std::string GetAppOperationStr()
-    {
-        return appOperationStr_;
-    }
-
-    static std::string GetCustomDescriptionStr()
-    {
-        return customDescriptionStr_;
-    }
-
-    static int32_t GetDeviceType()
-    {
-        return deviceType_;
-    }
-
-    static std::string GetTargetDeviceName()
-    {
-        return targetDeviceName_;
-    }
-
-    static std::string GetHostPkgLabel()
-    {
-        return hostPkgLabel_;
-    }
-    static bool GetIsProxyBind()
-    {
-        return isProxyBind_;
-    }
-    static std::string GetAppUserData()
-    {
-        return appUserData_;
-    }
-    static std::string GetTitle()
-    {
-        return title_;
-    }
+    void CloseDialog();
+    void OnAbilityConnectDone(
+        const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode);
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName& element, int resultCode);
 private:
     DmDialogManager();
     ~DmDialogManager();
+    void SendMsgRequest(const sptr<IRemoteObject>& remoteObject);
     class DialogAbilityConnection : public OHOS::AAFwk::AbilityConnectionStub {
     public:
         void OnAbilityConnectDone(
             const AppExecFwk::ElementName& element, const sptr<IRemoteObject>& remoteObject, int resultCode) override;
         void OnAbilityDisconnectDone(const AppExecFwk::ElementName& element, int resultCode) override;
-
-    private:
-        std::mutex mutex_;
     };
 
-    static std::string bundleName_;
-    static std::string abilityName_;
-    static std::string deviceName_;
-    static std::string targetDeviceName_;
-    static std::string appOperationStr_;
-    static std::string customDescriptionStr_;
-    static std::string pinCode_;
-    static std::string hostPkgLabel_;
-    static int32_t deviceType_;
-    static std::atomic<bool> isConnectSystemUI_;
-    static sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_;
-    static DmDialogManager dialogMgr_;
-    static bool isProxyBind_;
-    static std::string appUserData_;
-    static std::string title_;
+    std::string bundleName_;
+    std::string abilityName_;
+    std::string deviceName_;
+    std::string targetDeviceName_;
+    std::string appOperationStr_;
+    std::string customDescriptionStr_;
+    std::string pinCode_;
+    std::string hostPkgLabel_;
+    int32_t deviceType_ = -1;
+    bool isProxyBind_ = false;
+    std::string appUserData_;
+    std::string title_;
+    std::mutex mutex_;
+    sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_ = nullptr;
+    sptr<IRemoteObject> g_remoteObject = nullptr;
+    std::atomic<bool> isConnectSystemUI_{false};
+    std::atomic<bool> isCloseDialog_{false};
 };
 } // namespace DistributedHardware
 } // namespace OHOS
