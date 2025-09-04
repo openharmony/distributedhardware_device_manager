@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "get_local_device_info_fuzzer.h"
 
 #include "device_manager_impl.h"
@@ -25,10 +25,10 @@ void GetLocalDeviceInfoFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-
+    FuzzedDataProvider fdp(data, size);
     std::string pkgName(reinterpret_cast<const char*>(data), size);
     std::string networkId(reinterpret_cast<const char*>(data), size);
-    int32_t deviceTypeId = *(reinterpret_cast<const int32_t*>(data));
+    int32_t deviceTypeId = fdp.ConsumeIntegral<int32_t>();
     DeviceManagerImpl::GetInstance().GetLocalDeviceNetWorkId(pkgName, networkId);
     DeviceManagerImpl::GetInstance().GetLocalDeviceId(pkgName, networkId);
     DeviceManagerImpl::GetInstance().GetLocalDeviceType(pkgName, deviceTypeId);

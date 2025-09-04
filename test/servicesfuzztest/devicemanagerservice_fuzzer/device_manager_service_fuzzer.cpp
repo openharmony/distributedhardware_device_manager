@@ -15,6 +15,7 @@
 
 #include <string>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_service.h"
 #include "device_manager_service_fuzzer.h"
 
@@ -25,7 +26,8 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    int sessionId = *(reinterpret_cast<const int*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int sessionId = fdp.ConsumeIntegral<int32_t>();
     std::string inputStr(reinterpret_cast<const char*>(data), size);
     std::string retStr;
     DmPinType pinType = DmPinType::QR_CODE;

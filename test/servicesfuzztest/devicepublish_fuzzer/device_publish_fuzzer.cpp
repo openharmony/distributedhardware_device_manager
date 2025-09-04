@@ -17,6 +17,7 @@
 #include <cstdint>
 #include <string>
 #include <unistd.h>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "device_manager_impl.h"
 #include "device_manager.h"
@@ -42,14 +43,20 @@ void DevicePublishFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     std::string bundleName(reinterpret_cast<const char*>(data), size);
-
+    FuzzedDataProvider fdp(data, size);
     DmPublishInfo publishInfo;
-    publishInfo.publishId = *(reinterpret_cast<const int32_t*>(data));
-    publishInfo.mode = *(reinterpret_cast<const DmDiscoverMode*>(data));
-    publishInfo.freq = *(reinterpret_cast<const DmExchangeFreq*>(data));
-
-    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
-
+    publishInfo.publishId = fdp.ConsumeIntegral<int32_t>();
+    publishInfo.mode = fdp.PickValueInArray<DmDiscoverMode>({
+        DM_DISCOVER_MODE_PASSIVE,
+        DM_DISCOVER_MODE_ACTIVE
+    });
+    publishInfo.freq = fdp.PickValueInArray<DmExchangeFreq>({
+        DM_LOW,
+        DM_MID,
+        DM_HIGH,
+        DM_SUPER_HIGH
+    });
+    int32_t publishId = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<PublishCallback> callback = std::make_shared<DevicePublishCallbackTest>();
     DeviceManager::GetInstance().PublishDeviceDiscovery(bundleName, publishInfo, callback);
     usleep(SLEEP_TIME_US);

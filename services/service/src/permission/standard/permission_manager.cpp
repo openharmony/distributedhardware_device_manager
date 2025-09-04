@@ -143,7 +143,6 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         LOGE("GetCallerProcessName GetCallingTokenID error.");
         return ERR_DM_FAILED;
     }
-    LOGI("tokenCaller ID == %{public}s", GetAnonyInt32(tokenCaller).c_str());
     ATokenTypeEnum tokenTypeFlag = AccessTokenKit::GetTokenTypeFlag(tokenCaller);
     if (tokenTypeFlag == ATokenTypeEnum::TOKEN_HAP) {
         HapTokenInfo tokenInfo;
@@ -169,7 +168,8 @@ int32_t PermissionManager::GetCallerProcessName(std::string &processName)
         return ERR_DM_FAILED;
     }
 
-    LOGI("Get process name: %{public}s success.", processName.c_str());
+    LOGI("Get process name: %{public}s success, tokenCaller ID == %{public}s.", processName.c_str(),
+        GetAnonyInt32(tokenCaller).c_str());
     return DM_OK;
 }
 

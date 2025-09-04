@@ -35,21 +35,32 @@ constexpr uint32_t IPC_VECTOR_MAX_SIZE = 1000;
         } \
     } while (0)
 
+    #define CHECK_CPY_SIZE_RETURN(destSize, srcSize) \
+    do { \
+        if ((destSize) <= (srcSize)) { \
+            LOGE("params size invalid"); \
+            return; \
+        } \
+    } while (0)
+
 //LCOV_EXCL_START
 void IpcModelCodec::DecodeDmDeviceBasicInfo(MessageParcel &parcel, DmDeviceBasicInfo &devInfo)
 {
     std::string deviceIdStr = parcel.ReadString();
+    CHECK_CPY_SIZE_RETURN(DM_MAX_DEVICE_ID_LEN, deviceIdStr.size());
     if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceId failed!");
         return;
     }
     std::string deviceNameStr = parcel.ReadString();
+    CHECK_CPY_SIZE_RETURN(DM_MAX_DEVICE_NAME_LEN, deviceNameStr.size());
     if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceName failed!");
         return;
     }
     devInfo.deviceTypeId = parcel.ReadUint16();
     std::string networkIdStr = parcel.ReadString();
+    CHECK_CPY_SIZE_RETURN(DM_MAX_DEVICE_ID_LEN, networkIdStr.size());
     if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s networkId failed!");
         return;
@@ -338,17 +349,20 @@ bool IpcModelCodec::EncodeDmDeviceIconInfoFilterOptions(const DmDeviceIconInfoFi
 void IpcModelCodec::DecodeDmDeviceInfo(MessageParcel &parcel, DmDeviceInfo &devInfo)
 {
     std::string deviceIdStr = parcel.ReadString();
+    CHECK_CPY_SIZE_RETURN(DM_MAX_DEVICE_ID_LEN, deviceIdStr.size());
     if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceId failed!");
         return;
     }
     std::string deviceNameStr = parcel.ReadString();
+    CHECK_CPY_SIZE_RETURN(DM_MAX_DEVICE_NAME_LEN, deviceNameStr.size());
     if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceName failed!");
         return;
     }
     devInfo.deviceTypeId = parcel.ReadUint16();
     std::string networkIdStr = parcel.ReadString();
+    CHECK_CPY_SIZE_RETURN(DM_MAX_DEVICE_ID_LEN, networkIdStr.size());
     if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s networkId failed!");
         return;

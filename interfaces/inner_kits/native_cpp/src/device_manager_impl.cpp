@@ -307,7 +307,6 @@ int32_t DeviceManagerImpl::GetAvailableDeviceList(const std::string &pkgName,
         ConvertDeviceInfoToDeviceBasicInfo(item, deviceBasicInfo);
         deviceList.push_back(deviceBasicInfo);
     }
-    LOGI("Completed, device size %{public}zu", deviceList.size());
     return DM_OK;
 }
 
@@ -378,7 +377,6 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
 
     info = rsp->GetLocalDeviceInfo();
     DmTraceEnd();
-    LOGI("Completed");
     SysEventWrite(std::string(GET_LOCAL_DEVICE_INFO_SUCCESS), DM_HISYEVENT_BEHAVIOR,
         std::string(GET_LOCAL_DEVICE_INFO_SUCCESS_MSG));
     DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceInfo",

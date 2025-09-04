@@ -16,7 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_impl.h"
 #include "device_manager.h"
 #include "device_manager_callback.h"
@@ -29,8 +29,9 @@ void SetUserOperationFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     std::string pkgName(reinterpret_cast<const char*>(data), size);
-    int32_t action = *(reinterpret_cast<const int32_t*>(data));
+    int32_t action = fdp.ConsumeIntegral<int32_t>();
     const std::string params = "extra";
 
     if (pkgName.empty()) {

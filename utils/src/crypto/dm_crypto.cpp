@@ -153,13 +153,16 @@ DM_EXPORT std::string Crypto::GetTokenIdHash(const std::string &tokenId)
 DM_EXPORT int32_t Crypto::ConvertHexStringToBytes(unsigned char *outBuf,
     uint32_t outBufLen, const char *inBuf, uint32_t inLen)
 {
-    (void)outBufLen;
     if ((outBuf == NULL) || (inBuf == NULL) || (inLen % HEX_TO_UINT8 != 0)) {
         LOGE("invalid param");
         return ERR_DM_FAILED;
     }
 
     uint32_t outLen = inLen / HEX_TO_UINT8;
+    if (outBufLen < outLen) {
+        LOGE("out of memory.");
+        return ERR_DM_FAILED;
+    }
     uint32_t i = 0;
     while (i < outLen) {
         unsigned char c = *inBuf++;
