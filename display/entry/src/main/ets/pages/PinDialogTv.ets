@@ -98,46 +98,46 @@ struct PinCustomDialog {
         Column() {
           Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
             Text($r('app.string.dm_connect_code'))
-              .fontSize('20fp')
+              .fontSize('32fp')
               .fontColor('#E5FFFFFF')
               .fontWeight(FontWeight.Medium)
               .lineHeight(this.isTibetanLanguages() ? '32.5vp' : 0)
               .margin({
-                left: '24vp',
-                right: '24vp'
+                left: '32vp',
+                right: '32vp'
               })
           }
-          .margin({ bottom: '24vp', top: '24vp' })
+          .margin({ bottom: '32vp', top: '32vp' })
 
           Row() {
             Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
               ForEach(this.pinCodeArr, (item: string, index: number) => {
                 Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
                   Text(item)
-                    .fontSize('30fp')
+                    .fontSize('40fp')
                     .fontColor('#E5FFFFFF')
                     .fontWeight(FontWeight.Medium)
-                }.width('24vp')
+                }.width('32vp')
                 .height('100%')
-                .margin(index === this.pinCodeArr.length - 1 ? {} : { right: '16vp' })
+                .margin(index === this.pinCodeArr.length - 1 ? {} : { right: '22vp' })
               })
             }
-            .height('40vp')
+            .height('53vp')
             .accessibilityText('[n1]' + this.pinCode + '[n0]')
           }
-          .margin({ bottom: '24vp' })
+          .margin({ bottom: '32vp' })
 
           Flex({ justifyContent: FlexAlign.Center }) {
             Button($r('app.string.dm_cancel'))
-              .fontSize('18vp')
+              .fontSize('24vp')
               .fontWeight(FontWeight.Medium)
               .fontColor('#E5FFFFFF')
               .width('100%')
-              .height('40vp')
+              .height('54vp')
               .backgroundColor(this.btnColor)
               .scale({x: this.buttonWidth, y: this.buttonHeight})
               .border({
-                width: '0.5vp',
+                width: '1vp',
                 color: '#26ffffff'
               })
               .defaultFocus(true)
@@ -176,7 +176,7 @@ struct PinCustomDialog {
                   this.buttonWidth = 1.05;
                   this.buttonHeight = 1.05;
                 } else {
-                  this.btnColor = '#33F1F3F5';
+                  this.btnColor = $r('sys.color.comp_background_tertiary');
                   this.buttonWidth = 1;
                   this.buttonHeight = 1;
                 }
@@ -190,20 +190,21 @@ struct PinCustomDialog {
                   .backgroundColor('#4DFFFFFF')
                 },
                 normal: {
-                  .backgroundColor('#33F1F3F5')
+                  .backgroundColor($r('sys.color.comp_background_tertiary'))
                 }
               })
           }.margin({
-            left: '24vp',
-            right: '24vp',
-            bottom: '24vp' })
+            left: '32vp',
+            right: '32vp',
+            bottom: '32vp' })
         }
-        .backgroundColor('#3C3C3C')
-        .borderRadius('16vp')
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+        .shadow(ShadowStyle.OUTER_FLOATING_SM)
+        .borderRadius('32vp')
         .border({
-          width: '0.5vp',
+          width: '1vp',
           color: '#26ffffff',
-          radius: '16vp'
+          radius: '32vp'
         })
         .width(px2vp(this.mLocalWidth) * 0.36)
         .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
