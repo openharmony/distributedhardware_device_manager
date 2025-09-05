@@ -152,7 +152,11 @@ struct PinCustomDialog {
                     this.controller.close();
                   }
                   this.cancel();
-                  this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+                  const param = {
+                    'META_TYPE': metaType
+                  };
+                  const jsonStr = JSON.stringify(param);
+                  this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY, jsonStr);
                 }
               })
               .onClick(() => {
@@ -160,7 +164,11 @@ struct PinCustomDialog {
                   this.controller.close();
                 }
                 this.cancel();
-                this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+                  const param = {
+                    'META_TYPE': metaType
+                  };
+                  const jsonStr = JSON.stringify(param);
+                  this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY, jsonStr);
               })
               .onHover((isHover?: boolean, event?: HoverEvent): void => {
                 if (isHover) {
