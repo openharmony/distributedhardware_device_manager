@@ -23,6 +23,7 @@ import { KeyCode } from '@ohos.multimodalInput.keyCode';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:PinDialog]==>';
+let metaType: number = 11;
 const ACTION_CANCEL_PINCODE_DISPLAY: number = 3;
 const MSG_CANCEL_PIN_CODE_SHOW: number = 2;
 
@@ -35,7 +36,7 @@ struct PinCustomDialog {
   @State pinCodeArr: Array<string> = [];
   @State btnColor: ResourceColor = Color.Transparent;
   @State isPC: boolean = false;
-  @State mLocalWidth: number = 1;
+  @State mLocalWidth: number = 0;
   controller?: CustomDialogController
 
   cancel() {
@@ -57,21 +58,24 @@ struct PinCustomDialog {
       this.mLocalWidth = display.getDefaultDisplaySync().width;
     } catch (err) {
       console.error('Failed to get display width:', err);
-      this.mLocalWidth = 1;
+      this.mLocalWidth = 0;
+    }
+    if (AppStorage.get('metaType') != null) {
+      metaType = AppStorage.get('metaType') as number;
     }
     this.isPC = Constant.isPC();
     this.pinCode = AppStorage.get('pinCode') as string;
     this.pinCodeArr = this.pinCode.split('');
   }
 
-  setUserOperation(operation: number) {
+  setUserOperation(operation: number, param: string) {
     console.log(TAG + 'setUserOperation: ' + operation);
     if (dmClass == null) {
       console.log(TAG + 'setUserOperation: ' + 'dmClass null');
       return;
     }
     try {
-      dmClass.setUserOperation(operation, 'extra');
+      dmClass.setUserOperation(operation, param);
     } catch (error) {
       console.log(TAG + 'dmClass setUserOperation failed');
     }
@@ -223,7 +227,11 @@ struct dialogPlusPage {
 
   onWillDismiss() {
     console.log(TAG + 'onWillDismiss: ' + ACTION_CANCEL_PINCODE_DISPLAY)
-    this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+    const param = {
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY, jsonStr);
     this.destruction();
   }
 
@@ -273,14 +281,14 @@ struct dialogPlusPage {
       });
   }
 
-  setUserOperation(operation: number) {
+  setUserOperation(operation: number, param: string) {
     console.log(TAG + 'setUserOperation: ' + operation)
     if (dmClass == null) {
       console.log(TAG + 'setUserOperation: ' + 'dmClass null')
       return;
     }
     try {
-      dmClass.setUserOperation(operation, 'extra');
+      dmClass.setUserOperation(operation, param);
     } catch (error) {
       console.log(TAG + 'dmClass setUserOperation failed')
     }
