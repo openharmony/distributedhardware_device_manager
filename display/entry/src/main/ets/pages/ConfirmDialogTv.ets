@@ -199,13 +199,13 @@ struct ConfirmCustomDialog {
     Shape() {
       Column() {
         SymbolGlyph(this.getImages(this.peerDeviceType))
-          .fontSize('74vp')
+          .fontSize('70vp')
           .renderingStrategy(SymbolRenderingStrategy.MULTIPLE_OPACITY)
           .fontColor(['#E5FFFFFF'])
       }
     }
     .visibility(this.isAvailableType ? Visibility.Visible : Visibility.None)
-    .margin({ bottom: '32vp', top: '32vp' })
+    .margin({ bottom: '24vp', top: '24vp' })
   }
 
   private isTibetanLanguages(): boolean {
@@ -218,200 +218,116 @@ struct ConfirmCustomDialog {
   build() {
     GridRow({
       columns: { xs: 4, sm: 8, md: 24 },
-      gutter: { x: 4 },
+      gutter: { x: '4vp' },
       breakpoints: { value: ['600vp', '840vp'] }
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: 6 }, offset: { sm: 2, md: 9 } }) {
         Column() {
-          this.Symbol();
-          Column() {
-            Text(this.title)
-              .textAlign(TextAlign.Center)
-              .fontSize('22fp')
-              .fontWeight(FontWeight.Regular)
-              .fontColor('#E5FFFFFF')
-              .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
-              .lineHeight(this.isTibetanLanguages() ? '22vp' : 0)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .width('auto')
-              .maxLines(2)
-            Text(this.peerCustomDescription)
-              .textAlign(TextAlign.Start)
-              .fontColor('#E5FFFFFF')
-              .fontWeight(FontWeight.Regular)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .fontSize('22vp')
-              .maxLines(2)
-              .width('auto')
-              .lineHeight(this.isTibetanLanguages() ? '22vp' : 0)
-              .margin({ top: '8vp' })
-              .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
-          }.margin({
-            top: this.isAvailableType ? 0 : '24vp',
-            bottom: '32vp', left: '32vp', right: '32vp' })
-
-          Column() {
-            Button($r('app.string.dm_allow_always'))
-              .margin({ bottom: '16vp' })
-              .onClick(() => {
-                this.onAllowAlways();
-              })
-              .fontSize('24vp')
+          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+            Text($r('app.string.dm_connect_code'))
+              .fontSize('32fp')
               .fontColor('#E5FFFFFF')
               .fontWeight(FontWeight.Medium)
-              .height(this.isTibetanLanguages() ? 'auto' : '54vp')
-              .width('100%')
-              .backgroundColor(this.btnColor)
-              .scale({x: this.firstButtonWidth, y: this.firstButtonHeight})
-              .focusable(true)
-              .border({
-                width: '1vp',
-                color: '#26ffffff'
-              })
-              .onHover((isHover?: boolean, event?: HoverEvent): void => {
-                if (isHover) {
-                  this.btnColor = '#4DFFFFFF';
-                  this.firstButtonWidth = 1.05;
-                  this.firstButtonHeight = 1.05;
-                } else {
-                  this.btnColor = $r('sys.color.comp_background_tertiary');
-                  this.firstButtonWidth = 1;
-                  this.firstButtonHeight = 1;
-                }
-              })
-              .stateStyles({
-                pressed: {
-                  .backgroundColor('#26FFFFFF')
-                },
-                focused: {
-                  .scale({x: 1.05, y: 1.05})
-                  .backgroundColor('#4DFFFFFF')
-                },
-                normal: {
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                }
-              })
-            Button($r('app.string.dm_allow_this_time'))
-              .margin({ bottom: '16vp' })
-              .onClick(() => {
-                this.onAllowOnce();
-              })
-              .fontSize('24vp')
-              .fontColor('#E5FFFFFF')
-              .fontWeight(FontWeight.Medium)
-              .focusable(true)
-              .height(this.isTibetanLanguages() ? 'auto' : '54vp')
-              .width('100%')
-              .backgroundColor(this.btnColor)
-              .scale({x: this.secondButtonWidth, y: this.secondButtonHeight})
-              .border({
-                width: '1vp',
-                color: '#26ffffff'
-              })
-              .onHover((isHover?: boolean, event?: HoverEvent): void => {
-                if (isHover) {
-                  this.btnColor = '#4DFFFFFF';
-                  this.secondButtonWidth = 1.05;
-                  this.secondButtonHeight = 1.05;
-                } else {
-                  this.btnColor = $r('sys.color.comp_background_tertiary');
-                  this.secondButtonWidth = 1;
-                  this.secondButtonHeight = 1;
-                }
-              })
-              .stateStyles({
-                pressed: {
-                  .backgroundColor('#26FFFFFF')
-                },
-                focused: {
-                  .scale({x: 1.05, y: 1.05})
-                  .backgroundColor('#4DFFFFFF')
-                },
-                normal: {
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                }
-              })
-            Button($r('app.plural.dm_not_allow', this.secondsNum, this.secondsNum))
-              .margin({ left: '16vp', right: '16vp' })
-              .fontSize('24vp')
-              .fontColor('#E5FFFFFF')
-              .fontWeight(FontWeight.Medium)
-              .focusable(true)
-              .onKeyEvent((event?: KeyEvent) => {
-                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                  console.log(TAG + 'onKeyEvent KEYCODE_HOME:' + event?.type)
-                  return;
-                }
-                if (event?.keyCode == KeyCode.KEYCODE_HOME) {
-                  console.log(TAG + 'onKeyEvent KEYCODE_HOME:' + event?.type)
-                  this.onCancel();
-                }
-              })
-              .onClick(() => {
-                this.onCancel();
-              })
-              .height(this.isTibetanLanguages() ? 'auto' : '54vp')
-              .width('100%')
-              .backgroundColor(this.btnColor)
-              .scale({x: this.thirdButtonWidth, y: this.thirdButtonHeight})
-              .border({
-                width: '1vp',
-                color: '#26ffffff'
-              })
-              .onHover((isHover?: boolean, event?: HoverEvent): void => {
-                if (isHover) {
-                  this.btnColor = '#4DFFFFFF';
-                  this.thirdButtonWidth = 1.05;
-                  this.thirdButtonHeight = 1.05;
-                } else {
-                  this.btnColor = $r('sys.color.comp_background_tertiary');
-                  this.thirdButtonWidth = 1;
-                  this.thirdButtonHeight = 1;
-                }
-              })
-              .stateStyles({
-                pressed: {
-                  .backgroundColor('#26FFFFFF')
-                },
-                focused: {
-                  .scale({x: 1.05, y: 1.05})
-                  .backgroundColor('#4DFFFFFF')
-                },
-                normal: {
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                }
+              .lineHeight(this.isTibetanLanguages() ? '32.5vp' : 0)
+              .margin({
+                left: '32vp',
+                right: '32vp'
               })
           }
-          .margin({
+          .margin({ bottom: '32vp', top: '32vp' })
+
+          Row() {
+            Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+              ForEach(this.pinCodeArr, (item: string, index: number) => {
+                Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+                  Text(item)
+                    .fontSize('40fp')
+                    .fontColor('#E5FFFFFF')
+                    .fontWeight(FontWeight.Medium)
+                }.width('32vp')
+                .height('100%')
+                .margin(index === this.pinCodeArr.length - 1 ? {} : { right: '22vp' })
+              })
+            }
+            .height('53vp')
+            .accessibilityText('[n1]' + this.pinCode + '[n0]')
+          }
+          .margin({ bottom: '32vp' })
+
+          Flex({ justifyContent: FlexAlign.Center }) {
+            Button($r('app.string.dm_cancel'))
+              .fontSize('24vp')
+              .fontWeight(FontWeight.Medium)
+              .fontColor('#E5FFFFFF')
+              .width('100%')
+              .height('54vp')
+              .backgroundColor(this.btnColor)
+              .scale({x: this.buttonWidth, y: this.buttonHeight})
+              .border({
+                width: '1vp',
+                color: '#26ffffff'
+              })
+              .defaultFocus(true)
+              .onKeyEvent((event?: KeyEvent) => {
+                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  return;
+                }
+                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  if (this.controller) {
+                    this.controller.close();
+                  }
+                  this.cancel();
+                  this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+                }
+              })
+              .onClick(() => {
+                if (this.controller) {
+                  this.controller.close();
+                }
+                this.cancel();
+                this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY);
+              })
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = '#F1F3F5';
+                  this.buttonWidth = 1.05;
+                  this.buttonHeight = 1.05;
+                } else {
+                  this.btnColor = $r('sys.color.comp_background_tertiary');
+                  this.buttonWidth = 1;
+                  this.buttonHeight = 1;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor('#26FFFFFF')
+                },
+                focused: {
+                  .scale({x: 1.05, y: 1.05})
+                  .backgroundColor('#4DFFFFFF')
+                },
+                normal: {
+                  .backgroundColor($r('sys.color.comp_background_tertiary'))
+                }
+              })
+          }.margin({
             left: '32vp',
             right: '32vp',
-            bottom: '32vp'
-          })
+            bottom: '32vp' })
         }
         .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .shadow(ShadowStyle.OUTER_FLOATING_SM)
-        .borderRadius(32)
+        .borderRadius('32vp')
         .border({
-          width: '1',
+          width: '1vp',
           color: '#26ffffff',
           radius: '32vp'
         })
-        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
         .width(px2vp(this.mLocalWidth) * 0.36)
+        .margin({ left: $r('sys.float.ohos_id_dialog_margin_start'), right: $r('sys.float.ohos_id_dialog_margin_end') })
       }
-      .onKeyPreIme((event:KeyEvent) => {
-        if (event?.keyCode === KeyCode.KEYCODE_MENU && event?.type === KeyType.Up) {
-          console.log(TAG + 'onKeyEvent KEYCODE_MENU:' + event?.type)
-          return true;
-        }
-        return false;
-      })
-      .onKeyEvent((event?: KeyEvent) => {
-        if (event?.keyCode == KeyCode.KEYCODE_HOME) {
-          console.log(TAG + 'onKeyEvent KEYCODE_HOME:' + event?.type)
-          this.onCancel();
-        }
-      })
     }
     .constraintSize({ maxHeight: '80%' })
   }
