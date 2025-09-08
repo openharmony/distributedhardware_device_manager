@@ -1591,7 +1591,7 @@ struct ConfirmCustomDialog {
                 .fontColor($r('sys.color.ohos_id_color_text_primary'))
                 .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
                 .lineHeight(this.isTibetanLanguages() ? 22 : 0)
-                .textOverflow({ overflow: TextOverflow.None })
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .width('auto')
                 .maxLines(2)
             }
