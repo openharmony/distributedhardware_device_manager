@@ -689,6 +689,19 @@ int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
     context->accesser.aclTypeList = aclNegoResult.Dump();
     NegotiateProxyAcl(context);
     NegotiateUltrasonic(context);
+    uint32_t credType = 0;
+    uint32_t aclType = 0;
+    if (IsUint32(credTypeNegoResult, "identicalCredType")) {
+        credType = credTypeNegoResult["identicalCredType"].Get<uint32_t>();
+    }
+    if (IsUint32(aclNegoResult, "identicalAcl")) {
+        aclType = aclNegoResult["identicalAcl"].Get<uint32_t>();
+    }
+    if (credType == DM_IDENTICAL_ACCOUNT && aclType != DM_IDENTICAL_ACCOUNT) {
+        context->softbusConnector->JoinLnn(context->accessee.addr, true);
+        context->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
+        return DM_OK;
+    }
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_USER_CONFIRM, context);
     // generate cert sync
     ffrt::submit([=]() { GenerateCertificate(context);});
