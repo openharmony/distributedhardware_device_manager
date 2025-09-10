@@ -1118,7 +1118,6 @@ int32_t AuthSinkConfirmState::ProcessBindAuthorize(std::shared_ptr<DmAuthContext
         context->authType == DmAuthType::AUTH_TYPE_PIN_ULTRASONIC) &&
         (context->serviceInfoFound || AuthSinkStatePinAuthComm::IsAuthCodeReady(context)) &&
         context->authBoxType == DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM) {
-
         CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_POINT_NULL);
         context->authStateMachine->TransitionTo(std::make_shared<AuthSinkPinNegotiateStartState>());
         CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
