@@ -669,6 +669,7 @@ void AuthSrcConfirmState::GenerateCertificate(std::shared_ptr<DmAuthContext> con
 int32_t AuthSrcConfirmState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcConfirmState start.");
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     context->timer->DeleteTimer(std::string(NEGOTIATE_TIMEOUT_TASK));
     ResetBindLevel(context);
     GetCustomDescBySinkLanguage(context);
