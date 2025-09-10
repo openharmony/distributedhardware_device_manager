@@ -2542,14 +2542,23 @@ void DeviceManagerService::HandleAccountLogout(int32_t userId, const std::string
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
     deviceMap = dmServiceImpl_->GetDeviceIdAndUserId(userId, accountId);
+    std::vector<std::string> peerHOUdids;
+    GetHoOsTypeUdids(peerHOUdids);
+    std::vector<std::string> dualPeerUdids;
     for (const auto &item : deviceMap) {
+        if (find(peerHOUdids.begin(), peerHOUdids.end(), item.first) != peerHOUdids.end()) {
+            LOGI("dualUdid: %{public}s", GetAnonyString(item.first).c_str());
+            dualPeerUdids.emplace_back(item.first);
+        }
         peerUdids.emplace_back(item.first);
     }
-    if (!peerUdids.empty()) {
+    if (!dualPeerUdids.empty()) {
         //logout notify cast+
         if (IsDMServiceAdapterResidentLoad()) {
             dmServiceImplExtResident_->AccountIdLogout(userId, accountId, peerUdids);
         }
+    }
+    if (!peerUdids.empty()) {
         char accountIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         if (Crypto::GetAccountIdHash(accountId, reinterpret_cast<uint8_t *>(accountIdHash)) != DM_OK) {
             LOGE("GetAccountHash failed.");
