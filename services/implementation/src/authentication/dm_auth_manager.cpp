@@ -503,7 +503,6 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
 void DmAuthManager::GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash)
 {
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     std::string peerUdid = "";
     int32_t ret = softbusConnector_->GetSoftbusSession()->GetPeerDeviceId(sessionId, peerUdid);
     if (ret != DM_OK) {
@@ -773,7 +772,6 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     LOGI("DmAuthManager::OnGroupCreated start group id %{public}s", GetAnonyString(groupId).c_str());
     CHECK_NULL_VOID(authMessageProcessor_);
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     if (groupId == "{}") {
         authResponseContext_->reply = ERR_DM_CREATE_GROUP_FAILED;
         authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -1011,7 +1009,6 @@ void DmAuthManager::StartNegotiate(const int32_t &sessionId)
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_NEGOTIATE);
     if (!NeedInsensibleSwitching()) {
         CHECK_NULL_VOID(softbusConnector_);
-        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
     }
     if (timer_ != nullptr) {
@@ -1156,7 +1153,6 @@ void DmAuthManager::ProcessAuthRequest(const int32_t &sessionId)
         }
     }
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     if (authResponseContext_->isOnline && softbusConnector_->CheckIsOnline(remoteDeviceId_)) {
         authResponseContext_->isOnline = true;
     } else {
@@ -1303,7 +1299,6 @@ int32_t DmAuthManager::ConfirmProcess(const int32_t &action)
         authMessageProcessor_->SetResponseContext(authResponseContext_);
         std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_AUTH);
         CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
-        CHECK_NULL_RETURN(softbusConnector_->GetSoftbusSession(), ERR_DM_POINT_NULL);
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
     }
     return DM_OK;
@@ -1338,7 +1333,6 @@ int32_t DmAuthManager::ConfirmProcessExt(const int32_t &action)
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_AUTH_EXT);
     CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
-    CHECK_NULL_RETURN(softbusConnector_->GetSoftbusSession(), ERR_DM_POINT_NULL);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
     return DM_OK;
 }
@@ -1550,7 +1544,6 @@ void DmAuthManager::SrcAuthenticateFinish()
         authMessageProcessor_->SetResponseContext(authResponseContext_);
         std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
         CHECK_NULL_VOID(softbusConnector_);
-        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
     } else {
         CHECK_NULL_VOID(authRequestContext_);
@@ -2368,7 +2361,6 @@ void DmAuthManager::RequestCredential()
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(authMessageProcessor_);
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     authResponseContext_->publicKey = publicKey;
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_PUBLICKEY);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
@@ -2464,7 +2456,6 @@ void DmAuthManager::ResponseCredential()
     authResponseContext_->publicKey = publicKey;
     CHECK_NULL_VOID(authMessageProcessor_);
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_PUBLICKEY);
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
 }
@@ -2486,7 +2477,6 @@ bool DmAuthManager::AuthDeviceTransmit(int64_t requestId, const uint8_t *data, u
         message = authMessageProcessor_->CreateDeviceAuthMessage(MSG_TYPE_RESP_AUTH_DEVICE_NEGOTIATE, data, dataLen);
     }
     CHECK_NULL_RETURN(softbusConnector_, false);
-    CHECK_NULL_RETURN(softbusConnector_->GetSoftbusSession(), false);
     if (softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message) != DM_OK) {
         LOGE("SoftbusSession send data failed.");
         return false;
@@ -2854,7 +2844,6 @@ void DmAuthManager::ProcRespNegotiateExt(const int32_t &sessionId)
         authResponseContext_->isAuthCodeReady = false;
     }
     CHECK_NULL_VOID(authMessageProcessor_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
 
@@ -2868,7 +2857,6 @@ void DmAuthManager::ProcRespNegotiate(const int32_t &sessionId)
     LOGI("DmAuthManager::ProcRespNegotiate session id");
     AbilityNegotiate();
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     CHECK_NULL_VOID(authMessageProcessor_);
     authResponseContext_->isOnline = softbusConnector_->CheckIsOnline(remoteDeviceId_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_NEGOTIATE);
@@ -2909,7 +2897,6 @@ void DmAuthManager::ProcIncompatible(const int32_t &sessionId)
     respNegotiateMsg[TAG_MSG_TYPE] = MSG_TYPE_RESP_NEGOTIATE;
     std::string message = respNegotiateMsg.Dump();
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
 }
 
@@ -3064,7 +3051,6 @@ void DmAuthManager::HandleSessionHeartbeat(std::string name)
     jsonObj[TAG_SESSION_HEARTBEAT] = TAG_SESSION_HEARTBEAT;
     std::string message = jsonObj.Dump();
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     CHECK_NULL_VOID(authResponseContext_);
     softbusConnector_->GetSoftbusSession()->SendHeartbeatData(authResponseContext_->sessionId, message);
 
@@ -3304,7 +3290,6 @@ void DmAuthManager::RequestReCheckMsg()
     authMessageProcessor_->SetResponseContext(authResponseContext_);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_REQ_RECHECK_MSG);
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
 }
 
@@ -3344,7 +3329,6 @@ void DmAuthManager::ResponseReCheckMsg()
     authMessageProcessor_->SetEncryptFlag(true);
     std::string message = authMessageProcessor_->CreateSimpleMessage(MSG_TYPE_RESP_RECHECK_MSG);
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     softbusConnector_->GetSoftbusSession()->SendData(authResponseContext_->sessionId, message);
     PutAccessControlList();
 }
@@ -3505,7 +3489,6 @@ void DmAuthManager::CloseAuthSession(const int32_t sessionId)
             std::to_string(sessionId));
     }
     CHECK_NULL_VOID(softbusConnector_);
-    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
 }
 
