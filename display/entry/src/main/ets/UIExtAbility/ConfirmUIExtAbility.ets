@@ -49,7 +49,7 @@ export default class ConfirmUIExtAbility extends UIExtensionAbility {
         if (want.parameters.title) {
             AppStorage.setOrCreate('title', want.parameters.title);
         }
-        if (want.parameters.metaType) {
+        if (want.parameters.metaType != undefined) {
             AppStorage.setOrCreate('metaType', want.parameters.metaType);
         }
 
