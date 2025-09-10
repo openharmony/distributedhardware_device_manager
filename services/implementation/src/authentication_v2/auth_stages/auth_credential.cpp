@@ -82,7 +82,6 @@ int32_t AuthCredentialTransmitSend(std::shared_ptr<DmAuthContext> context, DmMes
     }
 
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
-    CHECK_NULL_RETURN(context->softbusConnector->GetSoftbusSession(), ERR_DM_FAILED);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -204,7 +203,6 @@ int32_t AuthSrcCredentialAuthDoneState::SendCredentialAuthMessage(std::shared_pt
         return ERR_DM_FAILED;
     }
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
-    CHECK_NULL_RETURN(context->softbusConnector->GetSoftbusSession(), ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -593,7 +591,6 @@ int32_t AuthSrcCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> co
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_CREDENTIAL_EXCHANGE, context);
     LOGI("AuthSrcCredentialExchangeState::Action() leave.");
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
-    CHECK_NULL_RETURN(context->softbusConnector->GetSoftbusSession(), ERR_DM_FAILED);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -785,7 +782,6 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_DATA_SYNC, context);
     LOGI("AuthSrcSKDeriveState::Action() leave.");
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
-    CHECK_NULL_RETURN(context->softbusConnector->GetSoftbusSession(), ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -906,7 +902,6 @@ int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_RESP_SK_DERIVE, context);
     LOGI("AuthSinkSKDeriveState::Action() leave.");
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
-    CHECK_NULL_RETURN(context->softbusConnector->GetSoftbusSession(), ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
