@@ -736,8 +736,10 @@ HWTEST_F(DmAuthManagerTest, OnUserOperation_005, testing::ext::TestSize.Level1)
 HWTEST_F(DmAuthManagerTest, OnUserOperation_006, testing::ext::TestSize.Level1)
 {
     int32_t action = 5;
-    std::string params = "5";
-    int32_t ret = authManager_->OnUserOperation(action, params);
+    JsonObject param;
+    param[PIN_CODE_KEY] = "5";
+    std::string paramStr = param.Dump();
+    int32_t ret = authManager_->OnUserOperation(action, paramStr);
     ASSERT_EQ(ret, DM_OK);
 }
 

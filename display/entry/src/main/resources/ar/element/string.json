@@ -11,14 +11,14 @@
             "name":"dm_confirm_title_hap",
             "value":"تطبيق %1$s على \u202a%2$s\u202c يريد الوصول إلى هذا الجهاز. هل تريد الوثوق بهذا التطبيق؟",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"إلغاء",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -53,7 +53,7 @@
             "name":"dm_allow_this_time",
             "value":"الوثوق هذه المرة فقط",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -67,14 +67,14 @@
             "name":"dm_enter_connect_code",
             "value":"أدخل رمز الاتصال الظاهر على شاشة الجهاز الآخر.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_cast",
-            "value":"يريد %s عرض شاشته على جهازك. هل تثق بهذا الجهاز؟",
+            "value":"يريد %s عرض شاشته على جهازك. هل تريد الوثوق بهذا الجهاز؟",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -93,9 +93,9 @@
         },
         {
             "name":"dm_bluetooth_dialog_close",
-            "value":"موافق",
+            "value":"حسنًا",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -114,16 +114,16 @@
         },
         {
             "name":"dm_bluetooth_dialog_content",
-            "value":"مطلوب تشغيل البلوتوث للاتصال بجهاز آخر. يُرجى تشغيله والمحاولة مرة أخرى.",
+            "value":"مطلوب تشغيل البلوتوث للاتصال بجهاز آخر. يُرجى تشغيله وإعادة المحاولة.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_connect",
-            "value":"الاتصال بالجهاز «\u202a%s\u202c»",
+            "value":"الاتصال بالجهاز \"\u202a%s\u202c\"",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

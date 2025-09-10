@@ -246,11 +246,17 @@ int32_t AuthManager::StopAuthenticateDevice(const std::string &pkgName)
     LOGI("AuthManager::StopAuthenticateDevice start");
 
     context_->reason = STOP_BIND;
+    if (context_->authStateMachine->IsWaitEvent()) {
+        context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
+        return DM_OK;
+    }
+
     if (context_->direction == DM_AUTH_SOURCE) {
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
     } else {
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSinkFinishState>());
     }
+    context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
     return DM_OK;
 }
 
@@ -562,7 +568,7 @@ int32_t AuthManager::GetBindLevel(int32_t bindLevel)
 void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("Get auth param with pkgName %{public}s and extra %{public}s.", pkgName.c_str(), extra.c_str());
+    LOGI("Get auth param with pkgName %{public}s.", pkgName.c_str());
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     context_->accesser.deviceId = std::string(localDeviceId);
@@ -616,7 +622,7 @@ void AuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
 int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("AuthManager::AuthenticateDevice start auth type %{public}d, extra %{public}s.", authType, extra.c_str());
+    LOGI("AuthManager::AuthenticateDevice start auth type %{public}d.", authType);
     SetAuthType(authType);
     context_->processInfo.pkgName = pkgName;
     GetBindCallerInfo();
@@ -652,9 +658,6 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
 {
     int ret = DM_OK;
     LOGI("AuthManager::BindTarget start. pkgName: %{public}s", pkgName.c_str());
-    for (auto iter = bindParam.begin(); iter != bindParam.end(); iter++) {
-        LOGI("AuthManager::BindTarget para: %{public}s : %{public}s ", iter->first.c_str(), iter->second.c_str());
-    }
 
     struct RadarInfo info = {
         .funcName = "AuthenticateDevice",
@@ -859,6 +862,9 @@ int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &param
         return ERR_DM_AUTH_NOT_START;
     }
 
+    JsonObject paramJson;
+    paramJson.Parse(params);
+    std::string pinCode;
     switch (action) {
         case USER_OPERATION_TYPE_CANCEL_PINCODE_INPUT:
             LOGE("AuthSrcManager OnUserOperation user cancel");
@@ -869,12 +875,17 @@ int32_t AuthSrcManager::OnUserOperation(int32_t action, const std::string &param
         case USER_OPERATION_TYPE_DONE_PINCODE_INPUT:
             LOGE("AuthSrcManager OnUserOperation user input done");
             context_->pinInputResult = USER_OPERATION_TYPE_DONE_PINCODE_INPUT;
+            if (paramJson.IsDiscarded() || !IsString(paramJson, PIN_CODE_KEY)) {
+                LOGE("AuthSrcManager OnUserOperation pinCode not found");
+                return ERR_DM_INPUT_PARA_INVALID;
+            }
+            pinCode = paramJson[PIN_CODE_KEY].Get<std::string>();
             {
-                if (!IsNumberString(params)) {
+                if (!IsNumberString(pinCode)) {
                     LOGE("OnUserOperation jsonStr error");
                     return ERR_DM_INPUT_PARA_INVALID;
                 }
-                context_->pinCode = params;
+                context_->pinCode = pinCode;
             }
             context_->authStateMachine->NotifyEventFinish(DmEventType::ON_USER_OPERATION);
             break;

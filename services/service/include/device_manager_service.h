@@ -64,9 +64,9 @@ public:
 
     void DelAllRelateShip();
 
-    DM_EXPORT void RegisterCallerAppId(const std::string &pkgName);
+    DM_EXPORT void RegisterCallerAppId(const std::string &pkgName, const int32_t userId);
 
-    DM_EXPORT void UnRegisterCallerAppId(const std::string &pkgName);
+    DM_EXPORT void UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId);
     
     void UninitSoftbusListener();
 
@@ -399,7 +399,7 @@ private:
     void DeleteHoDevice(const std::vector<int32_t> &foreGroundUserIds, const std::vector<int32_t> &backGroundUserIds);
     void HandleAccountLogoutEventCallback(const std::string &commonEventType, int32_t currentUserId,
         int32_t beforeUserId);
-
+    void InitTaskOfDelTimeOutAcl();
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     void SubscribePublishCommonEvent();
     void QueryDependsSwitchState();

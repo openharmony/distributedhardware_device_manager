@@ -205,6 +205,7 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
         const std::vector<int32_t> &backGroundUserIds);
+    void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

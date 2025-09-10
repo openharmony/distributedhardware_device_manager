@@ -70,6 +70,7 @@ int32_t HiDumpHelper::HiDump(const std::vector<std::string>& args, std::string &
 void HiDumpHelper::SetNodeInfo(const DmDeviceInfo& deviceInfo)
 {
     LOGI("HiDumpHelper::SetNodeInfo");
+    std::lock_guard<std::mutex> autoLock(nodeInfosLock_);
     CHECK_SIZE_VOID(nodeInfos_);
     nodeInfos_.push_back(deviceInfo);
 }
@@ -99,7 +100,7 @@ int32_t HiDumpHelper::ShowAllLoadTrustedList(std::string &result)
 {
     LOGI("dump all trusted device List");
     int32_t ret = DM_OK;
-
+    std::lock_guard<std::mutex> autoLock(nodeInfosLock_);
     if (nodeInfos_.size() == 0) {
         LOGE("dump trusted device list is empty");
         result.append("dump trusted device list is empty");

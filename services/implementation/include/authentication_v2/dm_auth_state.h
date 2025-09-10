@@ -201,7 +201,7 @@ protected:
 
 class AuthSrcConfirmState : public DmAuthState {
 public:
-    virtual ~AuthSrcConfirmState() {};
+    virtual ~AuthSrcConfirmState();
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
 private:
@@ -239,7 +239,7 @@ private:
     void GetCustomDescBySinkLanguage(std::shared_ptr<DmAuthContext> context);
     void ResetBindLevel(std::shared_ptr<DmAuthContext> context);
     void NegotiateUltrasonic(std::shared_ptr<DmAuthContext> context);
-    void GenerateCertificate(std::shared_ptr<DmAuthContext> context);
+    static void GenerateCertificate(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkStatePinAuthComm {

@@ -86,9 +86,10 @@ void SetSetDnPolicyPermission()
 HWTEST_F(DeviceManagerServiceTest, GetTrustedDeviceList_201, testing::ext::TestSize.Level1)
 {
     std::string pkgName = "pkgName";
+    int32_t userId = 10001;
     EXPECT_CALL(*appManagerMock_, GetAppId()).Times(::testing::AtLeast(1)).WillOnce(Return("appId"));
     DeviceManagerService::GetInstance().listener_ = std::make_shared<DeviceManagerServiceListener>();
-    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName);
+    DeviceManagerService::GetInstance().RegisterCallerAppId(pkgName, userId);
     DeletePermission();
     const std::string extra;
     std::vector<DmDeviceInfo> deviceList;

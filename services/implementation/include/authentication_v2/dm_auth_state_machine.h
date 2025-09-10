@@ -74,6 +74,8 @@ public:
     // Stop the thread
     void Stop();
 
+    bool IsWaitEvent();
+
 private:
     // Loop to wait for state transitions and execute actions
     void Run(std::shared_ptr<DmAuthContext> context);
@@ -123,6 +125,8 @@ private:
 
     // Thread for state machine execution
     std::thread thread_;
+
+    std::atomic<bool> isWait_ = false;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

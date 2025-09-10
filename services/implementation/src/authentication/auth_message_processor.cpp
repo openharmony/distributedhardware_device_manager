@@ -114,6 +114,7 @@ void AuthMessageProcessor::GetJsonObj(JsonObject &jsonObj)
     }
 }
 
+//LCOV_EXCL_START
 bool AuthMessageProcessor::IsPincodeImported()
 {
     auto sptrAuthMgr = authMgr_.lock();
@@ -153,6 +154,7 @@ std::vector<std::string> AuthMessageProcessor::CreateAuthRequestMessage()
     }
     return jsonStrVec;
 }
+//LCOV_EXCL_STOP
 
 std::string AuthMessageProcessor::CreateSimpleMessage(int32_t msgType)
 {

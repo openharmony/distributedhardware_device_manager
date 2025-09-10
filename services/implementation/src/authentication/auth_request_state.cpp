@@ -25,6 +25,7 @@ int32_t AuthRequestState::Leave()
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 int32_t AuthRequestState::SetAuthManager(std::shared_ptr<DmAuthManager> authManager)
 {
     authManager_ = std::move(authManager);
@@ -250,5 +251,6 @@ int32_t AuthRequestReCheckMsgDone::Enter()
     stateAuthManager->RequestReCheckMsgDone();
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -2030,6 +2030,9 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
         .stageRes = static_cast<int32_t>(StageRes::STAGE_CANCEL),
         .bizState = static_cast<int32_t>(BizState::BIZ_STATE_END),
     };
+    JsonObject paramJson;
+    paramJson.Parse(params);
+    std::string pinCode;
     switch (action) {
         case USER_OPERATION_TYPE_ALLOW_AUTH:
         case USER_OPERATION_TYPE_CANCEL_AUTH:
@@ -2049,7 +2052,12 @@ int32_t DmAuthManager::OnUserOperation(int32_t action, const std::string &params
             info.errCode = DmRadarHelper::GetInstance().GetErrCode(ERR_DM_BIND_USER_CANCEL_ERROR);
             break;
         case USER_OPERATION_TYPE_DONE_PINCODE_INPUT:
-            ProcessPincode(params);
+            if (paramJson.IsDiscarded() || !IsString(paramJson, PIN_CODE_KEY)) {
+                LOGE("DmAuthManager OnUserOperation pinCode not found");
+                return ERR_DM_INPUT_PARA_INVALID;
+            }
+            pinCode = paramJson[PIN_CODE_KEY].Get<std::string>();
+            ProcessPincode(pinCode);
             info.stageRes = static_cast<int32_t>(StageRes::STAGE_SUCC);
             break;
         default:

@@ -50,7 +50,7 @@ namespace {
 
 const std::string DM_NAPI_EVENT_DEVICE_STATE_CHANGE = "deviceStateChange";
 const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_SUCCESS = "discoverSuccess";
-const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFail";
+const std::string DM_NAPI_EVENT_DEVICE_DISCOVER_FAIL = "discoverFailure";
 const std::string DM_NAPI_EVENT_DEVICE_PUBLISH_SUCCESS = "publishSuccess";
 const std::string DM_NAPI_EVENT_DEVICE_PUBLISH_FAIL = "publishFail";
 const std::string DM_NAPI_EVENT_DEVICE_SERVICE_DIE = "serviceDie";
@@ -677,7 +677,7 @@ void DeviceManagerNapi::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedRe
     SetValueInt32(env_, "reason", (int)failedReason, result);
     std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)failedReason);
     SetValueUtf8String(env_, "errInfo", errCodeInfo, result);
-    OnEvent("discoverFail", DM_NAPI_ARGS_ONE, &result);
+    OnEvent("discoverFailure", DM_NAPI_ARGS_ONE, &result);
     napi_close_handle_scope(env_, scope);
 }
 

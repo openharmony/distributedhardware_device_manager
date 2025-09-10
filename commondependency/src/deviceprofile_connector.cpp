@@ -590,6 +590,7 @@ void DeviceProfileConnector::FilterNeedDeleteACLInfos(
     }
 }
 
+//LCOV_EXCL_START
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
@@ -634,6 +635,7 @@ std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceI
     }
     return aclProfileVec;
 }
+//LCOV_EXCL_STOP
 
 std::vector<AccessControlProfile> DeviceProfileConnector::GetAclProfileByDeviceIdAndUserId(const std::string &deviceId,
     int32_t userId, const std::string &remoteDeviceId)
@@ -2325,6 +2327,7 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
     return offlineParam;
 }
 
+//LCOV_EXCL_START
 DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAccessControlProfile()
 {
     std::vector<AccessControlProfile> profiles;
@@ -2344,6 +2347,7 @@ DM_EXPORT std::vector<AccessControlProfile> DeviceProfileConnector::GetAllAclInc
     }
     return profiles;
 }
+//LCOV_EXCL_STOP
 
 DM_EXPORT void DeviceProfileConnector::DeleteAccessControlById(
     int64_t accessControlId)
@@ -3509,6 +3513,25 @@ bool DeviceProfileConnector::IsAllowAuthAlways(const std::string &localUdid, int
         }
     }
     return false;
+}
+
+int32_t DeviceProfileConnector::GetAuthOnceUdids(std::unordered_set<std::string> &udidSet)
+{
+    std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
+    std::string localUdid = GetLocalDeviceId();
+    for (auto &item : profiles) {
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
+        if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
+            if (accesserUdid == localUdid) {
+                udidSet.insert(accesseeUdid);
+            }
+            if (accesseeUdid == localUdid) {
+                udidSet.insert(accesserUdid);
+            }
+        }
+    }
+    return DM_OK;
 }
 
 IDeviceProfileConnector *CreateDpConnectorInstance()

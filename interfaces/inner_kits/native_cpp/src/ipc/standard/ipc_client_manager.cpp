@@ -68,6 +68,11 @@ int32_t IpcClientManager::ClientInit()
     if (!object->AddDeathRecipient(dmRecipient_)) {
         LOGE("InitDeviceManagerService: AddDeathRecipient Failed");
     }
+    if (!object->IsProxyObject()) {
+        LOGI("object is not proxy object.");
+        dmInterface_ = sptr<IpcClientServerProxy>(new IpcClientServerProxy(object));
+        return DM_OK;
+    }
     dmInterface_ = iface_cast<IpcRemoteBroker>(object);
     LOGI("Completed");
     return DM_OK;

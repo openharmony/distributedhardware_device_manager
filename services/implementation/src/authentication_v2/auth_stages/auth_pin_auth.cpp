@@ -652,8 +652,8 @@ int32_t AuthSrcReverseUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext>
         return DM_OK;
     } else if (retEvent == DmEventType::ON_ERROR) {
         LOGI("AuthSrcReverseUltrasonicDoneState::AuthDevice ON_ERROR failed.");
-        context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_PIN_AUTH_START, context);
         context->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
+        context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_PIN_AUTH_START, context);
         return DM_OK;
     }
     return STOP_BIND;
@@ -711,8 +711,8 @@ int32_t AuthSrcForwardUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext>
             return DM_OK;
         } else if (retEvent == DmEventType::ON_ERROR) {
             LOGI("OnPinCodeChanged ON_ERROR failed.");
-            context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_PIN_AUTH_START, context);
             context->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
+            context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_PIN_AUTH_START, context);
             return DM_OK;
         }
     } else if (retEvent == DmEventType::ON_ULTRASONIC_PIN_TIMEOUT) {

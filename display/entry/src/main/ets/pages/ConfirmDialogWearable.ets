@@ -18,6 +18,7 @@ import common from '@ohos.app.ability.common';
 
 let dmClass: deviceManager.DeviceManager | null;
 let TAG = '[DeviceManagerUI:ConfirmDialog]==>';
+let metaType: number = 11;
 const ACTION_ALLOW_AUTH_ONCE: number = 0;
 const ACTION_CANCEL_AUTH: number = 1;
 const ACTION_AUTH_CONFIRM_TIMEOUT: number = 2;
@@ -125,7 +126,7 @@ struct Index {
     }
   }
 
-  setUserOperation(operation: number) {
+  setUserOperation(operation: number, param: string) {
     console.log(TAG + 'setUserOperation: ' + operation);
     if (dmClass === null) {
       console.log(TAG + 'setUserOperation: ' + 'dmClass null');
@@ -133,7 +134,7 @@ struct Index {
     }
     try {
       this.isUserOperate = true;
-      dmClass.setUserOperation(operation, 'extra');
+      dmClass.setUserOperation(operation, param);
     } catch (error) {
       console.log(TAG + 'dmClass setUserOperation failed');
     }
@@ -145,6 +146,9 @@ struct Index {
 
     if (AppStorage.get('deviceName') != null) {
       this.peerDeviceName = AppStorage.get('deviceName') as string;
+    }
+    if (AppStorage.get('metaType') != null) {
+      metaType = AppStorage.get('metaType') as number;
     }
     let hostPkgLabel: string = AppStorage.get('hostPkgLabel') as string;
     if (hostPkgLabel === CAST_PKG_NAME) {
@@ -173,7 +177,11 @@ struct Index {
       if (this.secondsNum === 0) {
         clearInterval(this.times);
         this.times = 0;
-        this.setUserOperation(ACTION_AUTH_CONFIRM_TIMEOUT);
+        const param = {
+          'META_TYPE': metaType
+        };
+        const jsonStr = JSON.stringify(param);
+        this.setUserOperation(ACTION_AUTH_CONFIRM_TIMEOUT, jsonStr);
         this.destruction();
         console.info('click cancel times run out');
       }
@@ -188,7 +196,11 @@ struct Index {
     }
 
     console.log('allow once' + ACTION_ALLOW_AUTH_ONCE);
-    this.setUserOperation(ACTION_ALLOW_AUTH_ONCE);
+    const param = {
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_ALLOW_AUTH_ONCE, jsonStr);
     this.destruction();
   }
 
@@ -200,7 +212,11 @@ struct Index {
     }
 
     console.log('allow always' + ACTION_ALLOW_AUTH_ALWAYS);
-    this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS);
+    const param = {
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_ALLOW_AUTH_ALWAYS, jsonStr);
     this.destruction();
   }
 
@@ -212,7 +228,11 @@ struct Index {
     }
 
     console.log('cancel' + ACTION_CANCEL_AUTH);
-    this.setUserOperation(ACTION_CANCEL_AUTH);
+    const param = {
+      'META_TYPE': metaType
+    };
+    const jsonStr = JSON.stringify(param);
+    this.setUserOperation(ACTION_CANCEL_AUTH, jsonStr);
     this.destruction();
   }
 

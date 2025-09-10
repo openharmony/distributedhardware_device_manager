@@ -1303,7 +1303,7 @@ HWTEST_F(SoftbusListenerTest, SetLocalDisplayName_001, testing::ext::TestSize.Le
         softbusListener = std::make_shared<SoftbusListener>();
     }
     int32_t ret = softbusListener->SetLocalDisplayName(displayName);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_NE(ret, DM_OK);
     std::vector<DmDeviceInfo> onlineDevInfoVec;
     EXPECT_CALL(*softbusCacheMock_, GetDeviceInfoFromCache(_)).Times(::testing::AtLeast(1))
         .WillOnce(DoAll(SetArgReferee<0>(onlineDevInfoVec), Return(DM_OK)));

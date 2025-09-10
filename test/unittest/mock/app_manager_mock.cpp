@@ -40,9 +40,9 @@ int32_t AppManager::GetHapTokenIdByName(int32_t userId, std::string &bundleName,
     return DmAppManager::dmAppManager->GetHapTokenIdByName(userId, bundleName, instIndex, tokenId);
 }
 
-int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &appId)
+int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &appId, const int32_t userId)
 {
-    return DmAppManager::dmAppManager->GetAppIdByPkgName(pkgName, appId);
+    return DmAppManager::dmAppManager->GetAppIdByPkgName(pkgName, appId, userId);
 }
 
 int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)

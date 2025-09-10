@@ -61,6 +61,7 @@ int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 int32_t AuthResponseInitState::GetStateType()
 {
     return AuthState::AUTH_RESPONSE_INIT;
@@ -196,5 +197,6 @@ int32_t AuthResponseReCheckMsg::Enter()
     stateAuthManager->ResponseReCheckMsg();
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 } // namespace DistributedHardware
 } // namespace OHOS

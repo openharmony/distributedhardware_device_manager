@@ -354,6 +354,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
     if (IsPC() && !MultipleUserConnector::IsUserUnlocked(currentUserId)) {
         HandleUserStopEvent(currentUserId);
     }
+    InitTaskOfDelTimeOutAcl();
 #endif
     LOGI("Init success.");
     return DM_OK;
@@ -371,14 +372,14 @@ DM_EXPORT void DeviceManagerService::UninitDMServiceListener()
     LOGI("Uninit.");
 }
 
-DM_EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName)
+DM_EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
-    AppManager::GetInstance().RegisterCallerAppId(pkgName);
+    AppManager::GetInstance().RegisterCallerAppId(pkgName, userId);
 }
 
-DM_EXPORT void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName)
+DM_EXPORT void DeviceManagerService::UnRegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
-    AppManager::GetInstance().UnRegisterCallerAppId(pkgName);
+    AppManager::GetInstance().UnRegisterCallerAppId(pkgName, userId);
 }
 
 int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, const std::string &extra,
@@ -1114,10 +1115,18 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
         LOGE("DeviceManagerService::SetUserOperation error: Invalid parameter, pkgName: %{public}s", pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (IsDMServiceAdapterSoLoaded()) {
+    JsonObject paramJson;
+    paramJson.Parse(params);
+    if (paramJson.IsDiscarded() || !IsInt32(paramJson, PARAM_KEY_META_TYPE)) {
+        LOGE("meta type not found");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int32_t metaType = paramJson[PARAM_KEY_META_TYPE].Get<int32_t>();
+    if (metaType != PROXY_DEFAULT && IsDMServiceAdapterSoLoaded()) {
+        LOGE("SetUserOperation metaType: %{public}d", metaType);
         dmServiceImplExtResident_->ReplyUiAction(pkgName, action, params);
     }
-    if (!IsDMServiceImplReady()) {
+    if (metaType != PROXY_DEFAULT || !IsDMServiceImplReady()) {
         LOGE("SetUserOperation failed, instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
@@ -2930,7 +2939,8 @@ DM_EXPORT int32_t DeviceManagerService::GetUdidHashByAnoyDeviceId(
 void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
     uint64_t tokenId, int32_t bindLevel)
 {
-    LOGI("TokenId %{public}" PRId64", bindLevel %{public}d, userId %{public}d.", tokenId, bindLevel, userId);
+    LOGI("TokenId %{public}s, bindLevel %{public}d, userId %{public}d.", GetAnonyInt32(tokenId).c_str(),
+        bindLevel, userId);
     if (static_cast<uint32_t>(bindLevel) == USER) {
         SendDeviceUnBindBroadCast(peerUdids, userId);
         return;
@@ -4361,6 +4371,38 @@ void DeviceManagerService::HandleAccountLogoutEventCallback(const std::string &c
     MultipleUserConnector::DeleteAccountInfoByUserId(currentUserId);
     MultipleUserConnector::SetAccountInfo(MultipleUserConnector::GetCurrentAccountUserID(),
         MultipleUserConnector::GetCurrentDMAccountInfo());
+}
+
+void DeviceManagerService::InitTaskOfDelTimeOutAcl()
+{
+    CHECK_NULL_VOID(discoveryMgr_);
+    if (!discoveryMgr_->IsCommonDependencyReady() || discoveryMgr_->GetCommonDependencyObj() == nullptr) {
+        LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
+        return;
+    }
+    std::unordered_set<std::string> udidSet;
+    discoveryMgr_->GetCommonDependencyObj()->GetAuthOnceUdids(udidSet);
+    if (udidSet.empty()) {
+        LOGI("no auth once data.");
+        return;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("instance not init or init failed.");
+        return;
+    }
+
+    for (const std::string &udid : udidSet) {
+        char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
+        if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
+            LOGE("get udidhash failed.");
+            return;
+        }
+        if (SoftbusCache::GetInstance().CheckIsOnline(udidHash)) {
+            LOGE("device is online udidhash %{public}s.", GetAnonyString(udidHash).c_str());
+            continue;
+        }
+        dmServiceImpl_->InitTaskOfDelTimeOutAcl(udid, udidHash);
+    }
 }
 #endif
 } // namespace DistributedHardware

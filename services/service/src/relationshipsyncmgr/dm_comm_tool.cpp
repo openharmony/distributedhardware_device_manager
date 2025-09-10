@@ -530,8 +530,8 @@ void DMCommTool::ProcessReceiveUninstAppEvent(const std::shared_ptr<InnerCommMsg
     RspAppUninstall(commMsg->remoteNetworkId, commMsg->socketId);
 
     if (uninstAppMsg.userId_ == -1 || uninstAppMsg.tokenId_ == -1) {
-        LOGE("param invalid, userId: %{public}d, tokenId: %{public}d",
-            uninstAppMsg.userId_, uninstAppMsg.tokenId_);
+        LOGE("param invalid, userId: %{public}d, tokenId: %{public}s",
+            uninstAppMsg.userId_, GetAnonyInt32(uninstAppMsg.tokenId_).c_str());
         return;
     } else {
         DeviceManagerService::GetInstance().ProcessUninstApp(uninstAppMsg.userId_,
@@ -558,8 +558,8 @@ void DMCommTool::ProcessReceiveUnBindAppEvent(const std::shared_ptr<InnerCommMsg
     RspAppUnbind(commMsg->remoteNetworkId, commMsg->socketId);
 
     if (unBindAppMsg.userId_ == -1 || unBindAppMsg.tokenId_ == -1) {
-        LOGE("param invalid, userId: %{public}d, tokenId: %{public}d",
-            unBindAppMsg.userId_, unBindAppMsg.tokenId_);
+        LOGE("param invalid, userId: %{public}d, tokenId: %{public}s",
+            unBindAppMsg.userId_, GetAnonyInt32(unBindAppMsg.tokenId_).c_str());
         return;
     } else {
         DeviceManagerService::GetInstance().ProcessUnBindApp(unBindAppMsg.userId_,

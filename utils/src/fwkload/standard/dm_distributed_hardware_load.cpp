@@ -33,7 +33,7 @@ DM_EXPORT void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
         LOGE("failed to get system ability mgr.");
         return;
     }
-    distributedHardwareLoadCount_++;
+    distributedHardwareLoadCount_.fetch_add(1);
     sptr<DistributedHardwareLoadCallback> distributedHardwareLoadCallback_(new DistributedHardwareLoadCallback());
     int32_t ret = samgr->LoadSystemAbility(DISTRIBUTED_HARDWARE_SA_ID, distributedHardwareLoadCallback_);
     if (ret != DM_OK) {
@@ -44,11 +44,11 @@ DM_EXPORT void DmDistributedHardwareLoad::LoadDistributedHardwareFwk(void)
 }
 void DmDistributedHardwareLoad::InitDistributedHardwareLoadCount(void)
 {
-    distributedHardwareLoadCount_ = 0;
+    distributedHardwareLoadCount_.store(0);
 }
 uint32_t DmDistributedHardwareLoad::GetDistributedHardwareLoadCount()
 {
-    return distributedHardwareLoadCount_;
+    return distributedHardwareLoadCount_.load();
 }
 
 void DistributedHardwareLoadCallback::OnLoadSystemAbilitySuccess(
