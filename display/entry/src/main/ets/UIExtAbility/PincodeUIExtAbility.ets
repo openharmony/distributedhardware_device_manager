@@ -24,7 +24,7 @@ export default class InputUIExtAbility extends UIExtensionAbility {
         if (want.parameters && want.parameters.pinCode) {
             AppStorage.setOrCreate('pinCode', want.parameters.pinCode);
         }
-        if (want.parameters.metaType) {
+        if (want.parameters.metaType != undefined) {
             AppStorage.setOrCreate('metaType', want.parameters.metaType);
         }
 

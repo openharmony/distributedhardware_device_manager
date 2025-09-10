@@ -27,7 +27,7 @@ export default class InputUIExtAbility extends UIExtensionAbility {
         if (want.parameters && want.parameters.model) {
             AppStorage.setOrCreate('model', want.parameters.model);
         }
-        if (want.parameters.metaType) {
+        if (want.parameters.metaType != undefined) {
             AppStorage.setOrCreate('metaType', want.parameters.metaType);
         }
 
