@@ -646,7 +646,7 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
         context_->listener->OnBindResult(context_->processInfo, context_->peerTargetId,
             DM_OK, STATUS_DM_AUTH_DEFAULT, "");
         context_->reason = DM_OK;
-        consext_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState()>);
+        context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
         return DM_OK;
     }
     InitAuthState(pkgName, authType, deviceId, extra);
