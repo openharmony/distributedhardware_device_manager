@@ -638,12 +638,15 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     }
     context_->isAuthenticateDevice = true;
     if (authType == AUTH_TYPE_CRE) {
+        GetConnDelayCloseTime(extra);
         LOGI("AuthManager::AuthenticateDevice for credential type, joinLNN directly.");
         context_->softbusConnector->JoinLnn(deviceId, true);
         context_->listener->OnAuthResult(context_->processInfo, context_->peerTargetId.deviceId,
             "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         context_->listener->OnBindResult(context_->processInfo, context_->peerTargetId,
             DM_OK, STATUS_DM_AUTH_DEFAULT, "");
+        context_->reason = DM_OK;
+        consext_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState()>);
         return DM_OK;
     }
     InitAuthState(pkgName, authType, deviceId, extra);
@@ -651,6 +654,20 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
         return ERR_DM_INPUT_PARA_INVALID;
     }
     return DM_OK;
+}
+
+void AuthManager::GetConnDelayCloseTime(const std::string &extra)
+{
+    JsonObject jsonObject(extra);
+    if (jsonObject.IsDiscarded()) {
+        LOGE("extra string not a json type.");
+        return;
+    }
+    context_->connDelayCloseTime = 0;
+    if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {
+        std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
+        context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
+    }
 }
 
 int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &targetId,
