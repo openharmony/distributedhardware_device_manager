@@ -36,6 +36,7 @@ static DumperInfo g_dumperDeviceType[] = {
     {DEVICE_TYPE_WATCH, "DEVICE_TYPE_WATCH"},
     {DEVICE_TYPE_CAR, "DEVICE_TYPE_CAR"},
     {DEVICE_TYPE_TV, "DEVICE_TYPE_TV"},
+    {DEVICE_TYPE_GLASSES, "DEVICE_TYPE_GLASSES"},
 };
 
 // HiDumper info

@@ -3350,6 +3350,7 @@ napi_value DeviceManagerNapi::InitDeviceTypeEnum(napi_env env, napi_value export
     napi_value wearable;
     napi_value car;
     napi_value tv;
+    napi_value glasses;
     int32_t refCount = 1;
 
     napi_create_uint32(env, static_cast<uint32_t>(DmDeviceType::DEVICE_TYPE_UNKNOWN),
@@ -3366,6 +3367,8 @@ napi_value DeviceManagerNapi::InitDeviceTypeEnum(napi_env env, napi_value export
         &car);
     napi_create_uint32(env, static_cast<uint32_t>(DmDeviceType::DEVICE_TYPE_TV),
         &tv);
+    napi_create_uint32(env, static_cast<uint32_t>(DmDeviceType::DEVICE_TYPE_GLASSES),
+        &glasses);
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN_TYPE", unknown_type),
@@ -3375,6 +3378,7 @@ napi_value DeviceManagerNapi::InitDeviceTypeEnum(napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY("WEARABLE", wearable),
         DECLARE_NAPI_STATIC_PROPERTY("CAR", car),
         DECLARE_NAPI_STATIC_PROPERTY("TV", tv),
+        DECLARE_NAPI_STATIC_PROPERTY("GLASSES", glasses),
     };
 
     napi_value result = nullptr;

@@ -99,6 +99,10 @@ typedef enum DmDeviceType {
     */
     DEVICE_TYPE_2IN1 = 0xA2F,
     THIRD_TV = 0x2E,
+    /**
+     *  Indicates ai glasses.
+     */
+    DEVICE_TYPE_GLASSES = 0xA31,
 } DmDeviceType;
 
 /**
@@ -371,6 +375,7 @@ DM_EXPORT extern const char* DEVICE_TYPE_WIFICAMERA_STRING;
 DM_EXPORT extern const char* DEVICE_TYPE_PC_STRING;
 DM_EXPORT extern const char* DEVICE_TYPE_SMART_DISPLAY_STRING;
 DM_EXPORT extern const char* DEVICE_TYPE_2IN1_STRING;
+DM_EXPORT extern const char* DEVICE_TYPE_GLASSES_STRING;
 
 typedef struct DmAccessCaller {
     std::string accountId;

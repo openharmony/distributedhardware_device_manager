@@ -25,5 +25,6 @@ const char* DEVICE_TYPE_WIFICAMERA_STRING = "WiFiCamera";
 const char* DEVICE_TYPE_PC_STRING = "PC";
 const char* DEVICE_TYPE_SMART_DISPLAY_STRING = "SMART_DISPLAY";
 const char* DEVICE_TYPE_2IN1_STRING = "2IN1";
+const char* DEVICE_TYPE_GLASSES_STRING = "GLASSES";
 } // namespace DistributedHardware
 } // namespace OHOS
