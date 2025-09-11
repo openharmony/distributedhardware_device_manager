@@ -663,8 +663,9 @@ void AuthManager::GetConnDelayCloseTime(const std::string &extra)
         LOGE("extra string not a json type.");
         return;
     }
+    CHECK_NULL_VOID(context_);
     context_->connDelayCloseTime = 0;
-    if (jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].IsString()) {
+    if (IsString(jsonObject, PARAM_CLOSE_SESSION_DELAY_SECONDS)) {
         std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
         context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
     }
