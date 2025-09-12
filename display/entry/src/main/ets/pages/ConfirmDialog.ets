@@ -1589,7 +1589,7 @@ struct ConfirmCustomDialog {
                 .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                .minFontSize(12)
+                .minFontSize(11)
                 .maxFontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                 .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
                 .lineHeight(this.isTibetanLanguages() ? 22 : 0)
