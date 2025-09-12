@@ -179,6 +179,32 @@ public:
     }
     virtual void OnCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode) = 0;
 };
+
+class ServiceDiscoveryCallback {
+public:
+    virtual ~ServiceDiscoveryCallback()
+    {
+    }
+    virtual void OnServiceFound(const DiscoveryServiceInfo &service) = 0;
+    virtual void OnServiceDiscoveryResult(int32_t resReason) = 0;
+};
+
+class ServiceInfoStateCallback {
+public:
+    virtual ~ServiceInfoStateCallback()
+    {
+    }
+    virtual void OnServiceOnline(int64_t serviceId) = 0;
+    virtual void OnServiceOffline(int64_t serviceId) = 0;
+};
+
+class ServicePublishCallback {
+public:
+    virtual ~ServicePublishCallback()
+    {
+    }
+    virtual void OnServicePublishResult(int64_t serviceId, int32_t reason) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

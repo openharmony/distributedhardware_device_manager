@@ -276,6 +276,7 @@ struct DmAuthContext {
     std::multimap<DmAccess, DmAccess> proxy;    // Multimap where the key is the accessor and the value is the accesssee
     bool isNeedJoinLnn{true};
     bool IsProxyBind{false};
+    bool isServiceBind{false};
     bool IsCallingProxyAsSubject{true};
     bool IsNeedSetProxy{false};
     bool isNeedAuthenticate{true}; // apply for skip authenticate

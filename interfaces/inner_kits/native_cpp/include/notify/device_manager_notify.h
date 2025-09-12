@@ -57,6 +57,7 @@ public:
     void UnRegisterCredentialCallback(const std::string &pkgName);
     void RegisterBindCallback(const std::string &pkgName, const PeerTargetId &targetId,
         std::shared_ptr<BindTargetCallback> callback);
+    void UnRegisterBindCallback(const std::string &pkgName, const PeerTargetId &targetId);
     void RegisterUnbindCallback(const std::string &pkgName, const PeerTargetId &targetId,
         std::shared_ptr<UnbindTargetCallback> callback);
     void OnBindResult(const std::string &pkgName, const PeerTargetId &targetId, int32_t result, int32_t status,
@@ -87,6 +88,13 @@ public:
         std::shared_ptr<SetRemoteDeviceNameCallback> callback);
     void OnSetRemoteDeviceNameResult(const std::string &pkgName, const std::string &deviceId, int32_t code);
     void UnRegisterPinHolderCallback(const std::string &pkgName);
+    void RegisterServiceDiscoveryCallback(int32_t discoveryServiceId,
+        std::shared_ptr<ServiceDiscoveryCallback> callback);
+    void UnRegisterServiceDiscoveryCallback(int32_t discoveryServiceId);
+    int32_t RegisterServiceStateCallback(const std::string &key, std::shared_ptr<ServiceInfoStateCallback> callback);
+    int32_t UnRegisterServiceStateCallback(const std::string &key);
+    void RegisterServicePublishCallback(int64_t serviceId, std::shared_ptr<ServicePublishCallback> callback);
+    void UnRegisterServicePublishCallback(int64_t serviceId);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -103,6 +111,8 @@ public:
         std::shared_ptr<DeviceStatusCallback> tempCbk);
     static void DeviceTrustChange(const std::string &udid, const std::string &uuid, DmAuthForm authForm,
         std::shared_ptr<DevTrustChangeCallback> tempCbk);
+    static void ServiceInfoOnline(
+        std::vector<std::pair<std::shared_ptr<ServiceInfoStateCallback>, int64_t>> callbackInfo);
 public:
     void OnRemoteDied();
     void OnDeviceOnline(const std::string &pkgName, const DmDeviceInfo &deviceInfo);
@@ -139,6 +149,10 @@ public:
         std::string content);
     std::shared_ptr<DiscoveryCallback> GetDiscoveryCallback(const std::string &pkgName, uint16_t subscribeId);
     void GetCallBack(std::map<DmCommonNotifyEvent, std::set<std::string>> &callbackMap);
+    void OnServiceFound(int32_t discoveryServiceId, const DiscoveryServiceInfo &service);
+    void OnServiceDiscoveryResult(int32_t discoveryServiceId, int32_t resReason);
+    void OnServiceOnline(const std::vector<int64_t> &serviceIds);
+    void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
 
 private:
 #if !defined(__LITEOS_M__)
@@ -166,6 +180,9 @@ private:
     std::map<std::string, std::shared_ptr<SetLocalDeviceNameCallback>> setLocalDeviceNameCallback_;
     std::map<std::string,
         std::map<std::string, std::shared_ptr<SetRemoteDeviceNameCallback>>> setRemoteDeviceNameCallback_;
+    std::map<int32_t, std::shared_ptr<ServiceDiscoveryCallback>> serviceDiscoveryCallbacks_;
+    std::map<std::string, std::shared_ptr<ServiceInfoStateCallback>> serviceStateCallback_;
+    std::map<int64_t, std::shared_ptr<ServicePublishCallback>> servicePublishCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

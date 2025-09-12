@@ -80,10 +80,21 @@ public:
         dmDeviceBasicInfo_ = dmDeviceBasicInfo;
     }
 
+    void SetServiceIds(const std::vector<int64_t> &serviceIds)
+    {
+        serviceIds_ = serviceIds;
+    }
+
+    const std::vector<int64_t> &GetServiceIds() const
+    {
+        return serviceIds_;
+    }
+
 private:
     int32_t deviceState_ { 0 };
     DmDeviceInfo dmDeviceInfo_;
     DmDeviceBasicInfo dmDeviceBasicInfo_;
+    std::vector<int64_t> serviceIds_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

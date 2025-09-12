@@ -986,7 +986,7 @@ void DmAuthState::JoinLnn(std::shared_ptr<DmAuthContext> context)
         LOGI("The remote device is offline.");
         isForceJoin = true;
     }
-    if (context->connSessionType == CONN_SESSION_TYPE_HML) {
+    if (context->connSessionType == CONN_SESSION_TYPE_HML || context->isServiceBind) {
         context->softbusConnector->JoinLnnByHml(context->sessionId, context->accesser.transmitSessionKeyId,
             context->accessee.transmitSessionKeyId, isForceJoin);
     } else {

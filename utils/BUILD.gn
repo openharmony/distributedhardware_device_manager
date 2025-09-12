@@ -167,6 +167,7 @@ if (defined(ohos_lite)) {
       "openssl:libcrypto_shared",
       "os_account:os_account_innerkits",
       "samgr:samgr_proxy",
+      "init:libbegetutil",
     ]
 
     public_external_deps = [
@@ -246,6 +247,7 @@ if (defined(ohos_lite)) {
       "openssl:libcrypto_shared",
       "os_account:os_account_innerkits",
       "samgr:samgr_proxy",
+      "init:libbegetutil",
     ]
 
     public_external_deps = [

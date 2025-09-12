@@ -225,7 +225,8 @@ void ParseMapFromJsonString(const std::string &jsonStr, std::map<std::string, st
 
 bool IsInvalidPeerTargetId(const PeerTargetId &targetId)
 {
-    return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() && targetId.wifiIp.empty();
+    return targetId.deviceId.empty() && targetId.brMac.empty() && targetId.bleMac.empty() &&
+        targetId.wifiIp.empty() && (targetId.serviceId == 0);
 }
 
 std::string ConvertCharArray2String(const char *srcData, uint32_t srcLen)

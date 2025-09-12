@@ -162,6 +162,7 @@ const char* APP_USER_DATA = "appUserData";
 const char* BUNDLE_INFO = "bundleInfo";
 const char* TITLE = "title";
 const char* DM_BUSINESS_ID = "business_id";
+const char* PARAM_KEY_IS_SERVICE_BIND = "isServiceBind";
 
 // errCode map
 const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
@@ -173,7 +174,7 @@ const std::map<int32_t, int32_t> MAP_ERROR_CODE = {
 };
 
 // wise device
-const uint32_t MAX_CONTAINER_SIZE = 1000;
+const uint32_t MAX_CONTAINER_SIZE = 10000;
 const int32_t MAX_DEVICE_PROFILE_SIZE = 500;
 const char* ACL_IS_LNN_ACL_KEY = "IsLnnAcl";
 const char* ACL_IS_LNN_ACL_VAL_TRUE = "true";
@@ -198,5 +199,6 @@ const int32_t DM_OH_OSTYPE = 10;
 const char* PEER_UDID = "peer_udid";
 const char* PEER_OSTYPE = "peer_ostype";
 const char* TIME_STAMP = "time_stamp";
+const char* SERVICE_ID_KEY = "serviceId";
 } // namespace DistributedHardware
 } // namespace OHOS

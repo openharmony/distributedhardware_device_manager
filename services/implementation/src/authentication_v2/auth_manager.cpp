@@ -483,7 +483,17 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     }
     ParseHmlInfoInJsonObject(jsonObject);
     ParseProxyJsonObject(jsonObject);
+    ParseServiceInfo(jsonObject);
     return;
+}
+
+void AuthManager::ParseServiceInfo(const JsonObject &jsonObject)
+{
+    if (context_ == nullptr || jsonObject.IsDiscarded() || !IsString(jsonObject, PARAM_KEY_IS_SERVICE_BIND) ||
+        jsonObject[PARAM_KEY_IS_SERVICE_BIND].Get<std::string>() != DM_VAL_TRUE) {
+        return;
+    }
+    context_->isServiceBind = true;
 }
 
 void AuthManager::ParseUltrasonicSide(const JsonObject &jsonObject)
@@ -586,6 +596,15 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         return;
     }
     ParseJsonObject(jsonObject);
+    if (context_->isServiceBind) {
+        if (IsNumberString(deviceId)) {
+            context_->accessee.serviceId = std::stoll(deviceId); // service bind device id is service id
+            context_->accesser.serviceId = std::stoll(deviceId);
+        } else {
+            LOGE("OpenAuthSession failed");
+            return;
+        }
+    }
     context_->accesser.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context_->accesser.userId);
 
     // compatible for old version

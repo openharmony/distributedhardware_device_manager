@@ -36,6 +36,7 @@ constexpr const char* DEVICE_OFFLINE = "deviceOffline";
 constexpr const char* DEVICEINFO_CHANGE = "deviceInfoChange";
 constexpr const char* DEVICE_READY = "deviceReady";
 constexpr const char* DEVICE_TRUST_CHANGE = "deviceTrustChange";
+constexpr const char* SERVICE_ONLINE = "serviceOnLine";
 #endif
 const uint16_t DM_INVALID_FLAG_ID = 0;
 void DeviceManagerNotify::RegisterDeathRecipientCallback(const std::string &pkgName,
@@ -717,11 +718,30 @@ void DeviceManagerNotify::RegisterBindCallback(const std::string &pkgName, const
         return;
     }
     std::lock_guard<std::mutex> autoLock(bindLock_);
+    if (bindCallback_.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("bindCallback_ map size is more than max size");
+        return;
+    }
     if (bindCallback_.count(pkgName) == 0) {
         CHECK_SIZE_VOID(bindCallback_);
         bindCallback_[pkgName] = std::map<PeerTargetId, std::shared_ptr<BindTargetCallback>>();
     }
     bindCallback_[pkgName][targetId] = callback;
+}
+
+void DeviceManagerNotify::UnRegisterBindCallback(const std::string &pkgName, const PeerTargetId &targetId)
+{
+    if (pkgName.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (bindCallback_.count(pkgName) > 0) {
+        bindCallback_[pkgName].erase(targetId);
+        if (bindCallback_[pkgName].empty()) {
+            bindCallback_.erase(pkgName);
+        }
+    }
 }
 
 void DeviceManagerNotify::RegisterUnbindCallback(const std::string &pkgName, const PeerTargetId &targetId,
@@ -733,6 +753,10 @@ void DeviceManagerNotify::RegisterUnbindCallback(const std::string &pkgName, con
         return;
     }
     std::lock_guard<std::mutex> autoLock(lock_);
+    if (unbindCallback_.size() >= MAX_CONTAINER_SIZE) {
+        LOGE("unbindCallback_ map size is more than max size");
+        return;
+    }
     if (unbindCallback_.count(pkgName) == 0) {
         CHECK_SIZE_VOID(unbindCallback_);
         unbindCallback_[pkgName] = std::map<PeerTargetId, std::shared_ptr<UnbindTargetCallback>>();
@@ -1449,6 +1473,190 @@ void DeviceManagerNotify::UnRegisterPinHolderCallback(const std::string &pkgName
     }
     std::lock_guard<std::mutex> autoLock(lock_);
     pinHolderCallback_.erase(pkgName);
+}
+
+void DeviceManagerNotify::RegisterServiceDiscoveryCallback(int32_t discoveryServiceId,
+    std::shared_ptr<ServiceDiscoveryCallback> callback)
+{
+    if (callback == nullptr) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return;
+    }
+    std::lock_guard<std::mutex> autolock(lock_);
+    CHECK_SIZE_VOID(serviceDiscoveryCallbacks_);
+    serviceDiscoveryCallbacks_[discoveryServiceId] = callback;
+}
+
+void DeviceManagerNotify::UnRegisterServiceDiscoveryCallback(int32_t discoveryServiceId)
+{
+    std::lock_guard<std::mutex> autolock(lock_);
+    if (serviceDiscoveryCallbacks_.count(discoveryServiceId) == 0) {
+        LOGE("error,Service Discovery not register.");
+        return;
+    }
+    serviceDiscoveryCallbacks_.erase(discoveryServiceId);
+}
+
+void DeviceManagerNotify::OnServiceFound(int32_t discoveryServiceId, const DiscoveryServiceInfo &service)
+{
+    std::shared_ptr<ServiceDiscoveryCallback> tempCbk;
+    std::lock_guard<std::mutex> autolock(lock_);
+    auto iter = serviceDiscoveryCallbacks_.find(discoveryServiceId);
+    if (iter == serviceDiscoveryCallbacks_.end()) {
+        LOGE("error, callback not register for discoveryServiceId %{public}s",
+            GetAnonyInt32(discoveryServiceId).c_str());
+        return;
+    }
+    tempCbk = iter->second;
+    if (tempCbk == nullptr) {
+        LOGE("OnServiceFound error, registered service discovery callback is nullptr.");
+        return;
+    }
+    LOGD("Complete with serviceInfo");
+    tempCbk->OnServiceFound(service);
+}
+
+void DeviceManagerNotify::OnServiceDiscoveryResult(int32_t discoveryServiceId, int32_t resReason)
+{
+    std::shared_ptr<ServiceDiscoveryCallback> tempCbk;
+    std::lock_guard<std::mutex> autolock(lock_);
+    auto iter = serviceDiscoveryCallbacks_.find(discoveryServiceId);
+    if (iter == serviceDiscoveryCallbacks_.end()) {
+        LOGE("error, callback not register for discoveryServiceId %{public}s",
+            GetAnonyInt32(discoveryServiceId).c_str());
+        return;
+    }
+    tempCbk = iter->second;
+    if (tempCbk == nullptr) {
+        LOGE("OnServiceDiscoveryResult error, registered service discovery callback is nullptr.");
+        return;
+    }
+    LOGD("Complete with result");
+    tempCbk->OnServiceDiscoveryResult(resReason);
+}
+
+void DeviceManagerNotify::OnServiceOnline(const std::vector<int64_t> &serviceIds)
+{
+    if (serviceIds.empty()) {
+        LOGE("Invalid parameter, serviceIds is empty.");
+        return;
+    }
+    LOGI("In, serviceIds size: %{public}zu", serviceIds.size());
+    std::string key = "";
+    std::vector<std::pair<std::shared_ptr<ServiceInfoStateCallback>, int64_t>> callbackInfo;
+    std::lock_guard<std::mutex> autoLock(lock_);
+    for (const auto &item : serviceIds) {
+        key = std::to_string(item);
+        auto iter = serviceStateCallback_.find(key);
+        if (iter == serviceStateCallback_.end()) {
+            continue;
+        }
+        callbackInfo.push_back(
+            std::pair<std::shared_ptr<ServiceInfoStateCallback>, int64_t>(iter->second, item));
+    }
+    if (callbackInfo.empty()) {
+        return;
+    }
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit([=]() { ServiceInfoOnline(callbackInfo); });
+#else
+    std::thread serviceOnline([=]() { ServiceInfoOnline(callbackInfo);});
+    int32_t ret = pthread_setname_np(serviceOnline.native_handle(), SERVICE_ONLINE);
+    if (ret != DM_OK) {
+        LOGE("DeviceManagerNotify serviceOnline setname failed.");
+    }
+    serviceOnline.detach();
+#endif
+}
+
+void DeviceManagerNotify::ServiceInfoOnline(
+    std::vector<std::pair<std::shared_ptr<ServiceInfoStateCallback>, int64_t>> callbackInfo)
+{
+    for (auto &iter : callbackInfo) {
+        if (iter.first == nullptr) {
+            continue;
+        }
+        iter.first->OnServiceOnline(iter.second);
+    }
+}
+
+int32_t DeviceManagerNotify::RegisterServiceStateCallback(const std::string &key,
+    std::shared_ptr<ServiceInfoStateCallback> callback)
+{
+    LOGI("DeviceManagerNotify::RegisterServiceStateCallback key = %{public}s", GetAnonyString(key).c_str());
+    if (key.empty() || callback == nullptr) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::lock_guard<std::mutex> autolock(lock_);
+    CHECK_SIZE_RETURN(serviceStateCallback_, ERR_DM_CALLBACK_REGISTER_FAILED);
+    serviceStateCallback_[key] = callback;
+    return DM_OK;
+}
+
+int32_t DeviceManagerNotify::UnRegisterServiceStateCallback(const std::string &key)
+{
+    LOGI("DeviceManagerNotify::UnRegisterServiceStateCallback key = %{public}s", GetAnonyString(key).c_str());
+    std::lock_guard<std::mutex> autolock(lock_);
+    if (key.empty() || serviceStateCallback_.find(key) == serviceStateCallback_.end()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    serviceStateCallback_.erase(key);
+    return DM_OK;
+}
+
+void DeviceManagerNotify::RegisterServicePublishCallback(int64_t serviceId,
+    std::shared_ptr<ServicePublishCallback> callback)
+{
+    LOGI("RegisterPublishCallback start");
+    if (callback == nullptr) {
+        LOGE("Invalid parameter, callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    CHECK_SIZE_VOID(servicePublishCallback_);
+    servicePublishCallback_[serviceId] = callback;
+    LOGI("RegisterPublishCallback success");
+}
+
+void DeviceManagerNotify::UnRegisterServicePublishCallback(int64_t serviceId)
+{
+    LOGI("UnRegisterServicePublishCallback start");
+    if (serviceId == 0) {
+        LOGE("UnRegisterServicePublishCallback error: Invalid parameter, serviceId is 0.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    servicePublishCallback_.erase(serviceId);
+    LOGI("UnRegisterServicePublishCallback success");
+}
+
+void DeviceManagerNotify::OnServicePublishResult(int64_t serviceId, int32_t publishResult)
+{
+    LOGI("OnServicePublishResult start, serviceId: %{public}s, publishResult: %{public}d",
+        GetAnonyString(std::to_string(serviceId)).c_str(), publishResult);
+    std::shared_ptr<ServicePublishCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        auto iter = servicePublishCallback_.find(serviceId);
+        if (iter == servicePublishCallback_.end()) {
+            LOGE("OnServicePublishResult error, callback not registered for serviceId");
+            return;
+        }
+        tempCbk = iter->second;
+        if (publishResult != DM_OK) {
+            servicePublishCallback_.erase(serviceId);
+            LOGI("OnServicePublishResult: Removed callback for serviceId");
+        }
+    }
+    if (tempCbk == nullptr) {
+        LOGE("OnServicePublishResult error, registered callback is nullptr");
+        return;
+    }
+    tempCbk->OnServicePublishResult(serviceId, publishResult);
+    LOGI("OnServicePublishResult end");
 }
 } // namespace DistributedHardware
 } // namespace OHOS
