@@ -341,7 +341,7 @@ int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)
     return DM_OK;
 }
 
-ServiceInfoProfile AppManager::CreateServiceInfoProfile(const PublishServiceParam &publishServiceParam,
+DM_EXPORT ServiceInfoProfile AppManager::CreateServiceInfoProfile(const PublishServiceParam &publishServiceParam,
     const int32_t &userId)
 {
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
