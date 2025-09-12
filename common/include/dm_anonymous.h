@@ -30,6 +30,8 @@ extern const int32_t LIST_SPLIT_LEN;
 DM_EXPORT std::string GetAnonyString(const std::string &value);
 std::string GetAnonyStringList(const std::vector<std::string> &values);
 std::string GetAnonyInt32(const int32_t value);
+std::string GetAnonyInt64(const int64_t value);
+std::string GetAnonyUint64(const uint64_t value);
 std::string GetAnonyInt32List(const std::vector<int32_t> &values);
 bool IsNumberString(const std::string &inputString);
 bool IsString(const JsonItemObject &jsonObj, const std::string &key);
