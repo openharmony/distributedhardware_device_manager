@@ -84,6 +84,42 @@ std::string GetAnonyInt32(const int32_t value)
     return tempString;
 }
 
+std::string GetAnonyInt64(const int64_t value)
+{
+    std::string tempString = std::to_string(value);
+    size_t length = tempString.length();
+    if (length == 0x01) {
+        tempString[0] = '*';
+        return tempString;
+    }
+    if (length == 0x02) {
+        tempString[1] = '*';
+        return tempString;
+    }
+    for (size_t i = 1; i < length - 1; i++) {
+        tempString[i] = '*';
+    }
+    return tempString;
+}
+
+std::string GetAnonyUint64(const uint64_t value)
+{
+    std::string tempString = std::to_string(value);
+    size_t length = tempString.length();
+    if (length == 0x01) {
+        tempString[0] = '*';
+        return tempString;
+    }
+    if (length == 0x02) {
+        tempString[1] = '*';
+        return tempString;
+    }
+    for (size_t i = 1; i < length - 1; i++) {
+        tempString[i] = '*';
+    }
+    return tempString;
+}
+
 std::string GetAnonyInt32List(const std::vector<int32_t> &values)
 {
     std::string temp = "[ ";
