@@ -92,6 +92,10 @@ std::string GetAnonyInt64(const int64_t value)
         tempString[0] = '*';
         return tempString;
     }
+    if (length == 0x02) {
+        tempString[1] = '*';
+        return tempString;
+    }
     for (size_t i = 1; i < length - 1; i++) {
         tempString[i] = '*';
     }
@@ -104,6 +108,10 @@ std::string GetAnonyUint64(const uint64_t value)
     size_t length = tempString.length();
     if (length == 0x01) {
         tempString[0] = '*';
+        return tempString;
+    }
+    if (length == 0x02) {
+        tempString[1] = '*';
         return tempString;
     }
     for (size_t i = 1; i < length - 1; i++) {
