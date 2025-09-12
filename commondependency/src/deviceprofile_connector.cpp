@@ -1830,7 +1830,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckAccessControl(
     const DmAccessCaller &caller, const std::string &srcUdid,
     const DmAccessCallee &callee, const std::string &sinkUdid)
 {
-    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s srcAccountId %{public}s,"
+    LOGI("srcUdid %{public}s, srcUserId %{public}d, srcPkgName %{public}s, srcAccountId %{public}s,"
         "sinkUdid %{public}s, sinkUserId %{public}d, sinkPkgName %{public}s, sinkAccountId %{public}s"
         "callerTokenId %{public}s, calleeTokenId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
         caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
