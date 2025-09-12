@@ -516,7 +516,7 @@ HWTEST_F(DmAuthManagerTest, ConfirmProcessExt_003, testing::ext::TestSize.Level1
     ASSERT_EQ(ret, DM_OK);
 }
 
-HWTEST_F(DmAuthManagerTest, ConfirmProcessExt_004, testing::ext::TestSize.Level0)
+HWTEST_F(DmAuthManagerTest, ConfirmProcessExt_004, testing::ext::TestSize.Level1)
 {
     DistributedDeviceProfile::LocalServiceInfo info;
     info.SetAuthBoxType((int32_t)DMLocalServiceInfoAuthBoxType::SKIP_CONFIRM);

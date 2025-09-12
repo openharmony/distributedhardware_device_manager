@@ -44,17 +44,20 @@ const int32_t GENERATE_CERT_TIMEOUT = 100; // 100ms
 // decrypt process
 int32_t g_authCredentialTransmitDecryptProcess(std::shared_ptr<DmAuthContext> context, DmEventType event)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
     if (context->transmitData.empty()) {
         LOGE("DmAuthMessageProcessor::CreateMessageReqCredAuthStart failed, get onTransmitData failed.");
         return ERR_DM_FAILED;
     }
 
+    CHECK_NULL_RETURN(context->hiChainAuthConnector, ERR_DM_FAILED);
     int32_t ret = context->hiChainAuthConnector->ProcessCredData(context->requestId, context->transmitData);
     if (ret != DM_OK) {
         LOGE("AuthCredentialTransmitDecryptProcess: ProcessCredData transmit data failed");
         return ERR_DM_FAILED;
     }
 
+    CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_FAILED);
     if (context->authStateMachine->WaitExpectEvent(event) != event) {
         LOGE("AuthCredentialTransmitDecryptProcess: Hichain auth transmit data failed");
         return ERR_DM_FAILED;
@@ -64,11 +67,13 @@ int32_t g_authCredentialTransmitDecryptProcess(std::shared_ptr<DmAuthContext> co
 
 int32_t AuthCredentialTransmitSend(std::shared_ptr<DmAuthContext> context, DmMessageType msgType)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
     if (context->transmitData.empty()) {
         LOGE("AuthCredentialTransmitSend: Get onTransmitData failed.");
         return ERR_DM_FAILED;
     }
 
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
     std::string message =
         context->authMessageProcessor->CreateMessage(msgType, context);
     if (message.empty()) {
@@ -76,6 +81,7 @@ int32_t AuthCredentialTransmitSend(std::shared_ptr<DmAuthContext> context, DmMes
         return ERR_DM_FAILED;
     }
 
+    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -129,6 +135,7 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
         return ret;
     }
     // Authentication completion triggers the Onfinish callback event.
+    CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_POINT_NULL);
     if (context->authStateMachine->WaitExpectEvent(ON_FINISH) != ON_FINISH) {
         LOGE("AuthSrcCredentialAuthDoneState::Action Hichain auth SINK transmit data failed");
         return ERR_DM_FAILED;
@@ -148,6 +155,7 @@ int32_t AuthSrcCredentialAuthDoneState::HandleSrcCredentialAuthDone(std::shared_
         context->isAppCredentialVerified = true;
         DerivativeSessionKey(context);
         msgType = MSG_TYPE_REQ_CREDENTIAL_AUTH_START;
+        CHECK_NULL_RETURN(context->hiChainAuthConnector, ERR_DM_POINT_NULL);
         ret = context->hiChainAuthConnector->AuthCredential(context->accesser.userId, context->requestId,
                                                             context->accesser.lnnCredentialId, std::string(""));
         if (ret != DM_OK) {
@@ -155,6 +163,7 @@ int32_t AuthSrcCredentialAuthDoneState::HandleSrcCredentialAuthDone(std::shared_
             return ret;
         }
         // wait for onTransmit event
+        CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_POINT_NULL);
         if (context->authStateMachine->WaitExpectEvent(ON_TRANSMIT) != ON_TRANSMIT) {
             LOGE("AuthSrcCredentialAuthDoneState::Action failed, ON_TRANSMIT event not arrived.");
             return ERR_DM_FAILED;
@@ -193,6 +202,7 @@ int32_t AuthSrcCredentialAuthDoneState::SendCredentialAuthMessage(std::shared_pt
         LOGE("AuthSrcCredentialAuthDoneState::Action CreateMessage failed");
         return ERR_DM_FAILED;
     }
+    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -201,6 +211,7 @@ int32_t AuthSrcCredentialAuthDoneState::DerivativeSessionKey(std::shared_ptr<DmA
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     if (!context->IsProxyBind || context->subjectProxyOnes.empty()) {
         int32_t skId = 0;
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
         int32_t ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accesser.userId, skId);
         if (ret != DM_OK) {
             LOGE("AuthSrcCredentialAuthDoneState::Action DP save user session key failed");
@@ -221,6 +232,7 @@ int32_t AuthSrcCredentialAuthDoneState::DerivativeProxySessionKey(std::shared_pt
     if (context->IsCallingProxyAsSubject && !context->accesser.isAuthed) {
         int32_t skId = 0;
         int32_t ret = 0;
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
         if (!context->reUseCreId.empty()) {
             std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
             context->accesser.tokenIdHash + context->accessee.tokenIdHash;
@@ -242,6 +254,7 @@ int32_t AuthSrcCredentialAuthDoneState::DerivativeProxySessionKey(std::shared_pt
         int32_t skId = 0;
         std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
             app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
         int32_t ret =
             context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accesser.userId, suffix, skId);
         if (ret != DM_OK) {
@@ -266,6 +279,8 @@ DmAuthStateType AuthSinkCredentialAuthStartState::GetStateType()
 
 int32_t AuthSinkCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(context->timer, ERR_DM_POINT_NULL);
     context->timer->DeleteTimer(std::string(WAIT_REQUEST_TIMEOUT_TASK));
 
     int32_t ret = g_authCredentialTransmitDecryptProcess(context, ON_TRANSMIT);
@@ -309,6 +324,7 @@ int32_t AuthSinkCredentialAuthNegotiateState::Action(std::shared_ptr<DmAuthConte
     if (context->accessee.isGenerateLnnCredential == true &&
         context->accessee.bindLevel != static_cast<int32_t>(USER) &&
         context->isAppCredentialVerified == true) {
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
         ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accessee.userId, skId);
         if (ret != DM_OK) {
             LOGE("AuthSinkCredentialAuthNegotiateState::Action DP save user session key failed");
@@ -320,6 +336,7 @@ int32_t AuthSinkCredentialAuthNegotiateState::Action(std::shared_ptr<DmAuthConte
         context->isAppCredentialVerified = true;
         if (!context->IsProxyBind || context->subjectProxyOnes.empty() ||
             (context->IsCallingProxyAsSubject && !context->accessee.isAuthed)) {
+            CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
             ret = context->authMessageProcessor->SaveSessionKeyToDP(context->accessee.userId, skId);
             if (ret != DM_OK) {
                 LOGE("DP save user session key failed %{public}d", ret);
@@ -346,6 +363,7 @@ int32_t AuthSinkCredentialAuthNegotiateState::DerivativeSessionKey(std::shared_p
         int32_t skId = 0;
         std::string suffix = context->accesser.deviceIdHash + context->accessee.deviceIdHash +
             app.proxyAccesser.tokenIdHash + app.proxyAccessee.tokenIdHash;
+        CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
         int32_t ret =
             context->authMessageProcessor->SaveDerivativeSessionKeyToDP(context->accessee.userId, suffix, skId);
         if (ret != DM_OK) {
@@ -380,6 +398,7 @@ std::string AuthCredentialAgreeState::CreateAuthParamsString(DmAuthScope authori
         jsonObj[TAG_METHOD] = method;
     }
 
+    CHECK_NULL_RETURN(authContext, "");
     jsonObj[TAG_LOWER_DEVICE_ID] = (method == DM_AUTH_CREDENTIAL_ADD_METHOD_GENERATE) ?
         authContext->GetDeviceId(DM_AUTH_LOCAL_SIDE) : authContext->GetDeviceId(DM_AUTH_REMOTE_SIDE);
     if (method == DM_AUTH_CREDENTIAL_ADD_METHOD_IMPORT) {
@@ -502,6 +521,9 @@ int32_t AuthCredentialAgreeState::AgreeCredential(DmAuthScope authorizedScope,
     std::string credId;
     LOGI("AuthCredentialAgreeState::AgreeCredential agree with accountId %{public}d and param %{public}s.",
         osAccountId, GetAnonyJsonString(authParamsString).c_str());
+    if (authContext->hiChainAuthConnector == nullptr) {
+        return ERR_DM_FAILED;
+    }
     int32_t ret = authContext->hiChainAuthConnector->AgreeCredential(osAccountId, selfCredId,
         authParamsString, credId);
     if (ret != DM_OK) {
@@ -522,18 +544,22 @@ DmAuthStateType AuthSrcCredentialExchangeState::GetStateType()
 int32_t AuthSrcCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcCredentialExchangeState::Action() start.");
+    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
     int32_t ret = ERR_DM_FAILED;
     context->isAppCredentialVerified = false;
     if (!NeedAgreeAcl(context)) {
+        CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_FAILED);
         context->authStateMachine->TransitionTo(std::make_shared<AuthSrcDataSyncState>());
         return DM_OK;
     }
     if (GetSessionKey(context)) {
+        CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_FAILED);
         context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthDoneState>());
         return DM_OK;
     }
 
     if (!IsNeedAgreeCredential(context)) {
+        CHECK_NULL_RETURN(context->authStateMachine, ERR_DM_FAILED);
         context->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialAuthStartState>());
         return DM_OK;
     }
@@ -561,8 +587,10 @@ int32_t AuthSrcCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> co
         return ret;
     }
 
+    CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_FAILED);
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_CREDENTIAL_EXCHANGE, context);
     LOGI("AuthSrcCredentialExchangeState::Action() leave.");
+    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_FAILED);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -576,12 +604,12 @@ int32_t AuthSinkCredentialExchangeState::Action(std::shared_ptr<DmAuthContext> c
     LOGI("AuthSinkCredentialExchangeState::Action start.");
     int32_t ret = ERR_DM_FAILED;
     std::string tmpCredId;
-    int32_t osAccountId = context->accessee.userId;
-    context->isAppCredentialVerified = false;
-    if (context == nullptr || context->hiChainAuthConnector == nullptr ||
-        context->authMessageProcessor == nullptr || context->softbusConnector == nullptr) {
+    if (context == nullptr || context->hiChainAuthConnector == nullptr || context->authMessageProcessor == nullptr ||
+        context->softbusConnector == nullptr || context->softbusConnector->GetSoftbusSession() == nullptr) {
         return ret;
     }
+    int32_t osAccountId = context->accessee.userId;
+    context->isAppCredentialVerified = false;
 
     // First authentication lnn cred
     if (context->accessee.isGenerateLnnCredential && context->accessee.bindLevel != static_cast<int32_t>(USER)) {
@@ -686,11 +714,12 @@ int32_t AuthSrcCredentialAuthStartState::Action(std::shared_ptr<DmAuthContext> c
 {
     LOGI("AuthSrcCredentialAuthStartState::Action start.");
     int32_t ret = ERR_DM_FAILED;
-    int32_t osAccountId = context->accesser.userId;
-    if (context == nullptr || context->hiChainAuthConnector == nullptr ||
-        context->authMessageProcessor == nullptr || context->softbusConnector == nullptr) {
+    if (context == nullptr || context->hiChainAuthConnector == nullptr || context->authMessageProcessor == nullptr ||
+        context->softbusConnector == nullptr || context->softbusConnector->GetSoftbusSession() == nullptr ||
+        context->authStateMachine == nullptr) {
         return ret;
     }
+    int32_t osAccountId = context->accesser.userId;
     if (IsNeedAgreeCredential(context)) {
         ret = AgreeAndDeleteCredential(context);
         if (ret != DM_OK) {
@@ -752,6 +781,7 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     // send 180
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_REQ_DATA_SYNC, context);
     LOGI("AuthSrcSKDeriveState::Action() leave.");
+    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 
@@ -871,6 +901,7 @@ int32_t AuthSinkSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     // send 151
     std::string message = context->authMessageProcessor->CreateMessage(MSG_TYPE_RESP_SK_DERIVE, context);
     LOGI("AuthSinkSKDeriveState::Action() leave.");
+    CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     return context->softbusConnector->GetSoftbusSession()->SendData(context->sessionId, message);
 }
 

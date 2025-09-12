@@ -82,6 +82,7 @@ void AuthMessageProcessor::GetJsonObj(JsonObject &jsonObj)
         LOGE("GetJsonObj invalid bindType size.");
         return;
     }
+    CHECK_NULL_VOID(authRequestContext_);
     jsonObj[TAG_VER] = DM_ITF_VER;
     jsonObj[TAG_MSG_TYPE] = MSG_TYPE_REQ_AUTH;
     jsonObj[TAG_INDEX] = 0;
@@ -201,6 +202,7 @@ void AuthMessageProcessor::CreatePublicKeyMessageExt(JsonObject &json)
         std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
         encryptFlag = encryptFlag_;
     }
+    CHECK_NULL_VOID(authResponseContext_);
     if (!encryptFlag) {
         LOGI("not encrypt publickey.");
         json[TAG_PUBLICKEY] = authResponseContext_->publicKey;
@@ -227,6 +229,7 @@ void AuthMessageProcessor::CreatePublicKeyMessageExt(JsonObject &json)
 
 void AuthMessageProcessor::CreateResponseAuthMessageExt(JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_TOKEN] = authResponseContext_->token;
     json[TAG_CONFIRM_OPERATION] = authResponseContext_->confirmOperation;
@@ -235,6 +238,7 @@ void AuthMessageProcessor::CreateResponseAuthMessageExt(JsonObject &json)
 
 void AuthMessageProcessor::CreateNegotiateMessage(JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     if (cryptoAdapter_ == nullptr) {
         json[TAG_CRYPTO_SUPPORT] = false;
     } else {
@@ -267,6 +271,7 @@ void AuthMessageProcessor::CreateNegotiateMessage(JsonObject &json)
 
 void AuthMessageProcessor::CreateRespNegotiateMessage(JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     if (cryptoAdapter_ == nullptr) {
         json[TAG_CRYPTO_SUPPORT] = false;
     } else {
@@ -301,12 +306,14 @@ void AuthMessageProcessor::CreateRespNegotiateMessage(JsonObject &json)
 
 void AuthMessageProcessor::CreateSyncGroupMessage(JsonObject &json)
 {
+    CHECK_NULL_VOID(authRequestContext_);
     json[TAG_DEVICE_ID] = authRequestContext_->deviceId;
     json[TAG_GROUPIDS] = authRequestContext_->syncGroupList;
 }
 
 void AuthMessageProcessor::CreateResponseAuthMessage(JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_DEVICE_ID] = authResponseContext_->deviceId;
     json[TAG_TOKEN] = authResponseContext_->token;
@@ -335,6 +342,7 @@ void AuthMessageProcessor::CreateResponseAuthMessage(JsonObject &json)
 
 void AuthMessageProcessor::CreateResponseFinishMessage(JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     json[TAG_REPLY] = authResponseContext_->reply;
     json[TAG_AUTH_FINISH] = authResponseContext_->isFinish;
 }
@@ -351,6 +359,7 @@ int32_t AuthMessageProcessor::ParseMessage(const std::string &message)
         return ERR_DM_FAILED;
     }
     int32_t msgType = jsonObject[TAG_MSG_TYPE].Get<int32_t>();
+    CHECK_NULL_RETURN(authResponseContext_, ERR_DM_FAILED);
     authResponseContext_->msgType = msgType;
     LOGI("message type %{public}d", authResponseContext_->msgType);
     switch (msgType) {
@@ -394,12 +403,14 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(JsonObject &json)
         encryptFlag = encryptFlag_;
     }
     if (!encryptFlag && IsString(json, TAG_PUBLICKEY)) {
+        CHECK_NULL_VOID(authResponseContext_);
         authResponseContext_->publicKey = json[TAG_PUBLICKEY].Get<std::string>();
         return;
     }
     if (encryptFlag && IsString(json, TAG_CRYPTIC_MSG)) {
         std::string encryptStr = json[TAG_CRYPTIC_MSG].Get<std::string>();
         std::string decryptStr = "";
+        CHECK_NULL_VOID(authResponseContext_);
         authResponseContext_->publicKey = "";
         CHECK_NULL_VOID(cryptoMgr_);
         if (cryptoMgr_->DecryptMessage(encryptStr, decryptStr) != DM_OK) {
@@ -440,6 +451,7 @@ void AuthMessageProcessor::ParseAuthResponseMessageExt(JsonObject &json)
 
 void AuthMessageProcessor::ParseResponseFinishMessage(JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     if (IsInt32(json, TAG_REPLY)) {
         authResponseContext_->reply = json[TAG_REPLY].Get<int32_t>();
     }
@@ -450,6 +462,7 @@ void AuthMessageProcessor::ParseResponseFinishMessage(JsonObject &json)
 
 void AuthMessageProcessor::GetAuthReqMessage(JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     authResponseContext_->localDeviceId = "";
     authResponseContext_->deviceId = "";
     if (IsInt32(json, TAG_AUTH_TYPE)) {
@@ -494,6 +507,7 @@ int32_t AuthMessageProcessor::ParseAuthRequestMessage(JsonObject &json)
     }
     idx = json[TAG_INDEX].Get<int32_t>();
     sliceNum = json[TAG_SLICE_NUM].Get<int32_t>();
+    CHECK_NULL_RETURN(authResponseContext_, ERR_DM_FAILED);
     if (idx == 0) {
         GetAuthReqMessage(json);
         authResponseContext_->appThumbnail = "";
@@ -532,6 +546,7 @@ void AuthMessageProcessor::ParseAuthResponseMessage(JsonObject &json)
         LOGE("AuthMessageProcessor::ParseAuthResponseMessage err json string, first time.");
         return;
     }
+    CHECK_NULL_VOID(authResponseContext_);
     authResponseContext_->reply = json[TAG_REPLY].Get<int32_t>();
     if (IsString(json, TAG_DEVICE_ID)) {
         authResponseContext_->deviceId = json[TAG_DEVICE_ID].Get<std::string>();
@@ -560,6 +575,7 @@ void AuthMessageProcessor::ParseAuthResponseMessage(JsonObject &json)
 
 void AuthMessageProcessor::ParsePkgNegotiateMessage(const JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     if (IsString(json, TAG_LOCAL_ACCOUNTID)) {
         authResponseContext_->localAccountId = json[TAG_LOCAL_ACCOUNTID].Get<std::string>();
     }
@@ -610,6 +626,7 @@ void AuthMessageProcessor::ParsePkgNegotiateMessage(const JsonObject &json)
 
 void AuthMessageProcessor::ParseNegotiateMessage(const JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     if (IsBool(json, TAG_CRYPTO_SUPPORT)) {
         authResponseContext_->cryptoSupport = json[TAG_CRYPTO_SUPPORT].Get<bool>();
     }
@@ -658,6 +675,7 @@ void AuthMessageProcessor::ParseNegotiateMessage(const JsonObject &json)
 
 void AuthMessageProcessor::ParseRespNegotiateMessage(const JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     if (IsBool(json, TAG_IDENTICAL_ACCOUNT)) {
         authResponseContext_->isIdenticalAccount = json[TAG_IDENTICAL_ACCOUNT].Get<bool>();
     }
@@ -721,6 +739,7 @@ std::string AuthMessageProcessor::CreateDeviceAuthMessage(int32_t msgType, const
 
 void AuthMessageProcessor::CreateReqReCheckMessage(JsonObject &jsonObj)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     JsonObject jsonTemp;
     jsonTemp[TAG_EDITION] = authResponseContext_->edition;
     jsonTemp[TAG_LOCAL_DEVICE_ID] = authResponseContext_->localDeviceId;
@@ -741,6 +760,7 @@ void AuthMessageProcessor::CreateReqReCheckMessage(JsonObject &jsonObj)
 
 void AuthMessageProcessor::ParseReqReCheckMessage(JsonObject &json)
 {
+    CHECK_NULL_VOID(authResponseContext_);
     std::string encryptStr = "";
     if (IsString(json, TAG_CRYPTIC_MSG)) {
         encryptStr = json[TAG_CRYPTIC_MSG].Get<std::string>();

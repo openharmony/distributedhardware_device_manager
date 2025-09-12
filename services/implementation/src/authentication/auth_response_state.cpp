@@ -52,6 +52,7 @@ int32_t AuthResponseState::TransitionTo(std::shared_ptr<AuthResponseState> state
         return ERR_DM_FAILED;
     }
     std::shared_ptr<DmAuthResponseContext> contextTemp = GetAuthContext();
+    CHECK_NULL_RETURN(state, ERR_DM_FAILED);
     state->SetAuthManager(stateAuthManager);
     stateAuthManager->SetAuthResponseState(state);
     state->SetAuthContext(contextTemp);
@@ -84,6 +85,7 @@ int32_t AuthResponseNegotiateState::Enter()
         LOGE("AuthResponseNegotiateState authManager_ is null");
         return ERR_DM_FAILED;
     }
+    CHECK_NULL_RETURN(context_, ERR_DM_FAILED);
     stateAuthManager->RespNegotiate(context_->sessionId);
     return DM_OK;
 }
