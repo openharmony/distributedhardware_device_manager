@@ -93,7 +93,6 @@ std::string GetAnonyInt64(const int64_t value)
         return tempString;
     }
     for (size_t i = 1; i < length - 1; i++) {
-
         tempString[i] = '*';
     }
     return tempString;
