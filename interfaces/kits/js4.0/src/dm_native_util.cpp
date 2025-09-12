@@ -139,6 +139,7 @@ std::string GetDeviceTypeById(DmDeviceType type)
         {DEVICE_TYPE_PC, DEVICE_TYPE_PC_STRING},
         {DEVICE_TYPE_SMART_DISPLAY, DEVICE_TYPE_SMART_DISPLAY_STRING},
         {DEVICE_TYPE_2IN1, DEVICE_TYPE_2IN1_STRING},
+        {DEVICE_TYPE_GLASSES, DEVICE_TYPE_GLASSES_STRING},
     };
     for (const auto& item : mapArray) {
         if (item.first == type) {
