@@ -63,6 +63,11 @@ constexpr uint32_t AUTH_EXT_WHITE_LIST_NUM = 1;
 constexpr const static char* g_extWhiteList[AUTH_EXT_WHITE_LIST_NUM] = {
     "CastEngineService",
 };
+enum DmDevBindType : int32_t {
+    DEVICE_PEER_TO_PEER_BIND_TYPE = 3,
+    DEVICE_ACROSS_ACCOUNT_BIND_TYPE = 4,
+    IDENTICAL_ACCOUNT_BIND_TYPE = 5
+};
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(DeviceProfileConnector);
 void PrintProfile(const AccessControlProfile &profile)
@@ -968,11 +973,11 @@ void DeviceProfileConnector::GetParamBindTypeVec(AccessControlProfile profile, s
     uint32_t bindType = profile.GetBindType();
     switch (bindType) {
         case DM_IDENTICAL_ACCOUNT:
-            bindTypeVec.push_back(IDENTICAL_ACCOUNT_TYPE);
+            bindTypeVec.push_back(DmDevBindType::IDENTICAL_ACCOUNT_BIND_TYPE);
             break;
         case DM_POINT_TO_POINT:
             if (profile.GetBindLevel() == USER) {
-                bindTypeVec.push_back(DEVICE_PEER_TO_PEER_TYPE);
+                bindTypeVec.push_back(DmDevBindType::DEVICE_PEER_TO_PEER_BIND_TYPE);
             }
             if (profile.GetBindLevel() == APP) {
                 bindTypeVec.push_back(APP_PEER_TO_PEER_TYPE);
@@ -980,7 +985,7 @@ void DeviceProfileConnector::GetParamBindTypeVec(AccessControlProfile profile, s
             break;
         case DM_ACROSS_ACCOUNT:
             if (profile.GetBindLevel() == USER) {
-                bindTypeVec.push_back(DEVICE_ACROSS_ACCOUNT_TYPE);
+                bindTypeVec.push_back(DmDevBindType::DEVICE_ACROSS_ACCOUNT_BIND_TYPE);
             }
             if (profile.GetBindLevel() == APP) {
                 bindTypeVec.push_back(APP_ACROSS_ACCOUNT_TYPE);
@@ -1014,12 +1019,12 @@ void DeviceProfileConnector::ProcessBindType(AccessControlProfile profiles, std:
     std::vector<int32_t> &sinkBindType, std::vector<int32_t> &bindTypeIndex, uint32_t index, std::string targetDeviceId)
 {
     if (profiles.GetBindType() == DM_IDENTICAL_ACCOUNT) {
-        sinkBindType.push_back(IDENTICAL_ACCOUNT_TYPE);
+        sinkBindType.push_back(DmDevBindType::IDENTICAL_ACCOUNT_BIND_TYPE);
         bindTypeIndex.push_back(index);
     }
     if (profiles.GetBindType() == DM_POINT_TO_POINT) {
         if (profiles.GetBindLevel() == USER) {
-            sinkBindType.push_back(DEVICE_PEER_TO_PEER_TYPE);
+            sinkBindType.push_back(DmDevBindType::DEVICE_PEER_TO_PEER_BIND_TYPE);
             bindTypeIndex.push_back(index);
         }
         if (profiles.GetBindLevel() == APP) {
@@ -1037,7 +1042,7 @@ void DeviceProfileConnector::ProcessBindType(AccessControlProfile profiles, std:
     }
     if (profiles.GetBindType() == DM_ACROSS_ACCOUNT) {
         if (profiles.GetBindLevel() == USER) {
-            sinkBindType.push_back(DEVICE_ACROSS_ACCOUNT_TYPE);
+            sinkBindType.push_back(DmDevBindType::DEVICE_ACROSS_ACCOUNT_BIND_TYPE);
             bindTypeIndex.push_back(index);
         }
         if (profiles.GetBindLevel() == APP) {
