@@ -1586,12 +1586,14 @@ struct ConfirmCustomDialog {
             Column() {
               Text(this.title)
                 .textAlign(TextAlign.Center)
-                .fontSize($r('sys.float.Title_S'))
+                .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                 .fontWeight(FontWeight.Bold)
                 .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                .minFontSize(11)
+                .maxFontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
                 .heightAdaptivePolicy(TextHeightAdaptivePolicy.LAYOUT_CONSTRAINT_FIRST)
                 .lineHeight(this.isTibetanLanguages() ? 22 : 0)
-                .textOverflow({ overflow: TextOverflow.None })
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .width('auto')
                 .maxLines(2)
             }
