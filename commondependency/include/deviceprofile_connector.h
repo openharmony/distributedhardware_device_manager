@@ -229,6 +229,12 @@ public:
         int32_t tokenId, const std::string &localUdid);
     DM_EXPORT DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, const std::string &localUdid, int32_t peerTokenId);
+    DM_EXPORT int32_t GetServiceInfoProfileByServiceId(int64_t serviceId, ServiceInfoProfile &serviceInfoProfile);
+    DM_EXPORT int32_t PutServiceInfoProfile(const ServiceInfoProfile &serviceInfoProfile);
+    DM_EXPORT int32_t DeleteServiceInfoProfile(int32_t regServiceId, int32_t userId);
+    DM_EXPORT void GetRemoteTokenIds(const std::string &localUdid, const std::string &udid,
+        std::vector<int64_t> &remoteTokenIds);
+    DM_EXPORT int32_t GetServiceInfoByTokenId(int64_t tokenId, ServiceInfoProfile &serviceInfo);
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile>
         GetAllAccessControlProfile();
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAclIncludeLnnAcl();
@@ -332,6 +338,7 @@ public:
         const std::vector<int32_t> &backGroundUserIds);
     DM_EXPORT bool IsAllowAuthAlways(const std::string &localUdid, int32_t userId, const std::string &peerUdid,
         const std::string &pkgName, int64_t tokenId);
+
     int32_t GetAuthOnceUdids(std::unordered_set<std::string> &udidSet);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);

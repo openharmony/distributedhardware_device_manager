@@ -23,7 +23,7 @@
 #include "bundle_mgr_interface.h"
 #include "bundle_mgr_proxy.h"
 #include "event_handler.h"
-
+#include "dm_device_info.h"
 #include "dm_single_instance.h"
 
 namespace OHOS {
@@ -46,6 +46,8 @@ public:
     DM_EXPORT int32_t GetBundleNameForSelf(std::string &bundleName);
     DM_EXPORT int32_t GetBundleNameByTokenId(int64_t tokenId, std::string &bundleName);
     DM_EXPORT int32_t GetTokenIdByBundleName(int32_t userId, std::string &bundleName, int64_t &tokenId);
+    DM_EXPORT ServiceInfoProfile CreateServiceInfoProfile(const PublishServiceParam &publishServiceParam,
+        const int32_t &userId);
 private:
     bool GetBundleManagerProxy(sptr<AppExecFwk::IBundleMgr> &bundleManager);
     std::mutex appIdMapLock_;

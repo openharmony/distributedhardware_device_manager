@@ -90,9 +90,16 @@ public:
     void OnSetRemoteDeviceNameResult(const ProcessInfo &processInfo, const std::string &deviceId,
         const std::string &deviceName, int32_t code) override;
     void SetExistPkgName(const std::set<std::string> &pkgNameSet) override;
+    void OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
+        const DiscoveryServiceInfo &discServiceInfo) override;
+    void OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId, int32_t reason) override;
+    void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
+        const DmDeviceInfo &info, const std::vector<int64_t> &serviceIds) override;
 
     std::string GetLocalDisplayDeviceName() override;
     int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) override;
+    int32_t OpenAuthSessionWithPara(int64_t serviceId) override;
+    void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
@@ -127,6 +134,17 @@ private:
     void ProcessAppOffline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     void RemoveNotExistProcess();
+    void ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
+        const DmDeviceBasicInfo &deviceBasicInfo, const std::vector<int64_t> &serviceIds);
+    void ProcessAppStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
+        const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
+        const std::vector<int64_t> &serviceIds);
+    void ProcessDeviceOnline(const std::vector<ProcessInfo> &procinfoVec, const ProcessInfo &processInfo,
+        const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
+        const std::vector<int64_t> &serviceIds);
+    void ProcessAppOnline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
+        const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
+        const std::vector<int64_t> &serviceIds);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;

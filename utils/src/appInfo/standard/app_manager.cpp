@@ -21,6 +21,7 @@
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "os_account_manager.h"
+#include "parameter.h"
 #include "system_ability_definition.h"
 #include "tokenid_kit.h"
 
@@ -34,6 +35,8 @@ namespace OHOS {
 namespace DistributedHardware {
 namespace {
 const uint32_t MAX_CONTAINER_SIZE = 1000;
+constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
+constexpr int32_t DEVICE_UUID_LENGTH = 65;
 }
 DM_IMPLEMENT_SINGLE_INSTANCE(AppManager);
 
@@ -336,6 +339,24 @@ int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)
     }
     bundleName = bundleInfo.name;
     return DM_OK;
+}
+
+DM_EXPORT ServiceInfoProfile AppManager::CreateServiceInfoProfile(const PublishServiceParam &publishServiceParam,
+    const int32_t &userId)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    ServiceInfoProfile serviceInfoProfile;
+    serviceInfoProfile.regServiceId = publishServiceParam.regServiceId;
+    serviceInfoProfile.deviceId = localDeviceId;
+    serviceInfoProfile.userId = userId;
+    serviceInfoProfile.tokenId = IPCSkeleton::GetCallingTokenID();
+    serviceInfoProfile.publishState = SERVICE_PUBLISHED_STATE;
+    serviceInfoProfile.serviceId = publishServiceParam.serviceInfo.serviceId;
+    serviceInfoProfile.serviceType = publishServiceParam.serviceInfo.serviceType;
+    serviceInfoProfile.serviceName = publishServiceParam.serviceInfo.serviceName;
+    serviceInfoProfile.serviceDisplayName = publishServiceParam.serviceInfo.serviceDisplayName;
+    return serviceInfoProfile;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

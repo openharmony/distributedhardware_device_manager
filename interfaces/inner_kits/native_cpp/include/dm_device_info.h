@@ -20,6 +20,7 @@
 #include <string>
 
 #include "dm_app_image_info.h"
+#include "dm_subscribe_info.h"
 
 #define DM_MAX_DEVICE_ID_LEN (97)
 #define DM_MAX_DEVICE_NAME_LEN (129)
@@ -296,11 +297,16 @@ typedef struct PeerTargetId {
      * wlan ip port.
      */
     uint16_t wifiPort = 0;
+    /**
+     * service id.
+     */
+    int64_t serviceId = 0;
 
     bool operator==(const PeerTargetId &other) const
     {
         return (deviceId == other.deviceId) && (brMac == other.brMac) &&
-            (bleMac == other.bleMac) && (wifiIp == other.wifiIp) && (wifiPort == other.wifiPort);
+            (bleMac == other.bleMac) && (wifiIp == other.wifiIp) && (wifiPort == other.wifiPort) &&
+            (serviceId == other.serviceId);
     }
 
     bool operator<(const PeerTargetId &other) const
@@ -310,7 +316,9 @@ typedef struct PeerTargetId {
             (deviceId == other.deviceId && brMac == other.brMac && bleMac < other.bleMac) ||
             (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp < other.wifiIp) ||
             (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp == other.wifiIp &&
-                wifiPort < other.wifiPort);
+                wifiPort < other.wifiPort) ||
+            (deviceId == other.deviceId && brMac == other.brMac && bleMac == other.bleMac && wifiIp == other.wifiIp &&
+                wifiPort == other.wifiPort && serviceId < other.serviceId);
     }
 } PeerTargetId;
 
@@ -475,6 +483,66 @@ typedef struct DMAclQuadInfo {
     std::string peerUdid;
     int32_t peerUserId;
 } DMAclQuadInfo;
+
+typedef struct ServiceInfo {
+    int64_t serviceId = 0;
+    std::string serviceType;
+    std::string serviceName;
+    std::string serviceDisplayName;
+} ServiceInfo;
+
+typedef enum DMSrvDiscoveryMode {
+    SERVICE_PUBLISH_MODE_PASSIVE = 0x15,
+    SERVICE_PUBLISH_MODE_ACTIVE = 0x25
+} DMSrvDiscoveryMode;
+
+typedef enum DMSrvMediumType {
+    SERVICE_MEDIUM_TYPE_AUTO = 0,
+    SERVICE_MEDIUM_TYPE_BLE,
+    SERVICE_MEDIUM_TYPE_BLE_TRIGGER,
+    SERVICE_MEDIUM_TYPE_MDNS,
+    SERVICE_MEDIUM_TYPE_BUTT,
+} DMSrvMediumType;
+
+typedef struct DiscoveryServiceParam {
+    std::string serviceName;
+    std::string serviceType;
+    int32_t discoveryServiceId = 0;
+    DmExchangeFreq freq;
+    DMSrvMediumType medium;
+    DMSrvDiscoveryMode mode;
+} DiscoveryServiceParam;
+
+typedef struct DiscoveryServiceInfo {
+    ServiceInfo serviceInfo;
+    std::string pkgName;
+} DiscoveryServiceInfo;
+
+typedef struct ServiceInfoProfile {
+    int32_t regServiceId = 0;
+    std::string deviceId;
+    int32_t userId = 0;
+    int64_t tokenId = 0;
+    int8_t publishState = 0;
+    int64_t serviceId = 0;
+    std::string serviceType;
+    std::string serviceName;
+    std::string serviceDisplayName;
+} ServiceInfoProfile;
+
+typedef struct ServiceRegInfo {
+    ServiceInfo serviceInfo;
+    std::string customData;
+    uint32_t dataLen = 0;
+} ServiceRegInfo;
+
+typedef struct PublishServiceParam {
+    ServiceInfo serviceInfo;
+    DMSrvDiscoveryMode discoverMode;
+    int32_t regServiceId = 0;
+    DMSrvMediumType media;
+    DmExchangeFreq freq;
+} PublishServiceParam;
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H

@@ -273,6 +273,42 @@ public:
         (void)isEnable160m;
         return 0;
     }
+    virtual void OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
+        const DiscoveryServiceInfo &discServiceInfo)
+    {
+        (void)processInfo;
+        (void)discServiceId;
+        (void)discServiceInfo;
+    }
+
+    virtual void OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId, int32_t reason)
+    {
+        (void)processInfo;
+        (void)discServiceId;
+        (void)reason;
+    }
+
+    virtual int32_t OpenAuthSessionWithPara(int64_t serviceId)
+    {
+        (void)serviceId;
+        return 0;
+    }
+
+    virtual void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
+        const DmDeviceInfo &info, const std::vector<int64_t> &serviceIds)
+    {
+        (void)processInfo;
+        (void)state;
+        (void)info;
+        (void)serviceIds;
+    }
+
+    virtual void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult)
+    {
+        (void)processInfo;
+        (void)serviceId;
+        (void)publishResult;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -154,6 +154,7 @@ private:
     void GetBindCallerInfo();
     int32_t GetBindLevel(int32_t bindLevel);
     void GetIsNeedJoinLnnParam(const std::map<std::string, std::string> &bindParam);
+    void ParseServiceInfo(const JsonObject &jsonObject);
     void GetConnDelayCloseTime(const std::string &extra);
 };
 

@@ -56,6 +56,16 @@ public:
     static bool DecodeNetworkIdQueryFilter(MessageParcel &parcel, NetworkIdQueryFilter &queryFilter);
     static bool EncodeStringVector(const std::vector<std::string> &vec, MessageParcel &parcel);
     static bool DecodeStringVector(MessageParcel &parcel, std::vector<std::string> &vec);
+    static bool EncodeSrvDiscParam(const DiscoveryServiceParam &param, MessageParcel &parcel);
+    static bool DecodeSrvDiscParam(MessageParcel &parcel, DiscoveryServiceParam &param);
+    static bool EncodeSrvDiscServiceInfo(const DiscoveryServiceInfo &serviceInfo, MessageParcel &parcel);
+    static bool DecodeSrvDiscServiceInfo(MessageParcel &parcel, DiscoveryServiceInfo &serviceInfo);
+    static bool EncodeServiceIds(const std::vector<int64_t> &serviceIds, MessageParcel &parcel);
+    static void DecodeServiceIds(std::vector<int64_t> &serviceIds, MessageParcel &parcel);
+    static bool EncodeServiceRegInfo(const ServiceRegInfo &serRegInfo, MessageParcel &parcel);
+    static bool DecodeServiceRegInfo(MessageParcel &parcel, ServiceRegInfo &serRegInfo);
+    static bool EncodePublishServiceParam(const PublishServiceParam &publishServiceParam, MessageParcel &parcel);
+    static bool DecodePublishServiceParam(MessageParcel &parcel, PublishServiceParam &publishServiceParam);
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -39,8 +39,11 @@
 #include "ipc_notify_get_device_profile_info_list_req.h"
 #include "ipc_notify_pin_holder_event_req.h"
 #include "ipc_notify_publish_result_req.h"
+#include "ipc_notify_service_discover_result_req.h"
+#include "ipc_notify_service_found_req.h"
 #include "ipc_notify_set_local_device_name_req.h"
 #include "ipc_notify_set_remote_device_name_req.h"
+#include "ipc_service_publish_result_req.h"
 #include "ipc_server_stub.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "datetime_ex.h"
@@ -1033,6 +1036,101 @@ void DeviceManagerServiceListener::SetExistPkgName(const std::set<std::string> &
     }
 }
 
+void DeviceManagerServiceListener::ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
+    const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo, const std::vector<int64_t> &serviceIds)
+{
+    std::vector<ProcessInfo> processInfoVec = GetNotifyProcessInfoByUserId(processInfo.userId,
+        DmCommonNotifyEvent::REG_DEVICE_STATE);
+    std::vector<ProcessInfo> hpProcessInfoVec;
+    std::vector<ProcessInfo> lpProcessInfoVec;
+    for (const auto &it : processInfoVec) {
+        if (highPriorityPkgNameSet_.find(it.pkgName) != highPriorityPkgNameSet_.end()) {
+            hpProcessInfoVec.push_back(it);
+        } else {
+            lpProcessInfoVec.push_back(it);
+        }
+    }
+    ProcessDeviceOnline(hpProcessInfoVec, processInfo, state, info, deviceBasicInfo, serviceIds);
+    ProcessDeviceOnline(lpProcessInfoVec, processInfo, state, info, deviceBasicInfo, serviceIds);
+}
+
+void DeviceManagerServiceListener::ProcessAppStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
+    const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
+    const std::vector<int64_t> &serviceIds)
+{
+    std::vector<ProcessInfo> processInfoVec = GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_STATE);
+    ProcessInfo bindProcessInfo = DealBindProcessInfo(processInfo);
+    processInfoVec.push_back(bindProcessInfo);
+    std::vector<ProcessInfo> allProcessInfos = ipcServerListener_.GetAllProcessInfo();
+    ProcessAppOnline(processInfoVec, processInfo, state, info, deviceBasicInfo, serviceIds);
+}
+
+void DeviceManagerServiceListener::OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
+    const DmDeviceInfo &info, const std::vector<int64_t> &serviceIds)
+{
+    LOGI("OnDeviceStateChange, state = %{public}d", state);
+    DmDeviceBasicInfo deviceBasicInfo;
+    ConvertDeviceInfoToDeviceBasicInfo(processInfo.pkgName, info, deviceBasicInfo);
+    if (processInfo.pkgName == std::string(DM_PKG_NAME)) {
+        ProcessDeviceStateChange(processInfo, state, info, deviceBasicInfo, serviceIds);
+    } else {
+        ProcessAppStateChange(processInfo, state, info, deviceBasicInfo, serviceIds);
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    KVAdapterManager::GetInstance().DeleteAgedEntry();
+#endif
+}
+
+void DeviceManagerServiceListener::ProcessDeviceOnline(const std::vector<ProcessInfo> &procInfoVec,
+    const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
+    const DmDeviceBasicInfo &deviceBasicInfo, const std::vector<int64_t> &serviceIds)
+{
+    LOGI("state %{public}d, udidhash %{public}s.", static_cast<int32_t>(state),
+        GetAnonyString(info.deviceId).c_str());
+    for (const auto &it : procInfoVec) {
+        std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
+        std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+        pReq->SetServiceIds(serviceIds);
+        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        DmDeviceState notifyState = state;
+        {
+            std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+            if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
+                notifyState = DmDeviceState::DEVICE_INFO_CHANGED;
+            } else {
+                alreadyOnlinePkgName_[notifyPkgName] = info;
+            }
+        }
+        SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
+        ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    }
+}
+
+void DeviceManagerServiceListener::ProcessAppOnline(const std::vector<ProcessInfo> &procInfoVec,
+    const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
+    const DmDeviceBasicInfo &deviceBasicInfo, const std::vector<int64_t> &serviceIds)
+{
+    LOGI("state %{public}d, udidhash %{public}s.", static_cast<int32_t>(state),
+        GetAnonyString(info.deviceId).c_str());
+    for (const auto &it : procInfoVec) {
+        std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
+        std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+        pReq->SetServiceIds(serviceIds);
+        std::string notifyPkgName = it.pkgName + "#" + std::to_string(it.userId) + "#" + std::string(info.deviceId);
+        DmDeviceState notifyState = state;
+        {
+            std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
+            if (alreadyOnlinePkgName_.find(notifyPkgName) != alreadyOnlinePkgName_.end()) {
+                notifyState = DmDeviceState::DEVICE_INFO_CHANGED;
+            } else {
+                alreadyOnlinePkgName_[notifyPkgName] = info;
+            }
+        }
+        SetDeviceInfo(pReq, it, notifyState, info, deviceBasicInfo);
+        ipcServerListener_.SendRequest(SERVER_DEVICE_STATE_NOTIFY, pReq, pRsp);
+    }
+}
+
 std::string DeviceManagerServiceListener::GetLocalDisplayDeviceName()
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -1052,6 +1150,46 @@ int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string 
 #else
     return ERR_DM_UNSUPPORTED_METHOD;
 #endif
+}
+
+int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(int64_t serviceId)
+{
+    return ERR_DM_UNSUPPORTED_METHOD;
+}
+
+void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
+    const DiscoveryServiceInfo &discServiceInfo)
+{
+    std::shared_ptr<IpcNotifyServiceFoundReq> pReq = std::make_shared<IpcNotifyServiceFoundReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetProcessInfo(processInfo);
+    pReq->SetDiscServiceId(discServiceId);
+    pReq->SetDiscServiceInfo(discServiceInfo);
+    ipcServerListener_.SendRequest(NOTIFY_SERVICE_FOUND, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnServiceDiscoveryResult(const ProcessInfo &processInfo, int32_t discServiceId,
+    int32_t reason)
+{
+    std::shared_ptr<IpcNotifyServiceDiscoverResultReq> pReq = std::make_shared<IpcNotifyServiceDiscoverResultReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetProcessInfo(processInfo);
+    pReq->SetDiscServiceId(discServiceId);
+    pReq->SetResult(reason);
+    ipcServerListener_.SendRequest(NOTIFY_SERVICE_DISCOVERY_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnServicePublishResult(const ProcessInfo &processInfo,
+    int64_t serviceId, int32_t publishResult)
+{
+    LOGI("OnServicePublishResult start");
+    std::shared_ptr<IpcServicePublishResultReq> pReq = std::make_shared<IpcServicePublishResultReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    pReq->SetServiceId(serviceId);
+    pReq->SetResult(publishResult);
+    pReq->SetPkgName(processInfo.pkgName);
+    pReq->SetProcessInfo(processInfo);
+    ipcServerListener_.SendRequest(SERVICE_PUBLISH_RESULT, pReq, pRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

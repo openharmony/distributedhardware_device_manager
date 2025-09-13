@@ -172,6 +172,7 @@ DM_EXPORT extern const char* APP_USER_DATA;
 DM_EXPORT extern const char* BUNDLE_INFO;
 DM_EXPORT extern const char* TITLE;
 DM_EXPORT extern const char* DM_BUSINESS_ID;
+DM_EXPORT extern const char* PARAM_KEY_IS_SERVICE_BIND;
 
 // screen state
 enum ScreenState {
@@ -190,6 +191,7 @@ const int32_t DEVICE_NAME_MAX_BYTES = 100;
 DM_EXPORT extern const char* ACL_IS_LNN_ACL_KEY;
 DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_TRUE;
 DM_EXPORT extern const char* ACL_IS_LNN_ACL_VAL_FALSE;
+DM_EXPORT extern const char* SERVICE_ID_KEY;
 
 extern const char* DM_VERSION_5_0_1;
 extern const char* DM_VERSION_5_0_2;

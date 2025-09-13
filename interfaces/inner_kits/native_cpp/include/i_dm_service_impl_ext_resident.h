@@ -113,6 +113,12 @@ public:
     virtual void HandleScreenLockEvent(bool isLock) = 0;
     virtual int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) = 0;
     virtual void HandleUserSwitchEvent(int32_t currentUserId, int32_t beforeUserId) = 0;
+    virtual int32_t StartServiceDiscovery(const ProcessInfo &processInfo, const DiscoveryServiceParam &discParam) = 0;
+    virtual int32_t StopServiceDiscovery(int32_t discServiceId) = 0;
+    virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
+    virtual int32_t StartPublishService(const ProcessInfo &processInfo,
+        const PublishServiceParam &publishServiceParam) = 0;
+    virtual int32_t StopPublishService(int64_t serviceId) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);
