@@ -104,7 +104,7 @@ const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t PIN_AUTH_TIMEOUT = 60;
 const int32_t EVENT_TIMEOUT = 5000; // 5000 ms
 
-constexpr uint16_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = 1;	
+constexpr uint16_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = 1;
 constexpr uint16_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = 4;
 constexpr const static char* OPEN_PROCESS_NAME_WHITE_LIST[OPEN_PROCESS_NAME_WHITE_LIST_NUM] = {
     "com.example.myapplication"
