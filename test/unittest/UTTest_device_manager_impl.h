@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,9 @@
 #include "device_manager_impl.h"
 #include "softbus_error_code.h"
 #include "device_manager_notify_mock.h"
+#include "dm_subscribe_info.h"
+#include "device_manager_notify.h"
+#include "dm_publish_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -37,7 +40,7 @@ public:
     void SetUp();
     void TearDown();
 
-    static inline  std::shared_ptr<DeviceManagerNotifyMock> deviceManagerNotifyMock_ =
+    static inline std::shared_ptr<DeviceManagerNotifyMock> deviceManagerNotifyMock_ =
         std::make_shared<DeviceManagerNotifyMock>();
     static inline std::shared_ptr<MockIpcClientProxy> ipcClientProxyMock_ = std::make_shared<MockIpcClientProxy>();
 };
@@ -153,6 +156,32 @@ public:
     {
     }
     void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
+};
+
+class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
+public:
+    ServiceDiscoveryCallbackTest() = default;
+    virtual ~ServiceDiscoveryCallbackTest() = default;
+    void OnServiceFound(const DiscoveryServiceInfo &service) override {}
+    void OnServiceDiscoveryResult(int32_t resReason) override {}
+};
+
+class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
+public:
+    void OnServiceOnline(int64_t serviceId) override {}
+    void OnServiceOffline(int64_t serviceId) override {}
+};
+
+class MockServicePublishCallback : public ServicePublishCallback {
+public:
+    void OnPublishResult(int32_t result, const std::string &publishId) {}
+};
+
+class ServicePublishCallbackTest : public ServicePublishCallback {
+public:
+    ServicePublishCallbackTest() = default;
+    virtual ~ServicePublishCallbackTest() = default;
+    void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

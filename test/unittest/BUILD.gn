@@ -103,6 +103,7 @@ group("unittest") {
     ":UTTest_softbus_connector",
     ":UTTest_softbus_listener",
     ":UTTest_softbus_listener_two",
+    "UTTest_device_manager_impl_four.cpp",
     ":UTTest_softbus_publish",
     ":UTTest_softbus_session",
   ]

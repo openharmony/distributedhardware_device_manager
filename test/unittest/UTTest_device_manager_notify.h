@@ -119,6 +119,30 @@ public:
     void OnDestroyResult(int32_t result) {}
     void OnPinHolderEvent(DmPinHolderEvent event, int32_t result, const std::string &content) {}
 };
+
+class BindTargetCallbackTest : public BindTargetCallback {
+public:
+    void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
+};
+
+class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
+public:
+    void OnServiceFound(const DiscoveryServiceInfo &service) override {}
+    void OnServiceDiscoveryResult(int32_t resReason) override {}
+};
+
+class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
+public:
+    void OnServiceOnline(int64_t serviceId) override {}
+    void OnServiceOffline(int64_t serviceId) override {}
+};
+
+class ServicePublishCallbackTest : public ServicePublishCallback {
+public:
+    ServicePublishCallbackTest() = default;
+    virtual ~ServicePublishCallbackTest() = default;
+    void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 
