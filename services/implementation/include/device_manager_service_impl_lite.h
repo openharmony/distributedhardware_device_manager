@@ -183,6 +183,9 @@ public:
     void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
         const std::vector<int32_t> &backGroundUserIds);
     void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash);
+    int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam);
+    int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 
