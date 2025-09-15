@@ -42,15 +42,14 @@ const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
     { std::string(WAIT_PIN_AUTH_TIMEOUT_TASK), CLONE_PIN_AUTH_TIMEOUT },
     { std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), CLONE_SESSION_HEARTBEAT_TIMEOUT }
 };
-
+constexpr uint16_t ONBINDRESULT_MAPPING_NUM = 2;
 constexpr int32_t MS_PER_SECOND = 1000;
 constexpr int32_t US_PER_MSECOND = 1000;
 constexpr int32_t GET_SYSTEMTIME_MAX_NUM = 3;
-constexpr const static char* ONBINDRESULT_MAPPING_LIST[] = {
+constexpr const static char* ONBINDRESULT_MAPPING_LIST[ONBINDRESULT_MAPPING_NUM] = {
     "CollaborationFwk",
     "cast_engine_service",
 };
-constexpr uint16_t ONBINDRESULT_MAPPING_NUM = std::size(ONBINDRESULT_MAPPING_LIST);
 
 const std::map<DmAuthStateType, DmAuthStatus> NEW_AND_OLD_STATE_MAPPING = {
     { DmAuthStateType::AUTH_SRC_FINISH_STATE, DmAuthStatus::STATUS_DM_AUTH_FINISH },

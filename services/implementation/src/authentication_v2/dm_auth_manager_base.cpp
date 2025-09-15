@@ -104,19 +104,17 @@ const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t PIN_AUTH_TIMEOUT = 60;
 const int32_t EVENT_TIMEOUT = 5000; // 5000 ms
 
-constexpr const static char* OPEN_PROCESS_NAME_WHITE_LIST[] = {
+constexpr uint16_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = 1;	
+constexpr uint16_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = 4;
+constexpr const static char* OPEN_PROCESS_NAME_WHITE_LIST[OPEN_PROCESS_NAME_WHITE_LIST_NUM] = {
     "com.example.myapplication"
 };
-
-constexpr uint32_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = std::size(OPEN_PROCESS_NAME_WHITE_LIST);
-
-constexpr const static char* CLOSE_PROCESS_NAME_WHITE_LIST[] = {
+constexpr const static char* CLOSE_PROCESS_NAME_WHITE_LIST[CLOSE_PROCESS_NAME_WHITE_LIST_NUM] = {
     "CollaborationFwk",
     "gameservice_server",
     "wear_link_service",
     "watch_system_service"
 };
-constexpr uint32_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = std::size(CLOSE_PROCESS_NAME_WHITE_LIST);
 
 constexpr const static char* PROCESS_NAME_PROXY_ADAPTATION_LIST[] = {
     "gameservice_server"
@@ -548,7 +546,7 @@ bool AuthManagerBase::CheckProcessNameInWhiteList(const std::string &processName
         LOGE("processName is empty");
         return false;
     }
-    uint32_t index = 0;
+    uint16_t index = 0;
 #ifdef DEVICE_MANAGER_COMMON_FLAG
     for (; index < OPEN_PROCESS_NAME_WHITE_LIST_NUM; ++index) {
         std::string whitePkgName(OPEN_PROCESS_NAME_WHITE_LIST[index]);
