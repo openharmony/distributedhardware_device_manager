@@ -2649,12 +2649,6 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
             authResponseContext_->reply = ERR_DM_INPUT_PARA_INVALID;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         } else {
-            if (timer_ != nullptr) {
-                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
-                    GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
-                        DmAuthManager::HandleAuthenticateTimeout(name);
-                    });
-            }
             UpdateInputPincodeDialog(errorCode);
         }
     }
@@ -3447,6 +3441,12 @@ bool DmAuthManager::CheckNeedShowAuthInfoDialog(int32_t errorCode)
 
 void DmAuthManager::UpdateInputPincodeDialog(int32_t errorCode)
 {
+    if (timer_ != nullptr) {
+        timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+            GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
+            DmAuthManager::HandleAuthenticateTimeout(name);
+        });
+    }
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(authUiStateMgr_);
     if (authResponseContext_->authType == AUTH_TYPE_NFC && !pincodeDialogEverShown_ &&
