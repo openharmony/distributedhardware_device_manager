@@ -430,11 +430,13 @@ private:
     void GetLocalUserIdFromDataBase(std::vector<int32_t> &foregroundUsers, std::vector<int32_t> &backgroundUsers);
     void PutLocalUserIdToDataBase(const std::vector<int32_t> &foregroundUsers,
         const std::vector<int32_t> &backgroundUsers);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t UpdateServiceInfo(int64_t serviceId);
     int32_t GenerateServiceId(int64_t &serviceId);
     int32_t ConvertServiceInfoProfileByRegInfo(const ServiceRegInfo &serviceRegInfo,
         ServiceInfoProfile &serviceInfoProfile);
     int32_t GenerateRegServiceId(int32_t &regServiceId);
+#endif
 
 private:
     bool isImplsoLoaded_ = false;
