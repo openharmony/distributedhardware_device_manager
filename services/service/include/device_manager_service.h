@@ -264,6 +264,7 @@ public:
         std::vector<std::string> &networkIds);
     void ProcessSyncAccountLogout(const std::string &accountId, const std::string &peerUdid, int32_t userId);
     int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m);
+    int32_t OpenAuthSessionWithPara(int64_t serviceId);
     int32_t UnRegisterPinHolderCallback(const std::string &pkgName);
     void ProcessReceiveRspAppUninstall(const std::string &remoteUdid);
     void ProcessReceiveRspAppUnbind(const std::string &remoteUdid);
@@ -275,6 +276,16 @@ public:
     bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam);
+    int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discServiceId);
+    int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam);
+    int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
+    int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId);
+    int32_t UnRegisterServiceInfo(int32_t regServiceId);
+    int32_t StartPublishService(const std::string &pkgName,
+        PublishServiceParam &publishServiceParam, int64_t &serviceId);
+    int32_t StopPublishService(int64_t serviceId);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();
@@ -418,6 +429,11 @@ private:
     void GetLocalUserIdFromDataBase(std::vector<int32_t> &foregroundUsers, std::vector<int32_t> &backgroundUsers);
     void PutLocalUserIdToDataBase(const std::vector<int32_t> &foregroundUsers,
         const std::vector<int32_t> &backgroundUsers);
+    int32_t UpdateServiceInfo(int64_t serviceId);
+    int32_t GenerateServiceId(int64_t &serviceId);
+    int32_t ConvertServiceInfoProfileByRegInfo(const ServiceRegInfo &serviceRegInfo,
+        ServiceInfoProfile &serviceInfoProfile);
+    int32_t GenerateRegServiceId(int32_t &regServiceId);
 
 private:
     bool isImplsoLoaded_ = false;

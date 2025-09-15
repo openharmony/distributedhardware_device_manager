@@ -553,6 +553,7 @@ private:
     bool IsAntiDisturbanceMode(const std::string &businessId);
     bool ParseAndCheckAntiDisturbanceMode(const std::string &businessId, const std::string &businessValue);
     void SetIsProxyBind(std::shared_ptr<DmAuthContext> context);
+    int32_t SinkNegotiateService(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkDataSyncState : public DmAuthState {
