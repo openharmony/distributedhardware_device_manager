@@ -1833,9 +1833,10 @@ int32_t DmAuthMessageProcessor::CreateMessageProxyReqUserConfirm(std::shared_ptr
 
 int32_t DmAuthMessageProcessor::CreateMessageRespUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
     json[TAG_AUTH_TYPE_LIST] = vectorAuthTypeToString(context->authTypeList);
     json[TAG_EXTRA_INFO] = context->accessee.extraInfo;
-    if (context != nullptr && context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+    if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
         JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
         for (const auto &app : context->subjectProxyOnes) {
             JsonObject object;
@@ -1918,7 +1919,7 @@ std::string DmAuthMessageProcessor::CompressSyncMsg(std::string &inputStr)
 {
     uint32_t srcLen = inputStr.size();
     uint32_t boundSize = compressBound(srcLen);  // Maximum compression length
-    if (boundSize <= 0) {
+    if (boundSize == 0) {
         LOGE("DmAuthMessageProcessor::CompressSyncMsg zlib compressBound failed");
         return "";
     }

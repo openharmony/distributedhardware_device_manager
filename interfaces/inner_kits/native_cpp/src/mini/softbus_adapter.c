@@ -1236,6 +1236,10 @@ static int OnSessionOpened(int sessionId, int result)
         return DM_OK;
     }
     char *msg = CreateNegotiateMsg();
+    if (msg == NULL) {
+        DMLOGE("Create negotiate empty msg.");
+        return ERR_DM_FAILED;
+    }
     int ret = SendBytes(sessionId, msg, strlen(msg));
     if (ret != SOFTBUS_OK) {
         DMLOGE("send byte failed, ret: %d.", ret);
