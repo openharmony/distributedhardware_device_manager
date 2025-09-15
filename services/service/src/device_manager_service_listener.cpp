@@ -1161,11 +1161,6 @@ int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string 
 #endif
 }
 
-int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(int64_t serviceId)
-{
-    return ERR_DM_UNSUPPORTED_METHOD;
-}
-
 void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
     const DiscoveryServiceInfo &discServiceInfo)
 {

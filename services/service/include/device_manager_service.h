@@ -215,6 +215,16 @@ public:
         const std::vector<std::string> &acceptEventUdids);
     std::set<std::pair<std::string, std::string>> GetProxyInfosByParseExtra(const std::string &pkgName,
         const std::string &extra, std::vector<std::pair<int64_t, int64_t>> &agentToProxyVec);
+    int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam);
+    int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discServiceId);
+    int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam);
+    int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
+    int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId);
+    int32_t UnRegisterServiceInfo(int32_t regServiceId);
+    int32_t StartPublishService(const std::string &pkgName,
+        PublishServiceParam &publishServiceParam, int64_t &serviceId);
+    int32_t StopPublishService(int64_t serviceId);
 #endif
     int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy);
     void ClearDiscoveryCache(const ProcessInfo &processInfo);
@@ -276,16 +286,7 @@ public:
     bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
-    int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam);
-    int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discServiceId);
-    int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
-        const std::map<std::string, std::string> &bindParam);
-    int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
-    int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId);
-    int32_t UnRegisterServiceInfo(int32_t regServiceId);
-    int32_t StartPublishService(const std::string &pkgName,
-        PublishServiceParam &publishServiceParam, int64_t &serviceId);
-    int32_t StopPublishService(int64_t serviceId);
+
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();

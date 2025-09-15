@@ -4202,6 +4202,7 @@ int32_t DeviceManagerService::OpenAuthSessionWithPara(const std::string &deviceI
     return dmServiceImplExtResident_->OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
 {
     if (!IsDMServiceAdapterResidentLoad()) {
@@ -4210,6 +4211,7 @@ int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
     }
     return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
 }
+#endif
 
 int32_t DeviceManagerService::UnRegisterPinHolderCallback(const std::string &pkgName)
 {
@@ -4429,6 +4431,7 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
         dmServiceImpl_->InitTaskOfDelTimeOutAcl(udid, udidHash);
     }
 }
+
 int32_t DeviceManagerService::StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
