@@ -819,6 +819,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status, int32_t oper
             if (transitToFinishState_) {
                 LOGI("Have received src finish state.");
                 authResponseContext_->state = AuthState::AUTH_RESPONSE_FINISH;
+                CHECK_NULL_VOID(authResponseState_);
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
             }
         }
@@ -1387,14 +1388,17 @@ void DmAuthManager::StartRespAuthProcess()
     CHECK_NULL_VOID(authRequestContext_);
     CHECK_NULL_VOID(authRequestState_);
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
-        timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
-            GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
-                DmAuthManager::HandleAuthenticateTimeout(name);
-            });
-        timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK),
-            GetTaskTimeout(SESSION_HEARTBEAT_TIMEOUT_TASK, SESSION_HEARTBEAT_TIMEOUT), [this] (std::string name) {
-                DmAuthManager::HandleSessionHeartbeat(name);
-            });
+        if (timer_ != nullptr) {
+            timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+                GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
+                    DmAuthManager::HandleAuthenticateTimeout(name);
+                });
+            timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK),
+                GetTaskTimeout(SESSION_HEARTBEAT_TIMEOUT_TASK, SESSION_HEARTBEAT_TIMEOUT), [this] (std::string name) {
+                    DmAuthManager::HandleSessionHeartbeat(name);
+                });
+        }
+
         CHECK_NULL_VOID(listener_);
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId,
             authRequestContext_->token, STATUS_DM_SHOW_PIN_INPUT_UI, DM_OK);
@@ -2622,6 +2626,7 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
             authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;
             authResponseContext_->state = AuthState::AUTH_RESPONSE_SHOW;
             isFinishOfLocal_ = false;
+            CHECK_NULL_VOID(authResponseState_);
             authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
         }
         return;
@@ -2644,12 +2649,6 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
             authResponseContext_->reply = ERR_DM_INPUT_PARA_INVALID;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         } else {
-            if (timer_ != nullptr) {
-                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
-                    GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
-                        DmAuthManager::HandleAuthenticateTimeout(name);
-                    });
-            }
             UpdateInputPincodeDialog(errorCode);
         }
     }
@@ -3442,6 +3441,12 @@ bool DmAuthManager::CheckNeedShowAuthInfoDialog(int32_t errorCode)
 
 void DmAuthManager::UpdateInputPincodeDialog(int32_t errorCode)
 {
+    if (timer_ != nullptr) {
+        timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+            GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
+            DmAuthManager::HandleAuthenticateTimeout(name);
+        });
+    }
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(authUiStateMgr_);
     if (authResponseContext_->authType == AUTH_TYPE_NFC && !pincodeDialogEverShown_ &&

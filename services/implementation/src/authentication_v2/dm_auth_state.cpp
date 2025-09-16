@@ -43,7 +43,7 @@ const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
     { std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), CLONE_SESSION_HEARTBEAT_TIMEOUT }
 };
 
-constexpr int32_t ONBINDRESULT_MAPPING_NUM = 2;
+constexpr uint16_t ONBINDRESULT_MAPPING_NUM = 2;
 constexpr int32_t MS_PER_SECOND = 1000;
 constexpr int32_t US_PER_MSECOND = 1000;
 constexpr int32_t GET_SYSTEMTIME_MAX_NUM = 3;

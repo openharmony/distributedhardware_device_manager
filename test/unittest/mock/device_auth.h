@@ -70,13 +70,13 @@
 #define FIELD_DEVICE_LIST "deviceList"
 #define FIELD_AUTH_CODE "authCode"
 
-using OsAccountEnum = enum OsAccountEnum : int32_t {
+using OsAccountEnum = enum : int32_t {
     DEFAULT_OS_ACCOUNT = 0,
     INVALID_OS_ACCOUNT = -1,
     ANY_OS_ACCOUNT = -2,
 };
 
-using GroupType = enum GroupType : int32_t {
+using GroupType = enum : int32_t {
     ALL_GROUP = 0,
     IDENTICAL_ACCOUNT_GROUP = 1,
     PEER_TO_PEER_GROUP = 256,
@@ -84,7 +84,7 @@ using GroupType = enum GroupType : int32_t {
     ACROSS_ACCOUNT_AUTHORIZE_GROUP = 1282
 };
 
-using GroupOperationCode = enum GroupOperationCode : int32_t {
+using GroupOperationCode = enum : int32_t {
     GROUP_CREATE = 0,
     GROUP_DISBAND = 1,
     MEMBER_INVITE = 2,
@@ -93,14 +93,14 @@ using GroupOperationCode = enum GroupOperationCode : int32_t {
     ACCOUNT_BIND = 5
 };
 
-using GroupAuthForm = enum GroupAuthForm : int32_t {
+using GroupAuthForm = enum : int32_t {
     AUTH_FORM_INVALID_TYPE = -1,
     AUTH_FORM_ACCOUNT_UNRELATED = 0,
     AUTH_FORM_IDENTICAL_ACCOUNT = 1,
     AUTH_FORM_ACROSS_ACCOUNT = 2,
 };
 
-using CredentialCode = enum CredentialCode : int32_t {
+using CredentialCode = enum : int32_t {
     IMPORT_SELF_CREDENTIAL = 0,
     DELETE_SELF_CREDENTIAL = 1,
     QUERY_SELF_CREDENTIAL_INFO = 2,
@@ -110,25 +110,25 @@ using CredentialCode = enum CredentialCode : int32_t {
     REQUEST_SIGNATURE = 6,
 };
 
-using UserType = enum UserType : int32_t {
+using UserType = enum : int32_t {
     DEVICE_TYPE_ACCESSORY = 0,
     DEVICE_TYPE_CONTROLLER = 1,
     DEVICE_TYPE_PROXY = 2
 };
 
-using ExpireTime = enum ExpireTime : int32_t {
+using ExpireTime = enum : int32_t {
     EXPIRE_TIME_INDEFINITE = -1,
     EXPIRE_TIME_MIN = 1,
     EXPIRE_TIME_MAX = 90,
 };
 
-using RequestResponse = enum RequestResponse : int32_t {
+using RequestResponse = enum : int32_t {
     REQUEST_REJECTED = 0x80000005,
     REQUEST_ACCEPTED = 0x80000006,
     REQUEST_WAITING = 0x80000007
 };
 
-using DataChangeListener = struct DataChangeListener {
+using DataChangeListener = struct {
     void (*onGroupCreated)(const char *groupInfo);
     void (*onGroupDeleted)(const char *groupInfo);
     void (*onDeviceBound)(const char *peerUdid, const char *groupInfo);
@@ -138,13 +138,13 @@ using DataChangeListener = struct DataChangeListener {
     void (*onTrustedDeviceNumChanged)(int curTrustedDeviceNum);
 };
 
-using CredChangeListener = struct CredChangeListener {
+using CredChangeListener = struct {
     void (*onCredAdd)(const char *credId, const char *credInfo);
     void (*onCredDelete)(const char *credId, const char *credInfo);
     void (*onCredUpdate)(const char *credId, const char *credInfo);
 };
 
-using DeviceAuthCallback = struct DeviceAuthCallback {
+using DeviceAuthCallback = struct {
     bool (*onTransmit)(int64_t requestId, const uint8_t *data, uint32_t dataLen);
     void (*onSessionKeyReturned)(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen);
     void (*onFinish)(int64_t requestId, int operationCode, const char *returnData);
@@ -152,7 +152,7 @@ using DeviceAuthCallback = struct DeviceAuthCallback {
     char *(*onRequest)(int64_t requestId, int operationCode, const char *reqParams);
 };
 
-using CredManager = struct CredManager {
+using CredManager = struct {
     int32_t (*addCredential)(int32_t osAccountId, const char *requestParams, char **returnData);
     int32_t (*exportCredential)(int32_t osAccountId, const char *credId, char **returnData);
     int32_t (*queryCredentialByParams)(int32_t osAccountId, const char *requestParams, char **returnData);
@@ -168,7 +168,7 @@ using CredManager = struct CredManager {
     void (*destroyInfo)(char **returnData);
 };
 
-using GroupAuthManager = struct GroupAuthManager {
+using GroupAuthManager = struct {
     int32_t (*processData)(int64_t authReqId, const uint8_t *data, uint32_t dataLen,
         const DeviceAuthCallback *gaCallback);
     int32_t (*queryTrustedDeviceNum)(void);
@@ -180,7 +180,7 @@ using GroupAuthManager = struct GroupAuthManager {
     void (*informDeviceDisconnection)(const char *udid);
 };
 
-using DeviceGroupManager = struct DeviceGroupManager {
+using DeviceGroupManager = struct {
     int32_t (*regCallback)(const char *appId, const DeviceAuthCallback *callback);
     int32_t (*unRegCallback)(const char *appId);
     int32_t (*regDataChangeListener)(const char *appId, const DataChangeListener *listener);
