@@ -211,31 +211,6 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
     }
 }
 
-int32_t DmDeviceStateManager::aaa()
-{
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-std::vector<int64_t> remoteTokenIds;
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    std::string localUdid(localDeviceId);
-    std::string udid = softbusConnector_->GetDeviceUdidByUdidHash(devInfo.deviceId);
-    DeviceProfileConnector::GetInstance().GetRemoteTokenIds(localUdid, udid, remoteTokenIds);
-    std::vector<int64_t> remoteServiceIds;
-    for (const auto &item : remoteTokenIds) {
-        ServiceInfoProfile serviceInfo;
-        if (DeviceProfileConnector::GetInstance().GetServiceInfoByTokenId(item, serviceInfo) != DM_OK) {
-            LOGE("GetServiceInfoByTokenid failed.");
-            continue;
-        }
-        remoteServiceIds.push_back(serviceInfo.serviceId);
-    }
-    LOGI("ProcessDeviceStateChange, remoteServiceIds size: %{public}zu", remoteServiceIds.size());
-    return DM_OK;
-#endif
-    return DM
-    
-}
-
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
     LOGI("OnDbReady function is called with pkgName: %{public}s and uuid = %{public}s",
