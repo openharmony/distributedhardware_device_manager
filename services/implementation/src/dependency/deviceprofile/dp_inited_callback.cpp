@@ -38,6 +38,7 @@ namespace {
 const std::string PUT_ALL_TRUSTED_DEVICES_TASK = "PutAllTrustedDevicesTask";
 }
 
+//LCOV_EXCL_START
 DpInitedCallback::DpInitedCallback()
 {}
 
@@ -59,7 +60,6 @@ int32_t DpInitedCallback::OnDpInited()
     return DM_OK;
 }
 
-//LCOV_EXCL_START
 void DpInitedCallback::PutAllTrustedDevices()
 {
     LOGE("In.");

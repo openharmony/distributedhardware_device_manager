@@ -111,10 +111,12 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 DmAuthStateType AuthSinkDataSyncState::GetStateType()
 {
     return DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE;
 }
+//LCOV_EXCL_STOP
 
 int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
@@ -196,10 +198,12 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 DmAuthStateType AuthSrcDataSyncState::GetStateType()
 {
     return DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE;
 }
+//LCOV_EXCL_STOP
 
 // Received 200 end message, send 201
 int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)

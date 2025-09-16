@@ -26,8 +26,8 @@ void GetLocalDeviceInfoFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string networkId(reinterpret_cast<const char*>(data), size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string networkId = fdp.ConsumeRandomLengthString();
     int32_t deviceTypeId = *(reinterpret_cast<const int32_t*>(data));
     DeviceManagerImpl::GetInstance().GetLocalDeviceNetWorkId(pkgName, networkId);
     DeviceManagerImpl::GetInstance().GetLocalDeviceId(pkgName, networkId);

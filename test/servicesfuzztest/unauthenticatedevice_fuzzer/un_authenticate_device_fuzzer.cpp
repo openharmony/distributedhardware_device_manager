@@ -32,26 +32,15 @@ void UnAuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
         (size > DM_MAX_DEVICE_ID_LEN))) {
         return;
     }
-
-    std::string bundleName(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    DmDeviceInfo deviceInfo;
-    if (memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
-        return;
-    }
-    if (memcpy_s(deviceInfo.deviceName, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
-        return;
-    }
-    if (memcpy_s(deviceInfo.networkId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
-        return;
-    }
     FuzzedDataProvider fdp(data, size);
+    std::string bundleName = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    DmDeviceInfo deviceInfo;
     deviceInfo.deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
     deviceInfo.range = fdp.ConsumeIntegral<int32_t>();
     deviceInfo.networkType = fdp.ConsumeIntegral<int32_t>();
-    std::string extraData(reinterpret_cast<const char*>(data), size);
+    std::string extraData = fdp.ConsumeRandomLengthString();
     deviceInfo.extraData = extraData;
-    deviceInfo.authForm = *(reinterpret_cast<const DmAuthForm*>(data));
 
     DeviceManager::GetInstance().UnAuthenticateDevice(bundleName, deviceInfo);
     DeviceManager::GetInstance().UnBindDevice(bundleName, deviceId);

@@ -26,12 +26,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-void RespQueryProxyAcceseeIdsFuzzTest(const uint8_t* data, size_t size)
+void RespQueryProxyAcceseeIdsFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->IsProxyBind = true;
     context->accessee.userId = fdp.ConsumeIntegral<int32_t>();
@@ -43,12 +39,8 @@ void RespQueryProxyAcceseeIdsFuzzTest(const uint8_t* data, size_t size)
     authSinkPtr->RespQueryProxyAcceseeIds(context);
 }
 
-void GetSinkProxyCredTypeForP2PFuzzTest(const uint8_t* data, size_t size)
+void GetSinkProxyCredTypeForP2PFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->IsProxyBind = true;
     context->accessee.userId = fdp.ConsumeIntegral<int32_t>();
@@ -66,12 +58,8 @@ void GetSinkProxyCredTypeForP2PFuzzTest(const uint8_t* data, size_t size)
     authSinkPtr->GetSinkProxyAclInfoForP2P(context, profile);
 }
 
-void DmNegotiateProcessFuzzTest(const uint8_t* data, size_t size)
+void DmNegotiateProcessFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->needBind = fdp.ConsumeBool();
     context->needAgreeCredential = fdp.ConsumeBool();
@@ -112,9 +100,6 @@ void DmNegotiateProcessFuzzTest(const uint8_t* data, size_t size)
     p2pCredP2pAclImportAuthType.NegotiateHandle(context);
     P2pCredP2pAclInputAuthType p2pCredP2pAclInputAuthType;
     p2pCredP2pAclInputAuthType.NegotiateHandle(context);
-
-    RespQueryProxyAcceseeIdsFuzzTest(data, size);
-    GetSinkProxyCredTypeForP2PFuzzTest(data, size);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
@@ -123,6 +108,12 @@ void DmNegotiateProcessFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DmNegotiateProcessFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DmNegotiateProcessFuzzTest(fdp);
+    OHOS::DistributedHardware::RespQueryProxyAcceseeIdsFuzzTest(fdp);
+    OHOS::DistributedHardware::GetSinkProxyCredTypeForP2PFuzzTest(fdp);
     return 0;
 }

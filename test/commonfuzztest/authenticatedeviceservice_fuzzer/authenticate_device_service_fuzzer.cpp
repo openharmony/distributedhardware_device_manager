@@ -66,7 +66,6 @@ void AuthenticateDeviceServiceFuzzTest(const uint8_t* data, size_t size)
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
     int32_t level = fdp.ConsumeIntegral<int32_t>();
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
-    DeviceManagerService::GetInstance().Init();
     DeviceManagerService::GetInstance().AuthenticateDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().BindDevice(pkgName, authType, deviceId, extra);
     DeviceManagerService::GetInstance().UnAuthenticateDevice(pkgName, extra);

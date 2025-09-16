@@ -14,6 +14,7 @@
  */
 
 #include <chrono>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <securec.h>
 #include <string>
 
@@ -26,22 +27,18 @@ namespace OHOS {
 namespace DistributedHardware {
 void OnSoftbusDeviceInfoChangedFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint16_t) || (size > DM_MAX_DEVICE_ID_LEN))) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
 
     int infoType = 1234;
     NodeBasicInfoType type = static_cast<NodeBasicInfoType>(infoType);
     NodeBasicInfo info;
-    if (memcpy_s(info.networkId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
-        return;
-    }
-    if (memcpy_s(info.deviceName, DM_MAX_DEVICE_NAME_LEN, (reinterpret_cast<const char *>(data)), size) != DM_OK) {
-        return;
-    }
-    info.deviceTypeId = *(reinterpret_cast<const uint16_t *>(data));
+    info.osType= fdp.ConsumeIntegral<int32_t>();
+    info.deviceTypeId= fdp.ConsumeIntegral<uint16_t>();
     softbusListener->OnSoftbusDeviceInfoChanged(type, &info);
 }
 }

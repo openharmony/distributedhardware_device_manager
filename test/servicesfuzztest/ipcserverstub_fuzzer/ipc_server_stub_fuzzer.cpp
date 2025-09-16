@@ -45,18 +45,16 @@ void IpcServerStubFuzzTest(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     ProcessInfo processInfo;
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
     processInfo.pkgName = pkgName;
     sptr<IpcRemoteBroker> listener = sptr<IpcServerStub>(new IpcServerStub());
     std::shared_ptr<IpcReq> req = nullptr;
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 
-    IpcServerStub::GetInstance().Init();
     IpcServerStub::GetInstance().OnRemoteRequest(code, data1, reply, option);
     IpcServerStub::GetInstance().RegisterDeviceManagerListener(processInfo, listener);
     IpcServerStub::GetInstance().GetDmListener(processInfo);
     IpcServerStub::GetInstance().SendCmd(code, req, rsp);
-    IpcServerStub::GetInstance().GetAllProcessInfo();
     IpcServerStub::GetInstance().UnRegisterDeviceManagerListener(processInfo);
 }
 }

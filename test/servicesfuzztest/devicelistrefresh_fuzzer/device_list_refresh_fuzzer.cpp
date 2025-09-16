@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 
 #include "device_manager_impl.h"
@@ -26,14 +27,15 @@ namespace OHOS {
 namespace DistributedHardware {
 void DeviceListRefreshFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string extra(reinterpret_cast<const char*>(data), size);
+    std::string extra = fdp.ConsumeRandomLengthString();
     std::vector<DmDeviceInfo> devList;
     std::vector<DmDeviceBasicInfo> availableDevList;
-    std::string bundleName(reinterpret_cast<const char*>(data), size);
+    std::string bundleName = fdp.ConsumeRandomLengthString();
     bool isRefresh = true;
     DmDeviceInfo deviceInfo;
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =

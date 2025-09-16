@@ -17,10 +17,10 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("IpcModelCodecFuzzTest") {
+ohos_fuzztest("IpcModelCodecThreeFuzzTest") {
   module_out_path = fuzz_test_output_path
   fuzz_config_file =
-      "${devicemanager_path}/test/servicesfuzztest/ipcmodelcodec_fuzzer"
+      "${devicemanager_path}/test/servicesfuzztest/ipcmodelcodecthree_fuzzer"
 
   include_dirs = [
     "${innerkits_path}/native_cpp/include",
@@ -59,18 +59,18 @@ ohos_fuzztest("IpcModelCodecFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "ipc_model_codec_fuzzer.cpp" ]
+  sources = [ "ipc_model_codec_three_fuzzer.cpp" ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"IpcModelCodecFuzzTest\"",
+    "DH_LOG_TAG=\"IpcModelCodecThreeFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
   ]
 
-  deps = [
+  deps = [ 
     "${innerkits_path}/native_cpp:devicemanagersdk",
     "${utils_path}:devicemanagerutilstest"
-    ]
+  ]
 
   external_deps = [
     "c_utils:utils",
@@ -86,6 +86,6 @@ ohos_fuzztest("IpcModelCodecFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":IpcModelCodecFuzzTest" ]
+  deps = [ ":IpcModelCodecThreeFuzzTest" ]
 }
 ###############################################################################

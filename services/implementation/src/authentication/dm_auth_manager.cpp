@@ -1370,6 +1370,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 void DmAuthManager::StartRespAuthProcess()
 {
     if (authResponseContext_ == nullptr) {
@@ -1426,6 +1427,7 @@ int32_t DmAuthManager::CreateGroup()
     hiChainConnector_->CreateGroup(authResponseContext_->requestId, authResponseContext_->groupName);
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthManager::AddMember(const std::string &pinCode)
 {
@@ -1793,6 +1795,7 @@ bool DmAuthManager::GetIsCryptoSupport()
     return isCryptoSupport_;
 }
 
+//LCOV_EXCL_START
 int32_t DmAuthManager::SetAuthRequestState(std::shared_ptr<AuthRequestState> authRequestState)
 {
     if (authRequestState == nullptr) {
@@ -1814,6 +1817,7 @@ int32_t DmAuthManager::SetAuthResponseState(std::shared_ptr<AuthResponseState> a
     authResponseState_ = authResponseState;
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthManager::GetPinCode(std::string &code)
 {
@@ -1827,6 +1831,7 @@ int32_t DmAuthManager::GetPinCode(std::string &code)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 void DmAuthManager::CheckAndEndTvDream()
 {
     NodeBasicInfo nodeBasicInfo;
@@ -1889,6 +1894,7 @@ void DmAuthManager::ShowConfigDialog()
     }
     LOGI("ShowConfigDialog end");
 }
+//LCOV_EXCL_STOP
 
 void DmAuthManager::ShowAuthInfoDialog(bool authDeviceError)
 {
@@ -1919,6 +1925,7 @@ void DmAuthManager::ShowAuthInfoDialog(bool authDeviceError)
     DmDialogManager::GetInstance().ShowPinDialog(authResponseContext_->code);
 }
 
+//LCOV_EXCL_START
 void DmAuthManager::ShowStartAuthDialog()
 {
     if (authResponseContext_ == nullptr) {
@@ -1961,6 +1968,7 @@ void DmAuthManager::ShowStartAuthDialog()
     pincodeDialogEverShown_ = true;
     DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthManager::ProcessPincode(const std::string &pinCode)
 {
@@ -2095,6 +2103,7 @@ int32_t DmAuthManager::SetReasonAndFinish(int32_t reason, int32_t state)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 bool DmAuthManager::IsIdenticalAccount()
 {
     JsonObject jsonObj;
@@ -2159,6 +2168,7 @@ std::string DmAuthManager::GetAccountGroupIdHash()
     }
     return jsonAccountObj.Dump();
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthManager::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {

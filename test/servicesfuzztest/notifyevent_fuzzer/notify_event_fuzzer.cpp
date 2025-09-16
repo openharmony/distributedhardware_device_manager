@@ -26,9 +26,9 @@ void NotifyEventFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    int32_t eventId = *(reinterpret_cast<const int32_t*>(data));
-    std::string event(reinterpret_cast<const char*>(data), size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    int32_t eventId = fdp.ConsumeIntegral<int32_t>();
+    std::string event = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().NotifyEvent(pkgName, eventId, event);
 }
 }

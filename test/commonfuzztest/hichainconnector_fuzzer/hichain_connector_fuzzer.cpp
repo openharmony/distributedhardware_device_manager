@@ -98,31 +98,26 @@ void AddAclInfo(std::vector<std::pair<int32_t, std::string>> &delACLInfoVec, std
     userIdVec.push_back(key);
 }
 
-void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
+void HiChainConnectorFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t)))) {
-        return;
-    }
-
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
-    FuzzedDataProvider fdp(data, size);
-    std::string userId(reinterpret_cast<const char*>(data), size);
+    std::string userId = fdp.ConsumeRandomLengthString();
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
     std::vector<GroupInfo> groupList;
-    std::string queryParams(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string reqDeviceId(reinterpret_cast<const char*>(data), size);
-    std::string hostDevice(reinterpret_cast<const char*>(data), size);
+    std::string queryParams = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string reqDeviceId = fdp.ConsumeRandomLengthString();
+    std::string hostDevice = fdp.ConsumeRandomLengthString();
     std::vector<std::string> remoteGroupIdList;
     int32_t groupType = fdp.ConsumeIntegral<int32_t>();
     JsonObject jsonDeviceList;
-    std::string groupOwner(reinterpret_cast<const char*>(data), size);
-    std::string credentialInfo(reinterpret_cast<const char*>(data), size);
-    std::string jsonStr(reinterpret_cast<const char*>(data), size);
+    std::string groupOwner = fdp.ConsumeRandomLengthString();
+    std::string credentialInfo = fdp.ConsumeRandomLengthString();
+    std::string jsonStr = fdp.ConsumeRandomLengthString();
     std::vector<std::string> udidList;
-    std::string pkgNameStr(reinterpret_cast<const char*>(data), size);
+    std::string pkgNameStr = fdp.ConsumeRandomLengthString();
     int32_t delUserid = fdp.ConsumeIntegral<int32_t>();
 
     hichainConnector->IsRedundanceGroup(userId, authType, groupList);
@@ -144,48 +139,45 @@ void HiChainConnectorFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
     hichainConnector->DeleteAllGroup(delUserid);
     hichainConnector->GetRelatedGroupsCommon(deviceId, pkgNameStr.data(), groupList);
-    hichainConnector->UnRegisterHiChainCallback();
 }
 
-void HiChainConnectorSecondFuzzTest(const uint8_t* data, size_t size)
+void HiChainConnectorSecondFuzzTest(FuzzedDataProvider &fdp)
 {
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
     std::vector<GroupInfo> groupList;
-    JsonObject jsonDeviceList;
     GroupInfo groupInfo;
+    groupInfo.userId = fdp.ConsumeRandomLengthString();
+    groupList.emplace_back(groupInfo);
+    JsonObject jsonDeviceList;
     std::vector<std::string> syncGroupList;
     hichainConnector->GetSyncGroupList(groupList, syncGroupList);
     hichainConnector->IsGroupInfoInvalid(groupInfo);
-    hichainConnector->UnRegisterHiChainGroupCallback();
-    hichainConnector->GetJsonStr(jsonDeviceList, "key");
+    hichainConnector->GetJsonStr(jsonDeviceList, fdp.ConsumeRandomLengthString());
 }
 
-void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
+void HiChainConnectorThirdFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < (sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t) + sizeof(int32_t)))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
-    std::string groupName = "groupName";
+    std::string groupName = fdp.ConsumeRandomLengthString();
     GroupInfo groupInfo;
-    std::string userId(reinterpret_cast<const char*>(data), size);
+    std::string userId = fdp.ConsumeRandomLengthString();
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
     std::vector<GroupInfo> groupList;
-    std::string queryParams(reinterpret_cast<const char*>(data), size);
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string reqDeviceId(reinterpret_cast<const char*>(data), size);
+    std::string queryParams = fdp.ConsumeRandomLengthString();
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string reqDeviceId = fdp.ConsumeRandomLengthString();
     JsonObject jsonOutObj;
     std::shared_ptr<IDmGroupResCallback> callback;
-    std::string jsonStr(reinterpret_cast<const char*>(data), size);
+    std::string jsonStr = fdp.ConsumeRandomLengthString();
     int32_t groupType = fdp.ConsumeIntegral<int32_t>();
-    std::string reqParams(reinterpret_cast<const char*>(data), size);
-    std::string credentialInfo(reinterpret_cast<const char*>(data), size);
+    std::string reqParams = fdp.ConsumeRandomLengthString();
+    std::string credentialInfo = fdp.ConsumeRandomLengthString();
+    std::string key = fdp.ConsumeRandomLengthString();
     hichainConnector->deviceGroupManager_ = nullptr;
     hichainConnector->AddMember(deviceId, queryParams);
     hichainConnector->getRegisterInfo(queryParams, jsonStr);
@@ -207,27 +199,21 @@ void HiChainConnectorThirdFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->IsGroupCreated(groupName, groupInfo);
     hichainConnector->GetGroupInfoExt(authType, queryParams, groupList);
     hichainConnector->GetGroupInfoCommon(authType, queryParams, pkgName.c_str(), groupList);
-    hichainConnector->RegisterHiChainGroupCallback(callback);
-    hichainConnector->GetJsonInt(jsonOutObj, "key");
+    hichainConnector->GetJsonInt(jsonOutObj, key);
     hichainConnector->deleteMultiMembers(groupType, userId, jsonOutObj);
     hichainConnector->DeleteAllGroupByUdid(reqParams);
 }
 
-void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
+void HiChainConnectorForthFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int32_t))) {
-        return;
-    }
-
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-    FuzzedDataProvider fdp(data, size);
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
-    std::string groupName(reinterpret_cast<const char*>(data), size);
-    std::string groupId = "groupId_forth";
-    std::string deviceId = "deviceId_forth";
-    std::string returnData(reinterpret_cast<const char*>(data), size);
-    std::string userId = "userId_forth";
+    std::string groupName = fdp.ConsumeRandomLengthString();
+    std::string groupId = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string returnData = fdp.ConsumeRandomLengthString();
+    std::string userId = fdp.ConsumeRandomLengthString();
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
     int errCode = 102;
     std::vector<std::string> syncGroupList;
@@ -235,6 +221,9 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
     std::vector<int32_t> userIdVec;
     hichainConnector->DeleteGroupByACL(delACLInfoVec, userIdVec);
     std::vector<GroupInfo> groupList;
+    GroupInfo groupInfo;
+    groupInfo.userId = fdp.ConsumeRandomLengthString();
+    groupList.emplace_back(groupInfo);
     AddGroupInfo(groupList);
     AddAclInfo(delACLInfoVec, userIdVec);
     hichainConnector->DeleteGroup(groupId);
@@ -259,37 +248,33 @@ void HiChainConnectorForthFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->onError(requestId, GroupOperationCode::MEMBER_DELETE, errCode, returnData.c_str());
     hichainConnector->onFinish(requestId, GroupOperationCode::GROUP_DISBAND, returnData.c_str());
     hichainConnector->onError(requestId, GroupOperationCode::GROUP_DISBAND, errCode, returnData.c_str());
-    hichainConnector->GenRequestId();
     hichainConnector->GetRelatedGroups(deviceId, groupList);
     hichainConnector->GetRelatedGroupsExt(deviceId, groupList);
     hichainConnector->GetSyncGroupList(groupList, syncGroupList);
     hichainConnector->GetGroupId(userId, authType, userId);
 }
 
-void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
+void HiChainConnectorFifthFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t))) {
-        return;
-    }
-
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-    FuzzedDataProvider fdp(data, size);
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
-    std::string groupName = "groupName_fifth";
+    std::string groupName = fdp.ConsumeRandomLengthString();
     int32_t authType = fdp.ConsumeIntegral<int32_t>();
-    std::string params = "params";
+    std::string params = fdp.ConsumeRandomLengthString();
     int32_t osAccountUserId = fdp.ConsumeIntegral<int32_t>();
     JsonObject jsonDeviceList;
     std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
     std::vector<int32_t> userIdVec;
+    userIdVec.emplace_back(fdp.ConsumeIntegral<int32_t>());
     std::vector<std::pair<int32_t, std::string>> delAclInfoVec1;
     std::string jsonStr = R"({"content": {"deviceid": "123"}}, authId: "123456"))";
     std::vector<std::string> udidList;
-    int32_t key = 12;
-    std::string value = "acl_info1";
+    udidList.emplace_back(fdp.ConsumeRandomLengthString());
+    int32_t key = fdp.ConsumeIntegral<int32_t>();
+    std::string value = fdp.ConsumeRandomLengthString();
     std::string credentialInfo = R"({"content": {"deviceid": "123"}}, authId: "123456"))";
-    std::string groupOwner(reinterpret_cast<const char*>(data), size);
+    std::string groupOwner = fdp.ConsumeRandomLengthString();
     delAclInfoVec1.push_back(std::make_pair(key, value));
     JsonObject jsonObj;
     jsonObj[AUTH_TYPE] = 1;
@@ -317,23 +302,19 @@ void HiChainConnectorFifthFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
 }
 
-void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
+void HiChainConnectorSixthFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
-    std::string groupOwner(reinterpret_cast<const char*>(data), size);
+    std::string groupOwner = fdp.ConsumeRandomLengthString();
     JsonObject jsonObj;
-    std::string deviceId = "deviceId";
-    std::string key = "localDeviceId";
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string key = fdp.ConsumeRandomLengthString();
     jsonObj["deviceId"] = 1;
     hichainConnector->GetJsonInt(jsonObj, key);
     hichainConnector->GetJsonInt(jsonObj, key);
     jsonObj[key] = 1;
-    jsonObj["deviceName"] = "devieName1";
+    jsonObj["deviceName"] = fdp.ConsumeRandomLengthString();
     hichainConnector->GetJsonInt(jsonObj, "devieName");
     hichainConnector->AddMember(deviceId, jsonObj.Dump());
     jsonObj[TAG_DEVICE_ID] = "deviceId_001";
@@ -344,23 +325,22 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     hichainConnector->AddMember(deviceId, jsonObj.Dump());
 
     JsonObject jsonObjCre;
-    std::string params;
+    std::string params = fdp.ConsumeRandomLengthString();
     jsonObjCre[AUTH_TYPE] = 1;
-    jsonObjCre["userId"] = "user_001";
+    jsonObjCre["userId"] = fdp.ConsumeRandomLengthString();
     jsonObjCre[FIELD_CREDENTIAL_TYPE] = 1;
     jsonObjCre[FIELD_OPERATION_CODE] = 1;
     jsonObjCre[FIELD_META_NODE_TYPE] = "metaNode_002";
     jsonObjCre[FIELD_DEVICE_LIST] = "deviceList";
     std::string credentialInfo = jsonObjCre.Dump();
     hichainConnector->ParseRemoteCredentialExt(credentialInfo, params, groupOwner);
-    int32_t groupType = *(reinterpret_cast<const int32_t*>(data));
+    int32_t groupType = fdp.ConsumeIntegral<int32_t>();
     JsonObject jsonDeviceList;
     int32_t osAccountUserId = 0;
-    std::string userId = "user_002";
+    std::string userId = fdp.ConsumeRandomLengthString();
     std::vector<std::string> fieldDeviceList = {"deviceList"};
     jsonDeviceList[FIELD_DEVICE_LIST] = fieldDeviceList;
     hichainConnector->ParseRemoteCredential(groupType, userId, jsonDeviceList, params, osAccountUserId);
-    FuzzedDataProvider fdp(data, size);
     int32_t userIdInt = fdp.ConsumeIntegral<int32_t>();
     std::string groupId = fdp.ConsumeRandomLengthString();
     hichainConnector->DeleteGroupExt(userIdInt, groupId);
@@ -369,50 +349,41 @@ void HiChainConnectorSixthFuzzTest(const uint8_t* data, size_t size)
     FromJson(jsonObj, groupInfo);
 }
 
-void HiChainConnectorSevenhFuzzTest(const uint8_t* data, size_t size)
+void HiChainConnectorSevenhFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(int32_t))) {
-        return;
-    }
-
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
     std::vector<std::pair<int32_t, std::string>> delACLInfoVec;
     delACLInfoVec.push_back(std::make_pair(1, "aclinfo_001"));
     std::vector<int32_t> userIdVec;
     hichainConnector->DeleteGroupByACL(delACLInfoVec, userIdVec);
-    std::string groupName = "";
-    FuzzedDataProvider fdp(data, size);
+    std::string groupName = fdp.ConsumeRandomLengthString();
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     hichainConnector->IsNeedDelete(groupName, userId, delACLInfoVec);
     userId = 1;
     groupName = "aclinfo_001";
     hichainConnector->IsNeedDelete(groupName, userId, delACLInfoVec);
     std::vector<std::string> udidList;
+    udidList.emplace_back(fdp.ConsumeRandomLengthString());
     JsonObject jsonObject;
-    std::string jsonStr = "dkocosdpa";
+    std::string jsonStr = fdp.ConsumeRandomLengthString();
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
     jsonObject["authId"] = 1;
     jsonStr = jsonObject.Dump();
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
 
-    jsonObject["authId"] = "authInfoId";
+    jsonObject["authId"] = fdp.ConsumeRandomLengthString();
     jsonStr = jsonObject.Dump();
     hichainConnector->GetTrustedDevicesUdid(jsonStr.data(), udidList);
     hichainConnector->deviceGroupManager_ = nullptr;
     int32_t groupType = fdp.ConsumeIntegral<int32_t>();
-    std::string usersId(reinterpret_cast<const char*>(data), size);
+    std::string usersId = fdp.ConsumeRandomLengthString();
     JsonObject jsonDeviceList;
     hichainConnector->deleteMultiMembers(groupType, usersId, jsonDeviceList);
 }
 
-void GetGroupInfoExtFuzzTest(const uint8_t* data, size_t size)
+void GetGroupInfoExtFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
-
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     int32_t maxStringLength = 64;
     std::string queryParams = fdp.ConsumeRandomLengthString(maxStringLength);
@@ -421,6 +392,22 @@ void GetGroupInfoExtFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
     hichainConnector->GetGroupInfoExt(userId, queryParams, groupList);
 }
+
+void HichainConnectorFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    HiChainConnectorFuzzTest(fdp);
+    HiChainConnectorSecondFuzzTest(fdp);
+    HiChainConnectorThirdFuzzTest(fdp);
+    HiChainConnectorForthFuzzTest(fdp);
+    HiChainConnectorFifthFuzzTest(fdp);
+    HiChainConnectorSixthFuzzTest(fdp);
+    HiChainConnectorSevenhFuzzTest(fdp);
+    GetGroupInfoExtFuzzTest(fdp);
+}
 }
 }
 
@@ -428,13 +415,6 @@ void GetGroupInfoExtFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::HiChainConnectorFuzzTest(data, size);
-    OHOS::DistributedHardware::HiChainConnectorSecondFuzzTest(data, size);
-    OHOS::DistributedHardware::HiChainConnectorThirdFuzzTest(data, size);
-    OHOS::DistributedHardware::HiChainConnectorForthFuzzTest(data, size);
-    OHOS::DistributedHardware::HiChainConnectorFifthFuzzTest(data, size);
-    OHOS::DistributedHardware::HiChainConnectorSixthFuzzTest(data, size);
-    OHOS::DistributedHardware::HiChainConnectorSevenhFuzzTest(data, size);
-    OHOS::DistributedHardware::GetGroupInfoExtFuzzTest(data, size);
+    OHOS::DistributedHardware::HichainConnectorFuzzTest(data, size);
     return 0;
 }

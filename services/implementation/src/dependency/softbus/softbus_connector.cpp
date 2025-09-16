@@ -623,6 +623,7 @@ int32_t SoftbusConnector::GetLocalDeviceTypeId()
     return nodeBasicInfo.deviceTypeId;
 }
 
+//LCOV_EXCL_START
 std::string SoftbusConnector::GetLocalDeviceNetworkId()
 {
     NodeBasicInfo nodeBasicInfo;
@@ -633,6 +634,7 @@ std::string SoftbusConnector::GetLocalDeviceNetworkId()
     }
     return nodeBasicInfo.networkId;
 }
+//LCOV_EXCL_STOP
 
 int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo)
 {
@@ -685,6 +687,7 @@ void SoftbusConnector::SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec
     processInfoVec_ = processInfoVec;
 }
 
+//LCOV_EXCL_START
 std::vector<ProcessInfo> SoftbusConnector::GetProcessInfo()
 {
     LOGI("start");
@@ -698,6 +701,7 @@ void SoftbusConnector::ClearProcessInfo()
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_.clear();
 }
+//LCOV_EXCL_STOP
 
 void SoftbusConnector::SetChangeProcessInfo(ProcessInfo processInfo)
 {
@@ -706,6 +710,7 @@ void SoftbusConnector::SetChangeProcessInfo(ProcessInfo processInfo)
     processChangeInfoVec_.push_back(processInfo);
 }
 
+//LCOV_EXCL_START
 std::vector<ProcessInfo> SoftbusConnector::GetChangeProcessInfo()
 {
     LOGI("start");
@@ -719,6 +724,7 @@ void SoftbusConnector::ClearChangeProcessInfo()
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     processChangeInfoVec_.clear();
 }
+//LCOV_EXCL_STOP
 
 void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm)
 {

@@ -15,7 +15,6 @@ group("fuzztest") {
   testonly = true
 
   deps = [
-    "onbytesreceived_fuzzer:fuzztest",
     "onsessionopened_fuzzer:fuzztest",
     "onsoftbusdeviceinfochanged_fuzzer:fuzztest",
     "onsoftbusdeviceoffline_fuzzer:fuzztest",

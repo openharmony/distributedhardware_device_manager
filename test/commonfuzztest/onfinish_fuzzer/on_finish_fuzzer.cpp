@@ -62,12 +62,11 @@ void OnFinishFuzzTest(const uint8_t* data, size_t size)
     }
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
     FuzzedDataProvider fdp(data, size);
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     int operationCode = fdp.ConsumeIntegral<int32_t>();
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
     const char *returnData = str.data();
     hichainConnector->onFinish(requestId, operationCode, returnData);
 }

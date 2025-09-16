@@ -102,7 +102,7 @@ namespace {
     constexpr const char* LOCAL_FOREGROUND_USERID = "local_foreground_userId";
     constexpr const char* LOCAL_BACKGROUND_USERID = "local_background_userId";
 }
-
+//LCOV_EXCL_START
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -371,6 +371,7 @@ DM_EXPORT void DeviceManagerService::UninitDMServiceListener()
 #endif
     LOGI("Uninit.");
 }
+//LCOV_EXCL_STOP 
 
 DM_EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {

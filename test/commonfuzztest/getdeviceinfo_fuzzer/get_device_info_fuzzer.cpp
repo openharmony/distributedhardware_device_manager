@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "get_device_info_fuzzer.h"
 
@@ -22,22 +23,15 @@ namespace DistributedHardware {
 
 void GetDeviceInfoFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(uint16_t)) || (size > DM_MAX_DEVICE_ID_LEN)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
-
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string networkId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string networkId = fdp.ConsumeRandomLengthString();
     DmDeviceInfo deviceInfo;
     deviceInfo.authForm = DmAuthForm::ACROSS_ACCOUNT;
-    int32_t ret = memcpy_s(deviceInfo.deviceId, DM_MAX_DEVICE_ID_LEN, (reinterpret_cast<const char *>(data)), size);
-    if (ret != EOK) {
-        return;
-    }
-    ret = memcpy_s(deviceInfo.deviceName, DM_MAX_DEVICE_NAME_LEN, (reinterpret_cast<const char *>(data)), size);
-    if (ret != EOK) {
-        return;
-    }
+    deviceInfo.extraData = fdp.ConsumeRandomLengthString();
 
     DeviceManagerImpl::GetInstance().GetDeviceInfo(pkgName, networkId, deviceInfo);
     std::string deviceName;

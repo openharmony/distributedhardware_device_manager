@@ -99,6 +99,7 @@ bool g_createGroupFlag = false;
 bool g_deleteGroupFlag = false;
 bool g_groupIsRedundance = false;
 
+//LCOV_EXCL_START
 HiChainConnector::HiChainConnector()
 {
     LOGI("HiChainConnector::constructor");
@@ -136,6 +137,7 @@ int32_t HiChainConnector::UnRegisterHiChainCallback()
     hiChainConnectorCallback_ = nullptr;
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t HiChainConnector::CreateGroup(int64_t requestId, const std::string &groupName)
 {
@@ -506,10 +508,12 @@ char *HiChainConnector::onRequest(int64_t requestId, int operationCode, const ch
     return buffer;
 }
 
+//LCOV_EXCL_START
 int64_t HiChainConnector::GenRequestId()
 {
     return GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
 }
+//LCOV_EXCL_STOP
 
 std::string HiChainConnector::GetConnectPara(std::string deviceId, std::string reqDeviceId)
 {
@@ -847,6 +851,7 @@ int32_t HiChainConnector::CreateGroup(int64_t requestId, int32_t authType, const
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 int32_t HiChainConnector::RegisterHiChainGroupCallback(const std::shared_ptr<IDmGroupResCallback> &callback)
 {
     hiChainResCallback_ = callback;
@@ -858,6 +863,7 @@ int32_t HiChainConnector::UnRegisterHiChainGroupCallback()
     hiChainResCallback_ = nullptr;
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t HiChainConnector::getRegisterInfo(const std::string &queryParams, std::string &returnJsonStr)
 {

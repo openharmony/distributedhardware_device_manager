@@ -34,28 +34,21 @@ namespace {
 
 std::shared_ptr<DMCommTool> dmCommToolPtr_ = std::make_shared<DMCommTool>();
 
-void DmCommToolFuzzTest(const uint8_t* data, size_t size)
+void DmCommToolFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t socketId = fdp.ConsumeIntegral<int32_t>();
-    std::string rmtNetworkId(reinterpret_cast<const char*>(data), size);
-    dmCommToolPtr_->Init();
-    dmCommToolPtr_->GetInstance();
-    dmCommToolPtr_->UnInit();
+    std::string rmtNetworkId = fdp.ConsumeRandomLengthString();
     std::vector<uint32_t> foregroundUserIds;
     foregroundUserIds.push_back(DATA_LEN);
     std::vector<uint32_t> backgroundUserIds;
     dmCommToolPtr_->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
     dmCommToolPtr_->RspLocalFrontOrBackUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds, socketId);
-    rmtNetworkId = "";
     dmCommToolPtr_->SendUserIds(rmtNetworkId, foregroundUserIds, backgroundUserIds);
-    std::string remoteNetworkId(reinterpret_cast<const char*>(data), size);
+    std::string remoteNetworkId = fdp.ConsumeRandomLengthString();
     std::shared_ptr<CommMsg> commMsg = std::make_shared<CommMsg>();
     std::shared_ptr<InnerCommMsg> innerCommMsg = std::make_shared<InnerCommMsg>(remoteNetworkId, commMsg, socketId);
     dmCommToolPtr_->ProcessReceiveUserIdsEvent(innerCommMsg);
+    dmCommToolPtr_->Init();
     dmCommToolPtr_->ProcessResponseUserIdsEvent(innerCommMsg);
     dmCommToolPtr_->ProcessReceiveCommonEvent(innerCommMsg);
     dmCommToolPtr_->ProcessResponseCommonEvent(innerCommMsg);
@@ -63,16 +56,10 @@ void DmCommToolFuzzTest(const uint8_t* data, size_t size)
     dmCommToolPtr_->ProcessReceiveUnBindAppEvent(innerCommMsg);
     dmCommToolPtr_->ProcessReceiveRspAppUninstallEvent(innerCommMsg);
     dmCommToolPtr_->ProcessReceiveRspAppUnbindEvent(innerCommMsg);
-    dmCommToolPtr_->GetDMTransportPtr();
-    dmCommToolPtr_->GetEventHandler();
 }
 
-void DmCommToolFirstFuzzTest(const uint8_t* data, size_t size)
+void DmCommToolFirstFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     DMCommTool::DMCommToolEventHandler dmCommToolEventHandler(
         AppExecFwk::EventRunner::Create(FUZZ_PROJECT_NAME), dmCommToolPtr_);
      
@@ -84,14 +71,14 @@ void DmCommToolFirstFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<InnerCommMsg> innrCommMsg = std::make_shared<InnerCommMsg>(rmtNetworkId, commMsg, socketId);
     UserIdsMsg userIdsMsg;
     userIdsMsg.foregroundUserIds.push_back(DATA_LEN);
+    innrCommMsg->remoteNetworkId = fdp.ConsumeRandomLengthString();
     dmCommToolEventHandler.ParseUserIdsMsg(innrCommMsg, userIdsMsg);
     AppExecFwk::InnerEvent::Pointer event = AppExecFwk::InnerEvent::Get(commMsg->code, innrCommMsg);
     dmCommToolEventHandler.ProcessEvent(event);
     dmCommToolPtr_->ProcessResponseUserStopEvent(innrCommMsg);
-    std::string commonEventType;
+    std::string commonEventType = fdp.ConsumeRandomLengthString();
     EventCallback eventCallback;
     dmCommToolPtr_->StartCommonEvent(commonEventType, eventCallback);
-    dmCommToolPtr_->Init();
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     int32_t tokenId = fdp.ConsumeIntegral<int32_t>();
     dmCommToolPtr_->SendUninstAppObj(userId, tokenId, rmtNetworkId);
@@ -111,7 +98,11 @@ void DmCommToolFirstFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DmCommToolFuzzTest(data, size);
-    OHOS::DistributedHardware::DmCommToolFirstFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DmCommToolFuzzTest(fdp);
+    OHOS::DistributedHardware::DmCommToolFirstFuzzTest(fdp);
     return 0;
 }
