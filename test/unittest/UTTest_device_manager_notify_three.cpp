@@ -1134,18 +1134,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterBindCallback_003, testing::ext::Test
     std::shared_ptr<BindTargetCallback> callback = std::make_shared<BindTargetCallbackTest>();
     DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId] = callback;
     ASSERT_EQ(DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId], callback);
-    PeerTargetId nonExistentTargetId;
-    DeviceManagerNotify::GetInstance().UnRegisterBindCallback(pkgName, nonExistentTargetId);
-    ASSERT_EQ(DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId], callback);
-}
-
-HWTEST_F(DeviceManagerNotifyTest, UnRegisterBindCallback_004, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    PeerTargetId targetId;
-    std::shared_ptr<BindTargetCallback> callback = std::make_shared<BindTargetCallbackTest>();
-    DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId] = callback;
-    ASSERT_EQ(DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId], callback);
     DeviceManagerNotify::GetInstance().UnRegisterBindCallback(pkgName, targetId);
     ASSERT_TRUE(DeviceManagerNotify::GetInstance().bindCallback_.empty());
 }

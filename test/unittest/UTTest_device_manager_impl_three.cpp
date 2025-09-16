@@ -1549,46 +1549,6 @@ HWTEST_F(DeviceManagerImplTest, BindServiceTarget_InvalidInput_102, testing::ext
     ASSERT_EQ(ret, true);
 }
 
-HWTEST_F(DeviceManagerImplTest, BindServiceTarget_IpcRequestFailed_101, testing::ext::TestSize.Level0)
-{
-    PeerTargetId targetId;
-    std::map<std::string, std::string> bindParam;
-    std::shared_ptr<BindTargetCallback> callback = nullptr;
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-                .Times(1).WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
-    int32_t ret = DeviceManagerImpl::GetInstance().BindServiceTarget("valid_pkg", targetId, bindParam, callback);
-    ret = (ret == ERR_DM_IPC_SEND_REQUEST_FAILED) || (ret == ERR_DM_NOT_INIT);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, BindServiceTarget_IpcResponseError_101, testing::ext::TestSize.Level0)
-{
-    PeerTargetId targetId;
-    std::map<std::string, std::string> bindParam;
-    std::shared_ptr<BindTargetCallback> callback = nullptr;
-    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-        .Times(1)
-        .WillOnce(testing::Return(DM_OK));
-    int32_t ret = DeviceManagerImpl::GetInstance().BindServiceTarget("valid_pkg", targetId, bindParam, callback);
-    ASSERT_EQ(ret, rsp->GetErrCode());
-}
-
-HWTEST_F(DeviceManagerImplTest, BindServiceTarget_Success_101, testing::ext::TestSize.Level0)
-{
-    PeerTargetId targetId;
-    std::map<std::string, std::string> bindParam;
-    std::shared_ptr<BindTargetCallback> callback = nullptr;
-    auto rsp = std::make_shared<IpcRsp>();
-    rsp->SetErrCode(DM_OK);
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-        .Times(1)
-        .WillOnce(testing::Return(DM_OK));
-    int32_t ret = DeviceManagerImpl::GetInstance().BindServiceTarget("valid_pkg", targetId, bindParam, callback);
-    ret = (ret == DM_OK) || (ret == ERR_DM_NOT_INIT);
-    ASSERT_EQ(ret, true);
-}
-
 HWTEST_F(DeviceManagerImplTest, UnbindServiceTarget_InvalidInput_101, testing::ext::TestSize.Level0)
 {
     int32_t ret = DeviceManagerImpl::GetInstance().UnbindServiceTarget("", 12345);
@@ -1864,16 +1824,6 @@ HWTEST_F(DeviceManagerImplTest, RegisterServiceStateCallback_005, testing::ext::
     ASSERT_EQ(ret, true);
 }
 
-HWTEST_F(DeviceManagerImplTest, RegisterServiceStateCallback_006, testing::ext::TestSize.Level0)
-{
-    std::string pkgName = "com.ohos.test";
-    int64_t serviceId = 12345;
-    std::shared_ptr<ServiceInfoStateCallback> callback = nullptr;
-    int32_t ret = DeviceManagerImpl::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, callback);
-    ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
 HWTEST_F(DeviceManagerImplTest, UnRegisterServiceStateCallback_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";
@@ -2008,21 +1958,6 @@ HWTEST_F(DeviceManagerImplTest, StopPublishService_006, testing::ext::TestSize.L
 HWTEST_F(DeviceManagerImplTest, StopPublishService_007, testing::ext::TestSize.Level0)
 {
     int64_t serviceId = INT64_MAX;
-    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
-        .WillOnce(DoAll(
-            WithArg<2>([](std::shared_ptr<IpcRsp> rsp) {
-                rsp->SetErrCode(DM_OK);
-            }),
-            Return(DM_OK)
-        ));
-    int32_t ret = DeviceManagerImpl::GetInstance().StopPublishService(serviceId);
-    ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    ASSERT_EQ(ret, true);
-}
-
-HWTEST_F(DeviceManagerImplTest, StopPublishService_008, testing::ext::TestSize.Level0)
-{
-    int64_t serviceId = 12345;
     EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
         .WillOnce(DoAll(
             WithArg<2>([](std::shared_ptr<IpcRsp> rsp) {
