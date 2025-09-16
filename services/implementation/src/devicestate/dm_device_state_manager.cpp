@@ -169,13 +169,13 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec)
 {
     LOGI("begin, devState = %{public}d networkId: %{public}s.", devState,
         GetAnonyString(devInfo.networkId).c_str());
     CHECK_NULL_VOID(listener_);
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<int64_t> remoteTokenIds;
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
@@ -201,15 +201,23 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
             } else {
                 listener_->OnDeviceStateChange(item, devState, devInfo);
             }
-#else
-    for (const auto &item : processInfoVec) {	
-        if (!item.pkgName.empty()) {	
-            LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());	
-            listener_->OnDeviceStateChange(item, devState, devInfo);
-#endif
         }
     }
 }
+#else
+void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
+    std::vector<ProcessInfo> &processInfoVec)
+{
+    LOGI("begin, devState = %{public}d networkId: %{public}s.", devState,
+        GetAnonyString(devInfo.networkId).c_str());
+    CHECK_NULL_VOID(listener_);
+    for (const auto &item : processInfoVec) {
+        if (!item.pkgName.empty()) {
+            listener_->OnDeviceStateChange(item, devState, devInfo);
+        }
+    }
+}
+#endif
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {
