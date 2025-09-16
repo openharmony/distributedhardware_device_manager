@@ -25,7 +25,8 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-    int sessionId = *(reinterpret_cast<const int*>(data));
+    FuzzedDataProvider fdp(data, size);
+    int sessionId = fdp.ConsumeIntegral<int32_t>();
     std::string inputStr = fdp.ConsumeRandomLengthString();
     std::string retStr = fdp.ConsumeRandomLengthString();
     DmPinType pinType = DmPinType::QR_CODE;

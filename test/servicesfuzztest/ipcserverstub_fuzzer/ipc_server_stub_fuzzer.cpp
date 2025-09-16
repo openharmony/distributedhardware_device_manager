@@ -40,7 +40,8 @@ void IpcServerStubFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
-    uint32_t code = *(reinterpret_cast<const uint32_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    uint32_t code = fdp.ConsumeIntegral<uint32_t>();
     MessageParcel data1;
     MessageParcel reply;
     MessageOption option;
