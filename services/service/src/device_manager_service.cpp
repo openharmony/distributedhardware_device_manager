@@ -23,7 +23,6 @@
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_device_info.h"
-#include "distributed_device_profile_client.h"
 #include "dm_hidumper.h"
 #include "dm_softbus_cache.h"
 #include "parameter.h"
@@ -33,6 +32,7 @@
 #include "datetime_ex.h"
 #include "deviceprofile_connector.h"
 #include "device_name_manager.h"
+#include "distributed_device_profile_client.h"
 #include "dm_comm_tool.h"
 #include "dm_random.h"
 #include "dm_transport_msg.h"
@@ -4202,15 +4202,6 @@ int32_t DeviceManagerService::OpenAuthSessionWithPara(const std::string &deviceI
     return dmServiceImplExtResident_->OpenAuthSessionWithPara(deviceId, actionId, isEnable160m);
 }
 
-int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
-{
-    if (!IsDMServiceAdapterResidentLoad()) {
-        LOGE("failed, adapter instance not init or init failed.");
-        return ERR_DM_UNSUPPORTED_METHOD;
-    }
-    return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
-}
-
 int32_t DeviceManagerService::UnRegisterPinHolderCallback(const std::string &pkgName)
 {
     if (!PermissionManager::GetInstance().CheckPermission()) {
@@ -4754,6 +4745,15 @@ int32_t DeviceManagerService::GenerateRegServiceId(int32_t &regServiceId)
     }
     LOGI("Generated regServiceId: %{public}s", GetAnonyInt32(regServiceId).c_str());
     return DM_OK;
+}
+
+int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
+{
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
 }
 #endif
 } // namespace DistributedHardware
