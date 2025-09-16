@@ -24,6 +24,8 @@
 #include "app_manager.h"
 #include "business_event.h"
 #include "distributed_device_profile_client.h"
+#include "dm_auth_cert.h"
+#include "dm_auth_attest_common.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
 #include "dm_timer.h"
@@ -234,6 +236,7 @@ int32_t AuthSinkNegotiateStateMachine::Action(std::shared_ptr<DmAuthContext> con
                 DmAuthState::HandleAuthenticateTimeout(context, name);
         });
     }
+
     // To be compatible with historical versions, use ConvertSrcVersion to get the actual version on the source side.
     std::string preVersion = std::string(DM_VERSION_5_0_OLD_MAX);
     LOGI("AuthSinkNegotiateStateMachine::Action start version compare %{public}s to %{public}s",

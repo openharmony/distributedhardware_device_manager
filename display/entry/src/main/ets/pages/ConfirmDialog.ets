@@ -234,7 +234,6 @@ struct ConfirmCustomDialog {
     };
     const jsonStr = JSON.stringify(param);
     console.log('allow once' + ACTION_ALLOW_AUTH_ONCE)
-    console.log('param:' + jsonStr)
     this.setUserAuthorization(ACTION_ALLOW_AUTH_ONCE, jsonStr)
     this.destruction()
   }
@@ -250,7 +249,6 @@ struct ConfirmCustomDialog {
     };
     const jsonStr = JSON.stringify(param);
     console.log('allow always' + ACTION_ALLOW_AUTH_ALWAYS)
-    console.log('param:' + jsonStr)
     this.setUserAuthorization(ACTION_ALLOW_AUTH_ALWAYS, jsonStr)
     this.destruction()
   }

@@ -97,7 +97,7 @@ DmCredentialManager::~DmCredentialManager()
 
 int32_t DmCredentialManager::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
 {
-    LOGI("start.");
+    LOGI("start to request credential.");
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     JsonObject jsonObject(reqJsonStr);
@@ -158,7 +158,7 @@ int32_t DmCredentialManager::ImportCredential(const std::string &pkgName, const 
 
 int32_t DmCredentialManager::ImportRemoteCredentialExt(const std::string &credentialInfo)
 {
-    LOGI("start.");
+    LOGI("ImportRemoteCredentialExt start.");
     if (hiChainConnector_->addMultiMembersExt(credentialInfo) != DM_OK) {
         LOGE("Failed to add member to group.");
         return ERR_DM_FAILED;
@@ -168,7 +168,7 @@ int32_t DmCredentialManager::ImportRemoteCredentialExt(const std::string &creden
 
 int32_t DmCredentialManager::ImportLocalCredential(const std::string &credentialInfo)
 {
-    LOGI(" start");
+    LOGI("ImportLocalCredential start");
     JsonObject jsonObject(credentialInfo);
     if (jsonObject.IsDiscarded()) {
         LOGE("credentialInfo string not a json type.");
@@ -195,7 +195,7 @@ int32_t DmCredentialManager::ImportLocalCredential(const std::string &credential
         LOGI("ImportLocalCredential credentialData err");
         return ERR_DM_FAILED;
     }
-    LOGI("get credentialData success!");
+    LOGI("ImportLocalCredential get credentialData success!");
     JsonObject jsonOutObj;
     if (GetCredentialData(credentialInfo, vecCredentialData[0], jsonOutObj) != DM_OK) {
         LOGE("failed to get credentialData field from input credential.");
@@ -254,7 +254,7 @@ int32_t DmCredentialManager::DeleteCredential(const std::string &pkgName, const 
 
 void DmCredentialManager::OnGroupResultExt(int32_t action, const std::string &resultInfo)
 {
-    LOGI("action %{public}d, resultInfo %{public}s.", action, resultInfo.c_str());
+    LOGI("DmCredentialManager::OnGroupResultExt action %{public}d, resultInfo %{public}s.", action, resultInfo.c_str());
     CHECK_NULL_VOID(listener_);
     listener_->OnCredentialResult(processInfo_, action, resultInfo);
 }
@@ -262,7 +262,7 @@ void DmCredentialManager::OnGroupResultExt(int32_t action, const std::string &re
 void DmCredentialManager::OnGroupResult(int64_t requestId, int32_t action,
     const std::string &resultInfo)
 {
-    LOGI("OnGroupResult");
+    LOGI("DmCredentialManager::OnImportResult");
     if (requestId_ != requestId) {
         return;
     }
@@ -280,7 +280,7 @@ int32_t DmCredentialManager::RegisterCredentialCallback(const std::string &pkgNa
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     MultipleUserConnector::GetCallerUserId(userId);
 #endif
-    LOGI("pkgName = %{public}s", GetAnonyString(pkgName).c_str());
+    LOGI("DmCredentialManager::RegisterCredentialCallback pkgName = %{public}s", GetAnonyString(pkgName).c_str());
     {
         std::lock_guard<std::mutex> autoLock(locks_);
         processInfo_.pkgName = pkgName;
@@ -296,7 +296,7 @@ int32_t DmCredentialManager::UnRegisterCredentialCallback(const std::string &pkg
         LOGE("DmCredentialManager::UnRegisterCredentialStateCallback input param is empty");
         return ERR_DM_FAILED;
     }
-    LOGI("pkgName = %{public}s",
+    LOGI("DmCredentialManager::UnRegisterCredentialStateCallback pkgName = %{public}s",
         GetAnonyString(pkgName).c_str());
     {
         std::lock_guard<std::mutex> autoLock(locks_);

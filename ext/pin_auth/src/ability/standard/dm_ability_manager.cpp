@@ -24,12 +24,12 @@ AbilityStatus DmAbilityManager::StartAbility(AAFwk::Want &want)
 {
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->Connect();
     if (ret != 0) {
-        LOGE("Connect Ability failed, error value = %{public}d", (int32_t)ret);
+        LOGE("Connect Ability failed, error value = %{public}d", static_cast<int32_t>(ret));
         return AbilityStatus::ABILITY_STATUS_FAILED;
     }
     ErrCode result = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (result != 0) {
-        LOGE("Start Ability failed, error value = %{public}d", (int32_t)result);
+        LOGE("Start Ability failed, error value = %{public}d", static_cast<int32_t>(result));
         return AbilityStatus::ABILITY_STATUS_FAILED;
     }
     return AbilityStatus::ABILITY_STATUS_SUCCESS;

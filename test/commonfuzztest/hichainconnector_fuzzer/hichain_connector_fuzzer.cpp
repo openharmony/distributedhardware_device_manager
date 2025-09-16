@@ -47,7 +47,6 @@ public:
     {
         (void)requestId;
         (void)status;
-        (void)operationCode;
     }
     std::string GetConnectAddr(std::string deviceId) override
     {

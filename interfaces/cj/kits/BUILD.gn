@@ -70,6 +70,7 @@ ohos_shared_library("cj_distributed_device_manager_ffi") {
   external_deps = [
     "access_token:libtokenid_sdk",
     "bounds_checking_function:libsec_shared",
+    "cJSON:cjson",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",

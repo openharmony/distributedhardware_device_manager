@@ -42,11 +42,11 @@ AdvertiseManager::~AdvertiseManager()
 int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
     const std::map<std::string, std::string> &advertiseParam)
 {
+    LOGI("AdvertiseManager::StartAdvertising begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("begin for pkgName = %{public}s.", pkgName.c_str());
     DmPublishInfo dmPubInfo;
     ConfigAdvParam(advertiseParam, &dmPubInfo, pkgName);
     std::string capability = DM_CAPABILITY_OSD;
@@ -66,7 +66,7 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
 
     int32_t ret = softbusListener_->PublishSoftbusLNN(dmPubInfo, capability, customData);
     if (ret != DM_OK) {
-        LOGE("failed, softbus publish lnn ret: %{public}d", ret);
+        LOGE("StartAdvertising failed, softbus publish lnn ret: %{public}d", ret);
         return ret;
     }
 
@@ -128,11 +128,12 @@ void AdvertiseManager::ConfigAdvParam(const std::map<std::string, std::string> &
 
 int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t publishId)
 {
+    LOGI("AdvertiseManager::StopDiscovering begin for pkgName = %{public}s, publishId = %{public}d.", pkgName.c_str(),
+        publishId);
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("begin for pkgName = %{public}s, publishId = %{public}d.", pkgName.c_str(), publishId);
     int32_t innerPublishId = GetAndRemoveInnerPublishId(pkgName, publishId);
     if (innerPublishId == DM_INVALID_FLAG_ID) {
         LOGE("Failed: cannot find pkgName in cache map.");
@@ -144,7 +145,7 @@ int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t pu
 void AdvertiseManager::HandleAutoStopAdvertise(const std::string &timerName, const std::string &pkgName,
     int32_t publishId)
 {
-    LOGI("auto stop advertise task timeout, timerName=%{public}s", timerName.c_str());
+    LOGI("HandleAutoStopAdvertise, auto stop advertise task timeout, timerName=%{public}s", timerName.c_str());
     StopAdvertising(pkgName, publishId);
 }
 
@@ -155,8 +156,13 @@ int32_t AdvertiseManager::GenInnerPublishId(const std::string &pkgName, int32_t 
         std::lock_guard<std::mutex> autoLock(pubMapLock_);
         CHECK_SIZE_RETURN(pkgName2PubIdMap_, DM_INVALID_FLAG_ID);
         CHECK_SIZE_RETURN(publishIdSet_, DM_INVALID_FLAG_ID);
-        if (pkgName2PubIdMap_[pkgName].find(publishId) != pkgName2PubIdMap_[pkgName].end()) {
+        if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end() &&
+            pkgName2PubIdMap_[pkgName].find(publishId) != pkgName2PubIdMap_[pkgName].end()) {
             return pkgName2PubIdMap_[pkgName][publishId];
+        }
+        if (publishIdSet_.size() >= (DM_MAX_RANDOM - 1)) {
+            LOGE("The publishIdSet_ cache size exceed the limit.");
+            return tempPublishId;
         }
         if (pkgName2PubIdMap_.find(pkgName) == pkgName2PubIdMap_.end()) {
             pkgName2PubIdMap_[pkgName] = std::map<int32_t, int32_t>();
@@ -198,15 +204,17 @@ int32_t AdvertiseManager::GetAndRemoveInnerPublishId(const std::string &pkgName,
 
 void AdvertiseManager::ClearPublishIdCache(const std::string &pkgName)
 {
+    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return;
     }
-    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(pubMapLock_);
-    for (auto iter : pkgName2PubIdMap_[pkgName]) {
-        softbusListener_->StopPublishSoftbusLNN(iter.second);
-        publishIdSet_.erase(iter.second);
+    if (pkgName2PubIdMap_.find(pkgName) != pkgName2PubIdMap_.end()) {
+        for (auto iter : pkgName2PubIdMap_[pkgName]) {
+            softbusListener_->StopPublishSoftbusLNN(iter.second);
+            publishIdSet_.erase(iter.second);
+        }
     }
     pkgName2PubIdMap_.erase(pkgName);
 }

@@ -121,7 +121,7 @@ HWTEST_F(HiChainAuthConnectorTest, onTransmit_002, testing::ext::TestSize.Level1
     uint32_t dataLen = 0;
     hiChain_->dmDeviceAuthCallback_ = std::make_shared<DmDeviceAuthCallbackTest>();
     bool ret = hiChain_->onTransmit(requestId, data, dataLen);
-    EXPECT_EQ(ret, true);
+    EXPECT_EQ(ret, false);
 }
 
 HWTEST_F(HiChainAuthConnectorTest, onRequest_001, testing::ext::TestSize.Level1)

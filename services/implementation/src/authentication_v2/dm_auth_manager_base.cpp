@@ -58,7 +58,7 @@ const char* TAG_HOST_PKGLABEL = "hostPkgLabel";
 const char* TAG_REMOTE_DEVICE_NAME = "REMOTE_DEVICE_NAME";
 const char* TAG_HOST = "HOST";
 const char* TAG_PROXY_CONTEXT_ID = "proxyContextId";
-
+const char* TAG_IS_NEED_AUTHENTICATE = "isNeedAuthenticate";
 const char* APP_OPERATION_KEY = "appOperation";
 const char* TARGET_PKG_NAME_KEY = "targetPkgName";
 const char* CUSTOM_DESCRIPTION_KEY = "customDescription";
@@ -541,7 +541,7 @@ int32_t AuthManagerBase::EndDream()
 
 bool AuthManagerBase::CheckProcessNameInWhiteList(const std::string &processName)
 {
-    LOGI("AuthManagerBase::CheckProcessNameInWhiteList start");
+    LOGI("DmAuthState::CheckProcessNameInWhiteList start");
     if (processName.empty()) {
         LOGE("processName is empty");
         return false;

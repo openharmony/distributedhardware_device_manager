@@ -29,6 +29,7 @@
 #include "dm_random.h"
 #include "dm_radar_helper.h"
 #include "hichain_connector_callback.h"
+#include "json_object.h"
 #include "multiple_user_connector.h"
 #include "json_object.h"
 #include "parameter.h"

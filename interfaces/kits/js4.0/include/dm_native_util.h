@@ -88,10 +88,10 @@ void DmDeviceIconInfoToJs(const napi_env &env, const DmDeviceIconInfo &deviceIco
 void DmDeviceProfileInfoToJsArray(const napi_env &env, const std::vector<DmDeviceProfileInfo> &devInfos,
     napi_value &arrayResult);
 bool JsToDmDeviceProfileInfos(const napi_env &env, const napi_value &jsObj, std::vector<DmDeviceProfileInfo> &devInfos);
-void JsToDiscoveryParam(const napi_env &env, const napi_value &object,
-    std::map<std::string, std::string> &discParam);
 void JsToDmDeviceNetworkIdFilterOptions(const napi_env &env, const napi_value &object,
     NetworkIdQueryFilter &info);
+void JsToDiscoveryParam(const napi_env &env, const napi_value &object,
+    std::map<std::string, std::string> &discParam);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_NATIVE_UTIL_H

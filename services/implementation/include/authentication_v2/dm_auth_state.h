@@ -169,13 +169,13 @@ public:
     static uint64_t GetSysTimeMs();
     static void DeleteAcl(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
+    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
     static void DeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
         const JsonItemObject &credInfo, const DistributedDeviceProfile::AccessControlProfile &profile);
     static void DirectlyDeleteCredential(std::shared_ptr<DmAuthContext> context, int32_t userId,
         const JsonItemObject &credInfo);
     static void DeleteAclAndSk(std::shared_ptr<DmAuthContext> context,
         const DistributedDeviceProfile::AccessControlProfile &profile);
-    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
     void JoinLnn(std::shared_ptr<DmAuthContext> context);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
@@ -570,6 +570,7 @@ public:
     virtual ~AuthSrcDataSyncState() {};
     DmAuthStateType GetStateType() override;
     int32_t Action(std::shared_ptr<DmAuthContext> context) override;
+    void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
 };
 
 class AuthSinkFinishState : public DmAuthState {

@@ -107,7 +107,6 @@ public:
      * @tc.type: FUNC
      */
     int32_t UnRegisterConnectorCallback();
-
 public:
     SoftbusConnector();
     ~SoftbusConnector();
@@ -162,6 +161,7 @@ private:
     int32_t GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
         std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl);
 #endif
+
 private:
     static std::string remoteUdidHash_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
@@ -176,6 +176,7 @@ private:
     static std::mutex discoveryDeviceInfoMutex_;
     static std::mutex deviceUdidLocks_;
     static std::mutex processInfoVecMutex_;
+    static std::mutex registerCallback_;
     static std::mutex processChangeInfoVecMutex_;
     static std::shared_ptr<ISoftbusConnectorCallback> connectorCallback_;
 };

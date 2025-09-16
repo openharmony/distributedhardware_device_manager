@@ -38,6 +38,7 @@ if (defined(ohos_lite)) {
         "${innerkits_path}/native_cpp/include",
         "${interfaces_path}/c/ipc/include",
         "${json_path}/include",
+        "//third_party/cJSON",
         "//third_party/bounds_checking_function/include",
       ]
 
@@ -67,6 +68,7 @@ if (defined(ohos_lite)) {
         "${json_path}:devicemanagerjson",
         "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       ]
+
       external_deps = [
         "bounds_checking_function:libsec_shared",
         "openssl:libcrypto_shared",
@@ -250,6 +252,7 @@ if (defined(ohos_lite)) {
 
     public_external_deps = [
       "bundle_framework:appexecfwk_core",
+      "cJSON:cjson",
       "kv_store:distributeddata_inner",
     ]
 

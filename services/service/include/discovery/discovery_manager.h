@@ -96,10 +96,10 @@ private:
     void OnDeviceFound(const std::string &pkgName, const uint32_t capabilityType,
         const DmDeviceInfo &info, const DeviceFilterPara &filterPara);
     void UpdateInfoFreq(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo);
-    void UpdateInfoMedium(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo);
     std::string AddMultiUserIdentify(const std::string &pkgName);
     std::string RemoveMultiUserIdentify(const std::string &pkgName);
     void GetPkgNameAndUserId(const std::string &pkgName, std::string &callerPkgName, int32_t &userId);
+    void UpdateInfoMedium(const std::map<std::string, std::string> &discoverParam, DmSubscribeInfo &dmSubInfo);
     int32_t GenInnerSubId(const std::string &pkgName, uint16_t subId);
     int32_t GetAndRemoveInnerSubId(const std::string &pkgName, uint16_t subId);
     int32_t StopDiscoveringByInnerSubId(const std::string &pkgName, uint16_t subscribeId);

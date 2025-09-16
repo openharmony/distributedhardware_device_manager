@@ -344,7 +344,8 @@ public:
 
     /**
      * @brief Get local device name.
-     * @return Returns device name.
+     * @param deviceName device name.
+     * @return Returns 0 if success.
      */
     virtual int32_t GetLocalDeviceName(std::string &deviceName) = 0;
 
@@ -607,6 +608,7 @@ public:
     virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual int32_t GetErrCode(int32_t errCode) = 0;
     virtual int32_t ShiftLNNGear(const std::string &pkgName) = 0;
+    virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) = 0;
     virtual int32_t RegDevTrustChangeCallback(const std::string &pkgName,
         std::shared_ptr<DevTrustChangeCallback> callback) = 0;
     virtual int32_t RegisterDeviceScreenStatusCallback(const std::string &pkgName,
@@ -614,7 +616,6 @@ public:
     virtual int32_t UnRegisterDeviceScreenStatusCallback(const std::string &pkgName) = 0;
     virtual int32_t GetDeviceScreenStatus(const std::string &pkgName, const std::string &networkId,
         int32_t &screenStatus) = 0;
-    virtual int32_t SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy) = 0;
     virtual int32_t StopAuthenticateDevice(const std::string &pkgName) = 0;
     virtual int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId) = 0;
     virtual int32_t RegisterCredentialAuthStatusCallback(const std::string &pkgName,
@@ -636,18 +637,18 @@ public:
         const std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> &deviceProfileInfoList) = 0;
     virtual int32_t GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
         std::string &displayName) = 0;
-    virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
-    virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) = 0;
-    virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
-    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
-        int32_t pinExchangeType, DMLocalServiceInfo &info) = 0;
+    virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
+        std::vector<std::string> &networkIds) = 0;
     virtual int32_t SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName,
         std::shared_ptr<SetLocalDeviceNameCallback> callback) = 0;
     virtual int32_t SetRemoteDeviceName(const std::string &pkgName, const std::string &deviceId,
         const std::string &deviceName, std::shared_ptr<SetRemoteDeviceNameCallback> callback) = 0;
     virtual int32_t RestoreLocalDeviceName(const std::string &pkgName) = 0;
-    virtual int32_t GetDeviceNetworkIdList(const std::string &bundleName, const NetworkIdQueryFilter &queryFilter,
-        std::vector<std::string> &networkIds) = 0;
+    virtual int32_t RegisterLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
+    virtual int32_t UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType) = 0;
+    virtual int32_t UpdateLocalServiceInfo(const DMLocalServiceInfo &info) = 0;
+    virtual int32_t GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
+        int32_t pinExchangeType, DMLocalServiceInfo &info) = 0;
     virtual int32_t UnRegisterPinHolderCallback(const std::string &pkgName) = 0;
     virtual bool CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;

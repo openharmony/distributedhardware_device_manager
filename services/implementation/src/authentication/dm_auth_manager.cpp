@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -132,7 +132,7 @@ bool DmAuthManager::IsHmlSessionType()
 int32_t DmAuthManager::CheckAuthParamVaild(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("start.");
+    LOGI("DmAuthManager::CheckAuthParamVaild start.");
     if (authType < DM_AUTH_TYPE_MIN || authType > DM_AUTH_TYPE_MAX) {
         LOGE("CheckAuthParamVaild failed, authType is illegal.");
         return ERR_DM_AUTH_FAILED;
@@ -275,7 +275,6 @@ void DmAuthManager::ParseJsonObject(JsonObject &jsonObject)
             if (authRequestContext_->peerBundleName == "") {
                 authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
             }
-            LOGI("ParseJsonObject peerBundleName = %{public}s", authRequestContext_->peerBundleName.c_str());
         } else {
             authRequestContext_->peerBundleName = authRequestContext_->hostPkgName;
         }
@@ -343,7 +342,6 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
         LOGE("extra string not a json type.");
         return;
     }
-    
     GetAuthParam(pkgName, authType, deviceId, extra);
     authMessageProcessor_->SetRequestContext(authRequestContext_);
     authRequestState_ = std::make_shared<AuthRequestInitState>();
@@ -360,7 +358,7 @@ void DmAuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
 int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t authType,
     const std::string &deviceId, const std::string &extra)
 {
-    LOGI("start auth type %{public}d.", authType);
+    LOGI("DmAuthManager::AuthenticateDevice start auth type %{public}d.", authType);
     processInfo_.pkgName = pkgName;
     {
         std::lock_guard<std::mutex> lock(bindParamMutex_);

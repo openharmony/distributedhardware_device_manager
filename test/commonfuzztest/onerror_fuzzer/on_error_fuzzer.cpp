@@ -17,11 +17,11 @@
 #include <cstdlib>
 #include <random>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
 #include "hichain_connector.h"
-#include <fuzzer/FuzzedDataProvider.h>
 
 #include "on_error_fuzzer.h"
 

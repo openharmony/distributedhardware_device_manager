@@ -145,7 +145,6 @@ const char* PARAM_CLOSE_SESSION_DELAY_SECONDS = "DM_CLOSE_SESSION_DELAY_SECONDS"
 const char* DM_AUTHENTICATION_TYPE = "DM_AUTHENTICATION_TYPE";
 
 const char* PARAM_KEY_CONN_SESSIONTYPE = "connSessionType";
-const char* PARAM_KEY_HML_RELEASETIME = "hmlReleaseTime";
 const char* PARAM_KEY_HML_ENABLE_160M = "hmlEnable160M";
 const char* PARAM_KEY_HML_ACTIONID = "hmlActionId";
 

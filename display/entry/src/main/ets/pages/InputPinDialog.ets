@@ -46,7 +46,7 @@ struct InputCustomDialog {
   @State isPC: boolean = false;
   @State isPhone: boolean = false;
   @State btnColor: ResourceColor = Color.Transparent;
-  @State mLocalHeight: number = 0;
+  @State mLocalHeight: number = 1;
   listener: mediaquery.MediaQueryListener = mediaquery.matchMediaSync('(orientation: landscape)');
   controller?: CustomDialogController;
   private scroller: Scroller = new Scroller();
@@ -56,7 +56,7 @@ struct InputCustomDialog {
       this.mLocalHeight = display.getDefaultDisplaySync().height;
     } catch (e) {
       console.error('Failed to get display height:', e);
-      this.mLocalHeight = 0;
+      this.mLocalHeight = 1;
     }
  
     let heightRatio = px2vp(this.mLocalHeight) * 0.2;
@@ -99,7 +99,7 @@ struct InputCustomDialog {
       this.mLocalHeight = display.getDefaultDisplaySync().height;
     } catch (err) {
       console.error('Failed to get display height:', err);
-      this.mLocalHeight = 0;
+      this.mLocalHeight = 1;
     }
     this.isPC = Constant.isPC();
     this.isPhone = Constant.isPhone();
