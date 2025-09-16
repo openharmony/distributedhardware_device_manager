@@ -23,6 +23,7 @@ if (defined(ohos_lite)) {
     static_library("devicemanagersdk") {
       include_dirs = [
         "${innerkits_path}/native_cpp/include/mini",
+        "//third_party/cJSON",
         "//kernel/liteos_m/kal/cmsis",
         "//utils/native/lite/include",
         "//kernel/liteos_m/kal/posix/include",
@@ -50,7 +51,6 @@ if (defined(ohos_lite)) {
         "//commonlibrary/utils_lite:utils",
         "//foundation/systemabilitymgr/samgr_lite/samgr",
         "//third_party/bounds_checking_function:libsec_static",
-        "//third_party/cJSON:cjson",
       ]
 
       cflags = [
@@ -219,6 +219,8 @@ if (defined(ohos_lite)) {
       "openssl:libcrypto_shared",
       "samgr:samgr_proxy",
     ]
+
+    public_external_deps = [ "cJSON:cjson" ]
 
     subsystem_name = "distributedhardware"
 

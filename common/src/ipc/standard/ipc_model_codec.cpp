@@ -23,7 +23,7 @@ namespace DistributedHardware {
 namespace {
 constexpr const char* UK_SEPARATOR = "#";
 constexpr int32_t MAX_ICON_SIZE = 4 * 1024 * 1024;
-constexpr uint32_t IPC_VECTOR_MAX_SIZE = 1000;
+constexpr uint32_t IPC_VECTOR_MAX_SIZE  = 1000;
 }
 
 #define READ_HELPER_RET(parcel, type, out, failRet) \
@@ -35,7 +35,7 @@ constexpr uint32_t IPC_VECTOR_MAX_SIZE = 1000;
         } \
     } while (0)
 
-    #define CHECK_CPY_SIZE_RETURN(destSize, srcSize) \
+#define CHECK_CPY_SIZE_RETURN(destSize, srcSize) \
     do { \
         if ((destSize) <= (srcSize)) { \
             LOGE("params size invalid"); \

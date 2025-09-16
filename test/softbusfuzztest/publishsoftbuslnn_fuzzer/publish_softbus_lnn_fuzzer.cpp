@@ -33,7 +33,6 @@ void PublishSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     DmPublishInfo dmPublishInfo;
     dmPublishInfo.publishId = fdp.ConsumeIntegral<int32_t>();
-    dmPublishInfo.publishId = *(reinterpret_cast<const int32_t*>(data));
     std::string capability(reinterpret_cast<const char*>(data), size);
     std::string customData(reinterpret_cast<const char*>(data), size);
 

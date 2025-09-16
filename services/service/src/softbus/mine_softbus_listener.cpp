@@ -526,13 +526,13 @@ int32_t MineSoftbusListener::SendBroadcastInfo(const string &pkgName, SubscribeI
 #if (defined(MINE_HARMONY))
     subscribeInfo.custData = base64Out;
     subscribeInfo.custDataLen = base64OutLen;
+#endif
     IRefreshCallback softbusRefreshCallback_ = SoftbusListener::GetSoftbusRefreshCb();
     retValue = RefreshLNN(DM_PKG_NAME, &subscribeInfo, &softbusRefreshCallback_);
     if (retValue != SOFTBUS_OK) {
         LOGE("failed to start to refresh quick discovery with ret: %{public}d.", retValue);
         return ERR_DM_FAILED;
     }
-#endif
     LOGI("send search broadcast info by softbus successfully with dataLen: %{public}zu, pkgName: %{public}s.",
         base64OutLen, pkgName.c_str());
     return DM_OK;

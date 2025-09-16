@@ -77,10 +77,10 @@ public:
     void OnCredentialAuthStatus(const ProcessInfo &processInfo, const std::string &deviceList, uint16_t deviceTypeId,
                                 int32_t errcode) override;
     void OnAppUnintall(const std::string &pkgName) override;
-    void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
-        int32_t status, std::string content) override;
     void OnProcessRemove(const ProcessInfo &processInfo) override;
     void OnDevStateCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
+    void OnSinkBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId, int32_t result,
+        int32_t status, std::string content) override;
     void OnGetDeviceProfileInfoListResult(const ProcessInfo &processInfo,
         const std::vector<DmDeviceProfileInfo> &deviceProfileInfos, int32_t code) override;
     void OnGetDeviceIconInfoResult(const ProcessInfo &processInfo,

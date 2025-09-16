@@ -114,8 +114,8 @@ typedef struct DmAuthRequestContext {
     std::string cryptoVer;
     std::string hostPkgName;
     std::string targetPkgName;
-    std::string bundleName;
     std::string peerBundleName;
+    std::string bundleName;
     std::string appOperation;
     std::string appDesc;
     std::string appName;
@@ -235,6 +235,7 @@ public:
      * @param deviceId device id.
      * @return Return 0 if success.
      */
+    int32_t UnBindDevice(const std::string &pkgName, const std::string &udid, int32_t bindLevel);
     int32_t UnBindDevice(const std::string &pkgName, const std::string &udid,
         int32_t bindLevel, const std::string &extra);
 
@@ -497,6 +498,10 @@ public:
 
 private:
     bool IsHmlSessionType();
+    void JoinLnn(const std::string &deviceId, bool isForceJoin = false);
+    int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
+        const std::string &extra);
+    int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
     bool CanUsePincodeFromDp();
     bool IsServiceInfoAuthTypeValid(int32_t authType);
     bool IsServiceInfoAuthBoxTypeValid(int32_t authBoxType);
@@ -505,10 +510,6 @@ private:
     void GetLocalServiceInfoInDp();
     bool CheckNeedShowAuthInfoDialog(int32_t errorCode);
     void UpdateInputPincodeDialog(int32_t errorCode);
-    void JoinLnn(const std::string &deviceId, bool isForceJoin = false);
-    int32_t CheckAuthParamVaild(const std::string &pkgName, int32_t authType, const std::string &deviceId,
-        const std::string &extra);
-    int32_t CheckAuthParamVaildExtra(const std::string &extra, const std::string &deviceId);
     bool CheckHmlParamValid(JsonObject &jsonObject);
     void ProcessSourceMsg();
     void ProcessSinkMsg();
@@ -586,13 +587,16 @@ private:
     int32_t GetTaskTimeout(const char* taskName, int32_t taskTimeOut);
     void GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash);
     void DeleteOffLineTimer(int32_t sessionId);
-    int32_t GetBinderInfo();
-    void SetProcessInfo();
+    void ProcessTerminateMsg(int32_t sessionId, int32_t reply);
     int32_t GetCloseSessionDelaySeconds(std::string &delaySecondsStr);
     void ConverToFinish();
+    void HandleDeviceOnline();
+    int32_t GetBinderInfo();
+    void SetProcessInfo();
     bool IsSinkMsgValid();
     bool IsSourceMsgValid();
     void ProcessReqPublicKey();
+    bool CheckBindLevel(const JsonObject &jsonObj, const std::string &key, int32_t &bindLevel);
     void RegisterCleanNotifyCallback(CleanNotifyCallback cleanNotifyCallback);
     void GetBindCallerInfo();
     void ProcessReqAuthTerminate();
@@ -636,14 +640,14 @@ private:
     std::mutex srcReqMsgLock_;
     bool isNeedProcCachedSrcReqMsg_ = false;
     std::string srcReqMsg_ = "";
+    std::string bundleName_ = "";
     int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
+    bool isWaitingJoinLnnCallback_ = false;
     DistributedDeviceProfile::LocalServiceInfo serviceInfoProfile_;
     bool pincodeDialogEverShown_ = false;
-    std::string bundleName_ = "";
     std::mutex sessionKeyIdMutex_;
     std::condition_variable sessionKeyIdCondition_;
     std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
-    bool isWaitingJoinLnnCallback_ = false;
     CleanNotifyCallback cleanNotifyCallback_{nullptr};
     std::mutex bindParamMutex_;
     std::map<std::string, std::string> bindParam_;

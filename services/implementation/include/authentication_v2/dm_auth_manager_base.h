@@ -57,7 +57,7 @@ extern const char* TAG_HOST_PKGLABEL;
 extern const char* TAG_REMOTE_DEVICE_NAME;
 extern const char* TAG_HOST;
 extern const char* TAG_PROXY_CONTEXT_ID;
-
+extern const char* TAG_IS_NEED_AUTHENTICATE;
 extern const char* APP_OPERATION_KEY;
 extern const char* TARGET_PKG_NAME_KEY;
 extern const char* CUSTOM_DESCRIPTION_KEY;

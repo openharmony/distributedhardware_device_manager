@@ -837,8 +837,9 @@ std::string DmAuthMessageProcessor::CreateMessage(DmMessageType msgType, std::sh
         return "";
     }
     int32_t ret = (this->*(itr->second))(context, jsonObj);
-    LOGI("start. message is %{public}s", GetAnonyJsonString(jsonObj.Dump()).c_str());
-    return (ret == DM_OK) ? jsonObj.Dump() : "";
+    std::string strMsg = jsonObj.Dump();
+    LOGI("start. message is %{public}s", GetAnonyJsonString(strMsg).c_str());
+    return (ret == DM_OK) ? strMsg : "";
 }
 
 int32_t DmAuthMessageProcessor::CreateCredentialNegotiateMessage(std::shared_ptr<DmAuthContext> context,

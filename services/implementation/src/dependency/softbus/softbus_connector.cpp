@@ -78,7 +78,7 @@ SoftbusConnector::~SoftbusConnector()
 void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
     int32_t sessionKeyId, int32_t aclId)
 {
-    LOGI("userId:%{public}d, credId:%{public}s, sessionKeyId:%{public}d, aclId:%{public}d",
+    LOGI("SyncAclList userId:%{public}d, credId:%{public}s, sessionKeyId:%{public}d, aclId:%{public}d",
         userId, credId.c_str(), sessionKeyId, aclId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     // 根据skid删除sk，删除skid
@@ -97,7 +97,6 @@ void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(aclId);
 #endif
 }
-
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
@@ -540,7 +539,7 @@ void SoftbusConnector::OnSoftbusJoinLNNResult(ConnectionAddr *addr, const char *
         LOGE("addr is null.");
         return;
     }
-    if (addr->type != CONNECTION_ADDR_SESSION_WITH_KEY) {
+    if (addr->type != CONNECTION_ADDR_SESSION) {
         LOGI("addr type is not session.");
         return;
     }
@@ -562,7 +561,7 @@ std::string SoftbusConnector::GetDeviceUdidByUdidHash(const std::string &udidHas
             return iter.first;
         }
     }
-    LOGE("failed, udidHash: %{public}s", GetAnonyString(udidHash).c_str());
+    LOGE("fail to GetUdidByUdidHash, udidHash: %{public}s", GetAnonyString(udidHash).c_str());
     return udidHash;
 }
 
@@ -648,7 +647,7 @@ int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, st
 
 std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId)
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::GetNetworkIdByDeviceId");
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;
     if (GetAllNodeDeviceInfo(DM_PKG_NAME, &nodeInfo, &deviceCount) != DM_OK) {
@@ -673,70 +672,70 @@ std::string SoftbusConnector::GetNetworkIdByDeviceId(const std::string &deviceId
 
 void SoftbusConnector::SetProcessInfo(ProcessInfo processInfo)
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::SetProcessInfo");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_.push_back(processInfo);
 }
 
 void SoftbusConnector::SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec)
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::SetProcessInfoVec");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_ = processInfoVec;
 }
 
 std::vector<ProcessInfo> SoftbusConnector::GetProcessInfo()
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::GetProcessInfo");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     return processInfoVec_;
 }
 
 void SoftbusConnector::ClearProcessInfo()
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::ClearProcessInfo");
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_.clear();
 }
 
 void SoftbusConnector::SetChangeProcessInfo(ProcessInfo processInfo)
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::SetChangeProcessInfo");
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     processChangeInfoVec_.push_back(processInfo);
 }
 
 std::vector<ProcessInfo> SoftbusConnector::GetChangeProcessInfo()
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::GetChangeProcessInfo");
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     return processChangeInfoVec_;
 }
 
 void SoftbusConnector::ClearChangeProcessInfo()
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::ClearChangeProcessInfo");
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     processChangeInfoVec_.clear();
 }
 
 void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm)
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::HandleDeviceOnline");
     deviceStateManagerCallback_->OnDeviceOnline(deviceId, authForm);
     return;
 }
 
 void SoftbusConnector::HandleDeviceOffline(std::string deviceId)
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::HandleDeviceOffline");
     deviceStateManagerCallback_->OnDeviceOffline(deviceId);
     return;
 }
 
 void SoftbusConnector::DeleteOffLineTimer(std::string &udidHash)
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::DeleteOffLineTimer");
     remoteUdidHash_ = udidHash;
     if (deviceStateManagerCallback_ != nullptr) {
         deviceStateManagerCallback_->DeleteOffLineTimer(udidHash);
@@ -829,7 +828,7 @@ bool SoftbusConnector::CheckIsOnline(const std::string &targetDeviceId)
 
 DmDeviceInfo SoftbusConnector::GetDeviceInfoByDeviceId(const std::string &deviceId)
 {
-    LOGI("start");
+    LOGI("SoftbusConnector::GetDeviceInfoBydeviceId");
     DmDeviceInfo info;
     int32_t deviceCount = 0;
     NodeBasicInfo *nodeInfo = nullptr;

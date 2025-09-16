@@ -57,7 +57,7 @@ public:
 
 void OnFinishFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int))) {
         return;
     }
 
@@ -66,7 +66,7 @@ void OnFinishFuzzTest(const uint8_t* data, size_t size)
 
     FuzzedDataProvider fdp(data, size);
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
-    int operationCode = fdp.ConsumeIntegral<int32_t>();
+    int operationCode = fdp.ConsumeIntegral<int>();
     std::string str(reinterpret_cast<const char*>(data), size);
     const char *returnData = str.data();
     hichainConnector->onFinish(requestId, operationCode, returnData);

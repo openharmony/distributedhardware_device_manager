@@ -732,7 +732,7 @@ int32_t SoftbusListener::InitSoftPublishLNN()
 int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscribeInfo &dmSubInfo,
     const std::string &customData)
 {
-    LOGI("begin, subscribeId: %{public}d.", dmSubInfo.subscribeId);
+    LOGI("RefreshSoftbusLNN begin, subscribeId: %{public}d.", dmSubInfo.subscribeId);
     SubscribeInfo subscribeInfo;
     if (memset_s(&subscribeInfo, sizeof(SubscribeInfo), 0, sizeof(SubscribeInfo)) != DM_OK) {
         LOGE("RefreshSoftbusLNN memset_s failed.");
@@ -778,7 +778,7 @@ int32_t SoftbusListener::RefreshSoftbusLNN(const char *pkgName, const DmSubscrib
 
 int32_t SoftbusListener::StopRefreshSoftbusLNN(uint16_t subscribeId)
 {
-    LOGI("begin, subscribeId: %{public}d.", (int32_t)subscribeId);
+    LOGI("StopRefreshSoftbusLNN begin, subscribeId: %{public}d.", (int32_t)subscribeId);
     {
         std::lock_guard<std::mutex> lock(g_lockDeviceIdSet);
         deviceIdSet.clear();
@@ -874,7 +874,7 @@ int32_t SoftbusListener::GetTrustedDeviceList(std::vector<DmDeviceInfo> &deviceI
 {
     int32_t ret = SoftbusCache::GetInstance().GetDeviceInfoFromCache(deviceInfoList);
     size_t deviceCount = deviceInfoList.size();
-    LOGI("size is %{public}zu.", deviceCount);
+    LOGI("Success from cache deviceInfoList size is %{public}zu.", deviceCount);
     return ret;
 }
 
@@ -1115,7 +1115,7 @@ int32_t SoftbusListener::GetNetworkTypeByNetworkId(const char *networkId, int32_
         return ret;
     }
     networkType = tempNetworkType;
-    LOGI("networkType %{public}d.", tempNetworkType);
+    LOGI("GetNetworkTypeByNetworkId networkType %{public}d.", tempNetworkType);
     return DM_OK;
 }
 
@@ -1224,6 +1224,7 @@ bool SoftbusListener::IsDmRadarHelperReady()
 bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
 {
     (void)name;
+    LOGI("SoftbusListener::CloseDmRadarHelperObj start.");
     std::lock_guard<std::mutex> lock(g_radarLoadLock);
     if (!isRadarSoLoad_ && (dmRadarHelper_ == nullptr) && (radarHandle_ == nullptr)) {
         return true;
@@ -1237,7 +1238,7 @@ bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
     isRadarSoLoad_ = false;
     dmRadarHelper_ = nullptr;
     radarHandle_ = nullptr;
-    LOGI("success.");
+    LOGI("close libdevicemanagerradar so success.");
     return true;
 }
 
@@ -1322,7 +1323,7 @@ std::string SoftbusListener::GetHostPkgName()
 
 void SoftbusListener::SendAclChangedBroadcast(const std::string &msg)
 {
-    LOGI("start");
+    LOGI("SendAclChangedBroadcast");
     if (SyncTrustedRelationShip(DM_PKG_NAME, msg.c_str(), msg.length()) != DM_OK) {
         LOGE("SyncTrustedRelationShip failed.");
     }
@@ -1343,7 +1344,7 @@ int32_t SoftbusListener::GetDeviceScreenStatus(const char *networkId, int32_t &s
         return ret;
     }
     screenStatus = devScreenStatus;
-    LOGI("screenStatus: %{public}d.", devScreenStatus);
+    LOGI("GetDeviceScreenStatus screenStatus: %{public}d.", devScreenStatus);
     return DM_OK;
 }
 
@@ -1353,6 +1354,7 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     NotifyUserIds notifyUserIds(remoteUdid, userIds);
     std::string msg = notifyUserIds.ToString();
+    LOGI("Notify remote userid to dsoftbus, msg: %{public}s", GetAnonyString(msg).c_str());
     return DM_OK;
 #else
     (void)remoteUdid;
@@ -1364,7 +1366,7 @@ int32_t SoftbusListener::SetForegroundUserIdsToDSoftBus(const std::string &remot
 //LCOV_EXCL_START
 void SoftbusListener::DeleteCacheDeviceInfo()
 {
-    LOGI("start.");
+    LOGI("DeleteCacheDeviceInfo start.");
     SoftbusCache::GetInstance().DeleteLocalDeviceInfo();
     std::vector<DmDeviceInfo> onlineDevInfoVec;
     SoftbusCache::GetInstance().GetDeviceInfoFromCache(onlineDevInfoVec);
@@ -1382,11 +1384,12 @@ void SoftbusListener::DeleteCacheDeviceInfo()
 
 int32_t SoftbusListener::SetLocalDisplayName(const std::string &displayName)
 {
-    LOGI("start");
+    LOGI("SoftbusListener Start SetLocalDisplayName!");
     uint32_t len = static_cast<uint32_t>(displayName.size());
     int32_t ret = ::SetDisplayName(DM_PKG_NAME, displayName.c_str(), len);
     if (ret != DM_OK) {
         LOGE("SoftbusListener SetLocalDisplayName failed!");
+        return ret;
     }
     return DM_OK;
 }

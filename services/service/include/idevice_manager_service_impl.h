@@ -220,6 +220,8 @@ public:
 
     virtual std::unordered_map<std::string, DmAuthForm> GetAppTrustDeviceIdList(std::string pkgname) = 0;
     virtual int32_t DpAclAdd(const std::string &udid) = 0;
+    virtual void DeleteAlwaysAllowTimeOut() = 0;
+    virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual int32_t IsSameAccount(const std::string &udid) = 0;
     virtual uint64_t GetTokenIdByNameAndDeviceId(std::string extra, std::string requestDeviceId) = 0;
     virtual void ScreenCommonEventCallback(std::string commonEventType) = 0;
@@ -265,8 +267,6 @@ public:
     virtual void HandleDeviceUnBind(int32_t bindType, const std::string &peerUdid,
         const std::string &localUdid, int32_t localUserId, const std::string &localAccountId) = 0;
     virtual int32_t RegisterAuthenticationType(int32_t authenticationType) = 0;
-    virtual void DeleteAlwaysAllowTimeOut() = 0;
-    virtual void CheckDeleteCredential(const std::string &remoteUdid, int32_t remoteUserId) = 0;
     virtual void HandleCredentialDeleted(const char *credId, const char *credInfo, const std::string &localUdid,
         std::string &remoteUdid, bool &isSendBroadCast) = 0;
     virtual void HandleShareUnbindBroadCast(const std::string &credId, const int32_t &userId,

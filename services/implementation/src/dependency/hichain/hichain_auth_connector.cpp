@@ -27,6 +27,12 @@
 namespace OHOS {
 namespace DistributedHardware {
 
+namespace {
+
+constexpr int32_t HICHAIN_DATA_SIZE = 10240;
+
+}
+
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::dmDeviceAuthCallback_ = nullptr;
 std::map<int64_t, std::shared_ptr<IDmDeviceAuthCallback>> HiChainAuthConnector::dmDeviceAuthCallbackMap_;
 std::mutex HiChainAuthConnector::dmDeviceAuthCallbackMutex_;
@@ -283,6 +289,11 @@ int32_t HiChainAuthConnector::AuthCredentialPinCode(int32_t osAccountId, int64_t
 bool HiChainAuthConnector::onTransmit(int64_t requestId, const uint8_t *data, uint32_t dataLen)
 {
     LOGI("AuthDevice onTransmit, requestId %{public}" PRId64, requestId);
+    if (dataLen > HICHAIN_DATA_SIZE) {
+        LOGE("dataLen = %{public}u is invalid.", dataLen);
+        return false;
+    }
+    CHECK_NULL_RETURN(data, false);
     auto dmDeviceAuthCallback = GetDeviceAuthCallback(requestId);
     if (dmDeviceAuthCallback == nullptr) {
         LOGE("HiChainAuthConnector::onTransmit dmDeviceAuthCallback_ is nullptr.");
@@ -336,6 +347,11 @@ void HiChainAuthConnector::onError(int64_t requestId, int operationCode, int err
 void HiChainAuthConnector::onSessionKeyReturned(int64_t requestId, const uint8_t *sessionKey, uint32_t sessionKeyLen)
 {
     LOGI("start.");
+    if (sessionKeyLen > HICHAIN_DATA_SIZE) {
+        LOGE("sessionKeyLen = %{public}u is invalid.", sessionKeyLen);
+        return;
+    }
+    CHECK_NULL_VOID(sessionKey);
     auto dmDeviceAuthCallback = GetDeviceAuthCallback(requestId);
     if (dmDeviceAuthCallback == nullptr) {
         LOGE("HiChainAuthConnector::onSessionKeyReturned dmDeviceAuthCallback_ is nullptr.");

@@ -27,14 +27,16 @@ using namespace OHOS::Security::AccessToken;
 namespace OHOS {
 namespace DistributedHardware {
 namespace {
-const std::string ERR_MESSAGE_NO_PERMISSION = "Permission verify failed.";
-const std::string ERR_MESSAGE_NOT_SYSTEM_APP = "The caller is not a system application.";
-const std::string ERR_MESSAGE_INVALID_PARAMS = "Input parameter error.";
+const std::string ERR_MESSAGE_NO_PERMISSION =
+    "Permission verification failed. The application does not have the permission required to call the API.";
+const std::string ERR_MESSAGE_NOT_SYSTEM_APP =
+    "Permission verification failed. A non-system application calls a system API.";
+const std::string ERR_MESSAGE_INVALID_PARAMS = "Parameter error.";
 const std::string ERR_MESSAGE_FAILED = "Failed to execute the function.";
 const std::string ERR_MESSAGE_OBTAIN_SERVICE = "Failed to obtain the service.";
-const std::string ERR_MESSAGE_AUTHENTICALTION_INVALID = "Authentication invalid.";
-const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery invalid.";
-const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish invalid.";
+const std::string ERR_MESSAGE_AUTHENTICALTION_INVALID = "Authentication unavailable.";
+const std::string ERR_MESSAGE_DISCOVERY_INVALID = "Discovery unavailable.";
+const std::string ERR_MESSAGE_PUBLISH_INVALID = "Publish unavailable.";
 const std::string ERR_MESSAGE_FROM_CLOUD_FAILED = "Get data from cloud failed.";
 const std::string ERR_MESSAGE_NEED_LOGIN = "A login account is required.";
 const std::string ERR_MESSAGE_SCAS_CHECK_FAILED = "The device name contains non-compliant content.";

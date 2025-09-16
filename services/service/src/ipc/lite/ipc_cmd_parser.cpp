@@ -251,39 +251,5 @@ ON_IPC_SERVER_CMD(SYNC_CALLBACK, IpcIo &req, IpcIo &reply)
     int32_t ret = DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmCommonNotifyEvent, processInfo);
     WriteInt32(&reply, ret);
 }
-
-ON_IPC_SERVER_CMD(START_DISCOVERING, IpcIo &req, IpcIo &reply)
-{
-    LOGI("start.");
-    std::string pkgName = (const char *)ReadString(&req, nullptr);
-    std::string discParaStr = (const char *)ReadString(&req, nullptr);
-    std::string filterOpStr = (const char *)ReadString(&req, nullptr);
-    std::map<std::string, std::string> discoverParam;
-    ParseMapFromJsonString(discParaStr, discoverParam);
-    std::map<std::string, std::string> filterOptions;
-    ParseMapFromJsonString(filterOpStr, filterOptions);
-    int32_t result = DeviceManagerService::GetInstance().StartDiscovering(pkgName, discoverParam, filterOptions);
-    WriteInt32(&reply, result);
-}
-
-ON_IPC_SERVER_CMD(STOP_DISCOVERING, IpcIo &req, IpcIo &reply)
-{
-    LOGI("start.");
-    std::string pkgName = (const char *)ReadString(&req, nullptr);
-    std::string discParaStr = (const char *)ReadString(&req, nullptr);
-    std::map<std::string, std::string> discoverParam;
-    ParseMapFromJsonString(discParaStr, discoverParam);
-    int32_t result = DeviceManagerService::GetInstance().StopDiscovering(pkgName, discoverParam);
-    WriteInt32(&reply, result);
-}
-
-ON_IPC_SERVER_CMD(GET_LOCAL_DEVICE_INFO, IpcIo &req, IpcIo &reply)
-{
-    LOGI("start.");
-    DmDeviceInfo localDeviceInfo;
-    int32_t result = DeviceManagerService::GetInstance().GetLocalDeviceInfo(localDeviceInfo);
-    EncodeDmDeviceInfo(localDeviceInfo, reply);
-    WriteInt32(&reply, result);
-}
 } // namespace DistributedHardware
 } // namespace OHOS

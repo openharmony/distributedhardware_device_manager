@@ -26,6 +26,7 @@ if (defined(ohos_lite)) {
         "${innerkits_path}/native_cpp/include",
         "${utils_path}/include/crypto",
         "${json_path}/include",
+        "//third_party/cJSON",
       ]
 
       sources = [
@@ -42,8 +43,8 @@ if (defined(ohos_lite)) {
       deps = [
         "${dsoftbussdk_path}:softbus_client",
         "${hilog_path}:hilog_shared",
-        "${json_path}:devicemanagerjson",
         "${third_path}:libsec_shared",
+        "${json_path}:devicemanagerjson",
         "${utils_path}:devicemanagerutils",
       ]
     }

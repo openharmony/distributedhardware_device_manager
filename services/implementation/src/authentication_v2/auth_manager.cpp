@@ -418,17 +418,6 @@ void AuthManager::ParseHmlInfoInJsonObject(const JsonObject &jsonObject)
     return;
 }
 
-std::string AuthManager::GetBundleName(const JsonObject &jsonObject)
-{
-    if (!jsonObject.IsDiscarded() && jsonObject[BUNDLE_NAME_KEY].IsString()) {
-        return jsonObject[BUNDLE_NAME_KEY].Get<std::string>();
-    }
-    bool isSystemSA = false;
-    std::string bundleName;
-    AppManager::GetInstance().GetCallerName(isSystemSA, bundleName);
-    return bundleName;
-}
-
 void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
 {
     if (IsString(jsonObject, DM_BUSINESS_ID)) {
@@ -448,7 +437,6 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
         std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
         context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
     }
-
     context_->accessee.bundleName = context_->accesser.bundleName;
     if (jsonObject[TAG_PEER_BUNDLE_NAME].IsString() && !jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>().empty()) {
         context_->accessee.bundleName = jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>();
@@ -456,14 +444,11 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     } else {
         context_->accessee.oldBundleName = context_->pkgName;
     }
-
     context_->accesser.pkgName = context_->pkgName;
     context_->accessee.pkgName = context_->accesser.pkgName;
-
     if (jsonObject[TAG_PEER_PKG_NAME].IsString()) {
         context_->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
     }
-
     if (jsonObject[TAG_PEER_DISPLAY_ID].IsNumberInteger()) {
         context_->accessee.displayId = jsonObject[TAG_PEER_DISPLAY_ID].Get<int32_t>();
     }
@@ -472,11 +457,13 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     } else {
         context_->accesser.userId = MultipleUserConnector::GetFirstForegroundUserId();
     }
-
+    if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
+        context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
+        LOGI("isNeedAuthenticate: %{public}d.", context_->isNeedAuthenticate);
+    }
     if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
         ParseUltrasonicSide(jsonObject);
     }
-
     ParseHmlInfoInJsonObject(jsonObject);
     ParseProxyJsonObject(jsonObject);
     return;
@@ -581,6 +568,7 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
         LOGE("extra string not a json type.");
         return;
     }
+
     ParseJsonObject(jsonObject);
     context_->accesser.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context_->accesser.userId);
 
@@ -969,8 +957,14 @@ void AuthSrcManager::AuthDeviceFinish(int64_t requestId)
     DmAuthStateType curState = context_->authStateMachine->GetCurState();
     switch (curState) {
         case DmAuthStateType::AUTH_SRC_PIN_AUTH_DONE_STATE:
-            // ON_FINISH event occurs, start credential exchange
-            context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialExchangeState>());
+            if (!context_->isNeedAuthenticate) {
+                LOGI("skip authenticate.");
+                context_->reason = ERR_DM_SKIP_AUTHENTICATE;
+                context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcFinishState>());
+            } else {
+                // ON_FINISH event occurs, start credential exchange
+                context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcCredentialExchangeState>());
+            }
             break;
         default:
             break;

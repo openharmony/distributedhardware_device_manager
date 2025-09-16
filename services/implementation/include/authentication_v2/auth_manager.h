@@ -139,7 +139,6 @@ private:
     void ParseJsonObject(const JsonObject &jsonObject);
     void GetAuthParam(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
-    std::string GetBundleName(const JsonObject &jsonObject);
     void SetAuthType(int32_t authType);
     bool IsAuthTypeSupported(const int32_t &authType);
     bool IsAuthCodeReady(const std::string &sessionName);
