@@ -680,6 +680,22 @@ int32_t DeviceManagerServiceImpl::CheckDeviceInfoPermission(const std::string &l
     return DM_OK;
 }
 
+int32_t DeviceManagerServiceImpl::BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    (void)pkgName;
+    (void)targetId;
+    (void)bindParam;
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
+{
+    (void)pkgName;
+    (void)serviceId;
+    return DM_OK;
+}
+
 void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
     int32_t remoteTokenId)
 {

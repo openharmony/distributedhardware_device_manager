@@ -18,9 +18,11 @@
 #include "cJSON.h"
 #include <dlfcn.h>
 #include <functional>
+#include <openssl/rand.h>
 #include "app_manager.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
+#include "dm_device_info.h"
 #include "dm_hidumper.h"
 #include "dm_softbus_cache.h"
 #include "parameter.h"
@@ -30,6 +32,7 @@
 #include "datetime_ex.h"
 #include "deviceprofile_connector.h"
 #include "device_name_manager.h"
+#include "distributed_device_profile_client.h"
 #include "dm_comm_tool.h"
 #include "dm_random.h"
 #include "dm_transport_msg.h"
@@ -95,12 +98,16 @@ namespace {
     const int32_t SEND_DELAY_MAX_TIME = 5;
     const int32_t SEND_DELAY_MIN_TIME = 0;
     const int32_t DELAY_TIME_SEC_CONVERSION = 1000000;      // 1000*1000
+    const int32_t RANDOM_OFF_SET = 8;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     const std::string GET_LOCAL_DEVICE_NAME_API_NAME = "GetLocalDeviceName";
 #endif
     constexpr const char* LOCAL_ALL_USERID = "local_all_userId";
     constexpr const char* LOCAL_FOREGROUND_USERID = "local_foreground_userId";
     constexpr const char* LOCAL_BACKGROUND_USERID = "local_background_userId";
+    constexpr int32_t GENERATE_SERVICE_ID_RETRY_TIME = 3;
+    constexpr int32_t SERVICE_UNPUBLISHED_STATE = 0;
+    constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 }
 
 DeviceManagerService::~DeviceManagerService()
@@ -4412,6 +4419,341 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
         }
         dmServiceImpl_->InitTaskOfDelTimeOutAcl(udid, udidHash);
     }
+}
+
+int32_t DeviceManagerService::StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || discParam.serviceType.empty() || discParam.discoveryServiceId == 0) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
+    return dmServiceImplExtResident_->StartServiceDiscovery(processInfo, discParam);
+}
+
+int32_t DeviceManagerService::StopServiceDiscovery(const std::string &pkgName, int32_t discServiceId)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || discServiceId == 0) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->StopServiceDiscovery(discServiceId);
+}
+
+int32_t DeviceManagerService::BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || pkgName == std::string(DM_PKG_NAME)) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (targetId.serviceId == 0) {
+        LOGE("Invalid parameter, service id is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("BindServiceTarget failed, DMServiceImpl instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->BindServiceTarget(pkgName, targetId, bindParam);
+}
+
+int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
+{
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || pkgName == std::string(DM_PKG_NAME) || serviceId == 0) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    if (!IsDMServiceImplReady()) {
+        LOGE("UnbindServiceTarget failed, DMServiceImpl instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->UnbindServiceTarget(pkgName, serviceId);
+}
+
+int32_t DeviceManagerService::RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("RegisterServiceInfo not support in common version.");
+    return ERR_DM_UNSUPPORTED_METHOD;
+#else
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The callerdoes not have permission to cal1 RegisterServiceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (serviceRegInfo.serviceInfo.serviceType.empty() || serviceRegInfo.serviceInfo.serviceName.empty() ||
+        serviceRegInfo.serviceInfo.serviceDisplayName.empty()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    ServiceInfoProfile serviceInfoProfile;
+    int32_t ret = GenerateRegServiceId(serviceInfoProfile.regServiceId);
+    if (ret != DM_OK) {
+        LOGE("Failed to generate regServiceId, ret: %{public}d.", ret);
+        return ret;
+    }
+    ret = ConvertServiceInfoProfileByRegInfo(serviceRegInfo, serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("ConvertServiceInfoProfileByRegInfo failed, ret: %{public}d", ret);
+        return ret;
+    }
+    ret = DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("PutServiceInfoProfile failed, ret: %{public}d", ret);
+        return ret;
+    }
+    regServiceId = serviceInfoProfile.regServiceId;
+    LOGI("RegisterServiceInfo success, regServiceId: %{public}s.", GetAnonyInt32(regServiceId).c_str());
+    return DM_OK;
+#endif
+}
+
+int32_t DeviceManagerService::UnRegisterServiceInfo(int32_t regServiceId)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("UnRegisterServiceInfo not support in common version.");
+    return ERR_DM_UNSUPPORTED_METHOD;
+#else
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call UnRegisterServiceInfo.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (regServiceId == 0) {
+        LOGE("Invalid parameter, regServiceId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int64_t tokenIdCaller = IPCSkeleton::GetCallingTokenID();
+    ServiceInfoProfile serviceInfo;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByTokenId(tokenIdCaller, serviceInfo);
+    if (ret != DM_OK || serviceInfo.regServiceId != regServiceId) {
+        LOGE("Invalid parameter, token id or regService id is invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (serviceInfo.publishState == SERVICE_PUBLISHED_STATE) {
+        ret = StopPublishService(serviceInfo.serviceId);
+        if (ret != DM_OK) {
+            LOGE("StopPublishService failed, ret: %{public}d.", ret);
+            return ret;
+        }
+    }
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+    ret = DeviceProfileConnector::GetInstance().DeleteServiceInfoProfile(regServiceId, userId);
+    if (ret != DM_OK) {
+        LOGE("DeleteServiceInfoProfile failed, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("UnRegisterServiceInfo success.");
+    return DM_OK;
+#endif
+}
+
+int32_t DeviceManagerService::StartPublishService(const std::string &pkgName,
+    PublishServiceParam &publishServiceParam, int64_t &serviceId)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("StartPublishService not support in common version.");
+    return ERR_DM_UNSUPPORTED_METHOD;
+#else
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call StantPublishService.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || publishServiceParam.regServiceId == 0 ||
+        publishServiceParam.serviceInfo.serviceType.empty() ||
+        publishServiceParam.serviceInfo.serviceName.empty() ||
+        publishServiceParam.serviceInfo.serviceDisplayName.empty()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int64_t tokenIdCaller = IPCSkeleton::GetCallingTokenID();
+    ServiceInfoProfile serviceInfo;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByTokenId(tokenIdCaller, serviceInfo);
+    if (ret != DM_OK || serviceInfo.regServiceId != publishServiceParam.regServiceId) {
+        LOGE("Invalid parameter, token id or regService id is invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    ret = GenerateServiceId(publishServiceParam.serviceInfo.serviceId);
+    if (ret != DM_OK) {
+        LOGE("GenerateServiceId failed, ret: %{public}d", ret);
+        return ret;
+    }
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+    ServiceInfoProfile serviceInfoProfile = AppManager::GetInstance().CreateServiceInfoProfile(publishServiceParam,
+        userId);
+    ret = DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("PutServiceInfoProfile failed, ret: %{public}d", ret);
+        return ret;
+    }
+    serviceId = publishServiceParam.serviceInfo.serviceId;
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("StartPublishService failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    ProcessInfo processInfo;
+    processInfo.pkgName = pkgName;
+    processInfo.userId = userId;
+    return dmServiceImplExtResident_->StartPublishService(processInfo, publishServiceParam);
+#endif
+}
+
+int32_t DeviceManagerService::StopPublishService(int64_t serviceId)
+{
+#ifdef DEVICE_MANAGER_COMMON_FLAG
+    LOGI("StopPublishService not support in common version.");
+    return ERR_DM_UNSUPPORTED_METHOD;
+#else
+    if (!PermissionManager::GetInstance().CheckPermission()) {
+        LOGE("The caller does not have permission to call1 StopPublishService.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (serviceId == 0) {
+        LOGE("Invalid parameter, serviceId is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    ServiceInfoProfile serviceInfo;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfo);
+    if (ret != DM_OK || serviceInfo.publishState == SERVICE_UNPUBLISHED_STATE) {
+        LOGE("Invalid parameter, serviceId or publish state is invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("StopPublishService failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    ret = dmServiceImplExtResident_->StopPublishService(serviceId);
+    if (ret != DM_OK) {
+        LOGE("StopPublishService failed in closed-source logic, ret: %{public}d", ret);
+        return ret;
+    }
+    ret = UpdateServiceInfo(serviceId);
+    if (ret != DM_OK) {
+        LOGE("StopPublishService failed in internal logic, ret: %{public}d", ret);
+        return ret;
+    }
+    LOGI("StopPublishService success.");
+    return DM_OK;
+#endif
+}
+
+int32_t DeviceManagerService::UpdateServiceInfo(int64_t serviceId)
+{
+    LOGI("UpdateServiceInfo Begin");
+    ServiceInfoProfile serviceInfoProfile;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("GetServiceInfoProfileByServiceId failed, ret: %{public}d", ret);
+        return ret;
+    }
+    serviceInfoProfile.publishState = SERVICE_UNPUBLISHED_STATE;
+    ret = DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("PutServiceInfoProfile failed, ret: %{public}d", ret);
+        return ret;
+    }
+
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAccessControlProfile();
+    for (auto &profile : profiles) {
+        JsonObject extraData(profile.GetExtraData());
+        if (extraData.IsDiscarded()) {
+            continue;
+        }
+        if (extraData.Contains(SERVICE_ID_KEY) && extraData[SERVICE_ID_KEY].Get<int64_t>() == serviceId) {
+            extraData.Erase(SERVICE_ID_KEY);
+            profile.SetExtraData(extraData.Dump());
+            DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
+        }
+    }
+    LOGI("UpdateServiceInfo success");
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GenerateServiceId(int64_t &serviceId)
+{
+    LOGI("GenerateServiceId Begin.");
+    for (int i = 0; i < GENERATE_SERVICE_ID_RETRY_TIME; i++) {
+        serviceId = GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
+        ServiceInfoProfile serviceInfoProfile;
+        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId,
+            serviceInfoProfile);
+        if (ret != DM_OK) {
+            LOGI("GenerateServiceId success, ret:%{public}d", ret);
+            return DM_OK;
+        }
+    }
+    LOGE("GenerateServiceId failed, serviceId already exists after retry");
+    return ERR_DM_FAILED;
+}
+
+int32_t DeviceManagerService::ConvertServiceInfoProfileByRegInfo(
+    const ServiceRegInfo &serviceRegInfo, ServiceInfoProfile &serviceInfoProfile)
+{
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    serviceInfoProfile.deviceId = std::string(localDeviceId);
+    MultipleUserConnector::GetCallerUserId(serviceInfoProfile.userId);
+    serviceInfoProfile.tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    serviceInfoProfile.serviceId = serviceRegInfo.serviceInfo.serviceId;
+    serviceInfoProfile.serviceType = serviceRegInfo.serviceInfo.serviceType;
+    serviceInfoProfile.serviceName = serviceRegInfo.serviceInfo.serviceName;
+    serviceInfoProfile.serviceDisplayName = serviceRegInfo.serviceInfo.serviceDisplayName;
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::GenerateRegServiceId(int32_t &regServiceId)
+{
+    LOGI("GenerateRegServiceId Begin.");
+    unsigned char buffer[16] = {0};
+    if (RAND_bytes(buffer, sizeof(buffer)) != 1) {
+        LOGE("Failed to generate random bytes using OpenSSL.");
+        return ERR_DM_FAILED;
+    }
+    regServiceId = 0;
+    for (size_t i = 0; i < sizeof(int32_t); ++i) {
+        regServiceId = (regServiceId << RANDOM_OFF_SET) | buffer[i];
+    }
+    LOGI("Generated regServiceId: %{public}s", GetAnonyInt32(regServiceId).c_str());
+    return DM_OK;
+}
+
+int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
+{
+    if (!IsDMServiceAdapterResidentLoad()) {
+        LOGE("failed, adapter instance not init or init failed.");
+        return ERR_DM_UNSUPPORTED_METHOD;
+    }
+    return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
 }
 #endif
 } // namespace DistributedHardware

@@ -23,6 +23,7 @@
 #include "app_manager.h"
 #include "bundle_mgr_interface.h"
 #include "bundle_mgr_proxy.h"
+#include "distributed_device_profile_client.h"
 #include "dm_error_type.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -71,6 +72,7 @@ constexpr const char* BIND_CALLER_USERID = "bindCallerUserId";
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
+constexpr const char* TAG_SERVICE_ID = "serviceId";
 // currently, we just support one bind session in one device at same time
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
 const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
@@ -1609,6 +1611,16 @@ static bool IsHmlSessionType(const JsonObject &jsonObject)
 int DeviceManagerServiceImpl::OpenAuthSession(const std::string& deviceId,
     const std::map<std::string, std::string> &bindParam)
 {
+    if (bindParam.find(PARAM_KEY_IS_SERVICE_BIND) != bindParam.end() &&
+        bindParam.at(PARAM_KEY_IS_SERVICE_BIND) == DM_VAL_TRUE) {
+        CHECK_NULL_RETURN(listener_, ERR_DM_FAILED);
+        if (IsNumberString(deviceId)) {
+            return listener_->OpenAuthSessionWithPara(std::stoll(deviceId));
+        } else {
+            LOGE("OpenAuthSession failed");
+            return ERR_DM_FAILED;
+        }
+    }
     bool hmlEnable160M = false;
     int32_t hmlActionId = 0;
     int invalidSessionId = -1;
@@ -1782,6 +1794,10 @@ int32_t DeviceManagerServiceImpl::ParseConnectAddr(const PeerTargetId &targetId,
         LOGE("GetDeviceInfo failed, ret: %{public}d", ret);
     }
     deviceInfo->addrNum = static_cast<uint32_t>(index);
+    if (bindParam.find(PARAM_KEY_IS_SERVICE_BIND) != bindParam.end() &&
+        bindParam.at(PARAM_KEY_IS_SERVICE_BIND) == DM_VAL_TRUE) {
+        deviceId = std::to_string(targetId.serviceId);
+    }
     if (softbusConnector_->AddMemberToDiscoverMap(deviceId, deviceInfo) != DM_OK) {
         LOGE("DeviceManagerServiceImpl::ParseConnectAddr failed, AddMemberToDiscoverMap failed.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -3202,6 +3218,97 @@ void DeviceManagerServiceImpl::DeleteSessionKey(int32_t userId,
     DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
     skId = profile.GetAccessee().GetAccesseeSessionKeyId();
     DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
+}
+
+int32_t DeviceManagerServiceImpl::BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    if (pkgName.empty()) {
+        LOGE("BindServiceTarget failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::map<std::string, std::string> bindParamTmp = bindParam;
+    bindParamTmp[PARAM_KEY_IS_SERVICE_BIND] = "true";
+    return BindTarget(pkgName, targetId, bindParamTmp);
+}
+
+int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
+{
+    if (pkgName.empty()) {
+        LOGE("UnbindServiceTarget failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int64_t tokenIdCaller = IPCSkeleton::GetCallingTokenID();
+    std::string peerDeviceId = "";
+    int32_t bindLevel = -1;
+    int32_t ret = DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, peerDeviceId, bindLevel);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, DeleteAclExtraDataServiceId failed.");
+        return ret;
+    }
+
+    ServiceInfoProfile serviceInfoProfile;
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+    ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, GetServiceInfoProfileByServiceId failed.");
+        return ret;
+    }
+    ret = DeviceProfileConnector::GetInstance().DeleteServiceInfoProfile(serviceInfoProfile.regServiceId, userId);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, DeleteServiceInfoProfile failed.");
+        return ret;
+    }
+    ret = UnBindDevice(pkgName, peerDeviceId, bindLevel);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, UnBindDevice failed.");
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller,
+    std::string &udid, int32_t &bindLevel)
+{
+    bool isDeletedExtra = false;
+    char localDeviceIdTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceIdTemp, DEVICE_UUID_LENGTH);
+    std::string localDeviceId = std::string(localDeviceIdTemp);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    for (auto &item : profiles) {
+        std::string extraData = item.GetExtraData();
+        if (extraData.empty()) {
+            continue;
+        }
+        JsonObject json;
+        json.Parse(extraData);
+        if (json.IsDiscarded()) {
+            continue;
+        }
+        if (IsInt64(json, TAG_SERVICE_ID)) {
+            int64_t aclServiceId = json[TAG_SERVICE_ID].Get<int64_t>();
+            if (aclServiceId != serviceId) {
+                continue;
+            }
+        }
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        int64_t tokenIdAcl = item.GetAccesser().GetAccesserTokenId();
+        if (accesserUdid == localDeviceId && tokenIdCaller == tokenIdAcl) {
+            isDeletedExtra = true;
+            json.Erase(TAG_SERVICE_ID);
+            item.SetExtraData(json.Dump());
+            udid = item.GetAccessee().GetAccesseeDeviceId();
+            bindLevel = item.GetBindLevel();
+            DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        }
+    }
+    if (!isDeletedExtra) {
+        LOGE("DeleteAclExtraDataServiceId failed, local is sink, not allow unbind.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return DM_OK;
 }
 
 void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,

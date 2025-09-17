@@ -653,6 +653,20 @@ public:
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) = 0;
+    virtual int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam,
+        std::shared_ptr<ServiceDiscoveryCallback> callback) = 0;
+    virtual int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discoveryServiceId) = 0;
+    virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) = 0;
+    virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) = 0;
+    virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
+        std::shared_ptr<ServiceInfoStateCallback> callback) = 0;
+    virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) = 0;
+    virtual int32_t StartPublishService(const std::string &pkgName, const PublishServiceParam &publishServiceParam,
+        std::shared_ptr<ServicePublishCallback> callback, int64_t &serviceId) = 0;
+    virtual int32_t StopPublishService(int64_t serviceId) = 0;
+    virtual int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId) = 0;
+    virtual int32_t UnRegisterServiceInfo(int32_t regServiceId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -53,6 +53,7 @@ namespace {
     const char* DM_ANTI_DISTURBANCE_MODE = "is_in_anti_disturbance_mode";
     const int64_t DM_MIN_RANDOM = 1;
     const int64_t DM_MAX_RANDOM_INT64 = INT64_MAX;
+    constexpr int8_t SERVICE_UNPUBLISHED_STATE = 0;
 }
 
 DmAuthStateType AuthSrcStartState::GetStateType()
@@ -209,6 +210,32 @@ int32_t AuthSinkNegotiateStateMachine::ProcRespNegotiate5_1_0(std::shared_ptr<Dm
     JsonObject credTypeJson;
     GetSinkCredType(context, credInfo, aclTypeJson, credTypeJson);
     context->accessee.credTypeList = credTypeJson.Dump();
+    if (context->isServiceBind) {
+        ret = SinkNegotiateService(context);
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t AuthSinkNegotiateStateMachine::SinkNegotiateService(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    int64_t serviceId = context->accessee.serviceId;
+    if (serviceId == 0) {
+        LOGE("service id invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    ServiceInfoProfile serviceInfoProfile;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId,
+        serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("GetServiceInfoProfileByServiceId failed, ret %{public}d.", ret);
+        return ret;
+    }
+    if (serviceInfoProfile.publishState == SERVICE_UNPUBLISHED_STATE) {
+        LOGE("service id not publish.");
+        return ERR_DM_SERVICE_BIND_PEER_SERVICE_ID_UNPUBLISH;
+    }
     return DM_OK;
 }
 

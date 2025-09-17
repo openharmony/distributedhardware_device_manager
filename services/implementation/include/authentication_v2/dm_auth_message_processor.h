@@ -357,6 +357,12 @@ private:
     void ParseUltrasonicSide(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     void ParseCert(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
     void ParseAccesserInfo(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
+    void ParseServiceNego(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
+    void ParseSyncServiceInfo(const JsonObject &jsonObject, std::shared_ptr<DmAuthContext> context);
+
+    int32_t SetSyncMsgJson(std::shared_ptr<DmAuthContext> &context, const DmAccess &accessSide,
+        const DmAccessToSync &accessToSync, JsonObject &syncMsgJson);
+    std::string GetAccesseeServiceInfo(int64_t serviceId);
     std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
     std::unordered_map<DmMessageType, CreateMessageFuncPtr> createMessageFuncMap_;
     std::unordered_map<DmMessageType, ParaseMessageFuncPtr> paraseMessageFuncMap_;

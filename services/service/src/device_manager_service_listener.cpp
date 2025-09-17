@@ -1142,6 +1142,15 @@ std::string DeviceManagerServiceListener::GetLocalDisplayDeviceName()
 #endif
 }
 
+int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(int64_t serviceId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DeviceManagerService::GetInstance().OpenAuthSessionWithPara(serviceId);
+#else
+    return ERR_DM_UNSUPPORTED_METHOD;
+#endif
+}
+
 int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string &deviceId,
     int32_t actionId, bool isEnable160m)
 {
@@ -1150,11 +1159,6 @@ int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string 
 #else
     return ERR_DM_UNSUPPORTED_METHOD;
 #endif
-}
-
-int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(int64_t serviceId)
-{
-    return ERR_DM_UNSUPPORTED_METHOD;
 }
 
 void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
