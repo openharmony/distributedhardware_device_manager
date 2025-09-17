@@ -21,12 +21,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerServiceFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int sessionId = fdp.ConsumeIntegral<int32_t>();
     std::string inputStr = fdp.ConsumeRandomLengthString();
     std::string retStr = fdp.ConsumeRandomLengthString();
@@ -81,7 +77,11 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceManagerServiceFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DeviceManagerServiceFuzzTest(fdp);
 
     return 0;
 }

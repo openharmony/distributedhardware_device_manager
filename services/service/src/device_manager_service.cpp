@@ -371,7 +371,7 @@ DM_EXPORT void DeviceManagerService::UninitDMServiceListener()
 #endif
     LOGI("Uninit.");
 }
-//LCOV_EXCL_STOP 
+//LCOV_EXCL_STOP
 
 DM_EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
