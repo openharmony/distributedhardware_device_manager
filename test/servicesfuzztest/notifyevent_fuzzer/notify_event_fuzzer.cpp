@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "notify_event_fuzzer.h"
 
 #include "device_manager_impl.h"
@@ -25,7 +26,7 @@ void NotifyEventFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
-
+    FuzzedDataProvider fdp(data, size);
     std::string pkgName = fdp.ConsumeRandomLengthString();
     int32_t eventId = fdp.ConsumeIntegral<int32_t>();
     std::string event = fdp.ConsumeRandomLengthString();
