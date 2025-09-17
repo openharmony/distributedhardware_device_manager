@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 #include <vector>
 #include "device_manager_service.h"

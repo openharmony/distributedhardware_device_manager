@@ -14,6 +14,7 @@
  */
 
 #include <algorithm>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <thread>
 #include <unistd.h>
 
