@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"Mã kết nối",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"%1$s trên %2$s muốn truy cập vào thiết bị này. Tin tưởng ứng dụng này?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"Hủy",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -53,7 +53,7 @@
             "name":"dm_allow_this_time",
             "value":"Chỉ tin tưởng lần này",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -67,14 +67,14 @@
             "name":"dm_enter_connect_code",
             "value":"Nhập mã kết nối hiển thị trên thiết bị còn lại.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_cast",
             "value":"%s muốn phản chiếu màn hình của mình lên thiết bị của bạn. Tin cậy thiết bị này?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -95,7 +95,7 @@
             "name":"dm_bluetooth_dialog_close",
             "value":"OK",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -116,14 +116,14 @@
             "name":"dm_bluetooth_dialog_content",
             "value":"Cần bật Bluetooth để kết nối với một thiết bị khác. Vui lòng bật Bluetooth và thử lại.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_connect",
             "value":"Kết nối tới %s",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

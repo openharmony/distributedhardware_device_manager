@@ -4,21 +4,21 @@
             "name":"dm_connect_code",
             "value":"연결 코드",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_confirm_title_hap",
             "value":"%2$s의 %1$s에서 이 장치에 액세스하려고 합니다. 이 앱을 신뢰할까요?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_cancel",
             "value":"취소",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -53,7 +53,7 @@
             "name":"dm_allow_this_time",
             "value":"이번 한 번만 신뢰",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -67,7 +67,7 @@
             "name":"dm_enter_connect_code",
             "value":"다른 장치에 표시된 연결 코드를 입력하십시오.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -95,7 +95,7 @@
             "name":"dm_bluetooth_dialog_close",
             "value":"확인",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -116,14 +116,14 @@
             "name":"dm_bluetooth_dialog_content",
             "value":"다른 장치에 연결하려면 블루투스를 실행해야 합니다. 실행하고 다시 시도하십시오.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_connect",
             "value":"%s에 연결",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

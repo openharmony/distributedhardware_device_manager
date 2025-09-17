@@ -47,14 +47,14 @@
                     "quantity":"one",
                     "value":"Не доверять (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
                     "quantity":"few",
                     "value":"Не доверять (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 },
                 {
