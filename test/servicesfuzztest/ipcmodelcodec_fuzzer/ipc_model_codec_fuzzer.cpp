@@ -16,6 +16,7 @@
 
 #include <fuzzer/FuzzedDataProvider.h>
 
+#include "dm_device_info.h"
 #include "ipc_model_codec.h"
 
 
@@ -749,6 +750,257 @@ void DecodeStringVectorFuzzTest(const uint8_t* data, size_t size)
     parcel.WriteUint32(invalidNum);
     ipcModelCodec->DecodeStringVector(invalidParcel, vec);
 }
+
+void EncodeServiceIdsFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t minReqSize = sizeof(int32_t) + sizeof(int64_t);
+    if ((data == nullptr) || (size < minReqSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    int32_t maxIds = 1000;
+    int32_t idCount = fdp.ConsumeIntegralInRange<int32_t>(0, maxIds);
+    std::vector<int64_t> serviceIds;
+
+    for (int32_t i = 0; i < idCount; ++i) {
+        serviceIds.push_back(fdp.ConsumeIntegral<int64_t>());
+    }
+
+    MessageParcel parcel;
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->EncodeServiceIds(serviceIds, parcel);
+}
+
+void DecodeServiceIdsFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t minReqSize = sizeof(int32_t) + sizeof(int64_t);
+    if ((data == nullptr) || (size < minReqSize)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t maxIntRange = 1000;
+    MessageParcel parcel;
+    int32_t idCount = fdp.ConsumeIntegralInRange<int32_t>(0, maxIntRange);
+    if (!parcel.WriteInt32(idCount)) {
+        return;
+    }
+    for (int32_t i = 0; i < idCount; ++i) {
+        int64_t id = fdp.ConsumeIntegral<int64_t>();
+        if (!parcel.WriteInt64(id)) {
+            return;
+        }
+    }
+
+    std::vector<int64_t> decodedIds;
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->DecodeServiceIds(decodedIds, parcel);
+}
+
+void EncodeServiceRegInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t uint32Count = 2;
+    size_t int64Count = 1;
+    size_t stringCount = 5;
+    size_t minSize = sizeof(uint32_t) * uint32Count + sizeof(int64_t) * int64Count + MAX_STRING_LENGTH * stringCount;
+
+    if ((data == nullptr) || (size < minSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    uint32_t minRangeSize = 0;
+    uint32_t maxRangeSize = 1000;
+    MessageParcel parcel;
+    uint32_t num = fdp.ConsumeIntegralInRange<uint32_t>(minRangeSize, maxRangeSize);
+    parcel.WriteUint32(num);
+    for (uint32_t i = 0; i < num; ++i) {
+        parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    }
+
+    ServiceRegInfo serRegInfo;
+    serRegInfo.customData = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serRegInfo.dataLen = fdp.ConsumeIntegralInRange<uint32_t>(minRangeSize, maxRangeSize);
+    serRegInfo.serviceInfo.serviceId = fdp.ConsumeIntegralInRange<int64_t>(minRangeSize, maxRangeSize);
+    serRegInfo.serviceInfo.serviceType = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serRegInfo.serviceInfo.serviceName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serRegInfo.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->EncodeServiceRegInfo(serRegInfo, parcel);
+}
+
+void DecodeServiceRegInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t uint32Count = 2;
+    size_t int64Count = 1;
+    size_t stringCount = 5;
+    size_t minSize = sizeof(uint32_t) * uint32Count + sizeof(int64_t) * int64Count + MAX_STRING_LENGTH * stringCount;
+
+    if ((data == nullptr) || (size < minSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    uint32_t minRangeSize = 0;
+    uint32_t maxRangeSize = 1000;
+    MessageParcel parcel;
+    uint32_t num = fdp.ConsumeIntegralInRange<uint32_t>(minRangeSize, maxRangeSize);
+    parcel.WriteUint32(num);
+    for (uint32_t i = 0; i < num; ++i) {
+        parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    }
+
+    ServiceRegInfo serRegInfo;
+    serRegInfo.customData = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serRegInfo.dataLen = fdp.ConsumeIntegralInRange<uint32_t>(minRangeSize, maxRangeSize);
+    serRegInfo.serviceInfo.serviceId = fdp.ConsumeIntegralInRange<int64_t>(minRangeSize, maxRangeSize);
+    serRegInfo.serviceInfo.serviceType = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serRegInfo.serviceInfo.serviceName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serRegInfo.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->DecodeServiceRegInfo(parcel, serRegInfo);
+}
+
+void EncodePublishServiceParamFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t int32Count = 1;
+    size_t int64Count = 1;
+    size_t stringCount = 3;
+    size_t minSize = sizeof(int32_t) * int32Count + sizeof(int64_t) * int64Count + MAX_STRING_LENGTH * stringCount;
+
+    if ((data == nullptr) || (size < minSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    uint32_t minRangeSize = 0;
+    uint32_t maxRangeSize = 1000;
+    MessageParcel parcel;
+    uint32_t num = fdp.ConsumeIntegralInRange<uint32_t>(minRangeSize, maxRangeSize);
+    parcel.WriteUint32(num);
+    for (uint32_t i = 0; i < num; ++i) {
+        parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    }
+
+    PublishServiceParam publishServiceParam;
+    publishServiceParam.regServiceId = fdp.ConsumeIntegralInRange<int32_t>(minRangeSize, maxRangeSize);
+    publishServiceParam.serviceInfo.serviceId = fdp.ConsumeIntegralInRange<int64_t>(minRangeSize, maxRangeSize);
+    publishServiceParam.serviceInfo.serviceType = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    publishServiceParam.serviceInfo.serviceName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    publishServiceParam.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->EncodePublishServiceParam(publishServiceParam, parcel);
+}
+
+void DecodePublishServiceParamFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t int32Count = 1;
+    size_t int64Count = 1;
+    size_t stringCount = 3;
+    size_t minSize = sizeof(int32_t) * int32Count + sizeof(int64_t) * int64Count + MAX_STRING_LENGTH * stringCount;
+
+    if ((data == nullptr) || (size < minSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    uint32_t minRangeSize = 0;
+    uint32_t maxRangeSize = 1000;
+    MessageParcel parcel;
+    uint32_t num = fdp.ConsumeIntegralInRange<uint32_t>(minRangeSize, maxRangeSize);
+    parcel.WriteUint32(num);
+    for (uint32_t i = 0; i < num; ++i) {
+        parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    }
+
+    PublishServiceParam publishServiceParam;
+    publishServiceParam.regServiceId = fdp.ConsumeIntegralInRange<int32_t>(minRangeSize, maxRangeSize);
+    publishServiceParam.serviceInfo.serviceId = fdp.ConsumeIntegralInRange<int64_t>(minRangeSize, maxRangeSize);
+    publishServiceParam.serviceInfo.serviceType = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    publishServiceParam.serviceInfo.serviceName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    publishServiceParam.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->DecodePublishServiceParam(parcel, publishServiceParam);
+}
+
+void EncodeSrvDiscParamFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t requiredSize = sizeof(int32_t) * 4 + MAX_STRING_LENGTH * 2;
+    if ((data == nullptr) || (size < requiredSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    DiscoveryServiceParam param;
+    param.serviceName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    param.serviceType = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    param.discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
+    param.freq = static_cast<DmExchangeFreq>(fdp.ConsumeIntegral<int32_t>());
+    param.medium = static_cast<DMSrvMediumType>(fdp.ConsumeIntegral<int32_t>());
+    param.mode = static_cast<DMSrvDiscoveryMode>(fdp.ConsumeIntegral<int32_t>());
+
+    MessageParcel parcel;
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->EncodeSrvDiscParam(param, parcel);
+}
+
+void DecodeSrvDiscParamFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t requiredSize = sizeof(int32_t) * 3 + MAX_STRING_LENGTH * 2;
+    if ((data == nullptr) || (size < requiredSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    MessageParcel parcel;
+    parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    parcel.WriteInt32(fdp.ConsumeIntegral<int32_t>());
+    parcel.WriteInt32(fdp.ConsumeIntegral<int32_t>());
+    parcel.WriteInt32(fdp.ConsumeIntegral<int32_t>());
+    parcel.WriteInt32(fdp.ConsumeIntegral<int32_t>());
+
+    DiscoveryServiceParam param;
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->DecodeSrvDiscParam(parcel, param);
+}
+
+void EncodeSrvDiscServiceInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t requiredSize = sizeof(int64_t) + MAX_STRING_LENGTH * 4;
+    if ((data == nullptr) || (size < requiredSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    DiscoveryServiceInfo serviceInfo;
+    serviceInfo.pkgName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serviceInfo.serviceInfo.serviceId = fdp.ConsumeIntegral<int64_t>();
+    serviceInfo.serviceInfo.serviceType = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serviceInfo.serviceInfo.serviceName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+    serviceInfo.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH);
+
+    MessageParcel parcel;
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->EncodeSrvDiscServiceInfo(serviceInfo, parcel);
+}
+
+void DecodeSrvDiscServiceInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t requiredSize = sizeof(int64_t) + MAX_STRING_LENGTH * 4;
+    if ((data == nullptr) || (size < requiredSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    MessageParcel parcel;
+    parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    parcel.WriteInt64(fdp.ConsumeIntegral<int64_t>());
+    parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+    parcel.WriteString(fdp.ConsumeRandomLengthString(MAX_STRING_LENGTH));
+
+    DiscoveryServiceInfo serviceInfo;
+    std::shared_ptr<IpcModelCodec> ipcModelCodec = std::make_shared<IpcModelCodec>();
+    ipcModelCodec->DecodeSrvDiscServiceInfo(parcel, serviceInfo);
+}
 }
 }
 
@@ -784,5 +1036,15 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::DistributedHardware::DecodeNetworkIdQueryFilterFuzzTest(data, size);
     OHOS::DistributedHardware::EncodeStringVectorFuzzTest(data, size);
     OHOS::DistributedHardware::DecodeStringVectorFuzzTest(data, size);
+    OHOS::DistributedHardware::EncodeServiceIdsFuzzTest(data, size);
+    OHOS::DistributedHardware::DecodeServiceIdsFuzzTest(data, size);
+    OHOS::DistributedHardware::EncodeServiceRegInfoFuzzTest(data, size);
+    OHOS::DistributedHardware::DecodeServiceRegInfoFuzzTest(data, size);
+    OHOS::DistributedHardware::EncodePublishServiceParamFuzzTest(data, size);
+    OHOS::DistributedHardware::DecodePublishServiceParamFuzzTest(data, size);
+    OHOS::DistributedHardware::EncodeSrvDiscParamFuzzTest(data, size);
+    OHOS::DistributedHardware::DecodeSrvDiscParamFuzzTest(data, size);
+    OHOS::DistributedHardware::EncodeSrvDiscServiceInfoFuzzTest(data, size);
+    OHOS::DistributedHardware::DecodeSrvDiscServiceInfoFuzzTest(data, size);
     return 0;
 }

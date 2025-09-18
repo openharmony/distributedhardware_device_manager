@@ -20,12 +20,14 @@
 #include <unistd.h>
 #include <unordered_map>
 #include <fuzzer/FuzzedDataProvider.h>
- 
+
+#include "device_manager_callback.h"
 #include "device_manager_impl.h"
+#include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
- 
+
 namespace {}
 class DevTrustChangeCallbackTest : public DevTrustChangeCallback {
 public:
@@ -37,6 +39,14 @@ class CredentialAuthStatusCallbackTest : public CredentialAuthStatusCallback {
 public:
     virtual ~CredentialAuthStatusCallbackTest() {}
     void OnCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode) override {}
+};
+
+class ServiceDiscoveryCallbackTest : public ServiceDiscoveryCallback {
+public:
+    ServiceDiscoveryCallbackTest() = default;
+    virtual ~ServiceDiscoveryCallbackTest() = default;
+    void OnServiceFound(const DiscoveryServiceInfo &service) override {}
+    void OnServiceDiscoveryResult(int32_t resReason) override {}
 };
 
 void StopAuthenticateDeviceTest(const uint8_t *data, size_t size)
@@ -331,6 +341,98 @@ void SyncCallbacksToServiceFuzzTest(const uint8_t* data, size_t size)
     callbackMap[event] = pkgNames;
     DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
 }
+
+void RegisterServiceStateCallbackFuzzTest(const uint8_t* data, size_t size)
+{
+    constexpr size_t minRequiredSize = sizeof(int64_t) + 1;
+    if ((data == nullptr) || (size < minRequiredSize)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
+    std::shared_ptr<ServiceInfoStateCallback> tempCb = std::make_shared<ServiceInfoStateCallback>();
+
+    DeviceManagerImpl::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, tempCb);
+}
+
+void UnRegisterServiceStateCallbackFuzzTest(const uint8_t* data, size_t size)
+{
+    constexpr size_t minRequiredSize = sizeof(int64_t) + 1;
+    if ((data == nullptr) || (size < minRequiredSize)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
+
+    DeviceManagerImpl::GetInstance().UnRegisterServiceStateCallback(pkgName, serviceId);
+}
+
+void StartServiceDiscoveryFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t maxStringLength = 64;
+    int32_t minDataSize = sizeof(uint32_t) + maxStringLength * 2 + 1;
+    if ((data == nullptr) || size < minDataSize) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
+    DiscoveryServiceParam discParam;
+    discParam.serviceType = fdp.ConsumeRandomLengthString(maxStringLength);
+    discParam.discoveryServiceId = fdp.ConsumeIntegral<uint32_t>();
+
+    std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
+    DeviceManagerImpl::GetInstance().StartServiceDiscovery(pkgName, discParam, callback);
+}
+
+void StopServiceDiscoveryFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t maxStringLength = 64;
+    if ((data == nullptr) || (size < sizeof(int32_t) + maxStringLength)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+
+    std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
+    int32_t discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
+    DeviceManagerImpl::GetInstance().StopServiceDiscovery(pkgName, discoveryServiceId);
+}
+
+void BindServiceTargetTest(const uint8_t *data, size_t size)
+{
+    size_t minLenth = sizeof(int64_t) + sizeof(uint16_t);
+    if ((data == nullptr) || (size < minLenth)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::map<std::string, std::string> bindParam;
+    std::shared_ptr<BindTargetCallback> callback;
+    PeerTargetId targetId;
+    targetId.deviceId = fdp.ConsumeRandomLengthString();
+    targetId.brMac = fdp.ConsumeRandomLengthString();
+    targetId.bleMac = fdp.ConsumeRandomLengthString();
+    targetId.wifiIp = fdp.ConsumeRandomLengthString();
+    targetId.wifiPort = fdp.ConsumeIntegral<uint16_t>();
+    targetId.serviceId = fdp.ConsumeIntegral<int64_t>();
+    DeviceManagerImpl::GetInstance().BindServiceTarget(pkgName, targetId, bindParam, callback);
+}
+
+void UnbindServiceTargetTest(const uint8_t *data, size_t size)
+{
+    size_t minLenth = sizeof(int64_t) + 1;
+    if ((data == nullptr) || (size < minLenth)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    int64_t targetId = fdp.ConsumeIntegral<int64_t>();
+    DeviceManagerImpl::GetInstance().UnbindServiceTarget(pkgName, targetId);
+}
 }
 }
 
@@ -359,5 +461,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     OHOS::DistributedHardware::DeviceManagerImplFuzzTest(data, size);
     OHOS::DistributedHardware::GetErrorCodeTest(data, size);
     OHOS::DistributedHardware::SyncCallbacksToServiceFuzzTest(data, size);
+    OHOS::DistributedHardware::RegisterServiceStateCallbackFuzzTest(data, size);
+    OHOS::DistributedHardware::UnRegisterServiceStateCallbackFuzzTest(data, size);
+    OHOS::DistributedHardware::StartServiceDiscoveryFuzzTest(data, size);
+    OHOS::DistributedHardware::StopServiceDiscoveryFuzzTest(data, size);
+    OHOS::DistributedHardware::BindServiceTargetTest(data, size);
+    OHOS::DistributedHardware::UnbindServiceTargetTest(data, size);
     return 0;
 }

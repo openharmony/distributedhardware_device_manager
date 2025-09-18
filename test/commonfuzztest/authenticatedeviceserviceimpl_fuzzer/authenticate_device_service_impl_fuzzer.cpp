@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -111,13 +111,15 @@ void AddPermission()
 
 void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t) + sizeof(int64_t) + 1)) {
         return;
     }
 
     std::string str(reinterpret_cast<const char*>(data), size);
     FuzzedDataProvider fdp(data, size);
     int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
+    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
+    std::string pkgName = fdp.ConsumeRandomLengthString();
     AddPermission();
     DmSubscribeInfo subscribeInfo = {
         .subscribeId = 0,
@@ -154,6 +156,9 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->BindTarget(str, peerTargetId, bindParam);
     deviceManagerServiceImpl->UnRegisterCredentialCallback(str);
     deviceManagerServiceImpl->UnRegisterUiStateCallback(str);
+    deviceManagerServiceImpl->BindServiceTarget(pkgName, peerTargetId, bindParam);
+    deviceManagerServiceImpl->UnbindServiceTarget(pkgName, serviceId);
+    deviceManagerServiceImpl->DeleteAclExtraDataServiceId(serviceId, serviceId, pkgName, bindLevel);
     usleep(USLEEP_TIME_US_5000000);
     deviceManagerServiceImpl->Release();
 }
