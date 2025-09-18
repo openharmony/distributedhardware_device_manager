@@ -26,8 +26,8 @@ class DmPermissionManager {
 public:
     virtual ~DmPermissionManager() = default;
 public:
-    virtual bool CheckPermission() = 0;
-    virtual bool CheckNewPermission() = 0;
+    virtual bool CheckAccessServicePermission() = 0;
+    virtual bool CheckDataSyncPermission() = 0;
     virtual bool CheckProcessNameValidOnPinHolder(const std::string &processName) = 0;
     virtual bool CheckProcessNameValidOnAuthCode(const std::string &processName) = 0;
     virtual int32_t GetCallerProcessName(std::string &processName) = 0;
@@ -43,8 +43,8 @@ public:
 
 class PermissionManagerMock : public DmPermissionManager {
 public:
-    MOCK_METHOD(bool, CheckPermission, ());
-    MOCK_METHOD(bool, CheckNewPermission, ());
+    MOCK_METHOD(bool, CheckAccessServicePermission, ());
+    MOCK_METHOD(bool, CheckDataSyncPermission, ());
     MOCK_METHOD(bool, CheckProcessNameValidOnPinHolder, (const std::string &));
     MOCK_METHOD(bool, CheckProcessNameValidOnAuthCode, (const std::string &));
     MOCK_METHOD(int32_t, GetCallerProcessName, (std::string &));
