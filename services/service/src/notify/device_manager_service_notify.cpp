@@ -42,7 +42,8 @@ const static std::set<DmCommonNotifyEvent> regNotifyEventSet_ = {
 int32_t DeviceManagerServiceNotify::RegisterCallBack(int32_t dmCommonNotifyEvent, const ProcessInfo &processInfo)
 {
     LOGI("start event %{public}d pkgName: %{public}s.", dmCommonNotifyEvent, processInfo.pkgName.c_str());
-    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission() &&
+        !PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission.");
         return ERR_DM_NO_PERMISSION;
     }
