@@ -30,7 +30,7 @@ namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 namespace {
 constexpr const char* DM_SERVICE_ACCESS_PERMISSION = "ohos.permission.ACCESS_SERVICE_DM";
-constexpr const char* DM_SERVICE_ACCESS_NEWPERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
+constexpr const char* DM_DISTRIBUTED_DATASYNC_PERMISSION = "ohos.permission.DISTRIBUTED_DATASYNC";
 constexpr const char* DM_MONITOR_DEVICE_NETWORK_STATE_PERMISSION = "ohos.permission.MONITOR_DEVICE_NETWORK_STATE";
 constexpr const static char* AUTH_CODE_WHITE_LIST[] = {
     "CollaborationFwk",
@@ -102,14 +102,14 @@ constexpr uint32_t GET_TRUSTED_DEVICE_LIST_WHITE_LIST_NUM = std::size(GET_TRUSTE
 constexpr const char* READ_LOCAL_DEVICE_NAME_PERMISSION = "ohos.permission.READ_LOCAL_DEVICE_NAME";
 }
 
-bool PermissionManager::CheckPermission(void)
+bool PermissionManager::CheckAccessServicePermission(void)
 {
     return VerifyAccessTokenByPermissionName(DM_SERVICE_ACCESS_PERMISSION);
 }
 
-bool PermissionManager::CheckNewPermission(void)
+bool PermissionManager::CheckDataSyncPermission(void)
 {
-    return VerifyAccessTokenByPermissionName(DM_SERVICE_ACCESS_NEWPERMISSION);
+    return VerifyAccessTokenByPermissionName(DM_DISTRIBUTED_DATASYNC_PERMISSION);
 }
 
 bool PermissionManager::CheckMonitorPermission(void)
@@ -348,7 +348,6 @@ bool PermissionManager::VerifyAccessTokenByPermissionName(const std::string& per
             return true;
         }
     }
-    LOGE("DM service access is denied, please apply for corresponding permissions");
     return false;
 }
 

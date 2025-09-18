@@ -20,14 +20,14 @@
 namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
-bool PermissionManager::CheckPermission()
+bool PermissionManager::CheckAccessServicePermission()
 {
-    return DmPermissionManager::dmPermissionManager->CheckPermission();
+    return DmPermissionManager::dmPermissionManager->CheckAccessServicePermission();
 }
 
-bool PermissionManager::CheckNewPermission()
+bool PermissionManager::CheckDataSyncPermission()
 {
-    return DmPermissionManager::dmPermissionManager->CheckNewPermission();
+    return DmPermissionManager::dmPermissionManager->CheckDataSyncPermission();
 }
 
 bool PermissionManager::CheckProcessNameValidOnPinHolder(const std::string &processName)

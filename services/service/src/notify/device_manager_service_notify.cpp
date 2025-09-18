@@ -17,6 +17,7 @@
 #include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
+#include "permission_manager.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -41,6 +42,10 @@ const static std::set<DmCommonNotifyEvent> regNotifyEventSet_ = {
 int32_t DeviceManagerServiceNotify::RegisterCallBack(int32_t dmCommonNotifyEvent, const ProcessInfo &processInfo)
 {
     LOGI("start event %{public}d pkgName: %{public}s.", dmCommonNotifyEvent, processInfo.pkgName.c_str());
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
+        LOGE("The caller does not have permission.");
+        return ERR_DM_NO_PERMISSION;
+    }
     if (processInfo.pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;

@@ -302,11 +302,11 @@ ServiceRunningState IpcServerStub::QueryServiceState() const
 
 int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener)
 {
+    LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
     if (processInfo.pkgName.empty() || listener == nullptr) {
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
         return ERR_DM_POINT_NULL;
     }
-    LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
 #ifdef SUPPORT_MEMMGR
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
@@ -345,11 +345,11 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
 
 int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &processInfo)
 {
+    LOGI("In, pkgName: %{public}s", processInfo.pkgName.c_str());
     if (processInfo.pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("In, pkgName: %{public}s", processInfo.pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto listenerIter = dmListener_.find(processInfo);
     if (listenerIter == dmListener_.end()) {
