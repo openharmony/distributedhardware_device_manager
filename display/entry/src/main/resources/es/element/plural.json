@@ -33,7 +33,7 @@
                     "quantity":"one",
                     "value":"No confiar (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]

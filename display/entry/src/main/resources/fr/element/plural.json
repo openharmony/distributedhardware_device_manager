@@ -33,7 +33,7 @@
                     "quantity":"one",
                     "value":"Ne pas faire confiance (%d)",
                     "attr":{
-                        "priority":"translate"
+                        "priority":"LT"
                     }
                 }
             ]
