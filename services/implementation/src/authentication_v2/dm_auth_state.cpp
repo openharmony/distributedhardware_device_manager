@@ -160,12 +160,6 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
     if (context->reason != DM_OK) {
         BindFail(context);
     } else {
-        SetAclInfo(context);
-        if (NeedAgreeAcl(context)) {
-            UpdateCredInfo(context);
-            context->authMessageProcessor->PutAccessControlList(context,
-                context->accessee, context->accesser.deviceId);
-        }
         LOGI("SinkFinish notify online");
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         Crypto::GetUdidHash(context->accesser.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
