@@ -216,7 +216,6 @@ void AuthenticateDeviceFirstFuzzTest(FuzzedDataProvider &fdp)
 
     DeviceManager::GetInstance().InitDeviceManager(str, g_initcallback);
     DeviceManager::GetInstance().RegisterDevStateCallback(str, str, g_stateCallback);
-    DeviceManager::GetInstance().RegisterDevStatusCallback(str, str, g_statusCallback);
     DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(str, g_Uicallback);
     std::string emptyStr = "";
     DeviceManager::GetInstance().RegisterDevStateCallback(emptyStr, str, g_stateCallback);
