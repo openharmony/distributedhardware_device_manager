@@ -49,6 +49,14 @@ public:
     void OnServiceDiscoveryResult(int32_t resReason) override {}
 };
 
+class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
+public:
+    ServiceInfoStateCallbackTest() = default;
+    virtual ~ServiceInfoStateCallbackTest() = default;
+    void OnServiceOnline(int64_t serviceId) override {}
+    void OnServiceOffline(int64_t serviceId) override {}
+};
+
 void StopAuthenticateDeviceTest(const uint8_t *data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -352,7 +360,7 @@ void RegisterServiceStateCallbackFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     std::string pkgName = fdp.ConsumeRandomLengthString();
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
-    std::shared_ptr<ServiceInfoStateCallback> tempCb = std::make_shared<ServiceInfoStateCallback>();
+    std::shared_ptr<ServiceInfoStateCallback> tempCb = std::make_shared<ServiceInfoStateCallbackTest>();
 
     DeviceManagerImpl::GetInstance().RegisterServiceStateCallback(pkgName, serviceId, tempCb);
 }

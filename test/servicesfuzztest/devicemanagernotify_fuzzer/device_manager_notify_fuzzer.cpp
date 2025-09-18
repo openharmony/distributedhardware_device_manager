@@ -54,6 +54,14 @@ public:
     void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
 };
 
+class ServiceInfoStateCallbackTest : public ServiceInfoStateCallback {
+public:
+    ServiceInfoStateCallbackTest() = default;
+    virtual ~ServiceInfoStateCallbackTest() = default;
+    void OnServiceOnline(int64_t serviceId) override {}
+    void OnServiceOffline(int64_t serviceId) override {}
+};
+
 void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0)) {
@@ -142,7 +150,7 @@ void ServiceInfoOnlineFuzzTest(const uint8_t* data, size_t size)
     }
 
     FuzzedDataProvider fdp(data, size);
-    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallback>();
+    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
     std::vector<std::pair<std::shared_ptr<ServiceInfoStateCallback>, int64_t>> callbackInfo;
     while (fdp.remaining_bytes() >= sizeof(int64_t)) {
         int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
@@ -162,7 +170,7 @@ void RegisterServiceStateCallbackFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
 
     std::string key = fdp.ConsumeRandomLengthString(size);
-    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallback>();
+    std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
 
     DeviceManagerNotify::GetInstance().RegisterServiceStateCallback(key, callback);
 }

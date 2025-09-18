@@ -184,6 +184,7 @@ void SetSyncMsgJsonFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < minDataSize)) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     context_->accesser.deviceId = fdp.ConsumeRandomLengthString();
     context_->accessee.userId = fdp.ConsumeIntegral<int32_t>();
     context_->accesser.isCommonFlag = fdp.ConsumeBool();
@@ -226,6 +227,7 @@ void GetAccesseeServiceInfoFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int64_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
     dmAuthMessageProcessor_->GetAccesseeServiceInfo(serviceId);
 }
