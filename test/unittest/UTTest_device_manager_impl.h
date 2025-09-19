@@ -27,9 +27,9 @@
 #include "device_manager_impl.h"
 #include "softbus_error_code.h"
 #include "device_manager_notify_mock.h"
-#include "dm_subscribe_info.h"
 #include "device_manager_notify.h"
 #include "dm_publish_info.h"
+#include "dm_subscribe_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {

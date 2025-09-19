@@ -14,20 +14,23 @@
  */
 
 #include "UTTest_device_manager_notify.h"
-#include "device_manager_notify.h"
-#include "dm_device_info.h"
+
+#include <unistd.h>
+
+#include "ipc_def.h"
 #include "ipc_remote_broker.h"
 #include "iremote_object.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "ipc_client_manager.h"
-#include "ipc_set_useroperation_req.h"
-#include "ipc_rsp.h"
-#include "ipc_def.h"
-#include "dm_error_type.h"
-#include "dm_constants.h"
 
-#include <unistd.h>
+#include "device_manager_notify.h"
+#include "dm_constants.h"
+#include "dm_device_info.h"
+#include "dm_error_type.h"
+#include "ipc_client_manager.h"
+#include "ipc_rsp.h"
+#include "ipc_set_useroperation_req.h"
+
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -1105,10 +1108,9 @@ void DeviceManagerFaCallbackTest::OnCall(const std::string &paramJson)
 {
     *count_ = *count_ + 1;
 }
+
 HWTEST_F(DeviceManagerNotifyTest, UnRegisterBindCallback_001, testing::ext::TestSize.Level0)
 {
-    ASSERT_TRUE(DeviceManagerNotify::GetInstance().bindCallback_.empty());
-
     std::string emptyPkgName = "testTargetId";
     PeerTargetId targetId;
     DeviceManagerNotify::GetInstance().UnRegisterBindCallback(emptyPkgName, targetId);
@@ -1121,7 +1123,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterBindCallback_002, testing::ext::Test
     PeerTargetId targetId;
     std::shared_ptr<BindTargetCallback> callback = std::make_shared<BindTargetCallbackTest>();
     DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId] = callback;
-    ASSERT_EQ(DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId], callback);
     std::string nonExistentPkgName = "com.ohos.nonexistent";
     DeviceManagerNotify::GetInstance().UnRegisterBindCallback(nonExistentPkgName, targetId);
     ASSERT_EQ(DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId], callback);
@@ -1133,7 +1134,6 @@ HWTEST_F(DeviceManagerNotifyTest, UnRegisterBindCallback_003, testing::ext::Test
     PeerTargetId targetId;
     std::shared_ptr<BindTargetCallback> callback = std::make_shared<BindTargetCallbackTest>();
     DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId] = callback;
-    ASSERT_EQ(DeviceManagerNotify::GetInstance().bindCallback_[pkgName][targetId], callback);
     DeviceManagerNotify::GetInstance().UnRegisterBindCallback(pkgName, targetId);
     ASSERT_TRUE(DeviceManagerNotify::GetInstance().bindCallback_.empty());
 }

@@ -28,6 +28,7 @@
 #include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
+#include "ipc_publish_service_info_rsp.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "ipc_set_useroperation_req.h"
@@ -39,7 +40,7 @@
 #include "securec.h"
 #include "token_setproc.h"
 #include "softbus_error_code.h"
-#include "ipc_publish_service_info_rsp.h"
+
 using namespace testing;
 
 namespace OHOS {
@@ -1438,6 +1439,7 @@ HWTEST_F(DeviceManagerImplTest, ExportAuthCode_301, testing::ext::TestSize.Level
     int32_t ret = DeviceManager::GetInstance().ExportAuthCode(authCode);
     ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
 }
+
 HWTEST_F(DeviceManagerImplTest, StartServiceDiscovery_001, testing::ext::TestSize.Level0)
 {
     std::string pkgName = "";

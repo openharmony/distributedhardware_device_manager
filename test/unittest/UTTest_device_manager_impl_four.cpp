@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2022-2025 Huawei Device Co., Ltd.
+* Copyright (c) 2025 Huawei Device Co., Ltd.
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
@@ -14,13 +14,19 @@
 */
 
 #include "UTTest_device_manager_impl.h"
-#include "dm_device_info.h"
 
 #include <memory>
 #include <unistd.h>
+
 #include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "securec.h"
+#include "softbus_error_code.h"
+#include "token_setproc.h"
+
 #include "device_manager_notify.h"
 #include "dm_constants.h"
+#include "dm_device_info.h"
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"
 #include "ipc_get_info_by_network_req.h"
@@ -28,18 +34,15 @@
 #include "ipc_get_local_device_info_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
+#include "ipc_publish_req.h"
+#include "ipc_publish_service_info_rsp.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
 #include "ipc_set_useroperation_req.h"
 #include "ipc_skeleton.h"
-#include "ipc_publish_req.h"
-#include "ipc_unpublish_req.h"
 #include "ipc_unauthenticate_device_req.h"
-#include "nativetoken_kit.h"
-#include "securec.h"
-#include "token_setproc.h"
-#include "softbus_error_code.h"
-#include "ipc_publish_service_info_rsp.h"
+#include "ipc_unpublish_req.h"
+
 using namespace testing;
 namespace OHOS {
 namespace DistributedHardware {
