@@ -3129,6 +3129,7 @@ DM_EXPORT void DeviceProfileConnector::CacheAcerAclId(const DistributedDevicePro
     dmAclIdParam.skId = profile.GetAccesser().GetAccesserSessionKeyId();
     dmAclIdParam.credId = profile.GetAccesser().GetAccesserCredentialIdStr();
     dmAclIdParam.accessControlId = profile.GetAccessControlId();
+    dmAclIdParam.pkgName = profile.GetAccesser().GetAccesserBundleName();
     aclInfos.push_back(dmAclIdParam);
 }
 
@@ -3141,6 +3142,7 @@ DM_EXPORT void DeviceProfileConnector::CacheAceeAclId(const DistributedDevicePro
     dmAclIdParam.skId = profile.GetAccessee().GetAccesseeSessionKeyId();
     dmAclIdParam.credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
     dmAclIdParam.accessControlId = profile.GetAccessControlId();
+    dmAclIdParam.pkgName = profile.GetAccessee().GetAccesseeBundleName();
     aclInfos.push_back(dmAclIdParam);
 }
 

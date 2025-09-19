@@ -309,6 +309,7 @@ private:
     void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
         int32_t &bindLevel);
+    void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
 private:
     std::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
