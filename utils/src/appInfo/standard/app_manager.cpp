@@ -127,19 +127,14 @@ int32_t AppManager::GetAppIdByPkgName(const std::string &pkgName, std::string &a
     LOGD("PkgName %{public}s, userId %{public}d", pkgName.c_str(), userId);
     std::string appIdKey = pkgName + "#" + std::to_string(userId);
     std::lock_guard<std::mutex> lock(appIdMapLock_);
-    if (appIdMap_.find(appIdKey) != appIdMap_.end()) {
-        appId = appIdMap_[appIdKey];
-        return DM_OK;
-    }
-    appId = GetAppId();
-    if (appId.empty()) {
-        LOGD("PkgName %{public}s get appid failed.", pkgName.c_str());
+    if (appIdMap_.find(appIdKey) == appIdMap_.end()) {
+        LOGE("appIdKey %{public}s get appid failed.", appIdKey.c_str());
         return ERR_DM_FAILED;
     }
     LOGI("PkgName %{public}s, userId %{public}d, appId %{public}s.",
         pkgName.c_str(), userId, GetAnonyString(appId).c_str());
     CHECK_SIZE_RETURN(appIdMap_, ERR_DM_FAILED);
-    appIdMap_[appIdKey] = appId;
+    appId = appIdMap_[appIdKey];
     return DM_OK;
 }
 
