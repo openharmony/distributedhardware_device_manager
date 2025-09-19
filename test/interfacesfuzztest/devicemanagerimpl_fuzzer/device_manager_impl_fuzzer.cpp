@@ -148,6 +148,7 @@ void SyncCallbacksToServiceFuzzTest(FuzzedDataProvider &fdp)
     callbackMap[event] = pkgNames;
     DeviceManagerImpl::GetInstance().SyncCallbacksToService(callbackMap);
 }
+
 void DeviceManagerImplFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(uint32_t))) {
