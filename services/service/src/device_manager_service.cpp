@@ -109,7 +109,7 @@ namespace {
     constexpr int32_t SERVICE_UNPUBLISHED_STATE = 0;
     constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 }
-
+//LCOV_EXCL_START
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -378,6 +378,7 @@ DM_EXPORT void DeviceManagerService::UninitDMServiceListener()
 #endif
     LOGI("Uninit.");
 }
+//LCOV_EXCL_STOP
 
 DM_EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {

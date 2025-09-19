@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef IPC_MODEL_CODEC_FUZZER_H
-#define IPC_MODEL_CODEC_FUZZER_H
+#ifndef IPC_MODEL_CODEC_THREE_FUZZER_H
+#define IPC_MODEL_CODEC_THREE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "ipcmodelcodec_fuzzer"
+#define FUZZ_PROJECT_NAME "ipcmodelcodecthree_fuzzer"
 
-#endif // IPC_MODEL_CODEC_FUZZER_H
+#endif // IPC_MODEL_CODEC_THREE_FUZZER_H

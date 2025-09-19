@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 #include <unistd.h>
 
@@ -41,8 +42,8 @@ void RegisterDeviceManagerFaCallbackFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-
-    std::string packageName(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string packageName = fdp.ConsumeRandomLengthString();
     std::shared_ptr<DeviceManagerFaCallbackTest> callback = std::make_shared<DeviceManagerFaCallbackTest>();
 
     DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(packageName, callback);

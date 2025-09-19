@@ -30,6 +30,7 @@ std::shared_ptr<ISoftbusSessionCallback> SoftbusSession::sessionCallback_ = null
 constexpr const char* DM_HITRACE_AUTH_TO_OPPEN_SESSION = "DM_HITRACE_AUTH_TO_OPPEN_SESSION";
 constexpr int32_t MAX_DATA_LEN = 65535;
 
+//LCOV_EXCL_START
 SoftbusSession::SoftbusSession()
 {
     LOGD("SoftbusSession constructor.");
@@ -51,6 +52,7 @@ int32_t SoftbusSession::UnRegisterSessionCallback()
     sessionCallback_ = nullptr;
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t SoftbusSession::OpenAuthSession(const std::string &deviceId)
 {

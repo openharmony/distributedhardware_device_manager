@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 #include "dm_adapter_manager.h"
 #include "dm_adapter_manager_fuzzer.h"
 
@@ -21,11 +23,12 @@ namespace DistributedHardware {
 
 void DmAdapterManagerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string soName(reinterpret_cast<const char*>(data), size);
+    std::string soName = fdp.ConsumeRandomLengthString();
     DmAdapterManager::GetInstance().GetCryptoAdapter(soName);
 }
 }

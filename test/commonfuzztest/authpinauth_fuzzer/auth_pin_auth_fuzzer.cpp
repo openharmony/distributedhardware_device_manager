@@ -33,6 +33,7 @@ void AuthPinAuthFuzzTest(const uint8_t* data, size_t size)
     FreezeProcess freezeProcess;
     FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->srvExtarInfo = fdp.ConsumeRandomLengthString();
     context->transmitData = fdp.ConsumeRandomLengthString();
     context->requestId = fdp.ConsumeIntegral<int64_t>();
     context->accesser.userId = fdp.ConsumeIntegral<int32_t>();

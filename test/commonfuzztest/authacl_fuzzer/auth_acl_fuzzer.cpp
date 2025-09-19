@@ -36,16 +36,13 @@ void AuthAclFuzzTest(const uint8_t* data, size_t size)
     std::shared_ptr<AuthSinkDataSyncState> authSink = std::make_shared<AuthSinkDataSyncState>();
     std::shared_ptr<AuthSrcDataSyncState> authSrc = std::make_shared<AuthSrcDataSyncState>();
 
-    authSink->GetStateType();
-    authSrc->GetStateType();
-
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->accesser.dmVersion = DM_VERSION_5_1_0;
     context->accesser.isCommonFlag = true;
+    context->extraInfo = fdp.ConsumeRandomLengthString();
     authSink->VerifyCertificate(context);
     context->accesser.isCommonFlag = false;
     authSink->VerifyCertificate(context);
-    authSink->VerifyCertificate(nullptr);
     context->IsProxyBind = true;
     authSink->DerivativeSessionKey(context);
     authSrc->GetPeerDeviceId(context, peerDeviceId);

@@ -20,77 +20,42 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-void ToJsonDoubleNLFuzzTest(const uint8_t* data, size_t size)
+void ToJsonDoubleNLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(double)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-
     JsonItemObject itemObject;
     double value = fdp.ConsumeFloatingPoint<double>();
-
     ToJson(itemObject, value);
 }
 
-void ToJsonInt16NLFuzzTest(const uint8_t* data, size_t size)
+void ToJsonInt16NLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(int16_t)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-
     JsonItemObject itemObject;
     int16_t value = fdp.ConsumeIntegral<int16_t>();
-
     ToJson(itemObject, value);
 }
 
-void FromJsonDoubleNLFuzzTest(const uint8_t* data, size_t size)
+void FromJsonDoubleNLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(double) + sizeof(double)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-
     JsonItemObject itemObject;
     double result = fdp.ConsumeFloatingPoint<double>();
-
     double testValue = fdp.ConsumeFloatingPoint<double>();
     ToJson(itemObject, testValue);
     FromJson(itemObject, result);
 }
 
-void FromJsonBoolNLFuzzTest(const uint8_t* data, size_t size)
+void FromJsonBoolNLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(bool) + sizeof(bool)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-
     JsonItemObject itemObject;
     bool result = fdp.ConsumeBool();
-
     bool testValue = fdp.ConsumeBool();
     ToJson(itemObject, testValue);
     FromJson(itemObject, result);
 }
 
-void FromJsonUint8NLFuzzTest(const uint8_t* data, size_t size)
+void FromJsonUint8NLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(int32_t) + sizeof(uint8_t)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-
     JsonItemObject itemObject;
     uint8_t result = fdp.ConsumeIntegral<uint8_t>();
-
     int32_t testValue = fdp.ConsumeIntegralInRange<int32_t>(
         std::numeric_limits<uint8_t>::min(),
         std::numeric_limits<uint8_t>::max());
@@ -98,14 +63,8 @@ void FromJsonUint8NLFuzzTest(const uint8_t* data, size_t size)
     FromJson(itemObject, result);
 }
 
-void FromJsonInt16NLFuzzTest(const uint8_t* data, size_t size)
+void FromJsonInt16NLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(int32_t) + sizeof(int16_t)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-
     JsonItemObject itemObject;
     int16_t result = fdp.ConsumeIntegralInRange<int16_t>(
         std::numeric_limits<int16_t>::min(),
@@ -114,99 +73,74 @@ void FromJsonInt16NLFuzzTest(const uint8_t* data, size_t size)
     int32_t testValue = fdp.ConsumeIntegralInRange<int32_t>(
         std::numeric_limits<int32_t>::min(),
         std::numeric_limits<int32_t>::max());
+    JsonItemObject targetObj = itemObject;
     ToJson(itemObject, testValue);
     FromJson(itemObject, result);
 }
 
-void IsNumberNLFuzzTest(const uint8_t* data, size_t size)
+void PushBackDoubleNLFuzzTest(FuzzedDataProvider &fdp)
 {
-    (void)data;
-    (void)size;
-    JsonItemObject object;
-    object.IsNumber();
-}
-
-void JsonItemObjectAssignmentNLFuzzTest(const uint8_t* data, size_t size)
-{
-    (void)data;
-    (void)size;
-    JsonItemObject sourceObj;
-    JsonItemObject targetObj = sourceObj;
-}
-
-void PushBackDoubleNLFuzzTest(const uint8_t* data, size_t size)
-{
-    if (data == nullptr || size < sizeof(double)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     JsonItemObject object;
 
     double value = fdp.ConsumeFloatingPoint<double>();
     object.PushBack(value);
 }
 
-void PushBackInt64NLFuzzTest(const uint8_t* data, size_t size)
+void PushBackInt64NLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(int64_t)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     JsonItemObject object;
 
     int64_t value = fdp.ConsumeIntegral<int64_t>();
     object.PushBack(value);
 }
 
-void PushBackStringNLFuzzTest(const uint8_t* data, size_t size)
+void PushBackStringNLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size == 0) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     JsonItemObject object;
 
     std::string value = fdp.ConsumeRandomLengthString();
     object.PushBack(value);
 }
 
-void GetToDoubleNLFuzzTest(const uint8_t* data, size_t size)
+void GetToDoubleNLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(double)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     JsonItemObject object;
     double value = fdp.ConsumeFloatingPoint<double>();
     object.GetTo(value);
 }
 
-void GetToUint32NLFuzzTest(const uint8_t* data, size_t size)
+void GetToUint32NLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(uint32_t)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     JsonItemObject object;
     uint32_t value = fdp.ConsumeIntegral<uint32_t>();
     object.GetTo(value);
 }
 
-void GetToBoolNLFuzzTest(const uint8_t* data, size_t size)
+void GetToBoolNLFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr || size < sizeof(bool)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     JsonItemObject object;
     bool value = fdp.ConsumeBool();
     object.GetTo(value);
+}
+
+void JsonObjectNlohmannjsonFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    ToJsonDoubleNLFuzzTest(fdp);
+    ToJsonInt16NLFuzzTest(fdp);
+    FromJsonDoubleNLFuzzTest(fdp);
+    FromJsonBoolNLFuzzTest(fdp);
+    FromJsonUint8NLFuzzTest(fdp);
+    FromJsonInt16NLFuzzTest(fdp);
+    PushBackDoubleNLFuzzTest(fdp);
+    PushBackInt64NLFuzzTest(fdp);
+    PushBackStringNLFuzzTest(fdp);
+    GetToDoubleNLFuzzTest(fdp);
+    GetToUint32NLFuzzTest(fdp);
+    GetToBoolNLFuzzTest(fdp);
 }
 }
 }
@@ -215,20 +149,6 @@ void GetToBoolNLFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::ToJsonDoubleNLFuzzTest(data, size);
-    OHOS::DistributedHardware::ToJsonInt16NLFuzzTest(data, size);
-    OHOS::DistributedHardware::FromJsonDoubleNLFuzzTest(data, size);
-    OHOS::DistributedHardware::FromJsonBoolNLFuzzTest(data, size);
-    OHOS::DistributedHardware::FromJsonUint8NLFuzzTest(data, size);
-    OHOS::DistributedHardware::FromJsonInt16NLFuzzTest(data, size);
-    OHOS::DistributedHardware::IsNumberNLFuzzTest(data, size);
-    OHOS::DistributedHardware::JsonItemObjectAssignmentNLFuzzTest(data, size);
-    OHOS::DistributedHardware::PushBackDoubleNLFuzzTest(data, size);
-    OHOS::DistributedHardware::PushBackInt64NLFuzzTest(data, size);
-    OHOS::DistributedHardware::PushBackStringNLFuzzTest(data, size);
-    OHOS::DistributedHardware::GetToDoubleNLFuzzTest(data, size);
-    OHOS::DistributedHardware::GetToUint32NLFuzzTest(data, size);
-    OHOS::DistributedHardware::GetToBoolNLFuzzTest(data, size);
-
+    OHOS::DistributedHardware::JsonObjectNlohmannjsonFuzzTest(data, size);
     return 0;
 }

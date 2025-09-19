@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 
 #include "device_manager_impl.h"
@@ -26,11 +27,12 @@ namespace OHOS {
 namespace DistributedHardware {
 void UnRegisterDeviceManagerFaCallbackFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string packName(reinterpret_cast<const char*>(data), size);
+    std::string packName = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(packName);

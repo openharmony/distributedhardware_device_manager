@@ -36,15 +36,11 @@ namespace {
     constexpr uint32_t USERFIRSTID = 40;
 }
 
-void DmTransPortMsgFuzzTest(const uint8_t* data, size_t size)
+void DmTransPortMsgFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t code = fdp.ConsumeIntegral<int32_t>();
-    std::string msg(reinterpret_cast<const char*>(data), size);
-    std::string remoteUdid(reinterpret_cast<const char*>(data), size);
+    std::string msg = fdp.ConsumeRandomLengthString();
+    std::string remoteUdid = fdp.ConsumeRandomLengthString();
     const char* jsonString = R"({
         "MsgType": "0",
         "userId": "12345",
@@ -63,11 +59,13 @@ void DmTransPortMsgFuzzTest(const uint8_t* data, size_t size)
     foregroundUserIds.push_back(FORUSERID);
     std::vector<uint32_t> backgroundUserIds;
     backgroundUserIds.push_back(BACKUSERID);
+    backgroundUserIds.push_back(fdp.ConsumeIntegral<uint32_t>());
     UserIdsMsg userIdsMsg(foregroundUserIds, backgroundUserIds, true);
     CommMsg commMsg(code, msg);
     std::vector<uint32_t> userIds;
     userIds.push_back(USERID);
     userIds.push_back(USERFIRSTID);
+    userIds.push_back(fdp.ConsumeIntegral<uint32_t>());
     NotifyUserIds notifyUserIds(remoteUdid, userIds);
     ToJson(jsonObject, userIdsMsg);
     FromJson(jsonObject, userIdsMsg);
@@ -87,15 +85,11 @@ void DmTransPortMsgFuzzTest(const uint8_t* data, size_t size)
     cJSON_Delete(jsonObject);
 }
 
-void DmTransPortMsgFirstFuzzTest(const uint8_t* data, size_t size)
+void DmTransPortMsgFirstFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t code = fdp.ConsumeIntegral<int32_t>();
-    std::string msg(reinterpret_cast<const char*>(data), size);
-    std::string remoteUdid(reinterpret_cast<const char*>(data), size);
+    std::string msg = fdp.ConsumeRandomLengthString();
+    std::string remoteUdid = fdp.ConsumeRandomLengthString();
     const char* jsonString = R"({
         "accountId": "a******3",
         "userId": 123,
@@ -105,12 +99,15 @@ void DmTransPortMsgFirstFuzzTest(const uint8_t* data, size_t size)
     })";
     cJSON* jsonObject = nullptr;
     LogoutAccountMsg accountInfo;
+    accountInfo.accountId = fdp.ConsumeRandomLengthString();
     ToJson(jsonObject, accountInfo);
     FromJson(jsonObject, accountInfo);
     UninstAppMsg uninstAppMsg;
+    uninstAppMsg.userId_ = fdp.ConsumeIntegral<int32_t>();
     ToJson(jsonObject, uninstAppMsg);
     FromJson(jsonObject, uninstAppMsg);
     UnBindAppMsg unBindAppMsg;
+    unBindAppMsg.extra_ = fdp.ConsumeRandomLengthString();
     ToJson(jsonObject, unBindAppMsg);
     FromJson(jsonObject, unBindAppMsg);
 
@@ -130,7 +127,11 @@ void DmTransPortMsgFirstFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DmTransPortMsgFuzzTest(data, size);
-    OHOS::DistributedHardware::DmTransPortMsgFirstFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DmTransPortMsgFuzzTest(fdp);
+    OHOS::DistributedHardware::DmTransPortMsgFirstFuzzTest(fdp);
     return 0;
 }
