@@ -118,8 +118,6 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     std::string str(reinterpret_cast<const char*>(data), size);
     FuzzedDataProvider fdp(data, size);
     int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
-    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
-    std::string pkgName = fdp.ConsumeRandomLengthString();
     AddPermission();
     DmSubscribeInfo subscribeInfo = {
         .subscribeId = 0,
@@ -156,6 +154,25 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     deviceManagerServiceImpl->BindTarget(str, peerTargetId, bindParam);
     deviceManagerServiceImpl->UnRegisterCredentialCallback(str);
     deviceManagerServiceImpl->UnRegisterUiStateCallback(str);
+    usleep(USLEEP_TIME_US_5000000);
+    deviceManagerServiceImpl->Release();
+}
+
+void AuthenticateDeviceServiceImplOneFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t) + sizeof(int64_t) + 1)) {
+        return;
+    }
+
+    FuzzedDataProvider fdp(data, size);
+    int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
+    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    AddPermission();
+    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
+
+    deviceManagerServiceImpl->Initialize(listener);
     deviceManagerServiceImpl->BindServiceTarget(pkgName, peerTargetId, bindParam);
     deviceManagerServiceImpl->UnbindServiceTarget(pkgName, serviceId);
     deviceManagerServiceImpl->DeleteAclExtraDataServiceId(serviceId, serviceId, pkgName, bindLevel);
@@ -170,6 +187,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::AuthenticateDeviceServiceImplFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceServiceImplOneFuzzTest(data, size);
 
     return 0;
 }
