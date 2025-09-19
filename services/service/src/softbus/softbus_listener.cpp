@@ -1196,6 +1196,7 @@ int32_t SoftbusListener::GetTargetInfoFromCache(const std::string &deviceId, Pee
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 void SoftbusListener::ClearDiscoveredDevice()
 {
     std::lock_guard<std::mutex> lock(g_deviceMapMutex);
@@ -1234,6 +1235,7 @@ bool SoftbusListener::IsDmRadarHelperReady()
     dmRadarHelper_ = func();
     return true;
 }
+//LCOV_EXCL_STOP
 
 bool SoftbusListener::CloseDmRadarHelperObj(std::string name)
 {

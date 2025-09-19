@@ -21,23 +21,24 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerServiceFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    int sessionId = *(reinterpret_cast<const int*>(data));
-    std::string inputStr(reinterpret_cast<const char*>(data), size);
-    std::string retStr;
+    int sessionId = fdp.ConsumeIntegral<int32_t>();
+    std::string inputStr = fdp.ConsumeRandomLengthString();
+    std::string retStr = fdp.ConsumeRandomLengthString();
     DmPinType pinType = DmPinType::QR_CODE;
     uint16_t subscribeId = 12;
     int32_t publishId = 14;
     DmDeviceInfo info;
+    info.extraData = fdp.ConsumeRandomLengthString();
     PeerTargetId targetId;
     DmSubscribeInfo subscribeInfo;
     subscribeInfo.subscribeId = 1;
     DmPublishInfo publishInfo;
     std::map<std::string, std::string> parametricMap;
+    uint32_t pinSize = fdp.ConsumeIntegral<uint32_t>();
+    std::vector<uint8_t> pinData = fdp.ConsumeBytes<uint8_t>(pinSize);
+    const void *pinDataPtr = pinData.data();
 
     DeviceManagerService::GetInstance().PublishDeviceDiscovery(inputStr, publishInfo);
     DeviceManagerService::GetInstance().RequestCredential(inputStr, inputStr);
@@ -59,7 +60,7 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().CreatePinHolder(inputStr, targetId, pinType, inputStr);
     DeviceManagerService::GetInstance().DestroyPinHolder(inputStr, targetId, pinType, inputStr);
     DeviceManagerService::GetInstance().OnPinHolderSessionOpened(sessionId, sessionId);
-    DeviceManagerService::GetInstance().OnPinHolderBytesReceived(sessionId, data, size);
+    DeviceManagerService::GetInstance().OnPinHolderBytesReceived(sessionId, pinDataPtr, pinSize);
     DeviceManagerService::GetInstance().OnPinHolderSessionClosed(sessionId);
     DeviceManagerService::GetInstance().ImportCredential(inputStr, inputStr);
     DeviceManagerService::GetInstance().DeleteCredential(inputStr, inputStr);
@@ -70,14 +71,8 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().GetLocalDeviceName(retStr);
 }
 
-void StartServiceDiscoveryFuzzTest(const uint8_t* data, size_t size)
+void StartServiceDiscoveryFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t maxStringLength = 64;
-    if ((data == nullptr) || (size < maxStringLength)) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
-
     std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
     DiscoveryServiceParam discParam;
     discParam.serviceType = fdp.ConsumeRandomLengthString(maxStringLength);
@@ -89,13 +84,8 @@ void StartServiceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().StartServiceDiscovery(pkgName, discParam);
 }
 
-void StopServiceDiscoveryFuzzTest(const uint8_t* data, size_t size)
+void StopServiceDiscoveryFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t maxStringLength = 64;
-    if ((data == nullptr) || (size < maxStringLength)) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
     int32_t discServiceId = fdp.ConsumeIntegral<int32_t>();
 
@@ -105,19 +95,8 @@ void StopServiceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().StopServiceDiscovery(pkgName, discServiceId);
 }
 
-void DeviceManagerServiceTwoFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerServiceTwoFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t intCount = 8;
-    int32_t int32Count = 8;
-    int32_t int64Count = 6;
-    int32_t uint16Count = 1;
-    int32_t uint32Count = 1;
-    const size_t minSize = sizeof(int) * intCount + sizeof(int32_t) * int32Count + sizeof(int64_t) * int64Count +
-        sizeof(uint16_t) * uint16Count + sizeof(uint32_t) * uint32Count;
-        if ((data == nullptr) || (size < minSize)) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
     int64_t internalServiceId = fdp.ConsumeIntegral<int64_t>();
     PublishServiceParam publishServiceParam;
@@ -163,10 +142,14 @@ void DeviceManagerServiceTwoFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceManagerServiceFuzzTest(data, size);
-    OHOS::DistributedHardware::StartServiceDiscoveryFuzzTest(data, size);
-    OHOS::DistributedHardware::StopServiceDiscoveryFuzzTest(data, size);
-    OHOS::DistributedHardware::DeviceManagerServiceTwoFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DeviceManagerServiceFuzzTest(fdp);
+    OHOS::DistributedHardware::StartServiceDiscoveryFuzzTest(fdp);
+    OHOS::DistributedHardware::StopServiceDiscoveryFuzzTest(fdp);
+    OHOS::DistributedHardware::DeviceManagerServiceTwoFuzzTest(fdp);
 
     return 0;
 }

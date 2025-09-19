@@ -60,15 +60,14 @@ void OnErrorFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int64_t) + sizeof(int) + sizeof(int))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
 
     std::shared_ptr<HiChainConnector> hichainConnector = std::make_shared<HiChainConnector>();
-    hichainConnector->RegisterHiChainCallback(std::make_shared<HiChainConnectorCallbackTest>());
 
-    FuzzedDataProvider fdp(data, size);
     int64_t requestId = fdp.ConsumeIntegral<int64_t>();
     int operationCode = fdp.ConsumeIntegral<int>();
     int errorCode = fdp.ConsumeIntegral<int>();
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
     const char *returnData = str.data();
     hichainConnector->onError(requestId, operationCode, errorCode, returnData);
 }

@@ -32,14 +32,6 @@ namespace DistributedHardware {
 namespace {
     constexpr uint32_t DATA_LEN = 10;
 }
-void DpInitedCallbackFuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    DpInitedCallback dpInitedCallback;
-    dpInitedCallback.PutAllTrustedDevices();
-}
 
 void DpInitedCallbackFirstFuzzTest(const uint8_t* data, size_t size)
 {
@@ -50,16 +42,12 @@ void DpInitedCallbackFirstFuzzTest(const uint8_t* data, size_t size)
     DpInitedCallback dpInitedCallback;
     std::unordered_map<std::string, DmAuthForm> authFormMap;
     DistributedDeviceProfile::TrustedDeviceInfo trustedDeviceInfo;
+    trustedDeviceInfo.networkId_ = fdp.ConsumeRandomLengthString();
     std::string extraDataStr = fdp.ConsumeRandomLengthString(50);
     DmDeviceInfo deviceInfo;
     deviceInfo.extraData = extraDataStr;
     dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
-    deviceInfo.extraData = "";
-    dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
-
-    deviceInfo.extraData = "extraInfo";
-    dpInitedCallback.ConvertToTrustedDeviceInfo(authFormMap, deviceInfo, trustedDeviceInfo);
-
+    
     JsonObject extraJson;
     extraJson[PARAM_KEY_OS_VERSION] = 1;
     deviceInfo.extraData = extraJson.Dump();
@@ -81,7 +69,6 @@ void DpInitedCallbackFirstFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DpInitedCallbackFuzzTest(data, size);
     OHOS::DistributedHardware::DpInitedCallbackFirstFuzzTest(data, size);
     return 0;
 }

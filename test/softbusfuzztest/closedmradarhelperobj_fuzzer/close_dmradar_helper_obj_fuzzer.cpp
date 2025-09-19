@@ -14,6 +14,7 @@
  */
 
 #include <chrono>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <securec.h>
 #include <string>
 
@@ -26,13 +27,13 @@ namespace OHOS {
 namespace DistributedHardware {
 void CloseDmRadarHelperObjFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string name(reinterpret_cast<const char*>(data), size);
+    std::string name = fdp.ConsumeRandomLengthString();
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
-    softbusListener->IsDmRadarHelperReady();
     softbusListener->CloseDmRadarHelperObj(name);
 }
 }

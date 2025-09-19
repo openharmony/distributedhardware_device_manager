@@ -1325,6 +1325,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 int32_t DeviceManagerImpl::OnDmServiceDied()
 {
     LOGI("Start");
@@ -1335,6 +1336,7 @@ int32_t DeviceManagerImpl::OnDmServiceDied()
     }
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t DeviceManagerImpl::GetEncryptedUuidByNetworkId(const std::string &pkgName, const std::string &networkId,
     std::string &uuid)

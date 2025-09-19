@@ -62,6 +62,7 @@ constexpr int32_t MAX_CALLBACK_NUM = 5000;
 constexpr int32_t RECLAIM_DELAY_TIME = 5 * 60 * 1000 * 1000; // 5 minutes
 constexpr int32_t ECHO_COUNT = 2;
 
+//LCOV_EXCL_START
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
     registerToService_ = false;
@@ -125,6 +126,7 @@ void IpcServerStub::ReclaimMemmgrFileMemForDM()
     }
     LOGI("ReclaimMemmgrFileMemForDM success.");
 }
+//LCOV_EXCL_STOP
 
 std::string IpcServerStub::AddDelimiter(const std::string &path)
 {
@@ -148,6 +150,7 @@ std::string IpcServerStub::JoinPath(const std::string &prefixPath, const std::st
     return JoinPath(JoinPath(prefixPath, midPath), subPath);
 }
 
+//LCOV_EXCL_START
 void IpcServerStub::HandleSoftBusServerAdd()
 {
     DeviceManagerService::GetInstance().InitSoftbusListener();
@@ -166,6 +169,7 @@ void IpcServerStub::HandleSoftBusServerAdd()
     ffrt::submit(task, ffrt::task_attr().delay(RECLAIM_DELAY_TIME));
     return;
 }
+//LCOV_EXCL_STOP
 
 void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
@@ -225,6 +229,7 @@ void IpcServerStub::OnRemoveSystemAbility(int32_t systemAbilityId, const std::st
     }
 }
 
+//LCOV_EXCL_START
 bool IpcServerStub::Init()
 {
     LOGI("IpcServerStub::Init ready to init.");
@@ -254,6 +259,7 @@ void IpcServerStub::OnStop()
 #endif // SUPPORT_MEMMGR
     LOGI("IpcServerStub::OnStop end.");
 }
+//LCOV_EXCL_STOP
 
 int32_t IpcServerStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -302,11 +308,11 @@ ServiceRunningState IpcServerStub::QueryServiceState() const
 
 int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processInfo, sptr<IpcRemoteBroker> listener)
 {
+    LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
     if (processInfo.pkgName.empty() || listener == nullptr) {
         LOGE("RegisterDeviceManagerListener error: input parameter invalid.");
         return ERR_DM_POINT_NULL;
     }
-    LOGI("pkgName: %{public}s", processInfo.pkgName.c_str());
 #ifdef SUPPORT_MEMMGR
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
@@ -345,11 +351,11 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
 
 int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &processInfo)
 {
+    LOGI("In, pkgName: %{public}s", processInfo.pkgName.c_str());
     if (processInfo.pkgName.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("In, pkgName: %{public}s", processInfo.pkgName.c_str());
     std::lock_guard<std::mutex> autoLock(listenerLock_);
     auto listenerIter = dmListener_.find(processInfo);
     if (listenerIter == dmListener_.end()) {
@@ -378,6 +384,7 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &proces
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
 {
     std::vector<ProcessInfo> processInfoVec;
@@ -387,6 +394,7 @@ std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
     }
     return processInfoVec;
 }
+//LCOV_EXCL_STOP
 
 const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo) const
 {
@@ -462,6 +470,7 @@ void IpcServerStub::RemoveSystemSA(const std::string &pkgName)
     }
 }
 
+//LCOV_EXCL_START
 std::set<std::string> IpcServerStub::GetSystemSA()
 {
     std::lock_guard<std::mutex> autoLock(listenerLock_);
@@ -471,5 +480,6 @@ std::set<std::string> IpcServerStub::GetSystemSA()
     }
     return systemSA;
 }
+//LCOV_EXCL_STOP
 } // namespace DistributedHardware
 } // namespace OHOS

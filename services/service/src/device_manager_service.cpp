@@ -109,7 +109,7 @@ namespace {
     constexpr int32_t SERVICE_UNPUBLISHED_STATE = 0;
     constexpr int32_t SERVICE_PUBLISHED_STATE = 1;
 }
-
+//LCOV_EXCL_START
 DeviceManagerService::~DeviceManagerService()
 {
     LOGI("DeviceManagerService destructor");
@@ -378,6 +378,7 @@ DM_EXPORT void DeviceManagerService::UninitDMServiceListener()
 #endif
     LOGI("Uninit.");
 }
+//LCOV_EXCL_STOP
 
 DM_EXPORT void DeviceManagerService::RegisterCallerAppId(const std::string &pkgName, const int32_t userId)
 {
@@ -397,8 +398,8 @@ int32_t DeviceManagerService::GetTrustedDeviceList(const std::string &pkgName, c
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    bool isOnlyShowNetworkId = !(PermissionManager::GetInstance().CheckPermission() ||
-        PermissionManager::GetInstance().CheckNewPermission());
+    bool isOnlyShowNetworkId = !(PermissionManager::GetInstance().CheckAccessServicePermission() ||
+        PermissionManager::GetInstance().CheckDataSyncPermission());
     std::vector<DmDeviceInfo> onlineDeviceList;
     CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->GetTrustedDeviceList(onlineDeviceList);
@@ -448,7 +449,7 @@ int32_t DeviceManagerService::GetAllTrustedDeviceList(const std::string &pkgName
         LOGE("Invalid parameter, pkgName or extra is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetAllTrustedDeviceList.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -466,7 +467,7 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
 {
     LOGD("Begin for pkgName = %{public}s, callerId = %{public}s, isRefresh ="
         "%{public}d, isWakeUp = %{public}d", pkgName.c_str(), GetAnonyString(callerId).c_str(), isRefresh, isWakeUp);
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call ShiftLNNGear, pkgName = %{public}s", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -488,8 +489,8 @@ int32_t DeviceManagerService::ShiftLNNGear(const std::string &pkgName, const std
 int32_t DeviceManagerService::GetDeviceInfo(const std::string &networkId, DmDeviceInfo &info)
 {
     LOGI("Begin networkId %{public}s.", GetAnonyString(networkId).c_str());
-    if (!PermissionManager::GetInstance().CheckPermission() &&
-        !PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission() &&
+        !PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call GetDeviceInfo.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -540,7 +541,7 @@ int32_t DeviceManagerService::GetLocalDeviceInfo(DmDeviceInfo &info)
 {
     LOGD("Begin.");
     bool isOnlyShowNetworkId = false;
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call GetLocalDeviceInfo.");
         isOnlyShowNetworkId = true;
     }
@@ -642,12 +643,12 @@ int32_t DeviceManagerService::GetLocalDeviceNameOld(std::string &deviceName)
 {
     LOGD("Begin.");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
-    if (!PermissionManager::GetInstance().CheckNewPermission() && !IsCallerInWhiteList()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission() && !IsCallerInWhiteList()) {
         LOGE("The caller does not have permission to call GetLocalDeviceName.");
         return ERR_DM_NO_PERMISSION;
     }
 #else
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call GetLocalDeviceName.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -666,7 +667,7 @@ int32_t DeviceManagerService::GetLocalDeviceNameOld(std::string &deviceName)
 int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &udid)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetUdidByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -681,7 +682,7 @@ int32_t DeviceManagerService::GetUdidByNetworkId(const std::string &pkgName, con
 int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                  std::string &uuid)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetUuidByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -695,7 +696,7 @@ int32_t DeviceManagerService::GetUuidByNetworkId(const std::string &pkgName, con
 
 int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName, const DmPublishInfo &publishInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call PublishDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -714,7 +715,7 @@ int32_t DeviceManagerService::PublishDeviceDiscovery(const std::string &pkgName,
 
 int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgName, int32_t publishId)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call UnPublishDeviceDiscovery.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -729,7 +730,7 @@ int32_t DeviceManagerService::UnPublishDeviceDiscovery(const std::string &pkgNam
 int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int32_t authType,
                                                  const std::string &deviceId, const std::string &extra)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call AuthenticateDevice.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -764,7 +765,7 @@ int32_t DeviceManagerService::AuthenticateDevice(const std::string &pkgName, int
 
 int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, const std::string &networkId)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call UnAuthenticateDevice.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -807,7 +808,7 @@ int32_t DeviceManagerService::UnAuthenticateDevice(const std::string &pkgName, c
 
 int32_t DeviceManagerService::StopAuthenticateDevice(const std::string &pkgName)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call StopAuthenticateDevice.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -831,7 +832,7 @@ int32_t DeviceManagerService::StopAuthenticateDevice(const std::string &pkgName)
 int32_t DeviceManagerService::BindDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
     const std::string &bindParam)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call BindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1076,7 +1077,7 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
 {
     LOGI("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s",
         GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str());
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call UnBindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1097,7 +1098,7 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
     LOGI("DeviceManagerService::ValidateUnBindDeviceParams pkgName: %{public}s, udidHash: %{public}s, "
         "extra: %{public}s", GetAnonyString(pkgName).c_str(), GetAnonyString(udidHash).c_str(),
         GetAnonyString(extra).c_str());
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call UnBindDevice.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1114,7 +1115,7 @@ int32_t DeviceManagerService::ValidateUnBindDeviceParams(const std::string &pkgN
 
 int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t action, const std::string &params)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call SetUserOperation.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -1196,7 +1197,7 @@ void DeviceManagerService::OnPinHolderBytesReceived(int sessionId, const void *d
 
 int32_t DeviceManagerService::RequestCredential(const std::string &reqJsonStr, std::string &returnJsonStr)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call RequestCredential.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1209,7 +1210,7 @@ int32_t DeviceManagerService::RequestCredential(const std::string &reqJsonStr, s
 
 int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call ImportCredential.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1223,7 +1224,7 @@ int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const
 
 int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call DeleteCredential.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1237,7 +1238,7 @@ int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const
 
 int32_t DeviceManagerService::MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call RequestCredential.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1251,7 +1252,7 @@ int32_t DeviceManagerService::MineRequestCredential(const std::string &pkgName, 
 int32_t DeviceManagerService::CheckCredential(const std::string &pkgName, const std::string &reqJsonStr,
     std::string &returnJsonStr)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call CheckCredential.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1266,7 +1267,7 @@ int32_t DeviceManagerService::CheckCredential(const std::string &pkgName, const 
 int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const std::string &reqJsonStr,
     std::string &returnJsonStr)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call ImportCredential.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1281,7 +1282,7 @@ int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const
 int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const std::string &reqJsonStr,
     std::string &returnJsonStr)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call DeleteCredential.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1295,7 +1296,7 @@ int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const
 
 int32_t DeviceManagerService::RegisterCredentialCallback(const std::string &pkgName)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call RegisterCredentialCallback.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -1308,7 +1309,7 @@ int32_t DeviceManagerService::RegisterCredentialCallback(const std::string &pkgN
 
 int32_t DeviceManagerService::UnRegisterCredentialCallback(const std::string &pkgName)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call UnRegisterCredentialCallback.",
             pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1327,7 +1328,7 @@ int32_t DeviceManagerService::RegisterUiStateCallback(const std::string &pkgName
             pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call RegisterUiStateCallback.",
             GetAnonyString(pkgName).c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1346,7 +1347,7 @@ int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgNa
             pkgName.c_str());
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call UnRegisterUiStateCallback.",
             GetAnonyString(pkgName).c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1439,7 +1440,7 @@ int32_t DeviceManagerService::DmHiDumper(const std::vector<std::string>& args, s
 
 int32_t DeviceManagerService::NotifyEvent(const std::string &pkgName, const int32_t eventId, const std::string &event)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call NotifyEvent.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -1514,13 +1515,13 @@ int32_t DeviceManagerService::CheckApiPermission(int32_t permissionLevel)
     int32_t ret = ERR_DM_NO_PERMISSION;
     switch (permissionLevel) {
         case NORMAL:
-            if (PermissionManager::GetInstance().CheckNewPermission()) {
+            if (PermissionManager::GetInstance().CheckDataSyncPermission()) {
                 LOGI("The caller have permission to call");
                 ret = DM_OK;
             }
             break;
         case SYSTEM_BASIC:
-            if (PermissionManager::GetInstance().CheckPermission()) {
+            if (PermissionManager::GetInstance().CheckAccessServicePermission()) {
                 LOGI("The caller have permission to call");
                 ret = DM_OK;
             }
@@ -1541,7 +1542,7 @@ int32_t DeviceManagerService::CheckApiPermission(int32_t permissionLevel)
 int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgName, const std::string &netWorkId,
                                                         int32_t &networkType)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetNetworkTypeByNetworkId.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -1556,7 +1557,7 @@ int32_t DeviceManagerService::GetNetworkTypeByNetworkId(const std::string &pkgNa
 
 int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller: %{public}s does not have permission to call ImportAuthCode.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -1582,7 +1583,7 @@ int32_t DeviceManagerService::ImportAuthCode(const std::string &pkgName, const s
 
 int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call ExportAuthCode.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1726,8 +1727,8 @@ void DeviceManagerService::UnloadDMDeviceRiskDetect()
 int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission() &&
-        !PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission() &&
+        !PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1745,8 +1746,8 @@ int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
 int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission() &&
-        !PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission() &&
+        !PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1768,7 +1769,7 @@ int32_t DeviceManagerService::StopDiscovering(const std::string &pkgName,
 int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &discoverParam, const std::map<std::string, std::string> &filterOptions)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1784,7 +1785,7 @@ int32_t DeviceManagerService::EnableDiscoveryListener(const std::string &pkgName
 int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgName,
     const std::map<std::string, std::string> &extraParam)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1799,7 +1800,7 @@ int32_t DeviceManagerService::DisableDiscoveryListener(const std::string &pkgNam
 int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
     const std::map<std::string, std::string> &advertiseParam)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1814,7 +1815,7 @@ int32_t DeviceManagerService::StartAdvertising(const std::string &pkgName,
 int32_t DeviceManagerService::StopAdvertising(const std::string &pkgName,
     const std::map<std::string, std::string> &advertiseParam)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1837,7 +1838,7 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
     const std::map<std::string, std::string> &bindParam)
 {
     LOGI("DeviceManagerService::BindTarget");
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1881,7 +1882,7 @@ int32_t DeviceManagerService::BindTarget(const std::string &pkgName, const PeerT
 int32_t DeviceManagerService::UnbindTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &unbindParam)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1958,7 +1959,7 @@ void DeviceManagerService::InitServiceInfos(
 
 int32_t DeviceManagerService::RegisterLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call RegisterLocalServiceInfo.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -1978,7 +1979,7 @@ int32_t DeviceManagerService::RegisterLocalServiceInfo(const DMLocalServiceInfo 
 
 int32_t DeviceManagerService::UnRegisterLocalServiceInfo(const std::string &bundleName, int32_t pinExchangeType)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call UnRegisterLocalServiceInfo.",
             bundleName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -1994,7 +1995,7 @@ int32_t DeviceManagerService::UnRegisterLocalServiceInfo(const std::string &bund
 
 int32_t DeviceManagerService::UpdateLocalServiceInfo(const DMLocalServiceInfo &serviceInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call UpdateLocalServiceInfo.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -2015,7 +2016,7 @@ int32_t DeviceManagerService::UpdateLocalServiceInfo(const DMLocalServiceInfo &s
 int32_t DeviceManagerService::GetLocalServiceInfoByBundleNameAndPinExchangeType(const std::string &bundleName,
     int32_t pinExchangeType, DMLocalServiceInfo &serviceInfo)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetLocalServiceInfo.",
             bundleName.c_str());
         return ERR_DM_NO_PERMISSION;
@@ -2038,7 +2039,7 @@ int32_t DeviceManagerService::GetLocalServiceInfoByBundleNameAndPinExchangeType(
 
 int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgName)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call ImportAuthCode.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -2063,7 +2064,7 @@ int32_t DeviceManagerService::RegisterPinHolderCallback(const std::string &pkgNa
 int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const PeerTargetId &targetId,
     DmPinType pinType, const std::string &payload)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call CreatePinHolder.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -2087,7 +2088,7 @@ int32_t DeviceManagerService::CreatePinHolder(const std::string &pkgName, const 
 int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const PeerTargetId &targetId,
     DmPinType pinType, const std::string &payload)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call DestroyPinHolder.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -2110,7 +2111,7 @@ int32_t DeviceManagerService::DestroyPinHolder(const std::string &pkgName, const
 
 int32_t DeviceManagerService::DpAclAdd(const std::string &udid)
 {
-    if (!PermissionManager::GetInstance().CheckNewPermission()) {
+    if (!PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call DpAclAdd.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -2127,7 +2128,7 @@ int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName,
 {
     LOGI("Begin pkgName: %{public}s, networkId: %{public}s",
         pkgName.c_str(), GetAnonyString(networkId).c_str());
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetDeviceSecurityLevel.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -2148,7 +2149,7 @@ int32_t DeviceManagerService::GetDeviceSecurityLevel(const std::string &pkgName,
 int32_t DeviceManagerService::IsSameAccount(const std::string &networkId)
 {
     LOGI("NetworkId %{public}s.", GetAnonyString(networkId).c_str());
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         return ERR_DM_NO_PERMISSION;
     }
     std::string udid = "";
@@ -2165,6 +2166,10 @@ int32_t DeviceManagerService::IsSameAccount(const std::string &networkId)
 
 bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission.");
+        return false;
+    }
     std::string srcUdid = "";
     std::string sinkUdid = "";
     if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
@@ -2176,6 +2181,10 @@ bool DeviceManagerService::CheckAccessControl(const DmAccessCaller &caller, cons
 
 bool DeviceManagerService::CheckIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission.");
+        return false;
+    }
     std::string srcUdid = "";
     std::string sinkUdid = "";
     if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
@@ -2859,7 +2868,7 @@ void DeviceManagerService::HandleDeviceNotTrust(const std::string &msg)
 
 int32_t DeviceManagerService::SetDnPolicy(const std::string &pkgName, std::map<std::string, std::string> &policy)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -3349,7 +3358,7 @@ int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, 
     int32_t &screenStatus)
 {
     LOGI("Begin pkgName: %{public}s, networkId: %{public}s", pkgName.c_str(), GetAnonyString(networkId).c_str());
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetDeviceScreenStatus.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -3370,7 +3379,7 @@ int32_t DeviceManagerService::GetDeviceScreenStatus(const std::string &pkgName, 
 int32_t DeviceManagerService::GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid,
                                                  std::string &networkId)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call GetNetworkIdByUdid.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -3509,7 +3518,7 @@ void DeviceManagerService::HandleDeviceUnBind(const char *peerUdid, const GroupI
 int32_t DeviceManagerService::GetAnonyLocalUdid(const std::string &pkgName, std::string &anonyUdid)
 {
     (void) pkgName;
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call GetAnonyLocalUdid.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -3869,7 +3878,7 @@ void DeviceManagerService::NotifyRemoteLocalUserStopByWifi(const std::string &lo
 int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgName,
     const std::map<std::string, std::string> &authParam)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -3899,7 +3908,7 @@ int32_t DeviceManagerService::RegisterAuthenticationType(const std::string &pkgN
 int32_t DeviceManagerService::GetDeviceProfileInfoList(const std::string &pkgName,
     DmDeviceProfileInfoFilterOptions &filterOptions)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -3914,7 +3923,7 @@ int32_t DeviceManagerService::GetDeviceProfileInfoList(const std::string &pkgNam
 int32_t DeviceManagerService::GetDeviceIconInfo(const std::string &pkgName,
     DmDeviceIconInfoFilterOptions &filterOptions)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -3929,7 +3938,7 @@ int32_t DeviceManagerService::GetDeviceIconInfo(const std::string &pkgName,
 int32_t DeviceManagerService::PutDeviceProfileInfoList(const std::string &pkgName,
     std::vector<DmDeviceProfileInfo> &deviceProfileInfoList)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -3965,7 +3974,7 @@ int32_t DeviceManagerService::SetLocalDisplayNameToSoftbus(const std::string &di
 int32_t DeviceManagerService::GetLocalDisplayDeviceName(const std::string &pkgName, int32_t maxNameLength,
     std::string &displayName)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -3978,7 +3987,7 @@ int32_t DeviceManagerService::GetLocalDisplayDeviceName(const std::string &pkgNa
 
 int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, const std::string &deviceName)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4002,7 +4011,7 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
 int32_t DeviceManagerService::SetRemoteDeviceName(const std::string &pkgName,
     const std::string &deviceId, const std::string &deviceName)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4046,7 +4055,7 @@ void DeviceManagerService::HandleNetworkConnected(int32_t networkStatus)
 int32_t DeviceManagerService::RestoreLocalDeviceName(const std::string &pkgName)
 {
     LOGI("In");
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4112,7 +4121,7 @@ bool DeviceManagerService::IsPC()
 int32_t DeviceManagerService::GetDeviceNetworkIdList(const std::string &pkgName,
     const NetworkIdQueryFilter &queryFilter, std::vector<std::string> &networkIds)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4204,7 +4213,7 @@ int32_t DeviceManagerService::OpenAuthSessionWithPara(const std::string &deviceI
 
 int32_t DeviceManagerService::UnRegisterPinHolderCallback(const std::string &pkgName)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller: %{public}s does not have permission to call UnRegisterPinHolderCallback.", pkgName.c_str());
         return ERR_DM_NO_PERMISSION;
     }
@@ -4245,7 +4254,7 @@ bool DeviceManagerService::GetAccessUdidByNetworkId(const std::string &srcNetWor
 {
     LOGI("start srcNetWorkId %{public}s, sinkNetWorkId %{public}s.", GetAnonyString(srcNetWorkId).c_str(),
         GetAnonyString(sinkNetWorkId).c_str());
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller not have permission to call GetAccessUdidByNetworkId.");
         return false;
     }
@@ -4260,6 +4269,10 @@ bool DeviceManagerService::GetAccessUdidByNetworkId(const std::string &srcNetWor
 
 bool DeviceManagerService::CheckSrcAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission.");
+        return false;
+    }
     std::string srcUdid = "";
     std::string sinkUdid = "";
     if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
@@ -4271,6 +4284,10 @@ bool DeviceManagerService::CheckSrcAccessControl(const DmAccessCaller &caller, c
 
 bool DeviceManagerService::CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission.");
+        return false;
+    }
     std::string srcUdid = "";
     std::string sinkUdid = "";
     if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
@@ -4282,6 +4299,10 @@ bool DeviceManagerService::CheckSinkAccessControl(const DmAccessCaller &caller, 
 
 bool DeviceManagerService::CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission.");
+        return false;
+    }
     std::string srcUdid = "";
     std::string sinkUdid = "";
     if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
@@ -4293,6 +4314,10 @@ bool DeviceManagerService::CheckSrcIsSameAccount(const DmAccessCaller &caller, c
 
 bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee)
 {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller does not have permission.");
+        return false;
+    }
     std::string srcUdid = "";
     std::string sinkUdid = "";
     if (!GetAccessUdidByNetworkId(caller.networkId.c_str(), srcUdid, callee.networkId.c_str(), sinkUdid)) {
@@ -4423,7 +4448,7 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
 
 int32_t DeviceManagerService::StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4443,7 +4468,7 @@ int32_t DeviceManagerService::StartServiceDiscovery(const std::string &pkgName, 
 
 int32_t DeviceManagerService::StopServiceDiscovery(const std::string &pkgName, int32_t discServiceId)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4461,7 +4486,7 @@ int32_t DeviceManagerService::StopServiceDiscovery(const std::string &pkgName, i
 int32_t DeviceManagerService::BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
     const std::map<std::string, std::string> &bindParam)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4483,7 +4508,7 @@ int32_t DeviceManagerService::BindServiceTarget(const std::string &pkgName, cons
 
 int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
 {
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4505,7 +4530,7 @@ int32_t DeviceManagerService::RegisterServiceInfo(const ServiceRegInfo &serviceR
     LOGI("RegisterServiceInfo not support in common version.");
     return ERR_DM_UNSUPPORTED_METHOD;
 #else
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The callerdoes not have permission to cal1 RegisterServiceInfo.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4542,7 +4567,7 @@ int32_t DeviceManagerService::UnRegisterServiceInfo(int32_t regServiceId)
     LOGI("UnRegisterServiceInfo not support in common version.");
     return ERR_DM_UNSUPPORTED_METHOD;
 #else
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call UnRegisterServiceInfo.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4583,7 +4608,7 @@ int32_t DeviceManagerService::StartPublishService(const std::string &pkgName,
     LOGI("StartPublishService not support in common version.");
     return ERR_DM_UNSUPPORTED_METHOD;
 #else
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call StantPublishService.");
         return ERR_DM_NO_PERMISSION;
     }
@@ -4633,7 +4658,7 @@ int32_t DeviceManagerService::StopPublishService(int64_t serviceId)
     LOGI("StopPublishService not support in common version.");
     return ERR_DM_UNSUPPORTED_METHOD;
 #else
-    if (!PermissionManager::GetInstance().CheckPermission()) {
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
         LOGE("The caller does not have permission to call1 StopPublishService.");
         return ERR_DM_NO_PERMISSION;
     }

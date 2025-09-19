@@ -26,8 +26,8 @@ class PermissionManager {
     DM_DECLARE_SINGLE_INSTANCE(PermissionManager);
 
 public:
-    bool CheckPermission(void);
-    bool CheckNewPermission(void);
+    bool CheckAccessServicePermission(void);
+    bool CheckDataSyncPermission(void);
     bool CheckMonitorPermission(void);
     int32_t GetCallerProcessName(std::string &processName);
     bool CheckProcessNameValidOnAuthCode(const std::string &processName);

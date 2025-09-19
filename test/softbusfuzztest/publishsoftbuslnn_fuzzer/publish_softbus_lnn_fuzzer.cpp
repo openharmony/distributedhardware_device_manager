@@ -14,6 +14,7 @@
  */
 
 #include <chrono>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <securec.h>
 #include <string>
 
@@ -29,10 +30,11 @@ void PublishSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(int32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
     DmPublishInfo dmPublishInfo;
-    dmPublishInfo.publishId = *(reinterpret_cast<const int32_t*>(data));
-    std::string capability(reinterpret_cast<const char*>(data), size);
-    std::string customData(reinterpret_cast<const char*>(data), size);
+    dmPublishInfo.publishId= fdp.ConsumeIntegral<int32_t>();
+    std::string capability = fdp.ConsumeRandomLengthString();
+    std::string customData = fdp.ConsumeRandomLengthString();
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->PublishSoftbusLNN(dmPublishInfo, capability, customData);
