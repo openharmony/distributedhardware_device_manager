@@ -609,6 +609,10 @@ void AuthSinkNegotiateStateMachine::CheckCredIdInAclForP2P(std::shared_ptr<DmAut
         credInfo.Erase(credId);
         return;
     }
+    if (!credInfo[credId].Contains(FILED_CRED_TYPE) ||
+        !credInfo[credId][FILED_CRED_TYPE].IsNumberInteger()) {
+        return;
+    }
     if (credInfo[credId][FILED_CRED_TYPE].Get<uint32_t>() == bindType) {
         std::vector<std::string> appList;
         credInfo[credId][FILED_AUTHORIZED_APP_LIST].Get(appList);

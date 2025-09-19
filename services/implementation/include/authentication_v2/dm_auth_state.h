@@ -183,6 +183,7 @@ protected:
     bool ProxyNeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
     bool GetReuseSkId(std::shared_ptr<DmAuthContext> context, int32_t &skId);
     void GetReuseACL(std::shared_ptr<DmAuthContext> context, DistributedDeviceProfile::AccessControlProfile &profile);
+    bool ValidateCredInfoStructure(const JsonItemObject &credInfo);
     uint32_t GetCredType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo);
     int32_t GetProxyCredInfo(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo,
         const std::vector<std::string> &tokenIdHashList);

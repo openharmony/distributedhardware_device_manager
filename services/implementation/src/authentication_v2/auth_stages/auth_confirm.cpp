@@ -252,6 +252,10 @@ void AuthSrcConfirmState::GetSrcCredTypeForP2P(std::shared_ptr<DmAuthContext> co
     JsonObject &aclInfo, JsonObject &credTypeJson, int32_t credType, std::vector<std::string> &deleteCredInfo)
 {
     CHECK_NULL_VOID(context);
+    if (credObj.IsDiscarded() || !IsString(credObj, FILED_CRED_ID)) {
+        LOGE("credObj is invalid or err json string.");
+        return;
+    }
     if (!aclInfo.Contains("pointTopointAcl") ||
         (context->accesser.aclProfiles[DM_POINT_TO_POINT].GetAccesser().GetAccesserCredentialIdStr() !=
         credObj[FILED_CRED_ID].Get<std::string>() &&
@@ -477,6 +481,11 @@ void AuthSrcConfirmState::CheckCredIdInAclForP2P(std::shared_ptr<DmAuthContext> 
         LOGE("acl bindlevel and credential authorizedScope not match");
         DeleteAcl(context, profile);
         credInfo.Erase(credId);
+        return;
+    }
+    if (!credInfo[credId].Contains(FILED_CRED_TYPE) ||
+        !credInfo[credId][FILED_CRED_TYPE].IsNumberInteger()) {
+        LOGE("credType is invalid.");
         return;
     }
     if (credInfo[credId][FILED_CRED_TYPE].Get<uint32_t>() == bindType) {
