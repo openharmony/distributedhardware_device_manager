@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,7 @@ void OnDataReceivedFuzzTest(const uint8_t* data, size_t size)
         std::make_shared<DmAuthManager>(softbusConnector, hiChainConnector, listener, hiChainAuthConnector);
     FuzzedDataProvider fdp(data, size);
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
-    std::string message(reinterpret_cast<const char*>(data), size);
+    std::string message = fdp.ConsumeRandomLengthString();
     authManager->OnDataReceived(sessionId, message);
     authManager->OnSessionClosed(sessionId);
 }

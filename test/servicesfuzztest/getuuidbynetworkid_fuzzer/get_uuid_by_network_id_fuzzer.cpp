@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_impl.h"
 #include "device_manager.h"
 #include "device_manager_callback.h"
@@ -30,9 +30,10 @@ void GetUuidByNetworkIdFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    std::string packName(reinterpret_cast<const char*>(data), size);
-    std::string netWorkId(reinterpret_cast<const char*>(data), size);
-    std::string uuid(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string packName = fdp.ConsumeRandomLengthString();
+    std::string netWorkId = fdp.ConsumeRandomLengthString();
+    std::string uuid = fdp.ConsumeRandomLengthString();
 
     DeviceManager::GetInstance().GetUuidByNetworkId(packName, netWorkId, uuid);
 }
