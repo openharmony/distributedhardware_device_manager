@@ -4340,12 +4340,13 @@ int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
         return ERR_DM_NO_PERMISSION;
     }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission() &&
-        !PermissionManager::GetInstance().CheckDataSyncPermission()) {
+        !PermissionManager::GetInstance().CheckDataSyncPermission() &&
+        !PermissionManager::GetInstance().CheckSoftbusCenterPermission()) {
         LOGE("The caller does not have permission to call GetUdidsByDeviceIds.");
         return ERR_DM_NO_PERMISSION;
     }
-
     for (auto deviceId : deviceIdList) {
+        LOGI("GetUdidsByDeviceIds deviceId = %{public}s.", GetAnonyString(deviceId).c_str());
         if (deviceIdToUdidMap.find(deviceId) == deviceIdToUdidMap.end()) {
             std::string udidHash = "";
             std::string udid = "";
