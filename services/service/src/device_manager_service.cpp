@@ -4330,7 +4330,7 @@ bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, 
 int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
     const std::vector<std::string> deviceIdList, std::map<std::string, std::string> &deviceIdToUdidMap)
 {
-    LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    LOGI("GetUdidsByDeviceIds pkgName = %{public}s.", pkgName.c_str());
     if (pkgName.empty() || deviceIdList.empty()) {
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
