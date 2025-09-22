@@ -51,6 +51,8 @@
 #include "ipc_get_localserviceinfo_rsp.h"
 #include "ipc_get_trustdevice_req.h"
 #include "ipc_get_trustdevice_rsp.h"
+#include "ipc_get_udids_by_deviceIds_req.h"
+#include "ipc_get_udids_by_deviceIds_rsp.h"
 #include "ipc_import_auth_code_req.h"
 #include "ipc_notify_event_req.h"
 #include "ipc_permission_req.h"
@@ -3002,6 +3004,31 @@ bool DeviceManagerImpl::CheckAclByIpcCode(const DmAccessCaller &caller, const Dm
     }
     bool result = static_cast<bool>(rsp->GetErrCode());
     DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", static_cast<int32_t>(result),
+        anonyLocalUdid_);
+    return result;
+}
+
+int32_t DeviceManagerImpl::GetUdidsByDeviceIds(const std::string &pkgName, const std::vector<std::string> deviceIdList,
+    std::map<std::string, std::string> &deviceIdToUdidMap)
+{
+    if (pkgName.empty() || deviceIdList.empty()) {
+        LOGE("error: Invalid para");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    LOGI("Start, pkgName: %{public}s", pkgName.c_str());
+    std::shared_ptr<IpcGetUdidsByDeviceIdsReq> req = std::make_shared<IpcGetUdidsByDeviceIdsReq>();
+    std::shared_ptr<IpcGetUdidsByDeviceIdsRsp> rsp = std::make_shared<IpcGetUdidsByDeviceIdsRsp>();
+    req->SetPkgName(pkgName);
+    req->SetDeviceIdList(deviceIdList);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_UDIDS_BY_DEVICEIDS, req, rsp);
+    if (ret != DM_OK) {
+        DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetUdidsByDeviceIds", ret, anonyLocalUdid_);
+        LOGE("GetUdidsByDeviceIds Send Request failed ret: %{public}d", ret);
+        return false;
+    }
+    int32_t result = static_cast<int32_t>(rsp->GetErrCode());
+    deviceIdToUdidMap = static_cast<std::map<std::string, std::string>>(rsp->GetDeviceIdToUdidMap());
+    DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetUdidsByDeviceIds", static_cast<int32_t>(result),
         anonyLocalUdid_);
     return result;
 }

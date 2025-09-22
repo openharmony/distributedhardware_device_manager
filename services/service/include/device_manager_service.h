@@ -286,6 +286,8 @@ public:
     bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    int32_t GetUdidsByDeviceIds(const std::string &pkgName, const std::vector<std::string> deviceIdList,
+        std::map<std::string, std::string> &deviceIdToUdidMap);
 
 private:
     bool IsDMServiceImplReady();
