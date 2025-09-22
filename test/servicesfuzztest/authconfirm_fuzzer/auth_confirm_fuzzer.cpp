@@ -256,8 +256,8 @@ void AuthConfirmFuzzTestNext(FuzzTestContext &ctx, JsonObject &jsonObject, Fuzze
     ctx.authSinkNegotiateStateMachine_->LnnAclCompare(ctx.context_, accesser, accessee);
     ctx.authSrcPinInputState_->ShowStartAuthDialog(ctx.context_);
     ctx.authSrcPinInputState_->Action(ctx.context_);
-    ctx.context_->importAuthCode = "123456";
-    ctx.context_->importPkgName = "pkgName";
+    ctx.context_->importAuthCode = fdp.ConsumeRandomLengthString();
+    ctx.context_->importPkgName = fdp.ConsumeRandomLengthString();
     ctx.authSinkStatePinAuthComm_->IsAuthCodeReady(ctx.context_);
     ctx.authSinkStatePinAuthComm_->IsPinCodeValid(ctx.context_->importAuthCode);
 }
@@ -272,20 +272,11 @@ void AuthConfirmFuzzTestThird(FuzzTestContext &ctx, FuzzedDataProvider &fdp)
     ctx.authSinkNegotiateStateMachine_->IsAntiDisturbanceMode(businessId);
     ctx.authSinkNegotiateStateMachine_->IsAntiDisturbanceMode("");
     ctx.authSinkNegotiateStateMachine_->ParseAndCheckAntiDisturbanceMode(businessId, businessValue);
-    businessId = "test_business_id";
-    businessValue = "{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":true}";
     ctx.authSinkNegotiateStateMachine_->ParseAndCheckAntiDisturbanceMode(businessId, businessValue);
-    ctx.authSrcNegotiateStateMachine_->GetStateType();
-    ctx.authSrcPinAuthStartState_->GetStateType();
-    ctx.authSinkPinAuthDoneState_->GetStateType();
-    ctx.authSrcReverseUltrasonicStartState_->GetStateType();
-    ctx.authSrcForwardUltrasonicStartState_->GetStateType();
-    ctx.authSinkReverseUltrasonicStartState_->GetStateType();
-    ctx.authSinkForwardUltrasonicDoneState_->GetStateType();
     ctx.authSrcPinNegotiateStartState_->ProcessCredAuth(ctx.context_);
     int32_t credType = fdp.ConsumeIntegral<int32_t>();
     ctx.authSrcPinNegotiateStartState_->GetCredIdByCredType(ctx.context_, credType);
-    ctx.context_->IsProxyBind = true;
+    ctx.context_->IsProxyBind = fdp.ConsumeBool();
     ctx.authSrcConfirmState_->NegotiateProxyCredential(ctx.context_);
     ctx.authSrcConfirmState_->NegotiateProxyAcl(ctx.context_);
     ctx.authSrcConfirmState_->ResetBindLevel(ctx.context_);

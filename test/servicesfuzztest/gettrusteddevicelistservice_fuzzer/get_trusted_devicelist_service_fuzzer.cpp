@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include <string>
 #include <vector>
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_service.h"
 #include "get_trusted_devicelist_service_fuzzer.h"
 
@@ -25,9 +26,16 @@ void GetTrustedDeviceListFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string extra(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string extra = fdp.ConsumeRandomLengthString();
     std::vector<DmDeviceInfo> deviceList;
+    DmDeviceInfo dmDeviceInfo;
+    dmDeviceInfo.deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
+    dmDeviceInfo.networkType = fdp.ConsumeIntegral<int32_t>();
+    dmDeviceInfo.range = fdp.ConsumeIntegral<int32_t>();
+    dmDeviceInfo.extraData = fdp.ConsumeRandomLengthString();
+    deviceList.push_back(dmDeviceInfo);
 
     DeviceManagerService::GetInstance().Init();
     DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);

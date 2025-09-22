@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include <chrono>
 #include <securec.h>
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "device_manager_impl.h"
 #include "dm_constants.h"
@@ -29,7 +30,8 @@ void StopRefreshSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(uint16_t))) {
         return;
     }
-    uint16_t subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    FuzzedDataProvider fdp(data, size);
+    uint16_t subscribeId = fdp.ConsumeIntegral<uint16_t>();
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->StopRefreshSoftbusLNN(subscribeId);

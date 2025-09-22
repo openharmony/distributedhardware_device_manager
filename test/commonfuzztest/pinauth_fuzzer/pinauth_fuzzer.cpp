@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include "pin_auth.h"
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include <memory>
 #include <string>
 
@@ -32,9 +33,9 @@ void PinAuthFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-
+    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthManager> authManager = nullptr;
-    std::string authToken(reinterpret_cast<const char*>(data), size);
+    std::string authToken = fdp.ConsumeRandomLengthString();
     std::shared_ptr<PinAuth> pinauth = std::make_shared<PinAuth>();
     pinauth->ShowAuthInfo(authToken, authManager);
     pinauth->StartAuth(authToken, authManager);

@@ -29,18 +29,9 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-
-namespace {
-constexpr int32_t INT32_SIZE = 5;
-}
-
 std::shared_ptr<DeviceNameManager> deviceNameMgr_ = std::make_shared<DeviceNameManager>();
-void DeviceNameManagerFuzzTest(const uint8_t* data, size_t size)
+void DeviceNameManagerFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < (sizeof(int32_t) * INT32_SIZE))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     deviceNameMgr_->InitDeviceNameWhenSoftBusReady();
     int32_t curUserId = fdp.ConsumeIntegral<int32_t>();
     deviceNameMgr_->InitDeviceNameWhenUserSwitch(curUserId, curUserId);
@@ -55,71 +46,49 @@ void DeviceNameManagerFuzzTest(const uint8_t* data, size_t size)
     deviceNameMgr_->InitDeviceName(userId);
 
     deviceNameMgr_->InitDeviceName(-1);
-    std::string prefixName(reinterpret_cast<const char*>(data), size);
-    std::string subffixName(reinterpret_cast<const char*>(data), size);
+    std::string prefixName = fdp.ConsumeRandomLengthString();
+    std::string subffixName = fdp.ConsumeRandomLengthString();
     deviceNameMgr_->InitDeviceNameToSoftBus(prefixName, subffixName);
 
     int32_t maxNamelength = fdp.ConsumeIntegral<int32_t>();
-    std::string displayName(reinterpret_cast<const char*>(data), size);
+    std::string displayName = fdp.ConsumeRandomLengthString();
     deviceNameMgr_->GetLocalDisplayDeviceName(maxNamelength, displayName);
     deviceNameMgr_->ModifyUserDefinedName(displayName);
     deviceNameMgr_->RestoreLocalDeviceName();
-    std::string nickName(reinterpret_cast<const char*>(data), size);
-    std::string deviceName(reinterpret_cast<const char*>(data), size);
+    std::string nickName = fdp.ConsumeRandomLengthString();
+    std::string deviceName = fdp.ConsumeRandomLengthString();
     deviceNameMgr_->InitDisplayDeviceNameToSettingsData(nickName, deviceName, userId);
     deviceNameMgr_->GetUserDefinedDeviceName(userId, deviceName);
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
     int32_t maxNumBytes = fdp.ConsumeIntegral<int32_t>();
     deviceNameMgr_->SubstrByBytes(str, maxNumBytes);
     deviceNameMgr_->GetSystemLanguage();
     deviceNameMgr_->GetLocalMarketName();
     deviceNameMgr_->SetUserDefinedDeviceName(deviceName, userId);
     deviceNameMgr_->GetDisplayDeviceName(userId, deviceName);
-    std::string state(reinterpret_cast<const char*>(data), size);
+    std::string state = fdp.ConsumeRandomLengthString();
     deviceNameMgr_->SetDisplayDeviceNameState(state, userId);
 }
 
-void DeviceNameManagerFirstFuzzTest(const uint8_t* data, size_t size)
+void DeviceNameManagerFirstFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
-    std::string deviceName(reinterpret_cast<const char*>(data), size);
+    std::string deviceName = fdp.ConsumeRandomLengthString();
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     deviceNameMgr_->SetDisplayDeviceName(deviceName, userId);
-    deviceNameMgr_->SetDisplayDeviceName("", userId);
     deviceNameMgr_->GetDeviceName(deviceName);
     deviceNameMgr_->SetDeviceName(deviceName);
-    deviceNameMgr_->SetDeviceName("");
     deviceNameMgr_->GetRemoteObj();
-    std::string tableName(reinterpret_cast<const char*>(data), size);
-    std::string key(reinterpret_cast<const char*>(data), size);
-    std::string value(reinterpret_cast<const char*>(data), size);
+    std::string tableName = fdp.ConsumeRandomLengthString();
+    std::string key = fdp.ConsumeRandomLengthString();
+    std::string value = fdp.ConsumeRandomLengthString();
     deviceNameMgr_->GetValue(tableName, userId, key, value);
     deviceNameMgr_->SetValue(tableName, userId, key, value);
-    std::string proxyUri(reinterpret_cast<const char*>(data), size);
+    std::string proxyUri = fdp.ConsumeRandomLengthString();
     deviceNameMgr_->CreateDataShareHelper(proxyUri);
     deviceNameMgr_->GetProxyUriStr(tableName, userId);
     deviceNameMgr_->MakeUri(proxyUri, key);
-    deviceNameMgr_->MakeUri("", key);
     std::shared_ptr<DataShare::DataShareHelper> helper = nullptr;
     deviceNameMgr_->ReleaseDataShareHelper(helper);
-}
-
-void DeviceNameManagerSecondFuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
-    std::shared_ptr<DeviceNameManager> deviceNameMgr = std::make_shared<DeviceNameManager>();
-    deviceNameMgr->UnInit();
-    deviceNameMgr->GetUserDefinedDeviceName();
-    deviceNameMgr_->GetSystemRegion();
-    DmDataShareCommonEventManager eventManager;
-    eventManager.eventValidFlag_ = true;
-    eventManager.UnsubscribeDataShareCommonEvent();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
@@ -128,8 +97,11 @@ void DeviceNameManagerSecondFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceNameManagerFuzzTest(data, size);
-    OHOS::DistributedHardware::DeviceNameManagerFirstFuzzTest(data, size);
-    OHOS::DistributedHardware::DeviceNameManagerSecondFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DeviceNameManagerFuzzTest(fdp);
+    OHOS::DistributedHardware::DeviceNameManagerFirstFuzzTest(fdp);
     return 0;
 }

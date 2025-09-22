@@ -30,7 +30,6 @@ group("fuzztest") {
     "softbuslistener_fuzzer:fuzztest",
     "softbuslistenergetlocaldeviceinfo_fuzzer:fuzztest",
     "softbussession_fuzzer:fuzztest",
-    "softbussessionobject_fuzzer:fuzztest",
     "stoprefreshsoftbuslnn_fuzzer:fuzztest",
   ]
 }

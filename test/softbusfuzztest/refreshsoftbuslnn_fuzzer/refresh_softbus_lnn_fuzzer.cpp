@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include <chrono>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <securec.h>
 #include <string>
 
@@ -29,15 +30,16 @@ void RefreshSoftbusLNNFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < sizeof(uint16_t))) {
         return;
     }
-    std::string pkgNameStr(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgNameStr = fdp.ConsumeRandomLengthString();
     const char *pkgName = pkgNameStr.c_str();
     DmSubscribeInfo dmSubInfo;
-    dmSubInfo.subscribeId = *(reinterpret_cast<const uint16_t*>(data));
+    dmSubInfo.subscribeId = fdp.ConsumeIntegral<uint16_t>();
     dmSubInfo.mode = DM_DISCOVER_MODE_ACTIVE;
     dmSubInfo.medium = DM_USB;
-    dmSubInfo.isSameAccount = true;
-    dmSubInfo.isWakeRemote = true;
-    std::string customData(reinterpret_cast<const char*>(data), size);
+    dmSubInfo.isSameAccount = fdp.ConsumeBool();
+    dmSubInfo.isWakeRemote = fdp.ConsumeBool();
+    std::string customData = fdp.ConsumeRandomLengthString();
 
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->RefreshSoftbusLNN(pkgName, dmSubInfo, customData);

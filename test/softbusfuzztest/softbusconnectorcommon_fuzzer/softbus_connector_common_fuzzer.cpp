@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include "softbus_connector.h"
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
@@ -29,8 +30,8 @@ void SoftBusConnectorCommonFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-
-    std::string str(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string str = fdp.ConsumeRandomLengthString();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 
     softbusConnector->GetDeviceUdidHashByUdid(str);
