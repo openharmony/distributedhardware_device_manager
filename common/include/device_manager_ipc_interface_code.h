@@ -134,6 +134,8 @@ enum DMIpcCmdInterfaceCode {
     START_PUBLISH_SERVICE,
     STOP_PUBLISH_SERVICE,
     SERVICE_PUBLISH_RESULT,
+    LEAVE_LNN,
+    LEAVE_LNN_RESULT,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

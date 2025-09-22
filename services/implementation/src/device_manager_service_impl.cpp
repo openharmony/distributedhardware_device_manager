@@ -596,6 +596,7 @@ void DeviceManagerServiceImpl::Release()
     if (softbusConnector_ != nullptr) {
         softbusConnector_->UnRegisterConnectorCallback();
         softbusConnector_->UnRegisterSoftbusStateCallback();
+        softbusConnector_->UnRegisterLeaveLNNCallback();
         if (softbusConnector_->GetSoftbusSession() != nullptr) {
             softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
         }
@@ -747,6 +748,7 @@ void DeviceManagerServiceImpl::CreateGlobalClassicalAuthMgr()
     softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
     hiChainConnector_->RegisterHiChainCallback(authMgr_);
     hiChainAuthConnector_->RegisterHiChainAuthCallback(authMgr_);
+    softbusConnector_->RegisterLeaveLNNCallback(authMgr_);
 }
 
 void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo)
@@ -3347,6 +3349,12 @@ void DeviceManagerServiceImpl::DeleteGroupByBundleName(const std::string &localU
             }
         }
     }
+}
+
+int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std::string &networkId)
+{
+    CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
+    return softbusConnector_->LeaveLNN(pkgName, networkId);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

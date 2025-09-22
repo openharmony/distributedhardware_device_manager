@@ -47,6 +47,13 @@ public:
     void DeleteOffLineTimer(std::string udidHash) override {}
 };
 
+class ISoftbusLeaveLNNCallbackTest : public ISoftbusLeaveLNNCallback {
+public:
+    virtual ~ISoftbusLeaveLNNCallbackTest() {}
+    void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
+        int32_t retCode) {}
+};
+
 void SoftbusConnectorTest::SetUp()
 {
 }
@@ -844,6 +851,17 @@ HWTEST_F(SoftbusConnectorTest, GetDeviceUdidHashByUdid_002, testing::ext::TestSi
     std::string deviceId = "deviceId";
     bool isForceJoin = false;
     softbusConnector->JoinLnn(deviceId, isForceJoin);
+}
+
+HWTEST_F(SoftbusConnectorTest, OnLeaveLNNResult_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
+    std::string networkId = "12345";
+    softbusConnector->leaveLnnPkgMap_[networkId] = "com.ohos.test";
+    int32_t retCode = 123;
+    softbusConnector->leaveLNNCallback_ = std::make_shared<ISoftbusLeaveLNNCallbackTest>();
+    softbusConnector->OnLeaveLNNResult(networkId.c_str(), retCode);
+    EXPECT_EQ(softbusConnector->leaveLnnPkgMap_.empty(), true);
 }
 } // namespace
 } // namespace DistributedHardware

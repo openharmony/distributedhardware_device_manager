@@ -2225,5 +2225,47 @@ ON_IPC_READ_RESPONSE(SERVICE_PUBLISH_RESULT, MessageParcel &reply, std::shared_p
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
+
+ON_IPC_CMD(LEAVE_LNN, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string networkId = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().LeaveLNN(pkgName, networkId);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(LEAVE_LNN_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyBindResultReq> pReq =
+        std::static_pointer_cast<IpcNotifyBindResultReq>(pBaseReq);
+    std::string networkId = pReq->GetContent();
+    if (!data.WriteString(networkId)) {
+        LOGE("write networkId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    int32_t result = pReq->GetResult();
+    if (!data.WriteInt32(result)) {
+        LOGE("write result code failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(LEAVE_LNN_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
