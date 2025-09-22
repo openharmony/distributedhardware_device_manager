@@ -101,5 +101,10 @@ int32_t DistributedDeviceProfileClient::GetAllAclIncludeLnnAcl(std::vector<Acces
 {
     return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->GetAllAclIncludeLnnAcl(profiles);
 }
+
+int32_t DistributedDeviceProfileClient::UpdateAccessControlProfile(const AccessControlProfile& profiles)
+{
+    return DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient->UpdateAccessControlProfile(profiles);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

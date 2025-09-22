@@ -44,6 +44,7 @@ public:
     MOCK_METHOD(int32_t, GetUdidHash, (const std::string &, unsigned char *));
     MOCK_METHOD(std::string, GetGroupIdHash, (const std::string &));
     MOCK_METHOD(int32_t, ConvertUdidHashToAnoyDeviceId, (const std::string &, const std::string &, DmKVValue &));
+    MOCK_METHOD(int32_t, RAND_bytes, (unsigned char *, int32_t));
 };
 }
 }

@@ -75,6 +75,10 @@ public:
     virtual void CacheAcerAclId(const DistributedDeviceProfile::AccessControlProfile &profile,
         std::vector<DmAclIdParam> &aclInfos) = 0;
     virtual bool IsLnnAcl(const DistributedDeviceProfile::AccessControlProfile &profile) = 0;
+    virtual int32_t GetServiceInfoProfileByServiceId(int64_t serviceId, ServiceInfoProfile &profile) = 0;
+    virtual int32_t DeleteServiceInfoProfile(int32_t regServiceId, int32_t userId) = 0;
+    virtual int32_t PutServiceInfoProfile(const ServiceInfoProfile &profile) = 0;
+    virtual int32_t GetServiceInfoByTokenId(int64_t tokenId, ServiceInfoProfile &serviceInfo) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -124,6 +128,10 @@ public:
     MOCK_METHOD(void, CacheAcerAclId, (const DistributedDeviceProfile::AccessControlProfile &profile,
         std::vector<DmAclIdParam> &aclInfos));
     MOCK_METHOD(bool, IsLnnAcl, (const DistributedDeviceProfile::AccessControlProfile &profile));
+    MOCK_METHOD(int32_t, PutServiceInfoProfile, (const ServiceInfoProfile &profile));
+    MOCK_METHOD(int32_t, GetServiceInfoProfileByServiceId, (int64_t serviceId, ServiceInfoProfile &profile));
+    MOCK_METHOD(int32_t, DeleteServiceInfoProfile, (int32_t regServiceId, int32_t userId));
+    MOCK_METHOD(int32_t, GetServiceInfoByTokenId, (int64_t tokenId, ServiceInfoProfile &serviceInfo));
 };
 }
 }

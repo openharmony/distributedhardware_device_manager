@@ -717,7 +717,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, ProcessAppUninstall_007, testing::ex
     profile.GetAccesser().SetAccesserTokenId(accessTokenId);
     profiles.push_back(profile);
 
-    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl())
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl()).Times(AnyNumber())
         .WillOnce(Return(profiles));
     EXPECT_CALL(*deviceProfileConnectorMock_, IsLnnAcl(_)).WillRepeatedly(Return(false));
     EXPECT_CALL(*hiChainConnectorMock_, DeleteGroupByACL(_, _)).Times(1);
@@ -821,6 +821,134 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclByTokenId_002, testing::ext
     EXPECT_TRUE(delProfileMap.empty());
     EXPECT_TRUE(delACLInfoVec.empty());
     EXPECT_TRUE(userIdVec.empty());
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_InvalidInput_101, testing::ext::TestSize.Level0) 
+{
+    PeerTargetId targetId;
+    std::map<std::string, std::string> bindParam;
+    int32_t ret = deviceManagerServiceImpl_->BindServiceTarget("", targetId, bindParam);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_Success_101, testing::ext::TestSize.Level0) 
+{
+    PeerTargetId targetId;
+    std::map<std::string, std::string> bindParam = {{"key1", "value1"}};
+    int32_t ret = deviceManagerServiceImpl_->BindServiceTarget("valid_pkg", targetId, bindParam);
+    ASSERT_EQ(ret, DM_OK);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_InvalidInput_101, testing::ext::TestSize.Level0)
+{
+    int64_t serviceId = 123456;
+    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("", serviceId);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_InvalidInput_102, testing::ext::TestSize.Level0)
+{
+    int64_t serviceId = 0;
+    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("valid_pkg", serviceId);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_Success_101, testing::ext::TestSize.Level0)
+{
+    int64_t serviceId = 123456;
+    ServiceInfoProfile profile;
+    profile.regServiceId = serviceId;
+    
+    EXPECT_CALL(*deviceManagerServiceImplMock_, DeleteAclExtraDataServiceId(serviceId, _, _, _))
+        .WillOnce(Return(DM_OK));
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(serviceId, _)).Times(AnyNumber())
+        .WillOnce(Return(DM_OK));
+    
+    EXPECT_CALL(*deviceProfileConnectorMock_, DeleteServiceInfoProfile(serviceId, -1)).Times(AnyNumber())
+        .WillOnce(Return(DM_OK));
+    
+    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("valid_pkg", serviceId);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_GetProfileFailed_101, testing::ext::TestSize.Level0) {
+    int64_t serviceId = 123456;
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, DeleteAclExtraDataServiceId(serviceId, _, _, _)).Times(AnyNumber())
+        .WillOnce(Return(DM_OK));
+
+    ServiceInfoProfile profile;
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetServiceInfoProfileByServiceId(serviceId, _)).Times(AnyNumber())
+        .WillOnce(Return(ERR_DM_FAILED));
+
+    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("valid_pkg", serviceId);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_DeleteAclFailed_101, testing::ext::TestSize.Level0)
+{
+    int64_t serviceId = 123456;
+
+    EXPECT_CALL(*deviceManagerServiceImplMock_, DeleteAclExtraDataServiceId(serviceId, _, _, _)).Times(AnyNumber())
+        .WillOnce(Return(ERR_DM_FAILED));
+
+    int32_t ret = deviceManagerServiceImpl_->UnbindServiceTarget("valid_pkg", serviceId);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_NoMatchingServiceId_101, testing::ext::TestSize.Level1)
+{
+    int64_t serviceId = 123456;
+    int64_t tokenIdCaller = 123;
+    std::string udid = "test";
+    int32_t bindLevel = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData(R"({"key": "value"})");
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl()).Times(AnyNumber())
+        .WillOnce(Return(profiles));
+
+    int32_t ret = deviceManagerServiceImpl_->DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_ExtraDataEmpty_101, testing::ext::TestSize.Level1)
+{
+    int64_t serviceId = 123456;
+    int64_t tokenIdCaller = 123;
+    std::string udid = "test";
+    int32_t bindLevel = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData("");
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl()).Times(AnyNumber())
+        .WillOnce(Return(profiles));
+
+    int32_t ret = deviceManagerServiceImpl_->DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_InvalidJson_101, testing::ext::TestSize.Level1)
+{
+    int64_t serviceId = 123456;
+    int64_t tokenIdCaller = 123;
+    std::string udid = "test";
+    int32_t bindLevel = 1;
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles;
+    DistributedDeviceProfile::AccessControlProfile profile;
+    profile.SetExtraData("invalid_json");
+    profiles.push_back(profile);
+
+    EXPECT_CALL(*deviceProfileConnectorMock_, GetAllAclIncludeLnnAcl()).Times(AnyNumber())
+        .WillOnce(Return(profiles));
+
+    int32_t ret = deviceManagerServiceImpl_->DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, udid, bindLevel);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 } // namespace
 } // namespace DistributedHardware

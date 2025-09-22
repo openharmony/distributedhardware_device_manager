@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <gmock/gmock.h>
 
 #include "device_manager_service_impl.h"
+#include "ipc_start_publish_service_req.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -50,8 +51,16 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual bool CheckIsSameAccount(const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
+    virtual int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller,
+        std::string &udid, int32_t &bindLevel) = 0;
+    virtual int32_t GenerateRegServiceId(int32_t &regServiceId) = 0;
+    virtual int32_t ConvertServiceInfoProfileByRegInfo(const ServiceRegInfo &serviceRegInfo,
+        ServiceInfoProfile &serviceInfoProfile) = 0;
+    virtual int32_t PutServiceInfoProfile(const ServiceInfoProfile &serviceInfoProfile) = 0;
+    virtual int32_t GenerateServiceId(int64_t &serviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
+    
 };
 
 class DeviceManagerServiceImplMock : public DmDeviceManagerServiceImpl {
@@ -77,6 +86,12 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid));
     MOCK_METHOD(bool, CheckIsSameAccount, (const DmAccessCaller &caller, const std::string &srcUdid,
         const DmAccessCallee &callee, const std::string &sinkUdid));
+    MOCK_METHOD(int32_t, DeleteAclExtraDataServiceId, (int64_t serviceId, int64_t tokenIdCaller,
+        std::string &udid, int32_t &bindLevel), (override));
+    MOCK_METHOD(int32_t, GenerateRegServiceId, (int32_t &regServiceId));
+    MOCK_METHOD(int32_t, ConvertServiceInfoProfileByRegInfo, (const ServiceRegInfo &regInfo, ServiceInfoProfile &profile));
+    MOCK_METHOD(int32_t, PutServiceInfoProfile, (const ServiceInfoProfile &profile));
+    MOCK_METHOD(int32_t, GenerateServiceId, (int64_t &serviceId));
 };
 }
 }

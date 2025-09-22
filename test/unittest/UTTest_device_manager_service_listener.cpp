@@ -29,6 +29,8 @@
 #include "ipc_notify_publish_result_req.h"
 #include "device_manager_service_notify.h"
 #include "app_manager.h"
+#include "ipc_service_publish_result_req.h"
+#include "ipc_server_listener_mock.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -49,6 +51,7 @@ void DeviceManagerServiceListenerTest::SetUpTestCase()
     DmIpcServerListener::dmIpcServerListener = ipcServerListenerMock_;
     DmKVAdapterManager::dmKVAdapterManager = kVAdapterManagerMock_;
     DmAppManager::dmAppManager = appManagerMock_;
+    DmDeviceManagerService::dmDeviceManagerService = deviceManagerServiceMock_;
 }
 
 void DeviceManagerServiceListenerTest::TearDownTestCase()
@@ -63,6 +66,7 @@ void DeviceManagerServiceListenerTest::TearDownTestCase()
     kVAdapterManagerMock_ = nullptr;
     DmAppManager::dmAppManager = nullptr;
     appManagerMock_ = nullptr;
+    deviceManagerServiceMock_ = nullptr;
 }
 
 namespace {

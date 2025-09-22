@@ -24,7 +24,7 @@
 using namespace testing;
 namespace OHOS {
 namespace DistributedHardware {
-
+constexpr int32_t DP_PERMISSION_DENIED = 98566155;
 void DmAuthMessageProcessorTest::SetUpTestCase()
 {
 }
@@ -209,6 +209,104 @@ HWTEST_F(DmAuthMessageProcessorTest, ParseNegotiateMessage_007, testing::ext::Te
 
     EXPECT_EQ(ret, DM_OK);
     EXPECT_EQ(context->accessee.extraInfo.empty(), false);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseSyncServiceInfo_001, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObject;
+    JsonObject serviceInfo;
+    serviceInfo[DistributedDeviceProfile::REG_SERVICE_ID] = 1;
+    serviceInfo[TAG_DEVICE_ID] = "dev001";
+    serviceInfo[TAG_USER_ID] = 2;
+    serviceInfo[TAG_TOKEN_ID] = static_cast<int64_t>(3);
+    serviceInfo[DistributedDeviceProfile::PUBLISH_STATE] = 4;
+    serviceInfo[DistributedDeviceProfile::REG_SERVICE_ID] = static_cast<int64_t>(5);
+    serviceInfo[DistributedDeviceProfile::SERVICE_TYPE] = "typeA";
+    serviceInfo[TAG_DEVICE_NAME] = "nameA";
+    serviceInfo[DistributedDeviceProfile::SERVICE_DISPLAY_NAME] = "displayA";
+    jsonObject[DistributedDeviceProfile::ACCESSEE_SERVICE_NAME] = serviceInfo.Dump();
+
+    auto context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    processor->ParseSyncServiceInfo(jsonObject, context);
+
+    ServiceInfoProfile profile;
+    int ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(5, profile);
+    EXPECT_EQ(ret, DP_PERMISSION_DENIED);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, ParseServiceNego_001, testing::ext::TestSize.Level1)
+{
+    JsonObject jsonObject;
+    jsonObject[PARAM_KEY_IS_SERVICE_BIND] = false;
+    auto context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    processor->ParseServiceNego(jsonObject, context);
+    EXPECT_FALSE(context->isServiceBind);
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, SetSyncMsgJson_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+
+    context->accesser.deviceId = "localUdid";
+    context->accessee.deviceId = "remoteUdid";
+    context->accesser.userId = 100;
+    context->accessee.userId = 200;
+    context->direction = DM_AUTH_SINK;
+    context->confirmOperation = USER_OPERATION_TYPE_ALLOW_AUTH;
+    context->accesser.isCommonFlag = true;
+    context->accesser.cert = "certData";
+    context->isServiceBind = true;
+    context->accessee.serviceId = 123456;
+
+    DmAccess accessSide;
+    accessSide.transmitSessionKeyId = 1;
+    accessSide.transmitSkTimeStamp = 123;
+    accessSide.transmitCredentialId = "credId";
+    accessSide.isGenerateLnnCredential = true;
+    accessSide.bindLevel = 2;
+    accessSide.lnnSessionKeyId = 3;
+    accessSide.lnnSkTimeStamp = 456;
+    accessSide.lnnCredentialId = "lnnCredId";
+    accessSide.dmVersion = "1.0.0";
+
+    DmAccessToSync accessToSync;
+    accessToSync.deviceName = "devName";
+    accessToSync.deviceNameFull = "devNameFull";
+    accessToSync.deviceId = "devId";
+    accessToSync.userId = 100;
+    accessToSync.accountId = "accId";
+    accessToSync.tokenId = 789;
+    accessToSync.bundleName = "bundle";
+    accessToSync.pkgName = "pkg";
+    accessToSync.bindLevel = 2;
+    accessToSync.sessionKeyId = 1;
+    accessToSync.skTimeStamp = 123;
+
+    JsonObject syncMsgJson;
+    int ret = processor->SetSyncMsgJson(context, accessSide, accessToSync, syncMsgJson);
+    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(syncMsgJson[TAG_TRANSMIT_SK_ID].Get<std::string>(), "1");
+    EXPECT_EQ(syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP].Get<int64_t>(), 123);
+    EXPECT_EQ(syncMsgJson[TAG_TRANSMIT_CREDENTIAL_ID].Get<std::string>(), "credId");
+    EXPECT_EQ(syncMsgJson[TAG_LNN_SK_ID].Get<std::string>(), "3");
+    EXPECT_EQ(syncMsgJson[TAG_LNN_SK_TIMESTAMP].Get<int64_t>(), 456);
+    EXPECT_EQ(syncMsgJson[TAG_LNN_CREDENTIAL_ID].Get<std::string>(), "lnnCredId");
+    EXPECT_EQ(syncMsgJson[TAG_DMVERSION].Get<std::string>(), "1.0.0");
+    EXPECT_EQ(syncMsgJson[TAG_IS_COMMON_FLAG].Get<bool>(), true);
+    EXPECT_EQ(syncMsgJson[TAG_DM_CERT_CHAIN].Get<std::string>(), "certData");
+    EXPECT_TRUE(syncMsgJson.Contains(TAG_ACL_CHECKSUM));
+    EXPECT_TRUE(syncMsgJson.Contains(TAG_USER_CONFIRM_OPT));
+}
+
+HWTEST_F(DmAuthMessageProcessorTest, GetAccesseeServiceInfo_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    auto processor = std::make_shared<DmAuthMessageProcessor>();
+    std::string result = processor->GetAccesseeServiceInfo(99999); 
+    EXPECT_EQ(result, "");
 }
 } // namespace DistributedHardware
 } // namespace OHOS
