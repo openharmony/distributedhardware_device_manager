@@ -1215,6 +1215,9 @@ int32_t DeviceManagerServiceImpl::TransferOldAuthMgr(int32_t msgType, const Json
             }
         }
     }
+    if (authMgr_ != nullptr && !authMgr_->IsTransferReady()) {
+        return DM_OK;
+    }
 
     return ret;
 }
