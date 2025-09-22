@@ -141,6 +141,7 @@ void ServiceInfoOnlineFuzzTest(FuzzedDataProvider &fdp)
 
 void RegisterServiceStateCallbackFuzzTest(FuzzedDataProvider &fdp)
 {
+    int32_t size = 32;
     std::string key = fdp.ConsumeRandomLengthString(size);
     std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
 
@@ -149,8 +150,8 @@ void RegisterServiceStateCallbackFuzzTest(FuzzedDataProvider &fdp)
 
 void UnRegisterServiceStateCallbackFuzzTest(FuzzedDataProvider &fdp)
 {
+    int32_t size = 32;
     std::string key = fdp.ConsumeRandomLengthString(size);
-
     DeviceManagerNotify::GetInstance().UnRegisterServiceStateCallback(key);
 }
 
@@ -189,6 +190,7 @@ void UnRegisterServiceDiscoveryCallbackFuzzTest(FuzzedDataProvider &fdp)
 
 void OnServiceFoundFuzzTest(FuzzedDataProvider &fdp)
 {
+    int32_t maxStringLength = 32;
     int32_t discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
     DiscoveryServiceInfo service;
     service.serviceInfo.serviceName = fdp.ConsumeRandomLengthString(maxStringLength);

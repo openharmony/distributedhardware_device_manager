@@ -73,6 +73,7 @@ void DeviceManagerServiceFuzzTest(FuzzedDataProvider &fdp)
 
 void StartServiceDiscoveryFuzzTest(FuzzedDataProvider &fdp)
 {
+    int32_t maxStringLength = 32;
     std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
     DiscoveryServiceParam discParam;
     discParam.serviceType = fdp.ConsumeRandomLengthString(maxStringLength);
@@ -86,6 +87,7 @@ void StartServiceDiscoveryFuzzTest(FuzzedDataProvider &fdp)
 
 void StopServiceDiscoveryFuzzTest(FuzzedDataProvider &fdp)
 {
+    int32_t maxStringLength = 32;
     std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
     int32_t discServiceId = fdp.ConsumeIntegral<int32_t>();
 
