@@ -31,16 +31,12 @@ namespace DistributedHardware {
 std::shared_ptr<DMCommTool> dmCommToolPtr_ = std::make_shared<DMCommTool>();
 std::shared_ptr<DMTransport> dmTransPortPtr_ = std::make_shared<DMTransport>(dmCommToolPtr_);
 
-void DmTransPortFuzzTest(const uint8_t* data, size_t size)
+void DmTransPortFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t socketId = fdp.ConsumeIntegral<int32_t>();
-    std::string rmtNetworkId(reinterpret_cast<const char*>(data), size);
-    std::string dmPkgName(reinterpret_cast<const char*>(data), size);
-    std::string peerSocketName(reinterpret_cast<const char*>(data), size);
+    std::string rmtNetworkId = fdp.ConsumeRandomLengthString();
+    std::string dmPkgName = fdp.ConsumeRandomLengthString();
+    std::string peerSocketName = fdp.ConsumeRandomLengthString();
     PeerSocketInfo info = { .name = const_cast<char*>(peerSocketName.c_str()),
         .networkId = const_cast<char*>(rmtNetworkId.c_str()),
         .pkgName = const_cast<char*>(dmPkgName.c_str()),
@@ -51,26 +47,20 @@ void DmTransPortFuzzTest(const uint8_t* data, size_t size)
     dmTransPortPtr_->OnSocketClosed(socketId, reason);
 
     void* dataInfo = nullptr;
-    uint32_t dataLen = 0;
+    uint32_t dataLen = fdp.ConsumeIntegral<uint32_t>();
     dmTransPortPtr_->OnBytesReceived(socketId, dataInfo, dataLen);
 
-    std::string dataStr(reinterpret_cast<const char*>(data), size);
+    std::string dataStr = fdp.ConsumeRandomLengthString();
     dataInfo = reinterpret_cast<void*>(dataStr.data());
     dataLen = static_cast<uint32_t>(dataStr.length());
     dmTransPortPtr_->OnBytesReceived(socketId, dataInfo, dataLen);
 
-    std::string payload(reinterpret_cast<const char*>(data), size);
-    dmTransPortPtr_->HandleReceiveMessage(socketId, payload);
-
-    payload = "";
+    std::string payload = fdp.ConsumeRandomLengthString();
     dmTransPortPtr_->HandleReceiveMessage(socketId, payload);
 }
 
-void DmTransPortFirstFuzzTest(const uint8_t* data, size_t size)
+void DmTransPortFirstFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
     const char* jsonString = R"({
         "MsgType": "0",
         "userId": "12345",
@@ -84,12 +74,11 @@ void DmTransPortFirstFuzzTest(const uint8_t* data, size_t size)
             {"type": 0, "userId": 222}
         ]
     })";
-    std::string payload(jsonString);
-    FuzzedDataProvider fdp(data, size);
+    std::string payload = fdp.ConsumeRandomLengthString();
     int32_t socketId = fdp.ConsumeIntegral<int32_t>();
-    std::string rmtNetworkId(reinterpret_cast<const char*>(data), size);
-    std::string dmPkgName(reinterpret_cast<const char*>(data), size);
-    std::string peerSocketName(reinterpret_cast<const char*>(data), size);
+    std::string rmtNetworkId = fdp.ConsumeRandomLengthString();
+    std::string dmPkgName = fdp.ConsumeRandomLengthString();
+    std::string peerSocketName = fdp.ConsumeRandomLengthString();
     PeerSocketInfo info = { .name = const_cast<char*>(peerSocketName.c_str()),
         .networkId = const_cast<char*>(rmtNetworkId.c_str()),
         .pkgName = const_cast<char*>(dmPkgName.c_str()),
@@ -101,32 +90,15 @@ void DmTransPortFirstFuzzTest(const uint8_t* data, size_t size)
     dmTransPortPtr_->StartSocket(rmtNetworkId, socketId);
     dmTransPortPtr_->StopSocket(rmtNetworkId);
     dmTransPortPtr_->Send(rmtNetworkId, payload, socketId);
-    rmtNetworkId = "";
-    dmTransPortPtr_->CreateClientSocket(rmtNetworkId);
     dmTransPortPtr_->StartSocket(rmtNetworkId, socketId);
     dmTransPortPtr_->StopSocket(rmtNetworkId);
     dmTransPortPtr_->Send(rmtNetworkId, payload, socketId);
     dmTransPortPtr_->IsDeviceSessionOpened(rmtNetworkId, socketId);
     dmTransPortPtr_->ClearDeviceSocketOpened(rmtNetworkId, socketId);
-    rmtNetworkId = "rmtNetworkId";
-    dmTransPortPtr_->CreateClientSocket(rmtNetworkId);
     dmTransPortPtr_->UnInit();
     dmTransPortPtr_->IsDeviceSessionOpened(rmtNetworkId, socketId);
-    std::string remoteDevId(reinterpret_cast<const char*>(data), size);
+    std::string remoteDevId = fdp.ConsumeRandomLengthString();
     dmTransPortPtr_->ClearDeviceSocketOpened(remoteDevId, socketId);
-    socketId = 1;
-    dmTransPortPtr_->Send(rmtNetworkId, payload, socketId);
-}
-
-void DmTransPortSecondFuzzTest(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
-    std::shared_ptr<DMCommTool> dmCommToolPtr = std::make_shared<DMCommTool>();
-    std::shared_ptr<DMTransport> dmTransPortPtr = std::make_shared<DMTransport>(dmCommToolPtr);
-    dmTransPortPtr->Init();
 }
 } // namespace DistributedHardware
 } // namespace OHOS
@@ -135,8 +107,11 @@ void DmTransPortSecondFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DmTransPortFuzzTest(data, size);
-    OHOS::DistributedHardware::DmTransPortFirstFuzzTest(data, size);
-    OHOS::DistributedHardware::DmTransPortSecondFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DmTransPortFuzzTest(fdp);
+    OHOS::DistributedHardware::DmTransPortFirstFuzzTest(fdp);
     return 0;
 }

@@ -16,7 +16,7 @@
 #include <chrono>
 #include <securec.h>
 #include <string>
-
+#include <fuzzer/FuzzedDataProvider.h>
 #include "device_manager_impl.h"
 #include "dm_constants.h"
 #include "softbus_listener.h"
@@ -30,9 +30,9 @@ void OnParameterChgCallbackFuzzTest(const uint8_t* data, size_t size)
         return;
     }
 
-    const char *key = reinterpret_cast<const char*>(data);
-    std::string str(reinterpret_cast<const char*>(data), size);
-    const char *value = str.data();
+    FuzzedDataProvider fdp(data, size);
+    const char* key = fdp.ConsumeRandomLengthString().c_str();
+    const char* value = fdp.ConsumeRandomLengthString().c_str();
     void *context = nullptr;
     std::shared_ptr<SoftbusListener> softbusListener = std::make_shared<SoftbusListener>();
     softbusListener->OnParameterChgCallback(key, value, context);

@@ -2261,6 +2261,9 @@ bool DmAuthMessageProcessor::IsExistTheToken(JsonObject &proxyObj, int64_t token
         return false;
     }
     for (auto const &item : proxyObj.Items()) {
+        if (item.IsDiscarded() || !item.IsNumberInteger()) {
+            continue;
+        }
         if (tokenId == item.Get<int64_t>()) {
             return true;
         }

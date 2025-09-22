@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 
 #include "device_manager_impl.h"
@@ -29,11 +30,16 @@ void DeviceListFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-
-    std::string extra(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string extra = fdp.ConsumeRandomLengthString();
+    std::string bundleName = fdp.ConsumeRandomLengthString();
     std::vector<DmDeviceInfo> devList;
-    std::string bundleName(reinterpret_cast<const char*>(data), size);
     DmDeviceInfo deviceInfo;
+    deviceInfo.deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
+    deviceInfo.networkType = fdp.ConsumeIntegral<int32_t>();
+    deviceInfo.range = fdp.ConsumeIntegral<int32_t>();
+    deviceInfo.extraData = fdp.ConsumeRandomLengthString();
+    devList.push_back(deviceInfo);
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
     DeviceManager::GetInstance().GetTrustedDeviceList(bundleName, extra, devList);

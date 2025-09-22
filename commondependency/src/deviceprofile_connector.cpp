@@ -234,11 +234,20 @@ DM_EXPORT void DeviceProfileConnector::AclHashVecToJson(
 
 DM_EXPORT void DeviceProfileConnector::AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value)
 {
+    if (itemObject.IsDiscarded() || !IsString(itemObject, TAG_ACL_HASH_KEY_VERSION) ||
+        !IsString(itemObject, TAG_ACL_HASH_KEY_ACLHASHLIST)) {
+        LOGE("Invalid JSON structure for ACL hash item");
+        return;
+    }
     value.version = itemObject[TAG_ACL_HASH_KEY_VERSION].Get<std::string>();
     std::string hashListStr = itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST].Get<std::string>();
     JsonObject hashList;
     hashList.Parse(hashListStr);
     for (auto const &item : hashList.Items()) {
+        if (item.IsDiscarded() || !item.IsString()) {
+            LOGE("ACL hash list contains invalid element");
+            continue;
+        }
         value.aclHashList.push_back(item.Get<std::string>());
     }
 }
@@ -249,6 +258,10 @@ DM_EXPORT void DeviceProfileConnector::AclHashVecFromJson(const JsonItemObject &
     for (auto const &item : itemObject.Items()) {
         JsonObject object;
         AclHashItem aclItem;
+        if (item.IsDiscarded() || !item.IsString()) {
+            LOGE("ItemObject contains invalid element");
+            continue;
+        }
         object.Parse(item.Get<std::string>());
         AclHashItemFromJson(object, aclItem);
         values.push_back(aclItem);
@@ -3129,6 +3142,7 @@ DM_EXPORT void DeviceProfileConnector::CacheAcerAclId(const DistributedDevicePro
     dmAclIdParam.skId = profile.GetAccesser().GetAccesserSessionKeyId();
     dmAclIdParam.credId = profile.GetAccesser().GetAccesserCredentialIdStr();
     dmAclIdParam.accessControlId = profile.GetAccessControlId();
+    dmAclIdParam.pkgName = profile.GetAccesser().GetAccesserBundleName();
     aclInfos.push_back(dmAclIdParam);
 }
 
@@ -3141,6 +3155,7 @@ DM_EXPORT void DeviceProfileConnector::CacheAceeAclId(const DistributedDevicePro
     dmAclIdParam.skId = profile.GetAccessee().GetAccesseeSessionKeyId();
     dmAclIdParam.credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
     dmAclIdParam.accessControlId = profile.GetAccessControlId();
+    dmAclIdParam.pkgName = profile.GetAccessee().GetAccesseeBundleName();
     aclInfos.push_back(dmAclIdParam);
 }
 

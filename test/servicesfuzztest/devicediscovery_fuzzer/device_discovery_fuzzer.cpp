@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,23 +44,22 @@ void DeviceDiscoveryFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size < (sizeof(uint16_t) + sizeof(uint16_t)))) {
         return;
     }
-    std::string bundleName(reinterpret_cast<const char*>(data), size);
-    uint16_t subscriptionId = 22;
-
     FuzzedDataProvider fdp(data, size);
+    std::string bundleName = fdp.ConsumeRandomLengthString();
+    uint16_t subscriptionId = fdp.ConsumeIntegral<uint16_t>();
+
     DmSubscribeInfo subInfo;
     subInfo.subscribeId = fdp.ConsumeIntegral<uint16_t>();
     subInfo.mode = DM_DISCOVER_MODE_ACTIVE;
     subInfo.medium = DM_USB;
-    subInfo.isSameAccount = true;
-    subInfo.isWakeRemote = true;
+    subInfo.isSameAccount = fdp.ConsumeBool();
+    subInfo.isWakeRemote = fdp.ConsumeBool();
     if (strncpy_s(subInfo.capability, DM_MAX_DEVICE_CAPABILITY_LEN, "111", DM_MAX_DEVICE_CAPABILITY_LEN) != 0) {
         return;
     }
-    std::string extra = "extraInfo";
+    std::string extra = fdp.ConsumeRandomLengthString();
 
     std::shared_ptr<DiscoveryCallback> callback = std::make_shared<DeviceDiscoveryCallbackTest>();
-    bundleName = "111";
     subInfo.subscribeId = subscriptionId;
     DeviceManager::GetInstance().StartDeviceDiscovery(bundleName, subInfo, extra, callback);
     usleep(SLEEP_TIME_US);

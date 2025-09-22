@@ -14,7 +14,6 @@
  */
 
 #include "device_manager_notify_fuzzer.h"
-
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
@@ -62,16 +61,12 @@ public:
     void OnServiceOffline(int64_t serviceId) override {}
 };
 
-void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerNotifyUnRegisterFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    uint16_t subscribeId = 33;
-    int32_t publishId = 123;
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    uint16_t subscribeId = fdp.ConsumeIntegral<uint16_t>();
+    int32_t publishId = fdp.ConsumeIntegral<int32_t>();
 
     DeviceManagerNotify::GetInstance().UnRegisterDeathRecipientCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
@@ -83,20 +78,20 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().OnUiCall(pkgName, deviceId);
 }
 
-void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerNotifyDeviceStatusFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string token(reinterpret_cast<const char*>(data), size);
-    uint16_t subscribeId = 12;
-    int32_t failedReason = 231;
-    uint32_t status = 3;
-    uint32_t reason = 14;
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string token = fdp.ConsumeRandomLengthString();
+    uint16_t subscribeId = fdp.ConsumeIntegral<uint16_t>();
+    int32_t failedReason = fdp.ConsumeIntegral<int32_t>();
+    uint32_t status = fdp.ConsumeIntegral<uint32_t>();
+    uint32_t reason = fdp.ConsumeIntegral<uint32_t>();
     DmDeviceInfo deviceInfo;
+    deviceInfo.deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
+    deviceInfo.networkType = fdp.ConsumeIntegral<int32_t>();
+    deviceInfo.range = fdp.ConsumeIntegral<int32_t>();
+    deviceInfo.extraData = fdp.ConsumeRandomLengthString();
     DmDeviceBasicInfo deviceBasicInfo;
 
     DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, deviceInfo);
@@ -113,27 +108,17 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, status, reason);
 }
 
-void DeviceManagerNotifyOnPublishResultFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerNotifyOnPublishResultFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
-    int32_t publishResult = *(reinterpret_cast<const int32_t*>(data));
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    int32_t publishId = fdp.ConsumeIntegral<int32_t>();
+    int32_t publishResult = fdp.ConsumeIntegral<int32_t>();
 
     DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, publishResult);
 }
 
-void OnServiceOnlineFuzzTest(const uint8_t* data, size_t size)
+void OnServiceOnlineFuzzTest(FuzzedDataProvider &fdp)
 {
-    constexpr size_t minRequiredSize = sizeof(int64_t) + 1;
-    if ((data == nullptr) || (size < minRequiredSize)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     std::vector<int64_t> serviceIds;
     while (fdp.remaining_bytes() >= sizeof(int64_t)) {
         serviceIds.push_back(fdp.ConsumeIntegral<int64_t>());
@@ -142,14 +127,8 @@ void OnServiceOnlineFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().OnServiceOnline(serviceIds);
 }
 
-void ServiceInfoOnlineFuzzTest(const uint8_t* data, size_t size)
+void ServiceInfoOnlineFuzzTest(FuzzedDataProvider &fdp)
 {
-    constexpr size_t minRequiredSize = sizeof(int64_t) + 1;
-    if ((data == nullptr) || (size < minRequiredSize)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
     std::vector<std::pair<std::shared_ptr<ServiceInfoStateCallback>, int64_t>> callbackInfo;
     while (fdp.remaining_bytes() >= sizeof(int64_t)) {
@@ -160,97 +139,56 @@ void ServiceInfoOnlineFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().ServiceInfoOnline(callbackInfo);
 }
 
-void RegisterServiceStateCallbackFuzzTest(const uint8_t* data, size_t size)
+void RegisterServiceStateCallbackFuzzTest(FuzzedDataProvider &fdp)
 {
-    constexpr size_t minRequiredSize = 2;
-    if ((data == nullptr) || (size < minRequiredSize)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
-
     std::string key = fdp.ConsumeRandomLengthString(size);
     std::shared_ptr<ServiceInfoStateCallback> callback = std::make_shared<ServiceInfoStateCallbackTest>();
 
     DeviceManagerNotify::GetInstance().RegisterServiceStateCallback(key, callback);
 }
 
-void UnRegisterServiceStateCallbackFuzzTest(const uint8_t* data, size_t size)
+void UnRegisterServiceStateCallbackFuzzTest(FuzzedDataProvider &fdp)
 {
-    constexpr size_t minRequiredSize = 2;
-    if ((data == nullptr) || (size < minRequiredSize)) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::string key = fdp.ConsumeRandomLengthString(size);
 
     DeviceManagerNotify::GetInstance().UnRegisterServiceStateCallback(key);
 }
 
-void RegisterServicePublishCallbackFuzzTest(const uint8_t* data, size_t size)
+void RegisterServicePublishCallbackFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
     auto callback = std::make_shared<MockServicePublishCallback>();
     DeviceManagerNotify::GetInstance().RegisterServicePublishCallback(serviceId, callback);
 }
 
-void UnRegisterServicePublishCallbackFuzzTest(const uint8_t* data, size_t size)
+void UnRegisterServicePublishCallbackFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int64_t))) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
     DeviceManagerNotify::GetInstance().UnRegisterServicePublishCallback(serviceId);
 }
 
-void OnServicePublishResultFuzzTest(const uint8_t* data, size_t size)
+void OnServicePublishResultFuzzTest(FuzzedDataProvider &fdp)
 {
-    const size_t minSize = sizeof(int64_t) + sizeof(int32_t);
-    if ((data == nullptr) || (size < minSize)) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
     int32_t publishResult = fdp.ConsumeIntegral<int32_t>();
     DeviceManagerNotify::GetInstance().OnServicePublishResult(serviceId, publishResult);
 }
 
-void RegisterServiceDiscoveryCallbackFuzzTest(const uint8_t* data, size_t size)
+void RegisterServiceDiscoveryCallbackFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<ServiceDiscoveryCallback> callback = std::make_shared<ServiceDiscoveryCallbackTest>();
     DeviceManagerNotify::GetInstance().RegisterServiceDiscoveryCallback(discoveryServiceId, callback);
 }
 
-void UnRegisterServiceDiscoveryCallbackFuzzTest(const uint8_t* data, size_t size)
+void UnRegisterServiceDiscoveryCallbackFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
     DeviceManagerNotify::GetInstance().UnRegisterServiceDiscoveryCallback(discoveryServiceId);
 }
 
-void OnServiceFoundFuzzTest(const uint8_t* data, size_t size)
+void OnServiceFoundFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t maxStringLength = 64;
-    if ((data == nullptr) || (size < maxStringLength)) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
     DiscoveryServiceInfo service;
     service.serviceInfo.serviceName = fdp.ConsumeRandomLengthString(maxStringLength);
@@ -266,14 +204,8 @@ void OnServiceFoundFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().OnServiceFound(discoveryServiceId, service);
 }
 
-void OnServiceDiscoveryResultFuzzTest(const uint8_t* data, size_t size)
+void OnServiceDiscoveryResultFuzzTest(FuzzedDataProvider &fdp)
 {
-    int32_t maxStringLength = sizeof(int32_t) + sizeof(int32_t);
-    if ((data == nullptr) || (size < maxStringLength)) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
-
     int32_t discoveryServiceId = fdp.ConsumeIntegral<int32_t>();
     int32_t resReason = fdp.ConsumeIntegral<int32_t>();
 
@@ -291,20 +223,24 @@ void OnServiceDiscoveryResultFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceManagerNotifyUnRegisterFuzzTest(data, size);
-    OHOS::DistributedHardware::DeviceManagerNotifyDeviceStatusFuzzTest(data, size);
-    OHOS::DistributedHardware::DeviceManagerNotifyOnPublishResultFuzzTest(data, size);
-    OHOS::DistributedHardware::OnServiceOnlineFuzzTest(data, size);
-    OHOS::DistributedHardware::ServiceInfoOnlineFuzzTest(data, size);
-    OHOS::DistributedHardware::RegisterServiceStateCallbackFuzzTest(data, size);
-    OHOS::DistributedHardware::UnRegisterServiceStateCallbackFuzzTest(data, size);
-    OHOS::DistributedHardware::RegisterServicePublishCallbackFuzzTest(data, size);
-    OHOS::DistributedHardware::UnRegisterServicePublishCallbackFuzzTest(data, size);
-    OHOS::DistributedHardware::OnServicePublishResultFuzzTest(data, size);
-    OHOS::DistributedHardware::RegisterServiceDiscoveryCallbackFuzzTest(data, size);
-    OHOS::DistributedHardware::UnRegisterServiceDiscoveryCallbackFuzzTest(data, size);
-    OHOS::DistributedHardware::OnServiceFoundFuzzTest(data, size);
-    OHOS::DistributedHardware::OnServiceDiscoveryResultFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DeviceManagerNotifyUnRegisterFuzzTest(fdp);
+    OHOS::DistributedHardware::DeviceManagerNotifyDeviceStatusFuzzTest(fdp);
+    OHOS::DistributedHardware::DeviceManagerNotifyOnPublishResultFuzzTest(fdp);
+    OHOS::DistributedHardware::OnServiceOnlineFuzzTest(fdp);
+    OHOS::DistributedHardware::ServiceInfoOnlineFuzzTest(fdp);
+    OHOS::DistributedHardware::RegisterServiceStateCallbackFuzzTest(fdp);
+    OHOS::DistributedHardware::UnRegisterServiceStateCallbackFuzzTest(fdp);
+    OHOS::DistributedHardware::RegisterServicePublishCallbackFuzzTest(fdp);
+    OHOS::DistributedHardware::UnRegisterServicePublishCallbackFuzzTest(fdp);
+    OHOS::DistributedHardware::OnServicePublishResultFuzzTest(fdp);
+    OHOS::DistributedHardware::RegisterServiceDiscoveryCallbackFuzzTest(fdp);
+    OHOS::DistributedHardware::UnRegisterServiceDiscoveryCallbackFuzzTest(fdp);
+    OHOS::DistributedHardware::OnServiceFoundFuzzTest(fdp);
+    OHOS::DistributedHardware::OnServiceDiscoveryResultFuzzTest(fdp);
 
     return 0;
 }

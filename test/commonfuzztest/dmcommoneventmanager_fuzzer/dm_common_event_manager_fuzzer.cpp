@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #include "dm_common_event_manager.h"
 #include "dm_log.h"
 #include "dm_common_event_manager_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -25,8 +26,8 @@ void DmCommonEventManagerFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-
-    std::string eventName(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string eventName = fdp.ConsumeRandomLengthString();
     std::vector<std::string> eventNameVec;
     eventNameVec.push_back(eventName);
     DmCommonEventManager dmCommonEventManager;

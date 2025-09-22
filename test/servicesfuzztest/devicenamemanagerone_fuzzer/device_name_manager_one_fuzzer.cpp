@@ -32,7 +32,7 @@ void DeviceNameManagerOnePrivateFuzzTest(FuzzedDataProvider &fdp)
     std::string tableName = fdp.ConsumeRandomLengthString();
     std::string key = fdp.ConsumeRandomLengthString();
     std::string proxyUri = fdp.ConsumeRemainingBytesAsString();
-    std::string value;
+    std::string value = fdp.ConsumeRemainingBytesAsString();
     
     DeviceNameManager::GetInstance().RegisterDeviceNameChangeMonitor(fdp.ConsumeIntegral<int32_t>(),
         fdp.ConsumeIntegral<int32_t>());
@@ -61,16 +61,11 @@ void DeviceNameManagerOnePrivateFuzzTest(FuzzedDataProvider &fdp)
     DeviceNameManager::GetInstance().ReleaseDataShareHelper(helper);
 }
     
-void DeviceNameManagerOneFuzzTest(const uint8_t* data, size_t size)
+void DeviceNameManagerOneFuzzTest(FuzzedDataProvider &fdp)
 {
-    if (data == nullptr) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
-
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     int32_t maxNamelength = fdp.ConsumeIntegral<int32_t>();
-    std::string displayName;
+    std::string displayName = fdp.ConsumeRandomLengthString();
     std::string deviceName = fdp.ConsumeRandomLengthString();
     int32_t curUserId = fdp.ConsumeIntegral<int32_t>();
     int32_t preUserId = fdp.ConsumeIntegral<int32_t>();
@@ -93,8 +88,6 @@ void DeviceNameManagerOneFuzzTest(const uint8_t* data, size_t size)
     DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
     DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
     DeviceNameManager::GetInstance().InitDeviceNameWhenLanguageOrRegionChanged();
-
-    OHOS::DistributedHardware::DeviceNameManagerOnePrivateFuzzTest(fdp);
 }
 }
 }
@@ -103,7 +96,12 @@ void DeviceNameManagerOneFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceNameManagerOneFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DeviceNameManagerOneFuzzTest(fdp);
+    OHOS::DistributedHardware::DeviceNameManagerOnePrivateFuzzTest(fdp);
 
     return 0;
 }

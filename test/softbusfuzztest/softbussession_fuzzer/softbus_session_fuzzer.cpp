@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,7 +63,7 @@ void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     int result = fdp.ConsumeIntegral<int>();
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
     std::shared_ptr<SoftbusSession> softbusSession = std::make_shared<SoftbusSession>();
 
     softbusSession->RegisterSessionCallback(std::make_shared<SoftbusSessionCallbackTest>());
@@ -74,7 +74,6 @@ void SoftBusSessionFuzzTest(const uint8_t* data, size_t size)
     softbusSession->SendData(sessionId, str);
     softbusSession->SendHeartbeatData(sessionId, str);
     softbusSession->OnSessionClosed(result);
-    softbusSession->UnRegisterSessionCallback();
 }
 }
 }

@@ -2006,8 +2006,7 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &inf
     DmOfflineParam offlineParam;
     bool notifyOffline = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId,
         offlineParam);
-    CHECK_NULL_VOID(hiChainConnector_);
-    hiChainConnector_->DeleteAllGroup(info.localUserId);
+    DeleteGroupByBundleName(info.localUdid, info.localUserId, offlineParam.needDelAclInfos);
     CHECK_NULL_VOID(hiChainAuthConnector_);
     {
         std::lock_guard lock(logoutMutex_);
@@ -3316,6 +3315,38 @@ void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &device
 {
     CHECK_NULL_VOID(deviceStateMgr_);
     deviceStateMgr_->StartDelTimerByDP(deviceUdid, deviceUdidHash);
+}
+
+void DeviceManagerServiceImpl::DeleteGroupByBundleName(const std::string &localUdid, int32_t userId,
+    const std::vector<DmAclIdParam> &acls)
+{
+    if (acls.empty()) {
+        LOGI("acls is empty.");
+        return;
+    }
+    CHECK_NULL_VOID(hiChainConnector_);
+    std::vector<GroupInfo> groupList;
+    hiChainConnector_->GetRelatedGroups(userId, localUdid, groupList);
+    for (auto &iter : groupList) {
+        for (auto &item : acls) {
+            if (!item.pkgName.empty() && iter.groupName.find(item.pkgName) != std::string::npos) {
+                int32_t ret = hiChainConnector_->DeleteGroup(iter.groupId);
+                LOGI("delete bundleName %{public}s, groupId %{public}s ,result %{public}d.",
+                    item.pkgName.c_str(), GetAnonyString(iter.groupId).c_str(), ret);
+            }
+        }
+    }
+    std::vector<GroupInfo> groupListExt;
+    hiChainConnector_->GetRelatedGroupsExt(userId, localUdid, groupListExt);
+    for (auto &iter : groupListExt) {
+        for (auto &item : acls) {
+            if (!item.pkgName.empty() && iter.groupName.find(item.pkgName) != std::string::npos) {
+                int32_t ret = hiChainConnector_->DeleteGroupExt(iter.groupId);
+                LOGI("delete groupsExt bundleName %{public}s, groupId %{public}s ,result %{public}d.",
+                    item.pkgName.c_str(), GetAnonyString(iter.groupId).c_str(), ret);
+            }
+        }
+    }
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

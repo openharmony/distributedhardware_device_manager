@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,7 @@ void IpcServerClientProxyFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     FuzzedDataProvider fdp(data, size);
-    int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
+    int32_t cmdCode = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     sptr<IRemoteObject> remoteObject = nullptr;
