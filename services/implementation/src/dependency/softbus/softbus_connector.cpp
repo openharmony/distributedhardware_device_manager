@@ -60,6 +60,9 @@ std::mutex SoftbusConnector::deviceUdidLocks_;
 std::mutex SoftbusConnector::processInfoVecMutex_;
 std::mutex SoftbusConnector::processChangeInfoVecMutex_;
 std::shared_ptr<ISoftbusConnectorCallback> SoftbusConnector::connectorCallback_ = nullptr;
+std::shared_ptr<ISoftbusLeaveLNNCallback> SoftbusConnector::leaveLNNCallback_ = nullptr;
+std::mutex SoftbusConnector::leaveLNNMutex_;
+std::map<std::string, std::string> SoftbusConnector::leaveLnnPkgMap_ = {};
 
 SoftbusConnector::SoftbusConnector()
 {
@@ -903,6 +906,49 @@ void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeB
         extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
         dmDeviceInfo.extraData = ToString(extraJson);
     }
+}
+
+int32_t SoftbusConnector::LeaveLNN(const std::string &pkgName, const std::string &networkId)
+{
+    LOGI("NetworkId: %{public}s", GetAnonyString(networkId).c_str());
+    {
+        std::lock_guard<std::mutex> lock(leaveLNNMutex_);
+        if (leaveLnnPkgMap_.size() == MAX_CONTAINER_SIZE) {
+            leaveLnnPkgMap_.erase(leaveLnnPkgMap_.begin());
+        }
+        leaveLnnPkgMap_[networkId] = pkgName;
+    }
+    return ::LeaveLNN(DM_PKG_NAME, networkId.c_str(), OnLeaveLNNResult);
+}
+
+void SoftbusConnector::OnLeaveLNNResult(const char *networkId, int32_t retCode)
+{
+    if (retCode == SOFTBUS_OK) {
+        LOGI("leave LNN called success.");
+        return;
+    }
+    if (networkId == nullptr || networkId[0] == '\0') {
+        LOGI("networkId is empty.");
+        return;
+    }
+    LOGE("retCode: %{public}d, networkId: %{public}s", retCode, GetAnonyString(networkId).c_str());
+    std::lock_guard<std::mutex> lock(leaveLNNMutex_);
+    CHECK_NULL_VOID(leaveLNNCallback_);
+    auto iter = leaveLnnPkgMap_.find(networkId);
+    if (iter != leaveLnnPkgMap_.end()) {
+        leaveLNNCallback_->OnLeaveLNNResult(iter->second, networkId, retCode);
+        leaveLnnPkgMap_.erase(networkId);
+    }
+}
+
+void SoftbusConnector::RegisterLeaveLNNCallback(std::shared_ptr<ISoftbusLeaveLNNCallback> callback)
+{
+    leaveLNNCallback_ = callback;
+}
+
+void SoftbusConnector::UnRegisterLeaveLNNCallback()
+{
+    leaveLNNCallback_ = nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -494,6 +494,7 @@ public:
     static bool IsPinCodeValid(int32_t numpin);
     bool IsImportedAuthCodeValid();
     bool IsSrc();
+    void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode);
 
 private:
     bool IsHmlSessionType();

@@ -1658,5 +1658,45 @@ void DeviceManagerNotify::OnServicePublishResult(int64_t serviceId, int32_t publ
     tempCbk->OnServicePublishResult(serviceId, publishResult);
     LOGI("OnServicePublishResult end");
 }
+
+void DeviceManagerNotify::RegisterLeaveLnnCallback(const std::string &networkId,
+    std::shared_ptr<LeaveLNNCallback> callback)
+{
+    if (callback == nullptr) {
+        LOGE("Invalid parameter, callback is nullptr.");
+        return;
+    }
+    std::lock_guard<std::mutex> autoLock(lock_);
+    if (leaveLnnCallback_.size() == MAX_CONTAINER_SIZE) {
+        leaveLnnCallback_.erase(leaveLnnCallback_.begin());
+    }
+    leaveLnnCallback_[networkId] = callback;
+}
+
+void DeviceManagerNotify::OnLeaveLNNResult(const std::string &networkId, int32_t retCode)
+{
+    if (networkId.empty()) {
+        LOGE("Error, networkId is empty.");
+        return;
+    }
+    LOGI("Start, networkId: %{public}s, retCode: %{public}d",
+        GetAnonyString(networkId).c_str(), retCode);
+    std::shared_ptr<LeaveLNNCallback> tempCbk;
+    {
+        std::lock_guard<std::mutex> autoLock(lock_);
+        auto iter = leaveLnnCallback_.find(networkId);
+        if (iter == leaveLnnCallback_.end()) {
+            LOGE("Error, callback not registered for networkId");
+            return;
+        }
+        tempCbk = iter->second;
+        leaveLnnCallback_.erase(networkId);
+    }
+    if (tempCbk == nullptr) {
+        LOGE("Error, registered callback is nullptr");
+        return;
+    }
+    tempCbk->OnLeaveLNNCallback(networkId, retCode);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -453,6 +453,8 @@ public:
     virtual int32_t StopPublishService(int64_t serviceId) override;
     virtual int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId) override;
     virtual int32_t UnRegisterServiceInfo(int32_t regServiceId) override;
+    virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId,
+        std::shared_ptr<LeaveLNNCallback> callback) override;
 
 private:
     DeviceManagerImpl() = default;

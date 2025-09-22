@@ -286,6 +286,7 @@ public:
     bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
     bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee);
+    int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
 
 private:
     bool IsDMServiceImplReady();

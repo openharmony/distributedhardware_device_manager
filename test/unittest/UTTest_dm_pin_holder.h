@@ -309,6 +309,13 @@ public:
         (void)serviceId;
         (void)publishResult;
     }
+
+    virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode)
+    {
+        (void)pkgName;
+        (void)networkId;
+        (void)retCode;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

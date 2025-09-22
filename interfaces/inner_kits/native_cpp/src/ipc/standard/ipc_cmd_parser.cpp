@@ -2460,5 +2460,38 @@ ON_IPC_READ_RESPONSE(UNREGISTER_SERVICE_INFO, MessageParcel &reply, std::shared_
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
+
+ON_IPC_SET_REQUEST(LEAVE_LNN, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetDeviceScreenStatusReq> pReq =
+        std::static_pointer_cast<IpcGetDeviceScreenStatusReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string networkId = pReq->GetNetWorkId();
+    if (!data.WriteString(pkgName)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(networkId)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(LEAVE_LNN, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcRsp> pRsp = std::static_pointer_cast<IpcRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(LEAVE_LNN_RESULT, MessageParcel &data, MessageParcel &reply)
+{
+    std::string networkId = data.ReadString();
+    int32_t code = data.ReadInt32();
+    DeviceManagerNotify::GetInstance().OnLeaveLNNResult(networkId, code);
+    reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
