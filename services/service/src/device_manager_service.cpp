@@ -4327,6 +4327,7 @@ bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, 
     return dmServiceImpl_->CheckSinkIsSameAccount(caller, srcUdid, callee, sinkUdid);
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
     const std::vector<std::string> deviceIdList, std::map<std::string, std::string> &deviceIdToUdidMap)
 {
@@ -4339,8 +4340,8 @@ int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
-    if (!PermissionManager::GetInstance().CheckAccessServicePermission() &&
-        !PermissionManager::GetInstance().CheckDataSyncPermission() &&
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission() ||
+        !PermissionManager::GetInstance().CheckDataSyncPermission() ||
         !PermissionManager::GetInstance().CheckSoftbusCenterPermission()) {
         LOGE("The caller does not have permission to call GetUdidsByDeviceIds.");
         return ERR_DM_NO_PERMISSION;
@@ -4359,6 +4360,7 @@ int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
     }
     return DM_OK;
 }
+#endif
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId,
