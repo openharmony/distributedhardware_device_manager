@@ -388,6 +388,11 @@ int32_t DmAuthState::GetAclBindType(std::shared_ptr<DmAuthContext> context, std:
         LOGE("GetAclBindType result not contains credId.");
         return DM_UNKNOWN_TYPE;
     }
+    if (!result[credId].Contains(FILED_CRED_TYPE) ||
+        !result[credId][FILED_CRED_TYPE].IsNumberInteger()) {
+        LOGE("credType is invalid.");
+        return DM_UNKNOWN_TYPE;
+    }
     int32_t credType = result[credId][FILED_CRED_TYPE].Get<int32_t>();
     if (credType == DM_AUTH_CREDENTIAL_ACCOUNT_RELATED) {
         return DM_SAME_ACCOUNT_TYPE;
@@ -401,8 +406,23 @@ int32_t DmAuthState::GetAclBindType(std::shared_ptr<DmAuthContext> context, std:
     return DM_UNKNOWN_TYPE;
 }
 
+bool DmAuthState::ValidateCredInfoStructure(const JsonItemObject &credInfo)
+{
+    if (!credInfo.Contains(FILED_CRED_TYPE) || !credInfo[FILED_CRED_TYPE].IsNumberInteger() ||
+        !credInfo.Contains(FILED_AUTHORIZED_SCOPE) || !credInfo[FILED_AUTHORIZED_SCOPE].IsNumberInteger() ||
+        !credInfo.Contains(FILED_SUBJECT) || !credInfo[FILED_SUBJECT].IsNumberInteger()) {
+        LOGE("credType or authorizedScope or subject invalid.");
+        return false;
+    }
+    return true;
+}
+
 uint32_t DmAuthState::GetCredType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo)
 {
+    CHECK_NULL_RETURN(context, DM_INVALIED_TYPE);
+    if (!ValidateCredInfoStructure(credInfo)) {
+        return DM_INVALIED_TYPE;
+    }
     int32_t credType = credInfo[FILED_CRED_TYPE].Get<int32_t>();
     int32_t authorizedScope = credInfo[FILED_AUTHORIZED_SCOPE].Get<int32_t>();
     int32_t subject = credInfo[FILED_SUBJECT].Get<int32_t>();
@@ -475,10 +495,7 @@ int32_t DmAuthState::GetProxyCredInfo(std::shared_ptr<DmAuthContext> context, co
 uint32_t DmAuthState::GetCredentialType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo)
 {
     CHECK_NULL_RETURN(context, DM_INVALIED_TYPE);
-    if (!credInfo.Contains(FILED_CRED_TYPE) || !credInfo[FILED_CRED_TYPE].IsNumberInteger() ||
-        !credInfo.Contains(FILED_AUTHORIZED_SCOPE) || !credInfo[FILED_AUTHORIZED_SCOPE].IsNumberInteger() ||
-        !credInfo.Contains(FILED_SUBJECT) || !credInfo[FILED_SUBJECT].IsNumberInteger()) {
-        LOGE("credType or authorizedScope invalid.");
+    if (!ValidateCredInfoStructure(credInfo)) {
         return DM_INVALIED_TYPE;
     }
     return GetCredType(context, credInfo);
