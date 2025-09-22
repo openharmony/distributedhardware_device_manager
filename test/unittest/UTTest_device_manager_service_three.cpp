@@ -1083,7 +1083,8 @@ HWTEST_F(DeviceManagerServiceThreeTest, RegisterServiceInfo_006, testing::ext::T
     EXPECT_CALL(*deviceManagerServiceImplMock_, GenerateRegServiceId(_)).Times(AnyNumber()).WillOnce(Return(DM_OK));
     EXPECT_CALL(*deviceManagerServiceImplMock_, ConvertServiceInfoProfileByRegInfo(_, _))
         .Times(AnyNumber()).WillOnce(Return(DM_OK));
-    EXPECT_CALL(*deviceProfileConnectorMock_, PutServiceInfoProfile(_)).WillOnce(Return(ERR_DM_FAILED));
+    EXPECT_CALL(*deviceProfileConnectorMock_, PutServiceInfoProfile(_)).Times(AnyNumber())
+        .WillOnce(Return(ERR_DM_FAILED));
     int32_t ret = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
     EXPECT_TRUE(ret == ERR_DM_UNSUPPORTED_METHOD || ret == ERR_DM_FAILED);
 }
