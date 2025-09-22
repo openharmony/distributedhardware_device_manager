@@ -1452,6 +1452,7 @@ ohos_unittest("UTTest_device_manager_service_listener") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "cJSON:cjson",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",

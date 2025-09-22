@@ -1898,7 +1898,7 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_001, testing::ext::TestSize
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
     targetId.serviceId = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
@@ -1909,7 +1909,7 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_002, testing::ext::TestSize
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
     targetId.serviceId = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1920,7 +1920,7 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_003, testing::ext::TestSize
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
     targetId.serviceId = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1941,7 +1941,7 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_005, testing::ext::TestSize
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
     targetId.serviceId = 123;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
     EXPECT_NE(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1953,7 +1953,7 @@ HWTEST_F(DeviceManagerServiceTest, BindServiceTarget_006, testing::ext::TestSize
     targetId.serviceId = 1;
     std::map<std::string, std::string> bindParam;
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().BindServiceTarget(pkgName, targetId, bindParam);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1962,7 +1962,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindServiceTarget_001, testing::ext::TestSi
 {
     std::string pkgName = "";
     int64_t serviceId = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1971,7 +1971,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindServiceTarget_002, testing::ext::TestSi
 {
     std::string pkgName = "com.ohos.test";
     int64_t serviceId = 0;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
@@ -1981,7 +1981,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindServiceTarget_003, testing::ext::TestSi
     std::string pkgName = "com.ohos.test";
     int64_t serviceId = 1;
     DeviceManagerService::GetInstance().isImplsoLoaded_ = false;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(true));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
     EXPECT_EQ(ret, DM_OK);
 }
@@ -1990,7 +1990,7 @@ HWTEST_F(DeviceManagerServiceTest, UnbindServiceTarget_004, testing::ext::TestSi
 {
     std::string pkgName = "com.ohos.test";
     int64_t serviceId = 1;
-    EXPECT_CALL(*permissionManagerMock_, CheckPermission()).WillOnce(Return(false));
+    EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().UnbindServiceTarget(pkgName, serviceId);
     EXPECT_EQ(ret, ERR_DM_NO_PERMISSION);
 }
