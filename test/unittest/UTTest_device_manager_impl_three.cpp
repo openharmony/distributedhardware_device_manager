@@ -1515,7 +1515,7 @@ HWTEST_F(DeviceManagerImplTest, StopServiceDiscovery_002, testing::ext::TestSize
 {
     std::string pkgName = "com.ohos.test";
     int32_t discoveryServiceId = 0;
-    int32_t ret = DeviceManager::GetInstance().StopServiceDiscovery(pkgName, discoveryServiceId);`
+    int32_t ret = DeviceManager::GetInstance().StopServiceDiscovery(pkgName, discoveryServiceId);
     ret = (ret == ERR_DM_INPUT_PARA_INVALID) || (ret == ERR_DM_UNSUPPORTED_METHOD);
     ASSERT_EQ(ret, true);
 }
