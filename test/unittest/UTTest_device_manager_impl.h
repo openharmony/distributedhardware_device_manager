@@ -154,6 +154,14 @@ public:
     }
     void OnBindResult(const PeerTargetId &targetId, int32_t result, int32_t status, std::string content) override {}
 };
+
+class LeaveLNNCallbackTest : public LeaveLNNCallback {
+public:
+    virtual ~LeaveLNNCallbackTest()
+    {
+    }
+    void OnLeaveLNNCallback(const std::string &networkId, int32_t retCode) override {}
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 

@@ -23,6 +23,7 @@
 
 #include "softbus_session_callback.h"
 #include "softbus_connector_callback.h"
+#include "softbus_leavelnn_callback.h"
 #include "hichain_connector_callback.h"
 #include "auth_request_state.h"
 #include "auth_response_state.h"
@@ -120,7 +121,8 @@ enum DmRole {
 class AuthManagerBase : public ISoftbusSessionCallback,
                         public ISoftbusConnectorCallback,
                         public IHiChainConnectorCallback,
-                        public IDmDeviceAuthCallback {
+                        public IDmDeviceAuthCallback,
+                        public ISoftbusLeaveLNNCallback {
 public:
     virtual int32_t AuthenticateDevice(const std::string &pkgName, int32_t authType, const std::string &deviceId,
                                        const std::string &extra);
@@ -240,6 +242,7 @@ public:
      */
     virtual void PrepareSoftbusSessionCallback();
     virtual void DeleteTimer();
+    virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode);
 
     // Public functions
     static std::string ConvertSrcVersion(const std::string &version, const std::string &edition);

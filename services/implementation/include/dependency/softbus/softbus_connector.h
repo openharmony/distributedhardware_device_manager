@@ -33,6 +33,7 @@
 #endif
 #include "softbus_connector_callback.h"
 #include "softbus_state_callback.h"
+#include "softbus_leavelnn_callback.h"
 #include "hichain_auth_connector.h"
 
 namespace OHOS {
@@ -146,6 +147,10 @@ public:
         const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
+    int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
+    static void OnLeaveLNNResult(const char *networkId, int32_t retCode);
+    void RegisterLeaveLNNCallback(std::shared_ptr<ISoftbusLeaveLNNCallback> callback);
+    void UnRegisterLeaveLNNCallback();
 
 private:
     static std::shared_ptr<ConnectionAddr> SetAddrAndJson(const ConnectionAddr *addr,
@@ -178,6 +183,9 @@ private:
     static std::mutex processInfoVecMutex_;
     static std::mutex processChangeInfoVecMutex_;
     static std::shared_ptr<ISoftbusConnectorCallback> connectorCallback_;
+    static std::shared_ptr<ISoftbusLeaveLNNCallback> leaveLNNCallback_;
+    static std::mutex leaveLNNMutex_;
+    static std::map<std::string, std::string> leaveLnnPkgMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

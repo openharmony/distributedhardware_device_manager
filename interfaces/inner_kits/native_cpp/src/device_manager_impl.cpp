@@ -3252,5 +3252,31 @@ int32_t DeviceManagerImpl::UnRegisterServiceInfo(int32_t regServiceId)
     LOGI("End");
     return DM_OK;
 }
+
+int32_t DeviceManagerImpl::LeaveLNN(const std::string &pkgName, const std::string &networkId,
+    std::shared_ptr<LeaveLNNCallback> callback)
+{
+    LOGD("Start");
+    if (pkgName.empty() || networkId.empty() || callback == nullptr) {
+        LOGE("param error: pkgName, networkId or callback is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    DeviceManagerNotify::GetInstance().RegisterLeaveLnnCallback(networkId, callback);
+    std::shared_ptr<IpcGetDeviceScreenStatusReq> req = std::make_shared<IpcGetDeviceScreenStatusReq>();
+    std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
+    req->SetPkgName(pkgName);
+    req->SetNetWorkId(networkId);
+    int32_t ret = ipcClientProxy_->SendRequest(LEAVE_LNN, req, rsp);
+    if (ret != DM_OK) {
+        LOGI("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

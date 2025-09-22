@@ -4781,5 +4781,22 @@ int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
     return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
 }
 #endif
+
+int32_t DeviceManagerService::LeaveLNN(const std::string &pkgName, const std::string &networkId)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller: %{public}s does not have permission to call LeaveLNN.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("Failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->LeaveLNN(pkgName, networkId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
