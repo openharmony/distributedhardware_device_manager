@@ -47,6 +47,13 @@ public:
     void DeleteOffLineTimer(std::string udidHash) override {}
 };
 
+class ISoftbusLeaveLNNCallbackTest : public ISoftbusLeaveLNNCallback {
+public:
+    virtual ~ISoftbusLeaveLNNCallbackTest() {}
+    void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
+        int32_t retCode) {}
+};
+
 void SoftbusConnectorTest::SetUp()
 {
 }
