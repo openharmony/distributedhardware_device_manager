@@ -4335,7 +4335,7 @@ int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    if (!AppManager::GetInstance().IsSystemSA() && !AppManager::GetInstance().IsSystemApp()) {
+    if (!AppManager::GetInstance().IsSystemApp()) {
         LOGE("The caller does not have permission to call");
         return ERR_DM_NO_PERMISSION;
     }
