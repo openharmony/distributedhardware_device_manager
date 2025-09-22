@@ -823,7 +823,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclByTokenId_002, testing::ext
     EXPECT_TRUE(userIdVec.empty());
 }
 
-HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_InvalidInput_101, testing::ext::TestSize.Level0) 
+HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_InvalidInput_101, testing::ext::TestSize.Level0)
 {
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam;
@@ -831,7 +831,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_InvalidInput_101, 
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_Success_101, testing::ext::TestSize.Level0) 
+HWTEST_F(DeviceManagerServiceImplFirstTest, BindServiceTarget_Success_101, testing::ext::TestSize.Level0)
 {
     PeerTargetId targetId;
     std::map<std::string, std::string> bindParam = {{"key1", "value1"}};
@@ -897,7 +897,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, UnbindServiceTarget_DeleteAclFailed_
     ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_NoMatchingServiceId_101, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_NoMatchingId_101, testing::ext::TestSize.Level1)
 {
     int64_t serviceId = 123456;
     int64_t tokenIdCaller = 123;
@@ -915,7 +915,7 @@ HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_NoMatchi
     EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
-HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtraDataServiceId_ExtraDataEmpty_101, testing::ext::TestSize.Level1)
+HWTEST_F(DeviceManagerServiceImplFirstTest, DeleteAclExtDataServiceId_ExtDataEmpty_01, testing::ext::TestSize.Level1)
 {
     int64_t serviceId = 123456;
     int64_t tokenIdCaller = 123;

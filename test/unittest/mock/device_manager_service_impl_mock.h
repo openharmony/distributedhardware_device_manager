@@ -60,7 +60,6 @@ public:
     virtual int32_t GenerateServiceId(int64_t &serviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
-    
 };
 
 class DeviceManagerServiceImplMock : public DmDeviceManagerServiceImpl {
@@ -89,7 +88,8 @@ public:
     MOCK_METHOD(int32_t, DeleteAclExtraDataServiceId, (int64_t serviceId, int64_t tokenIdCaller,
         std::string &udid, int32_t &bindLevel), (override));
     MOCK_METHOD(int32_t, GenerateRegServiceId, (int32_t &regServiceId));
-    MOCK_METHOD(int32_t, ConvertServiceInfoProfileByRegInfo, (const ServiceRegInfo &regInfo, ServiceInfoProfile &profile));
+    MOCK_METHOD(int32_t, ConvertServiceInfoProfileByRegInfo, (const ServiceRegInfo &regInfo,
+        ServiceInfoProfile &profile));
     MOCK_METHOD(int32_t, PutServiceInfoProfile, (const ServiceInfoProfile &profile));
     MOCK_METHOD(int32_t, GenerateServiceId, (int64_t &serviceId));
 };
