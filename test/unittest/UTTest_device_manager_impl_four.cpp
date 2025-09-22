@@ -147,7 +147,7 @@ HWTEST_F(DeviceManagerImplTest, RegisterServiceInfo_007, testing::ext::TestSize.
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().RegisterServiceInfo(serviceInfo, regServiceId);
     ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
-    if (ret == DM_OK){
+    if (ret == DM_OK) {
         ASSERT_EQ(regServiceId, expectedRegServiceId);
     }
     ASSERT_EQ(ret, true);

@@ -1686,7 +1686,7 @@ HWTEST_F(DeviceManagerImplTest, StartPublishService_006, testing::ext::TestSize.
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().StartPublishService(pkgName, publishServiceParam,
         callback, serviceId);
-    if (ret == DM_OK){
+    if (ret == DM_OK) {
         ASSERT_EQ(serviceId, expectedServiceId);
     }
     ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
@@ -1713,7 +1713,7 @@ HWTEST_F(DeviceManagerImplTest, StartPublishService_007, testing::ext::TestSize.
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().StartPublishService(pkgName, publishServiceParam,
         callback, serviceId);
-    if (ret == DM_OK){
+    if (ret == DM_OK) {
         ASSERT_EQ(serviceId, expectedServiceId);
     }
     ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
@@ -1739,7 +1739,7 @@ HWTEST_F(DeviceManagerImplTest, StartPublishService_008, testing::ext::TestSize.
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().StartPublishService(pkgName, publishServiceParam,
         callback, serviceId);
-    if (ret == DM_OK){
+    if (ret == DM_OK) {
         ASSERT_EQ(serviceId, expectedServiceId);
     }
     ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
@@ -1765,7 +1765,7 @@ HWTEST_F(DeviceManagerImplTest, StartPublishService_009, testing::ext::TestSize.
         ));
     int32_t ret = DeviceManagerImpl::GetInstance().StartPublishService(pkgName, publishServiceParam,
         callback, serviceId);
-    if (ret == DM_OK){
+    if (ret == DM_OK) {
         ASSERT_EQ(serviceId, expectedServiceId);
     }
     ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
