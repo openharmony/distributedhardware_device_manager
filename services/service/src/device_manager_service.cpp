@@ -3462,6 +3462,14 @@ int32_t DeviceManagerService::RegDevStateCallbackToService(const std::string &pk
     processInfo.pkgName = pkgName;
     processInfo.userId = userId;
     listener_->OnDevStateCallbackAdd(processInfo, deviceList);
+
+    std::vector<DmDeviceInfo> readyDeviceList;
+    CHECK_NULL_RETURN(dmServiceImpl_, ERR_DM_POINT_NULL);
+    dmServiceImpl_->GetNotifyEventInfos(readyDeviceList);
+    if (readyDeviceList.size() == 0) {
+        return DM_OK;
+    }
+    listener_->OnDevDbReadyCallbackAdd(processInfo, readyDeviceList);
 #else
     (void)pkgName;
 #endif

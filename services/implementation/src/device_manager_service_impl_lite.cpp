@@ -696,6 +696,11 @@ int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName
     return DM_OK;
 }
 
+void DeviceManagerServiceImpl::GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList)
+{
+    (void)deviceList;
+}
+
 void DeviceManagerServiceImpl::HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
     int32_t remoteTokenId)
 {

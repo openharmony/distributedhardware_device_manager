@@ -83,6 +83,8 @@ public:
                          std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector);
     ~DmDeviceStateManager();
 
+    void SaveNotifyEventInfos(const int32_t eventId, const std::string &deviceId);
+    void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
     int32_t ProcNotifyEvent(const int32_t eventId, const std::string &deviceId);
     void SaveOnlineDeviceInfo(const DmDeviceInfo &info);
     void DeleteOfflineDeviceInfo(const DmDeviceInfo &info);
@@ -131,6 +133,8 @@ private:
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     std::string decisionSoName_;
     NotifyTask eventTask_;
+    std::mutex notifyEventInfosMutex_;
+    std::map<std::string, DmDeviceInfo> notifyEventInfos_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

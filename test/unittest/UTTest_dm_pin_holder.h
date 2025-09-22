@@ -309,6 +309,11 @@ public:
         (void)serviceId;
         (void)publishResult;
     }
+    virtual void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList)
+    {
+        (void)processInfo;
+        (void)deviceList;
+    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

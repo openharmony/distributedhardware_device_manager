@@ -82,19 +82,30 @@ void DmDeviceStateManager::SaveOnlineDeviceInfo(const DmDeviceInfo &info)
 void DmDeviceStateManager::DeleteOfflineDeviceInfo(const DmDeviceInfo &info)
 {
     LOGI("begin, deviceId = %{public}s", GetAnonyString(std::string(info.deviceId)).c_str());
-    std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
-    std::string deviceId = std::string(info.deviceId);
-    for (auto iter: remoteDeviceInfos_) {
-        if (std::string(iter.second.deviceId) == deviceId) {
-            remoteDeviceInfos_.erase(iter.first);
-            LOGI("Delete remoteDeviceInfos complete");
-            break;
+    {
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+        std::string deviceId = std::string(info.deviceId);
+        for (auto iter: remoteDeviceInfos_) {
+            if (std::string(iter.second.deviceId) == deviceId) {
+                remoteDeviceInfos_.erase(iter.first);
+                LOGI("Delete remoteDeviceInfos complete");
+                break;
+            }
+        }
+        for (auto iter: stateDeviceInfos_) {
+            if (std::string(iter.second.deviceId) == deviceId) {
+                stateDeviceInfos_.erase(iter.first);
+                LOGI("Delete stateDeviceInfos complete");
+                break;
+            }
         }
     }
-    for (auto iter: stateDeviceInfos_) {
+    std::lock_guard<std::mutex> mutexLock(notifyEventInfosMutex_);
+    std::string deviceId = std::string(info.deviceId);
+    for (auto iter: notifyEventInfos_) {
         if (std::string(iter.second.deviceId) == deviceId) {
-            stateDeviceInfos_.erase(iter.first);
-            LOGI("Delete stateDeviceInfos complete");
+            notifyEventInfos_.erase(iter.first);
+            LOGI("Delete notifyEventInfos_ complete");
             break;
         }
     }
@@ -486,6 +497,31 @@ DmAuthForm DmDeviceStateManager::GetAuthForm(const std::string &networkId)
     }
 
     return DmAuthForm::INVALID_TYPE;
+}
+
+void DmDeviceStateManager::SaveNotifyEventInfos(const int32_t eventId, const std::string &deviceId)
+{
+    LOGI("SaveNotifyEventInfos in, eventId: %{public}d", eventId);
+    DmDeviceInfo saveInfo;
+    {
+        std::lock_guard<std::mutex> mutexLock(remoteDeviceInfosMutex_);
+        auto iter = remoteDeviceInfos_.find(deviceId);
+        if (iter == remoteDeviceInfos_.end()) {
+            LOGE("SaveNotifyEventInfos complete not find deviceId: %{public}s", GetAnonyString(deviceId).c_str());
+            return;
+        }
+        saveInfo = iter->second;
+    }
+    std::lock_guard<std::mutex> mutexLock(notifyEventInfosMutex_);
+    notifyEventInfos_[deviceId] = saveInfo;
+}
+
+void DmDeviceStateManager::GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList)
+{
+    std::lock_guard<std::mutex> mutexLock(notifyEventInfosMutex_);
+    for (auto item: notifyEventInfos_) {
+        deviceList.push_back(item.second);
+    }
 }
 
 int32_t DmDeviceStateManager::ProcNotifyEvent(const int32_t eventId, const std::string &deviceId)

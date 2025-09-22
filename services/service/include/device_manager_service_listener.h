@@ -100,6 +100,7 @@ public:
     int32_t OpenAuthSessionWithPara(const std::string &deviceId, int32_t actionId, bool isEnable160m) override;
     int32_t OpenAuthSessionWithPara(int64_t serviceId) override;
     void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) override;
+    void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
 
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
@@ -145,11 +146,14 @@ private:
     void ProcessAppOnline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
         const std::vector<int64_t> &serviceIds);
+    void ClearDbReadyMap(std::string &notifyPkgName);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;
     static std::mutex alreadyNotifyPkgNameLock_;
     static std::map<std::string, DmDeviceInfo> alreadyOnlinePkgName_;
+    static std::mutex alreadyDbReadyPkgNameLock_;
+    static std::map<std::string, DmDeviceInfo> alreadyDbReadyPkgName_;
     static std::unordered_set<std::string> highPriorityPkgNameSet_;
     static std::mutex actUnrelatedPkgNameLock_;
     static std::set<std::string> actUnrelatedPkgName_;

@@ -186,6 +186,7 @@ public:
     int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
+    void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 
