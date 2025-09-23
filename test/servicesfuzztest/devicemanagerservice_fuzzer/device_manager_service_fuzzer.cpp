@@ -70,6 +70,73 @@ void DeviceManagerServiceFuzzTest(FuzzedDataProvider &fdp)
     DeviceManagerService::GetInstance().DpAclAdd(inputStr);
     DeviceManagerService::GetInstance().GetLocalDeviceName(retStr);
 }
+
+void StartServiceDiscoveryFuzzTest(FuzzedDataProvider &fdp)
+{
+    int32_t maxStringLength = 32;
+    std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
+    DiscoveryServiceParam discParam;
+    discParam.serviceType = fdp.ConsumeRandomLengthString(maxStringLength);
+    discParam.discoveryServiceId = fdp.ConsumeIntegral<uint32_t>();
+
+    DeviceManagerService::GetInstance().StartServiceDiscovery(pkgName, discParam);
+    DeviceManagerService::GetInstance().StartServiceDiscovery("", discParam);
+    discParam.discoveryServiceId = 0;
+    DeviceManagerService::GetInstance().StartServiceDiscovery(pkgName, discParam);
+}
+
+void StopServiceDiscoveryFuzzTest(FuzzedDataProvider &fdp)
+{
+    int32_t maxStringLength = 32;
+    std::string pkgName = fdp.ConsumeRandomLengthString(maxStringLength);
+    int32_t discServiceId = fdp.ConsumeIntegral<int32_t>();
+
+    DeviceManagerService::GetInstance().StopServiceDiscovery(pkgName, discServiceId);
+    DeviceManagerService::GetInstance().StopServiceDiscovery("", discServiceId);
+    discServiceId = 0;
+    DeviceManagerService::GetInstance().StopServiceDiscovery(pkgName, discServiceId);
+}
+
+void DeviceManagerServiceTwoFuzzTest(FuzzedDataProvider &fdp)
+{
+    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
+    int64_t internalServiceId = fdp.ConsumeIntegral<int64_t>();
+    PublishServiceParam publishServiceParam;
+    publishServiceParam.serviceInfo.serviceId = fdp.ConsumeIntegral<int64_t>();
+    publishServiceParam.serviceInfo.serviceType = fdp.ConsumeIntegral<int32_t>();
+    publishServiceParam.serviceInfo.serviceName = fdp.ConsumeRandomLengthString();
+    publishServiceParam.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString();
+    ServiceRegInfo serviceRegInfo;
+    serviceRegInfo.serviceInfo.serviceId = fdp.ConsumeIntegral<int32_t>();
+    serviceRegInfo.serviceInfo.serviceType = fdp.ConsumeIntegral<int32_t>();
+    serviceRegInfo.serviceInfo.serviceName = fdp.ConsumeRandomLengthString();
+    serviceRegInfo.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString();
+    int32_t regServiceId = 0;
+    int64_t publishServiceId = 0;
+    int64_t fuzzServiceId = 0;
+    int32_t fuzzUserId = fdp.ConsumeIntegral<int32_t>();
+    PublishServiceParam fuzzPublishServiceParam;
+    fuzzPublishServiceParam.regServiceId = fdp.ConsumeIntegral<int32_t>();
+    fuzzPublishServiceParam.serviceInfo.serviceId = fdp.ConsumeIntegral<int64_t>();
+    fuzzPublishServiceParam.serviceInfo.serviceType = fdp.ConsumeRandomLengthString();
+    fuzzPublishServiceParam.serviceInfo.serviceName = fdp.ConsumeRandomLengthString();
+    fuzzPublishServiceParam.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString();
+    int32_t fuzzUserId2 = fdp.ConsumeIntegral<int32_t>();
+    ServiceInfoProfile fuzzServiceInfoProfile;
+    fuzzServiceInfoProfile.serviceId = fuzzServiceId;
+    fuzzServiceInfoProfile.userId = fuzzUserId2;
+    fuzzServiceInfoProfile.serviceName = fdp.ConsumeRandomLengthString();
+    fuzzServiceInfoProfile.serviceType = fdp.ConsumeRandomLengthString();
+    int32_t fuzzRegServiceId = 0;
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
+    DeviceManagerService::GetInstance().UnRegisterServiceInfo(regServiceId);
+    DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, publishServiceId);
+    DeviceManagerService::GetInstance().StopPublishService(publishServiceId);
+    DeviceManagerService::GetInstance().GenerateServiceId(fuzzServiceId);
+    DeviceManagerService::GetInstance().ConvertServiceInfoProfileByRegInfo(serviceRegInfo, fuzzServiceInfoProfile);
+    DeviceManagerService::GetInstance().GenerateRegServiceId(fuzzRegServiceId);
+}
 }
 }
 
@@ -82,6 +149,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     OHOS::DistributedHardware::DeviceManagerServiceFuzzTest(fdp);
+    OHOS::DistributedHardware::StartServiceDiscoveryFuzzTest(fdp);
+    OHOS::DistributedHardware::StopServiceDiscoveryFuzzTest(fdp);
+    OHOS::DistributedHardware::DeviceManagerServiceTwoFuzzTest(fdp);
 
     return 0;
 }

@@ -13,24 +13,19 @@
  * limitations under the License.
  */
 
-#include <string>
 #include <cstdlib>
-#include <random>
 #include <fuzzer/FuzzedDataProvider.h>
+#include <random>
+#include <string>
 
 #include "deviceprofile_connector.h"
 #include "device_profile_connector_fuzzer.h"
+#include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t NUMBER = 7;
-void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
+void DeviceProfileConnectorFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(DmAccesser)) || (size < (sizeof(int32_t) * NUMBER))) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     std::string trustDeviceId = fdp.ConsumeRandomLengthString();
     std::string requestDeviceId = fdp.ConsumeRandomLengthString();
     std::string pkgName = fdp.ConsumeRandomLengthString();
@@ -64,14 +59,65 @@ void DeviceProfileConnectorFuzzTest(const uint8_t* data, size_t size)
     DeviceProfileConnector::GetInstance().CheckDevIdInAclForDevBind(pkgName, localDeviceId);
     DeviceProfileConnector::GetInstance().GetTrustNumber(localDeviceId);
 }
+
+void GetServiceInfoProfileByServiceIdFuzzTest(FuzzedDataProvider &fdp)
+{
+    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
+    int32_t maxStringLength = 1000;
+    ServiceInfoProfile serviceInfoProfile;
+    serviceInfoProfile.regServiceId = fdp.ConsumeIntegral<int32_t>();
+    serviceInfoProfile.deviceId = fdp.ConsumeRandomLengthString(maxStringLength);
+    serviceInfoProfile.userId = fdp.ConsumeIntegral<int32_t>();
+    serviceInfoProfile.tokenId = fdp.ConsumeIntegral<int64_t>();
+    serviceInfoProfile.publishState = fdp.ConsumeIntegral<int8_t>();
+    serviceInfoProfile.serviceId = fdp.ConsumeIntegral<int64_t>();
+    serviceInfoProfile.serviceType = fdp.ConsumeRandomLengthString(maxStringLength);
+    serviceInfoProfile.serviceName = fdp.ConsumeRandomLengthString(maxStringLength);
+    serviceInfoProfile.serviceDisplayName = fdp.ConsumeRandomLengthString(maxStringLength);
+
+    DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfoProfile);
+}
+
+void PutServiceInfoProfileFuzzTest(FuzzedDataProvider &fdp)
+{
+    int32_t maxStringLen = 64;
+    ServiceInfoProfile serviceInfoProfile;
+    serviceInfoProfile.regServiceId = fdp.ConsumeIntegral<int32_t>();
+    serviceInfoProfile.deviceId = fdp.ConsumeRandomLengthString(maxStringLen);
+    serviceInfoProfile.userId = fdp.ConsumeIntegral<int32_t>();
+    serviceInfoProfile.tokenId = fdp.ConsumeIntegral<int64_t>();
+    serviceInfoProfile.publishState = fdp.ConsumeIntegral<int8_t>();
+    serviceInfoProfile.serviceId = fdp.ConsumeIntegral<int64_t>();
+    serviceInfoProfile.serviceType = fdp.ConsumeRandomLengthString(maxStringLen);
+    serviceInfoProfile.serviceName = fdp.ConsumeRandomLengthString(maxStringLen);
+    serviceInfoProfile.serviceDisplayName = fdp.ConsumeRandomLengthString(maxStringLen);
+
+    DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
+}
+
+void DeleteServiceInfoProfileFuzzTest(FuzzedDataProvider &fdp)
+{
+    int32_t regServiceId = fdp.ConsumeIntegral<int32_t>();
+    int32_t userId = fdp.ConsumeIntegral<int32_t>();
+
+    DeviceProfileConnector::GetInstance().DeleteServiceInfoProfile(regServiceId, userId);
+}
 }
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    const size_t minSize = sizeof(int32_t) + sizeof(int32_t) + sizeof(bool);
+    if ((data == nullptr) || (size < minSize)) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceProfileConnectorFuzzTest(data, size);
+    OHOS::DistributedHardware::DeviceProfileConnectorFuzzTest(fdp);
+    OHOS::DistributedHardware::GetServiceInfoProfileByServiceIdFuzzTest(fdp);
+    OHOS::DistributedHardware::PutServiceInfoProfileFuzzTest(fdp);
+    OHOS::DistributedHardware::DeleteServiceInfoProfileFuzzTest(fdp);
 
     return 0;
 }

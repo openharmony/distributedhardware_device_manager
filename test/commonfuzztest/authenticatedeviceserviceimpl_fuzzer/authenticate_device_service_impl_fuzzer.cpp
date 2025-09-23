@@ -104,12 +104,8 @@ void AddPermission()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
-void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceServiceImplFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::string str = fdp.ConsumeRandomLengthString();
     std::string returnJsonStr = fdp.ConsumeRandomLengthString();
     int32_t eventId = fdp.ConsumeIntegral<int32_t>();
@@ -154,6 +150,33 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
     usleep(USLEEP_TIME_US_5000000);
     deviceManagerServiceImpl->Release();
 }
+
+void AuthenticateDeviceServiceImplOneFuzzTest(FuzzedDataProvider &fdp)
+{
+    int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
+    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    AddPermission();
+    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
+    auto deviceManagerServiceImpl = std::make_shared<DeviceManagerServiceImpl>();
+
+    deviceManagerServiceImpl->Initialize(listener);
+    deviceManagerServiceImpl->BindServiceTarget(pkgName, peerTargetId, bindParam);
+    deviceManagerServiceImpl->UnbindServiceTarget(pkgName, serviceId);
+    deviceManagerServiceImpl->DeleteAclExtraDataServiceId(serviceId, serviceId, pkgName, bindLevel);
+    usleep(USLEEP_TIME_US_5000000);
+    deviceManagerServiceImpl->Release();
+}
+
+void AuthenticateDeviceServiceImplAllFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t) + sizeof(int64_t) + 1)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    AuthenticateDeviceServiceImplFuzzTest(fdp);
+    AuthenticateDeviceServiceImplOneFuzzTest(fdp);
+}
 }
 }
 
@@ -161,7 +184,7 @@ void AuthenticateDeviceServiceImplFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::AuthenticateDeviceServiceImplFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceServiceImplAllFuzzTest(data, size);
 
     return 0;
 }

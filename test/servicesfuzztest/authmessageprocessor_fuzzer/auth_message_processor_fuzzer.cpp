@@ -178,6 +178,60 @@ void AuthMessageProcessorFuzzTestNextTwo(FuzzedDataProvider &fdp, JsonObject &js
     dmAuthMessageProcessor_->SetAclProxyRelate(context_, acl);
 }
 
+void SetSyncMsgJsonFuzzTest(const uint8_t* data, size_t size)
+{
+    const int32_t minDataSize = sizeof(int64_t) * 16 + sizeof(int32_t) * 9 + 4;
+    if ((data == nullptr) || (size < minDataSize)) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    context_->accesser.deviceId = fdp.ConsumeRandomLengthString();
+    context_->accessee.userId = fdp.ConsumeIntegral<int32_t>();
+    context_->accesser.isCommonFlag = fdp.ConsumeBool();
+    context_->accesser.cert = fdp.ConsumeRandomLengthString();
+    context_->direction = static_cast<DmAuthDirection>(fdp.ConsumeIntegralInRange<int32_t>(0, 1));
+    context_->confirmOperation = static_cast<UiAction>(fdp.ConsumeIntegral<int32_t>());
+    context_->isServiceBind = fdp.ConsumeBool();
+    context_->accessee.serviceId = fdp.ConsumeIntegral<int64_t>();
+
+    DmAccess accessSide;
+    accessSide.transmitSessionKeyId = fdp.ConsumeIntegral<int32_t>();
+    accessSide.transmitSkTimeStamp = fdp.ConsumeIntegral<int64_t>();
+    accessSide.transmitCredentialId = fdp.ConsumeRandomLengthString();
+    accessSide.isGenerateLnnCredential = fdp.ConsumeBool();
+    accessSide.bindLevel = fdp.ConsumeIntegral<int32_t>();
+    accessSide.lnnSessionKeyId = fdp.ConsumeIntegral<int32_t>();
+    accessSide.lnnSkTimeStamp = fdp.ConsumeIntegral<int64_t>();
+    accessSide.lnnCredentialId = fdp.ConsumeRandomLengthString();
+    accessSide.dmVersion = fdp.ConsumeRandomLengthString();
+
+    DmAccessToSync accessToSync;
+    accessToSync.deviceName = fdp.ConsumeRandomLengthString();
+    accessToSync.deviceNameFull = fdp.ConsumeRandomLengthString();
+    accessToSync.deviceId = fdp.ConsumeRandomLengthString();
+    accessToSync.userId = fdp.ConsumeIntegral<int32_t>();
+    accessToSync.accountId = fdp.ConsumeRandomLengthString();
+    accessToSync.tokenId = fdp.ConsumeIntegral<int64_t>();
+    accessToSync.bundleName = fdp.ConsumeRandomLengthString();
+    accessToSync.pkgName = fdp.ConsumeRandomLengthString();
+    accessToSync.bindLevel = fdp.ConsumeIntegral<int32_t>();
+    accessToSync.sessionKeyId = fdp.ConsumeIntegral<int32_t>();
+    accessToSync.skTimeStamp = fdp.ConsumeIntegral<int64_t>();
+
+    JsonObject syncMsgJson;
+    dmAuthMessageProcessor_->SetSyncMsgJson(context_, accessSide, accessToSync, syncMsgJson);
+}
+
+void GetAccesseeServiceInfoFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(int64_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
+    dmAuthMessageProcessor_->GetAccesseeServiceInfo(serviceId);
+}
+
 void AuthMessageProcessorFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
@@ -236,6 +290,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::AuthMessageProcessorFuzzTest(data, size);
+    OHOS::DistributedHardware::SetSyncMsgJsonFuzzTest(data, size);
+    OHOS::DistributedHardware::GetAccesseeServiceInfoFuzzTest(data, size);
 
     return 0;
 }
