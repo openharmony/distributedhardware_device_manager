@@ -2018,6 +2018,27 @@ ON_IPC_CMD(CHECK_SINK_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
     return OnIpcCmd(CHECK_SINK_SAME_ACCOUNT, data, reply);
 }
 
+ON_IPC_CMD(GET_UDIDS_BY_DEVICEIDS, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::vector<std::string> deviceIdList;
+    IpcModelCodec::DecodeStringVector(data, deviceIdList);
+    std::map<std::string, std::string> deviceIdToUdidMap;
+    int32_t result = DeviceManagerService::GetInstance().GetUdidsByDeviceIds(pkgName, deviceIdList, deviceIdToUdidMap);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (result == DM_OK && !deviceIdToUdidMap.empty()) {
+        std::string outParaStr = ConvertMapToJsonString(deviceIdToUdidMap);
+        if (!reply.WriteString(outParaStr)) {
+            LOGE("write returnJsonStr failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(START_SERVICE_DISCOVERING, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
