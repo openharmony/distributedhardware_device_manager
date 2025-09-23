@@ -27,7 +27,7 @@
 #include "ipc_server_listener_mock.h"
 #include "kv_adapter_manager_mock.h"
 #include "app_manager_mock.h"
-
+#include "device_manager_service_mock.h"
 namespace OHOS {
 namespace DistributedHardware {
 class DeviceManagerServiceListenerTest : public testing::Test {
@@ -44,6 +44,8 @@ public:
     static inline  std::shared_ptr<KVAdapterManagerMock> kVAdapterManagerMock_ =
         std::make_shared<KVAdapterManagerMock>();
     static inline  std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
+    static inline  std::shared_ptr<DeviceManagerServiceMock> deviceManagerServiceMock_ =
+        std::make_shared<DeviceManagerServiceMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -31,6 +31,8 @@
 #include "softbus_listener_mock.h"
 #include "device_manager_service_mock.h"
 #include "device_manager_service_impl_mock.h"
+#include "deviceprofile_connector_mock.h"
+#include "distributed_device_profile_client_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -49,6 +51,11 @@ public:
         std::make_shared<SoftbusListenerMock>();
     static inline  std::shared_ptr<DeviceManagerServiceImplMock> deviceManagerServiceImplMock_ =
         std::make_shared<DeviceManagerServiceImplMock>();
+    static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ =
+        std::make_shared<DeviceProfileConnectorMock>();
+    static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
+        distributedDeviceProfileClientMock_ =
+        std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS

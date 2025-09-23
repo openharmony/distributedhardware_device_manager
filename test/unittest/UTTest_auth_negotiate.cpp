@@ -27,7 +27,6 @@ namespace DistributedHardware {
 constexpr const char* TEST_STRING = "test_string";
 constexpr int32_t TEST_NEGATIVE = -1;
 constexpr int32_t TEST_POSITIVE = 1;
-
 void AuthNegotiateTest::SetUpTestCase()
 {
     LOGI("AuthNegotiateTest::SetUpTestCase start.");
@@ -385,6 +384,22 @@ HWTEST_F(AuthNegotiateTest, ParseAndCheckAntiDisturbanceMode_008, testing::ext::
     std::string businessValue = "{\"business_id\":\"test_business_id\",\"is_in_anti_disturbance_mode\":123}";
 
     EXPECT_FALSE(authState->ParseAndCheckAntiDisturbanceMode(businessId, businessValue));
+}
+
+HWTEST_F(AuthNegotiateTest, SinkNegotiateService_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    int result = authState->SinkNegotiateService(nullptr);
+    EXPECT_EQ(result, ERR_DM_POINT_NULL);
+}
+
+HWTEST_F(AuthNegotiateTest, SinkNegotiateService_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.serviceId = 0;
+    std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
+    int result = authState->SinkNegotiateService(context);
+    EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
 }
 }
 }

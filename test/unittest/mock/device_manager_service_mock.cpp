@@ -39,5 +39,10 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
 {
     return DmDeviceManagerService::dmDeviceManagerService->IsDMServiceAdapterResidentLoad();
 }
+
+int32_t OpenAuthSessionWithPara(int64_t serviceId)
+{
+    return DmDeviceManagerService::dmDeviceManagerService->OpenAuthSessionWithPara(serviceId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

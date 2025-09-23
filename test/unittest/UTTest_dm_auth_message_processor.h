@@ -21,7 +21,8 @@
 #include <gtest/gtest.h>
 #include "json_object.h"
 #include "crypto_mgr_mock.h"
- 
+#include "deviceprofile_connector_mock.h"
+
 namespace OHOS {
 namespace DistributedHardware {
 class DmAuthMessageProcessorTest : public testing::Test {
@@ -30,6 +31,8 @@ public:
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static inline std::shared_ptr<DeviceProfileConnectorMock> deviceProfileConnectorMock_ =
+        std::make_shared<DeviceProfileConnectorMock>();
 };
 } // namespace DistributedHardware
 } // namespace OHOS
