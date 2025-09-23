@@ -182,7 +182,7 @@ public:
     ServicePublishCallbackTest() = default;
     virtual ~ServicePublishCallbackTest() = default;
     void OnServicePublishResult(int64_t serviceId, int32_t reason) override {}
-}
+};
 class LeaveLNNCallbackTest : public LeaveLNNCallback {
 public:
     virtual ~LeaveLNNCallbackTest()
