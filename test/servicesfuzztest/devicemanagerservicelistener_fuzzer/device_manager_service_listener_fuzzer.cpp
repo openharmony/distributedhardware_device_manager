@@ -22,13 +22,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerServiceListenerFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerServiceListenerFuzzTest(FuzzedDataProvider &fdp)
 {
-    const size_t minSize = sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t);
-    if ((data == nullptr) || (size < minSize)) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t pkgNameSize = 128;
     int32_t maxPidSize = 99999;
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
@@ -43,13 +38,8 @@ void DeviceManagerServiceListenerFuzzTest(const uint8_t* data, size_t size)
     listener.OnServicePublishResult(processInfo, serviceId, publishResult);
 }
 
-void OnServiceFoundFuzzTest(const uint8_t* data, size_t size)
+void OnServiceFoundFuzzTest(FuzzedDataProvider &fdp)
 {
-    const size_t minSize = sizeof(int32_t) * 2 + sizeof(int64_t) + 128;
-    if (data == nullptr || size < minSize) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t pkgNameSize = 64;
     int32_t serviceInfoSize = 32;
     ProcessInfo processInfo;
@@ -68,13 +58,8 @@ void OnServiceFoundFuzzTest(const uint8_t* data, size_t size)
     listener.OnServiceFound(processInfo, discServiceId, discServiceInfo);
 }
 
-void OnServiceDiscoveryResultFuzzTest(const uint8_t* data, size_t size)
+void OnServiceDiscoveryResultFuzzTest(FuzzedDataProvider &fdp)
 {
-    const size_t minSize = sizeof(int32_t) * 2 + sizeof(int32_t) + 64;
-    if (data == nullptr || size < minSize) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t pkgNameSize = 64;
     ProcessInfo processInfo;
     processInfo.userId = fdp.ConsumeIntegral<int32_t>();
@@ -86,13 +71,8 @@ void OnServiceDiscoveryResultFuzzTest(const uint8_t* data, size_t size)
     listener.OnServiceDiscoveryResult(processInfo, discServiceId, reason);
 }
 
-void OnServicePublishResultFuzzTest(const uint8_t* data, size_t size)
+void OnServicePublishResultFuzzTest(FuzzedDataProvider &fdp)
 {
-    const size_t minSize = sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t);
-    if ((data == nullptr) || (size < minSize)) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t pkgNameSize = 128;
     int32_t maxPidSize = 99999;
     int64_t serviceId = fdp.ConsumeIntegral<int64_t>();
@@ -111,10 +91,15 @@ void OnServicePublishResultFuzzTest(const uint8_t* data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::DistributedHardware::DeviceManagerServiceListenerFuzzTest(data, size);
-    OHOS::DistributedHardware::OnServiceFoundFuzzTest(data, size);
-    OHOS::DistributedHardware::OnServiceDiscoveryResultFuzzTest(data, size);
-    OHOS::DistributedHardware::OnServicePublishResultFuzzTest(data, size);
+    const size_t minSize = sizeof(int64_t) + sizeof(int32_t) + sizeof(int32_t);
+    if ((data == nullptr) || (size < minSize)) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DeviceManagerServiceListenerFuzzTest(fdp);
+    OHOS::DistributedHardware::OnServiceFoundFuzzTest(fdp);
+    OHOS::DistributedHardware::OnServiceDiscoveryResultFuzzTest(fdp);
+    OHOS::DistributedHardware::OnServicePublishResultFuzzTest(fdp);
 
     return 0;
 }
