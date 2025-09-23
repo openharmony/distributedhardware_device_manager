@@ -3024,7 +3024,7 @@ int32_t DeviceManagerImpl::GetUdidsByDeviceIds(const std::string &pkgName, const
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetUdidsByDeviceIds", ret, anonyLocalUdid_);
         LOGE("GetUdidsByDeviceIds Send Request failed ret: %{public}d", ret);
-        return false;
+        return ret;
     }
     int32_t result = static_cast<int32_t>(rsp->GetErrCode());
     deviceIdToUdidMap = static_cast<std::map<std::string, std::string>>(rsp->GetDeviceIdToUdidMap());
