@@ -1480,6 +1480,7 @@ int32_t DeviceManagerServiceImpl::NotifyEvent(const std::string &pkgName, const 
             LOGE("deviceStateMgr_ is nullptr");
             return ERR_DM_POINT_NULL;
         }
+        deviceStateMgr_->SaveNotifyEventInfos(eventId, deviceId);
         if (deviceStateMgr_->ProcNotifyEvent(eventId, deviceId) != DM_OK) {
             LOGE("NotifyEvent failed");
             return ERR_DM_INPUT_PARA_INVALID;
@@ -3320,6 +3321,12 @@ void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &device
 {
     CHECK_NULL_VOID(deviceStateMgr_);
     deviceStateMgr_->StartDelTimerByDP(deviceUdid, deviceUdidHash);
+}
+
+void DeviceManagerServiceImpl::GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList)
+{
+    CHECK_NULL_VOID(deviceStateMgr_);
+    deviceStateMgr_->GetNotifyEventInfos(deviceList);
 }
 
 void DeviceManagerServiceImpl::DeleteGroupByBundleName(const std::string &localUdid, int32_t userId,

@@ -310,6 +310,12 @@ public:
         (void)publishResult;
     }
 
+    virtual void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList)
+    {
+        (void)processInfo;
+        (void)deviceList;
+    }
+
     virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode)
     {
         (void)pkgName;
