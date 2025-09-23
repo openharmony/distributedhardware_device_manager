@@ -292,6 +292,7 @@ public:
     virtual void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
         const std::string &deviceUdidHash) = 0;
     virtual void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList) = 0;
+    virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId) = 0;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

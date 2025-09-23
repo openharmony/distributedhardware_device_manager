@@ -28,6 +28,7 @@ class PermissionManager {
 public:
     bool CheckAccessServicePermission(void);
     bool CheckDataSyncPermission(void);
+    bool CheckSoftbusCenterPermission(void);
     bool CheckMonitorPermission(void);
     int32_t GetCallerProcessName(std::string &processName);
     bool CheckProcessNameValidOnAuthCode(const std::string &processName);

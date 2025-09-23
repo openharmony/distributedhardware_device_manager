@@ -2018,6 +2018,27 @@ ON_IPC_CMD(CHECK_SINK_SAME_ACCOUNT, MessageParcel &data, MessageParcel &reply)
     return OnIpcCmd(CHECK_SINK_SAME_ACCOUNT, data, reply);
 }
 
+ON_IPC_CMD(GET_UDIDS_BY_DEVICEIDS, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::vector<std::string> deviceIdList;
+    IpcModelCodec::DecodeStringVector(data, deviceIdList);
+    std::map<std::string, std::string> deviceIdToUdidMap;
+    int32_t result = DeviceManagerService::GetInstance().GetUdidsByDeviceIds(pkgName, deviceIdList, deviceIdToUdidMap);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (result == DM_OK && !deviceIdToUdidMap.empty()) {
+        std::string outParaStr = ConvertMapToJsonString(deviceIdToUdidMap);
+        if (!reply.WriteString(outParaStr)) {
+            LOGE("write returnJsonStr failed");
+            return ERR_DM_IPC_WRITE_FAILED;
+        }
+    }
+    return DM_OK;
+}
+
 ON_IPC_CMD(START_SERVICE_DISCOVERING, MessageParcel &data, MessageParcel &reply)
 {
     std::string pkgName = data.ReadString();
@@ -2201,6 +2222,48 @@ ON_IPC_SET_REQUEST(SERVICE_PUBLISH_RESULT, std::shared_ptr<IpcReq> pBaseReq, Mes
 ON_IPC_READ_RESPONSE(SERVICE_PUBLISH_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
     CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    pBaseRsp->SetErrCode(reply.ReadInt32());
+    return DM_OK;
+}
+
+ON_IPC_CMD(LEAVE_LNN, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string networkId = data.ReadString();
+    int32_t result = DeviceManagerService::GetInstance().LeaveLNN(pkgName, networkId);
+    if (!reply.WriteInt32(result)) {
+        LOGE("write result failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(LEAVE_LNN_RESULT, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    if (pBaseReq == nullptr) {
+        return ERR_DM_FAILED;
+    }
+    std::shared_ptr<IpcNotifyBindResultReq> pReq =
+        std::static_pointer_cast<IpcNotifyBindResultReq>(pBaseReq);
+    std::string networkId = pReq->GetContent();
+    if (!data.WriteString(networkId)) {
+        LOGE("write networkId failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    int32_t result = pReq->GetResult();
+    if (!data.WriteInt32(result)) {
+        LOGE("write result code failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(LEAVE_LNN_RESULT, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    if (pBaseRsp == nullptr) {
+        LOGE("pBaseRsp is null");
+        return ERR_DM_FAILED;
+    }
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }

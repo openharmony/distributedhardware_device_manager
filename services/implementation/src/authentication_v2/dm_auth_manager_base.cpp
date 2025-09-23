@@ -589,5 +589,8 @@ bool AuthManagerBase::CheckProcessNameInProxyAdaptationList(const std::string &p
 
 void AuthManagerBase::DeleteTimer()
 {}
+
+void AuthManagerBase::OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode)
+{}
 }  // namespace DistributedHardware
 }  // namespace OHOS

@@ -210,6 +210,7 @@ public:
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
     void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash);
     void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
+    int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);

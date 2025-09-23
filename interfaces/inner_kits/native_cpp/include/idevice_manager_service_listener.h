@@ -186,6 +186,8 @@ public:
     virtual void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) = 0;
     virtual void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo,
         const std::vector<DmDeviceInfo> &deviceList) = 0;
+    virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
+        int32_t retCode) {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

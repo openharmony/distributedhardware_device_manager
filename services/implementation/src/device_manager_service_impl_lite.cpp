@@ -775,6 +775,13 @@ void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &device
     (void)deviceUdidHash;
 }
 
+int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std::string &networkId)
+{
+    (void)pkgName;
+    (void)networkId;
+    return DM_OK;
+}
+
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)
 {
     return new DeviceManagerServiceImpl;

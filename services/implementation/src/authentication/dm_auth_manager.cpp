@@ -3533,5 +3533,11 @@ void DmAuthManager::GetBindCallerInfo()
         }
     }
 }
+
+void DmAuthManager::OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode)
+{
+    CHECK_NULL_VOID(listener_);
+    listener_->OnLeaveLNNResult(pkgName, networkId, retCode);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

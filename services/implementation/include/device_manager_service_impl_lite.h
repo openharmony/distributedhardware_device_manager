@@ -187,6 +187,7 @@ public:
         const std::map<std::string, std::string> &bindParam);
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
     void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
+    int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
 private:
     std::string GetUdidHashByNetworkId(const std::string &networkId);
 

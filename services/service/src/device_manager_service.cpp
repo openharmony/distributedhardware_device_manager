@@ -4336,6 +4336,41 @@ bool DeviceManagerService::CheckSinkIsSameAccount(const DmAccessCaller &caller, 
 }
 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
+    const std::vector<std::string> deviceIdList, std::map<std::string, std::string> &deviceIdToUdidMap)
+{
+    LOGI("GetUdidsByDeviceIds pkgName = %{public}s.", pkgName.c_str());
+    if (pkgName.empty() || deviceIdList.empty()) {
+        LOGE("Invalid parameter, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!AppManager::GetInstance().IsSystemApp()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission() ||
+        !PermissionManager::GetInstance().CheckDataSyncPermission() ||
+        !PermissionManager::GetInstance().CheckSoftbusCenterPermission()) {
+        LOGE("The caller does not have permission to call GetUdidsByDeviceIds.");
+        return ERR_DM_NO_PERMISSION;
+    }
+    for (auto deviceId : deviceIdList) {
+        LOGI("GetUdidsByDeviceIds deviceId = %{public}s.", GetAnonyString(deviceId).c_str());
+        if (deviceIdToUdidMap.find(deviceId) == deviceIdToUdidMap.end()) {
+            std::string udidHash = "";
+            std::string udid = "";
+            GetUdidHashByAnoyDeviceId(deviceId, udidHash);
+            SoftbusCache::GetInstance().GetUdidByUdidHash(udidHash, udid);
+            if (!deviceId.empty() && !udidHash.empty() && !udid.empty()) {
+                deviceIdToUdidMap[deviceId] = udid;
+            }
+        }
+    }
+    return DM_OK;
+}
+#endif
+
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &commonEventType, int32_t currentUserId,
     int32_t beforeUserId)
 {
@@ -4789,5 +4824,22 @@ int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)
     return dmServiceImplExtResident_->OpenAuthSessionWithPara(serviceId);
 }
 #endif
+
+int32_t DeviceManagerService::LeaveLNN(const std::string &pkgName, const std::string &networkId)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller: %{public}s does not have permission to call LeaveLNN.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || networkId.empty()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    if (!IsDMServiceImplReady()) {
+        LOGE("Failed, instance not init or init failed.");
+        return ERR_DM_NOT_INIT;
+    }
+    return dmServiceImpl_->LeaveLNN(pkgName, networkId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS
