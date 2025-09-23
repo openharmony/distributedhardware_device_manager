@@ -205,6 +205,14 @@ public:
     }
     virtual void OnServicePublishResult(int64_t serviceId, int32_t reason) = 0;
 };
+
+class LeaveLNNCallback {
+public:
+    virtual ~LeaveLNNCallback()
+    {
+    }
+    virtual void OnLeaveLNNCallback(const std::string &networkId, int32_t retCode) = 0;
+};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_CALLBACK_H

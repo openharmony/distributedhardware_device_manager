@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 #include <vector>
 #include "device_manager_service.h"
@@ -20,23 +21,24 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerServiceFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    int sessionId = *(reinterpret_cast<const int*>(data));
-    std::string inputStr(reinterpret_cast<const char*>(data), size);
-    std::string retStr;
+    int sessionId = fdp.ConsumeIntegral<int32_t>();
+    std::string inputStr = fdp.ConsumeRandomLengthString();
+    std::string retStr = fdp.ConsumeRandomLengthString();
     DmPinType pinType = DmPinType::QR_CODE;
     uint16_t subscribeId = 12;
     int32_t publishId = 14;
     DmDeviceInfo info;
+    info.extraData = fdp.ConsumeRandomLengthString();
     PeerTargetId targetId;
     DmSubscribeInfo subscribeInfo;
     subscribeInfo.subscribeId = 1;
     DmPublishInfo publishInfo;
     std::map<std::string, std::string> parametricMap;
+    uint32_t pinSize = fdp.ConsumeIntegral<uint32_t>();
+    std::vector<uint8_t> pinData = fdp.ConsumeBytes<uint8_t>(pinSize);
+    const void *pinDataPtr = pinData.data();
 
     DeviceManagerService::GetInstance().PublishDeviceDiscovery(inputStr, publishInfo);
     DeviceManagerService::GetInstance().RequestCredential(inputStr, inputStr);
@@ -58,7 +60,7 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerService::GetInstance().CreatePinHolder(inputStr, targetId, pinType, inputStr);
     DeviceManagerService::GetInstance().DestroyPinHolder(inputStr, targetId, pinType, inputStr);
     DeviceManagerService::GetInstance().OnPinHolderSessionOpened(sessionId, sessionId);
-    DeviceManagerService::GetInstance().OnPinHolderBytesReceived(sessionId, data, size);
+    DeviceManagerService::GetInstance().OnPinHolderBytesReceived(sessionId, pinDataPtr, pinSize);
     DeviceManagerService::GetInstance().OnPinHolderSessionClosed(sessionId);
     DeviceManagerService::GetInstance().ImportCredential(inputStr, inputStr);
     DeviceManagerService::GetInstance().DeleteCredential(inputStr, inputStr);
@@ -75,7 +77,11 @@ void DeviceManagerServiceFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceManagerServiceFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DeviceManagerServiceFuzzTest(fdp);
 
     return 0;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 
 #include <algorithm>
@@ -39,16 +40,12 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerNotifyUnRegisterFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    uint16_t subscribeId = 33;
-    int32_t publishId = 123;
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    uint16_t subscribeId = fdp.ConsumeIntegral<uint16_t>();
+    int32_t publishId = fdp.ConsumeIntegral<int32_t>();
 
     DeviceManagerNotify::GetInstance().UnRegisterDeathRecipientCallback(pkgName);
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(pkgName);
@@ -60,20 +57,20 @@ void DeviceManagerNotifyUnRegisterFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().OnUiCall(pkgName, deviceId);
 }
 
-void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerNotifyDeviceStatusFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
-    std::string token(reinterpret_cast<const char*>(data), size);
-    uint16_t subscribeId = 12;
-    int32_t failedReason = 231;
-    uint32_t status = 3;
-    uint32_t reason = 14;
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string deviceId = fdp.ConsumeRandomLengthString();
+    std::string token = fdp.ConsumeRandomLengthString();
+    uint16_t subscribeId = fdp.ConsumeIntegral<uint16_t>();
+    int32_t failedReason = fdp.ConsumeIntegral<int32_t>();
+    uint32_t status = fdp.ConsumeIntegral<uint32_t>();
+    uint32_t reason = fdp.ConsumeIntegral<uint32_t>();
     DmDeviceInfo deviceInfo;
+    deviceInfo.deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
+    deviceInfo.networkType = fdp.ConsumeIntegral<int32_t>();
+    deviceInfo.range = fdp.ConsumeIntegral<int32_t>();
+    deviceInfo.extraData = fdp.ConsumeRandomLengthString();
     DmDeviceBasicInfo deviceBasicInfo;
 
     DeviceManagerNotify::GetInstance().OnDeviceOnline(pkgName, deviceInfo);
@@ -90,15 +87,11 @@ void DeviceManagerNotifyDeviceStatusFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, deviceId, token, status, reason);
 }
 
-void DeviceManagerNotifyOnPublishResultFuzzTest(const uint8_t* data, size_t size)
+void DeviceManagerNotifyOnPublishResultFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    int32_t publishId = *(reinterpret_cast<const int32_t*>(data));
-    int32_t publishResult = *(reinterpret_cast<const int32_t*>(data));
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    int32_t publishId = fdp.ConsumeIntegral<int32_t>();
+    int32_t publishResult = fdp.ConsumeIntegral<int32_t>();
 
     DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, publishId, publishResult);
 }
@@ -109,9 +102,13 @@ void DeviceManagerNotifyOnPublishResultFuzzTest(const uint8_t* data, size_t size
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DeviceManagerNotifyUnRegisterFuzzTest(data, size);
-    OHOS::DistributedHardware::DeviceManagerNotifyDeviceStatusFuzzTest(data, size);
-    OHOS::DistributedHardware::DeviceManagerNotifyOnPublishResultFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DeviceManagerNotifyUnRegisterFuzzTest(fdp);
+    OHOS::DistributedHardware::DeviceManagerNotifyDeviceStatusFuzzTest(fdp);
+    OHOS::DistributedHardware::DeviceManagerNotifyOnPublishResultFuzzTest(fdp);
 
     return 0;
 }

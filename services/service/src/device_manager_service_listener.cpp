@@ -1142,6 +1142,15 @@ std::string DeviceManagerServiceListener::GetLocalDisplayDeviceName()
 #endif
 }
 
+int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(int64_t serviceId)
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    return DeviceManagerService::GetInstance().OpenAuthSessionWithPara(serviceId);
+#else
+    return ERR_DM_UNSUPPORTED_METHOD;
+#endif
+}
+
 int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string &deviceId,
     int32_t actionId, bool isEnable160m)
 {
@@ -1150,11 +1159,6 @@ int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(const std::string 
 #else
     return ERR_DM_UNSUPPORTED_METHOD;
 #endif
-}
-
-int32_t DeviceManagerServiceListener::OpenAuthSessionWithPara(int64_t serviceId)
-{
-    return ERR_DM_UNSUPPORTED_METHOD;
 }
 
 void DeviceManagerServiceListener::OnServiceFound(const ProcessInfo &processInfo, int32_t discServiceId,
@@ -1190,6 +1194,30 @@ void DeviceManagerServiceListener::OnServicePublishResult(const ProcessInfo &pro
     pReq->SetPkgName(processInfo.pkgName);
     pReq->SetProcessInfo(processInfo);
     ipcServerListener_.SendRequest(SERVICE_PUBLISH_RESULT, pReq, pRsp);
+}
+
+void DeviceManagerServiceListener::OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
+    int32_t retCode)
+{
+    LOGI("start");
+    std::shared_ptr<IpcNotifyBindResultReq> pReq = std::make_shared<IpcNotifyBindResultReq>();
+    std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
+    ProcessInfo processInfoTemp;
+    for (const auto &item : processInfos) {
+        if (item.pkgName == pkgName) {
+            processInfoTemp = item;
+            break;
+        }
+    }
+    if (processInfoTemp.pkgName.empty()) {
+        LOGI("not register listener");
+        return;
+    }
+    pReq->SetContent(networkId);
+    pReq->SetResult(retCode);
+    pReq->SetProcessInfo(processInfoTemp);
+    ipcServerListener_.SendRequest(LEAVE_LNN_RESULT, pReq, pRsp);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

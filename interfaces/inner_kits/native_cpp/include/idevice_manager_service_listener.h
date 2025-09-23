@@ -184,6 +184,8 @@ public:
     virtual void OnDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state,
         const DmDeviceInfo &info, const std::vector<int64_t> &serviceIds) = 0;
     virtual void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) = 0;
+    virtual void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId,
+        int32_t retCode) {}
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -46,8 +46,8 @@ void PinHolderFuzzTest(const uint8_t* data, size_t size)
     }
 
     FuzzedDataProvider fdp(data, size);
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string payload(reinterpret_cast<const char*>(data), size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string payload = fdp.ConsumeRandomLengthString();
     PeerTargetId peerTargetId;
     peerTargetId.deviceId = pkgName;
     peerTargetId.brMac = pkgName;

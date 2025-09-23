@@ -25,12 +25,8 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-void DmAnonyousFuzzTest(const uint8_t* data, size_t size)
+void DmAnonyousFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::vector<std::string> strList;
     int64_t testNumber = fdp.ConsumeIntegral<int64_t>();
     std::string test1 = fdp.ConsumeRandomLengthString();
@@ -39,7 +35,7 @@ void DmAnonyousFuzzTest(const uint8_t* data, size_t size)
     strList.push_back(test2);
     GetAnonyStringList(strList);
     std::vector<int32_t> intList;
-    intList.push_back(1);
+    intList.push_back(fdp.ConsumeIntegral<int32_t>());
     GetAnonyInt32List(intList);
     std::string key1 = fdp.ConsumeRandomLengthString();
     std::string key2 = fdp.ConsumeRandomLengthString();
@@ -62,12 +58,8 @@ void DmAnonyousFuzzTest(const uint8_t* data, size_t size)
     IsJsonValIntegerString(jsonObj, key2);
 }
 
-void DmAnonyousFuzzTestFirst(const uint8_t* data, size_t size)
+void DmAnonyousFuzzTestFirst(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::string str1 = fdp.ConsumeRandomLengthString();
     std::string str2 = fdp.ConsumeRandomLengthString();
     int32_t versionNum = 0;
@@ -75,13 +67,13 @@ void DmAnonyousFuzzTestFirst(const uint8_t* data, size_t size)
     int64_t testNumber = fdp.ConsumeIntegral<int64_t>();
     StringToInt(str1, decimal);
     StringToInt64(str1, decimal);
-    GetVersionNumber("1.0.0", versionNum);
-    GetCallerPkgName("com.example.app#test");
-    GetSubscribeId("123#12345");
+    GetVersionNumber(fdp.ConsumeRandomLengthString(), versionNum);
+    GetCallerPkgName(fdp.ConsumeRandomLengthString());
+    GetSubscribeId(fdp.ConsumeRandomLengthString());
     std::multimap<std::string, int32_t> unorderedmap;
     unorderedmap.insert(std::make_pair(str1, testNumber));
     IsValueExist(unorderedmap, str1, testNumber);
-    GetSubStr("test#123", "#", 0);
+    GetSubStr(fdp.ConsumeRandomLengthString() + "#" + fdp.ConsumeRandomLengthString(), "#", 0);
 }
 }
 }
@@ -90,7 +82,11 @@ void DmAnonyousFuzzTestFirst(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::DmAnonyousFuzzTest(data, size);
-    OHOS::DistributedHardware::DmAnonyousFuzzTestFirst(data, size);
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DmAnonyousFuzzTest(fdp);
+    OHOS::DistributedHardware::DmAnonyousFuzzTestFirst(fdp);
     return 0;
 }

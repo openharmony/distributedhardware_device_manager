@@ -797,22 +797,11 @@ void AuthManager::GetRemoteDeviceId(std::string &deviceId)
 
 int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &params)
 {
-    LOGI("AuthSinkManager::OnUserOperation start.");
+    LOGI("action %{public}d.", action);
     if (context_ == nullptr || context_->authStateMachine == nullptr) {
         LOGE("OnUserOperation: Authenticate is not start");
         return ERR_DM_AUTH_NOT_START;
     }
-
-    std::string businessId = context_->businessId;
-    if (!businessId.empty()) {
-        LOGI("AuthSinkManager::OnUserOperation found businessId: %{public}s", businessId.c_str());
-        int32_t ret = HandleBusinessEvents(businessId, action);
-        if (ret != DM_OK) {
-            LOGE("AuthSinkManager::OnUserOperation failed to handle business events, ret: %{public}d", ret);
-            return ret;
-        }
-    }
-
     switch (action) {
         case USER_OPERATION_TYPE_CANCEL_AUTH:
         case USER_OPERATION_TYPE_ALLOW_AUTH:
@@ -825,12 +814,18 @@ int32_t AuthSinkManager::OnUserOperation(int32_t action, const std::string &para
                 context_->reply = USER_OPERATION_TYPE_CANCEL_AUTH;
             }
             context_->authStateMachine->NotifyEventFinish(DmEventType::ON_USER_OPERATION);
+            if (!context_->businessId.empty()) {
+                HandleBusinessEvents(context_->businessId, action);
+            }
             break;
         case USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT:
             LOGI("AuthSinkManager::OnUserOperation USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT.");
             context_->confirmOperation = USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT;
             context_->reason = ERR_DM_PEER_CONFIRM_TIME_OUT;
             context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
+            if (!context_->businessId.empty()) {
+                HandleBusinessEvents(context_->businessId, action);
+            }
             break;
         case USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY:
             LOGI("AuthSinkManager::OnUserOperation USER_OPERATION_TYPE_CANCEL_PINCODE_DISPLAY.");
@@ -1186,12 +1181,13 @@ void AuthManager::DeleteTimer()
 
 int32_t AuthManager::HandleBusinessEvents(const std::string &businessId, int32_t action)
 {
-    LOGI("AuthManager::HandleBusinessEvents start.");
+    LOGI("businessId %{public}s, action %{public}d.", businessId.c_str(), action);
     DistributedDeviceProfile::BusinessEvent rejectEvent;
     rejectEvent.SetBusinessKey(DM_REJECT_KEY);
     JsonObject rejectJson;
     rejectJson[DM_BUSINESS_ID] = businessId;
-    rejectJson[DM_AUTH_DIALOG_REJECT] = (action == USER_OPERATION_TYPE_CANCEL_AUTH);
+    rejectJson[DM_AUTH_DIALOG_REJECT] =
+        (action == USER_OPERATION_TYPE_CANCEL_AUTH || action == USER_OPERATION_TYPE_AUTH_CONFIRM_TIMEOUT);
     rejectJson[DM_TIMESTAMP] = std::to_string(GetCurrentTimestamp());
     rejectEvent.SetBusinessValue(rejectJson.Dump());
     int32_t ret = DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutBusinessEvent(rejectEvent);

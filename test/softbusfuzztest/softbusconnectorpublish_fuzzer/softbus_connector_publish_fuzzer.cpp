@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include <string>
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include "softbus_connector.h"
 #include "softbus_bus_center.h"
@@ -26,11 +27,12 @@ namespace OHOS {
 namespace DistributedHardware {
 void SoftBusConnectorPublishFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
+    if ((data == nullptr) || (size < sizeof(int32_t) + sizeof(uint16_t))) {
         return;
     }
 
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string deviceId = fdp.ConsumeRandomLengthString();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
 
     softbusConnector->HaveDeviceInMap(deviceId);

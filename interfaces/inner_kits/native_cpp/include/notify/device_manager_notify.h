@@ -95,6 +95,7 @@ public:
     int32_t UnRegisterServiceStateCallback(const std::string &key);
     void RegisterServicePublishCallback(int64_t serviceId, std::shared_ptr<ServicePublishCallback> callback);
     void UnRegisterServicePublishCallback(int64_t serviceId);
+    void RegisterLeaveLnnCallback(const std::string &networkId, std::shared_ptr<LeaveLNNCallback> callback);
 
 public:
     static void DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk);
@@ -153,6 +154,7 @@ public:
     void OnServiceDiscoveryResult(int32_t discoveryServiceId, int32_t resReason);
     void OnServiceOnline(const std::vector<int64_t> &serviceIds);
     void OnServicePublishResult(int64_t serviceId, int32_t publishResult);
+    void OnLeaveLNNResult(const std::string &networkId, int32_t retCode);
 
 private:
 #if !defined(__LITEOS_M__)
@@ -183,6 +185,7 @@ private:
     std::map<int32_t, std::shared_ptr<ServiceDiscoveryCallback>> serviceDiscoveryCallbacks_;
     std::map<std::string, std::shared_ptr<ServiceInfoStateCallback>> serviceStateCallback_;
     std::map<int64_t, std::shared_ptr<ServicePublishCallback>> servicePublishCallback_;
+    std::map<std::string, std::shared_ptr<LeaveLNNCallback>> leaveLnnCallback_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

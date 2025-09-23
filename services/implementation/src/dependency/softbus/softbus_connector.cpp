@@ -60,6 +60,9 @@ std::mutex SoftbusConnector::deviceUdidLocks_;
 std::mutex SoftbusConnector::processInfoVecMutex_;
 std::mutex SoftbusConnector::processChangeInfoVecMutex_;
 std::shared_ptr<ISoftbusConnectorCallback> SoftbusConnector::connectorCallback_ = nullptr;
+std::shared_ptr<ISoftbusLeaveLNNCallback> SoftbusConnector::leaveLNNCallback_ = nullptr;
+std::mutex SoftbusConnector::leaveLNNMutex_;
+std::map<std::string, std::string> SoftbusConnector::leaveLnnPkgMap_ = {};
 
 SoftbusConnector::SoftbusConnector()
 {
@@ -623,6 +626,7 @@ int32_t SoftbusConnector::GetLocalDeviceTypeId()
     return nodeBasicInfo.deviceTypeId;
 }
 
+//LCOV_EXCL_START
 std::string SoftbusConnector::GetLocalDeviceNetworkId()
 {
     NodeBasicInfo nodeBasicInfo;
@@ -633,6 +637,7 @@ std::string SoftbusConnector::GetLocalDeviceNetworkId()
     }
     return nodeBasicInfo.networkId;
 }
+//LCOV_EXCL_STOP
 
 int32_t SoftbusConnector::AddMemberToDiscoverMap(const std::string &deviceId, std::shared_ptr<DeviceInfo> deviceInfo)
 {
@@ -685,6 +690,7 @@ void SoftbusConnector::SetProcessInfoVec(std::vector<ProcessInfo> processInfoVec
     processInfoVec_ = processInfoVec;
 }
 
+//LCOV_EXCL_START
 std::vector<ProcessInfo> SoftbusConnector::GetProcessInfo()
 {
     LOGI("start");
@@ -698,6 +704,7 @@ void SoftbusConnector::ClearProcessInfo()
     std::lock_guard<std::mutex> lock(processInfoVecMutex_);
     processInfoVec_.clear();
 }
+//LCOV_EXCL_STOP
 
 void SoftbusConnector::SetChangeProcessInfo(ProcessInfo processInfo)
 {
@@ -706,6 +713,7 @@ void SoftbusConnector::SetChangeProcessInfo(ProcessInfo processInfo)
     processChangeInfoVec_.push_back(processInfo);
 }
 
+//LCOV_EXCL_START
 std::vector<ProcessInfo> SoftbusConnector::GetChangeProcessInfo()
 {
     LOGI("start");
@@ -719,6 +727,7 @@ void SoftbusConnector::ClearChangeProcessInfo()
     std::lock_guard<std::mutex> lock(processChangeInfoVecMutex_);
     processChangeInfoVec_.clear();
 }
+//LCOV_EXCL_STOP
 
 void SoftbusConnector::HandleDeviceOnline(std::string deviceId, int32_t authForm)
 {
@@ -897,6 +906,49 @@ void SoftbusConnector::ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeB
         extraJson[PARAM_KEY_OS_VERSION] = std::string(nodeBasicInfo.osVersion);
         dmDeviceInfo.extraData = ToString(extraJson);
     }
+}
+
+int32_t SoftbusConnector::LeaveLNN(const std::string &pkgName, const std::string &networkId)
+{
+    LOGI("NetworkId: %{public}s", GetAnonyString(networkId).c_str());
+    {
+        std::lock_guard<std::mutex> lock(leaveLNNMutex_);
+        if (leaveLnnPkgMap_.size() == MAX_CONTAINER_SIZE) {
+            leaveLnnPkgMap_.erase(leaveLnnPkgMap_.begin());
+        }
+        leaveLnnPkgMap_[networkId] = pkgName;
+    }
+    return ::LeaveLNN(DM_PKG_NAME, networkId.c_str(), OnLeaveLNNResult);
+}
+
+void SoftbusConnector::OnLeaveLNNResult(const char *networkId, int32_t retCode)
+{
+    if (retCode == SOFTBUS_OK) {
+        LOGI("leave LNN called success.");
+        return;
+    }
+    if (networkId == nullptr || networkId[0] == '\0') {
+        LOGI("networkId is empty.");
+        return;
+    }
+    LOGE("retCode: %{public}d, networkId: %{public}s", retCode, GetAnonyString(networkId).c_str());
+    std::lock_guard<std::mutex> lock(leaveLNNMutex_);
+    CHECK_NULL_VOID(leaveLNNCallback_);
+    auto iter = leaveLnnPkgMap_.find(networkId);
+    if (iter != leaveLnnPkgMap_.end()) {
+        leaveLNNCallback_->OnLeaveLNNResult(iter->second, networkId, retCode);
+        leaveLnnPkgMap_.erase(networkId);
+    }
+}
+
+void SoftbusConnector::RegisterLeaveLNNCallback(std::shared_ptr<ISoftbusLeaveLNNCallback> callback)
+{
+    leaveLNNCallback_ = callback;
+}
+
+void SoftbusConnector::UnRegisterLeaveLNNCallback()
+{
+    leaveLNNCallback_ = nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

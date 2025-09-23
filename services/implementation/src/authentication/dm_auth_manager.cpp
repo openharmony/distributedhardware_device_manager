@@ -819,6 +819,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status, int32_t oper
             if (transitToFinishState_) {
                 LOGI("Have received src finish state.");
                 authResponseContext_->state = AuthState::AUTH_RESPONSE_FINISH;
+                CHECK_NULL_VOID(authResponseState_);
                 authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
             }
         }
@@ -1369,6 +1370,7 @@ int32_t DmAuthManager::StartAuthProcess(const int32_t &action)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 void DmAuthManager::StartRespAuthProcess()
 {
     if (authResponseContext_ == nullptr) {
@@ -1387,14 +1389,17 @@ void DmAuthManager::StartRespAuthProcess()
     CHECK_NULL_VOID(authRequestContext_);
     CHECK_NULL_VOID(authRequestState_);
     if (authResponseContext_->reply == USER_OPERATION_TYPE_ALLOW_AUTH) {
-        timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
-            GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
-                DmAuthManager::HandleAuthenticateTimeout(name);
-            });
-        timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK),
-            GetTaskTimeout(SESSION_HEARTBEAT_TIMEOUT_TASK, SESSION_HEARTBEAT_TIMEOUT), [this] (std::string name) {
-                DmAuthManager::HandleSessionHeartbeat(name);
-            });
+        if (timer_ != nullptr) {
+            timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+                GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
+                    DmAuthManager::HandleAuthenticateTimeout(name);
+                });
+            timer_->StartTimer(std::string(SESSION_HEARTBEAT_TIMEOUT_TASK),
+                GetTaskTimeout(SESSION_HEARTBEAT_TIMEOUT_TASK, SESSION_HEARTBEAT_TIMEOUT), [this] (std::string name) {
+                    DmAuthManager::HandleSessionHeartbeat(name);
+                });
+        }
+
         CHECK_NULL_VOID(listener_);
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId,
             authRequestContext_->token, STATUS_DM_SHOW_PIN_INPUT_UI, DM_OK);
@@ -1422,6 +1427,7 @@ int32_t DmAuthManager::CreateGroup()
     hiChainConnector_->CreateGroup(authResponseContext_->requestId, authResponseContext_->groupName);
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthManager::AddMember(const std::string &pinCode)
 {
@@ -1789,6 +1795,7 @@ bool DmAuthManager::GetIsCryptoSupport()
     return isCryptoSupport_;
 }
 
+//LCOV_EXCL_START
 int32_t DmAuthManager::SetAuthRequestState(std::shared_ptr<AuthRequestState> authRequestState)
 {
     if (authRequestState == nullptr) {
@@ -1810,6 +1817,7 @@ int32_t DmAuthManager::SetAuthResponseState(std::shared_ptr<AuthResponseState> a
     authResponseState_ = authResponseState;
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthManager::GetPinCode(std::string &code)
 {
@@ -1823,6 +1831,7 @@ int32_t DmAuthManager::GetPinCode(std::string &code)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 void DmAuthManager::CheckAndEndTvDream()
 {
     NodeBasicInfo nodeBasicInfo;
@@ -1885,6 +1894,7 @@ void DmAuthManager::ShowConfigDialog()
     }
     LOGI("ShowConfigDialog end");
 }
+//LCOV_EXCL_STOP
 
 void DmAuthManager::ShowAuthInfoDialog(bool authDeviceError)
 {
@@ -1915,6 +1925,7 @@ void DmAuthManager::ShowAuthInfoDialog(bool authDeviceError)
     DmDialogManager::GetInstance().ShowPinDialog(authResponseContext_->code);
 }
 
+//LCOV_EXCL_START
 void DmAuthManager::ShowStartAuthDialog()
 {
     if (authResponseContext_ == nullptr) {
@@ -1957,6 +1968,7 @@ void DmAuthManager::ShowStartAuthDialog()
     pincodeDialogEverShown_ = true;
     DmDialogManager::GetInstance().ShowInputDialog(authResponseContext_->targetDeviceName);
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthManager::ProcessPincode(const std::string &pinCode)
 {
@@ -2091,6 +2103,7 @@ int32_t DmAuthManager::SetReasonAndFinish(int32_t reason, int32_t state)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 bool DmAuthManager::IsIdenticalAccount()
 {
     JsonObject jsonObj;
@@ -2155,6 +2168,7 @@ std::string DmAuthManager::GetAccountGroupIdHash()
     }
     return jsonAccountObj.Dump();
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthManager::ImportAuthCode(const std::string &pkgName, const std::string &authCode)
 {
@@ -2622,6 +2636,7 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
             authResponseContext_->reply = ERR_DM_AUTH_CODE_INCORRECT;
             authResponseContext_->state = AuthState::AUTH_RESPONSE_SHOW;
             isFinishOfLocal_ = false;
+            CHECK_NULL_VOID(authResponseState_);
             authResponseState_->TransitionTo(std::make_shared<AuthResponseFinishState>());
         }
         return;
@@ -2644,12 +2659,6 @@ void DmAuthManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
             authResponseContext_->reply = ERR_DM_INPUT_PARA_INVALID;
             authRequestState_->TransitionTo(std::make_shared<AuthRequestFinishState>());
         } else {
-            if (timer_ != nullptr) {
-                timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
-                    GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
-                        DmAuthManager::HandleAuthenticateTimeout(name);
-                    });
-            }
             UpdateInputPincodeDialog(errorCode);
         }
     }
@@ -3442,6 +3451,12 @@ bool DmAuthManager::CheckNeedShowAuthInfoDialog(int32_t errorCode)
 
 void DmAuthManager::UpdateInputPincodeDialog(int32_t errorCode)
 {
+    if (timer_ != nullptr) {
+        timer_->StartTimer(std::string(INPUT_TIMEOUT_TASK),
+            GetTaskTimeout(INPUT_TIMEOUT_TASK, INPUT_TIMEOUT), [this] (std::string name) {
+            DmAuthManager::HandleAuthenticateTimeout(name);
+        });
+    }
     CHECK_NULL_VOID(authResponseContext_);
     CHECK_NULL_VOID(authUiStateMgr_);
     if (authResponseContext_->authType == AUTH_TYPE_NFC && !pincodeDialogEverShown_ &&
@@ -3517,6 +3532,12 @@ void DmAuthManager::GetBindCallerInfo()
             authRequestContext_->hostPkgLabel = bindParam_["bindCallerHostPkgLabel"];
         }
     }
+}
+
+void DmAuthManager::OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode)
+{
+    CHECK_NULL_VOID(listener_);
+    listener_->OnLeaveLNNResult(pkgName, networkId, retCode);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

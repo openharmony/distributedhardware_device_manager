@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+# Copyright (c) 2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,25 +17,36 @@ import("//build/test.gni")
 import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("OnBytesReceivedFuzzTest") {
+ohos_fuzztest("IpcModelCodecOneFuzzTest") {
   module_out_path = fuzz_test_output_path
   fuzz_config_file =
-      "${devicemanager_path}/test/softbusfuzztest/onbytesreceived_fuzzer"
+      "${devicemanager_path}/test/servicesfuzztest/ipcmodelcodecone_fuzzer"
 
   include_dirs = [
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include",
+    "${innerkits_path}/native_cpp/include/ipc/standard",
+    "${innerkits_path}/native_cpp/include/ipc",
+    "${innerkits_path}/native_cpp/include/notify",
+    "${common_path}/include/ipc/standard",
     "${common_path}/include",
     "${common_path}/include/ipc",
     "${common_path}/include/ipc/model",
-    "${innerkits_path}/native_cpp/include",
     "${utils_path}/include",
     "${utils_path}/include/ipc/standard",
-    "${servicesimpl_path}/include",
-    "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/adapter",
-    "${servicesimpl_path}/include/authentication",
-    "${servicesimpl_path}/include/dependency/commonevent",
-    "${servicesimpl_path}/include/dependency/hichain",
+    "${servicesimpl_path}/include/dependency/timer",
     "${servicesimpl_path}/include/dependency/softbus",
+    "${servicesimpl_path}/include/authentication",
+    "${servicesimpl_path}/include/adapter",
+    "${servicesimpl_path}/include",
+    "${services_path}/include/ipc/standard",
+    "${servicesimpl_path}/include/discovery",
+    "${servicesimpl_path}/include/dependency/hichain",
+    "${servicesimpl_path}/include/deviceinfo",
+    "${servicesimpl_path}/include/devicestate",
+    "${devicemanager_path}/test/unittest/mock",
+    "${servicesimpl_path}/include/ability",
+    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [
@@ -48,28 +59,26 @@ ohos_fuzztest("OnBytesReceivedFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "on_bytes_received_fuzzer.cpp" ]
-
-  deps = [
-    "${innerkits_path}/native_cpp:devicemanagersdk",
-    "${services_path}:devicemanagerservicetest",
-    "${servicesimpl_path}:devicemanagerserviceimpl",
-    "${utils_path}:devicemanagerutilstest",
-  ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "device_info_manager:distributed_device_profile_common",
-    "device_info_manager:distributed_device_profile_sdk",
-    "dsoftbus:softbus_client",
-    "init:libbegetutil",
-    "safwk:system_ability_fwk",
-  ]
+  sources = [ "ipc_model_codec_one_fuzzer.cpp" ]
 
   defines = [
     "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"OnBytesReceivedFuzzTest\"",
+    "DH_LOG_TAG=\"IpcModelCodecOneFuzzTest\"",
     "LOG_DOMAIN=0xD004110",
+  ]
+
+  deps = [
+    "${innerkits_path}/native_cpp:devicemanagersdk",
+    "${utils_path}:devicemanagerutilstest"
+    ]
+
+  external_deps = [
+    "c_utils:utils",
+    "device_auth:deviceauth_sdk",
+    "ipc:ipc_core",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "safwk:system_ability_fwk",
   ]
 }
 
@@ -77,6 +86,6 @@ ohos_fuzztest("OnBytesReceivedFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":OnBytesReceivedFuzzTest" ]
+  deps = [ ":IpcModelCodecOneFuzzTest" ]
 }
 ###############################################################################

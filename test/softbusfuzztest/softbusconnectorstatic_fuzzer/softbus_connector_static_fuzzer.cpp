@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <fuzzer/FuzzedDataProvider.h>
+
 #include "softbus_connector.h"
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
@@ -26,11 +28,12 @@ namespace DistributedHardware {
 
 void SoftBusConnectorStaticFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string deviceId(reinterpret_cast<const char*>(data), size);
+    std::string deviceId = fdp.ConsumeRandomLengthString();
     const char *networkId = deviceId.c_str();
     std::string uuid;
 

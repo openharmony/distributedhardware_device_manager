@@ -105,6 +105,13 @@ const char* TAG_LANGUAGE = "language";
 const char* TAG_ULTRASONIC_SIDE = "ultrasonicSide";
 const char* TAG_REMAINING_FROZEN_TIME = "remainingFrozenTime";
 const char* TAG_IS_SUPPORT_ULTRASONIC = "isSupportUltrasonic";
+const char* TAG_SERVICE_ID = "serviceId";
+const char* TAG_ACCESSEE_SERVICE_INFO = "accesseeServiceInfo";
+const char* TAG_REG_SERVICE_ID = "regServiceId";
+const char* TAG_PUBLISH_STATE = "publishState";
+const char* TAG_SERVICE_TYPE = "serviceType";
+const char* TAG_SERVICE_NAME = "serviceName";
+const char* TAG_SERVICE_DISPLAY_NAME = "serviceDisplayName";
 
 constexpr const char* TAG_CUSTOM_DESCRIPTION = "CUSTOMDESC";
 
@@ -362,6 +369,7 @@ int32_t DmAuthMessageProcessor::PutAccessControlList(std::shared_ptr<DmAuthConte
         profile.SetBindLevel(USER);
         std::string isLnnAclTrue = std::string(ACL_IS_LNN_ACL_VAL_TRUE);
         extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclTrue;
+        extraData[TAG_SERVICE_ID] = access.serviceId;
         profile.SetExtraData(extraData.Dump());
         int32_t ret =
             DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().PutAccessControlProfile(profile);
@@ -373,6 +381,7 @@ int32_t DmAuthMessageProcessor::PutAccessControlList(std::shared_ptr<DmAuthConte
     if (!context->IsProxyBind || context->subjectProxyOnes.empty() || (context->IsCallingProxyAsSubject && !isAuthed)) {
         std::string isLnnAclFalse = std::string(ACL_IS_LNN_ACL_VAL_FALSE);
         extraData[ACL_IS_LNN_ACL_KEY] = isLnnAclFalse;
+        extraData[TAG_SERVICE_ID] = access.serviceId;
         profile.SetExtraData(extraData.Dump());
         profile.SetBindLevel(access.bindLevel);
         SetTransmitAccessControlList(context, accesser, accessee);
@@ -900,6 +909,8 @@ int32_t DmAuthMessageProcessor::CreateNegotiateMessage(std::shared_ptr<DmAuthCon
     jsonObject[TAG_PEER_DISPLAY_ID] = context->accessee.displayId;
     jsonObject[TAG_PEER_PKG_NAME] = context->accessee.pkgName;
     jsonObject[TAG_HOST_PKGLABEL] = context->pkgLabel;
+    jsonObject[TAG_SERVICE_ID] = context->accessee.serviceId;
+    jsonObject[PARAM_KEY_IS_SERVICE_BIND] = context->isServiceBind;
 
     if (!context->businessId.empty()) {
         jsonObject[DM_BUSINESS_ID] = context->businessId;
@@ -1202,7 +1213,51 @@ int32_t DmAuthMessageProcessor::ParseSyncMessage(std::shared_ptr<DmAuthContext> 
         }
     }
     ParseCert(jsonObject, context);
+    ParseSyncServiceInfo(jsonObject, context);
     return DM_OK;
+}
+
+void DmAuthMessageProcessor::ParseSyncServiceInfo(const JsonObject &jsonObject,
+    std::shared_ptr<DmAuthContext> context)
+{
+    std::string serviceInfoStr = "";
+    if (IsString(jsonObject, TAG_ACCESSEE_SERVICE_INFO)) {
+        serviceInfoStr = jsonObject[TAG_ACCESSEE_SERVICE_INFO].Get<std::string>();
+    }
+    JsonObject json;
+    json.Parse(serviceInfoStr);
+    if (json.IsDiscarded()) {
+        return;
+    }
+    ServiceInfoProfile serviceInfoProfile;
+    if (IsInt32(json, TAG_REG_SERVICE_ID)) {
+        serviceInfoProfile.regServiceId = json[TAG_REG_SERVICE_ID].Get<int32_t>();
+    }
+    if (IsString(json, TAG_DEVICE_ID)) {
+        serviceInfoProfile.deviceId = json[TAG_DEVICE_ID].Get<std::string>();
+    }
+    if (IsInt32(json, TAG_USER_ID)) {
+        serviceInfoProfile.userId = json[TAG_USER_ID].Get<int32_t>();
+    }
+    if (IsInt64(json, TAG_TOKEN_ID)) {
+        serviceInfoProfile.tokenId = json[TAG_TOKEN_ID].Get<int64_t>();
+    }
+    if (IsInt32(json, TAG_PUBLISH_STATE)) {
+        serviceInfoProfile.publishState = json[TAG_PUBLISH_STATE].Get<int32_t>();
+    }
+    if (IsInt64(json, TAG_SERVICE_ID)) {
+        serviceInfoProfile.serviceId = json[TAG_SERVICE_ID].Get<int64_t>();
+    }
+    if (IsString(json, TAG_SERVICE_TYPE)) {
+        serviceInfoProfile.serviceType = json[TAG_SERVICE_TYPE].Get<std::string>();
+    }
+    if (IsString(json, TAG_SERVICE_NAME)) {
+        serviceInfoProfile.serviceName = json[TAG_SERVICE_NAME].Get<std::string>();
+    }
+    if (IsString(json, TAG_SERVICE_DISPLAY_NAME)) {
+        serviceInfoProfile.serviceDisplayName = json[TAG_SERVICE_DISPLAY_NAME].Get<std::string>();
+    }
+    DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
 }
 
 int32_t DmAuthMessageProcessor::ParseProxyAccessToSync(std::shared_ptr<DmAuthContext> &context,
@@ -1411,8 +1466,24 @@ int32_t DmAuthMessageProcessor::ParseNegotiateMessage(
     ParseAccesserInfo(jsonObject, context);
     ParseUltrasonicSide(jsonObject, context);
     ParseProxyNegotiateMessage(jsonObject, context);
+    ParseServiceNego(jsonObject, context);
     context->authStateMachine->TransitionTo(std::make_shared<AuthSinkNegotiateStateMachine>());
     return DM_OK;
+}
+
+void DmAuthMessageProcessor::ParseServiceNego(const JsonObject &jsonObject,
+    std::shared_ptr<DmAuthContext> context)
+{
+    context->isServiceBind = false;
+    if (IsBool(jsonObject, PARAM_KEY_IS_SERVICE_BIND)) {
+        context->isServiceBind = jsonObject[PARAM_KEY_IS_SERVICE_BIND].Get<bool>();
+    }
+    if (!context->isServiceBind) {
+        return;
+    }
+    if (IsInt64(jsonObject, TAG_SERVICE_ID)) {
+        context->accessee.serviceId = jsonObject[TAG_SERVICE_ID].Get<int64_t>();
+    }
 }
 
 void DmAuthMessageProcessor::ParseAccesserInfo(const JsonObject &jsonObject,
@@ -1833,9 +1904,10 @@ int32_t DmAuthMessageProcessor::CreateMessageProxyReqUserConfirm(std::shared_ptr
 
 int32_t DmAuthMessageProcessor::CreateMessageRespUserConfirm(std::shared_ptr<DmAuthContext> context, JsonObject &json)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_FAILED);
     json[TAG_AUTH_TYPE_LIST] = vectorAuthTypeToString(context->authTypeList);
     json[TAG_EXTRA_INFO] = context->accessee.extraInfo;
-    if (context != nullptr && context->IsProxyBind && !context->subjectProxyOnes.empty()) {
+    if (context->IsProxyBind && !context->subjectProxyOnes.empty()) {
         JsonObject allProxyObj(JsonCreateType::JSON_CREATE_TYPE_ARRAY);
         for (const auto &app : context->subjectProxyOnes) {
             JsonObject object;
@@ -1918,7 +1990,7 @@ std::string DmAuthMessageProcessor::CompressSyncMsg(std::string &inputStr)
 {
     uint32_t srcLen = inputStr.size();
     uint32_t boundSize = compressBound(srcLen);  // Maximum compression length
-    if (boundSize <= 0) {
+    if (boundSize == 0) {
         LOGE("DmAuthMessageProcessor::CompressSyncMsg zlib compressBound failed");
         return "";
     }
@@ -2008,6 +2080,27 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     DmAccessToSync accessToSync;
     SaveToDmAccessSync(accessToSync, context, accessSide);
 
+    if (SetSyncMsgJson(context, accessSide, accessToSync, syncMsgJson) != DM_OK) {
+        LOGE("DmAuthMessageProcessor::SetSyncMsgJson failed");
+        return ERR_DM_FAILED;
+    }
+
+    CreateProxyAccessMessage(context, syncMsgJson);
+    std::string syncMsg = syncMsgJson.Dump();
+    std::string compressMsg = CompressSyncMsg(syncMsg);
+    if (compressMsg.empty()) {
+        LOGE("DmAuthMessageProcessor::EncryptSyncMessage compress failed");
+        return ERR_DM_FAILED;
+    }
+    JsonObject plainJson;
+    plainJson[TAG_COMPRESS_ORI_LEN] = syncMsg.size();
+    plainJson[TAG_COMPRESS] = Base64Encode(compressMsg);
+    return cryptoMgr_->EncryptMessage(plainJson.Dump(), encSyncMsg);
+}
+
+int32_t DmAuthMessageProcessor::SetSyncMsgJson(std::shared_ptr<DmAuthContext> &context, const DmAccess &accessSide,
+    const DmAccessToSync &accessToSync, JsonObject &syncMsgJson)
+{
     syncMsgJson[TAG_TRANSMIT_SK_ID] = std::to_string(accessSide.transmitSessionKeyId);
     syncMsgJson[TAG_TRANSMIT_SK_TIMESTAMP] = accessSide.transmitSkTimeStamp;
     syncMsgJson[TAG_TRANSMIT_CREDENTIAL_ID] = accessSide.transmitCredentialId;
@@ -2042,17 +2135,33 @@ int32_t DmAuthMessageProcessor::EncryptSyncMessage(std::shared_ptr<DmAuthContext
     }
     syncMsgJson[TAG_IS_COMMON_FLAG] = context->accesser.isCommonFlag;
     syncMsgJson[TAG_DM_CERT_CHAIN] = context->accesser.cert;
-    CreateProxyAccessMessage(context, syncMsgJson);
-    std::string syncMsg = syncMsgJson.Dump();
-    std::string compressMsg = CompressSyncMsg(syncMsg);
-    if (compressMsg.empty()) {
-        LOGE("DmAuthMessageProcessor::EncryptSyncMessage compress failed");
-        return ERR_DM_FAILED;
+    if (context->isServiceBind) {
+        std::string serviceInfo = GetAccesseeServiceInfo(context->accessee.serviceId);
+        syncMsgJson[TAG_ACCESSEE_SERVICE_INFO] = serviceInfo;
     }
-    JsonObject plainJson;
-    plainJson[TAG_COMPRESS_ORI_LEN] = syncMsg.size();
-    plainJson[TAG_COMPRESS] = Base64Encode(compressMsg);
-    return cryptoMgr_->EncryptMessage(plainJson.Dump(), encSyncMsg);
+    return DM_OK;
+}
+
+std::string DmAuthMessageProcessor::GetAccesseeServiceInfo(int64_t serviceId)
+{
+    ServiceInfoProfile serviceInfoProfile;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId,
+        serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("GetAccesseeServiceInfo GetServiceInfoProfileByServiceId failed.");
+        return "";
+    }
+    JsonObject json;
+    json[TAG_REG_SERVICE_ID] = serviceInfoProfile.regServiceId;
+    json[TAG_DEVICE_ID] = serviceInfoProfile.deviceId;
+    json[TAG_USER_ID] = serviceInfoProfile.userId;
+    json[TAG_TOKEN_ID] = serviceInfoProfile.tokenId;
+    json[TAG_PUBLISH_STATE] = serviceInfoProfile.publishState;
+    json[TAG_SERVICE_ID] = serviceInfoProfile.serviceId;
+    json[TAG_SERVICE_TYPE] = serviceInfoProfile.serviceType;
+    json[TAG_SERVICE_NAME] = serviceInfoProfile.serviceName;
+    json[TAG_SERVICE_DISPLAY_NAME] = serviceInfoProfile.serviceDisplayName;
+    return json.Dump();
 }
 
 int32_t DmAuthMessageProcessor::CreateProxyAccessMessage(std::shared_ptr<DmAuthContext> &context,
@@ -2152,6 +2261,9 @@ bool DmAuthMessageProcessor::IsExistTheToken(JsonObject &proxyObj, int64_t token
         return false;
     }
     for (auto const &item : proxyObj.Items()) {
+        if (item.IsDiscarded() || !item.IsNumberInteger()) {
+            continue;
+        }
         if (tokenId == item.Get<int64_t>()) {
             return true;
         }

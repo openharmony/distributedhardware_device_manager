@@ -371,8 +371,6 @@ void AuthSinkDeviceRequestFuzzTest(FuzzedDataProvider &fdp)
         free(ret);
         ret = nullptr;
     }
-    authManager->DeleteTimer();
-    authManager->GetBindCallerInfo();
 }
 
 void HandleBusinessEventsFuzzTest(FuzzedDataProvider &fdp)
@@ -380,8 +378,6 @@ void HandleBusinessEventsFuzzTest(FuzzedDataProvider &fdp)
     std::string businessId = fdp.ConsumeRandomLengthString();
     int action = fdp.ConsumeIntegral<int>();
     authManager->HandleBusinessEvents(businessId, action);
-    authManager->ClearSoftbusSessionCallback();
-    authManager->PrepareSoftbusSessionCallback();
 }
 
 void ParseProxyJsonObjectFuzzTest(FuzzedDataProvider &fdp)

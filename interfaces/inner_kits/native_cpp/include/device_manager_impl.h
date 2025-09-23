@@ -439,6 +439,24 @@ public:
     virtual bool CheckSinkAccessControl(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSrcIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
     virtual bool CheckSinkIsSameAccount(const DmAccessCaller &caller, const DmAccessCallee &callee) override;
+    virtual int32_t GetUdidsByDeviceIds(const std::string &pkgName, const std::vector<std::string> deviceIdList,
+        std::map<std::string, std::string> &deviceIdToUdidMap) override;
+    virtual int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        std::map<std::string, std::string> &bindParam, std::shared_ptr<BindTargetCallback> callback) override;
+    virtual int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId) override;
+    virtual int32_t StartServiceDiscovery(const std::string &pkgName, const DiscoveryServiceParam &discParam,
+        std::shared_ptr<ServiceDiscoveryCallback> callback) override;
+    virtual int32_t StopServiceDiscovery(const std::string &pkgName, int32_t discoveryServiceId) override;
+    virtual int32_t RegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId,
+        std::shared_ptr<ServiceInfoStateCallback> callback) override;
+    virtual int32_t UnRegisterServiceStateCallback(const std::string &pkgName, int64_t serviceId) override;
+    virtual int32_t StartPublishService(const std::string &pkgName, const PublishServiceParam &publishServiceParam,
+        std::shared_ptr<ServicePublishCallback> callback, int64_t &serviceId) override;
+    virtual int32_t StopPublishService(int64_t serviceId) override;
+    virtual int32_t RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId) override;
+    virtual int32_t UnRegisterServiceInfo(int32_t regServiceId) override;
+    virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId,
+        std::shared_ptr<LeaveLNNCallback> callback) override;
 
 private:
     DeviceManagerImpl() = default;

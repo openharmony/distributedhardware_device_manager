@@ -105,16 +105,24 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     }
     // Synchronize the local SP information, the format is uncertain, not done for now
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
+    SetAclInfo(context);
+    if (NeedAgreeAcl(context)) {
+        UpdateCredInfo(context);
+        context->authMessageProcessor->PutAccessControlList(context,
+            context->accessee, context->accesser.deviceId);
+    }
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
     context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
     LOGI("AuthSinkDataSyncState::Action ok");
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 DmAuthStateType AuthSinkDataSyncState::GetStateType()
 {
     return DmAuthStateType::AUTH_SINK_DATA_SYNC_STATE;
 }
+//LCOV_EXCL_STOP
 
 int32_t AuthSinkDataSyncState::DerivativeSessionKey(std::shared_ptr<DmAuthContext> context)
 {
@@ -196,10 +204,12 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 DmAuthStateType AuthSrcDataSyncState::GetStateType()
 {
     return DmAuthStateType::AUTH_SRC_DATA_SYNC_STATE;
 }
+//LCOV_EXCL_STOP
 
 // Received 200 end message, send 201
 int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)

@@ -51,13 +51,10 @@ void DmFreezeProcessFuzzTest(const uint8_t *data, size_t size)
     std::string result = fdp.ConsumeRandomLengthString();
     DeviceFreezeState freezeStateObj;
     BindFailedEvents bindFailedEvents;
-    std::string bundleName = CAST_BUNDLE_NAME;
-    int32_t deviceType = DEVICE_TYPE_TV;
+    std::string bundleName = fdp.ConsumeRandomLengthString();
     int64_t reservedDataTimeStamp = fdp.ConsumeIntegral<int64_t>();
     FreezeProcess::GetInstance().ConvertJsonToDeviceFreezeState(result, freezeStateObj);
     FreezeProcess::GetInstance().ConvertJsonToBindFailedEvents(result, bindFailedEvents);
-    bundleName = fdp.ConsumeRandomLengthString();
-    deviceType = fdp.ConsumeIntegral<int32_t>();
     freezeStateObj.startFreezeTimeStamp = fdp.ConsumeIntegral<int32_t>();
     FreezeProcess::GetInstance().freezeStateCache_ = freezeStateObj;
     FreezeProcess::GetInstance().CleanBindFailedEvents(reservedDataTimeStamp);

@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 
 #include "device_manager_impl.h"
@@ -26,13 +27,14 @@ namespace OHOS {
 namespace DistributedHardware {
 void GetUdidByNetworkIdFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
+    FuzzedDataProvider fdp(data, size);
 
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string netWorkId(reinterpret_cast<const char*>(data), size);
-    std::string udid(reinterpret_cast<const char*>(data), size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string netWorkId = fdp.ConsumeRandomLengthString();
+    std::string udid = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
     DeviceManager::GetInstance().GetUdidByNetworkId(pkgName, netWorkId, udid);

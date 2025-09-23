@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,41 +22,31 @@
 namespace OHOS {
 namespace DistributedHardware {
 // AuthSrcManager fuzz
-void OnDataReceivedSrcFuzzTest(const uint8_t* data, size_t size)
+void OnDataReceivedSrcFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     std::shared_ptr<AuthManager> authManager = std::make_shared<AuthSrcManager>(softbusConnector, hiChainConnector,
         listener, hiChainAuthConnector);
-    FuzzedDataProvider fdp(data, size);
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
-    std::string message(reinterpret_cast<const char*>(data), size);
+    std::string message = fdp.ConsumeRandomLengthString();
     authManager->OnDataReceived(sessionId, message);
     authManager->OnSessionClosed(sessionId);
 }
 
 // AuthSinkManager fuzz
-void OnDataReceivedSinkFuzzTest(const uint8_t* data, size_t size)
+void OnDataReceivedSinkFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     std::shared_ptr<IDeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector = std::make_shared<HiChainAuthConnector>();
     std::shared_ptr<HiChainConnector> hiChainConnector = std::make_shared<HiChainConnector>();
     std::shared_ptr<AuthManager> authManager = std::make_shared<AuthSinkManager>(softbusConnector, hiChainConnector,
         listener, hiChainAuthConnector);
-    FuzzedDataProvider fdp(data, size);
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
-    std::string message(reinterpret_cast<const char*>(data), size);
+    std::string message = fdp.ConsumeRandomLengthString();
     authManager->OnDataReceived(sessionId, message);
     authManager->OnSessionClosed(sessionId);
 }
@@ -67,7 +57,11 @@ void OnDataReceivedSinkFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::OnDataReceivedSrcFuzzTest(data, size);
-    OHOS::DistributedHardware::OnDataReceivedSinkFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::OnDataReceivedSrcFuzzTest(fdp);
+    OHOS::DistributedHardware::OnDataReceivedSinkFuzzTest(fdp);
     return 0;
 }

@@ -23,6 +23,7 @@
 #include "app_manager.h"
 #include "bundle_mgr_interface.h"
 #include "bundle_mgr_proxy.h"
+#include "distributed_device_profile_client.h"
 #include "dm_error_type.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
@@ -71,6 +72,7 @@ constexpr const char* BIND_CALLER_USERID = "bindCallerUserId";
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
+constexpr const char* TAG_SERVICE_ID = "serviceId";
 // currently, we just support one bind session in one device at same time
 constexpr size_t MAX_NEW_PROC_SESSION_COUNT_TEMP = 1;
 const int32_t USLEEP_TIME_US_500000 = 500000; // 500ms
@@ -594,6 +596,7 @@ void DeviceManagerServiceImpl::Release()
     if (softbusConnector_ != nullptr) {
         softbusConnector_->UnRegisterConnectorCallback();
         softbusConnector_->UnRegisterSoftbusStateCallback();
+        softbusConnector_->UnRegisterLeaveLNNCallback();
         if (softbusConnector_->GetSoftbusSession() != nullptr) {
             softbusConnector_->GetSoftbusSession()->UnRegisterSessionCallback();
         }
@@ -745,6 +748,7 @@ void DeviceManagerServiceImpl::CreateGlobalClassicalAuthMgr()
     softbusConnector_->GetSoftbusSession()->RegisterSessionCallback(authMgr_);
     hiChainConnector_->RegisterHiChainCallback(authMgr_);
     hiChainAuthConnector_->RegisterHiChainAuthCallback(authMgr_);
+    softbusConnector_->RegisterLeaveLNNCallback(authMgr_);
 }
 
 void DeviceManagerServiceImpl::HandleOffline(DmDeviceState devState, DmDeviceInfo &devInfo)
@@ -1213,6 +1217,9 @@ int32_t DeviceManagerServiceImpl::TransferOldAuthMgr(int32_t msgType, const Json
             }
         }
     }
+    if (authMgr_ != nullptr && !authMgr_->IsTransferReady()) {
+        return DM_OK;
+    }
 
     return ret;
 }
@@ -1609,6 +1616,16 @@ static bool IsHmlSessionType(const JsonObject &jsonObject)
 int DeviceManagerServiceImpl::OpenAuthSession(const std::string& deviceId,
     const std::map<std::string, std::string> &bindParam)
 {
+    if (bindParam.find(PARAM_KEY_IS_SERVICE_BIND) != bindParam.end() &&
+        bindParam.at(PARAM_KEY_IS_SERVICE_BIND) == DM_VAL_TRUE) {
+        CHECK_NULL_RETURN(listener_, ERR_DM_FAILED);
+        if (IsNumberString(deviceId)) {
+            return listener_->OpenAuthSessionWithPara(std::stoll(deviceId));
+        } else {
+            LOGE("OpenAuthSession failed");
+            return ERR_DM_FAILED;
+        }
+    }
     bool hmlEnable160M = false;
     int32_t hmlActionId = 0;
     int invalidSessionId = -1;
@@ -1782,6 +1799,10 @@ int32_t DeviceManagerServiceImpl::ParseConnectAddr(const PeerTargetId &targetId,
         LOGE("GetDeviceInfo failed, ret: %{public}d", ret);
     }
     deviceInfo->addrNum = static_cast<uint32_t>(index);
+    if (bindParam.find(PARAM_KEY_IS_SERVICE_BIND) != bindParam.end() &&
+        bindParam.at(PARAM_KEY_IS_SERVICE_BIND) == DM_VAL_TRUE) {
+        deviceId = std::to_string(targetId.serviceId);
+    }
     if (softbusConnector_->AddMemberToDiscoverMap(deviceId, deviceInfo) != DM_OK) {
         LOGE("DeviceManagerServiceImpl::ParseConnectAddr failed, AddMemberToDiscoverMap failed.");
         return ERR_DM_INPUT_PARA_INVALID;
@@ -1990,8 +2011,7 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &inf
     DmOfflineParam offlineParam;
     bool notifyOffline = DeviceProfileConnector::GetInstance().DeleteAclForAccountLogOut(info, accountId,
         offlineParam);
-    CHECK_NULL_VOID(hiChainConnector_);
-    hiChainConnector_->DeleteAllGroup(info.localUserId);
+    DeleteGroupByBundleName(info.localUdid, info.localUserId, offlineParam.needDelAclInfos);
     CHECK_NULL_VOID(hiChainAuthConnector_);
     {
         std::lock_guard lock(logoutMutex_);
@@ -3204,11 +3224,140 @@ void DeviceManagerServiceImpl::DeleteSessionKey(int32_t userId,
     DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, skId);
 }
 
+int32_t DeviceManagerServiceImpl::BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+    const std::map<std::string, std::string> &bindParam)
+{
+    if (pkgName.empty()) {
+        LOGE("BindServiceTarget failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::map<std::string, std::string> bindParamTmp = bindParam;
+    bindParamTmp[PARAM_KEY_IS_SERVICE_BIND] = "true";
+    return BindTarget(pkgName, targetId, bindParamTmp);
+}
+
+int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
+{
+    if (pkgName.empty()) {
+        LOGE("UnbindServiceTarget failed, pkgName is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    int64_t tokenIdCaller = IPCSkeleton::GetCallingTokenID();
+    std::string peerDeviceId = "";
+    int32_t bindLevel = -1;
+    int32_t ret = DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, peerDeviceId, bindLevel);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, DeleteAclExtraDataServiceId failed.");
+        return ret;
+    }
+
+    ServiceInfoProfile serviceInfoProfile;
+    int32_t userId = -1;
+    MultipleUserConnector::GetCallerUserId(userId);
+    ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfoProfile);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, GetServiceInfoProfileByServiceId failed.");
+        return ret;
+    }
+    ret = DeviceProfileConnector::GetInstance().DeleteServiceInfoProfile(serviceInfoProfile.regServiceId, userId);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, DeleteServiceInfoProfile failed.");
+        return ret;
+    }
+    ret = UnBindDevice(pkgName, peerDeviceId, bindLevel);
+    if (ret != DM_OK) {
+        LOGE("UnbindServiceTarget failed, UnBindDevice failed.");
+        return ret;
+    }
+    return DM_OK;
+}
+
+int32_t DeviceManagerServiceImpl::DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller,
+    std::string &udid, int32_t &bindLevel)
+{
+    bool isDeletedExtra = false;
+    char localDeviceIdTemp[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceIdTemp, DEVICE_UUID_LENGTH);
+    std::string localDeviceId = std::string(localDeviceIdTemp);
+    std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
+        DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
+    for (auto &item : profiles) {
+        std::string extraData = item.GetExtraData();
+        if (extraData.empty()) {
+            continue;
+        }
+        JsonObject json;
+        json.Parse(extraData);
+        if (json.IsDiscarded()) {
+            continue;
+        }
+        if (IsInt64(json, TAG_SERVICE_ID)) {
+            int64_t aclServiceId = json[TAG_SERVICE_ID].Get<int64_t>();
+            if (aclServiceId != serviceId) {
+                continue;
+            }
+        }
+        std::string accesserUdid = item.GetAccesser().GetAccesserDeviceId();
+        int64_t tokenIdAcl = item.GetAccesser().GetAccesserTokenId();
+        if (accesserUdid == localDeviceId && tokenIdCaller == tokenIdAcl) {
+            isDeletedExtra = true;
+            json.Erase(TAG_SERVICE_ID);
+            item.SetExtraData(json.Dump());
+            udid = item.GetAccessee().GetAccesseeDeviceId();
+            bindLevel = item.GetBindLevel();
+            DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(item);
+        }
+    }
+    if (!isDeletedExtra) {
+        LOGE("DeleteAclExtraDataServiceId failed, local is sink, not allow unbind.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    return DM_OK;
+}
+
 void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
     const std::string &deviceUdidHash)
 {
     CHECK_NULL_VOID(deviceStateMgr_);
     deviceStateMgr_->StartDelTimerByDP(deviceUdid, deviceUdidHash);
+}
+
+void DeviceManagerServiceImpl::DeleteGroupByBundleName(const std::string &localUdid, int32_t userId,
+    const std::vector<DmAclIdParam> &acls)
+{
+    if (acls.empty()) {
+        LOGI("acls is empty.");
+        return;
+    }
+    CHECK_NULL_VOID(hiChainConnector_);
+    std::vector<GroupInfo> groupList;
+    hiChainConnector_->GetRelatedGroups(userId, localUdid, groupList);
+    for (auto &iter : groupList) {
+        for (auto &item : acls) {
+            if (!item.pkgName.empty() && iter.groupName.find(item.pkgName) != std::string::npos) {
+                int32_t ret = hiChainConnector_->DeleteGroup(iter.groupId);
+                LOGI("delete bundleName %{public}s, groupId %{public}s ,result %{public}d.",
+                    item.pkgName.c_str(), GetAnonyString(iter.groupId).c_str(), ret);
+            }
+        }
+    }
+    std::vector<GroupInfo> groupListExt;
+    hiChainConnector_->GetRelatedGroupsExt(userId, localUdid, groupListExt);
+    for (auto &iter : groupListExt) {
+        for (auto &item : acls) {
+            if (!item.pkgName.empty() && iter.groupName.find(item.pkgName) != std::string::npos) {
+                int32_t ret = hiChainConnector_->DeleteGroupExt(iter.groupId);
+                LOGI("delete groupsExt bundleName %{public}s, groupId %{public}s ,result %{public}d.",
+                    item.pkgName.c_str(), GetAnonyString(iter.groupId).c_str(), ret);
+            }
+        }
+    }
+}
+
+int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std::string &networkId)
+{
+    CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
+    return softbusConnector_->LeaveLNN(pkgName, networkId);
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

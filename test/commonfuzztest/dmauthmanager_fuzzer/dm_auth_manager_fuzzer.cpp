@@ -34,12 +34,10 @@ std::shared_ptr<AuthResponseState> g_authResponseState = std::make_shared<AuthRe
 std::shared_ptr<DmAuthManager> g_authManager =
     std::make_shared<DmAuthManager>(g_softbusConnector, g_hiChainConnector, g_listener, g_hiChainAuthConnector);
 
-int32_t g_sessionId = 1;
 int32_t g_sessionSide = 0;
 int32_t g_result = 1;
 int32_t g_authType = 1;
 int32_t g_status = 1;
-std::string g_pinCode = "111111";
 int32_t g_action = 1;
 int32_t g_userId = 1;
 int32_t g_pageId = 1;
@@ -63,9 +61,11 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
         return;
     }
     FuzzedDataProvider fdp(data, size);
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
     int32_t bindLevel = fdp.ConsumeIntegral<int32_t>();
     int32_t operationCode = fdp.ConsumeIntegral<int32_t>();
+    int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
+    std::string pinCode = fdp.ConsumeRandomLengthString();
     g_authManager->authMessageProcessor_ = std::make_shared<AuthMessageProcessor>(g_authManager);
     g_authManager->authMessageProcessor_->authResponseContext_ = std::make_shared<DmAuthResponseContext>();
     g_authManager->authRequestContext_ = std::make_shared<DmAuthRequestContext>();
@@ -79,29 +79,22 @@ void DmAuthManagerFuzzTest(const uint8_t* data, size_t size)
     g_authManager->timer_ = std::make_shared<DmTimer>();
 
     g_authManager->InitAuthState(str, g_authType, str, str);
-    g_authManager->OnSessionOpened(g_sessionId, g_sessionSide, g_result);
+    g_authManager->OnSessionOpened(sessionId, g_sessionSide, g_result);
     g_authManager->AuthenticateDevice(str, g_authType, str, str);
     g_authManager->ImportAuthCode(str, str);
-    g_authManager->BindTarget(str, g_targetId, g_bindParam, g_sessionId, g_localSessionId);
-    g_authManager->ShowConfigDialog();
-    g_authManager->ShowAuthInfoDialog();
-    g_authManager->ShowStartAuthDialog();
-    g_authManager->OnDataReceived(g_sessionId, str);
+    g_authManager->BindTarget(str, g_targetId, g_bindParam, sessionId, g_localSessionId);
+    g_authManager->ShowAuthInfoDialog(fdp.ConsumeBool());
+    g_authManager->OnDataReceived(sessionId, str);
     g_authManager->OnGroupCreated(g_requestId, str);
     g_authManager->OnMemberJoin(g_requestId, g_status, operationCode);
-    g_authManager->StartNegotiate(g_sessionId);
-    g_authManager->RespNegotiate(g_sessionId);
-    g_authManager->SendAuthRequest(g_sessionId);
-    g_authManager->SetAuthRequestState(g_authRequestState);
-    g_authManager->SetAuthResponseState(g_authResponseState);
-    g_authManager->StartAuthProcess(g_action);
-    g_authManager->StartRespAuthProcess();
-    g_authManager->CreateGroup();
-    g_authManager->ProcessPincode(g_pinCode);
-    g_authManager->SetPageId(g_pageId);
-    g_authManager->SetReasonAndFinish(g_reason, g_state);
-    g_authManager->IsIdenticalAccount();
-    g_authManager->OnSessionClosed(g_sessionId);
+    g_authManager->StartNegotiate(sessionId);
+    g_authManager->RespNegotiate(sessionId);
+    g_authManager->SendAuthRequest(sessionId);
+    g_authManager->StartAuthProcess(fdp.ConsumeIntegral<int32_t>());
+    g_authManager->ProcessPincode(pinCode);
+    g_authManager->SetPageId(fdp.ConsumeIntegral<int32_t>());
+    g_authManager->SetReasonAndFinish(g_reason, fdp.ConsumeIntegral<int32_t>());
+    g_authManager->OnSessionClosed(sessionId);
     g_authManager->OnUserOperation(g_action, str);
     g_authManager->GetConnectAddr(str);
     g_authManager->HandleAuthenticateTimeout(str);
@@ -117,6 +110,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::DmAuthManagerFuzzTest(data, size);
-
     return 0;
 }

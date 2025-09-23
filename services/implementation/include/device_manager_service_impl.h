@@ -205,7 +205,11 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid);
     void DeleteHoDevice(const std::string &peerUdid, const std::vector<int32_t> &foreGroundUserIds,
         const std::vector<int32_t> &backGroundUserIds);
+    int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
+        const std::map<std::string, std::string> &bindParam);
+    int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
     void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash);
+    int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
 private:
     int32_t PraseNotifyEventJson(const std::string &event, JsonObject &jsonObject);
     std::string GetUdidHashByNetworkId(const std::string &networkId);
@@ -304,6 +308,9 @@ private:
         const std::string &deviceId, int32_t reason, uint64_t tokenId);
     void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet);
     void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
+    int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
+        int32_t &bindLevel);
+    void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
 private:
     std::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only

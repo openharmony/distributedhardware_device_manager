@@ -104,6 +104,7 @@ typedef struct DmAclIdParam {
     int64_t accessControlId;
     int32_t skId;
     std::string credId;
+    std::string pkgName;
 } DmAclIdParam;
 
 typedef struct DmOfflineParam {

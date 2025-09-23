@@ -19,6 +19,7 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 
 #include "device_manager_ipc_interface_code.h"
@@ -28,11 +29,12 @@ namespace OHOS {
 namespace DistributedHardware {
 void IpcClientManagerFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    int32_t cmdCode = UNREGISTER_DEVICE_MANAGER_LISTENER;
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    int32_t cmdCode = fdp.ConsumeIntegralInRange<int32_t>(REGISTER_DEVICE_MANAGER_LISTENER, IPC_MSG_BUTT);
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
 

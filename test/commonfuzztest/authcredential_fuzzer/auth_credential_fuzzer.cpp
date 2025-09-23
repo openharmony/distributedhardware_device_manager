@@ -25,8 +25,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-constexpr uint32_t SERVICE = 2;
-
 void DerivativeSessionKeyFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size < sizeof(int32_t))) {
@@ -34,7 +32,7 @@ void DerivativeSessionKeyFuzzTest(const uint8_t* data, size_t size)
     }
     FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
-    context->IsProxyBind = true;
+    context->IsProxyBind = fdp.ConsumeBool();
     context->accesser.userId = fdp.ConsumeIntegral<int32_t>();
     context->accesser.transmitSessionKeyId = fdp.ConsumeIntegral<int32_t>();
     DmProxyAuthContext dmProxyAuthContext;
@@ -52,8 +50,8 @@ void DerivativeProxySessionKeyFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->reUseCreId = fdp.ConsumeRandomLengthString();
-    context->IsProxyBind = true;
-    context->accesser.isAuthed = true;
+    context->IsProxyBind = fdp.ConsumeBool();
+    context->accesser.isAuthed = fdp.ConsumeBool();
     context->accesser.deviceIdHash = fdp.ConsumeRandomLengthString();
     context->accessee.deviceIdHash = fdp.ConsumeRandomLengthString();
     context->accesser.tokenIdHash = fdp.ConsumeRandomLengthString();
@@ -85,9 +83,9 @@ void AuthCredentialFuzzTest(const uint8_t* data, size_t size)
     context->transmitData = fdp.ConsumeRandomLengthString();
     context->requestId = fdp.ConsumeIntegral<int64_t>();
     context->accesser.userId = fdp.ConsumeIntegral<int32_t>();
-    context->accesser.isGenerateLnnCredential = true;
-    context->isAppCredentialVerified = false;
-    context->accesser.bindLevel = SERVICE;
+    context->accesser.isGenerateLnnCredential = fdp.ConsumeBool();
+    context->isAppCredentialVerified = fdp.ConsumeBool();
+    context->accesser.bindLevel = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<DmAuthState> authFirst = std::make_shared<AuthSrcCredentialAuthNegotiateState>();
     std::shared_ptr<AuthSrcCredentialAuthDoneState> authSecond = std::make_shared<AuthSrcCredentialAuthDoneState>();
     std::shared_ptr<DmAuthState> authThird = std::make_shared<AuthSinkCredentialAuthNegotiateState>();
@@ -97,15 +95,9 @@ void AuthCredentialFuzzTest(const uint8_t* data, size_t size)
 
     authFirst->Action(context);
     authSecond->Action(context);
-    context->isAppCredentialVerified = true;
+    context->isAppCredentialVerified = fdp.ConsumeBool();
     authSecond->Action(context);
-    context->accesser.isGenerateLnnCredential = false;
-    authFirst->GetStateType();
-    authSecond->GetStateType();
-    authThird->GetStateType();
-    authForth->GetStateType();
-    authFifth->GetStateType();
-    authSixth->GetStateType();
+    context->accesser.isGenerateLnnCredential = fdp.ConsumeBool();
 
     DerivativeSessionKeyFuzzTest(data, size);
     DerivativeProxySessionKeyFuzzTest(data, size);

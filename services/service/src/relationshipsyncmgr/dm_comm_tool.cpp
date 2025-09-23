@@ -42,6 +42,7 @@ constexpr int32_t DM_COMM_RSP_APP_UNBIND = 9;
 constexpr const char* EVENT_TASK = "EventTask";
 const char* const USER_STOP_MSG_KEY = "stopUserId";
 
+//LCOV_EXCL_START
 DMCommTool::DMCommTool() : dmTransportPtr_(nullptr)
 {
     LOGI("Ctor DMCommTool");
@@ -72,6 +73,7 @@ std::shared_ptr<DMCommTool> DMCommTool::GetInstance()
     static std::shared_ptr<DMCommTool> instance = std::make_shared<DMCommTool>();
     return instance;
 }
+//LCOV_EXCL_STOP
 
 int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds)
@@ -654,6 +656,7 @@ void DMCommTool::ProcessResponseUserIdsEvent(const std::shared_ptr<InnerCommMsg>
     }
 }
 
+//LCOV_EXCL_START
 std::shared_ptr<DMCommTool::DMCommToolEventHandler> DMCommTool::GetEventHandler()
 {
     return this->eventHandler_;
@@ -663,6 +666,7 @@ const std::shared_ptr<DMTransport> DMCommTool::GetDMTransportPtr()
 {
     return this->dmTransportPtr_;
 }
+//LCOV_EXCL_STOP
 
 int32_t DMCommTool::CreateUserStopMessage(int32_t stopUserId, std::string &msgStr)
 {

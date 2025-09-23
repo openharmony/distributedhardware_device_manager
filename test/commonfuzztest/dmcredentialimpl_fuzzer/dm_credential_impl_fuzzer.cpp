@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 #include "device_manager_impl.h"
 #include "device_manager.h"
@@ -34,9 +35,10 @@ void DeviceManagerCredentialFuzzTest(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size == 0)) {
         return;
     }
-    std::string pkgName(reinterpret_cast<const char*>(data), size);
-    std::string reqJsonStr;
-    std::string returnJsonStr;
+    FuzzedDataProvider fdp(data, size);
+    std::string pkgName = fdp.ConsumeRandomLengthString();
+    std::string reqJsonStr = fdp.ConsumeRandomLengthString();
+    std::string returnJsonStr = fdp.ConsumeRandomLengthString();
     std::shared_ptr<CredentialCallbackFuzzTest> callback = std::make_shared<CredentialCallbackFuzzTest>();
 
     DeviceManager::GetInstance().RequestCredential(pkgName, returnJsonStr);

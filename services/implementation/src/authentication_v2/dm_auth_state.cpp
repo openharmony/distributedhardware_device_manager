@@ -43,7 +43,7 @@ const std::map<std::string, int32_t> TASK_TIME_OUT_MAP = {
     { std::string(SESSION_HEARTBEAT_TIMEOUT_TASK), CLONE_SESSION_HEARTBEAT_TIMEOUT }
 };
 
-constexpr int32_t ONBINDRESULT_MAPPING_NUM = 2;
+constexpr uint16_t ONBINDRESULT_MAPPING_NUM = 2;
 constexpr int32_t MS_PER_SECOND = 1000;
 constexpr int32_t US_PER_MSECOND = 1000;
 constexpr int32_t GET_SYSTEMTIME_MAX_NUM = 3;
@@ -160,12 +160,6 @@ void DmAuthState::SinkFinish(std::shared_ptr<DmAuthContext> context)
     if (context->reason != DM_OK) {
         BindFail(context);
     } else {
-        SetAclInfo(context);
-        if (NeedAgreeAcl(context)) {
-            UpdateCredInfo(context);
-            context->authMessageProcessor->PutAccessControlList(context,
-                context->accessee, context->accesser.deviceId);
-        }
         LOGI("SinkFinish notify online");
         char deviceIdHash[DM_MAX_DEVICE_ID_LEN] = {0};
         Crypto::GetUdidHash(context->accesser.deviceId, reinterpret_cast<uint8_t *>(deviceIdHash));
@@ -394,6 +388,11 @@ int32_t DmAuthState::GetAclBindType(std::shared_ptr<DmAuthContext> context, std:
         LOGE("GetAclBindType result not contains credId.");
         return DM_UNKNOWN_TYPE;
     }
+    if (!result[credId].Contains(FILED_CRED_TYPE) ||
+        !result[credId][FILED_CRED_TYPE].IsNumberInteger()) {
+        LOGE("credType is invalid.");
+        return DM_UNKNOWN_TYPE;
+    }
     int32_t credType = result[credId][FILED_CRED_TYPE].Get<int32_t>();
     if (credType == DM_AUTH_CREDENTIAL_ACCOUNT_RELATED) {
         return DM_SAME_ACCOUNT_TYPE;
@@ -407,8 +406,23 @@ int32_t DmAuthState::GetAclBindType(std::shared_ptr<DmAuthContext> context, std:
     return DM_UNKNOWN_TYPE;
 }
 
+bool DmAuthState::ValidateCredInfoStructure(const JsonItemObject &credInfo)
+{
+    if (!credInfo.Contains(FILED_CRED_TYPE) || !credInfo[FILED_CRED_TYPE].IsNumberInteger() ||
+        !credInfo.Contains(FILED_AUTHORIZED_SCOPE) || !credInfo[FILED_AUTHORIZED_SCOPE].IsNumberInteger() ||
+        !credInfo.Contains(FILED_SUBJECT) || !credInfo[FILED_SUBJECT].IsNumberInteger()) {
+        LOGE("credType or authorizedScope or subject invalid.");
+        return false;
+    }
+    return true;
+}
+
 uint32_t DmAuthState::GetCredType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo)
 {
+    CHECK_NULL_RETURN(context, DM_INVALIED_TYPE);
+    if (!ValidateCredInfoStructure(credInfo)) {
+        return DM_INVALIED_TYPE;
+    }
     int32_t credType = credInfo[FILED_CRED_TYPE].Get<int32_t>();
     int32_t authorizedScope = credInfo[FILED_AUTHORIZED_SCOPE].Get<int32_t>();
     int32_t subject = credInfo[FILED_SUBJECT].Get<int32_t>();
@@ -481,10 +495,7 @@ int32_t DmAuthState::GetProxyCredInfo(std::shared_ptr<DmAuthContext> context, co
 uint32_t DmAuthState::GetCredentialType(std::shared_ptr<DmAuthContext> context, const JsonItemObject &credInfo)
 {
     CHECK_NULL_RETURN(context, DM_INVALIED_TYPE);
-    if (!credInfo.Contains(FILED_CRED_TYPE) || !credInfo[FILED_CRED_TYPE].IsNumberInteger() ||
-        !credInfo.Contains(FILED_AUTHORIZED_SCOPE) || !credInfo[FILED_AUTHORIZED_SCOPE].IsNumberInteger() ||
-        !credInfo.Contains(FILED_SUBJECT) || !credInfo[FILED_SUBJECT].IsNumberInteger()) {
-        LOGE("credType or authorizedScope invalid.");
+    if (!ValidateCredInfoStructure(credInfo)) {
         return DM_INVALIED_TYPE;
     }
     return GetCredType(context, credInfo);

@@ -27,31 +27,24 @@
 namespace OHOS {
 namespace DistributedHardware {
 
-void SoftBusConnectorFuzzTest(const uint8_t* data, size_t size)
+void OnSoftbusJoinLNNResultFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
     ConnectionAddr *addr = nullptr;
-    const char *networkId = reinterpret_cast<const char*>(data);
-    int32_t result = *(reinterpret_cast<const int32_t*>(data));
+    std::string networkId_str = fdp.ConsumeRandomLengthString();
+    const char *networkId = networkId_str.c_str();
+    int32_t result = fdp.ConsumeIntegral<int32_t>();
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->OnSoftbusJoinLNNResult(addr, networkId, result);
 }
 
-void SoftBusConnectorFirstFuzzTest(const uint8_t* data, size_t size)
+void SoftBusConnectorFirstFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     int32_t userId = fdp.ConsumeIntegral<int32_t>();
     std::string credId = fdp.ConsumeRandomLengthString();
     int32_t sessionKeyId = fdp.ConsumeIntegral<int32_t>();
     int32_t aclId = fdp.ConsumeIntegral<int32_t>();
-    std::string localUdid = "localDeviceId";
-    std::string remoteUdid = "remoteDeviceId";
+    std::string localUdid = fdp.ConsumeRandomLengthString();
+    std::string remoteUdid = fdp.ConsumeRandomLengthString();
     DistributedDeviceProfile::AccessControlProfile localAcl;
     std::vector<std::string> acLStrList;
     std::string jsonString = fdp.ConsumeRandomLengthString();
@@ -60,15 +53,15 @@ void SoftBusConnectorFirstFuzzTest(const uint8_t* data, size_t size)
     softbusConnector->SyncAclList(userId, credId, sessionKeyId, aclId);
     DistributedDeviceProfile::Accesser acer;
     DistributedDeviceProfile::Accessee acee;
-    acee.SetAccesseeDeviceId("localDeviceId");
-    acer.SetAccesserDeviceId("remoteDeviceId");
-    localAcl.SetTrustDeviceId("remoteDeviceId");
+    acee.SetAccesseeDeviceId(localUdid);
+    acer.SetAccesserDeviceId(remoteUdid);
+    localAcl.SetTrustDeviceId(remoteUdid);
     localAcl.SetAccesser(acer);
     localAcl.SetAccessee(acee);
     softbusConnector->SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, acLStrList);
-    acer.SetAccesserDeviceId("localDeviceId");
-    acee.SetAccesseeDeviceId("remoteDeviceId");
-    localAcl.SetTrustDeviceId("remoteDeviceId");
+    acer.SetAccesserDeviceId(localUdid);
+    acee.SetAccesseeDeviceId(remoteUdid);
+    localAcl.SetTrustDeviceId(remoteUdid);
     localAcl.SetAccesser(acer);
     localAcl.SetAccessee(acee);
     softbusConnector->SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, acLStrList);
@@ -76,6 +69,7 @@ void SoftBusConnectorFirstFuzzTest(const uint8_t* data, size_t size)
     std::string localVersion = fdp.ConsumeRandomLengthString();
     softbusConnector->GetLocalVersion(localUdid, remoteUdid, localVersion, localAcl);
     std::vector<std::string> aclVerDesc;
+    aclVerDesc.emplace_back(fdp.ConsumeRandomLengthString());
     std::map<std::string, AclHashItem> remoteAllAclMap;
     softbusConnector->SortAclListDesc(remoteAllAclList, aclVerDesc, remoteAllAclMap);
     std::vector<std::string> remoteVerDesc;
@@ -87,12 +81,8 @@ void SoftBusConnectorFirstFuzzTest(const uint8_t* data, size_t size)
     softbusConnector->JoinLnn(deviceId, remoteUdidHash);
 }
 
-void SoftBusConnectorSecondFuzzTest(const uint8_t* data, size_t size)
+void SoftBusConnectorSecondFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     int32_t sessionId = fdp.ConsumeIntegral<int32_t>();
     int32_t sessionKeyId = fdp.ConsumeIntegral<int32_t>();
@@ -102,31 +92,26 @@ void SoftBusConnectorSecondFuzzTest(const uint8_t* data, size_t size)
     std::string deviceId = fdp.ConsumeRandomLengthString();
     softbusConnector->JoinLNNBySkId(sessionId, sessionKeyId, remoteSessionKeyId, udid, udidHash);
     softbusConnector->JoinLnnByHml(sessionId, sessionKeyId, remoteSessionKeyId);
-    int32_t tempSessionKeyId = 1;
-    int32_t tempRemoteSessionKeyId = 2;
-    sessionKeyId = tempSessionKeyId;
-    remoteSessionKeyId = tempRemoteSessionKeyId;
     softbusConnector->JoinLnnByHml(sessionId, sessionKeyId, remoteSessionKeyId);
     DeviceInfo deviceInfo;
     DmDeviceInfo dmDeviceInfo;
+    dmDeviceInfo.extraData = fdp.ConsumeRandomLengthString();
     memcpy_s(deviceInfo.devId, sizeof(deviceInfo.devId), "deviceId", sizeof("deviceId"));
     memcpy_s(deviceInfo.devName, sizeof(deviceInfo.devName), "deviceName", sizeof("deviceName"));
     softbusConnector->ConvertDeviceInfoToDmDevice(deviceInfo, dmDeviceInfo);
     DmDeviceBasicInfo dmDeviceBasicInfo;
+    dmDeviceBasicInfo.extraData = fdp.ConsumeRandomLengthString();
     softbusConnector->ConvertDeviceInfoToDmDevice(deviceInfo, dmDeviceBasicInfo);
-    softbusConnector->GetLocalDeviceNetworkId();
     ProcessInfo processInfo;
+    processInfo.pkgName = fdp.ConsumeRandomLengthString();
     softbusConnector->SetProcessInfo(processInfo);
     std::vector<ProcessInfo> processInfoVec;
+    processInfoVec.emplace_back(processInfo);
     softbusConnector->SetProcessInfoVec(processInfoVec);
-    softbusConnector->GetProcessInfo();
-    softbusConnector->ClearProcessInfo();
     softbusConnector->SetChangeProcessInfo(processInfo);
-    softbusConnector->GetChangeProcessInfo();
-    softbusConnector->ClearChangeProcessInfo();
     softbusConnector->DeleteOffLineTimer(udidHash);
     softbusConnector->CheckIsNeedJoinLnn(udid, deviceId);
-    softbusConnector->CheckIsNeedJoinLnn("udid", "deviceId");
+    softbusConnector->CheckIsNeedJoinLnn(udid, deviceId);
     NodeBasicInfo nodeBasicInfo;
     memcpy_s(nodeBasicInfo.networkId, sizeof(nodeBasicInfo.networkId), "networkId", sizeof("networkId"));
     memcpy_s(nodeBasicInfo.deviceName, sizeof(nodeBasicInfo.deviceName), "deviceName", sizeof("deviceName"));
@@ -138,13 +123,8 @@ void SoftBusConnectorSecondFuzzTest(const uint8_t* data, size_t size)
     softbusConnector->GetAclListHash(localUserInfo, remoteUserInfo, remoteAclList);
 }
 
-void AddMemberToDiscoverMapFuzzTest(const uint8_t* data, size_t size)
+void AddMemberToDiscoverMapFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-
-    FuzzedDataProvider fdp(data, size);
     int32_t maxStringLength = 64;
     std::string deviceId = fdp.ConsumeRandomLengthString(maxStringLength);
 
@@ -156,7 +136,18 @@ void AddMemberToDiscoverMapFuzzTest(const uint8_t* data, size_t size)
 
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->AddMemberToDiscoverMap(deviceId, deviceInfo);
-    softbusConnector->AddMemberToDiscoverMap("", deviceInfo);
+}
+    
+void SoftBusConnectorFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OnSoftbusJoinLNNResultFuzzTest(fdp);
+    SoftBusConnectorFirstFuzzTest(fdp);
+    SoftBusConnectorSecondFuzzTest(fdp);
+    AddMemberToDiscoverMapFuzzTest(fdp);
 }
 }
 }
@@ -166,8 +157,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::SoftBusConnectorFuzzTest(data, size);
-    OHOS::DistributedHardware::SoftBusConnectorFirstFuzzTest(data, size);
-    OHOS::DistributedHardware::SoftBusConnectorSecondFuzzTest(data, size);
-    OHOS::DistributedHardware::AddMemberToDiscoverMapFuzzTest(data, size);
     return 0;
 }

@@ -15,6 +15,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #include <string>
 
 #include "device_manager_impl.h"
@@ -36,11 +37,12 @@ public:
 
 void RegisterDevStateCallbackFuzzTest(const uint8_t* data, size_t size)
 {
-    if ((data == nullptr) || (size == 0)) {
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
         return;
     }
-    std::string bundleName(reinterpret_cast<const char*>(data), size);
-    std::string extra(reinterpret_cast<const char*>(data), size);
+    FuzzedDataProvider fdp(data, size);
+    std::string bundleName = fdp.ConsumeRandomLengthString();
+    std::string extra = fdp.ConsumeRandomLengthString();
     std::shared_ptr<DeviceStatusCallback> deviceStatusCallback = std::make_shared<DeviceStatusCallbackFuzzTest>();
 
     DeviceManager::GetInstance().RegisterDevStatusCallback(bundleName, extra, deviceStatusCallback);

@@ -1971,6 +1971,56 @@ HWTEST_F(DeviceManagerImplTest, StopPublishService_007, testing::ext::TestSize.L
     ret = (ret == DM_OK) || (ret == ERR_DM_UNSUPPORTED_METHOD);
     ASSERT_EQ(ret, true);
 }
+HWTEST_F(DeviceManagerImplTest, LeaveLNN_301, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string networkId;
+    std::shared_ptr<LeaveLNNCallback> callback = std::make_shared<LeaveLNNCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().LeaveLNN(pkgName, networkId, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, LeaveLNN_302, testing::ext::TestSize.Level0)
+{
+    std::string pkgName;
+    std::string networkId = "123";
+    std::shared_ptr<LeaveLNNCallback> callback = std::make_shared<LeaveLNNCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().LeaveLNN(pkgName, networkId, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, LeaveLNN_303, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::string networkId = "123";
+    std::shared_ptr<LeaveLNNCallback> callback = nullptr;
+    int32_t ret = DeviceManager::GetInstance().LeaveLNN(pkgName, networkId, callback);
+    ASSERT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(DeviceManagerImplTest, LeaveLNN_304, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    std::shared_ptr<DmInitCallback> callback = std::make_shared<DmInitCallbackTest>();
+    DeviceManager::GetInstance().InitDeviceManager(pkgName, callback);
+    std::string networkId = "123";
+    std::shared_ptr<LeaveLNNCallback> leaveLnnCallback = std::make_shared<LeaveLNNCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().LeaveLNN(pkgName, networkId, leaveLnnCallback);
+    ASSERT_EQ(ret, DM_OK);
+    DeviceManager::GetInstance().UnInitDeviceManager(pkgName);
+}
+
+HWTEST_F(DeviceManagerImplTest, LeaveLNN_305, testing::ext::TestSize.Level0)
+{
+    std::string pkgName = "com.ohos.test";
+    EXPECT_CALL(*ipcClientProxyMock_, SendRequest(testing::_, testing::_, testing::_))
+        .Times(1)
+        .WillOnce(testing::Return(ERR_DM_IPC_SEND_REQUEST_FAILED));
+    std::string networkId = "123";
+    std::shared_ptr<LeaveLNNCallback> callback = std::make_shared<LeaveLNNCallbackTest>();
+    int32_t ret = DeviceManager::GetInstance().LeaveLNN(pkgName, networkId, callback);
+    ASSERT_EQ(ret, ERR_DM_IPC_SEND_REQUEST_FAILED);
+}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

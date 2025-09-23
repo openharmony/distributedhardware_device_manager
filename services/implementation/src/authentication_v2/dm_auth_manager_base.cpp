@@ -104,8 +104,8 @@ const int32_t SESSION_HEARTBEAT_TIMEOUT = 50;
 const int32_t PIN_AUTH_TIMEOUT = 60;
 const int32_t EVENT_TIMEOUT = 5000; // 5000 ms
 
-constexpr int32_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = 1;
-constexpr int32_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = 4;
+constexpr uint16_t OPEN_PROCESS_NAME_WHITE_LIST_NUM = 1;
+constexpr uint16_t CLOSE_PROCESS_NAME_WHITE_LIST_NUM = 4;
 constexpr const static char* OPEN_PROCESS_NAME_WHITE_LIST[OPEN_PROCESS_NAME_WHITE_LIST_NUM] = {
     "com.example.myapplication"
 };
@@ -575,7 +575,7 @@ bool AuthManagerBase::CheckProcessNameInProxyAdaptationList(const std::string &p
         LOGE("processName is empty");
         return false;
     }
-    uint16_t index = 0;
+    uint32_t index = 0;
     for (; index < PROCESS_NAME_PROXY_ADAPTATION_LIST_NUM; ++index) {
         std::string whitePkgName(PROCESS_NAME_PROXY_ADAPTATION_LIST[index]);
         if (processName == whitePkgName) {
@@ -588,6 +588,9 @@ bool AuthManagerBase::CheckProcessNameInProxyAdaptationList(const std::string &p
 }
 
 void AuthManagerBase::DeleteTimer()
+{}
+
+void AuthManagerBase::OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode)
 {}
 }  // namespace DistributedHardware
 }  // namespace OHOS

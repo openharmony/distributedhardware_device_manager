@@ -169,6 +169,42 @@ void DmDeviceStateManager::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     }
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
+    std::vector<ProcessInfo> &processInfoVec)
+{
+    LOGI("begin, devState = %{public}d networkId: %{public}s.", devState,
+        GetAnonyString(devInfo.networkId).c_str());
+    CHECK_NULL_VOID(listener_);
+    std::vector<int64_t> remoteTokenIds;
+    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
+    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
+    std::string localUdid(localDeviceId);
+    std::string udid = softbusConnector_->GetDeviceUdidByUdidHash(devInfo.deviceId);
+    DeviceProfileConnector::GetInstance().GetRemoteTokenIds(localUdid, udid, remoteTokenIds);
+    std::vector<int64_t> remoteServiceIds;
+    for (const auto &item : remoteTokenIds) {
+        ServiceInfoProfile serviceInfo;
+        if (DeviceProfileConnector::GetInstance().GetServiceInfoByTokenId(item, serviceInfo) != DM_OK) {
+            LOGE("GetServiceInfoByTokenid failed.");
+            continue;
+        }
+        remoteServiceIds.push_back(serviceInfo.serviceId);
+    }
+    LOGI("ProcessDeviceStateChange, remoteServiceIds size: %{public}zu", remoteServiceIds.size());
+
+    for (const auto &item : processInfoVec) {
+        if (!item.pkgName.empty()) {
+            LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
+            if (!remoteServiceIds.empty() && devState == DEVICE_STATE_ONLINE) {
+                listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIds);
+            } else {
+                listener_->OnDeviceStateChange(item, devState, devInfo);
+            }
+        }
+    }
+}
+#else
 void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState, const DmDeviceInfo &devInfo,
     std::vector<ProcessInfo> &processInfoVec)
 {
@@ -177,11 +213,11 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
     CHECK_NULL_VOID(listener_);
     for (const auto &item : processInfoVec) {
         if (!item.pkgName.empty()) {
-            LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
             listener_->OnDeviceStateChange(item, devState, devInfo);
         }
     }
 }
+#endif
 
 void DmDeviceStateManager::OnDbReady(const std::string &pkgName, const std::string &uuid)
 {

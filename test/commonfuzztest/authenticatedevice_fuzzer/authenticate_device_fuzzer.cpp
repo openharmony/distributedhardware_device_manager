@@ -207,20 +207,15 @@ void AddPermission()
     OHOS::Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
 
-void AuthenticateDeviceFirstFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceFirstFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    AddPermission();
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
 
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
 
     DeviceManager::GetInstance().InitDeviceManager(str, g_initcallback);
     DeviceManager::GetInstance().RegisterDevStateCallback(str, str, g_stateCallback);
-    DeviceManager::GetInstance().RegisterDevStatusCallback(str, str, g_statusCallback);
     DeviceManager::GetInstance().RegisterDeviceManagerFaCallback(str, g_Uicallback);
     std::string emptyStr = "";
     DeviceManager::GetInstance().RegisterDevStateCallback(emptyStr, str, g_stateCallback);
@@ -229,7 +224,7 @@ void AuthenticateDeviceFirstFuzzTest(const uint8_t* data, size_t size)
     strncpy_s(g_deviceInfo.networkId, sizeof(g_deviceInfo.networkId), "networkId", sizeof(g_deviceInfo.networkId) - 1);
     g_deviceInfo.networkId[sizeof(g_deviceInfo.networkId) - 1] = '\0';
     DeviceManager::GetInstance().UnAuthenticateDevice(str, g_deviceInfo);
-    std::string pkgName = "pkgName";
+    std::string pkgName = fdp.ConsumeRandomLengthString();
     DeviceManager::GetInstance().StartDeviceDiscovery(pkgName, g_subscribeInfo, pkgName, g_discoveryCallback);
     DeviceManager::GetInstance().StopDeviceDiscovery(str, g_subscribeInfo.subscribeId);
     DeviceManager::GetInstance().StartDeviceDiscovery(pkgName, g_tokenId, pkgName, g_discoveryCallback);
@@ -239,13 +234,9 @@ void AuthenticateDeviceFirstFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().UnInitDeviceManager(str);
 }
 
-void AuthenticateDeviceSecondFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceSecondFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    AddPermission();
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
 
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
@@ -265,13 +256,9 @@ void AuthenticateDeviceSecondFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().IsSameAccount(str);
 }
 
-void AuthenticateDeviceThirdFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceThirdFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    AddPermission();
-    std::string str = Crypto::Sha256(data, size);
+    std::string str = fdp.ConsumeRandomLengthString();
 
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
@@ -290,31 +277,27 @@ void AuthenticateDeviceThirdFuzzTest(const uint8_t* data, size_t size)
     DeviceManager::GetInstance().UnBindDevice(str, g_deviceInfo.deviceId);
     DeviceManager::GetInstance().UnRegisterDeviceManagerFaCallback(str);
     DeviceManager::GetInstance().UnRegisterDevStateCallback(str);
-    DeviceManager::GetInstance().UnRegisterDevStateCallback(emptyStr);
     DeviceManager::GetInstance().UnRegisterDevStatusCallback(str);
     std::map<std::string, std::string> authParam;
     authParam[DM_AUTHENTICATION_TYPE] = str;
     DeviceManager::GetInstance().RegisterAuthenticationType(str, authParam);
-    DeviceManager::GetInstance().RegisterAuthenticationType(emptyStr, authParam);
 }
 
-void AuthenticateDeviceFourthFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceFourthFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    AddPermission();
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
-    std::string emptyStr = "";
+    std::string emptyStr = fdp.ConsumeRandomLengthString();
     DmDeviceInfo info;
+    info.extraData = fdp.ConsumeRandomLengthString();
     DmDeviceBasicInfo deviceBasicInfo;
-    int32_t indexTwo = 2;
-    int32_t numOne = 1;
-    int32_t numOneTwoTimes = 11;
-    int32_t numOneThreeTimes = 111;
-    int32_t numOneSixTimes = 111111;
+    deviceBasicInfo.extraData = fdp.ConsumeRandomLengthString();
+    int32_t indexTwo = fdp.ConsumeIntegral<int32_t>();
+    int32_t numOne = fdp.ConsumeIntegral<int32_t>();
+    int32_t numOneTwoTimes = fdp.ConsumeIntegral<int32_t>();
+    int32_t numOneThreeTimes = fdp.ConsumeIntegral<int32_t>();
+    int32_t numOneSixTimes = fdp.ConsumeIntegral<int32_t>();
     DeviceManagerImpl::GetInstance().ConvertDeviceInfoToDeviceBasicInfo(info, deviceBasicInfo);
     DeviceManagerImpl::GetInstance().GetTrustedDeviceList(str, emptyStr, g_deviceList);
     DeviceManagerImpl::GetInstance().GetTrustedDeviceList(str, emptyStr, false, g_deviceList);
@@ -335,36 +318,38 @@ void AuthenticateDeviceFourthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().UnRegisterDeviceManagerFaCallback(str);
     DeviceManagerImpl::GetInstance().VerifyAuthentication(str, emptyStr, nullptr);
     PeerTargetId targetId;
+    targetId.bleMac = fdp.ConsumeRandomLengthString();
     std::map<std::string, std::string> discoverParam;
+    discoverParam.emplace(fdp.ConsumeRandomLengthString(), fdp.ConsumeRandomLengthString());
     DeviceManagerImpl::GetInstance().BindTarget(str, targetId, discoverParam, nullptr);
     DeviceManagerImpl::GetInstance().UnbindTarget(str, targetId, discoverParam, nullptr);
     DeviceManagerImpl::GetInstance().GetTrustedDeviceList(str, discoverParam, false, g_deviceList);
     DeviceManagerImpl::GetInstance().RegisterDevStateCallback(str, discoverParam, nullptr);
-    DeviceManagerImpl::GetInstance().AddDiscoveryCallback("test", discoverParam, nullptr);
-    DeviceManagerImpl::GetInstance().RemoveDiscoveryCallback("test");
-    DeviceManagerImpl::GetInstance().AddPublishCallback("test");
-    DeviceManagerImpl::GetInstance().RemovePublishCallback("test");
+    DeviceManagerImpl::GetInstance().AddDiscoveryCallback(str, discoverParam, nullptr);
+    DeviceManagerImpl::GetInstance().RemoveDiscoveryCallback(str);
+    DeviceManagerImpl::GetInstance().AddPublishCallback(str);
+    DeviceManagerImpl::GetInstance().RemovePublishCallback(str);
     DeviceManagerImpl::GetInstance().RegisterPinHolderCallback(str, nullptr);
     DeviceManagerImpl::GetInstance().GetDeviceSecurityLevel(str, emptyStr, indexTwo);
     DeviceManagerImpl::GetInstance().GetDeviceSecurityLevel(str, str, indexTwo);
     DeviceManagerImpl::GetInstance().IsSameAccount(emptyStr);
 }
 
-void AuthenticateDeviceFifthFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceFifthFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size == 0)) {
-        return;
-    }
-    AddPermission();
-    std::string str(reinterpret_cast<const char*>(data), size);
+    std::string str = fdp.ConsumeRandomLengthString();
 
     DeviceManagerImpl::GetInstance().ipcClientProxy_ =
         std::make_shared<IpcClientProxy>(std::make_shared<IpcClientManager>());
-    std::string emptyStr = "";
+    std::string emptyStr = fdp.ConsumeRandomLengthString();
+    std::string bindParam = "";
     DmDeviceInfo info;
+    info.extraData = fdp.ConsumeRandomLengthString();
     DmDeviceBasicInfo deviceBasicInfo;
-    int32_t indexTwo = 2;
+    deviceBasicInfo.extraData = fdp.ConsumeRandomLengthString();
+    int32_t indexTwo = fdp.ConsumeIntegral<int32_t>();
     DmAuthParam dmFaParam;
+    dmFaParam.appName = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().GetFaParam(str, dmFaParam);
     DeviceManagerImpl::GetInstance().SetUserOperation(str, 1, emptyStr);
     DeviceManagerImpl::GetInstance().GetUdidByNetworkId(str, emptyStr, g_returnStr);
@@ -390,32 +375,28 @@ void AuthenticateDeviceFifthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().CheckCredential(str, g_reqJsonStr, g_returnStr);
     DeviceManagerImpl::GetInstance().GetEncryptedUuidByNetworkId(str, emptyStr, g_returnStr);
     DeviceManagerImpl::GetInstance().GenerateEncryptedUuid(str, emptyStr, emptyStr, g_returnStr);
-    DeviceManagerImpl::GetInstance().BindDevice(str, 1, emptyStr, emptyStr, nullptr);
+    DeviceManagerImpl::GetInstance().BindDevice(str, 1, emptyStr, bindParam, nullptr);
     DeviceManagerImpl::GetInstance().UnBindDevice(str, emptyStr);
     DeviceManagerImpl::GetInstance().GetNetworkTypeByNetworkId(str, emptyStr, indexTwo);
     DeviceManagerImpl::GetInstance().GetNetworkTypeByNetworkId(str, str, indexTwo);
     DeviceManagerImpl::GetInstance().ImportAuthCode(emptyStr, emptyStr);
     DeviceManagerImpl::GetInstance().ImportAuthCode(str, str);
-    std::string authCode = "123456";
+    std::string authCode = fdp.ConsumeRandomLengthString();
     DeviceManagerImpl::GetInstance().ImportAuthCode(str, authCode);
-    DeviceManagerImpl::GetInstance().ExportAuthCode(g_returnStr);
+    DeviceManagerImpl::GetInstance().ExportAuthCode(str);
 }
 
-void AuthenticateDeviceSixthFuzzTest(const uint8_t* data, size_t size)
+void AuthenticateDeviceSixthFuzzTest(FuzzedDataProvider &fdp)
 {
     int32_t maxStringLength = 10;
-    size_t requiredSize = maxStringLength * 9;
-    if ((data == nullptr) || (size < requiredSize)) {
-        return;
-    }
-    AddPermission();
-    FuzzedDataProvider fdp(data, size);
     std::string str = fdp.ConsumeRandomLengthString();
 
-    std::string emptyStr = "";
-    int32_t indexTwo = 2;
+    std::string emptyStr = fdp.ConsumeRandomLengthString();
+    int32_t indexTwo = fdp.ConsumeIntegral<int32_t>();
     std::map<std::string, std::string> discoverParam;
     std::map<std::string, std::string> policy;
+    discoverParam.emplace(fdp.ConsumeRandomLengthString(maxStringLength),
+        fdp.ConsumeRandomLengthString(maxStringLength));
     policy[fdp.ConsumeRandomLengthString(maxStringLength)] = fdp.ConsumeRandomLengthString(maxStringLength);
     policy[fdp.ConsumeRandomLengthString(maxStringLength)] = fdp.ConsumeRandomLengthString(maxStringLength);
     DeviceManagerImpl::GetInstance().StartDiscovering(str, discoverParam, discoverParam, nullptr);
@@ -449,6 +430,21 @@ void AuthenticateDeviceSixthFuzzTest(const uint8_t* data, size_t size)
     DeviceManagerImpl::GetInstance().UnRegisterDeviceManagerFaCallback(emptyStr);
     DeviceManagerImpl::GetInstance().GetTrustedDeviceList(emptyStr, discoverParam, false, g_deviceList);
 }
+
+void AuthenticateDeviceFuzzTest(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size < sizeof(uint32_t))) {
+        return;
+    }
+    FuzzedDataProvider fdp(data, size);
+    AddPermission();
+    AuthenticateDeviceFirstFuzzTest(fdp);
+    AuthenticateDeviceSecondFuzzTest(fdp);
+    AuthenticateDeviceThirdFuzzTest(fdp);
+    AuthenticateDeviceFourthFuzzTest(fdp);
+    AuthenticateDeviceFifthFuzzTest(fdp);
+    AuthenticateDeviceSixthFuzzTest(fdp);
+}
 }
 }
 
@@ -456,11 +452,6 @@ void AuthenticateDeviceSixthFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::AuthenticateDeviceFirstFuzzTest(data, size);
-    OHOS::DistributedHardware::AuthenticateDeviceSecondFuzzTest(data, size);
-    OHOS::DistributedHardware::AuthenticateDeviceThirdFuzzTest(data, size);
-    OHOS::DistributedHardware::AuthenticateDeviceFourthFuzzTest(data, size);
-    OHOS::DistributedHardware::AuthenticateDeviceFifthFuzzTest(data, size);
-    OHOS::DistributedHardware::AuthenticateDeviceSixthFuzzTest(data, size);
+    OHOS::DistributedHardware::AuthenticateDeviceFuzzTest(data, size);
     return 0;
 }

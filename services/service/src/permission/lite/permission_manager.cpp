@@ -21,12 +21,17 @@ namespace OHOS {
 namespace DistributedHardware {
 DM_IMPLEMENT_SINGLE_INSTANCE(PermissionManager);
 
-bool PermissionManager::CheckPermission(void)
+bool PermissionManager::CheckAccessServicePermission(void)
 {
     return true;
 }
 
-bool PermissionManager::CheckNewPermission(void)
+bool PermissionManager::CheckDataSyncPermission(void)
+{
+    return true;
+}
+
+bool PermissionManager::CheckSoftbusCenterPermission(void)
 {
     return true;
 }
