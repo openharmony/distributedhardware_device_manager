@@ -167,8 +167,7 @@ void AuthenticateDeviceServiceImplOneFuzzTest(FuzzedDataProvider &fdp)
     usleep(USLEEP_TIME_US_5000000);
     deviceManagerServiceImpl->Release();
 }
-}
-}
+
 void AuthenticateDeviceServiceImplAllFuzzTest(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size == 0) || (size < sizeof(int32_t) + sizeof(int64_t) + 1)) {
@@ -177,6 +176,8 @@ void AuthenticateDeviceServiceImplAllFuzzTest(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     AuthenticateDeviceServiceImplFuzzTest(fdp);
     AuthenticateDeviceServiceImplOneFuzzTest(fdp);
+}
+}
 }
 
 /* Fuzzer entry point */
