@@ -30,6 +30,7 @@ public:
     virtual int32_t GetTrustedDeviceList(const std::string &pkgName, std::vector<DmDeviceInfo> &deviceList) = 0;
     virtual bool IsDMServiceAdapterSoLoaded() = 0;
     virtual bool IsDMServiceAdapterResidentLoad() = 0;
+    virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerService> dmDeviceManagerService = nullptr;
 };
@@ -40,6 +41,7 @@ public:
     MOCK_METHOD(int32_t, GetTrustedDeviceList, (const std::string &, std::vector<DmDeviceInfo> &));
     MOCK_METHOD(bool, IsDMServiceAdapterSoLoaded, ());
     MOCK_METHOD(bool, IsDMServiceAdapterResidentLoad, ());
+    MOCK_METHOD(int32_t, OpenAuthSessionWithPara, (int64_t));
 };
 }
 }

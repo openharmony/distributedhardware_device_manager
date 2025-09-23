@@ -200,5 +200,26 @@ bool DeviceProfileConnector::IsLnnAcl(const DistributedDeviceProfile::AccessCont
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->IsLnnAcl(profile);
 }
+
+int32_t DeviceProfileConnector::GetServiceInfoProfileByServiceId(int64_t serviceId,
+    ServiceInfoProfile &profile)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileByServiceId(serviceId, profile);
+}
+
+int32_t DeviceProfileConnector::PutServiceInfoProfile(const ServiceInfoProfile &profile)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->PutServiceInfoProfile(profile);
+}
+
+int32_t DeviceProfileConnector::DeleteServiceInfoProfile(int32_t regServiceId, int32_t userId)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteServiceInfoProfile(regServiceId, userId);
+}
+
+int32_t DeviceProfileConnector::GetServiceInfoByTokenId(int64_t tokenId, ServiceInfoProfile &serviceInfo)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoByTokenId(tokenId, serviceInfo);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

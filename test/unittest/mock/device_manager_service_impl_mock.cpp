@@ -116,5 +116,29 @@ bool DeviceManagerServiceImpl::CheckIsSameAccount(const DmAccessCaller &caller, 
     return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->CheckIsSameAccount(caller, srcUdid, callee,
         sinkUdid);
 }
+
+int32_t DeviceManagerServiceImpl::DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller,
+    std::string &udid, int32_t &bindLevel)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->DeleteAclExtraDataServiceId(serviceId, tokenIdCaller,
+        udid, bindLevel);
+}
+
+int32_t GenerateRegServiceId(int32_t &regServiceId)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->GenerateRegServiceId(regServiceId);
+}
+
+int32_t ConvertServiceInfoProfileByRegInfo(const ServiceRegInfo &serviceRegInfo,
+    ServiceInfoProfile &serviceInfoProfile)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->ConvertServiceInfoProfileByRegInfo(serviceRegInfo,
+        serviceInfoProfile);
+}
+
+int32_t PutServiceInfoProfile(const ServiceInfoProfile &serviceInfoProfile)
+{
+    return DmDeviceManagerServiceImpl::dmDeviceManagerServiceImpl->PutServiceInfoProfile(serviceInfoProfile);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

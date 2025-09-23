@@ -43,6 +43,7 @@ public:
     virtual int32_t GetBusinessEvent(BusinessEvent &event) = 0;
     virtual int32_t PutBusinessEvent(const DistributedDeviceProfile::BusinessEvent &event) = 0;
     virtual int32_t GetAllAclIncludeLnnAcl(std::vector<AccessControlProfile>& profiles) = 0;
+    virtual int32_t UpdateAccessControlProfile(const AccessControlProfile& profiles) = 0;
 public:
     static inline std::shared_ptr<DpDistributedDeviceProfileClient> dpDistributedDeviceProfileClient = nullptr;
 };
@@ -64,6 +65,7 @@ public:
     MOCK_METHOD(int32_t, GetBusinessEvent, (BusinessEvent &event));
     MOCK_METHOD(int32_t, PutBusinessEvent, (const DistributedDeviceProfile::BusinessEvent &event));
     MOCK_METHOD(int32_t, GetAllAclIncludeLnnAcl, (std::vector<AccessControlProfile>&));
+    MOCK_METHOD(int32_t, UpdateAccessControlProfile, (const AccessControlProfile&));
 };
 }
 }
