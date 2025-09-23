@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-const int32_t NUMBER = 7;
 void DeviceProfileConnectorFuzzTest(FuzzedDataProvider &fdp)
 {
     std::string trustDeviceId = fdp.ConsumeRandomLengthString();
