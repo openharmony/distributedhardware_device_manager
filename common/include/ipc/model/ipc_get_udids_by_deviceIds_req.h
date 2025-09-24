@@ -24,8 +24,8 @@ class IpcGetUdidsByDeviceIdsReq : public IpcReq {
     DECLARE_IPC_MODEL(IpcGetUdidsByDeviceIdsReq);
 public:
     /**
-     * @tc.name: IpcGetTrustDeviceRsp::GetDeviceIdList
-     * @tc.desc: Get DeviceIdList of the Ipc Get Trust Device Response
+     * @tc.name: IpcGetUdidsByDeviceIdsReq::GetDeviceIdList
+     * @tc.desc: Get DeviceIdList of the Ipc Get Udids By DeviceIds Request
      * @tc.type: FUNC
      */
     std::vector<std::string> GetDeviceIdList() const
@@ -34,8 +34,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcGetTrustDeviceRsp::SetDeviceIdList
-     * @tc.desc: Set DeviceIdList of the Ipc Get Trust Device Response
+     * @tc.name: IpcGetUdidsByDeviceIdsReq::SetDeviceIdList
+     * @tc.desc: Set DeviceIdList of the Ipc Get Udids By DeviceIds Request
      * @tc.type: FUNC
      */
     void SetDeviceIdList(const std::vector<std::string> &deviceIdList)
