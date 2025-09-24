@@ -61,7 +61,6 @@ int32_t KVAdapter::Init()
         DistributedKv::Status status = GetLocalKvStorePtr();
         if (status == DistributedKv::Status::SUCCESS && kvStorePtr_) {
             LOGI("Init KvStorePtr Success");
-            RegisterKvStoreDeathListener();
             isInited_.store(true);
             return DM_OK;
         }
@@ -82,11 +81,10 @@ int32_t KVAdapter::Init()
 
 void KVAdapter::UnInit()
 {
-    LOGI("KVAdapter Uninted");
+    LOGI("KVAdapter UnInit");
     if (isInited_.load()) {
         std::lock_guard<std::mutex> lock(kvAdapterMutex_);
         CHECK_NULL_VOID(kvStorePtr_);
-        UnregisterKvStoreDeathListener();
         kvStorePtr_.reset();
         isInited_.store(false);
     }
@@ -140,16 +138,6 @@ int32_t KVAdapter::Get(const std::string &key, std::string &value)
     return DM_OK;
 }
 
-void KVAdapter::OnRemoteDied()
-{
-    LOGI("OnRemoteDied, recover db begin");
-    auto reInitTask = [this]() {
-        LOGI("ReInit, storeId:%{public}s", storeId_.storeId.c_str());
-        ReInit();
-    };
-    ffrt::submit(reInitTask);
-}
-
 DistributedKv::Status KVAdapter::GetLocalKvStorePtr()
 {
     DistributedKv::Options options = {
@@ -164,20 +152,6 @@ DistributedKv::Status KVAdapter::GetLocalKvStorePtr()
     std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
     DistributedKv::Status status = kvDataMgr_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
     return status;
-}
-
-void KVAdapter::RegisterKvStoreDeathListener()
-{
-    LOGI("Register syncCompleted listener");
-    std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
-    kvDataMgr_.RegisterKvStoreServiceDeathRecipient(shared_from_this());
-}
-
-void KVAdapter::UnregisterKvStoreDeathListener()
-{
-    LOGI("UnRegister death listener");
-    std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
-    kvDataMgr_.UnRegisterKvStoreServiceDeathRecipient(shared_from_this());
 }
 
 int32_t KVAdapter::DeleteKvStore()

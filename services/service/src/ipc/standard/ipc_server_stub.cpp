@@ -199,12 +199,6 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
         return;
     }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
-        KVAdapterManager::GetInstance().ReInit();
-        return;
-    }
-#endif
     if (systemAbilityId == DEVICE_AUTH_SERVICE_ID) {
         DeviceManagerService::GetInstance().InitHichainListener();
         return;

@@ -55,6 +55,7 @@ private:
 
 private:
     std::shared_ptr<DistributedKv::KvStoreDeathRecipient> deathRecipient_ = nullptr;
+    std::mutex kvAdapterMtx_;
     std::shared_ptr<KVAdapter> kvAdapter_ = nullptr;
     std::mutex idCacheMapMtx_;
     std::map<std::string, DmKVValue> idCacheMap_;
