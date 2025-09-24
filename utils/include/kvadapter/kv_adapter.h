@@ -31,7 +31,7 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-class KVAdapter : public DistributedKv::KvStoreDeathRecipient, public std::enable_shared_from_this<KVAdapter> {
+class KVAdapter : public std::enable_shared_from_this<KVAdapter> {
 public:
     KVAdapter() = default;
     virtual ~KVAdapter() = default;
@@ -44,14 +44,11 @@ public:
     int32_t DeleteByAppId(const std::string &appId, const std::string &prefix);
     int32_t DeleteBatch(const std::vector<std::string> &keys);
     int32_t Delete(const std::string& key);
-    void OnRemoteDied() override;
     int32_t GetAllOstypeData(const std::string &key, std::vector<std::string> &values);
     int32_t GetOstypeCountByPrefix(const std::string &prefix, int32_t &count);
 
 private:
     DistributedKv::Status GetLocalKvStorePtr();
-    void RegisterKvStoreDeathListener();
-    void UnregisterKvStoreDeathListener();
 
 private:
     DistributedKv::AppId appId_;

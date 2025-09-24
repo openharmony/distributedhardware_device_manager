@@ -69,7 +69,6 @@ bool KVAdapterManagerTest::InitKvStoreEnv()
     }
     EXPECT_CALL(*kvDataMgr_, GetSingleKvStore(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<ARG_FOURTH>(mockSingleKvStore_), Return(Status::SUCCESS)));
-    EXPECT_CALL(*kvDataMgr_, RegisterKvStoreServiceDeathRecipient(_)).Times(1);
     return KVAdapterManager::GetInstance().Init() == DM_OK;
 }
 
@@ -78,7 +77,6 @@ bool KVAdapterManagerTest::UnInitKvStoreEnv()
     if (!kvDataMgr_ || !mockSingleKvStore_) {
         return false;
     }
-    EXPECT_CALL(*kvDataMgr_, UnRegisterKvStoreServiceDeathRecipient(_)).Times(1);
     KVAdapterManager::GetInstance().UnInit();
     IDistributedKvDataManager::ReleaseDistributedKvDataManager();
     mockSingleKvStore_.reset();
@@ -113,8 +111,6 @@ HWTEST_F(KVAdapterManagerTest, ReInit_001, testing::ext::TestSize.Level1)
     ASSERT_TRUE(kvDataMgr_ != nullptr);
     EXPECT_CALL(*kvDataMgr_, GetSingleKvStore(_, _, _, _))
         .WillOnce(DoAll(SetArgReferee<ARG_FOURTH>(mockSingleKvStore_), Return(Status::SUCCESS)));
-    EXPECT_CALL(*kvDataMgr_, RegisterKvStoreServiceDeathRecipient(_)).Times(AtLeast(1));
-    EXPECT_CALL(*kvDataMgr_, UnRegisterKvStoreServiceDeathRecipient(_)).Times(AtLeast(1));
     KVAdapterManager::GetInstance().ReInit();
 }
 
