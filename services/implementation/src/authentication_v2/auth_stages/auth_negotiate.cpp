@@ -77,7 +77,7 @@ std::string AuthSrcNegotiateStateMachine::GetAccountGroupIdHash(std::shared_ptr<
     jsonObj[FIELD_GROUP_TYPE] = GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP;
     std::string queryParams = jsonObj.Dump();
 
-    int32_t osAccountUserId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t osAccountUserId = context->accesser.userId;
     if (osAccountUserId < 0) {
         LOGE("get current process account user id failed");
         return "";
@@ -134,19 +134,23 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     context->accessee.deviceId = std::string(localDeviceId);
     context->accessee.deviceIdHash = Crypto::GetUdidHash(context->accessee.deviceId);
-
+    context->accessee.deviceType = context->softbusConnector->GetLocalDeviceTypeId();
     // 2. Get userId
-    context->accessee.userId = MultipleUserConnector::GetUserIdByDisplayId(
-        static_cast<uint64_t>(context->accessee.displayId));
+    context->accessee.userId = MultipleUserConnector::GetUserIdByDisplayId(context->accessee.displayId);
     if (context->accessee.userId < 0) {
         LOGE("get userId failed.");
         return ERR_DM_GET_LOCAL_USERID_FAILED;
     }
-
+    if (context->accessee.deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
+        int32_t res = CheckUserIdValidity(context);
+        if (res != DM_OK) {
+            LOGE("CheckUserIdValidity failed.");
+            return ERR_DM_FAILED; // todo 待修改
+        }
+    }
     // 3. Get accountId
     context->accessee.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context->accessee.userId);
     context->accessee.accountIdHash = Crypto::GetAccountIdHash16(context->accessee.accountId);
-
     // 4. Get tokenId
     if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
         context->accessee.tokenId) == DM_OK) {
@@ -167,6 +171,29 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.deviceName = context->listener->GetLocalDisplayDeviceName();
     context->accessee.networkId = context->softbusConnector->GetLocalDeviceNetworkId();
     return RespQueryProxyAcceseeIds(context);
+}
+
+int32_t AuthSinkNegotiateStateMachine::CheckUserIdValidity(std::shared_ptr<DmAuthContext> context) 
+{
+    int32_t controlScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
+    if (controlScreenUserId < 0) {
+        LOGE("controlScreenUserId is invalid.");
+        return ERR_DM_FAILED; // todo 待修改
+    }
+    // SA
+    if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
+        context->accessee.tokenId) == DM_OK) {
+        if (context->accessee.displayId == -1) {
+            context->accessee.userId = controlScreenUserId;
+            return DM_OK;
+        }
+        if (context->accessee.userId != controlScreenUserId) {
+            LOGE("SA accesser.userId and controlScreenUserId is not same.");
+            return ERR_DM_FAILED; // todo 待修改
+        }
+    }
+    context->accessee.userId = controlScreenUserId;
+    return DM_OK;
 }
 
 int32_t AuthSinkNegotiateStateMachine::RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context)

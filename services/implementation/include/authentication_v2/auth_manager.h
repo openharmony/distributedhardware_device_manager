@@ -156,6 +156,7 @@ private:
     void GetIsNeedJoinLnnParam(const std::map<std::string, std::string> &bindParam);
     void ParseServiceInfo(const JsonObject &jsonObject);
     void GetConnDelayCloseTime(const std::string &extra);
+    int32_t CheckUserIdForCar();
 };
 
 class AuthSrcManager : public AuthManager {

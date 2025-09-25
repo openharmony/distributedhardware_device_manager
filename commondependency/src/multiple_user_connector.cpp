@@ -410,12 +410,12 @@ DM_EXPORT void MultipleUserConnector::GetCallingTokenId(uint32_t &tokenId)
 #endif
 }
 
-DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(uint64_t displayId)
+DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
 {
     LOGI("displayId %{public}" PRIu64, displayId);
     int32_t userId = -1;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (static_cast<int32_t>(displayId) == -1) {
+    if (displayId == -1) {
         userId = GetFirstForegroundUserId();
         return userId;
     }

@@ -466,13 +466,16 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     if (jsonObject[TAG_PEER_PKG_NAME].IsString()) {
         context_->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
     }
+    if (jsonObject[TAG_LOCAL_DISPLAY_ID].IsNumberInteger()) {
+        context_->accesser.displayId = jsonObject[TAG_LOCAL_DISPLAY_ID].Get<int32_t>();
+    }
     if (jsonObject[TAG_PEER_DISPLAY_ID].IsNumberInteger()) {
         context_->accessee.displayId = jsonObject[TAG_PEER_DISPLAY_ID].Get<int32_t>();
     }
     if (jsonObject[TAG_LOCAL_USERID].IsNumberInteger()) {
         context_->accesser.userId = jsonObject[TAG_LOCAL_USERID].Get<int32_t>();
     } else {
-        context_->accesser.userId = MultipleUserConnector::GetFirstForegroundUserId();
+        context_->accesser.userId = MultipleUserConnector::GetUserIdByDisplayId(context_->accesser.displayId);
     }
     if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
         context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
@@ -634,7 +637,6 @@ void AuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     GetAuthParam(pkgName, authType, deviceId, extra);
     context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcStartState>());
     LOGI("AuthManager::AuthenticateDevice complete");
-
     return;
 }
 
@@ -669,9 +671,43 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
         return DM_OK;
     }
     InitAuthState(pkgName, authType, deviceId, extra);
+    if (context_->accesser.deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
+        ret = CheckUserIdForCar();
+        if (ret != DM_OK) {
+            LOGE("CheckUserIdForCar failed.");
+            return ret;
+        }
+    }
     if (context_->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Invalid) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    return DM_OK;
+}
+
+int32_t AuthManager::CheckUserIdForCar()
+{
+    int32_t controlScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
+    if (controlScreenUserId < 0) {
+        LOGE("controlScreenUserId is invalid.");
+        return ERR_DM_FAILED; // todo 待修改
+    }
+    // SA
+    if (AppManager::GetInstance().IsSystemSA()) {
+        if (context_->accesser.displayId == -1) {
+            context_->accesser.userId = controlScreenUserId;
+            return DM_OK;
+        }
+        if (context_->accesser.userId != controlScreenUserId) {
+             LOGE("SA accesser.userId and controlScreenUserId is not same.");
+             return ERR_DM_FAILED; // todo 待修改
+        }
+    }
+    // HAP
+    if (context_->processInfo.userId != controlScreenUserId) {
+        LOGE("SA accesser.userId and controlScreenUserId is not same.");
+        return ERR_DM_FAILED; // todo 待修改
+    }
+    context_->accesser.userId = controlScreenUserId;
     return DM_OK;
 }
 
@@ -1147,7 +1183,7 @@ void AuthManager::GetBindCallerInfo()
     {
         std::lock_guard<std::mutex> lock(bindParamMutex_);
         if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
-            context_->processInfo.userId = std::atoi(bindParam_["bindCallerUserId"].c_str());
+            context_->processInfo.userId = std::atoi(bindParam_["bindCallerUserId"].c_str()); // processInfo.userId
         }
         if (bindParam_.find("bindCallerTokenId") != bindParam_.end()) {
             context_->accesser.tokenId = std::atoi(bindParam_["bindCallerTokenId"].c_str());
