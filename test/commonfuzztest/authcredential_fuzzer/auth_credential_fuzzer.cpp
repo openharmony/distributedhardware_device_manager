@@ -25,12 +25,8 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-void DerivativeSessionKeyFuzzTest(const uint8_t* data, size_t size)
+void DerivativeSessionKeyFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->IsProxyBind = fdp.ConsumeBool();
     context->accesser.userId = fdp.ConsumeIntegral<int32_t>();
@@ -42,12 +38,8 @@ void DerivativeSessionKeyFuzzTest(const uint8_t* data, size_t size)
     authPtr->DerivativeSessionKey(context);
 }
 
-void DerivativeProxySessionKeyFuzzTest(const uint8_t* data, size_t size)
+void DerivativeProxySessionKeyFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->reUseCreId = fdp.ConsumeRandomLengthString();
     context->IsProxyBind = fdp.ConsumeBool();
@@ -72,13 +64,9 @@ void DerivativeProxySessionKeyFuzzTest(const uint8_t* data, size_t size)
     authCrePtr->GenerateTokenIds(context, jsonObject);
 }
 
-void AuthCredentialFuzzTest(const uint8_t* data, size_t size)
+void AuthCredentialFuzzTest(FuzzedDataProvider &fdp)
 {
-    if ((data == nullptr) || (size < sizeof(int32_t))) {
-        return;
-    }
     FreezeProcess freezeProcess;
-    FuzzedDataProvider fdp(data, size);
     std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
     context->transmitData = fdp.ConsumeRandomLengthString();
     context->requestId = fdp.ConsumeIntegral<int64_t>();
@@ -97,10 +85,6 @@ void AuthCredentialFuzzTest(const uint8_t* data, size_t size)
     authSecond->Action(context);
     context->isAppCredentialVerified = fdp.ConsumeBool();
     authSecond->Action(context);
-    context->accesser.isGenerateLnnCredential = fdp.ConsumeBool();
-
-    DerivativeSessionKeyFuzzTest(data, size);
-    DerivativeProxySessionKeyFuzzTest(data, size);
 }
 }
 }
@@ -109,6 +93,12 @@ void AuthCredentialFuzzTest(const uint8_t* data, size_t size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::DistributedHardware::AuthCredentialFuzzTest(data, size);
+    if ((data == nullptr) || (size < sizeof(int32_t))) {
+        return 0;
+    }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::DistributedHardware::DerivativeSessionKeyFuzzTest(fdp);
+    OHOS::DistributedHardware::DerivativeProxySessionKeyFuzzTest(fdp);
+    OHOS::DistributedHardware::AuthCredentialFuzzTest(fdp);
     return 0;
 }
