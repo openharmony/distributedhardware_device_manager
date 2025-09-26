@@ -154,7 +154,11 @@ int32_t DeviceManagerService::InitSoftbusListener()
 void DeviceManagerService::InitHichainListener()
 {
     LOGI("DeviceManagerService::InitHichainListener Start.");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(hichainListenerLock_);
+#else
     std::lock_guard<std::mutex> lock(hichainListenerLock_);
+#endif
     if (hichainListener_ == nullptr) {
         hichainListener_ = std::make_shared<HichainListener>();
     }
@@ -165,7 +169,7 @@ void DeviceManagerService::InitHichainListener()
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 void DeviceManagerService::StartDetectDeviceRisk()
 {
-    std::lock_guard<std::mutex> lock(detectLock_);
+    std::lock_guard<ffrt::mutex> lock(detectLock_);
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_NULL_VOID(samgr);
     if (samgr->CheckSystemAbility(RISK_ANALYSIS_MANAGER_SA_ID) == nullptr) {
@@ -187,7 +191,7 @@ void DeviceManagerService::StartDetectDeviceRisk()
 
 void DeviceManagerService::DelAllRelateShip()
 {
-    std::lock_guard<std::mutex> lock(hichainListenerLock_);
+    std::lock_guard<ffrt::mutex> lock(hichainListenerLock_);
     if (hichainListener_ == nullptr) {
         hichainListener_ = std::make_shared<HichainListener>();
     }
@@ -1361,7 +1365,11 @@ int32_t DeviceManagerService::UnRegisterUiStateCallback(const std::string &pkgNa
 
 bool DeviceManagerService::IsDMServiceImplReady()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(isImplLoadLock_);
+#else
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
+#endif
     if (isImplsoLoaded_ && (dmServiceImpl_ != nullptr)) {
         return true;
     }
@@ -1398,13 +1406,21 @@ bool DeviceManagerService::IsDMServiceImplReady()
 
 bool DeviceManagerService::IsDMImplSoLoaded()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(isImplLoadLock_);
+#else
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
+#endif
     return isImplsoLoaded_;
 }
 
 bool DeviceManagerService::IsDMServiceAdapterSoLoaded()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(isAdapterResidentLoadLock_);
+#else
     std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
+#endif
     if (!isAdapterResidentSoLoaded_ || (dmServiceImplExtResident_ == nullptr)) {
         return false;
     }
@@ -1606,7 +1622,11 @@ int32_t DeviceManagerService::ExportAuthCode(std::string &authCode)
 void DeviceManagerService::UnloadDMServiceImplSo()
 {
     LOGI("Start.");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(isImplLoadLock_);
+#else
     std::lock_guard<std::mutex> lock(isImplLoadLock_);
+#endif
     if (dmServiceImpl_ != nullptr) {
         dmServiceImpl_->Release();
     }
@@ -1622,7 +1642,11 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
     if (listener_ == nullptr) {
         listener_ = std::make_shared<DeviceManagerServiceListener>();
     }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(isAdapterResidentLoadLock_);
+#else
     std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
+#endif
     if (isAdapterResidentSoLoaded_ && (dmServiceImplExtResident_ != nullptr)) {
         return true;
     }
@@ -1660,7 +1684,11 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
 void DeviceManagerService::UnloadDMServiceAdapterResident()
 {
     LOGI("Start.");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(isAdapterResidentLoadLock_);
+#else
     std::lock_guard<std::mutex> lock(isAdapterResidentLoadLock_);
+#endif
     if (dmServiceImplExtResident_ != nullptr) {
         dmServiceImplExtResident_->Release();
     }
@@ -1674,7 +1702,11 @@ void DeviceManagerService::UnloadDMServiceAdapterResident()
 
 bool DeviceManagerService::IsDMDeviceRiskDetectSoLoaded()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(isDeviceRiskDetectSoLoadLock_);
+#else
     std::lock_guard<std::mutex> lock(isDeviceRiskDetectSoLoadLock_);
+#endif
     if (isDeviceRiskDetectSoLoaded_ && (dmDeviceRiskDetect_ != nullptr)) {
         return true;
     }
@@ -1712,7 +1744,11 @@ bool DeviceManagerService::IsDMDeviceRiskDetectSoLoaded()
 void DeviceManagerService::UnloadDMDeviceRiskDetect()
 {
     LOGI("Start.");
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(isDeviceRiskDetectSoLoadLock_);
+#else
     std::lock_guard<std::mutex> lock(isDeviceRiskDetectSoLoadLock_);
+#endif
     if (dmDeviceRiskDetect_ != nullptr) {
         dmDeviceRiskDetect_->Release();
         dmDeviceRiskDetect_ = nullptr;
@@ -4464,9 +4500,9 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
         LOGE("IsCommonDependencyReady failed or GetCommonDependencyObj() is nullptr.");
         return;
     }
-    std::unordered_set<std::string> udidSet;
-    discoveryMgr_->GetCommonDependencyObj()->GetAuthOnceUdids(udidSet);
-    if (udidSet.empty()) {
+    std::map<std::string, std::unordered_set<int32_t>> udid2UserIdsMap;
+    discoveryMgr_->GetCommonDependencyObj()->GetAuthOnceUdids(udid2UserIdsMap);
+    if (udid2UserIdsMap.empty()) {
         LOGI("no auth once data.");
         return;
     }
@@ -4475,7 +4511,7 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
         return;
     }
 
-    for (const std::string &udid : udidSet) {
+    for (const auto &[udid, userIds] : udid2UserIdsMap) {
         char udidHash[DM_MAX_DEVICE_ID_LEN] = {0};
         if (Crypto::GetUdidHash(udid, reinterpret_cast<uint8_t *>(udidHash)) != DM_OK) {
             LOGE("get udidhash failed.");
@@ -4485,7 +4521,9 @@ void DeviceManagerService::InitTaskOfDelTimeOutAcl()
             LOGE("device is online udidhash %{public}s.", GetAnonyString(udidHash).c_str());
             continue;
         }
-        dmServiceImpl_->InitTaskOfDelTimeOutAcl(udid, udidHash);
+        for (auto userId : userIds) {
+            dmServiceImpl_->InitTaskOfDelTimeOutAcl(udid, udidHash, userId);
+        }
     }
 }
 

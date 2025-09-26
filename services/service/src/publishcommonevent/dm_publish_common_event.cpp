@@ -58,7 +58,7 @@ bool DmPublishCommonEventManager::SubscribePublishCommonEvent(const std::vector<
         LOGE("eventNameVec is empty or callback is nullptr.");
         return false;
     }
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
         LOGE("failed to subscribe ble/wifi/screen commom eventName size: %{public}zu", eventNameVec.size());
         return false;
@@ -102,7 +102,7 @@ bool DmPublishCommonEventManager::SubscribePublishCommonEvent(const std::vector<
 
 bool DmPublishCommonEventManager::UnsubscribePublishCommonEvent()
 {
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
         LOGE("failed to unsubscribe ble/wifi/screen commom event name size: %{public}zu because event is invalid.",
             eventNameVec_.size());
@@ -138,55 +138,55 @@ bool DmPublishCommonEventManager::UnsubscribePublishCommonEvent()
 
 void DmPublishCommonEventManager::SetSubscriber(std::shared_ptr<DmPublishEventSubscriber> subscriber)
 {
-    std::lock_guard<std::mutex> lock(subscriberMutex_);
+    std::lock_guard<ffrt::mutex> lock(subscriberMutex_);
     subscriber_ = subscriber;
 }
 
 std::shared_ptr<DmPublishEventSubscriber> DmPublishCommonEventManager::GetSubscriber()
 {
-    std::lock_guard<std::mutex> lock(subscriberMutex_);
+    std::lock_guard<ffrt::mutex> lock(subscriberMutex_);
     return subscriber_;
 }
 
 void DmPublishEventSubscriber::SetWifiState(const int32_t wifiState)
 {
-    std::lock_guard<std::mutex> lock(wifiStateMutex_);
+    std::lock_guard<ffrt::mutex> lock(wifiStateMutex_);
     wifiState_ = wifiState;
 }
 
 int32_t DmPublishEventSubscriber::GetWifiState()
 {
-    std::lock_guard<std::mutex> lock(wifiStateMutex_);
+    std::lock_guard<ffrt::mutex> lock(wifiStateMutex_);
     return wifiState_;
 }
 
 void DmPublishEventSubscriber::SetBluetoothState(const int32_t bluetoothState)
 {
-    std::lock_guard<std::mutex> lock(bluetoothStateMutex_);
+    std::lock_guard<ffrt::mutex> lock(bluetoothStateMutex_);
     bluetoothState_ = bluetoothState;
 }
 
 int32_t DmPublishEventSubscriber::GetBluetoothState()
 {
-    std::lock_guard<std::mutex> lock(bluetoothStateMutex_);
+    std::lock_guard<ffrt::mutex> lock(bluetoothStateMutex_);
     return bluetoothState_;
 }
 
 void DmPublishEventSubscriber::SetScreenState(const int32_t screenState)
 {
-    std::lock_guard<std::mutex> lock(screenStateMutex_);
+    std::lock_guard<ffrt::mutex> lock(screenStateMutex_);
     screenState_ = screenState;
 }
 
 int32_t DmPublishEventSubscriber::GetScreenState()
 {
-    std::lock_guard<std::mutex> lock(screenStateMutex_);
+    std::lock_guard<ffrt::mutex> lock(screenStateMutex_);
     return screenState_;
 }
 
 void DmPublishEventSubscriber::SetScreenEventState(const std::string &receiveEvent)
 {
-    std::lock_guard<std::mutex> lock(screenStateMutex_);
+    std::lock_guard<ffrt::mutex> lock(screenStateMutex_);
 #ifdef SUPPORT_POWER_MANAGER
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_ON) {
         screenState_ = DM_SCREEN_ON;
@@ -207,7 +207,7 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 
 #ifdef SUPPORT_BLUETOOTH
     {
-        std::lock_guard<std::mutex> lock(bluetoothStateMutex_);
+        std::lock_guard<ffrt::mutex> lock(bluetoothStateMutex_);
         if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_HOST_STATE_UPDATE &&
             eventState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON)) {
             bluetoothState_ = static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON);
@@ -223,7 +223,7 @@ void DmPublishEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 
 #ifdef SUPPORT_WIFI
     {
-        std::lock_guard<std::mutex> lock(wifiStateMutex_);
+        std::lock_guard<ffrt::mutex> lock(wifiStateMutex_);
         if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_WIFI_POWER_STATE &&
             eventState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED)) {
             wifiState_ = static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED);

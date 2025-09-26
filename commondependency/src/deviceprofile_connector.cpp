@@ -3655,7 +3655,7 @@ bool DeviceProfileConnector::IsAllowAuthAlways(const std::string &localUdid, int
     return false;
 }
 
-int32_t DeviceProfileConnector::GetAuthOnceUdids(std::unordered_set<std::string> &udidSet)
+int32_t DeviceProfileConnector::GetAuthOnceUdids(std::map<std::string, std::unordered_set<int32_t>> &udid2UserIdsMap)
 {
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
     std::string localUdid = GetLocalDeviceId();
@@ -3664,10 +3664,10 @@ int32_t DeviceProfileConnector::GetAuthOnceUdids(std::unordered_set<std::string>
         std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
         if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
             if (accesserUdid == localUdid) {
-                udidSet.insert(accesseeUdid);
+                udid2UserIdsMap[accesseeUdid].insert(item.GetAccesser().GetAccesserUserId());
             }
             if (accesseeUdid == localUdid) {
-                udidSet.insert(accesserUdid);
+                udid2UserIdsMap[accesserUdid].insert(item.GetAccessee().GetAccesseeUserId());
             }
         }
     }

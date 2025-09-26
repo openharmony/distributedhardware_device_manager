@@ -61,7 +61,7 @@ int32_t FreezeProcess::SyncFreezeData()
         return ret;
     }
     {
-        std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
+        std::lock_guard<ffrt::mutex> lock(freezeStateCacheMtx_);
         freezeStateCache_ = freezeStateObj;
     }
     std::string bindFailedEventsValue;
@@ -76,7 +76,7 @@ int32_t FreezeProcess::SyncFreezeData()
         LOGE("ConvertJsonToBindFailedEvents, ret: %{public}d", ret);
         return ret;
     }
-    std::lock_guard<std::mutex> lock(bindFailedEventsCacheMtx_);
+    std::lock_guard<ffrt::mutex> lock(bindFailedEventsCacheMtx_);
     bindFailedEventsCache_ = bindFailedEventsObj;
     LOGI("Sync freeze data success");
     return DM_OK;
@@ -131,7 +131,7 @@ int32_t FreezeProcess::ConvertJsonToBindFailedEvents(const std::string &result, 
 bool FreezeProcess::IsFrozen(int64_t &remainingFrozenTime)
 {
     {
-        std::lock_guard<std::mutex> lock(isSyncedMtx_);
+        std::lock_guard<ffrt::mutex> lock(isSyncedMtx_);
         if (!isSynced_) {
             SyncFreezeData();
             isSynced_ = true;
@@ -139,7 +139,7 @@ bool FreezeProcess::IsFrozen(int64_t &remainingFrozenTime)
     }
     int64_t stopFreezeTimeStamp = 0;
     {
-        std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
+        std::lock_guard<ffrt::mutex> lock(freezeStateCacheMtx_);
         if (bindFailedEventsCache_.IsEmpty()) {
             LOGI("bindFailedEventsCache is empty");
             return false;
@@ -174,7 +174,7 @@ int32_t FreezeProcess::CleanFreezeRecord(int64_t nowTime)
 
 int32_t FreezeProcess::CleanBindFailedEvents(int64_t reservedDataTimeStamp)
 {
-    std::lock_guard<std::mutex> lock(bindFailedEventsCacheMtx_);
+    std::lock_guard<ffrt::mutex> lock(bindFailedEventsCacheMtx_);
     if (bindFailedEventsCache_.IsEmpty()) {
         LOGI("bindFailedEventsCache is empty, no need to clean");
         return DM_OK;
@@ -210,7 +210,7 @@ int32_t FreezeProcess::CleanBindFailedEvents(int64_t reservedDataTimeStamp)
 
 int32_t FreezeProcess::CleanFreezeState(int64_t reservedDataTimeStamp)
 {
-    std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
+    std::lock_guard<ffrt::mutex> lock(freezeStateCacheMtx_);
     if (freezeStateCache_.IsEmpty()) {
         LOGI("freezeStateCache is empty, no need to clean");
         return DM_OK;
@@ -251,14 +251,14 @@ int32_t FreezeProcess::DeleteFreezeRecord()
         return ERR_DM_FAILED;
     }
     {
-        std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
+        std::lock_guard<ffrt::mutex> lock(freezeStateCacheMtx_);
         freezeStateCache_.Reset();
     }
     if (KVAdapterManager::GetInstance().DeleteFreezeData(BIND_FAILED_EVENTS_KEY) != DM_OK) {
         LOGE("delete bindFailedEvents data failed");
         return ERR_DM_FAILED;
     }
-    std::lock_guard<std::mutex> lock(bindFailedEventsCacheMtx_);
+    std::lock_guard<ffrt::mutex> lock(bindFailedEventsCacheMtx_);
     bindFailedEventsCache_.Reset();
     return DM_OK;
 }
@@ -266,7 +266,7 @@ int32_t FreezeProcess::DeleteFreezeRecord()
 int32_t FreezeProcess::UpdateFreezeRecord()
 {
     int64_t nowTime = GetSecondsSince1970ToNow();
-    std::lock_guard<std::mutex> lock(bindFailedEventsCacheMtx_);
+    std::lock_guard<ffrt::mutex> lock(bindFailedEventsCacheMtx_);
     BindFailedEvents bindFailedEventsTmp = bindFailedEventsCache_;
     int64_t lastFreezeTimeStamps = 0;
     if (!bindFailedEventsTmp.freezeTimeStamps.empty()) {
@@ -301,7 +301,7 @@ int32_t FreezeProcess::UpdateFreezeRecord()
 
 int32_t FreezeProcess::UpdateFreezeState(int64_t nowTime)
 {
-    std::lock_guard<std::mutex> lock(freezeStateCacheMtx_);
+    std::lock_guard<ffrt::mutex> lock(freezeStateCacheMtx_);
     DeviceFreezeState freezeStateTmp = freezeStateCache_;
     int64_t nextFreezeTime = 0;
     CalculateNextFreezeTime(freezeStateTmp.stopFreezeTimeStamp - freezeStateTmp.startFreezeTimeStamp, nextFreezeTime);

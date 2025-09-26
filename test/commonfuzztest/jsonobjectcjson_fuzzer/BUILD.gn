@@ -52,6 +52,7 @@ ohos_fuzztest("JsonObjectCjsonFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "cJSON:cjson",
+    "ffrt:libffrt",
     "hilog:libhilog",
   ]
 }

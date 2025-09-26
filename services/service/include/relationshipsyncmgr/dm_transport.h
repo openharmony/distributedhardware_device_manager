@@ -19,6 +19,7 @@
 #include <set>
 
 #include "event_handler.h"
+#include "ffrt.h"
 #include "socket.h"
 
 namespace OHOS {
@@ -49,7 +50,7 @@ private:
     int32_t StartSocketInner(const std::string &rmtNetworkId, int32_t &socketId);
 
 private:
-    std::mutex rmtSocketIdMtx_;
+    ffrt::mutex rmtSocketIdMtx_;
     // record the socket id for the connection with remote devices, <remote networkId, socketId>
     std::map<std::string, std::set<int32_t>> remoteDevSocketIds_;
     std::set<int32_t> sourceSocketIds_;

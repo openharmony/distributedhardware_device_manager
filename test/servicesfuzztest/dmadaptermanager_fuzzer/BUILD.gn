@@ -62,6 +62,7 @@ ohos_fuzztest("DmAdapterManagerFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "ffrt:libffrt",
     "safwk:system_ability_fwk",
   ]
 }

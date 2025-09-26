@@ -180,7 +180,7 @@ std::shared_ptr<ICryptoAdapter> DmConfigManager::GetCryptoAdapter(const std::str
         return nullptr;
     }
 
-    std::unique_lock<std::mutex> locker(cryptoAdapterMutex_);
+    std::unique_lock<ffrt::mutex> locker(cryptoAdapterMutex_);
     auto ptrIter = cryptoAdapterPtr_.find(soName);
     if (ptrIter != cryptoAdapterPtr_.end()) {
         return cryptoAdapterPtr_[soName];

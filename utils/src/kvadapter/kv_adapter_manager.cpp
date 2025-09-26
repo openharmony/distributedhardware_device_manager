@@ -49,12 +49,12 @@ DM_EXPORT int32_t KVAdapterManager::Init()
 {
     LOGI("Init Kv-Adapter manager");
     {
-        std::lock_guard<std::mutex> lock(idCacheMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
         idCacheMap_.clear();
     }
     int32_t ret = DM_OK;
     {
-        std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+        std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
         if (kvAdapter_ == nullptr) {
             kvAdapter_ = std::make_shared<KVAdapter>();
             ret = kvAdapter_->Init();
@@ -66,7 +66,7 @@ DM_EXPORT int32_t KVAdapterManager::Init()
 DM_EXPORT void KVAdapterManager::UnInit()
 {
     LOGI("Uninit Kv-Adapter manager");
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_VOID(kvAdapter_);
     kvAdapter_->UnInit();
     kvAdapter_ = nullptr;
@@ -75,7 +75,7 @@ DM_EXPORT void KVAdapterManager::UnInit()
 DM_EXPORT void KVAdapterManager::ReInit()
 {
     LOGI("Re init kv adapter");
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_VOID(kvAdapter_);
     kvAdapter_->ReInit();
 }
@@ -85,7 +85,7 @@ int32_t KVAdapterManager::PutByAnoyDeviceId(const std::string &key, const DmKVVa
     std::string dmKey = DM_KV_STORE_PREFIX + key;
     std::string prefixKey = DM_KV_STORE_PREFIX + value.appID + DB_KEY_DELIMITER + value.udidHash;
     {
-        std::lock_guard<std::mutex> lock(idCacheMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
         auto idIter = idCacheMap_.find(dmKey);
         if (idIter != idCacheMap_.end() && !IsTimeOut(idIter->second.lastModifyTime, value.lastModifyTime,
             DM_KV_STORE_REFRESH_TIME)) {
@@ -98,7 +98,7 @@ int32_t KVAdapterManager::PutByAnoyDeviceId(const std::string &key, const DmKVVa
     std::string valueStr = "";
     ConvertDmKVValueToJson(value, valueStr);
     {
-        std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+        std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
         CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
         if (kvAdapter_->Put(dmKey, valueStr) != DM_OK) {
             LOGE("Insert value to DB for dmKey failed");
@@ -116,7 +116,7 @@ DM_EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value
 {
     std::string dmKey = DM_KV_STORE_PREFIX + key;
     {
-        std::lock_guard<std::mutex> lock(idCacheMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
         auto idIter = idCacheMap_.find(dmKey);
         if (idIter != idCacheMap_.end()) {
             value = idIter->second;
@@ -125,7 +125,7 @@ DM_EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value
     }
     std::string valueStr;
     {
-        std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+        std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
         CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
         if (kvAdapter_->Get(dmKey, valueStr) != DM_OK) {
             LOGE("Get kv value failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
@@ -134,7 +134,7 @@ DM_EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value
     }
     ConvertJsonToDmKVValue(valueStr, value);
     {
-        std::lock_guard<std::mutex> lock(idCacheMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
         idCacheMap_[dmKey] = value;
         std::string prefixKey = DM_KV_STORE_PREFIX + value.appID + DB_KEY_DELIMITER + value.udidHash;
         idCacheMap_[prefixKey] = value;
@@ -145,7 +145,7 @@ DM_EXPORT int32_t KVAdapterManager::Get(const std::string &key, DmKVValue &value
 DM_EXPORT int32_t KVAdapterManager::DeleteAgedEntry()
 {
     int64_t nowTime = GetSecondsSince1970ToNow();
-    std::lock_guard<std::mutex> lock(idCacheMapMtx_);
+    std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
     for (auto it = idCacheMap_.begin(); it != idCacheMap_.end();) {
         if (IsTimeOut(it->second.lastModifyTime, nowTime, MAX_SUPPORTED_EXIST_TIME)) {
             it = idCacheMap_.erase(it);
@@ -165,7 +165,7 @@ DM_EXPORT int32_t KVAdapterManager::AppUnintall(const std::string &appId)
 {
     LOGI("appId %{public}s.", GetAnonyString(appId).c_str());
     {
-        std::lock_guard<std::mutex> lock(idCacheMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(idCacheMapMtx_);
         for (auto it = idCacheMap_.begin(); it != idCacheMap_.end();) {
             if (it->second.appID == appId) {
                 it = idCacheMap_.erase(it);
@@ -174,7 +174,7 @@ DM_EXPORT int32_t KVAdapterManager::AppUnintall(const std::string &appId)
             }
         }
     }
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->DeleteByAppId(appId, DM_KV_STORE_PREFIX) != DM_OK) {
         LOGE("DeleteByAppId failed");
@@ -186,7 +186,7 @@ DM_EXPORT int32_t KVAdapterManager::AppUnintall(const std::string &appId)
 DM_EXPORT int32_t KVAdapterManager::GetFreezeData(const std::string &key, std::string &value)
 {
     std::string dmKey = DM_KV_STORE_FREEZE_PREFIX + key;
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Get(dmKey, value) != DM_OK) {
         LOGE("Get freeze data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
@@ -198,7 +198,7 @@ DM_EXPORT int32_t KVAdapterManager::GetFreezeData(const std::string &key, std::s
 DM_EXPORT int32_t KVAdapterManager::PutFreezeData(const std::string &key, std::string &value)
 {
     std::string dmKey = DM_KV_STORE_FREEZE_PREFIX + key;
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Put(dmKey, value) != DM_OK) {
         LOGE("Insert freeze data failed, k:%{public}s, v:%{public}s", dmKey.c_str(), value.c_str());
@@ -211,7 +211,7 @@ DM_EXPORT int32_t KVAdapterManager::PutFreezeData(const std::string &key, std::s
 DM_EXPORT int32_t KVAdapterManager::DeleteFreezeData(const std::string &key)
 {
     std::string dmKey = DM_KV_STORE_FREEZE_PREFIX + key;
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Delete(dmKey) != DM_OK) {
         LOGE("delete freeze data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
@@ -223,7 +223,7 @@ DM_EXPORT int32_t KVAdapterManager::DeleteFreezeData(const std::string &key)
 DM_EXPORT int32_t KVAdapterManager::GetAllOstypeData(std::vector<std::string> &values)
 {
     std::string dmKey = ComposeOsTypePrefix();
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->GetAllOstypeData(dmKey, values) != DM_OK) {
         LOGE("Get all data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
@@ -236,7 +236,7 @@ DM_EXPORT int32_t KVAdapterManager::PutOstypeData(const std::string &key, const 
 {
     LOGI("key %{public}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str());
     std::string dmKey = ComposeOsTypePrefix() + key;
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Put(dmKey, value) != DM_OK) {
         LOGE("Insert data failed, k:%{public}s, v:%{public}s", GetAnonyString(dmKey).c_str(), value.c_str());
@@ -249,7 +249,7 @@ DM_EXPORT int32_t KVAdapterManager::DeleteOstypeData(const std::string &key)
 {
     LOGI("key %{public}s.", GetAnonyString(key).c_str());
     std::string dmKey = ComposeOsTypePrefix() + key;
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Delete(dmKey) != DM_OK) {
         LOGE("delete data failed, dmKey: %{public}s", GetAnonyString(dmKey).c_str());
@@ -261,7 +261,7 @@ DM_EXPORT int32_t KVAdapterManager::DeleteOstypeData(const std::string &key)
 DM_EXPORT int32_t KVAdapterManager::GetLocalUserIdData(const std::string &key, std::string &value)
 {
     LOGI("key %{public}s.", GetAnonyString(key).c_str());
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Get(key, value) != DM_OK) {
         LOGE("Get data failed, key: %{public}s", GetAnonyString(key).c_str());
@@ -273,7 +273,7 @@ DM_EXPORT int32_t KVAdapterManager::GetLocalUserIdData(const std::string &key, s
 DM_EXPORT int32_t KVAdapterManager::PutLocalUserIdData(const std::string &key, const std::string &value)
 {
     LOGI("key %{public}s, value %{public}s.", GetAnonyString(key).c_str(), value.c_str());
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     if (kvAdapter_->Put(key, value) != DM_OK) {
         LOGE("Put data failed, key:%{public}s, value:%{public}s", GetAnonyString(key).c_str(), value.c_str());
@@ -284,7 +284,7 @@ DM_EXPORT int32_t KVAdapterManager::PutLocalUserIdData(const std::string &key, c
 
 DM_EXPORT int32_t KVAdapterManager::GetOsTypeCount(int32_t &count)
 {
-    std::lock_guard<std::mutex> kvAdapterLck(kvAdapterMtx_);
+    std::lock_guard<ffrt::mutex> kvAdapterLck(kvAdapterMtx_);
     CHECK_NULL_RETURN(kvAdapter_, ERR_DM_POINT_NULL);
     std::string osTypePrefix = ComposeOsTypePrefix();
     if (kvAdapter_->GetOstypeCountByPrefix(osTypePrefix, count) != DM_OK) {

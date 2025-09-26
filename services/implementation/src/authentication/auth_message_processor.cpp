@@ -199,7 +199,7 @@ void AuthMessageProcessor::CreatePublicKeyMessageExt(JsonObject &json)
 {
     bool encryptFlag = false;
     {
-        std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
+        std::lock_guard<ffrt::mutex> mutexLock(encryptFlagMutex_);
         encryptFlag = encryptFlag_;
     }
     CHECK_NULL_VOID(authResponseContext_);
@@ -399,7 +399,7 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(JsonObject &json)
 {
     bool encryptFlag = false;
     {
-        std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
+        std::lock_guard<ffrt::mutex> mutexLock(encryptFlagMutex_);
         encryptFlag = encryptFlag_;
     }
     if (!encryptFlag && IsString(json, TAG_PUBLICKEY)) {
@@ -814,7 +814,7 @@ int32_t AuthMessageProcessor::SaveSessionKey(const uint8_t *sessionKey, const ui
 
 void AuthMessageProcessor::SetEncryptFlag(bool flag)
 {
-    std::lock_guard<std::mutex> mutexLock(encryptFlagMutex_);
+    std::lock_guard<ffrt::mutex> mutexLock(encryptFlagMutex_);
     encryptFlag_ = flag;
 }
 

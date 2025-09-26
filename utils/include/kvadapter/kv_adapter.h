@@ -26,6 +26,7 @@
 
 #include "dm_kv_info.h"
 #include "distributed_kv_data_manager.h"
+#include "ffrt.h"
 #include "kvstore_death_recipient.h"
 #include "kvstore_observer.h"
 
@@ -56,8 +57,8 @@ private:
     DistributedKv::DistributedKvDataManager kvDataMgr_;
     DistributedKv::DataType dataType_ = DistributedKv::DataType::TYPE_STATICS;
     std::shared_ptr<DistributedKv::SingleKvStore> kvStorePtr_ = nullptr;
-    std::mutex kvAdapterMutex_;
-    std::mutex kvDataMgrMutex_;
+    ffrt::mutex kvAdapterMutex_;
+    ffrt::mutex kvDataMgrMutex_;
     std::atomic<bool> isInited_ = false;
 };
 } // namespace DistributedHardware

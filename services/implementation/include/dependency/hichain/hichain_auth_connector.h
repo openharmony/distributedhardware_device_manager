@@ -22,6 +22,9 @@
 #include "device_auth.h"
 #include "device_auth_defines.h"
 #include "hichain_connector_callback.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ffrt.h"
+#endif
 #include "json_object.h"
 
 namespace OHOS {
@@ -86,7 +89,11 @@ private:
     DeviceAuthCallback deviceAuthCallback_;
     static std::shared_ptr<IDmDeviceAuthCallback> dmDeviceAuthCallback_;
     static std::map<int64_t, std::shared_ptr<IDmDeviceAuthCallback>> dmDeviceAuthCallbackMap_;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    static ffrt::mutex dmDeviceAuthCallbackMutex_;
+#else
     static std::mutex dmDeviceAuthCallbackMutex_;
+#endif
 };
 } // namespace DistributedHardware
 } // namespace OHOS

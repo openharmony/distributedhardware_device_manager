@@ -25,6 +25,7 @@
 
 #include "access_control_profile.h"
 #include "auth_manager.h"
+#include "deviceprofile_connector.h"
 #include "dm_ability_manager.h"
 #include "dm_auth_manager.h"
 #include "dm_auth_manager_base.h"
@@ -34,11 +35,11 @@
 #include "dm_device_state_manager.h"
 #include "dm_single_instance.h"
 #include "dp_inited_callback.h"
+#include "ffrt.h"
 #include "idevice_manager_service_impl.h"
 #include "ipc_skeleton.h"
 #include "mine_hichain_connector.h"
 #include "softbus_connector.h"
-#include "deviceprofile_connector.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -208,7 +209,7 @@ public:
     int32_t BindServiceTarget(const std::string &pkgName, const PeerTargetId &targetId,
         const std::map<std::string, std::string> &bindParam);
     int32_t UnbindServiceTarget(const std::string &pkgName, int64_t serviceId);
-    void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash);
+    void InitTaskOfDelTimeOutAcl(const std::string &deviceUdid, const std::string &deviceUdidHash, int32_t userId);
     void GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList);
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
 private:
@@ -313,10 +314,10 @@ private:
         int32_t &bindLevel);
     void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
 private:
-    std::mutex authMgrMtx_;
+    ffrt::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
     bool isNeedJoinLnn_ = true;
-    std::mutex isNeedJoinLnnMtx_;
+    ffrt::mutex isNeedJoinLnnMtx_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;
     std::shared_ptr<DmDeviceStateManager> deviceStateMgr_;
@@ -327,27 +328,27 @@ private:
     std::shared_ptr<DmCommonEventManager> commonEventManager_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::atomic<bool> isCredentialType_ = false;
-    std::mutex logoutMutex_;
+    ffrt::mutex logoutMutex_;
     sptr<DpInitedCallback> dpInitedCallback_ = nullptr;
 
     // The session ID corresponding to the device ID, used only on the src side
     std::map<std::string, int> deviceId2SessionIdMap_;
     std::map<int, std::shared_ptr<Session>> sessionsMap_;  // sessionId corresponds to the session object
-    std::mutex mapMutex_;  // sessionsMap_ lock
-    std::map<int, std::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
-    std::map<int, std::mutex> sessionEnableMutexMap_;      // Lock corresponding to the session
+    ffrt::mutex mapMutex_;  // sessionsMap_ lock
+    std::map<int, ffrt::condition_variable> sessionEnableCvMap_;  // Condition variable corresponding to the session
+    std::map<int, ffrt::mutex> sessionEnableMutexMap_;      // Lock corresponding to the session
     std::map<int, bool> sessionEnableCvReadyMap_;  // Condition variable ready flag
     std::map<int, bool> sessionStopMap_;  // stop flag
     std::map<int, bool> sessionEnableMap_;  // enable flag
-    std::mutex logicalSessionId2TokenIdMapMtx_;
+    ffrt::mutex logicalSessionId2TokenIdMapMtx_;
     std::map<uint64_t, uint64_t> logicalSessionId2TokenIdMap_;  // The relationship between logicalSessionId and tokenId
-    std::mutex logicalSessionId2SessionIdMapMtx_;
+    ffrt::mutex logicalSessionId2SessionIdMapMtx_;
     std::map<uint64_t, int> logicalSessionId2SessionIdMap_;  // The relationship logicalSessionId and physical sessionId
-    std::mutex configsMapMutex_;
+    ffrt::mutex configsMapMutex_;
     std::map<uint64_t, std::shared_ptr<Config>> configsMap_;    // Import when authMgr is not initialized
-    std::mutex authMgrMapMtx_;
+    ffrt::mutex authMgrMapMtx_;
     std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
-    std::mutex tokenIdSessionIdMapMtx_;
+    ffrt::mutex tokenIdSessionIdMapMtx_;
     std::map<uint64_t, int> tokenIdSessionIdMap_;  // New protocol sharing
 };
 

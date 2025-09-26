@@ -18,12 +18,12 @@
 
 #include <map>
 #include <memory>
-#include <mutex>
 #include <set>
 #include <tuple>
 #include <unordered_set>
 #include <vector>
 
+#include "ffrt.h"
 #include "ipc_remote_broker.h"
 #include "ipc_req.h"
 #include "ipc_rsp.h"
@@ -162,7 +162,7 @@ private:
 private:
     bool registerToService_;
     ServiceRunningState state_;
-    mutable std::mutex listenerLock_;
+    mutable ffrt::mutex listenerLock_;
     std::map<ProcessInfo, sptr<AppDeathRecipient>> appRecipient_;
     std::map<ProcessInfo, sptr<IpcRemoteBroker>> dmListener_;
     std::set<std::string> systemSA_;

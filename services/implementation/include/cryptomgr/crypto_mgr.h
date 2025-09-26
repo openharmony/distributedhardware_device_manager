@@ -18,8 +18,8 @@
 
 #include <cinttypes>
 #include <string>
-#include <mutex>
 
+#include "ffrt.h"
 namespace OHOS {
 namespace DistributedHardware {
 #define SESSION_KEY_LENGTH 32
@@ -59,9 +59,9 @@ private:
     int32_t MbedAesGcmDecrypt(const AesGcmCipherKey *cipherKey, const unsigned char *cipherText,
         uint32_t cipherTextSize, unsigned char *plain, uint32_t &plainLen);
 private:
-    std::mutex sessionKeyMtx_;
+    ffrt::mutex sessionKeyMtx_;
     DMSessionKey sessionKey_;
-    std::mutex randomLock_;
+    ffrt::mutex randomLock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

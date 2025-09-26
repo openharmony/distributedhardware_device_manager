@@ -47,8 +47,8 @@ void DeviceNameManagerFuzzTest(FuzzedDataProvider &fdp)
 
     deviceNameMgr_->InitDeviceName(-1);
     std::string prefixName = fdp.ConsumeRandomLengthString();
-    std::string subffixName = fdp.ConsumeRandomLengthString();
-    deviceNameMgr_->InitDeviceNameToSoftBus(prefixName, subffixName);
+    std::string suffixName = fdp.ConsumeRandomLengthString();
+    deviceNameMgr_->InitDeviceNameToSoftBus(prefixName, suffixName);
 
     int32_t maxNamelength = fdp.ConsumeIntegral<int32_t>();
     std::string displayName = fdp.ConsumeRandomLengthString();

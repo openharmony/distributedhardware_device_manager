@@ -55,7 +55,7 @@ bool DmScreenCommonEventManager::SubscribeScreenCommonEvent(const std::vector<st
         LOGE("eventNameVec is empty or callback is nullptr.");
         return false;
     }
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
         LOGE("failed to subscribe screen commom eventName size: %{public}zu", eventNameVec.size());
         return false;
@@ -98,7 +98,7 @@ bool DmScreenCommonEventManager::SubscribeScreenCommonEvent(const std::vector<st
 
 bool DmScreenCommonEventManager::UnsubscribeScreenCommonEvent()
 {
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
         LOGE("failed to unsubscribe screen commom event name size: %{public}zu because event is invalid.",
             eventNameVec_.size());

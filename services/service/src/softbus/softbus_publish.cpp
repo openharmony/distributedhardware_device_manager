@@ -24,6 +24,9 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_softbus_cache.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ffrt.h"
+#endif
 #include "system_ability_definition.h"
 #ifdef SUPPORT_WIFI
 #include "wifi_msg.h"
@@ -36,11 +39,19 @@ static IPublishCb softbusPublishCallback_ = {
     .OnPublishResult = SoftbusPublish::OnSoftbusPublishResult,
 };
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+ffrt::mutex g_publishMutex;
+#else
 std::mutex g_publishMutex;
+#endif
 
 void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32_t screenState)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> saLock(g_publishMutex);
+#else
     std::lock_guard<std::mutex> saLock(g_publishMutex);
+#endif
     DmDeviceInfo info;
     SoftbusCache::GetInstance().GetLocalDeviceInfo(info);
     LOGI("PublishCommonEventCallback start, bleState: %{public}d, wifiState: %{public}d, screenState: %{public}d"
@@ -52,17 +63,11 @@ void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32
     }
     SoftbusPublish softbusPublish;
     if (screenState == DM_SCREEN_OFF) {
-        int32_t ret = softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
-        if (ret != DM_OK) {
-            LOGE("stop publish failed, ret : %{public}d.", ret);
-            return;
-        }
-        LOGI("stop publish successed, ret : %{public}d.", ret);
+        softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         return;
     }
 #ifdef SUPPORT_BLUETOOTH
-    if (bluetoothState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON) &&
-        screenState == DM_SCREEN_ON) {
+    if (bluetoothState == static_cast<int32_t>(Bluetooth::BTStateID::STATE_TURN_ON) && screenState == DM_SCREEN_ON) {
         softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         int32_t ret = softbusPublish.PublishSoftbusLNN();
         if (ret != DM_OK) {
@@ -76,8 +81,7 @@ void PublishCommonEventCallback(int32_t bluetoothState, int32_t wifiState, int32
 #endif // SUPPORT_BLUETOOTH
 
 #ifdef SUPPORT_WIFI
-    if (wifiState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED) &&
-        screenState == DM_SCREEN_ON) {
+    if (wifiState == static_cast<int32_t>(OHOS::Wifi::WifiState::ENABLED) && screenState == DM_SCREEN_ON) {
         softbusPublish.StopPublishSoftbusLNN(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
         int32_t ret = softbusPublish.PublishSoftbusLNN();
         if (ret != DM_OK) {
@@ -134,6 +138,7 @@ int32_t SoftbusPublish::StopPublishSoftbusLNN(int32_t publishId)
         LOGE("[SOFTBUS]StopPublishLNN failed, ret: %{public}d.", ret);
         return ERR_DM_STOP_PUBLISH_LNN_FAILED;
     }
+    LOGI("StopPublishLNN successed, ret: %{public}d.", ret);
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -41,7 +41,7 @@ AuthCert::~AuthCert()
 bool AuthCert::IsDMAdapterAuthCertLoaded()
 {
     LOGI("Start.");
-    std::lock_guard<std::mutex> lock(isAdapterAuthCertLoadedLock_);
+    std::lock_guard<ffrt::mutex> lock(isAdapterAuthCertLoadedLock_);
     if (isAdapterAuthCertSoLoaded_ && (dmAuthCertExt_ != nullptr)) {
         return true;
     }
