@@ -55,7 +55,7 @@ bool DmAccountCommonEventManager::SubscribeAccountCommonEvent(const std::vector<
         LOGE("eventNameVec is empty or callback is nullptr.");
         return false;
     }
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
         LOGE("failed to subscribe account commom eventName size: %{public}zu", eventNameVec.size());
         return false;
@@ -98,7 +98,7 @@ bool DmAccountCommonEventManager::SubscribeAccountCommonEvent(const std::vector<
 
 bool DmAccountCommonEventManager::UnsubscribeAccountCommonEvent()
 {
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
         LOGE("failed to unsubscribe account commom event name size: %{public}zu because event is invalid.",
             eventNameVec_.size());

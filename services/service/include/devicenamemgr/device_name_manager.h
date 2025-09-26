@@ -17,11 +17,11 @@
 #define OHOS_DEVICE_NAME_MANAGER_H
 
 #include <memory>
-#include <mutex>
 #include <string>
 
 #include "datashare_helper.h"
 #include "device_name_change_monitor.h"
+#include "ffrt.h"
 #include "single_instance.h"
 
 namespace OHOS {
@@ -54,8 +54,8 @@ private:
     void RegisterDeviceNameChangeMonitor(int32_t curUserId, int32_t preUserId);
     void UnRegisterDeviceNameChangeMonitor(int32_t userId);
     void InitDeviceName(int32_t userId);
-    void InitDeviceNameToSoftBus(const std::string &prefixName, const std::string &subffixName);
-    std::string GetLocalDisplayDeviceName(const std::string &prefixName, const std::string &subffixName,
+    void InitDeviceNameToSoftBus(const std::string &prefixName, const std::string &suffixName);
+    std::string GetLocalDisplayDeviceName(const std::string &prefixName, const std::string &suffixName,
         int32_t maxNamelength);
     std::string SubstrByBytes(const std::string &str, int32_t maxNumBytes);
 
@@ -80,11 +80,11 @@ private:
 
     sptr<IRemoteObject> GetRemoteObj();
 private:
-    std::mutex remoteObjMtx_;
+    ffrt::mutex remoteObjMtx_;
     sptr<IRemoteObject> remoteObj_ = nullptr;
-    std::mutex localMarketNameMtx_;
+    ffrt::mutex localMarketNameMtx_;
     std::string localMarketName_ = "";
-    std::mutex monitorMapMtx_;
+    ffrt::mutex monitorMapMtx_;
     std::map<int32_t, sptr<DeviceNameChangeMonitor>> monitorMap_;
     std::atomic<bool> isDataShareReady_ = false;
     std::atomic<bool> isAccountSysReady_ = false;

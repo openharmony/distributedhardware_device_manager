@@ -127,11 +127,11 @@ int32_t DeviceNameManager::InitDeviceNameWhenSoftBusReady()
 int32_t DeviceNameManager::UnInit()
 {
     {
-        std::lock_guard<std::mutex> lock(remoteObjMtx_);
+        std::lock_guard<ffrt::mutex> lock(remoteObjMtx_);
         remoteObj_ = nullptr;
     }
     {
-        std::lock_guard<std::mutex> lock(monitorMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(monitorMapMtx_);
         monitorMap_.clear();
     }
     return DM_OK;
@@ -215,7 +215,7 @@ void DeviceNameManager::RegisterDeviceNameChangeMonitor(int32_t curUserId, int32
     }
     sptr<DeviceNameChangeMonitor> monitor = nullptr;
     {
-        std::lock_guard<std::mutex> lock(monitorMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(monitorMapMtx_);
         auto iter = monitorMap_.find(curUserId);
         if (iter != monitorMap_.end()) {
             return;
@@ -233,7 +233,7 @@ void DeviceNameManager::RegisterDeviceNameChangeMonitor(int32_t curUserId, int32
     if (helper == nullptr) {
         LOGE("helper is nullptr");
         {
-            std::lock_guard<std::mutex> lock(monitorMapMtx_);
+            std::lock_guard<ffrt::mutex> lock(monitorMapMtx_);
             auto iter = monitorMap_.find(curUserId);
             if (iter != monitorMap_.end()) {
                 monitorMap_.erase(iter);
@@ -255,7 +255,7 @@ void DeviceNameManager::UnRegisterDeviceNameChangeMonitor(int32_t userId)
     }
     sptr<DeviceNameChangeMonitor> monitor = nullptr;
     {
-        std::lock_guard<std::mutex> lock(monitorMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(monitorMapMtx_);
         auto iter = monitorMap_.find(userId);
         if (iter != monitorMap_.end()) {
             monitor = iter->second;
@@ -302,14 +302,14 @@ void DeviceNameManager::InitDeviceName(int32_t userId)
     InitDisplayDeviceNameToSettingsData(nickName, deviceName, userId);
 }
 
-void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, const std::string &subffixName)
+void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, const std::string &suffixName)
 {
-    LOGI("In prefixName:%{public}s, subffixName:%{public}s",
-        GetAnonyString(prefixName).c_str(), GetAnonyString(subffixName).c_str());
-    std::string raw = GetLocalDisplayDeviceName(prefixName, subffixName, 0);
-    std::string name18 = GetLocalDisplayDeviceName(prefixName, subffixName, NUM18);
-    std::string name21 = GetLocalDisplayDeviceName(prefixName, subffixName, NUM21);
-    std::string name24 = GetLocalDisplayDeviceName(prefixName, subffixName, NUM24);
+    LOGI("In prefixName:%{public}s, suffixName:%{public}s",
+        GetAnonyString(prefixName).c_str(), GetAnonyString(suffixName).c_str());
+    std::string raw = GetLocalDisplayDeviceName(prefixName, suffixName, 0);
+    std::string name18 = GetLocalDisplayDeviceName(prefixName, suffixName, NUM18);
+    std::string name21 = GetLocalDisplayDeviceName(prefixName, suffixName, NUM21);
+    std::string name24 = GetLocalDisplayDeviceName(prefixName, suffixName, NUM24);
     cJSON *root = cJSON_CreateObject();
     if (root == NULL) {
         LOGE("cJSON_CreateObject fail!");
@@ -351,14 +351,14 @@ int32_t DeviceNameManager::GetLocalDisplayDeviceName(int32_t maxNamelength, std:
     return DM_OK;
 }
 
-std::string DeviceNameManager::GetLocalDisplayDeviceName(const std::string &prefixName, const std::string &subffixName,
+std::string DeviceNameManager::GetLocalDisplayDeviceName(const std::string &prefixName, const std::string &suffixName,
     int32_t maxNameLength)
 {
     if (prefixName.empty()) {
-        if (maxNameLength == 0 || static_cast<int32_t>(subffixName.size()) <= maxNameLength) {
-            return subffixName;
+        if (maxNameLength == 0 || static_cast<int32_t>(suffixName.size()) <= maxNameLength) {
+            return suffixName;
         }
-        return SubstrByBytes(subffixName, maxNameLength - NUM3) + DEFAULT_CONCATENATION_CHARACTER;
+        return SubstrByBytes(suffixName, maxNameLength - NUM3) + DEFAULT_CONCATENATION_CHARACTER;
     }
     int32_t defaultNameMaxLength = DEFAULT_DEVICE_NAME_MAX_LENGTH;
     if (maxNameLength >= NUM21) {
@@ -368,19 +368,19 @@ std::string DeviceNameManager::GetLocalDisplayDeviceName(const std::string &pref
     if (GetSystemLanguage() != LANGUAGE_ZH_HANS || GetSystemRegion() != LOCAL_ZH_HANS_CN) {
         nameSeparator = NAME_SEPARATOR_OTHER;
     }
-    std::string displayName = prefixName + nameSeparator + subffixName;
+    std::string displayName = prefixName + nameSeparator + suffixName;
     if (maxNameLength == 0 || static_cast<int32_t>(displayName.size()) <= maxNameLength) {
         return displayName;
     }
-    std::string subffix = subffixName;
-    if (static_cast<int32_t>(subffixName.size()) > defaultNameMaxLength) {
-        subffix = SubstrByBytes(subffixName, defaultNameMaxLength - NUM3) + DEFAULT_CONCATENATION_CHARACTER;
+    std::string suffix = suffixName;
+    if (static_cast<int32_t>(suffixName.size()) > defaultNameMaxLength) {
+        suffix = SubstrByBytes(suffixName, defaultNameMaxLength - NUM3) + DEFAULT_CONCATENATION_CHARACTER;
     }
-    int32_t remainingLen = maxNameLength - static_cast<int32_t>(subffix.size());
+    int32_t remainingLen = maxNameLength - static_cast<int32_t>(suffix.size());
     if (remainingLen <= 0) {
-        return subffix;
+        return suffix;
     }
-    displayName = prefixName + nameSeparator + subffix;
+    displayName = prefixName + nameSeparator + suffix;
     if (static_cast<int32_t>(displayName.size()) <= maxNameLength) {
         return displayName;
     }
@@ -389,7 +389,7 @@ std::string DeviceNameManager::GetLocalDisplayDeviceName(const std::string &pref
     if (static_cast<int32_t>(prefix.size()) > remainingLen) {
         prefix = SubstrByBytes(prefix, remainingLen) + DEFAULT_CONCATENATION_CHARACTER;
     }
-    displayName = prefix + subffix;
+    displayName = prefix + suffix;
     return displayName;
 }
 
@@ -518,7 +518,7 @@ std::string DeviceNameManager::GetSystemRegion()
 
 std::string DeviceNameManager::GetLocalMarketName()
 {
-    std::lock_guard<std::mutex> lock(localMarketNameMtx_);
+    std::lock_guard<ffrt::mutex> lock(localMarketNameMtx_);
     if (localMarketName_.empty()) {
         const char *marketName = GetMarketName();
         if (marketName == nullptr) {
@@ -578,7 +578,7 @@ int32_t DeviceNameManager::SetDeviceName(const std::string &deviceName)
 
 sptr<IRemoteObject> DeviceNameManager::GetRemoteObj()
 {
-    std::lock_guard<std::mutex> lock(remoteObjMtx_);
+    std::lock_guard<ffrt::mutex> lock(remoteObjMtx_);
     if (remoteObj_ != nullptr) {
         return remoteObj_;
     }

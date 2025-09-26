@@ -112,7 +112,7 @@ private:
     bool GetCurrentTimeSec(int32_t &sec);
     std::map<std::string, int32_t> recvBroadCastIdMap_;
     std::shared_ptr<DmTimer> timer_;
-    std::mutex lock_;
+    ffrt::mutex lock_;
 };
 
 const std::string GetUserIdInfoList(const std::vector<UserIdInfo> &list);

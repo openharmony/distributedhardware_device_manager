@@ -16,7 +16,6 @@
 #ifndef OHOS_DM_COMM_TOOL_H
 #define OHOS_DM_COMM_TOOL_H
 
-#include <mutex>
 #include <queue>
 #include "dm_transport.h"
 #include "dm_transport_msg.h"
@@ -86,7 +85,7 @@ public:
 private:
     std::shared_ptr<DMTransport> dmTransportPtr_;
     std::shared_ptr<DMCommTool::DMCommToolEventHandler> eventHandler_;
-    mutable std::mutex eventMutex_;
+    mutable ffrt::mutex eventMutex_;
     std::shared_ptr<ffrt::queue> eventQueue_;
 };
 } // DistributedHardware

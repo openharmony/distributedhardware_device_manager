@@ -80,9 +80,9 @@ private:
     bool isSynced_ = false;
     DeviceFreezeState freezeStateCache_;
     BindFailedEvents bindFailedEventsCache_;
-    std::mutex freezeStateCacheMtx_;
-    std::mutex bindFailedEventsCacheMtx_;
-    std::mutex isSyncedMtx_;
+    ffrt::mutex freezeStateCacheMtx_;
+    ffrt::mutex bindFailedEventsCacheMtx_;
+    ffrt::mutex isSyncedMtx_;
 };
 
 } // namespace DistributedHardware

@@ -896,7 +896,7 @@ int32_t DMCommTool::StartCommonEvent(std::string commonEventType, EventCallback 
     }
     CHECK_NULL_RETURN(eventQueue_, ERR_DM_POINT_NULL);
     LOGI("StartCommonEvent start eventType: %{public}s", commonEventType.c_str());
-    std::lock_guard<std::mutex> locker(eventMutex_);
+    std::lock_guard<ffrt::mutex> locker(eventMutex_);
     auto taskFunc = [eventCallback] () { eventCallback(); };
     eventQueue_->submit(taskFunc);
     return DM_OK;

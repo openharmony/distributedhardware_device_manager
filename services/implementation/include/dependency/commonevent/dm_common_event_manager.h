@@ -27,6 +27,7 @@
 #include "common_event_subscribe_info.h"
 #include "common_event_subscriber.h"
 #include "dm_log.h"
+#include "ffrt.h"
 #include "matching_skills.h"
 #include "dm_single_instance.h"
 #include "system_ability_status_change_stub.h"
@@ -62,7 +63,7 @@ public:
 private:
     std::vector<std::string> eventNameVec_;
     bool eventValidFlag_ = false;
-    std::mutex evenSubscriberMutex_;
+    ffrt::mutex evenSubscriberMutex_;
     std::shared_ptr<DmEventSubscriber> subscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 

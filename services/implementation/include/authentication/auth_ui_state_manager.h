@@ -21,6 +21,7 @@
 #include <string>
 
 #include "dm_ability_manager.h"
+#include "ffrt.h"
 #include "idevice_manager_service_listener.h"
 
 namespace OHOS {
@@ -43,7 +44,7 @@ public:
     void UpdateUiState(const DmUiStateMsg msg);
 private:
     std::set<ProcessInfo> pkgSet_;
-    std::mutex pkgSetMutex_;
+    ffrt::mutex pkgSetMutex_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
 };
 

@@ -55,7 +55,7 @@ int32_t KVAdapter::Init()
     }
     this->appId_.appId = APP_ID;
     this->storeId_.storeId = STORE_ID;
-    std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+    std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
     int32_t tryTimes = MAX_INIT_RETRY_TIMES;
     while (tryTimes > 0) {
         DistributedKv::Status status = GetLocalKvStorePtr();
@@ -71,7 +71,7 @@ int32_t KVAdapter::Init()
             LOGE("init db error, remove and rebuild it");
             DeleteKvStore();
         }
-        usleep(INIT_RETRY_SLEEP_INTERVAL);
+        ffrt_usleep(INIT_RETRY_SLEEP_INTERVAL);
         tryTimes--;
     }
     CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_INIT_FAILED);
@@ -83,7 +83,7 @@ void KVAdapter::UnInit()
 {
     LOGI("KVAdapter UnInit");
     if (isInited_.load()) {
-        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
         CHECK_NULL_VOID(kvStorePtr_);
         kvStorePtr_.reset();
         isInited_.store(false);
@@ -105,7 +105,7 @@ int32_t KVAdapter::Put(const std::string &key, const std::string &value)
     }
     DistributedKv::Status status;
     {
-        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
         CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
 
         DistributedKv::Key kvKey(key);
@@ -126,7 +126,7 @@ int32_t KVAdapter::Get(const std::string &key, std::string &value)
     DistributedKv::Value kvValue;
     DistributedKv::Status status;
     {
-        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
         CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
         status = kvStorePtr_->Get(kvKey, kvValue);
     }
@@ -149,7 +149,7 @@ DistributedKv::Status KVAdapter::GetLocalKvStorePtr()
         .kvStoreType = DistributedKv::KvStoreType::SINGLE_VERSION,
         .baseDir = DATABASE_DIR
     };
-    std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
+    std::lock_guard<ffrt::mutex> lock(kvDataMgrMutex_);
     DistributedKv::Status status = kvDataMgr_.GetSingleKvStore(options, appId_, storeId_, kvStorePtr_);
     return status;
 }
@@ -157,7 +157,7 @@ DistributedKv::Status KVAdapter::GetLocalKvStorePtr()
 int32_t KVAdapter::DeleteKvStore()
 {
     LOGI("Delete KvStore!");
-    std::lock_guard<std::mutex> lock(kvDataMgrMutex_);
+    std::lock_guard<ffrt::mutex> lock(kvDataMgrMutex_);
     kvDataMgr_.CloseKvStore(appId_, storeId_);
     kvDataMgr_.DeleteKvStore(appId_, storeId_, DATABASE_DIR);
     return DM_OK;
@@ -171,7 +171,7 @@ int32_t KVAdapter::DeleteByAppId(const std::string &appId, const std::string &pr
     }
     std::vector<DistributedKv::Entry> localEntries;
     {
-        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
         if (kvStorePtr_ == nullptr) {
             LOGE("kvStoragePtr_ is null");
             return ERR_DM_POINT_NULL;
@@ -211,7 +211,7 @@ int32_t KVAdapter::DeleteBatch(const std::vector<std::string> &keys)
     }
 
     {
-        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
         if (kvStorePtr_ == nullptr) {
             LOGE("kvStorePtr is nullptr!");
             return ERR_DM_POINT_NULL;
@@ -231,7 +231,7 @@ int32_t KVAdapter::Delete(const std::string& key)
 {
     DistributedKv::Status status;
     {
-        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
         if (kvStorePtr_ == nullptr) {
             LOGE("kvStorePtr is nullptr!");
             return ERR_DM_POINT_NULL;
@@ -254,7 +254,7 @@ int32_t KVAdapter::GetAllOstypeData(const std::string &key, std::vector<std::str
     }
     std::vector<DistributedKv::Entry> localEntries;
     {
-        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
         CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
         if (kvStorePtr_->GetEntries(key, localEntries) != DistributedKv::Status::SUCCESS) {
             LOGE("Get entrys from DB failed.");
@@ -289,7 +289,7 @@ int32_t KVAdapter::GetOstypeCountByPrefix(const std::string &prefix, int32_t &co
         return ERR_DM_FAILED;
     }
     {
-        std::lock_guard<std::mutex> lock(kvAdapterMutex_);
+        std::lock_guard<ffrt::mutex> lock(kvAdapterMutex_);
         CHECK_NULL_RETURN(kvStorePtr_, ERR_DM_POINT_NULL);
         DataQuery prefixQuery;
         prefixQuery.KeyPrefix(prefix);

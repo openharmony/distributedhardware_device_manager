@@ -59,7 +59,7 @@ int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outp
         return ERR_DM_CRYPTO_PARA_INVALID;
     }
 
-    std::lock_guard<std::mutex> lock(sessionKeyMtx_);
+    std::lock_guard<ffrt::mutex> lock(sessionKeyMtx_);
     AesGcmCipherKey cipherKey = {.keyLen = sessionKey_.keyLen};
     if (memcpy_s(cipherKey.key, SESSION_KEY_LENGTH, sessionKey_.key, sessionKey_.keyLen) != EOK) {
         LOGE("set key fail");
@@ -176,7 +176,7 @@ int32_t CryptoMgr::GenerateRandomArray(unsigned char *randStr, uint32_t len)
     int32_t ret;
 
     if (!initFlag) {
-        std::lock_guard<std::mutex> lock(randomLock_);
+        std::lock_guard<ffrt::mutex> lock(randomLock_);
         mbedtls_ctr_drbg_init(&ctrDrbg);
         mbedtls_entropy_init(&entropy);
         ret = mbedtls_ctr_drbg_seed(&ctrDrbg, mbedtls_entropy_func, &entropy, NULL, 0);
@@ -187,7 +187,7 @@ int32_t CryptoMgr::GenerateRandomArray(unsigned char *randStr, uint32_t len)
         initFlag = true;
     }
 
-    std::lock_guard<std::mutex> lock(randomLock_);
+    std::lock_guard<ffrt::mutex> lock(randomLock_);
     ret = mbedtls_ctr_drbg_random(&ctrDrbg, randStr, len);
     if (ret != 0) {
         LOGE("gen random error, ret=%{public}d", ret);
@@ -206,7 +206,7 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
     }
     Crypto::ConvertHexStringToBytes(inputMsgBytsTemp, inputMsgBytesLen,
         reinterpret_cast<const char*>(inputMsg.c_str()), inputMsg.length());
-    std::lock_guard<std::mutex> lock(sessionKeyMtx_);
+    std::lock_guard<ffrt::mutex> lock(sessionKeyMtx_);
     AesGcmCipherKey cipherKey = {.keyLen = sessionKey_.keyLen};
     if (memcpy_s(cipherKey.key, SESSION_KEY_LENGTH, sessionKey_.key, sessionKey_.keyLen) != EOK) {
         LOGE("set key fail");
@@ -306,7 +306,7 @@ int32_t CryptoMgr::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyL
 
     ClearSessionKey();
     {
-        std::lock_guard<std::mutex> lock(sessionKeyMtx_);
+        std::lock_guard<ffrt::mutex> lock(sessionKeyMtx_);
         sessionKey_.key = (uint8_t*)calloc(keyLen, sizeof(uint8_t));
         sessionKey_.keyLen = keyLen;
     }
@@ -315,13 +315,13 @@ int32_t CryptoMgr::SaveSessionKey(const uint8_t *sessionKey, const uint32_t keyL
 
 std::vector<unsigned char> CryptoMgr::GetSessionKey()
 {
-    std::lock_guard<std::mutex> lock(sessionKeyMtx_);
+    std::lock_guard<ffrt::mutex> lock(sessionKeyMtx_);
     return std::vector<unsigned char>(sessionKey_.key, sessionKey_.key + sessionKey_.keyLen);
 }
 
 void CryptoMgr::ClearSessionKey()
 {
-    std::lock_guard<std::mutex> lock(sessionKeyMtx_);
+    std::lock_guard<ffrt::mutex> lock(sessionKeyMtx_);
     if (sessionKey_.key != nullptr) {
         (void)memset_s(sessionKey_.key, sessionKey_.keyLen, 0, sessionKey_.keyLen);
         free(sessionKey_.key);
@@ -338,7 +338,7 @@ int32_t CryptoMgr::ProcessSessionKey(const uint8_t *sessionKey, const uint32_t k
     }
     ClearSessionKey();
     {
-        std::lock_guard<std::mutex> lock(sessionKeyMtx_);
+        std::lock_guard<ffrt::mutex> lock(sessionKeyMtx_);
         sessionKey_.key = (uint8_t*)calloc(keyLen, sizeof(uint8_t));
         if (memcpy_s(sessionKey_.key, keyLen, sessionKey, keyLen) != DM_OK) {
             LOGE("memcpy_s failed.");

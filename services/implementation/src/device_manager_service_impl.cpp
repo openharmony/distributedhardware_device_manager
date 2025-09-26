@@ -35,14 +35,12 @@
 #include "multiple_user_connector.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "dm_common_event_manager.h"
 #include "parameter.h"
 #include "dm_random.h"
 #include "common_event_support.h"
 #include "ffrt.h"
 using namespace OHOS::EventFwk;
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -202,7 +200,7 @@ void DeviceManagerServiceImpl::ImportConfig(std::shared_ptr<AuthManagerBase> aut
     const std::string &pkgName)
 {
     // Import configuration
-    std::lock_guard<std::mutex> configsLock(configsMapMutex_);
+    std::lock_guard<ffrt::mutex> configsLock(configsMapMutex_);
     if (configsMap_.find(tokenId) != configsMap_.end()) {
         authMgr->ImportAuthCode(configsMap_[tokenId]->pkgName, configsMap_[tokenId]->authCode);
         authMgr->RegisterAuthenticationType(configsMap_[tokenId]->authenticationType);
@@ -235,7 +233,7 @@ void DeviceManagerServiceImpl::ImportAuthCodeToConfig(std::shared_ptr<AuthManage
     std::string pkgName;
     std::string authCode;
     authMgr->GetAuthCodeAndPkgName(pkgName, authCode);
-    std::lock_guard<std::mutex> configsLock(configsMapMutex_);
+    std::lock_guard<ffrt::mutex> configsLock(configsMapMutex_);
     if (configsMap_.find(tokenId) == configsMap_.end()) {
         configsMap_[tokenId] = std::make_shared<Config>();
     }
@@ -275,7 +273,7 @@ int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const
 {
     LOGI("tokenId: %{public}s, pkgname:%{public}s", GetAnonyInt32(tokenId).c_str(), pkgName.c_str());
     {
-        std::lock_guard<std::mutex> lock(authMgrMtx_);
+        std::lock_guard<ffrt::mutex> lock(authMgrMtx_);
         if (authMgr_ == nullptr) {
             CreateGlobalClassicalAuthMgr();
         }
@@ -289,7 +287,7 @@ int32_t DeviceManagerServiceImpl::InitOldProtocolAuthMgr(uint64_t tokenId, const
     }
     {
         // The value of logicalSessionId in the old protocol is always 0.
-        std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         logicalSessionId2TokenIdMap_[0] = tokenId;
     }
     return DM_OK;
@@ -329,9 +327,9 @@ void DeviceManagerServiceImpl::CleanSessionMap(std::shared_ptr<Session> session)
     session->logicalSessionCnt_.fetch_sub(1);
     if (session->logicalSessionCnt_.load(std::memory_order_relaxed) <= 0) {
         {
-            std::lock_guard<std::mutex> lock(isNeedJoinLnnMtx_);
+            std::lock_guard<ffrt::mutex> lock(isNeedJoinLnnMtx_);
             if (isNeedJoinLnn_) {
-                usleep(USLEEP_TIME_US_500000);
+                ffrt_usleep(USLEEP_TIME_US_500000);
             }
             isNeedJoinLnn_ = true;
         }
@@ -346,7 +344,7 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
         softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
     }
     {
-        std::lock_guard<std::mutex> lock(mapMutex_);
+        std::lock_guard<ffrt::mutex> lock(mapMutex_);
         std::shared_ptr<Session> session = nullptr;
         if (sessionsMap_.find(sessionId) != sessionsMap_.end()) {
             session = sessionsMap_[sessionId];
@@ -367,12 +365,12 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
 void DeviceManagerServiceImpl::CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId)
 {
     {
-        std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         logicalSessionId2TokenIdMap_.erase(logicalSessionId);
     }
     int32_t sessionId = 0;
     {
-        std::lock_guard<std::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
         if (logicalSessionId2SessionIdMap_.find(logicalSessionId) == logicalSessionId2SessionIdMap_.end()) {
             return;
         }
@@ -394,7 +392,7 @@ void DeviceManagerServiceImpl::CleanAuthMgrByLogicalSessionId(uint64_t logicalSe
     }
     uint64_t tokenId = 0;
     {
-        std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         if (logicalSessionId2TokenIdMap_.find(logicalSessionId) != logicalSessionId2TokenIdMap_.end()) {
             tokenId = logicalSessionId2TokenIdMap_[logicalSessionId];
         } else {
@@ -422,14 +420,14 @@ int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, st
         return ERR_DM_POINT_NULL;
     }
     {
-        std::lock_guard<std::mutex> mapLock(mapMutex_);
+        std::lock_guard<ffrt::mutex> mapLock(mapMutex_);
         if (sessionEnableMap_.find(sessionId) != sessionEnableMap_.end() && !sessionEnableMap_[sessionId]) {
             LOGE("session is not open, no need add authMgr.");
             return ERR_DM_AUTH_OPEN_SESSION_FAILED;
         }
     }
     {
-        std::lock_guard<std::mutex> lock(authMgrMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         if (authMgrMap_.size() >= MAX_NEW_PROC_SESSION_COUNT_TEMP) {
             LOGE("Other bind session exist, can not start new one. authMgrMap_.size:%{public}zu", authMgrMap_.size());
             return ERR_DM_AUTH_BUSINESS_BUSY;
@@ -437,7 +435,7 @@ int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, st
         authMgrMap_[tokenId] = authMgr;
     }
     {
-        std::lock_guard<std::mutex> mapLock(tokenIdSessionIdMapMtx_);
+        std::lock_guard<ffrt::mutex> mapLock(tokenIdSessionIdMapMtx_);
         if (tokenIdSessionIdMap_.find(tokenId) == tokenIdSessionIdMap_.end()) {
             tokenIdSessionIdMap_[tokenId] = sessionId;
         }
@@ -448,14 +446,14 @@ int32_t DeviceManagerServiceImpl::AddAuthMgr(uint64_t tokenId, int sessionId, st
 void DeviceManagerServiceImpl::EraseAuthMgr(uint64_t tokenId)
 {
     {
-        std::lock_guard<std::mutex> lock(authMgrMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         if (authMgrMap_.find(tokenId) != authMgrMap_.end()) {
             LOGI("authMgrMap_ erase token: %{public}" PRIu64 ".", tokenId);
             authMgrMap_.erase(tokenId);
         }
     }
     {
-        std::lock_guard<std::mutex> lock(tokenIdSessionIdMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
         LOGI("tokenIdSessionIdMap_ erase token: %{public}" PRIu64 ".", tokenId);
         tokenIdSessionIdMap_.erase(tokenId);
     }
@@ -465,7 +463,7 @@ void DeviceManagerServiceImpl::EraseAuthMgr(uint64_t tokenId)
 std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgrByTokenId(uint64_t tokenId)
 {
     {
-        std::lock_guard<std::mutex> lock(authMgrMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         if (authMgrMap_.find(tokenId) != authMgrMap_.end()) {
             LOGI("authMgrMap_ token: %{public}" PRIu64 ".", tokenId);
             return authMgrMap_[tokenId];
@@ -479,13 +477,13 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetCurrentAuthMgr()
 {
     uint64_t tokenId = 0;
     {
-        std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         if (logicalSessionId2TokenIdMap_.find(0) != logicalSessionId2TokenIdMap_.end()) {
             tokenId = logicalSessionId2TokenIdMap_[0];
         }
     }
     {
-        std::lock_guard<std::mutex> lock(authMgrMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         for (auto &pair : authMgrMap_) {
             if (pair.first != tokenId) {
                 return pair.second;
@@ -554,7 +552,7 @@ int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManage
 void DeviceManagerServiceImpl::ReleaseMaps()
 {
     {
-        std::lock_guard<std::mutex> lock(authMgrMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         for (auto& pair : authMgrMap_) {
             pair.second = nullptr;
         }
@@ -565,7 +563,7 @@ void DeviceManagerServiceImpl::ReleaseMaps()
     }
     sessionsMap_.clear();
     {
-        std::lock_guard<std::mutex> configsLock(configsMapMutex_);
+        std::lock_guard<ffrt::mutex> configsLock(configsMapMutex_);
         for (auto& pair : configsMap_) {
             pair.second = nullptr;
         }
@@ -578,11 +576,11 @@ void DeviceManagerServiceImpl::ReleaseMaps()
     sessionEnableMap_.clear();
     sessionEnableCvReadyMap_.clear();
     {
-        std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         logicalSessionId2TokenIdMap_.clear();
     }
     {
-        std::lock_guard<std::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
         logicalSessionId2SessionIdMap_.clear();
     }
 }
@@ -648,7 +646,7 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
     int32_t tryCnt = 0;
     while (tryCnt < MAX_TRY_STOP_CNT) {
         {
-            std::lock_guard<std::mutex> lock(tokenIdSessionIdMapMtx_);
+            std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
             if (tokenIdSessionIdMap_.find(tokenId) == tokenIdSessionIdMap_.end()) {
                 LOGI("sessionId not create, pkgName:%{public}s, tokenId:%{public}" PRIu64, pkgName.c_str(), tokenId);
                 return DM_OK;
@@ -658,7 +656,7 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
         if (sessionId > 0) {
             break;
         }
-        usleep(USLEEP_TIME_US_20000);
+        ffrt_usleep(USLEEP_TIME_US_20000);
         tryCnt++;
     }
     if (sessionId == DEFAULT_SESSION_ID) {
@@ -667,7 +665,7 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
     }
     LOGI("pkgName:%{public}s, sessionId:%{public}d, tokenId:%{public}" PRIu64, pkgName.c_str(), sessionId, tokenId);
     if (sessionEnableCvMap_.find(sessionId) != sessionEnableCvMap_.end()) {
-        std::unique_lock<std::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
+        std::unique_lock<ffrt::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
         if (sessionEnableMap_.find(sessionId) != sessionEnableMap_.end() && !sessionEnableMap_[sessionId]) {
             sessionStopMap_[sessionId] = true;
         }
@@ -680,7 +678,7 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
     if (authMgr != nullptr) {
         ret = authMgr->StopAuthenticateDevice(pkgName);
         if (ret == DM_OK) {
-            usleep(USLEEP_TIME_US_550000);
+            ffrt_usleep(USLEEP_TIME_US_550000);
         }
     } else {
         CleanSessionMap(sessionId);
@@ -930,7 +928,7 @@ int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
 {
     bool isNeedCloseSession = false;
     if (sessionEnableCvMap_.find(sessionId) != sessionEnableCvMap_.end()) {
-        std::lock_guard<std::mutex> lock(sessionEnableMutexMap_[sessionId]);
+        std::lock_guard<ffrt::mutex> lock(sessionEnableMutexMap_[sessionId]);
         if (result == 0) {
             LOGI("OnSessionOpened successful, sessionId: %{public}d", sessionId);
             if (sessionStopMap_.find(sessionId) != sessionStopMap_.end() && sessionStopMap_[sessionId]) {
@@ -962,7 +960,7 @@ int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
     }
     // Get the remote deviceId, sink end gives sessionsMap[deviceId] = session;
     {
-        std::lock_guard<std::mutex> lock(mapMutex_);
+        std::lock_guard<ffrt::mutex> lock(mapMutex_);
         if (sessionsMap_.find(sessionId) == sessionsMap_.end()) {
             sessionsMap_[sessionId] = std::make_shared<Session>(sessionId, peerUdid);
         }
@@ -996,7 +994,7 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetCurSession(int sessionId)
     std::shared_ptr<Session> curSession = nullptr;
     // Get the remote deviceId, sink end gives sessionsMap[deviceId] = session;
     {
-        std::lock_guard<std::mutex> lock(mapMutex_);
+        std::lock_guard<ffrt::mutex> lock(mapMutex_);
         if (sessionsMap_.find(sessionId) != sessionsMap_.end()) {
             curSession = sessionsMap_[sessionId];
         } else {
@@ -1028,7 +1026,7 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgrByMessage(i
             return nullptr;
         }
         curSession->logicalSessionSet_.insert(logicalSessionId);
-        std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         if (logicalSessionId2TokenIdMap_.find(logicalSessionId) != logicalSessionId2TokenIdMap_.end()) {
             LOGE("GetAuthMgrByMessage, logicalSessionId exists in logicalSessionId2TokenIdMap_.");
             return nullptr;
@@ -1039,7 +1037,7 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgrByMessage(i
             LOGE("GetAuthMgrByMessage, The logical session ID does not exist in the physical session.");
             return nullptr;
         }
-        std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         tokenId = logicalSessionId2TokenIdMap_[logicalSessionId];
     }
 
@@ -1049,11 +1047,11 @@ std::shared_ptr<AuthManagerBase> DeviceManagerServiceImpl::GetAuthMgrByMessage(i
 int32_t DeviceManagerServiceImpl::GetLogicalIdAndTokenIdBySessionId(uint64_t &logicalSessionId,
     uint64_t &tokenId, int32_t sessionId)
 {
-    std::lock_guard<std::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+    std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
     for (auto& pair : logicalSessionId2SessionIdMap_) {
         if (pair.second == sessionId) {
             logicalSessionId = pair.first;
-            std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+            std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
             tokenId = logicalSessionId2TokenIdMap_[logicalSessionId];
         }
     }
@@ -1126,7 +1124,7 @@ int32_t DeviceManagerServiceImpl::TransferByAuthType(int32_t authType,
         authMgr_->EnableInsensibleSwitching();
         curSession->logicalSessionSet_.insert(0);
         {
-            std::lock_guard<std::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+            std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
             logicalSessionId2SessionIdMap_[0] = sessionId;
         }
         authMgr->OnSessionDisable();
@@ -1533,7 +1531,7 @@ int32_t DeviceManagerServiceImpl::GetUdidHashByNetWorkId(const char *networkId, 
 std::shared_ptr<Config> DeviceManagerServiceImpl::GetConfigByTokenId()
 {
     uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
-    std::lock_guard<std::mutex> configsLock(configsMapMutex_);
+    std::lock_guard<ffrt::mutex> configsLock(configsMapMutex_);
     if (configsMap_.find(tokenId) == configsMap_.end()) {
         configsMap_[tokenId] = std::make_shared<Config>();
     }
@@ -1661,7 +1659,7 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
     // Check again whether the corresponding object already exists (because other threads may have created it during
     //  the lock acquisition in the previous step)
 
-    std::lock_guard<std::mutex> lock(mapMutex_);
+    std::lock_guard<ffrt::mutex> lock(mapMutex_);
     if (deviceId2SessionIdMap_.find(deviceId) != deviceId2SessionIdMap_.end()) {
         sessionId = deviceId2SessionIdMap_[deviceId];
     }
@@ -1676,11 +1674,11 @@ std::shared_ptr<Session> DeviceManagerServiceImpl::GetOrCreateSession(const std:
     }
 
     {
-        std::lock_guard<std::mutex> lock(tokenIdSessionIdMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
         tokenIdSessionIdMap_[tokenId] = sessionId;
     }
 
-    std::unique_lock<std::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
+    std::unique_lock<ffrt::mutex> cvLock(sessionEnableMutexMap_[sessionId]);
     sessionEnableCvReadyMap_[sessionId] = false;
     sessionStopMap_[sessionId] = false;
     sessionEnableMap_[sessionId] = false;
@@ -1788,7 +1786,7 @@ int32_t DeviceManagerServiceImpl::ParseConnectAddr(const PeerTargetId &targetId,
     }
     LOGI("isNeedJoinLnnStr: %{public}s.", isNeedJoinLnnStr.c_str());
     {
-        std::lock_guard<std::mutex> lock(isNeedJoinLnnMtx_);
+        std::lock_guard<ffrt::mutex> lock(isNeedJoinLnnMtx_);
         if (isNeedJoinLnnStr == NEED_JOIN_LNN || isNeedJoinLnnStr == NO_NEED_JOIN_LNN) {
             isNeedJoinLnn_ = std::atoi(isNeedJoinLnnStr.c_str());
         }
@@ -1816,11 +1814,11 @@ void DeviceManagerServiceImpl::SaveTokenIdAndSessionId(uint64_t &tokenId,
     int32_t &sessionId, uint64_t &logicalSessionId)
 {
     {
-        std::lock_guard<std::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
+        std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
         logicalSessionId2TokenIdMap_[logicalSessionId] = tokenId;
     }
     {
-        std::lock_guard<std::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
+        std::lock_guard<ffrt::mutex> sessionIdLock(logicalSessionId2SessionIdMapMtx_);
         logicalSessionId2SessionIdMap_[logicalSessionId] = sessionId;
     }
 }
@@ -1850,7 +1848,7 @@ void DeviceManagerServiceImpl::OnAuthResultAndOnBindResult(const ProcessInfo &pr
     const std::string &deviceId, int32_t reason, uint64_t tokenId)
 {
     {
-        std::lock_guard<std::mutex> lock(tokenIdSessionIdMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
         auto iter = tokenIdSessionIdMap_.find(tokenId);
         if (iter != tokenIdSessionIdMap_.end()) {
             tokenIdSessionIdMap_.erase(iter);
@@ -1932,7 +1930,7 @@ int32_t DeviceManagerServiceImpl::BindTarget(const std::string &pkgName, const P
     uint64_t tokenId = IPCSkeleton::GetCallingTokenID();
     LOGI("DeviceManagerServiceImpl In, pkgName:%{public}s, tokenId:%{public}" PRIu64, pkgName.c_str(), tokenId);
     {
-        std::lock_guard<std::mutex> lock(tokenIdSessionIdMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(tokenIdSessionIdMapMtx_);
         if (tokenIdSessionIdMap_.find(tokenId) != tokenIdSessionIdMap_.end()) {
             LOGE("BindTarget failed, this device is being bound. please try again later,"
                 "pkgName:%{public}s, tokenId:%{public}" PRIu64, pkgName.c_str(), tokenId);
@@ -2117,7 +2115,7 @@ void DeviceManagerServiceImpl::ScreenCommonEventCallback(std::string commonEvent
 {
     if (commonEventType == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_LOCKED) {
         LOGI("on screen locked.");
-        std::lock_guard<std::mutex> lock(authMgrMapMtx_);
+        std::lock_guard<ffrt::mutex> lock(authMgrMapMtx_);
         for (auto& pair : authMgrMap_) {
             if (pair.second != nullptr) {
                 LOGI("tokenId: %{public}s.", GetAnonyInt32(pair.first).c_str());
@@ -3317,10 +3315,10 @@ int32_t DeviceManagerServiceImpl::DeleteAclExtraDataServiceId(int64_t serviceId,
 }
 
 void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
-    const std::string &deviceUdidHash)
+    const std::string &deviceUdidHash, int32_t userId)
 {
     CHECK_NULL_VOID(deviceStateMgr_);
-    deviceStateMgr_->StartDelTimerByDP(deviceUdid, deviceUdidHash);
+    deviceStateMgr_->StartDelTimerByDP(deviceUdid, deviceUdidHash, userId);
 }
 
 void DeviceManagerServiceImpl::GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList)

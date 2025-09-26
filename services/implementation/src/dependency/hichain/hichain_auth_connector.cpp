@@ -35,7 +35,11 @@ constexpr int32_t HICHAIN_DATA_SIZE = 10240;
 
 std::shared_ptr<IDmDeviceAuthCallback> HiChainAuthConnector::dmDeviceAuthCallback_ = nullptr;
 std::map<int64_t, std::shared_ptr<IDmDeviceAuthCallback>> HiChainAuthConnector::dmDeviceAuthCallbackMap_;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+ffrt::mutex HiChainAuthConnector::dmDeviceAuthCallbackMutex_;
+#else
 std::mutex HiChainAuthConnector::dmDeviceAuthCallbackMutex_;
+#endif
 
 void HiChainAuthConnector::FreeJsonString(char *jsonStr)
 {
@@ -75,14 +79,22 @@ HiChainAuthConnector::~HiChainAuthConnector()
 
 int32_t HiChainAuthConnector::RegisterHiChainAuthCallback(std::shared_ptr<IDmDeviceAuthCallback> callback)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(dmDeviceAuthCallbackMutex_);
+#else
     std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
+#endif
     dmDeviceAuthCallback_ = callback;
     return DM_OK;
 }
 
 int32_t HiChainAuthConnector::UnRegisterHiChainAuthCallback()
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(dmDeviceAuthCallbackMutex_);
+#else
     std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
+#endif
     dmDeviceAuthCallback_ = nullptr;
     return DM_OK;
 }
@@ -91,14 +103,22 @@ int32_t HiChainAuthConnector::UnRegisterHiChainAuthCallback()
 int32_t HiChainAuthConnector::RegisterHiChainAuthCallbackById(int64_t id,
     std::shared_ptr<IDmDeviceAuthCallback> callback)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(dmDeviceAuthCallbackMutex_);
+#else
     std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
+#endif
     dmDeviceAuthCallbackMap_[id] = callback;
     return DM_OK;
 }
 
 int32_t HiChainAuthConnector::UnRegisterHiChainAuthCallbackById(int64_t id)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(dmDeviceAuthCallbackMutex_);
+#else
     std::lock_guard<std::mutex> lock(dmDeviceAuthCallbackMutex_);
+#endif
     if (dmDeviceAuthCallbackMap_.find(id) != dmDeviceAuthCallbackMap_.end()) {
         dmDeviceAuthCallbackMap_[id] = nullptr;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,15 +18,11 @@
 
 #include <condition_variable>
 #include <memory>
+#include <mutex>
 #include <queue>
 #include <string>
 #include <thread>
 
-#if defined(__LITEOS_M__)
-#include "dm_mutex.h"
-#else
-#include <mutex>
-#endif
 #include "idevice_manager_service_listener.h"
 #include "dm_adapter_manager.h"
 #include "softbus_connector.h"
@@ -93,7 +89,7 @@ public:
     void OnDbReady(const std::string &pkgName, const std::string &uuid);
     void RegisterOffLineTimer(const DmDeviceInfo &deviceInfo);
     void StartOffLineTimer(const DmDeviceInfo &deviceInfo);
-    void DeleteTimeOutGroup(std::string name);
+    void DeleteTimeOutGroup(const std::string &name);
     void ChangeDeviceInfo(const DmDeviceInfo &info);
     int32_t RegisterSoftbusStateCallback();
     void OnDeviceOnline(std::string deviceId, int32_t authForm);
@@ -105,7 +101,7 @@ public:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
 #endif
-    void StartDelTimerByDP(const std::string &deviceUdid, const std::string &deviceUdidHash);
+    void StartDelTimerByDP(const std::string &deviceUdid, const std::string &deviceUdidHash, int32_t userId);
 private:
     void StartEventThread();
     void StopEventThread();
@@ -126,8 +122,10 @@ private:
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
     std::map<std::string, DmDeviceInfo> remoteDeviceInfos_;
     std::map<std::string, DmDeviceInfo> stateDeviceInfos_;
+    // key is udidhash + "_" + userId
     std::map<std::string, StateTimerInfo> stateTimerInfoMap_;
-    std::map<std::string, std::string> udidhash2udidMap_;
+    // key is udidhash + "_" + userId
+    std::map<std::string, std::string> udidhashAndUserId2udidMap_;
     std::shared_ptr<DmTimer> timer_;
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector_;

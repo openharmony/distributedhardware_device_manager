@@ -16,7 +16,6 @@
 #include "dm_auth_manager.h"
 
 #include <algorithm>
-#include <mutex>
 #include <string>
 #include <unistd.h>
 
@@ -38,13 +37,11 @@
 #include "dm_log.h"
 #include "dm_radar_helper.h"
 #include "dm_random.h"
+#include "ffrt.h"
 #include "multiple_user_connector.h"
 #include "json_object.h"
 #include "openssl/sha.h"
 #include "parameter.h"
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-#include "multiple_user_connector.h"
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -99,7 +96,7 @@ constexpr const static char* PROCESS_NAME_WHITE_LIST[PROCESS_NAME_WHITE_LIST_NUM
 };
 
 constexpr const char* DM_VERSION_4_1_5_1 = "4.1.5.1";
-std::mutex g_authFinishLock;
+ffrt::mutex g_authFinishLock;
 
 DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
                              std::shared_ptr<HiChainConnector> hiChainConnector,
@@ -368,7 +365,7 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     LOGI("start auth type %{public}d.", authType);
     processInfo_.pkgName = pkgName;
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
             processInfo_.userId = std::atoi(bindParam_["bindCallerUserId"].c_str());
         }
@@ -588,7 +585,7 @@ void DmAuthManager::OnSessionClosed(const int32_t sessionId)
     LOGI("DmAuthManager::OnSessionClosed sessionId = %{public}d", sessionId);
     if (authResponseState_ != nullptr && authResponseContext_ != nullptr) {
         {
-            std::lock_guard<std::mutex> lock(groupMutex_);
+            std::lock_guard<ffrt::mutex> lock(groupMutex_);
             if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
                 authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
                 LOGI("wait addmemer callback");
@@ -698,7 +695,7 @@ void DmAuthManager::ProcessSinkMsg()
                 break;
             }
             if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
-                std::lock_guard<std::mutex> lock(srcReqMsgLock_);
+                std::lock_guard<ffrt::mutex> lock(srcReqMsgLock_);
                 isNeedProcCachedSrcReqMsg_ = true;
             }
             break;
@@ -710,7 +707,7 @@ void DmAuthManager::ProcessSinkMsg()
 void DmAuthManager::ProcessReqAuthTerminate()
 {
     {
-        std::lock_guard<std::mutex> lock(groupMutex_);
+        std::lock_guard<ffrt::mutex> lock(groupMutex_);
         if (authResponseState_->GetStateType() == AUTH_RESPONSE_SHOW &&
             authResponseContext_->reply == DM_OK && isCreateGroup_ && !isAddMember_) {
             LOGI("wait addmemer callback");
@@ -750,7 +747,7 @@ void DmAuthManager::OnDataReceived(const int32_t sessionId, const std::string me
     } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
         // sink device auth process
         {
-            std::lock_guard<std::mutex> lock(srcReqMsgLock_);
+            std::lock_guard<ffrt::mutex> lock(srcReqMsgLock_);
             srcReqMsg_ = message;
         }
         ProcessSinkMsg();
@@ -814,7 +811,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status, int32_t oper
         LOGI("join group success.");
         CompatiblePutAcl();
         {
-            std::lock_guard<std::mutex> lock(groupMutex_);
+            std::lock_guard<ffrt::mutex> lock(groupMutex_);
             isAddMember_ = true;
             if (transitToFinishState_) {
                 LOGI("Have received src finish state.");
@@ -826,7 +823,7 @@ void DmAuthManager::OnMemberJoin(int64_t requestId, int32_t status, int32_t oper
     }
     if (status == DM_OK && operationCode == GroupOperationCode::GROUP_CREATE) {
         {
-            std::lock_guard<std::mutex> lock(groupMutex_);
+            std::lock_guard<ffrt::mutex> lock(groupMutex_);
             isCreateGroup_ = true;
         }
     }
@@ -1595,16 +1592,16 @@ void DmAuthManager::SrcAuthenticateFinish()
 void DmAuthManager::AuthenticateFinish()
 {
     {
-        std::lock_guard<std::mutex> lock(srcReqMsgLock_);
+        std::lock_guard<ffrt::mutex> lock(srcReqMsgLock_);
         srcReqMsg_ = "";
         isNeedProcCachedSrcReqMsg_ = false;
-        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        std::lock_guard<ffrt::mutex> guard(sessionKeyIdMutex_);
         sessionKeyIdAsyncResult_.clear();
     }
     pincodeDialogEverShown_ = false;
     serviceInfoProfile_ = {};
     authType_ = AUTH_TYPE_UNKNOW;
-    std::lock_guard<std::mutex> autoLock(g_authFinishLock);
+    std::lock_guard<ffrt::mutex> autoLock(g_authFinishLock);
     if (authResponseContext_ == nullptr || authUiStateMgr_ == nullptr) {
         LOGE("failed to AuthenticateFinish because authResponseContext_ or authUiStateMgr is nullptr");
         return;
@@ -2216,7 +2213,7 @@ int32_t DmAuthManager::BindTarget(const std::string &pkgName, const PeerTargetId
         addrType = bindParam.at(PARAM_KEY_CONN_ADDR_TYPE);
     }
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         bindParam_ = bindParam;
     }
     if (ParseConnectAddr(targetId, deviceId, addrType) == DM_OK) {
@@ -2568,7 +2565,7 @@ void DmAuthManager::SinkAuthDeviceFinish()
     std::string srcReqMsg = "";
     bool isNeedProcCachedSrcReqMsg = false;
     {
-        std::lock_guard<std::mutex> lock(srcReqMsgLock_);
+        std::lock_guard<ffrt::mutex> lock(srcReqMsgLock_);
         srcReqMsg = srcReqMsg_;
         isNeedProcCachedSrcReqMsg = isNeedProcCachedSrcReqMsg_;
         srcReqMsg_ = "";
@@ -2686,7 +2683,7 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
     }
     authResponseContext_->localSessionKeyId = 0;
     {
-        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        std::lock_guard guard(sessionKeyIdMutex_);
         sessionKeyIdAsyncResult_.clear();
         sessionKeyIdAsyncResult_[requestId] = std::optional<int32_t>();
     }
@@ -2703,7 +2700,7 @@ void DmAuthManager::AuthDeviceSessionKey(int64_t requestId, const uint8_t *sessi
 void DmAuthManager::PutSessionKeyAsync(int64_t requestId, std::vector<unsigned char> hash)
 {
     {
-        std::lock_guard<std::mutex> guard(sessionKeyIdMutex_);
+        std::lock_guard guard(sessionKeyIdMutex_);
         int32_t sessionKeyId = 0;
         int32_t ret =
             DeviceProfileConnector::GetInstance().PutSessionKey(MultipleUserConnector::GetCurrentAccountUserID(),
@@ -2719,7 +2716,7 @@ void DmAuthManager::PutSessionKeyAsync(int64_t requestId, std::vector<unsigned c
 
 int32_t DmAuthManager::GetSessionKeyIdSync(int64_t requestId)
 {
-    std::unique_lock<std::mutex> guard(sessionKeyIdMutex_);
+    std::unique_lock guard(sessionKeyIdMutex_);
     if (sessionKeyIdAsyncResult_.find(requestId) == sessionKeyIdAsyncResult_.end()) {
         LOGW("GetSessionKeyIdSync failed, not find by requestId");
         return 0;
@@ -3411,7 +3408,7 @@ void DmAuthManager::ProcessReqPublicKey()
         return;
     }
     if (authResponseState_->GetStateType() == AuthState::AUTH_RESPONSE_SHOW) {
-        std::lock_guard<std::mutex> lock(srcReqMsgLock_);
+        std::lock_guard<ffrt::mutex> lock(srcReqMsgLock_);
         isNeedProcCachedSrcReqMsg_ = true;
     }
 }
@@ -3518,7 +3515,7 @@ void DmAuthManager::GetBindCallerInfo()
     LOGI("start.");
     CHECK_NULL_VOID(authRequestContext_);
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         if (bindParam_.find("bindCallerTokenId") != bindParam_.end()) {
             authRequestContext_->tokenId = std::atoi(bindParam_["bindCallerTokenId"].c_str());
         }

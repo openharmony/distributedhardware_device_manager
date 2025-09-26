@@ -54,7 +54,7 @@ bool DmDataShareCommonEventManager::SubscribeDataShareCommonEvent(const std::vec
         LOGE("eventNameVec is empty or callback is nullptr.");
         return false;
     }
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
         LOGE("failed to subscribe datashare commom eventName size: %{public}zu", eventNameVec.size());
         return false;
@@ -98,7 +98,7 @@ bool DmDataShareCommonEventManager::SubscribeDataShareCommonEvent(const std::vec
 //LCOV_EXCL_START
 bool DmDataShareCommonEventManager::UnsubscribeDataShareCommonEvent()
 {
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
         LOGE("failed to unsubscribe datashare commom event name size: %{public}zu because event is invalid.",
             eventNameVec_.size());

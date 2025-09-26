@@ -21,6 +21,9 @@
 
 #include "ability_connect_callback_interface.h"
 #include "ability_connect_callback_stub.h"
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+#include "ffrt.h"
+#endif
 
 #include "dm_single_instance.h"
 
@@ -60,7 +63,11 @@ private:
     bool isProxyBind_ = false;
     std::string appUserData_;
     std::string title_;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::mutex mutex_;
+#else
     std::mutex mutex_;
+#endif
     sptr<OHOS::AAFwk::IAbilityConnection> dialogConnectionCallback_ = nullptr;
     sptr<IRemoteObject> g_remoteObject = nullptr;
     std::atomic<bool> isConnectSystemUI_{false};

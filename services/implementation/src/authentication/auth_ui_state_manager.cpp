@@ -36,7 +36,7 @@ void AuthUiStateManager::RegisterUiStateCallback(const std::string pkgName)
     ProcessInfo processInfo;
     processInfo.userId = userId;
     processInfo.pkgName = pkgName;
-    std::lock_guard<std::mutex> lock(pkgSetMutex_);
+    std::lock_guard<ffrt::mutex> lock(pkgSetMutex_);
     pkgSet_.emplace(processInfo);
 }
 
@@ -47,7 +47,7 @@ void AuthUiStateManager::UnRegisterUiStateCallback(const std::string pkgName)
     ProcessInfo processInfo;
     processInfo.userId = userId;
     processInfo.pkgName = pkgName;
-    std::lock_guard<std::mutex> lock(pkgSetMutex_);
+    std::lock_guard<ffrt::mutex> lock(pkgSetMutex_);
     if (pkgSet_.find(processInfo) == pkgSet_.end()) {
         LOGE("AuthUiStateManager UnRegisterUiStateCallback processInfo is not exist.");
         return;
@@ -64,7 +64,7 @@ void AuthUiStateManager::UpdateUiState(const DmUiStateMsg msg)
     JsonObject jsonObj;
     jsonObj[UI_STATE_MSG] = msg;
     std::string paramJson = jsonObj.Dump();
-    std::lock_guard<std::mutex> lock(pkgSetMutex_);
+    std::lock_guard<ffrt::mutex> lock(pkgSetMutex_);
     if (pkgSet_.empty()) {
         LOGW("pkgSet_ is empty");
         if (msg == MSG_CANCEL_CONFIRM_SHOW || msg == MSG_CANCEL_PIN_CODE_INPUT || msg == MSG_CANCEL_PIN_CODE_SHOW) {

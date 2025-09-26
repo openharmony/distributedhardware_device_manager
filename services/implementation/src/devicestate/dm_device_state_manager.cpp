@@ -272,31 +272,35 @@ void DmDeviceStateManager::RegisterOffLineTimer(const DmDeviceInfo &deviceInfo)
         LOGE("get udidhash by udid: %{public}s failed.", GetAnonyString(deviceUdid).c_str());
         return;
     }
-    LOGI("Register offline timer for udidHash: %{public}s", GetAnonyString(std::string(udidHash)).c_str());
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
+    LOGI("Register offline timer for udidHash: %{public}s, userId: %{public}d",
+        GetAnonyString(std::string(udidHash)).c_str(), userId);
+    std::string key = std::string(udidHash) + "_" +  std::to_string(userId);
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     for (auto &iter : stateTimerInfoMap_) {
-        if ((iter.first == std::string(udidHash)) && (timer_ != nullptr)) {
+        if ((iter.first == key) && (timer_ != nullptr)) {
             timer_->DeleteTimer(iter.second.timerName);
             stateTimerInfoMap_.erase(iter.first);
-            auto idIter = udidhash2udidMap_.find(udidHash);
-            if (idIter != udidhash2udidMap_.end()) {
-                udidhash2udidMap_.erase(idIter->first);
+            auto idIter = udidhashAndUserId2udidMap_.find(key);
+            if (idIter != udidhashAndUserId2udidMap_.end()) {
+                udidhashAndUserId2udidMap_.erase(idIter->first);
             }
             break;
         }
     }
-    if (stateTimerInfoMap_.find(std::string(udidHash)) == stateTimerInfoMap_.end()) {
+    if (stateTimerInfoMap_.find(key) == stateTimerInfoMap_.end()) {
         std::string sha256UdidHash = Crypto::Sha256(std::string(udidHash));
-        std::string timerName = std::string(STATE_TIMER_PREFIX) + sha256UdidHash.substr(0, sha256UdidHash.size() / 2);
+        std::string timerName = std::string(STATE_TIMER_PREFIX) + sha256UdidHash.substr(0, sha256UdidHash.size() / 2) +
+            "_" +  std::to_string(userId);
         StateTimerInfo stateTimer = {
             .timerName = timerName,
             .networkId = deviceInfo.networkId,
             .isStart = false,
         };
-        stateTimerInfoMap_[std::string(udidHash)] = stateTimer;
+        stateTimerInfoMap_[key] = stateTimer;
     }
-    if (udidhash2udidMap_.find(std::string(udidHash)) == udidhash2udidMap_.end()) {
-        udidhash2udidMap_[std::string(udidHash)] = deviceUdid;
+    if (udidhashAndUserId2udidMap_.find(key) == udidhashAndUserId2udidMap_.end()) {
+        udidhashAndUserId2udidMap_[key] = deviceUdid;
     }
 }
 
@@ -321,31 +325,33 @@ void DmDeviceStateManager::StartOffLineTimer(const DmDeviceInfo &deviceInfo)
 
 void DmDeviceStateManager::DeleteOffLineTimer(std::string udidHash)
 {
+    int32_t userId = MultipleUserConnector::GetCurrentAccountUserID();
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
-    LOGI("DELETE offline timer for networkId: %{public}s", GetAnonyString(udidHash).c_str());
+    LOGI("DELETE offline timer for networkId: %{public}s, userId:%{public}d", GetAnonyString(udidHash).c_str(), userId);
     if (timer_ == nullptr || udidHash.empty()) {
         return;
     }
-    auto iter = stateTimerInfoMap_.find(udidHash);
+    std::string key = udidHash + "_" +  std::to_string(userId);
+    auto iter = stateTimerInfoMap_.find(key);
     if (iter != stateTimerInfoMap_.end()) {
         timer_->DeleteTimer(iter->second.timerName);
         iter->second.isStart = false;
         stateTimerInfoMap_.erase(iter->first);
-        auto idIter = udidhash2udidMap_.find(udidHash);
-        if (idIter != udidhash2udidMap_.end()) {
-            udidhash2udidMap_.erase(idIter->first);
+        auto idIter = udidhashAndUserId2udidMap_.find(key);
+        if (idIter != udidhashAndUserId2udidMap_.end()) {
+            udidhashAndUserId2udidMap_.erase(idIter->first);
         }
     }
     return;
 }
-
-void DmDeviceStateManager::DeleteTimeOutGroup(std::string name)
+// name is half(udidhash) + "_" + userId
+void DmDeviceStateManager::DeleteTimeOutGroup(const std::string &name)
 {
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
     for (auto iter = stateTimerInfoMap_.begin(); iter != stateTimerInfoMap_.end(); iter++) {
         if (((iter->second).timerName == name) && (hiChainConnector_ != nullptr)) {
-            auto idIter = udidhash2udidMap_.find(iter->first);
-            if (idIter == udidhash2udidMap_.end()) {
+            auto idIter = udidhashAndUserId2udidMap_.find(iter->first);
+            if (idIter == udidhashAndUserId2udidMap_.end()) {
                 LOGE("remove hichain group find deviceId: %{public}s failed.", GetAnonyString(iter->first).c_str());
                 break;
             }
@@ -645,30 +651,34 @@ void DmDeviceStateManager::HandleDeviceScreenStatusChange(DmDeviceInfo &devInfo,
     }
 }
 
-void DmDeviceStateManager::StartDelTimerByDP(const std::string &deviceUdid, const std::string &deviceUdidHash)
+void DmDeviceStateManager::StartDelTimerByDP(const std::string &deviceUdid, const std::string &deviceUdidHash,
+    int32_t userId)
 {
-    LOGI("StartDelTimerByDP for udidHash: %{public}s", GetAnonyString(std::string(deviceUdidHash)).c_str());
+    LOGI("StartDelTimerByDP for udidHash: %{public}s, userId: %{public}d",
+        GetAnonyString(std::string(deviceUdidHash)).c_str(), userId);
+    std::string key = deviceUdidHash + "_" +  std::to_string(userId);
     std::lock_guard<std::mutex> mutexLock(timerMapMutex_);
-    auto iter = stateTimerInfoMap_.find(deviceUdidHash);
+    auto iter = stateTimerInfoMap_.find(key);
     if ((iter != stateTimerInfoMap_.end()) && (timer_ != nullptr)) {
         timer_->DeleteTimer(iter->second.timerName);
         stateTimerInfoMap_.erase(iter);
-        auto idIter = udidhash2udidMap_.find(deviceUdidHash);
-        if (idIter != udidhash2udidMap_.end()) {
-            udidhash2udidMap_.erase(idIter);
+        auto idIter = udidhashAndUserId2udidMap_.find(key);
+        if (idIter != udidhashAndUserId2udidMap_.end()) {
+            udidhashAndUserId2udidMap_.erase(idIter);
         }
     }
     std::string sha256UdidHash = Crypto::Sha256(std::string(deviceUdidHash));
-    std::string timerName = std::string(STATE_TIMER_PREFIX) + sha256UdidHash.substr(0, sha256UdidHash.size() / 2);
+    std::string timerName = std::string(STATE_TIMER_PREFIX) + sha256UdidHash.substr(0, sha256UdidHash.size() / 2) +
+        "_" + std::to_string(userId);
     if (stateTimerInfoMap_.find(std::string(deviceUdidHash)) == stateTimerInfoMap_.end()) {
         StateTimerInfo stateTimer = {
             .timerName = timerName,
             .isStart = true,
         };
-        stateTimerInfoMap_[std::string(deviceUdidHash)] = stateTimer;
+        stateTimerInfoMap_[key] = stateTimer;
     }
-    if (udidhash2udidMap_.find(std::string(deviceUdidHash)) == udidhash2udidMap_.end()) {
-        udidhash2udidMap_[std::string(deviceUdidHash)] = deviceUdid;
+    if (udidhashAndUserId2udidMap_.find(key) == udidhashAndUserId2udidMap_.end()) {
+        udidhashAndUserId2udidMap_[key] = deviceUdid;
     }
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();

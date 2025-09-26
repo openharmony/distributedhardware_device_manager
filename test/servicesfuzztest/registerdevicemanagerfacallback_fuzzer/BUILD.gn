@@ -69,6 +69,7 @@ ohos_fuzztest("RegisterDeviceManagerFaCallbackFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "ipc:ipc_single",
     "napi:ace_napi",
     "safwk:system_ability_fwk",

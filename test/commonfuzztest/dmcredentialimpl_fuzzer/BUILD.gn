@@ -62,6 +62,7 @@ ohos_fuzztest("DMCredentialImplFuzzTest") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]

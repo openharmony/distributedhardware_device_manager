@@ -29,6 +29,7 @@
 #include "dm_device_info.h"
 #include "dm_log.h"
 #include "dm_timer.h"
+#include "ffrt.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
 #include "softbus_connector.h"
@@ -304,9 +305,9 @@ struct DmAuthContext {
     bool needBind{true};
     bool needAgreeCredential{true};
     bool needAuth{true};
-    std::mutex certMtx_; // cert lock
-    std::mutex certCVMtx_; // cert cv lock
-    std::condition_variable certCV_; // cert cv
+    ffrt::mutex certMtx_; // cert lock
+    ffrt::mutex certCVMtx_; // cert cv lock
+    ffrt::condition_variable certCV_; // cert cv
     CleanNotifyCallback cleanNotifyCallback{nullptr};
 
     std::string GetDeviceId(DmAuthSide side);

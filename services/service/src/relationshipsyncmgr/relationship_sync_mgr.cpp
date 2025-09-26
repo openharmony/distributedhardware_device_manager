@@ -901,7 +901,7 @@ const std::string RelationShipChangeMsg::ToMapKey() const
 
 void ReleationShipSyncMgr::HandleRecvBroadCastTimeout(const std::string &key)
 {
-    std::lock_guard<std::mutex> autoLock(lock_);
+    std::lock_guard<ffrt::mutex> autoLock(lock_);
     auto iter = recvBroadCastIdMap_.find(key);
     if (iter != recvBroadCastIdMap_.end()) {
         recvBroadCastIdMap_.erase(iter);
@@ -958,7 +958,7 @@ bool ReleationShipSyncMgr::IsNewBroadCastId(const RelationShipChangeMsg &msg)
         return true;
     }
     std::string key = msg.ToMapKey();
-    std::lock_guard<std::mutex> autoLock(lock_);
+    std::lock_guard<ffrt::mutex> autoLock(lock_);
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }

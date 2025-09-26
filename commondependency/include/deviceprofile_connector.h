@@ -15,6 +15,7 @@
 #ifndef OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #define OHOS_DM_DEVICEPROFILE_CONNECTOR_H
 #include <algorithm>
+#include <map>
 #include <string>
 #include <unordered_set>
 #include "access_control_profile.h"
@@ -148,7 +149,7 @@ public:
         const std::vector<std::string> &acceptEventUdids) = 0;
     virtual int32_t HandleAccountCommonEvent(const std::string &localUdid, const std::vector<std::string> &deviceVec,
         const std::vector<int32_t> &foregroundUserIds, const std::vector<int32_t> &backgroundUserIds) = 0;
-    virtual int32_t GetAuthOnceUdids(std::unordered_set<std::string> &udidSet) = 0;
+    virtual int32_t GetAuthOnceUdids(std::map<std::string, std::unordered_set<int32_t>> &udid2UserIdsMap) = 0;
 };
 
 class DeviceProfileConnector : public IDeviceProfileConnector {
@@ -340,7 +341,7 @@ public:
     DM_EXPORT bool IsAllowAuthAlways(const std::string &localUdid, int32_t userId, const std::string &peerUdid,
         const std::string &pkgName, int64_t tokenId);
 
-    int32_t GetAuthOnceUdids(std::unordered_set<std::string> &udidSet);
+    int32_t GetAuthOnceUdids(std::map<std::string, std::unordered_set<int32_t>> &udid2UserIdsMap);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,

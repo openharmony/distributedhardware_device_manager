@@ -23,6 +23,7 @@
 #include "device_manager_service_listener.h"
 #include "softbus_session_callback.h"
 #include "dm_crypto_mock.h"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -36,6 +37,7 @@ public:
         std::make_shared<SoftbusConnectorMock>();
     static inline std::shared_ptr<CryptoMock> cryptoMock_ =
         std::make_shared<CryptoMock>();
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ = nullptr;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -64,7 +64,7 @@ HWTEST_F(DeviceNameManagerTest, Init_001, testing::ext::TestSize.Level1)
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
     ASSERT_TRUE(helper_ != nullptr);
 
-    std::string subffixName = "手机";
+    std::string suffixName = "手机";
     auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
     auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
     EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_))
@@ -78,7 +78,7 @@ HWTEST_F(DeviceNameManagerTest, Init_001, testing::ext::TestSize.Level1)
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
-        DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
+        DoAll(SetArgReferee<1>(suffixName), Return(DataShare::E_OK)));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
     DeviceNameManager::GetInstance().UnInit();
@@ -94,7 +94,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_001, testing::ext::
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
     ASSERT_TRUE(helper_ != nullptr);
 
-    std::string subffixName = "手机";
+    std::string suffixName = "手机";
     int32_t curUserId = DEFAULT_VALUABLE_USER_ID + 1;
     int32_t preUserId = DEFAULT_VALUABLE_USER_ID;
     auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
@@ -110,7 +110,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_001, testing::ext::
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
-        DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
+        DoAll(SetArgReferee<1>(suffixName), Return(DataShare::E_OK)));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenSoftBusReady();
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(curUserId, preUserId);
@@ -126,7 +126,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_002, testing::ext::
     ASSERT_TRUE(client_ != nullptr);
     ASSERT_TRUE(helper_ != nullptr);
 
-    std::string subffixName = "手机";
+    std::string suffixName = "手机";
     int32_t curUserId = DEFAULT_USER_ID;
     int32_t preUserId = DEFAULT_USER_ID;
 
@@ -142,7 +142,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenUserSwitch_002, testing::ext::
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
-        DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
+        DoAll(SetArgReferee<1>(suffixName), Return(DataShare::E_OK)));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(curUserId, preUserId);
     DeviceNameManager::GetInstance().UnInit();
@@ -158,7 +158,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogout_001, testing::ext::Test
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
     ASSERT_TRUE(helper_ != nullptr);
 
-    std::string subffixName = "手机";
+    std::string suffixName = "手机";
     auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
     auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
     EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_))
@@ -172,7 +172,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogout_001, testing::ext::Test
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
-        DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
+        DoAll(SetArgReferee<1>(suffixName), Return(DataShare::E_OK)));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
     DeviceNameManager::GetInstance().UnInit();
@@ -188,7 +188,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogin_001, testing::ext::TestS
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
     ASSERT_TRUE(helper_ != nullptr);
 
-    std::string subffixName = "手机";
+    std::string suffixName = "手机";
     auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
     auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
     EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_))
@@ -202,7 +202,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenLogin_001, testing::ext::TestS
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
-        DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
+        DoAll(SetArgReferee<1>(suffixName), Return(DataShare::E_OK)));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
     DeviceNameManager::GetInstance().UnInit();
@@ -218,7 +218,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNickChange_001, testing::ext::
     ASSERT_TRUE(multipleUserConnector_ != nullptr);
     ASSERT_TRUE(helper_ != nullptr);
 
-    std::string subffixName = "手机";
+    std::string suffixName = "手机";
     auto bundleMgr = sptr<BundleMgrMock>(new (std::nothrow) BundleMgrMock());
     auto systemAbilityManager = sptr<SystemAbilityManagerMock>(new (std::nothrow) SystemAbilityManagerMock());
     EXPECT_CALL(*systemAbilityManager, GetSystemAbility(_))
@@ -232,7 +232,7 @@ HWTEST_F(DeviceNameManagerTest, InitDeviceNameWhenNickChange_001, testing::ext::
 
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(
-        DoAll(SetArgReferee<1>(subffixName), Return(DataShare::E_OK)));
+        DoAll(SetArgReferee<1>(suffixName), Return(DataShare::E_OK)));
 
     DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
     DeviceNameManager::GetInstance().UnInit();
@@ -288,9 +288,9 @@ HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_001, testing::ext::Tes
     EXPECT_CALL(*resultSet, GetRowCount(_)).WillRepeatedly(DoAll(SetArgReferee<0>(1), Return(DataShare::E_OK)));
     EXPECT_CALL(*resultSet, GoToRow(_)).Times(AtLeast(1));
     EXPECT_CALL(*resultSet, GetString(_, _)).WillRepeatedly(Invoke([&getStringInvokeCount](int, std::string &output) {
-        std::string subffixName = "OH-3.2";
+        std::string suffixName = "OH-3.2";
         if (getStringInvokeCount++ > 0) {
-            output = subffixName;
+            output = suffixName;
         }
         return DM_OK;
     }));
@@ -616,60 +616,60 @@ HWTEST_F(DeviceNameManagerTest, GetUserDefinedDeviceName_001, testing::ext::Test
 HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_003, testing::ext::TestSize.Level1)
 {
     std::string prefixName = "My";
-    std::string subffixName = "Device";
+    std::string suffixName = "Device";
     int32_t maxNameLength = 20;
     std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
-        subffixName, maxNameLength);
+        suffixName, maxNameLength);
     EXPECT_EQ(result, "My的Device");
 }
 
 HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_004, testing::ext::TestSize.Level1)
 {
     std::string prefixName = "MyVeryLong";
-    std::string subffixName = "DeviceName";
+    std::string suffixName = "DeviceName";
     int32_t maxNameLength = 15;
     std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
-        subffixName, maxNameLength);
+        suffixName, maxNameLength);
     EXPECT_EQ(result, "My...DeviceName");
 }
 
 HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_005, testing::ext::TestSize.Level1)
 {
     std::string prefixName = "My";
-    std::string subffixName = "Device";
+    std::string suffixName = "Device";
     int32_t maxNameLength = 0;
     std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
-        subffixName, maxNameLength);
+        suffixName, maxNameLength);
     EXPECT_EQ(result, "My的Device");
 }
 
 HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_006, testing::ext::TestSize.Level1)
 {
     std::string prefixName = "My";
-    std::string subffixName = "VeryLongDeviceNameThatExceedsLimit";
+    std::string suffixName = "VeryLongDeviceNameThatExceedsLimit";
     int32_t maxNameLength = 30;
     std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
-        subffixName, maxNameLength);
+        suffixName, maxNameLength);
     EXPECT_EQ(result, "My的VeryLongDevi...");
 }
 
 HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_007, testing::ext::TestSize.Level1)
 {
     std::string prefixName = "";
-    std::string subffixName = "Device";
+    std::string suffixName = "Device";
     int32_t maxNameLength = 10;
     std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
-        subffixName, maxNameLength);
+        suffixName, maxNameLength);
     EXPECT_EQ(result, "Device");
 }
 
 HWTEST_F(DeviceNameManagerTest, GetLocalDisplayDeviceName_008, testing::ext::TestSize.Level1)
 {
     std::string prefixName = "";
-    std::string subffixName = "VeryLongDeviceName";
+    std::string suffixName = "VeryLongDeviceName";
     int32_t maxNameLength = 10;
     std::string result = DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(prefixName,
-        subffixName, maxNameLength);
+        suffixName, maxNameLength);
     EXPECT_EQ(result, "VeryLon...");
 }
 

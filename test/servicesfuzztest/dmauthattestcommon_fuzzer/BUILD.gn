@@ -66,8 +66,9 @@ ohos_fuzztest("DmAuthAttestCommonFuzzTest") {
   external_deps = [
     "cJSON:cjson",
     "c_utils:utils",
-    "safwk:system_ability_fwk",
+    "ffrt:libffrt",
     "hilog:libhilog",
+    "safwk:system_ability_fwk",
   ]
 }
 

@@ -62,7 +62,7 @@ public:
     DM_EXPORT int32_t DeleteAll();
 
 private:
-    mutable std::mutex timerMutex_;
+    mutable ffrt::mutex timerMutex_;
     std::unordered_map<std::string, ffrt::task_handle> timerVec_ = {};
     std::shared_ptr<ffrt::queue> queue_;
 };

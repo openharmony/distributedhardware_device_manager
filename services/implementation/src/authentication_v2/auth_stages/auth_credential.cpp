@@ -123,7 +123,7 @@ int32_t AuthSrcCredentialAuthDoneState::Action(std::shared_ptr<DmAuthContext> co
     CHECK_NULL_RETURN(context->authMessageProcessor, ERR_DM_POINT_NULL);
     if (GetSessionKey(context)) {
         DerivativeSessionKey(context);
-        std::unique_lock<std::mutex> cvLock(context->certCVMtx_);
+        std::unique_lock cvLock(context->certCVMtx_);
         context->certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
             [=] {return !context->accesser.cert.empty();});
         context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_REQ_DATA_SYNC, context);
@@ -178,13 +178,13 @@ int32_t AuthSrcCredentialAuthDoneState::HandleSrcCredentialAuthDone(std::shared_
             return ret;
         }
         SetAuthContext(skId, context->accesser.lnnSkTimeStamp, context->accesser.lnnSessionKeyId);
-        std::unique_lock<std::mutex> cvLock(context->certCVMtx_);
+        std::unique_lock cvLock(context->certCVMtx_);
         context->certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
             [=] {return !context->accesser.cert.empty();});
         msgType = MSG_TYPE_REQ_DATA_SYNC;
     } else {  // Non-first-time authentication transport credential process
         DerivativeSessionKey(context);
-        std::unique_lock<std::mutex> cvLock(context->certCVMtx_);
+        std::unique_lock cvLock(context->certCVMtx_);
         context->certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
             [=] {return !context->accesser.cert.empty();});
         msgType = MSG_TYPE_REQ_DATA_SYNC;
@@ -775,7 +775,7 @@ int32_t AuthSrcSKDeriveState::Action(std::shared_ptr<DmAuthContext> context)
     // derive transmit sk
     DerivativeSessionKey(context);
     // wait cert generate
-    std::unique_lock<std::mutex> cvLock(context->certCVMtx_);
+    std::unique_lock cvLock(context->certCVMtx_);
     context->certCV_.wait_for(cvLock, std::chrono::milliseconds(GENERATE_CERT_TIMEOUT),
         [=] {return !context->accesser.cert.empty();});
     // send 180
