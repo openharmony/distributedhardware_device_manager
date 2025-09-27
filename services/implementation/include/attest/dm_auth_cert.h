@@ -17,14 +17,11 @@
 #define OHOS_DM_AUTH_CERT_H
 
 #include <dlfcn.h>
+#include <mutex>
 
 #include "dm_cert.h"
+#include "ffrt.h"
 #include "i_dm_auth_cert_ext.h"
-#if defined(__LITEOS_M__)
-#include "dm_mutex.h"
-#else
-#include <mutex>
-#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -48,7 +45,7 @@ private:
 
     bool isAdapterAuthCertSoLoaded_ = false;
     void *authCertSoHandle_ = nullptr;
-    std::mutex isAdapterAuthCertLoadedLock_;
+    ffrt::mutex isAdapterAuthCertLoadedLock_;
     std::shared_ptr<IDMAuthCertExt> dmAuthCertExt_;
 };
 } // namespace DistributedHardware

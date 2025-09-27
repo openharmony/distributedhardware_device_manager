@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,6 @@
 #define TYPE_TV_ID 0x9C
 
 #include <map>
-#include <mutex>
 #include <string>
 
 #include "auth_request_state.h"
@@ -33,6 +32,7 @@
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_timer.h"
+#include "ffrt.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
 #include "service_info_unique_key.h"
@@ -634,21 +634,21 @@ private:
     std::atomic<int32_t> authType_ = AUTH_TYPE_UNKNOW;
     std::string remoteUdidHash_ = "";
     ProcessInfo processInfo_;
-    std::mutex srcReqMsgLock_;
+    ffrt::mutex srcReqMsgLock_;
     bool isNeedProcCachedSrcReqMsg_ = false;
     std::string srcReqMsg_ = "";
     int32_t authenticationType_ = USER_OPERATION_TYPE_ALLOW_AUTH;
     DistributedDeviceProfile::LocalServiceInfo serviceInfoProfile_;
     bool pincodeDialogEverShown_ = false;
     std::string bundleName_ = "";
-    std::mutex sessionKeyIdMutex_;
-    std::condition_variable sessionKeyIdCondition_;
+    ffrt::mutex sessionKeyIdMutex_;
+    ffrt::condition_variable sessionKeyIdCondition_;
     std::map<int64_t, std::optional<int32_t>> sessionKeyIdAsyncResult_;
     bool isWaitingJoinLnnCallback_ = false;
     CleanNotifyCallback cleanNotifyCallback_{nullptr};
-    std::mutex bindParamMutex_;
+    ffrt::mutex bindParamMutex_;
     std::map<std::string, std::string> bindParam_;
-    std::mutex groupMutex_;
+    ffrt::mutex groupMutex_;
     bool isAddMember_ = false;
     bool isCreateGroup_ = false;
     bool transitToFinishState_ = false;

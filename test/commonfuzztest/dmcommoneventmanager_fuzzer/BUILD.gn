@@ -64,6 +64,7 @@ ohos_fuzztest("DmCommonEventManagerFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "dsoftbus:softbus_client",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_core",

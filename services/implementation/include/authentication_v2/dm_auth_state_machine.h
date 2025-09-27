@@ -28,6 +28,7 @@
 #include <chrono>
 
 #include "dm_auth_state.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -114,10 +115,10 @@ private:
     std::queue<std::shared_ptr<DmAuthState>> statesQueue_;
 
     // Synchronization primitives
-    std::mutex stateMutex_;
-    std::condition_variable stateCv_;
-    std::mutex eventMutex_;
-    std::condition_variable eventCv_;
+    ffrt::mutex stateMutex_;
+    ffrt::condition_variable stateCv_;
+    ffrt::mutex eventMutex_;
+    ffrt::condition_variable eventCv_;
 
     // Direction of authentication
     DmAuthDirection direction_;

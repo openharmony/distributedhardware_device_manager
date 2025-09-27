@@ -199,12 +199,6 @@ void IpcServerStub::OnAddSystemAbility(int32_t systemAbilityId, const std::strin
         return;
     }
 
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    if (systemAbilityId == DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
-        KVAdapterManager::GetInstance().ReInit();
-        return;
-    }
-#endif
     if (systemAbilityId == DEVICE_AUTH_SERVICE_ID) {
         DeviceManagerService::GetInstance().InitHichainListener();
         return;
@@ -317,7 +311,7 @@ int32_t IpcServerStub::RegisterDeviceManagerListener(const ProcessInfo &processI
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().SetCritical(pid, true, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
 #endif // SUPPORT_MEMMGR
-    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(processInfo);
     if (iter != dmListener_.end()) {
         LOGI("Listener already exists");
@@ -356,7 +350,7 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &proces
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     auto listenerIter = dmListener_.find(processInfo);
     if (listenerIter == dmListener_.end()) {
         LOGI("Listener not exists");
@@ -388,7 +382,7 @@ int32_t IpcServerStub::UnRegisterDeviceManagerListener(const ProcessInfo &proces
 std::vector<ProcessInfo> IpcServerStub::GetAllProcessInfo()
 {
     std::vector<ProcessInfo> processInfoVec;
-    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     for (const auto &iter : dmListener_) {
         processInfoVec.push_back(iter.first);
     }
@@ -402,7 +396,7 @@ const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo
         LOGE("Invalid parameter, pkgName is empty.");
         return nullptr;
     }
-    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     auto iter = dmListener_.find(processInfo);
     if (iter == dmListener_.end()) {
         return nullptr;
@@ -413,7 +407,7 @@ const sptr<IpcRemoteBroker> IpcServerStub::GetDmListener(ProcessInfo processInfo
 const ProcessInfo IpcServerStub::GetDmListenerPkgName(const wptr<IRemoteObject> &remote) const
 {
     ProcessInfo processInfo;
-    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     for (const auto &iter : dmListener_) {
         if ((iter.second)->AsObject() == remote.promote()) {
             processInfo = iter.first;
@@ -473,7 +467,7 @@ void IpcServerStub::RemoveSystemSA(const std::string &pkgName)
 //LCOV_EXCL_START
 std::set<std::string> IpcServerStub::GetSystemSA()
 {
-    std::lock_guard<std::mutex> autoLock(listenerLock_);
+    std::lock_guard<ffrt::mutex> autoLock(listenerLock_);
     std::set<std::string> systemSA;
     for (const auto &item : systemSA_) {
         systemSA.insert(item);

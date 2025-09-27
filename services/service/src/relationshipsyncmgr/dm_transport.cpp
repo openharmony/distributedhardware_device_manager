@@ -52,7 +52,7 @@ int32_t DMTransport::OnSocketOpened(int32_t socketId, const PeerSocketInfo &info
 {
     LOGI("OnSocketOpened, socket: %{public}d, peerSocketName: %{public}s, peerNetworkId: %{public}s, "
         "peerPkgName: %{public}s", socketId, info.name, GetAnonyString(info.networkId).c_str(), info.pkgName);
-    std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
+    std::lock_guard<ffrt::mutex> lock(rmtSocketIdMtx_);
     if (remoteDevSocketIds_.find(info.networkId) == remoteDevSocketIds_.end()) {
         std::set<int32_t> socketSet;
         socketSet.insert(socketId);
@@ -66,7 +66,7 @@ int32_t DMTransport::OnSocketOpened(int32_t socketId, const PeerSocketInfo &info
 void DMTransport::OnSocketClosed(int32_t socketId, ShutdownReason reason)
 {
     LOGI("OnSocketClosed, socket: %{public}d, reason: %{public}d", socketId, (int32_t)reason);
-    std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
+    std::lock_guard<ffrt::mutex> lock(rmtSocketIdMtx_);
     for (auto iter = remoteDevSocketIds_.begin(); iter != remoteDevSocketIds_.end();) {
         iter->second.erase(socketId);
         if (iter->second.empty()) {
@@ -306,7 +306,7 @@ int32_t DMTransport::Init()
 int32_t DMTransport::UnInit()
 {
     {
-        std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
+        std::lock_guard<ffrt::mutex> lock(rmtSocketIdMtx_);
         for (auto iter = remoteDevSocketIds_.begin(); iter != remoteDevSocketIds_.end(); ++iter) {
             for (auto iter1 = iter->second.begin(); iter1 != iter->second.end(); ++iter1) {
                 LOGI("Shutdown client socket: %{public}d to remote dev: %{public}s", *iter1,
@@ -334,7 +334,7 @@ bool DMTransport::IsDeviceSessionOpened(const std::string &rmtNetworkId, int32_t
     if (!IsIdLengthValid(rmtNetworkId)) {
         return false;
     }
-    std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
+    std::lock_guard<ffrt::mutex> lock(rmtSocketIdMtx_);
     auto iter = remoteDevSocketIds_.find(rmtNetworkId);
     if (iter == remoteDevSocketIds_.end()) {
         return false;
@@ -350,7 +350,7 @@ bool DMTransport::IsDeviceSessionOpened(const std::string &rmtNetworkId, int32_t
 
 std::string DMTransport::GetRemoteNetworkIdBySocketId(int32_t socketId)
 {
-    std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
+    std::lock_guard<ffrt::mutex> lock(rmtSocketIdMtx_);
     std::string networkId = "";
     for (auto const &item : remoteDevSocketIds_) {
         if (item.second.find(socketId) != item.second.end()) {
@@ -366,7 +366,7 @@ void DMTransport::ClearDeviceSocketOpened(const std::string &remoteDevId, int32_
     if (!IsIdLengthValid(remoteDevId)) {
         return;
     }
-    std::lock_guard<std::mutex> lock(rmtSocketIdMtx_);
+    std::lock_guard<ffrt::mutex> lock(rmtSocketIdMtx_);
     auto iter = remoteDevSocketIds_.find(remoteDevId);
     if (iter == remoteDevSocketIds_.end()) {
         return;

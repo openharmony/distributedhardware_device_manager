@@ -315,6 +315,7 @@ ohos_unittest("UTTest_app_manager_two") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -395,6 +396,7 @@ ohos_unittest("UTTest_ipc_get_device_info_rsp") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -414,6 +416,7 @@ ohos_unittest("UTTest_dm_common_event_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -431,6 +434,7 @@ ohos_unittest("device_manager_impl_test") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -665,6 +669,7 @@ ohos_unittest("UTTest_mine_hichain_connector") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -878,6 +883,7 @@ ohos_unittest("UTTest_dm_adapter_manager") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -901,6 +907,7 @@ ohos_unittest("UTTest_dm_anonymous") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -1077,6 +1084,7 @@ ohos_unittest("UTTest_ipc_server_listener") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
     "safwk:system_ability_fwk",
@@ -1187,6 +1195,7 @@ ohos_unittest("UTTest_multiple_user_connector") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
     "os_account:libaccountkits",
@@ -1216,6 +1225,7 @@ ohos_unittest("UTTest_permission_manager") {
     "access_token:libtoken_setproc",
     "cJSON:cjson",
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -1255,6 +1265,7 @@ ohos_unittest("UTTest_oh_device_manager") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "ipc:ipc_core",
   ]
@@ -1294,6 +1305,7 @@ ohos_unittest("UTTest_ipc_client_server_proxy") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -1367,6 +1379,7 @@ ohos_unittest("UTTest_dm_dfx") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
@@ -1545,6 +1558,7 @@ ohos_unittest("ipc_client_manager_test") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -1679,6 +1693,7 @@ ohos_unittest("UTTest_dm_radar_helper_test") {
 
   external_deps = [
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -1704,6 +1719,7 @@ ohos_unittest("UTTest_discovery_filter") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -1814,6 +1830,7 @@ ohos_unittest("UTTest_dm_distributed_hardware_load") {
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
@@ -1856,6 +1873,7 @@ ohos_unittest("UTTest_dm_crypto") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]
@@ -1875,7 +1893,10 @@ ohos_unittest("UTTest_dm_account_common_event") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [
+    "ffrt:libffrt",
+    "hilog:libhilog",
+  ]
 }
 
 ## UnitTest UTTest_dm_account_common_event }}}
@@ -1894,6 +1915,7 @@ ohos_unittest("UTTest_dm_publish_common_event") {
 
   external_deps = [
     "bluetooth:btframework",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "wifi:wifi_sdk",
   ]
@@ -1915,6 +1937,7 @@ ohos_unittest("UTTest_dm_screen_common_event") {
 
   external_deps = [
     "bluetooth:btframework",
+    "ffrt:libffrt",
     "hilog:libhilog",
     "wifi:wifi_sdk",
   ]
@@ -1953,7 +1976,10 @@ ohos_unittest("UTTest_hichain_listener") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [ 
+    "ffrt:libffrt",
+    "hilog:libhilog",
+  ]
 }
 
 ## UnitTest UTTest_hichain_listener }}}
@@ -2042,6 +2068,7 @@ ohos_unittest("UTTest_app_manager") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",
@@ -2065,7 +2092,10 @@ ohos_unittest("UTTest_crypto_mgr") {
 
   deps = [ ":device_manager_test_common" ]
 
-  external_deps = [ "hilog:libhilog" ]
+  external_deps = [ 
+    "ffrt:libffrt",
+    "hilog:libhilog",
+  ]
 }
 
 ## UnitTest UTTest_crypto_mgr }}}
@@ -2092,6 +2122,7 @@ ohos_unittest("UTTest_device_name_manager") {
   external_deps = [
     "data_share:datashare_common",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
     "hilog:libhilog",

@@ -769,10 +769,11 @@ void DeviceManagerServiceImpl::DeleteHoDevice(const std::string &peerUdid,
 }
 
 void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &deviceUdid,
-    const std::string &deviceUdidHash)
+    const std::string &deviceUdidHash, int32_t userId)
 {
     (void)deviceUdid;
     (void)deviceUdidHash;
+    (void)userId;
 }
 
 int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std::string &networkId)

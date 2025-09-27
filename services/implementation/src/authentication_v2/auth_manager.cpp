@@ -162,7 +162,7 @@ AuthManager::~AuthManager()
         LOGI("AuthManager context variables destroy successful.");
     }
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         bindParam_.clear();
     }
     LOGI("DmAuthManager destructor");
@@ -587,7 +587,7 @@ int32_t AuthManager::GetBindLevel(int32_t bindLevel)
     std::string processName = "";
     bool isSystemSA = false;
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         if (bindParam_.find("bindCallerProcessName") != bindParam_.end()) {
             processName = bindParam_["bindCallerProcessName"];
         }
@@ -650,7 +650,7 @@ void AuthManager::GetAuthParam(const std::string &pkgName, int32_t authType,
     CheckBindLevel(jsonObject, TAG_BIND_LEVEL, context_->accesser.oldBindLevel);
     context_->accesser.oldBindLevel = GetBindLevel(context_->accesser.oldBindLevel);
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         bindParam_["bindCallerOldBindLevel"] = std::to_string(context_->accesser.oldBindLevel);
     }
     LOGI("bindCallerOldBindLevel %{public}d.", context_->accesser.oldBindLevel);
@@ -757,7 +757,7 @@ int32_t AuthManager::BindTarget(const std::string &pkgName, const PeerTargetId &
     }
     context_->peerTargetId = targetId_;
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         bindParam_ = bindParam;
     }
     if (!targetId.deviceId.empty()) {
@@ -1152,7 +1152,7 @@ void AuthManager::GetBindTargetParams(std::string &pkgName, PeerTargetId &target
     pkgName = context_->pkgName;
     targetId = targetId_;
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         bindParam = bindParam_;
     }
     LOGI("AuthManager::GetBindTargetParams get pkgName %{public}s to reuse", pkgName.c_str());
@@ -1186,7 +1186,7 @@ void AuthManager::GetBindCallerInfo()
 {
     LOGI("start.");
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
             context_->processInfo.userId = std::atoi(bindParam_["bindCallerUserId"].c_str()); // processInfo.userId
         }
@@ -1214,7 +1214,7 @@ void AuthManager::DeleteTimer()
         LOGI("AuthManager context deleteTimer successful.");
     }
     {
-        std::lock_guard<std::mutex> lock(bindParamMutex_);
+        std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         bindParam_.clear();
     }
     LOGI("end.");

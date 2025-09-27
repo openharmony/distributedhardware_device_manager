@@ -54,6 +54,7 @@ ohos_fuzztest("GetDeviceInfoFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "ffrt:libffrt",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]

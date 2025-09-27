@@ -48,7 +48,7 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::vector<std::string> 
         LOGE("enentNsmr is empty or callback is nullptr.");
         return false;
     }
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (eventValidFlag_) {
         LOGE("failed to subscribe commom eventName size: %{public}zu", eventNameVec.size());
         return false;
@@ -92,7 +92,7 @@ bool DmCommonEventManager::SubscribeServiceEvent(const std::vector<std::string> 
 
 bool DmCommonEventManager::UnsubscribeServiceEvent()
 {
-    std::lock_guard<std::mutex> locker(evenSubscriberMutex_);
+    std::lock_guard<ffrt::mutex> locker(evenSubscriberMutex_);
     if (!eventValidFlag_) {
         LOGE("failed to unsubscribe commom event name size: %{public}zu because event is invalid.",
             eventNameVec_.size());

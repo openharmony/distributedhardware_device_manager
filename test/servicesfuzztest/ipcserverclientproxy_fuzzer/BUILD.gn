@@ -73,6 +73,7 @@ ohos_fuzztest("IpcServerClientProxyFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "device_auth:deviceauth_sdk",
+    "ffrt:libffrt",
     "ipc:ipc_core",
     "ipc:ipc_single",
     "napi:ace_napi",

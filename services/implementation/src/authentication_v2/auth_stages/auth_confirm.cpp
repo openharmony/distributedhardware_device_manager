@@ -666,7 +666,7 @@ void AuthSrcConfirmState::GenerateCertificate(std::shared_ptr<DmAuthContext> con
         return;
     }
     {
-        std::lock_guard<std::mutex> lock(context->certMtx_);
+        std::lock_guard lock(context->certMtx_);
         context->accesser.cert = AuthAttestCommon::GetInstance().SerializeDmCertChain(&dmCertChain);
     }
     context->certCV_.notify_all();

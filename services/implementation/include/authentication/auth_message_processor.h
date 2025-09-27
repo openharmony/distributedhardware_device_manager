@@ -107,7 +107,7 @@ private:
     std::shared_ptr<ICryptoAdapter> cryptoAdapter_;
     std::shared_ptr<DmAuthRequestContext> authRequestContext_;
     std::shared_ptr<DmAuthResponseContext> authResponseContext_;
-    std::mutex encryptFlagMutex_;
+    ffrt::mutex encryptFlagMutex_;
     bool encryptFlag_ = false;
     std::shared_ptr<CryptoMgr> cryptoMgr_ = nullptr;
 };

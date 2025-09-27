@@ -24,8 +24,8 @@ class IpcGetUdidsByDeviceIdsRsp : public IpcRsp {
     DECLARE_IPC_MODEL(IpcGetUdidsByDeviceIdsRsp);
 public:
     /**
-     * @tc.name: IpcGetTrustDeviceRsp::GetDeviceIdToUdidMap
-     * @tc.desc: Get DeviceIdToUdidMap of the Ipc Get Trust Device Response
+     * @tc.name: IpcGetUdidsByDeviceIdsRsp::GetDeviceIdToUdidMap
+     * @tc.desc: Get DeviceIdToUdidMap of the Ipc Get Udids By DeviceIds Response
      * @tc.type: FUNC
      */
     std::map<std::string, std::string> GetDeviceIdToUdidMap() const
@@ -34,8 +34,8 @@ public:
     }
 
     /**
-     * @tc.name: IpcGetTrustDeviceRsp::SetDeviceIdToUdidMap
-     * @tc.desc: Set DeviceIdToUdidMap of the Ipc Get Trust Device Response
+     * @tc.name: IpcGetUdidsByDeviceIdsRsp::SetDeviceIdToUdidMap
+     * @tc.desc: Set DeviceIdToUdidMap of the Ipc Get Udids By DeviceIds Response
      * @tc.type: FUNC
      */
     void SetDeviceIdToUdidMap(const std::map<std::string, std::string> &deviceIdToUdidMap)

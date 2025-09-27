@@ -17,6 +17,7 @@
 #define OHOS_PUBLISH_COMMON_EVENT_H
 
 #include "common_event_manager.h"
+#include "ffrt.h"
 #include "system_ability_status_change_stub.h"
 
 #include "dm_constants.h"
@@ -50,9 +51,9 @@ private:
     int32_t bluetoothState_ { -1 };
     int32_t screenState_ = DM_SCREEN_UNKNOWN;
     PublishEventCallback callback_;
-    std::mutex wifiStateMutex_;
-    std::mutex bluetoothStateMutex_;
-    std::mutex screenStateMutex_;
+    ffrt::mutex wifiStateMutex_;
+    ffrt::mutex bluetoothStateMutex_;
+    ffrt::mutex screenStateMutex_;
 };
 
 class DmPublishCommonEventManager {
@@ -68,8 +69,8 @@ public:
 private:
     std::vector<std::string> eventNameVec_;
     bool eventValidFlag_ = false;
-    std::mutex evenSubscriberMutex_;
-    std::mutex subscriberMutex_;
+    ffrt::mutex evenSubscriberMutex_;
+    ffrt::mutex subscriberMutex_;
     std::shared_ptr<DmPublishEventSubscriber> subscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 

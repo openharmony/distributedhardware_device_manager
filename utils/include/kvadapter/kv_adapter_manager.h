@@ -22,7 +22,7 @@
 #include <string>
 
 #include "dm_single_instance.h"
-
+#include "ffrt.h"
 #include "kv_adapter.h"
 
 namespace OHOS {
@@ -55,8 +55,9 @@ private:
 
 private:
     std::shared_ptr<DistributedKv::KvStoreDeathRecipient> deathRecipient_ = nullptr;
+    ffrt::mutex kvAdapterMtx_;
     std::shared_ptr<KVAdapter> kvAdapter_ = nullptr;
-    std::mutex idCacheMapMtx_;
+    ffrt::mutex idCacheMapMtx_;
     std::map<std::string, DmKVValue> idCacheMap_;
 };
 } // namespace DistributedHardware

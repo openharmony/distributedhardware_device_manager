@@ -17,6 +17,7 @@
 #define OHOS_ACCOUNT_COMMON_EVENT_H
 
 #include "common_event_manager.h"
+#include "ffrt.h"
 #include "system_ability_status_change_stub.h"
 
 namespace OHOS {
@@ -63,7 +64,7 @@ public:
 private:
     std::vector<std::string> eventNameVec_;
     bool eventValidFlag_ = false;
-    std::mutex evenSubscriberMutex_;
+    ffrt::mutex evenSubscriberMutex_;
     std::shared_ptr<DmAccountEventSubscriber> subscriber_ = nullptr;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 

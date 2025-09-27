@@ -21,6 +21,7 @@
 #include "auth_ui_state_manager.h"
 #include "dm_auth_manager_base.h"
 #include "dm_device_info.h"
+#include "ffrt.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
 #include "json_object.h"
@@ -127,7 +128,7 @@ public:
 
 protected:
     std::shared_ptr<DmAuthContext> context_;
-    std::mutex bindParamMutex_;
+    ffrt::mutex bindParamMutex_;
     std::map<std::string, std::string> bindParam_;
     PeerTargetId targetId_;
 

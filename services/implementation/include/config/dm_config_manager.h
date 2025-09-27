@@ -19,9 +19,6 @@
 #include <cstdlib>
 #include <map>
 #include <memory>
-#if !defined(__LITEOS_M__)
-#include <mutex>
-#endif
 #include <set>
 #include <string>
 #include <vector>
@@ -30,6 +27,9 @@
 #include "crypto_adapter.h"
 #include "decision_adapter.h"
 #include "dm_single_instance.h"
+#if !defined(__LITEOS_M__)
+#include "ffrt.h"
+#endif
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -80,8 +80,7 @@ private:
 
 private:
 #if !defined(__LITEOS_M__)
-    std::mutex authAdapterMutex_;
-    std::mutex cryptoAdapterMutex_;
+    ffrt::mutex cryptoAdapterMutex_;
 #endif
     std::map<int32_t, AuthSoLoadInfo> soAuthLoadInfo_;
     std::map<std::string, AdapterSoLoadInfo> soAdapterLoadInfo_;

@@ -18,11 +18,8 @@
 
 #include <string>
 #include <memory>
-#if defined(__LITEOS_M__)
-#include "dm_mutex.h"
-#else
+
 #include <mutex>
-#endif
 
 #include "advertise_manager.h"
 #include "discovery_manager.h"
@@ -449,11 +446,18 @@ private:
     bool isDeviceRiskDetectSoLoaded_ = false;
     void *residentSoHandle_ = nullptr;
     void *deviceRiskDetectSoHandle_ = nullptr;
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::mutex isImplLoadLock_;
+    ffrt::mutex isAdapterResidentLoadLock_;
+    ffrt::mutex isDeviceRiskDetectSoLoadLock_;
+    ffrt::mutex detectLock_;
+    ffrt::mutex hichainListenerLock_;
+#else
     std::mutex isImplLoadLock_;
     std::mutex isAdapterResidentLoadLock_;
     std::mutex isDeviceRiskDetectSoLoadLock_;
-    std::mutex detectLock_;
     std::mutex hichainListenerLock_;
+#endif
     std::mutex userVecLock_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;

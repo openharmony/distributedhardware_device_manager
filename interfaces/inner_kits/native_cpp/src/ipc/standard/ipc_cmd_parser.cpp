@@ -2241,7 +2241,7 @@ ON_IPC_SET_REQUEST(GET_UDIDS_BY_DEVICEIDS, std::shared_ptr<IpcReq> pBaseReq, Mes
     }
     std::vector<std::string> deviceIdList = pReq->GetDeviceIdList();
     if (!IpcModelCodec::EncodeStringVector(deviceIdList, data)) {
-        LOGE("write GetServiceId failed");
+        LOGE("write deviceIdList failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

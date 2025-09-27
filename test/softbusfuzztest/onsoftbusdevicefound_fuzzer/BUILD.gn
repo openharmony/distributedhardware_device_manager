@@ -52,6 +52,7 @@ ohos_fuzztest("OnSoftbusDeviceFoundFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "dsoftbus:softbus_client",
+    "ffrt:libffrt",
     "safwk:system_ability_fwk",
   ]
 
