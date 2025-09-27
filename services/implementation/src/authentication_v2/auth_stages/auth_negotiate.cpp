@@ -136,17 +136,10 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.deviceIdHash = Crypto::GetUdidHash(context->accessee.deviceId);
     context->accessee.deviceType = context->softbusConnector->GetLocalDeviceTypeId();
     // 2. Get userId
-    context->accessee.userId = MultipleUserConnector::GetUserIdByDisplayId(context->accessee.displayId);
+    context->accessee.userId = MultipleUserConnector::GetSinkUserId(context);
     if (context->accessee.userId < 0) {
         LOGE("get userId failed.");
         return ERR_DM_GET_LOCAL_USERID_FAILED;
-    }
-    if (context->accessee.deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
-        int32_t res = CheckUserIdValidity(context);
-        if (res != DM_OK) {
-            LOGE("CheckUserIdValidity failed.");
-            return ERR_DM_FAILED; // todo 待修改
-        }
     }
     // 3. Get accountId
     context->accessee.accountId = MultipleUserConnector::GetOhosAccountIdByUserId(context->accessee.userId);
@@ -173,27 +166,31 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     return RespQueryProxyAcceseeIds(context);
 }
 
-int32_t AuthSinkNegotiateStateMachine::CheckUserIdValidity(std::shared_ptr<DmAuthContext> context) 
+int32_t AuthSinkNegotiateStateMachine::GetSinkUserId(std::shared_ptr<DmAuthContext> context)
 {
-    int32_t controlScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
-    if (controlScreenUserId < 0) {
-        LOGE("controlScreenUserId is invalid.");
-        return ERR_DM_FAILED; // todo 待修改
-    }
-    // SA
-    if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
-        context->accessee.tokenId) == DM_OK) {
-        if (context->accessee.displayId == -1) {
-            context->accessee.userId = controlScreenUserId;
-            return DM_OK;
+    LOGI("displayId = %{public}d", context->accessee.displayId);
+    int32_t userId = -1;
+    if (context->accessee.deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
+        int32_t controlScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
+        if (controlScreenUserId < 0) {
+            LOGE("controlScreenUserId = %{public}d is invalid.", controlScreenUserId);
+            return userId;
         }
-        if (context->accessee.userId != controlScreenUserId) {
-            LOGE("SA accesser.userId and controlScreenUserId is not same.");
-            return ERR_DM_FAILED; // todo 待修改
+        if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
+            context->accessee.tokenId) == DM_OK) {
+            if (context->accessee.displayId == -1) {
+                LOGI("not transmit local displayId, return controlScreenUserId");
+                return controlScreenUserId;
+            }
+            if (context->accessee.displayId != 0) {
+                LOGE("accessee.displayId = %{public}d is 
+                    not control screen.", context->accessee.displayId);
+                return userId;
+            }
         }
+        return controlScreenUserId;
     }
-    context->accessee.userId = controlScreenUserId;
-    return DM_OK;
+    return MultipleUserConnector::GetUserIdByDisplayId(context->accessee.displayId);
 }
 
 int32_t AuthSinkNegotiateStateMachine::RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context)

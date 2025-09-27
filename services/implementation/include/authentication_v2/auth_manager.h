@@ -20,6 +20,7 @@
 
 #include "auth_ui_state_manager.h"
 #include "dm_auth_manager_base.h"
+#include "dm_device_info.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
 #include "json_object.h"
@@ -156,7 +157,7 @@ private:
     void GetIsNeedJoinLnnParam(const std::map<std::string, std::string> &bindParam);
     void ParseServiceInfo(const JsonObject &jsonObject);
     void GetConnDelayCloseTime(const std::string &extra);
-    int32_t CheckUserIdForCar();
+    int32_t GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType);
 };
 
 class AuthSrcManager : public AuthManager {

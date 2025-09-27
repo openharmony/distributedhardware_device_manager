@@ -475,7 +475,8 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     if (jsonObject[TAG_LOCAL_USERID].IsNumberInteger()) {
         context_->accesser.userId = jsonObject[TAG_LOCAL_USERID].Get<int32_t>();
     } else {
-        context_->accesser.userId = MultipleUserConnector::GetUserIdByDisplayId(context_->accesser.displayId);
+        context_->accesser.userId = MultipleUserConnector::
+            GetSrcUserIdByDisplayIdAndDeviceType(context_->accesser.displayId, context_->accesser.deviceType);
     }
     if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
         context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
@@ -488,6 +489,40 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     ParseProxyJsonObject(jsonObject);
     ParseServiceInfo(jsonObject);
     return;
+}
+
+int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType)
+{
+    LOGI("displayId = %{public}d", displayId);
+    int32_t userId = -1;
+    if (deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
+        int32_t controlScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
+        if (controlScreenUserId < 0) {
+            LOGE("controlScreenUserId = %{public}d is invalid.", controlScreenUserId);
+            return userId;
+        }
+        bool isSystemSA = false;
+        if (bindParam_.find("bindCallerIsSystemSA") != bindParam_.end()) {
+            isSystemSA = static_cast<bool>(std::atoi(bindParam_["bindCallerIsSystemSA"].c_str()));
+        }
+        if (isSystemSA) {
+            if (context_->accesser.displayId == -1) {
+                LOGI("not transmit local displayId, return controlScreenUserId");
+                return controlScreenUserId;
+            }
+            if (context_->accesser.displayId != 0) {
+                LOGE("accesser.displayId = %{public}d is not control screen.", context_->accesser.displayId);
+                return userId;
+            }
+        }
+        // HAP
+        if (context_->processInfo.userId != controlScreenUserId) {
+            LOGE("hap userId and controlScreenUserId is not same.");
+            return userId;
+        }
+        return controlScreenUserId;
+    }
+    return MultipleUserConnector::GetUserIdByDisplayId(displayId);
 }
 
 void AuthManager::ParseServiceInfo(const JsonObject &jsonObject)
@@ -671,43 +706,13 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
         return DM_OK;
     }
     InitAuthState(pkgName, authType, deviceId, extra);
-    if (context_->accesser.deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
-        ret = CheckUserIdForCar();
-        if (ret != DM_OK) {
-            LOGE("CheckUserIdForCar failed.");
-            return ret;
-        }
+    if (context_->accesser.userId < 0) {
+        LOGI("accesser.userId is invalid.");
+        return ERR_DM_INPUT_PARA_INVALID;
     }
     if (context_->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Invalid) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    return DM_OK;
-}
-
-int32_t AuthManager::CheckUserIdForCar()
-{
-    int32_t controlScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
-    if (controlScreenUserId < 0) {
-        LOGE("controlScreenUserId is invalid.");
-        return ERR_DM_FAILED; // todo 待修改
-    }
-    // SA
-    if (AppManager::GetInstance().IsSystemSA()) {
-        if (context_->accesser.displayId == -1) {
-            context_->accesser.userId = controlScreenUserId;
-            return DM_OK;
-        }
-        if (context_->accesser.userId != controlScreenUserId) {
-             LOGE("SA accesser.userId and controlScreenUserId is not same.");
-             return ERR_DM_FAILED; // todo 待修改
-        }
-    }
-    // HAP
-    if (context_->processInfo.userId != controlScreenUserId) {
-        LOGE("SA accesser.userId and controlScreenUserId is not same.");
-        return ERR_DM_FAILED; // todo 待修改
-    }
-    context_->accesser.userId = controlScreenUserId;
     return DM_OK;
 }
 
@@ -1244,7 +1249,11 @@ int32_t AuthManager::CheckProxyAuthParamVaild(const std::string &extra)
     if (jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<std::string>() != DM_VAL_TRUE) {
         return DM_OK;
     }
-    if (!AppManager::GetInstance().IsSystemSA()) {
+    bool isSystemSA = false;
+    if (bindParam_.find("bindCallerIsSystemSA") != bindParam_.end()) {
+        isSystemSA = static_cast<bool>(std::atoi(bindParam_["bindCallerIsSystemSA"].c_str()));
+    }
+    if (!isSystemSA) {
         LOGE("no proxy permission");
         return ERR_DM_NO_PERMISSION;
     }
