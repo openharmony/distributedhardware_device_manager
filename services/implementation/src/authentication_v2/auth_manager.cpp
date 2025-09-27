@@ -1188,7 +1188,7 @@ void AuthManager::GetBindCallerInfo()
     {
         std::lock_guard<ffrt::mutex> lock(bindParamMutex_);
         if (bindParam_.find("bindCallerUserId") != bindParam_.end()) {
-            context_->processInfo.userId = std::atoi(bindParam_["bindCallerUserId"].c_str()); // processInfo.userId
+            context_->processInfo.userId = std::atoi(bindParam_["bindCallerUserId"].c_str());
         }
         if (bindParam_.find("bindCallerTokenId") != bindParam_.end()) {
             context_->accesser.tokenId = std::atoi(bindParam_["bindCallerTokenId"].c_str());
