@@ -16,7 +16,7 @@
 #include "UTTest_auth_message_processor.h"
 
 #include "dm_log.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "auth_message_processor.h"
 #include "softbus_connector.h"

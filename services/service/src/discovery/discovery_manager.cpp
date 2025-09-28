@@ -18,7 +18,7 @@
 #include <dlfcn.h>
 #include "softbus_common.h"
 
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_random.h"
 #include "parameter.h"

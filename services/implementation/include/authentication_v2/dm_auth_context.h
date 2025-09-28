@@ -23,7 +23,7 @@
 #include "auth_manager.h"
 #include "auth_ui_state_manager.h"
 #include "dm_ability_manager.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_auth_message_processor.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"

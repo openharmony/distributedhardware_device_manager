@@ -30,7 +30,7 @@
 #include "dm_radar_helper.h"
 #include "dm_language_manager.h"
 #include "dm_constants.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_random.h"
 #include "dm_auth_context.h"
 #include "dm_auth_state.h"

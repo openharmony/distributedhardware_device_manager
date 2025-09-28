@@ -45,7 +45,7 @@ if (defined(ohos_lite)) {
         "${common_path}/src/dfx/lite/dm_hidumper.cpp",
         "${common_path}/src/dfx/lite/dm_hisysevent.cpp",
         "${common_path}/src/dfx/lite/dm_hitrace.cpp",
-        "${common_path}/src/dm_anonymous.cpp",
+        "${common_path}/src/dm_common_util.cpp",
         "${common_path}/src/dm_error_message.cpp",
         "${common_path}/src/ipc/lite/ipc_cmd_register.cpp",
         "src/appInfo/lite/app_manager.cpp",
@@ -127,7 +127,7 @@ if (defined(ohos_lite)) {
     configs = [ ":cflags_config" ]
 
     sources = [
-      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dm_common_util.cpp",
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",
@@ -208,7 +208,7 @@ if (defined(ohos_lite)) {
     ]
 
     sources = [
-      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dm_common_util.cpp",
       "src/appInfo/standard/app_manager.cpp",
       "src/crypto/dm_crypto.cpp",
       "src/dm_random.cpp",

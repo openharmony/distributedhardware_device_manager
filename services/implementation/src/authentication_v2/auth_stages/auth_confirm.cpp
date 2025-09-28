@@ -21,7 +21,7 @@
 #include "access_control_profile.h"
 #include "deviceprofile_connector.h"
 #include "distributed_device_profile_errors.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_auth_attest_common.h"
 #include "dm_auth_cert.h"
 #include "dm_auth_context.h"

@@ -20,7 +20,7 @@
 #include "auth_manager.h"
 #include "deviceprofile_connector.h"
 #include "device_manager_service_listener.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_auth_context.h"
 #include "dm_auth_manager_base.h"
 #include "auth_manager.h"

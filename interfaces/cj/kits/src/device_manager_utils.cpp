@@ -19,7 +19,7 @@
 #include <mutex>
 
 #include "device_manager_impl.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 

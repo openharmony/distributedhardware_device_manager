@@ -16,7 +16,7 @@
 #include "UTTest_kv_adapter_manager.h"
 #include "datetime_ex.h"
 #include "dm_constants.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 
 using ::testing::_;
 using ::testing::An;

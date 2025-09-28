@@ -20,7 +20,7 @@
 #include <string>
 #include <gtest/gtest.h>
 
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "discovery_filter.h"
 #include "dm_log.h"

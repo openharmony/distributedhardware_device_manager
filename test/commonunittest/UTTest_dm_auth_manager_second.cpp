@@ -18,7 +18,7 @@
 #include "auth_message_processor.h"
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_dialog_manager.h"

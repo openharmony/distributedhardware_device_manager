@@ -29,7 +29,7 @@ if (defined(ohos_lite)) {
       ]
 
       sources = [
-        "${common_path}/src/dm_anonymous.cpp",
+        "${common_path}/src/dm_common_util.cpp",
         "src/dm_softbus_cache.cpp",
       ]
 

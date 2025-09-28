@@ -20,7 +20,7 @@
 
 #include "ability_manager_client.h"
 #include "auth_message_processor.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_log.h"
 #include "dm_crypto.h"
 #include "json_object.h"

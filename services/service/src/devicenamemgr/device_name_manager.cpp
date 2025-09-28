@@ -19,7 +19,7 @@
 #include "multiple_user_connector.h"
 #include "system_ability_definition.h"
 #include "device_manager_service.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "parameter.h"
 

@@ -16,7 +16,7 @@
 
 #include <dlfcn.h>
 
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_log.h"
 #include "json_config.h"
 #include "json_object.h"

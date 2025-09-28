@@ -898,7 +898,7 @@ ohos_unittest("UTTest_dm_anonymous") {
   include_dirs = [ "${devicemanager_path}/test/commonunittest" ]
 
   sources = [
-    "${common_path}/src/dm_anonymous.cpp",
+    "${common_path}/src/dm_common_util.cpp",
     "${common_path}/src/dm_error_message.cpp",
     "${devicemanager_path}/test/commonunittest/UTTest_dm_anonymous.cpp",
   ]
