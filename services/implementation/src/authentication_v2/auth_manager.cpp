@@ -455,11 +455,11 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
         std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
         context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
     }
+    ParseAccessJsonObject(jsonObject);
     if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
         context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
         LOGI("isNeedAuthenticate: %{public}d.", context_->isNeedAuthenticate);
     }
-    ParseAccessJsonObject(jsonObject);
     if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
         ParseUltrasonicSide(jsonObject);
     }
