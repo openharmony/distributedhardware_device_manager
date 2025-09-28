@@ -14,21 +14,25 @@
  */
 
 @!namespace("@ohos.distributedDeviceManager", "distributedDeviceManager")
+@!sts_export_default
+
+@!sts_inject_into_module("""
+import { AsyncCallback, Callback, BusinessError } from '@ohos.base';
+""")
 
 @!sts_inject("""
 static { loadLibrary("device_manager_ani_taihe.z");}
 """)
 
-struct  DeviceBasicInfo {
+struct DeviceBasicInfo {
     deviceId: String;
     deviceName: String;
     deviceType: String;
-    networkId: String;
-    extraData: String;
+    networkId: Optional<String>;
 }
 
 function MakeDeviceBasicInfo(deviceId:String, deviceName:String, deviceType:String,
-                             networkId:String, extraData: String): DeviceBasicInfo;
+                             networkId:Optional<String>): DeviceBasicInfo;
 
 struct ServiceProfileInfo {
     deviceId: String;
@@ -72,13 +76,28 @@ struct DeviceStateChangeResult {
 function MakeDeviceStateChangeResult(deviceStateChange : DeviceStateChange,
                                    deviceBasicInfo : DeviceBasicInfo): DeviceStateChangeResult;
 
+struct BindTargetResult {
+    deviceId: String;
+}
+
 interface DeviceManager {
+    GetInner(): i64;
+
     GetLocalDeviceId(): String;
-    UnbindTarget(deviceId: String): void;
     GetDeviceType(networkId: String): i32;
     GetDeviceName(networkId: String): String;
     GetLocalDeviceNetworkId(): String;
 
+    @gen_async("getAvailableDeviceList")
+    @gen_promise("getAvailableDeviceList")
+    GetAvailableDeviceListSync(): Array<DeviceBasicInfo>;
+ 
+    BindTarget(deviceId: String, bindParam: @record Map<String, Opaque>, callback: (err: @sts_type("BusinessError<void>") Opaque, data: BindTargetResult) => void): void;
+    UnbindTarget(deviceId: String): void;
+ 
+    StartDiscovering(discoverParam: @record Map<String, Opaque>, filterOptions: Optional<@record Map<String, Opaque>>): void;
+    StopDiscovering(): void;
+    
     @!sts_inject_into_interface("on(type: string, callback: (data: object) => void): void;")
     @!sts_inject_into_class("""on(type: string, callback: object): void {
         if (type === "discoverSuccess") {
@@ -135,3 +154,4 @@ interface DeviceManager {
 }
 
 function CreateDeviceManager(bundleName: String): DeviceManager;
+function ReleaseDeviceManager(deviceManager: DeviceManager): void;

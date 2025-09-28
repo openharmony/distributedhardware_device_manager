@@ -14,6 +14,7 @@
  */
 
 #include "ohos.distributedDeviceManager.ani.hpp"
+#include "dm_log.h"
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
@@ -22,7 +23,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
     if (ANI_OK != ohos::distributedDeviceManager::ANIRegister(env)) {
-        std::cerr << "Error from ohos::distributedDeviceManager::ANIRegister" << std::endl;
+        LOGE("Error from ohos::distributedDeviceManager::ANIRegister");
         return ANI_ERROR;
     }
     *result = ANI_VERSION_1;

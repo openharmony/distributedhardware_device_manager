@@ -12,9 +12,9 @@
 # limitations under the License.
 
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
-import("//foundation/distributedhardware/device_manager/device_manager.gni")
 import("//build/ohos.gni")
 import("//build/ohos/taihe_idl/taihe.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
 
 subsystem_name = "distributedhardware"
 part_name = "device_manager"
@@ -52,25 +52,39 @@ if (device_manager_enable_ets_frontend) {
       "include",
       "${innerkits_path}/native_cpp/include",
       "${devicemanager_path}/interfaces/kits/taihe/include",
+      "${json_path}/include",
+    ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagertaihe\"",
+      "LOG_DOMAIN=0xD004110",
     ]
 
     sources = get_target_outputs(":run_taihe")
     sources += [
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dm_error_message.cpp",
       "src/ani_constructor.cpp",
+      "src/ani_dm_utils.cpp",
+      "src/ani_error_utils.cpp",
+      "src/ani_utils.cpp",
+      "src/dm_ani_callback.cpp",
       "src/ohos.distributedDeviceManager.cpp",
-      "src/dm_ani_callback.cpp"
     ]
 
     deps = [
       ":run_taihe",
-      "${innerkits_path}/native_cpp:devicemanagersdk"
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${json_path}:devicemanagerjson",
     ]
 
     external_deps = [
-      "hilog:libhilog",
+      "access_token:libtokenid_sdk",
       "bundle_framework:appexecfwk_base",
       "bundle_framework:appexecfwk_core",
       "eventhandler:libeventhandler",
+      "hilog:libhilog",
     ]
   }
 
@@ -87,9 +101,7 @@ if (device_manager_enable_ets_frontend) {
     module_install_dir = "framework"
     part_name = "$part_name"
     subsystem_name = "$subsystem_name"
-    deps = [
-      ":ohos_distributedDeviceManager_abc"
-    ]
+    deps = [ ":ohos_distributedDeviceManager_abc" ]
   }
 }
 
