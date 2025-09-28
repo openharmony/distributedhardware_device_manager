@@ -3390,7 +3390,7 @@ int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std
 void DeviceManagerServiceImpl::GetSessionDelayCloseTime(const std::map<std::string, std::string> &bindParam)
 {
     if (bindParam.find(PARAM_CLOSE_SESSION_DELAY_SECONDS) != bindParam.end()) {
-        std::string inputDelayTime = bindParam[PARAM_CLOSE_SESSION_DELAY_SECONDS];
+        std::string inputDelayTime = bindParam.at(PARAM_CLOSE_SESSION_DELAY_SECONDS);
         delayCloseTime_ = ConvertStrToInt(inputDelayTime);
     }
     const int32_t closeSessionDelaySecondsMax = 10;
