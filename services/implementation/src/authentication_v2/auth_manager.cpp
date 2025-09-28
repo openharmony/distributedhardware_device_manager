@@ -469,7 +469,7 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     return;
 }
 
-void AuthManager::ParseAccessJsonObject(JsonObject &jsonObject)
+void AuthManager::ParseAccessJsonObject(const JsonObject &jsonObject)
 {
     CHECK_NULL_VOID(context_);
     context_->accessee.bundleName = context_->accesser.bundleName;

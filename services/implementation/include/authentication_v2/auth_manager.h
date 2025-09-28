@@ -139,7 +139,7 @@ private:
     void ParseProxyJsonObject(const JsonObject &jsonObject);
     void GetBindLevelByBundleName(std::string &bundleName, int32_t userId, int32_t &bindLevel);
     void ParseJsonObject(const JsonObject &jsonObject);
-    void ParseAccessJsonObject(JsonObject &jsonObject);
+    void ParseAccessJsonObject(const JsonObject &jsonObject);
     void GetAuthParam(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
     std::string GetBundleName(const JsonObject &jsonObject);
