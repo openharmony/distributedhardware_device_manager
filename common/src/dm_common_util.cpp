@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_log.h"
 #include <sstream>
 #include <set>
@@ -497,6 +497,20 @@ int64_t GetCurrentTimestamp()
     auto now = std::chrono::system_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch());
     return duration.count();
+}
+
+int32_t ConvertStrToInt(const std::string &inputStr)
+{
+    if (!IsNumberString(inputStr)) {
+        LOGE("Invalid parameter, param is not number.");
+        return 0;
+    }
+    int32_t outputNumber = std::atoi(inputStr.c_str());
+    if (outputNumber < 0) {
+        LOGE("Invalid parameter, param out of range.");
+        return 0;
+    }
+    return outputNumber;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

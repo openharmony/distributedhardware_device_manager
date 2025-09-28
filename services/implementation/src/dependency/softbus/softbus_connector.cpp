@@ -19,7 +19,7 @@
 #include <securec.h>
 #include <unistd.h>
 
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_device_info.h"

@@ -15,7 +15,7 @@
 
 #include "UTTest_dm_credential_manager.h"
 #include "accesstoken_kit.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_credential_manager.cpp"
 #include "dm_random.h"

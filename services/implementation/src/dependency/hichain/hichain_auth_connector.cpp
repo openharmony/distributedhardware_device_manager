@@ -17,7 +17,7 @@
 #include "hichain_auth_connector.h"
 
 #include "dm_log.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "hichain_connector_callback.h"

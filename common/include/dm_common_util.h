@@ -109,6 +109,7 @@ std::string GetSubStr(const std::string &rawStr, const std::string &separator, i
 bool IsJsonValIntegerString(const JsonItemObject &jsonObj, const std::string &key);
 std::string GetAnonyJsonString(const std::string &value);
 int64_t GetCurrentTimestamp();
+int32_t ConvertStrToInt(const std::string &inputStr);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_ANONYMOUS_H

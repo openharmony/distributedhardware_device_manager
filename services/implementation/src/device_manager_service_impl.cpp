@@ -25,7 +25,7 @@
 #include "bundle_mgr_proxy.h"
 #include "distributed_device_profile_client.h"
 #include "dm_error_type.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_distributed_hardware_load.h"
@@ -340,9 +340,26 @@ void DeviceManagerServiceImpl::CleanSessionMap(std::shared_ptr<Session> session)
 void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
 {
     LOGI("In sessionId:%{public}d.", sessionId);
-    if (softbusConnector_ != nullptr) {
-        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
-    }
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+    std::string peerUdid = "";
+    softbusConnector_->GetSoftbusSession()->GetPeerDeviceId(sessionId, peerUdid);
+    auto taskFunc = [=]() {
+        CHECK_NULL_VOID(softbusConnector_);
+        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
+        {
+            std::lock_guard<ffrt::mutex> lock(authSessionCountMtx_);
+            if (authSessionCount_.find(peerUdid) != authSessionCount_.end() && authSessionCount_[peerUdid] > 0) {
+                authSessionCount_[peerUdid]--;
+                if (authSessionCount_[peerUdid] == 0) {
+                    softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
+                    authSessionCount_.erase(peerUdid);
+                }
+            }
+        }
+    };
+    const int64_t MICROSECOND_PER_SECOND = 1000000L;
+    ffrt::submit(taskFunc, ffrt::task_attr().delay(delayCloseTime_ * MICROSECOND_PER_SECOND));
     {
         std::lock_guard<ffrt::mutex> lock(mapMutex_);
         std::shared_ptr<Session> session = nullptr;
@@ -951,6 +968,10 @@ int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
         .peerUdid = peerUdid,
         .channelId = sessionId,
     };
+    {
+        std::lock_guard<ffrt::mutex> lock(authSessionCountMtx_);
+        authSessionCount_[peerUdid]++;
+    }
     if (!DmRadarHelper::GetInstance().ReportAuthSessionOpenCb(info)) {
         LOGE("ReportAuthSessionOpenCb failed");
     }
@@ -1906,6 +1927,7 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
         OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ERR_DM_POINT_NULL, tokenId);
         return;
     }
+    GetSessionDelayCloseTime(bindParam);
     authMgr->SetBindTargetParams(targetId);
     if ((ret = authMgr->BindTarget(pkgName, targetIdTmp, bindParam, sessionId, logicalSessionId)) != DM_OK) {
         LOGE("authMgr BindTarget failed, ret %{public}d.", ret);
@@ -3363,6 +3385,18 @@ int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std
 {
     CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
     return softbusConnector_->LeaveLNN(pkgName, networkId);
+}
+
+void DeviceManagerServiceImpl::GetSessionDelayCloseTime(const std::map<std::string, std::string> &bindParam)
+{
+    if (bindParam.find(PARAM_CLOSE_SESSION_DELAY_SECONDS) != bindParam.end()) {
+        std::string inputDelayTime = bindParam.at(PARAM_CLOSE_SESSION_DELAY_SECONDS);
+        delayCloseTime_ = ConvertStrToInt(inputDelayTime);
+    }
+    const int32_t closeSessionDelaySecondsMax = 10;
+    if (delayCloseTime_ == 0 || delayCloseTime_ > closeSessionDelaySecondsMax) {
+        delayCloseTime_ = closeSessionDelaySecondsMax;
+    }
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

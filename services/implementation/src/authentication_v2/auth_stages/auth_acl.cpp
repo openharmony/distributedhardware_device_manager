@@ -280,12 +280,13 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
             tempContext->cleanNotifyCallback(tempContext->logicalSessionId);
         }
     };
-    const int64_t MICROSECOND_PER_SECOND = 1000000L;
-    int32_t delaySeconds = context->connDelayCloseTime;
     if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED) {
-        delaySeconds = 0;
+        ffrt::submit(taskFunc);  //bind fail, close channel immediately
+        return DM_OK;
     }
-    ffrt::submit(taskFunc, ffrt::task_attr().delay(delaySeconds * MICROSECOND_PER_SECOND));
+    if (context->cleanNotifyCallback != nullptr) {
+        context->cleanNotifyCallback(context->logicalSessionId);  //bind success, close channel delayedly
+    }
     return DM_OK;
 }
 

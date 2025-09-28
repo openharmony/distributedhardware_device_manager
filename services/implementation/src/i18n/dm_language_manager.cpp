@@ -18,7 +18,7 @@
 #include "cJSON.h"
 #include <map>
 
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "json_object.h"

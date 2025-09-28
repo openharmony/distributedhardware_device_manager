@@ -313,6 +313,7 @@ private:
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
         int32_t &bindLevel);
     void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
+    void GetSessionDelayCloseTime(const std::map<std::string, std::string> &bindParam);
 private:
     ffrt::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
@@ -350,6 +351,9 @@ private:
     std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
     ffrt::mutex tokenIdSessionIdMapMtx_;
     std::map<uint64_t, int> tokenIdSessionIdMap_;  // New protocol sharing
+    int32_t delayCloseTime_ = 0;
+    ffrt::mutex authSessionCountMtx_;
+    std::map<std::string, int32_t> authSessionCount_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);

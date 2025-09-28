@@ -14,7 +14,7 @@
  */
 
 #include "auth_ui_state_manager.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_dialog_manager.h"
 #include "dm_log.h"
 #include "json_object.h"
