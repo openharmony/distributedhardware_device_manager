@@ -470,8 +470,8 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
         processInfo.userId = acl.GetAccesser().GetAccesserUserId();
         offlineParam.processVec.push_back(processInfo);
         CacheAcerAclId(acl, offlineParam.needDelAclInfos);
-        LOGI("Src del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
-             ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+        LOGI("Src del acl aclId: %{public}" PRId64 ", localUdid: %{public}s, remoteUdid: %{public}s"
+             ", bindType: %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
              GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
              acl.GetBindLevel());
         isMatch = true;
@@ -485,8 +485,8 @@ bool DeviceProfileConnector::FindTargetAcl(const DistributedDeviceProfile::Acces
         processInfo.userId = acl.GetAccessee().GetAccesseeUserId();
         offlineParam.processVec.push_back(processInfo);
         CacheAceeAclId(acl, offlineParam.needDelAclInfos);
-        LOGI("Sink del acl aclId: %{public}" PRId64 ", localUdid %{public}s, remoteUdid %{public}s"
-             ", bindType %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
+        LOGI("Sink del acl aclId: %{public}" PRId64 ", localUdid: %{public}s, remoteUdid: %{public}s"
+             ", bindType: %{public}d, bindLevel: %{public}d", acl.GetAccessControlId(),
              GetAnonyString(localUdid).c_str(), GetAnonyString(remoteUdid).c_str(), acl.GetBindType(),
              acl.GetBindLevel());
         isMatch = true;
