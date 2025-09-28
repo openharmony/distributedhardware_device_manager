@@ -19,7 +19,7 @@
 
 #include "device_manager_ipc_interface_code.h"
 #include "device_manager_notify.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "ipc_client_manager.h"

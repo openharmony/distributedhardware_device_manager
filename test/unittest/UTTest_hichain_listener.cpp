@@ -14,7 +14,7 @@
  */
 
 #include "UTTest_hichain_listener.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_error_type.h"
 
 namespace OHOS {

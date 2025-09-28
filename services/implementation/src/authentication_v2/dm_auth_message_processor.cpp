@@ -29,7 +29,7 @@
 #include "deviceprofile_connector.h"
 #include "dm_log.h"
 #include "dm_constants.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_auth_manager_base.h"
 #include "dm_auth_context.h"
 #include "dm_auth_state_machine.h"

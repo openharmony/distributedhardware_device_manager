@@ -38,7 +38,7 @@
 #include "nativetoken_kit.h"
 #include "securec.h"
 #include "token_setproc.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 
 using namespace testing;
 using namespace testing::ext;

@@ -20,7 +20,7 @@
 #include "datetime_ex.h"
 #include "string_ex.h"
 
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_error_type.h"
 #include "dm_log.h"
 

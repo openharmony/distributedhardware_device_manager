@@ -15,7 +15,7 @@
 
 #include "auth_manager.h"
 #include "deviceprofile_connector.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_auth_context.h"
 #include "dm_auth_message_processor.h"
 #include "dm_auth_state_machine.h"

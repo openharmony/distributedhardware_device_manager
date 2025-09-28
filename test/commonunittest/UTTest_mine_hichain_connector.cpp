@@ -15,7 +15,7 @@
 
 #include "UTTest_mine_hichain_connector.h"
 
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "mine_hichain_connector.h"
 

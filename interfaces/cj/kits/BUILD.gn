@@ -49,7 +49,7 @@ ohos_shared_library("cj_distributed_device_manager_ffi") {
   ]
 
   sources = [
-    "${common_path}/src/dm_common_util.cpp",
+    "${common_path}/src/dm_anonymous.cpp",
     "${common_path}/src/dm_error_message.cpp",
     "src/device_manager_ffi.cpp",
     "src/device_manager_impl.cpp",

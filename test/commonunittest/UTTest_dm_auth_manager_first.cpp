@@ -19,7 +19,7 @@
 #include "common_event_support.h"
 #include "device_manager_service_listener.h"
 #include "dm_auth_manager.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "dm_radar_helper.h"

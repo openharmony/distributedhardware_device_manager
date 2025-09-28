@@ -18,7 +18,7 @@
 #include <unordered_map>       // for __hash_map_const_iterator, unordered_map
 #include <utility>             // for pair
 #include "dm_constants.h"
-#include "dm_common_util.h"      // for GetAnonyString
+#include "dm_anonymous.h"      // for GetAnonyString
 #include "dm_error_type.h"
 #include "dm_log.h"            // for LOGI, LOGE
 

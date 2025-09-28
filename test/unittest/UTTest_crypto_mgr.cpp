@@ -14,7 +14,7 @@
  */
 
 #include "UTTest_crypto_mgr.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "json_object.h"
 

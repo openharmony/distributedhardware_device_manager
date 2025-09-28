@@ -15,7 +15,7 @@
 #include "dm_kv_info.h"
 
 #include "cJSON.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 
 namespace OHOS {
 namespace DistributedHardware {

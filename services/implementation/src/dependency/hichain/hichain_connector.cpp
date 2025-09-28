@@ -20,7 +20,7 @@
 #include <functional>
 #include <securec.h>
 
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_dfx_constants.h"
