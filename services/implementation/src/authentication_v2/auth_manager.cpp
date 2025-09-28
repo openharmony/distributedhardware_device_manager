@@ -494,7 +494,7 @@ void AuthManager::ParseAccessJsonObject(const JsonObject &jsonObject)
         context_->accesser.userId = jsonObject[TAG_LOCAL_USERID].Get<int32_t>();
     } else {
         context_->accesser.userId = GetSrcUserIdByDisplayIdAndDeviceType(context_->accesser.displayId,
-            context_->accesser.deviceType);
+            static_cast<DmDeviceType>(context_->accesser.deviceType));
     }
     return ;
 }
