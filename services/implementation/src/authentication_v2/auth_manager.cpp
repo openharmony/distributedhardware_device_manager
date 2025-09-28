@@ -52,6 +52,7 @@ constexpr int32_t MIN_PIN_CODE = 100000;
 constexpr int32_t MAX_PIN_CODE = 999999;
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
+const int32_t CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID = 0;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
@@ -493,10 +494,12 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
 
 int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType)
 {
+    CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     LOGI("displayId = %{public}d", displayId);
     int32_t userId = -1;
     if (deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
-        int32_t controlScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
+        int32_t controlScreenUserId = MultipleUserConnector::
+            GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
         if (controlScreenUserId < 0) {
             LOGE("controlScreenUserId = %{public}d is invalid.", controlScreenUserId);
             return userId;
@@ -510,12 +513,12 @@ int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmD
                 LOGI("not transmit local displayId, return controlScreenUserId");
                 return controlScreenUserId;
             }
-            if (context_->accesser.displayId != 0) {
-                LOGE("accesser.displayId = %{public}d is not control screen.", context_->accesser.displayId);
+            if (context_->accesser.displayId != CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID) {
+                LOGE("accesser.displayId = %{public}d is not control screen.",
+                    context_->accesser.displayId);
                 return userId;
             }
         }
-        // HAP
         if (context_->processInfo.userId != controlScreenUserId) {
             LOGE("hap userId and controlScreenUserId is not same.");
             return userId;
@@ -708,7 +711,7 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     InitAuthState(pkgName, authType, deviceId, extra);
     if (context_->accesser.userId < 0) {
         LOGI("accesser.userId is invalid.");
-        return ERR_DM_INPUT_PARA_INVALID;
+        return ERR_DM_GET_LOCAL_USERID_FAILED;
     }
     if (context_->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Invalid) {
         return ERR_DM_INPUT_PARA_INVALID;

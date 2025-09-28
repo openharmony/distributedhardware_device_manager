@@ -53,6 +53,7 @@ namespace {
     const char* DM_ANTI_DISTURBANCE_MODE = "is_in_anti_disturbance_mode";
     const int64_t DM_MIN_RANDOM = 1;
     const int64_t DM_MAX_RANDOM_INT64 = INT64_MAX;
+    const int32_t CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID = 0;
     constexpr int8_t SERVICE_UNPUBLISHED_STATE = 0;
 }
 
@@ -134,9 +135,9 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     context->accessee.deviceId = std::string(localDeviceId);
     context->accessee.deviceIdHash = Crypto::GetUdidHash(context->accessee.deviceId);
-    context->accessee.deviceType = context->softbusConnector->GetLocalDeviceTypeId();
     // 2. Get userId
-    context->accessee.userId = MultipleUserConnector::GetSinkUserId(context);
+    int32_t deviceType = context->softbusConnector->GetLocalDeviceTypeId();
+    context->accessee.userId = GetSinkUserIdByDeviceType(context, deviceType);
     if (context->accessee.userId < 0) {
         LOGE("get userId failed.");
         return ERR_DM_GET_LOCAL_USERID_FAILED;
@@ -166,12 +167,14 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     return RespQueryProxyAcceseeIds(context);
 }
 
-int32_t AuthSinkNegotiateStateMachine::GetSinkUserId(std::shared_ptr<DmAuthContext> context)
+int32_t AuthSinkNegotiateStateMachine::GetSinkUserIdByDeviceType(std::shared_ptr<DmAuthContext> context,
+    DmDeviceType deviceType)
 {
     LOGI("displayId = %{public}d", context->accessee.displayId);
     int32_t userId = -1;
     if (context->accessee.deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
-        int32_t controlScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(0);
+        int32_t controlScreenUserId = MultipleUserConnector::
+            GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
         if (controlScreenUserId < 0) {
             LOGE("controlScreenUserId = %{public}d is invalid.", controlScreenUserId);
             return userId;
@@ -182,9 +185,9 @@ int32_t AuthSinkNegotiateStateMachine::GetSinkUserId(std::shared_ptr<DmAuthConte
                 LOGI("not transmit local displayId, return controlScreenUserId");
                 return controlScreenUserId;
             }
-            if (context->accessee.displayId != 0) {
-                LOGE("accessee.displayId = %{public}d is 
-                    not control screen.", context->accessee.displayId);
+            if (context->accessee.displayId != CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID) {
+                LOGE("accessee.displayId = %{public}d is not control screen.",
+                    context->accessee.displayId);
                 return userId;
             }
         }
