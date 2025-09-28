@@ -455,6 +455,23 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
         std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
         context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
     }
+    if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
+        context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
+        LOGI("isNeedAuthenticate: %{public}d.", context_->isNeedAuthenticate);
+    }
+    ParseAccessJsonObject(jsonObject);
+    if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
+        ParseUltrasonicSide(jsonObject);
+    }
+    ParseHmlInfoInJsonObject(jsonObject);
+    ParseProxyJsonObject(jsonObject);
+    ParseServiceInfo(jsonObject);
+    return;
+}
+
+void AuthManager::ParseAccessJsonObject(JsonObject &jsonObject)
+{
+    CHECK_NULL_VOID(context_);
     context_->accessee.bundleName = context_->accesser.bundleName;
     if (jsonObject[TAG_PEER_BUNDLE_NAME].IsString() && !jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>().empty()) {
         context_->accessee.bundleName = jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>();
@@ -476,20 +493,10 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     if (jsonObject[TAG_LOCAL_USERID].IsNumberInteger()) {
         context_->accesser.userId = jsonObject[TAG_LOCAL_USERID].Get<int32_t>();
     } else {
-        context_->accesser.userId = MultipleUserConnector::
-            GetSrcUserIdByDisplayIdAndDeviceType(context_->accesser.displayId, context_->accesser.deviceType);
+        context_->accesser.userId = GetSrcUserIdByDisplayIdAndDeviceType(context_->accesser.displayId,
+            context_->accesser.deviceType);
     }
-    if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
-        context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
-        LOGI("isNeedAuthenticate: %{public}d.", context_->isNeedAuthenticate);
-    }
-    if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
-        ParseUltrasonicSide(jsonObject);
-    }
-    ParseHmlInfoInJsonObject(jsonObject);
-    ParseProxyJsonObject(jsonObject);
-    ParseServiceInfo(jsonObject);
-    return;
+    return ;
 }
 
 int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType)

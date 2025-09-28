@@ -137,7 +137,8 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.deviceIdHash = Crypto::GetUdidHash(context->accessee.deviceId);
     // 2. Get userId
     int32_t deviceType = context->softbusConnector->GetLocalDeviceTypeId();
-    context->accessee.userId = GetSinkUserIdByDeviceType(context, deviceType);
+    context->accessee.userId = GetSinkUserIdByDeviceType(context,
+        static_cast<DmDeviceType> (deviceType));
     if (context->accessee.userId < 0) {
         LOGE("get userId failed.");
         return ERR_DM_GET_LOCAL_USERID_FAILED;
