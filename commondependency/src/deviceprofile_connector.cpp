@@ -17,7 +17,7 @@
 
 #include "deviceprofile_connector.h"
 #include "crypto_mgr.h"
-#include "dm_anonymous.h"
+#include "dm_common_util.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_log.h"
@@ -234,20 +234,11 @@ DM_EXPORT void DeviceProfileConnector::AclHashVecToJson(
 
 DM_EXPORT void DeviceProfileConnector::AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value)
 {
-    if (itemObject.IsDiscarded() || !IsString(itemObject, TAG_ACL_HASH_KEY_VERSION) ||
-        !IsString(itemObject, TAG_ACL_HASH_KEY_ACLHASHLIST)) {
-        LOGE("Invalid JSON structure for ACL hash item");
-        return;
-    }
     value.version = itemObject[TAG_ACL_HASH_KEY_VERSION].Get<std::string>();
     std::string hashListStr = itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST].Get<std::string>();
     JsonObject hashList;
     hashList.Parse(hashListStr);
     for (auto const &item : hashList.Items()) {
-        if (item.IsDiscarded() || !item.IsString()) {
-            LOGE("ACL hash list contains invalid element");
-            continue;
-        }
         value.aclHashList.push_back(item.Get<std::string>());
     }
 }
@@ -258,10 +249,6 @@ DM_EXPORT void DeviceProfileConnector::AclHashVecFromJson(const JsonItemObject &
     for (auto const &item : itemObject.Items()) {
         JsonObject object;
         AclHashItem aclItem;
-        if (item.IsDiscarded() || !item.IsString()) {
-            LOGE("ItemObject contains invalid element");
-            continue;
-        }
         object.Parse(item.Get<std::string>());
         AclHashItemFromJson(object, aclItem);
         values.push_back(aclItem);
@@ -1853,7 +1840,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckAccessControl(
         "callerTokenId %{public}s, calleeTokenId %{public}s.", GetAnonyString(srcUdid).c_str(), caller.userId,
         caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
-        GetAnonyString(callee.accountId).c_str(), GetAnonyUint64(caller.tokenId).c_str(),
+        GetAnonyString(callee.accountId).c_str(),  (caller.tokenId).c_str(),
         GetAnonyUint64(callee.tokenId).c_str());
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::vector<AccessControlProfile> profilesFilter =
@@ -3142,7 +3129,6 @@ DM_EXPORT void DeviceProfileConnector::CacheAcerAclId(const DistributedDevicePro
     dmAclIdParam.skId = profile.GetAccesser().GetAccesserSessionKeyId();
     dmAclIdParam.credId = profile.GetAccesser().GetAccesserCredentialIdStr();
     dmAclIdParam.accessControlId = profile.GetAccessControlId();
-    dmAclIdParam.pkgName = profile.GetAccesser().GetAccesserBundleName();
     aclInfos.push_back(dmAclIdParam);
 }
 
@@ -3155,7 +3141,6 @@ DM_EXPORT void DeviceProfileConnector::CacheAceeAclId(const DistributedDevicePro
     dmAclIdParam.skId = profile.GetAccessee().GetAccesseeSessionKeyId();
     dmAclIdParam.credId = profile.GetAccessee().GetAccesseeCredentialIdStr();
     dmAclIdParam.accessControlId = profile.GetAccessControlId();
-    dmAclIdParam.pkgName = profile.GetAccessee().GetAccesseeBundleName();
     aclInfos.push_back(dmAclIdParam);
 }
 
@@ -3655,7 +3640,7 @@ bool DeviceProfileConnector::IsAllowAuthAlways(const std::string &localUdid, int
     return false;
 }
 
-int32_t DeviceProfileConnector::GetAuthOnceUdids(std::map<std::string, std::unordered_set<int32_t>> &udid2UserIdsMap)
+int32_t DeviceProfileConnector::GetAuthOnceUdids(std::unordered_set<std::string> &udidSet)
 {
     std::vector<AccessControlProfile> profiles = GetAllAclIncludeLnnAcl();
     std::string localUdid = GetLocalDeviceId();
@@ -3664,10 +3649,10 @@ int32_t DeviceProfileConnector::GetAuthOnceUdids(std::map<std::string, std::unor
         std::string accesseeUdid = item.GetAccessee().GetAccesseeDeviceId();
         if (item.GetAuthenticationType() == ALLOW_AUTH_ONCE) {
             if (accesserUdid == localUdid) {
-                udid2UserIdsMap[accesseeUdid].insert(item.GetAccesser().GetAccesserUserId());
+                udidSet.insert(accesseeUdid);
             }
             if (accesseeUdid == localUdid) {
-                udid2UserIdsMap[accesserUdid].insert(item.GetAccessee().GetAccesseeUserId());
+                udidSet.insert(accesserUdid);
             }
         }
     }
