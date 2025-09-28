@@ -111,25 +111,25 @@ void DmAniDeviceManagerUiCallback::OnCall(const std::string &paramJson)
 
 void DmAniDiscoveryCallback::SetSuccessCallback(JsDiscoverSuccessCallback discoverSuccessCallback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     discoverSuccessCallback_ = discoverSuccessCallback;
 }
 
 void DmAniDiscoveryCallback::ResetSuccessCallback()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     discoverSuccessCallback_.reset();
 }
 
 void DmAniDiscoveryCallback::SetFailedCallback(JsDiscoverFailedCallback discoverFailedCallback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     discoverFailedCallback_ = discoverFailedCallback;
 }
 
 void DmAniDiscoveryCallback::ResetFailedCallback()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     discoverFailedCallback_.reset();
 }
 
@@ -155,7 +155,7 @@ void DmAniDiscoveryCallback::OnDeviceFoundInMainThread(uint16_t subscribeId,
         ::taihe::optional<::taihe::string>::make(deviceBasicInfo.networkId)
     };
     ohos::distributedDeviceManager::DiscoverySuccessResult taiheResult = {basicInfo};
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     if (discoverSuccessCallback_.has_value()) {
         discoverSuccessCallback_.value()(taiheResult);
     }
@@ -175,7 +175,7 @@ void DmAniDiscoveryCallback::OnDiscoveryFailedInMainThread(uint16_t subscribeId,
     LOGI("OnDiscoveryFailed for subscribeId %{public}d", (int32_t)subscribeId);
     std::string errCodeInfo = OHOS::DistributedHardware::GetErrorString((int)failedReason);
     ohos::distributedDeviceManager::DiscoveryFailureResult taiheResult = { failedReason };
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     if (discoverFailedCallback_.has_value()) {
         discoverFailedCallback_.value()(taiheResult);
     }
@@ -188,7 +188,7 @@ void DmAniDiscoveryCallback::OnDiscoverySuccess(uint16_t subscribeId)
 int32_t DmAniDiscoveryCallback::GetRefCount()
 {
     int count = 0;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     if (discoverSuccessCallback_.has_value()) {
         count++;
     }
@@ -200,7 +200,7 @@ int32_t DmAniDiscoveryCallback::GetRefCount()
 
 void DmAniBindTargetCallback::Release()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     jsCallback_.reset();
 }
 
@@ -241,7 +241,7 @@ void DmAniBindTargetCallback::OnBindResultInMainThread(const OHOS::DistributedHa
         LOGI("update ui change, status: %{public}d, reason: %{public}d", status, result);
     } else {
         LOGI("OnBindResult call js");
-        std::lock_guard<std::mutex> lock(mutex_);
+        std::lock_guard<std::mutex> lock(jsCallbackMutex_);
         if (jsCallback_.has_value()) {
             jsCallback_.value()(reinterpret_cast<uintptr_t>(err), data);
         }
@@ -250,14 +250,14 @@ void DmAniBindTargetCallback::OnBindResultInMainThread(const OHOS::DistributedHa
 
 void DmAniAuthenticateCallback::Release()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     jsCallback_.reset();
 }
 
 void DmAniAuthenticateCallback::SetTaiheCallback(
     ::taihe::callback<void(uintptr_t err, ::ohos::distributedDeviceManager::BindTargetResult const& data)> callback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(jsCallbackMutex_);
     jsCallback_ = callback;
 }
 
@@ -292,7 +292,7 @@ void DmAniAuthenticateCallback::OnAuthResultInMainThread(const std::string &devi
     } else {
         LOGI("OnAuthResult call js");
         {
-            std::lock_guard<std::mutex> lock(mutex_);
+            std::lock_guard<std::mutex> lock(jsCallbackMutex_);
             if (jsCallback_.has_value()) {
                 jsCallback_.value()(reinterpret_cast<uintptr_t>(err), data);
             }

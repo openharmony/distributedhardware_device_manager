@@ -48,7 +48,7 @@ public:
     virtual void Release() {}
 
 protected:
-    std::mutex mutex_;
+    std::mutex jsCallbackMutex_;
     static std::shared_ptr<OHOS::AppExecFwk::EventHandler> mainHandler_;
 };
 

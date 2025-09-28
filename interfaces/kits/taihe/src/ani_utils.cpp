@@ -441,6 +441,9 @@ bool UnionAccessor::TryConvert<std::vector<ani_ref>>(std::vector<ani_ref> &value
 bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> const& taiheMap,
     const char* key, std::string& value)
 {
+    if (env == nullptr) {
+        return false;
+    }
     std::string stdKey(key);
     auto iter = taiheMap.find_item(stdKey);
     if (iter == taiheMap.end()) {
@@ -456,6 +459,9 @@ bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> c
 bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> const& taiheMap,
     const char* key, int32_t& value)
 {
+    if (env == nullptr) {
+        return false;
+    }
     std::string stdKey(key);
     auto iter = taiheMap.find_item(stdKey);
     if (iter == taiheMap.end()) {

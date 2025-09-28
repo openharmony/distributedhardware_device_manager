@@ -55,6 +55,9 @@ void ThrowError(int32_t code, const char* message)
 
 ani_object ToBusinessError(ani_env *env, int32_t code, const std::string &message)
 {
+    if (env == nullptr) {
+        return {};
+    }
     ani_class cls {};
     CHECK_AND_RETURN_RET_LOG(env->FindClass(CLASS_NAME_BUSINESSERROR, &cls) == ANI_OK, nullptr,
         "find class %{public}s failed", CLASS_NAME_BUSINESSERROR);
