@@ -233,23 +233,23 @@ DM_EXPORT void DeviceProfileConnector::AclHashVecToJson(
 }
 
 DM_EXPORT void DeviceProfileConnector::AclHashItemFromJson(const JsonItemObject &itemObject, AclHashItem &value)
-{	
+{
     if (itemObject.IsDiscarded() || !IsString(itemObject, TAG_ACL_HASH_KEY_VERSION) ||
         !IsString(itemObject, TAG_ACL_HASH_KEY_ACLHASHLIST)) {
         LOGE("Invalid JSON structure for ACL hash item");
         return;
     }
-    value.version = itemObject[TAG_ACL_HASH_KEY_VERSION].Get<std::string>();	
-    std::string hashListStr = itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST].Get<std::string>();	
-    JsonObject hashList;	
-    hashList.Parse(hashListStr);	
-    for (auto const &item : hashList.Items()) {	
+    value.version = itemObject[TAG_ACL_HASH_KEY_VERSION].Get<std::string>();
+    std::string hashListStr = itemObject[TAG_ACL_HASH_KEY_ACLHASHLIST].Get<std::string>();
+    JsonObject hashList;
+    hashList.Parse(hashListStr);
+    for (auto const &item : hashList.Items()) {
         if (item.IsDiscarded() || !item.IsString()) {
             LOGE("ACL hash list contains invalid element");
             continue;
         }
-        value.aclHashList.push_back(item.Get<std::string>());	
-    }	
+        value.aclHashList.push_back(item.Get<std::string>());
+    }
 }
 
 DM_EXPORT void DeviceProfileConnector::AclHashVecFromJson(const JsonItemObject &itemObject,
