@@ -360,6 +360,7 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
     };
     const int64_t MICROSECOND_PER_SECOND = 1000000L;
     ffrt::submit(taskFunc, ffrt::task_attr().delay(delayCloseTime_ * MICROSECOND_PER_SECOND));
+    delayCloseTime_ = 0;
     {
         std::lock_guard<ffrt::mutex> lock(mapMutex_);
         std::shared_ptr<Session> session = nullptr;
