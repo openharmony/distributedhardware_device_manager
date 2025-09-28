@@ -505,7 +505,7 @@ int32_t ConvertStrToInt(const std::string &inputStr)
         LOGE("Invalid parameter, param is not number.");
         return 0;
     }
-    int32_t outputNumber = std::atoi(delaySecondsStr.c_str());
+    int32_t outputNumber = std::atoi(inputStr.c_str());
     if (outputNumber < 0) {
         LOGE("Invalid parameter, param out of range.");
         return 0;

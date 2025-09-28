@@ -340,13 +340,13 @@ void DeviceManagerServiceImpl::CleanSessionMap(std::shared_ptr<Session> session)
 void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
 {
     LOGI("In sessionId:%{public}d.", sessionId);
-    CHECK_SIZE_VOID(softbusConnector_);
-    CHECK_SIZE_VOID(softbusConnector_->GetSoftbusSession());
+    CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     std::string peerUdid = "";
     softbusConnector_->GetSoftbusSession()->GetPeerDeviceId(sessionId, peerUdid);
     auto taskFunc = [=]() {
-        CHECK_SIZE_VOID(softbusConnector_);
-        CHECK_SIZE_VOID(softbusConnector_->GetSoftbusSession());
+        CHECK_NULL_VOID(softbusConnector_);
+        CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
         {
             std::lock_guard<ffrt::mutex> lock(authSessionCountMtx_);
             if (authSessionCount_.find(peerUdid) != authSessionCount_.end() && authSessionCount_[peerUdid] > 0) {
@@ -3390,7 +3390,8 @@ int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std
 void DeviceManagerServiceImpl::GetSessionDelayCloseTime(const std::map<std::string, std::string> &bindParam)
 {
     if (bindParam.find(PARAM_CLOSE_SESSION_DELAY_SECONDS) != bindParam.end()) {
-        delayCloseTime_ = ConvertStrToInt(bindParam[PARAM_CLOSE_SESSION_DELAY_SECONDS]);
+        std::string inputDelayTime = bindParam[PARAM_CLOSE_SESSION_DELAY_SECONDS];
+        delayCloseTime_ = ConvertStrToInt(inputDelayTime);
     }
     const int32_t closeSessionDelaySecondsMax = 10;
     if (delayCloseTime_ == 0 || delayCloseTime_ > closeSessionDelaySecondsMax) {
