@@ -412,7 +412,7 @@ DM_EXPORT void MultipleUserConnector::GetCallingTokenId(uint32_t &tokenId)
 
 DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
 {
-    LOGI("displayId %{public}" PRIu64, displayId);
+    LOGI("displayId %{public}d", displayId);
     int32_t userId = -1;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (displayId == -1) {
@@ -420,7 +420,8 @@ DM_EXPORT int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
         return userId;
     }
 #ifdef OS_ACCOUNT_PART_EXISTS
-    int32_t ret = OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(displayId, userId);
+    int32_t ret = OHOS::AccountSA::OsAccountManager::
+        GetForegroundOsAccountLocalId(static_cast<uint64_t>(displayId), userId);
     if (ret != DM_OK) {
         LOGE("GetForegroundOsAccountLocalId failed ret %{public}d.", ret);
     }
