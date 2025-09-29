@@ -19,7 +19,7 @@
 #include <cstdlib>
 #include <thread>
 
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "softbus_listener.cpp"
 #include "softbus_error_code.h"

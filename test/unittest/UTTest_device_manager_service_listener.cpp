@@ -18,7 +18,7 @@
 #include <cstring>
 #include <memory>
 
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
 #include "dm_log.h"

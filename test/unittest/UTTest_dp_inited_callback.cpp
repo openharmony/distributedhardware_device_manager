@@ -17,7 +17,7 @@
 #include "deviceprofile_connector_mock.h"
 #include "dm_softbus_cache_mock.h"
 #include "dm_constants.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "nlohmann/json.hpp"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "ffrt.h"

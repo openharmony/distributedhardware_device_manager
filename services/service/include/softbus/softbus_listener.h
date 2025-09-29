@@ -32,7 +32,7 @@
 #include "dm_publish_info.h"
 #include "dm_radar_helper.h"
 #include "i_softbus_discovering_callback.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 #include "access_control_profile.h"
 #endif

@@ -19,7 +19,7 @@
 #include <unistd.h>
 #include "accesstoken_kit.h"
 #include "device_manager_notify.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_log.h"
 #include "ipc_authenticate_device_req.h"

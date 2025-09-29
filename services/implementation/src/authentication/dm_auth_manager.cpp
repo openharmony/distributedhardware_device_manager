@@ -28,7 +28,7 @@
 #include "auth_message_processor.h"
 #include "common_event_support.h"
 #include "dm_ability_manager.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_config_manager.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"

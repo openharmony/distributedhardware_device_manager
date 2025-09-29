@@ -16,7 +16,7 @@
 #include "device_manager_impl.h"
 #include <random>
 #include "device_manager_notify.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_dfx_constants.h"
 #include "dm_hisysevent.h"

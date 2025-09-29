@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 #include "datetime_ex.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_device_info.h"
 #include "dm_freeze_process.h"
 

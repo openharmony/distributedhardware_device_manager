@@ -21,7 +21,7 @@
 #include "device_manager_impl.h"
 #include "dm_constants.h"
 #include "softbus_listener.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 namespace OHOS {
 namespace DistributedHardware {
 

@@ -33,7 +33,7 @@
 #include "dm_timer.h"
 #include "dm_radar_helper.h"
 #include "dm_device_info.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_auth_state_machine.h"
 #include "dm_auth_context.h"
 #include "dm_auth_message_processor.h"

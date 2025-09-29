@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <string>
 
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_auth_manager_base.h"
 #include "dm_cert.h"
 #include "dm_crypto.h"

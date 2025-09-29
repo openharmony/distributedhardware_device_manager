@@ -25,7 +25,7 @@
 #include "bundle_mgr_proxy.h"
 #include "distributed_device_profile_client.h"
 #include "dm_error_type.h"
-#include "dm_common_util.h"
+#include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_distributed_hardware_load.h"
@@ -360,6 +360,7 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
     };
     const int64_t MICROSECOND_PER_SECOND = 1000000L;
     ffrt::submit(taskFunc, ffrt::task_attr().delay(delayCloseTime_ * MICROSECOND_PER_SECOND));
+    delayCloseTime_ = 0;
     {
         std::lock_guard<ffrt::mutex> lock(mapMutex_);
         std::shared_ptr<Session> session = nullptr;
