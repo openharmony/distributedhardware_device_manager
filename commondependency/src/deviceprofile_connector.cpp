@@ -3680,7 +3680,7 @@ void DeviceProfileConnector::DeleteDpInvalidAcl()
     int32_t ret = DistributedDeviceProfileClient::GetInstance().GetAllAclIncludeLnnAcl(profiles);
     if (ret != DM_OK) {
         LOGE("DP failed, ret = %{public}d", ret);
-        return ;
+        return;
     }
     for (auto item = profiles.begin(); item != profiles.end(); item++) {
         std::string acerAccountId = profile.GetAccesser().GetAccesserAccountId();
