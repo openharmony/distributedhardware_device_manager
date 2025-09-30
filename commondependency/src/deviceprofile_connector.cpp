@@ -3681,7 +3681,7 @@ void DeviceProfileConnector::DeleteDpInvalidAcl()
     if (ret != DM_OK) {
         LOGE("DP failed, ret = %{public}d", ret);
     }
-    for (auto item = profiles.begin(); item != profiles.end();) {
+    for (auto item = profiles.begin(); item != profiles.end(); item++) {
         std::string acerAccountId = profile.GetAccesser().GetAccesserAccountId();
         std::string aceeAccountId = profile.GetAccessee().GetAccesseeAccountId();
         if (item->GetBindType == DM_IDENTICAL_ACCOUNT && (acerAccountId == "ohosAnonymousUid" ||
