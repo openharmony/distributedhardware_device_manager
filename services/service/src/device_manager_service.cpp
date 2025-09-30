@@ -367,6 +367,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
     }
     InitTaskOfDelTimeOutAcl();
 #endif
+    DeviceProfileConnector::GetInstance().DeleteDpInvalidAcl();
     LOGI("Init success.");
     return DM_OK;
 }
@@ -4412,6 +4413,7 @@ void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &comm
 {
     LOGI("commonEventType %{public}s, currentUserId %{public}d, beforeUserId %{public}d.", commonEventType.c_str(),
         currentUserId, beforeUserId);
+    DeviceProfileConnector::GetInstance().DeleteDpInvalidAcl();
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
     MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
     DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
@@ -4481,6 +4483,7 @@ void DeviceManagerService::HandleAccountLogoutEventCallback(const std::string &c
 {
     LOGI("commonEventType %{public}s, currentUserId %{public}d, beforeUserId %{public}d.", commonEventType.c_str(),
         currentUserId, beforeUserId);
+    DeviceProfileConnector::GetInstance().DeleteDpInvalidAcl();
     DeviceNameManager::GetInstance().InitDeviceNameWhenLogout();
     DMAccountInfo dmAccountInfo = MultipleUserConnector::GetAccountInfoByUserId(beforeUserId);
     if (dmAccountInfo.accountId.empty()) {

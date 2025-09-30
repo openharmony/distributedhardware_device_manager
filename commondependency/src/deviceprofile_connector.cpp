@@ -3674,6 +3674,24 @@ int32_t DeviceProfileConnector::GetAuthOnceUdids(std::map<std::string, std::unor
     return DM_OK;
 }
 
+void DeviceProfileConnector::DeleteDpInvalidAcl()
+{
+    std::vector<AccessControlProfile> profiles;
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetAllAclIncludeLnnAcl(profiles);
+    if (ret != DM_OK) {
+        LOGE("DP failed, ret = %{public}d", ret);
+    }
+    for (auto item = profiles.begin(); item != profiles.end();) {
+        std::string acerAccountId = profile.GetAccesser().GetAccesserAccountId();
+        std::string aceeAccountId = profile.GetAccessee().GetAccesseeAccountId();
+        if (item->GetBindType == DM_IDENTICAL_ACCOUNT && (acerAccountId == "ohosAnonymousUid" ||
+            aceeAccountId == "ohosAnonymousUid")) {
+            PrintProfile(*item);
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item.GetAccessControlId());
+        }
+    }
+}
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();
