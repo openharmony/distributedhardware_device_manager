@@ -366,8 +366,8 @@ int32_t DeviceManagerService::InitDMServiceListener()
         HandleUserStopEvent(currentUserId);
     }
     InitTaskOfDelTimeOutAcl();
-#endif
     DeviceProfileConnector::GetInstance().DeleteDpInvalidAcl();
+#endif
     LOGI("Init success.");
     return DM_OK;
 }
