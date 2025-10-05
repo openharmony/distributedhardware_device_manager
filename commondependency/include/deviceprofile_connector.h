@@ -340,6 +340,7 @@ public:
         const std::vector<int32_t> &backGroundUserIds);
     DM_EXPORT bool IsAllowAuthAlways(const std::string &localUdid, int32_t userId, const std::string &peerUdid,
         const std::string &pkgName, int64_t tokenId);
+    DM_EXPORT void DeleteDpInvalidAcl();
 
     int32_t GetAuthOnceUdids(std::map<std::string, std::unordered_set<int32_t>> &udid2UserIdsMap);
 private:

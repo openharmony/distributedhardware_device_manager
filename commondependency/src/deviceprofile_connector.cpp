@@ -91,13 +91,13 @@ void PrintProfile(const AccessControlProfile &profile)
     int32_t aceeSkId = profile.GetAccessee().GetAccesseeSessionKeyId();
     int64_t aceeTokenId = profile.GetAccessee().GetAccesseeTokenId();
 
-    LOGI("bindType %{public}d, bindLevel %{public}d, acerDeviceId %{public}s, acerUserId %{public}d,"
+    LOGI("bindType %{public}d, bindLevel %{public}d, status %{public}d, acerDeviceId %{public}s, acerUserId %{public}d,"
         "acerAccountId %{public}s, acerPkgName %{public}s, acerCredId %{public}s,"
         "acerSkId %{public}d, aceeDeviceId %{public}s, aceeUserId %{public}d, aceeAccountId %{public}s,"
         "aceePkgName %{public}s, aceeCredId %{public}s, aceeSkId %{public}d,"
         "acerTokenId %{public}s, aceeTokenId %{public}s.",
-        bindType, bindLevel, GetAnonyString(acerDeviceId).c_str(), acerUserId, GetAnonyString(acerAccountId).c_str(),
-        acerPkgName.c_str(), GetAnonyString(acerCredId).c_str(), acerSkId,
+        bindType, bindLevel, profile.GetStatus(), GetAnonyString(acerDeviceId).c_str(), acerUserId,
+        GetAnonyString(acerAccountId).c_str(), acerPkgName.c_str(), GetAnonyString(acerCredId).c_str(), acerSkId,
         GetAnonyString(aceeDeviceId).c_str(), aceeUserId, GetAnonyString(aceeAccountId).c_str(),
         aceePkgName.c_str(), GetAnonyString(aceeCredId).c_str(), aceeSkId,
         GetAnonyInt64(acerTokenId).c_str(), GetAnonyInt64(aceeTokenId).c_str());
@@ -3672,6 +3672,25 @@ int32_t DeviceProfileConnector::GetAuthOnceUdids(std::map<std::string, std::unor
         }
     }
     return DM_OK;
+}
+
+void DeviceProfileConnector::DeleteDpInvalidAcl()
+{
+    std::vector<AccessControlProfile> profiles;
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetAllAclIncludeLnnAcl(profiles);
+    if (ret != DM_OK) {
+        LOGE("DP failed, ret = %{public}d", ret);
+        return;
+    }
+    for (auto item = profiles.begin(); item != profiles.end(); item++) {
+        std::string acerAccountId = item->GetAccesser().GetAccesserAccountId();
+        std::string aceeAccountId = item->GetAccessee().GetAccesseeAccountId();
+        if (item->GetBindType() == DM_IDENTICAL_ACCOUNT && (acerAccountId == "ohosAnonymousUid" ||
+            aceeAccountId == "ohosAnonymousUid")) {
+            PrintProfile(*item);
+            DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item->GetAccessControlId());
+        }
+    }
 }
 
 IDeviceProfileConnector *CreateDpConnectorInstance()
