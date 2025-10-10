@@ -140,7 +140,7 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
     context->accessee.userId = GetSinkUserIdByDeviceType(context,
         static_cast<DmDeviceType> (deviceType));
     if (context->accessee.userId < 0) {
-        LOGE("get userId failed.");
+        LOGE("get accessee userId failed.");
         return ERR_DM_GET_LOCAL_USERID_FAILED;
     }
     // 3. Get accountId
@@ -173,7 +173,8 @@ int32_t AuthSinkNegotiateStateMachine::GetSinkUserIdByDeviceType(std::shared_ptr
 {
     LOGI("displayId = %{public}d", context->accessee.displayId);
     int32_t userId = -1;
-    if (context->accessee.deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
+    if (deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
+        LOGI("sink is car.");
         int32_t controlScreenUserId = MultipleUserConnector::
             GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
         if (controlScreenUserId < 0) {

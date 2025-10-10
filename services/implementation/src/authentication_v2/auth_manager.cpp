@@ -505,6 +505,7 @@ int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmD
     LOGI("displayId = %{public}d", displayId);
     int32_t userId = -1;
     if (deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
+        LOGI("src is car.");
         int32_t controlScreenUserId = MultipleUserConnector::
             GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
         if (controlScreenUserId < 0) {
@@ -717,7 +718,7 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
     }
     InitAuthState(pkgName, authType, deviceId, extra);
     if (context_->accesser.userId < 0) {
-        LOGI("accesser.userId is invalid.");
+        LOGE("accesser.userId is invalid.");
         return ERR_DM_GET_LOCAL_USERID_FAILED;
     }
     if (context_->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Invalid) {
