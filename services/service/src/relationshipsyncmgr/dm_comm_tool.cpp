@@ -73,7 +73,6 @@ std::shared_ptr<DMCommTool> DMCommTool::GetInstance()
     static std::shared_ptr<DMCommTool> instance = std::make_shared<DMCommTool>();
     return instance;
 }
-//LCOV_EXCL_STOP
 
 int32_t DMCommTool::SendUserIds(const std::string rmtNetworkId,
     const std::vector<uint32_t> &foregroundUserIds, const std::vector<uint32_t> &backgroundUserIds)
@@ -160,6 +159,7 @@ int32_t DMCommTool::SendUninstAppObj(int32_t userId, int32_t tokenId, const std:
     LOGI("Send local foreground userids success");
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t DMCommTool::RspAppUninstall(const std::string &rmtNetworkId, int32_t socketId)
 {
@@ -812,6 +812,7 @@ void DMCommTool::ProcessResponseUserStopEvent(const std::shared_ptr<InnerCommMsg
     DeviceManagerService::GetInstance().HandleUserStop(stopUserId, localUdid, acceptEventUdids);
 }
 
+//LCOV_EXCL_START
 int32_t DMCommTool::SendLogoutAccountInfo(const std::string &rmtNetworkId,
     const std::string &accountId, int32_t userId)
 {
@@ -901,5 +902,6 @@ int32_t DMCommTool::StartCommonEvent(std::string commonEventType, EventCallback 
     eventQueue_->submit(taskFunc);
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 } // DistributedHardware
 } // OHOS
