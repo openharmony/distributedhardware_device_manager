@@ -184,7 +184,7 @@ int32_t AuthSinkNegotiateStateMachine::GetSinkUserIdByDeviceType(std::shared_ptr
         if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
             context->accessee.tokenId) == DM_OK) {
             if (context->accessee.displayId == -1) {
-                LOGI("not transmit local displayId, return controlScreenUserId");
+                LOGI("not transmit peer displayId, return controlScreenUserId");
                 return controlScreenUserId;
             }
             if (context->accessee.displayId != CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID) {

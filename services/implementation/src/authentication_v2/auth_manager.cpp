@@ -526,6 +526,7 @@ int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmD
                     context_->accesser.displayId);
                 return userId;
             }
+            return controlScreenUserId;
         }
         if (context_->processInfo.userId != controlScreenUserId) {
             LOGE("hap userId and controlScreenUserId is not same.");
