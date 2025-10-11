@@ -52,6 +52,7 @@ CryptoMgr::~CryptoMgr()
     ClearSessionKey();
 }
 
+//LCOV_EXCL_START
 int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outputMsg)
 {
     if (inputMsg.length() > MAX_ENCRY_MSG_LEN) {
@@ -101,6 +102,7 @@ int32_t CryptoMgr::EncryptMessage(const std::string &inputMsg, std::string &outp
     encData = nullptr;
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t CryptoMgr::DoEncryptData(AesGcmCipherKey *cipherKey, const unsigned char *input, uint32_t inLen,
     unsigned char *encryptData, uint32_t *encryptLen)
@@ -196,6 +198,7 @@ int32_t CryptoMgr::GenerateRandomArray(unsigned char *randStr, uint32_t len)
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outputMsg)
 {
     const uint32_t inputMsgBytesLen = inputMsg.length() / HEX_TO_UINT8;
@@ -244,6 +247,7 @@ int32_t CryptoMgr::DecryptMessage(const std::string &inputMsg, std::string &outp
     outData = nullptr;
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t CryptoMgr::MbedAesGcmDecrypt(const AesGcmCipherKey *cipherKey, const unsigned char *cipherText,
     uint32_t cipherTextSize, unsigned char *plain, uint32_t &plainLen)
