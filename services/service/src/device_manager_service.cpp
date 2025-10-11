@@ -4386,8 +4386,7 @@ int32_t DeviceManagerService::GetUdidsByDeviceIds(const std::string &pkgName,
         return ERR_DM_NO_PERMISSION;
     }
     if (!PermissionManager::GetInstance().CheckAccessServicePermission() ||
-        !PermissionManager::GetInstance().CheckDataSyncPermission() ||
-        !PermissionManager::GetInstance().CheckSoftbusCenterPermission()) {
+        !PermissionManager::GetInstance().CheckDataSyncPermission()) {
         LOGE("The caller does not have permission to call GetUdidsByDeviceIds.");
         return ERR_DM_NO_PERMISSION;
     }
