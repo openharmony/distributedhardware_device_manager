@@ -639,7 +639,7 @@ int32_t AuthSrcReverseUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext>
 {
     LOGI("AuthSrcReverseUltrasonicDoneState::Action Start.");
     context->timer->DeleteTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK));
-    int32_t osAccountId = MultipleUserConnector::GetCurrentAccountUserID();
+    int32_t osAccountId = context->accesser.userId;
     auto ret = context->hiChainAuthConnector->AuthCredentialPinCode(osAccountId, context->requestId,
         context->pinCode);
     if (ret != DM_OK) {

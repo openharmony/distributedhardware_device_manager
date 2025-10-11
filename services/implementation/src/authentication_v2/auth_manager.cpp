@@ -52,6 +52,8 @@ constexpr int32_t MIN_PIN_CODE = 100000;
 constexpr int32_t MAX_PIN_CODE = 999999;
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
+constexpr int32_t INVALID_USERID = -1;
+constexpr int32_t MAIN_SCREEN_DISPLAYID = 0;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
@@ -454,6 +456,23 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
         std::string delaySecondsStr = jsonObject[PARAM_CLOSE_SESSION_DELAY_SECONDS].Get<std::string>();
         context_->connDelayCloseTime = GetCloseSessionDelaySeconds(delaySecondsStr);
     }
+    ParseAccessJsonObject(jsonObject);
+    if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
+        context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
+        LOGI("isNeedAuthenticate: %{public}d.", context_->isNeedAuthenticate);
+    }
+    if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
+        ParseUltrasonicSide(jsonObject);
+    }
+    ParseHmlInfoInJsonObject(jsonObject);
+    ParseProxyJsonObject(jsonObject);
+    ParseServiceInfo(jsonObject);
+    return;
+}
+
+void AuthManager::ParseAccessJsonObject(const JsonObject &jsonObject)
+{
+    CHECK_NULL_VOID(context_);
     context_->accessee.bundleName = context_->accesser.bundleName;
     if (jsonObject[TAG_PEER_BUNDLE_NAME].IsString() && !jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>().empty()) {
         context_->accessee.bundleName = jsonObject[TAG_PEER_BUNDLE_NAME].Get<std::string>();
@@ -466,25 +485,61 @@ void AuthManager::ParseJsonObject(const JsonObject &jsonObject)
     if (jsonObject[TAG_PEER_PKG_NAME].IsString()) {
         context_->accessee.pkgName = jsonObject[TAG_PEER_PKG_NAME].Get<std::string>();
     }
+    if (jsonObject[TAG_LOCAL_DISPLAY_ID].IsNumberInteger()) {
+        context_->accesser.displayId = jsonObject[TAG_LOCAL_DISPLAY_ID].Get<int32_t>();
+    }
     if (jsonObject[TAG_PEER_DISPLAY_ID].IsNumberInteger()) {
         context_->accessee.displayId = jsonObject[TAG_PEER_DISPLAY_ID].Get<int32_t>();
     }
     if (jsonObject[TAG_LOCAL_USERID].IsNumberInteger()) {
         context_->accesser.userId = jsonObject[TAG_LOCAL_USERID].Get<int32_t>();
     } else {
-        context_->accesser.userId = MultipleUserConnector::GetFirstForegroundUserId();
+        context_->accesser.userId = GetSrcUserIdByDisplayIdAndDeviceType(context_->accesser.displayId,
+            static_cast<DmDeviceType>(context_->accesser.deviceType));
     }
-    if (jsonObject[TAG_IS_NEED_AUTHENTICATE].IsString()) {
-        context_->isNeedAuthenticate = std::atoi(jsonObject[TAG_IS_NEED_AUTHENTICATE].Get<std::string>().c_str());
-        LOGI("isNeedAuthenticate: %{public}d.", context_->isNeedAuthenticate);
+    return ;
+}
+
+int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType)
+{
+    CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
+    LOGI("displayId = %{public}d", displayId);
+    if (deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
+        return GetSrcCarUserIdByDisplayId(displayId);
     }
-    if (context_->authType == AUTH_TYPE_PIN_ULTRASONIC) {
-        ParseUltrasonicSide(jsonObject);
+    return MultipleUserConnector::GetUserIdByDisplayId(displayId);
+}
+
+int32_t AuthManager::GetSrcCarUserIdByDisplayId(int32_t displayId)
+{
+    CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
+    LOGI("GetSrcCarUserIdByDisplayId start.");
+    int32_t mainScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(MAIN_SCREEN_DISPLAYID);
+    if (mainScreenUserId < 0) {
+        LOGE("mainScreenUserId = %{public}d is invalid.", mainScreenUserId);
+        return INVALID_USERID;
     }
-    ParseHmlInfoInJsonObject(jsonObject);
-    ParseProxyJsonObject(jsonObject);
-    ParseServiceInfo(jsonObject);
-    return;
+    bool isSystemSA = false;
+    if (bindParam_.find(BIND_CALLER_IS_SYSTEM_SA) != bindParam_.end()) {
+        isSystemSA = static_cast<bool>(std::atoi(bindParam_[BIND_CALLER_IS_SYSTEM_SA].c_str()));
+    }
+    if (isSystemSA) {
+        if (context_->accesser.displayId == -1) {
+            LOGI("not transmit local displayId, return mainScreenUserId");
+            return mainScreenUserId;
+        }
+        if (context_->accesser.displayId != MAIN_SCREEN_DISPLAYID) {
+            LOGE("accesser.displayId = %{public}d is not control screen.",
+                context_->accesser.displayId);
+            return INVALID_USERID;
+        }
+        return mainScreenUserId;
+    }
+    if (context_->processInfo.userId != mainScreenUserId) {
+        LOGE("hap userId and mainScreenUserId is not same.");
+        return INVALID_USERID;
+    }
+    return mainScreenUserId;
 }
 
 void AuthManager::ParseServiceInfo(const JsonObject &jsonObject)
@@ -634,7 +689,6 @@ void AuthManager::InitAuthState(const std::string &pkgName, int32_t authType,
     GetAuthParam(pkgName, authType, deviceId, extra);
     context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcStartState>());
     LOGI("AuthManager::AuthenticateDevice complete");
-
     return;
 }
 
@@ -669,6 +723,10 @@ int32_t AuthManager::AuthenticateDevice(const std::string &pkgName, int32_t auth
         return DM_OK;
     }
     InitAuthState(pkgName, authType, deviceId, extra);
+    if (context_->accesser.userId < 0) {
+        LOGE("accesser.userId is invalid.");
+        return ERR_DM_GET_LOCAL_USERID_FAILED;
+    }
     if (context_->ultrasonicInfo == DmUltrasonicInfo::DM_Ultrasonic_Invalid) {
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -1209,7 +1267,11 @@ int32_t AuthManager::CheckProxyAuthParamVaild(const std::string &extra)
     if (jsonObject[PARAM_KEY_IS_PROXY_BIND].Get<std::string>() != DM_VAL_TRUE) {
         return DM_OK;
     }
-    if (!AppManager::GetInstance().IsSystemSA()) {
+    bool isSystemSA = false;
+    if (bindParam_.find(BIND_CALLER_IS_SYSTEM_SA) != bindParam_.end()) {
+        isSystemSA = static_cast<bool>(std::atoi(bindParam_[BIND_CALLER_IS_SYSTEM_SA].c_str()));
+    }
+    if (!isSystemSA) {
         LOGE("no proxy permission");
         return ERR_DM_NO_PERMISSION;
     }

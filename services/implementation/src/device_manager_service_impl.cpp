@@ -3197,7 +3197,7 @@ void DeviceManagerServiceImpl::SetBindCallerInfoToBindParam(const std::map<std::
     bindParamTmp["bindCallerBundleName"] = bindCallerInfo.bundleName;
     bindParamTmp["bindCallerHostPkgLabel"] = bindCallerInfo.hostPkgLabel;
     bindParamTmp["bindCallerProcessName"] = bindCallerInfo.processName;
-    bindParamTmp["bindCallerIsSystemSA"] = bindCallerInfo.isSystemSA;
+    bindParamTmp["bindCallerIsSystemSA"] = std::to_string(bindCallerInfo.isSystemSA);
 }
 
 bool DeviceManagerServiceImpl::CheckSrcAccessControl(const DmAccessCaller &caller, const std::string &srcUdid,

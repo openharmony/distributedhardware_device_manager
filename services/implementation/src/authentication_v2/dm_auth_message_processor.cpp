@@ -93,6 +93,7 @@ const char* TAG_STATE = "state";
 const char* TAG_REASON = "reason";
 const char* TAG_PEER_USER_ID = "peerUserId";
 const char* TAG_PEER_DISPLAY_ID = "peerDisplayId";
+const char* TAG_LOCAL_DISPLAY_ID = "localDisplayId";
 const char* TAG_EXTRA_INFO = "extraInfo";
 const char* TAG_ACL_TYPE_LIST = "aclTypeList";
 const char* TAG_CERT_TYPE_LIST = "certTypeList";

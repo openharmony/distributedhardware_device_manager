@@ -20,6 +20,7 @@
 
 #include "auth_ui_state_manager.h"
 #include "dm_auth_manager_base.h"
+#include "dm_device_info.h"
 #include "ffrt.h"
 #include "hichain_auth_connector.h"
 #include "hichain_connector.h"
@@ -138,6 +139,7 @@ private:
     void ParseProxyJsonObject(const JsonObject &jsonObject);
     void GetBindLevelByBundleName(std::string &bundleName, int32_t userId, int32_t &bindLevel);
     void ParseJsonObject(const JsonObject &jsonObject);
+    void ParseAccessJsonObject(const JsonObject &jsonObject);
     void GetAuthParam(const std::string &sessionName, int32_t authType,
         const std::string &deviceId, const std::string &extra);
     std::string GetBundleName(const JsonObject &jsonObject);
@@ -157,6 +159,8 @@ private:
     void GetIsNeedJoinLnnParam(const std::map<std::string, std::string> &bindParam);
     void ParseServiceInfo(const JsonObject &jsonObject);
     void GetConnDelayCloseTime(const std::string &extra);
+    int32_t GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType);
+    int32_t GetSrcCarUserIdByDisplayId(int32_t displayId);
 };
 
 class AuthSrcManager : public AuthManager {

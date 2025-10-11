@@ -1152,9 +1152,6 @@ void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDe
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleDeviceStatusChange(devState, devInfo);
     }
-    if (IsDMServiceAdapterResidentLoad()) {
-        dmServiceImplExtResident_->HandleDeviceStatusChange(devState, devInfo);
-    }
 }
 
 int DeviceManagerService::OnSessionOpened(int sessionId, int result)
