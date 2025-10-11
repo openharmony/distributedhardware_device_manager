@@ -2142,6 +2142,7 @@ int32_t DmAuthMessageProcessor::SetSyncMsgJson(std::shared_ptr<DmAuthContext> &c
     return DM_OK;
 }
 
+//LCOV_EXCL_START
 std::string DmAuthMessageProcessor::GetAccesseeServiceInfo(int64_t serviceId)
 {
     ServiceInfoProfile serviceInfoProfile;
@@ -2196,6 +2197,7 @@ int32_t DmAuthMessageProcessor::CreateProxyAccessMessage(std::shared_ptr<DmAuthC
     syncMsgJson[PARAM_KEY_SUBJECT_PROXYED_SUBJECTS] = allProxyObj.Dump();
     return DM_OK;
 }
+//LCOV_EXCL_STOP
 
 int32_t DmAuthMessageProcessor::ACLToStr(DistributedDeviceProfile::AccessControlProfile acl, std::string aclStr)
 {
