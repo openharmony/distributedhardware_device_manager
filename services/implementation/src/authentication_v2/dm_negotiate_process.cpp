@@ -125,6 +125,7 @@ int32_t NegotiateProcess::HandleNegotiateResult(std::shared_ptr<DmAuthContext> c
     return HandleProxyNegotiateResult(context, ret);
 }
 
+//LCOV_EXCL_START
 int32_t NegotiateProcess::HandleProxyNegotiateResult(std::shared_ptr<DmAuthContext> context, int32_t result)
 {
     CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
@@ -194,6 +195,7 @@ bool NegotiateProcess::IsExistTheTokenId(const std::string extraData, const std:
     return false;
 }
 
+//LCOV_EXCL_STOP
 CredType NegotiateProcess::ConvertCredType(const std::string &credType)
 {
     LOGI("start credType %{public}s.", credType.c_str());

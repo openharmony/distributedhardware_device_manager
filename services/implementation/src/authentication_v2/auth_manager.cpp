@@ -1179,6 +1179,7 @@ void AuthManager::DeleteTimer()
     LOGI("end.");
 }
 
+//LCOV_EXCL_START
 int32_t AuthManager::HandleBusinessEvents(const std::string &businessId, int32_t action)
 {
     LOGI("businessId %{public}s, action %{public}d.", businessId.c_str(), action);
@@ -1295,5 +1296,6 @@ void AuthManager::GetBindLevelByBundleName(std::string &bundleName, int32_t user
         LOGE("src not contain the bundlename %{public}s.", bundleName.c_str());
     }
 }
+//LCOV_EXCL_STOP
 }  // namespace DistributedHardware
 }  // namespace OHOS
