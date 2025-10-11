@@ -55,6 +55,7 @@ namespace {
     const int64_t DM_MAX_RANDOM_INT64 = INT64_MAX;
     const int32_t CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID = 0;
     constexpr int8_t SERVICE_UNPUBLISHED_STATE = 0;
+    const int32_t INVALID_USERID = -1;
 }
 
 DmAuthStateType AuthSrcStartState::GetStateType()
@@ -171,31 +172,36 @@ int32_t AuthSinkNegotiateStateMachine::RespQueryAcceseeIds(std::shared_ptr<DmAut
 int32_t AuthSinkNegotiateStateMachine::GetSinkUserIdByDeviceType(std::shared_ptr<DmAuthContext> context,
     DmDeviceType deviceType)
 {
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
     LOGI("displayId = %{public}d", context->accessee.displayId);
-    int32_t userId = -1;
     if (deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
-        LOGI("sink is car.");
-        int32_t controlScreenUserId = MultipleUserConnector::
-            GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
-        if (controlScreenUserId < 0) {
-            LOGE("controlScreenUserId = %{public}d is invalid.", controlScreenUserId);
-            return userId;
-        }
-        if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
-            context->accessee.tokenId) == DM_OK) {
-            if (context->accessee.displayId == -1) {
-                LOGI("not transmit peer displayId, return controlScreenUserId");
-                return controlScreenUserId;
-            }
-            if (context->accessee.displayId != CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID) {
-                LOGE("accessee.displayId = %{public}d is not control screen.",
-                    context->accessee.displayId);
-                return userId;
-            }
-        }
-        return controlScreenUserId;
+        return GetSinkCarUserId(context);
     }
     return MultipleUserConnector::GetUserIdByDisplayId(context->accessee.displayId);
+}
+
+int32_t AuthSinkNegotiateStateMachine::GetSinkCarUserId(std::shared_ptr<DmAuthContext> context)
+{
+    CHECK_NULL_RETURN(context, ERR_DM_POINT_NULL);
+    LOGI("GetSinkCarUserId start.");
+    int32_t mainScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
+    if (mainScreenUserId < 0) {
+        LOGE("mainScreenUserId = %{public}d is invalid.", mainScreenUserId);
+        return INVALID_USERID;
+    }
+    if (AppManager::GetInstance().GetNativeTokenIdByName(context->accessee.bundleName,
+        context->accessee.tokenId) == DM_OK) {
+        if (context->accessee.displayId == -1) {
+            LOGI("not transmit peer displayId, return mainScreenUserId");
+            return mainScreenUserId;
+        }
+        if (context->accessee.displayId != CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID) {
+            LOGE("accessee.displayId = %{public}d is not control screen.",
+                context->accessee.displayId);
+            return INVALID_USERID;
+        }
+    }
+    return mainScreenUserId;
 }
 
 int32_t AuthSinkNegotiateStateMachine::RespQueryProxyAcceseeIds(std::shared_ptr<DmAuthContext> context)

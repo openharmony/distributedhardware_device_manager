@@ -160,6 +160,7 @@ private:
     void ParseServiceInfo(const JsonObject &jsonObject);
     void GetConnDelayCloseTime(const std::string &extra);
     int32_t GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmDeviceType deviceType);
+    int32_t GetSrcCarUserIdByDisplayId(int32_t displayId);
 };
 
 class AuthSrcManager : public AuthManager {

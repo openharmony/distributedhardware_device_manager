@@ -556,6 +556,7 @@ private:
     void SetIsProxyBind(std::shared_ptr<DmAuthContext> context);
     int32_t SinkNegotiateService(std::shared_ptr<DmAuthContext> context);
     int32_t GetSinkUserIdByDeviceType(std::shared_ptr<DmAuthContext> context, DmDeviceType deviceType);
+    int32_t GetSinkCarUserId(std::shared_ptr<DmAuthContext> context);
 };
 
 class AuthSinkDataSyncState : public DmAuthState {

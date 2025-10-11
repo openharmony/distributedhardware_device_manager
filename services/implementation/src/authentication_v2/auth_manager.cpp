@@ -52,7 +52,8 @@ constexpr int32_t MIN_PIN_CODE = 100000;
 constexpr int32_t MAX_PIN_CODE = 999999;
 constexpr int32_t DM_ULTRASONIC_FORWARD = 0;
 constexpr int32_t DM_ULTRASONIC_REVERSE = 1;
-const int32_t CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID = 0;
+constexpr int32_t INVALID_USERID = -1;
+constexpr int32_t MAIN_SCREEN_DISPLAYID = 0;
 const char* IS_NEED_JOIN_LNN = "IsNeedJoinLnn";
 constexpr const char* NEED_JOIN_LNN = "0";
 constexpr const char* NO_NEED_JOIN_LNN = "1";
@@ -503,38 +504,42 @@ int32_t AuthManager::GetSrcUserIdByDisplayIdAndDeviceType(int32_t displayId, DmD
 {
     CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
     LOGI("displayId = %{public}d", displayId);
-    int32_t userId = -1;
     if (deviceType == DmDeviceType::DEVICE_TYPE_CAR) {
-        LOGI("src is car.");
-        int32_t controlScreenUserId = MultipleUserConnector::
-            GetUserIdByDisplayId(CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID);
-        if (controlScreenUserId < 0) {
-            LOGE("controlScreenUserId = %{public}d is invalid.", controlScreenUserId);
-            return userId;
-        }
-        bool isSystemSA = false;
-        if (bindParam_.find("bindCallerIsSystemSA") != bindParam_.end()) {
-            isSystemSA = static_cast<bool>(std::atoi(bindParam_["bindCallerIsSystemSA"].c_str()));
-        }
-        if (isSystemSA) {
-            if (context_->accesser.displayId == -1) {
-                LOGI("not transmit local displayId, return controlScreenUserId");
-                return controlScreenUserId;
-            }
-            if (context_->accesser.displayId != CAR_CENTRAL_CONTROL_SCREEN_DISPLAYID) {
-                LOGE("accesser.displayId = %{public}d is not control screen.",
-                    context_->accesser.displayId);
-                return userId;
-            }
-            return controlScreenUserId;
-        }
-        if (context_->processInfo.userId != controlScreenUserId) {
-            LOGE("hap userId and controlScreenUserId is not same.");
-            return userId;
-        }
-        return controlScreenUserId;
+        return GetSrcCarUserIdByDisplayId(displayId);
     }
     return MultipleUserConnector::GetUserIdByDisplayId(displayId);
+}
+
+int32_t AuthManager::GetSrcCarUserIdByDisplayId(int32_t displayId)
+{
+    CHECK_NULL_RETURN(context_, ERR_DM_POINT_NULL);
+    LOGI("GetSrcCarUserIdByDisplayId start.");
+    int32_t mainScreenUserId = MultipleUserConnector::GetUserIdByDisplayId(MAIN_SCREEN_DISPLAYID);
+    if (mainScreenUserId < 0) {
+        LOGE("mainScreenUserId = %{public}d is invalid.", mainScreenUserId);
+        return INVALID_USERID;
+    }
+    bool isSystemSA = false;
+    if (bindParam_.find(BIND_CALLER_IS_SYSTEM_SA) != bindParam_.end()) {
+        isSystemSA = static_cast<bool>(std::atoi(bindParam_[BIND_CALLER_IS_SYSTEM_SA].c_str()));
+    }
+    if (isSystemSA) {
+        if (context_->accesser.displayId == -1) {
+            LOGI("not transmit local displayId, return mainScreenUserId");
+            return mainScreenUserId;
+        }
+        if (context_->accesser.displayId != MAIN_SCREEN_DISPLAYID) {
+            LOGE("accesser.displayId = %{public}d is not control screen.",
+                context_->accesser.displayId);
+            return INVALID_USERID;
+        }
+        return mainScreenUserId;
+    }
+    if (context_->processInfo.userId != mainScreenUserId) {
+        LOGE("hap userId and mainScreenUserId is not same.");
+        return INVALID_USERID;
+    }
+    return mainScreenUserId;
 }
 
 void AuthManager::ParseServiceInfo(const JsonObject &jsonObject)
@@ -1262,8 +1267,8 @@ int32_t AuthManager::CheckProxyAuthParamVaild(const std::string &extra)
         return DM_OK;
     }
     bool isSystemSA = false;
-    if (bindParam_.find("bindCallerIsSystemSA") != bindParam_.end()) {
-        isSystemSA = static_cast<bool>(std::atoi(bindParam_["bindCallerIsSystemSA"].c_str()));
+    if (bindParam_.find(BIND_CALLER_IS_SYSTEM_SA) != bindParam_.end()) {
+        isSystemSA = static_cast<bool>(std::atoi(bindParam_[BIND_CALLER_IS_SYSTEM_SA].c_str()));
     }
     if (!isSystemSA) {
         LOGE("no proxy permission");

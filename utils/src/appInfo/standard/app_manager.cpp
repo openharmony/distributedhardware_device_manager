@@ -249,6 +249,10 @@ DM_EXPORT int32_t AppManager::GetNativeTokenIdByName(std::string &processName,
         LOGE("GetNativeTokenId failed.");
         return ERR_DM_FAILED;
     }
+    if (AccessTokenKit::GetTokenTypeFlag(nativeTokenId) != ATokenTypeEnum::TOKEN_NATIVE) {
+        LOGE("nativeTokenId is not SA.");
+        return ERR_DM_FAILED;
+    }
     tokenId = static_cast<int64_t>(nativeTokenId);
     return DM_OK;
 }
