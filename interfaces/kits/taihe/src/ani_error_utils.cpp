@@ -141,4 +141,33 @@ ani_object CreateBusinessError(int32_t errCode, bool isAsync)
     return error;
 }
 
+bool AniPromiseCallback(ani_env* env, ani_resolver deferred, int32_t result, ani_ref resolveResult)
+{
+    ani_status status = ANI_OK;
+    if (result != DM_OK) {
+        ani_ref errobj = static_cast<ani_error>(CreateBusinessError(result, false));
+        if (errobj == nullptr) {
+            LOGE("ToBusinessError return null");
+            env->GetUndefined(&errobj);
+        }
+        if ((status = env->PromiseResolver_Reject(deferred, static_cast<ani_error>(errobj))) != ANI_OK) {
+            LOGE("PromiseResolver_Reject failed, status = %{public}d", status);
+            return false;
+        }
+        return true;
+    }
+    ani_ref promiseResult = resolveResult;
+    if (promiseResult == nullptr) {
+        if ((status = env->GetUndefined(&promiseResult)) != ANI_OK) {
+            LOGE("get undefined value failed, status = %{public}d", status);
+            return false;
+        }
+    }
+    if ((status = env->PromiseResolver_Resolve(deferred, promiseResult)) != ANI_OK) {
+        LOGE("PromiseResolver_Resolve failed, status = %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
 } // namespace ani_errorutils

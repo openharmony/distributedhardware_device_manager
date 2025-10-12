@@ -37,6 +37,18 @@ int32_t AniGetProperty(const ani_env *env, ani_object ani_obj, const char *prope
 int32_t AniGetProperty(const ani_env *env, ani_object ani_obj, const char *property, ani_object &result,
     bool optional = false);
 
+ani_status AniCreateInt(ani_env* env, int32_t value, ani_object& result);
+ani_string AniCreateString(ani_env *env, const std::string &para);
+
+ani_object AniCreateArray(ani_env *env, const std::vector<ani_object> &objectArray);
+ani_object AniCreatEmptyRecord(ani_env* env, ani_method& setMethod);
+
+ani_method AniGetMethod(ani_env *env, ani_class cls, const char* methodName, const char* signature);
+ani_class AniGetClass(ani_env *env, const char* className);
+ani_method AniGetClassMethod(ani_env *env, const char* className, const char* methodName, const char* signature);
+
+bool AniMapSet(ani_env *env, ani_object map, ani_method mapSetMethod, const char* key, const std::string &valueStr);
+
 class AniObjectUtils {
 public:
     template<typename T>
@@ -116,11 +128,12 @@ private:
     ani_object obj_;
 };
 
-bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> const& taiheMap,
+bool AniGetMapItem(ani_env *env, const ::taihe::map_view<::taihe::string, uintptr_t> &taiheMap,
     const char* key, std::string& value);
-bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> const& taiheMap,
+bool AniGetMapItem(ani_env *env, const ::taihe::map_view<::taihe::string, uintptr_t> &taiheMap,
     const char* key, int32_t& value);
 
+void AniExecuteFunc(ani_vm* vm, const std::function<void(ani_env*)> func);
 } //namespace ani_utils
 #endif
 

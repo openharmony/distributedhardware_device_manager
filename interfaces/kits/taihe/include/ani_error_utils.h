@@ -43,6 +43,8 @@ void ThrowError(int32_t code, const char* message);
 ani_object CreateBusinessError(int32_t errCode, bool isAsync = true);
 ani_object ToBusinessError(ani_env *env, int32_t code, const std::string &message);
 
+bool AniPromiseCallback(ani_env* env, ani_resolver deferred, int32_t errCode, ani_ref resolveResult = nullptr);
+
 #define CHECK_AND_RETURN_RET_LOG(cond, ret, fmt, ...) \
     do {                                              \
         if (!(cond)) {                                \
