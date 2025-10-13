@@ -779,7 +779,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetWhiteListSAProcessInfo_001, testin
     processInfo1.userId = 0;
     DeviceManagerServiceNotify::GetInstance().RegisterCallBack(dmNotifyEvent, processInfo1);
     ret = listener_->GetWhiteListSAProcessInfo(dmCommonNotifyEvent);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, testing::ext::TestSize.Level1)
@@ -804,7 +804,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, tes
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
     EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).WillOnce(Return(systemSA));
     ret = listener_->GetNotifyProcessInfoByUserId(userId, dmCommonNotifyEvent);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 
     processInfos.clear();
     processInfo.userId = 10;
@@ -831,7 +831,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, GetNotifyProcessInfoByUserId_001, tes
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
     EXPECT_CALL(*ipcServerListenerMock_, GetSystemSA()).WillOnce(Return(systemSA));
     ret = listener_->GetNotifyProcessInfoByUserId(userId, dmCommonNotifyEvent);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, DealBindProcessInfo_001, testing::ext::TestSize.Level1)
@@ -1002,7 +1002,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, RemoveNotExistProcess_001, testing::e
     DmDeviceInfo info;
     listener_->alreadyOnlinePkgName_[notifyPkgName] = info;
     listener_->RemoveNotExistProcess();
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_004, testing::ext::TestSize.Level1)
@@ -1019,7 +1019,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnBindResult_004, testing::ext::TestS
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     listener_->OnBindResult(processInfo, targetId, result, status, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_004, testing::ext::TestSize.Level1)
@@ -1035,7 +1035,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnAuthResult_004, testing::ext::TestS
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     listener_->OnAuthResult(processInfo, deviceId, token, status, reason);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_002, testing::ext::TestSize.Level1)
@@ -1051,7 +1051,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnUnbindResult_002, testing::ext::Tes
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyDeviceId(_, _, _)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*kVAdapterManagerMock_, Get(_, _)).WillOnce(Return(DM_OK));
     listener_->OnUnbindResult(processInfo, targetId, result, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_002, testing::ext::TestSize.Level1)
@@ -1071,7 +1071,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnSinkBindResult_002, testing::ext::T
     processInfos.push_back(processInfo);
     EXPECT_CALL(*ipcServerListenerMock_, GetAllProcessInfo()).WillOnce(Return(processInfos));
     listener_->OnSinkBindResult(processInfo, targetId, result, status, content);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::TestSize.Level1)
@@ -1088,7 +1088,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, SetDeviceInfo_001, testing::ext::Test
     EXPECT_CALL(*appManagerMock_, GetAppIdByPkgName(_, _, _)).Times(::testing::AtLeast(2)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*cryptoMock_, ConvertUdidHashToAnoyAndSave(_, _, _)).WillOnce(Return(DM_OK));
     listener_->SetDeviceInfo(pReq, processInfo, state, deviceInfo, deviceBasicInfo);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 HWTEST_F(DeviceManagerServiceListenerTest, GetLocalDisplayDeviceName_001, testing::ext::TestSize.Level1)

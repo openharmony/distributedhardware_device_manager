@@ -1264,5 +1264,21 @@ void DeviceManagerServiceListener::OnLeaveLNNResult(const std::string &pkgName, 
     pReq->SetProcessInfo(processInfoTemp);
     ipcServerListener_.SendRequest(LEAVE_LNN_RESULT, pReq, pRsp);
 }
+
+bool DeviceManagerServiceListener::IsNeedNotifyStateChange(const ProcessInfo &processInfo)
+{
+    std::set<ProcessInfo> notifyProcessInfos;
+    DeviceManagerServiceNotify::GetInstance().GetCallBack(DmCommonNotifyEvent::REG_DEVICE_STATE, notifyProcessInfos);
+    if (notifyProcessInfos.find(processInfo) == notifyProcessInfos.end()) {
+        LOGE("state callback not exist, pkg:%{public}s", processInfo.pkgName.c_str());
+        return false;
+    }
+    std::vector<ProcessInfo> processInfos = ipcServerListener_.GetAllProcessInfo();
+    if (find(processInfos.begin(), processInfos.end(), processInfo) == processInfos.end()) {
+        LOGE("not init dm, pkg:%{public}s", processInfo.pkgName.c_str());
+        return false;
+    }
+    return true;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

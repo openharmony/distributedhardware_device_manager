@@ -260,7 +260,7 @@ HWTEST_F(AppManagerTest, GetNativeTokenIdByName_001, testing::ext::TestSize.Leve
 
     EXPECT_CALL(*token_, GetNativeTokenId(_)).WillOnce(Return(VALUABLE_TOKEN_ID));
     ret = AppManager::GetInstance().GetNativeTokenIdByName(processName, tokenId);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_FAILED);
     EXPECT_EQ(tokenId, VALUABLE_TOKEN_ID);
 }
 

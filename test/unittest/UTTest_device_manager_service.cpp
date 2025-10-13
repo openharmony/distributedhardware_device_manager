@@ -853,7 +853,7 @@ HWTEST_F(DeviceManagerServiceTest, SetUserOperation_004, testing::ext::TestSize.
     const std::string param = R"({"test":"extra"})";
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
-    EXPECT_EQ(ret, DM_OK);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**

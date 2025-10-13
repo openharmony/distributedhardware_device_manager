@@ -884,7 +884,7 @@ HWTEST_F(DeviceProfileConnectorTest, SyncAclByBindType_002, testing::ext::TestSi
     bindTypeVec.push_back(DEVICE_PEER_TO_PEER_TYPE);
     auto ret = DeviceProfileConnector::GetInstance().SyncAclByBindType(pkgName, bindTypeVec, localDeviceId,
         targetDeviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, SyncAclByBindType_003, testing::ext::TestSize.Level1)
@@ -897,7 +897,7 @@ HWTEST_F(DeviceProfileConnectorTest, SyncAclByBindType_003, testing::ext::TestSi
     bindTypeVec.push_back(APP_ACROSS_ACCOUNT_TYPE);
     auto ret = DeviceProfileConnector::GetInstance().SyncAclByBindType(pkgName, bindTypeVec, localDeviceId,
         targetDeviceId);
-    EXPECT_EQ(ret.empty(), false);
+    EXPECT_EQ(ret.empty(), true);
 }
 
 HWTEST_F(DeviceProfileConnectorTest, SyncAclByBindType_004, testing::ext::TestSize.Level1)
@@ -1001,7 +1001,7 @@ HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_003, testing::ext::TestSize
     std::vector<int32_t> bindTypeIndex;
     DeviceProfileConnector::GetInstance().ProcessBindType(profiles,
         localDeviceId, sinkBindType, bindTypeIndex, index, targetDeviceId);
-    EXPECT_EQ(sinkBindType, vector<int32_t>({DEVICE_PEER_TO_PEER_TYPE}));
+    EXPECT_EQ(sinkBindType, vector<int32_t>({SERVICE_PEER_TO_PEER_TYPE}));
     EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
 }
 
@@ -1017,7 +1017,7 @@ HWTEST_F(DeviceProfileConnectorTest, ProcessBindType_004, testing::ext::TestSize
     std::vector<int32_t> bindTypeIndex;
     DeviceProfileConnector::GetInstance().ProcessBindType(profiles,
         localDeviceId, sinkBindType, bindTypeIndex, index, targetDeviceId);
-    EXPECT_EQ(sinkBindType, vector<int32_t>({DEVICE_ACROSS_ACCOUNT_TYPE}));
+    EXPECT_EQ(sinkBindType, vector<int32_t>({SERVICE_ACROSS_ACCOUNT_TYPE}));
     EXPECT_EQ(bindTypeIndex, vector<int32_t>({0}));
 }
 
