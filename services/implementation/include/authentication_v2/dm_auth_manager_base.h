@@ -109,7 +109,7 @@ extern const int32_t DM_AUTH_TYPE_MIN;
 extern const int32_t MIN_PIN_TOKEN;
 extern const int32_t MAX_PIN_TOKEN;
 
-using CleanNotifyCallback = std::function<void(uint64_t)>;
+using CleanNotifyCallback = std::function<void(uint64_t, int32_t)>;
 
 enum DmRole {
     DM_ROLE_UNKNOWN = 0,

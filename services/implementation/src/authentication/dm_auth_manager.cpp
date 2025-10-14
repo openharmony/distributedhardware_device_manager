@@ -1644,7 +1644,7 @@ void DmAuthManager::ResetParams()
     isCreateGroup_ = false;
     transitToFinishState_ = false;
     if (cleanNotifyCallback_ != nullptr) {
-        cleanNotifyCallback_(0);
+        cleanNotifyCallback_(0, 0);
     }
 }
 
