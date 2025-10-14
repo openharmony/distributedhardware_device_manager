@@ -246,7 +246,7 @@ int32_t AuthManager::StopAuthenticateDevice(const std::string &pkgName)
 {
     (void)pkgName;
     LOGI("AuthManager::StopAuthenticateDevice start");
-
+    context_->connDelayCloseTime = 0;
     context_->reason = STOP_BIND;
     if (context_->authStateMachine->IsWaitEvent()) {
         context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);

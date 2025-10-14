@@ -2141,10 +2141,10 @@ HWTEST_F(DeviceManagerServiceImplTest, CleanSessionMap_001, testing::ext::TestSi
 {
     int sessionId = 0;
     std::string deviceId = "deviceId";
-    deviceManagerServiceImpl_->CleanSessionMap(nullptr);
+    deviceManagerServiceImpl_->CleanSessionMap(nullptr, 0);
     std::shared_ptr<Session> session = std::make_shared<Session>(sessionId, deviceId);
     session->logicalSessionCnt_.fetch_add(1);
-    deviceManagerServiceImpl_->CleanSessionMap(session);
+    deviceManagerServiceImpl_->CleanSessionMap(session, 0);
     EXPECT_EQ(session->logicalSessionCnt_.load(), 0);
 }
 
@@ -2152,16 +2152,16 @@ HWTEST_F(DeviceManagerServiceImplTest, CleanSessionMap_002, testing::ext::TestSi
 {
     int sessionId = 0;
     deviceManagerServiceImpl_->softbusConnector_ = nullptr;
-    deviceManagerServiceImpl_->CleanSessionMap(sessionId);
+    deviceManagerServiceImpl_->CleanSessionMap(sessionId, 0);
     if (deviceManagerServiceImpl_->softbusConnector_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
     deviceManagerServiceImpl_->sessionsMap_.clear();
-    deviceManagerServiceImpl_->CleanSessionMap(sessionId);
+    deviceManagerServiceImpl_->CleanSessionMap(sessionId, 0);
     std::string deviceId = "deviceId";
     std::shared_ptr<Session> session = std::make_shared<Session>(sessionId, deviceId);
     deviceManagerServiceImpl_->sessionsMap_[sessionId] = session;
-    deviceManagerServiceImpl_->CleanSessionMap(sessionId);
+    deviceManagerServiceImpl_->CleanSessionMap(sessionId, 0);
     EXPECT_FALSE(deviceManagerServiceImpl_->sessionsMap_.empty());
 }
 

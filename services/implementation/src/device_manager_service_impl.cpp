@@ -190,10 +190,10 @@ static uint64_t GetTokenId(bool isSrcSide, int32_t displayId, std::string &bundl
     return tokenId;
 }
 
-void DeviceManagerServiceImpl::NotifyCleanEvent(uint64_t logicalSessionId)
+void DeviceManagerServiceImpl::NotifyCleanEvent(uint64_t logicalSessionId, int32_t connDelayCloseTime)
 {
     LOGI("logicalSessionId: %{public}" PRIu64 ".", logicalSessionId);
-    ffrt::submit([=]() { CleanAuthMgrByLogicalSessionId(logicalSessionId); });
+    ffrt::submit([=]() { CleanAuthMgrByLogicalSessionId(logicalSessionId, connDelayCloseTime); });
 }
 
 void DeviceManagerServiceImpl::ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId,
@@ -257,8 +257,8 @@ int32_t DeviceManagerServiceImpl::InitNewProtocolAuthMgr(bool isSrcSide, uint64_
         authMgr = std::make_shared<AuthSinkManager>(softbusConnector_, hiChainConnector_,
             listener_, hiChainAuthConnector_);
     }
-    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId) {
-        this->NotifyCleanEvent(logicalSessionId);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
     };
     // Register resource destruction notification function
     authMgr->RegisterCleanNotifyCallback(cleanNotifyCallback);
@@ -319,7 +319,7 @@ int32_t DeviceManagerServiceImpl::InitAndRegisterAuthMgr(bool isSrcSide, uint64_
     return InitOldProtocolAuthMgr(tokenId, pkgName, session->sessionId_);
 }
 
-void DeviceManagerServiceImpl::CleanSessionMap(std::shared_ptr<Session> session)
+void DeviceManagerServiceImpl::CleanSessionMap(std::shared_ptr<Session> session, int32_t connDelayCloseTime)
 {
     if (session == nullptr) {
         return;
@@ -333,11 +333,11 @@ void DeviceManagerServiceImpl::CleanSessionMap(std::shared_ptr<Session> session)
             }
             isNeedJoinLnn_ = true;
         }
-        CleanSessionMap(session->sessionId_);
+        CleanSessionMap(session->sessionId_, connDelayCloseTime);
     }
 }
 
-void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
+void DeviceManagerServiceImpl::CleanSessionMap(int sessionId, int32_t connDelayCloseTime)
 {
     LOGI("In sessionId:%{public}d.", sessionId);
     CHECK_NULL_VOID(softbusConnector_);
@@ -347,20 +347,10 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
     auto taskFunc = [=]() {
         CHECK_NULL_VOID(softbusConnector_);
         CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
-        {
-            std::lock_guard<ffrt::mutex> lock(authSessionCountMtx_);
-            if (authSessionCount_.find(peerUdid) != authSessionCount_.end() && authSessionCount_[peerUdid] > 0) {
-                authSessionCount_[peerUdid]--;
-                if (authSessionCount_[peerUdid] == 0) {
-                    softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
-                    authSessionCount_.erase(peerUdid);
-                }
-            }
-        }
+        softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
     };
     const int64_t MICROSECOND_PER_SECOND = 1000000L;
-    ffrt::submit(taskFunc, ffrt::task_attr().delay(delayCloseTime_ * MICROSECOND_PER_SECOND));
-    delayCloseTime_ = 0;
+    ffrt::submit(taskFunc, ffrt::task_attr().delay(connDelayCloseTime * MICROSECOND_PER_SECOND));
     {
         std::lock_guard<ffrt::mutex> lock(mapMutex_);
         std::shared_ptr<Session> session = nullptr;
@@ -380,7 +370,7 @@ void DeviceManagerServiceImpl::CleanSessionMap(int sessionId)
     }
 }
 
-void DeviceManagerServiceImpl::CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId)
+void DeviceManagerServiceImpl::CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime)
 {
     {
         std::lock_guard<ffrt::mutex> tokenIdLock(logicalSessionId2TokenIdMapMtx_);
@@ -397,12 +387,12 @@ void DeviceManagerServiceImpl::CleanSessionMapByLogicalSessionId(uint64_t logica
     }
     auto session = GetCurSession(sessionId);
     if (session != nullptr) {
-        CleanSessionMap(session);
+        CleanSessionMap(session, connDelayCloseTime);
     }
     return;
 }
 
-void DeviceManagerServiceImpl::CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId)
+void DeviceManagerServiceImpl::CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime)
 {
     if (logicalSessionId == 0 && authMgr_ != nullptr) {
         authMgr_->SetTransferReady(true);
@@ -419,7 +409,7 @@ void DeviceManagerServiceImpl::CleanAuthMgrByLogicalSessionId(uint64_t logicalSe
         }
     }
 
-    CleanSessionMapByLogicalSessionId(logicalSessionId);
+    CleanSessionMapByLogicalSessionId(logicalSessionId, connDelayCloseTime);
     hiChainAuthConnector_->UnRegisterHiChainAuthCallbackById(logicalSessionId);
     EraseAuthMgr(tokenId);
     return;
@@ -699,7 +689,7 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
             ffrt_usleep(USLEEP_TIME_US_550000);
         }
     } else {
-        CleanSessionMap(sessionId);
+        CleanSessionMap(sessionId, 0);
     }
     EraseAuthMgr(tokenId);
     return ret;
@@ -756,8 +746,8 @@ void DeviceManagerServiceImpl::CreateGlobalClassicalAuthMgr()
     // Create old auth_mar, only create an independent one
     authMgr_ = std::make_shared<DmAuthManager>(softbusConnector_, hiChainConnector_, listener_,
         hiChainAuthConnector_);
-    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId) {
-        this->NotifyCleanEvent(logicalSessionId);
+    CleanNotifyCallback cleanNotifyCallback = [=](const auto &logicalSessionId, const auto &connDelayCloseTime) {
+        this->NotifyCleanEvent(logicalSessionId, connDelayCloseTime);
     };
     authMgr_->RegisterCleanNotifyCallback(cleanNotifyCallback);
     softbusConnector_->RegisterConnectorCallback(authMgr_);
@@ -969,15 +959,11 @@ int DeviceManagerServiceImpl::OnSessionOpened(int sessionId, int result)
         .peerUdid = peerUdid,
         .channelId = sessionId,
     };
-    {
-        std::lock_guard<ffrt::mutex> lock(authSessionCountMtx_);
-        authSessionCount_[peerUdid]++;
-    }
     if (!DmRadarHelper::GetInstance().ReportAuthSessionOpenCb(info)) {
         LOGE("ReportAuthSessionOpenCb failed");
     }
     if (isNeedCloseSession) {
-        CleanSessionMap(sessionId);
+        CleanSessionMap(sessionId, 0);
         return DM_OK;
     }
     // Get the remote deviceId, sink end gives sessionsMap[deviceId] = session;
@@ -1160,7 +1146,7 @@ int32_t DeviceManagerServiceImpl::TransferByAuthType(int32_t authType,
         CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
         (void)softbusConnector_->GetSoftbusSession()->SendData(sessionId, endMessage);
         // Close new protocol session
-        CleanAuthMgrByLogicalSessionId(logicalSessionId);
+        CleanAuthMgrByLogicalSessionId(logicalSessionId, 0);
     }
     if (authType == ULTRASONIC_AUTHTYPE) {
         int32_t ret = ChangeUltrasonicTypeToPin(bindParam);
@@ -1904,7 +1890,7 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
         logicalSessionId = GenerateRandNum(sessionId);
         if (curSession->logicalSessionSet_.find(logicalSessionId) != curSession->logicalSessionSet_.end()) {
             LOGE("Failed to create the logical session.");
-            CleanSessionMap(sessionId);
+            CleanSessionMap(sessionId, 0);
             OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId,
                 ERR_DM_INPUT_PARA_INVALID, tokenId);
             return;
@@ -1915,7 +1901,7 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
     int32_t ret = InitAndRegisterAuthMgr(true, tokenId, curSession, logicalSessionId, "");
     if (ret != DM_OK) {
         LOGE("InitAndRegisterAuthMgr failed, ret %{public}d.", ret);
-        CleanSessionMap(sessionId);
+        CleanSessionMap(sessionId, 0);
         OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ret, tokenId);
         return;
     }
@@ -1924,15 +1910,14 @@ void DeviceManagerServiceImpl::BindTargetImpl(uint64_t tokenId, const std::strin
     SaveTokenIdAndSessionId(tokenId, sessionId, logicalSessionId);
     auto authMgr = GetAuthMgrByTokenId(tokenId);
     if (authMgr == nullptr) {
-        CleanAuthMgrByLogicalSessionId(logicalSessionId);
+        CleanAuthMgrByLogicalSessionId(logicalSessionId, 0);
         OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ERR_DM_POINT_NULL, tokenId);
         return;
     }
-    GetSessionDelayCloseTime(bindParam);
     authMgr->SetBindTargetParams(targetId);
     if ((ret = authMgr->BindTarget(pkgName, targetIdTmp, bindParam, sessionId, logicalSessionId)) != DM_OK) {
         LOGE("authMgr BindTarget failed, ret %{public}d.", ret);
-        CleanAuthMgrByLogicalSessionId(logicalSessionId);
+        CleanAuthMgrByLogicalSessionId(logicalSessionId, 0);
         OnAuthResultAndOnBindResult(processInfo, targetId, targetIdTmp.deviceId, ret, tokenId);
     }
     LOGI("end, tokenId %{public}s.", GetAnonyInt32(tokenId).c_str());
@@ -3386,18 +3371,6 @@ int32_t DeviceManagerServiceImpl::LeaveLNN(const std::string &pkgName, const std
 {
     CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
     return softbusConnector_->LeaveLNN(pkgName, networkId);
-}
-
-void DeviceManagerServiceImpl::GetSessionDelayCloseTime(const std::map<std::string, std::string> &bindParam)
-{
-    if (bindParam.find(PARAM_CLOSE_SESSION_DELAY_SECONDS) != bindParam.end()) {
-        std::string inputDelayTime = bindParam.at(PARAM_CLOSE_SESSION_DELAY_SECONDS);
-        delayCloseTime_ = ConvertStrToInt(inputDelayTime);
-    }
-    const int32_t closeSessionDelaySecondsMax = 10;
-    if (delayCloseTime_ == 0 || delayCloseTime_ > closeSessionDelaySecondsMax) {
-        delayCloseTime_ = closeSessionDelaySecondsMax;
-    }
 }
 
 extern "C" IDeviceManagerServiceImpl *CreateDMServiceObject(void)

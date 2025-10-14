@@ -234,7 +234,7 @@ int32_t AuthSinkFinishState::Action(std::shared_ptr<DmAuthContext> context)
     SinkFinish(context);
     LOGI("AuthSinkFinishState::Action ok");
     if (context->cleanNotifyCallback != nullptr) {
-        context->cleanNotifyCallback(context->logicalSessionId);
+        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
     }
 
     return DM_OK;
@@ -274,18 +274,11 @@ int32_t AuthSrcFinishState::Action(std::shared_ptr<DmAuthContext> context)
         JoinLnn(context);
     }
     LOGI("AuthSrcFinishState::Action ok");
-    std::shared_ptr<DmAuthContext> tempContext = context;
-    auto taskFunc = [this, tempContext]() {
-        if (tempContext->cleanNotifyCallback != nullptr) {
-            tempContext->cleanNotifyCallback(tempContext->logicalSessionId);
-        }
-    };
     if (context->reason != DM_OK && context->reason != DM_ALREADY_AUTHED) {
-        ffrt::submit(taskFunc);  //bind fail, close channel immediately
-        return DM_OK;
+        context->connDelayCloseTime = 0;
     }
     if (context->cleanNotifyCallback != nullptr) {
-        context->cleanNotifyCallback(context->logicalSessionId);  //bind success, close channel delayedly
+        context->cleanNotifyCallback(context->logicalSessionId, context->connDelayCloseTime);
     }
     return DM_OK;
 }
