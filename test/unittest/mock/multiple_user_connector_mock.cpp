@@ -68,5 +68,10 @@ void MultipleUserConnector::GetCallerUserId(int32_t &userId)
 {
     return DmMultipleUserConnector::dmMultipleUserConnector->GetCallerUserId(userId);
 }
+
+int32_t MultipleUserConnector::GetUserIdByDisplayId(int32_t displayId)
+{
+    return DmMultipleUserConnector::dmMultipleUserConnector->GetUserIdByDisplayId(displayId);
+}
 } // namespace DistributedHardware
 } // namespace OHOS

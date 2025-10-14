@@ -2364,6 +2364,7 @@ ohos_unittest("UTTest_auth_manager") {
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_auth_manager.cpp",
     "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/multiple_user_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]

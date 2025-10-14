@@ -36,6 +36,8 @@ private:
     static inline std::shared_ptr<DistributedDeviceProfile::DistributedDeviceProfileClientMock>
         distributedDeviceProfileClientMock_ =
         std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
+        std::make_shared<MultipleUserConnectorMock>();
 
     std::shared_ptr<SoftbusConnector> softbusConnector;
     std::shared_ptr<IDeviceManagerServiceListener> deviceManagerServicelistener;
