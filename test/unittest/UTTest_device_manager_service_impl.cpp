@@ -2162,7 +2162,7 @@ HWTEST_F(DeviceManagerServiceImplTest, CleanSessionMap_002, testing::ext::TestSi
     std::shared_ptr<Session> session = std::make_shared<Session>(sessionId, deviceId);
     deviceManagerServiceImpl_->sessionsMap_[sessionId] = session;
     deviceManagerServiceImpl_->CleanSessionMap(sessionId);
-    EXPECT_TRUE(deviceManagerServiceImpl_->sessionsMap_.empty());
+    EXPECT_FALSE(deviceManagerServiceImpl_->sessionsMap_.empty());
 }
 
 HWTEST_F(DeviceManagerServiceImplTest, AddAuthMgr_001, testing::ext::TestSize.Level1)

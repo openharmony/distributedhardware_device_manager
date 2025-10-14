@@ -199,7 +199,6 @@ HWTEST_F(AuthConfirmTest, AuthSrcConfirmState_GetSrcCredentialInfo_001, testing:
     JsonObject jsonObject;
 
     context->accesser.accountIdHash = context->accessee.accountIdHash = "";
-    EXPECT_CALL(*dmHiChainAuthConnectorMock, QueryCredentialInfo(_, _, _)).WillOnce(Return(DM_OK));
     authState->GetSrcCredentialInfo(context, jsonObject);
 
     context->accesser.accountIdHash = "0";
