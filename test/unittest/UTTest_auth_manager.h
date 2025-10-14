@@ -23,6 +23,7 @@
 #include "hichain_connector.h"
 #include "softbus_connector.h"
 #include "distributed_device_profile_client_mock.h"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {

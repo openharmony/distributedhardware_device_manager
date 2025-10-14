@@ -405,8 +405,8 @@ HWTEST_F(AuthManagerTest, GetSrcUserIdByDisplayIdAndDeviceType_001, testing::ext
 {
     int32_t displayId = 0;
     DmDeviceType deviceType = DmDeviceType::DEVICE_TYPE_CAR;
-    EXPECT_CALL(*multipleUserconnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(-1));
-    int ret = authManager->GetSrcUserIdByDisplayIdAndDeviceType(displayId, deviceType);
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(-1));
+    int32_t ret = authManager->GetSrcUserIdByDisplayIdAndDeviceType(displayId, deviceType);
     EXPECT_EQ(ret, -1);
 }
 
@@ -414,52 +414,51 @@ HWTEST_F(AuthManagerTest, GetSrcUserIdByDisplayIdAndDeviceType_002, testing::ext
 {
     int32_t displayId = 0;
     DmDeviceType deviceType = DmDeviceType::DEVICE_TYPE_PHONE;
-    EXPECT_CALL(*multipleUserconnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(-1));
-    int ret = authManager->GetSrcUserIdByDisplayIdAndDeviceType(displayId, deviceType);
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(-1));
+    int32_t ret = authManager->GetSrcUserIdByDisplayIdAndDeviceType(displayId, deviceType);
     EXPECT_EQ(ret, -1);
 }
 
 HWTEST_F(AuthManagerTest, GetSrcCarUserIdByDisplayId_001, testing::ext::TestSize.Level1)
 {
     int32_t displayId = 0;
-    EXPECT_CALL(*multipleUserconnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(-1));
-    int ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(-1));
+    int32_t ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
     EXPECT_EQ(ret, -1);
 }
 
 HWTEST_F(AuthManagerTest, GetSrcCarUserIdByDisplayId_002, testing::ext::TestSize.Level1)
 {
     int32_t displayId = -1;
-    authManager->bindParam_.insert("bindCallerIsSystemSA", 1);
-    EXPECT_CALL(*multipleUserconnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100))
-    int ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
+    authManager->bindParam_["bindCallerIsSystemSA"] = "1";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    int32_t ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
     EXPECT_EQ(ret, 100);
 }
 
 HWTEST_F(AuthManagerTest, GetSrcCarUserIdByDisplayId_003, testing::ext::TestSize.Level1)
 {
     int32_t displayId = 6;
-    authManager->bindParam_.insert("bindCallerIsSystemSA", 1);
-    EXPECT_CALL(*multipleUserconnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100))
-    int ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
-    EXPECT_EQ(ret, 100);
+    authManager->bindParam_["bindCallerIsSystemSA"] = "1";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    int32_t ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
+    EXPECT_EQ(ret, -1);
 }
 
 HWTEST_F(AuthManagerTest, GetSrcCarUserIdByDisplayId_004, testing::ext::TestSize.Level1)
 {
     int32_t displayId = 0;
-    authManager->bindParam_.insert("bindCallerIsSystemSA", 1);
-    EXPECT_CALL(*multipleUserconnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100))
-    int ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
+    authManager->bindParam_["bindCallerIsSystemSA"] = "1";
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    int32_t ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
     EXPECT_EQ(ret, 100);
 }
 
 HWTEST_F(AuthManagerTest, GetSrcCarUserIdByDisplayId_005, testing::ext::TestSize.Level1)
 {
     int32_t displayId = 0;
-    authManager->context_->processInfo.userId = 100;
-    EXPECT_CALL(*multipleUserconnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
-    int ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    int32_t ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
     EXPECT_EQ(ret, -1);
 }
 
@@ -467,8 +466,8 @@ HWTEST_F(AuthManagerTest, GetSrcCarUserIdByDisplayId_006, testing::ext::TestSize
 {
     int32_t displayId = 0;
     authManager->context_->processInfo.userId = 100;
-    EXPECT_CALL(*multipleUserconnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
-    int ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    int32_t ret = authManager->GetSrcCarUserIdByDisplayId(displayId);
     EXPECT_EQ(ret, 100);
 }
 } // namespace DistributedHardware

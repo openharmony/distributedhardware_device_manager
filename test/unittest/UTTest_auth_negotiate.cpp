@@ -35,6 +35,8 @@ void AuthNegotiateTest::SetUpTestCase()
     DmSoftbusSession::dmSoftbusSession = softbusSessionMock;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient =
         distributedDeviceProfileClientMock_;
+    DmMultipleUserConnector::dmMultipleUserConnector = multipleUserConnectorMock_;
+    DmAppManager::dmAppManager = appManagerMock_;
 }
 
 void AuthNegotiateTest::TearDownTestCase()
@@ -46,6 +48,10 @@ void AuthNegotiateTest::TearDownTestCase()
     DmSoftbusSession::dmSoftbusSession = nullptr;
     DistributedDeviceProfile::DpDistributedDeviceProfileClient::dpDistributedDeviceProfileClient = nullptr;
     distributedDeviceProfileClientMock_ = nullptr;
+    DmMultipleUserConnector::dmMultipleUserConnector = nullptr;
+    multipleUserConnectorMock_ = nullptr;
+    DmAppManager::dmAppManager = nullptr;
+    appManagerMock_ = nullptr;
 }
 
 void AuthNegotiateTest::SetUp()
@@ -400,6 +406,74 @@ HWTEST_F(AuthNegotiateTest, SinkNegotiateService_002, testing::ext::TestSize.Lev
     std::shared_ptr<AuthSinkNegotiateStateMachine> authState = std::make_shared<AuthSinkNegotiateStateMachine>();
     int result = authState->SinkNegotiateService(context);
     EXPECT_EQ(result, ERR_DM_INPUT_PARA_INVALID);
+}
+
+HWTEST_F(AuthNegotiateTest, GetSinkUserIdByDeviceType_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.displayId = 0;
+    DmDeviceType deviceType = DmDeviceType::DEVICE_TYPE_CAR;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(-1));
+    int result = authState->GetSinkUserIdByDeviceType(context, deviceType);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(AuthNegotiateTest, GetSinkUserIdByDeviceType_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.displayId = 0;
+    DmDeviceType deviceType = DmDeviceType::DEVICE_TYPE_PAD;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    int result = authState->GetSinkUserIdByDeviceType(context, deviceType);
+    EXPECT_EQ(result, 100);
+}
+
+HWTEST_F(AuthNegotiateTest, GetSinkCarUserId_001, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.displayId = 0;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(-1));
+    int result = authState->GetSinkCarUserId(context);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(AuthNegotiateTest, GetSinkCarUserId_002, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.displayId = -1;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
+    int result = authState->GetSinkCarUserId(context);
+    EXPECT_EQ(result, 100);
+}
+
+HWTEST_F(AuthNegotiateTest, GetSinkCarUserId_003, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.displayId = 6;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
+    int result = authState->GetSinkCarUserId(context);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(AuthNegotiateTest, GetSinkCarUserId_004, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.displayId = 0;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    EXPECT_CALL(*appManagerMock_, GetNativeTokenIdByName(_, _)).WillOnce(Return(DM_OK));
+    int result = authState->GetSinkCarUserId(context);
+    EXPECT_EQ(result, 100);
+}
+
+HWTEST_F(AuthNegotiateTest, GetSinkCarUserId_005, testing::ext::TestSize.Level1)
+{
+    std::shared_ptr<DmAuthContext> context = std::make_shared<DmAuthContext>();
+    context->accessee.displayId = 0;
+    EXPECT_CALL(*multipleUserConnectorMock_, GetUserIdByDisplayId(_)).WillOnce(Return(100));
+    int result = authState->GetSinkCarUserId(context);
+    EXPECT_EQ(result, 100);
 }
 }
 }
