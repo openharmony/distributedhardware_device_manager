@@ -187,7 +187,7 @@ public:
     bool IsProxyUnbind(const std::string &extra);
     int32_t DeleteAclV2(const std::string &sessionName, const std::string &localUdid, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra);
-    void NotifyCleanEvent(uint64_t logicalSessionId);
+    void NotifyCleanEvent(uint64_t logicalSessionId, int32_t connDelayCloseTime);
     void HandleServiceUnBindEvent(int32_t userId, const std::string &remoteUdid,
         int32_t remoteTokenId);
     int32_t DeleteGroup(const std::string &pkgName, const std::string &deviceId);
@@ -264,10 +264,10 @@ private:
     void ImportConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId, const std::string &pkgName);
     void ImportAuthCodeToConfig(std::shared_ptr<AuthManagerBase> authMgr, uint64_t tokenId);
 
-    void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId);
-    void CleanSessionMap(std::shared_ptr<Session> session);
-    void CleanSessionMap(int sessionId);
-    void CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId);
+    void CleanAuthMgrByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime);
+    void CleanSessionMap(std::shared_ptr<Session> session, int32_t connDelayCloseTime);
+    void CleanSessionMap(int sessionId, int32_t connDelayCloseTime);
+    void CleanSessionMapByLogicalSessionId(uint64_t logicalSessionId, int32_t connDelayCloseTime);
     int32_t DeleteAclForProcV2(const std::string &localUdid, uint32_t localTokenId, const std::string &remoteUdid,
         int32_t bindLevel, const std::string &extra, int32_t userId);
     int32_t DeleteSkCredAndAcl(const std::vector<DmAclIdParam> &acls);
@@ -313,7 +313,6 @@ private:
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
         int32_t &bindLevel);
     void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
-    void GetSessionDelayCloseTime(const std::map<std::string, std::string> &bindParam);
 private:
     ffrt::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
@@ -351,9 +350,6 @@ private:
     std::map<uint64_t, std::shared_ptr<AuthManagerBase>> authMgrMap_;  // New protocol sharing
     ffrt::mutex tokenIdSessionIdMapMtx_;
     std::map<uint64_t, int> tokenIdSessionIdMap_;  // New protocol sharing
-    int32_t delayCloseTime_ = 0;
-    ffrt::mutex authSessionCountMtx_;
-    std::map<std::string, int32_t> authSessionCount_;
 };
 
 using CreateDMServiceFuncPtr = IDeviceManagerServiceImpl *(*)(void);
