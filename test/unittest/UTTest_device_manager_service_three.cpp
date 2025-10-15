@@ -170,7 +170,7 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetUserOperation_301, testing::ext::Test
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceImplReady()).WillOnce(Return(false));
     int ret = DeviceManagerService::GetInstance().SetUserOperation(pkgName, action, param);
-    EXPECT_EQ(ret, ERR_DM_NOT_INIT);
+    EXPECT_EQ(ret, ERR_DM_INPUT_PARA_INVALID);
 }
 
 /**

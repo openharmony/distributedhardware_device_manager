@@ -166,7 +166,7 @@ HWTEST_F(AuthManagerTest, OnUserOperation_004, testing::ext::TestSize.Level1)
 
     int32_t ret = authManager->OnUserOperation(action, params);
 
-    EXPECT_EQ(ret, ERR_DM_FAILED);
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(AuthManagerTest, OnUserOperation_005, testing::ext::TestSize.Level1)

@@ -1006,7 +1006,7 @@ void AuthSrcManager::AuthDeviceError(int64_t requestId, int32_t errorCode)
         context_->authStateMachine->TransitionTo(std::make_shared<AuthSrcPinNegotiateStartState>());
     } else {
         LOGI("AuthSrcManager::AuthDeviceError unexpected err.");
-        context_->reason = errorCode;
+        context_->reason = (errorCode == ERR_DM_HICHAIN_PROOFMISMATCH ? ERR_DM_BIND_PIN_CODE_ERROR : errorCode);
         context_->authStateMachine->NotifyEventFinish(DmEventType::ON_FAIL);
     }
     LOGI("AuthSrcManager::AuthDeviceError leave.");
