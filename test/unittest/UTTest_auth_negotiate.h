@@ -45,7 +45,7 @@ private:
     static inline std::shared_ptr<AccessTokenKitMock> tokenMock = nullptr;
     static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
         std::make_shared<MultipleUserConnectorMock>();
-    static inline std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();;
+    static inline std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
 
     std::shared_ptr<SoftbusConnector> softbusConnector;
     std::shared_ptr<IDeviceManagerServiceListener> listener;

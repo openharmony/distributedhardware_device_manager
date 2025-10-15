@@ -2347,6 +2347,7 @@ ohos_unittest("UTTest_auth_negotiate") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
