@@ -2333,6 +2333,8 @@ ohos_unittest("UTTest_auth_negotiate") {
     "${devicemanager_path}/test/unittest/mock/softbus_connector_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/softbus_session_mock.cpp",
     "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/app_manager_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/multiple_user_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]
@@ -2345,6 +2347,7 @@ ohos_unittest("UTTest_auth_negotiate") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
+    "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock",
     "googletest:gmock_main",
@@ -2364,6 +2367,7 @@ ohos_unittest("UTTest_auth_manager") {
   sources = [
     "${devicemanager_path}/test/unittest/UTTest_auth_manager.cpp",
     "${devicemanager_path}/test/unittest/mock/distributed_device_profile_client_mock.cpp",
+    "${devicemanager_path}/test/unittest/mock/multiple_user_connector_mock.cpp",
   ]
 
   deps = [ ":device_manager_test_common" ]

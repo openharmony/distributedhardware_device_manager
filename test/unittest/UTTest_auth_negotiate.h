@@ -21,7 +21,9 @@
 #include "accesstoken_kit_mock.h"
 #include "softbus_connector_mock.h"
 #include "softbus_session_mock.h"
+#include "app_manager_mock.h"
 #include "distributed_device_profile_client_mock.h"
+#include "multiple_user_connector_mock.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -41,6 +43,10 @@ private:
         distributedDeviceProfileClientMock_ =
         std::make_shared<DistributedDeviceProfile::DistributedDeviceProfileClientMock>();
     static inline std::shared_ptr<AccessTokenKitMock> tokenMock = nullptr;
+    static inline std::shared_ptr<MultipleUserConnectorMock> multipleUserConnectorMock_ =
+        std::make_shared<MultipleUserConnectorMock>();
+    static inline std::shared_ptr<AppManagerMock> appManagerMock_ = std::make_shared<AppManagerMock>();
+
     std::shared_ptr<SoftbusConnector> softbusConnector;
     std::shared_ptr<IDeviceManagerServiceListener> listener;
     std::shared_ptr<HiChainAuthConnector> hiChainAuthConnector;

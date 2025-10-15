@@ -524,13 +524,12 @@ int32_t AuthManager::GetSrcCarUserIdByDisplayId(int32_t displayId)
         isSystemSA = static_cast<bool>(std::atoi(bindParam_[BIND_CALLER_IS_SYSTEM_SA].c_str()));
     }
     if (isSystemSA) {
-        if (context_->accesser.displayId == -1) {
+        if (displayId == -1) {
             LOGI("not transmit local displayId, return mainScreenUserId");
             return mainScreenUserId;
         }
-        if (context_->accesser.displayId != MAIN_SCREEN_DISPLAYID) {
-            LOGE("accesser.displayId = %{public}d is not control screen.",
-                context_->accesser.displayId);
+        if (displayId != MAIN_SCREEN_DISPLAYID) {
+            LOGE("accesser.displayId = %{public}d is not control screen.", displayId);
             return INVALID_USERID;
         }
         return mainScreenUserId;
