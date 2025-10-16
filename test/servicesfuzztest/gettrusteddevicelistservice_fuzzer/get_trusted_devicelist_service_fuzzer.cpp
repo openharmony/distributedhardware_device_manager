@@ -37,7 +37,6 @@ void GetTrustedDeviceListFuzzTest(const uint8_t* data, size_t size)
     dmDeviceInfo.extraData = fdp.ConsumeRandomLengthString();
     deviceList.push_back(dmDeviceInfo);
 
-    DeviceManagerService::GetInstance().Init();
     DeviceManagerService::GetInstance().GetTrustedDeviceList(pkgName, extra, deviceList);
     DeviceManagerService::GetInstance().GetUdidByNetworkId(pkgName, pkgName, pkgName);
     DeviceManagerService::GetInstance().GetUuidByNetworkId(pkgName, pkgName, pkgName);
