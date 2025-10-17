@@ -3216,6 +3216,10 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcAccessControl(const DmAccessCalle
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str(), GetAnonyUint64(caller.tokenId).c_str(),
         GetAnonyUint64(callee.tokenId).c_str());
+    if (CheckUserIdIsForegroundUserId(caller.userId)) {
+        LOGI("srcUserId = %{public}d is not ForegroundUserId", caller.userId);
+        return false;
+    }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
     std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
@@ -3341,6 +3345,10 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkAccessControl(const DmAccessCall
         caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str());
+    if (CheckUserIdIsForegroundUserId(callee.userId)) {
+        LOGI("sinkUdid = %{public}d is not ForegroundUserId", callee.userId);
+        return false;
+    }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
     std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
@@ -3500,6 +3508,10 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCalle
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str(), GetAnonyUint64(caller.tokenId).c_str(),
         GetAnonyUint64(callee.tokenId).c_str());
+    if (CheckUserIdIsForegroundUserId(caller.userId)) {
+        LOGI("srcUdid = %{public}d is not ForegroundUserId", caller.userId);
+        return false;
+    }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
     std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
@@ -3526,6 +3538,10 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str(), GetAnonyUint64(caller.tokenId).c_str(),
         GetAnonyUint64(callee.tokenId).c_str());
+    if (CheckUserIdIsForegroundUserId(callee.userId)) {
+        LOGI("sinkUdid = %{public}d is not ForegroundUserId", callee.userId);
+        return false;
+    }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
     std::string localUdid = GetLocalDeviceId();
     std::string trustUdid = (localUdid == srcUdid ? sinkUdid : srcUdid);
@@ -3538,6 +3554,20 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
             return true;
         }
     }
+    return false;
+}
+
+DM_EXPORT bool DeviceProfileConnector::CheckUserIdIsForegroundUserId(const int32_t userId)
+{
+    std::vector<int32_t> userVec;
+    int32_t ret = MultipleUserConnector::GetForegroundUserIds(userVec);
+    if (ret != DM_OK) {
+        LOGE("GetForegroundUserIds failed, ret = %{public}d", ret);
+    }
+    if (std::find(userVec.begin(), userVec.end(), userId) != userVec.end()) {
+        return true;
+    }
+    LOGE("userId = %{public}d is not foregroundUserId.", userId);
     return false;
 }
 

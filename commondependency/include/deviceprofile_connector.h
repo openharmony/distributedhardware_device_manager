@@ -341,8 +341,8 @@ public:
     DM_EXPORT bool IsAllowAuthAlways(const std::string &localUdid, int32_t userId, const std::string &peerUdid,
         const std::string &pkgName, int64_t tokenId);
     DM_EXPORT void DeleteDpInvalidAcl();
-
     int32_t GetAuthOnceUdids(std::map<std::string, std::unordered_set<int32_t>> &udid2UserIdsMap);
+    DM_EXPORT bool CheckUserIdIsForegroundUserId(const int32_t userId);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
