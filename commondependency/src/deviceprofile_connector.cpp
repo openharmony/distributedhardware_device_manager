@@ -3563,6 +3563,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckUserIdIsForegroundUserId(const int32
     int32_t ret = MultipleUserConnector::GetForegroundUserIds(userVec);
     if (ret != DM_OK) {
         LOGE("GetForegroundUserIds failed, ret = %{public}d", ret);
+        return false;
     }
     if (std::find(userVec.begin(), userVec.end(), userId) != userVec.end()) {
         return true;
