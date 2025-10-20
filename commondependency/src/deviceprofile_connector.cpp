@@ -3216,7 +3216,7 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcAccessControl(const DmAccessCalle
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str(), GetAnonyUint64(caller.tokenId).c_str(),
         GetAnonyUint64(callee.tokenId).c_str());
-    if (CheckUserIdIsForegroundUserId(caller.userId)) {
+    if (!CheckUserIdIsForegroundUserId(caller.userId)) {
         LOGI("srcUserId = %{public}d is not ForegroundUserId", caller.userId);
         return false;
     }
@@ -3345,8 +3345,8 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkAccessControl(const DmAccessCall
         caller.pkgName.c_str(), GetAnonyString(caller.accountId).c_str(),
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str());
-    if (CheckUserIdIsForegroundUserId(callee.userId)) {
-        LOGI("sinkUdid = %{public}d is not ForegroundUserId", callee.userId);
+    if (!CheckUserIdIsForegroundUserId(callee.userId)) {
+        LOGI("sinkUserId = %{public}d is not ForegroundUserId", callee.userId);
         return false;
     }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
@@ -3508,8 +3508,8 @@ DM_EXPORT bool DeviceProfileConnector::CheckSrcIsSameAccount(const DmAccessCalle
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str(), GetAnonyUint64(caller.tokenId).c_str(),
         GetAnonyUint64(callee.tokenId).c_str());
-    if (CheckUserIdIsForegroundUserId(caller.userId)) {
-        LOGI("srcUdid = %{public}d is not ForegroundUserId", caller.userId);
+    if (!CheckUserIdIsForegroundUserId(caller.userId)) {
+        LOGI("srcUserId = %{public}d is not ForegroundUserId", caller.userId);
         return false;
     }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
@@ -3538,8 +3538,8 @@ DM_EXPORT bool DeviceProfileConnector::CheckSinkIsSameAccount(const DmAccessCall
         GetAnonyString(sinkUdid).c_str(), callee.userId, callee.pkgName.c_str(),
         GetAnonyString(callee.accountId).c_str(), GetAnonyUint64(caller.tokenId).c_str(),
         GetAnonyUint64(callee.tokenId).c_str());
-    if (CheckUserIdIsForegroundUserId(callee.userId)) {
-        LOGI("sinkUdid = %{public}d is not ForegroundUserId", callee.userId);
+    if (!CheckUserIdIsForegroundUserId(callee.userId)) {
+        LOGI("sinkUserId = %{public}d is not ForegroundUserId", callee.userId);
         return false;
     }
     std::vector<AccessControlProfile> profiles = GetAllAccessControlProfile();
