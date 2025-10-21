@@ -102,7 +102,6 @@ public:
     void OnServicePublishResult(const ProcessInfo &processInfo, int64_t serviceId, int32_t publishResult) override;
     void OnDevDbReadyCallbackAdd(const ProcessInfo &processInfo, const std::vector<DmDeviceInfo> &deviceList) override;
     void OnLeaveLNNResult(const std::string &pkgName, const std::string &networkId, int32_t retCode) override;
-    bool IsNeedNotifyStateChange(const ProcessInfo &processInfo) override;
 private:
     void ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
         const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo);
@@ -129,11 +128,11 @@ private:
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     void ProcessDeviceOffline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessDeviceInfoChange(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
+    void ProcessDeviceInfoChange(std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessAppOnline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
+    void ProcessAppOnline(std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
-    void ProcessAppOffline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
+    void ProcessAppOffline(std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo);
     void RemoveNotExistProcess();
     void ProcessDeviceStateChange(const ProcessInfo &processInfo, const DmDeviceState &state, const DmDeviceInfo &info,
@@ -144,10 +143,11 @@ private:
     void ProcessDeviceOnline(const std::vector<ProcessInfo> &procinfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
         const std::vector<int64_t> &serviceIds);
-    void ProcessAppOnline(const std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
+    void ProcessAppOnline(std::vector<ProcessInfo> &procInfoVec, const ProcessInfo &processInfo,
         const DmDeviceState &state, const DmDeviceInfo &info, const DmDeviceBasicInfo &deviceBasicInfo,
         const std::vector<int64_t> &serviceIds);
     void ClearDbReadyMap(std::string &notifyPkgName);
+    void SetNeedNotifyProcessInfos(const ProcessInfo &processInfo, std::vector<ProcessInfo> &procInfoVec);
 private:
 #if !defined(__LITEOS_M__)
     IpcServerListener ipcServerListener_;
