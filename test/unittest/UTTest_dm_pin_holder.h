@@ -322,12 +322,6 @@ public:
         (void)networkId;
         (void)retCode;
     }
-
-    virtual bool IsNeedNotifyStateChange(const ProcessInfo &processInfo)
-    {
-        (void)processInfo;
-        return false;
-    }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

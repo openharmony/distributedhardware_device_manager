@@ -205,8 +205,7 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
     LOGI("ProcessDeviceStateChange, remoteServiceIds size: %{public}zu", remoteServiceIds.size());
 
     for (const auto &item : processInfoVec) {
-        bool isNeed = listener_->IsNeedNotifyStateChange(item);
-        if (isNeed && !item.pkgName.empty()) {
+        if (!item.pkgName.empty()) {
             LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
             if (!remoteServiceIds.empty() && devState == DEVICE_STATE_ONLINE) {
                 listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIds);
