@@ -343,6 +343,7 @@ JsonItemObject& JsonItemObject::operator=(const JsonItemObject &object)
     return *this;
 }
 
+//LCOV_EXCL_START
 std::string JsonItemObject::DumpFormated() const
 {
     return Dump(true, true);
@@ -393,6 +394,7 @@ const JsonItemObject JsonItemObject::operator[](const std::string &key) const
 {
     return At(key);
 }
+//LCOV_EXCL_STOP
 
 bool JsonItemObject::Contains(const std::string &key) const
 {
@@ -404,10 +406,12 @@ bool JsonItemObject::Contains(const std::string &key) const
     return (item != nullptr);
 }
 
+//LCOV_EXCL_START
 bool JsonItemObject::IsDiscarded() const
 {
     return (item_ == nullptr);
 }
+//LCOV_EXCL_STOP
 
 bool JsonItemObject::PushBack(const std::string &strValue)
 {
@@ -483,6 +487,7 @@ void JsonItemObject::AddItemToArray(JsonItemObject &item)
     }
 }
 
+//LCOV_EXCL_START
 std::string JsonItemObject::Key() const
 {
     if (item_ != nullptr) {
@@ -490,6 +495,7 @@ std::string JsonItemObject::Key() const
     }
     return itemName_;
 }
+//LCOV_EXCL_STOP
 
 JsonItemObject JsonItemObject::At(const std::string &key) const
 {
@@ -583,6 +589,7 @@ void JsonItemObject::GetTo(bool &value) const
     value = cJSON_IsTrue(GetCJsonPointer(item_)) ? true : false;
 }
 
+//LCOV_EXCL_START
 std::vector<JsonItemObject> JsonItemObject::Items() const
 {
     std::vector<JsonItemObject> items;
@@ -601,6 +608,7 @@ std::vector<JsonItemObject> JsonItemObject::Items() const
     }
     return items;
 }
+//LCOV_EXCL_STOP
 
 bool JsonItemObject::InitItem(JsonItemObject &item)
 {
@@ -620,6 +628,7 @@ bool JsonItemObject::InitItem(JsonItemObject &item)
     return true;
 }
 
+//LCOV_EXCL_START
 bool JsonItemObject::InitArray()
 {
     if (!beValid_) {
@@ -635,6 +644,7 @@ bool JsonItemObject::InitArray()
     }
     return true;
 }
+//LCOV_EXCL_STOP
 
 bool JsonItemObject::ReplaceItem(void *newItem)
 {

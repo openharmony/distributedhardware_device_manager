@@ -23,6 +23,7 @@ namespace DistributedHardware {
 void ToJsonDoubleFuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     double value = fdp.ConsumeFloatingPoint<double>();
 
     ToJson(itemObject, value);
@@ -30,6 +31,7 @@ void ToJsonDoubleFuzzTest(FuzzedDataProvider &fdp)
 void ToJsonUint8FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     uint8_t value = fdp.ConsumeIntegral<uint8_t>();
 
     ToJson(itemObject, value);
@@ -38,6 +40,7 @@ void ToJsonUint8FuzzTest(FuzzedDataProvider &fdp)
 void ToJsonInt16FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     int16_t value = fdp.ConsumeIntegral<int16_t>();
 
     ToJson(itemObject, value);
@@ -46,6 +49,7 @@ void ToJsonInt16FuzzTest(FuzzedDataProvider &fdp)
 void ToJsonUint16FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     uint16_t value = fdp.ConsumeIntegral<uint16_t>();
 
     ToJson(itemObject, value);
@@ -54,6 +58,7 @@ void ToJsonUint16FuzzTest(FuzzedDataProvider &fdp)
 void ToJsonUint64FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     uint64_t value = fdp.ConsumeIntegral<uint64_t>();
 
     ToJson(itemObject, value);
@@ -62,6 +67,7 @@ void ToJsonUint64FuzzTest(FuzzedDataProvider &fdp)
 void FromJsonDoubleFuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     double result = fdp.ConsumeFloatingPoint<double>();
 
     double testValue = fdp.ConsumeFloatingPoint<double>();
@@ -72,6 +78,7 @@ void FromJsonDoubleFuzzTest(FuzzedDataProvider &fdp)
 void FromJsonBoolFuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     bool result = fdp.ConsumeBool();
 
     bool testValue = fdp.ConsumeBool();
@@ -82,6 +89,7 @@ void FromJsonBoolFuzzTest(FuzzedDataProvider &fdp)
 void FromJsonUint8FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     uint8_t result = fdp.ConsumeIntegral<uint8_t>();
 
     int32_t testValue = fdp.ConsumeIntegralInRange<int32_t>(
@@ -94,6 +102,7 @@ void FromJsonUint8FuzzTest(FuzzedDataProvider &fdp)
 void FromJsonInt16FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     int16_t result = fdp.ConsumeIntegralInRange<int16_t>(
         std::numeric_limits<int16_t>::min(),
         std::numeric_limits<int16_t>::max());
@@ -108,6 +117,7 @@ void FromJsonInt16FuzzTest(FuzzedDataProvider &fdp)
 void FromJsonUint16FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     uint16_t result = fdp.ConsumeIntegralInRange<uint16_t>(
         std::numeric_limits<uint16_t>::min(),
         std::numeric_limits<uint16_t>::max());
@@ -122,6 +132,7 @@ void FromJsonUint16FuzzTest(FuzzedDataProvider &fdp)
 void FromJsonInt32FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject itemObject;
+    itemObject.needDeleteItem_ = true;
     int32_t result = fdp.ConsumeIntegral<int32_t>();
 
     int32_t testValue = fdp.ConsumeIntegral<int32_t>();
@@ -132,6 +143,7 @@ void FromJsonInt32FuzzTest(FuzzedDataProvider &fdp)
 void PushBackDoubleFuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject object;
+    object.needDeleteItem_ = true;
 
     double value = fdp.ConsumeFloatingPoint<double>();
     object.PushBack(value);
@@ -140,6 +152,7 @@ void PushBackDoubleFuzzTest(FuzzedDataProvider &fdp)
 void PushBackInt64FuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject object;
+    object.needDeleteItem_ = true;
 
     int64_t value = fdp.ConsumeIntegral<int64_t>();
     object.PushBack(value);
@@ -148,6 +161,7 @@ void PushBackInt64FuzzTest(FuzzedDataProvider &fdp)
 void GetToBoolFuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject object;
+    object.needDeleteItem_ = true;
     bool value = fdp.ConsumeBool();
     object.GetTo(value);
 }
@@ -155,6 +169,7 @@ void GetToBoolFuzzTest(FuzzedDataProvider &fdp)
 void EraseFuzzTest(FuzzedDataProvider &fdp)
 {
     JsonItemObject object;
+    object.needDeleteItem_ = true;
     std::string key = fdp.ConsumeRandomLengthString();
     object.Erase(key);
 }
@@ -189,6 +204,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::DistributedHardware::JsonModelFuzzTest(data, size);
-
     return 0;
 }
