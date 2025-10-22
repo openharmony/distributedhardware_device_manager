@@ -144,6 +144,159 @@ ani_string AniStringUtils::ToAni(const ani_env *env, const std::string& str)
     return aniStr;
 }
 
+ani_status AniCreateInt(ani_env* env, int32_t value, ani_object& result)
+{
+    ani_status state;
+    ani_class intClass;
+    if ((state = env->FindClass("std.core.Int", &intClass)) != ANI_OK) {
+        LOGE("FindClass std/core/Int failed, %{public}d", state);
+        return state;
+    }
+    ani_method intClassCtor;
+    if ((state = env->Class_FindMethod(intClass, "<ctor>", "i:", &intClassCtor)) != ANI_OK) {
+        LOGE("Class_FindMethod Int ctor failed, %{public}d", state);
+        return state;
+    }
+    ani_int aniValue = value;
+    if ((state = env->Object_New(intClass, intClassCtor, &result, aniValue)) != ANI_OK) {
+        LOGE("New Int object failed, %{public}d", state);
+    }
+    if (state != ANI_OK) {
+        result = nullptr;
+    }
+    return state;
+}
+
+ani_string AniCreateString(ani_env *env, const std::string &para)
+{
+    if (env == nullptr) {
+        return {};
+    }
+    ani_string ani_string_result = nullptr;
+    if (env->String_NewUTF8(para.c_str(), para.size(), &ani_string_result) != ANI_OK) {
+        return {};
+    }
+    return ani_string_result;
+}
+
+ani_method AniGetMethod(ani_env *env, ani_class cls, const char* methodName, const char* signature)
+{
+    if (env == nullptr) {
+        return nullptr;
+    }
+    ani_method retMethod {};
+    if (ANI_OK != env->Class_FindMethod(cls, methodName, signature, &retMethod)) {
+        return nullptr;
+    }
+    return retMethod;
+}
+
+ani_class AniGetClass(ani_env *env, const char* className)
+{
+    if (env == nullptr) {
+        return nullptr;
+    }
+    ani_class cls {};
+    if (ANI_OK != env->FindClass(className, &cls)) {
+        return nullptr;
+    }
+    return cls;
+}
+
+ani_method AniGetClassMethod(ani_env *env, const char* className, const char* methodName, const char* signature)
+{
+    ani_class retClass = AniGetClass(env, className);
+    if (retClass == nullptr) {
+        return nullptr;
+    }
+    ani_method retMethod {};
+    if (ANI_OK != env->Class_FindMethod(retClass, methodName, signature, &retMethod)) {
+        return nullptr;
+    }
+    return retMethod;
+}
+
+ani_object AniCreatEmptyRecord(ani_env* env, ani_method& setMethod)
+{
+    ani_method constructor = ani_utils::AniGetClassMethod(env, "escompat.Record", "<ctor>", ":");
+    ani_method mapSetMethod = ani_utils::AniGetClassMethod(env, "escompat.Record", "$_set", nullptr);
+    if (constructor == nullptr || mapSetMethod == nullptr) {
+        LOGE("AniGetClassMethod escompat.Record find method failed");
+        return nullptr;
+    }
+    ani_object ani_record_result = nullptr;
+    if (ANI_OK != env->Object_New(ani_utils::AniGetClass(env, "escompat.Record"), constructor, &ani_record_result)) {
+        LOGE("escompat.Record Object_New failed");
+        return nullptr;
+    }
+    setMethod = mapSetMethod;
+    return ani_record_result;
+}
+
+ani_array AniCreateEmptyAniArray(ani_env *env, uint32_t size)
+{
+    if (env == nullptr) {
+        LOGE("create ani array env is null");
+        return nullptr;
+    }
+    ani_ref undefinedRef = nullptr;
+    if (ANI_OK != env->GetUndefined(&undefinedRef)) {
+        LOGE("GetUndefined Failed.");
+    }
+    ani_array resultArray;
+    env->Array_New(size, undefinedRef, &resultArray);
+    return resultArray;
+}
+
+ani_object AniCreateArray(ani_env *env, const std::vector<ani_object> &objectArray)
+{
+    ani_array array = AniCreateEmptyAniArray(env, objectArray.size());
+    if (array == nullptr) {
+        LOGE("Create array failed");
+        return nullptr;
+    }
+    ani_size index = 0;
+    for (auto &aniItem : objectArray) {
+        if (ANI_OK != env->Array_Set(array, index, aniItem)) {
+            LOGE("Set array failed, index=%{public}zu", index);
+            return nullptr;
+        }
+        index++;
+    }
+    return array;
+}
+
+bool AniMapSet(ani_env *env, ani_object map, ani_method mapSetMethod, const char* key, ani_ref value)
+{
+    if (env == nullptr || map == nullptr || mapSetMethod == nullptr
+        || key == nullptr || key[0] == 0 || value == nullptr) {
+        return false;
+    }
+    ani_ref keyref = AniCreateString(env, std::string(key));
+    if (keyref == nullptr) {
+        LOGE("AniCreateString failed");
+        return false;
+    }
+    if (ANI_OK != env->Object_CallMethod_Void(map, mapSetMethod, keyref, value)) {
+        LOGE("Object_CallMethod_Void failed");
+        return false;
+    }
+    return true;
+}
+
+bool AniMapSet(ani_env *env, ani_object map, ani_method mapSetMethod, const char* key, const std::string &valueStr)
+{
+    if (valueStr.empty()) {
+        return false;
+    }
+    ani_ref valueRef = AniCreateString(env, valueStr);
+    if (valueRef == nullptr) {
+        LOGE("AniCreateString failed");
+        return false;
+    }
+    return AniMapSet(env, map, mapSetMethod, key, valueRef);
+}
+
 template<>
 bool UnionAccessor::IsInstanceOfType<bool>()
 {
@@ -203,8 +356,8 @@ bool UnionAccessor::TryConvertArray<bool>(std::vector<bool> &value)
             return false;
         }
         ani_boolean val;
-        if (ANI_OK != env_->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "unboxed", nullptr, &val)) {
-            LOGE("Object_CallMethodByName_Boolean unbox failed");
+        if (ANI_OK != env_->Object_CallMethodByName_Boolean(static_cast<ani_object>(ref), "toBoolean", nullptr, &val)) {
+            LOGE("Object_CallMethodByName_Boolean toBoolean failed");
             return false;
         }
         value.push_back(static_cast<bool>(val));
@@ -228,8 +381,8 @@ bool UnionAccessor::TryConvertArray<int>(std::vector<int> &value)
             return false;
         }
         ani_int intValue;
-        if (ANI_OK != env_->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "unboxed", nullptr, &intValue)) {
-            LOGE("Object_CallMethodByName_Int unbox failed");
+        if (ANI_OK != env_->Object_CallMethodByName_Int(static_cast<ani_object>(ref), "toInt", nullptr, &intValue)) {
+            LOGE("Object_CallMethodByName_Int toInt failed");
             return false;
         }
         value.push_back(static_cast<int>(intValue));
@@ -253,8 +406,8 @@ bool UnionAccessor::TryConvertArray<double>(std::vector<double> &value)
             return false;
         }
         ani_double val;
-        if (ANI_OK != env_->Object_CallMethodByName_Double(static_cast<ani_object>(ref), "unboxed", nullptr, &val)) {
-            LOGE("Object_CallMethodByName_Double unbox failed");
+        if (ANI_OK != env_->Object_CallMethodByName_Double(static_cast<ani_object>(ref), "toDouble", nullptr, &val)) {
+            LOGE("Object_CallMethodByName_Double toDouble failed");
             return false;
         }
         value.push_back(static_cast<double>(val));
@@ -335,8 +488,9 @@ bool UnionAccessor::TryConvert<int>(int &value)
     }
 
     ani_int aniValue;
-    auto ret = env_->Object_CallMethodByName_Int(obj_, "unboxed", nullptr, &aniValue);
+    auto ret = env_->Object_CallMethodByName_Int(obj_, "toInt", nullptr, &aniValue);
     if (ret != ANI_OK) {
+        LOGE("toInt failed");
         return false;
     }
     value = static_cast<int>(aniValue);
@@ -373,8 +527,9 @@ bool UnionAccessor::TryConvert<double>(double &value)
     }
 
     ani_double aniValue;
-    auto ret = env_->Object_CallMethodByName_Double(obj_, "unboxed", nullptr, &aniValue);
+    auto ret = env_->Object_CallMethodByName_Double(obj_, "toDouble", nullptr, &aniValue);
     if (ret != ANI_OK) {
+        LOGE("toDouble failed");
         return false;
     }
     value = static_cast<double>(aniValue);
@@ -402,8 +557,9 @@ bool UnionAccessor::TryConvert<bool>(bool &value)
     }
 
     ani_boolean aniValue;
-    auto ret = env_->Object_CallMethodByName_Boolean(obj_, "unboxed", nullptr, &aniValue);
+    auto ret = env_->Object_CallMethodByName_Boolean(obj_, "toBoolean", nullptr, &aniValue);
     if (ret != ANI_OK) {
+        LOGE("toBoolean failed");
         return false;
     }
     value = static_cast<bool>(aniValue);
@@ -438,7 +594,7 @@ bool UnionAccessor::TryConvert<std::vector<ani_ref>>(std::vector<ani_ref> &value
     return TryConvertArray(value);
 }
 
-bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> const& taiheMap,
+bool AniGetMapItem(ani_env *env, const ::taihe::map_view<::taihe::string, uintptr_t> &taiheMap,
     const char* key, std::string& value)
 {
     if (env == nullptr) {
@@ -456,7 +612,7 @@ bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> c
     return result;
 }
 
-bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> const& taiheMap,
+bool AniGetMapItem(ani_env *env, const ::taihe::map_view<::taihe::string, uintptr_t> &taiheMap,
     const char* key, int32_t& value)
 {
     if (env == nullptr) {
@@ -472,6 +628,36 @@ bool AniGetMapItem(ani_env *env, ::taihe::map_view<::taihe::string, uintptr_t> c
     UnionAccessor access(env, aniobj);
     bool result = access.TryConvert(value);
     return result;
+}
+
+void AniExecuteFunc(ani_vm* vm, const std::function<void(ani_env*)> func)
+{
+    LOGI("AniExecutePromise");
+    if (vm == nullptr) {
+        LOGE("AniExecutePromise, vm error");
+        return;
+    }
+    ani_env *currentEnv = nullptr;
+    ani_status aniResult = vm->GetEnv(ANI_VERSION_1, &currentEnv);
+    if (ANI_OK == aniResult && currentEnv != nullptr) {
+        LOGI("AniExecutePromise, env exist");
+        func(currentEnv);
+        return;
+    }
+
+    ani_env* newEnv = nullptr;
+    ani_options aniArgs { 0, nullptr };
+    aniResult = vm->AttachCurrentThread(&aniArgs, ANI_VERSION_1, &newEnv);
+    if (ANI_OK != aniResult) {
+        LOGE("AniExecutePromise, AttachCurrentThread error");
+        return;
+    }
+    func(newEnv);
+    aniResult = vm->DetachCurrentThread();
+    if (ANI_OK != aniResult) {
+        LOGE("AniExecutePromise, DetachCurrentThread error");
+        return;
+    }
 }
 
 } //namespace ani_utils

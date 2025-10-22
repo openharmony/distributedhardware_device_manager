@@ -15,7 +15,6 @@
 
 #include "ohos.distributedDeviceManager.h"
 #include "ani_error_utils.h"
-#include <iostream>
 #include <string>
 #include "device_manager.h"
 #include "dm_constants.h"
@@ -38,11 +37,6 @@ using namespace ani_errorutils;
 
 namespace ANI::distributedDeviceManager {
 const int32_t DM_NAPI_BUF_LENGTH = 256;
-
-constexpr int32_t DEVICE_TYPE_UNKNOWN = -1;
-constexpr const char *DEVICE_TYPE_EMPTY_STR = "";
-constexpr const char *ERROR_DEVICE_ID = "error deviceId";
-constexpr const char *ERROR_NETWORK_ID = "error networkId";
 
 std::mutex g_deviceManagerMapMutex;
 std::mutex g_initCallbackMapMutex;
@@ -87,10 +81,36 @@ int64_t DeviceManagerImpl::GetInner()
     return reinterpret_cast<int64_t>(this);
 }
 
+bool DeviceManagerImpl::CreatePromise(ani_env* &env, ani_vm* &vm, ani_object &promise, ani_resolver &deferred)
+{
+    env = nullptr;
+    vm = nullptr;
+    promise = nullptr;
+    deferred = nullptr;
+
+    env = taihe::get_env();
+    if (env == nullptr) {
+        LOGE("get_env failed");
+        return false;
+    }
+    ani_status status = ANI_OK;
+    if ((status = env->Promise_New(&deferred, &promise)) != ANI_OK) {
+        LOGE("create promise object failed, status = %{public}d", status);
+        return false;
+    }
+    status = env->GetVM(&vm);
+    if (status != ANI_OK || vm == nullptr) {
+        LOGE("GetVM failed, status = %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
 ohos::distributedDeviceManager::DeviceManager CreateDeviceManager(taihe::string_view bundleName)
 {
+    ani_env *env = taihe::get_env();
     std::string stdBundleName(bundleName);
-    std::shared_ptr<DmAniInitCallback> initCallback = std::make_shared<DmAniInitCallback>(bundleName);
+    std::shared_ptr<DmAniInitCallback> initCallback = std::make_shared<DmAniInitCallback>(env, bundleName);
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().InitDeviceManager(
         std::string(bundleName), initCallback);
     if (ret != 0) {
@@ -149,19 +169,76 @@ ohos::distributedDeviceManager::DeviceStateChangeResult MakeDeviceStateChangeRes
     return {deviceStateChange, deviceBasicInfo};
 }
 
-std::string DeviceManagerImpl::GetLocalDeviceId()
+::taihe::string DeviceManagerImpl::GetLocalDeviceId()
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetLocalDeviceId for failed1");
-        return DEVICE_TYPE_EMPTY_STR;
+        ani_errorutils::CreateBusinessError(ERR_DM_NO_PERMISSION);
+        return {};
     }
     std::string deviceId;
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceId(bundleName_, deviceId);
     if (ret != 0) {
-        taihe::set_business_error(DM_ERR_FAILED, "GetLocalDeviceId for failed2");
-        return ERROR_DEVICE_ID;
+        ani_errorutils::CreateBusinessError(ret);
+        return {};
     }
-    return std::string(deviceId);
+    return ::taihe::string(deviceId);
+}
+
+::taihe::string DeviceManagerImpl::GetLocalDeviceNetworkId()
+{
+    if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
+        ani_errorutils::CreateBusinessError(ERR_DM_NO_PERMISSION);
+        return {};
+    }
+    std::string networkId;
+    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceNetWorkId(
+        bundleName_, networkId);
+    if (ret != 0) {
+        LOGE("GetLocalDeviceNetworkId for failed, ret %{public}d", ret);
+        ani_errorutils::CreateBusinessError(ret);
+        return {};
+    }
+    return ::taihe::string(networkId);
+}
+
+::taihe::string DeviceManagerImpl::GetLocalDeviceName()
+{
+    std::string deviceName;
+    int32_t ret = DeviceManager::GetInstance().GetLocalDeviceName(bundleName_, deviceName);
+    if (ret != 0) {
+        LOGE("GetLocalDeviceName for failed, ret %{public}d", ret);
+        ani_errorutils::CreateBusinessError(ret);
+    }
+    return ::taihe::string(deviceName);
+}
+
+int32_t DeviceManagerImpl::GetLocalDeviceType()
+{
+    int32_t ret = DeviceManager::GetInstance().CheckNewAPIAccessPermission();
+    if (ret != 0) {
+        ani_errorutils::CreateBusinessError(ERR_DM_NO_PERMISSION);
+        return 0;
+    }
+    int32_t deviceType = 0;
+    ret = DeviceManager::GetInstance().GetLocalDeviceType(bundleName_, deviceType);
+    if (ret != 0) {
+        LOGE("GetLocalDeviceType for failed, ret %{public}d", ret);
+        ani_errorutils::CreateBusinessError(ret);
+        return 0;
+    }
+    return deviceType;
+}
+
+::taihe::string DeviceManagerImpl::GetDeviceName(taihe::string_view networkId)
+{
+    std::string deviceName;
+    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetDeviceName(
+        bundleName_, std::string(networkId), deviceName);
+    if (ret != 0) {
+        ani_errorutils::CreateBusinessError(ret);
+        return {};
+    }
+    return ::taihe::string(deviceName);
 }
 
 int32_t DeviceManagerImpl::GetDeviceType(taihe::string_view networkId)
@@ -170,47 +247,299 @@ int32_t DeviceManagerImpl::GetDeviceType(taihe::string_view networkId)
     int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetDeviceType(
         bundleName_, std::string(networkId), deviceType);
     if (ret != 0) {
-        taihe::set_business_error(DM_ERR_FAILED, "GetDeviceType for failed");
-        return DEVICE_TYPE_UNKNOWN;
+        ani_errorutils::CreateBusinessError(ret);
+        return 0;
     }
     return deviceType;
 }
 
-std::string DeviceManagerImpl::GetDeviceName(taihe::string_view networkId)
+void DeviceManagerImpl::ReplyUiAction(int32_t action, ::taihe::string_view actionResult)
 {
-    std::string deviceName;
-    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetDeviceName(
-        bundleName_, std::string(networkId), deviceName);
-    if (ret != 0) {
-        taihe::set_business_error(DM_ERR_FAILED, "GetDeviceName for failed");
-        return DEVICE_TYPE_EMPTY_STR;
+    if (!IsSystemApp()) {
+        LOGI("ReplyUiAction not SystemApp");
+        ani_errorutils::CreateBusinessError(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP);
+        return;
     }
-    return std::string(deviceName);
+    int32_t ret = DeviceManager::GetInstance().SetUserOperation(bundleName_, action, std::string(actionResult));
+    if (ret != 0) {
+        LOGE("SetUserOperation for bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
+        ani_errorutils::CreateBusinessError(ret);
+    }
 }
 
-std::string DeviceManagerImpl::GetLocalDeviceNetworkId()
+uintptr_t DeviceManagerImpl::GetDeviceProfileInfoList(
+    ::ohos::distributedDeviceManager::DeviceProfileInfoFilterOptions const& filterOptions)
 {
-    if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION, "GetLocalDeviceNetworkId failed");
-        return DEVICE_TYPE_EMPTY_STR;
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return 0;
     }
-    std::string networkId;
-    int32_t ret = OHOS::DistributedHardware::DeviceManager::GetInstance().GetLocalDeviceNetWorkId(
-        bundleName_, networkId);
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        LOGE("CheckAPIAccessPermission failed");
+        ani_errorutils::CreateBusinessError(ret);
+        return 0;
+    }
+    ani_env *env = nullptr;
+    ani_vm *vm = nullptr;
+    ani_object promise = nullptr;
+    ani_resolver deferred = nullptr;
+    bool bret = CreatePromise(env, vm, promise, deferred);
+    if (!bret) {
+        LOGE("CreatePromise failed");
+        return reinterpret_cast<uintptr_t>(promise);
+    }
+    OHOS::DistributedHardware::DmDeviceProfileInfoFilterOptions dmOptions;
+    dmOptions.isCloud = filterOptions.isCloud;
+    if (filterOptions.deviceIdList.has_value()) {
+        dmOptions.deviceIdList = std::vector<std::string>(
+            filterOptions.deviceIdList.value().begin(), filterOptions.deviceIdList.value().end());
+    }
+    AsyncUtilBase::AsyncExecue([vm, deferred, dmOptions, bundleName = bundleName_] {
+        auto callback = std::make_shared<DmAniGetDeviceProfileInfoListCallback>(vm, deferred);
+        int32_t ret = DeviceManager::GetInstance().GetDeviceProfileInfoList(bundleName, dmOptions, callback);
+        if (ret == ERR_DM_CALLBACK_REGISTER_FAILED) {
+            LOGE("GetDeviceProfileInfoList failed, bundleName:%{public}s, ret=%{public}d",
+                bundleName.c_str(), ret);
+            callback->OnResult({}, ret);
+        }
+    });
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+int32_t DeviceManagerImpl::PutDeviceProfileInfoListSync(
+    ::taihe::array_view<::ohos::distributedDeviceManager::DeviceProfileInfo> deviceProfileInfoList)
+{
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return 0;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        LOGE("CheckAPIAccessPermission failed");
+        ani_errorutils::CreateBusinessError(ret);
+        return 0;
+    }
+    std::vector<OHOS::DistributedHardware::DmDeviceProfileInfo> dmInfoList;
+    ani_dmutils::DeviceProfileInfoArrayToNative(deviceProfileInfoList, dmInfoList);
+    ret = DeviceManager::GetInstance().PutDeviceProfileInfoList(bundleName_, dmInfoList);
+    if (ret != DM_OK) {
+        LOGE("PutDeviceProfileInfoList failed, bundleName:%{public}s, code=%{public}d",
+            bundleName_.c_str(), ret);
+        ani_errorutils::CreateBusinessError(ret);
+    }
+
+    return ret;
+}
+
+uintptr_t DeviceManagerImpl::GetDeviceIconInfo(
+    ::ohos::distributedDeviceManager::DeviceIconInfoFilterOptions const& filterOptions)
+{
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return 0;
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        LOGE("CheckAPIAccessPermission failed");
+        ani_errorutils::CreateBusinessError(ret);
+        return 0;
+    }
+    ani_env *env = nullptr;
+    ani_vm *vm = nullptr;
+    ani_object promise = nullptr;
+    ani_resolver deferred = nullptr;
+    bool bret = CreatePromise(env, vm, promise, deferred);
+    if (!bret) {
+        LOGE("CreatePromise failed");
+        return reinterpret_cast<uintptr_t>(promise);
+    }
+    OHOS::DistributedHardware::DmDeviceIconInfoFilterOptions dmOptions;
+    dmOptions.productId = std::string(filterOptions.productId);
+    if (filterOptions.subProductId.has_value()) {
+        dmOptions.subProductId = std::string(filterOptions.subProductId.value());
+    }
+    dmOptions.imageType = std::string(filterOptions.imageType);
+    dmOptions.specName = std::string(filterOptions.specName);
+    if (filterOptions.internalModel.has_value()) {
+        dmOptions.internalModel = std::string(filterOptions.internalModel.value());
+    }
+    AsyncUtilBase::AsyncExecue([vm, deferred, dmOptions, bundleName = bundleName_] {
+        auto callback = std::make_shared<DmAniGetDeviceIconInfoCallback>(vm, deferred);
+        int32_t ret = DeviceManager::GetInstance().GetDeviceIconInfo(bundleName,
+            dmOptions, callback);
+        if (ret != DM_OK) {
+            LOGE("GetDeviceIconInfoPromise failed, bundleName:%{public}s, ret=%{public}d",
+                bundleName.c_str(), ret);
+            callback->OnResult({}, ret);
+        }
+    });
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+::taihe::string DeviceManagerImpl::GetLocalDisplayDeviceNameSync(int32_t maxNameLength)
+{
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return "";
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        LOGE("CheckAPIAccessPermission failed");
+        ani_errorutils::CreateBusinessError(ret);
+        return "";
+    }
+    std::string displayName;
+    ret = DeviceManager::GetInstance().GetLocalDisplayDeviceName(bundleName_, maxNameLength, displayName);
+    if (ret != DM_OK) {
+        LOGE("GetLocalDisplayDeviceName failed, bundleName:%{public}s, ret=%{public}d",
+            bundleName_.c_str(), ret);
+        ani_errorutils::CreateBusinessError(ret);
+    }
+    return ::taihe::string(displayName);
+}
+
+uintptr_t DeviceManagerImpl::SetLocalDeviceName(::taihe::string_view deviceName)
+{
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        ani_errorutils::CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return 0;
+    }
+    if (deviceName.size() > DEVICE_NAME_MAX_BYTES) {
+        LOGE("deviceName is too long");
+        ani_errorutils::CreateBusinessError(ERR_DM_INPUT_PARA_INVALID);
+        return 0;
+    }
+    ani_env *env = nullptr;
+    ani_vm *vm = nullptr;
+    ani_object promise = nullptr;
+    ani_resolver deferred = nullptr;
+    bool ret = CreatePromise(env, vm, promise, deferred);
+    if (!ret) {
+        LOGE("CreatePromise failed");
+        return reinterpret_cast<uintptr_t>(promise);
+    }
+    std::string stdname(deviceName);
+    AsyncUtilBase::AsyncExecue([vm, deferred, stdname, bundleName = bundleName_] {
+        auto callback = std::make_shared<DmAniSetLocalDeviceNameCallback>(vm, deferred);
+        int32_t ret = DeviceManager::GetInstance().SetLocalDeviceName(bundleName, stdname, callback);
+        if (ret == ERR_DM_CALLBACK_REGISTER_FAILED) {
+            LOGE("SetLocalDeviceName failed, bundleName:%{public}s, ret=%{public}d",
+                bundleName.c_str(), ret);
+            callback->OnResult(ret);
+        }
+    });
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+uintptr_t DeviceManagerImpl::SetRemoteDeviceName(::taihe::string_view deviceId, ::taihe::string_view deviceName)
+{
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        ani_errorutils::CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return 0;
+    }
+    if (deviceName.size() > DEVICE_NAME_MAX_BYTES) {
+        LOGE("deviceName is too long");
+        ani_errorutils::CreateBusinessError(ERR_DM_INPUT_PARA_INVALID);
+        return 0;
+    }
+    ani_env *env = nullptr;
+    ani_vm *vm = nullptr;
+    ani_object promise = nullptr;
+    ani_resolver deferred = nullptr;
+    bool ret = CreatePromise(env, vm, promise, deferred);
+    if (!ret) {
+        LOGE("CreatePromise failed");
+        return reinterpret_cast<uintptr_t>(promise);
+    }
+    std::string stdId(deviceId);
+    std::string stdName(deviceName);
+    AsyncUtilBase::AsyncExecue([vm, deferred, stdId, stdName, bundleName = bundleName_] {
+        auto callback = std::make_shared<DmAniSetRemoteDeviceNameCallback>(vm, deferred);
+        int32_t ret = DeviceManager::GetInstance().SetRemoteDeviceName(bundleName, stdId, stdName, callback);
+        if (ret == ERR_DM_CALLBACK_REGISTER_FAILED) {
+            LOGE("SetRemoteDeviceName failed, bundleName:%{public}s, ret=%{public}d",
+                bundleName.c_str(), ret);
+            callback->OnResult(ret);
+        }
+    });
+    return reinterpret_cast<uintptr_t>(promise);
+}
+
+void DeviceManagerImpl::SetHeartbeatPolicy(::ohos::distributedDeviceManager::StrategyForHeartbeat policy,
+    int32_t delayTime)
+{
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        ani_errorutils::CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return;
+    }
+    std::map<std::string, std::string> policyParam;
+    policyParam[PARAM_KEY_POLICY_STRATEGY_FOR_BLE] = std::to_string(policy.get_value());
+    policyParam[PARAM_KEY_POLICY_TIME_OUT] = std::to_string(delayTime);
+    int32_t ret = DeviceManager::GetInstance().SetDnPolicy(bundleName_, policyParam);
     if (ret != 0) {
-        LOGE("GetLocalDeviceNetworkId for failed, ret %{public}d", ret);
-        taihe::set_business_error(DM_ERR_FAILED, "GetLocalDeviceNetworkId failed");
-        return ERROR_NETWORK_ID;
+        LOGE("SetDnPolicy bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
+        ani_errorutils::CreateBusinessError(ret);
     }
-    return std::string(networkId);
+}
+
+void DeviceManagerImpl::RestoreLocalDeviceName()
+{
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        ani_errorutils::CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return;
+    }
+    int32_t ret = DeviceManager::GetInstance().RestoreLocalDeviceName(bundleName_);
+    if (ret != 0) {
+        LOGE("RestoreLocalDeviceName, bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
+        ani_errorutils::CreateBusinessError(ret);
+    }
+}
+
+::taihe::array<::taihe::string> DeviceManagerImpl::GetDeviceNetworkIdListSync(
+    ::ohos::distributedDeviceManager::NetworkIdQueryFilter const& filterOptions)
+{
+    if (!IsSystemApp()) {
+        LOGE("Caller is not systemApp");
+        ani_errorutils::CreateBusinessError(static_cast<int32_t>(DMBussinessErrorCode::ERR_NOT_SYSTEM_APP));
+        return {};
+    }
+    int32_t ret = DeviceManager::GetInstance().CheckAPIAccessPermission();
+    if (ret != DM_OK) {
+        LOGE("CheckAPIAccessPermission failed");
+        ani_errorutils::CreateBusinessError(ret);
+        return {};
+    }
+
+    OHOS::DistributedHardware::NetworkIdQueryFilter dmFilter;
+    dmFilter.wiseDeviceId = std::string(filterOptions.wiseDeviceId);
+    dmFilter.onlineStatus = filterOptions.onlineStatus;
+    std::vector<std::string> deviceNetworkIds;
+    ret = DeviceManager::GetInstance().GetDeviceNetworkIdList(bundleName_, dmFilter, deviceNetworkIds);
+    if (ret != 0) {
+        LOGE("GetDeviceNetworkIdList, bundleName %{public}s failed, ret %{public}d", bundleName_.c_str(), ret);
+        ani_errorutils::CreateBusinessError(ret);
+        return {};
+    }
+    if (deviceNetworkIds.size() == 0) {
+        return {};
+    }
+    return ::taihe::array<::taihe::string>(::taihe::copy_data_t{}, deviceNetworkIds.data(), deviceNetworkIds.size());
 }
 
 void DeviceManagerImpl::OnDeviceNameChange(taihe::callback_view<void(
     ohos::distributedDeviceManager::DeviceNameChangeResult const&)> onDeviceNameChangecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
-            "ondeviceNameChange check permission failed.");
+        ani_errorutils::CreateBusinessError(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION);
         return;
     }
 
@@ -240,8 +569,7 @@ void DeviceManagerImpl::OnReplyResult(taihe::callback_view<void(
     ohos::distributedDeviceManager::ReplyResult const&)> onReplyResultcb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
-            "OnReplyResult check permission failed");
+        ani_errorutils::CreateBusinessError(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION);
         return;
     }
 
@@ -263,8 +591,7 @@ void DeviceManagerImpl::OnDeviceStateChange(taihe::callback_view<void(
     ohos::distributedDeviceManager::DeviceStateChangeResult const&)> onDeviceStateChangecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
-            "ondeviceStateChange check Permission failed");
+        ani_errorutils::CreateBusinessError(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION);
         return;
     }
 
@@ -291,18 +618,17 @@ void DeviceManagerImpl::OnDeviceStateChange(taihe::callback_view<void(
     return;
 }
 
-void DeviceManagerImpl::OnServiceDie(taihe::callback_view<void()> onServiceDiecb)
+void DeviceManagerImpl::OnServiceDie(taihe::callback_view<void(uintptr_t data)> onServiceDiecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
-            "OnReplyResult check permission failed");
+        ani_errorutils::CreateBusinessError(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION);
         return;
     }
 
     {
         std::lock_guard<std::mutex> autoLock(g_initCallbackMapMutex);
         auto dmCallback = g_initCallbackMap[bundleName_];
-        dmCallback->SetServiceDieCallback(std::make_shared<taihe::callback<void()>>(onServiceDiecb));
+        dmCallback->SetServiceDieCallback(onServiceDiecb);
     }
     return;
 }
@@ -311,8 +637,7 @@ void DeviceManagerImpl::OffDeviceNameChange(taihe::optional_view<taihe::callback
     ohos::distributedDeviceManager::DeviceNameChangeResult const&)>> offDeviceNameChangecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
-            "offdeviceNameChange check permission failed.");
+        ani_errorutils::CreateBusinessError(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION);
         return;
     }
 
@@ -342,8 +667,7 @@ void DeviceManagerImpl::OffReplyResult(taihe::optional_view<taihe::callback<void
     ohos::distributedDeviceManager::ReplyResult const&)>> offReplyResultcb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
-            "OffReplyResult check permission failed");
+        ani_errorutils::CreateBusinessError(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION);
         return;
     }
 
@@ -373,8 +697,7 @@ void DeviceManagerImpl::OffDeviceStateChange(taihe::optional_view<taihe::callbac
     ohos::distributedDeviceManager::DeviceStateChangeResult const&)>> offDeviceStateChangecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
-            "offdeviceStateChange check Permission failed");
+        ani_errorutils::CreateBusinessError(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION);
         return;
     }
 
@@ -399,11 +722,10 @@ void DeviceManagerImpl::OffDeviceStateChange(taihe::optional_view<taihe::callbac
     return;
 }
 
-void DeviceManagerImpl::OffServiceDie(taihe::optional_view<taihe::callback<void()>> offServiceDiecb)
+void DeviceManagerImpl::OffServiceDie(taihe::optional_view<taihe::callback<void(uintptr_t data)>> offServiceDiecb)
 {
     if (OHOS::DistributedHardware::DeviceManager::GetInstance().CheckNewAPIAccessPermission() != 0) {
-        taihe::set_business_error(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION,
-            "offdiscoverFailure check permission failed.");
+        ani_errorutils::CreateBusinessError(OHOS::DistributedHardware::ERR_DM_NO_PERMISSION);
         return;
     }
 
@@ -452,7 +774,7 @@ void DeviceManagerImpl::ReleaseDeviceManager()
 {
     int32_t ret = DeviceManager::GetInstance().UnInitDeviceManager(bundleName_);
     if (ret != 0) {
-        taihe::set_business_error(ret, "ReleaseDeviceManager for bundleName failed");
+        ani_errorutils::CreateBusinessError(ret);
         return;
     }
     ClearBundleCallbacks(bundleName_);
@@ -718,7 +1040,7 @@ void DeviceManagerImpl::StopDiscovering()
     }
 }
 
-void DeviceManagerImpl::JsToBindParam(ani_env* env, ::taihe::map_view<::taihe::string, uintptr_t> const& object,
+void DeviceManagerImpl::JsToBindParam(ani_env* env, const ::taihe::map_view<::taihe::string, uintptr_t> &object,
     std::string &bindParam, int32_t &bindType, bool &isMetaType)
 {
     int32_t bindTypeTemp = -1;
@@ -770,13 +1092,13 @@ void DeviceManagerImpl::JsToBindParam(ani_env* env, ::taihe::map_view<::taihe::s
 }
 
 bool DeviceManagerImpl::JsToDiscoverTargetType(ani_env* env,
-    ::taihe::map_view<::taihe::string, uintptr_t> const&object, int32_t &discoverTargetType)
+    const ::taihe::map_view<::taihe::string, uintptr_t> &object, int32_t &discoverTargetType)
 {
     return ani_utils::AniGetMapItem(env, object, "discoverTargetType", discoverTargetType);
 }
 
 void DeviceManagerImpl::JsToDmDiscoveryExtra(ani_env* env,
-    ::taihe::map_view<::taihe::string, uintptr_t> const&object, std::string &extra)
+    const ::taihe::map_view<::taihe::string, uintptr_t> &object, std::string &extra)
 {
     JsonObject jsonObj;
     int32_t availableStatus = DM_NAPI_DISCOVER_EXTRA_INIT_ONE;
@@ -812,7 +1134,7 @@ void DeviceManagerImpl::JsToDmDiscoveryExtra(ani_env* env,
     LOGI("JsToDmDiscoveryExtra, extra :%{public}s", extra.c_str());
 }
 
-void DeviceManagerImpl::JsToDiscoveryParam(ani_env* env, ::taihe::map_view<::taihe::string, uintptr_t> const&object,
+void DeviceManagerImpl::JsToDiscoveryParam(ani_env* env, const ::taihe::map_view<::taihe::string, uintptr_t> &object,
     std::map<std::string, std::string> &discParam)
 {
     std::string customData;
@@ -829,8 +1151,49 @@ bool DeviceManagerImpl::IsSystemApp()
     return OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId);
 }
 
-void DeviceManagerImpl::ClearBundleCallbacks(std::string &bundleName)
+void DeviceManagerImpl::ClearDiscoverCallbacks(const std::string &bundleName)
 {
+    std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
+    auto iter = g_discoveryCallbackMap.find(bundleName);
+    if (iter != g_discoveryCallbackMap.end()) {
+        std::shared_ptr<DmAniDiscoveryCallback> callback = iter->second;
+        if (callback != nullptr) {
+            callback->ResetSuccessCallback();
+            callback->ResetFailedCallback();
+        }
+    }
+    g_discoveryCallbackMap.erase(bundleName);
+}
+
+void DeviceManagerImpl::ClearAuthCallbacks(const std::string &bundleName)
+{
+    std::lock_guard<std::mutex> autoLock(g_authCallbackMapMutex);
+    auto iter = g_authCallbackMap.find(bundleName);
+    if (iter != g_authCallbackMap.end()) {
+        std::shared_ptr<DmAniAuthenticateCallback> callback = iter->second;
+        if (callback != nullptr) {
+            callback->Release();
+        }
+    }
+    g_authCallbackMap.erase(bundleName);
+}
+
+void DeviceManagerImpl::ClearBindCallbacks(const std::string &bundleName)
+{
+    std::lock_guard<std::mutex> autoLock(g_bindCallbackMapMutex);
+    auto iter = g_bindCallbackMap.find(bundleName);
+    if (iter != g_bindCallbackMap.end()) {
+        std::shared_ptr<DmAniBindTargetCallback> callback = iter->second;
+        if (callback != nullptr) {
+            callback->Release();
+        }
+    }
+    g_bindCallbackMap.erase(bundleName);
+}
+
+void DeviceManagerImpl::ClearBundleCallbacks(const std::string &bundleName)
+{
+    LOGI("ClearBundleCallbacks");
     {
         std::lock_guard<std::mutex> autoLock(g_deviceManagerMapMutex);
         g_deviceManagerMap.erase(bundleName);
@@ -840,39 +1203,20 @@ void DeviceManagerImpl::ClearBundleCallbacks(std::string &bundleName)
         g_initCallbackMap.erase(bundleName);
     }
     {
-        std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
-        auto iter = g_discoveryCallbackMap.find(bundleName);
-        if (iter != g_discoveryCallbackMap.end()) {
-            std::shared_ptr<DmAniDiscoveryCallback> callback = iter->second;
-            if (callback != nullptr) {
-                callback->ResetSuccessCallback();
-                callback->ResetFailedCallback();
-            }
-        }
-        g_discoveryCallbackMap.erase(bundleName);
+        std::lock_guard<std::mutex> autoLock(g_deviceNameChangeCallbackMapMutex);
+        g_deviceNameChangeCallbackMap.erase(bundleName);
     }
     {
-        std::lock_guard<std::mutex> autoLock(g_authCallbackMapMutex);
-        auto iter = g_authCallbackMap.find(bundleName);
-        if (iter != g_authCallbackMap.end()) {
-            std::shared_ptr<DmAniAuthenticateCallback> callback = iter->second;
-            if (callback != nullptr) {
-                callback->Release();
-            }
-        }
-        g_authCallbackMap.erase(bundleName);
+        std::lock_guard<std::mutex> autoLock(g_deviceStateChangeDataCallbackMapMutex);
+        g_deviceStateChangeDataCallbackMap.erase(bundleName);
     }
     {
-        std::lock_guard<std::mutex> autoLock(g_bindCallbackMapMutex);
-        auto iter = g_bindCallbackMap.find(bundleName);
-        if (iter != g_bindCallbackMap.end()) {
-            std::shared_ptr<DmAniBindTargetCallback> callback = iter->second;
-            if (callback != nullptr) {
-                callback->Release();
-            }
-        }
-        g_bindCallbackMap.erase(bundleName);
+        std::lock_guard<std::mutex> autoLock(g_dmUiCallbackMapMutex);
+        g_dmUiCallbackMap.erase(bundleName);
     }
+    ClearBindCallbacks(bundleName);
+    ClearAuthCallbacks(bundleName);
+    ClearDiscoverCallbacks(bundleName);
 }
 
 } // namespace ANI::distributedDeviceManager

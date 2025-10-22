@@ -34,14 +34,15 @@ struct DeviceBasicInfo {
 function MakeDeviceBasicInfo(deviceId:String, deviceName:String, deviceType:String,
                              networkId:Optional<String>): DeviceBasicInfo;
 
-struct ServiceProfileInfo {
-    deviceId: String;
-}
-
 enum DeviceStateChange: i32 {
     UNKNOWN = 0,
     AVAILABLE = 1,
     UNAVAILABLE = 2,
+}
+
+enum StrategyForHeartbeat: i32 {
+    TEMP_STOP_HEARTBEAT = 100,
+    START_HEARTBEAT = 101,
 }
 
 struct DeviceNameChangeResult {
@@ -80,13 +81,80 @@ struct BindTargetResult {
     deviceId: String;
 }
 
+struct DeviceIconInfo {
+    productId: String;
+    subProductId: Optional<String>;
+    imageType: String;
+    specName: String;
+    url: String;
+    icon: @arraybuffer Array<u8>;
+    internalModel: Optional<String>;
+}
+
+struct ServiceProfileInfo {
+    deviceId: String;
+    serviceId: String;
+    serviceType: String;
+    data: Optional<String>;
+}
+
+struct DeviceProfileInfo {
+    deviceId: String;
+    deviceSn: String;
+    mac: String;
+    model: String;
+    deviceType: String;
+    manufacturer: String;
+    deviceName: String;
+    productId: String;
+    subProductId: Optional<String>;
+    sdkVersion: String;
+    bleMac: String;
+    brMac: String;
+    sleMac: String;
+    firmwareVersion: String;
+    hardwareVersion: String;
+    softwareVersion: String;
+    protocolType: i32;
+    setupType: i32;
+    wiseDeviceId: String;
+    wiseUserId: String;
+    registerTime: String;
+    modifyTime: String;
+    shareTime: String;
+    isLocalDevice: bool;
+    services: Optional<Array<ServiceProfileInfo>>;
+    productName: Optional<String>;
+    internalModel: Optional<String>;
+  }
+
+struct DeviceProfileInfoFilterOptions {
+    isCloud : bool;
+    deviceIdList: Optional<Array<String>>;
+}
+
+struct DeviceIconInfoFilterOptions {
+    productId: String;
+    subProductId: Optional<String>;
+    imageType: String;
+    specName: String;
+    internalModel: Optional<String>;
+}
+
+struct NetworkIdQueryFilter {
+    wiseDeviceId : String;
+    onlineStatus : i32;
+}
+
 interface DeviceManager {
     GetInner(): i64;
 
     GetLocalDeviceId(): String;
-    GetDeviceType(networkId: String): i32;
-    GetDeviceName(networkId: String): String;
     GetLocalDeviceNetworkId(): String;
+    GetLocalDeviceName(): String;
+    GetLocalDeviceType(): i32;
+    GetDeviceName(networkId: String): String;
+    GetDeviceType(networkId: String): i32;
 
     @gen_async("getAvailableDeviceList")
     @gen_promise("getAvailableDeviceList")
@@ -98,8 +166,35 @@ interface DeviceManager {
     StartDiscovering(discoverParam: @record Map<String, Opaque>, filterOptions: Optional<@record Map<String, Opaque>>): void;
     StopDiscovering(): void;
     
-    @!sts_inject_into_interface("on(type: string, callback: (data: object) => void): void;")
-    @!sts_inject_into_class("""on(type: string, callback: object): void {
+    ReplyUiAction(action: i32, actionResult: String): void;
+
+    GetDeviceProfileInfoList(filterOptions: DeviceProfileInfoFilterOptions): @sts_type("Promise<Array<DeviceProfileInfo>>") Opaque;
+
+    @gen_promise("putDeviceProfileInfoList")
+    PutDeviceProfileInfoListSync(deviceProfileInfoList: Array<DeviceProfileInfo>): i32;
+
+    GetDeviceIconInfo(filterOptions: DeviceIconInfoFilterOptions): @sts_type("Promise<DeviceIconInfo>") Opaque;
+
+    @gen_promise("getLocalDisplayDeviceName")
+    GetLocalDisplayDeviceNameSync(maxNameLength: i32): String;
+
+    SetLocalDeviceName(deviceName: String): @sts_type("Promise<int>") Opaque;
+
+    SetRemoteDeviceName(deviceId: String, deviceName: String): @sts_type("Promise<int>") Opaque;
+
+    SetHeartbeatPolicy(policy: StrategyForHeartbeat, delayTime: i32): void;
+
+    RestoreLocalDeviceName(): void;
+
+    @gen_promise("getDeviceNetworkIdList")
+    GetDeviceNetworkIdListSync(filterOptions: NetworkIdQueryFilter): Array<String>;
+
+    @!sts_inject_into_interface("""
+    on(type: string, callback: (data: object) => void): void;
+    restoreLocalDeivceName(): void;
+    """)
+    @!sts_inject_into_class("""
+    on(type: string, callback: object): void {
         if (type === "discoverSuccess") {
             this.onDiscoverSuccess(callback as (data: DiscoverySuccessResult) => void);
         } else if (type === "deviceStateChange") {
@@ -111,10 +206,13 @@ interface DeviceManager {
         } else if (type === "discoverFailure") {
             this.onDiscoverFailure(callback as (data: DiscoveryFailureResult) => void);
         } else if (type ==="serviceDie") {
-            this.onServiceDie(callback as () => void);
+            this.onServiceDie(callback as (data: object) => void);
         } else {
             throw new Error(`Unknown type: ${type}`);
         }
+    }
+    restoreLocalDeivceName(): void {
+        this.restoreLocalDeviceName();
     }
     """)
 
@@ -131,8 +229,8 @@ interface DeviceManager {
         } else if (type === "discoverFailure"){
             this.offDiscoverFailure(callback as (((data: DiscoveryFailureResult) => void) | undefined));
         } else if (type ==="serviceDie") {
-            this.offServiceDie(callback as () => void);
-        }else {
+            this.offServiceDie(callback as (((data: object) => void) | undefined));
+        } else {
             throw new Error(`Unknown type: ${type}`);
         }
     }
@@ -149,8 +247,8 @@ interface DeviceManager {
     OffDeviceNameChange(offDeviceNameChangecb: Optional<(deviceName: DeviceNameChangeResult) => void>): void;
     OnDiscoverFailure(onDiscoverFailurecb: (reason: DiscoveryFailureResult) => void): void;
     OffDiscoverFailure(offDiscoverFailurecb: Optional<(reason: DiscoveryFailureResult) => void>): void;
-    OnServiceDie(onServiceDiecb: () => void): void;
-    OffServiceDie(offServiceDiecb: Optional<() => void>): void;
+    OnServiceDie(onServiceDiecb: (data: Opaque) => void): void;
+    OffServiceDie(offServiceDiecb: Optional<(data: Opaque) => void>): void;
 }
 
 function CreateDeviceManager(bundleName: String): DeviceManager;

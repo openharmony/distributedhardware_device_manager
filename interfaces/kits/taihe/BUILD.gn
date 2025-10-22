@@ -85,6 +85,7 @@ if (device_manager_enable_ets_frontend) {
       "bundle_framework:appexecfwk_core",
       "eventhandler:libeventhandler",
       "hilog:libhilog",
+      "ipc:ipc_core",
     ]
   }
 
