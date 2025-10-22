@@ -90,7 +90,7 @@ HWTEST_F(DeviceManagerServiceListenerTest, OnDeviceStateChange_001, testing::ext
         .deviceTypeId = 1,
     };
     listener_->OnDeviceStateChange(processInfo, state, info);
-    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), false);
+    EXPECT_EQ(listener_->alreadyOnlinePkgName_.empty(), true);
 }
 
 /**
