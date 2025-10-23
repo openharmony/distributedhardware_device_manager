@@ -322,13 +322,10 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
             LOGE("OnDeviceChanged, deviceManagerNapi not find for bundleName %{public}s",
                 callback->bundleName_.c_str());
         } else {
-            if (callback->deviceBasicInfo_.extraData.empty()) {
-                LOGI("Device change event received, but no extra data.");
-                DeleteDmNapiStatusJsCallbackPtr(callback);
-                DeleteUvWork(work);
-                return;
+            JsonObject bindParamObj;
+            if (!callback->deviceBasicInfo_.extraData.empty()) {
+                bindParamObj.Parse(callback->deviceBasicInfo_.extraData);
             }
-            JsonObject bindParamObj(callback->deviceBasicInfo_.extraData);
             if (!bindParamObj.IsDiscarded() && IsInt32(bindParamObj, PARAM_KEY_BASIC_INFO_TYPE)) {
                 DMNodeBasicInfoType type = static_cast<DMNodeBasicInfoType>(
                 bindParamObj[PARAM_KEY_BASIC_INFO_TYPE].Get<int32_t>());
