@@ -69,10 +69,12 @@ std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNam
 void handleExtraData(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
     if (info.extraData.empty()) {
+        LOGE("extraData is empty.");
         return;
     }
     JsonObject paramJson(info.extraData);
     if (paramJson.IsDiscarded()) {
+        LOGE("paramJson jsonStr error.");
         return;
     }
     JsonObject jsonObj;
