@@ -662,7 +662,12 @@ void DeviceManagerNapi::OnDeviceNameChange(const std::string &deviceName)
         return;
     }
     napi_value result = nullptr;
-    NAPI_CALL_RETURN_VOID(env_, napi_create_object(env_, &result));
+    napi_status statusCreate = napi_create_object(env_, &result);
+    if (statusCreate != napi_ok || result == nullptr) {
+        LOGE("create result object failed");
+        NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
+        return;
+    }
     SetValueUtf8String(env_, "deviceName", deviceName, result);
 
     OnEvent("deviceNameChange", DM_NAPI_ARGS_ONE, &result);
