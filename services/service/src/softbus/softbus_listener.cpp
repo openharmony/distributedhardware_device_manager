@@ -500,35 +500,46 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         LOGE("NodeBasicInfo is nullptr.");
         return;
     }
-    if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
-        int32_t networkType = -1;
-        if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
+    int32_t networkType = -1;
+    switch (type) {
+        case NodeBasicInfoType::TYPE_DEVICE_NAME:
+            UpdateDeviceName(info);
+            break;
+        case NodeBasicInfoType::TYPE_NETWORK_INFO:
             if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
                 reinterpret_cast<uint8_t *>(&networkType), LNN_COMMON_LEN) != DM_OK) {
                 LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
                 return;
             }
             LOGI("NetworkType %{public}d.", networkType);
-        }
-        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
-            UpdateDeviceName(info);
-        }
-        DmSoftbusEvent dmSoftbusEventInfo;
-        dmSoftbusEventInfo.eventType = EVENT_TYPE_CHANGED;
-        ConvertNodeBasicInfoToDmDevice(*info, dmSoftbusEventInfo.dmDeviceInfo);
-        LOGI("networkId: %{public}s.", GetAnonyString(dmSoftbusEventInfo.dmDeviceInfo.networkId).c_str());
-        dmSoftbusEventInfo.dmDeviceInfo.networkType = networkType;
-        SoftbusCache::GetInstance().ChangeDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
-    #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-        SoftbusEventQueueAdd(dmSoftbusEventInfo);
-    #else
-        std::thread deviceInfoChange([=]() { DeviceNameChange(dmSoftbusEventInfo.dmDeviceInfo); });
-        if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
-            LOGE("DeviceNameChange setname failed.");
-        }
-        deviceInfoChange.detach();
-    #endif
+            break;
+        default:
+            LOGI("type is not matching.");
+            return;
     }
+    DmSoftbusEvent dmSoftbusEventInfo;
+    dmSoftbusEventInfo.eventType = EVENT_TYPE_CHANGED;
+    ConvertNodeBasicInfoToDmDevice(*info, dmSoftbusEventInfo.dmDeviceInfo);
+    JsonObject paramJson;
+    if (!dmSoftbusEventInfo.dmDeviceInfo.extraData.empty()) {
+        paramJson.Parse(dmSoftbusEventInfo.dmDeviceInfo.extraData);
+    }
+    if (!paramJson.IsDiscarded()) {
+        paramJson[PARAM_KEY_BASIC_INFO_TYPE] = type;
+        dmSoftbusEventInfo.dmDeviceInfo.extraData = ToString(paramJson);
+    }
+    LOGI("networkId: %{public}s.", GetAnonyString(dmSoftbusEventInfo.dmDeviceInfo.networkId).c_str());
+    dmSoftbusEventInfo.dmDeviceInfo.networkType = networkType;
+    SoftbusCache::GetInstance().ChangeDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    SoftbusEventQueueAdd(dmSoftbusEventInfo);
+#else
+    std::thread deviceInfoChange([=]() { DeviceNameChange(dmSoftbusEventInfo.dmDeviceInfo); });
+    if (pthread_setname_np(deviceInfoChange.native_handle(), DEVICE_NAME_CHANGE) != DM_OK) {
+        LOGE("DeviceNameChange setname failed.");
+    }
+    deviceInfoChange.detach();
+#endif
 }
 
 void SoftbusListener::OnLocalDevInfoChange()

@@ -395,6 +395,7 @@ public:
     static napi_value SetHeartbeatPolicy(napi_env env, napi_callback_info info);
     void OnSetLocalDeviceNameCallbackResult(SetLocalDeviceNameAsyncCallbackInfo *jsCallback);
     void OnSetRemoteDeviceNameCallbackResult(SetRemoteDeviceNameAsyncCallbackInfo *jsCallback);
+    void OnDeviceNameChange(const std::string &deviceName);
 
 private:
     static void ReleasePublishCallback(std::string &bundleName);

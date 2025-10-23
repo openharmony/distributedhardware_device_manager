@@ -68,37 +68,21 @@ std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNam
 
 void handleExtraData(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
-    cJSON *extraDataJsonObj = cJSON_Parse(info.extraData.c_str());
-    if (extraDataJsonObj == NULL) {
+    if (info.extraData.empty()) {
         return;
     }
-    cJSON *customDataJson = cJSON_GetObjectItem(extraDataJsonObj, PARAM_KEY_CUSTOM_DATA);
-    if (customDataJson == NULL || !cJSON_IsString(customDataJson)) {
-        cJSON_Delete(extraDataJsonObj);
+    JsonObject paramJson(info.extraData);
+    if (paramJson.IsDiscarded()) {
         return;
     }
-    char *customData = cJSON_PrintUnformatted(customDataJson);
-    if (customData == nullptr) {
-        cJSON_Delete(extraDataJsonObj);
-        return;
+    JsonObject jsonObj;
+    if (IsString(paramJson, PARAM_KEY_CUSTOM_DATA)) {
+        jsonObj[PARAM_KEY_CUSTOM_DATA] = paramJson[PARAM_KEY_CUSTOM_DATA].Get<std::string>();
     }
-    cJSON_Delete(extraDataJsonObj);
-    cJSON *basicExtraDataJsonObj = cJSON_CreateObject();
-    if (basicExtraDataJsonObj == NULL) {
-        cJSON_free(customData);
-        return;
+    if (IsInt32(paramJson, PARAM_KEY_BASIC_INFO_TYPE)) {
+        jsonObj[PARAM_KEY_BASIC_INFO_TYPE] = paramJson[PARAM_KEY_BASIC_INFO_TYPE].Get<int32_t>();
     }
-    cJSON_AddStringToObject(basicExtraDataJsonObj, PARAM_KEY_CUSTOM_DATA, customData);
-    char *basicExtraData = cJSON_PrintUnformatted(basicExtraDataJsonObj);
-    if (basicExtraData == nullptr) {
-        cJSON_free(customData);
-        cJSON_Delete(basicExtraDataJsonObj);
-        return;
-    }
-    deviceBasicInfo.extraData = std::string(basicExtraData);
-    cJSON_free(customData);
-    cJSON_free(basicExtraData);
-    cJSON_Delete(basicExtraDataJsonObj);
+    deviceBasicInfo.extraData = ToString(jsonObj);
 }
 
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
