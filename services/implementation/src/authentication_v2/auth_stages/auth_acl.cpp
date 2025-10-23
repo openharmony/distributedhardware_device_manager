@@ -99,7 +99,7 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     // Query the ACL of the sink end. Compare the ACLs at both ends.
     CHECK_NULL_RETURN(context->softbusConnector, ERR_DM_POINT_NULL);
     context->softbusConnector->SyncLocalAclListProcess({context->accessee.deviceId, context->accessee.userId},
-        {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList);
+        {context->accesser.deviceId, context->accesser.userId}, context->accesser.aclStrList, false);
     if (GetSessionKey(context)) {
         DerivativeSessionKey(context);
     }
@@ -111,6 +111,7 @@ int32_t AuthSinkDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
         context->authMessageProcessor->PutAccessControlList(context,
             context->accessee, context->accesser.deviceId);
     }
+    context->softbusConnector->SyncAclList();
     context->authMessageProcessor->CreateAndSendMsg(MSG_TYPE_RESP_DATA_SYNC, context);
     context->accessee.deviceName = context->softbusConnector->GetLocalDeviceName();
     LOGI("AuthSinkDataSyncState::Action ok");
@@ -180,13 +181,14 @@ int32_t AuthSrcDataSyncState::Action(std::shared_ptr<DmAuthContext> context)
     if (NeedAgreeAcl(context)) {
         // Query the ACL of the sink end. Compare the ACLs at both ends.
         context->softbusConnector->SyncLocalAclListProcess({context->accesser.deviceId, context->accesser.userId},
-            {context->accessee.deviceId, context->accessee.userId}, context->accessee.aclStrList);
+            {context->accessee.deviceId, context->accessee.userId}, context->accessee.aclStrList, false);
         context->accesser.deviceName = context->softbusConnector->GetLocalDeviceName();
         // Save this acl
         SetAclInfo(context);
         UpdateCredInfo(context);
         context->authMessageProcessor->PutAccessControlList(context, context->accesser, context->accessee.deviceId);
         // Synchronize the local SP information, the format is uncertain, not done for now
+        context->softbusConnector->SyncAclList();
     }
 
     std::string peerDeviceId = "";

@@ -549,11 +549,12 @@ int32_t DeviceManagerServiceImpl::StopAuthenticateDevice(const std::string &pkgN
 }
 
 int32_t DeviceManagerServiceImpl::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately)
 {
     (void)localDevUserInfo;
     (void)remoteDevUserInfo;
     (void)remoteAclList;
+    (void)isDelImmediately;
     return 0;
 }
 

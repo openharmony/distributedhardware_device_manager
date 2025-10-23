@@ -146,7 +146,7 @@ public:
     int32_t StopAuthenticateDevice(const std::string &pkgName);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately);
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId);

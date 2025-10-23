@@ -54,10 +54,10 @@ std::shared_ptr<SoftbusSession> SoftbusConnector::GetSoftbusSession()
 }
 
 int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-                                                  const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately)
 {
     return DmSoftbusConnector::dmSoftbusConnector->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo,
-                                                                           remoteAclList);
+                                                                           remoteAclList, isDelImmediately);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

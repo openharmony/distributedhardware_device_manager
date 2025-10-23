@@ -233,7 +233,7 @@ public:
     int32_t GetNetworkIdByUdid(const std::string &pkgName, const std::string &udid, std::string &networkId);
     void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId, int32_t errcode);
     int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately);
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     void ProcessSyncUserIds(const std::vector<uint32_t> &foregroundUserIds,
