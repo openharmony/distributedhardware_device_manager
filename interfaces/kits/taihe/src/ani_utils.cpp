@@ -588,7 +588,7 @@ bool UnionAccessor::TryConvert<std::vector<float>>(std::vector<float> &value)
 template<>
 bool UnionAccessor::TryConvert<std::vector<ani_ref>>(std::vector<ani_ref> &value)
 {
-    if (!IsInstanceOf("escompat.Array")) {
+    if (!IsInstanceOf("std.core.Array")) {
         return false;
     }
     return TryConvertArray(value);
