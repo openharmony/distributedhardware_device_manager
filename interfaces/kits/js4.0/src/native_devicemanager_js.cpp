@@ -85,6 +85,7 @@ std::mutex g_publishCallbackMapMutex;
 std::mutex g_authCallbackMapMutex;
 std::mutex g_bindCallbackMapMutex;
 std::mutex g_dmUiCallbackMapMutex;
+std::mutex g_onRemoteDiedHandleMutex;
 
 void DeleteUvWork(uv_work_t *&work)
 {
@@ -154,6 +155,7 @@ void DmNapiInitCallback::OnRemoteDied()
     int ret = uv_queue_work_with_qos(loop, work, [] (uv_work_t *work) {
         LOGD("OnRemoteDied uv_queue_work_with_qos");
     }, [] (uv_work_t *work, int status) {
+        std::lock_guard<std::mutex> autoLock(g_onRemoteDiedHandleMutex);
         DmNapiStatusJsCallback *callback = reinterpret_cast<DmNapiStatusJsCallback *>(work->data);
         DeviceManagerNapi *deviceManagerNapi = DeviceManagerNapi::GetDeviceManagerNapi(callback->bundleName_);
         if (deviceManagerNapi == nullptr) {
