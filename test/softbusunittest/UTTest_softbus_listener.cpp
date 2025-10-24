@@ -89,22 +89,6 @@ HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_001, testing::ext::
 }
 
 /**
- * @tc.name: ConvertNodeBasicInfoToDmDevice_002
- * @tc.desc: return DM_OK
- * @tc.type: FUNC
- */
-HWTEST_F(SoftbusListenerTest, ConvertNodeBasicInfoToDmDevice_002, testing::ext::TestSize.Level1)
-{
-    NodeBasicInfo nodeBasicInfo;
-    DmDeviceBasicInfo dmDevicdeviceNameeInfo;
-    if (softbusListener == nullptr) {
-        softbusListener = std::make_shared<SoftbusListener>();
-    }
-    int32_t ret = softbusListener->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmDevicdeviceNameeInfo);
-    EXPECT_EQ(ret, DM_OK);
-}
-
-/**
  * @tc.name: OnSoftbusDeviceOnline_001
  * @tc.desc: return true
  * @tc.type: FUNC
