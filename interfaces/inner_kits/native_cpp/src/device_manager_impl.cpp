@@ -2264,7 +2264,7 @@ bool DeviceManagerImpl::IsSameAccount(const std::string &netWorkId)
     std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetStr(netWorkId);
-    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(ipcClientProxy_, false);
     int32_t ret = ipcClientProxy_->SendRequest(IS_SAME_ACCOUNT, req, rsp);
     if (ret != DM_OK) {
         LOGE("IsSameAccount Send Request failed ret: %{public}d", ret);
@@ -2539,7 +2539,7 @@ void DeviceManagerImpl::SyncCallbackToService(DmCommonNotifyEvent dmCommonNotify
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDmCommonNotifyEvent(static_cast<int32_t>(dmCommonNotifyEvent));
-    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    CHECK_NULL_VOID(ipcClientProxy_);
     int32_t ret = ipcClientProxy_->SendRequest(SYNC_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGI("Send Request failed ret: %{public}d", ret);
@@ -3035,7 +3035,7 @@ bool DeviceManagerImpl::CheckAclByIpcCode(const DmAccessCaller &caller, const Dm
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetAccessCaller(caller);
     req->SetAccessCallee(callee);
-    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    CHECK_NULL_RETURN(ipcClientProxy_, false);
     int32_t ret = ipcClientProxy_->SendRequest(ipcCode, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", ret, anonyLocalUdid_);
