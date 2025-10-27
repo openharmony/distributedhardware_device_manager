@@ -439,6 +439,8 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     LOGI("device offline networkId: %{public}s.", GetAnonyString(dmSoftbusEventInfo.dmDeviceInfo.networkId).c_str());
     std::string peerUdid;
     GetUdidByNetworkId(info->networkId, peerUdid);
+    SoftbusCache::GetInstance().DeleteDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
+    SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmSoftbusEventInfo.dmDeviceInfo.networkId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     if (SoftbusEventQueueAdd(dmSoftbusEventInfo) != DM_OK) {
         return;
@@ -454,8 +456,6 @@ void SoftbusListener::OnSoftbusDeviceOffline(NodeBasicInfo *info)
     }
     deviceOffLine.detach();
 #endif
-    SoftbusCache::GetInstance().DeleteDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
-    SoftbusCache::GetInstance().DeleteDeviceSecurityLevel(dmSoftbusEventInfo.dmDeviceInfo.networkId);
     {
         struct RadarInfo radarInfo = {
             .funcName = "OnSoftbusDeviceOffline",
