@@ -97,6 +97,7 @@ int32_t IpcClientManager::Init(const std::string &pkgName)
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetListener(listener);
+    CHECK_NULL_RETURN(dmInterface_, ERR_DM_POINT_NULL);
     ret = dmInterface_->SendCmd(REGISTER_DEVICE_MANAGER_LISTENER, req, rsp);
     if (ret != DM_OK) {
         LOGE("InitDeviceManager: RegisterDeviceManagerListener Failed with ret %{public}d", ret);
