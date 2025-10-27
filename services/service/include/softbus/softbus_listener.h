@@ -85,7 +85,6 @@ public:
     static int32_t GetTargetInfoFromCache(const std::string &deviceId, PeerTargetId &targetId,
         ConnectionAddrType &addrType);
     static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceInfo &devInfo);
-    static int32_t ConvertNodeBasicInfoToDmDevice(const NodeBasicInfo &nodeInfo, DmDeviceBasicInfo &devInfo);
     static std::string ConvertBytesToUpperCaseHexString(const uint8_t arr[], const size_t size);
     static int32_t ConvertScreenStatusToDmDevice(const NodeBasicInfo &nodeInfo, const int32_t devScreenStatus,
         DmDeviceInfo &devInfo);

@@ -170,10 +170,6 @@ void SoftBusListenerSecondFuzzTest(FuzzedDataProvider &fdp)
     devInfo.networkType = fdp.ConsumeIntegral<int32_t>();
     softbusListener_->ConvertScreenStatusToDmDevice(nodeBasicInfo, devScreenStatus, devInfo);
     softbusListener_->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, devInfo);
-    DmDeviceBasicInfo dmdevInfo;
-    dmdevInfo.deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
-    dmdevInfo.extraData = fdp.ConsumeRandomLengthString();
-    softbusListener_->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmdevInfo);
     uint8_t arr[DATA_LEN] = {1};
     size_t len = static_cast<size_t>(DATA_LEN);
     softbusListener_->ConvertBytesToUpperCaseHexString(arr, len);
@@ -385,10 +381,6 @@ void SoftBusListenerSeventhFuzzTest(FuzzedDataProvider &fdp)
     devInfo.extraData = fdp.ConsumeRandomLengthString();
     softbusListener_->ConvertScreenStatusToDmDevice(nodeBasicInfo, devScreenStatus, devInfo);
     softbusListener_->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, devInfo);
-    DmDeviceBasicInfo dmdevInfo;
-    dmdevInfo.deviceTypeId = fdp.ConsumeIntegral<uint16_t>();
-    dmdevInfo.extraData = fdp.ConsumeRandomLengthString();
-    softbusListener_->ConvertNodeBasicInfoToDmDevice(nodeBasicInfo, dmdevInfo);
 }
 
 void PutOstypeDataFuzzTest(FuzzedDataProvider &fdp)
