@@ -497,7 +497,6 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         return;
     }
     if (type == NodeBasicInfoType::TYPE_DEVICE_NAME || type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
-        LOGI("DeviceInfo %{public}d change.", type);
         int32_t networkType = -1;
         if (type == NodeBasicInfoType::TYPE_NETWORK_INFO) {
             if (GetNodeKeyInfo(DM_PKG_NAME, info->networkId, NodeDeviceInfoKey::NODE_KEY_NETWORK_TYPE,
