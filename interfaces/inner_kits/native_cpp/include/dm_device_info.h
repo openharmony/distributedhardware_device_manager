@@ -175,7 +175,7 @@ typedef struct DmDeviceInfo {
     /**
      * Device type of the device.
      */
-    uint16_t deviceTypeId = DmDeviceType::DEVICE_TYPE_UNKNOWN;
+    uint16_t deviceTypeId;
     /**
      * NetworkId of the device.
      */
@@ -183,15 +183,15 @@ typedef struct DmDeviceInfo {
     /**
      * The distance of discovered device, in centimeter(cm).
      */
-    int32_t range = 0;
+    int32_t range;
     /**
      * NetworkType of the device.
      */
-    int32_t networkType = 0;
+    int32_t networkType;
     /**
      * Device authentication form.
      */
-    DmAuthForm authForm = DmAuthForm::INVALID_TYPE;
+    DmAuthForm authForm;
     /**
      * Extra data of the device.
      * include json keys: "CONN_ADDR_TYPE", "BR_MAC_", "BLE_MAC", "WIFI_IP", "WIFI_PORT", "CUSTOM_DATA"
@@ -215,7 +215,7 @@ DmDeviceBasicInfo {
     /**
      * Device type of the device.
      */
-    uint16_t deviceTypeId = DmDeviceType::DEVICE_TYPE_UNKNOWN;
+    uint16_t deviceTypeId;
     /**
      * NetworkId of the device.
      */
@@ -543,12 +543,6 @@ typedef struct PublishServiceParam {
     DMSrvMediumType media;
     DmExchangeFreq freq;
 } PublishServiceParam;
-
-enum class DMNodeBasicInfoType : int32_t {
-    TYPE_NETWORK_ID = 0,
-    TYPE_DEVICE_NAME,
-    TYPE_NETWORK_INFO,
-};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H
