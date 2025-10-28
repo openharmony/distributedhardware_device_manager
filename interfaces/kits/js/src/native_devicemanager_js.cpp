@@ -1946,8 +1946,8 @@ void DeviceManagerNapi::AsyncAfterTaskCallback(napi_env env, napi_status status,
 {
     (void)status;
     CredentialAsyncCallbackInfo *creAsyncCallbackInfo = reinterpret_cast<CredentialAsyncCallbackInfo *>(data);
-    CallRequestCreInfoStatus(env, status, creAsyncCallbackInfo);
     CHECK_NULL_VOID(creAsyncCallbackInfo);
+    CallRequestCreInfoStatus(env, status, creAsyncCallbackInfo);
     napi_delete_async_work(env, creAsyncCallbackInfo->asyncWork);
     delete creAsyncCallbackInfo;
 }
