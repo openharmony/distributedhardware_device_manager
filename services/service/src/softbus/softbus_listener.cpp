@@ -504,11 +504,11 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
                 LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
                 return;
             }
-            LOGI("NetworkType %{public}d.", networkType);	
-        }	
-        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {	
-            UpdateDeviceName(info);	
-        }	
+            LOGI("NetworkType %{public}d.", networkType);
+        }
+        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
+            UpdateDeviceName(info);
+        }
         DmSoftbusEvent dmSoftbusEventInfo;
         dmSoftbusEventInfo.eventType = EVENT_TYPE_CHANGED;
         ConvertNodeBasicInfoToDmDevice(*info, dmSoftbusEventInfo.dmDeviceInfo);
