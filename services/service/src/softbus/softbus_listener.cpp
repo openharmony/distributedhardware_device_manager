@@ -505,17 +505,17 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
                 LOGE("[SOFTBUS]GetNodeKeyInfo networkType failed.");
                 return;
             }
-            LOGI("OnSoftbusDeviceInfoChanged NetworkType %{public}d.", networkType);
-        }
+            LOGI("NetworkType %{public}d.", networkType);	
+        }	
+        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {	
+            UpdateDeviceName(info);	
+        }	
         DmSoftbusEvent dmSoftbusEventInfo;
         dmSoftbusEventInfo.eventType = EVENT_TYPE_CHANGED;
         ConvertNodeBasicInfoToDmDevice(*info, dmSoftbusEventInfo.dmDeviceInfo);
         LOGI("networkId: %{public}s.", GetAnonyString(dmSoftbusEventInfo.dmDeviceInfo.networkId).c_str());
         dmSoftbusEventInfo.dmDeviceInfo.networkType = networkType;
         SoftbusCache::GetInstance().ChangeDeviceInfo(dmSoftbusEventInfo.dmDeviceInfo);
-        if (type == NodeBasicInfoType::TYPE_DEVICE_NAME) {
-            UpdateDeviceName(dmSoftbusEventInfo.dmDeviceInfo);
-        }
     #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
         SoftbusEventQueueAdd(dmSoftbusEventInfo);
     #else
