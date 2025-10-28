@@ -526,9 +526,6 @@ void SoftbusListener::OnSoftbusDeviceInfoChanged(NodeBasicInfoType type, NodeBas
         deviceInfoChange.detach();
     #endif
     }
-    DmSoftbusEvent dmSoftbusEventInfo;
-    dmSoftbusEventInfo.eventType = EVENT_TYPE_CHANGED;
-    ConvertNodeBasicInfoToDmDevice(*info, dmSoftbusEventInfo.dmDeviceInfo);
 }
 
 void SoftbusListener::OnLocalDevInfoChange()
