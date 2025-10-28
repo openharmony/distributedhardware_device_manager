@@ -68,23 +68,37 @@ std::unordered_set<std::string> DeviceManagerServiceListener::highPriorityPkgNam
 
 void handleExtraData(const DmDeviceInfo &info, DmDeviceBasicInfo &deviceBasicInfo)
 {
-    if (info.extraData.empty()) {
-        LOGE("extraData is empty.");
+    cJSON *extraDataJsonObj = cJSON_Parse(info.extraData.c_str());
+    if (extraDataJsonObj == NULL) {
         return;
     }
-    JsonObject paramJson(info.extraData);
-    if (paramJson.IsDiscarded()) {
-        LOGE("paramJson jsonStr error.");
+    cJSON *customDataJson = cJSON_GetObjectItem(extraDataJsonObj, PARAM_KEY_CUSTOM_DATA);
+    if (customDataJson == NULL || !cJSON_IsString(customDataJson)) {
+        cJSON_Delete(extraDataJsonObj);
         return;
     }
-    JsonObject jsonObj;
-    if (IsString(paramJson, PARAM_KEY_CUSTOM_DATA)) {
-        jsonObj[PARAM_KEY_CUSTOM_DATA] = paramJson[PARAM_KEY_CUSTOM_DATA].Get<std::string>();
+    char *customData = cJSON_PrintUnformatted(customDataJson);
+    if (customData == nullptr) {
+        cJSON_Delete(extraDataJsonObj);
+        return;
     }
-    if (IsInt32(paramJson, PARAM_KEY_BASIC_INFO_TYPE)) {
-        jsonObj[PARAM_KEY_BASIC_INFO_TYPE] = paramJson[PARAM_KEY_BASIC_INFO_TYPE].Get<int32_t>();
+    cJSON_Delete(extraDataJsonObj);
+    cJSON *basicExtraDataJsonObj = cJSON_CreateObject();
+    if (basicExtraDataJsonObj == NULL) {
+        cJSON_free(customData);
+        return;
     }
-    deviceBasicInfo.extraData = ToString(jsonObj);
+    cJSON_AddStringToObject(basicExtraDataJsonObj, PARAM_KEY_CUSTOM_DATA, customData);
+    char *basicExtraData = cJSON_PrintUnformatted(basicExtraDataJsonObj);
+    if (basicExtraData == nullptr) {
+        cJSON_free(customData);
+        cJSON_Delete(basicExtraDataJsonObj);
+        return;
+    }
+    deviceBasicInfo.extraData = std::string(basicExtraData);
+    cJSON_free(customData);
+    cJSON_free(basicExtraData);
+    cJSON_Delete(basicExtraDataJsonObj);
 }
 
 void DeviceManagerServiceListener::ConvertDeviceInfoToDeviceBasicInfo(const std::string &pkgName,
