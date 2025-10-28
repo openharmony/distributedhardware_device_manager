@@ -68,6 +68,7 @@ void DmNativeEvent::Off(std::string &eventType)
         return;
     }
     auto listener = iter->second;
+    CHECK_NULL_VOID(listener);
     napi_delete_reference(env_, listener->handlerRef);
     eventMap_.erase(eventType);
     napi_close_handle_scope(env_, scope);
@@ -100,6 +101,7 @@ void DmNativeEvent::OnEvent(const std::string &eventType, size_t argc, const nap
     }
 
     napi_value handler = nullptr;
+    CHECK_NULL_VOID(listener);
     status = napi_get_reference_value(env_, listener->handlerRef, &handler);
     if (status != napi_ok) {
         LOGE("napi_get_reference_value handler for %{public}s failed, status = %{public}d", eventType.c_str(), status);

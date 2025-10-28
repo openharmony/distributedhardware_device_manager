@@ -1430,6 +1430,7 @@ void DeviceManagerNapi::ReleasePublishCallback(std::string &bundleName)
         }
         publishCallback = iter->second;
     }
+    CHECK_NULL_VOID(publishCallback);
     publishCallback->DecreaseRefCount();
     if (publishCallback->GetRefCount() == 0) {
         std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
@@ -1707,7 +1708,7 @@ void DeviceManagerNapi::CallRequestCreInfoStatus(napi_env env, napi_status &stat
     napi_value handler = nullptr;
     napi_value result = nullptr;
     napi_create_object(env, &result);
-
+    CHECK_NULL_VOID(creAsyncCallbackInfo);
     if (creAsyncCallbackInfo->status == 0) {
         if (creAsyncCallbackInfo->returnJsonStr == "") {
             LOGE("creAsyncCallbackInfo returnJsonStr is null");
@@ -1731,7 +1732,7 @@ void DeviceManagerNapi::CallGetLocalDeviceInfoSync(napi_env env, napi_status &st
                                                    DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo)
 {
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
-
+    CHECK_NULL_VOID(deviceInfoAsyncCallbackInfo);
     LOGI("DeviceManager::CallGetLocalDeviceInfoSync deviceId:%{public}s deviceName:%{public}s deviceTypeId:%{public}d ",
          GetAnonyString(deviceInfoAsyncCallbackInfo->deviceInfo.deviceId).c_str(),
          GetAnonyString(deviceInfoAsyncCallbackInfo->deviceInfo.deviceName).c_str(),
@@ -1750,6 +1751,7 @@ void DeviceManagerNapi::CallGetLocalDeviceInfo(napi_env env, napi_status &status
                                                DeviceInfoAsyncCallbackInfo *deviceInfoAsyncCallbackInfo)
 {
     napi_value result[DM_NAPI_ARGS_TWO] = {0};
+    CHECK_NULL_VOID(deviceInfoAsyncCallbackInfo);
     LOGI("DeviceManager::CallGetLocalDeviceInfo deviceId:%{public}s deviceName:%{public}s deviceTypeId:%{public}d ",
          GetAnonyString(deviceInfoAsyncCallbackInfo->deviceInfo.deviceId).c_str(),
          GetAnonyString(deviceInfoAsyncCallbackInfo->deviceInfo.deviceName).c_str(),
@@ -1926,6 +1928,7 @@ void DeviceManagerNapi::CallAsyncWork(napi_env env, DeviceInfoListAsyncCallbackI
 void DeviceManagerNapi::AsyncTaskCallback(napi_env env, void *data)
 {
     CredentialAsyncCallbackInfo *creAsyncCallbackInfo = reinterpret_cast<CredentialAsyncCallbackInfo *>(data);
+    CHECK_NULL_VOID(creAsyncCallbackInfo);
     int32_t ret = DeviceManager::GetInstance().RequestCredential(creAsyncCallbackInfo->bundleName,
         creAsyncCallbackInfo->reqInfo, creAsyncCallbackInfo->returnJsonStr);
     if (ret != 0) {
@@ -1943,6 +1946,7 @@ void DeviceManagerNapi::AsyncAfterTaskCallback(napi_env env, napi_status status,
 {
     (void)status;
     CredentialAsyncCallbackInfo *creAsyncCallbackInfo = reinterpret_cast<CredentialAsyncCallbackInfo *>(data);
+    CHECK_NULL_VOID(creAsyncCallbackInfo);
     CallRequestCreInfoStatus(env, status, creAsyncCallbackInfo);
     napi_delete_async_work(env, creAsyncCallbackInfo->asyncWork);
     delete creAsyncCallbackInfo;
@@ -1952,7 +1956,7 @@ void DeviceManagerNapi::CallCredentialAsyncWork(napi_env env, CredentialAsyncCal
 {
     napi_value resourceName;
     napi_create_string_latin1(env, "RequestCreInfo", NAPI_AUTO_LENGTH, &resourceName);
-
+    CHECK_NULL_VOID(creAsyncCallbackInfo);
     napi_create_async_work(env, nullptr, resourceName, AsyncTaskCallback, AsyncAfterTaskCallback,
         (void *)creAsyncCallbackInfo, &creAsyncCallbackInfo->asyncWork);
     napi_queue_async_work_with_qos(env, creAsyncCallbackInfo->asyncWork, napi_qos_user_initiated);
@@ -1963,6 +1967,7 @@ napi_value DeviceManagerNapi::CallDeviceList(napi_env env, napi_callback_info in
 {
     napi_value result = nullptr;
     std::string extra = "";
+    CHECK_NULL_RETURN(deviceInfoListAsyncCallbackInfo, result);
     deviceInfoListAsyncCallbackInfo->extra = extra;
     GET_PARAMS(env, info, DM_NAPI_ARGS_ONE);
     napi_valuetype eventHandleType = napi_undefined;

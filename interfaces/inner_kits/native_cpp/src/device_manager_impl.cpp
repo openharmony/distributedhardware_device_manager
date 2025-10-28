@@ -134,9 +134,9 @@ int32_t DeviceManagerImpl::InitDeviceManager(const std::string &pkgName, std::sh
     }
     DmTraceStart(std::string(DM_HITRACE_INIT));
     LOGI("Start, pkgName: %{public}s", GetAnonyString(pkgName).c_str());
-
     int32_t ret = DM_OK;
     int32_t retryNum = 0;
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     while (retryNum < SERVICE_INIT_MAX_NUM) {
         ret = ipcClientProxy_->Init(pkgName);
         if (ret == DM_OK) {
@@ -179,7 +179,7 @@ int32_t DeviceManagerImpl::UnInitDeviceManager(const std::string &pkgName)
         return ERR_DM_INPUT_PARA_INVALID;
     }
     LOGI("Start, pkgName: %{public}s", GetAnonyString(pkgName).c_str());
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->UnInit(pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnInitDeviceManager", ret, anonyLocalUdid_);
     if (ret != DM_OK) {
@@ -236,6 +236,7 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     std::shared_ptr<IpcGetTrustDeviceRsp> rsp = std::make_shared<IpcGetTrustDeviceRsp>();
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_TRUST_DEVICE_LIST, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList",
@@ -276,6 +277,7 @@ int32_t DeviceManagerImpl::GetTrustedDeviceList(const std::string &pkgName, cons
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
     req->SetRefresh(isRefresh);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_TRUST_DEVICE_LIST, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetTrustedDeviceList",
@@ -335,6 +337,7 @@ int32_t DeviceManagerImpl::GetDeviceInfo(const std::string &pkgName, const std::
     std::shared_ptr<IpcGetDeviceInfoRsp> rsp = std::make_shared<IpcGetDeviceInfoRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(networkId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportGetDeviceInfo(pkgName, "GetDeviceInfo",
@@ -366,6 +369,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcGetLocalDeviceInfoRsp> rsp = std::make_shared<IpcGetLocalDeviceInfoRsp>();
     req->SetPkgName(pkgName);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceInfo",
@@ -373,7 +377,6 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
         LOGE("DeviceManagerImpl::GetLocalDeviceInfo error, Send Request failed ret: %{public}d", ret);
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
-
     ret = rsp->GetErrCode();
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportGetLocalDevInfo(pkgName, "GetLocalDeviceInfo",
@@ -383,7 +386,6 @@ int32_t DeviceManagerImpl::GetLocalDeviceInfo(const std::string &pkgName, DmDevi
             std::string(GET_LOCAL_DEVICE_INFO_FAILED_MSG));
         return ret;
     }
-
     info = rsp->GetLocalDeviceInfo();
     DmTraceEnd();
     SysEventWrite(std::string(GET_LOCAL_DEVICE_INFO_SUCCESS), DM_HISYEVENT_BEHAVIOR,
@@ -542,17 +544,16 @@ int32_t DeviceManagerImpl::StartDiscovering(const std::string &pkgName,
     }
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     DmTraceStart(std::string(DM_HITRACE_START_DEVICE));
-
     uint16_t subscribeId = AddDiscoveryCallback(pkgName, discoverParam, callback);
     discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
     std::string discParaStr = ConvertMapToJsonString(discoverParam);
     std::string filterOpStr = ConvertMapToJsonString(filterOptions);
-
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(ComposeStr(pkgName, subscribeId));
     req->SetFirstParam(discParaStr);
     req->SetSecondParam(filterOpStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(START_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
         LOGE("StartDiscovering error: Send Request failed ret: %{public}d", ret);
@@ -591,11 +592,11 @@ int32_t DeviceManagerImpl::StopDiscovering(const std::string &pkgName,
     }
     discoverParam.emplace(PARAM_KEY_SUBSCRIBE_ID, std::to_string(subscribeId));
     std::string discParaStr = ConvertMapToJsonString(discoverParam);
-
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(ComposeStr(pkgName, subscribeId));
     req->SetFirstParam(discParaStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(STOP_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
         LOGE("StopDiscovering error: Send Request failed ret: %{public}d", ret);
@@ -628,6 +629,7 @@ int32_t DeviceManagerImpl::PublishDeviceDiscovery(const std::string &pkgName, co
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetPublishInfo(publishInfo);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(PUBLISH_DEVICE_DISCOVER, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "PublishDeviceDiscovery", ret, anonyLocalUdid_);
@@ -661,6 +663,7 @@ int32_t DeviceManagerImpl::UnPublishDeviceDiscovery(const std::string &pkgName, 
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetPublishId(publishId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNPUBLISH_DEVICE_DISCOVER, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnPublishDeviceDiscovery", ret, anonyLocalUdid_);
@@ -708,6 +711,7 @@ int32_t DeviceManagerImpl::AuthenticateDevice(const std::string &pkgName, int32_
     req->SetExtra(extraJson.Dump());
     req->SetAuthType(authType);
     req->SetDeviceInfo(deviceInfo);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(AUTHENTICATE_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("AuthenticateDevice error: Send Request failed ret: %{public}d", ret);
@@ -740,6 +744,7 @@ int32_t DeviceManagerImpl::UnAuthenticateDevice(const std::string &pkgName, cons
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceInfo(deviceInfo);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNAUTHENTICATE_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnAuthenticateDevice error: Send Request failed ret: %{public}d", ret);
@@ -771,6 +776,7 @@ int32_t DeviceManagerImpl::StopAuthenticateDevice(const std::string &pkgName)
     std::shared_ptr<IpcCommonParamReq> req = std::make_shared<IpcCommonParamReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(STOP_AUTHENTICATE_DEVICE, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "StopAuthenticateDevice", ret, anonyLocalUdid_);
@@ -856,7 +862,7 @@ int32_t DeviceManagerImpl::SetUserOperation(const std::string &pkgName, int32_t 
     req->SetPkgName(pkgName);
     req->SetOperation(action);
     req->SetParams(params);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(SERVER_USER_AUTH_OPERATION, req, rsp);
     if (ret != DM_OK) {
         LOGI("SetUserOperation Send Request failed ret: %{public}d", ret);
@@ -886,7 +892,7 @@ int32_t DeviceManagerImpl::GetUdidByNetworkId(const std::string &pkgName, const 
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(netWorkId);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_UDID_BY_NETWORK, req, rsp);
     if (ret != DM_OK) {
         LOGI("GetUdidByNetworkId Send Request failed ret: %{public}d", ret);
@@ -916,7 +922,7 @@ int32_t DeviceManagerImpl::GetUuidByNetworkId(const std::string &pkgName, const 
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(netWorkId);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_UUID_BY_NETWORK, req, rsp);
     if (ret != DM_OK) {
         LOGI("GetUuidByNetworkId Send Request failed ret: %{public}d", ret);
@@ -961,7 +967,7 @@ int32_t DeviceManagerImpl::RegisterUiStateCallback(const std::string &pkgName)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_UI_STATE_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterUiStateCallback", ret, anonyLocalUdid_);
@@ -991,7 +997,7 @@ int32_t DeviceManagerImpl::UnRegisterUiStateCallback(const std::string &pkgName)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_UI_STATE_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "UnRegisterUiStateCallback", ret, anonyLocalUdid_);
@@ -1026,7 +1032,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, const s
     std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
     req->SetPkgName(pkgName);
     req->SetCredentialParam(reqParaStr);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REQUEST_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
         LOGI("RequestCredential Send Request failed ret: %{public}d", ret);
@@ -1059,7 +1065,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetCredentialParam(reqParaStr);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(IMPORT_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
         LOGI("ImportCredential Send Request failed ret: %{public}d", ret);
@@ -1091,7 +1097,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetCredentialParam(reqParaStr);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(DELETE_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
         LOGI("DeleteCredential Send Request failed ret: %{public}d", ret);
@@ -1120,7 +1126,7 @@ int32_t DeviceManagerImpl::RegisterCredentialCallback(const std::string &pkgName
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_CREDENTIAL_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGI("RegisterCredentialCallback Send Request failed ret: %{public}d", ret);
@@ -1148,7 +1154,7 @@ int32_t DeviceManagerImpl::UnRegisterCredentialCallback(const std::string &pkgNa
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_CREDENTIAL_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGI("UnRegisterCredentialCallback Send Request failed ret: %{public}d", ret);
@@ -1184,7 +1190,7 @@ int32_t DeviceManagerImpl::NotifyEvent(const std::string &pkgName, const int32_t
     req->SetPkgName(pkgName);
     req->SetEventId(eventId);
     req->SetEvent(event);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(NOTIFY_EVENT, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "NotifyEvent", ret, anonyLocalUdid_);
@@ -1217,6 +1223,7 @@ int32_t DeviceManagerImpl::RequestCredential(const std::string &pkgName, std::st
     std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
     req->SetPkgName(pkgName);
     req->SetCredentialParam(reqParaStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REQUEST_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
         LOGI("RequestCredential Send Request failed ret: %{public}d", ret);
@@ -1244,7 +1251,7 @@ int32_t DeviceManagerImpl::CheckCredential(const std::string &pkgName, const std
     std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
     req->SetPkgName(pkgName);
     req->SetCredentialParam(reqJsonStr);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(SERVER_GET_DMFA_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGI("CheckCredential Send Request failed ret: %{public}d", ret);
@@ -1277,7 +1284,7 @@ int32_t DeviceManagerImpl::ImportCredential(const std::string &pkgName, const st
     std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
     req->SetPkgName(pkgName);
     req->SetCredentialParam(reqParaStr);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(IMPORT_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
         LOGI("ImportCredential Send Request failed ret: %{public}d", ret);
@@ -1310,7 +1317,7 @@ int32_t DeviceManagerImpl::DeleteCredential(const std::string &pkgName, const st
     std::shared_ptr<IpcSetCredentialRsp> rsp = std::make_shared<IpcSetCredentialRsp>();
     req->SetPkgName(pkgName);
     req->SetCredentialParam(reqParaStr);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(DELETE_CREDENTIAL, req, rsp);
     if (ret != DM_OK) {
         LOGI("DeleteCredential Send Request failed ret: %{public}d", ret);
@@ -1354,7 +1361,7 @@ int32_t DeviceManagerImpl::GetEncryptedUuidByNetworkId(const std::string &pkgNam
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(networkId);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_ENCRYPTED_UUID_BY_NETWOEKID, req, rsp);
     if (ret != DM_OK) {
         LOGI("GetEncryptedUuidByNetworkId Send Request failed ret: %{public}d", ret);
@@ -1385,7 +1392,7 @@ int32_t DeviceManagerImpl::GenerateEncryptedUuid(const std::string &pkgName, con
     req->SetPkgName(pkgName);
     req->SetUuid(uuid);
     req->SetAppId(appId);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GENERATE_ENCRYPTED_UUID, req, rsp);
     if (ret != DM_OK) {
         LOGI("GenerateEncryptedUuid Send Request failed ret: %{public}d", ret);
@@ -1453,6 +1460,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceName(const std::string &pkgName, std::s
     LOGI("Start, pkgName: %{public}s", pkgName.c_str());
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcGetLocalDeviceNameRsp> rsp = std::make_shared<IpcGetLocalDeviceNameRsp>();
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_NAME_OLD, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -1472,6 +1480,7 @@ int32_t DeviceManagerImpl::GetLocalDeviceName(std::string &deviceName)
 {
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcGetLocalDeviceNameRsp> rsp = std::make_shared<IpcGetLocalDeviceNameRsp>();
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -1558,6 +1567,7 @@ int32_t DeviceManagerImpl::BindDevice(const std::string &pkgName, int32_t bindTy
     req->SetBindParam(paramJson.Dump());
     req->SetBindType(bindType);
     req->SetDeviceId(deviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(BIND_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("BindDevice error: Send Request failed ret: %{public}d", ret);
@@ -1586,6 +1596,7 @@ int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::s
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceId(deviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNBIND_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnBindDevice error: Send Request failed ret: %{public}d", ret);
@@ -1615,6 +1626,7 @@ int32_t DeviceManagerImpl::UnBindDevice(const std::string &pkgName, const std::s
     req->SetPkgName(pkgName);
     req->SetDeviceId(deviceId);
     req->SetExtraInfo(extra);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNBIND_DEVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnBindDevice error: Send Request failed ret: %{public}d", ret);
@@ -1644,7 +1656,7 @@ int32_t DeviceManagerImpl::GetNetworkTypeByNetworkId(const std::string &pkgName,
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(netWorkId);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_NETWORKTYPE_BY_NETWORK, req, rsp);
     if (ret != DM_OK) {
         LOGI("GetNetworkTypeByNetworkId Send Request failed ret: %{public}d", ret);
@@ -1683,7 +1695,7 @@ int32_t DeviceManagerImpl::ImportAuthCode(const std::string &pkgName, const std:
     req->SetAuthCode(authCode);
     req->SetPkgName(pkgName);
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(IMPORT_AUTH_CODE, req, rsp);
     if (ret != DM_OK) {
         LOGI("ImportAuthCode Send Request failed ret: %{public}d", ret);
@@ -1704,7 +1716,7 @@ int32_t DeviceManagerImpl::ExportAuthCode(std::string &authCode)
 
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcExportAuthCodeRsp> rsp = std::make_shared<IpcExportAuthCodeRsp>();
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(EXPORT_AUTH_CODE, req, rsp);
     if (ret != DM_OK) {
         LOGI("ExportAuthCode Send Request failed ret: %{public}d", ret);
@@ -1741,6 +1753,7 @@ int32_t DeviceManagerImpl::RegisterDiscoveryCallback(const std::string &pkgName,
     req->SetPkgName(ComposeStr(pkgName, subscribeId));
     req->SetFirstParam(discParaStr);
     req->SetSecondParam(filterOpStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGE("RegisterDiscoveryCallback error: Send Request failed ret: %{public}d", ret);
@@ -1780,6 +1793,7 @@ int32_t DeviceManagerImpl::UnRegisterDiscoveryCallback(const std::string &pkgNam
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(ComposeStr(pkgName, subscribeId));
     req->SetFirstParam(extraParaStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_DISCOVERY_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgNameTemp, "UnRegisterDiscoveryCallback",
@@ -1822,6 +1836,7 @@ int32_t DeviceManagerImpl::StartAdvertising(const std::string &pkgName,
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetFirstParam(adverParaStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(START_ADVERTISING, req, rsp);
     if (ret != DM_OK) {
         LOGE("StartAdvertising error: Send Request failed ret: %{public}d", ret);
@@ -1863,6 +1878,7 @@ int32_t DeviceManagerImpl::StopAdvertising(const std::string &pkgName,
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetFirstParam(adverParaStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(STOP_ADVERTISING, req, rsp);
     if (ret != DM_OK) {
         LOGE("StopAdvertising error: Send Request failed ret: %{public}d", ret);
@@ -1896,6 +1912,7 @@ int32_t DeviceManagerImpl::BindTarget(const std::string &pkgName, const PeerTarg
     req->SetPkgName(pkgName);
     req->SetPeerTargetId(targetId);
     req->SetBindParam(bindParamStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(BIND_TARGET, req, rsp);
     if (ret != DM_OK) {
         LOGE("BindTarget error: Send Request failed ret: %{public}d", ret);
@@ -1926,6 +1943,7 @@ int32_t DeviceManagerImpl::UnbindTarget(const std::string &pkgName, const PeerTa
     req->SetPkgName(pkgName);
     req->SetPeerTargetId(targetId);
     req->SetBindParam(unbindParamStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNBIND_TARGET, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnbindTarget error: Send Request failed ret: %{public}d", ret);
@@ -2077,7 +2095,7 @@ int32_t DeviceManagerImpl::RegisterPinHolderCallback(const std::string &pkgName,
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     req->SetPkgName(pkgName);
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_PIN_HOLDER_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterPinHolderCallback", ret, anonyLocalUdid_);
@@ -2110,7 +2128,7 @@ int32_t DeviceManagerImpl::CreatePinHolder(const std::string &pkgName, const Pee
     req->SetPinType(pinType);
     req->SetPayload(payload);
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(CREATE_PIN_HOLDER, req, rsp);
     if (ret != DM_OK) {
         LOGI("CreatePinHolder Send Request failed ret: %{public}d", ret);
@@ -2140,7 +2158,7 @@ int32_t DeviceManagerImpl::DestroyPinHolder(const std::string &pkgName, const Pe
     req->SetPinType(pinType);
     req->SetPayload(payload);
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(DESTROY_PIN_HOLDER, req, rsp);
     if (ret != DM_OK) {
         LOGI("DestroyPinHolder Send Request failed ret: %{public}d", ret);
@@ -2164,6 +2182,7 @@ int32_t DeviceManagerImpl::DpAclAdd(const int64_t accessControlId, const std::st
     std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetStr(udid);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(DP_ACL_ADD, req, rsp);
     if (ret != DM_OK) {
         LOGE("DpAclAdd error: Send Request failed ret: %{public}d", ret);
@@ -2195,7 +2214,7 @@ int32_t DeviceManagerImpl::GetDeviceSecurityLevel(const std::string &pkgName, co
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(networkId);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_SECURITY_LEVEL, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetDeviceSecurityLevel", ret, anonyLocalUdid_);
@@ -2220,6 +2239,7 @@ int32_t DeviceManagerImpl::CheckApiPermission(int32_t permissionLevel)
     std::shared_ptr<IpcPermissionReq> req = std::make_shared<IpcPermissionReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPermissionLevel(permissionLevel);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(CHECK_API_PERMISSION, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2244,6 +2264,7 @@ bool DeviceManagerImpl::IsSameAccount(const std::string &netWorkId)
     std::shared_ptr<IpcAclProfileReq> req = std::make_shared<IpcAclProfileReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetStr(netWorkId);
+    CHECK_NULL_RETURN(ipcClientProxy_, false);
     int32_t ret = ipcClientProxy_->SendRequest(IS_SAME_ACCOUNT, req, rsp);
     if (ret != DM_OK) {
         LOGE("IsSameAccount Send Request failed ret: %{public}d", ret);
@@ -2272,6 +2293,7 @@ int32_t DeviceManagerImpl::ShiftLNNGear(const std::string &pkgName)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(SHIFT_LNN_GEAR, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "ShiftLNNGear", ret, anonyLocalUdid_);
@@ -2304,6 +2326,7 @@ int32_t DeviceManagerImpl::SetDnPolicy(const std::string &pkgName, std::map<std:
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetFirstParam(strategy);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(SET_DN_POLICY, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "SetDnPolicy", ret, anonyLocalUdid_);
@@ -2375,7 +2398,7 @@ int32_t DeviceManagerImpl::GetDeviceScreenStatus(const std::string &pkgName, con
     std::shared_ptr<IpcGetDeviceScreenStatusRsp> rsp = std::make_shared<IpcGetDeviceScreenStatusRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(networkId);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_SCREEN_STATUS, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2405,7 +2428,7 @@ int32_t DeviceManagerImpl::GetNetworkIdByUdid(const std::string &pkgName, const 
     std::shared_ptr<IpcGetInfoByNetWorkRsp> rsp = std::make_shared<IpcGetInfoByNetWorkRsp>();
     req->SetPkgName(pkgName);
     req->SetUdid(udid);
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_NETWORKID_BY_UDID, req, rsp);
     if (ret != DM_OK) {
         LOGI("GetNetworkIdByUdid Send Request failed ret: %{public}d", ret);
@@ -2475,6 +2498,7 @@ int32_t DeviceManagerImpl::GetAnonyLocalUdid(const std::string &pkgName, std::st
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcGetAnonyLocalUdidRsp> rsp = std::make_shared<IpcGetAnonyLocalUdidRsp>();
     req->SetPkgName(pkgName);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_ANONY_LOCAL_UDID, req, rsp);
     if (ret != DM_OK) {
         LOGI("GetAnonyLocalUdid Send Request failed ret: %{public}d", ret);
@@ -2515,6 +2539,7 @@ void DeviceManagerImpl::SyncCallbackToService(DmCommonNotifyEvent dmCommonNotify
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDmCommonNotifyEvent(static_cast<int32_t>(dmCommonNotifyEvent));
+    CHECK_NULL_VOID(ipcClientProxy_);
     int32_t ret = ipcClientProxy_->SendRequest(SYNC_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGI("Send Request failed ret: %{public}d", ret);
@@ -2544,6 +2569,7 @@ int32_t DeviceManagerImpl::GetAllTrustedDeviceList(const std::string &pkgName, c
     std::shared_ptr<IpcGetTrustDeviceRsp> rsp = std::make_shared<IpcGetTrustDeviceRsp>();
     req->SetPkgName(pkgName);
     req->SetExtra(extra);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_ALL_TRUST_DEVICE_LIST, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportGetTrustDeviceList(pkgName, "GetAllTrustedDeviceList",
@@ -2599,6 +2625,7 @@ int32_t DeviceManagerImpl::RegisterAuthenticationType(const std::string &pkgName
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetFirstParam(authTypeStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REG_AUTHENTICATION_TYPE, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2626,6 +2653,7 @@ int32_t DeviceManagerImpl::GetDeviceProfileInfoList(const std::string &pkgName,
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetFilterOptions(filterOptions);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     ret = ipcClientProxy_->SendRequest(GET_DEVICE_PROFILE_INFO_LIST, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
@@ -2658,6 +2686,7 @@ int32_t DeviceManagerImpl::GetDeviceIconInfo(const std::string &pkgName,
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetFilterOptions(filterOptions);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     ret = ipcClientProxy_->SendRequest(GET_DEVICE_ICON_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2690,6 +2719,7 @@ int32_t DeviceManagerImpl::PutDeviceProfileInfoList(const std::string &pkgName,
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceProfileInfoList(deviceProfileInfoList);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(PUT_DEVICE_PROFILE_INFO_LIST, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
@@ -2712,6 +2742,7 @@ int32_t DeviceManagerImpl::GetLocalDisplayDeviceName(const std::string &pkgName,
     std::shared_ptr<IpcGetLocalDisplayDeviceNameRsp> rsp = std::make_shared<IpcGetLocalDisplayDeviceNameRsp>();
     req->SetPkgName(pkgName);
     req->SetMaxNameLength(maxNameLength);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_LOCAL_DISPLAY_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
@@ -2733,6 +2764,7 @@ int32_t DeviceManagerImpl::RegisterLocalServiceInfo(const DMLocalServiceInfo &in
     std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetLocalServiceInfo(info);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REG_LOCALSERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2754,6 +2786,7 @@ int32_t DeviceManagerImpl::UnRegisterLocalServiceInfo(const std::string &bundleN
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetFirstParam(bundleName);
     req->SetInt32Param(pinExchangeType);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNREG_LOCALSERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2774,6 +2807,7 @@ int32_t DeviceManagerImpl::UpdateLocalServiceInfo(const DMLocalServiceInfo &info
     std::shared_ptr<IpcRegServiceInfoReq> req = std::make_shared<IpcRegServiceInfoReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetLocalServiceInfo(info);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UPDATE_LOCALSERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2795,6 +2829,7 @@ int32_t DeviceManagerImpl::GetLocalServiceInfoByBundleNameAndPinExchangeType(
     std::shared_ptr<IpcGetLocalServiceInfoRsp> rsp = std::make_shared<IpcGetLocalServiceInfoRsp>();
     req->SetFirstParam(bundleName);
     req->SetInt32Param(pinExchangeType);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_SERVICEINFO_BYBUNDLENAME_PINEXCHANGETYPE, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2829,6 +2864,7 @@ int32_t DeviceManagerImpl::SetLocalDeviceName(const std::string &pkgName, const 
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceName(deviceName);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     ret = ipcClientProxy_->SendRequest(SET_LOCAL_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
@@ -2865,6 +2901,7 @@ int32_t DeviceManagerImpl::SetRemoteDeviceName(const std::string &pkgName, const
     req->SetPkgName(pkgName);
     req->SetDeviceName(deviceName);
     req->SetDeviceId(deviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     ret = ipcClientProxy_->SendRequest(SET_REMOTE_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
@@ -2891,6 +2928,7 @@ int32_t DeviceManagerImpl::RestoreLocalDeviceName(const std::string &pkgName)
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(RESTORE_LOCAL_DEVICE_NAME, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
@@ -2912,6 +2950,7 @@ int32_t DeviceManagerImpl::GetDeviceNetworkIdList(const std::string &bundleName,
     std::shared_ptr<IpcGetDeviceNetworkIdListRsp> rsp = std::make_shared<IpcGetDeviceNetworkIdListRsp>();
     req->SetPkgName(bundleName);
     req->SetQueryFilter(queryFilter);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_DEVICE_NETWORK_ID_LIST, req, rsp);
     if (ret != DM_OK) {
         LOGE("Send Request failed ret: %{public}d", ret);
@@ -2937,7 +2976,7 @@ int32_t DeviceManagerImpl::UnRegisterPinHolderCallback(const std::string &pkgNam
     std::shared_ptr<IpcReq> req = std::make_shared<IpcReq>();
     req->SetPkgName(pkgName);
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
-
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_PIN_HOLDER_CALLBACK, req, rsp);
     if (ret != DM_OK) {
         LOGI("Send Request failed ret: %{public}d", ret);
@@ -2996,6 +3035,7 @@ bool DeviceManagerImpl::CheckAclByIpcCode(const DmAccessCaller &caller, const Dm
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetAccessCaller(caller);
     req->SetAccessCallee(callee);
+    CHECK_NULL_RETURN(ipcClientProxy_, false);
     int32_t ret = ipcClientProxy_->SendRequest(ipcCode, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(caller.pkgName, "CheckAclByIpcCode", ret, anonyLocalUdid_);
@@ -3020,6 +3060,7 @@ int32_t DeviceManagerImpl::GetUdidsByDeviceIds(const std::string &pkgName, const
     std::shared_ptr<IpcGetUdidsByDeviceIdsRsp> rsp = std::make_shared<IpcGetUdidsByDeviceIdsRsp>();
     req->SetPkgName(pkgName);
     req->SetDeviceIdList(deviceIdList);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(GET_UDIDS_BY_DEVICEIDS, req, rsp);
     if (ret != DM_OK) {
         DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "GetUdidsByDeviceIds", ret, anonyLocalUdid_);
@@ -3046,6 +3087,7 @@ int32_t DeviceManagerImpl::StartServiceDiscovery(const std::string &pkgName, con
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetDiscParam(discParam);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(START_SERVICE_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
         LOGE("StartServiceDiscovery error: Send Request failed ret: %{public}d", ret);
@@ -3073,6 +3115,7 @@ int32_t DeviceManagerImpl::StopServiceDiscovery(const std::string &pkgName, int3
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetInt32Param(discoveryServiceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(STOP_SERVICE_DISCOVERING, req, rsp);
     if (ret != DM_OK) {
         LOGE("StopServiceDiscovery error: Send Request failed ret: %{public}d", ret);
@@ -3102,6 +3145,7 @@ int32_t DeviceManagerImpl::BindServiceTarget(const std::string &pkgName, const P
     req->SetPkgName(pkgName);
     req->SetPeerTargetId(targetId);
     req->SetBindParam(bindParamStr);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(BIND_SERVICE_TARGET, req, rsp);
     if (ret != DM_OK) {
         LOGE("BindServiceTarget error: Send Request failed ret: %{public}d", ret);
@@ -3129,6 +3173,7 @@ int32_t DeviceManagerImpl::UnbindServiceTarget(const std::string &pkgName, int64
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetServiceId(serviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNBIND_SERVICE_TARGET, req, rsp);
     if (ret != DM_OK) {
         LOGE("UnbindServiceTarget error: Send Request failed ret: %{public}d", ret);
@@ -3190,6 +3235,7 @@ int32_t DeviceManagerImpl::StartPublishService(const std::string &pkgName,
     req->SetPkgName(pkgName);
     req->SetPublishServiceParam(publishServiceParam);
     req->SetServiceId(serviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(START_PUBLISH_SERVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
@@ -3216,6 +3262,7 @@ int32_t DeviceManagerImpl::StopPublishService(int64_t serviceId)
     std::shared_ptr<IpcStopPublishServiceReq> req = std::make_shared<IpcStopPublishServiceReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetServiceId(serviceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(STOP_PUBLISH_SERVICE, req, rsp);
     if (ret != DM_OK) {
         LOGE("error:Send Request failed ret: %{public}d", ret);
@@ -3242,6 +3289,7 @@ int32_t DeviceManagerImpl::RegisterServiceInfo(const ServiceRegInfo &serviceInfo
     std::shared_ptr<IpcPublishServiceInfoRsp> rsp = std::make_shared<IpcPublishServiceInfoRsp>();
     req->SetServiceRegInfo(serviceInfo);
     req->SetRegServiceId(regServiceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_SERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("error: Send Request failed ret: %{public}d", ret);
@@ -3266,6 +3314,7 @@ int32_t DeviceManagerImpl::UnRegisterServiceInfo(int32_t regServiceId)
     std::shared_ptr<IpcUnRegisterServiceInfoReq> req = std::make_shared<IpcUnRegisterServiceInfoReq>();
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetRegServiceId(regServiceId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(UNREGISTER_SERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
         LOGE("error:Send Request failed ret: %{public}d", ret);
@@ -3293,6 +3342,7 @@ int32_t DeviceManagerImpl::LeaveLNN(const std::string &pkgName, const std::strin
     std::shared_ptr<IpcRsp> rsp = std::make_shared<IpcRsp>();
     req->SetPkgName(pkgName);
     req->SetNetWorkId(networkId);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(LEAVE_LNN, req, rsp);
     if (ret != DM_OK) {
         LOGI("Send Request failed ret: %{public}d", ret);

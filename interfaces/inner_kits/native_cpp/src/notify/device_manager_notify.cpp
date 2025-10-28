@@ -967,47 +967,55 @@ std::map<std::string, std::shared_ptr<DmInitCallback>> DeviceManagerNotify::GetD
 
 void DeviceManagerNotify::DeviceInfoOnline(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk)
 {
+    CHECK_NULL_VOID(tempCbk);
     tempCbk->OnDeviceOnline(deviceInfo);
 }
 
 void DeviceManagerNotify::DeviceInfoOffline(const DmDeviceInfo &deviceInfo,
     std::shared_ptr<DeviceStateCallback> tempCbk)
 {
+    CHECK_NULL_VOID(tempCbk);
     tempCbk->OnDeviceOffline(deviceInfo);
 }
 
 void DeviceManagerNotify::DeviceInfoChanged(const DmDeviceInfo &deviceInfo,
     std::shared_ptr<DeviceStateCallback> tempCbk)
 {
+    CHECK_NULL_VOID(tempCbk);
     tempCbk->OnDeviceChanged(deviceInfo);
 }
 
 void DeviceManagerNotify::DeviceInfoReady(const DmDeviceInfo &deviceInfo, std::shared_ptr<DeviceStateCallback> tempCbk)
 {
+    CHECK_NULL_VOID(tempCbk);
     tempCbk->OnDeviceReady(deviceInfo);
 }
 
 void DeviceManagerNotify::DeviceBasicInfoOnline(const DmDeviceBasicInfo &deviceBasicInfo,
     std::shared_ptr<DeviceStatusCallback> tempCbk)
 {
+    CHECK_NULL_VOID(tempCbk);
     tempCbk->OnDeviceOnline(deviceBasicInfo);
 }
 
 void DeviceManagerNotify::DeviceBasicInfoOffline(const DmDeviceBasicInfo &deviceBasicInfo,
     std::shared_ptr<DeviceStatusCallback> tempCbk)
 {
+    CHECK_NULL_VOID(tempCbk);
     tempCbk->OnDeviceOffline(deviceBasicInfo);
 }
 
 void DeviceManagerNotify::DeviceBasicInfoChanged(const DmDeviceBasicInfo &deviceBasicInfo,
     std::shared_ptr<DeviceStatusCallback> tempCbk)
 {
+    CHECK_NULL_VOID(tempCbk);
     tempCbk->OnDeviceChanged(deviceBasicInfo);
 }
 
 void DeviceManagerNotify::DeviceBasicInfoReady(const DmDeviceBasicInfo &deviceBasicInfo,
     std::shared_ptr<DeviceStatusCallback> tempCbk)
 {
+    CHECK_NULL_VOID(tempCbk);
     tempCbk->OnDeviceReady(deviceBasicInfo);
 }
 

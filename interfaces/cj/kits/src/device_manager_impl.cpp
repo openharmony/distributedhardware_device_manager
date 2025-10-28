@@ -812,6 +812,7 @@ int32_t DeviceManagerFfiImpl::ReleaseDiscoveryCallback()
         }
         DiscoveryCallback = iter->second;
     }
+    CHECK_NULL_RETURN(DiscoveryCallback, DM_ERR_FAILED);
     DiscoveryCallback->DecreaseRefCount();
     if (DiscoveryCallback->GetRefCount() == 0) {
         std::lock_guard<std::mutex> autoLock(g_discoveryCallbackMapMutex);
@@ -832,6 +833,7 @@ int32_t DeviceManagerFfiImpl::ReleasePublishCallback()
         }
         publishCallback = iter->second;
     }
+    CHECK_NULL_RETURN(publishCallback, DM_ERR_FAILED);
     publishCallback->DecreaseRefCount();
     if (publishCallback->GetRefCount() == 0) {
         std::lock_guard<std::mutex> autoLock(g_publishCallbackMapMutex);
