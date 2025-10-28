@@ -3449,10 +3449,11 @@ void DeviceManagerService::SubscribePackageCommonEvent()
 }
 
 int32_t DeviceManagerService::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately)
 {
     if (IsDMServiceImplReady()) {
-        return dmServiceImpl_->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo, remoteAclList);
+        return dmServiceImpl_->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo,
+            remoteAclList, isDelImmediately);
     }
     return ERR_DM_FAILED;
 }

@@ -22,6 +22,7 @@
 #include <queue>
 #include <string>
 #include <vector>
+#include <set>
 
 #include "softbus_bus_center.h"
 #include "dm_device_info.h"
@@ -38,6 +39,22 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+typedef struct DelInfoCache {
+    int32_t userId;
+    int32_t sessionKeyId;
+    int32_t aclId;
+    std::string credId;
+    bool operator==(const DelInfoCache &other) const
+    {
+        return (userId == other.userId) && (credId == other.credId) &&
+            (sessionKeyId == other.sessionKeyId) && (aclId == other.aclId);
+    }
+    bool operator<(const DelInfoCache &other) const
+    {
+        return aclId < other.aclId;
+    }
+} DelInfoCache;
+
 class SoftbusConnector {
 public:
     /**
@@ -142,9 +159,10 @@ public:
     void ClearChangeProcessInfo();
     DmDeviceInfo GetDeviceInfoByDeviceId(const std::string &deviceId);
     void DeleteOffLineTimer(std::string &udidHash);
+    void SyncAclList();
     void SyncAclList(int32_t userId, std::string credId, int32_t sessionKeyId, int32_t aclId);
     int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList);
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately);
     int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList);
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
@@ -163,9 +181,11 @@ private:
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     int32_t ParaseAclChecksumList(const std::string &jsonString, std::vector<AclHashItem> &remoteAllAclList);
     int32_t SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
-        DistributedDeviceProfile::AccessControlProfile &localAcl, std::vector<std::string> &acLStrList);
+        DistributedDeviceProfile::AccessControlProfile &localAcl,
+        std::vector<std::string> &acLStrList, bool isDelImmediately);
     int32_t GetLocalVersion(const std::string localUdid, const std::string remoteUdid,
         std::string &localVersion, DistributedDeviceProfile::AccessControlProfile &localAcl);
+    void DeleteCredential(const DelInfoCache &acl);
 #endif
 private:
     static std::string remoteUdidHash_;
@@ -186,6 +206,8 @@ private:
     static std::shared_ptr<ISoftbusLeaveLNNCallback> leaveLNNCallback_;
     static std::mutex leaveLNNMutex_;
     static std::map<std::string, std::string> leaveLnnPkgMap_;
+    static std::mutex dmDelInfoMutex_;
+    static std::set<DelInfoCache> dmDelInfoCache_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

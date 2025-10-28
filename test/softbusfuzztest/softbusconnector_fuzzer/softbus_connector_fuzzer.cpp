@@ -48,9 +48,11 @@ void SoftBusConnectorFirstFuzzTest(FuzzedDataProvider &fdp)
     DistributedDeviceProfile::AccessControlProfile localAcl;
     std::vector<std::string> acLStrList;
     std::string jsonString = fdp.ConsumeRandomLengthString();
+    bool isDelImmediately = fdp.ConsumeBool();
     std::vector<AclHashItem> remoteAllAclList;
     std::shared_ptr<SoftbusConnector> softbusConnector = std::make_shared<SoftbusConnector>();
     softbusConnector->SyncAclList(userId, credId, sessionKeyId, aclId);
+    softbusConnector->SyncAclList();
     DistributedDeviceProfile::Accesser acer;
     DistributedDeviceProfile::Accessee acee;
     acee.SetAccesseeDeviceId(localUdid);
@@ -58,13 +60,13 @@ void SoftBusConnectorFirstFuzzTest(FuzzedDataProvider &fdp)
     localAcl.SetTrustDeviceId(remoteUdid);
     localAcl.SetAccesser(acer);
     localAcl.SetAccessee(acee);
-    softbusConnector->SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, acLStrList);
+    softbusConnector->SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, acLStrList, isDelImmediately);
     acer.SetAccesserDeviceId(localUdid);
     acee.SetAccesseeDeviceId(remoteUdid);
     localAcl.SetTrustDeviceId(remoteUdid);
     localAcl.SetAccesser(acer);
     localAcl.SetAccessee(acee);
-    softbusConnector->SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, acLStrList);
+    softbusConnector->SyncLocalAclList5_1_0(localUdid, remoteUdid, localAcl, acLStrList, isDelImmediately);
     softbusConnector->ParaseAclChecksumList(jsonString, remoteAllAclList);
     std::string localVersion = fdp.ConsumeRandomLengthString();
     softbusConnector->GetLocalVersion(localUdid, remoteUdid, localVersion, localAcl);
@@ -119,7 +121,8 @@ void SoftBusConnectorSecondFuzzTest(FuzzedDataProvider &fdp)
     DevUserInfo localUserInfo;
     DevUserInfo remoteUserInfo;
     std::string remoteAclList = fdp.ConsumeRandomLengthString();
-    softbusConnector->SyncLocalAclListProcess(localUserInfo, remoteUserInfo, remoteAclList);
+    bool isDelImmediately = fdp.ConsumeBool();
+    softbusConnector->SyncLocalAclListProcess(localUserInfo, remoteUserInfo, remoteAclList, isDelImmediately);
     softbusConnector->GetAclListHash(localUserInfo, remoteUserInfo, remoteAclList);
 }
 

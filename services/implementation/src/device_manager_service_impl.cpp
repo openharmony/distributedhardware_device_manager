@@ -2458,10 +2458,11 @@ void DeviceManagerServiceImpl::HandleDeviceScreenStatusChange(DmDeviceInfo &devI
 }
 
 int32_t DeviceManagerServiceImpl::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately)
 {
     CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
-    return softbusConnector_->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo, remoteAclList);
+    return softbusConnector_->SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo,
+        remoteAclList, isDelImmediately);
 }
 
 int32_t DeviceManagerServiceImpl::GetAclListHash(const DevUserInfo &localDevUserInfo,

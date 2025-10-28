@@ -247,7 +247,7 @@ public:
     virtual void HandleCredentialAuthStatus(const std::string &deviceList, uint16_t deviceTypeId,
                                             int32_t errcode) = 0;
     virtual int32_t SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList) = 0;
+        const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately) = 0;
     virtual int32_t GetAclListHash(const DevUserInfo &localDevUserInfo,
         const DevUserInfo &remoteDevUserInfo, std::string &aclList) = 0;
     virtual int32_t ProcessAppUnintall(const std::string &appId, int32_t accessTokenId) = 0;

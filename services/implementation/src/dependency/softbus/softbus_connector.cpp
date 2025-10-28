@@ -44,6 +44,7 @@ constexpr const char* ETH_IP = "ETH_IP";
 constexpr const char* ETH_PORT = "ETH_PORT";
 constexpr const char* NCM_IP = "NCM_IP";
 constexpr const char* NCM_PORT = "NCM_PORT";
+constexpr const char* FILED_AUTHORIZED_APP_LIST = "authorizedAppList";
 
 namespace {
     const char* TAG_ACL = "accessControlTable";
@@ -63,6 +64,8 @@ std::shared_ptr<ISoftbusConnectorCallback> SoftbusConnector::connectorCallback_ 
 std::shared_ptr<ISoftbusLeaveLNNCallback> SoftbusConnector::leaveLNNCallback_ = nullptr;
 std::mutex SoftbusConnector::leaveLNNMutex_;
 std::map<std::string, std::string> SoftbusConnector::leaveLnnPkgMap_ = {};
+std::mutex SoftbusConnector::dmDelInfoMutex_;
+std::set<DelInfoCache> SoftbusConnector::dmDelInfoCache_ = {};
 
 SoftbusConnector::SoftbusConnector()
 {
@@ -78,6 +81,74 @@ SoftbusConnector::~SoftbusConnector()
     LOGD("SoftbusConnector destructor.");
 }
 
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+void SoftbusConnector::DeleteCredential(const DelInfoCache &acl)
+{
+    CHECK_NULL_VOID(hiChainAuthConnector_);
+    JsonObject credJson;
+    int32_t ret = hiChainAuthConnector_->QueryCredInfoByCredId(acl.userId, acl.credId, credJson);
+    if (ret != DM_OK || !credJson.Contains(acl.credId)) {
+        LOGE("DeleteCredential err, ret:%{public}d", ret);
+        return;
+    }
+    if (!credJson[acl.credId].Contains(FILED_AUTHORIZED_APP_LIST)) {
+        ret = hiChainAuthConnector_->DeleteCredential(acl.userId, acl.credId);
+        if (ret != DM_OK) {
+            LOGE("DeletecredId err, ret:%{public}d", ret);
+        }
+        return;
+    }
+    DistributedDeviceProfile::AccessControlProfile profile =
+        DeviceProfileConnector::GetInstance().GetAccessControlProfileByAccessControlId(acl.aclId);
+    if (profile.GetAccessControlId() != acl.aclId) {
+        LOGE("DeleteCredential, no found profile");
+        return;
+    }
+    std::vector<std::string> appList;
+    credJson[acl.credId][FILED_AUTHORIZED_APP_LIST].Get(appList);
+    auto erIt = std::find(appList.begin(), appList.end(), std::to_string(profile.GetAccesser().GetAccesserTokenId()));
+    if (erIt != appList.end()) {
+        appList.erase(erIt);
+    }
+    auto eeIt = std::find(appList.begin(), appList.end(), std::to_string(profile.GetAccessee().GetAccesseeTokenId()));
+    if (eeIt != appList.end()) {
+        appList.erase(eeIt);
+    }
+    if (appList.size() == 0) {
+        ret = hiChainAuthConnector_->DeleteCredential(acl.userId, acl.credId);
+        if (ret != DM_OK) {
+            LOGE("DeletecredId err, ret:%{public}d", ret);
+        }
+        return;
+    }
+    hiChainAuthConnector_->UpdateCredential(acl.credId, acl.userId, appList);
+}
+#endif
+
+void SoftbusConnector::SyncAclList()
+{
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<std::mutex> lock(dmDelInfoMutex_);
+    for (const auto &item : dmDelInfoCache_) {
+        int32_t userId = item.userId;
+        int32_t sessionKeyId = item.sessionKeyId;
+        int32_t aclId = item.aclId;
+        std::string credId = item.credId;
+        LOGI("userId:%{public}d, credId:%{public}s, sessionKeyId:%{public}d, aclId:%{public}d",
+            userId, credId.c_str(), sessionKeyId, aclId);
+        // delete seesionkey by skid
+        int32_t ret = DeviceProfileConnector::GetInstance().DeleteSessionKey(userId, sessionKeyId);
+        if (ret != DM_OK) {
+            LOGE("SyncAclList DeleteSessionKey failed. ret:%{public}d.", ret);
+        }
+        DeleteCredential(item);
+        // delete acl
+        DeviceProfileConnector::GetInstance().DeleteAccessControlById(aclId);
+    }
+    dmDelInfoCache_.clear();
+#endif
+}
+
 void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
     int32_t sessionKeyId, int32_t aclId)
 {
@@ -89,22 +160,16 @@ void SoftbusConnector::SyncAclList(int32_t userId, std::string credId,
     if (ret != DM_OK) {
         LOGE("SyncAclList DeleteSessionKey failed.");
     }
-    if (hiChainAuthConnector_ != nullptr) {
-        // 根据凭据id 删除sink端多余的凭据
-        ret = hiChainAuthConnector_->DeleteCredential(userId, credId);
-        if (ret != DM_OK) {
-            LOGE("SyncAclList DeleteCredential failed.");
-        }
-    }
+    DeleteCredential({ userId, sessionKeyId, aclId, credId });
     // 删除本条acl
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(aclId);
 #endif
 }
 
-
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, const std::string remoteUdid,
-    DistributedDeviceProfile::AccessControlProfile &localAcl, std::vector<std::string> &acLStrList)
+    DistributedDeviceProfile::AccessControlProfile &localAcl,
+    std::vector<std::string> &acLStrList, bool isDelImmediately)
 {
     bool res = DeviceProfileConnector::GetInstance().ChecksumAcl(localAcl, acLStrList);
     if (res) {
@@ -112,17 +177,31 @@ int32_t SoftbusConnector::SyncLocalAclList5_1_0(const std::string localUdid, con
     }
     if (localAcl.GetAccesser().GetAccesserDeviceId() == localUdid &&
         localAcl.GetAccessee().GetAccesseeDeviceId() == remoteUdid) {
-        LOGI("SyncLocalAclListProcess Src.");
-        SyncAclList(localAcl.GetAccesser().GetAccesserUserId(),
-            localAcl.GetAccesser().GetAccesserCredentialIdStr(),
-            localAcl.GetAccesser().GetAccesserSessionKeyId(), localAcl.GetAccessControlId());
+        if (!isDelImmediately) {
+            LOGI("SyncLocalAclListProcess Src.");
+            std::lock_guard<std::mutex> lock(dmDelInfoMutex_);
+            dmDelInfoCache_.insert({ localAcl.GetAccesser().GetAccesserUserId(),
+                localAcl.GetAccesser().GetAccesserSessionKeyId(),
+                localAcl.GetAccessControlId(), localAcl.GetAccesser().GetAccesserCredentialIdStr()});
+        } else {
+            SyncAclList(localAcl.GetAccesser().GetAccesserUserId(),
+                localAcl.GetAccesser().GetAccesserCredentialIdStr(),
+                localAcl.GetAccesser().GetAccesserSessionKeyId(), localAcl.GetAccessControlId());
+        }
     }
     if (localAcl.GetAccesser().GetAccesserDeviceId() == remoteUdid &&
         localAcl.GetAccessee().GetAccesseeDeviceId() == localUdid) {
-        LOGI("SyncLocalAclListProcess Sink.");
-        SyncAclList(localAcl.GetAccessee().GetAccesseeUserId(),
-            localAcl.GetAccessee().GetAccesseeCredentialIdStr(),
-            localAcl.GetAccessee().GetAccesseeSessionKeyId(), localAcl.GetAccessControlId());
+        if (!isDelImmediately) {
+            LOGI("SyncLocalAclListProcess Sink.");
+            std::lock_guard<std::mutex> lock(dmDelInfoMutex_);
+            dmDelInfoCache_.insert({ localAcl.GetAccessee().GetAccesseeUserId(),
+                localAcl.GetAccessee().GetAccesseeSessionKeyId(),
+                localAcl.GetAccessControlId(), localAcl.GetAccessee().GetAccesseeCredentialIdStr() });
+        } else {
+            SyncAclList(localAcl.GetAccessee().GetAccesseeUserId(),
+                localAcl.GetAccessee().GetAccesseeCredentialIdStr(),
+                localAcl.GetAccessee().GetAccesseeSessionKeyId(), localAcl.GetAccessControlId());
+        }
     }
     return DM_OK;
 }
@@ -191,7 +270,7 @@ std::string SoftbusConnector::MatchTargetVersion(const std::string &localVersion
 #endif
 
 int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUserInfo,
-    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
+    const DevUserInfo &remoteDevUserInfo, std::string remoteAclList, bool isDelImmediately)
 {
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     std::vector<AclHashItem> remoteAllAclList;
@@ -223,7 +302,7 @@ int32_t SoftbusConnector::SyncLocalAclListProcess(const DevUserInfo &localDevUse
         switch (versionNum) {
             case DM_VERSION_INT_5_1_0:
                 ret = SyncLocalAclList5_1_0(localDevUserInfo.deviceId, remoteDevUserInfo.deviceId, localAcl,
-                    remoteAclHashList);
+                    remoteAclHashList, isDelImmediately);
                 break;
             default:
                 LOGE("versionNum is invaild, ver: %{public}d", versionNum);

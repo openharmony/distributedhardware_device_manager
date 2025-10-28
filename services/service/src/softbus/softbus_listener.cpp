@@ -219,7 +219,7 @@ int32_t SoftbusListener::OnSyncLocalAclList(const DevUserInfo &localDevUserInfo,
     const DevUserInfo &remoteDevUserInfo, std::string remoteAclList)
 {
     return DeviceManagerService::GetInstance().SyncLocalAclListProcess(localDevUserInfo, remoteDevUserInfo,
-        remoteAclList);
+        remoteAclList, true);
 }
 
 int32_t SoftbusListener::OnGetAclListHash(const DevUserInfo &localDevUserInfo,
