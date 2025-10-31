@@ -1089,7 +1089,7 @@ DM_EXPORT std::vector<int32_t> DeviceProfileConnector::SyncAclByBindType(
         for (uint32_t srcIndex = 0; srcIndex < bindTypeVec.size(); srcIndex++) {
             if (sinkBindType[sinkIndex] == bindTypeVec[srcIndex]) {
                 deleteAclFlag = false;
-                bindType.push_back(bindTypeVec[sinkIndex]);
+                bindType.push_back(bindTypeVec[srcIndex]);
             }
         }
         if (deleteAclFlag) {
