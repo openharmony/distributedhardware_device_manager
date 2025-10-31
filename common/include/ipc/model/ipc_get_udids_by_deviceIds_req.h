@@ -25,7 +25,7 @@ class IpcGetUdidsByDeviceIdsReq : public IpcReq {
 public:
     /**
      * @tc.name: IpcGetUdidsByDeviceIdsReq::GetDeviceIdList
-     * @tc.desc: Get DeviceIdList of the Ipc Get Udids By DeviceIds Request
+     * @tc.desc: Get DeviceIdList of the Ipc Get Udids By Devices Request
      * @tc.type: FUNC
      */
     std::vector<std::string> GetDeviceIdList() const
@@ -35,7 +35,7 @@ public:
 
     /**
      * @tc.name: IpcGetUdidsByDeviceIdsReq::SetDeviceIdList
-     * @tc.desc: Set DeviceIdList of the Ipc Get Udids By DeviceIds Request
+     * @tc.desc: Set DeviceIdList of the Ipc Get Udids By Devices Request
      * @tc.type: FUNC
      */
     void SetDeviceIdList(const std::vector<std::string> &deviceIdList)

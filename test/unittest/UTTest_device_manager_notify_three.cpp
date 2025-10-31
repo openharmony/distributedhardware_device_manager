@@ -1022,92 +1022,6 @@ HWTEST_F(DeviceManagerNotifyTest, RegisterPinHolderCallback_303, testing::ext::T
     DeviceManagerNotify::GetInstance().RegisterPinHolderCallback(pkgName, callback);
     EXPECT_EQ(DeviceManagerNotify::GetInstance().pinHolderCallback_.empty(), true);
 }
-} // namespace
-
-DmInitCallbackTest::DmInitCallbackTest(int &count) : DmInitCallback()
-{
-    count_ = &count;
-}
-void DmInitCallbackTest::OnRemoteDied()
-{
-    *count_ = *count_ + 1;
-}
-
-DeviceStateCallbackTest::DeviceStateCallbackTest(int &count) : DeviceStateCallback()
-{
-    count_ = &count;
-}
-
-void DeviceStateCallbackTest::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
-{
-    *count_ = *count_ + 1;
-}
-
-void DeviceStateCallbackTest::OnDeviceReady(const DmDeviceInfo &deviceInfo)
-{
-    *count_ = *count_ + 1;
-}
-
-void DeviceStateCallbackTest::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
-{
-    *count_ = *count_ + 1;
-}
-
-void DeviceStateCallbackTest::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
-{
-    *count_ = *count_ + 1;
-}
-
-DiscoveryCallbackTest::DiscoveryCallbackTest(int &count) : DiscoveryCallback()
-{
-    count_ = &count;
-}
-
-void DiscoveryCallbackTest::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
-{
-    *count_ = *count_ + 1;
-}
-
-void DiscoveryCallbackTest::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason)
-{
-    *count_ = *count_ + 1;
-}
-
-void DiscoveryCallbackTest::OnDiscoverySuccess(uint16_t subscribeId)
-{
-    *count_ = *count_ + 1;
-}
-
-PublishCallbackTest::PublishCallbackTest(int &count) : PublishCallback()
-{
-    count_ = &count;
-}
-
-void PublishCallbackTest::OnPublishResult(int32_t publishId, int32_t failedReason)
-{
-    *count_ = *count_ + 1;
-}
-
-AuthenticateCallbackTest::AuthenticateCallbackTest(int &count) : AuthenticateCallback()
-{
-    count_ = &count;
-}
-
-void AuthenticateCallbackTest::OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
-    int32_t reason)
-{
-    *count_ = *count_ + 1;
-}
-
-DeviceManagerFaCallbackTest::DeviceManagerFaCallbackTest(int &count) : DeviceManagerUiCallback()
-{
-    count_ = &count;
-}
-
-void DeviceManagerFaCallbackTest::OnCall(const std::string &paramJson)
-{
-    *count_ = *count_ + 1;
-}
 
 HWTEST_F(DeviceManagerNotifyTest, UnRegisterBindCallback_001, testing::ext::TestSize.Level0)
 {
@@ -1487,6 +1401,92 @@ HWTEST_F(DeviceManagerNotifyTest, OnServiceOnline_004, testing::ext::TestSize.Le
     size_t finalSize = DeviceManagerNotify::GetInstance().serviceStateCallback_.size();
     ASSERT_EQ(finalSize, 1);
     DeviceManagerNotify::GetInstance().serviceStateCallback_.clear();
+}
+} // namespace
+
+DmInitCallbackTest::DmInitCallbackTest(int &count) : DmInitCallback()
+{
+    count_ = &count;
+}
+void DmInitCallbackTest::OnRemoteDied()
+{
+    *count_ = *count_ + 1;
+}
+
+DeviceStateCallbackTest::DeviceStateCallbackTest(int &count) : DeviceStateCallback()
+{
+    count_ = &count;
+}
+
+void DeviceStateCallbackTest::OnDeviceOnline(const DmDeviceInfo &deviceInfo)
+{
+    *count_ = *count_ + 1;
+}
+
+void DeviceStateCallbackTest::OnDeviceReady(const DmDeviceInfo &deviceInfo)
+{
+    *count_ = *count_ + 1;
+}
+
+void DeviceStateCallbackTest::OnDeviceOffline(const DmDeviceInfo &deviceInfo)
+{
+    *count_ = *count_ + 1;
+}
+
+void DeviceStateCallbackTest::OnDeviceChanged(const DmDeviceInfo &deviceInfo)
+{
+    *count_ = *count_ + 1;
+}
+
+DiscoveryCallbackTest::DiscoveryCallbackTest(int &count) : DiscoveryCallback()
+{
+    count_ = &count;
+}
+
+void DiscoveryCallbackTest::OnDeviceFound(uint16_t subscribeId, const DmDeviceInfo &deviceInfo)
+{
+    *count_ = *count_ + 1;
+}
+
+void DiscoveryCallbackTest::OnDiscoveryFailed(uint16_t subscribeId, int32_t failedReason)
+{
+    *count_ = *count_ + 1;
+}
+
+void DiscoveryCallbackTest::OnDiscoverySuccess(uint16_t subscribeId)
+{
+    *count_ = *count_ + 1;
+}
+
+PublishCallbackTest::PublishCallbackTest(int &count) : PublishCallback()
+{
+    count_ = &count;
+}
+
+void PublishCallbackTest::OnPublishResult(int32_t publishId, int32_t failedReason)
+{
+    *count_ = *count_ + 1;
+}
+
+AuthenticateCallbackTest::AuthenticateCallbackTest(int &count) : AuthenticateCallback()
+{
+    count_ = &count;
+}
+
+void AuthenticateCallbackTest::OnAuthResult(const std::string &deviceId, const std::string &token, int32_t status,
+    int32_t reason)
+{
+    *count_ = *count_ + 1;
+}
+
+DeviceManagerFaCallbackTest::DeviceManagerFaCallbackTest(int &count) : DeviceManagerUiCallback()
+{
+    count_ = &count;
+}
+
+void DeviceManagerFaCallbackTest::OnCall(const std::string &paramJson)
+{
+    *count_ = *count_ + 1;
 }
 } // namespace DistributedHardware
 } // namespace OHOS
