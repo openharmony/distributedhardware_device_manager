@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -138,7 +138,7 @@ int32_t SoftbusPublish::StopPublishSoftbusLNN(int32_t publishId)
         LOGE("[SOFTBUS]StopPublishLNN failed, ret: %{public}d.", ret);
         return ERR_DM_STOP_PUBLISH_LNN_FAILED;
     }
-    LOGI("StopPublishLNN successed, ret: %{public}d.", ret);
+    LOGI("StopPublishLNN success, ret: %{public}d.", ret);
     return DM_OK;
 }
 } // namespace DistributedHardware
