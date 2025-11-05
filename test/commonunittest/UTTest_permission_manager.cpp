@@ -253,7 +253,8 @@ HWTEST_F(PermissionManagerTest, GetCallerProcessName_002, testing::ext::TestSize
     ASSERT_EQ(ret, DM_OK);
 
     EXPECT_CALL(*ipcSkeletonMock_, GetCallingTokenID()).WillOnce(Return(1001));
-    EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).WillOnce(Return(ATokenTypeEnum::TOKEN_TYPE_BUTT));
+    EXPECT_CALL(*accessTokenKitMock_, GetTokenTypeFlag(_)).Times(::testing::AtLeast(1))
+        .WillOnce(Return(ATokenTypeEnum::TOKEN_TYPE_BUTT));
     ret = PermissionManager::GetInstance().GetCallerProcessName(processName);
     ASSERT_EQ(ret, ERR_DM_FAILED);
 }
