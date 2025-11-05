@@ -76,15 +76,19 @@ static ffrt::mutex g_lockDeviceTrustedChange;
 static ffrt::mutex g_lockUserIdCheckSumChange;
 static ffrt::mutex g_credentialAuthStatus;
 static ffrt::mutex g_dmSoftbusEventQueueLock;
+static ffrt::mutex g_lockDeviceOnLine;
+static ffrt::mutex g_lockDeviceOffLine;
+static ffrt::mutex g_lockDevInfoChange;
+static ffrt::mutex g_lockDevScreenStatusChange;
 #else
 static std::mutex g_lockDeviceTrustedChange;
 static std::mutex g_credentialAuthStatus;
-#endif
 static std::mutex g_lockDeviceOnLine;
 static std::mutex g_lockDeviceOffLine;
 static std::mutex g_lockDevInfoChange;
-static std::mutex g_lockDeviceIdSet;
 static std::mutex g_lockDevScreenStatusChange;
+#endif
+static std::mutex g_lockDeviceIdSet;
 static std::map<std::string,
     std::vector<std::pair<ConnectionAddrType, std::shared_ptr<DeviceInfo>>>> discoveredDeviceMap;
 static std::map<std::string, std::shared_ptr<ISoftbusDiscoveringCallback>> lnnOpsCbkMap;
@@ -151,7 +155,11 @@ static IRefreshCallback softbusRefreshCallback_ = {
 
 void SoftbusListener::DeviceOnLine(DmDeviceInfo deviceInfo)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(g_lockDeviceOnLine);
+#else
     std::lock_guard<std::mutex> lock(g_lockDeviceOnLine);
+#endif
     LOGI("received device online deviceId: %{public}s, networkId: %{public}s.",
         GetAnonyString(deviceInfo.deviceId).c_str(), GetAnonyString(deviceInfo.networkId).c_str());
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_ONLINE, deviceInfo);
@@ -159,13 +167,21 @@ void SoftbusListener::DeviceOnLine(DmDeviceInfo deviceInfo)
 
 void SoftbusListener::DeviceOffLine(DmDeviceInfo deviceInfo)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(g_lockDeviceOffLine);
+#else
     std::lock_guard<std::mutex> lock(g_lockDeviceOffLine);
+#endif
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_STATE_OFFLINE, deviceInfo);
 }
 
 void SoftbusListener::DeviceNameChange(DmDeviceInfo deviceInfo)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(g_lockDevInfoChange);
+#else
     std::lock_guard<std::mutex> lock(g_lockDevInfoChange);
+#endif
     DeviceManagerService::GetInstance().HandleDeviceStatusChange(DEVICE_INFO_CHANGED, deviceInfo);
 }
 
@@ -201,7 +217,11 @@ void SoftbusListener::DeviceUserIdCheckSumChange(const std::string &msg)
 
 void SoftbusListener::DeviceScreenStatusChange(DmDeviceInfo deviceInfo)
 {
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(g_lockDevScreenStatusChange);
+#else
     std::lock_guard<std::mutex> lock(g_lockDevScreenStatusChange);
+#endif
     DeviceManagerService::GetInstance().HandleDeviceScreenStatusChange(deviceInfo);
 }
 
