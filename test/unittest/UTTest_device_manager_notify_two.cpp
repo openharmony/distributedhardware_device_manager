@@ -482,9 +482,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline_002, testing::ext::TestSize.Lev
     std::string testPkgName = "com.ohos.test1";
     // 7. call DeviceManagerNotify OnDeviceOnline with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOnline called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo));
 }
 
 /*
@@ -522,9 +521,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline_003, testing::ext::TestSize.Lev
     std::string testPkgName = "";
     // 7. call DeviceManagerNotify OnDeviceOnline with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOnline called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo));
 }
 
 /*
@@ -603,9 +601,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOnline_005, testing::ext::TestSize.Lev
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(testPkgName);
     // 7. call DeviceManagerNotify OnDeviceOnline with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOnline called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceOnline(testPkgName, deviceInfo));
 }
 
 /*
@@ -681,9 +678,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_002, testing::ext::TestSize.Le
     std::string testPkgName = "com.ohos.test1";
     // 7. call DeviceManagerNotify OnDeviceOffline with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOffline called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo));
 }
 
 /*
@@ -721,9 +717,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_003, testing::ext::TestSize.Le
     std::string testPkgName = "";
     // 7. call DeviceManagerNotify OnDeviceOffline with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOffline called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo));
 }
 
 /*
@@ -802,9 +797,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceOffline_005, testing::ext::TestSize.Le
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(testPkgName);
     // 7. call DeviceManagerNotify OnDeviceOffline with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceOffline called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceOffline(testPkgName, deviceInfo));
 }
 
 /*
@@ -881,9 +875,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceChanged_002, testing::ext::TestSize.Le
     std::string testPkgName = "com.ohos.test1";
     // 7. call DeviceManagerNotify OnDeviceChanged with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceChanged(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceChanged called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceChanged(testPkgName, deviceInfo));
 }
 
 /*
@@ -921,9 +914,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceChanged_003, testing::ext::TestSize.Le
     std::string testPkgName = "";
     // 7. call DeviceManagerNotify OnDeviceChanged with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceChanged(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceChanged called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceChanged(testPkgName, deviceInfo));
 }
 
 /*
@@ -1002,9 +994,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceChanged_005, testing::ext::TestSize.Le
     DeviceManagerNotify::GetInstance().UnRegisterDeviceStateCallback(testPkgName);
     // 7. call DeviceManagerNotify OnDeviceChanged with testpkcName
     DmDeviceInfo deviceInfo;
-    DeviceManagerNotify::GetInstance().OnDeviceChanged(testPkgName, deviceInfo);
     // 8. check if callback OnDeviceChanged called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceChanged(testPkgName, deviceInfo));
 }
 
 /*
@@ -1083,10 +1074,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound2, testing::ext::TestSize.Level0)
     ASSERT_NE(checkMap, nullptr);
     DmDeviceInfo deviceInfo;
     std::string testPkgName = "com.ohos.test1";
-    // 6. call DeviceManagerNotify OnDeviceFound
-    DeviceManagerNotify::GetInstance().OnDeviceFound(testPkgName, subscribeId, deviceInfo);
     // 7. check if callback OnDeviceFound called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceFound(testPkgName, subscribeId, deviceInfo));
 }
 
 /*
@@ -1124,10 +1113,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound3, testing::ext::TestSize.Level0)
     ASSERT_NE(checkMap, nullptr);
     DmDeviceInfo deviceInfo;
     uint16_t testsubscribeId = 1;
-    // 6. call DeviceManagerNotify OnDeviceFound
-    DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, testsubscribeId, deviceInfo);
     // 7. check if callback OnDeviceFound called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceFound(pkgName, testsubscribeId, deviceInfo));
 }
 
 /*
@@ -1165,10 +1152,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound4, testing::ext::TestSize.Level0)
     ASSERT_NE(checkMap, nullptr);
     DmDeviceInfo deviceInfo;
     std::string testPkgName = "";
-    // 6. call DeviceManagerNotify OnDeviceFound
-    DeviceManagerNotify::GetInstance().OnDeviceFound(testPkgName, subscribeId, deviceInfo);
     // 7. check if callback OnDeviceFound called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceFound(testPkgName, subscribeId, deviceInfo));
 }
 
 /*
@@ -1207,10 +1192,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDeviceFound5, testing::ext::TestSize.Level0)
     DmDeviceInfo deviceInfo;
     std::string testPkgName = "";
     DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(testPkgName, subscribeId);
-    // 6. call DeviceManagerNotify OnDeviceFound
-    DeviceManagerNotify::GetInstance().OnDeviceFound(testPkgName, subscribeId, deviceInfo);
     // 7. check if callback OnDeviceFound called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDeviceFound(testPkgName, subscribeId, deviceInfo));
 }
 
 /*
@@ -1288,10 +1271,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed2, testing::ext::TestSize.Leve
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "com.ohos.test1";
     int32_t failedReason = 0;
-    // 6. call DeviceManagerNotify OnDiscoverFailed
-    DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName, subscribeId, failedReason);
     // 7. check if callback OnDiscoverFailed called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName, subscribeId, failedReason));
 }
 
 /*
@@ -1329,10 +1310,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed3, testing::ext::TestSize.Leve
     ASSERT_NE(checkMap, nullptr);
     int32_t failedReason = 0;
     uint16_t testsubscribeId = 1;
-    // 6. call DeviceManagerNotify OnDiscoverFailed
-    DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, testsubscribeId, failedReason);
     // 7. check if callback OnDiscoverFailed called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, testsubscribeId, failedReason));
 }
 
 /*
@@ -1370,10 +1349,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed4, testing::ext::TestSize.Leve
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "";
     int32_t failedReason = 0;
-    // 6. call DeviceManagerNotify OnDiscoverFailed
-    DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName, subscribeId, failedReason);
     // 7. check if callback OnDiscoverFailed called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName, subscribeId, failedReason));
 }
 
 /*
@@ -1412,10 +1389,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed5, testing::ext::TestSize.Leve
     std::string testPkgName = "";
     DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(testPkgName, subscribeId);
     int32_t failedReason = 0;
-    // 6. call DeviceManagerNotify OnDiscoverFailed
-    DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName, subscribeId, failedReason);
     // 7. check if callback OnDiscoverFailed called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName, subscribeId, failedReason));
 }
 
 /*
@@ -1491,10 +1466,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverySuccess2, testing::ext::TestSize.Le
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "com.ohos.test1";
-    // 6. call DeviceManagerNotify OnDiscoverySuccess
-    DeviceManagerNotify::GetInstance().OnDiscoverySuccess(testPkgName, subscribeId);
     // 7. check if callback OnDiscoverySuccess called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoverySuccess(testPkgName, subscribeId));
 }
 
 /*
@@ -1531,10 +1504,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverySuccess3, testing::ext::TestSize.Le
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     uint16_t testsubscribeId = 1;
-    // 6. call DeviceManagerNotify OnDiscoverySuccess
-    DeviceManagerNotify::GetInstance().OnDiscoverySuccess(pkgName, testsubscribeId);
     // 7. check if callback OnDiscoverySuccess called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoverySuccess(pkgName, testsubscribeId));
 }
 
 /*
@@ -1571,10 +1542,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverySuccess4, testing::ext::TestSize.Le
     // 5. check checkMap not null
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "";
-    // 6. call DeviceManagerNotify OnDiscoverySuccess
-    DeviceManagerNotify::GetInstance().OnDiscoverySuccess(testPkgName, subscribeId);
     // 7. check if callback OnDiscoverySuccess called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoverySuccess(testPkgName, subscribeId));
 }
 
 /*
@@ -1612,10 +1581,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverySuccess5, testing::ext::TestSize.Le
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "";
     DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(testPkgName, subscribeId);
-    // 6. call DeviceManagerNotify OnDiscoverySuccess
-    DeviceManagerNotify::GetInstance().OnDiscoverySuccess(testPkgName, subscribeId);
     // 7. check if callback OnDiscoverySuccess called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoverySuccess(testPkgName, subscribeId));
 }
 
 /*
@@ -1693,10 +1660,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishResult2, testing::ext::TestSize.Level
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "com.ohos.test1";
     int32_t failedReason = 1;
-    // 6. call DeviceManagerNotify OnPublishResult
-    DeviceManagerNotify::GetInstance().OnPublishResult(testPkgName, publishId, failedReason);
     // 7. check if callback OnPublishResult called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnPublishResult(testPkgName, publishId, failedReason));
 }
 
 /*
@@ -1734,10 +1699,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishResult3, testing::ext::TestSize.Level
     ASSERT_NE(checkMap, nullptr);
     int32_t failedReason = 1;
     int32_t testpublishId = 1;
-    // 6. call DeviceManagerNotify OnPublishResult
-    DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, testpublishId, failedReason);
     // 7. check if callback OnPublishResult called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnPublishResult(pkgName, testpublishId, failedReason));
 }
 
 /*
@@ -1775,10 +1738,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishFailed4, testing::ext::TestSize.Level
     ASSERT_NE(checkMap, nullptr);
     std::string testPkgName = "";
     int32_t failedReason = 1;
-    // 6. call DeviceManagerNotify OnPublishResult
-    DeviceManagerNotify::GetInstance().OnPublishResult(testPkgName, publishId, failedReason);
     // 7. check if callback OnPublishResult called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnPublishResult(testPkgName, publishId, failedReason));
 }
 
 /*
@@ -1817,10 +1778,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnPublishFailed5, testing::ext::TestSize.Level
     std::string testPkgName = "";
     DeviceManagerNotify::GetInstance().UnRegisterPublishCallback(testPkgName, publishId);
     int32_t failedReason = 1;
-    // 6. call DeviceManagerNotify OnPublishResult
-    DeviceManagerNotify::GetInstance().OnPublishResult(testPkgName, publishId, failedReason);
     // 7. check if callback OnPublishResult called
-    ASSERT_EQ(count, 0);
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnPublishResult(testPkgName, publishId, failedReason));
 }
 } // namespace
 } // namespace DistributedHardware

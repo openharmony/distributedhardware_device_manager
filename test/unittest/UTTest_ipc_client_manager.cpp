@@ -219,7 +219,7 @@ HWTEST_F(IpcClientManagerTest, Init_004, testing::ext::TestSize.Level0)
     // 3. call Init with pkgName
     int32_t ret = instance->Init(pkgName);
     // 4. check ret is DEVICEMANAGER_OK
-    ASSERT_EQ(ret, ret);
+    ASSERT_NE(ret, DM_OK);
 }
 
 /**

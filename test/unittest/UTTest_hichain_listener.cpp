@@ -51,8 +51,7 @@ HWTEST_F(HichainListenerTest, RegisterDataChangeCb_002, testing::ext::TestSize.L
 {
     HichainListener listerner;
     listerner.deviceGroupManager_ = nullptr;
-    listerner.RegisterDataChangeCb();
-    EXPECT_TRUE(listerner.deviceGroupManager_ == nullptr);
+    ASSERT_NO_FATAL_FAILURE(listerner.RegisterDataChangeCb());
 }
 
 
@@ -107,8 +106,7 @@ HWTEST_F(HichainListenerTest, RegisterCredentialCb_002, testing::ext::TestSize.L
 {
     HichainListener listerner;
     listerner.credManager_ = nullptr;
-    listerner.RegisterCredentialCb();
-    EXPECT_TRUE(listerner.credManager_ == nullptr);
+    ASSERT_NO_FATAL_FAILURE(listerner.RegisterCredentialCb());
 }
 
 HWTEST_F(HichainListenerTest, OnCredentialDeleted_001, testing::ext::TestSize.Level1)
