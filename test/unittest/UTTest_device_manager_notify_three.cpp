@@ -351,7 +351,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnAuthResult3, testing::ext::TestSize.Level0)
     uint32_t status = 0;
     uint32_t reason = 0;
     // 7. check if callback OnDiscoverySuccess called
-    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnAuthResult(pkgName, testDeviceId, token, status, reason));
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnAuthResult(pkgName,
+        testDeviceId, token, status, reason));
 }
 
 /*
