@@ -1272,7 +1272,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed2, testing::ext::TestSize.Leve
     std::string testPkgName = "com.ohos.test1";
     int32_t failedReason = 0;
     // 7. check if callback OnDiscoverFailed called
-    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName, subscribeId, failedReason));
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName,
+        subscribeId, failedReason));
 }
 
 /*
