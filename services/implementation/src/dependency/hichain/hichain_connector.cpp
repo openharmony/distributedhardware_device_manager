@@ -687,6 +687,7 @@ int32_t HiChainConnector::DeleteGroupExt(std::string &groupId)
 
 int32_t HiChainConnector::DeleteGroupExt(int32_t userId, std::string &groupId)
 {
+    LOGI("userId: %{public}d, groupId: %{public}s", userId, GetAnonyString(groupId).c_str());
     int64_t requestId = GenRequestId();
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;
@@ -1165,6 +1166,31 @@ void HiChainConnector::DeleteAllGroup(int32_t userId)
     }
 }
 
+void HiChainConnector::DeleteAllGroup(int32_t userId, const std::string &remoteUdid)
+{
+    LOGI("userId: %{public}d, remoteUdid: %{public}s", userId, GetAnonyString(remoteUdid).c_str());
+    std::vector<GroupInfo> groupList;
+    GetRelatedGroups(userId, remoteUdid, groupList);
+    for (auto &iter : groupList) {
+        if (iter.groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+            continue;
+        }
+        if (DeleteGroup(userId, iter.groupId) != DM_OK) {
+            LOGE("Delete groupId %{public}s failed.", GetAnonyString(iter.groupId).c_str());
+        }
+    }
+    std::vector<GroupInfo> groupListExt;
+    GetRelatedGroupsExt(userId, remoteUdid, groupListExt);
+    for (auto &iter : groupListExt) {
+        if (iter.groupType == GROUP_TYPE_IDENTICAL_ACCOUNT_GROUP) {
+            continue;
+        }
+        if (DeleteGroupExt(userId, iter.groupId) != DM_OK) {
+            LOGE("DeleteGroupExt groupId %{public}s failed.", GetAnonyString(iter.groupId).c_str());
+        }
+    }
+}
+
 int32_t HiChainConnector::GetRelatedGroupsCommon(const std::string &deviceId, const char* pkgName,
     std::vector<GroupInfo> &groupList)
 {
@@ -1219,6 +1245,7 @@ int32_t HiChainConnector::DeleteGroup(const int32_t userId, std::string &groupId
         LOGE("user id failed");
         return ERR_DM_FAILED;
     }
+    LOGI("userId: %{public}d, groupId: %{public}s", userId, GetAnonyString(groupId).c_str());
     int64_t requestId = GenRequestId();
     JsonObject jsonObj;
     jsonObj[FIELD_GROUP_ID] = groupId;

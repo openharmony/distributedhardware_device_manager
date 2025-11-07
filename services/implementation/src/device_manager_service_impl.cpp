@@ -2221,7 +2221,7 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
             remoteAccountHash, offlineParam);
 
         CHECK_NULL_VOID(hiChainConnector_);
-        hiChainConnector_->DeleteAllGroup(item.second);
+        hiChainConnector_->DeleteAllGroup(item.second, remoteUdid);
         CHECK_NULL_VOID(hiChainAuthConnector_);
         {
             std::lock_guard lock(logoutMutex_);
