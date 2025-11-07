@@ -638,6 +638,9 @@ DmAuthStateType AuthSrcReverseUltrasonicDoneState::GetStateType()
 int32_t AuthSrcReverseUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcReverseUltrasonicDoneState::Action Start.");
+    if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
+        return STOP_BIND;
+    }
     context->timer->DeleteTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK));
     int32_t osAccountId = context->accesser.userId;
     auto ret = context->hiChainAuthConnector->AuthCredentialPinCode(osAccountId, context->requestId,
@@ -681,6 +684,9 @@ DmAuthStateType AuthSrcForwardUltrasonicDoneState::GetStateType()
 int32_t AuthSrcForwardUltrasonicDoneState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSrcForwardUltrasonicDoneState::Action Start.");
+    if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
+        return STOP_BIND;
+    }
     context->timer->StartTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK),
         GET_ULTRASONIC_PIN_TIMEOUT, [context] (std::string name) {
             LOGI("AuthSrcForwardUltrasonicDoneState timeout.");
@@ -730,6 +736,9 @@ DmAuthStateType AuthSinkReverseUltrasonicStartState::GetStateType()
 int32_t AuthSinkReverseUltrasonicStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkReverseUltrasonicStartState::Action Start.");
+    if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
+        return STOP_BIND;
+    }
     context->timer->StartTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK),
         GET_ULTRASONIC_PIN_TIMEOUT, [context] (std::string name) {
             LOGI("AuthSinkReverseUltrasonicStartState timeout.");
@@ -796,6 +805,9 @@ DmAuthStateType AuthSinkForwardUltrasonicStartState::GetStateType()
 int32_t AuthSinkForwardUltrasonicStartState::Action(std::shared_ptr<DmAuthContext> context)
 {
     LOGI("AuthSinkForwardUltrasonicStartState::Action Start.");
+    if (context->authType != AUTH_TYPE_PIN_ULTRASONIC) {
+        return STOP_BIND;
+    }
     context->timer->StartTimer(std::string(GET_ULTRASONIC_PIN_TIMEOUT_TASK),
         GET_ULTRASONIC_PIN_TIMEOUT, [context] (std::string name) {
             LOGI("AuthSinkForwardUltrasonicStartState timeout.");
