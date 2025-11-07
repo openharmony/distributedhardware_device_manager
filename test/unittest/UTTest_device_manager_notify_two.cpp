@@ -1311,7 +1311,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed3, testing::ext::TestSize.Leve
     int32_t failedReason = 0;
     uint16_t testsubscribeId = 1;
     // 7. check if callback OnDiscoverFailed called
-    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName, testsubscribeId, failedReason));
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(pkgName,
+        testsubscribeId, failedReason));
 }
 
 /*
@@ -1390,7 +1391,8 @@ HWTEST_F(DeviceManagerNotifyTest, OnDiscoverFailed5, testing::ext::TestSize.Leve
     DeviceManagerNotify::GetInstance().UnRegisterDiscoveryCallback(testPkgName, subscribeId);
     int32_t failedReason = 0;
     // 7. check if callback OnDiscoverFailed called
-    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName, subscribeId, failedReason));
+    ASSERT_NO_FATAL_FAILURE(DeviceManagerNotify::GetInstance().OnDiscoveryFailed(testPkgName,
+        subscribeId, failedReason));
 }
 
 /*
