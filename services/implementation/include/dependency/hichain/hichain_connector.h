@@ -220,6 +220,7 @@ public:
     int32_t addMultiMembersExt(const std::string &credentialInfo);
 
     void DeleteAllGroup(int32_t userId);
+    void DeleteAllGroup(int32_t userId, const std::string &remoteUdid);
     int32_t GetRelatedGroups(int32_t userId, const std::string &deviceId, std::vector<GroupInfo> &groupList);
     int32_t GetRelatedGroupsExt(const std::string &deviceId, std::vector<GroupInfo> &groupList);
     int32_t GetRelatedGroupsExt(int32_t userId, const std::string &deviceId, std::vector<GroupInfo> &groupList);
