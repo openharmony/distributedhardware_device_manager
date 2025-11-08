@@ -86,11 +86,8 @@ HWTEST_F(IpcClientStubTest, OnRemoteRequest_001, testing::ext::TestSize.Level0)
     sptr<IpcClientStub> instance(new IpcClientStub());
     // 3. call IpcClientStub OnRemoteRequest with parameter
     int32_t result = instance->OnRemoteRequest(code, data, reply, option);
-    if (result != DM_OK) {
-        result = ERR_DM_FAILED;
-    }
     // 4. check result is ERR_DM_FAILED
-    ASSERT_EQ(result, ERR_DM_FAILED);
+    ASSERT_NE(result, DM_OK);
 }
 
 /**
