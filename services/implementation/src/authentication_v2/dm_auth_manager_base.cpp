@@ -524,6 +524,7 @@ int32_t AuthManagerBase::EndDream()
         return ERR_DM_FAILED;
     }
 #if defined(SUPPORT_SCREENLOCK)
+    CHECK_NULL_RETURN(OHOS::ScreenLock::ScreenLockManager::GetInstance(), ERR_DM_FAILED);
     if (!OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked()) {
         LOGI("screen not locked");
         return DM_OK;

@@ -116,6 +116,7 @@ int32_t DmCredentialManager::RequestCredential(const std::string &reqJsonStr, st
     jsonObj[FIELD_USER_ID] = userId;
     jsonObj[FIELD_DEVICE_ID] = localDeviceId;
     std::string tmpStr = jsonObj.Dump();
+    CHECK_NULL_RETURN(hiChainConnector_, ERR_DM_POINT_NULL);
     return hiChainConnector_->getRegisterInfo(tmpStr.c_str(), returnJsonStr);
 }
 

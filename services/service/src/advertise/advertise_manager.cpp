@@ -63,7 +63,7 @@ int32_t AdvertiseManager::StartAdvertising(const std::string &pkgName,
     if (advertiseParam.find(PARAM_KEY_CUSTOM_DATA) != advertiseParam.end()) {
         customData = advertiseParam.find(PARAM_KEY_CUSTOM_DATA)->second;
     }
-
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     int32_t ret = softbusListener_->PublishSoftbusLNN(dmPubInfo, capability, customData);
     if (ret != DM_OK) {
         LOGE("failed, softbus publish lnn ret: %{public}d", ret);
@@ -138,6 +138,7 @@ int32_t AdvertiseManager::StopAdvertising(const std::string &pkgName, int32_t pu
         LOGE("Failed: cannot find pkgName in cache map.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    CHECK_NULL_RETURN(softbusListener_, ERR_DM_POINT_NULL);
     return softbusListener_->StopPublishSoftbusLNN(innerPublishId);
 }
 
@@ -203,6 +204,7 @@ void AdvertiseManager::ClearPublishIdCache(const std::string &pkgName)
         return;
     }
     LOGI("Begin for pkgName = %{public}s.", pkgName.c_str());
+    CHECK_NULL_VOID(softbusListener_);
     std::lock_guard<std::mutex> autoLock(pubMapLock_);
     for (auto iter : pkgName2PubIdMap_[pkgName]) {
         softbusListener_->StopPublishSoftbusLNN(iter.second);

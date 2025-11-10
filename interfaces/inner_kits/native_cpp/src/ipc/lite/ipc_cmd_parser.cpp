@@ -39,18 +39,24 @@ namespace DistributedHardware {
 void DecodeDmDeviceInfo(IpcIo &reply, DmDeviceInfo &devInfo)
 {
     size_t len = 0;
-    std::string deviceIdStr = (const char *)ReadString(&reply, &len);
+    uint8_t *deviceIdReadStr = ReadString(&reply, &len);
+    CHECK_NULL_VOID(deviceIdReadStr);
+    std::string deviceIdStr(reinterpret_cast<const char*>(deviceIdReadStr), len);
     if (strcpy_s(devInfo.deviceId, deviceIdStr.size() + 1, deviceIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceId failed!");
         return;
     }
-    std::string deviceNameStr = (const char *)ReadString(&reply, &len);
+    uint8_t *deviceNameReadStr = ReadString(&reply, &len);
+    CHECK_NULL_VOID(deviceNameReadStr);
+    std::string deviceNameStr(reinterpret_cast<const char*>(deviceNameReadStr), len);
     if (strcpy_s(devInfo.deviceName, deviceNameStr.size() + 1, deviceNameStr.c_str()) != DM_OK) {
         LOGE("strcpy_s deviceName failed!");
         return;
     }
     ReadUint16(&reply, &devInfo.deviceTypeId);
-    std::string networkIdStr = (const char *)ReadString(&reply, &len);
+    uint8_t *networkIdReadStr = ReadString(&reply, &len);
+    CHECK_NULL_VOID(networkIdReadStr);
+    std::string networkIdStr(reinterpret_cast<const char*>(networkIdReadStr), len);
     if (strcpy_s(devInfo.networkId, networkIdStr.size() + 1, networkIdStr.c_str()) != DM_OK) {
         LOGE("strcpy_s networkId failed!");
         return;
@@ -60,7 +66,10 @@ void DecodeDmDeviceInfo(IpcIo &reply, DmDeviceInfo &devInfo)
     int32_t authForm = 0;
     ReadInt32(&reply, &authForm);
     devInfo.authForm = (DmAuthForm)authForm;
-    devInfo.extraData = (const char *)ReadString(&reply, &len);
+    uint8_t *extraDataStr = ReadString(&reply, &len);
+    CHECK_NULL_VOID(extraDataStr);
+    std::string extraData(reinterpret_cast<const char*>(extraDataStr), len);
+    devInfo.extraData = extraData;
 }
 
 int32_t SetRspErrCode(IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
@@ -78,6 +87,7 @@ int32_t SetRspErrCode(IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 ON_IPC_SET_REQUEST(REGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcRegisterListenerReq> pReq = std::static_pointer_cast<IpcRegisterListenerReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     SvcIdentity svcIdentity = pReq->GetSvcIdentity();
@@ -99,6 +109,7 @@ ON_IPC_READ_RESPONSE(REGISTER_DEVICE_MANAGER_LISTENER, IpcIo &reply, std::shared
 ON_IPC_SET_REQUEST(UNREGISTER_DEVICE_MANAGER_LISTENER, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request,
                    uint8_t *buffer, size_t buffLen)
 {
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_POINT_NULL);
     std::string pkgName = pBaseReq->GetPkgName();
 
     IpcIoInit(&request, buffer, buffLen, 0);
@@ -114,6 +125,7 @@ ON_IPC_READ_RESPONSE(UNREGISTER_DEVICE_MANAGER_LISTENER, IpcIo &reply, std::shar
 ON_IPC_SET_REQUEST(GET_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcGetInfoByNetWorkReq> pReq =
         std::static_pointer_cast<IpcGetInfoByNetWorkReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
@@ -127,6 +139,7 @@ ON_IPC_SET_REQUEST(GET_DEVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, IpcIo &req
 
 ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcGetDeviceInfoRsp> pRsp =
         std::static_pointer_cast<IpcGetDeviceInfoRsp>(pBaseRsp);
     DmDeviceInfo deviceInfo;
@@ -141,6 +154,7 @@ ON_IPC_READ_RESPONSE(GET_DEVICE_INFO, IpcIo &reply, std::shared_ptr<IpcRsp> pBas
 ON_IPC_SET_REQUEST(GET_TRUST_DEVICE_LIST, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcGetTrustDeviceReq> req = std::static_pointer_cast<IpcGetTrustDeviceReq>(pBaseReq);
     std::string pkgName = req->GetPkgName();
     std::string extra = req->GetExtra();
@@ -153,6 +167,7 @@ ON_IPC_SET_REQUEST(GET_TRUST_DEVICE_LIST, std::shared_ptr<IpcReq> pBaseReq, IpcI
 
 ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcGetTrustDeviceRsp> pRsp = std::static_pointer_cast<IpcGetTrustDeviceRsp>(pBaseRsp);
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -175,6 +190,7 @@ ON_IPC_READ_RESPONSE(GET_TRUST_DEVICE_LIST, IpcIo &reply, std::shared_ptr<IpcRsp
 ON_IPC_SET_REQUEST(REQUEST_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     std::string requestJsonStr = pReq->GetCredentialParam();
@@ -187,6 +203,7 @@ ON_IPC_SET_REQUEST(REQUEST_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, IpcIo &
 
 ON_IPC_READ_RESPONSE(REQUEST_CREDENTIAL, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -201,6 +218,7 @@ ON_IPC_READ_RESPONSE(REQUEST_CREDENTIAL, IpcIo &reply, std::shared_ptr<IpcRsp> p
 ON_IPC_SET_REQUEST(SERVER_GET_DMFA_INFO, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     std::string reqJsonStr = pReq->GetCredentialParam();
@@ -213,6 +231,7 @@ ON_IPC_SET_REQUEST(SERVER_GET_DMFA_INFO, std::shared_ptr<IpcReq> pBaseReq, IpcIo
 
 ON_IPC_READ_RESPONSE(SERVER_GET_DMFA_INFO, IpcIo &reply, std::shared_ptr<IpcRsp> pBaseRsp)
 {
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcSetCredentialRsp> pRsp = std::static_pointer_cast<IpcSetCredentialRsp>(pBaseRsp);
     int32_t ret = 0;
     ReadInt32(&reply, &ret);
@@ -227,6 +246,7 @@ ON_IPC_READ_RESPONSE(SERVER_GET_DMFA_INFO, IpcIo &reply, std::shared_ptr<IpcRsp>
 ON_IPC_SET_REQUEST(IMPORT_CREDENTIAL, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcSetCredentialReq> pReq = std::static_pointer_cast<IpcSetCredentialReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     std::string credentialInfo = pReq->GetCredentialParam();
@@ -289,7 +309,9 @@ ON_IPC_READ_RESPONSE(DELETE_CREDENTIAL, IpcIo &reply, std::shared_ptr<IpcRsp> pB
 ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, IpcIo &reply)
 {
     size_t len = 0;
-    std::string pkgName = (const char *)ReadString(&reply, &len);
+    uint8_t *str = ReadString(&reply, &len);
+    CHECK_NULL_VOID(str);
+    std::string pkgName(reinterpret_cast<const char*>(str), len);
     int32_t state = 0;
     ReadInt32(&reply, &state);
     DmDeviceState deviceState = static_cast<DmDeviceState>(state);
@@ -314,7 +336,9 @@ ON_IPC_CMD(SERVER_DEVICE_STATE_NOTIFY, IpcIo &reply)
 ON_IPC_CMD(SERVER_DEVICE_FOUND, IpcIo &reply)
 {
     size_t len = 0;
-    std::string pkgName = (const char *)ReadString(&reply, &len);
+    uint8_t *str = ReadString(&reply, &len);
+    CHECK_NULL_VOID(str);
+    std::string pkgName(reinterpret_cast<const char*>(str), len);
     uint16_t subscribeId = 0;
     ReadUint16(&reply, &subscribeId);
     DmDeviceInfo deviceInfo;
@@ -325,7 +349,9 @@ ON_IPC_CMD(SERVER_DEVICE_FOUND, IpcIo &reply)
 ON_IPC_CMD(SERVER_DISCOVER_FINISH, IpcIo &reply)
 {
     size_t len = 0;
-    std::string pkgName = (const char *)ReadString(&reply, &len);
+    uint8_t *str = ReadString(&reply, &len);
+    CHECK_NULL_VOID(str);
+    std::string pkgName(reinterpret_cast<const char*>(str), len);
     uint16_t subscribeId = 0;
     ReadUint16(&reply, &subscribeId);
     int32_t failedReason = 0;
@@ -345,6 +371,7 @@ ON_IPC_CMD(SERVER_DISCOVER_FINISH, IpcIo &reply)
 ON_IPC_SET_REQUEST(SYNC_CALLBACK, std::shared_ptr<IpcReq> pBaseReq, IpcIo &request, uint8_t *buffer,
                    size_t buffLen)
 {
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_POINT_NULL);
     std::shared_ptr<IpcSyncCallbackReq> pReq = std::static_pointer_cast<IpcSyncCallbackReq>(pBaseReq);
     std::string pkgName = pReq->GetPkgName();
     int32_t dmCommonNotifyEvent = pReq->GetDmCommonNotifyEvent();

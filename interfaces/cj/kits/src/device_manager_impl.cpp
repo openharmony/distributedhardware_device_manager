@@ -142,6 +142,7 @@ void InsertJsonParamesToMap(JsonObject &bindParamObj, std::map<std::string, std:
 
 DeviceManagerFfiImpl::DeviceManagerFfiImpl(const std::string &bundleName, int32_t *errCode) : bundleName_(bundleName)
 {
+    CHECK_NULL_VOID(errCode);
     *errCode = StringCheck(bundleName);
     if (*errCode != 0) {
         LOGE("CreateDeviceManager for bundleName %{public}s failed, ret %{public}d.", bundleName_.c_str(), *errCode);
