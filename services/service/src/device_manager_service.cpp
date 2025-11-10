@@ -116,6 +116,9 @@ DeviceManagerService::~DeviceManagerService()
     UnloadDMServiceImplSo();
     UnloadDMServiceAdapterResident();
     UnloadDMDeviceRiskDetect();
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
+    UnloadDmCheckApiWhiteListSo();
+#endif
 }
 
 int32_t DeviceManagerService::Init()
@@ -607,6 +610,17 @@ bool DeviceManagerService::IsCallerInWhiteList()
         return false;
     }
     return dmCheckApiWhiteList_->IsCallerInWhiteList(callerName, GET_LOCAL_DEVICE_NAME_API_NAME);
+}
+
+void DeviceManagerService::UnloadDmCheckApiWhiteListSo()
+{
+    LOGI("Start.");
+    std::lock_guard<std::mutex> lock(isAdapterCheckApiWhiteListLoadedLock_);
+    if (checkApiWhiteListSoHandle_ != nullptr) {
+        LOGI("checkApiWhiteListSoHandle_ is not nullptr.");
+        dlclose(checkApiWhiteListSoHandle_);
+        checkApiWhiteListSoHandle_ = nullptr;
+    }
 }
 
 bool DeviceManagerService::IsDMAdapterCheckApiWhiteListLoaded()
@@ -1372,18 +1386,19 @@ bool DeviceManagerService::IsDMServiceImplReady()
         return true;
     }
     LOGI("libdevicemanagerserviceimpl start load.");
-    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
-    if (so_handle == nullptr) {
-        so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
+    dmServiceImplSoHandle_ = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
+    if (dmServiceImplSoHandle_ == nullptr) {
+        dmServiceImplSoHandle_ = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NODELETE);
     }
-    if (so_handle == nullptr) {
+    if (dmServiceImplSoHandle_ == nullptr) {
         LOGE("load libdevicemanagerserviceimpl so failed, errMsg: %{public}s.", dlerror());
         return false;
     }
     dlerror();
-    auto func = (CreateDMServiceFuncPtr)dlsym(so_handle, "CreateDMServiceObject");
+    auto func = (CreateDMServiceFuncPtr)dlsym(dmServiceImplSoHandle_, "CreateDMServiceObject");
     if (dlerror() != nullptr || func == nullptr) {
-        dlclose(so_handle);
+        dlclose(dmServiceImplSoHandle_);
+        dmServiceImplSoHandle_ = nullptr;
         LOGE("Create object function is not exist.");
         return false;
     }
@@ -1628,10 +1643,10 @@ void DeviceManagerService::UnloadDMServiceImplSo()
     if (dmServiceImpl_ != nullptr) {
         dmServiceImpl_->Release();
     }
-    void *so_handle = dlopen(LIB_IMPL_NAME, RTLD_NOW | RTLD_NOLOAD);
-    if (so_handle != nullptr) {
+    if (dmServiceImplSoHandle_ != nullptr) {
         LOGI("DeviceManagerService so_handle is not nullptr.");
-        dlclose(so_handle);
+        dlclose(dmServiceImplSoHandle_);
+        dmServiceImplSoHandle_ = nullptr;
     }
 }
 

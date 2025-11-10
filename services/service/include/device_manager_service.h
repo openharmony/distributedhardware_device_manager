@@ -425,6 +425,7 @@ private:
         const std::string &accountIdHash, const std::string &accountName, int32_t userId);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     bool IsCallerInWhiteList();
+    void UnloadDmCheckApiWhiteListSo();
     bool IsDMAdapterCheckApiWhiteListLoaded();
 #endif
     bool GetAccessUdidByNetworkId(const std::string &srcNetWorkId, std::string &srcUdid,
@@ -446,6 +447,7 @@ private:
     bool isDeviceRiskDetectSoLoaded_ = false;
     void *residentSoHandle_ = nullptr;
     void *deviceRiskDetectSoHandle_ = nullptr;
+    void *dmServiceImplSoHandle_ = nullptr;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex isImplLoadLock_;
     ffrt::mutex isAdapterResidentLoadLock_;
