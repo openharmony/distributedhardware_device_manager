@@ -68,7 +68,7 @@ AbilityStatus DmAbilityManager::StartAbility(const std::string &params)
     if (!appOperationStr.empty()) {
         want.SetParam(APP_OPERATION, appOperationStr);
     }
-
+    CHECK_NULL_RETURN(AAFwk::AbilityManagerClient::GetInstance(), AbilityStatus::ABILITY_STATUS_FAILED);
     AAFwk::AbilityManagerClient::GetInstance()->Connect();
     ErrCode result = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (result != 0) {

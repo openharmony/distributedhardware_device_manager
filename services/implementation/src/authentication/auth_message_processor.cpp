@@ -435,6 +435,7 @@ void AuthMessageProcessor::ParsePublicKeyMessageExt(JsonObject &json)
 void AuthMessageProcessor::ParseAuthResponseMessageExt(JsonObject &json)
 {
     LOGI("start");
+    CHECK_NULL_VOID(authResponseContext_);
     if (IsInt32(json, TAG_REPLY)) {
         authResponseContext_->reply = json[TAG_REPLY].Get<int32_t>();
     }

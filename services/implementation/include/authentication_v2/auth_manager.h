@@ -111,7 +111,6 @@ public:
     // Internal API begin
     void SetAuthContext(std::shared_ptr<DmAuthContext> context);
     std::shared_ptr<DmAuthContext> GetAuthContext();
-    static bool IsHmlSessionType(const std::string &sessionType);
     void GetBindTargetParams(std::string &pkgName, PeerTargetId &targetId,
         std::map<std::string, std::string> &bindParam);
     void GetAuthCodeAndPkgName(std::string &pkgName, std::string &authCode);

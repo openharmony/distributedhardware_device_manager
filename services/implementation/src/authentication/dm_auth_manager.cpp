@@ -374,19 +374,23 @@ int32_t DmAuthManager::AuthenticateDevice(const std::string &pkgName, int32_t au
     int32_t ret = CheckAuthParamVaild(pkgName, authType, deviceId, extra);
     if (ret != DM_OK) {
         LOGE("DmAuthManager::AuthenticateDevice failed, param is invaild.");
+        CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
         listener_->OnBindResult(processInfo_, peerTargetId_, ret, STATUS_DM_AUTH_DEFAULT, "");
         return ret;
     }
     ret = CheckAuthParamVaildExtra(extra, deviceId);
     if (ret != DM_OK) {
         LOGE("CheckAuthParamVaildExtra failed, param is invaild.");
+        CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
         listener_->OnBindResult(processInfo_, peerTargetId_, ret, STATUS_DM_AUTH_DEFAULT, "");
         return ret;
     }
     isAuthenticateDevice_ = true;
     if (authType == AUTH_TYPE_CRE) {
         LOGI("DmAuthManager::AuthenticateDevice for credential type, joinLNN directly.");
+        CHECK_NULL_RETURN(softbusConnector_, ERR_DM_POINT_NULL);
         softbusConnector_->JoinLnn(deviceId, true);
+        CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
         listener_->OnAuthResult(processInfo_, peerTargetId_.deviceId, "", STATUS_DM_AUTH_DEFAULT, DM_OK);
         listener_->OnBindResult(processInfo_, peerTargetId_, DM_OK, STATUS_DM_AUTH_DEFAULT, "");
     }
@@ -500,6 +504,7 @@ int32_t DmAuthManager::UnBindDevice(const std::string &pkgName, const std::strin
 void DmAuthManager::GetPeerUdidHash(int32_t sessionId, std::string &peerUdidHash)
 {
     CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     std::string peerUdid = "";
     int32_t ret = softbusConnector_->GetSoftbusSession()->GetPeerDeviceId(sessionId, peerUdid);
     if (ret != DM_OK) {
@@ -558,13 +563,13 @@ void DmAuthManager::OnSessionOpened(int32_t sessionId, int32_t sessionSide, int3
             authResponseContext->reply = ERR_DM_AUTH_BUSINESS_BUSY;
             authMessageProcessor->SetResponseContext(authResponseContext);
             std::string message = authMessageProcessor->CreateSimpleMessage(MSG_TYPE_REQ_AUTH_TERMINATE);
+            CHECK_NULL_VOID(softbusConnector_);
             softbusConnector_->GetSoftbusSession()->SendData(sessionId, message);
             softbusConnector_->GetSoftbusSession()->CloseAuthSession(sessionId);
         }
     } else {
-        if (authResponseState_ == nullptr && authRequestState_ != nullptr &&
+        if (authResponseState_ == nullptr && authRequestState_ != nullptr && authRequestContext_ != nullptr &&
             authRequestState_->GetStateType() == AuthState::AUTH_REQUEST_INIT) {
-            CHECK_NULL_VOID(authRequestContext_);
             authRequestContext_->sessionId = sessionId;
             authResponseContext_->sessionId = sessionId;
             authMessageProcessor_->SetRequestContext(authRequestContext_);
@@ -769,6 +774,7 @@ void DmAuthManager::OnGroupCreated(int64_t requestId, const std::string &groupId
     LOGI("DmAuthManager::OnGroupCreated start group id %{public}s", GetAnonyString(groupId).c_str());
     CHECK_NULL_VOID(authMessageProcessor_);
     CHECK_NULL_VOID(softbusConnector_);
+    CHECK_NULL_VOID(softbusConnector_->GetSoftbusSession());
     if (groupId == "{}") {
         authResponseContext_->reply = ERR_DM_CREATE_GROUP_FAILED;
         authMessageProcessor_->SetResponseContext(authResponseContext_);
@@ -2422,15 +2428,15 @@ int32_t DmAuthManager::ImportCredential(std::string &deviceId, std::string &publ
     int32_t osAccountId = MultipleUserConnector::GetCurrentAccountUserID();
     if ((authRequestState_ != nullptr) && (authResponseState_ == nullptr)) {
         // Source Import Credential
-        LOGI("Source Import Credential remoteUserId: %{public}d", authRequestContext_->remoteUserId);
         CHECK_NULL_RETURN(authRequestContext_, ERR_DM_POINT_NULL);
+        LOGI("Source Import Credential remoteUserId: %{public}d", authRequestContext_->remoteUserId);
         CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
         return hiChainAuthConnector_->ImportCredential(osAccountId, authRequestContext_->remoteUserId, deviceId,
             publicKey);
     } else if ((authResponseState_ != nullptr) && (authRequestState_ == nullptr)) {
         // Sink Import Credential
-        LOGI("Source Import Credential remoteUserId: %{public}d", authResponseContext_->remoteUserId);
         CHECK_NULL_RETURN(authResponseContext_, ERR_DM_POINT_NULL);
+        LOGI("Source Import Credential remoteUserId: %{public}d", authResponseContext_->remoteUserId);
         CHECK_NULL_RETURN(hiChainAuthConnector_, ERR_DM_POINT_NULL);
         return hiChainAuthConnector_->ImportCredential(osAccountId, authResponseContext_->remoteUserId, deviceId,
             publicKey);
@@ -3126,6 +3132,7 @@ bool DmAuthManager::IsScreenLocked()
 {
     bool isLocked = false;
 #if defined(SUPPORT_SCREENLOCK)
+    CHECK_NULL_RETURN(OHOS::ScreenLock::ScreenLockManager::GetInstance(), isLocked);
     isLocked = OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
 #endif
     LOGI("IsScreenLocked isLocked: %{public}d.", isLocked);

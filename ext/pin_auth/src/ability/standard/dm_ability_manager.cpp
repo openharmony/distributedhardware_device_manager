@@ -22,6 +22,7 @@ namespace OHOS {
 namespace DistributedHardware {
 AbilityStatus DmAbilityManager::StartAbility(AAFwk::Want &want)
 {
+    CHECK_NULL_RETURN(AAFwk::AbilityManagerClient::GetInstance(), AbilityStatus::ABILITY_STATUS_FAILED);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->Connect();
     if (ret != 0) {
         LOGE("Connect Ability failed, error value = %{public}d", (int32_t)ret);

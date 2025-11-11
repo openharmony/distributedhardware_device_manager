@@ -363,6 +363,7 @@ int32_t DeviceManagerService::InitDMServiceListener()
         pinHolder_ = std::make_shared<PinHolder>(listener_);
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    CHECK_NULL_RETURN(DMCommTool::GetInstance(), ERR_DM_POINT_NULL);
     DMCommTool::GetInstance()->Init();
     int32_t currentUserId = MultipleUserConnector::GetFirstForegroundUserId();
     if (IsPC() && !MultipleUserConnector::IsUserUnlocked(currentUserId)) {
@@ -2333,12 +2334,14 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenNickChange();
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_STOPPED && IsPC()) {
+        CHECK_NULL_VOID(DMCommTool::GetInstance());
         DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
             [this, commonEventType] () {
                 DeviceManagerService::HandleAccountCommonEvent(commonEventType);
             });
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_UNLOCKED && IsPC()) {
         DeviceNameManager::GetInstance().AccountSysReady(beforeUserId);
+        CHECK_NULL_VOID(DMCommTool::GetInstance());
         DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
             [this, commonEventType] () {
                 DeviceManagerService::HandleAccountCommonEvent(commonEventType);
@@ -2547,6 +2550,7 @@ int32_t DeviceManagerService::SendAccountCommonEventByWifi(const std::string &ne
     for (auto const &u : backgroundUserIds) {
         backgroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
     }
+    CHECK_NULL_RETURN(DMCommTool::GetInstance(), ERR_DM_POINT_NULL);
     return DMCommTool::GetInstance()->SendUserIds(networkId, foregroundUserIdsUInt, backgroundUserIdsUInt);
 }
 
@@ -3325,6 +3329,7 @@ void DeviceManagerService::ProcessCheckSumByWifi(std::string networkId, std::vec
     for (auto const &u : backgroundUserIds) {
         backgroundUserIdsUInt.push_back(static_cast<uint32_t>(u));
     }
+    CHECK_NULL_VOID(DMCommTool::GetInstance());
     DMCommTool::GetInstance()->SendUserIds(networkId, foregroundUserIdsUInt, backgroundUserIdsUInt);
 }
 
@@ -3710,6 +3715,7 @@ int32_t DeviceManagerService::SendUninstAppByWifi(int32_t userId, int32_t tokenI
 {
     LOGE("DeviceManagerService::SendUninstAppByWifi userId: %{public}s, tokenId: %{public}s",
         GetAnonyInt32(userId).c_str(), GetAnonyInt32(tokenId).c_str());
+    CHECK_NULL_RETURN(DMCommTool::GetInstance(), ERR_DM_POINT_NULL);
     return DMCommTool::GetInstance()->SendUninstAppObj(userId, tokenId, networkId);
 }
 
@@ -3717,6 +3723,7 @@ int32_t DeviceManagerService::SendUnBindAppByWifi(int32_t userId, int32_t tokenI
     const std::string &networkId, const std::string &udid)
 {
     LOGE("DeviceManagerService::SendUnBindAppByWifi");
+    CHECK_NULL_RETURN(DMCommTool::GetInstance(), ERR_DM_POINT_NULL);
     return DMCommTool::GetInstance()->SendUnBindAppObj(userId, tokenId, extra, networkId, udid);
 }
 
@@ -3914,6 +3921,7 @@ void DeviceManagerService::NotifyRemoteLocalUserStopByWifi(const std::string &lo
     for (const auto &it : wifiDevices) {
         std::vector<std::string> updateUdids;
         updateUdids.push_back(it.first);
+        CHECK_NULL_VOID(DMCommTool::GetInstance());
         int32_t result = DMCommTool::GetInstance()->SendUserStop(it.second, stopUserId);
         if (result != DM_OK) {
             LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
@@ -4241,6 +4249,7 @@ void DeviceManagerService::NotifyRemoteLocalLogout(const std::vector<std::string
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     for (const auto &it : wifiDevices) {
+        CHECK_NULL_VOID(DMCommTool::GetInstance());
         int32_t ret = DMCommTool::GetInstance()->SendLogoutAccountInfo(it, accountIdHash, userId);
         if (ret != DM_OK) {
             LOGE("Send LogoutAccount Info error, ret = %{public}d", ret);
@@ -4428,6 +4437,7 @@ void DeviceManagerService::HandleUserSwitchEventCallback(const std::string &comm
     DeviceProfileConnector::GetInstance().DeleteDpInvalidAcl();
     DeviceNameManager::GetInstance().InitDeviceNameWhenUserSwitch(currentUserId, beforeUserId);
     MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
+    CHECK_NULL_VOID(DMCommTool::GetInstance());
     DMCommTool::GetInstance()->StartCommonEvent(commonEventType,
         [this, commonEventType] () {
             DeviceManagerService::HandleAccountCommonEvent(commonEventType);

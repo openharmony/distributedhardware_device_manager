@@ -311,7 +311,7 @@ void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, c
     std::string name21 = GetLocalDisplayDeviceName(prefixName, suffixName, NUM21);
     std::string name24 = GetLocalDisplayDeviceName(prefixName, suffixName, NUM24);
     cJSON *root = cJSON_CreateObject();
-    if (root == NULL) {
+    if (root == nullptr) {
         LOGE("cJSON_CreateObject fail!");
         return;
     }
@@ -321,7 +321,7 @@ void DeviceNameManager::InitDeviceNameToSoftBus(const std::string &prefixName, c
     cJSON_AddStringToObject(root, SOFTBUS_NAME_24_JSON_KEY, name24.c_str());
     char *jsonChar = cJSON_PrintUnformatted(root);
     cJSON_Delete(root);
-    if (jsonChar == NULL) {
+    if (jsonChar == nullptr) {
         LOGE("cJSON_PrintUnformatted fail!");
         return;
     }

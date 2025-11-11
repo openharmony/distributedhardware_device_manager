@@ -105,6 +105,7 @@ bool DmAuthState::IsScreenLocked()
 {
     bool isLocked = false;
 #if defined(SUPPORT_SCREENLOCK)
+    CHECK_NULL_RETURN(OHOS::ScreenLock::ScreenLockManager::GetInstance(), isLocked);
     isLocked = OHOS::ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
 #endif
     LOGI("IsScreenLocked isLocked: %{public}d.", isLocked);
