@@ -34,19 +34,8 @@ public:
         serviceRegInfo_ = serviceRegInfo;
     }
 
-    int32_t GetRegServiceId() const
-    {
-        return regServiceId_;
-    }
-
-    void SetRegServiceId(int32_t regServiceId)
-    {
-        regServiceId_ = regServiceId;
-    }
-
 private:
     ServiceRegInfo serviceRegInfo_;
-    int32_t regServiceId_ = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

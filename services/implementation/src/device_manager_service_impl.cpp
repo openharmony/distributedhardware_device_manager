@@ -3247,15 +3247,17 @@ int32_t DeviceManagerServiceImpl::BindServiceTarget(const std::string &pkgName, 
 int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName, int64_t serviceId)
 {
     if (pkgName.empty()) {
-        LOGE("UnbindServiceTarget failed, pkgName is empty.");
+        LOGE("failed, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     int64_t tokenIdCaller = IPCSkeleton::GetCallingTokenID();
     std::string peerDeviceId = "";
     int32_t bindLevel = -1;
+    LOGI("start pkgName:%{public}s, serviceId:%{public}" PRId64 ", tokenId:%{public}" PRId64,
+        pkgName.c_str(), serviceId, tokenIdCaller);
     int32_t ret = DeleteAclExtraDataServiceId(serviceId, tokenIdCaller, peerDeviceId, bindLevel);
     if (ret != DM_OK) {
-        LOGE("UnbindServiceTarget failed, DeleteAclExtraDataServiceId failed.");
+        LOGE("failed, DeleteAclExtraDataServiceId failed.");
         return ret;
     }
 
@@ -3264,17 +3266,17 @@ int32_t DeviceManagerServiceImpl::UnbindServiceTarget(const std::string &pkgName
     MultipleUserConnector::GetCallerUserId(userId);
     ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfoProfile);
     if (ret != DM_OK) {
-        LOGE("UnbindServiceTarget failed, GetServiceInfoProfileByServiceId failed.");
+        LOGE("failed, GetServiceInfoProfileByServiceId failed.");
         return ret;
     }
     ret = DeviceProfileConnector::GetInstance().DeleteServiceInfoProfile(serviceInfoProfile.regServiceId, userId);
     if (ret != DM_OK) {
-        LOGE("UnbindServiceTarget failed, DeleteServiceInfoProfile failed.");
+        LOGE("failed, DeleteServiceInfoProfile failed.");
         return ret;
     }
     ret = UnBindDevice(pkgName, peerDeviceId, bindLevel);
     if (ret != DM_OK) {
-        LOGE("UnbindServiceTarget failed, UnBindDevice failed.");
+        LOGE("failed, UnBindDevice failed.");
         return ret;
     }
     return DM_OK;
@@ -3292,16 +3294,19 @@ int32_t DeviceManagerServiceImpl::DeleteAclExtraDataServiceId(int64_t serviceId,
     for (auto &item : profiles) {
         std::string extraData = item.GetExtraData();
         if (extraData.empty()) {
+            LOGW("extraData empty.");
             continue;
         }
         JsonObject json;
         json.Parse(extraData);
         if (json.IsDiscarded()) {
+            LOGW("extraData invalid.");
             continue;
         }
         if (IsInt64(json, TAG_SERVICE_ID)) {
             int64_t aclServiceId = json[TAG_SERVICE_ID].Get<int64_t>();
             if (aclServiceId != serviceId) {
+                LOGW("aclServiceId(%{public}" PRId64 ") != serviceId(%{public}" PRId64 ").", aclServiceId, serviceId);
                 continue;
             }
         }

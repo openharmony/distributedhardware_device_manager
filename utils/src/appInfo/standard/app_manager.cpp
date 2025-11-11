@@ -339,23 +339,5 @@ int32_t AppManager::GetBundleNameForSelf(std::string &bundleName)
     bundleName = bundleInfo.name;
     return DM_OK;
 }
-
-DM_EXPORT ServiceInfoProfile AppManager::CreateServiceInfoProfile(const PublishServiceParam &publishServiceParam,
-    const int32_t &userId)
-{
-    char localDeviceId[DEVICE_UUID_LENGTH] = {0};
-    GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
-    ServiceInfoProfile serviceInfoProfile;
-    serviceInfoProfile.regServiceId = publishServiceParam.regServiceId;
-    serviceInfoProfile.deviceId = localDeviceId;
-    serviceInfoProfile.userId = userId;
-    serviceInfoProfile.tokenId = IPCSkeleton::GetCallingTokenID();
-    serviceInfoProfile.publishState = SERVICE_PUBLISHED_STATE;
-    serviceInfoProfile.serviceId = publishServiceParam.serviceInfo.serviceId;
-    serviceInfoProfile.serviceType = publishServiceParam.serviceInfo.serviceType;
-    serviceInfoProfile.serviceName = publishServiceParam.serviceInfo.serviceName;
-    serviceInfoProfile.serviceDisplayName = publishServiceParam.serviceInfo.serviceDisplayName;
-    return serviceInfoProfile;
-}
 } // namespace DistributedHardware
 } // namespace OHOS

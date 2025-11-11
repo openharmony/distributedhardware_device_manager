@@ -2404,11 +2404,6 @@ ON_IPC_SET_REQUEST(START_PUBLISH_SERVICE, std::shared_ptr<IpcReq> pBaseReq, Mess
         LOGE("write publishServiceParam failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
-    int64_t serviceId = pReq->GetServiceId();
-    if (!data.WriteInt64(serviceId)) {
-        LOGE("write GetServiceId failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
     std::string pkgName = pReq->GetPkgName();
     if (!data.WriteString(pkgName)) {
         LOGE("write pkgName failed");
@@ -2454,11 +2449,6 @@ ON_IPC_SET_REQUEST(REGISTER_SERVICE_INFO, std::shared_ptr<IpcReq> pBaseReq, Mess
     const ServiceRegInfo serviceRegInfo = pReq->GetServiceRegInfo();
     if (!IpcModelCodec::EncodeServiceRegInfo(serviceRegInfo, data)) {
         LOGE("write serviceRegInfo failed");
-        return ERR_DM_IPC_WRITE_FAILED;
-    }
-    int32_t regServiceId = pReq->GetRegServiceId();
-    if (!data.WriteInt32(regServiceId)) {
-        LOGE("write regServiceId failed");
         return ERR_DM_IPC_WRITE_FAILED;
     }
     return DM_OK;

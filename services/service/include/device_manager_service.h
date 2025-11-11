@@ -437,7 +437,8 @@ private:
     int32_t UpdateServiceInfo(int64_t serviceId);
     int32_t GenerateServiceId(int64_t &serviceId);
     int32_t ConvertServiceInfoProfileByRegInfo(const ServiceRegInfo &serviceRegInfo,
-        ServiceInfoProfile &serviceInfoProfile);
+        ServiceInfoProfile &serviceInfoProfile, int64_t tokenId);
+    int32_t CheckServiceHasRegistered(const ServiceRegInfo &serviceRegInfo, int64_t tokenId, int32_t &regServiceId);
     int32_t GenerateRegServiceId(int32_t &regServiceId);
 #endif
 

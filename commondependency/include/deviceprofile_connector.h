@@ -22,10 +22,11 @@
 #include "dm_device_info.h"
 #include "dm_single_instance.h"
 #include "i_dp_inited_callback.h"
+#include "json_object.h"
 #include "local_service_info.h"
 #include "parameter.h"
+#include "service_info_profile_new.h"
 #include "trusted_device_info.h"
-#include "json_object.h"
 
 enum AllowAuthType {
     ALLOW_AUTH_ONCE = 1,
@@ -232,11 +233,12 @@ public:
     DM_EXPORT DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, const std::string &localUdid, int32_t peerTokenId);
     DM_EXPORT int32_t GetServiceInfoProfileByServiceId(int64_t serviceId, ServiceInfoProfile &serviceInfoProfile);
+    DM_EXPORT int32_t GetServiceInfoProfileByRegServiceId(int32_t regServiceId, ServiceInfoProfile &serviceInfoProfile);
+    DM_EXPORT int32_t GetServiceInfoProfileByTokenId(int64_t tokenId, std::vector<ServiceInfoProfile> &serviceInfos);
     DM_EXPORT int32_t PutServiceInfoProfile(const ServiceInfoProfile &serviceInfoProfile);
     DM_EXPORT int32_t DeleteServiceInfoProfile(int32_t regServiceId, int32_t userId);
     DM_EXPORT void GetRemoteTokenIds(const std::string &localUdid, const std::string &udid,
-        std::vector<int64_t> &remoteTokenIds);
-    DM_EXPORT int32_t GetServiceInfoByTokenId(int64_t tokenId, ServiceInfoProfile &serviceInfo);
+        std::unordered_set<int64_t> &remoteTokenIds);
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile>
         GetAllAccessControlProfile();
     DM_EXPORT std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAclIncludeLnnAcl();
@@ -443,6 +445,8 @@ private:
         const DmAccessCaller &caller, const std::string &srcUdid, const DmAccessCallee &callee,
         const std::string &sinkUdid);
     bool CheckExtWhiteList(const std::string &bundleName);
+    void ConverToDmServiceInfoProfile(const DistributedDeviceProfile::ServiceInfoProfileNew &dpServiceInfo,
+        ServiceInfoProfile &dmServiceInfo);
 };
 
 extern "C" IDeviceProfileConnector *CreateDpConnectorInstance();

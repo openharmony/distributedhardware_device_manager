@@ -2355,24 +2355,57 @@ DmOfflineParam DeviceProfileConnector::HandleServiceUnBindEvent(int32_t remoteUs
 DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfoProfileByServiceId(int64_t serviceId,
     ServiceInfoProfile &serviceInfoProfile)
 {
-    LOGI("GetServiceInfoProfileByServiceId start");
-    ServiceInfoProfileNew serviceInfoProfileDp;
+    LOGI("start");
+    ServiceInfoProfileNew dpServiceInfo;
     int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfoProfileByServiceId(
-        serviceId, serviceInfoProfileDp);
+        serviceId, dpServiceInfo);
     if (ret != DM_OK) {
         LOGE("GetServiceInfoProfileByServiceId failed, result: %{public}d", ret);
+        if (ret == DP_NOT_FIND_DATA) {
+            ret = ERR_DM_SERVICE_INFO_NOT_EXIST;
+        }
         return ret;
     }
-    serviceInfoProfile.regServiceId = serviceInfoProfileDp.GetRegServiceId();
-    serviceInfoProfile.deviceId = serviceInfoProfileDp.GetDeviceId();
-    serviceInfoProfile.userId = serviceInfoProfileDp.GetUserId();
-    serviceInfoProfile.tokenId = serviceInfoProfileDp.GetTokenId();
-    serviceInfoProfile.publishState = serviceInfoProfileDp.GetSerPubState();
-    serviceInfoProfile.serviceId = serviceInfoProfileDp.GetServiceId();
-    serviceInfoProfile.serviceType = serviceInfoProfileDp.GetServiceType();
-    serviceInfoProfile.serviceName = serviceInfoProfileDp.GetServiceName();
-    serviceInfoProfile.serviceDisplayName = serviceInfoProfileDp.GetServiceDisplayName();
-    LOGI("GetServiceInfoProfileByServiceId success");
+    ConverToDmServiceInfoProfile(dpServiceInfo, serviceInfoProfile);
+    LOGI("success");
+    return DM_OK;
+}
+
+DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfoProfileByRegServiceId(int32_t regServiceId,
+    ServiceInfoProfile &serviceInfoProfile)
+{
+    LOGI("start");
+    ServiceInfoProfileNew dpServiceInfo;
+    int32_t ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfoProfileByRegServiceId(regServiceId,
+        dpServiceInfo);
+    if (ret != DM_OK) {
+        LOGE("GetServiceInfoProfileByRegServiceId failed, result: %{public}d", ret);
+        if (ret == DP_NOT_FIND_DATA) {
+            ret = ERR_DM_SERVICE_INFO_NOT_EXIST;
+        }
+        return ret;
+    }
+    ConverToDmServiceInfoProfile(dpServiceInfo, serviceInfoProfile);
+    return DM_OK;
+}
+
+DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfoProfileByTokenId(int64_t tokenId,
+    std::vector<ServiceInfoProfile> &serviceInfos)
+{
+    std::vector<DistributedDeviceProfile::ServiceInfoProfileNew> dpServiceInfos;
+    auto ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfoProfileByTokenId(tokenId, dpServiceInfos);
+    if (ret != DM_OK) {
+        LOGW("GetServiceInfoProfileByTokenId failed. ret:%{public}d", ret);
+        if (ret == DP_NOT_FIND_DATA) {
+            ret = ERR_DM_SERVICE_INFO_NOT_EXIST;
+        }
+        return ret;
+    }
+    for (const auto &dpServiceInfo : dpServiceInfos) {
+        ServiceInfoProfile dmServiceInfo;
+        ConverToDmServiceInfoProfile(dpServiceInfo, dmServiceInfo);
+        serviceInfos.emplace_back(dmServiceInfo);
+    }
     return DM_OK;
 }
 
@@ -3608,7 +3641,7 @@ DM_EXPORT void DeviceProfileConnector::DeleteHoDevice(const std::string &peerUdi
 }
 
 DM_EXPORT void DeviceProfileConnector::GetRemoteTokenIds(const std::string &localUdid,
-    const std::string &udid, std::vector<int64_t> &remoteTokenIds)
+    const std::string &udid, std::unordered_set<int64_t> &remoteTokenIds)
 {
     if (udid.empty() || localUdid.empty() || localUdid == udid) {
         LOGE("GetRemoteTokenIds udid error.");
@@ -3624,35 +3657,14 @@ DM_EXPORT void DeviceProfileConnector::GetRemoteTokenIds(const std::string &loca
         if (item.GetAccessee().GetAccesseeDeviceId() == localUdid &&
             item.GetAccesser().GetAccesserDeviceId() == udid) {
             peerToken = static_cast<uint64_t>(item.GetAccesser().GetAccesserTokenId());
-            remoteTokenIds.push_back(peerToken);
+            remoteTokenIds.insert(peerToken);
         }
         if (item.GetAccessee().GetAccesseeDeviceId()== udid &&
             item.GetAccesser().GetAccesserDeviceId() == localUdid) {
             peerToken = static_cast<uint64_t>(item.GetAccessee().GetAccesseeTokenId());
-            remoteTokenIds.push_back(peerToken);
+            remoteTokenIds.insert(peerToken);
         }
     }
-}
-
-DM_EXPORT int32_t DeviceProfileConnector::GetServiceInfoByTokenId(int64_t tokenId,
-    ServiceInfoProfile &serviceInfo)
-{
-    DistributedDeviceProfile::ServiceInfoProfileNew dpServiceInfo;
-    auto ret = DistributedDeviceProfileClient::GetInstance().GetServiceInfoProfileByTokenId(tokenId, dpServiceInfo);
-    if (ret != 0) {
-        LOGE("GetServiceInfoByTokenId GetServiceInfoProfileByTokenId failed.");
-        return ret;
-    }
-    serviceInfo.regServiceId = dpServiceInfo.GetRegServiceId();
-    serviceInfo.deviceId = dpServiceInfo.GetDeviceId();
-    serviceInfo.userId = dpServiceInfo.GetUserId();
-    serviceInfo.tokenId = dpServiceInfo.GetTokenId();
-    serviceInfo.publishState = dpServiceInfo.GetSerPubState();
-    serviceInfo.serviceId = dpServiceInfo.GetServiceId();
-    serviceInfo.serviceType = dpServiceInfo.GetServiceType();
-    serviceInfo.serviceName = dpServiceInfo.GetServiceName();
-    serviceInfo.serviceDisplayName = dpServiceInfo.GetServiceDisplayName();
-    return DM_OK;
 }
 
 bool DeviceProfileConnector::CheckExtWhiteList(const std::string &pkgName)
@@ -3722,6 +3734,19 @@ void DeviceProfileConnector::DeleteDpInvalidAcl()
             DistributedDeviceProfileClient::GetInstance().DeleteAccessControlProfile(item->GetAccessControlId());
         }
     }
+}
+void DeviceProfileConnector::ConverToDmServiceInfoProfile(
+    const ServiceInfoProfileNew &dpServiceInfo, ServiceInfoProfile &dmServiceInfo)
+{
+    dmServiceInfo.regServiceId = dpServiceInfo.GetRegServiceId();
+    dmServiceInfo.deviceId = dpServiceInfo.GetDeviceId();
+    dmServiceInfo.userId = dpServiceInfo.GetUserId();
+    dmServiceInfo.tokenId = dpServiceInfo.GetTokenId();
+    dmServiceInfo.publishState = dpServiceInfo.GetSerPubState();
+    dmServiceInfo.serviceId = dpServiceInfo.GetServiceId();
+    dmServiceInfo.serviceType = dpServiceInfo.GetServiceType();
+    dmServiceInfo.serviceName = dpServiceInfo.GetServiceName();
+    dmServiceInfo.serviceDisplayName = dpServiceInfo.GetServiceDisplayName();
 }
 
 IDeviceProfileConnector *CreateDpConnectorInstance()

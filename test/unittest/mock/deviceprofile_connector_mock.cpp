@@ -217,9 +217,15 @@ int32_t DeviceProfileConnector::DeleteServiceInfoProfile(int32_t regServiceId, i
     return DmDeviceProfileConnector::dmDeviceProfileConnector->DeleteServiceInfoProfile(regServiceId, userId);
 }
 
-int32_t DeviceProfileConnector::GetServiceInfoByTokenId(int64_t tokenId, ServiceInfoProfile &serviceInfo)
+int32_t DeviceProfileConnector::GetServiceInfoProfileByTokenId(int64_t tokenId,
+    std::vector<ServiceInfoProfile> &serInfos)
 {
-    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoByTokenId(tokenId, serviceInfo);
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileByTokenId(tokenId, serInfos);
+}
+
+int32_t DeviceProfileConnector::GetServiceInfoProfileByRegServiceId(int32_t regSerId, ServiceInfoProfile &serInfo)
+{
+    return DmDeviceProfileConnector::dmDeviceProfileConnector->GetServiceInfoProfileByRegServiceId(regSerId, serInfo);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

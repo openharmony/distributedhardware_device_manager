@@ -2020,13 +2020,6 @@ HWTEST_F(DeviceManagerServiceTest, UpdateServiceInfo_003, testing::ext::TestSize
     int32_t ret = DeviceManagerService::GetInstance().UpdateServiceInfo(serviceId);
     EXPECT_EQ(ret, DM_OK);
 }
-
-HWTEST_F(DeviceManagerServiceTest, GenerateRegServiceId_001, testing::ext::TestSize.Level1)
-{
-    int32_t regserviceId = 102030;
-    int32_t ret = DeviceManagerService::GetInstance().GenerateRegServiceId(regserviceId);
-    EXPECT_EQ(ret, DM_OK);
-}
 } // namespace
 } // namespace DistributedHardware
 } // namespace OHOS

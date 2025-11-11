@@ -53,11 +53,6 @@ public:
         const DmAccessCallee &callee, const std::string &sinkUdid) = 0;
     virtual int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller,
         std::string &udid, int32_t &bindLevel) = 0;
-    virtual int32_t GenerateRegServiceId(int32_t &regServiceId) = 0;
-    virtual int32_t ConvertServiceInfoProfileByRegInfo(const ServiceRegInfo &serviceRegInfo,
-        ServiceInfoProfile &serviceInfoProfile) = 0;
-    virtual int32_t PutServiceInfoProfile(const ServiceInfoProfile &serviceInfoProfile) = 0;
-    virtual int32_t GenerateServiceId(int64_t &serviceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerServiceImpl> dmDeviceManagerServiceImpl = nullptr;
 };
@@ -78,20 +73,14 @@ public:
         std::string &, bool &));
     MOCK_METHOD(void, HandleShareUnbindBroadCast, (const std::string &, const int32_t &, const std::string &));
     MOCK_METHOD(int32_t, CheckDeviceInfoPermission, (const std::string &, const std::string &));
-    MOCK_METHOD(void, HandleAppUnBindEvent, (int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId));
-    MOCK_METHOD(void, HandleAppUnBindEvent, (int32_t remoteUserId, const std::string &remoteUdid,
-        int32_t tokenId, int32_t peerTokenId));
-    MOCK_METHOD(bool, CheckAccessControl, (const DmAccessCaller &caller, const std::string &srcUdid,
-        const DmAccessCallee &callee, const std::string &sinkUdid));
-    MOCK_METHOD(bool, CheckIsSameAccount, (const DmAccessCaller &caller, const std::string &srcUdid,
-        const DmAccessCallee &callee, const std::string &sinkUdid));
-    MOCK_METHOD(int32_t, DeleteAclExtraDataServiceId, (int64_t serviceId, int64_t tokenIdCaller,
-        std::string &udid, int32_t &bindLevel), (override));
-    MOCK_METHOD(int32_t, GenerateRegServiceId, (int32_t &regServiceId));
-    MOCK_METHOD(int32_t, ConvertServiceInfoProfileByRegInfo, (const ServiceRegInfo &regInfo,
-        ServiceInfoProfile &profile));
-    MOCK_METHOD(int32_t, PutServiceInfoProfile, (const ServiceInfoProfile &profile));
-    MOCK_METHOD(int32_t, GenerateServiceId, (int64_t &serviceId));
+    MOCK_METHOD(void, HandleAppUnBindEvent, (int32_t, const std::string &, int32_t));
+    MOCK_METHOD(void, HandleAppUnBindEvent, (int32_t, const std::string &, int32_t, int32_t));
+    MOCK_METHOD(bool, CheckAccessControl, (const DmAccessCaller &, const std::string &,
+        const DmAccessCallee &, const std::string &));
+    MOCK_METHOD(bool, CheckIsSameAccount, (const DmAccessCaller &, const std::string &,
+        const DmAccessCallee &, const std::string &));
+    MOCK_METHOD(int32_t, DeleteAclExtraDataServiceId, (int64_t, int64_t,
+        std::string &, int32_t &), (override));
 };
 }
 }
