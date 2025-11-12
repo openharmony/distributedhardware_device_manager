@@ -215,7 +215,7 @@ DmDeviceBasicInfo {
     /**
      * Device type of the device.
      */
-    uint16_t deviceTypeId;
+    uint16_t deviceTypeId = DmDeviceType::DEVICE_TYPE_UNKNOWN;
     /**
      * NetworkId of the device.
      */
