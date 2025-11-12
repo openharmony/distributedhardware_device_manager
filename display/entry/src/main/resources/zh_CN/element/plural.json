@@ -23,6 +23,18 @@
                     }
                 }
             ]
+        },
+        {
+            "name":"dm_link_not_agree",
+            "value":[
+                {
+                    "quantity":"other",
+                    "value":"不同意 ( %d 秒)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
         }
     ]
 }
