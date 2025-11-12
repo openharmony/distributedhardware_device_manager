@@ -37,6 +37,25 @@
                     }
                 }
             ]
+        },
+        {
+            "name":"dm_link_not_agree",
+            "value":[
+                {
+                    "quantity":"one",
+                    "value":"Don't agree (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                },
+                {
+                    "quantity":"other",
+                    "value":"Don't agree (%d)",
+                    "attr":{
+                        "priority":"translate"
+                    }
+                }
+            ]
         }
     ]
 }

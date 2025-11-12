@@ -67,6 +67,15 @@
         "label": "$string:ServiceExtAbility_label",
         "exported": true,
         "type": "sysDialog/common"
+      },
+      {
+        "name": "com.ohos.devicemanagerui.BuildConfirmUIExtAbility",
+        "srcEntrance": "./ets/UIExtAbility/BuildConfirmUIExtAbility.ets",
+        "description": "$string:ServiceExtAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:ServiceExtAbility_label",
+        "exported": true,
+        "type": "sysDialog/common"
       }
     ],
     "requestPermissions": [

@@ -33,7 +33,6 @@ struct PinCustomDialog {
   @State btnColor: ResourceColor = Color.Transparent;
   @State isPC: boolean = false;
   controller?: CustomDialogController
-  private scroller: Scroller = new Scroller();
 
   cancel() {
     console.log(TAG + 'destruction()');
@@ -86,67 +85,54 @@ struct PinCustomDialog {
       breakpoints: { value: ['600vp', '840vp'] }
     }) {
       GridCol({ span: { xs: 4, sm: 4, md: this.isPC ? 6 : 4 }, offset: { sm: 2, md: this.isPC ? 9 : 4 } }) {
-        Scroll(this.scroller) {
-          Column() {
+        Column() {
+          Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
+            Text($r('app.string.dm_connect_code'))
+              .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
+              .fontColor($r('sys.color.ohos_id_color_text_primary'))
+              .fontWeight(FontWeight.Bold)
+              .lineHeight(this.isTibetanLanguages() ? 32.5 : 0)
+              .margin({
+                left: 24,
+                right: 24
+              })
+          }
+          .constraintSize({ minHeight: 56 })
+          .margin({ bottom: this.isPC ? 16 : 8 })
+
+          Row() {
             Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-              Text($r('app.string.dm_connect_code'))
-                .fontSize($r('sys.float.ohos_id_text_size_dialog_tittle'))
-                .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                .fontWeight(FontWeight.Bold)
-                .lineHeight(this.isTibetanLanguages() ? 32.5 : 0)
-                .margin({
-                  left: 24,
-                  right: 24
-                })
+              ForEach(this.pinCodeArr, (item: string) => {
+                Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
+                  Text(item)
+                    .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                    .fontColor($r('sys.color.ohos_id_color_text_primary'))
+                    .fontWeight(FontWeight.Medium)
+                }.width('10%')
+                .height('100%')
+              })
             }
-            .constraintSize({ minHeight: 56 })
-            .margin({ bottom: this.isPC ? 16 : 8 })
+            .height(48)
+            .accessibilityText('[n1]'+this.pinCode+'[n0]')
+          }
+          .margin({ bottom: this.isPC ? 16 : 8 })
 
-            Row() {
-              Flex({ direction: FlexDirection.Row, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-                ForEach(this.pinCodeArr, (item: string) => {
-                  Flex({ justifyContent: FlexAlign.Center, alignItems: ItemAlign.Center }) {
-                    Text(item)
-                      .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-                      .fontColor($r('sys.color.ohos_id_color_text_primary'))
-                      .fontWeight(FontWeight.Medium)
-                  }.width('10%')
-                  .height('100%')
-                })
-              }
-              .height(48)
-              .accessibilityText('[n1]' + this.pinCode + '[n0]')
-            }
-            .margin({ bottom: this.isPC ? 16 : 8 })
-
-            Flex({ justifyContent: FlexAlign.Center }) {
-              Button($r('app.string.dm_cancel'))
-                .fontSize($r('sys.float.ohos_id_text_size_button1'))
-                .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
-                .constraintSize({ minHeight: 40 })
-                .width('100%')
-                .height(57)
-                .backgroundColor(this.btnColor)
-                .defaultFocus(true)
-                .onKeyEvent((event?: KeyEvent) => {
-                  if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
-                    console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
-                    return;
-                  }
-                  if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
-                    console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
-                    if (this.controller) {
-                      this.controller.close();
-                    }
-                    this.cancel();
-                    const param = {
-                      'META_TYPE': metaType
-                    };
-                    const jsonStr = JSON.stringify(param);
-                    this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY, jsonStr);
-                  }
-                })
-                .onClick(() => {
+          Flex({ justifyContent: FlexAlign.Center }) {
+            Button($r('app.string.dm_cancel'))
+              .fontSize($r('sys.float.ohos_id_text_size_button1'))
+              .fontColor($r('sys.color.ohos_id_color_text_primary_activated'))
+              .constraintSize({ minHeight: 40 })
+              .width('100%')
+              .height(57)
+              .backgroundColor(this.btnColor)
+              .defaultFocus(true)
+              .onKeyEvent((event?: KeyEvent) => {
+                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Down) {
+                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
+                  return;
+                }
+                if (event && event?.keyCode === KeyCode.KEYCODE_HOME && event?.type === KeyType.Up) {
+                  console.log(TAG + 'onKeyEvent eventType: ' + event?.type)
                   if (this.controller) {
                     this.controller.close();
                   }
@@ -156,31 +142,39 @@ struct PinCustomDialog {
                   };
                   const jsonStr = JSON.stringify(param);
                   this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY, jsonStr);
-                })
-                .onHover((isHover?: boolean, event?: HoverEvent): void => {
-                  if (isHover) {
-                    this.btnColor = $r('sys.color.ohos_id_color_hover');
-                  } else {
-                    this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
-                  }
-                })
-                .stateStyles({
-                  pressed: {
-                    .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
-                  },
-                  normal: {
-                    .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
-                  }
-                })
-            }.margin({
-              left: 16,
-              right: 16,
-              bottom: this.isPC ? 24 : 16
-            })
-          }
+                }
+              })
+              .onClick(() => {
+                if (this.controller) {
+                  this.controller.close();
+                }
+                this.cancel();
+                const param = {
+                  'META_TYPE': metaType
+                };
+                const jsonStr = JSON.stringify(param);
+                this.setUserOperation(ACTION_CANCEL_PINCODE_DISPLAY, jsonStr);
+              })
+              .onHover((isHover?: boolean, event?: HoverEvent): void => {
+                if (isHover) {
+                  this.btnColor = $r('sys.color.ohos_id_color_hover');
+                } else {
+                  this.btnColor = this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent;
+                }
+              })
+              .stateStyles({
+                pressed: {
+                  .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
+                },
+                normal: {
+                  .backgroundColor(this.isPC ? $r('sys.color.ohos_id_color_button_normal') : Color.Transparent)
+                }
+              })
+          }.margin({
+            left: 16,
+            right: 16,
+            bottom: this.isPC ? 24 : 16 })
         }
-        .scrollable(ScrollDirection.Vertical)
-        .scrollBar(BarState.On)
         .constraintSize({ maxHeight: `${300}` })
         .borderRadius($r('sys.float.ohos_id_corner_radius_dialog'))
         .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)

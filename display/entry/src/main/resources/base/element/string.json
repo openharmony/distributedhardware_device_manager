@@ -145,6 +145,20 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dm_link_agree",
+            "value":"Agreed (valid for 1 day)",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_link_title",
+            "value":"%1$s on %2$s would like to access this device. Do you agree?",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }
