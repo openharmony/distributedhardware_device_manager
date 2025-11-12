@@ -3234,7 +3234,6 @@ int32_t DeviceManagerImpl::StartPublishService(const std::string &pkgName,
     std::shared_ptr<IpcPublishServiceInfoRsp> rsp = std::make_shared<IpcPublishServiceInfoRsp>();
     req->SetPkgName(pkgName);
     req->SetPublishServiceParam(publishServiceParam);
-    req->SetServiceId(serviceId);
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(START_PUBLISH_SERVICE, req, rsp);
     if (ret != DM_OK) {
@@ -3288,7 +3287,6 @@ int32_t DeviceManagerImpl::RegisterServiceInfo(const ServiceRegInfo &serviceInfo
     std::shared_ptr<IpcRegisterServiceInfoNewReq> req = std::make_shared<IpcRegisterServiceInfoNewReq>();
     std::shared_ptr<IpcPublishServiceInfoRsp> rsp = std::make_shared<IpcPublishServiceInfoRsp>();
     req->SetServiceRegInfo(serviceInfo);
-    req->SetRegServiceId(regServiceId);
     CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
     int32_t ret = ipcClientProxy_->SendRequest(REGISTER_SERVICE_INFO, req, rsp);
     if (ret != DM_OK) {
@@ -3296,11 +3294,11 @@ int32_t DeviceManagerImpl::RegisterServiceInfo(const ServiceRegInfo &serviceInfo
         return ERR_DM_IPC_SEND_REQUEST_FAILED;
     }
     ret = rsp->GetErrCode();
+    regServiceId = rsp->GetRegServiceId();
     if (ret != DM_OK) {
         LOGE("error: failed with ret %{public}d", ret);
         return ret;
     }
-    regServiceId = rsp->GetRegServiceId();
     LOGI("End");
     return DM_OK;
 }

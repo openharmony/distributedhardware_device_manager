@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,23 @@ bool DeviceManagerService::IsDMServiceAdapterResidentLoad()
 int32_t OpenAuthSessionWithPara(int64_t serviceId)
 {
     return DmDeviceManagerService::dmDeviceManagerService->OpenAuthSessionWithPara(serviceId);
+}
+
+int32_t DeviceManagerService::GenerateServiceId(int64_t &serviceId)
+{
+    return DmDeviceManagerService::dmDeviceManagerService->GenerateServiceId(serviceId);
+}
+
+int32_t DeviceManagerService::CheckServiceHasRegistered(const ServiceRegInfo &serviceRegInfo,
+    int64_t tokenId, int32_t &regServiceId)
+{
+    return DmDeviceManagerService::dmDeviceManagerService->CheckServiceHasRegistered(serviceRegInfo,
+        tokenId, regServiceId);
+}
+
+int32_t DeviceManagerService::GenerateRegServiceId(int32_t &regServiceId)
+{
+    return DmDeviceManagerService::dmDeviceManagerService->GenerateRegServiceId(regServiceId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

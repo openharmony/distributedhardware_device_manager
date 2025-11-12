@@ -186,29 +186,33 @@ void DmDeviceStateManager::ProcessDeviceStateChange(const DmDeviceState devState
 {
     LOGI("begin, devState = %{public}d networkId: %{public}s.", devState,
         GetAnonyString(devInfo.networkId).c_str());
-    CHECK_NULL_VOID(listener_);
-    std::vector<int64_t> remoteTokenIds;
+    std::unordered_set<int64_t> remoteTokenIds;
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     std::string localUdid(localDeviceId);
+    CHECK_NULL_VOID(softbusConnector_);
     std::string udid = softbusConnector_->GetDeviceUdidByUdidHash(devInfo.deviceId);
     DeviceProfileConnector::GetInstance().GetRemoteTokenIds(localUdid, udid, remoteTokenIds);
-    std::vector<int64_t> remoteServiceIds;
+    std::unordered_set<int64_t> remoteServiceIds;
     for (const auto &item : remoteTokenIds) {
-        ServiceInfoProfile serviceInfo;
-        if (DeviceProfileConnector::GetInstance().GetServiceInfoByTokenId(item, serviceInfo) != DM_OK) {
-            LOGE("GetServiceInfoByTokenid failed.");
+        std::vector<ServiceInfoProfile> serviceInfos;
+        if (DeviceProfileConnector::GetInstance().GetServiceInfoProfileByTokenId(item, serviceInfos) != DM_OK) {
+            LOGE("GetServiceInfoProfileByTokenId failed.");
             continue;
         }
-        remoteServiceIds.push_back(serviceInfo.serviceId);
+        for (const auto &serviceInfo : serviceInfos) {
+            remoteServiceIds.insert(serviceInfo.serviceId);
+        }
     }
     LOGI("ProcessDeviceStateChange, remoteServiceIds size: %{public}zu", remoteServiceIds.size());
 
+    CHECK_NULL_VOID(listener_);
     for (const auto &item : processInfoVec) {
         if (!item.pkgName.empty()) {
             LOGI("ProcessDeviceStateChange, pkgName = %{public}s", item.pkgName.c_str());
             if (!remoteServiceIds.empty() && devState == DEVICE_STATE_ONLINE) {
-                listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIds);
+                std::vector<int64_t> remoteServiceIdVec(remoteServiceIds.begin(), remoteServiceIds.end());
+                listener_->OnDeviceStateChange(item, devState, devInfo, remoteServiceIdVec);
             } else {
                 listener_->OnDeviceStateChange(item, devState, devInfo);
             }

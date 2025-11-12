@@ -4622,12 +4622,36 @@ int32_t DeviceManagerService::UnbindServiceTarget(const std::string &pkgName, in
         LOGE("Invalid parameter, pkgName is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+    LOGI("Start for pkgName = %{public}s, serviceId:%{public}" PRId64, pkgName.c_str(), serviceId);
     if (!IsDMServiceImplReady()) {
         LOGE("UnbindServiceTarget failed, DMServiceImpl instance not init or init failed.");
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->UnbindServiceTarget(pkgName, serviceId);
+}
+
+int32_t DeviceManagerService::CheckServiceHasRegistered(const ServiceRegInfo &serviceRegInfo, int64_t tokenId,
+    int32_t &regServiceId)
+{
+    std::vector<ServiceInfoProfile> serviceInfos;
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByTokenId(tokenId, serviceInfos);
+    if (ret == ERR_DM_SERVICE_INFO_NOT_EXIST || serviceInfos.empty()) {
+        return DM_OK;
+    }
+    if (ret != DM_OK) {
+        LOGE("GetServiceInfoProfileByTokenId failed, ret:%{public}d, tokenId:%{public}" PRId64, ret, tokenId);
+        return ret;
+    }
+    for (const auto &item : serviceInfos) {
+        if (item.serviceType == serviceRegInfo.serviceInfo.serviceType &&
+            item.serviceName == serviceRegInfo.serviceInfo.serviceName &&
+            item.serviceDisplayName == serviceRegInfo.serviceInfo.serviceDisplayName) {
+            regServiceId = item.regServiceId;
+            LOGE("service is already registed, tokenId:%{public}" PRId64, tokenId);
+            return ERR_DM_SERVICE_HAS_BEEN_REGISTER;
+        }
+    }
+    return DM_OK;
 }
 
 int32_t DeviceManagerService::RegisterServiceInfo(const ServiceRegInfo &serviceRegInfo, int32_t &regServiceId)
@@ -4645,13 +4669,19 @@ int32_t DeviceManagerService::RegisterServiceInfo(const ServiceRegInfo &serviceR
         LOGE("Invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    int64_t tokenId = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
+    int32_t ret = CheckServiceHasRegistered(serviceRegInfo, tokenId, regServiceId);
+    if (ret != DM_OK) {
+        LOGE("CheckServiceHasRegistered faild, ret:%{public}d.", ret);
+        return ret;
+    }
     ServiceInfoProfile serviceInfoProfile;
-    int32_t ret = GenerateRegServiceId(serviceInfoProfile.regServiceId);
+    ret = GenerateRegServiceId(serviceInfoProfile.regServiceId);
     if (ret != DM_OK) {
         LOGE("Failed to generate regServiceId, ret: %{public}d.", ret);
         return ret;
     }
-    ret = ConvertServiceInfoProfileByRegInfo(serviceRegInfo, serviceInfoProfile);
+    ret = ConvertServiceInfoProfileByRegInfo(serviceRegInfo, serviceInfoProfile, tokenId);
     if (ret != DM_OK) {
         LOGE("ConvertServiceInfoProfileByRegInfo failed, ret: %{public}d", ret);
         return ret;
@@ -4662,7 +4692,7 @@ int32_t DeviceManagerService::RegisterServiceInfo(const ServiceRegInfo &serviceR
         return ret;
     }
     regServiceId = serviceInfoProfile.regServiceId;
-    LOGI("RegisterServiceInfo success, regServiceId: %{public}s.", GetAnonyInt32(regServiceId).c_str());
+    LOGI("RegisterServiceInfo success, regServiceId: %{public}d.", regServiceId);
     return DM_OK;
 #endif
 }
@@ -4681,18 +4711,18 @@ int32_t DeviceManagerService::UnRegisterServiceInfo(int32_t regServiceId)
         LOGE("Invalid parameter, regServiceId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int64_t tokenIdCaller = IPCSkeleton::GetCallingTokenID();
+    LOGI("start regServiceId:%{public}d", regServiceId);
+    int64_t tokenIdCaller = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
     ServiceInfoProfile serviceInfo;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByTokenId(tokenIdCaller, serviceInfo);
-    if (ret != DM_OK || serviceInfo.regServiceId != regServiceId) {
-        LOGE("Invalid parameter, token id or regService id is invalid.");
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByRegServiceId(regServiceId, serviceInfo);
+    if (ret != DM_OK || serviceInfo.tokenId != tokenIdCaller) {
+        LOGE("Invalid parameter, regService id is invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
     if (serviceInfo.publishState == SERVICE_PUBLISHED_STATE) {
         ret = StopPublishService(serviceInfo.serviceId);
         if (ret != DM_OK) {
-            LOGE("StopPublishService failed, ret: %{public}d.", ret);
-            return ret;
+            LOGW("StopPublishService failed, ret: %{public}d.", ret);
         }
     }
     int32_t userId = -1;
@@ -4702,7 +4732,7 @@ int32_t DeviceManagerService::UnRegisterServiceInfo(int32_t regServiceId)
         LOGE("DeleteServiceInfoProfile failed, ret: %{public}d", ret);
         return ret;
     }
-    LOGI("UnRegisterServiceInfo success.");
+    LOGI("success. regServiceId:%{public}d", regServiceId);
     return DM_OK;
 #endif
 }
@@ -4718,42 +4748,42 @@ int32_t DeviceManagerService::StartPublishService(const std::string &pkgName,
         LOGE("The caller does not have permission to call StantPublishService.");
         return ERR_DM_NO_PERMISSION;
     }
-    if (pkgName.empty() || publishServiceParam.regServiceId == 0 ||
-        publishServiceParam.serviceInfo.serviceType.empty() ||
-        publishServiceParam.serviceInfo.serviceName.empty() ||
-        publishServiceParam.serviceInfo.serviceDisplayName.empty()) {
+    if (pkgName.empty() || publishServiceParam.regServiceId == 0) {
         LOGE("Invalid parameter.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    int64_t tokenIdCaller = IPCSkeleton::GetCallingTokenID();
+    LOGI("start regServiceId:%{public}d", publishServiceParam.regServiceId);
     ServiceInfoProfile serviceInfo;
-    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoByTokenId(tokenIdCaller, serviceInfo);
-    if (ret != DM_OK || serviceInfo.regServiceId != publishServiceParam.regServiceId) {
-        LOGE("Invalid parameter, token id or regService id is invalid.");
+    int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByRegServiceId(
+        publishServiceParam.regServiceId, serviceInfo);
+    if (ret != DM_OK || serviceInfo.tokenId != static_cast<int64_t>(IPCSkeleton::GetCallingTokenID())) {
+        LOGE("serviceInfo not exist or tokenId not match.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    ret = GenerateServiceId(publishServiceParam.serviceInfo.serviceId);
-    if (ret != DM_OK) {
-        LOGE("GenerateServiceId failed, ret: %{public}d", ret);
-        return ret;
+    if (serviceInfo.serviceId != 0 && serviceInfo.publishState == SERVICE_PUBLISHED_STATE) {
+        LOGW("The regServiceId:%{public}d has already been published.", publishServiceParam.regServiceId);
+    } else {
+        ret = GenerateServiceId(serviceInfo.serviceId);
+        if (ret != DM_OK) {
+            return ret;
+        }
+        serviceInfo.publishState = SERVICE_PUBLISHED_STATE;
+        ret = DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfo);
+        if (ret != DM_OK) {
+            return ret;
+        }
     }
-    int32_t userId = -1;
-    MultipleUserConnector::GetCallerUserId(userId);
-    ServiceInfoProfile serviceInfoProfile = AppManager::GetInstance().CreateServiceInfoProfile(publishServiceParam,
-        userId);
-    ret = DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
-    if (ret != DM_OK) {
-        LOGE("PutServiceInfoProfile failed, ret: %{public}d", ret);
-        return ret;
-    }
-    serviceId = publishServiceParam.serviceInfo.serviceId;
+    serviceId = serviceInfo.serviceId;
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("StartPublishService failed, adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
-    ProcessInfo processInfo;
-    processInfo.pkgName = pkgName;
-    processInfo.userId = userId;
+    publishServiceParam.serviceInfo.serviceId = serviceInfo.serviceId;
+    publishServiceParam.serviceInfo.serviceName = serviceInfo.serviceName;
+    publishServiceParam.serviceInfo.serviceType = serviceInfo.serviceType;
+    publishServiceParam.serviceInfo.serviceDisplayName = serviceInfo.serviceDisplayName;
+    ProcessInfo processInfo = { .pkgName = pkgName };
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
     return dmServiceImplExtResident_->StartPublishService(processInfo, publishServiceParam);
 #endif
 }
@@ -4772,9 +4802,11 @@ int32_t DeviceManagerService::StopPublishService(int64_t serviceId)
         LOGE("Invalid parameter, serviceId is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
+    LOGI("start serviceId:%{public}" PRId64, serviceId);
+    int64_t tokenIdCaller = static_cast<int64_t>(IPCSkeleton::GetCallingTokenID());
     ServiceInfoProfile serviceInfo;
     int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfo);
-    if (ret != DM_OK || serviceInfo.publishState == SERVICE_UNPUBLISHED_STATE) {
+    if (ret != DM_OK || serviceInfo.publishState == SERVICE_UNPUBLISHED_STATE || serviceInfo.tokenId != tokenIdCaller) {
         LOGE("Invalid parameter, serviceId or publish state is invalid.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
@@ -4784,7 +4816,7 @@ int32_t DeviceManagerService::StopPublishService(int64_t serviceId)
     }
     ret = dmServiceImplExtResident_->StopPublishService(serviceId);
     if (ret != DM_OK) {
-        LOGE("StopPublishService failed in closed-source logic, ret: %{public}d", ret);
+        LOGW("StopPublishService failed in closed-source logic, ret: %{public}d", ret);
         return ret;
     }
     ret = UpdateServiceInfo(serviceId);
@@ -4792,20 +4824,21 @@ int32_t DeviceManagerService::StopPublishService(int64_t serviceId)
         LOGE("StopPublishService failed in internal logic, ret: %{public}d", ret);
         return ret;
     }
-    LOGI("StopPublishService success.");
+    LOGI("success. serviceId:%{public}" PRId64, serviceId);
     return DM_OK;
 #endif
 }
 
 int32_t DeviceManagerService::UpdateServiceInfo(int64_t serviceId)
 {
-    LOGI("UpdateServiceInfo Begin");
+    LOGI("Begin serviceId:%{public}" PRId64, serviceId);
     ServiceInfoProfile serviceInfoProfile;
     int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId, serviceInfoProfile);
     if (ret != DM_OK) {
         LOGE("GetServiceInfoProfileByServiceId failed, ret: %{public}d", ret);
         return ret;
     }
+    serviceInfoProfile.serviceId = 0;
     serviceInfoProfile.publishState = SERVICE_UNPUBLISHED_STATE;
     ret = DeviceProfileConnector::GetInstance().PutServiceInfoProfile(serviceInfoProfile);
     if (ret != DM_OK) {
@@ -4826,7 +4859,7 @@ int32_t DeviceManagerService::UpdateServiceInfo(int64_t serviceId)
             DistributedDeviceProfile::DistributedDeviceProfileClient::GetInstance().UpdateAccessControlProfile(profile);
         }
     }
-    LOGI("UpdateServiceInfo success");
+    LOGI("success serviceId:%{public}" PRId64, serviceId);
     return DM_OK;
 }
 
@@ -4834,27 +4867,32 @@ int32_t DeviceManagerService::GenerateServiceId(int64_t &serviceId)
 {
     LOGI("GenerateServiceId Begin.");
     for (int i = 0; i < GENERATE_SERVICE_ID_RETRY_TIME; i++) {
-        serviceId = GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
+        int64_t serviceIdTemp = GenRandLongLong(MIN_REQUEST_ID, MAX_REQUEST_ID);
         ServiceInfoProfile serviceInfoProfile;
-        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceId,
+        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByServiceId(serviceIdTemp,
             serviceInfoProfile);
-        if (ret != DM_OK) {
-            LOGI("GenerateServiceId success, ret:%{public}d", ret);
+        if (ret == DM_OK) {
+            LOGW("serviceId %{public}" PRId64 " is exist", serviceIdTemp);
+            continue;
+        }
+        if (ret == ERR_DM_SERVICE_INFO_NOT_EXIST) {
+            serviceId = serviceIdTemp;
             return DM_OK;
         }
+        LOGW("GetServiceInfoProfileByServiceId faild, ret:%{public}d", ret);
     }
     LOGE("GenerateServiceId failed, serviceId already exists after retry");
     return ERR_DM_FAILED;
 }
 
 int32_t DeviceManagerService::ConvertServiceInfoProfileByRegInfo(
-    const ServiceRegInfo &serviceRegInfo, ServiceInfoProfile &serviceInfoProfile)
+    const ServiceRegInfo &serviceRegInfo, ServiceInfoProfile &serviceInfoProfile, int64_t tokenId)
 {
     char localDeviceId[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localDeviceId, DEVICE_UUID_LENGTH);
     serviceInfoProfile.deviceId = std::string(localDeviceId);
     MultipleUserConnector::GetCallerUserId(serviceInfoProfile.userId);
-    serviceInfoProfile.tokenId = OHOS::IPCSkeleton::GetCallingTokenID();
+    serviceInfoProfile.tokenId = tokenId;
     serviceInfoProfile.serviceId = serviceRegInfo.serviceInfo.serviceId;
     serviceInfoProfile.serviceType = serviceRegInfo.serviceInfo.serviceType;
     serviceInfoProfile.serviceName = serviceRegInfo.serviceInfo.serviceName;
@@ -4865,17 +4903,31 @@ int32_t DeviceManagerService::ConvertServiceInfoProfileByRegInfo(
 int32_t DeviceManagerService::GenerateRegServiceId(int32_t &regServiceId)
 {
     LOGI("GenerateRegServiceId Begin.");
-    unsigned char buffer[16] = {0};
-    if (RAND_bytes(buffer, sizeof(buffer)) != 1) {
-        LOGE("Failed to generate random bytes using OpenSSL.");
-        return ERR_DM_FAILED;
-    }
-    regServiceId = 0;
-    for (size_t i = 0; i < sizeof(int32_t); ++i) {
-        regServiceId = (regServiceId << RANDOM_OFF_SET) | buffer[i];
+    for (int i = 0; i < GENERATE_SERVICE_ID_RETRY_TIME; i++) {
+        unsigned char buffer[16] = {0};
+        if (RAND_bytes(buffer, sizeof(buffer)) != 1) {
+            LOGE("Failed to generate random bytes using OpenSSL.");
+            return ERR_DM_FAILED;
+        }
+        int32_t regServiceIdTemp = 0;
+        for (size_t i = 0; i < sizeof(int32_t); ++i) {
+            regServiceIdTemp = (regServiceIdTemp << RANDOM_OFF_SET) | buffer[i];
+        }
+        ServiceInfoProfile serviceInfoProfile;
+        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByRegServiceId(regServiceIdTemp,
+            serviceInfoProfile);
+        if (ret == DM_OK) {
+            LOGW("regServiceId %{public}d is exist", regServiceIdTemp);
+            continue;
+        }
+        if (ret == ERR_DM_SERVICE_INFO_NOT_EXIST) {
+            regServiceId = regServiceIdTemp;
+            return DM_OK;
+        }
+        LOGW("GetServiceInfoProfileByRegServiceId faild, ret:%{public}d", ret);
     }
     LOGI("Generated regServiceId: %{public}s", GetAnonyInt32(regServiceId).c_str());
-    return DM_OK;
+    return ERR_DM_SERVICE_GEN_REGISTER_ID_FAILED;
 }
 
 int32_t DeviceManagerService::OpenAuthSessionWithPara(int64_t serviceId)

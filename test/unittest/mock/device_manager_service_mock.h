@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,10 @@ public:
     virtual bool IsDMServiceAdapterSoLoaded() = 0;
     virtual bool IsDMServiceAdapterResidentLoad() = 0;
     virtual int32_t OpenAuthSessionWithPara(int64_t serviceId) = 0;
+    virtual int32_t GenerateServiceId(int64_t &serviceId) = 0;
+    virtual int32_t CheckServiceHasRegistered(const ServiceRegInfo &serviceRegInfo, int64_t tokenId,
+        int32_t &regServiceId) = 0;
+    virtual int32_t GenerateRegServiceId(int32_t &regServiceId) = 0;
 public:
     static inline std::shared_ptr<DmDeviceManagerService> dmDeviceManagerService = nullptr;
 };
@@ -42,6 +46,9 @@ public:
     MOCK_METHOD(bool, IsDMServiceAdapterSoLoaded, ());
     MOCK_METHOD(bool, IsDMServiceAdapterResidentLoad, ());
     MOCK_METHOD(int32_t, OpenAuthSessionWithPara, (int64_t));
+    MOCK_METHOD(int32_t, GenerateServiceId, (int64_t &));
+    MOCK_METHOD(int32_t, CheckServiceHasRegistered, (const ServiceRegInfo &, int64_t, int32_t &));
+    MOCK_METHOD(int32_t, GenerateRegServiceId, (int32_t &));
 };
 }
 }

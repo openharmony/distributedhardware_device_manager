@@ -114,7 +114,6 @@ void DeviceManagerServiceTwoFuzzTest(FuzzedDataProvider &fdp)
     int32_t regServiceId = 0;
     int64_t publishServiceId = 0;
     int64_t fuzzServiceId = 0;
-    int32_t fuzzUserId = fdp.ConsumeIntegral<int32_t>();
     PublishServiceParam fuzzPublishServiceParam;
     fuzzPublishServiceParam.regServiceId = fdp.ConsumeIntegral<int32_t>();
     fuzzPublishServiceParam.serviceInfo.serviceId = fdp.ConsumeIntegral<int64_t>();
@@ -123,7 +122,7 @@ void DeviceManagerServiceTwoFuzzTest(FuzzedDataProvider &fdp)
     fuzzPublishServiceParam.serviceInfo.serviceDisplayName = fdp.ConsumeRandomLengthString();
     int32_t fuzzUserId2 = fdp.ConsumeIntegral<int32_t>();
     ServiceInfoProfile fuzzServiceInfoProfile;
-    fuzzServiceInfoProfile.serviceId = fuzzServiceId;
+    fuzzServiceInfoProfile.serviceId = fdp.ConsumeIntegral<int64_t>();
     fuzzServiceInfoProfile.userId = fuzzUserId2;
     fuzzServiceInfoProfile.serviceName = fdp.ConsumeRandomLengthString();
     fuzzServiceInfoProfile.serviceType = fdp.ConsumeRandomLengthString();
@@ -134,7 +133,8 @@ void DeviceManagerServiceTwoFuzzTest(FuzzedDataProvider &fdp)
     DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, publishServiceId);
     DeviceManagerService::GetInstance().StopPublishService(publishServiceId);
     DeviceManagerService::GetInstance().GenerateServiceId(fuzzServiceId);
-    DeviceManagerService::GetInstance().ConvertServiceInfoProfileByRegInfo(serviceRegInfo, fuzzServiceInfoProfile);
+    DeviceManagerService::GetInstance().ConvertServiceInfoProfileByRegInfo(serviceRegInfo,
+        fuzzServiceInfoProfile, fdp.ConsumeIntegral<int64_t>());
     DeviceManagerService::GetInstance().GenerateRegServiceId(fuzzRegServiceId);
 }
 }

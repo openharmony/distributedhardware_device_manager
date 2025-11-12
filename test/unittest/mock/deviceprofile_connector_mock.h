@@ -78,7 +78,8 @@ public:
     virtual int32_t GetServiceInfoProfileByServiceId(int64_t serviceId, ServiceInfoProfile &profile) = 0;
     virtual int32_t DeleteServiceInfoProfile(int32_t regServiceId, int32_t userId) = 0;
     virtual int32_t PutServiceInfoProfile(const ServiceInfoProfile &profile) = 0;
-    virtual int32_t GetServiceInfoByTokenId(int64_t tokenId, ServiceInfoProfile &serviceInfo) = 0;
+    virtual int32_t GetServiceInfoProfileByTokenId(int64_t tokenId, std::vector<ServiceInfoProfile> &serviceInfos) = 0;
+    virtual int32_t GetServiceInfoProfileByRegServiceId(int32_t regServiceId, ServiceInfoProfile &profile) = 0;
 public:
     static inline std::shared_ptr<DmDeviceProfileConnector> dmDeviceProfileConnector = nullptr;
 };
@@ -118,20 +119,21 @@ public:
         (const std::string &, (const std::vector<int32_t> &), (const std::vector<int32_t> &)));
     MOCK_METHOD((std::map<std::string, int32_t>), GetDeviceIdAndBindLevel,
         ((std::vector<int32_t>), const std::string &));
-    MOCK_METHOD(void, DeleteAccessControlById, (int64_t& accessControlId));
+    MOCK_METHOD(void, DeleteAccessControlById, (int64_t&));
     MOCK_METHOD(std::vector<ProcessInfo>, GetProcessInfoFromAclByUserId,
-        (const std::string &localDeviceId, const std::string &targetDeviceId, int32_t userId));
+        (const std::string &, const std::string &, int32_t));
     MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAccessControlProfile, ());
     MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAllAclIncludeLnnAcl, ());
-    MOCK_METHOD(std::vector<std::string>, GetDeviceIdAndUdidListByTokenId, (const std::vector<int32_t> &userIds,
-        const std::string &localUdid, int32_t tokenId));
-    MOCK_METHOD(void, CacheAcerAclId, (const DistributedDeviceProfile::AccessControlProfile &profile,
-        std::vector<DmAclIdParam> &aclInfos));
-    MOCK_METHOD(bool, IsLnnAcl, (const DistributedDeviceProfile::AccessControlProfile &profile));
-    MOCK_METHOD(int32_t, PutServiceInfoProfile, (const ServiceInfoProfile &profile));
-    MOCK_METHOD(int32_t, GetServiceInfoProfileByServiceId, (int64_t serviceId, ServiceInfoProfile &profile));
-    MOCK_METHOD(int32_t, DeleteServiceInfoProfile, (int32_t regServiceId, int32_t userId));
-    MOCK_METHOD(int32_t, GetServiceInfoByTokenId, (int64_t tokenId, ServiceInfoProfile &serviceInfo));
+    MOCK_METHOD(std::vector<std::string>, GetDeviceIdAndUdidListByTokenId, (const std::vector<int32_t> &,
+        const std::string &, int32_t));
+    MOCK_METHOD(void, CacheAcerAclId, (const DistributedDeviceProfile::AccessControlProfile &,
+        std::vector<DmAclIdParam> &));
+    MOCK_METHOD(bool, IsLnnAcl, (const DistributedDeviceProfile::AccessControlProfile &));
+    MOCK_METHOD(int32_t, PutServiceInfoProfile, (const ServiceInfoProfile &));
+    MOCK_METHOD(int32_t, GetServiceInfoProfileByServiceId, (int64_t, ServiceInfoProfile &));
+    MOCK_METHOD(int32_t, DeleteServiceInfoProfile, (int32_t, int32_t));
+    MOCK_METHOD(int32_t, GetServiceInfoProfileByTokenId, (int64_t, std::vector<ServiceInfoProfile> &));
+    MOCK_METHOD(int32_t, GetServiceInfoProfileByRegServiceId, (int32_t, ServiceInfoProfile &));
 };
 }
 }

@@ -36,18 +36,7 @@ public:
         publishServiceParam_ = publishServiceParam;
     }
 
-    int64_t GetServiceId()
-    {
-        return serviceId_;
-    }
-
-    void SetServiceId(int64_t serviceId)
-    {
-        serviceId_ = serviceId;
-    }
-
 private:
-    int64_t serviceId_ = 0;
     PublishServiceParam publishServiceParam_;
 };
 } // namespace DistributedHardware

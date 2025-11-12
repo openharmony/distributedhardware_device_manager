@@ -2149,7 +2149,7 @@ ON_IPC_CMD(REGISTER_SERVICE_INFO, MessageParcel &data, MessageParcel &reply)
 {
     ServiceRegInfo serviceRegInfo;
     IpcModelCodec::DecodeServiceRegInfo(data, serviceRegInfo);
-    int32_t regServiceId = data.ReadInt32();
+    int32_t regServiceId = 0;
     int32_t result = DeviceManagerService::GetInstance().RegisterServiceInfo(serviceRegInfo, regServiceId);
     if (!reply.WriteInt32(result)) {
         LOGE("Failed to write result to reply.");
@@ -2177,7 +2177,7 @@ ON_IPC_CMD(START_PUBLISH_SERVICE, MessageParcel &data, MessageParcel &reply)
 {
     PublishServiceParam publishServiceParam;
     IpcModelCodec::DecodePublishServiceParam(data, publishServiceParam);
-    int64_t serviceId = data.ReadInt64();
+    int64_t serviceId = 0;
     std::string pkgName = data.ReadString();
     int32_t result = DeviceManagerService::GetInstance().StartPublishService(pkgName, publishServiceParam, serviceId);
     if (!reply.WriteInt32(result)) {
