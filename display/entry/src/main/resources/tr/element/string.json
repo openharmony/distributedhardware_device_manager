@@ -32,26 +32,96 @@
             "name":"dm_confirm_intention",
             "value":"Bu, cihazlar arası veri senkronizasyonu ve iş birliği için gereklidir.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"Bu kez güven",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"Her zaman güven",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_this_time",
             "value":"Sadece bu kez güven",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"Diğer cihazda gösterilen bağlantı kodunu girin.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s ekranını cihazınıza yansıtmak istiyor. Bu cihaza güvenilsin mi?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s Bu cihaza güvenilsin mi?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"Yanlış şifre. Bağlantı kurulamadı.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"Tamam",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"Kimlik doğrulaması yapılıyor…",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s cihazınıza bağlanmak istiyor.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"Başka bir cihaza bağlanmak için Bluetooth'un etkinleştirilmesi gerekiyor. Lütfen etkinleştirin ve tekrar deneyin.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"%s cihazı ile bağlantı",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"\"%s\" bu cihaza bağlanmak istiyor. Lütfen hangi servislere erişebileceğini seçin:",
             "attr":{
                 "priority":"translate"
             }

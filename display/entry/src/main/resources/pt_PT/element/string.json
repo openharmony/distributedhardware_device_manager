@@ -46,12 +46,82 @@
             "name":"dm_allow_always",
             "value":"Confiar sempre",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_this_time",
             "value":"Confiar apenas esta vez",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"Introduza o código de ligação mostrado no outro dispositivo.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s pretende espelhar o respetivo ecrã no seu dispositivo. Confiar neste dispositivo?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s Confiar neste dispositivo?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"Palavra-passe incorreta. Falha ao estabelecer ligação.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"A autenticar...",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s pretende ligar-se ao seu dispositivo.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"O Bluetooth tem de estar ativado para ligar a outro dispositivo. Ative e tente novamente.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"Ligar a %s",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"\"%s\" pretende ligar-se a este dispositivo. Selecione os serviços a que poderá aceder:",
             "attr":{
                 "priority":"translate"
             }

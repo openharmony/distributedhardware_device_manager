@@ -2,9 +2,9 @@
     "string":[
         {
             "name":"dm_connect_code",
-            "value":"ချိတ်ဆက်မှုကုဒ်",
+            "value":"ချိတ်ဆက်ကုဒ်",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -39,19 +39,89 @@
             "name":"dm_allow_temp",
             "value":"ဤတစ်ကြိမ်အတွက် ယုံကြည်သည်",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"အမြဲ ယုံကြည်သည်",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_this_time",
             "value":"ဤတစ်ကြိမ်သာ ယုံကြည်သည်",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"အခြားစက်တွင် ပြထားသည့် ချိတ်ဆက်ကုဒ်ကို ရိုက်ထည့်ပါ။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s က သင့်စက်တွင် ၎င်း၏မျက်နှာပြင်ကို ထပ်တူပြသလိုပါသည်။ ဤစက်ကို ယုံကြည်ပါသလား။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s ဤစက်ကို ယုံကြည်ပါသလား။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"စကားဝှက် မှားနေပါသည်။ ချိတ်ဆက်မှု မအောင်မြင်ပါ။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"အိုကေ",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"စစ်မှန်ကြောင်း အတည်ပြုနေဆဲ…",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s က သင့်စက်နှင့် ချိတ်ဆက်လိုပါသည်။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"အခြားစက်နှင့် ချိတ်ဆက်ရန်အတွက် ဘလူးတုသ် ဖွင့်ရန် လိုပါသည်။ ၎င်းကို ဖွင့်ပြီး ထပ်ကြိုးစားကြည့်ပါ။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"%s နှင့် ချိတ်ဆက်ရန်",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"\"%s\" က ဤစက်နှင့် ချိတ်ဆက်လိုပါသည်။ ၎င်း ဝင်ရောက်သုံးစွဲနိုင်သည့် ဝန်ဆောင်မှုများကို ရွေးချယ်ပေးပါ-",
             "attr":{
                 "priority":"translate"
             }

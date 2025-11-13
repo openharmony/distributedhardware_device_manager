@@ -9,9 +9,9 @@
         },
         {
             "name":"dm_confirm_title_hap",
-            "value":"%1$s su %2$s desidera accedere a questo dispositivo. Considerare questa app attendibile?",
+            "value":"%1$s su %2$s desidera accedere a questo dispositivo. Vuoi considerare questa app attendibile?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -32,26 +32,96 @@
             "name":"dm_confirm_intention",
             "value":"È necessario per la sincronizzazione dei dati e la collaborazione tra più dispositivi.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"Considera attendibile questa volta",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"Sempre attendibile",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_this_time",
             "value":"Considera attendibile solo questa volta",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"Inserisci il codice di connessione visualizzato sull'altro dispositivo.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s desidera riprodurre il proprio schermo sul tuo dispositivo. Vuoi considerare attendibile questo dispositivo?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s Vuoi considerare attendibile questo dispositivo?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"Password errata. Connessione non riuscita.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"Autenticazione…",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s vorrebbe connettersi al tuo dispositivo.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"Per connettersi a un altro dispositivo, è necessario che il Bluetooth sia abilitato. Abilitalo e riprova.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"Connetti a %s",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"\"%s\" vorrebbe connettersi a questo dispositivo. Seleziona i servizi a cui può accedere:",
             "attr":{
                 "priority":"translate"
             }

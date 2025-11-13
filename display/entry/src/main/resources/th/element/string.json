@@ -32,26 +32,96 @@
             "name":"dm_confirm_intention",
             "value":"จำเป็นสำหรับการซิงค์ข้อมูลและการทำงานร่วมกันข้ามอุปกรณ์",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"เชื่อถือเฉพาะครั้งนี้",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"เชื่อถือเสมอ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_this_time",
             "value":"เชื่อถือเฉพาะครั้งนี้เท่านั้น",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"ป้อนรหัสการเชื่อมต่อที่แสดงบนอุปกรณ์อื่น",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s ต้องการสะท้อนหน้าจอของตนบนอุปกรณ์ของคุณ เชื่อถืออุปกรณ์นี้หรือไม่",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s เชื่อถืออุปกรณ์นี้หรือไม่",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"รหัสผ่านไม่ถูกต้อง การเชื่อมต่อล้มเหลว",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"ตกลง",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"กำลังรับรองความถูกต้อง…",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s ต้องการเชื่อมต่อกับอุปกรณ์ของคุณ",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"จำเป็นต้องเปิดใช้งานบลูทูธเพื่อเชื่อมต่อกับอุปกรณ์อื่น โปรดเปิดใช้งานแล้วลองอีกครั้ง",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"เชื่อมต่อกับ %s แล้ว",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"\"%s\" ต้องการเชื่อมต่อกับอุปกรณ์นี้ โปรดเลือกบริการที่สามารถเข้าถึงได้:",
             "attr":{
                 "priority":"translate"
             }

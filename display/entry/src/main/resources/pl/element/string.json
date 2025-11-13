@@ -32,26 +32,96 @@
             "name":"dm_confirm_intention",
             "value":"Jest to wymagane do synchronizacji danych między urządzeniami i do współpracy.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"Zaufaj tym razem",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"Zawsze ufaj",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_this_time",
             "value":"Zaufaj tylko tym razem",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"Wprowadź kod połączenia wyświetlany na drugim urządzeniu.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"Urządzenie %s chce dublować swój ekran na Twoim urządzeniu. Uznać to urządzenie za zaufane?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s Uznać to urządzenie za zaufane?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"Nieprawidłowe hasło. Nie udało się połączyć.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"Uwierzytelnianie…",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"Urządzenie %s chce nawiązać połączenie z Twoim urządzeniem.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"Włącz Bluetooth, aby połączyć się z innym urządzeniem. Włącz i spróbuj ponownie.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"Połącz z urządzeniem %s",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"Urządzenie %s chce nawiązać połączenie z tym urządzeniem. Wybierz usługi, do których może uzyskać dostęp:",
             "attr":{
                 "priority":"translate"
             }
