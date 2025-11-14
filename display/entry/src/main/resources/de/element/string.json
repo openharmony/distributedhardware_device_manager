@@ -32,26 +32,96 @@
             "name":"dm_confirm_intention",
             "value":"Dies ist für die geräteübergreifende Datensynchronisierung und Kooperation erforderlich.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_temp",
             "value":"Dieses Mal vertrauen",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_always",
             "value":"Immer Vertrauen",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"dm_allow_this_time",
             "value":"Nur dieses Mal vertrauen",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_enter_connect_code",
+            "value":"Geben Sie den auf dem anderen Gerät angezeigten Verbindungscode ein.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_title_cast",
+            "value":"%s möchte seinen Bildschirm auf Ihrem Gerät spiegeln. Diesem Gerät vertrauen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_is_trust_device",
+            "value":"%s Diesem Gerät vertrauen?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_password_error",
+            "value":"Falsches Passwort. Verbindung fehlgeschlagen.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_close",
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_authenticating",
+            "value":"Authentifizieren ...",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect_device",
+            "value":"%s möchte eine Verbindung mit Ihrem Gerät herstellen.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_bluetooth_dialog_content",
+            "value":"Bluetooth muss aktiviert sein, um eine Verbindung mit einem anderen Gerät herzustellen. Aktivieren Sie es und versuchen Sie es erneut.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_connect",
+            "value":"Mit %s verbinden",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dm_confirm_proxy",
+            "value":"„%s“ möchte eine Verbindung mit diesem Gerät herstellen. Wählen Sie aus, auf welche Services es zugreifen kann:",
             "attr":{
                 "priority":"translate"
             }
