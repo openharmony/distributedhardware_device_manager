@@ -324,19 +324,8 @@ void DmNapiDeviceStatusCallback::OnDeviceChanged(const DmDeviceBasicInfo &device
             LOGE("OnDeviceChanged, deviceManagerNapi not find for bundleName %{public}s",
                 callback->bundleName_.c_str());
         } else {
-            JsonObject bindParamObj;
-            if (!callback->deviceBasicInfo_.extraData.empty()) {
-                bindParamObj.Parse(callback->deviceBasicInfo_.extraData);
-            }
-            if (!bindParamObj.IsDiscarded() && IsInt32(bindParamObj, PARAM_KEY_BASIC_INFO_TYPE)) {
-                DMNodeBasicInfoType type = static_cast<DMNodeBasicInfoType>(
-                bindParamObj[PARAM_KEY_BASIC_INFO_TYPE].Get<int32_t>());
-                if (type == DMNodeBasicInfoType::TYPE_DEVICE_NAME) {
-                    LOGI("Device name change event received.");
-                    std::string deviceName = callback->deviceBasicInfo_.deviceName;
-                    deviceManagerNapi->OnDeviceNameChange(deviceName);
-                }
-            }
+            std::string deviceName = callback->deviceBasicInfo_.deviceName;
+            deviceManagerNapi->OnDeviceStatusChange(DmNapiDevStatusChange::CHANGE, callback->deviceBasicInfo_);
         }
         DeleteDmNapiStatusJsCallbackPtr(callback);
         DeleteUvWork(work);
@@ -653,27 +642,6 @@ void DeviceManagerNapi::OnDeviceStatusChange(DmNapiDevStatusChange action,
     napi_set_named_property(env_, result, "device", device);
     OnEvent("deviceStateChange", DM_NAPI_ARGS_ONE, &result);
     napi_close_handle_scope(env_, scope);
-}
-
-void DeviceManagerNapi::OnDeviceNameChange(const std::string &deviceName)
-{
-    napi_handle_scope scope;
-    napi_status status = napi_open_handle_scope(env_, &scope);
-    if (status != napi_ok || scope == nullptr) {
-        LOGE("open handle scope failed");
-        return;
-    }
-    napi_value result = nullptr;
-    napi_status statusCreate = napi_create_object(env_, &result);
-    if (statusCreate != napi_ok || result == nullptr) {
-        LOGE("create result object failed");
-        NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
-        return;
-    }
-    SetValueUtf8String(env_, "deviceName", deviceName, result);
-
-    OnEvent("deviceNameChange", DM_NAPI_ARGS_ONE, &result);
-    NAPI_CALL_RETURN_VOID(env_, napi_close_handle_scope(env_, scope));
 }
 
 void DeviceManagerNapi::OnDeviceFound(uint16_t subscribeId, const DmDeviceBasicInfo &deviceBasicInfo)

@@ -543,12 +543,6 @@ typedef struct PublishServiceParam {
     DMSrvMediumType media;
     DmExchangeFreq freq;
 } PublishServiceParam;
-
-enum class DMNodeBasicInfoType : int32_t {
-    TYPE_NETWORK_ID = 0,
-    TYPE_DEVICE_NAME,
-    TYPE_NETWORK_INFO,
-};
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // OHOS_DM_DEVICE_INFO_H
