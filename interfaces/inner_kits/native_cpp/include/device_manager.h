@@ -671,6 +671,8 @@ public:
     virtual int32_t UnRegisterServiceInfo(int32_t regServiceId) = 0;
     virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId,
         std::shared_ptr<LeaveLNNCallback> callback) { return 0; }
+    virtual int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
+        DMLocalServiceInfoAuthType &authType) { return 0; }
 };
 } // namespace DistributedHardware
 } // namespace OHOS

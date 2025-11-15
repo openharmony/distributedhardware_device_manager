@@ -457,7 +457,8 @@ public:
     virtual int32_t UnRegisterServiceInfo(int32_t regServiceId) override;
     virtual int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId,
         std::shared_ptr<LeaveLNNCallback> callback) override;
-
+    virtual int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
+        DMLocalServiceInfoAuthType &authType) override;
 private:
     DeviceManagerImpl() = default;
     ~DeviceManagerImpl() = default;

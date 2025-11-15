@@ -4956,5 +4956,26 @@ int32_t DeviceManagerService::LeaveLNN(const std::string &pkgName, const std::st
     }
     return dmServiceImpl_->LeaveLNN(pkgName, networkId);
 }
+
+int32_t DeviceManagerService::GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
+    DMLocalServiceInfoAuthType &authType)
+{
+    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
+        LOGE("The caller: %{public}s does not have permission to call LeaveLNN.", pkgName.c_str());
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (!AppManager::GetInstance().IsSystemSA()) {
+        LOGE("The caller does not have permission to call");
+        return ERR_DM_NO_PERMISSION;
+    }
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("Invalid parameter.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    DeviceProfileConnector::GetInstance().GetAuthTypeByUdidHash(udidHash, pkgName, authType);
+#endif
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS

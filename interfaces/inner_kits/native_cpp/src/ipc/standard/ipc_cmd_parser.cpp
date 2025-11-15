@@ -33,6 +33,8 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_anony_local_udid_rsp.h"
+#include "ipc_get_authType_by_udidhash_req.h"
+#include "ipc_get_authType_by_udidhash_rsp.h"
 #include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_device_network_id_list_req.h"
@@ -2512,6 +2514,34 @@ ON_IPC_CMD(LEAVE_LNN_RESULT, MessageParcel &data, MessageParcel &reply)
     int32_t code = data.ReadInt32();
     DeviceManagerNotify::GetInstance().OnLeaveLNNResult(networkId, code);
     reply.WriteInt32(DM_OK);
+    return DM_OK;
+}
+
+ON_IPC_SET_REQUEST(GET_AUTHTYPE_BY_UDIDHASH, std::shared_ptr<IpcReq> pBaseReq, MessageParcel &data)
+{
+    CHECK_NULL_RETURN(pBaseReq, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetAuthTypeByUdidHashReq> pReq =
+        std::static_pointer_cast<IpcGetAuthTypeByUdidHashReq>(pBaseReq);
+    std::string pkgName = pReq->GetPkgName();
+    std::string udidHash = pReq->GetUdidHash();
+    if (!data.WriteString(pkgName)) {
+        LOGE("write pkgName failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!data.WriteString(udidHash)) {
+        LOGE("write udidHash failed");
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
+
+ON_IPC_READ_RESPONSE(GET_AUTHTYPE_BY_UDIDHASH, MessageParcel &reply, std::shared_ptr<IpcRsp> pBaseRsp)
+{
+    CHECK_NULL_RETURN(pBaseRsp, ERR_DM_FAILED);
+    std::shared_ptr<IpcGetAuthTypeByUdidHashRsp> pRsp =
+        std::static_pointer_cast<IpcGetAuthTypeByUdidHashRsp>(pBaseRsp);
+    pRsp->SetErrCode(reply.ReadInt32());
+    pRsp->SetAuthType(reply.ReadInt32());
     return DM_OK;
 }
 } // namespace DistributedHardware

@@ -345,6 +345,8 @@ public:
     DM_EXPORT void DeleteDpInvalidAcl();
     int32_t GetAuthOnceUdids(std::map<std::string, std::unordered_set<int32_t>> &udid2UserIdsMap);
     DM_EXPORT bool CheckUserIdIsForegroundUserId(const int32_t userId);
+    DM_EXPORT void GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
+        DMLocalServiceInfoAuthType &authType);
 private:
     int32_t HandleDmAuthForm(DistributedDeviceProfile::AccessControlProfile profiles, DmDiscoveryInfo discoveryInfo);
     void GetParamBindTypeVec(DistributedDeviceProfile::AccessControlProfile profiles, std::string requestDeviceId,
