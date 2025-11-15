@@ -585,6 +585,30 @@ void DmAuthState::DeleteAcl(std::shared_ptr<DmAuthContext> context,
     DeviceProfileConnector::GetInstance().DeleteAccessControlById(profile.GetAccessControlId());
 }
 
+void DmAuthState::DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclInfo,
+    const std::set<uint32_t> bindLevelSet, bool isSrc)
+{
+    CHECK_NULL_VOID(context);
+    DmAccess access = isSrc ? context->accesser : context->accessee;
+    if (bindLevelSet.empty()) {
+        LOGE("DeleteRedundancyAcl empty set");
+        return;
+    }
+    if (aclInfo.Contains("pointTopointAcl") && !aclInfo.Contains("lnnAcl") &&
+        bindLevelSet.find(USER) == bindLevelSet.end()) {
+        aclInfo.Erase("pointTopointAcl");
+        if (access.aclProfiles.find(DM_POINT_TO_POINT) != access.aclProfiles.end()) {
+            DeleteAcl(context, access.aclProfiles[DM_POINT_TO_POINT]);
+        }
+    }
+    if (!aclInfo.Contains("pointTopointAcl") && aclInfo.Contains("lnnAcl")) {
+        aclInfo.Erase("lnnAcl");
+        if (access.aclProfiles.find(DM_LNN) != access.aclProfiles.end()) {
+            DeleteAcl(context, access.aclProfiles[DM_LNN]);
+        }
+    }
+}
+
 void DmAuthState::SetProcessInfo(std::shared_ptr<DmAuthContext> context)
 {
     CHECK_NULL_VOID(context);

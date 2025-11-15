@@ -328,7 +328,7 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
     FilterProfilesByContext(profiles, context);
-    uint32_t bindLevel = DM_INVALIED_TYPE;
+    std::set<uint32_t> bindLevelSet = {};
     for (const auto &item : profiles) {
         std::string trustDeviceId = item.GetTrustDeviceId();
         std::string trustDeviceIdHash = Crypto::GetUdidHash(trustDeviceId);
@@ -338,7 +338,7 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
                 GetAnonyString(trustDeviceIdHash).c_str(), GetAnonyString(context->accesser.deviceIdHash).c_str());
             continue;
         }
-        bindLevel = item.GetBindLevel();
+        bindLevelSet.insert(item.GetBindLevel());
         switch (item.GetBindType()) {
             case DM_IDENTICAL_ACCOUNT:
                 if (context->accessee.accountIdHash != context->accesser.accountIdHash ||
@@ -366,10 +366,7 @@ void AuthSrcConfirmState::GetSrcAclInfo(std::shared_ptr<DmAuthContext> context,
                 break;
         }
     }
-    if (aclInfo.Contains("pointTopointAcl") && !aclInfo.Contains("lnnAcl") && bindLevel != USER) {
-        aclInfo.Erase("pointTopointAcl");
-        DeleteAcl(context, context->accesser.aclProfiles[DM_POINT_TO_POINT]);
-    }
+    DeleteRedundancyAcl(context, aclInfo, bindLevelSet, true);
 }
 
 void AuthSrcConfirmState::GetSrcAclInfoForP2P(std::shared_ptr<DmAuthContext> context,
@@ -560,22 +557,9 @@ void AuthSrcConfirmState::GetSrcCredentialInfo(std::shared_ptr<DmAuthContext> co
 {
     LOGI("start.");
     CHECK_NULL_VOID(context);
-    // get identical credential
-    if (context->accesser.accountIdHash == context->accessee.accountIdHash) {
-        GetIdenticalCredentialInfo(context, credInfo);
-    }
-    // get share credential
-    if (context->accesser.accountIdHash != context->accessee.accountIdHash &&
-        context->accesser.accountIdHash != Crypto::GetAccountIdHash16("ohosAnonymousUid") &&
-        context->accessee.accountIdHash != Crypto::GetAccountIdHash16("ohosAnonymousUid")) {
-        GetShareCredentialInfo(context, credInfo);
-        GetP2PCredentialInfo(context, credInfo);
-    }
-    // get point_to_point credential
-    if (context->accesser.accountIdHash == Crypto::GetAccountIdHash16("ohosAnonymousUid") ||
-        context->accessee.accountIdHash == Crypto::GetAccountIdHash16("ohosAnonymousUid")) {
-        GetP2PCredentialInfo(context, credInfo);
-    }
+    GetIdenticalCredentialInfo(context, credInfo);
+    GetShareCredentialInfo(context, credInfo);
+    GetP2PCredentialInfo(context, credInfo);
     std::vector<std::string> deleteCredInfo;
     for (auto &item : credInfo.Items()) { // id1:json1, id2:json2, id3:json3
         if (!item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {

@@ -177,6 +177,8 @@ public:
         const DistributedDeviceProfile::AccessControlProfile &profile);
     void GetPeerDeviceId(std::shared_ptr<DmAuthContext> context, std::string &peerDeviceId);
     void JoinLnn(std::shared_ptr<DmAuthContext> context);
+    void DeleteRedundancyAcl(std::shared_ptr<DmAuthContext> context, JsonObject &aclInfo,
+        const std::set<uint32_t> bindLevelSet, bool isSrc);
 protected:
     bool NeedReqUserConfirm(std::shared_ptr<DmAuthContext> context);
     bool NeedAgreeAcl(std::shared_ptr<DmAuthContext> context);
