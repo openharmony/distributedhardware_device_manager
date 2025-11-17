@@ -26,10 +26,10 @@ std::vector<DistributedDeviceProfile::AccessControlProfile> DeviceProfileConnect
 }
 
 int32_t DeviceProfileConnector::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-    const std::string &localUdid, DmOfflineParam &offlineParam)
+    const std::string &localUdid, DmOfflineParam &offlineParam, int32_t tokenId)
 {
     return DmDeviceProfileConnector::dmDeviceProfileConnector->HandleDevUnBindEvent(remoteUserId, remoteUdid,
-        localUdid, offlineParam);
+        localUdid, offlineParam, tokenId);
 }
 
 int32_t DeviceProfileConnector::HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,

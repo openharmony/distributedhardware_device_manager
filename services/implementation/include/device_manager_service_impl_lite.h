@@ -134,7 +134,7 @@ public:
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid);
-    void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid);
+    void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId);

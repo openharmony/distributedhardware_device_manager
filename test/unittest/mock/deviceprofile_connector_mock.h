@@ -29,7 +29,7 @@ public:
 public:
     virtual std::vector<DistributedDeviceProfile::AccessControlProfile> GetAllAccessControlProfile() = 0;
     virtual int32_t HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-        const std::string &localUdid, DmOfflineParam &offlineParam) = 0;
+        const std::string &localUdid, DmOfflineParam &offlineParam, int32_t tokenId) = 0;
     virtual int32_t HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid, const std::string &localUdid) = 0;
     virtual uint32_t CheckBindType(std::string trustDeviceId, std::string requestDeviceId) = 0;
@@ -87,7 +87,8 @@ public:
 class DeviceProfileConnectorMock : public DmDeviceProfileConnector {
 public:
     MOCK_METHOD(std::vector<DistributedDeviceProfile::AccessControlProfile>, GetAllAccessControlProfile, ());
-    MOCK_METHOD(int32_t, HandleDevUnBindEvent, (int32_t, const std::string &, const std::string &, DmOfflineParam &));
+    MOCK_METHOD(int32_t, HandleDevUnBindEvent, (int32_t, const std::string &, const std::string &, DmOfflineParam &,
+        int32_t));
     MOCK_METHOD(int32_t, HandleAccountLogoutEvent, (int32_t, const std::string &, const std::string &,
         const std::string &));
     MOCK_METHOD(uint32_t, CheckBindType, (std::string, std::string));

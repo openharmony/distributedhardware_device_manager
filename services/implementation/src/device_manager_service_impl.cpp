@@ -2027,7 +2027,7 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &inf
     }
 
     std::set<std::string> pkgNameSet;
-    GetBundleName(info, pkgNameSet);
+    GetBundleName(info, pkgNameSet, notifyOffline);
     if (notifyOffline) {
         CHECK_NULL_VOID(softbusConnector_);
         softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
@@ -2038,7 +2038,8 @@ void DeviceManagerServiceImpl::HandleIdentAccountLogout(const DMAclQuadInfo &inf
     }
 }
 
-void DeviceManagerServiceImpl::GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet)
+void DeviceManagerServiceImpl::GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet,
+    bool &notifyOffline)
 {
     std::vector<DistributedDeviceProfile::AccessControlProfile> profiles =
         DeviceProfileConnector::GetInstance().GetAllAclIncludeLnnAcl();
@@ -2052,12 +2053,20 @@ void DeviceManagerServiceImpl::GetBundleName(const DMAclQuadInfo &info, std::set
         if (accesserUdid == info.localUdid && accesserUserId == info.localUserId &&
             accesseeUdid == info.peerUdid && accesseeUserId == info.peerUserId &&
             (!accesserPkgName.empty())) {
+            if (item.GetBindLevel() == USER) {
+                notifyOffline = false;
+                return;
+            }
             pkgNameSet.insert(accesserPkgName);
             continue;
         }
         if (accesserUdid == info.peerUdid && accesserUserId == info.peerUserId &&
             accesseeUdid == info.localUdid && accesseeUserId == info.localUserId &&
             (!accesseePkgName.empty())) {
+            if (item.GetBindLevel() == USER) {
+                notifyOffline = false;
+                return;
+            }
             pkgNameSet.insert(accesseePkgName);
             continue;
         }
@@ -2230,7 +2239,7 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
         }
 
         std::set<std::string> pkgNameSet;
-        GetBundleName(info, pkgNameSet);
+        GetBundleName(info, pkgNameSet, notifyOffline);
         if (notifyOffline) {
             CHECK_NULL_VOID(softbusConnector_);
             softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
@@ -2275,14 +2284,15 @@ int32_t DeviceManagerServiceImpl::DeleteGroup(const std::string &pkgName, const 
     return DM_OK;
 }
 
-void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid)
+void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId)
 {
     char localUdidTemp[DEVICE_UUID_LENGTH] = {0};
     GetDevUdid(localUdidTemp, DEVICE_UUID_LENGTH);
     std::string localUdid = std::string(localUdidTemp);
     DmOfflineParam offlineParam;
     int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(
-        remoteUserId, remoteUdid, localUdid, offlineParam);
+        remoteUserId, remoteUdid, localUdid, offlineParam, tokenId);
     if (static_cast<uint32_t>(bindType) == DM_INVALIED_TYPE) {
         LOGE("Invalied bindtype.");
         return;
@@ -2646,7 +2656,7 @@ void DeviceManagerServiceImpl::GetDelACLInfoVec(const int32_t &accessTokenId,
             continue;
         }
         if (accessTokenId == static_cast<int32_t>(accesssertokenId) &&
-            userId == item.GetAccesser().GetAccesserUserId() &&
+            userId == static_cast<uint32_t>(item.GetAccesser().GetAccesserUserId()) &&
             localUdid == item.GetAccessee().GetAccesseeDeviceId()) {
             DmOfflineParam offlineParam;
             delProfileMap[item.GetAccessControlId()] = item;
@@ -2659,7 +2669,7 @@ void DeviceManagerServiceImpl::GetDelACLInfoVec(const int32_t &accessTokenId,
             }
         }
         if (accessTokenId == static_cast<int32_t>(accessseetokenId) &&
-            userId == item.GetAccessee().GetAccesseeUserId() &&
+            userId == static_cast<uint32_t>(item.GetAccessee().GetAccesseeUserId()) &&
             localUdid == item.GetAccesser().GetAccesserDeviceId()) {
             DmOfflineParam offlineParam;
             DeviceProfileConnector::GetInstance().CacheAcerAclId(item, offlineParam.needDelAclInfos);
@@ -3024,13 +3034,7 @@ int32_t DeviceManagerServiceImpl::DeleteAclForProcV2(const std::string &localUdi
         DeleteSkCredAndAcl(offlineParam.allLnnAclInfos);
     }
 
-    //third, not user/DM_IDENTICAL_ACCOUNT acl exist but app/service acl exist
-    //determin if need report offline to unbind bundle
-    if (offlineParam.allUserAclInfos.empty() && !offlineParam.allLeftAppOrSvrAclInfos.empty()) {
-        LOGI("after clear target acl, No user acl exist, report offline");
-        softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
-        softbusConnector_->HandleDeviceOffline(remoteUdid);
-    }
+    NotifyDeviceOrAppOffline(offlineParam, remoteUdid);
     return DM_OK;
 }
 
@@ -3333,6 +3337,63 @@ void DeviceManagerServiceImpl::InitTaskOfDelTimeOutAcl(const std::string &device
 {
     CHECK_NULL_VOID(deviceStateMgr_);
     deviceStateMgr_->StartDelTimerByDP(deviceUdid, deviceUdidHash, userId);
+}
+
+void DeviceManagerServiceImpl::NotifyDeviceOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid)
+{
+    if (offlineParam.hasUserAcl && offlineParam.allUserAclInfos.empty() &&
+        offlineParam.allLeftAppOrSvrAclInfos.empty()) {
+        LOGI("not left acl");
+        ProcessInfo processInfo;
+        processInfo.pkgName = std::string(DM_PKG_NAME);
+        processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
+        std::vector<ProcessInfo> processVec = { processInfo };
+        CHECK_NULL_VOID(softbusConnector_);
+        softbusConnector_->SetProcessInfoVec(processVec);
+        softbusConnector_->HandleDeviceOffline(remoteUdid);
+    }
+    if (!offlineParam.hasUserAcl && offlineParam.allUserAclInfos.empty() &&
+        offlineParam.allLeftAppOrSvrAclInfos.empty()) {
+        LOGI("not left acl");
+        CHECK_NULL_VOID(softbusConnector_);
+        softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
+        softbusConnector_->HandleDeviceOffline(remoteUdid);
+    }
+}
+
+void DeviceManagerServiceImpl::NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid)
+{
+    if (!offlineParam.allUserAclInfos.empty()) {
+        LOGI("left user acl, not notify");
+        return;
+    }
+    if (offlineParam.hasUserAcl && offlineParam.allUserAclInfos.empty() &&
+        !offlineParam.allLeftAppOrSvrAclInfos.empty()) {
+        LOGI("left app or service acl.");
+        ProcessInfo processInfo;
+        processInfo.pkgName = std::string(DM_PKG_NAME);
+        processInfo.userId = MultipleUserConnector::GetFirstForegroundUserId();
+        offlineParam.processVec.push_back(processInfo);
+        CHECK_NULL_VOID(softbusConnector_);
+        softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
+        std::set<std::string> pkgNameSet;
+        for (auto &item : offlineParam.allLeftAppOrSvrAclInfos) {
+            pkgNameSet.insert(item.pkgName);
+        }
+        CHECK_NULL_VOID(listener_);
+        listener_->SetExistPkgName(pkgNameSet);
+        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        return;
+    }
+    if (!offlineParam.hasUserAcl && offlineParam.allUserAclInfos.empty() &&
+        !offlineParam.allLeftAppOrSvrAclInfos.empty()) {
+        LOGI("left service or app acl");
+        CHECK_NULL_VOID(softbusConnector_);
+        softbusConnector_->SetProcessInfoVec(offlineParam.processVec);
+        softbusConnector_->HandleDeviceOffline(remoteUdid);
+        return;
+    }
+    NotifyDeviceOffline(offlineParam, remoteUdid);
 }
 
 void DeviceManagerServiceImpl::GetNotifyEventInfos(std::vector<DmDeviceInfo> &deviceList)

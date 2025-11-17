@@ -303,7 +303,7 @@ private:
         int32_t bindLevel);
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
         int32_t bindLevel, uint64_t peerTokenId);
-    void SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId);
+    void SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
     void SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId);
     int32_t CalculateBroadCastDelayTime();
     void SendAppUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
@@ -419,6 +419,7 @@ private:
     void QueryDependsSwitchState();
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
     DM_EXPORT void SubscribeDataShareCommonEvent();
+    void ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg);
 #endif
     void HandleNetworkConnected(int32_t networkStatus);
     void NotifyRemoteLocalLogout(const std::vector<std::string> &peerUdids,

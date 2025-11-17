@@ -226,7 +226,7 @@ private:
     std::multimap<std::string, int32_t> GetDeviceIdAndUserId(int32_t userId, const std::string &accountId);
     void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid);
-    void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid);
+    void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId);
     void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId);
@@ -308,7 +308,9 @@ private:
         const std::string &pkgName, uint64_t tokenId);
     void OnAuthResultAndOnBindResult(const ProcessInfo &processInfo, const PeerTargetId &targetId,
         const std::string &deviceId, int32_t reason, uint64_t tokenId);
-    void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet);
+    void GetBundleName(const DMAclQuadInfo &info, std::set<std::string> &pkgNameSet, bool &notifyOffline);
+    void NotifyDeviceOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
+    void NotifyDeviceOrAppOffline(DmOfflineParam &offlineParam, const std::string &remoteUdid);
     void DeleteSessionKey(int32_t userId, const DistributedDeviceProfile::AccessControlProfile &profile);
     int32_t DeleteAclExtraDataServiceId(int64_t serviceId, int64_t tokenIdCaller, std::string &udid,
         int32_t &bindLevel);

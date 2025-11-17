@@ -232,7 +232,7 @@ public:
         const std::string &accountId) = 0;
     virtual void HandleAccountLogoutEvent(int32_t remoteUserId, const std::string &remoteAccountHash,
         const std::string &remoteUdid) = 0;
-    virtual void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid) = 0;
+    virtual void HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
     virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid, int32_t tokenId) = 0;
     virtual void HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, int32_t peerTokenId) = 0;

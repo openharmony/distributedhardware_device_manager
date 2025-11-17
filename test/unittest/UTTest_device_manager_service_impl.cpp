@@ -1898,14 +1898,15 @@ HWTEST_F(DeviceManagerServiceImplTest, SaveOnlineDeviceInfo_001, testing::ext::T
     EXPECT_CALL(*deviceProfileConnectorMock_, HandleAppUnBindEvent(_, _, _, _)).WillOnce(Return(dmOfflineParam));
     deviceManagerServiceImpl_->HandleAppUnBindEvent(remoteUserId, remoteUdid, tokenId);
 
-    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _, _)).WillOnce(Return(DM_INVALIED_TYPE));
-    deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid);
+    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _, _, _)).WillOnce(Return(DM_INVALIED_TYPE));
+    deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid, tokenId);
 
-    EXPECT_CALL(*deviceProfileConnectorMock_, HandleDevUnBindEvent(_, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
+    EXPECT_CALL(*deviceProfileConnectorMock_,
+        HandleDevUnBindEvent(_, _, _, _, _)).WillOnce(Return(DM_IDENTICAL_ACCOUNT));
     if (deviceManagerServiceImpl_->authMgr_ == nullptr) {
         deviceManagerServiceImpl_->Initialize(listener_);
     }
-    deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid);
+    deviceManagerServiceImpl_->HandleDevUnBindEvent(remoteUserId, remoteUdid, tokenId);
 
     int32_t userId = 123456;
     remoteUdid = "remoteDeviceId";
