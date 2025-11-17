@@ -148,7 +148,7 @@
         },
         {
             "name":"dm_link_agree",
-            "value":"同意（1天内有效）",
+            "value":"同意（%d 天内有效）",
             "attr":{
                 "priority":"translate"
             }
