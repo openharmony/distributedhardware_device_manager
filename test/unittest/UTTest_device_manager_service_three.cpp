@@ -536,9 +536,15 @@ HWTEST_F(DeviceManagerServiceThreeTest, SetLocalDeviceName_301, testing::ext::Te
     EXPECT_CALL(*permissionManagerMock_, CheckAccessServicePermission()).WillOnce(Return(true));
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
     EXPECT_CALL(*deviceManagerServiceMock_, IsDMServiceAdapterResidentLoad()).WillOnce(Return(false));
     int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
     EXPECT_EQ(ret, ERR_DM_UNSUPPORTED_METHOD);
+#else
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    int32_t ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
+    EXPECT_EQ(ret, DM_OK);
+#endif
 }
 
 HWTEST_F(DeviceManagerServiceThreeTest, SetRemoteDeviceName_301, testing::ext::TestSize.Level1)

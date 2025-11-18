@@ -1,0 +1,116 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+import("//build/ohos/taihe_idl/taihe.gni")
+import("//foundation/distributedhardware/device_manager/device_manager.gni")
+
+subsystem_name = "distributedhardware"
+part_name = "device_manager"
+taihe_generated_file_path = "$taihe_file_path/out/$subsystem_name/$part_name"
+
+copy_taihe_idl("copy_taihe") {
+  sources = [ "${devicemanager_path}/interfaces/kits/taihe/idl/ohos.distributedDeviceManager.taihe" ]
+}
+
+ohos_taihe("run_taihe") {
+  taihe_generated_file_path = "$taihe_generated_file_path"
+  deps = [ ":copy_taihe" ]
+  outputs = [
+    "$taihe_generated_file_path/src/ohos.distributedDeviceManager.ani.cpp",
+    "$taihe_generated_file_path/src/ohos.distributedDeviceManager.abi.c",
+  ]
+}
+
+if (device_manager_enable_ets_frontend) {
+  taihe_shared_library("device_manager_ani_taihe") {
+    sanitize = {
+      integer_overflow = true
+      ubsan = true
+      boundary_sanitize = true
+      cfi = true
+      cfi_cross_dso = true
+      debug = false
+    }
+
+    taihe_generated_file_path = "$taihe_generated_file_path"
+    subsystem_name = "$subsystem_name"
+    part_name = "$part_name"
+
+    include_dirs = [
+      "include",
+      "${innerkits_path}/native_cpp/include",
+      "${devicemanager_path}/interfaces/kits/taihe/include",
+      "${json_path}/include",
+    ]
+
+    defines = [
+      "HI_LOG_ENABLE",
+      "DH_LOG_TAG=\"devicemanagertaihe\"",
+      "LOG_DOMAIN=0xD004110",
+    ]
+
+    sources = get_target_outputs(":run_taihe")
+    sources += [
+      "${common_path}/src/dm_anonymous.cpp",
+      "${common_path}/src/dm_error_message.cpp",
+      "src/ani_constructor.cpp",
+      "src/ani_dm_utils.cpp",
+      "src/ani_error_utils.cpp",
+      "src/ani_utils.cpp",
+      "src/dm_ani_callback.cpp",
+      "src/ohos.distributedDeviceManager.cpp",
+    ]
+
+    deps = [
+      ":run_taihe",
+      "${innerkits_path}/native_cpp:devicemanagersdk",
+      "${json_path}:devicemanagerjson",
+    ]
+
+    external_deps = [
+      "access_token:libtokenid_sdk",
+      "bundle_framework:appexecfwk_base",
+      "bundle_framework:appexecfwk_core",
+      "eventhandler:libeventhandler",
+      "hilog:libhilog",
+      "ipc:ipc_core",
+    ]
+  }
+
+  generate_static_abc("ohos_distributedDeviceManager_abc") {
+    base_url = "$taihe_generated_file_path"
+    files = [ "$taihe_generated_file_path/@ohos.distributedDeviceManager.ets" ]
+    is_boot_abc = "True"
+    device_dst_file = "/system/framework/ohos_distributedDeviceManager_abc.abc"
+    dependencies = [ ":run_taihe" ]
+  }
+
+  ohos_prebuilt_etc("ohos_distributedDeviceManager_etc") {
+    source = "$target_out_dir/ohos_distributedDeviceManager_abc.abc"
+    module_install_dir = "framework"
+    part_name = "$part_name"
+    subsystem_name = "$subsystem_name"
+    deps = [ ":ohos_distributedDeviceManager_abc" ]
+  }
+}
+
+group("devicemanager_ani") {
+  if (device_manager_enable_ets_frontend) {
+    deps = [
+      ":device_manager_ani_taihe",
+      ":ohos_distributedDeviceManager_etc",
+    ]
+  }
+}
