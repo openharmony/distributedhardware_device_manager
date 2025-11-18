@@ -20,6 +20,7 @@ group("devicemanager_native_js") {
       "./js:devicemanager",
       "./js4.0:distributeddevicemanager",
       "./ndk:devicemanager_ndk",
+      "./taihe:devicemanager_ani",
     ]
   }
 }

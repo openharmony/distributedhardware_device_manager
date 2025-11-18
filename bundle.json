@@ -16,7 +16,8 @@
         "syscap": ["SystemCapability.DistributedHardware.DeviceManager"],
         "features": [
             "device_manager_no_interaction_auth",
-            "device_manager_feature_product"
+            "device_manager_feature_product",
+            "device_manager_enable_ets_frontend"
         ],
         "adapted_system_type": ["standard", "mini"],
         "rom": "2048KB",
@@ -49,18 +50,19 @@
                 "ipc",
                 "json",
                 "kv_store",
+                "mbedtls",
                 "memmgr",
                 "napi",
                 "openssl",
                 "os_account",
                 "power_manager",
+                "resource_management",
+                "runtime_core",
                 "safwk",
                 "samgr",
-                "selinux_adapter",
-                "resource_management",
-                "wifi",
                 "screenlock_mgr",
-                "mbedtls",
+                "selinux_adapter",
+                "wifi",
                 "zlib"
             ],
             "third_party": []

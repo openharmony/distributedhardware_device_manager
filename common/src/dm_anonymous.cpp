@@ -164,6 +164,16 @@ bool IsString(const JsonItemObject &jsonObj, const std::string &key)
     return res;
 }
 
+bool IsUint16(const JsonItemObject &jsonObj, const std::string &key)
+{
+    bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= 0 &&
+        jsonObj[key].Get<int64_t>() <= UINT16_MAX;
+    if (!res) {
+        LOGE("the key %{public}s in jsonObj is invalid.", key.c_str());
+    }
+    return res;
+}
+
 bool IsInt32(const JsonItemObject &jsonObj, const std::string &key)
 {
     bool res = jsonObj.Contains(key) && jsonObj[key].IsNumberInteger() && jsonObj[key].Get<int64_t>() >= INT32_MIN &&

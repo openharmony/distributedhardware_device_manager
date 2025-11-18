@@ -35,6 +35,7 @@ std::string GetAnonyUint64(const uint64_t value);
 std::string GetAnonyInt32List(const std::vector<int32_t> &values);
 bool IsNumberString(const std::string &inputString);
 bool IsString(const JsonItemObject &jsonObj, const std::string &key);
+DM_EXPORT bool IsUint16(const JsonItemObject &jsonObj, const std::string &key);
 DM_EXPORT bool IsInt32(const JsonItemObject &jsonObj, const std::string &key);
 bool IsUint32(const JsonItemObject &jsonObj, const std::string &key);
 bool IsInt64(const JsonItemObject &jsonObj, const std::string &key);
