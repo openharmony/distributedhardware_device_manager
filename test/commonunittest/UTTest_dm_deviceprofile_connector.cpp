@@ -1193,8 +1193,9 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_001, testing::ext::Tes
     std::string remoteUdid = "remoteDeviceId";
     std::string localUdid = "localDeviceId";
     DmOfflineParam offlineParam;
+    int32_t tokenId = 11;
     int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
-        offlineParam);
+        offlineParam, tokenId);
     EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 }
 
@@ -1420,24 +1421,25 @@ HWTEST_F(DeviceProfileConnectorTest, HandleDevUnBindEvent_002, testing::ext::Tes
     std::string remoteUdid;
     std::string localUdid = "localDeviceId";
     DmOfflineParam offlineParam;
+    int32_t tokenId = 11;
     int32_t bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
-        offlineParam);
+        offlineParam, tokenId);
     EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 
     remoteUdid = "123456";
     bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
-        offlineParam);
+        offlineParam, tokenId);
     EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 
     remoteUdid = "localDeviceId";
     remoteUserId = 1234;
     bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
-        offlineParam);
+        offlineParam, tokenId);
     EXPECT_NE(bindType, DM_IDENTICAL_ACCOUNT);
 
     remoteUserId = 456;
     bindType = DeviceProfileConnector::GetInstance().HandleDevUnBindEvent(remoteUserId, remoteUdid, localUdid,
-        offlineParam);
+        offlineParam, tokenId);
     EXPECT_EQ(bindType, DM_INVALIED_TYPE);
 }
 

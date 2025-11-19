@@ -487,10 +487,12 @@ void DeviceManagerServiceImpl::HandleAccountLogoutEvent(int32_t remoteUserId, co
     return;
 }
 
-void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid)
+void DeviceManagerServiceImpl::HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
+    int32_t tokenId)
 {
     (void)remoteUserId;
     (void)remoteUdid;
+    (void)tokenId;
     return;
 }
 

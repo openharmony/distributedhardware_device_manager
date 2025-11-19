@@ -117,6 +117,7 @@ typedef struct DmOfflineParam {
     int32_t leftAclNumber;
     int32_t peerUserId;
     bool hasLnnAcl = false;
+    bool hasUserAcl = false;
     int64_t accessControlId;
     // save the need unbind acl info
     std::vector<DmAclIdParam> needDelAclInfos;
@@ -227,7 +228,7 @@ public:
         const std::string &remoteUdid, const std::string &localUdid);
 
     DM_EXPORT int32_t HandleDevUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
-        const std::string &localUdid, DmOfflineParam &offlineParam);
+        const std::string &localUdid, DmOfflineParam &offlineParam, int32_t tokenId);
     DM_EXPORT DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
         int32_t tokenId, const std::string &localUdid);
     DM_EXPORT DmOfflineParam HandleAppUnBindEvent(int32_t remoteUserId, const std::string &remoteUdid,
@@ -386,7 +387,8 @@ private:
     void UpdatePeerUserId(DistributedDeviceProfile::AccessControlProfile profile, std::string &localUdid,
         const std::vector<int32_t> &localUserIds, const std::string &remoteUdid,
         const std::vector<int32_t> &remoteFrontUserIds);
-    void SetProcessInfoPkgName(const DistributedDeviceProfile::AccessControlProfile &acl, ProcessInfo &processInfo);
+    void SetProcessInfoPkgName(const DistributedDeviceProfile::AccessControlProfile &acl,
+        std::vector<OHOS::DistributedHardware::ProcessInfo> &processInfoVec, bool isAccer);
     bool CheckAclStatusNotMatch(const DistributedDeviceProfile::AccessControlProfile &profile,
         const std::string &localUdid, const std::vector<int32_t> &foregroundUserIds,
         const std::vector<int32_t> &backgroundUserIds);

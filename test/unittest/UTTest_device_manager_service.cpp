@@ -2248,9 +2248,9 @@ HWTEST_F(DeviceManagerServiceTest, SetDnPolicy_003, testing::ext::TestSize.Level
     DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, USER);
     DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, APP);
     DeviceManagerService::GetInstance().SendUnBindBroadCast(peerUdids, userId, tokenId, 2);
-    DeviceManagerService::GetInstance().SendDeviceUnBindBroadCast(peerUdids, userId);
+    DeviceManagerService::GetInstance().SendDeviceUnBindBroadCast(peerUdids, userId, tokenId);
     DeviceManagerService::GetInstance().softbusListener_ = std::make_shared<SoftbusListener>();
-    DeviceManagerService::GetInstance().SendDeviceUnBindBroadCast(peerUdids, userId);
+    DeviceManagerService::GetInstance().SendDeviceUnBindBroadCast(peerUdids, userId, tokenId);
     DeviceManagerService::GetInstance().softbusListener_ = nullptr;
     std::string processName = "collaboration_service";
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_))

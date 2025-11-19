@@ -3020,7 +3020,7 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
     LOGI("TokenId %{public}s, bindLevel %{public}d, userId %{public}d.", GetAnonyInt32(tokenId).c_str(),
         bindLevel, userId);
     if (static_cast<uint32_t>(bindLevel) == USER) {
-        SendDeviceUnBindBroadCast(peerUdids, userId);
+        SendDeviceUnBindBroadCast(peerUdids, userId, tokenId);
         return;
     }
     if (static_cast<uint32_t>(bindLevel) == APP) {
@@ -3037,7 +3037,7 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
     uint64_t tokenId, int32_t bindLevel, uint64_t peerTokenId)
 {
     if (static_cast<uint32_t>(bindLevel) == USER) {
-        SendDeviceUnBindBroadCast(peerUdids, userId);
+        SendDeviceUnBindBroadCast(peerUdids, userId, tokenId);
         return;
     }
     if (static_cast<uint32_t>(bindLevel) == APP) {
@@ -3050,12 +3050,14 @@ void DeviceManagerService::SendUnBindBroadCast(const std::vector<std::string> &p
     }
 }
 
-void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId)
+void DeviceManagerService::SendDeviceUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId,
+    uint64_t tokenId)
 {
     RelationShipChangeMsg msg;
     msg.type = RelationShipChangeType::DEVICE_UNBIND;
     msg.userId = static_cast<uint32_t>(userId);
     msg.peerUdids = peerUdids;
+    msg.tokenId = tokenId;
     std::string broadCastMsg = ReleationShipSyncMgr::GetInstance().SyncTrustRelationShip(msg);
     CHECK_NULL_VOID(softbusListener_);
     softbusListener_->SendAclChangedBroadcast(broadCastMsg);
@@ -3209,17 +3211,11 @@ bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeM
                 relationShipMsg.peerUdid);
             break;
         case RelationShipChangeType::DEVICE_UNBIND:
-            dmServiceImpl_->HandleDevUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid);
+            dmServiceImpl_->HandleDevUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+                static_cast<int32_t>(relationShipMsg.tokenId));
             break;
         case RelationShipChangeType::APP_UNBIND:
-            if (relationShipMsg.peerTokenId != 0) {
-                    dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
-                        static_cast<int32_t>(relationShipMsg.peerTokenId),
-                        static_cast<int32_t>(relationShipMsg.tokenId));
-            } else {
-                dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
-                    static_cast<int32_t>(relationShipMsg.tokenId));
-            }
+            ParseAppUnBindRelationShip(relationShipMsg);
             break;
         case RelationShipChangeType::SERVICE_UNBIND:
             dmServiceImpl_->HandleServiceUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
@@ -3251,6 +3247,18 @@ bool DeviceManagerService::ParseRelationShipChangeType(const RelationShipChangeM
             return false;
     }
     return true;
+}
+
+void DeviceManagerService::ParseAppUnBindRelationShip(const RelationShipChangeMsg &relationShipMsg)
+{
+    if (relationShipMsg.peerTokenId != 0) {
+        dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+            static_cast<int32_t>(relationShipMsg.peerTokenId),
+            static_cast<int32_t>(relationShipMsg.tokenId));
+    } else {
+        dmServiceImpl_->HandleAppUnBindEvent(relationShipMsg.userId, relationShipMsg.peerUdid,
+            static_cast<int32_t>(relationShipMsg.tokenId));
+    }
 }
 
 bool DeviceManagerService::IsMsgEmptyAndDMServiceImplReady(const std::string &msg)

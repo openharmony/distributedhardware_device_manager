@@ -34,10 +34,10 @@ namespace {
     const int32_t ACCOUNT_LOGOUT_PAYLOAD_LEN = 9;
     /**
      * @brief device unbind payload length 2 bytes
-     * |      2 bytes         | 1 bytes     |
-     * | userid lower 2 bytes | broadcastId |
+     * |      2 bytes         | 1 bytes     |     4 bytes           |
+     * | userid lower 2 bytes | broadcastId |     tokenId           |
      */
-    const int32_t DEVICE_UNBIND_PAYLOAD_LEN = 3;
+    const int32_t DEVICE_UNBIND_PAYLOAD_LEN = 7;
     /**
      * @brief app unbind payload length 6 bytes
      * |      2 bytes         |         4 bytes          |         4 bytes              | 1 bytes     |
@@ -58,6 +58,7 @@ namespace {
      * @brief the userid payload cost 2 bytes.
      *
      */
+    const int32_t UNBIND_DEVICE_TOKENID_LEN = 3;
     const int32_t USERID_PAYLOAD_LEN = 2;
     const int32_t TOKENID_PAYLOAD_LEN = 6;
     const int32_t ACCOUNTID_PAYLOAD_LEN = 6;
@@ -350,8 +351,11 @@ void RelationShipChangeMsg::ToDeviceUnbindPayLoad(uint8_t *&msg, uint32_t &len) 
     for (int i = 0; i < USERID_PAYLOAD_LEN; i++) {
         msg[i] |= (userId >> (i * BITS_PER_BYTE)) & 0xFF;
     }
-    for (int i = USERID_PAYLOAD_LEN; i < DEVICE_UNBIND_PAYLOAD_LEN; i++) {
+    for (int i = USERID_PAYLOAD_LEN; i < UNBIND_DEVICE_TOKENID_LEN; i++) {
         msg[i] |= (broadCastId >> ((i - USERID_PAYLOAD_LEN) * BITS_PER_BYTE)) & 0xFF;
+    }
+    for (int i = UNBIND_DEVICE_TOKENID_LEN; i < DEVICE_UNBIND_PAYLOAD_LEN; i++) {
+        msg[i] |= (tokenId >> ((i - UNBIND_DEVICE_TOKENID_LEN) * BITS_PER_BYTE)) & 0xFF;
     }
     len = DEVICE_UNBIND_PAYLOAD_LEN;
 }
@@ -522,12 +526,21 @@ bool RelationShipChangeMsg::FromDeviceUnbindPayLoad(const cJSON *payloadJson)
         }
     }
     broadCastId = 0;
-    for (uint32_t j = USERID_PAYLOAD_LEN; j < DEVICE_UNBIND_PAYLOAD_LEN; j++) {
+    for (uint32_t j = USERID_PAYLOAD_LEN; j < UNBIND_DEVICE_TOKENID_LEN; j++) {
         cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
         CHECK_NULL_RETURN(payloadItem, false);
         if (cJSON_IsNumber(payloadItem)) {
             broadCastId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
                 ((j - USERID_PAYLOAD_LEN) * BITS_PER_BYTE);
+        }
+    }
+    tokenId = 0;
+    for (uint32_t j = UNBIND_DEVICE_TOKENID_LEN; j < DEVICE_UNBIND_PAYLOAD_LEN; j++) {
+        cJSON *payloadItem = cJSON_GetArrayItem(payloadJson, j);
+        CHECK_NULL_RETURN(payloadItem, false);
+        if (cJSON_IsNumber(payloadItem)) {
+            tokenId |= (static_cast<uint8_t>(payloadItem->valueint)) <<
+                ((j - UNBIND_DEVICE_TOKENID_LEN) * BITS_PER_BYTE);
         }
     }
     return true;

@@ -794,9 +794,14 @@ void DeviceManagerServiceListener::ProcessDeviceOffline(const std::vector<Proces
     LOGI("userId %{public}d, state %{public}d, udidhash %{public}s.", processInfo.userId, static_cast<int32_t>(state),
         GetAnonyString(info.deviceId).c_str());
     RemoveNotExistProcess();
+    std::vector<ProcessInfo> whiteListVec = GetWhiteListSAProcessInfo(DmCommonNotifyEvent::REG_DEVICE_STATE);
     std::shared_ptr<IpcNotifyDeviceStateReq> pReq = std::make_shared<IpcNotifyDeviceStateReq>();
     std::shared_ptr<IpcRsp> pRsp = std::make_shared<IpcRsp>();
+    bool isOnline = SoftbusCache::GetInstance().CheckIsOnline(std::string(info.deviceId));
     for (const auto &it : procInfoVec) {
+        if (isOnline && find(whiteListVec.begin(), whiteListVec.end(), it) != whiteListVec.end()) {
+            continue;
+        }
         {
             std::lock_guard<std::mutex> autoLock(alreadyNotifyPkgNameLock_);
             if (actUnrelatedPkgName_.find(it.pkgName) != actUnrelatedPkgName_.end()) {
