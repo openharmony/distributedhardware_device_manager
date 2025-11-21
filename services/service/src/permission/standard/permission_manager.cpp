@@ -81,6 +81,7 @@ constexpr uint32_t GETDEVICEINFO_WHITE_LIST_NUM = std::size(GETDEVICEINFO_WHITE_
 constexpr const static char* MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST[] = {
     "com.huawei.hmos.settings",
     "com.huawei.hmos.tvcooperation",
+    "com.ohos.settings",
 };
 constexpr int32_t MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST_NUM = std::size(MODIFY_LOCAL_DEVICE_NAME_WHITE_LIST);
 

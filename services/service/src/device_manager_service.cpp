@@ -4056,6 +4056,8 @@ int32_t DeviceManagerService::GetLocalDisplayDeviceName(const std::string &pkgNa
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     return DeviceNameManager::GetInstance().GetLocalDisplayDeviceName(maxNameLength, displayName);
 #endif
+    (void) maxNameLength;
+    (void) displayName;
     return DM_OK;
 }
 
@@ -4075,11 +4077,29 @@ int32_t DeviceManagerService::SetLocalDeviceName(const std::string &pkgName, con
         return ERR_DM_NO_PERMISSION;
     }
     LOGI("Start for pkgName = %{public}s", pkgName.c_str());
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
     if (!IsDMServiceAdapterResidentLoad()) {
         LOGE("SetLocalDeviceName failed, adapter instance not init or init failed.");
         return ERR_DM_UNSUPPORTED_METHOD;
     }
     return dmServiceImplExtResident_->SetLocalDeviceName(pkgName, deviceName);
+#else
+    CHECK_NULL_RETURN(listener_, ERR_DM_POINT_NULL);
+    ProcessInfo processInfo = {.pkgName = pkgName};
+    MultipleUserConnector::GetCallerUserId(processInfo.userId);
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    ffrt::submit([listener = listener_, deviceName = deviceName, processInfo = processInfo]() {
+        CHECK_NULL_VOID(listener);
+        listener->OnSetLocalDeviceNameResult(processInfo, deviceName, DM_OK);
+    });
+#else
+    std::thread([listener = listener_, deviceName = deviceName, processInfo = processInfo]() {
+        CHECK_NULL_VOID(listener);
+        listener->OnSetLocalDeviceNameResult(processInfo, deviceName, DM_OK);
+    }).detach();
+#endif
+    return DM_OK;
+#endif
 }
 
 int32_t DeviceManagerService::SetRemoteDeviceName(const std::string &pkgName,

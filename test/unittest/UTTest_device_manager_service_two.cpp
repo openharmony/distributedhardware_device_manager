@@ -1561,8 +1561,13 @@ HWTEST_F(DeviceManagerServiceTest, SetLocalDeviceName_202, testing::ext::TestSiz
 
     EXPECT_CALL(*permissionManagerMock_, GetCallerProcessName(_)).WillOnce(Return(DM_OK));
     EXPECT_CALL(*permissionManagerMock_, CheckProcessNameValidModifyLocalDeviceName(_)).WillOnce(Return(true));
+#if !defined(DEVICE_MANAGER_COMMON_FLAG)
     ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
-    EXPECT_NE(ret, DM_OK);
+#else
+    DeviceManagerService::GetInstance().InitDMServiceListener();
+    ret = DeviceManagerService::GetInstance().SetLocalDeviceName(pkgName, deviceName);
+#endif
+    EXPECT_EQ(ret, DM_OK);
 }
 
 HWTEST_F(DeviceManagerServiceTest, SetRemoteDeviceName_201, testing::ext::TestSize.Level1)

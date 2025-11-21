@@ -597,12 +597,11 @@ void DmServiceProfileInfoToJsArray(const napi_env &env, const std::vector<DmServ
         SetValueUtf8String(env, "deviceId", svrInfos[i].deviceId, item);
         SetValueUtf8String(env, "serviceId", svrInfos[i].serviceId, item);
         SetValueUtf8String(env, "serviceType", svrInfos[i].serviceType, item);
-        napi_value data = nullptr;
-        napi_create_object(env, &data);
+        JsonObject jsonObj;
         for (const auto& [key, value] : svrInfos[i].data) {
-            SetValueUtf8String(env, key, value, data);
+            jsonObj[key] = value;
         }
-        napi_set_named_property(env, item, "data", data);
+        SetValueUtf8String(env, "data", jsonObj.Dump(), item);
         napi_status status = napi_set_element(env, arrayResult, i, item);
         if (status != napi_ok) {
             LOGE("DmServiceProfileInfoToJsArray To JsArray set element error: %{public}d", status);
