@@ -3775,6 +3775,31 @@ void DeviceProfileConnector::ConverToDmServiceInfoProfile(
     dmServiceInfo.serviceDisplayName = dpServiceInfo.GetServiceDisplayName();
 }
 
+DM_EXPORT void DeviceProfileConnector::GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
+    DMLocalServiceInfoAuthType &authType)
+{
+    authType = DMLocalServiceInfoAuthType::CANCEL;
+    std::vector<AccessControlProfile> acls = GetAccessControlProfile();
+    for (const auto &acl : acls) {
+        if (Crypto::GetUdidHash(acl.GetTrustDeviceId()) != udidHash) {
+            continue;
+        }
+        if (acl.GetBindType() == DM_IDENTICAL_ACCOUNT || acl.GetBindType() == DM_SHARE) {
+            authType = DMLocalServiceInfoAuthType::TRUST_ALWAYS;
+            return;
+        }
+        if ((acl.GetBindType() == DM_POINT_TO_POINT || acl.GetBindType() == DM_ACROSS_ACCOUNT) &&
+            (acl.GetBindLevel() == USER || acl.GetAccesser().GetAccesserBundleName() == pkgName ||
+            acl.GetAccessee().GetAccesseeBundleName() == pkgName)) {
+            if (acl.GetAuthenticationType() == ALLOW_AUTH_ALWAYS) {
+                authType = DMLocalServiceInfoAuthType::TRUST_ALWAYS;
+                return;
+            }
+            authType = DMLocalServiceInfoAuthType::TRUST_ONETIME;
+        }
+    }
+}
+
 IDeviceProfileConnector *CreateDpConnectorInstance()
 {
     return &DeviceProfileConnector::GetInstance();

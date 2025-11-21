@@ -288,7 +288,8 @@ public:
         std::map<std::string, std::string> &deviceIdToUdidMap);
 #endif
     int32_t LeaveLNN(const std::string &pkgName, const std::string &networkId);
-
+    int32_t GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
+        DMLocalServiceInfoAuthType &authType);
 private:
     bool IsDMServiceImplReady();
     bool IsDMImplSoLoaded();

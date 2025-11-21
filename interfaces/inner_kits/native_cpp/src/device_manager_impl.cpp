@@ -35,6 +35,8 @@
 #include "ipc_export_auth_code_rsp.h"
 #include "ipc_generate_encrypted_uuid_req.h"
 #include "ipc_get_anony_local_udid_rsp.h"
+#include "ipc_get_authType_by_udidhash_req.h"
+#include "ipc_get_authType_by_udidhash_rsp.h"
 #include "ipc_get_device_icon_info_req.h"
 #include "ipc_get_device_info_rsp.h"
 #include "ipc_get_device_network_id_list_req.h"
@@ -3351,6 +3353,33 @@ int32_t DeviceManagerImpl::LeaveLNN(const std::string &pkgName, const std::strin
         LOGE("Failed with ret %{public}d", ret);
         return ret;
     }
+    return DM_OK;
+}
+
+int32_t DeviceManagerImpl::GetAuthTypeByUdidHash(const std::string &udidHash, const std::string &pkgName,
+    DMLocalServiceInfoAuthType &authType)
+{
+    LOGD("Start");
+    if (pkgName.empty() || udidHash.empty()) {
+        LOGE("param error: pkgName or udidHash is empty.");
+        return ERR_DM_INPUT_PARA_INVALID;
+    }
+    std::shared_ptr<IpcGetAuthTypeByUdidHashReq> req = std::make_shared<IpcGetAuthTypeByUdidHashReq>();
+    std::shared_ptr<IpcGetAuthTypeByUdidHashRsp> rsp = std::make_shared<IpcGetAuthTypeByUdidHashRsp>();
+    req->SetPkgName(pkgName);
+    req->SetUdidHash(udidHash);
+    CHECK_NULL_RETURN(ipcClientProxy_, ERR_DM_POINT_NULL);
+    int32_t ret = ipcClientProxy_->SendRequest(GET_AUTHTYPE_BY_UDIDHASH, req, rsp);
+    if (ret != DM_OK) {
+        LOGE("Send Request failed ret: %{public}d", ret);
+        return ERR_DM_IPC_SEND_REQUEST_FAILED;
+    }
+    ret = rsp->GetErrCode();
+    if (ret != DM_OK) {
+        LOGE("Failed with ret %{public}d", ret);
+        return ret;
+    }
+    authType = static_cast<DMLocalServiceInfoAuthType>(rsp->GetAuthType());
     return DM_OK;
 }
 } // namespace DistributedHardware

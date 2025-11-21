@@ -136,6 +136,7 @@ enum DMIpcCmdInterfaceCode {
     SERVICE_PUBLISH_RESULT,
     LEAVE_LNN,
     LEAVE_LNN_RESULT,
+    GET_AUTHTYPE_BY_UDIDHASH,
     // Add ipc msg here
     IPC_MSG_BUTT
 };

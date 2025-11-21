@@ -2267,5 +2267,20 @@ ON_IPC_READ_RESPONSE(LEAVE_LNN_RESULT, MessageParcel &reply, std::shared_ptr<Ipc
     pBaseRsp->SetErrCode(reply.ReadInt32());
     return DM_OK;
 }
+
+ON_IPC_CMD(GET_AUTHTYPE_BY_UDIDHASH, MessageParcel &data, MessageParcel &reply)
+{
+    std::string pkgName = data.ReadString();
+    std::string udidHash = data.ReadString();
+    DMLocalServiceInfoAuthType authType = DMLocalServiceInfoAuthType::CANCEL;
+    int32_t result = DeviceManagerService::GetInstance().GetAuthTypeByUdidHash(udidHash, pkgName, authType);
+    if (!reply.WriteInt32(result)) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    if (!reply.WriteInt32(static_cast<int32_t>(authType))) {
+        return ERR_DM_IPC_WRITE_FAILED;
+    }
+    return DM_OK;
+}
 } // namespace DistributedHardware
 } // namespace OHOS
