@@ -197,6 +197,7 @@ std::string DmAuthState::GenerateBindResultContent(std::shared_ptr<DmAuthContext
     if (context->remainingFrozenTime != 0) {
         jsonObj[TAG_REMAINING_FROZEN_TIME] = context->remainingFrozenTime;
     }
+    jsonObj[PARAM_KEY_IS_PROXY_BIND] = context->IsProxyBind;
     LOGI("remainingFrozenTime: %{public}" PRId64, context->remainingFrozenTime);
     std::string content = jsonObj.Dump();
     return content;
