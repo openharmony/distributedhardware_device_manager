@@ -25,6 +25,8 @@
 #include "discovery_manager.h"
 #include "pin_holder.h"
 #include "device_manager_service_listener.h"
+#include "dm_credential_manager.h"
+#include "dm_service_hichain_connector.h"
 #include "idevice_manager_service_impl.h"
 #include "hichain_listener.h"
 #include "i_dm_check_api_white_list.h"
@@ -464,6 +466,8 @@ private:
     std::mutex hichainListenerLock_;
 #endif
     std::mutex userVecLock_;
+    std::shared_ptr<DmServiceHiChainConnector> hiChainConnector_;
+    std::shared_ptr<DmCredentialManager> credentialMgr_;
     std::shared_ptr<AdvertiseManager> advertiseMgr_;
     std::shared_ptr<DiscoveryManager> discoveryMgr_;
     std::shared_ptr<SoftbusListener> softbusListener_;

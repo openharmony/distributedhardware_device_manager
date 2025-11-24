@@ -363,6 +363,12 @@ int32_t DeviceManagerService::InitDMServiceListener()
         pinHolder_ = std::make_shared<PinHolder>(listener_);
     }
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    if (hiChainConnector_ == nullptr) {
+        hiChainConnector_ = std::make_shared<DmServiceHiChainConnector>();
+    }
+    if (credentialMgr_ == nullptr) {
+        credentialMgr_ = std::make_shared<DmCredentialManager>(hiChainConnector_, listener_);
+    }
     CHECK_NULL_RETURN(DMCommTool::GetInstance(), ERR_DM_POINT_NULL);
     DMCommTool::GetInstance()->Init();
     int32_t currentUserId = MultipleUserConnector::GetFirstForegroundUserId();
@@ -1225,34 +1231,6 @@ int32_t DeviceManagerService::RequestCredential(const std::string &reqJsonStr, s
     return dmServiceImpl_->RequestCredential(reqJsonStr, returnJsonStr);
 }
 
-int32_t DeviceManagerService::ImportCredential(const std::string &pkgName, const std::string &credentialInfo)
-{
-    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller: %{public}s does not have permission to call ImportCredential.",
-            pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("ImportCredential failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->ImportCredential(pkgName, credentialInfo);
-}
-
-int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const std::string &deleteInfo)
-{
-    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller: %{public}s does not have permission to call DeleteCredential.",
-            pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("DeleteCredential failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->DeleteCredential(pkgName, deleteInfo);
-}
-
 int32_t DeviceManagerService::MineRequestCredential(const std::string &pkgName, std::string &returnJsonStr)
 {
     if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
@@ -1309,33 +1287,6 @@ int32_t DeviceManagerService::DeleteCredential(const std::string &pkgName, const
         return ERR_DM_NOT_INIT;
     }
     return dmServiceImpl_->DeleteCredential(pkgName, reqJsonStr, returnJsonStr);
-}
-
-int32_t DeviceManagerService::RegisterCredentialCallback(const std::string &pkgName)
-{
-    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller: %{public}s does not have permission to call RegisterCredentialCallback.", pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("RegisterCredentialCallback failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->RegisterCredentialCallback(pkgName);
-}
-
-int32_t DeviceManagerService::UnRegisterCredentialCallback(const std::string &pkgName)
-{
-    if (!PermissionManager::GetInstance().CheckAccessServicePermission()) {
-        LOGE("The caller: %{public}s does not have permission to call UnRegisterCredentialCallback.",
-            pkgName.c_str());
-        return ERR_DM_NO_PERMISSION;
-    }
-    if (!IsDMServiceImplReady()) {
-        LOGE("UnRegisterCredentialCallback failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->UnRegisterCredentialCallback(pkgName);
 }
 
 int32_t DeviceManagerService::RegisterUiStateCallback(const std::string &pkgName)
