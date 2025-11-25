@@ -20,6 +20,7 @@
 #include <memory>
 
 #include <mutex>
+#include <utility>
 
 #include "advertise_manager.h"
 #include "discovery_manager.h"
@@ -295,11 +296,11 @@ private:
     bool IsDMImplSoLoaded();
     bool IsDMServiceAdapterSoLoaded();
     bool IsDMServiceAdapterResidentLoad();
-    bool IsDMDeviceRiskDetectSoLoaded();
+    std::pair<bool, IDMDeviceRiskDetect*> LoadDMDeviceRiskDetect();
     bool IsMsgEmptyAndDMServiceImplReady(const std::string &msg);
     void UnloadDMServiceImplSo();
     void UnloadDMServiceAdapterResident();
-    void UnloadDMDeviceRiskDetect();
+    void UnloadDMDeviceRiskDetect(IDMDeviceRiskDetect* &riskDetectPtr);
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
         int32_t bindLevel);
     void SendUnBindBroadCast(const std::vector<std::string> &peerUdids, int32_t userId, uint64_t tokenId,
@@ -447,20 +448,18 @@ private:
 private:
     bool isImplsoLoaded_ = false;
     bool isAdapterResidentSoLoaded_ = false;
-    bool isDeviceRiskDetectSoLoaded_ = false;
     void *residentSoHandle_ = nullptr;
-    void *deviceRiskDetectSoHandle_ = nullptr;
     void *dmServiceImplSoHandle_ = nullptr;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     ffrt::mutex isImplLoadLock_;
     ffrt::mutex isAdapterResidentLoadLock_;
-    ffrt::mutex isDeviceRiskDetectSoLoadLock_;
+    ffrt::mutex deviceRiskDetectSoLoadLock_;
     ffrt::mutex detectLock_;
     ffrt::mutex hichainListenerLock_;
 #else
     std::mutex isImplLoadLock_;
     std::mutex isAdapterResidentLoadLock_;
-    std::mutex isDeviceRiskDetectSoLoadLock_;
+    std::mutex deviceRiskDetectSoLoadLock_;
     std::mutex hichainListenerLock_;
 #endif
     std::mutex userVecLock_;

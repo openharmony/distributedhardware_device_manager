@@ -34,6 +34,7 @@
 #include "device_name_manager.h"
 #include "distributed_device_profile_client.h"
 #include "dm_comm_tool.h"
+#include "dm_library_manager.h"
 #include "dm_random.h"
 #include "dm_transport_msg.h"
 #include "dm_jsonstr_handle.h"
@@ -115,7 +116,6 @@ DeviceManagerService::~DeviceManagerService()
     LOGI("DeviceManagerService destructor");
     UnloadDMServiceImplSo();
     UnloadDMServiceAdapterResident();
-    UnloadDMDeviceRiskDetect();
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     UnloadDmCheckApiWhiteListSo();
 #endif
@@ -179,16 +179,18 @@ void DeviceManagerService::StartDetectDeviceRisk()
         LOGE("%{public}d sa not start", RISK_ANALYSIS_MANAGER_SA_ID);
         return;
     }
-    if (!IsDMDeviceRiskDetectSoLoaded()) {
+    auto loadRet = LoadDMDeviceRiskDetect();
+    if (!loadRet.first || loadRet.second == nullptr) {
         LOGE("load dm device risk detect failed.");
         return;
     }
 
-    bool isRisk = dmDeviceRiskDetect_->IsDeviceHasRisk();
+    bool isRisk = loadRet.second->IsDeviceHasRisk();
     if (isRisk) {
         LOGI("device status is Illegal");
         DelAllRelateShip();
     }
+    UnloadDMDeviceRiskDetect(loadRet.second);
     return;
 }
 
@@ -1714,64 +1716,55 @@ void DeviceManagerService::UnloadDMServiceAdapterResident()
     }
 }
 
-bool DeviceManagerService::IsDMDeviceRiskDetectSoLoaded()
-{
-#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::lock_guard<ffrt::mutex> lock(isDeviceRiskDetectSoLoadLock_);
-#else
-    std::lock_guard<std::mutex> lock(isDeviceRiskDetectSoLoadLock_);
-#endif
-    if (isDeviceRiskDetectSoLoaded_ && (dmDeviceRiskDetect_ != nullptr)) {
-        return true;
-    }
-    deviceRiskDetectSoHandle_ = dlopen(LIB_DM_DEVICE_RISK_DETECT_NAME, RTLD_NOW | RTLD_NODELETE | RTLD_NOLOAD);
-    if (deviceRiskDetectSoHandle_ == nullptr) {
-        deviceRiskDetectSoHandle_ = dlopen(LIB_DM_DEVICE_RISK_DETECT_NAME, RTLD_NOW | RTLD_NODELETE);
-    }
-    if (deviceRiskDetectSoHandle_ == nullptr) {
-        LOGE("load dm device risk detect so failed.");
-        return false;
-    }
-    dlerror();
-    auto func = (CreateDMDeviceRiskDetectFuncPtr)dlsym(deviceRiskDetectSoHandle_, "CreateDMDeviceRiskDetectObject");
-    if (dlerror() != nullptr || func == nullptr) {
-        dlclose(deviceRiskDetectSoHandle_);
-        deviceRiskDetectSoHandle_ = nullptr;
-        LOGE("Create object function is not exist.");
-        return false;
-    }
-
-    dmDeviceRiskDetect_ = std::shared_ptr<IDMDeviceRiskDetect>(func());
-    if (dmDeviceRiskDetect_->Initialize() != DM_OK) {
-        dlclose(deviceRiskDetectSoHandle_);
-        deviceRiskDetectSoHandle_ = nullptr;
-        dmDeviceRiskDetect_ = nullptr;
-        isDeviceRiskDetectSoLoaded_ = false;
-        LOGE("dm sdevice risk detect init failed.");
-        return false;
-    }
-    isDeviceRiskDetectSoLoaded_ = true;
-    LOGI("Success.");
-    return true;
-}
-
-void DeviceManagerService::UnloadDMDeviceRiskDetect()
+std::pair<bool, IDMDeviceRiskDetect*> DeviceManagerService::LoadDMDeviceRiskDetect()
 {
     LOGI("Start.");
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
-    std::lock_guard<ffrt::mutex> lock(isDeviceRiskDetectSoLoadLock_);
+    std::lock_guard<ffrt::mutex> lock(deviceRiskDetectSoLoadLock_);
 #else
-    std::lock_guard<std::mutex> lock(isDeviceRiskDetectSoLoadLock_);
+    std::lock_guard<std::mutex> lock(deviceRiskDetectSoLoadLock_);
 #endif
-    if (dmDeviceRiskDetect_ != nullptr) {
-        dmDeviceRiskDetect_->Release();
-        dmDeviceRiskDetect_ = nullptr;
+    auto& libManager = GetLibraryManager();
+    auto createRiskDetectObj = libManager.GetFunction<IDMDeviceRiskDetect*(*)()>(LIB_DM_DEVICE_RISK_DETECT_NAME,
+        "CreateDMDeviceRiskDetectObject");
+    if (createRiskDetectObj == nullptr) {
+        LOGE("load dm device risk detect so failed");
+        return {false, nullptr};
     }
-    if (deviceRiskDetectSoHandle_ != nullptr) {
-        LOGI("dm device risk detect deviceRiskDetectSoHandle_ is not nullptr.");
-        dlclose(deviceRiskDetectSoHandle_);
-        deviceRiskDetectSoHandle_ = nullptr;
+
+    IDMDeviceRiskDetect* riskDetectPtr = createRiskDetectObj();
+    if (riskDetectPtr == nullptr) {
+        LOGE("get risk detect ptr failed");
+        libManager.Release(LIB_DM_DEVICE_RISK_DETECT_NAME);
+        return {false, nullptr};
     }
+
+    if (riskDetectPtr->Initialize() != DM_OK) {
+        libManager.Release(LIB_DM_DEVICE_RISK_DETECT_NAME);
+        LOGE("dm sdevice risk detect init failed.");
+        return {false, nullptr};
+    }
+    LOGI("Success.");
+    return {true, riskDetectPtr};
+}
+
+void DeviceManagerService::UnloadDMDeviceRiskDetect(IDMDeviceRiskDetect* &riskDetectPtr)
+{
+    LOGI("Start.");
+    if (riskDetectPtr == nullptr) {
+        LOGE("The risk detect ptr is null");
+        return;
+    }
+#if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
+    std::lock_guard<ffrt::mutex> lock(deviceRiskDetectSoLoadLock_);
+#else
+    std::lock_guard<std::mutex> lock(deviceRiskDetectSoLoadLock_);
+#endif
+    riskDetectPtr->Release();
+    riskDetectPtr = nullptr;
+    auto& libManager = GetLibraryManager();
+    libManager.Release(LIB_DM_DEVICE_RISK_DETECT_NAME);
+    LOGI("Success.");
 }
 
 int32_t DeviceManagerService::StartDiscovering(const std::string &pkgName,
