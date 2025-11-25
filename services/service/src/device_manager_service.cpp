@@ -4937,19 +4937,19 @@ int32_t DeviceManagerService::GenerateRegServiceId(int32_t &regServiceId)
             LOGE("Failed to generate random bytes using OpenSSL.");
             return ERR_DM_FAILED;
         }
-        int32_t regServiceIdTemp = 0;
+        uint32_t regServiceIdTemp = 0;
         for (size_t i = 0; i < sizeof(int32_t); ++i) {
             regServiceIdTemp = (regServiceIdTemp << RANDOM_OFF_SET) | buffer[i];
         }
         ServiceInfoProfile serviceInfoProfile;
-        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByRegServiceId(regServiceIdTemp,
-            serviceInfoProfile);
+        int32_t ret = DeviceProfileConnector::GetInstance().GetServiceInfoProfileByRegServiceId(
+            static_cast<int32_t>(regServiceIdTemp), serviceInfoProfile);
         if (ret == DM_OK) {
-            LOGW("regServiceId %{public}d is exist", regServiceIdTemp);
+            LOGW("regServiceId %{public}d is exist", static_cast<int32_t>(regServiceIdTemp));
             continue;
         }
         if (ret == ERR_DM_SERVICE_INFO_NOT_EXIST) {
-            regServiceId = regServiceIdTemp;
+            regServiceId = static_cast<int32_t>(regServiceIdTemp);
             return DM_OK;
         }
         LOGW("GetServiceInfoProfileByRegServiceId faild, ret:%{public}d", ret);

@@ -68,7 +68,11 @@ void DmNativeEvent::Off(std::string &eventType)
         return;
     }
     auto listener = iter->second;
-    CHECK_NULL_VOID(listener);
+    if (listener == nullptr) {
+        LOGE("listener is null for %{public}s", eventType.c_str());
+        napi_close_handle_scope(env_, scope);
+        return;
+    }
     napi_delete_reference(env_, listener->handlerRef);
     eventMap_.erase(eventType);
     napi_close_handle_scope(env_, scope);
