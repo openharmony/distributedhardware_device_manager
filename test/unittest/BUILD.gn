@@ -105,7 +105,7 @@ group("unittest") {
     ":UTTest_softbus_listener_two",
     ":UTTest_softbus_publish",
     ":UTTest_softbus_session",
-    ":UTTest_dm_library_manager_test"
+    ":UTTest_dm_library_manager_test",
   ]
 }
 
@@ -2576,6 +2576,9 @@ ohos_unittest("UTTest_dm_library_manager_test") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
     "googletest:gmock",
     "hilog:libhilog",
   ]

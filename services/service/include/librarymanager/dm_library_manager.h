@@ -63,7 +63,8 @@ private:
 };
 
 template<typename FuncType>
-FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std::string& functionName) {
+FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std::string& functionName)
+{
     auto libInfo = GetOrCreateLibrary(libraryPath);
     {
         std::shared_lock<std::shared_mutex> readLock(libInfo->mutex);
@@ -93,7 +94,8 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
     return reinterpret_cast<FuncType>(sym);
 }
 
-inline DMLibraryManager& GetLibraryManager() {
+inline DMLibraryManager& GetLibraryManager()
+{
     return DMLibraryManager::GetInstance();
 }
 } // namespace DistributedHardware

@@ -67,46 +67,44 @@ HWTEST_F(DMLibraryManagerTest, LoadImplSo_002, testing::ext::TestSize.Level0)
     std::string funName3 = "CreateDpConnectorInstance";
 
     std::vector<std::thread> threads;
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 100; ++i) {
         threads.emplace_back([=]() {
-            for (int j = 0; j < 5; ++j) {
-                auto& libMgr = GetLibraryManager();
-                std::string libPath = "";
-                std::string funName = "";
+            auto& libMgr = GetLibraryManager();
+            std::string libPath = "";
+            std::string funName = "";
 
-                if (i % 3 == 0) {
-                    libPath = soName1;
-                    funName = funName1;
-                } else if (i % 3 == 1) {
-                    libPath = soName2;
-                    funName = funName2;
-                } else {
-                    libPath = soName3;
-                    funName = funName3;
-                }
-
-                if (i % 3 == 0) {
-                    auto createDMSvrObj = libMgr.GetFunction<IDeviceManagerServiceImpl*(*)()>(libPath, funName);
-                    EXPECT_NE(createDMSvrObj, nullptr);
-                    IDeviceManagerServiceImpl* dmSvrImplPtr = createDMSvrObj();
-                    EXPECT_NE(dmSvrImplPtr, nullptr);
-                    libMgr.Release(libPath);
-                } else if (i % 3 == 1) {
-                    auto createRadarHelper = libMgr.GetFunction<IDmRadarHelper *(*)()>(libPath, funName);
-                    EXPECT_NE(createRadarHelper, nullptr);
-                    IDmRadarHelper* radarHelperPtr = createRadarHelper();
-                    EXPECT_NE(radarHelperPtr, nullptr);
-                    libMgr.Release(libPath);
-                } else {                        
-                    auto createDpConn = libMgr.GetFunction<IDeviceProfileConnector *(*)()>(libPath, funName);
-                    EXPECT_NE(createDpConn, nullptr);
-                    IDeviceProfileConnector* dpConnectorPtr = createDpConn();
-                    EXPECT_NE(dpConnectorPtr, nullptr);
-                    libMgr.Release(libPath);
-                }
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            if (i % 3 == 0) {
+                libPath = soName1;
+                funName = funName1;
+            } else if (i % 3 == 1) {
+                libPath = soName2;
+                funName = funName2;
+            } else {
+                libPath = soName3;
+                funName = funName3;
             }
+
+            if (i % 3 == 0) {
+                auto createDMSvrObj = libMgr.GetFunction<IDeviceManagerServiceImpl*(*)()>(libPath, funName);
+                EXPECT_NE(createDMSvrObj, nullptr);
+                IDeviceManagerServiceImpl* dmSvrImplPtr = createDMSvrObj();
+                EXPECT_NE(dmSvrImplPtr, nullptr);
+                libMgr.Release(libPath);
+            } else if (i % 3 == 1) {
+                auto createRadarHelper = libMgr.GetFunction<IDmRadarHelper *(*)()>(libPath, funName);
+                EXPECT_NE(createRadarHelper, nullptr);
+                IDmRadarHelper* radarHelperPtr = createRadarHelper();
+                EXPECT_NE(radarHelperPtr, nullptr);
+                libMgr.Release(libPath);
+            } else {
+                auto createDpConn = libMgr.GetFunction<IDeviceProfileConnector *(*)()>(libPath, funName);
+                EXPECT_NE(createDpConn, nullptr);
+                IDeviceProfileConnector* dpConnectorPtr = createDpConn();
+                EXPECT_NE(dpConnectorPtr, nullptr);
+                libMgr.Release(libPath);
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         });
     }
     for (auto& t : threads) {
