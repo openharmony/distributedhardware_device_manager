@@ -86,7 +86,7 @@ void DMLibraryManager::DoUnloadLib(std::string& libraryPath)
     auto now = std::chrono::steady_clock::now();
     int freeTimeSpan = std::chrono::duration_cast<std::chrono::seconds>(now - libInfo->lastUsed).count();
 
-    if (currentRefs == 0 && freeTimeSpan > LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN) {
+    if (currentRefs == 0 && freeTimeSpan >= LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN) {
         if (libInfo->handle != nullptr) {
             LOGI("Do unload lib: %{public}s", libraryPath.c_str());
             dlclose(libInfo->handle);

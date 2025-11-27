@@ -107,11 +107,8 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
     }
     libInfo->lastUsed = std::chrono::steady_clock::now();
     if (libInfo->isLibTimerBegin == false) {
-        auto weakSelf = weak_from_this();
-        libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN, [weakSelf] (std::string libPath) {
-            if (auto self = weakSelf.lock()) {
-                self->DoUnloadLib(libPath);
-            }
+        libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN, [this] (std::string libPath) {
+            DMLibraryManager::DoUnloadLib(libPath);
         });
         libInfo->isLibTimerBegin = true;
     }
