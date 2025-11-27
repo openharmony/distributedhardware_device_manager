@@ -1984,8 +1984,8 @@ int32_t DeviceManagerImpl::RegisterDevStateCallback(const std::string &pkgName,
         LOGE("DeviceManagerImpl::RegisterDeviceStateCallback failed: input pkgName or callback is empty.");
         return ERR_DM_INPUT_PARA_INVALID;
     }
-    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DeviceManagerNotify::GetInstance().RegisterDeviceStateCallback(pkgName, callback);
+    SyncCallbackToService(DmCommonNotifyEvent::REG_DEVICE_STATE, pkgName);
     DmRadarHelper::GetInstance().ReportDmBehavior(pkgName, "RegisterDevStateCallback", DM_OK, anonyLocalUdid_);
     LOGI("Completed, pkgName: %{public}s", pkgName.c_str());
     return DM_OK;
