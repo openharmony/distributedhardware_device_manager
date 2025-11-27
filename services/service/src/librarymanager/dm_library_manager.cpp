@@ -38,8 +38,7 @@ size_t DMLibraryManager::GetSegmentIndex(const std::string& libraryPath) const
     return std::hash<std::string>{}(libraryPath) % NUM_SEGMENTS;
 }
 
-std::shared_ptr<DMLibraryManager::LibraryInfo>
-DMLibraryManager::GetOrCreateLibrary(const std::string& libraryPath)
+std::shared_ptr<DMLibraryManager::LibraryInfo> DMLibraryManager::GetOrCreateLibrary(const std::string& libraryPath)
 {
     size_t segmentIdx = GetSegmentIndex(libraryPath);
 
@@ -62,8 +61,7 @@ DMLibraryManager::GetOrCreateLibrary(const std::string& libraryPath)
     return newLibInfo;
 }
 
-std::shared_ptr<DMLibraryManager::LibraryInfo>
-DMLibraryManager::GetLibraryInfo(const std::string& libraryPath)
+std::shared_ptr<DMLibraryManager::LibraryInfo> DMLibraryManager::GetLibraryInfo(const std::string& libraryPath)
 {
     size_t segmentIdx = GetSegmentIndex(libraryPath);
 
