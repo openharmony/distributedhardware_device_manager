@@ -25,7 +25,7 @@
 #include "dm_device_info.h"
 
 namespace OHOS {
-namespace DistributedHardware { 
+namespace DistributedHardware {
 struct WhiteListInfo {
     int32_t objectSaUid = 0;
     int32_t subjectSaUid = 0;
