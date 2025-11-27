@@ -16,6 +16,7 @@
 #define OHOS_DM_LIBRARY_MANAGER_H
 
 #include <atomic>
+#include <chrono>
 #include <dlfcn.h>
 #include <string>
 #include <memory>
@@ -25,11 +26,15 @@
 #include <shared_mutex>
 
 #include "dm_log.h"
+#include "dm_timer.h"
 
 namespace OHOS {
 namespace DistributedHardware {
+// if a lib not used more than 60 seconds, trigger unload it.
+constexpr int32_t LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN = 60;
 class DMLibraryManager {
 public:
+    using TimePoint = std::chrono::steady_clock::time_point;
     DMLibraryManager();
 
     static DMLibraryManager& GetInstance();
@@ -45,7 +50,16 @@ private:
     struct LibraryInfo {
         void* handle = nullptr;
         std::atomic<int> refCount{0};
+        std::atomic<bool> isLibTimerBegin{false};
         mutable std::shared_mutex mutex;
+        TimePoint lastUsed;
+        std::unique_ptr<DmTimer> libTimer;
+
+        LibraryInfo()
+        {
+            lastUsed = std::chrono::steady_clock::now();
+            libTimer = std::make_unique<DmTimer>();
+        }
     };
 
     static const size_t NUM_SEGMENTS = 8;
@@ -60,6 +74,7 @@ private:
 private:
     std::shared_ptr<LibraryInfo> GetOrCreateLibrary(const std::string& libraryPath);
     std::shared_ptr<LibraryInfo> GetLibraryInfo(const std::string& libraryPath);
+    void DoUnloadLib(std::string& libraryPath);
 };
 
 template<typename FuncType>
@@ -77,7 +92,7 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
                 libInfo->handle = dlopen(libraryPath.c_str(), RTLD_LAZY);
                 if (!libInfo->handle) {
                     libInfo->refCount--;
-                    LOGE("dlopen failed for %s: %s", libraryPath.c_str(), dlerror());
+                    LOGE("dlopen failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
                     return nullptr;
                 }
             }
@@ -87,10 +102,17 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
     void* sym = dlsym(libInfo->handle, functionName.c_str());
     if (!sym) {
         libInfo->refCount--;
-        LOGE("dlopen failed for %s: %s", libraryPath.c_str(), dlerror());
+        LOGE("dlopen failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
         return nullptr;
     }
-
+    libInfo->lastUsed = std::chrono::steady_clock::now();
+    if (libInfo->isLibTimerBegin == false) {
+        libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN, [this] (std::string libPath) {
+            DMLibraryManager::DoUnloadLib(libPath);
+        });
+        libInfo->isLibTimerBegin = true;
+    }
+    LOGI("Do load lib: %{public}s", libraryPath.c_str());
     return reinterpret_cast<FuncType>(sym);
 }
 

@@ -2579,6 +2579,7 @@ ohos_unittest("UTTest_dm_library_manager_test") {
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
     "dsoftbus:softbus_client",
+    "ffrt:libffrt",
     "googletest:gmock",
     "hilog:libhilog",
   ]

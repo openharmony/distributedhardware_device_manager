@@ -74,25 +74,51 @@ std::shared_ptr<DMLibraryManager::LibraryInfo> DMLibraryManager::GetLibraryInfo(
     return nullptr;
 }
 
+void DMLibraryManager::DoUnloadLib(std::string& libraryPath)
+{
+    auto libInfo = GetLibraryInfo(libraryPath);
+    if (libInfo == nullptr) {
+        return;
+    }
+
+    int currentRefs = libInfo->refCount.load();
+    auto now = std::chrono::steady_clock::now();
+    int freeTimeSpan = std::chrono::duration_cast<std::chrono::seconds>(now - libInfo->lastUsed).count();
+
+    std::unique_lock<std::shared_mutex> lock(libInfo->mutex);
+    if (currentRefs == 0 && freeTimeSpan > LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN) {
+        if (libInfo->handle != nullptr) {
+            LOGI("Do unload lib: %{public}s", libraryPath.c_str());
+            dlclose(libInfo->handle);
+            libInfo->handle = nullptr;
+            libInfo->isLibTimerBegin = false;
+        }
+    } else {
+        LOGI("Can not unload lib: %{public}s, ref: %{public}d, free time(sec): %{public}d",
+            libraryPath.c_str(), currentRefs, freeTimeSpan);
+        libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN, [this] (std::string libPath) {
+            DMLibraryManager::DoUnloadLib(libPath);
+        });
+    }
+}
+
 void DMLibraryManager::Release(const std::string& libraryPath)
 {
     auto libInfo = GetLibraryInfo(libraryPath);
-    if (!libInfo) return;
+    if (!libInfo) {
+        return;
+    }
 
     int currentRefs = libInfo->refCount.fetch_sub(1);
-    if (currentRefs == 1) {
-        std::unique_lock<std::shared_mutex> lock(libInfo->mutex);
-        if (libInfo->handle) {
-            dlclose(libInfo->handle);
-            libInfo->handle = nullptr;
-        }
-    }
+    LOGI("the lib:%{public}s current ref: %{public}d", libraryPath.c_str(), currentRefs);
 }
 
 void DMLibraryManager::RequestUnload(const std::string& libraryPath)
 {
     auto libInfo = GetLibraryInfo(libraryPath);
-    if (!libInfo) return;
+    if (!libInfo) {
+        return;
+    }
 
     int currentRefs = libInfo->refCount.load();
     if (currentRefs == 0) {
