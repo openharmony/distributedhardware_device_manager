@@ -81,11 +81,11 @@ void DMLibraryManager::DoUnloadLib(std::string& libraryPath)
         return;
     }
 
+    std::unique_lock<std::shared_mutex> lock(libInfo->mutex);
     int currentRefs = libInfo->refCount.load();
     auto now = std::chrono::steady_clock::now();
     int freeTimeSpan = std::chrono::duration_cast<std::chrono::seconds>(now - libInfo->lastUsed).count();
 
-    std::unique_lock<std::shared_mutex> lock(libInfo->mutex);
     if (currentRefs == 0 && freeTimeSpan > LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN) {
         if (libInfo->handle != nullptr) {
             LOGI("Do unload lib: %{public}s", libraryPath.c_str());
@@ -109,8 +109,12 @@ void DMLibraryManager::Release(const std::string& libraryPath)
         return;
     }
 
-    int currentRefs = libInfo->refCount.fetch_sub(1);
-    LOGI("the lib:%{public}s current ref: %{public}d", libraryPath.c_str(), currentRefs);
+    int currentRefs = libInfo->refCount.fetch_sub(1, std::memory_order_acq_rel);
+    if (currentRefs <= 0) {
+        LOGE("Reference count underflow for %{public}s", libraryPath.c_str());
+        libInfo->refCount.store(0, std::memory_order_relaxed);
+    }
+    LOGI("the lib:%{public}s current ref: %{public}d", libraryPath.c_str(), currentRefs - 1);
 }
 
 void DMLibraryManager::RequestUnload(const std::string& libraryPath)
