@@ -32,7 +32,7 @@ namespace OHOS {
 namespace DistributedHardware {
 // if a lib not used more than 60 seconds, trigger unload it.
 constexpr int32_t LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN = 60;
-class DMLibraryManager : public std::enable_shared_from_this<DMLibraryManager> {
+class DMLibraryManager {
 public:
     using TimePoint = std::chrono::steady_clock::time_point;
     DMLibraryManager();
