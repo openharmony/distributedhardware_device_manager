@@ -17,6 +17,7 @@
 #define OHOS_I_DM_SERVICE_IMPL_EXT_RESIDENT_H
 
 #include "idevice_manager_service_listener.h"
+#include "isa_specification_verify.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -119,6 +120,8 @@ public:
     virtual int32_t StartPublishService(const ProcessInfo &processInfo,
         const PublishServiceParam &publishServiceParam) = 0;
     virtual int32_t StopPublishService(int64_t serviceId) = 0;
+    virtual bool CheckBuildLink(const DmSaCaller &caller, const DmSaCallee &callee,
+        bool isRpc, bool isSrc) = 0;
 };
 
 using CreateDMServiceExtResidentFuncPtr = IDMServiceImplExtResident *(*)(void);
