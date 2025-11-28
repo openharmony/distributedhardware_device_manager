@@ -78,6 +78,7 @@ ohos_shared_library("devicemanagerdependency") {
 
   external_deps = [
     "ability_base:want",
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -150,6 +151,7 @@ ohos_shared_library("devicemanagerdependencytest") {
 
   external_deps = [
     "ability_base:want",
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
