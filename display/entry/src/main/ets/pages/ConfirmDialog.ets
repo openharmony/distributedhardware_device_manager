@@ -1601,7 +1601,6 @@ struct ConfirmCustomDialog {
               top: this.isAvailableType ? 0 : 24,
               bottom: 15, left: 24, right: 24
             })
-            .width('100%')
             Column() {
               Text(this.peerCustomDescription)
                 .textAlign(TextAlign.Start)
@@ -1615,7 +1614,6 @@ struct ConfirmCustomDialog {
                 .margin({ top: 8 })
                 .visibility(this.peerCustomDescription === '' ? Visibility.None : Visibility.Visible)
             }.margin({
-              top: this.isAvailableType ? 0 : 24,
               bottom: 16, left: 24, right: 24
             })
             
