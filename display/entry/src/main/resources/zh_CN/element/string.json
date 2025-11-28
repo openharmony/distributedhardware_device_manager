@@ -145,20 +145,6 @@
             "attr":{
                 "priority":"translate"
             }
-        },
-        {
-            "name":"dm_link_agree",
-            "value":"同意（%d 天内有效）",
-            "attr":{
-                "priority":"translate"
-            }
-        },
-        {
-            "name":"dm_link_title",
-            "value":"%2$s 的 %1$s 请求访问本机。是否同意？",
-            "attr":{
-                "priority":"translate"
-            }
         }
     ]
 }
