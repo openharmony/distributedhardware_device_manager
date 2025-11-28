@@ -46,7 +46,6 @@ ohos_fuzztest("IpcModelCodecOneFuzzTest") {
     "${servicesimpl_path}/include/devicestate",
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [

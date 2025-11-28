@@ -24,7 +24,6 @@
 #include <thread>
 
 #include "idevice_manager_service_listener.h"
-#include "dm_adapter_manager.h"
 #include "softbus_connector.h"
 #include "dm_timer.h"
 #include "hichain_connector.h"

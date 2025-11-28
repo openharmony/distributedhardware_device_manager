@@ -60,7 +60,6 @@ if (defined(ohos_lite)) {
       sources = [
         "${devicemanager_path}/commondependency/src/multiple_user_connector.cpp",
         "src/ability/lite/dm_ability_manager.cpp",
-        "src/adapter/lite/dm_adapter_manager.cpp",
         "src/credential/dm_credential_manager.cpp",
         "src/dependency/hichain/hichain_auth_connector.cpp",
         "src/dependency/hichain/hichain_connector.cpp",
@@ -112,7 +111,6 @@ if (defined(ohos_lite)) {
   config("devicemanagerserviceimpl_config") {
     include_dirs = [
       "include",
-      "include/config",
       "include/adapter",
       "include/attest",
       "include/authentication",
@@ -177,7 +175,6 @@ if (defined(ohos_lite)) {
     sources = [
       "src/ability/standard/dm_ability_manager.cpp",
       "src/ability/standard/dm_dialog_manager.cpp",
-      "src/adapter/standard/dm_adapter_manager.cpp",
       "src/attest/dm_auth_attest_common.cpp",
       "src/attest/dm_auth_cert.cpp",
       "src/authentication/auth_message_processor.cpp",
@@ -198,7 +195,6 @@ if (defined(ohos_lite)) {
       "src/authentication_v2/dm_auth_state_machine.cpp",
       "src/authentication_v2/dm_negotiate_process.cpp",
       "src/authentication_v2/dm_freeze_process.cpp",
-      "src/config/dm_config_manager.cpp",
       "src/credential/dm_credential_manager.cpp",
       "src/cryptomgr/crypto_mgr.cpp",
       "src/dependency/commonevent/dm_common_event_manager.cpp",

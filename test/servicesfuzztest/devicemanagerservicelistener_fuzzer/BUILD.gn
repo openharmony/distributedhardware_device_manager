@@ -43,7 +43,6 @@ ohos_fuzztest("DeviceManagerServiceListenerFuzzTest") {
     "${servicesimpl_path}/include/deviceinfo/",
     "${servicesimpl_path}/include/devicestate",
     "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [

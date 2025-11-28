@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 #include <refbase.h>
 
-#include "dm_adapter_manager.h"
 #include "softbus_connector_mock.h"
 #include "device_manager_service_listener.h"
 #include "softbus_session_callback.h"

@@ -19,6 +19,7 @@
 
 #include "dm_log.h"
 #include "dm_constants.h"
+#include "dm_device_info.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -69,13 +70,6 @@ HWTEST_F(DmDistributedHardwareLoadTest, Sha256_001, testing::ext::TestSize.Level
     bool isUpper = false;
     std::string ret = crypto->Sha256(text, isUpper);
     EXPECT_NE(ret.empty(), true);
-}
-
-HWTEST_F(DmDistributedHardwareLoadTest, GetCryptoAdapter_001, testing::ext::TestSize.Level0)
-{
-    std::string soName = "soName";
-    auto ret = DmAdapterManager::GetInstance().GetCryptoAdapter(soName);
-    EXPECT_EQ(ret, nullptr);
 }
 
 HWTEST_F(DmDistributedHardwareLoadTest, GetUdidHash_001, testing::ext::TestSize.Level0)

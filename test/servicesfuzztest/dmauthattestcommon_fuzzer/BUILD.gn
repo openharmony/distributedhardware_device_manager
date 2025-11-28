@@ -31,7 +31,6 @@ ohos_fuzztest("DmAuthAttestCommonFuzzTest") {
     "${servicesimpl_path}/include",
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
     "${innerkits_path}/native_cpp/include",
     "${servicesimpl_path}/include/attest",
     "${utils_path}/include/kvadapter",
@@ -48,7 +47,6 @@ ohos_fuzztest("DmAuthAttestCommonFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "${servicesimpl_path}/src/adapter/standard/dm_adapter_manager.cpp",
     "dm_auth_attest_common_fuzzer.cpp",
     "${json_path}/src/json_object_cjson.cpp",
   ]

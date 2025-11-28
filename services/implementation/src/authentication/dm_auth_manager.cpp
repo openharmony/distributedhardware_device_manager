@@ -29,7 +29,6 @@
 #include "common_event_support.h"
 #include "dm_ability_manager.h"
 #include "dm_anonymous.h"
-#include "dm_config_manager.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_dialog_manager.h"
@@ -106,9 +105,8 @@ DmAuthManager::DmAuthManager(std::shared_ptr<SoftbusConnector> softbusConnector,
       hiChainAuthConnector_(hiChainAuthConnector)
 {
     LOGI("DmAuthManager constructor");
-    DmConfigManager &dmConfigManager = DmConfigManager::GetInstance();
-    dmConfigManager.GetAuthAdapter(authenticationMap_);
     authUiStateMgr_ = std::make_shared<AuthUiStateManager>(listener_);
+    authenticationMap_[AUTH_TYPE_PIN] = nullptr;
     authenticationMap_[AUTH_TYPE_IMPORT_AUTH_CODE] = nullptr;
     authenticationMap_[AUTH_TYPE_CRE] = nullptr;
     authenticationMap_[AUTH_TYPE_NFC] = nullptr;

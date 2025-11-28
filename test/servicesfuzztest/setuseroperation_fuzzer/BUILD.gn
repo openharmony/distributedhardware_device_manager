@@ -43,7 +43,6 @@ ohos_fuzztest("SetUserOperationFuzzTest") {
     "${servicesimpl_path}/include/devicestate",
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [

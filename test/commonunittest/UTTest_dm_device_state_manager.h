@@ -19,7 +19,6 @@
 #include <refbase.h>
 
 #include "softbus_connector.h"
-#include "dm_adapter_manager.h"
 #include "device_manager_service_listener.h"
 #include "softbus_session_callback.h"
 
