@@ -193,6 +193,7 @@ ohos_unittest("UTTest_dm_auth_cert") {
   deps = [ ":device_manager_test_common" ]
  
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -253,6 +254,7 @@ ohos_unittest("UTTest_ipc_cmd_parser_service") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "cJSON:cjson",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -314,6 +316,7 @@ ohos_unittest("UTTest_app_manager_two") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bundle_framework:appexecfwk_base",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
     "googletest:gmock",
@@ -503,6 +506,7 @@ ohos_unittest("UTTest_device_manager_service") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bundle_framework:appexecfwk_base",
     "cJSON:cjson",
     "data_share:datashare_consumer",
     "device_auth:deviceauth_sdk",
@@ -1055,6 +1059,7 @@ ohos_unittest("UTTest_ipc_server_client_proxy") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "cJSON:cjson",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
@@ -1264,6 +1269,7 @@ ohos_unittest("UTTest_oh_device_manager") {
   ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
@@ -1405,6 +1411,7 @@ ohos_unittest("UTTest_device_manager_service_impl") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1435,6 +1442,7 @@ ohos_unittest("UTTest_device_manager_service_impl_first") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -1587,6 +1595,7 @@ ohos_unittest("UTTest_dm_auth_manager_first") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
@@ -2121,6 +2130,7 @@ ohos_unittest("UTTest_device_name_manager") {
   deps = [ ":device_manager_test_common" ]
 
   external_deps = [
+    "bundle_framework:appexecfwk_base",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "ffrt:libffrt",
@@ -2344,6 +2354,7 @@ ohos_unittest("UTTest_auth_negotiate") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "bundle_framework:appexecfwk_base",
     "device_auth:deviceauth_sdk",
     "device_info_manager:distributed_device_profile_common",
     "device_info_manager:distributed_device_profile_sdk",
