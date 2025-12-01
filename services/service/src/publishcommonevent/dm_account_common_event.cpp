@@ -150,8 +150,8 @@ void DmAccountEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         beforeUserId = data.GetCode();
         accountValidEvent = true;
     }
-    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT ||
-        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
+    if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT ||
+        receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN) {
         currentUserId = data.GetWant().GetIntParam("userId", 0);
         beforeUserId = currentUserId;
         accountValidEvent = true;

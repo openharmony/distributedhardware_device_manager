@@ -96,11 +96,11 @@ HWTEST_F(DmAccountCommonEventManagerTest, OnReceiveEvent_001, testing::ext::Test
     data.SetCode(1);
     accountCommonEventManager->subscriber_->OnReceiveEvent(data);
 
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT);
     data.SetWant(want);
     accountCommonEventManager->subscriber_->OnReceiveEvent(data);
 
-    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN);
     data.SetWant(want);
     accountCommonEventManager->subscriber_->OnReceiveEvent(data);
     EXPECT_NE(accountCommonEventManager->subscriber_->GetSubscriberEventNameVec(), changeEventVec);

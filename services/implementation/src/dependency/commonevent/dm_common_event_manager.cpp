@@ -133,7 +133,7 @@ void DmEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     int32_t userId = data.GetCode();
     if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         userId = data.GetCode();
-    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+    } else if (receiveEvent == EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT) {
         userId = data.GetWant().GetIntParam("userId", 0);
     }
     if (userId <= 0) {
