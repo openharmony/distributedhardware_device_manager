@@ -23,7 +23,6 @@
 #include "authentication.h"
 #include "softbus_session.h"
 #include "device_manager_service_listener.h"
-#include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "softbus_connector.h"
 #include "hichain_connector.h"

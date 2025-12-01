@@ -26,7 +26,6 @@ ohos_fuzztest("PinAuthFuzzTest") {
     "${common_path}/include",
     "${ext_path}/pin_auth/include/ability",
     "${servicesimpl_path}/include/dependency/timer",
-    "${servicesimpl_path}/include/config",
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/authentication/showconfirm/standard",

@@ -44,7 +44,6 @@ group("unittest") {
     ":UTTest_discovery_filter",
     ":UTTest_discovery_manager",
     ":UTTest_dm_account_common_event",
-    ":UTTest_dm_adapter_manager",
     ":UTTest_dm_auth_attest_common",
     ":UTTest_dm_auth_cert",
     ":UTTest_dm_anonymous",
@@ -877,24 +876,6 @@ ohos_unittest("UTTest_softbus_session") {
 }
 
 ## UnitTest UTTest_softbus_session }}}
-
-## UnitTest UTTest_dm_adapter_manager {{{
-ohos_unittest("UTTest_dm_adapter_manager") {
-  module_out_path = module_out_path
-
-  sources = [ "UTTest_dm_adapter_manager.cpp" ]
-
-  deps = [ ":device_manager_test_common" ]
-
-  external_deps = [
-    "device_auth:deviceauth_sdk",
-    "ffrt:libffrt",
-    "googletest:gmock",
-    "hilog:libhilog",
-  ]
-}
-
-## UnitTest UTTest_dm_adapter_manager }}}
 
 ## UnitTest UTTest_dm_anonymous {{{
 ohos_unittest("UTTest_dm_anonymous") {
@@ -2462,7 +2443,6 @@ config("device_manager_test_common_public_config") {
     "${services_path}/include/pinholder",
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
     "${servicesimpl_path}/include/dependency/multipleuser",
     "${servicesimpl_path}/include/pinholder",
     "${devicemanager_path}/test/unittest/mock/",

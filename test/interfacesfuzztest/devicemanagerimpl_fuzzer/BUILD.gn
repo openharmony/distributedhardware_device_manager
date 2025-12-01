@@ -47,7 +47,6 @@ ohos_fuzztest("DeviceManagerImplFuzzTest") {
     "${servicesimpl_path}/include/dependency/hichain",
     "${servicesimpl_path}/include/devicestate",
     "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [

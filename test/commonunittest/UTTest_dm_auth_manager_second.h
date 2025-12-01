@@ -26,7 +26,6 @@
 #include "auth_response_state.h"
 #include "authentication.h"
 #include "device_manager_service_listener.h"
-#include "dm_adapter_manager.h"
 #include "dm_auth_manager.h"
 #include "dm_constants.h"
 #include "dm_timer.h"

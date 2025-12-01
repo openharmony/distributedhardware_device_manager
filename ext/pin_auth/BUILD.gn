@@ -43,7 +43,6 @@ ohos_shared_library("devicemanagerext_pin_auth") {
     "${devicemanager_path}/commondependency/include",
     "${ext_path}/pin_auth/include/ability",
     "${servicesimpl_path}/include/dependency/timer",
-    "${servicesimpl_path}/include/config",
     "${servicesimpl_path}/include/adapter",
     "${servicesimpl_path}/include/authentication",
     "${servicesimpl_path}/include/authentication/showconfirm/standard",

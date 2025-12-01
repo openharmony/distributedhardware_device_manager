@@ -17,7 +17,6 @@
 
 #include <pthread.h>
 
-#include "dm_adapter_manager.h"
 #include "dm_anonymous.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"

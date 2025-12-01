@@ -43,7 +43,6 @@ ohos_fuzztest("UnRegisterDeviceManagerFaCallbackFuzzTest") {
     "${devicemanager_path}/interfaces/kits/js/include",
     "${devicemanager_path}/test/unittest/mock",
     "${servicesimpl_path}/include/ability",
-    "${servicesimpl_path}/include/config",
   ]
 
   cflags = [

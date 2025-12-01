@@ -27,7 +27,6 @@
 #include "idevice_manager_service_listener.h"
 #include "deviceprofile_connector.h"
 #include "dm_ability_manager.h"
-#include "dm_adapter_manager.h"
 #include "dm_auth_manager_base.h"
 #include "dm_constants.h"
 #include "dm_device_info.h"
@@ -604,7 +603,6 @@ private:
     std::shared_ptr<HiChainConnector> hiChainConnector_;
     std::shared_ptr<AuthUiStateManager> authUiStateMgr_;
     std::shared_ptr<IDeviceManagerServiceListener> listener_;
-    std::shared_ptr<DmAdapterManager> adapterMgr_;
     std::map<int32_t, std::shared_ptr<IAuthentication>> authenticationMap_;
     std::shared_ptr<AuthRequestState> authRequestState_ = nullptr;
     std::shared_ptr<AuthRequestState> authRequestStateTemp_ = nullptr;

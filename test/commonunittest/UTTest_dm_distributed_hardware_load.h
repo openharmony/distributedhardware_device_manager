@@ -18,7 +18,6 @@
 #include <gtest/gtest.h>
 #include <refbase.h>
 
-#include "dm_adapter_manager.h"
 #include "dm_constants.h"
 #include "dm_crypto.h"
 #include "dm_distributed_hardware_load.h"
