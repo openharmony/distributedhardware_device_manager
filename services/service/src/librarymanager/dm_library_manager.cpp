@@ -82,21 +82,27 @@ void DMLibraryManager::DoUnloadLib(std::string& libraryPath)
     }
 
     std::unique_lock<std::shared_mutex> lock(libInfo->mutex);
-    int currentRefs = libInfo->refCount.load();
+    int32_t currentRefs = libInfo->refCount.load();
     auto now = std::chrono::steady_clock::now();
-    int freeTimeSpan = std::chrono::duration_cast<std::chrono::seconds>(now - libInfo->lastUsed).count();
+    auto nowSec = static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count());
+    int32_t freeTimeSpan = static_cast<int32_t>(nowSec - libInfo->lastUsed);
 
-    if (currentRefs == 0 && freeTimeSpan >= LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN) {
+    if ((currentRefs == 0 && freeTimeSpan >= LIB_UNLOAD_TRIGGER_FREE_TIMESPAN) ||
+        (currentRefs != 0 && freeTimeSpan >= LIB_UNLOAD_TRIGGER_MAX_FREE_TIMESPAN)) {
         if (libInfo->handle != nullptr) {
             LOGI("Do unload lib: %{public}s", libraryPath.c_str());
             dlclose(libInfo->handle);
             libInfo->handle = nullptr;
             libInfo->isLibTimerBegin = false;
+            libInfo->refCount.store(0, std::memory_order_relaxed);
         }
+        libInfo->libTimer->DeleteTimer(libraryPath);
     } else {
         LOGI("Can not unload lib: %{public}s, ref: %{public}d, free time(sec): %{public}d",
             libraryPath.c_str(), currentRefs, freeTimeSpan);
-        libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN, [this] (std::string libPath) {
+        libInfo->libTimer->DeleteTimer(libraryPath);
+        libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRIGGER_FREE_TIMESPAN, [this] (std::string libPath) {
             DMLibraryManager::DoUnloadLib(libPath);
         });
     }
@@ -109,38 +115,12 @@ void DMLibraryManager::Release(const std::string& libraryPath)
         return;
     }
 
-    int currentRefs = libInfo->refCount.fetch_sub(1, std::memory_order_acq_rel);
+    int32_t currentRefs = libInfo->refCount.fetch_sub(1, std::memory_order_acq_rel);
     if (currentRefs <= 0) {
         LOGE("Reference count underflow for %{public}s", libraryPath.c_str());
         libInfo->refCount.store(0, std::memory_order_relaxed);
     }
     LOGI("the lib:%{public}s current ref: %{public}d", libraryPath.c_str(), currentRefs - 1);
-}
-
-void DMLibraryManager::RequestUnload(const std::string& libraryPath)
-{
-    auto libInfo = GetLibraryInfo(libraryPath);
-    if (!libInfo) {
-        return;
-    }
-
-    int currentRefs = libInfo->refCount.load();
-    if (currentRefs == 0) {
-        std::unique_lock<std::shared_mutex> lock(libInfo->mutex);
-        if (libInfo->handle) {
-            dlclose(libInfo->handle);
-            libInfo->handle = nullptr;
-        }
-    }
-}
-
-bool DMLibraryManager::IsLoaded(const std::string& libraryPath)
-{
-    auto libInfo = GetLibraryInfo(libraryPath);
-    if (!libInfo) return false;
-
-    std::shared_lock<std::shared_mutex> lock(libInfo->mutex);
-    return libInfo->handle != nullptr;
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -31,10 +31,11 @@
 namespace OHOS {
 namespace DistributedHardware {
 // if a lib not used more than 60 seconds, trigger unload it.
-constexpr int32_t LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN = 60;
+constexpr int32_t LIB_UNLOAD_TRIGGER_FREE_TIMESPAN = 60;
+// if a lib not used more than 30 min, trigger force unload it.
+constexpr int32_t LIB_UNLOAD_TRIGGER_MAX_FREE_TIMESPAN = 60 * 30;
 class DMLibraryManager {
 public:
-    using TimePoint = std::chrono::steady_clock::time_point;
     DMLibraryManager();
 
     static DMLibraryManager& GetInstance();
@@ -43,21 +44,21 @@ public:
     FuncType GetFunction(const std::string& libraryPath, const std::string& functionName);
 
     void Release(const std::string& libraryPath);
-    void RequestUnload(const std::string& libraryPath);
-    bool IsLoaded(const std::string& libraryPath);
 
 private:
     struct LibraryInfo {
         void* handle = nullptr;
-        std::atomic<int> refCount{0};
+        std::atomic<int32_t> refCount{0};
         std::atomic<bool> isLibTimerBegin{false};
+        std::atomic<uint64_t> lastUsed;
         mutable std::shared_mutex mutex;
-        TimePoint lastUsed;
         std::unique_ptr<DmTimer> libTimer;
 
         LibraryInfo()
         {
-            lastUsed = std::chrono::steady_clock::now();
+            auto now = std::chrono::steady_clock::now();
+            lastUsed = static_cast<uint64_t>(
+                std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count());
             libTimer = std::make_unique<DmTimer>();
         }
     };
@@ -105,9 +106,11 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
         LOGE("dlopen failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
         return nullptr;
     }
-    libInfo->lastUsed = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now();
+    libInfo->lastUsed = static_cast<uint64_t>(
+        std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count());
     if (libInfo->isLibTimerBegin == false) {
-        libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRGIIGER_FREE_TIMESPAN, [this] (std::string libPath) {
+        libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRIGGER_FREE_TIMESPAN, [this] (std::string libPath) {
             DMLibraryManager::DoUnloadLib(libPath);
         });
         libInfo->isLibTimerBegin = true;
