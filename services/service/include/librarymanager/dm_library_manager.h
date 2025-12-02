@@ -101,7 +101,7 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
     void* sym = dlsym(libInfo->handle, functionName.c_str());
     if (sym == nullptr) {
         libInfo->refCount--;
-        LOGE("dlopen failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
+        LOGE("dlsym failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
         return nullptr;
     }
     auto now = std::chrono::steady_clock::now();
