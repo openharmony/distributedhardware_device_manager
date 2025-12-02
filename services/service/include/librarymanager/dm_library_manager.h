@@ -107,11 +107,12 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
     auto now = std::chrono::steady_clock::now();
     libInfo->lastUsed = static_cast<uint64_t>(
         std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count());
-    if (libInfo->isLibTimerBegin == false) {
+    bool expected = false;
+    if (libInfo->isLibTimerBegin.compare_exchange_strong(expected, true,
+            std::memory_order_acq_rel, std::memory_order_acquire)) {
         libInfo->libTimer->StartTimer(libraryPath, LIB_UNLOAD_TRIGGER_FREE_TIMESPAN, [this] (std::string libPath) {
             DMLibraryManager::DoUnloadLib(libPath);
         });
-        libInfo->isLibTimerBegin = true;
     }
     LOGI("Do load lib: %{public}s", libraryPath.c_str());
     return reinterpret_cast<FuncType>(sym);
