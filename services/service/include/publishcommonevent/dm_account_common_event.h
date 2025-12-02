@@ -34,8 +34,8 @@ using OHOS::EventFwk::CommonEventSubscribeInfo;
  * ------------------------------------------
  * COMMON_EVENT_USER_SWITCHED   |   switch target user id   |   the user id before switch
  * COMMON_EVENT_USER_REMOVED    |           -1              |   the user id removed
- * COMMON_EVENT_HWID_LOGOUT     |  logout in witch user id  |   logout in witch user id
- * COMMON_EVENT_HWID_LOGIN      |  login in witch user id   |   login in witch user id
+ * COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT     |  logout in witch user id  |   logout in witch user id
+ * COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN      |  login in witch user id   |   login in witch user id
  */
 using AccountEventCallback = std::function<void(std::string, int32_t, int32_t)>;
 

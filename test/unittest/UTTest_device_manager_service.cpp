@@ -293,10 +293,10 @@ HWTEST_F(DeviceManagerServiceTest, UnPublishDeviceDiscovery_004, testing::ext::T
     std::multimap<std::string, int32_t> curMultiMap;
     std::string commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
-    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGIN;
+    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN;
     DMAccountInfo dmAccountInfo;
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
-    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_HWID_LOGOUT;
+    commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT;
     EXPECT_CALL(*multipleUserConnectorMock_, GetAccountInfoByUserId(_)).WillOnce(Return(dmAccountInfo));
     DeviceManagerService::GetInstance().AccountCommonEventCallback(commonEventType, userId, preUserId);
     commonEventType = EventFwk::CommonEventSupport::COMMON_EVENT_USER_REMOVED;

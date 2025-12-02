@@ -98,6 +98,11 @@ int32_t SoftbusSession::GetPeerDeviceId(int32_t sessionId, std::string &peerDevI
 
 int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 {
+    if (message.size() > MAX_DATA_LEN) {
+        LOGE("SendData size is %{public}zu too long.", message.size());
+        return ERR_DM_FAILED;
+    }
+
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendBytes failed.");
@@ -108,6 +113,11 @@ int32_t SoftbusSession::SendData(int32_t sessionId, std::string &message)
 
 int32_t SoftbusSession::SendHeartbeatData(int32_t sessionId, std::string &message)
 {
+    if (message.size() > MAX_DATA_LEN) {
+        LOGE("SendHeartbeatData size is %{public}zu too long.", message.size());
+        return ERR_DM_FAILED;
+    }
+
     int32_t ret = SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
     if (ret != DM_OK) {
         LOGE("[SOFTBUS]SendHeartbeatData failed.");

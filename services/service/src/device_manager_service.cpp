@@ -2275,8 +2275,8 @@ void DeviceManagerService::SubscribeAccountCommonEvent()
     std::vector<std::string> AccountCommonEventVec;
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_REMOVED);
-    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGOUT);
-    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_HWID_LOGIN);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT);
+    AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_INFO_UPDATED);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_STOPPED);
     AccountCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_USER_UNLOCKED);
@@ -2321,10 +2321,10 @@ DM_EXPORT void DeviceManagerService::AccountCommonEventCallback(
 {
     if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         HandleUserSwitchEventCallback(commonEventType, currentUserId, beforeUserId);
-    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGIN) {
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGIN) {
         DeviceNameManager::GetInstance().InitDeviceNameWhenLogin();
         MultipleUserConnector::SetAccountInfo(currentUserId, MultipleUserConnector::GetCurrentDMAccountInfo());
-    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_HWID_LOGOUT) {
+    } else if (commonEventType == CommonEventSupport::COMMON_EVENT_DISTRIBUTED_ACCOUNT_LOGOUT) {
         HandleAccountLogoutEventCallback(commonEventType, currentUserId, beforeUserId);
     } else if (commonEventType == CommonEventSupport::COMMON_EVENT_USER_REMOVED) {
         HandleUserRemoved(beforeUserId);
