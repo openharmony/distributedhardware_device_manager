@@ -32,8 +32,6 @@ namespace OHOS {
 namespace DistributedHardware {
 // if a lib not used more than 60 seconds, trigger unload it.
 constexpr int32_t LIB_UNLOAD_TRIGGER_FREE_TIMESPAN = 60;
-// if a lib not used more than 30 min, trigger force unload it.
-constexpr int32_t LIB_UNLOAD_TRIGGER_MAX_FREE_TIMESPAN = 60 * 30;
 class DMLibraryManager {
 public:
     DMLibraryManager();
@@ -75,7 +73,7 @@ private:
 private:
     std::shared_ptr<LibraryInfo> GetOrCreateLibrary(const std::string& libraryPath);
     std::shared_ptr<LibraryInfo> GetLibraryInfo(const std::string& libraryPath);
-    void DoUnloadLib(std::string& libraryPath);
+    void DoUnloadLib(const std::string& libraryPath);
 };
 
 template<typename FuncType>
@@ -86,12 +84,12 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
         std::shared_lock<std::shared_mutex> readLock(libInfo->mutex);
         libInfo->refCount++;
 
-        if (!libInfo->handle) {
+        if (libInfo->handle == nullptr) {
             readLock.unlock();
             std::unique_lock<std::shared_mutex> writeLock(libInfo->mutex);
-            if (!libInfo->handle) {
+            if (libInfo->handle == nullptr) {
                 libInfo->handle = dlopen(libraryPath.c_str(), RTLD_LAZY);
-                if (!libInfo->handle) {
+                if (libInfo->handle == nullptr) {
                     libInfo->refCount--;
                     LOGE("dlopen failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
                     return nullptr;
@@ -101,7 +99,7 @@ FuncType DMLibraryManager::GetFunction(const std::string& libraryPath, const std
     }
 
     void* sym = dlsym(libInfo->handle, functionName.c_str());
-    if (!sym) {
+    if (sym == nullptr) {
         libInfo->refCount--;
         LOGE("dlopen failed for %{public}s: %{public}s", libraryPath.c_str(), dlerror());
         return nullptr;

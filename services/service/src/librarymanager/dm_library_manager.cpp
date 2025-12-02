@@ -74,7 +74,7 @@ std::shared_ptr<DMLibraryManager::LibraryInfo> DMLibraryManager::GetLibraryInfo(
     return nullptr;
 }
 
-void DMLibraryManager::DoUnloadLib(std::string& libraryPath)
+void DMLibraryManager::DoUnloadLib(const std::string& libraryPath)
 {
     auto libInfo = GetLibraryInfo(libraryPath);
     if (libInfo == nullptr) {
@@ -88,14 +88,12 @@ void DMLibraryManager::DoUnloadLib(std::string& libraryPath)
         std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count());
     int32_t freeTimeSpan = static_cast<int32_t>(nowSec - libInfo->lastUsed);
 
-    if ((currentRefs == 0 && freeTimeSpan >= LIB_UNLOAD_TRIGGER_FREE_TIMESPAN) ||
-        (currentRefs != 0 && freeTimeSpan >= LIB_UNLOAD_TRIGGER_MAX_FREE_TIMESPAN)) {
+    if (currentRefs == 0 && freeTimeSpan >= LIB_UNLOAD_TRIGGER_FREE_TIMESPAN) {
         if (libInfo->handle != nullptr) {
             LOGI("Do unload lib: %{public}s", libraryPath.c_str());
             dlclose(libInfo->handle);
             libInfo->handle = nullptr;
             libInfo->isLibTimerBegin = false;
-            libInfo->refCount.store(0, std::memory_order_relaxed);
         }
         libInfo->libTimer->DeleteTimer(libraryPath);
     } else {
@@ -111,7 +109,7 @@ void DMLibraryManager::DoUnloadLib(std::string& libraryPath)
 void DMLibraryManager::Release(const std::string& libraryPath)
 {
     auto libInfo = GetLibraryInfo(libraryPath);
-    if (!libInfo) {
+    if (libInfo == nullptr) {
         return;
     }
 
