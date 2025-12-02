@@ -160,6 +160,7 @@ private:
     void HandleSoftBusServerAdd();
 
 private:
+    ffrt::mutex registerLock_;
     bool registerToService_;
     ServiceRunningState state_;
     mutable ffrt::mutex listenerLock_;

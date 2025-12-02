@@ -524,6 +524,7 @@ static uint64_t GenerateRandNum(int sessionId)
 int32_t DeviceManagerServiceImpl::Initialize(const std::shared_ptr<IDeviceManagerServiceListener> &listener)
 {
     LOGI("Initialize");
+    std::lock_guard<ffrt::mutex> lock(dmServiceImplInitMutex_);
     if (softbusConnector_ == nullptr) {
         softbusConnector_ = std::make_shared<SoftbusConnector>();
     }
@@ -596,6 +597,7 @@ void DeviceManagerServiceImpl::ReleaseMaps()
 void DeviceManagerServiceImpl::Release()
 {
     LOGI("Release");
+    std::lock_guard<ffrt::mutex> lock(dmServiceImplInitMutex_);
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
     commonEventManager_ = nullptr;
 #endif

@@ -65,6 +65,7 @@ constexpr int32_t ECHO_COUNT = 2;
 //LCOV_EXCL_START
 IpcServerStub::IpcServerStub() : SystemAbility(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID, true)
 {
+    std::lock_guard<ffrt::mutex> autoLock(registerLock_);
     registerToService_ = false;
     state_ = ServiceRunningState::STATE_NOT_START;
 }
@@ -229,6 +230,7 @@ bool IpcServerStub::Init()
     LOGI("IpcServerStub::Init ready to init.");
     KVAdapterManager::GetInstance().Init();
     DeviceManagerService::GetInstance().InitDMServiceListener();
+    std::lock_guard<ffrt::mutex> autoLock(registerLock_);
     if (!registerToService_) {
         bool ret = Publish(this);
         LOGI("Publish, cost %{public}" PRId64 " ms", GetTickCount() -  startBeginTime_);
@@ -246,7 +248,10 @@ void IpcServerStub::OnStop()
     LOGI("IpcServerStub::OnStop ready to stop service.");
     DeviceManagerService::GetInstance().UninitDMServiceListener();
     state_ = ServiceRunningState::STATE_NOT_START;
-    registerToService_ = false;
+    {
+        std::lock_guard<ffrt::mutex> autoLock(registerLock_);
+        registerToService_ = false;
+    }
 #ifdef SUPPORT_MEMMGR
     int pid = getpid();
     Memory::MemMgrClient::GetInstance().NotifyProcessStatus(pid, 1, 0, DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);

@@ -350,6 +350,7 @@ int32_t DiscoveryManager::StopDiscoveringByInnerSubId(const std::string &pkgName
 
         if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
             discoveryContextMap_.erase(pkgName);
+            std::lock_guard<std::mutex> autoLock(timerLocks_);
             if (timer_ != nullptr) {
                 timer_->DeleteTimer(pkgName);
             }
@@ -485,6 +486,7 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
         }
         if (discoveryContextMap_.find(pkgName) != discoveryContextMap_.end()) {
             discoveryContextMap_.erase(pkgName);
+            std::lock_guard<std::mutex> lock(timerLocks_);
             if (timer_ != nullptr) {
                 timer_->DeleteTimer(pkgName);
             }
@@ -502,6 +504,7 @@ void DiscoveryManager::OnDiscoveringResult(const std::string &pkgName, int32_t s
 
 void DiscoveryManager::StartDiscoveryTimer(const std::string &pkgName)
 {
+    std::lock_guard<std::mutex> autoLock(timerLocks_);
     if (timer_ == nullptr) {
         timer_ = std::make_shared<DmTimer>();
     }
@@ -611,6 +614,7 @@ int32_t DiscoveryManager::GetDeviceAclParam(const std::string &pkgName, int32_t 
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE))
 IDeviceProfileConnector* DiscoveryManager::GetCommonDependencyObj()
 {
+    std::lock_guard<std::mutex> lock(comDependencyLoadLock);
     return dpConnector_;
 }
 
@@ -680,6 +684,7 @@ void DiscoveryManager::ClearDiscoveryCache(const ProcessInfo &processInfo)
         softbusListener_->StopRefreshSoftbusLNN(innerSubId);
     }
 
+    std::lock_guard<std::mutex> autoLock(timerLocks_);
     CHECK_NULL_VOID(timer_);
     for (auto it : subscribeIdSet) {
         std::string pkgNameTemp = (ComposeStr(ComposeStr(processInfo.pkgName, it), processInfo.userId));

@@ -258,7 +258,7 @@ int32_t DmAuthStateMachine::TransitionTo(std::shared_ptr<DmAuthState> state)
             LOGE("DmAuthStateMachine: The state transition does not meet the rule from %{public}d to %{public}d.",
                 preState_, nextState);
             ret = ERR_DM_NEXT_STATE_INVALID;
-            reason = ERR_DM_NEXT_STATE_INVALID;
+            reason.store(ERR_DM_NEXT_STATE_INVALID);
             if (direction_ == DM_AUTH_SOURCE) {
                 statesQueue_.push(std::make_shared<AuthSrcFinishState>());
                 preState_ = DmAuthStateType::AUTH_SRC_FINISH_STATE;
@@ -343,8 +343,8 @@ void DmAuthStateMachine::Run(std::shared_ptr<DmAuthContext> context)
         if (!state.has_value()) {
             break;
         }
-        if (reason != DM_OK) {
-            context->reason = reason;
+        if (reason.load() != DM_OK) {
+            context->reason = reason.load();
         }
         // Obtain the status and execute the status action.
         DmAuthStateType stateType = state.value()->GetStateType();
