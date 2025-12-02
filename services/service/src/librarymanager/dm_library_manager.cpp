@@ -91,7 +91,11 @@ void DMLibraryManager::DoUnloadLib(const std::string& libraryPath)
     if (currentRefs == 0 && freeTimeSpan >= LIB_UNLOAD_TRIGGER_FREE_TIMESPAN) {
         if (libInfo->handle != nullptr) {
             LOGI("Do unload lib: %{public}s", libraryPath.c_str());
-            dlclose(libInfo->handle);
+            int32_t ret = dlclose(libInfo->handle);
+            if (ret != 0) {
+                LOGE("dlclose lib: %{public}s failed, ret: %{public}d, err: %{public}s",
+                    libraryPath.c_str(), ret, dlerror());
+            }
             libInfo->handle = nullptr;
             libInfo->isLibTimerBegin = false;
         }
