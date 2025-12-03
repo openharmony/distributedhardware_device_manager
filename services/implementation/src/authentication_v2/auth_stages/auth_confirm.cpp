@@ -557,9 +557,23 @@ void AuthSrcConfirmState::GetSrcCredentialInfo(std::shared_ptr<DmAuthContext> co
 {
     LOGI("start.");
     CHECK_NULL_VOID(context);
-    GetIdenticalCredentialInfo(context, credInfo);
-    GetShareCredentialInfo(context, credInfo);
-    GetP2PCredentialInfo(context, credInfo);
+    // get identical credential
+    if (context->accesser.accountIdHash == context->accessee.accountIdHash) {
+        GetIdenticalCredentialInfo(context, credInfo);
+        GetP2PCredentialInfo(context, credInfo);
+    }
+    // get share credential
+    if (context->accesser.accountIdHash != context->accessee.accountIdHash &&
+        context->accesser.accountIdHash != Crypto::GetAccountIdHash16("ohosAnonymousUid") &&
+        context->accessee.accountIdHash != Crypto::GetAccountIdHash16("ohosAnonymousUid")) {
+        GetShareCredentialInfo(context, credInfo);
+        GetP2PCredentialInfo(context, credInfo);
+    }
+    // get point_to_point credential
+    if (context->accesser.accountIdHash == Crypto::GetAccountIdHash16("ohosAnonymousUid") ||
+        context->accessee.accountIdHash == Crypto::GetAccountIdHash16("ohosAnonymousUid")) {
+        GetP2PCredentialInfo(context, credInfo);
+    }
     std::vector<std::string> deleteCredInfo;
     for (auto &item : credInfo.Items()) { // id1:json1, id2:json2, id3:json3
         if (!item.Contains(FILED_CRED_ID) || !item[FILED_CRED_ID].IsString()) {
