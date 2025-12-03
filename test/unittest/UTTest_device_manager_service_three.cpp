@@ -907,19 +907,6 @@ HWTEST_F(DeviceManagerServiceThreeTest, ProcessReceiveRspAppUnbind_302, testing:
     EXPECT_EQ(DeviceManagerService::GetInstance().timer_, nullptr);
 }
 
-HWTEST_F(DeviceManagerServiceThreeTest, StartDetectDeviceRisk_301, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().isDeviceRiskDetectSoLoaded_ = false;
-    DeviceManagerService::GetInstance().StartDetectDeviceRisk();
-    EXPECT_EQ(DeviceManagerService::GetInstance().isDeviceRiskDetectSoLoaded_, false);
-}
-
-HWTEST_F(DeviceManagerServiceThreeTest, UnloadDMDeviceRiskDetect_301, testing::ext::TestSize.Level1)
-{
-    DeviceManagerService::GetInstance().UnloadDMDeviceRiskDetect();
-    EXPECT_EQ(DeviceManagerService::GetInstance().dmDeviceRiskDetect_, nullptr);
-}
-
 HWTEST_F(DeviceManagerServiceThreeTest, OpenAuthSessionWithPara_001, testing::ext::TestSize.Level1)
 {
     int64_t serviceId = 12345;

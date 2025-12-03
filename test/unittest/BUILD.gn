@@ -104,6 +104,7 @@ group("unittest") {
     ":UTTest_softbus_listener_two",
     ":UTTest_softbus_publish",
     ":UTTest_softbus_session",
+    ":UTTest_dm_library_manager_test",
   ]
 }
 
@@ -2550,3 +2551,29 @@ ohos_unittest("UTTest_freeze_process") {
 }
 
 ## UnitTest UTTest_freeze_process }}}
+
+## UnitTest UTTest_dm_library_manager_test {{{
+
+ohos_unittest("UTTest_dm_library_manager_test") {
+  module_out_path = module_out_path
+
+  include_dirs = [
+    "${devicemanager_path}/commondependency/include",
+    "${devicemanager_path}/radar/include",
+  ]
+
+  sources = [ "UTTest_dm_library_manager_test.cpp" ]
+
+  deps = [ ":device_manager_test_common" ]
+
+  external_deps = [
+    "device_info_manager:distributed_device_profile_common",
+    "device_info_manager:distributed_device_profile_sdk",
+    "dsoftbus:softbus_client",
+    "ffrt:libffrt",
+    "googletest:gmock",
+    "hilog:libhilog",
+  ]
+}
+
+## UnitTest UTTest_dm_library_manager_test }}}
