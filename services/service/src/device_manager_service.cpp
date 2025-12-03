@@ -238,9 +238,6 @@ void DeviceManagerService::DelAllRelateShip()
 void DeviceManagerService::SubscribePublishCommonEvent()
 {
     LOGI("DeviceManagerServiceImpl::SubscribeCommonEvent");
-    if (publshCommonEventManager_ == nullptr) {
-        publshCommonEventManager_ = std::make_shared<DmPublishCommonEventManager>();
-    }
     PublishEventCallback callback = [=](const auto &arg1, const auto &arg2, const auto &arg3) {
         OHOS::DistributedHardware::PublishCommonEventCallback(arg1, arg2, arg3);
     };
@@ -254,6 +251,10 @@ void DeviceManagerService::SubscribePublishCommonEvent()
 #endif // SUPPORT_WIFI
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
+    std::lock_guard<ffrt::mutex> lock(eventManagerLock_);
+    if (publshCommonEventManager_ == nullptr) {
+        publshCommonEventManager_ = std::make_shared<DmPublishCommonEventManager>();
+    }
     if (publshCommonEventManager_->SubscribePublishCommonEvent(PublishCommonEventVec, callback)) {
         LOGI("subscribe ble and wifi and screen common event success");
     }
@@ -291,7 +292,12 @@ DM_EXPORT void DeviceManagerService::SubscribeDataShareCommonEvent()
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
 void DeviceManagerService::QueryDependsSwitchState()
 {
-    std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = publshCommonEventManager_->GetSubscriber();
+    std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = nullptr;
+    {
+        std::lock_guard<ffrt::mutex> lock(eventManagerLock_);
+        CHECK_NULL_VOID(publshCommonEventManager_);
+        publishSubScriber = publshCommonEventManager_->GetSubscriber();
+    }
     CHECK_NULL_VOID(publishSubScriber);
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     CHECK_NULL_VOID(samgr);
@@ -323,19 +329,17 @@ void DeviceManagerService::QueryDependsSwitchState()
     }
 #endif // SUPPORT_WIFI
 
+    ScreenState state = DM_SCREEN_ON;
 #ifdef SUPPORT_POWER_MANAGER
     if (samgr->CheckSystemAbility(POWER_MANAGER_SERVICE_ID) == nullptr) {
-        publishSubScriber->SetScreenState(DM_SCREEN_OFF);
+        state = DM_SCREEN_OFF;
     } else {
-        if (OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
-            publishSubScriber->SetScreenState(DM_SCREEN_ON);
-        } else {
-            publishSubScriber->SetScreenState(DM_SCREEN_OFF);
+        if (!OHOS::PowerMgr::PowerMgrClient::GetInstance().IsScreenOn()) {
+            state = DM_SCREEN_OFF;
         }
     }
-#else
-    publishSubScriber->SetScreenState(DM_SCREEN_ON);
 #endif // SUPPORT_POWER_MANAGER
+    publishSubScriber->SetScreenState(state);
     OHOS::DistributedHardware::PublishCommonEventCallback(publishSubScriber->GetBluetoothState(),
         publishSubScriber->GetWifiState(), publishSubScriber->GetScreenState());
 }
@@ -1158,15 +1162,18 @@ int32_t DeviceManagerService::SetUserOperation(std::string &pkgName, int32_t act
         return ERR_DM_INPUT_PARA_INVALID;
     }
     int32_t metaType = paramJson[PARAM_KEY_META_TYPE].Get<int32_t>();
-    if (metaType != PROXY_DEFAULT && IsDMServiceAdapterSoLoaded()) {
-        LOGE("SetUserOperation metaType: %{public}d", metaType);
-        dmServiceImplExtResident_->ReplyUiAction(pkgName, action, params);
+    int32_t ret = ERR_DM_FAILED;
+    if (metaType != PROXY_DEFAULT) {
+        if (IsDMServiceAdapterSoLoaded()) {
+            LOGI("SetUserOperation metaType: %{public}d", metaType);
+            ret = dmServiceImplExtResident_->ReplyUiAction(pkgName, action, params);
+        }
+    } else {
+        if (IsDMServiceImplReady()) {
+            ret =dmServiceImpl_->SetUserOperation(pkgName, action, params);
+        }
     }
-    if (metaType != PROXY_DEFAULT || !IsDMServiceImplReady()) {
-        LOGE("SetUserOperation failed, instance not init or init failed.");
-        return ERR_DM_NOT_INIT;
-    }
-    return dmServiceImpl_->SetUserOperation(pkgName, action, params);
+    return ret;
 }
 
 void DeviceManagerService::HandleDeviceStatusChange(DmDeviceState devState, DmDeviceInfo &devInfo)
@@ -2468,6 +2475,7 @@ void DeviceManagerService::NotifyRemoteAccountCommonEventByWifi(const std::strin
             UpdateAcl(localUdid, updateUdids, foregroundUserIds, backgroundUserIds);
             continue;
         }
+        std::lock_guard<std::mutex> autoLock(timerLocks_);
         if (timer_ == nullptr) {
             timer_ = std::make_shared<DmTimer>();
         }
@@ -2710,6 +2718,7 @@ void DeviceManagerService::ProcessSyncUserIds(const std::vector<uint32_t> &foreg
     if (softbusListener_ != nullptr) {
         softbusListener_->SetForegroundUserIdsToDSoftBus(remoteUdid, foregroundUserIds);
     }
+    std::lock_guard<std::mutex> autoLock(timerLocks_);
     if (timer_ != nullptr) {
         timer_->DeleteTimer(std::string(USER_SWITCH_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
     }
@@ -2807,8 +2816,11 @@ void DeviceManagerService::ProcessCommonUserStatusEvent(const std::vector<uint32
         GetIntegerList<uint32_t>(foregroundUserIds).c_str(), GetIntegerList<uint32_t>(backgroundUserIds).c_str(),
         GetAnonyString(remoteUdid).c_str());
 
-    if (timer_ != nullptr) {
-        timer_->DeleteTimer(std::string(ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+    {
+        std::lock_guard<std::mutex> autoLock(timerLocks_);
+        if (timer_ != nullptr) {
+            timer_->DeleteTimer(std::string(ACCOUNT_COMMON_EVENT_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
+        }
     }
     if (IsDMServiceImplReady()) {
         dmServiceImpl_->HandleCommonEventBroadCast(foregroundUserIds, backgroundUserIds, remoteUdid);
@@ -3607,6 +3619,7 @@ void DeviceManagerService::NotifyRemoteUninstallAppByWifi(int32_t userId, int32_
             LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
             continue;
         }
+        std::lock_guard<std::mutex> autoLock(timerLocks_);
         if (timer_ == nullptr) {
             timer_ = std::make_shared<DmTimer>();
         }
@@ -3633,6 +3646,7 @@ void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t t
             LOGE("by wifi failed: %{public}s", GetAnonyString(it.first).c_str());
             continue;
         }
+        std::lock_guard<std::mutex> autoLock(timerLocks_);
         if (timer_ == nullptr) {
             timer_ = std::make_shared<DmTimer>();
         }
@@ -3648,6 +3662,7 @@ void DeviceManagerService::NotifyRemoteUnBindAppByWifi(int32_t userId, int32_t t
 void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remoteUdid)
 {
     LOGI("ProcessReceiveRspAppUninstall remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    std::lock_guard<std::mutex> autoLock(timerLocks_);
     if (timer_ != nullptr && remoteUdid != "") {
         timer_->DeleteTimer(std::string(APP_UNINSTALL_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
     }
@@ -3656,6 +3671,7 @@ void DeviceManagerService::ProcessReceiveRspAppUninstall(const std::string &remo
 void DeviceManagerService::ProcessReceiveRspAppUnbind(const std::string &remoteUdid)
 {
     LOGI("ProcessReceiveRspAppUnbind remoteUdid: %{public}s", GetAnonyString(remoteUdid).c_str());
+    std::lock_guard<std::mutex> autoLock(timerLocks_);
     if (timer_ != nullptr && remoteUdid != "") {
         timer_->DeleteTimer(std::string(APP_UNBIND_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(remoteUdid));
     }
@@ -3805,9 +3821,12 @@ void DeviceManagerService::DivideNotifyMethod(const std::vector<std::string> &pe
 void DeviceManagerService::HandleUserStop(int32_t stopUserId, const std::string &stopEventUdid,
     const std::vector<std::string> &acceptEventUdids)
 {
-    if (timer_ != nullptr) {
-        for (const auto &udid : acceptEventUdids) {
-            timer_->DeleteTimer(std::string(USER_STOP_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid));
+    {
+        std::lock_guard<std::mutex> autoLock(timerLocks_);
+        if (timer_ != nullptr) {
+            for (const auto &udid : acceptEventUdids) {
+                timer_->DeleteTimer(std::string(USER_STOP_BY_WIFI_TIMEOUT_TASK) + Crypto::Sha256(udid));
+            }
         }
     }
     if (MultipleUserConnector::IsUserUnlocked(stopUserId)) {
@@ -3878,6 +3897,7 @@ void DeviceManagerService::NotifyRemoteLocalUserStopByWifi(const std::string &lo
             HandleUserStop(stopUserId, localUdid, updateUdids);
             continue;
         }
+        std::lock_guard<std::mutex> autoLock(timerLocks_);
         if (timer_ == nullptr) {
             timer_ = std::make_shared<DmTimer>();
         }

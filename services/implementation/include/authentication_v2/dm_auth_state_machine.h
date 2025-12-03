@@ -122,7 +122,7 @@ private:
 
     // Direction of authentication
     DmAuthDirection direction_;
-    int32_t reason{DM_OK};
+    std::atomic<int32_t> reason{DM_OK};
 
     // Thread for state machine execution
     std::thread thread_;

@@ -108,6 +108,7 @@ private:
 private:
     std::mutex locks_;
     std::mutex subIdMapLocks_;
+    std::mutex timerLocks_;
     std::shared_ptr<DmTimer> timer_;
     // Caller subId to inner subId. The key is the caller pkgName, the value is
     // a list of externals subId to inner subId.

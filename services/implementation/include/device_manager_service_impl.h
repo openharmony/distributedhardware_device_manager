@@ -316,6 +316,7 @@ private:
         int32_t &bindLevel);
     void DeleteGroupByBundleName(const std::string &localUdid, int32_t userId, const std::vector<DmAclIdParam> &acls);
 private:
+    ffrt::mutex dmServiceImplInitMutex_;
     ffrt::mutex authMgrMtx_;
     std::shared_ptr<AuthManagerBase> authMgr_;     // Old protocol only
     bool isNeedJoinLnn_ = true;

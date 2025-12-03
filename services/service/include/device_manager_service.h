@@ -487,11 +487,13 @@ private:
     int64_t SendLastBroadCastTime_ = 0;
     int64_t lastDelayTime_ = 0;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
+    ffrt::mutex eventManagerLock_;
     std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
     DM_EXPORT std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
 #endif
     std::string localNetWorkId_ = "";
+    std::mutex timerLocks_;
     std::shared_ptr<DmTimer> timer_;
 #if !(defined(__LITEOS_M__) || defined(LITE_DEVICE)) && !defined(DEVICE_MANAGER_COMMON_FLAG)
     bool isAdapterCheckApiWhiteListSoLoaded_ = false;

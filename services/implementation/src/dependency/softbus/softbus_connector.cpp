@@ -1022,11 +1022,13 @@ void SoftbusConnector::OnLeaveLNNResult(const char *networkId, int32_t retCode)
 
 void SoftbusConnector::RegisterLeaveLNNCallback(std::shared_ptr<ISoftbusLeaveLNNCallback> callback)
 {
+    std::lock_guard<std::mutex> lock(leaveLNNMutex_);
     leaveLNNCallback_ = callback;
 }
 
 void SoftbusConnector::UnRegisterLeaveLNNCallback()
 {
+    std::lock_guard<std::mutex> lock(leaveLNNMutex_);
     leaveLNNCallback_ = nullptr;
 }
 } // namespace DistributedHardware
