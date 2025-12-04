@@ -488,7 +488,7 @@ private:
     int64_t lastDelayTime_ = 0;
 #if defined(SUPPORT_BLUETOOTH) || defined(SUPPORT_WIFI)
     ffrt::mutex eventManagerLock_;
-    std::shared_ptr<DmPublishCommonEventManager> publshCommonEventManager_;
+    std::shared_ptr<DmPublishCommonEventManager> publishCommonEventManager_;
 #endif // SUPPORT_BLUETOOTH  SUPPORT_WIFI
     DM_EXPORT std::shared_ptr<DmDataShareCommonEventManager> dataShareCommonEventManager_;
 #endif

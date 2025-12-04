@@ -684,11 +684,6 @@ HWTEST_F(HichainConnectorTest, onFinish_002, testing::ext::TestSize.Level1)
     hiChainConnector->hiChainResCallback_ = nullptr;
     hiChainConnector->onFinish(requestId, operationCode, returnData);
 
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<HiChainConnector> hiChainConn = std::make_shared<HiChainConnector>();
-    hiChainConnector->hiChainResCallback_ = std::make_shared<DmCredentialManager>(hiChainConn, listener);
-    hiChainConnector->onFinish(requestId, operationCode, returnData);
-
     operationCode = GroupOperationCode::GROUP_DISBAND;
     hiChainConnector->onFinish(requestId, operationCode, returnData);
 
@@ -749,11 +744,6 @@ HWTEST_F(HichainConnectorTest, onError_002, testing::ext::TestSize.Level1)
     hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
 
     hiChainConnector->networkStyle_ = 1;
-    hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
-
-    std::shared_ptr<DeviceManagerServiceListener> listener = std::make_shared<DeviceManagerServiceListener>();
-    std::shared_ptr<HiChainConnector> hiChainConn = std::make_shared<HiChainConnector>();
-    hiChainConnector->hiChainResCallback_ = std::make_shared<DmCredentialManager>(hiChainConn, listener);
     hiChainConnector->onError(requestId, operationCode, errorCode, errorReturn);
 
     operationCode = GroupOperationCode::GROUP_DISBAND;

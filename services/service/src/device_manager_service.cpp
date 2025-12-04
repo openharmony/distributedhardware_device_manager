@@ -252,10 +252,10 @@ void DeviceManagerService::SubscribePublishCommonEvent()
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_ON);
     PublishCommonEventVec.emplace_back(CommonEventSupport::COMMON_EVENT_SCREEN_OFF);
     std::lock_guard<ffrt::mutex> lock(eventManagerLock_);
-    if (publshCommonEventManager_ == nullptr) {
-        publshCommonEventManager_ = std::make_shared<DmPublishCommonEventManager>();
+    if (publishCommonEventManager_ == nullptr) {
+        publishCommonEventManager_ = std::make_shared<DmPublishCommonEventManager>();
     }
-    if (publshCommonEventManager_->SubscribePublishCommonEvent(PublishCommonEventVec, callback)) {
+    if (publishCommonEventManager_->SubscribePublishCommonEvent(PublishCommonEventVec, callback)) {
         LOGI("subscribe ble and wifi and screen common event success");
     }
     return;
@@ -295,8 +295,8 @@ void DeviceManagerService::QueryDependsSwitchState()
     std::shared_ptr<DmPublishEventSubscriber> publishSubScriber = nullptr;
     {
         std::lock_guard<ffrt::mutex> lock(eventManagerLock_);
-        CHECK_NULL_VOID(publshCommonEventManager_);
-        publishSubScriber = publshCommonEventManager_->GetSubscriber();
+        CHECK_NULL_VOID(publishCommonEventManager_);
+        publishSubScriber = publishCommonEventManager_->GetSubscriber();
     }
     CHECK_NULL_VOID(publishSubScriber);
     auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
